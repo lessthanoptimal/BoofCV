@@ -27,6 +27,7 @@ import boofcv.struct.feature.TupleDesc;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class HybridTrack<TD extends TupleDesc<TD>> extends PointTrack {
 	// KLT feature description
 	public PyramidKltFeature trackKlt;

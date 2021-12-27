@@ -22,18 +22,18 @@ import boofcv.misc.BoofLambdas;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Default implementations for all functions in {@link DescribePoint}. Primary for testing purposes.
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway"})
 public abstract class DescribePointAbstract<T extends ImageBase<T>, TD extends TupleDesc<TD>>
 		implements DescribePoint<T, TD> {
 
-	protected @Nullable Class<TD> type;
-	protected @Nullable BoofLambdas.Factory<TD> factory;
+	protected Class<TD> type;
+	protected BoofLambdas.Factory<TD> factory;
 
 	protected DescribePointAbstract(){}
 

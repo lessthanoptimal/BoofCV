@@ -109,7 +109,7 @@ public class ImplSsdCornerNaive<T extends ImageGray<T>> implements GradientCorne
 
 	@Override
 	public Class<T> getInputType() {
-		return null; // unknown until called.
+		throw new RuntimeException("Unknown");
 	}
 
 }

@@ -40,12 +40,13 @@ import org.ddogleg.struct.DogArray_I32;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class Watershed_to_ImageSuperpixels<T extends ImageBase<T>> implements ImageSuperpixels<T> {
 
 	private WatershedVincentSoille1991 alg;
 	private ConnectRule rule;
 
-	private GrayU8 converted = new GrayU8(1,1);
+	private GrayU8 converted = new GrayU8(1, 1);
 
 	private MergeSmallRegions<GrayU8> pruneSmall;
 
@@ -58,20 +59,20 @@ public class Watershed_to_ImageSuperpixels<T extends ImageBase<T>> implements Im
 	// but is required by the interface
 	private ImageType<T> imageType;
 
-	public Watershed_to_ImageSuperpixels(WatershedVincentSoille1991 alg, int minimumSize, ConnectRule rule) {
+	public Watershed_to_ImageSuperpixels( WatershedVincentSoille1991 alg, int minimumSize, ConnectRule rule ) {
 		this.alg = alg;
 		this.rule = rule;
 
-		if( minimumSize > 0 )
-			pruneSmall = new MergeSmallRegions<>(minimumSize,rule,new ComputeRegionMeanColor.U8());
+		if (minimumSize > 0)
+			pruneSmall = new MergeSmallRegions<>(minimumSize, rule, new ComputeRegionMeanColor.U8());
 	}
 
 	@Override
-	public void segment(T input, GrayS32 output) {
-		InputSanityCheck.checkSameShape(input,output);
-		converted.reshape(input.width,input.height);
+	public void segment( T input, GrayS32 output ) {
+		InputSanityCheck.checkSameShape(input, output);
+		converted.reshape(input.width, input.height);
 
-		GConvertImage.convert(input,converted);
+		GConvertImage.convert(input, converted);
 
 		// segment the image
 		alg.process(converted);
@@ -81,12 +82,12 @@ public class Watershed_to_ImageSuperpixels<T extends ImageBase<T>> implements Im
 		GrayS32 pixelToRegion = alg.getOutput();
 
 		// Merge small regions together
-		if( pruneSmall != null ) {
+		if (pruneSmall != null) {
 			regionMemberCount.resize(numRegions);
 			regionColor.resize(numRegions);
 
-			ImageSegmentationOps.countRegionPixels(pixelToRegion,numRegions,regionMemberCount.data);
-			pruneSmall.process(converted,pixelToRegion,regionMemberCount,regionColor);
+			ImageSegmentationOps.countRegionPixels(pixelToRegion, numRegions, regionMemberCount.data);
+			pruneSmall.process(converted, pixelToRegion, regionMemberCount, regionColor);
 
 			numRegions = regionMemberCount.size();
 		}
@@ -109,7 +110,7 @@ public class Watershed_to_ImageSuperpixels<T extends ImageBase<T>> implements Im
 		return imageType;
 	}
 
-	public void setImageType(ImageType<T> imageType) {
+	public void setImageType( ImageType<T> imageType ) {
 		this.imageType = imageType;
 	}
 }

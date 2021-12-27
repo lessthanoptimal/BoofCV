@@ -158,7 +158,7 @@ public class FactorySegmentationAlg {
 	}
 
 	public static <T extends ImageBase<T>>
-	SegmentSlic<T> slic( ConfigSlic config, ImageType<T> imageType ) {
+	SegmentSlic<T> slic( @Nullable ConfigSlic config, ImageType<T> imageType ) {
 		if (config == null)
 			throw new IllegalArgumentException("No default configuration since the number of segments must be specified.");
 

@@ -29,6 +29,7 @@ import boofcv.struct.pyramid.ImagePyramid;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class PyramidKltForHybrid<I extends ImageGray<I>, D extends ImageGray<D>> {
 	/** configuration for low level KLT tracker */
 	public ConfigKlt config;
@@ -55,8 +56,7 @@ public class PyramidKltForHybrid<I extends ImageGray<I>, D extends ImageGray<D>>
 		tracker = new PyramidKltTracker<>(klt);
 	}
 
-	protected PyramidKltForHybrid() {
-	}
+	protected PyramidKltForHybrid() {}
 
 	public void setDescription( float x, float y, PyramidKltFeature ret ) {
 		ret.setPosition(x, y);

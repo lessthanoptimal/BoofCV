@@ -44,7 +44,8 @@ public class WrapperHessianThreeImageDetIntensity<I extends ImageGray<I>, D exte
 	}
 
 	@Override
-	public void process( I image, D derivX, D derivY, D derivXX, D derivYY, D derivXY ) {
+	public void process( I image, @Nullable D derivX, @Nullable D derivY,
+						 @Nullable D derivXX, @Nullable D derivYY, @Nullable D derivXY ) {
 		init(image.width, image.height);
 		if (image instanceof GrayU8) {
 			HessianThreeDeterminant.process((GrayU8)image, intensity, borderS32);

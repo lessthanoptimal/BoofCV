@@ -83,6 +83,7 @@ import java.util.Arrays;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class DescribeDenseHogAlg<Input extends ImageBase<Input>> extends BaseDenseHog<Input> {
 
 	// orientation and magnitude of each pixel

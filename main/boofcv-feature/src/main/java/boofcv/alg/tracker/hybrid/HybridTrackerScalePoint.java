@@ -48,6 +48,7 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class HybridTrackerScalePoint
 		<I extends ImageGray<I>, D extends ImageGray<D>, TD extends TupleDesc<TD>> {
 	// The max number of allowed unassociated tracks before it starts to drop them

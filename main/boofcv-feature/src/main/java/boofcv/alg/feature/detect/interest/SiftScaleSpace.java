@@ -44,6 +44,7 @@ import lombok.Getter;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class SiftScaleSpace {
 
 	// Storages images for all the octaves
@@ -95,7 +96,7 @@ public class SiftScaleSpace {
 	public SiftScaleSpace( int firstOctave, int lastOctave,
 						   int numScales,
 						   double sigma0 ) {
-		BoofMiscOps.checkTrue(firstOctave>=-1);
+		BoofMiscOps.checkTrue(firstOctave >= -1);
 
 		if (lastOctave <= firstOctave)
 			throw new IllegalArgumentException("Last octave must be more than the first octave");
@@ -143,7 +144,7 @@ public class SiftScaleSpace {
 	/**
 	 * Checks to see if the octave is too small to process and no more layers should be processed
 	 */
-	public boolean isOctaveTooSmall(int octaveIdx) {
+	public boolean isOctaveTooSmall( int octaveIdx ) {
 		Octave o = octaves[octaveIdx];
 		return o.scales[0].width < 10 || o.scales[0].height < 10;
 	}
@@ -188,8 +189,8 @@ public class SiftScaleSpace {
 			}
 
 			// Create the first image in the octave using the scale which has 2x the blur of the initial image
-			if (octaveIdx+1<octaves.length)
-				PyramidOps.scaleDown2(octaves[octaveIdx].scales[numScales], octaves[octaveIdx+1].scales[0]);
+			if (octaveIdx + 1 < octaves.length)
+				PyramidOps.scaleDown2(octaves[octaveIdx].scales[numScales], octaves[octaveIdx + 1].scales[0]);
 		}
 	}
 
@@ -255,7 +256,7 @@ public class SiftScaleSpace {
 	 *
 	 * @return pixel size to input image
 	 */
-	public double pixelScaleCurrentToInput(int octave) {
+	public double pixelScaleCurrentToInput( int octave ) {
 		return Math.pow(2.0, octave);
 	}
 

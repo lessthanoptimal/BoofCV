@@ -222,6 +222,7 @@ public class DescribeDenseHogFastAlg<Input extends ImageBase<Input>> extends Bas
 		return cells[row*cellCols + col];
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	public static class Cell {
 		public float[] histogram;
 

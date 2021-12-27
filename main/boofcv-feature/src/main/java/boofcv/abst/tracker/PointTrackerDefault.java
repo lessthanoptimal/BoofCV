@@ -20,6 +20,7 @@ package boofcv.abst.tracker;
 
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,89 +34,55 @@ import java.util.List;
 public class PointTrackerDefault<T extends ImageBase<T>> implements PointTracker<T> {
 	public long frameID;
 
-	public PointTrackerDefault() {
-		reset();
-	}
+	public PointTrackerDefault() {reset();}
 
-	@Override
-	public void process(T image) {
-		frameID++;
-	}
+	@Override public void process( T image ) {frameID++;}
 
-	@Override
-	public void reset() {
-		frameID = -1;
-	}
+	@Override public void reset() {frameID = -1;}
 
-	@Override
-	public long getFrameID() {
-		return frameID;
-	}
+	@Override public long getFrameID() {return frameID;}
 
-	@Override
-	public int getTotalActive() {
-		return 0;
-	}
+	@Override public int getTotalActive() {return 0;}
 
-	@Override
-	public int getTotalInactive() {
-		return 0;
-	}
+	@Override public int getTotalInactive() {return 0;}
 
-	@Override
-	public void dropAllTracks() {
-	}
+	@Override public void dropAllTracks() {}
 
-	@Override
-	public int getMaxSpawn() {
-		return 0;
-	}
+	@Override public int getMaxSpawn() {return 0;}
 
-	@Override
-	public boolean dropTrack(PointTrack track) {
-		return false;
-	}
+	@Override public boolean dropTrack( PointTrack track ) {return false;}
 
-	@Override
-	public void dropTracks(Dropper dropper) {
-	}
+	@Override public void dropTracks( Dropper dropper ) {}
 
-	@Override
-	public List<PointTrack> getAllTracks(List<PointTrack> list) {
-		if( list != null )
+	@Override public List<PointTrack> getAllTracks( @Nullable List<PointTrack> list ) {
+		if (list != null)
 			return list;
 		return new ArrayList<>();
 	}
 
-	@Override
-	public List<PointTrack> getActiveTracks(List<PointTrack> list) {
-		if( list != null )
+	@Override public List<PointTrack> getActiveTracks( @Nullable List<PointTrack> list ) {
+		if (list != null)
 			return list;
 		return new ArrayList<>();
 	}
 
-	@Override
-	public List<PointTrack> getInactiveTracks(List<PointTrack> list) {
-		if( list != null )
+	@Override public List<PointTrack> getInactiveTracks( @Nullable List<PointTrack> list ) {
+		if (list != null)
 			return list;
 		return new ArrayList<>();
 	}
 
-	@Override
-	public List<PointTrack> getDroppedTracks(List<PointTrack> list) {
-		if( list != null )
+	@Override public List<PointTrack> getDroppedTracks( @Nullable List<PointTrack> list ) {
+		if (list != null)
 			return list;
 		return new ArrayList<>();
 	}
 
-	@Override
-	public List<PointTrack> getNewTracks(List<PointTrack> list) {
-		return null;
+	@Override public List<PointTrack> getNewTracks( @Nullable List<PointTrack> list ) {
+		throw new RuntimeException("implement");
 	}
 
-	@Override
-	public void spawnTracks() {}
+	@Override public void spawnTracks() {}
 
 	@Override public ImageType<T> getImageType() {throw new IllegalArgumentException("Not implemented");}
-
 }

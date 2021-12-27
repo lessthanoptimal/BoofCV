@@ -72,6 +72,7 @@ import org.ddogleg.struct.Stoppable;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class SegmentMeanShiftSearch<T extends ImageBase<T>>
 		implements Stoppable {
 	// used to detect convergence of mean-shift
@@ -104,7 +105,7 @@ public abstract class SegmentMeanShiftSearch<T extends ImageBase<T>>
 	protected float[] spacialTable;
 
 	// quick lookup for Gaussian kernel
-	protected float weightTable[] = new float[100];
+	protected float[] weightTable = new float[100];
 
 	// If true it will use the fast approximation of mean-shift
 	boolean fast;

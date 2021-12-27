@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -449,6 +449,7 @@ public class LlahOperations {
 	/**
 	 * Documents that were found to match observed dots
 	 */
+	@SuppressWarnings({"NullAway.Init"})
 	public static class FoundDocument {
 		/** Which document */
 		public LlahDocument document;

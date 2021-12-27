@@ -37,20 +37,18 @@ public class FactoryImageSegmentation {
 	/**
 	 * Creates a new instance of {@link SegmentMeanShift} which is in a wrapper for {@link ImageSuperpixels}.
 	 *
-	 * @see SegmentMeanShift
-	 *
 	 * @param config Configuration. If null then defaults are used.
 	 * @param imageType Type of input image.
 	 * @param <T> Image type
 	 * @return new instance of {@link ImageSuperpixels}
+	 * @see SegmentMeanShift
 	 */
-	public static <T extends ImageBase<T>>ImageSuperpixels<T>
-	meanShift(@Nullable ConfigSegmentMeanShift config , ImageType<T> imageType )
-	{
-		if( config == null )
+	public static <T extends ImageBase<T>> ImageSuperpixels<T>
+	meanShift( @Nullable ConfigSegmentMeanShift config, ImageType<T> imageType ) {
+		if (config == null)
 			config = new ConfigSegmentMeanShift();
 
-		SegmentMeanShift<T> ms = FactorySegmentationAlg.meanShift(config,imageType);
+		SegmentMeanShift<T> ms = FactorySegmentationAlg.meanShift(config, imageType);
 
 		return new MeanShift_to_ImageSuperpixels<>(ms, config.connectRule);
 	}
@@ -58,16 +56,14 @@ public class FactoryImageSegmentation {
 	/**
 	 * Creates a new instance of {@link SegmentSlic} which is in a wrapper for {@link ImageSuperpixels}.
 	 *
-	 * @see SegmentSlic
-	 *
 	 * @param config Configuration.
 	 * @param imageType Type of input image.
 	 * @param <T> Image type
 	 * @return new instance of {@link ImageSuperpixels}
+	 * @see SegmentSlic
 	 */
-	public static <T extends ImageBase<T>>ImageSuperpixels<T>
-	slic( @Nullable ConfigSlic config , ImageType<T> imageType )
-	{
+	public static <T extends ImageBase<T>> ImageSuperpixels<T>
+	slic( @Nullable ConfigSlic config, ImageType<T> imageType ) {
 		SegmentSlic<T> ms = FactorySegmentationAlg.slic(config, imageType);
 
 		return new Slic_to_ImageSuperpixels<>(ms);
@@ -76,17 +72,15 @@ public class FactoryImageSegmentation {
 	/**
 	 * Creates a new instance of {@link SegmentFelzenszwalbHuttenlocher04} which is in a wrapper for {@link ImageSuperpixels}.
 	 *
-	 * @see SegmentFelzenszwalbHuttenlocher04
-	 *
 	 * @param config Configuration. If null defaults are used.
 	 * @param imageType Type of input image.
 	 * @param <T> Image type
 	 * @return new instance of {@link ImageSuperpixels}
+	 * @see SegmentFelzenszwalbHuttenlocher04
 	 */
-	public static <T extends ImageBase<T>>ImageSuperpixels<T>
-	fh04( @Nullable ConfigFh04 config , ImageType<T> imageType )
-	{
-		if( config == null )
+	public static <T extends ImageBase<T>> ImageSuperpixels<T>
+	fh04( @Nullable ConfigFh04 config, ImageType<T> imageType ) {
+		if (config == null)
 			config = new ConfigFh04();
 
 		SegmentFelzenszwalbHuttenlocher04<T> fh = FactorySegmentationAlg.fh04(config, imageType);
@@ -100,16 +94,14 @@ public class FactoryImageSegmentation {
 	 * is used where each local minima is a region, which causes over segmentation. Watershed also only can process
 	 * gray scale U8 images. All other image types are converted into that format.
 	 *
-	 * @see WatershedVincentSoille1991
-	 *
 	 * @param config Configuration. If null default is used.
 	 * @param <T> Image type
 	 * @return new instance of {@link ImageSuperpixels}
+	 * @see WatershedVincentSoille1991
 	 */
-	public static <T extends ImageBase<T>>ImageSuperpixels<T>
-	watershed( @Nullable ConfigWatershed config , ImageType<T> imageType )
-	{
-		if( config == null )
+	public static <T extends ImageBase<T>> ImageSuperpixels<T>
+	watershed( @Nullable ConfigWatershed config, ImageType<T> imageType ) {
+		if (config == null)
 			config = new ConfigWatershed();
 
 		WatershedVincentSoille1991 watershed = FactorySegmentationAlg.watershed(config.connectRule);

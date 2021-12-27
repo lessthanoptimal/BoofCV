@@ -29,6 +29,7 @@ import org.ddogleg.struct.FastAccess;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway"})
 public class AbstractAssociateDescription2D<Desc> implements AssociateDescription2D<Desc> {
 	// @formatter:off
 	@Override public void initialize(int imageWidth, int imageHeight) {}

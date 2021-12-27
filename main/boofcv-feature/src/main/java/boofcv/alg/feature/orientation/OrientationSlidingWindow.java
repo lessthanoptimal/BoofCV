@@ -40,6 +40,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class OrientationSlidingWindow<D extends ImageGray<D>>
 		implements OrientationGradient<D> {
 	// The actual radius being sampled in pixels

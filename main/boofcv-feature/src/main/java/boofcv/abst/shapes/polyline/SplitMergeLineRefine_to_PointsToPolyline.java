@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,6 +37,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 @Deprecated
 public class SplitMergeLineRefine_to_PointsToPolyline implements PointsToPolyline {
 
@@ -56,20 +57,19 @@ public class SplitMergeLineRefine_to_PointsToPolyline implements PointsToPolylin
 
 	Polygon2D_F64 tmp = new Polygon2D_F64();
 
-	public SplitMergeLineRefine_to_PointsToPolyline(ConfigSplitMergeLineFit config)
-	{
+	public SplitMergeLineRefine_to_PointsToPolyline( ConfigSplitMergeLineFit config ) {
 		ConfigLength minimumSplit = config.minimumSide.copy();
-		if( config.loop ) {
+		if (config.loop) {
 			splitMerge = new SplitMergeLineFitLoop(config.splitFraction, minimumSplit, config.iterations);
 		} else {
 			splitMerge = new SplitMergeLineFitSegment(config.splitFraction, minimumSplit, config.iterations);
 		}
 
-		if( config.refine > 0 ) {
-			refine = new RefinePolyLineCorner(config.loop,config.refine);
+		if (config.refine > 0) {
+			refine = new RefinePolyLineCorner(config.loop, config.refine);
 		}
 
-		if( config.pruneSplitPenalty > 0 ) {
+		if (config.pruneSplitPenalty > 0) {
 			pruner = new MinimizeEnergyPrune(config.pruneSplitPenalty);
 		}
 
@@ -78,9 +78,8 @@ public class SplitMergeLineRefine_to_PointsToPolyline implements PointsToPolylin
 		maxVertexes = config.maximumSides;
 	}
 
-
 	@Override
-	public boolean process(List<Point2D_I32> input, DogArray_I32 vertexes) {
+	public boolean process( List<Point2D_I32> input, DogArray_I32 vertexes ) {
 		if (!splitMerge.process(input, vertexes)) {
 			return false;
 		}
@@ -106,7 +105,7 @@ public class SplitMergeLineRefine_to_PointsToPolyline implements PointsToPolylin
 	}
 
 	@Override
-	public void setMinimumSides(int minimum) {
+	public void setMinimumSides( int minimum ) {
 		this.minVertexes = minimum;
 	}
 
@@ -116,7 +115,7 @@ public class SplitMergeLineRefine_to_PointsToPolyline implements PointsToPolylin
 	}
 
 	@Override
-	public void setMaximumSides(int maximum) {
+	public void setMaximumSides( int maximum ) {
 		this.maxVertexes = maximum;
 		// detect more than the max. Prune will reduce the number of corners later on
 		splitMerge.setAbortSplits(maximum*2);
@@ -133,7 +132,7 @@ public class SplitMergeLineRefine_to_PointsToPolyline implements PointsToPolylin
 	}
 
 	@Override
-	public void setConvex(boolean convex) {
+	public void setConvex( boolean convex ) {
 		this.convex = convex;
 	}
 

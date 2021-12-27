@@ -465,7 +465,7 @@ public class FactoryPointTracker {
 	 */
 	public static <I extends ImageGray<I>, Desc extends TupleDesc<Desc>>
 	PointTracker<I> hybrid( InterestPointDetector<I> detector,
-							OrientationImage<I> orientation,
+							@Nullable OrientationImage<I> orientation,
 							DescribePointRadiusAngle<I, Desc> describe,
 							AssociateDescription2D<Desc> associate,
 							int tooCloseRadius,

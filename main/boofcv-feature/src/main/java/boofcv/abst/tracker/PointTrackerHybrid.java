@@ -31,6 +31,7 @@ import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import org.ddogleg.struct.DogArray;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -43,7 +44,7 @@ import static boofcv.abst.tracker.PointTrackerUtils.addAllTracksInList;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings({"unchecked", "rawtypes"})
+@SuppressWarnings({"unchecked", "rawtypes", "NullAway.Init"})
 public class PointTrackerHybrid<I extends ImageGray<I>, D extends ImageGray<D>, Desc extends TupleDesc<Desc>>
 		implements PointTracker<I> {
 
@@ -166,27 +167,27 @@ public class PointTrackerHybrid<I extends ImageGray<I>, D extends ImageGray<D>, 
 	}
 
 	@Override
-	public List<PointTrack> getAllTracks( List<PointTrack> list ) {
+	public List<PointTrack> getAllTracks( @Nullable List<PointTrack> list ) {
 		return addAllTracksInList((List)tracker.getTracksAll().toList(), list);
 	}
 
 	@Override
-	public List<PointTrack> getActiveTracks( List<PointTrack> list ) {
+	public List<PointTrack> getActiveTracks( @Nullable List<PointTrack> list ) {
 		return addAllTracksInList((List)tracker.getTracksActive().toList(), list);
 	}
 
 	@Override
-	public List<PointTrack> getInactiveTracks( List<PointTrack> list ) {
+	public List<PointTrack> getInactiveTracks( @Nullable List<PointTrack> list ) {
 		return addAllTracksInList((List)tracker.getTracksInactive().toList(), list);
 	}
 
 	@Override
-	public List<PointTrack> getDroppedTracks( List<PointTrack> list ) {
+	public List<PointTrack> getDroppedTracks( @Nullable List<PointTrack> list ) {
 		return addAllTracksInList((List)tracker.getTracksDropped(), list);
 	}
 
 	@Override
-	public List<PointTrack> getNewTracks( List<PointTrack> list ) {
+	public List<PointTrack> getNewTracks( @Nullable List<PointTrack> list ) {
 		return addAllTracksInList((List)tracker.getTracksSpawned(), list);
 	}
 }

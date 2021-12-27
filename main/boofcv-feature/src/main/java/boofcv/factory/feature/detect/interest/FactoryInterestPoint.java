@@ -55,17 +55,18 @@ import org.jetbrains.annotations.Nullable;
 public class FactoryInterestPoint {
 
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
-	InterestPointDetector<T> generic( ConfigDetectInterestPoint config ,
-									  Class<T> inputType, @Nullable Class<D> derivType )
-	{
-		switch(config.type) {
-			case FAST_HESSIAN: return FactoryInterestPoint.fastHessian(config.fastHessian,inputType);
-			case SIFT: return FactoryInterestPoint.sift(config.scaleSpaceSift,config.sift,inputType);
+	InterestPointDetector<T> generic( ConfigDetectInterestPoint config,
+									  Class<T> inputType, @Nullable Class<D> derivType ) {
+		switch (config.type) {
+			case FAST_HESSIAN:
+				return FactoryInterestPoint.fastHessian(config.fastHessian, inputType);
+			case SIFT:
+				return FactoryInterestPoint.sift(config.scaleSpaceSift, config.sift, inputType);
 			case POINT: {
-				if( derivType == null )
+				if (derivType == null)
 					derivType = GImageDerivativeOps.getDerivativeType(inputType);
-				GeneralFeatureDetector<T, D> alg = FactoryDetectPoint.create(config.point,inputType,derivType);
-				return FactoryInterestPoint.wrapPoint(alg, config.point.scaleRadius,inputType, derivType);
+				GeneralFeatureDetector<T, D> alg = FactoryDetectPoint.create(config.point, inputType, derivType);
+				return FactoryInterestPoint.wrapPoint(alg, config.point.scaleRadius, inputType, derivType);
 			}
 			default:
 				throw new IllegalArgumentException("Unknown detector");
@@ -80,11 +81,11 @@ public class FactoryInterestPoint {
 	 * @see FastCornerDetector
 	 */
 	public static <T extends ImageGray<T>>
-	InterestPointDetector<T> createFast(@Nullable ConfigFastCorner configFast ,
-										int featureLimitPerSet,
-										@Nullable ConfigSelectLimit configSelect,
-										Class<T> imageType) {
-		if( configFast == null )
+	InterestPointDetector<T> createFast( @Nullable ConfigFastCorner configFast,
+										 int featureLimitPerSet,
+										 @Nullable ConfigSelectLimit configSelect,
+										 Class<T> imageType ) {
+		if (configFast == null)
 			configFast = new ConfigFastCorner();
 		configFast.checkValidity();
 
@@ -93,8 +94,8 @@ public class FactoryInterestPoint {
 
 		FeatureSelectLimit<Point2D_I16> selector = FactorySelectLimit.spatial(configSelect, Point2D_I16.class);
 
-		var ret = new FastToInterestPoint<>(alg,selector);
-		ret.setFeatureLimitPerSet(featureLimitPerSet<=0?Integer.MAX_VALUE:featureLimitPerSet);
+		var ret = new FastToInterestPoint<>(alg, selector);
+		ret.setFeatureLimitPerSet(featureLimitPerSet <= 0 ? Integer.MAX_VALUE : featureLimitPerSet);
 		return ret;
 	}
 
@@ -108,9 +109,9 @@ public class FactoryInterestPoint {
 	 * @return The interest point detector.
 	 */
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
-	InterestPointDetector<T> wrapPoint(GeneralFeatureDetector<T, D> feature,
-									   double scaleRadius , Class<T> inputType, Class<D> derivType) {
-		if( derivType == null )
+	InterestPointDetector<T> wrapPoint( GeneralFeatureDetector<T, D> feature,
+										double scaleRadius, Class<T> inputType, @Nullable Class<D> derivType ) {
+		if (derivType == null)
 			derivType = GImageDerivativeOps.getDerivativeType(inputType);
 
 		ImageGradient<T, D> gradient = null;
@@ -127,20 +128,20 @@ public class FactoryInterestPoint {
 	/**
 	 * Wraps {@link FeatureLaplacePyramid} inside an {@link InterestPointDetector}.
 	 *
-	 * @param feature   Feature detector.
-	 * @param scales    Scales at which features are detected at.
-	 * @param pyramid   Should it be constructed as a pyramid or scale-space
+	 * @param feature Feature detector.
+	 * @param scales Scales at which features are detected at.
+	 * @param pyramid Should it be constructed as a pyramid or scale-space
 	 * @param inputType Image type of input image.
 	 * @return The interest point detector.
 	 */
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
-	InterestPointDetector<T> wrapDetector(FeatureLaplacePyramid<T, D> feature,
-										  double[] scales, boolean pyramid,
-										  Class<T> inputType) {
+	InterestPointDetector<T> wrapDetector( FeatureLaplacePyramid<T, D> feature,
+										   double[] scales, boolean pyramid,
+										   Class<T> inputType ) {
 
 		PyramidFloat<T> ss;
 
-		if( pyramid )
+		if (pyramid)
 			ss = FactoryPyramid.scaleSpacePyramid(scales, inputType);
 		else
 			ss = FactoryPyramid.scaleSpace(scales, inputType);
@@ -151,20 +152,20 @@ public class FactoryInterestPoint {
 	/**
 	 * Wraps {@link FeaturePyramid} inside an {@link InterestPointDetector}.
 	 *
-	 * @param feature   Feature detector.
-	 * @param scales    Scales at which features are detected at.
-	 * @param pyramid   Should it be constructed as a pyramid or scale-space
+	 * @param feature Feature detector.
+	 * @param scales Scales at which features are detected at.
+	 * @param pyramid Should it be constructed as a pyramid or scale-space
 	 * @param inputType Image type of input image.
 	 * @return The interest point detector.
 	 */
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
-	InterestPointDetector<T> wrapDetector(FeaturePyramid<T, D> feature,
-										  double[] scales, boolean pyramid,
-										  Class<T> inputType) {
+	InterestPointDetector<T> wrapDetector( FeaturePyramid<T, D> feature,
+										   double[] scales, boolean pyramid,
+										   Class<T> inputType ) {
 
 		PyramidFloat<T> ss;
 
-		if( pyramid )
+		if (pyramid)
 			ss = FactoryPyramid.scaleSpacePyramid(scales, inputType);
 		else
 			ss = FactoryPyramid.scaleSpace(scales, inputType);
@@ -182,23 +183,23 @@ public class FactoryInterestPoint {
 	 */
 	public static <T extends ImageGray<T>>
 	InterestPointDetector<T> fastHessian( ConfigFastHessian config, Class<T> imageType ) {
-		return new WrapFHtoInterestPoint(FactoryInterestPointAlgs.fastHessian(config),imageType);
+		return new WrapFHtoInterestPoint(FactoryInterestPointAlgs.fastHessian(config), imageType);
 	}
 
 	public static <T extends ImageGray<T>>
-	InterestPointDetector<T> sift(@Nullable ConfigSiftScaleSpace configSS ,
-								  @Nullable ConfigSiftDetector configDet , Class<T> imageType ) {
+	InterestPointDetector<T> sift( @Nullable ConfigSiftScaleSpace configSS,
+								   @Nullable ConfigSiftDetector configDet, Class<T> imageType ) {
 
-		if( configSS == null )
+		if (configSS == null)
 			configSS = new ConfigSiftScaleSpace();
-		if( configDet == null )
+		if (configDet == null)
 			configDet = new ConfigSiftDetector();
 
-		var ss = new SiftScaleSpace(configSS.firstOctave,configSS.lastOctave,configSS.numScales,configSS.sigma0);
+		var ss = new SiftScaleSpace(configSS.firstOctave, configSS.lastOctave, configSS.numScales, configSS.sigma0);
 		NonMaxLimiter nonmax = FactoryFeatureExtractor.nonmaxLimiter(
-				configDet.extract,configDet.selector,configDet.maxFeaturesPerScale);
+				configDet.extract, configDet.selector, configDet.maxFeaturesPerScale);
 		FeatureSelectLimitIntensity<ScalePoint> selectorAll = FactorySelectLimit.intensity(configDet.selector);
-		var detector = new SiftDetector(selectorAll,configDet.edgeR,nonmax);
+		var detector = new SiftDetector(selectorAll, configDet.edgeR, nonmax);
 		detector.maxFeaturesAll = configDet.maxFeaturesAll;
 
 		return new WrapSiftDetector<>(ss, detector, imageType);

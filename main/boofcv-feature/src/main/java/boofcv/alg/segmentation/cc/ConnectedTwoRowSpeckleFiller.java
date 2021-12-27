@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,6 +44,7 @@ import static boofcv.misc.BoofMiscOps.checkTrue;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class ConnectedTwoRowSpeckleFiller<T extends ImageGray<T>> implements ConnectedSpeckleFiller<T> {
 
 	/** Number of clusters that were filed in */

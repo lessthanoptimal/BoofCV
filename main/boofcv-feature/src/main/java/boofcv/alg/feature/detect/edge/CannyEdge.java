@@ -30,6 +30,7 @@ import georegression.struct.point.Point2D_I32;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Implementation of canny edge detector. The canny edge detector detects the edges of objects
@@ -42,6 +43,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class CannyEdge<T extends ImageGray<T>, D extends ImageGray<D>> {
 
 	// blurs the input image
@@ -142,7 +144,7 @@ public class CannyEdge<T extends ImageGray<T>, D extends ImageGray<D>> {
 		performThresholding(threshLow, threshHigh, output);
 	}
 
-	protected void performThresholding( float threshLow, float threshHigh, GrayU8 output ) {
+	protected void performThresholding( float threshLow, float threshHigh, @Nullable GrayU8 output ) {
 		if (hysteresisPts != null) {
 			hysteresisPts.process(suppressed, direction, threshLow, threshHigh);
 
@@ -157,7 +159,7 @@ public class CannyEdge<T extends ImageGray<T>, D extends ImageGray<D>> {
 				}
 			}
 		} else {
-			hysteresisMark.process(suppressed, direction, threshLow, threshHigh, output);
+			hysteresisMark.process(suppressed, direction, threshLow, threshHigh, Objects.requireNonNull(output));
 		}
 	}
 

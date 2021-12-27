@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,28 +21,28 @@ package boofcv.abst.feature.detect.intensity;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Provides some basic functionality for implementing {@link GeneralFeatureIntensity}.
  *
  * @author Peter Abeles
  */
-public abstract class BaseGeneralFeatureIntensity <I extends ImageGray<I>, D extends ImageGray<D>>
-		implements GeneralFeatureIntensity<I,D>
-{
-	GrayF32 intensity = new GrayF32(1,1);
+public abstract class BaseGeneralFeatureIntensity<I extends ImageGray<I>, D extends ImageGray<D>>
+		implements GeneralFeatureIntensity<I, D> {
+	GrayF32 intensity = new GrayF32(1, 1);
 
-	Class<I> imageType;
-	Class<D> derivType;
+	@Nullable Class<I> imageType;
+	@Nullable Class<D> derivType;
 
-	protected BaseGeneralFeatureIntensity(Class<I> imageType, Class<D> derivType) {
+	protected BaseGeneralFeatureIntensity( @Nullable Class<I> imageType, @Nullable Class<D> derivType ) {
 		this.imageType = imageType;
 		this.derivType = derivType;
 	}
 
-	public void init(int width , int height) {
-		if( intensity.width != width || intensity.height != height ) {
-			intensity.reshape(width,height);
+	public void init( int width, int height ) {
+		if (intensity.width != width || intensity.height != height) {
+			intensity.reshape(width, height);
 			// zero the image to make sure it's borders values are zero
 			GImageMiscOps.fill(intensity, 0);
 		}
@@ -54,12 +54,12 @@ public abstract class BaseGeneralFeatureIntensity <I extends ImageGray<I>, D ext
 	}
 
 	@Override
-	public Class<I> getImageType() {
+	@Nullable public Class<I> getImageType() {
 		return imageType;
 	}
 
 	@Override
-	public Class<D> getDerivType() {
+	@Nullable public Class<D> getDerivType() {
 		return derivType;
 	}
 }

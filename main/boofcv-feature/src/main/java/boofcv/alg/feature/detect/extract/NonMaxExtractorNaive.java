@@ -82,7 +82,7 @@ public class NonMaxExtractorNaive {
 		final int imgWidth = intensityImage.getWidth();
 		final int imgHeight = intensityImage.getHeight();
 
-		final float inten[] = intensityImage.data;
+		final float[] inten = intensityImage.data;
 
 		for (int y = border; y < imgHeight - border; y++) {
 			int center = intensityImage.startIndex + y * intensityImage.stride + border;
@@ -130,7 +130,7 @@ public class NonMaxExtractorNaive {
 		final int imgWidth = intensityImage.getWidth();
 		final int imgHeight = intensityImage.getHeight();
 
-		final float inten[] = intensityImage.data;
+		final float[] inten = intensityImage.data;
 
 		for (int y = border; y < imgHeight - border; y++) {
 			int center = intensityImage.startIndex + y * intensityImage.stride + border;

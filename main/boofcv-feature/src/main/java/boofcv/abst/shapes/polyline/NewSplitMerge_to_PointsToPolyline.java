@@ -30,6 +30,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class NewSplitMerge_to_PointsToPolyline implements PointsToPolyline {
 
 	// The base algorithm
@@ -38,8 +39,7 @@ public class NewSplitMerge_to_PointsToPolyline implements PointsToPolyline {
 	// refine corner location
 	RefinePolyLineCorner refine;
 
-	public NewSplitMerge_to_PointsToPolyline( ConfigPolylineSplitMerge config ){
-
+	public NewSplitMerge_to_PointsToPolyline( ConfigPolylineSplitMerge config ) {
 		alg = new PolylineSplitMerge();
 		alg.setMinimumSideLength(config.minimumSideLength);
 		alg.setMaxNumberOfSideSamples(config.maxNumberOfSideSamples);
@@ -53,25 +53,25 @@ public class NewSplitMerge_to_PointsToPolyline implements PointsToPolyline {
 		alg.setMaxSideError(config.maxSideError);
 		alg.setLoops(config.loops);
 
-		if( config.refineIterations > 0 ) {
-			refine = new RefinePolyLineCorner(config.loops,config.refineIterations);
+		if (config.refineIterations > 0) {
+			refine = new RefinePolyLineCorner(config.loops, config.refineIterations);
 		}
 	}
 
 	@Override
-	public boolean process(List<Point2D_I32> input, DogArray_I32 vertexes) {
-		if( !alg.process(input) )
+	public boolean process( List<Point2D_I32> input, DogArray_I32 vertexes ) {
+		if (!alg.process(input))
 			return false;
 
 		PolylineSplitMerge.CandidatePolyline best = alg.getBestPolyline();
 
-		if( best == null ) {
+		if (best == null) {
 			return false;
 		}
 
 		vertexes.setTo(best.splits);
 
-		if( refine != null && !refine.fit(input,vertexes)) {
+		if (refine != null && !refine.fit(input, vertexes)) {
 			return false;
 		}
 
@@ -79,7 +79,7 @@ public class NewSplitMerge_to_PointsToPolyline implements PointsToPolyline {
 	}
 
 	@Override
-	public void setMinimumSides(int minimum) {
+	public void setMinimumSides( int minimum ) {
 		alg.setMinSides(minimum);
 	}
 
@@ -89,7 +89,7 @@ public class NewSplitMerge_to_PointsToPolyline implements PointsToPolyline {
 	}
 
 	@Override
-	public void setMaximumSides(int maximum) {
+	public void setMaximumSides( int maximum ) {
 		alg.setMaxSides(maximum);
 	}
 
@@ -104,7 +104,7 @@ public class NewSplitMerge_to_PointsToPolyline implements PointsToPolyline {
 	}
 
 	@Override
-	public void setConvex(boolean convex) {
+	public void setConvex( boolean convex ) {
 		alg.setConvex(convex);
 	}
 

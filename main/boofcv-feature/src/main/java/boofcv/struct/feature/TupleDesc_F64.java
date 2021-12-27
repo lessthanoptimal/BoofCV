@@ -28,6 +28,7 @@ import java.util.Arrays;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class TupleDesc_F64 implements TupleDesc<TupleDesc_F64> {
 	public @Getter @Setter double[] data;
 
@@ -42,7 +43,7 @@ public class TupleDesc_F64 implements TupleDesc<TupleDesc_F64> {
 
 	protected TupleDesc_F64() {}
 
-	public double get(int index) {return data[index];}
+	public double get( int index ) {return data[index];}
 
 	public void setTo( double... value ) {
 		System.arraycopy(value, 0, this.data, 0, this.data.length);

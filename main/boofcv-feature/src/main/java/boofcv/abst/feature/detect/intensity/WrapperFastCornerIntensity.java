@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.abst.feature.detect.intensity;
 import boofcv.alg.feature.detect.intensity.FastCornerDetector;
 import boofcv.struct.ListIntPoint2D;
 import boofcv.struct.image.ImageGray;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Wrapper around {@link FastCornerDetector} for {@link GeneralFeatureIntensity}.
@@ -38,11 +39,14 @@ public class WrapperFastCornerIntensity<I extends ImageGray<I>, D extends ImageG
 	}
 
 	@Override
-	public void process(I input, D derivX , D derivY , D derivXX , D derivYY , D derivXY ) {
+	public void process( I input,
+						 @Nullable D derivX , @Nullable D derivY ,
+						 @Nullable D derivXX , @Nullable D derivYY , @Nullable D derivXY ) {
 		init(input.width,input.height);
 		alg.process(input,intensity);
 	}
 
+	// @formatter:off
 	@Override public ListIntPoint2D getCandidatesMin()    { return alg.getCandidatesLow(); }
 	@Override public ListIntPoint2D getCandidatesMax()    { return alg.getCandidatesHigh(); }
 	@Override public boolean        getRequiresGradient() { return false; }
@@ -52,5 +56,6 @@ public class WrapperFastCornerIntensity<I extends ImageGray<I>, D extends ImageG
 	@Override public boolean        localMinimums()       { return true; }
 	@Override public boolean        localMaximums()       { return true; }
 	@Override public Class<I>       getImageType()        { return alg.getImageType(); }
-	@Override public Class<D>       getDerivType()        { return null; }
+	@Override public Class<D>       getDerivType()        { throw new RuntimeException("Not Applicable"); }
+	// @formatter:on
 }

@@ -29,6 +29,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class PointTrack {
 	/** Location of the track in the image */
 	public final Point2D_F64 pixel = new Point2D_F64();
@@ -81,6 +82,7 @@ public class PointTrack {
 		description = t.description;
 	}
 
+	@SuppressWarnings({"NullAway"})
 	public void reset() {
 		lastSeenFrameID = -1;
 		spawnFrameID = -1;

@@ -34,6 +34,7 @@ import org.ddogleg.struct.DogArray;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class HysteresisEdgeTraceMark {
 
 	// after an edge has been traversed it is set to this value

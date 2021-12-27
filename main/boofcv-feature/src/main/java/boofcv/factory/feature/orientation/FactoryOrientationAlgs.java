@@ -25,6 +25,7 @@ import boofcv.abst.feature.orientation.OrientationIntegral;
 import boofcv.alg.feature.orientation.*;
 import boofcv.alg.feature.orientation.impl.*;
 import boofcv.struct.image.*;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Creates specific implementations of local region orientation estimators.
@@ -119,7 +120,7 @@ public class FactoryOrientationAlgs {
 	 * @see ImplOrientationAverageGradientIntegral
 	 */
 	public static <II extends ImageGray<II>>
-	OrientationIntegral<II> average_ii( ConfigAverageIntegral config, Class<II> integralType ) {
+	OrientationIntegral<II> average_ii( @Nullable ConfigAverageIntegral config, Class<II> integralType ) {
 		if (config == null)
 			config = new ConfigAverageIntegral();
 
@@ -159,7 +160,7 @@ public class FactoryOrientationAlgs {
 	 * @see OrientationSlidingWindow
 	 */
 	public static <II extends ImageGray<II>>
-	OrientationIntegral<II> sliding_ii( ConfigSlidingIntegral config, Class<II> integralType ) {
+	OrientationIntegral<II> sliding_ii( @Nullable ConfigSlidingIntegral config, Class<II> integralType ) {
 		if (config == null)
 			config = new ConfigSlidingIntegral();
 		config.checkValidity();
@@ -177,7 +178,7 @@ public class FactoryOrientationAlgs {
 	 * @return OrientationHistogramSift
 	 */
 	public static <D extends ImageGray<D>>
-	OrientationHistogramSift<D> sift( ConfigSiftOrientation config, Class<D> derivType ) {
+	OrientationHistogramSift<D> sift( @Nullable ConfigSiftOrientation config, Class<D> derivType ) {
 		if (config == null)
 			config = new ConfigSiftOrientation();
 		config.checkValidity();

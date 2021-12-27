@@ -26,6 +26,7 @@ import boofcv.struct.pyramid.PyramidFloat;
 import georegression.struct.point.Point2D_F64;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Wrapper around {@link boofcv.alg.feature.detect.interest.FeaturePyramid} for {@link boofcv.abst.feature.detect.interest.InterestPointDetector}.
@@ -95,6 +96,6 @@ public class WrapFPtoInterestPoint<T extends ImageGray<T>, D extends ImageGray<D
 
 	@Override
 	public ImageType<T> getInputType() {
-		return ImageType.single(detector.getDetector().getImageType());
+		return ImageType.single(Objects.requireNonNull(detector.getDetector().getImageType()));
 	}
 }

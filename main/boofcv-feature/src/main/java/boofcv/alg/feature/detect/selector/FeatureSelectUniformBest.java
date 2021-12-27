@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,6 +40,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class FeatureSelectUniformBest<Point> implements FeatureSelectLimitIntensity<Point> {
 
 	/** Configuration for uniformly selecting a grid */
@@ -135,7 +136,7 @@ public class FeatureSelectUniformBest<Point> implements FeatureSelectLimitIntens
 	/**
 	 * Sort points in cells based on their intensity
 	 */
-	private void sortCellLists( GrayF32 intensity, boolean positive ) {
+	private void sortCellLists( @Nullable GrayF32 intensity, boolean positive ) {
 		// Add points to the grid elements and sort them based feature intensity
 		final FastAccess<Info<Point>> cells = grid.cells;
 		for (int cellidx = 0; cellidx < cells.size; cellidx++) {

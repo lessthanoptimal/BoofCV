@@ -59,6 +59,8 @@ public class DescribeSift_RadiusAngle<T extends ImageGray<T>>
 		this.scaleSpace = scaleSpace;
 		this.describe = describe;
 		this.imageType = ImageType.single(imageType);
+
+		gradient.initialize(scaleSpace);
 	}
 
 	@Override

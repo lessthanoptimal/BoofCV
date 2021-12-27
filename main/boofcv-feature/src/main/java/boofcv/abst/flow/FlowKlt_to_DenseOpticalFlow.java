@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,11 +34,11 @@ import java.lang.reflect.Array;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class FlowKlt_to_DenseOpticalFlow<I extends ImageGray<I>, D extends ImageGray<D>>
-	implements DenseOpticalFlow<I>
-{
-	DenseOpticalFlowKlt<I,D> flowKlt;
-	ImageGradient<I,D> gradient;
+		implements DenseOpticalFlow<I> {
+	DenseOpticalFlowKlt<I, D> flowKlt;
+	ImageGradient<I, D> gradient;
 
 	ImagePyramid<I> pyramidSrc;
 	ImagePyramid<I> pyramidDst;
@@ -49,12 +49,11 @@ public class FlowKlt_to_DenseOpticalFlow<I extends ImageGray<I>, D extends Image
 
 	ImageType<I> imageType;
 
-	public FlowKlt_to_DenseOpticalFlow(DenseOpticalFlowKlt<I, D> flowKlt,
-									   ImageGradient<I, D> gradient,
-									   ImagePyramid<I> pyramidSrc,
-									   ImagePyramid<I> pyramidDst,
-									   Class<I> inputType , Class<D> derivType )
-	{
+	public FlowKlt_to_DenseOpticalFlow( DenseOpticalFlowKlt<I, D> flowKlt,
+										ImageGradient<I, D> gradient,
+										ImagePyramid<I> pyramidSrc,
+										ImagePyramid<I> pyramidDst,
+										Class<I> inputType, Class<D> derivType ) {
 		this.flowKlt = flowKlt;
 		this.gradient = gradient;
 		this.pyramidSrc = pyramidSrc;
@@ -66,16 +65,16 @@ public class FlowKlt_to_DenseOpticalFlow<I extends ImageGray<I>, D extends Image
 	}
 
 	@Override
-	public void process(I source, I destination, ImageFlow flow) {
+	public void process( I source, I destination, ImageFlow flow ) {
 		pyramidSrc.process(source);
 		pyramidDst.process(destination);
 
-		if( pyramidSrc.getNumLayers() != pyramidDst.getNumLayers() )
+		if (pyramidSrc.getNumLayers() != pyramidDst.getNumLayers())
 			throw new IllegalArgumentException("Pyramids do not have the same number of layers!");
 
-		if( srcDerivX == null || srcDerivX.length != pyramidSrc.getNumLayers() ) {
-			srcDerivX = (D[]) Array.newInstance(derivType, pyramidSrc.getNumLayers());
-			srcDerivY = (D[]) Array.newInstance(derivType, pyramidSrc.getNumLayers());
+		if (srcDerivX == null || srcDerivX.length != pyramidSrc.getNumLayers()) {
+			srcDerivX = (D[])Array.newInstance(derivType, pyramidSrc.getNumLayers());
+			srcDerivY = (D[])Array.newInstance(derivType, pyramidSrc.getNumLayers());
 
 			for (int i = 0; i < srcDerivX.length; i++) {
 				srcDerivX[i] = GeneralizedImageOps.createSingleBand(derivType, 1, 1);
@@ -83,12 +82,12 @@ public class FlowKlt_to_DenseOpticalFlow<I extends ImageGray<I>, D extends Image
 			}
 		}
 
-		PyramidOps.reshapeOutput(pyramidSrc,srcDerivX);
-		PyramidOps.reshapeOutput(pyramidSrc,srcDerivY);
+		PyramidOps.reshapeOutput(pyramidSrc, srcDerivX);
+		PyramidOps.reshapeOutput(pyramidSrc, srcDerivY);
 
-		PyramidOps.gradient(pyramidSrc, gradient, srcDerivX,srcDerivY);
+		PyramidOps.gradient(pyramidSrc, gradient, srcDerivX, srcDerivY);
 
-		flowKlt.process(pyramidSrc,srcDerivX,srcDerivY,pyramidDst,flow);
+		flowKlt.process(pyramidSrc, srcDerivX, srcDerivY, pyramidDst, flow);
 	}
 
 	@Override

@@ -27,14 +27,14 @@ import org.ddogleg.struct.FastAccess;
 public class AssociateDescriptionAbstract<Desc> implements AssociateDescription<Desc> {
 	// @formatter:off
 	@Override public void associate() {}
-	@Override public FastAccess<AssociatedIndex> getMatches() { return null; }
-	@Override public DogArray_I32 getUnassociatedSource() { return null; }
-	@Override public DogArray_I32 getUnassociatedDestination() { return null; }
+	@Override public FastAccess<AssociatedIndex> getMatches() { throw new RuntimeException("Implement"); }
+	@Override public DogArray_I32 getUnassociatedSource() { throw new RuntimeException("Implement"); }
+	@Override public DogArray_I32 getUnassociatedDestination() { throw new RuntimeException("Implement"); }
 	@Override public void setMaxScoreThreshold( double score ) {}
-	@Override public MatchScoreType getScoreType() { return null; }
+	@Override public MatchScoreType getScoreType() { throw new RuntimeException("Implement"); }
 	@Override public boolean uniqueSource() { return false; }
 	@Override public boolean uniqueDestination() { return false; }
-	@Override public Class<Desc> getDescriptionType() { return null; }
+	@Override public Class<Desc> getDescriptionType() { throw new RuntimeException("Implement"); }
 	@Override public void setSource( FastAccess<Desc> listSrc ) {}
 	@Override public void setDestination( FastAccess<Desc> listDst ) {}
 	// @formatter:on

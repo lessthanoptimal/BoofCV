@@ -49,6 +49,7 @@ import java.util.Objects;
  * @param <D> Image derivative type.
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class GeneralFeatureDetector<I extends ImageGray<I>, D extends ImageGray<D>> {
 	// list of feature locations found by the extractor
 	protected @Getter QueueCorner maximums = new QueueCorner(10);
@@ -67,8 +68,8 @@ public class GeneralFeatureDetector<I extends ImageGray<I>, D extends ImageGray<
 	protected @Getter @Setter int featureLimit;
 
 	/** extracts corners from the intensity image */
-	protected @Getter NonMaxSuppression extractorMin;
-	protected @Getter NonMaxSuppression extractorMax;
+	protected @Nullable @Getter NonMaxSuppression extractorMin;
+	protected @Nullable @Getter NonMaxSuppression extractorMax;
 	// Two extracts are needed because of the requirement to exclude specified corners.
 	// Otherwise a single extractor could be used
 
@@ -157,6 +158,7 @@ public class GeneralFeatureDetector<I extends ImageGray<I>, D extends ImageGray<
 
 		// Detect local minimums and maximums separately while excluding points in the exclude list
 		if (intensity.localMinimums()) {
+			Objects.requireNonNull(extractorMin);
 			markExcludedPixels(intensityImage, -Float.MAX_VALUE);
 			if (intensity.hasCandidates()) {
 				extractorMin.process(intensityImage, intensity.getCandidatesMin(), null, found, null);
@@ -167,6 +169,7 @@ public class GeneralFeatureDetector<I extends ImageGray<I>, D extends ImageGray<
 		}
 
 		if (intensity.localMaximums()) {
+			Objects.requireNonNull(extractorMax);
 			markExcludedPixels(intensityImage, Float.MAX_VALUE);
 			if (intensity.hasCandidates()) {
 				extractorMax.process(intensityImage, null, intensity.getCandidatesMax(), null, found);
@@ -190,8 +193,8 @@ public class GeneralFeatureDetector<I extends ImageGray<I>, D extends ImageGray<
 	/**
 	 * More features were detected than requested. Need to select a subset of them
 	 */
-	private void resolveSelectAmbiguity( GrayF32 intensity, QueueCorner excluded, QueueCorner found,
-										 QueueCorner output, int numSelect, boolean positive ) {
+	private void resolveSelectAmbiguity( GrayF32 intensity, @Nullable QueueCorner excluded,
+										 QueueCorner found, QueueCorner output, int numSelect, boolean positive ) {
 		output.reset();
 		if (numSelect > 0) {
 			selectMax.select(intensity, -1, -1, positive, excluded, found, numSelect, selected);
@@ -241,7 +244,8 @@ public class GeneralFeatureDetector<I extends ImageGray<I>, D extends ImageGray<
 	 * @return feature extraction threshold.
 	 */
 	public float getThreshold() {
-		return extractorMin != null ? -extractorMin.getThresholdMinimum() : extractorMax.getThresholdMaximum();
+		return extractorMin != null ? -extractorMin.getThresholdMinimum() :
+				Objects.requireNonNull(extractorMax).getThresholdMaximum();
 	}
 
 	/**
@@ -271,7 +275,8 @@ public class GeneralFeatureDetector<I extends ImageGray<I>, D extends ImageGray<
 	}
 
 	public int getSearchRadius() {
-		return extractorMin != null ? extractorMin.getSearchRadius() : extractorMax.getSearchRadius();
+		return extractorMin != null ? extractorMin.getSearchRadius() :
+				Objects.requireNonNull(extractorMax).getSearchRadius();
 	}
 
 	public @Nullable Class<I> getImageType() {

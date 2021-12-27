@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,9 @@ import boofcv.alg.feature.detect.extract.NonMaxExtractorNaive;
 import boofcv.struct.ListIntPoint2D;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Objects;
 
 /**
  * Wrapper around the {@link boofcv.alg.feature.detect.extract.NonMaxExtractorNaive} class.
@@ -32,68 +35,50 @@ public class WrapperNonMaximumNaive implements NonMaxSuppression {
 
 	NonMaxExtractorNaive alg;
 
-	public WrapperNonMaximumNaive(NonMaxExtractorNaive alg) {
+	public WrapperNonMaximumNaive( NonMaxExtractorNaive alg ) {
 		this.alg = alg;
 	}
 
-	@Override
-	public int getIgnoreBorder() {
+	@Override public int getIgnoreBorder() {
 		return alg.getBorder();
 	}
 
-	@Override
-	public void setIgnoreBorder(int border) {
+	@Override public void setIgnoreBorder( int border ) {
 		alg.setBorder(border);
 	}
 
-	@Override
-	public void process(GrayF32 intensity,
-						ListIntPoint2D candidateMin, ListIntPoint2D candidateMax,
-						QueueCorner foundMin, QueueCorner foundMax) {
+	@Override public void process( GrayF32 intensity,
+								   @Nullable ListIntPoint2D candidateMin, @Nullable ListIntPoint2D candidateMax,
+								   @Nullable QueueCorner foundMin, @Nullable QueueCorner foundMax ) {
+		Objects.requireNonNull(foundMax);
 		alg.process(intensity, foundMax);
 	}
 
-	@Override
-	public boolean getUsesCandidates() {
-		return false;
-	}
+	@Override public boolean getUsesCandidates() {return false;}
 
-	@Override
-	public float getThresholdMinimum() {
+	@Override public float getThresholdMinimum() {
 		return Float.NaN;
 	}
 
-	@Override
-	public float getThresholdMaximum() {
+	@Override public float getThresholdMaximum() {
 		return alg.getThreshold();
 	}
 
-	@Override
-	public void setThresholdMinimum(float threshold) {
-	}
+	@Override public void setThresholdMinimum( float threshold ) {}
 
-	@Override
-	public void setThresholdMaximum(float threshold) {
+	@Override public void setThresholdMaximum( float threshold ) {
 		alg.setThreshold(threshold);
 	}
 
-	@Override
-	public void setSearchRadius(int radius) {
+	@Override public void setSearchRadius( int radius ) {
 		alg.setSearchRadius(radius);
 	}
 
-	@Override
-	public int getSearchRadius() {
+	@Override public int getSearchRadius() {
 		return alg.getSearchRadius();
 	}
 
-	@Override
-	public boolean canDetectMaximums() {
-		return true;
-	}
+	@Override public boolean canDetectMaximums() {return true;}
 
-	@Override
-	public boolean canDetectMinimums() {
-		return false;
-	}
+	@Override public boolean canDetectMinimums() {return false;}
 }

@@ -78,6 +78,7 @@ public class CompleteSift {
 
 		final int dof = describe.getDescriptorLength();
 		features = new DogArray<>(() -> new TupleDesc_F64(dof));
+		gradient.initialize(scaleSpace);
 	}
 
 	/**

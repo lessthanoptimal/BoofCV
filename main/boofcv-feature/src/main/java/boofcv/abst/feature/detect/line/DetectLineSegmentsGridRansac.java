@@ -30,6 +30,7 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.line.LineSegment2D_F32;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -41,7 +42,7 @@ import java.util.List;
 public class DetectLineSegmentsGridRansac<T extends ImageGray<T>, D extends ImageGray<D>>
 		implements DetectLineSegment<T> {
 	GridRansacLineDetector<D> detectorGrid;
-	ConnectLinesGrid connect;
+	@Nullable ConnectLinesGrid connect;
 
 	D derivX;
 	D derivY;
@@ -53,7 +54,7 @@ public class DetectLineSegmentsGridRansac<T extends ImageGray<T>, D extends Imag
 	double edgeThreshold;
 
 	public DetectLineSegmentsGridRansac( GridRansacLineDetector<D> detectorGrid,
-										 ConnectLinesGrid connect,
+										 @Nullable ConnectLinesGrid connect,
 										 ImageGradient<T, D> gradient,
 										 double edgeThreshold,
 										 Class<T> imageType, Class<D> derivType ) {

@@ -33,6 +33,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I16;
 import lombok.Getter;
 import lombok.Setter;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -428,7 +429,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 	}
 
 	@Override
-	public List<PointTrack> getActiveTracks( List<PointTrack> list ) {
+	public List<PointTrack> getActiveTracks( @Nullable List<PointTrack> list ) {
 		list = declareTrackStorage(list);
 
 		addToList(active, list);
@@ -440,12 +441,12 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 	 * KLT does not have inactive tracks since all tracks are dropped if a problem occurs.
 	 */
 	@Override
-	public List<PointTrack> getInactiveTracks( List<PointTrack> list ) {
+	public List<PointTrack> getInactiveTracks( @Nullable List<PointTrack> list ) {
 		return declareTrackStorage(list);
 	}
 
 	@Override
-	public List<PointTrack> getDroppedTracks( List<PointTrack> list ) {
+	public List<PointTrack> getDroppedTracks( @Nullable List<PointTrack> list ) {
 		list = declareTrackStorage(list);
 
 		addToList(dropped, list);
@@ -454,7 +455,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 	}
 
 	@Override
-	public List<PointTrack> getNewTracks( List<PointTrack> list ) {
+	public List<PointTrack> getNewTracks( @Nullable List<PointTrack> list ) {
 		list = declareTrackStorage(list);
 
 		addToList(spawned, list);
@@ -463,7 +464,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 	}
 
 	@Override
-	public List<PointTrack> getAllTracks( List<PointTrack> list ) {
+	public List<PointTrack> getAllTracks( @Nullable List<PointTrack> list ) {
 		return getActiveTracks(list);
 	}
 
@@ -504,6 +505,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 	/**
 	 * Contains the image pyramid
 	 */
+	@SuppressWarnings({"NullAway.Init"})
 	class ImageStruct {
 		public PyramidDiscrete<I> basePyramid;
 		public D[] derivX;

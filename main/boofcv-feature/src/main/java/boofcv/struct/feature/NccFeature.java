@@ -31,6 +31,7 @@ import java.util.Arrays;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class NccFeature implements TupleDesc<NccFeature> {
 	/** Mean pixel intensity   Can be used to reconstruct the original values of the template. */
 	public double mean;

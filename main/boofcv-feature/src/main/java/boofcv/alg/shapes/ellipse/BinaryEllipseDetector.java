@@ -26,6 +26,7 @@ import georegression.struct.curve.EllipseRotated_F64;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.DogArray;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +42,7 @@ import java.util.List;
 public class BinaryEllipseDetector<T extends ImageGray<T>> {
 
 	BinaryEllipseDetectorPixel ellipseDetector;
-	SnapToEllipseEdge<T> ellipseRefiner;
+	@Nullable SnapToEllipseEdge<T> ellipseRefiner;
 	EdgeIntensityEllipse<T> intensityCheck;
 
 	// storage for the output refined ellipses
@@ -63,7 +64,7 @@ public class BinaryEllipseDetector<T extends ImageGray<T>> {
 	 * @param inputType Input image type
 	 */
 	public BinaryEllipseDetector( BinaryEllipseDetectorPixel ellipseDetector,
-								  SnapToEllipseEdge<T> ellipseRefiner,
+								  @Nullable SnapToEllipseEdge<T> ellipseRefiner,
 								  EdgeIntensityEllipse<T> intensityCheck,
 								  Class<T> inputType ) {
 		this.ellipseDetector = ellipseDetector;
@@ -84,7 +85,8 @@ public class BinaryEllipseDetector<T extends ImageGray<T>> {
 	 * @param distToUndist Transform from distorted to undistorted image.
 	 * @param undistToDist Transform from undistorted to distorted image.
 	 */
-	public void setLensDistortion( PixelTransform<Point2D_F32> distToUndist, PixelTransform<Point2D_F32> undistToDist ) {
+	public void setLensDistortion( PixelTransform<Point2D_F32> distToUndist,
+								   PixelTransform<Point2D_F32> undistToDist ) {
 		this.ellipseDetector.setLensDistortion(distToUndist);
 		if (this.ellipseRefiner != null)
 			this.ellipseRefiner.setTransform(undistToDist);

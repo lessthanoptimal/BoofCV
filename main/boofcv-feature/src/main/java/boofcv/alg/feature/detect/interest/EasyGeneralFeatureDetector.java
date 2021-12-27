@@ -35,14 +35,15 @@ import java.util.Objects;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class EasyGeneralFeatureDetector<T extends ImageGray<T>, D extends ImageGray<D>> {
 
 	// Feature detector
 	protected GeneralFeatureDetector<T, D> detector;
 	// Computes image gradient
-	protected ImageGradient<T, D> gradient;
+	protected @Nullable ImageGradient<T, D> gradient;
 	// computes hessian
-	protected ImageHessian<D> hessian;
+	protected @Nullable ImageHessian<D> hessian;
 
 	// storage for image derivatives
 	protected D derivX; // first derivative x-axis
@@ -102,7 +103,8 @@ public class EasyGeneralFeatureDetector<T extends ImageGray<T>, D extends ImageG
 	/**
 	 * Declare storage for image derivatives as needed
 	 */
-	private void declareDerivativeImages( ImageGradient<T, D> gradient, ImageHessian<D> hessian, Class<D> derivType ) {
+	private void declareDerivativeImages( @Nullable ImageGradient<T, D> gradient,
+										  @Nullable ImageHessian<D> hessian, Class<D> derivType ) {
 		if (gradient != null || hessian != null) {
 			derivX = GeneralizedImageOps.createSingleBand(derivType, 1, 1);
 			derivY = GeneralizedImageOps.createSingleBand(derivType, 1, 1);
@@ -125,9 +127,9 @@ public class EasyGeneralFeatureDetector<T extends ImageGray<T>, D extends ImageG
 		initializeDerivatives(input);
 
 		if (detector.getRequiresGradient() || detector.getRequiresHessian())
-			gradient.process(input, derivX, derivY);
+			Objects.requireNonNull(gradient).process(input, derivX, derivY);
 		if (detector.getRequiresHessian())
-			hessian.process(derivX, derivY, derivXX, derivYY, derivXY);
+			Objects.requireNonNull(hessian).process(derivX, derivY, derivXX, derivYY, derivXY);
 
 		detector.setExclude(exclude);
 		detector.process(input, derivX, derivY, derivXX, derivYY, derivXY);
@@ -163,7 +165,7 @@ public class EasyGeneralFeatureDetector<T extends ImageGray<T>, D extends ImageG
 
 	public ImageType<T> getInputType() {
 		if (detector.getRequiresGradient() || detector.getRequiresHessian())
-			return gradient.getInputType();
-		return ImageType.single(detector.getImageType());
+			return Objects.requireNonNull(gradient).getInputType();
+		return ImageType.single(Objects.requireNonNull(detector.getImageType()));
 	}
 }
