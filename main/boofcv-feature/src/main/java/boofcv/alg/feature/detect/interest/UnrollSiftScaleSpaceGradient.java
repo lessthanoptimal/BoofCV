@@ -23,6 +23,8 @@ import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.image.GrayF32;
 import org.ddogleg.struct.DogArray;
 
+import java.util.Objects;
+
 /**
  * Precomputes the gradient for all scales in the scale-space and saves them in a list. Since it saves the entire
  * scale space it can take up a bit of memory, but allows quick random look up of images.
@@ -38,33 +40,45 @@ public class UnrollSiftScaleSpaceGradient {
 
 	private int numScales;
 
-	/**
-	 * Sets the input image. Scale-space is computed and unrolled from this image
-	 */
-	public void process( SiftScaleSpace scaleSpace ) {
+	/** Initializes data structures given the scale-space */
+	public void initialize( SiftScaleSpace scaleSpace ) {
 		numScales = scaleSpace.getNumScales();
 		int numScales = scaleSpace.getNumScales()*scaleSpace.getTotalOctaves();
 		scales.reserve(numScales);
 		scales.reset();
 
 		for (int octaveIdx = 0; octaveIdx < scaleSpace.octaves.length; octaveIdx++) {
-			if (scaleSpace.isOctaveTooSmall(octaveIdx))
-				break;
-
 			int octave = octaveIdx + scaleSpace.firstOctave;
 			SiftScaleSpace.Octave o = scaleSpace.octaves[octaveIdx];
 
 			for (int i = 0; i < scaleSpace.getNumScales(); i++) {
-				// See comment in ImageScale for why there's an offset below
-				GrayF32 scaleImage = o.scales[i+1];
 				double sigma = scaleSpace.computeSigmaScale(octave, i);
 				double pixelCurrentToInput = scaleSpace.pixelScaleCurrentToInput(octave);
 
 				ImageScale scale = scales.grow();
-
-				gradient.process(scaleImage, scale.derivX, scale.derivY);
 				scale.imageToInput = pixelCurrentToInput;
 				scale.sigma = sigma;
+			}
+		}
+	}
+
+	/**
+	 * Sets the input image. Scale-space is computed and unrolled from this image
+	 */
+	public void process( SiftScaleSpace scaleSpace ) {
+		int scaleIdx = 0;
+		for (int octaveIdx = 0; octaveIdx < scaleSpace.octaves.length; octaveIdx++) {
+			// Don't process what is invalid
+			if (scaleSpace.isOctaveTooSmall(octaveIdx))
+				break;
+
+			SiftScaleSpace.Octave o = scaleSpace.octaves[octaveIdx];
+
+			for (int i = 0; i < scaleSpace.getNumScales(); i++, scaleIdx++) {
+				// See comment in ImageScale for why there's an offset below
+				GrayF32 scaleImage = o.scales[i + 1];
+				ImageScale scale = scales.get(scaleIdx);
+				gradient.process(scaleImage, scale.derivX, scale.derivY);
 			}
 		}
 	}
@@ -84,7 +98,7 @@ public class UnrollSiftScaleSpaceGradient {
 				best = image;
 			}
 		}
-		return best;
+		return Objects.requireNonNull(best);
 	}
 
 	public GrayF32 getDerivX( byte octaveIdx, byte scaleIdx ) {

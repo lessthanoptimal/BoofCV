@@ -28,6 +28,7 @@ import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_F64;
 import org.ddogleg.struct.FastArray;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Wrapper class around independent feature detectors, region orientation, and descriptors, that allow
@@ -44,7 +45,7 @@ public class DetectDescribeFusion<T extends ImageGray<T>, TD extends TupleDesc<T
 	// detects interest points
 	private final InterestPointDetector<T> detector;
 	// optional override for orientation
-	private final OrientationImage<T> orientation;
+	private final @Nullable OrientationImage<T> orientation;
 	// describes each feature found
 	private final DescribePointRadiusAngle<T, TD> describe;
 
@@ -64,7 +65,7 @@ public class DetectDescribeFusion<T extends ImageGray<T>, TD extends TupleDesc<T
 	 * @param describe Describes features
 	 */
 	public DetectDescribeFusion( InterestPointDetector<T> detector,
-								 OrientationImage<T> orientation,
+								 @Nullable OrientationImage<T> orientation,
 								 DescribePointRadiusAngle<T, TD> describe ) {
 		this.describe = describe;
 		this.orientation = orientation;

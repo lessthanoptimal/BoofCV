@@ -38,9 +38,9 @@ public abstract class DescribePointRadiusAngleAbstract<T extends ImageBase<T>, T
 	@Override public void setImage( T image ) {}
 	@Override public boolean isScalable() { return false; }
 	@Override public boolean isOriented() { return false; }
-	@Override public ImageType<T> getImageType() { return null; }
+	@Override public ImageType<T> getImageType() { throw new RuntimeException("Implement"); }
 	@Override public double getCanonicalWidth() { return 0; }
-	@Override public TD createDescription() { return null; }
-	@Override public Class<TD> getDescriptionType() { return null; }
+	@Override public TD createDescription() { throw new RuntimeException("Implement"); }
+	@Override public Class<TD> getDescriptionType() { throw new RuntimeException("Implement"); }
 	// @formatter:on
 }

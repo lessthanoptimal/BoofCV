@@ -44,6 +44,7 @@ import org.ddogleg.struct.DogArray_I32;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class ClusterLabeledImage extends RegionMergeTree {
 
 	// which connectivity rule is used. 4 or 8.

@@ -46,6 +46,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class AssociateNearestNeighbor<D>
 		implements AssociateDescription<D> {
 	// Nearest Neighbor algorithm and storage for the results

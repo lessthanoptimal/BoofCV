@@ -80,6 +80,7 @@ import static boofcv.misc.CircularIndex.addOffset;
  * @author Peter Abeles
  * @see XCornerAbeles2019Intensity
  */
+@SuppressWarnings({"NullAway.Init"})
 public class DetectChessboardCornersX {
 	/**
 	 * The largest x-corner intensity is found in the image then multiplied by this factor to select the cutoff point

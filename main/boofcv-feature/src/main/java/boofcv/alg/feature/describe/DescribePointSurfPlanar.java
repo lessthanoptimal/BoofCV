@@ -35,6 +35,7 @@ import boofcv.struct.image.Planar;
  * @see DescribePointSurf
  * @see DescribePointSurfMod
  */
+@SuppressWarnings({"NullAway.Init"})
 public class DescribePointSurfPlanar<II extends ImageGray<II>> {
 	// SURF algorithms
 	private DescribePointSurf<II> describe;

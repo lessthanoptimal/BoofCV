@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,6 +30,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class FeatureSelectNBest<Point> implements FeatureSelectLimitIntensity<Point> {
 
 	// list of the found best corners
@@ -43,8 +44,9 @@ public class FeatureSelectNBest<Point> implements FeatureSelectLimitIntensity<Po
 	public FeatureSelectNBest() {}
 
 	@Override
-	public void select( GrayF32 intensity, int width, int height, boolean positive, @Nullable FastAccess<Point> prior,
-						FastAccess<Point> detected, int limit, FastArray<Point> selected ) {
+	public void select( @Nullable GrayF32 intensity, int width, int height, boolean positive,
+						@Nullable FastAccess<Point> prior, FastAccess<Point> detected, int limit,
+						FastArray<Point> selected ) {
 		BoofMiscOps.checkTrue(limit > 0);
 		selected.reset();
 

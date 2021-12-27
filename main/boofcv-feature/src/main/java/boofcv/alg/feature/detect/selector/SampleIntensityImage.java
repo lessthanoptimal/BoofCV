@@ -22,6 +22,7 @@ import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I16;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Classes for sampling the intensity image
@@ -34,8 +35,9 @@ public class SampleIntensityImage {
 	 * Implementation for {@link Point2D_I16}
 	 */
 	public static class I16 implements SampleIntensity<Point2D_I16> {
+		@SuppressWarnings({"NullAway"}) // Passing in null for this type is a bug and is easily detected
 		@Override
-		public float sample( GrayF32 intensity, int index, Point2D_I16 p ) {
+		public float sample( @Nullable GrayF32 intensity, int index, Point2D_I16 p ) {
 			return intensity.unsafe_get(p.x, p.y);
 		}
 
@@ -47,8 +49,9 @@ public class SampleIntensityImage {
 	 * Implementation for {@link Point2D_F32}
 	 */
 	public static class F32 implements SampleIntensity<Point2D_F32> {
+		@SuppressWarnings({"NullAway"}) // Passing in null for this type is a bug and is easily detected
 		@Override
-		public float sample( GrayF32 intensity, int index, Point2D_F32 p ) {
+		public float sample( @Nullable GrayF32 intensity, int index, Point2D_F32 p ) {
 			return intensity.unsafe_get((int)p.x, (int)p.y);
 		}
 
@@ -60,8 +63,9 @@ public class SampleIntensityImage {
 	 * Implementation for {@link Point2D_F64}
 	 */
 	public static class F64 implements SampleIntensity<Point2D_F64> {
+		@SuppressWarnings({"NullAway"}) // Passing in null for this type is a bug and is easily detected
 		@Override
-		public float sample( GrayF32 intensity, int index, Point2D_F64 p ) {
+		public float sample( @Nullable GrayF32 intensity, int index, Point2D_F64 p ) {
 			return intensity.unsafe_get((int)p.x, (int)p.y);
 		}
 

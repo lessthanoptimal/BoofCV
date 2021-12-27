@@ -35,13 +35,13 @@ public abstract class DetectDescribePointAbstract<T extends ImageBase<T>, Desc e
 	@Override public void detect(T input) { }
 	@Override public boolean hasScale() { return false; }
 	@Override public boolean hasOrientation() { return false; }
-	@Override public ImageType<T> getInputType() { return null; }
-	@Override public Desc createDescription() { return null; }
-	@Override public Class<Desc> getDescriptionType() { return null; }
+	@Override public ImageType<T> getInputType() { throw new RuntimeException("Implement"); }
+	@Override public Desc createDescription() { throw new RuntimeException("Implement"); }
+	@Override public Class<Desc> getDescriptionType() { throw new RuntimeException("Implement"); }
 	@Override public int getNumberOfSets() { return 1; }
 	@Override public int getSet(int index) { return 0; }
 	@Override public int getNumberOfFeatures() { return 0; }
-	@Override public Point2D_F64 getLocation(int featureIndex) { return null; }
+	@Override public Point2D_F64 getLocation(int featureIndex) { throw new RuntimeException("Implement"); }
 	@Override public double getRadius(int featureIndex) { return 0; }
 	@Override public double getOrientation(int featureIndex) { return 0; }
 	// @formatter:on

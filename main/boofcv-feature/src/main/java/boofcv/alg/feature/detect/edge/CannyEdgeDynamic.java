@@ -24,6 +24,7 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Canny edge detector where the thresholds are computed dynamically based upon the magnitude of the largest edge
@@ -42,8 +43,7 @@ public class CannyEdgeDynamic<T extends ImageGray<T>, D extends ImageGray<D>> ex
 	}
 
 	@Override
-	protected void performThresholding( float threshLow, float threshHigh, GrayU8 output ) {
-
+	protected void performThresholding( float threshLow, float threshHigh, @Nullable GrayU8 output ) {
 		if (threshLow < 0 || threshLow > 1 || threshHigh < 0 || threshHigh > 1)
 			throw new IllegalArgumentException("Relative thresholds must be from 0 to 1, inclusive.");
 

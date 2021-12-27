@@ -33,33 +33,33 @@ import boofcv.struct.image.ImageGray;
  * @author Peter Abeles
  */
 public class OrientationSiftToImage<T extends ImageGray<T>>
-		implements OrientationImage<T>
-{
+		implements OrientationImage<T> {
 	UnrollSiftScaleSpaceGradient gradient = new UnrollSiftScaleSpaceGradient();
 	OrientationHistogramSift<GrayF32> alg;
 	UnrollSiftScaleSpaceGradient.ImageScale image;
 	double sigma = 1.0/BoofDefaults.SIFT_SCALE_TO_RADIUS;
 
 	Class<T> imageType;
-	GrayF32 imageFloat = new GrayF32(1,1);
+	GrayF32 imageFloat = new GrayF32(1, 1);
 	SiftScaleSpace ss;
 
-	public OrientationSiftToImage(OrientationHistogramSift<GrayF32> alg,
-								  SiftScaleSpace ss, Class<T> imageType ) {
+	public OrientationSiftToImage( OrientationHistogramSift<GrayF32> alg,
+								   SiftScaleSpace ss, Class<T> imageType ) {
 		this.alg = alg;
 		this.ss = ss;
 		this.imageType = imageType;
+
+		gradient.initialize(ss);
 	}
 
 	@Override
-	public void setImage(T image) {
-
+	public void setImage( T image ) {
 		GrayF32 input;
-		if( image instanceof GrayF32) {
+		if (image instanceof GrayF32) {
 			input = (GrayF32)image;
 		} else {
-			imageFloat.reshape(image.width,image.height);
-			GConvertImage.convert(image,imageFloat);
+			imageFloat.reshape(image.width, image.height);
+			GConvertImage.convert(image, imageFloat);
 			input = imageFloat;
 		}
 
@@ -74,17 +74,17 @@ public class OrientationSiftToImage<T extends ImageGray<T>>
 	}
 
 	@Override
-	public void setObjectRadius(double radius) {
-		sigma = radius / BoofDefaults.SIFT_SCALE_TO_RADIUS;
+	public void setObjectRadius( double radius ) {
+		sigma = radius/BoofDefaults.SIFT_SCALE_TO_RADIUS;
 		this.image = gradient.lookup(sigma);
 	}
 
 	@Override
-	public double compute(double c_x, double c_y) {
-		alg.setImageGradient(image.derivX,image.derivY);
+	public double compute( double c_x, double c_y ) {
+		alg.setImageGradient(image.derivX, image.derivY);
 
 		double imageToInput = image.imageToInput;
-		alg.process(c_x/imageToInput,c_y/imageToInput, sigma/imageToInput);
+		alg.process(c_x/imageToInput, c_y/imageToInput, sigma/imageToInput);
 
 		return alg.getPeakOrientation();
 	}

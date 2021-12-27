@@ -41,6 +41,7 @@ import java.util.List;
  * grow to be quite large, but there is no way to assign objects with large internal arrays to newly found
  * lists which require large arrays. That was a long sentence.
  */
+@SuppressWarnings({"NullAway.Init"})
 public class HysteresisEdgeTracePoints {
 
 	// after an edge has been traversed it is set to this value. This is also why the lower threshold

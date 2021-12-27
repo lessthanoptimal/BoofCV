@@ -29,6 +29,7 @@ import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_F32;
 import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastArray;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>
@@ -79,6 +80,7 @@ import org.ddogleg.struct.FastArray;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class SegmentFelzenszwalbHuttenlocher04<T extends ImageBase<T>> {
 
 	// tuning parameter. Determines the number of segments. Larger number means larger regions
@@ -95,7 +97,7 @@ public class SegmentFelzenszwalbHuttenlocher04<T extends ImageBase<T>> {
 	private final FhEdgeWeights<T> computeWeights;
 
 	private final QuickSortObj_F32 sorter = new QuickSortObj_F32();
-	private ApproximateSort_F32 sorterApprox = null;
+	private @Nullable ApproximateSort_F32 sorterApprox = null;
 	// storage for edges so that they can be recycled on the next call
 	protected DogArray<Edge> edges = new DogArray<>(Edge::new);
 	// list of edges which were not matched to anything. used to merge small regions

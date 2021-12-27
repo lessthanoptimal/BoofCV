@@ -56,6 +56,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 // todo compute stan once for every line
+@SuppressWarnings({"NullAway.Init"})
 public class ConnectLinesGrid {
 	// how similar two lines need to be, in radians
 	float lineSlopeAngleTol;

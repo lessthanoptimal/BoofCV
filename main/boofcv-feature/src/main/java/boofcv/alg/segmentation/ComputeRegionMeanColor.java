@@ -28,6 +28,7 @@ import org.ddogleg.struct.DogArray_I32;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class ComputeRegionMeanColor<T extends ImageBase<T>> {
 
 	// Input image

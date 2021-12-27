@@ -32,7 +32,6 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Factory for detecting higher level shapes
  *
- *
  * @author Peter Abeles
  */
 public class FactoryShapeDetector {
@@ -46,9 +45,8 @@ public class FactoryShapeDetector {
 	 * @return Detecto
 	 */
 	public static <T extends ImageGray<T>>
-	BinaryEllipseDetector<T> ellipse(@Nullable ConfigEllipseDetector config , Class<T> imageType )
-	{
-		if( config == null )
+	BinaryEllipseDetector<T> ellipse( @Nullable ConfigEllipseDetector config, Class<T> imageType ) {
+		if (config == null)
 			config = new ConfigEllipseDetector();
 
 		config.checkValidity();
@@ -65,7 +63,7 @@ public class FactoryShapeDetector {
 		refine.setConvergenceTol(config.convergenceTol);
 		refine.setMaxIterations(config.maxIterations);
 
-		if( config.maxIterations <= 0 || config.numSampleContour <= 0 ) {
+		if (config.maxIterations <= 0 || config.numSampleContour <= 0) {
 			refine = null;
 		}
 
@@ -86,25 +84,25 @@ public class FactoryShapeDetector {
 	 * @return Detector
 	 */
 	public static <T extends ImageGray<T>>
-	DetectPolygonBinaryGrayRefine<T> polygon(@Nullable ConfigPolygonDetector config, Class<T> imageType)
-	{
+	DetectPolygonBinaryGrayRefine<T> polygon( @Nullable ConfigPolygonDetector config, Class<T> imageType ) {
+		if (config == null)
+			config = new ConfigPolygonDetector();
 		config.checkValidity();
 
 		RefinePolygonToContour refineContour = config.refineContour ? new RefinePolygonToContour() : null;
 
 		RefinePolygonToGray<T> refineGray = config.refineGray != null ?
-				refinePolygon(config.refineGray,imageType) : null;
+				refinePolygon(config.refineGray, imageType) : null;
 
-		DetectPolygonFromContour<T> detector = polygonContour(config.detector,imageType);
+		DetectPolygonFromContour<T> detector = polygonContour(config.detector, imageType);
 
-		return new DetectPolygonBinaryGrayRefine<>(detector,refineContour,refineGray,
+		return new DetectPolygonBinaryGrayRefine<>(detector, refineContour, refineGray,
 				config.minimumRefineEdgeIntensity,
 				config.adjustForThresholdBias);
 	}
 
 	public static <T extends ImageGray<T>>
-	DetectPolygonFromContour<T> polygonContour(ConfigPolygonFromContour config, Class<T> imageType)
-	{
+	DetectPolygonFromContour<T> polygonContour( ConfigPolygonFromContour config, Class<T> imageType ) {
 		config.checkValidity();
 
 		PointsToPolyline contourToPolygon =
@@ -116,11 +114,11 @@ public class FactoryShapeDetector {
 		return new DetectPolygonFromContour<>(contourToPolygon,
 				config.minimumContour,
 				config.clockwise, config.canTouchBorder,
-				config.minimumEdgeIntensity, config.tangentEdgeIntensity,contour, imageType);
+				config.minimumEdgeIntensity, config.tangentEdgeIntensity, contour, imageType);
 	}
 
 	public static <T extends ImageGray<T>>
-	RefinePolygonToGray<T> refinePolygon(ConfigRefinePolygonLineToImage config , Class<T> imageType ) {
+	RefinePolygonToGray<T> refinePolygon( ConfigRefinePolygonLineToImage config, Class<T> imageType ) {
 		return new RefinePolygonToGrayLine<>(
 				config.cornerOffset, config.lineSamples,
 				config.sampleRadius, config.maxIterations,

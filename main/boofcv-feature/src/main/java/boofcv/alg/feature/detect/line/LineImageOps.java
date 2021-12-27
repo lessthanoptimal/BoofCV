@@ -28,6 +28,7 @@ import georegression.struct.line.LineParametric2D_F32;
 import georegression.struct.line.LineSegment2D_F32;
 import georegression.struct.point.Point2D_F32;
 import org.ddogleg.sorting.QuickSort_F32;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -219,8 +220,7 @@ public class LineImageOps {
 	/**
 	 * Find the point in which the line intersects the image border and create a line segment at those points
 	 */
-	public static LineSegment2D_F32 convert( LineParametric2D_F32 l,
-											 int width, int height ) {
+	public static @Nullable LineSegment2D_F32 convert( LineParametric2D_F32 l, int width, int height ) {
 		LineParametric2D_F32 side = new LineParametric2D_F32();
 		side.p.setTo(0, 0);
 		side.slope.setTo(1, 0);

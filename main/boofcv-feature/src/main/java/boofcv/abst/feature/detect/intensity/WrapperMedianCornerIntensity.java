@@ -34,6 +34,7 @@ import java.lang.reflect.Method;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("unchecked")
 public class WrapperMedianCornerIntensity<I extends ImageGray<I>, D extends ImageGray<D>>
 		extends BaseGeneralFeatureIntensity<I, D> {
 

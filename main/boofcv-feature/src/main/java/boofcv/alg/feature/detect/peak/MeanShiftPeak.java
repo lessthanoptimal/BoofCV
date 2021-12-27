@@ -39,6 +39,7 @@ import lombok.Setter;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class MeanShiftPeak<T extends ImageGray<T>> {
 
 	// Input image and interpolation function

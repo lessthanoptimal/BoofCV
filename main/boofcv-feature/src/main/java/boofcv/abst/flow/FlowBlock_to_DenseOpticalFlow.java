@@ -30,9 +30,9 @@ import boofcv.struct.pyramid.ImagePyramid;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class FlowBlock_to_DenseOpticalFlow<T extends ImageGray<T>>
-	implements DenseOpticalFlow<T>
-{
+		implements DenseOpticalFlow<T> {
 	DenseOpticalFlowBlockPyramid<T> flowAlg;
 
 	// width and height of input image. used to see if anything changes
@@ -49,10 +49,10 @@ public class FlowBlock_to_DenseOpticalFlow<T extends ImageGray<T>>
 
 	ImageType<T> imageType;
 
-	public FlowBlock_to_DenseOpticalFlow(DenseOpticalFlowBlockPyramid<T> flowAlg,
-										 double scale,
-										 int maxLayers,
-										 Class<T> imageType) {
+	public FlowBlock_to_DenseOpticalFlow( DenseOpticalFlowBlockPyramid<T> flowAlg,
+										  double scale,
+										  int maxLayers,
+										  Class<T> imageType ) {
 		this.flowAlg = flowAlg;
 		this.scale = scale;
 		this.maxLayers = maxLayers;
@@ -61,25 +61,25 @@ public class FlowBlock_to_DenseOpticalFlow<T extends ImageGray<T>>
 	}
 
 	@Override
-	public void process(T source, T destination, ImageFlow flow) {
+	public void process( T source, T destination, ImageFlow flow ) {
 
-		if( width != source.width || height != source.height ) {
+		if (width != source.width || height != source.height) {
 			width = source.width;
 			height = source.height;
 
-			int minSize = (2*(flowAlg.getRegionRadius() + flowAlg.getRegionRadius()+1) + 1);
+			int minSize = (2*(flowAlg.getRegionRadius() + flowAlg.getRegionRadius() + 1) + 1);
 
 			// apply no blur to the layers. If the user wants a blurred image they can blur it themselves
-			pyramidSrc = UtilDenseOpticalFlow.standardPyramid(source.width,source.height,scale,0,
-					minSize,maxLayers,source.getImageType().getImageClass());
-			pyramidDst = UtilDenseOpticalFlow.standardPyramid(source.width,source.height,scale,0,
-					minSize,maxLayers,source.getImageType().getImageClass());
+			pyramidSrc = UtilDenseOpticalFlow.standardPyramid(source.width, source.height, scale, 0,
+					minSize, maxLayers, source.getImageType().getImageClass());
+			pyramidDst = UtilDenseOpticalFlow.standardPyramid(source.width, source.height, scale, 0,
+					minSize, maxLayers, source.getImageType().getImageClass());
 		}
 
 		pyramidSrc.process(source);
 		pyramidDst.process(destination);
 
-		flowAlg.process(pyramidSrc,pyramidDst);
+		flowAlg.process(pyramidSrc, pyramidDst);
 
 		flow.setTo(flowAlg.getOpticalFlow());
 	}

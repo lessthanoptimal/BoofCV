@@ -197,10 +197,12 @@ public class PruneCloseTracks<T> {
 		return candidateDropped;
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	protected static class TrackDrop<TD> {
 		public TD track;
 		public boolean dropped;
 
+		@SuppressWarnings({"NullAway"})
 		public void reset() {
 			track = null;
 			dropped = false;

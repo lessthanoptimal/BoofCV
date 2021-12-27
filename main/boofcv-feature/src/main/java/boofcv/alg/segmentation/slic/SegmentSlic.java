@@ -62,6 +62,7 @@ import java.util.Arrays;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class SegmentSlic<T extends ImageBase<T>>
 		implements Stoppable {
 	// border which ensures there is a 3x3 neighborhood around the initial clusters and that there are pixels
@@ -441,6 +442,7 @@ public abstract class SegmentSlic<T extends ImageBase<T>>
 	/**
 	 * The mean in k-means. Point in image (x,y) and color space.
 	 */
+	@SuppressWarnings({"NullAway.Init"})
 	public static class Cluster {
 		// unique ID for the cluster
 		public int id;
@@ -448,7 +450,7 @@ public abstract class SegmentSlic<T extends ImageBase<T>>
 		// location of the cluster in the image and color space
 		public float x;
 		public float y;
-		public float color[];
+		public float[] color;
 
 		// the total. Used when being updated
 		public float totalWeight;

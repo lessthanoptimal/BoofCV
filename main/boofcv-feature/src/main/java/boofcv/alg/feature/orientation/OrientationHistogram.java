@@ -36,6 +36,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class OrientationHistogram<D extends ImageGray<D>>
 		implements OrientationGradient<D> {
 	// the region's radius

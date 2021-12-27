@@ -49,6 +49,7 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class DetectDescribeAssociateTracker<I extends ImageGray<I>, TD extends TupleDesc<TD>> {
 	// associates features between two images together
 	protected AssociateDescriptionSets2D<TD> associate;
