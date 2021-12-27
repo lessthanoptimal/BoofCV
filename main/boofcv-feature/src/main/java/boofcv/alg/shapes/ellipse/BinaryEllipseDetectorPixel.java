@@ -39,9 +39,11 @@ import georegression.struct.point.Point2D_I32;
 import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.struct.DogArray;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * <p>Detects ellipses inside a binary image by finding their contour and fitting an ellipse to the contour. Fitting
@@ -69,6 +71,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class BinaryEllipseDetectorPixel {
 	// maximum distance from the ellipse in pixels
 	private @Getter @Setter double maxDistanceFromEllipse = 3.0;
@@ -85,28 +88,28 @@ public class BinaryEllipseDetectorPixel {
 	private @Getter @Setter double maxMajorToMinorRatio = Double.MAX_VALUE;
 
 	// connect rule used with contour finding
-	private @Getter ConnectRule connectRule;
+	private final @Getter ConnectRule connectRule;
 	// allow it to switch between two algorithms
-	private BinaryLabelContourFinder contourFinder;
-	private GrayS32 labeled = new GrayS32(1, 1);
-	private BinaryContourFinderLinearExternal contourExternal;
+	private @Nullable BinaryLabelContourFinder contourFinder;
+	private final GrayS32 labeled = new GrayS32(1, 1);
+	private @Nullable BinaryContourFinderLinearExternal contourExternal;
 
-	private FitEllipseAlgebraic_F64 algebraic = new FitEllipseAlgebraic_F64();
+	private final FitEllipseAlgebraic_F64 algebraic = new FitEllipseAlgebraic_F64();
 
-	private ClosestPointEllipseAngle_F64 closestPoint = new ClosestPointEllipseAngle_F64(1e-4f, 15);
+	private final ClosestPointEllipseAngle_F64 closestPoint = new ClosestPointEllipseAngle_F64(1e-4f, 15);
 
 	// transforms which can be used to handle lens distortion
 	protected PixelTransform<Point2D_F32> distToUndist;
 	protected Point2D_F32 distortedPoint = new Point2D_F32();
 
-	private PrintStream verbose = null;
+	private @Nullable PrintStream verbose = null;
 
-	private DogArray<Point2D_F64> pointsF = new DogArray<>(Point2D_F64::new);
+	private final DogArray<Point2D_F64> pointsF = new DogArray<>(Point2D_F64::new);
 
-	private DogArray<Found> found = new DogArray<>(Found::new);
+	private final DogArray<Found> found = new DogArray<>(Found::new);
 
 	// temporary storage for a contour
-	private DogArray<Point2D_I32> contourTmp = new DogArray<>(Point2D_I32::new);
+	private final DogArray<Point2D_I32> contourTmp = new DogArray<>(Point2D_I32::new);
 
 	public BinaryEllipseDetectorPixel( ConnectRule connectRule ) {
 		this.connectRule = connectRule;
@@ -146,9 +149,9 @@ public class BinaryEllipseDetectorPixel {
 		selectedFinder.setMinContour(minimumContour);
 
 		if (isInternalContour()) {
-			contourFinder.process(binary, labeled);
+			Objects.requireNonNull(contourFinder).process(binary, labeled);
 		} else {
-			contourExternal.process(binary);
+			Objects.requireNonNull(contourExternal).process(binary);
 		}
 
 		List<ContourPacked> blobs = selectedFinder.getContours();
@@ -298,7 +301,7 @@ public class BinaryEllipseDetectorPixel {
 		if (contourFinder != null)
 			return contourFinder;
 		else
-			return contourExternal;
+			return Objects.requireNonNull(contourExternal);
 	}
 
 	public boolean isVerbose() {
@@ -338,6 +341,7 @@ public class BinaryEllipseDetectorPixel {
 		return found.toList();
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	public static class Found {
 		/**
 		 * Computed ellipse in undistorted pixel coordinates

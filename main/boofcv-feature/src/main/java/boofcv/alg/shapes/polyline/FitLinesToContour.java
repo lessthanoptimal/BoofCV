@@ -44,6 +44,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class FitLinesToContour {
 
 	// maximum number of samples along a line. After a certain point little is gained by  sampling all of those

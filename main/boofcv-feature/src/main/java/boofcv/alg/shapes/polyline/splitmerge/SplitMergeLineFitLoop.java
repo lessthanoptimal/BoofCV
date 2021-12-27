@@ -25,6 +25,7 @@ import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.DogArray_I32;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Implementation of {@link SplitMergeLineFit} for looped lists of points. The beginning and end of the list are
@@ -225,6 +226,7 @@ public class SplitMergeLineFitLoop extends SplitMergeLineFit {
 	 * @return Selected offset from start of the split. -1 if no split was selected
 	 */
 	protected int selectSplitOffset( int indexStart, int length ) {
+		Objects.requireNonNull(contour);
 		int bestOffset = -1;
 
 		int indexEnd = (indexStart + length)%N;

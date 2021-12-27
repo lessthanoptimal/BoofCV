@@ -76,6 +76,7 @@ import java.util.Set;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class DetectPolygonFromContour<T extends ImageGray<T>> implements VerbosePrint {
 
 	// minimum size of a shape's contour as a fraction of the image width

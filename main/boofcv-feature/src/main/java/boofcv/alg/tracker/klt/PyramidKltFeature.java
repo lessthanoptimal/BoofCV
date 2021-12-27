@@ -23,6 +23,7 @@ package boofcv.alg.tracker.klt;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class PyramidKltFeature {
 	/** KLT feature description for each layer in the pyramid */
 	public KltFeature[] desc;

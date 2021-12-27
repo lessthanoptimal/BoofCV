@@ -40,6 +40,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class MinimizeEnergyPrune {
 
 	// how much a corner adds to the energy calculation
