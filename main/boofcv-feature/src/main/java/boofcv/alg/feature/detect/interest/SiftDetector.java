@@ -87,6 +87,7 @@ import static boofcv.alg.feature.detect.interest.FastHessianFeatureDetector.poly
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class SiftDetector {
 
 	// conversion factor to go from pixel coordinate in current octave to input image

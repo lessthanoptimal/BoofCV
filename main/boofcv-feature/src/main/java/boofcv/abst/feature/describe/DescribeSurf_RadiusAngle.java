@@ -29,6 +29,7 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class DescribeSurf_RadiusAngle<T extends ImageGray<T>, II extends ImageGray<II>>
 		implements DescribePointRadiusAngle<T, TupleDesc_F64> {
 

@@ -37,6 +37,7 @@ import org.ddogleg.struct.FastArray;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class AssociateThreeByPairs<TD extends TupleDesc<TD>> implements AssociateThreeDescription<TD> {
 
 	// image to image association

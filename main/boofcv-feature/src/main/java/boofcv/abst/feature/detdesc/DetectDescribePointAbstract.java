@@ -31,7 +31,7 @@ import georegression.struct.point.Point2D_F64;
 public abstract class DetectDescribePointAbstract<T extends ImageBase<T>, Desc extends TupleDesc<Desc>>
 		implements DetectDescribePoint<T, Desc> {
 	// @formatter:off
-	@Override public Desc getDescription(int index) { return null; }
+	@Override public Desc getDescription(int index) { throw new RuntimeException("implement"); }
 	@Override public void detect(T input) { }
 	@Override public boolean hasScale() { return false; }
 	@Override public boolean hasOrientation() { return false; }

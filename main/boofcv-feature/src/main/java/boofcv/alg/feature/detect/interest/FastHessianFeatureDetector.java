@@ -92,6 +92,7 @@ import java.util.List;
  * @author Peter Abeles
  * @see boofcv.factory.feature.detect.interest.FactoryInterestPoint
  */
+@SuppressWarnings({"NullAway.Init"})
 public class FastHessianFeatureDetector<II extends ImageGray<II>> {
 
 	// Reference to pass in integral image

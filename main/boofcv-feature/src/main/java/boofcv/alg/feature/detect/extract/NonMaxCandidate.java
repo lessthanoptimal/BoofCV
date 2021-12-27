@@ -24,6 +24,8 @@ import georegression.struct.point.Point2D_I16;
 import org.ddogleg.struct.DogArray;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 /**
  * <p/>
  * Performs a sparse search for local minimums/maximums by only examine around candidates.
@@ -63,7 +65,7 @@ public class NonMaxCandidate {
 	public void process( GrayF32 intensityImage,
 						 @Nullable ListIntPoint2D candidatesMin,
 						 @Nullable ListIntPoint2D candidatesMax,
-						 DogArray<Point2D_I16> foundMin, DogArray<Point2D_I16> foundMax ) {
+						 @Nullable DogArray<Point2D_I16> foundMin, @Nullable DogArray<Point2D_I16> foundMax ) {
 
 		this.input = intensityImage;
 
@@ -74,11 +76,11 @@ public class NonMaxCandidate {
 		search.initialize(intensityImage);
 
 		if (candidatesMin != null) {
-			foundMin.reset();
+			Objects.requireNonNull(foundMin).reset();
 			examineMinimum(intensityImage, candidatesMin, foundMin);
 		}
 		if (candidatesMax != null) {
-			foundMax.reset();
+			Objects.requireNonNull(foundMax).reset();
 			examineMaximum(intensityImage, candidatesMax, foundMax);
 		}
 	}

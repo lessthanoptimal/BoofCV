@@ -24,6 +24,7 @@ import georegression.metric.UtilAngle;
 import georegression.struct.line.LineParametric2D_F32;
 import georegression.struct.line.LineSegment2D_F32;
 import georegression.struct.point.Point2D_F32;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -178,7 +179,7 @@ public class ImageLinePruneMerge {
 		lines = filtered;
 	}
 
-	public List<LineParametric2D_F32> createList( List<LineParametric2D_F32> ret ) {
+	public List<LineParametric2D_F32> createList( @Nullable List<LineParametric2D_F32> ret ) {
 		if (ret == null)
 			ret = new ArrayList<>();
 		else

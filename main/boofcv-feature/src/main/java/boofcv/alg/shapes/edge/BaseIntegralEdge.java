@@ -28,6 +28,7 @@ import boofcv.struct.border.BorderType;
 import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F32;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Base class for computing line integrals along lines/edges.
@@ -55,7 +56,7 @@ public class BaseIntegralEdge<T extends ImageGray<T>> {
 	 *
 	 * @param undistToDist Pixel transformation from undistorted pixels into the actual distorted input image.
 	 */
-	public void setTransform( PixelTransform<Point2D_F32> undistToDist ) {
+	public void setTransform( @Nullable PixelTransform<Point2D_F32> undistToDist ) {
 		if (undistToDist != null) {
 			InterpolatePixelS<T> interpolate = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
 			integralImage = new GImageGrayDistorted<>(undistToDist, interpolate);

@@ -28,6 +28,7 @@ import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import lombok.Getter;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>
@@ -52,6 +53,7 @@ import lombok.Getter;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class RefinePolygonToGrayLine<T extends ImageGray<T>> implements RefinePolygonToGray<T> {
 
 	// How far away from a corner will it sample the line
@@ -127,7 +129,8 @@ public class RefinePolygonToGrayLine<T extends ImageGray<T>> implements RefinePo
 	}
 
 	@Override
-	public void setLensDistortion( int width, int height, PixelTransform<Point2D_F32> distToUndist, PixelTransform<Point2D_F32> undistToDist ) {
+	public void setLensDistortion( int width, int height,
+								   @Nullable PixelTransform<Point2D_F32> distToUndist, @Nullable PixelTransform<Point2D_F32> undistToDist ) {
 		this.snapToEdge.setTransform(undistToDist);
 	}
 

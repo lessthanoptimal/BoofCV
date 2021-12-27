@@ -31,9 +31,11 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.line.LineParametric2D_F32;
 import org.ddogleg.struct.DogArray;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * <p>
@@ -54,6 +56,7 @@ import java.util.List;
  * @author Peter Abeles
  * @see boofcv.alg.feature.detect.line.HoughParametersFootOfNorm
  */
+@SuppressWarnings({"NullAway.Init"})
 public class DetectLineHoughFootSubimage<D extends ImageGray<D>>
 		implements DetectEdgeLines<D> {
 	int totalHorizontalDivisions;
@@ -81,7 +84,7 @@ public class DetectLineHoughFootSubimage<D extends ImageGray<D>>
 	// the maximum number of lines it will return
 	int maxLines;
 
-	List<LineParametric2D_F32> foundLines;
+	@Nullable List<LineParametric2D_F32> foundLines;
 
 	/**
 	 * Specifies detection parameters. The suggested parameters should be used as a starting point and will
@@ -140,6 +143,11 @@ public class DetectLineHoughFootSubimage<D extends ImageGray<D>>
 		// removing duplicate lines  caused by processing sub-images
 		foundLines = pruneLines(derivX.width, derivX.height);
 
+		removeReferences();
+	}
+
+	@SuppressWarnings("NullAway")
+	private void removeReferences() {
 		// remove reference to external data structures
 		this.derivX = null;
 		this.derivY = null;
@@ -147,7 +155,7 @@ public class DetectLineHoughFootSubimage<D extends ImageGray<D>>
 
 	@Override
 	public List<LineParametric2D_F32> getFoundLines() {
-		return foundLines;
+		return Objects.requireNonNull(foundLines, "Did you run detect?");
 	}
 
 	private List<LineParametric2D_F32> pruneLines( int width, int height ) {

@@ -117,6 +117,7 @@ public class NonMaxLimiter {
 	/**
 	 * Data structure which provides information on a local extremum.
 	 */
+	@SuppressWarnings({"NullAway.Init"})
 	public static class LocalExtreme implements Comparable<LocalExtreme> {
 		/**
 		 * Absolute value of image intensity

@@ -60,6 +60,7 @@ import boofcv.struct.sparse.SparseScaleGradient;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class DescribePointSurf<II extends ImageGray<II>> {
 
 	// Number of sub-regions wide the large grid is

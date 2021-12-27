@@ -45,6 +45,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -112,7 +113,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> implements Verbose
 	@Getter @Setter private boolean outputClockwiseUpY;
 
 	/** transforms which can be used to handle lens distortion */
-	@Getter protected PixelTransform<Point2D_F32> distToUndist, undistToDist;
+	@Getter protected @Nullable PixelTransform<Point2D_F32> distToUndist, undistToDist;
 	protected Point2D_F32 distortedPoint = new Point2D_F32();
 
 	/** How intense the edge along a contour needs to be for it to be processed */
@@ -139,7 +140,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> implements Verbose
 	MovingAverage milliShapes = new MovingAverage(0.8);
 
 	// If not null then it will print verbose messages to this stream
-	PrintStream verbose = null;
+	@Nullable PrintStream verbose = null;
 
 	/**
 	 * Configures the detector.
@@ -197,7 +198,8 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> implements Verbose
 	 * @param undistToDist Transform from undistorted to distorted image.
 	 */
 	public void setLensDistortion( int width, int height,
-								   PixelTransform<Point2D_F32> distToUndist, PixelTransform<Point2D_F32> undistToDist ) {
+								   @Nullable PixelTransform<Point2D_F32> distToUndist,
+								   @Nullable PixelTransform<Point2D_F32> undistToDist ) {
 
 		this.distToUndist = distToUndist;
 		this.undistToDist = undistToDist;
@@ -513,6 +515,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> implements Verbose
 	 * Removes lens distortion from the found contour
 	 */
 	private void removeDistortionFromContour( List<Point2D_I32> distorted, DogArray<Point2D_I32> undistorted ) {
+		Objects.requireNonNull(distToUndist);
 		undistorted.reset();
 
 		for (int j = 0; j < distorted.size(); j++) {
@@ -585,6 +588,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> implements Verbose
 		return milliShapes.getAverage();
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	public static class Info {
 		/**
 		 * Was it created from an external or internal contour
@@ -632,6 +636,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> implements Verbose
 			return contour.internalIndexes.size > 0;
 		}
 
+		@SuppressWarnings("NullAway")
 		public void reset() {
 			external = false;
 			edgeInside = edgeOutside = -1;

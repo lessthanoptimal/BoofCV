@@ -42,6 +42,7 @@ import java.util.List;
  * @author Peter Abeles
  * @see boofcv.alg.feature.describe.DescribePointSurfPlanar
  */
+@SuppressWarnings({"NullAway.Init"})
 public class DetectDescribeSurfPlanar<II extends ImageGray<II>> {
 	// SURF algorithms
 	protected FastHessianFeatureDetector<II> detector;

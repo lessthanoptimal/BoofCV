@@ -90,8 +90,8 @@ public class EasyGeneralFeatureDetector<T extends ImageGray<T>, D extends ImageG
 	 * Constructor which allows the user to specify how derivatives are computed
 	 */
 	public EasyGeneralFeatureDetector( GeneralFeatureDetector<T, D> detector,
-									   ImageGradient<T, D> gradient,
-									   ImageHessian<D> hessian,
+									   @Nullable ImageGradient<T, D> gradient,
+									   @Nullable ImageHessian<D> hessian,
 									   Class<D> derivType ) {
 		this.detector = detector;
 		this.gradient = gradient;

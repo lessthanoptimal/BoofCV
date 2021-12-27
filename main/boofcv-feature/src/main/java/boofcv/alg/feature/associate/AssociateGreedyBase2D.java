@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,6 +31,7 @@ import pabeles.concurrency.GrowArray;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class AssociateGreedyBase2D<D> extends AssociateGreedyBase<D> {
 	// used to compute the distance between two points
 	protected GrowArray<AssociateImageDistanceFunction> distances; // used for concurrency

@@ -34,7 +34,7 @@ import java.lang.reflect.Method;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "NullAway.Init"})
 public class WrapperMedianCornerIntensity<I extends ImageGray<I>, D extends ImageGray<D>>
 		extends BaseGeneralFeatureIntensity<I, D> {
 
@@ -54,7 +54,8 @@ public class WrapperMedianCornerIntensity<I extends ImageGray<I>, D extends Imag
 	}
 
 	@Override
-	public void process( I input, D derivX, D derivY, D derivXX, D derivYY, D derivXY ) {
+	public void process( I input, @Nullable D derivX, @Nullable D derivY,
+						 @Nullable D derivXX, @Nullable D derivYY, @Nullable D derivXY ) {
 		init(input.width, input.height);
 
 		if (medianImage == null) {

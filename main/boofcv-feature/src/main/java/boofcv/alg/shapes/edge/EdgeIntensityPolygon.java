@@ -23,6 +23,7 @@ import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Looks at the difference in pixel values along the edge of a polygon and decides if its a false positive or not.
@@ -74,7 +75,7 @@ public class EdgeIntensityPolygon<T extends ImageGray<T>> {
 	 *
 	 * @param undistToDist Pixel transformation from undistorted pixels into the actual distorted input image..
 	 */
-	public void setTransform( PixelTransform<Point2D_F32> undistToDist ) {
+	public void setTransform( @Nullable PixelTransform<Point2D_F32> undistToDist ) {
 		scorer.setTransform(undistToDist);
 	}
 

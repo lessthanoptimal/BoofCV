@@ -22,6 +22,7 @@ import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.override.BOverrideClass;
 import boofcv.override.BOverrideManager;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Location of override functions related to {@link FactoryFeatureExtractor}.
@@ -30,8 +31,8 @@ import boofcv.override.BOverrideManager;
  */
 public class BOverrideFactoryFeatureExtractor extends BOverrideClass {
 
-	public static NonMax nonmax;
-	public static NonMaxCandidate nonmaxCandidate;
+	public static @Nullable NonMax nonmax;
+	public static @Nullable NonMaxCandidate nonmaxCandidate;
 
 	static {
 		BOverrideManager.register(BOverrideFactoryFeatureExtractor.class);
