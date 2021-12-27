@@ -49,7 +49,6 @@ public class UnrollSiftScaleSpaceGradient {
 
 		for (int octaveIdx = 0; octaveIdx < scaleSpace.octaves.length; octaveIdx++) {
 			int octave = octaveIdx + scaleSpace.firstOctave;
-			SiftScaleSpace.Octave o = scaleSpace.octaves[octaveIdx];
 
 			for (int i = 0; i < scaleSpace.getNumScales(); i++) {
 				double sigma = scaleSpace.computeSigmaScale(octave, i);

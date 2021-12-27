@@ -25,6 +25,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class DescribePointRawPixelsRectangle<T extends ImageGray<T>> {
 	// image that descriptors are being extracted from
 	protected T image;

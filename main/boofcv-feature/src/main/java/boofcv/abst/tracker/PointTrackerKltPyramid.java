@@ -46,6 +46,7 @@ import static boofcv.abst.tracker.PointTrackerUtils.declareTrackStorage;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<D>>
 		implements PointTracker<I> {
 	// If this is a positive number it specifies the maximum number of allowed tracks
@@ -187,7 +188,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 	 * @param y y-coordinate
 	 * @return the new track if successful or null if no new track could be created
 	 */
-	public PointTrack addTrack( double x, double y ) {
+	public @Nullable PointTrack addTrack( double x, double y ) {
 		if (!input.isInBounds((int)x, (int)y))
 			return null;
 

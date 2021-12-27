@@ -43,8 +43,8 @@ import java.util.List;
  * @see OrientationIntegral
  * @see DescribePointSurf
  */
-public class Surf_DetectDescribe
-		<T extends ImageGray<T>, II extends ImageGray<II>>
+@SuppressWarnings({"NullAway.Init"})
+public class Surf_DetectDescribe<T extends ImageGray<T>, II extends ImageGray<II>>
 		implements DetectDescribePoint<T, TupleDesc_F64> {
 	// SURF algorithms
 	protected FastHessianFeatureDetector<II> detector;

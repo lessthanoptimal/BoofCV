@@ -30,6 +30,7 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class DescribeSurf_Point<T extends ImageGray<T>, II extends ImageGray<II>>
 		implements DescribePoint<T, TupleDesc_F64> {
 

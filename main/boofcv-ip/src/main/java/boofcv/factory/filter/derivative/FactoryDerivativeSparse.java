@@ -37,6 +37,7 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.sparse.GradientValue;
 import boofcv.struct.sparse.SparseImageGradient;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Creates filters for performing sparse derivative calculations.
@@ -55,7 +56,7 @@ public class FactoryDerivativeSparse {
 	 * @see DerivativeLaplacian
 	 */
 	public static <T extends ImageGray<T>>
-	ImageFunctionSparse<T> createLaplacian( Class<T> imageType, ImageBorder<T> border ) {
+	ImageFunctionSparse<T> createLaplacian( Class<T> imageType, @Nullable ImageBorder<T> border ) {
 		if (border == null) {
 			border = FactoryImageBorder.single(BorderType.EXTENDED, imageType);
 		}

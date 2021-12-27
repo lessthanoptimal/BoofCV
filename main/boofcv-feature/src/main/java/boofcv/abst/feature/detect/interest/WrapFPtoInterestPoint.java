@@ -33,6 +33,7 @@ import java.util.Objects;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class WrapFPtoInterestPoint<T extends ImageGray<T>, D extends ImageGray<D>> implements InterestPointDetector<T> {
 
 	FeaturePyramid<T, D> detector;

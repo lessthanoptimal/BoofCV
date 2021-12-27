@@ -23,24 +23,26 @@ import boofcv.struct.ListIntPoint2D;
 import boofcv.struct.image.ImageGray;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 /**
  * Wrapper around children of {@link boofcv.alg.feature.detect.intensity.GradientCornerIntensity}.
- * 
+ *
  * @author Peter Abeles
  */
-public class WrapperGradientCornerIntensity<I extends ImageGray<I>,D extends ImageGray<D>>
-		extends BaseGeneralFeatureIntensity<I,D>
-{
+public class WrapperGradientCornerIntensity<I extends ImageGray<I>, D extends ImageGray<D>>
+		extends BaseGeneralFeatureIntensity<I, D> {
 	GradientCornerIntensity<D> alg;
 
-	public WrapperGradientCornerIntensity(GradientCornerIntensity<D> alg) {
-		super(null,alg.getInputType());
+	public WrapperGradientCornerIntensity( GradientCornerIntensity<D> alg ) {
+		super(null, alg.getInputType());
 		this.alg = alg;
 	}
 
-	@Override public void process(I image , D derivX, D derivY, D derivXX, D derivYY, D derivXY ) {
-		init(image.width,image.height);
-		alg.process(derivX,derivY,intensity);
+	@Override public void process( I image, @Nullable D derivX, @Nullable D derivY,
+								   @Nullable D derivXX, @Nullable D derivYY, @Nullable D derivXY ) {
+		init(image.width, image.height);
+		alg.process(Objects.requireNonNull(derivX), Objects.requireNonNull(derivY), intensity);
 	}
 
 	@Override public @Nullable ListIntPoint2D getCandidatesMin() {

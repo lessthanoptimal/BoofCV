@@ -34,6 +34,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class OrientationAverage<D extends ImageGray<D>> implements OrientationGradient<D> {
 	// image gradient
 	protected D derivX;

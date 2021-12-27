@@ -33,6 +33,7 @@ import org.ddogleg.struct.FastAccess;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class WrapAssociateGreedy<T> implements AssociateDescription<T> {
 
 	AssociateGreedyDescBase<T> alg;

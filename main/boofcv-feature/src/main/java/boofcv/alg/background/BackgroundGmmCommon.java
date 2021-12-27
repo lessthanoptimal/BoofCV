@@ -32,6 +32,7 @@ import pabeles.concurrency.GrowArray;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class BackgroundGmmCommon {
 	// Storage for estimated models
 	//

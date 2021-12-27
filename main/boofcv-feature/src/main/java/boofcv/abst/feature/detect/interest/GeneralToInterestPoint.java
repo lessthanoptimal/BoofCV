@@ -28,6 +28,7 @@ import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I16;
 import org.ddogleg.struct.DogArray;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Wrapper around {@link boofcv.alg.feature.detect.interest.GeneralFeatureDetector} to make it compatible with {@link InterestPointDetector}.
@@ -48,22 +49,21 @@ public class GeneralToInterestPoint<T extends ImageGray<T>, D extends ImageGray<
 	// list of points it found
 	protected DogArray<Point2D_F64> foundPoints = new DogArray<>(10, Point2D_F64::new);
 
-	public GeneralToInterestPoint( GeneralFeatureDetector<T, D> detector,
-								   double radius) {
+	public GeneralToInterestPoint( GeneralFeatureDetector<T, D> detector, double radius) {
 		super(detector, detector.getImageType(), detector.getDerivType());
 		configure(detector, radius);
 	}
 
 	public GeneralToInterestPoint( GeneralFeatureDetector<T, D> detector,
 								   double radius,
-								   Class<T> imageType, Class<D> derivType ) {
+								   @Nullable Class<T> imageType, @Nullable Class<D> derivType ) {
 		super(detector, imageType, derivType);
 		configure(detector, radius);
 	}
 
 	public GeneralToInterestPoint( GeneralFeatureDetector<T, D> detector,
-								   ImageGradient<T, D> gradient,
-								   ImageHessian<D> hessian,
+								   @Nullable ImageGradient<T, D> gradient,
+								   @Nullable ImageHessian<D> hessian,
 								   double radius,
 								   Class<D> derivType ) {
 		super(detector, gradient, hessian, derivType);

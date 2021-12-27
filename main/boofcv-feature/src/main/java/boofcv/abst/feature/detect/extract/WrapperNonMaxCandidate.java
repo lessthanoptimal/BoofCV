@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.alg.feature.detect.extract.NonMaxCandidate;
 import boofcv.struct.ListIntPoint2D;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Wrapper around the {@link boofcv.alg.feature.detect.extract.NonMaxCandidate} class.
@@ -30,15 +31,15 @@ import boofcv.struct.image.GrayF32;
  */
 public class WrapperNonMaxCandidate implements NonMaxSuppression {
 	NonMaxCandidate extractor;
-	boolean minimums,maximums;
+	boolean minimums, maximums;
 
-	public WrapperNonMaxCandidate(NonMaxCandidate.Search search, boolean minimums, boolean maximums ) {
+	public WrapperNonMaxCandidate( NonMaxCandidate.Search search, boolean minimums, boolean maximums ) {
 		this.extractor = new NonMaxCandidate(search);
 		this.minimums = minimums;
 		this.maximums = maximums;
 	}
 
-	public WrapperNonMaxCandidate(NonMaxCandidate extractor, boolean minimums, boolean maximums ) {
+	public WrapperNonMaxCandidate( NonMaxCandidate extractor, boolean minimums, boolean maximums ) {
 		this.extractor = extractor;
 		this.minimums = minimums;
 		this.maximums = maximums;
@@ -55,17 +56,17 @@ public class WrapperNonMaxCandidate implements NonMaxSuppression {
 	}
 
 	@Override
-	public void setThresholdMinimum(float threshold) {
+	public void setThresholdMinimum( float threshold ) {
 		extractor.setThresholdMin(threshold);
 	}
 
 	@Override
-	public void setThresholdMaximum(float threshold) {
+	public void setThresholdMaximum( float threshold ) {
 		extractor.setThresholdMax(threshold);
 	}
 
 	@Override
-	public void setIgnoreBorder(int border) {
+	public void setIgnoreBorder( int border ) {
 		extractor.setBorder(border);
 	}
 
@@ -75,10 +76,10 @@ public class WrapperNonMaxCandidate implements NonMaxSuppression {
 	}
 
 	@Override
-	public void process(GrayF32 intensity,
-						ListIntPoint2D candidateMin, ListIntPoint2D candidateMax,
-						QueueCorner foundMin, QueueCorner foundMax) {
-		extractor.process(intensity, candidateMin, candidateMax, foundMin,foundMax);
+	public void process( GrayF32 intensity,
+						 @Nullable ListIntPoint2D candidateMin, @Nullable ListIntPoint2D candidateMax,
+						 @Nullable QueueCorner foundMin, @Nullable QueueCorner foundMax ) {
+		extractor.process(intensity, candidateMin, candidateMax, foundMin, foundMax);
 	}
 
 	@Override
@@ -87,7 +88,7 @@ public class WrapperNonMaxCandidate implements NonMaxSuppression {
 	}
 
 	@Override
-	public void setSearchRadius(int radius) {
+	public void setSearchRadius( int radius ) {
 		extractor.setSearchRadius(radius);
 	}
 

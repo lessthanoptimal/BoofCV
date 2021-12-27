@@ -60,7 +60,8 @@ public class WrapperHessianDerivBlobIntensity<I extends ImageGray<I>, D extends 
 	}
 
 	@Override
-	public void process( I image, D derivX, D derivY, D derivXX, D derivYY, D derivXY ) {
+	public void process( I image, @Nullable D derivX, @Nullable D derivY,
+						 @Nullable D derivXX, @Nullable D derivYY, @Nullable D derivXY ) {
 		init(image.width, image.height);
 
 		try {

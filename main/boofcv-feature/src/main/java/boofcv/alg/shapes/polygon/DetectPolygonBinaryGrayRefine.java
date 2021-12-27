@@ -40,6 +40,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 
 	// Detects the polygons using a contour from a binary image
@@ -48,10 +49,10 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 	AdjustPolygonForThresholdBias adjustForBias;
 
 	// Refines the edges using the contour alone
-	private RefinePolygonToContour refineContour;
+	private @Nullable RefinePolygonToContour refineContour;
 
 	// Refines the edges using the gray scale image
-	private RefinePolygonToGray<T> refineGray;
+	private @Nullable RefinePolygonToGray<T> refineGray;
 
 	// Used to remove false positives
 	private EdgeIntensityPolygon<T> edgeIntensity;
@@ -77,8 +78,8 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 	 * @param adjustForThresholdBias Should it adjust contour polygons for the bias caused by thresholding?
 	 */
 	public DetectPolygonBinaryGrayRefine( DetectPolygonFromContour<T> detector,
-										  RefinePolygonToContour refineContour,
-										  RefinePolygonToGray<T> refineGray,
+										  @Nullable RefinePolygonToContour refineContour,
+										  @Nullable RefinePolygonToGray<T> refineGray,
 										  double minimumRefineEdgeIntensity,
 										  boolean adjustForThresholdBias ) {
 		this.detector = detector;

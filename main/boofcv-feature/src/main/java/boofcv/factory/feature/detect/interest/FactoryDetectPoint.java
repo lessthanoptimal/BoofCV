@@ -38,6 +38,8 @@ import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_I16;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 /**
  * <p>
  * Creates instances of {@link GeneralFeatureDetector}, which detects the location of
@@ -60,27 +62,25 @@ public class FactoryDetectPoint {
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
 	GeneralFeatureDetector<T, D> create( ConfigPointDetector config, @Nullable Class<T> imageType, @Nullable Class<D> derivType ) {
 		if (derivType == null)
-			derivType = GImageDerivativeOps.getDerivativeType(imageType);
+			derivType = GImageDerivativeOps.getDerivativeType(Objects.requireNonNull(imageType));
 
 		config.general.detectMaximums = true;
 		config.general.detectMinimums = false;
 		switch (config.type) {
-			case FAST:
-			case LAPLACIAN:
-				config.general.detectMinimums = true; break;
-			default: break;
+			case FAST, LAPLACIAN -> config.general.detectMinimums = true;
+			default -> {}
 		}
 
 		return switch (config.type) {
-			case HARRIS -> FactoryDetectPoint.createHarris(config.general, config.harris, derivType);
+			case HARRIS -> FactoryDetectPoint.createHarris(config.general, config.harris, Objects.requireNonNull(derivType));
 			case SHI_TOMASI -> FactoryDetectPoint.createShiTomasi(config.general, config.shiTomasi, derivType);
-			case FAST -> FactoryDetectPoint.createFast(config.general, config.fast, imageType);
-			case KIT_ROS -> FactoryDetectPoint.createKitRos(config.general, derivType);
-			case MEDIAN -> FactoryDetectPoint.createMedian(config.general, imageType);
-			case DETERMINANT -> FactoryDetectPoint.createHessianDirect(HessianBlobIntensity.Type.DETERMINANT, config.general, imageType);
-			case LAPLACIAN -> FactoryDetectPoint.createHessianDirect(HessianBlobIntensity.Type.TRACE, config.general, imageType);
-			case DETERMINANT_H -> FactoryDetectPoint.createHessianDeriv(config.general, HessianBlobIntensity.Type.DETERMINANT, derivType);
-			case LAPLACIAN_H -> FactoryDetectPoint.createHessianDeriv(config.general, HessianBlobIntensity.Type.TRACE, derivType);
+			case FAST -> FactoryDetectPoint.createFast(config.general, config.fast, Objects.requireNonNull(imageType));
+			case KIT_ROS -> FactoryDetectPoint.createKitRos(config.general, Objects.requireNonNull(derivType));
+			case MEDIAN -> FactoryDetectPoint.createMedian(config.general, Objects.requireNonNull(imageType));
+			case DETERMINANT -> FactoryDetectPoint.createHessianDirect(HessianBlobIntensity.Type.DETERMINANT, config.general, Objects.requireNonNull(imageType));
+			case LAPLACIAN -> FactoryDetectPoint.createHessianDirect(HessianBlobIntensity.Type.TRACE, config.general, Objects.requireNonNull(imageType));
+			case DETERMINANT_H -> FactoryDetectPoint.createHessianDeriv(config.general, HessianBlobIntensity.Type.DETERMINANT, Objects.requireNonNull(derivType));
+			case LAPLACIAN_H -> FactoryDetectPoint.createHessianDeriv(config.general, HessianBlobIntensity.Type.TRACE, Objects.requireNonNull(derivType));
 			default -> throw new IllegalArgumentException("Unknown type " + config.type);
 		};
 	}

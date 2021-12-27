@@ -32,14 +32,14 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class WrapFLPtoInterestPoint<T extends ImageGray<T>, D extends ImageGray<D>> implements InterestPointDetector<T> {
 
 	FeatureLaplacePyramid<T, D> detector;
 	List<ScalePoint> location;
 	PyramidFloat<T> ss;
 
-	public WrapFLPtoInterestPoint( FeatureLaplacePyramid<T, D> detector,
-								   PyramidFloat<T> ss ) {
+	public WrapFLPtoInterestPoint( FeatureLaplacePyramid<T, D> detector, PyramidFloat<T> ss ) {
 		this.detector = detector;
 		this.ss = ss;
 	}

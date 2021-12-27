@@ -22,6 +22,7 @@ import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.shapes.Polygon2D_F64;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Refines a polygon using the gray scale image. This results in a more accurate fit than just the contour alone
@@ -40,7 +41,8 @@ public interface RefinePolygonToGray<T extends ImageGray<T>> {
 	 * Specifies lens distortion
 	 */
 	void setLensDistortion( int width, int height,
-							PixelTransform<Point2D_F32> distToUndist, PixelTransform<Point2D_F32> undistToDist );
+							@Nullable PixelTransform<Point2D_F32> distToUndist,
+							@Nullable PixelTransform<Point2D_F32> undistToDist );
 
 	/**
 	 * Clears the previously set lens distortion

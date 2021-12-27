@@ -27,6 +27,7 @@ import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.Stoppable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>
@@ -65,7 +66,7 @@ public class SegmentMeanShift<T extends ImageBase<T>>
 	// ensures that all pixels in segment are connected
 	ClusterLabeledImage segment;
 	// Prunes and merges smaller regions together
-	MergeSmallRegions<T> prune;
+	@Nullable MergeSmallRegions<T> prune;
 
 	// If a request to stop running hsa been requested
 	volatile boolean stopRequested = false;
@@ -83,7 +84,7 @@ public class SegmentMeanShift<T extends ImageBase<T>>
 	 */
 	public SegmentMeanShift( SegmentMeanShiftSearch<T> search,
 							 MergeRegionMeanShift merge,
-							 MergeSmallRegions<T> prune,
+							 @Nullable MergeSmallRegions<T> prune,
 							 ConnectRule connectRule ) {
 		this.search = search;
 		this.merge = merge;

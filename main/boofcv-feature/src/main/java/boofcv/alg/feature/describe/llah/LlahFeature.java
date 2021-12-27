@@ -18,6 +18,8 @@
 
 package boofcv.alg.feature.describe.llah;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Arrays;
 
 /**
@@ -30,7 +32,7 @@ public class LlahFeature {
 	/**
 	 * If there's a hash collision
 	 */
-	public LlahFeature next;
+	public @Nullable LlahFeature next;
 	public int documentID;
 	public int landmarkID;
 	public final int[] invariants;
