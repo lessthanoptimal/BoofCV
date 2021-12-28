@@ -29,26 +29,26 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("NullAway.Init")
 public class SimpleNumberSequenceReader {
+	char commentChar;
 
-	public SimpleNumberSequenceReader(char commentChar) {
+	Reader input;
+	List<Double> sequence;
+
+	char[] buffer = new char[1024];
+
+	public SimpleNumberSequenceReader( char commentChar ) {
 		this.commentChar = commentChar;
 	}
 
-	char commentChar;
-	Reader input;
-
-	List<Double> sequence;
-
-	char buffer[] = new char[1024];
-	
 	public List<Double> read( Reader input ) throws IOException {
 		this.input = input;
 		sequence = new ArrayList<>();
 		int v = input.read();
 
-		while( v >= 0 ) {
-			if( v == commentChar ) {
+		while (v >= 0) {
+			if (v == commentChar) {
 				skipLine();
 			} else {
 				parseLine(v);
@@ -56,18 +56,23 @@ public class SimpleNumberSequenceReader {
 			v = input.read();
 		}
 
-		this.input = null;
+		dereferenceInput();
 		return sequence;
 	}
-	
+
+	@SuppressWarnings("NullAway")
+	private void dereferenceInput() {
+		this.input = null;
+	}
+
 	private void parseLine( int v ) throws IOException {
 		int size = 0;
 
-		while( v >= 0 && v != '\n' ) {
-			if( Character.isWhitespace(v) ) {
-				if( size > 0 ) {
-					String s = new String(buffer,0,size);
-					sequence.add( Double.parseDouble(s) );
+		while (v >= 0 && v != '\n') {
+			if (Character.isWhitespace(v)) {
+				if (size > 0) {
+					String s = new String(buffer, 0, size);
+					sequence.add(Double.parseDouble(s));
 					size = 0;
 				}
 			} else {
@@ -75,17 +80,17 @@ public class SimpleNumberSequenceReader {
 			}
 			v = input.read();
 		}
-		if( size > 0 ) {
-			String s = new String(buffer,0,size);
-			sequence.add( Double.parseDouble(s) );
+		if (size > 0) {
+			String s = new String(buffer, 0, size);
+			sequence.add(Double.parseDouble(s));
 		}
 	}
-	
+
 	private void skipLine() throws IOException {
-		
+
 		int v = input.read();
-	
-		while( v >= 0 && v != '\n' ) {
+
+		while (v >= 0 && v != '\n') {
 			v = input.read();
 		}
 	}

@@ -26,15 +26,18 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import lombok.Getter;
 import lombok.Setter;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.image.BufferedImage;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Loads and optionally scales all the images in a list.
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class LoadFileImageSequence2<T extends ImageBase<T>> implements SimpleImageSequence<T> {
 
 	int index;
@@ -49,7 +52,7 @@ public class LoadFileImageSequence2<T extends ImageBase<T>> implements SimpleIma
 	T work;
 
 	// reference to output GUI image
-	BufferedImage imageGUI;
+	@Nullable BufferedImage imageGUI;
 
 	boolean loop = false;
 	boolean forwards = true;
@@ -174,7 +177,7 @@ public class LoadFileImageSequence2<T extends ImageBase<T>> implements SimpleIma
 
 	@Override
 	public BufferedImage getGuiImage() {
-		return imageGUI;
+		return Objects.requireNonNull(imageGUI);
 	}
 
 	@Override
@@ -191,6 +194,7 @@ public class LoadFileImageSequence2<T extends ImageBase<T>> implements SimpleIma
 	public void close() {
 	}
 
+	@SuppressWarnings({"NullAway"})
 	@Override
 	public void reset() {
 		index = 0;

@@ -31,6 +31,7 @@ import georegression.struct.se.Se3_F64;
 import georegression.struct.so.Rodrigues_F64;
 
 import java.io.*;
+import java.util.Objects;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -39,6 +40,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class CodecBundleAdjustmentInTheLarge {
 	public SceneStructureMetric scene;
 	public SceneObservations observations;
@@ -151,7 +153,7 @@ public class CodecBundleAdjustmentInTheLarge {
 		Rodrigues_F64 axisAngle = new Rodrigues_F64();
 		for (int viewIdx = 0; viewIdx < scene.views.size; viewIdx++) {
 			SceneStructureMetric.View view = scene.views.data[viewIdx];
-			BundlePinholeSnavely camera = scene.cameras.get(view.camera).getModel();
+			BundlePinholeSnavely camera = Objects.requireNonNull(scene.cameras.get(view.camera).getModel());
 			Se3_F64 parent_to_view = scene.getParentToView(viewIdx);
 
 			ConvertRotation3D_F64.matrixToRodrigues(parent_to_view.R, axisAngle);

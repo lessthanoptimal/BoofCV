@@ -31,6 +31,7 @@ import java.lang.reflect.InvocationTargetException;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class DynamicWebcamInterface implements WebcamInterface {
 
 	WebcamInterface webcam;

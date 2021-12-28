@@ -38,6 +38,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class JpegByteImageSequence<T extends ImageBase<T>> implements SimpleImageSequence<T> {
 
 	int index;

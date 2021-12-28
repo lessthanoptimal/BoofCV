@@ -30,13 +30,14 @@ import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
+import java.util.Objects;
 
 /**
  * Loads or plays a sequence of buffered images.
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class BufferedFileImageSequence<T extends ImageBase<T>> implements SimpleImageSequence<T> {
 
 	BufferedImage[] orig;
@@ -56,9 +57,9 @@ public class BufferedFileImageSequence<T extends ImageBase<T>> implements Simple
 	 * Will load an image sequence with no modification.
 	 *
 	 * @param directory The directory containing the images.
-	 * @param suffix	The suffix that the images have.
+	 * @param suffix The suffix that the images have.
 	 */
-	public BufferedFileImageSequence(ImageType<T> type, File directory, String suffix) {
+	public BufferedFileImageSequence( ImageType<T> type, File directory, String suffix ) {
 		this.type = type;
 
 		if (!directory.isDirectory()) throw new IllegalArgumentException("directory must specify a directory");
@@ -66,39 +67,37 @@ public class BufferedFileImageSequence<T extends ImageBase<T>> implements Simple
 		String[] files = directory.list(new Filter(suffix));
 
 		List<String> listNames = new ArrayList<>();
-		for( String s : files ) {
+		for (String s : files) {
 			listNames.add(s);
 		}
 
 		Collections.sort(listNames);
 
-		orig = new BufferedImage[ files.length ];
-		images = type.createArray( files.length );
+		orig = new BufferedImage[files.length];
+		images = type.createArray(files.length);
 		int index = 0;
 		for (String s : listNames) {
-			BufferedImage b = orig[index] = UtilImageIO.loadImage(directory.getPath()+"/"+s);
-			T a = images[index++] = type.createImage(b.getWidth(),b.getHeight());
+			BufferedImage b = orig[index] = UtilImageIO.loadImage(directory.getPath() + "/" + s);
+			Objects.requireNonNull(b);
+			T a = images[index++] = type.createImage(b.getWidth(), b.getHeight());
 			ConvertBufferedImage.convertFrom(b, a, true);
 		}
 	}
 
-	/**
-	 *
-	 */
-	public BufferedFileImageSequence(ImageType<T> type, BufferedImage[] orig) {
+	public BufferedFileImageSequence( ImageType<T> type, BufferedImage[] orig ) {
 		this.type = type;
 		this.orig = orig;
-		images = type.createArray( orig.length );
+		images = type.createArray(orig.length);
 
-		for( int i = 0; i < orig.length; i++ ) {
+		for (int i = 0; i < orig.length; i++) {
 			BufferedImage b = orig[i];
-			images[i] = type.createImage(b.getWidth(),b.getHeight());
+			images[i] = type.createImage(b.getWidth(), b.getHeight());
 			ConvertBufferedImage.convertFrom(orig[i], images[i], true);
 		}
 	}
 
 	@Override
-	public void setLoop(boolean loop) {
+	public void setLoop( boolean loop ) {
 		this.loop = loop;
 	}
 
@@ -117,7 +116,7 @@ public class BufferedFileImageSequence<T extends ImageBase<T>> implements Simple
 	 */
 	@Override
 	public boolean hasNext() {
-		if( loop )
+		if (loop)
 			return true;
 		else
 			return index < images.length;
@@ -130,14 +129,14 @@ public class BufferedFileImageSequence<T extends ImageBase<T>> implements Simple
 	 */
 	@Override
 	public T next() {
-		if( loop ) {
-			if( forwards ) {
-				if( index >= images.length ) {
-					index = images.length-1;
+		if (loop) {
+			if (forwards) {
+				if (index >= images.length) {
+					index = images.length - 1;
 					forwards = false;
 				}
 			} else {
-				if( index < 0 ) {
+				if (index < 0) {
 					index = 0;
 					forwards = true;
 				}
@@ -146,7 +145,7 @@ public class BufferedFileImageSequence<T extends ImageBase<T>> implements Simple
 
 		this.imageGUI = orig[index];
 
-		if( forwards )
+		if (forwards)
 			image = images[index++];
 		else
 			image = images[index--];
@@ -170,7 +169,7 @@ public class BufferedFileImageSequence<T extends ImageBase<T>> implements Simple
 
 	@Override
 	public int getFrameNumber() {
-		return index-1;
+		return index - 1;
 	}
 
 	@Override
@@ -181,16 +180,17 @@ public class BufferedFileImageSequence<T extends ImageBase<T>> implements Simple
 
 		String suffix;
 
-		private Filter(String suffix) {
+		private Filter( String suffix ) {
 			this.suffix = suffix;
 		}
 
 		@Override
-		public boolean accept(File dir, String name) {
+		public boolean accept( File dir, String name ) {
 			return name.contains(suffix);
 		}
 	}
 
+	@SuppressWarnings({"NullAway"})
 	@Override
 	public void reset() {
 		index = 0;

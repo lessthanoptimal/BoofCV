@@ -21,6 +21,7 @@ package boofcv.io;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.image.BufferedImage;
 import java.io.Reader;
@@ -28,20 +29,21 @@ import java.io.Reader;
 /**
  * Abstract interface for accessing files, images, and videos. Intended to help
  * handle regular applications and applets
- * 
+ *
  * @author Peter Abeles
  */
 public interface MediaManager {
-	
-	Reader openFile( String fileName );
-	
-	BufferedImage openImage( String fileName );
-	
+
+	@Nullable Reader openFile( String fileName );
+
+	@Nullable BufferedImage openImage( String fileName );
+
 	<T extends ImageBase<T>>
-	SimpleImageSequence<T> openVideo( String fileName , ImageType<T> imageInfo );
+	@Nullable SimpleImageSequence<T> openVideo( String fileName, ImageType<T> imageInfo );
 
 	/**
 	 * Opens the specified webcam.
+	 *
 	 * @param device Reference to the webcam device. null if you just want to open the default
 	 * @param width requested image width. Default resolution is any value less than 0
 	 * @param height requested image height. Default resolution is any value less than 0
@@ -49,5 +51,5 @@ public interface MediaManager {
 	 * @return The image sequence.
 	 */
 	<T extends ImageBase<T>>
-	SimpleImageSequence<T> openCamera(String device, int width, int height, ImageType<T> imageType);
+	@Nullable SimpleImageSequence<T> openCamera( String device, int width, int height, ImageType<T> imageType );
 }

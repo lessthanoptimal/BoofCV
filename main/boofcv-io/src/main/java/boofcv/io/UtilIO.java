@@ -77,6 +77,9 @@ public class UtilIO {
 	 */
 	public static List<String> loadListStringYaml( File file ) {
 		URL url = UtilIO.ensureURL(file.getPath());
+		if (url == null)
+			throw new RuntimeException("Unknown file="+file.getPath());
+
 		try (var reader = new BufferedInputStream(url.openStream())) {
 			Yaml yaml = createYmlObject();
 			return yaml.load(reader);
@@ -182,6 +185,8 @@ public class UtilIO {
 	 */
 	public static <T extends Configuration> T loadConfig( File file ) {
 		URL url = UtilIO.ensureURL(file.getPath());
+		if (url == null)
+			throw new RuntimeException("Unknown file="+file.getPath());
 
 		try (InputStream stream = url.openStream()) {
 			var output = new BufferedInputStream(stream);
@@ -261,7 +266,7 @@ public class UtilIO {
 				throw new UncheckedIOException(e);
 			}
 		}
-		return intrinsic;
+		return Objects.requireNonNull(intrinsic);
 	}
 
 	public static BufferedReader openBufferedReader( String fileName ) throws FileNotFoundException {
@@ -274,8 +279,10 @@ public class UtilIO {
 	/**
 	 * Given a path which may or may not be a URL return a URL
 	 */
-	public static URL ensureURL( String path ) {
+	public static @Nullable URL ensureURL( String path ) {
 		path = systemToUnix(path);
+		if (path == null)
+			return null;
 		URL url;
 		try {
 			url = new URL(path);
@@ -293,7 +300,7 @@ public class UtilIO {
 		return url;
 	}
 
-	public static String ensureFilePath( String path ) {
+	public static @Nullable String ensureFilePath( String path ) {
 		URL url = ensureURL(path);
 		if (url == null)
 			return null;
@@ -318,7 +325,7 @@ public class UtilIO {
 		}
 	}
 
-	public static String systemToUnix( String path ) {
+	public static @Nullable String systemToUnix( String path ) {
 		if (path == null) return null;
 		if (File.separatorChar == '\\') {
 			return path.replace('\\', '/');
@@ -354,7 +361,7 @@ public class UtilIO {
 		return path;
 	}
 
-	public static InputStream openStream( String path ) {
+	public static @Nullable InputStream openStream( String path ) {
 		try {
 			URL url = ensureURL(path);
 			if (url == null) {
@@ -437,7 +444,7 @@ public class UtilIO {
 	}
 
 	public static File getFileToBase() {
-		return new File(getPathToBase());
+		return new File(Objects.requireNonNull(getPathToBase()));
 	}
 
 	/**
@@ -445,7 +452,7 @@ public class UtilIO {
 	 *
 	 * @return Path to the base directory.
 	 */
-	public static String getPathToBase() {
+	public static @Nullable String getPathToBase() {
 		String path = new File(".").getAbsoluteFile().getParent();
 
 		while (path != null) {
@@ -488,6 +495,7 @@ public class UtilIO {
 	 * @param exitOnCancel If it should quit on cancel or not.
 	 * @return Name of the selected file or null if nothing was selected.
 	 */
+	@SuppressWarnings("NullAway")
 	public static String selectFile( boolean exitOnCancel ) {
 		String fileName = null;
 		JFileChooser fc = new JFileChooser();
@@ -551,7 +559,10 @@ public class UtilIO {
 	}
 
 	public static <T> T load( String fileName ) {
-		URL url = UtilIO.ensureURL(fileName);
+		@Nullable URL url = UtilIO.ensureURL(fileName);
+		if (url == null)
+			throw new RuntimeException("Unknown path="+fileName);
+
 		try (InputStream fileIn = url.openStream()) {
 			ObjectInputStream in = new ObjectInputStream(fileIn);
 			return (T)in.readObject();
@@ -613,7 +624,7 @@ public class UtilIO {
 	/**
 	 * Reads an entire file and converts it into a text string
 	 */
-	public static String readAsString( String path ) {
+	public static @Nullable String readAsString( String path ) {
 		InputStream stream = openStream(path);
 		if (stream == null) {
 			System.err.println("Failed to open " + path);
@@ -625,7 +636,7 @@ public class UtilIO {
 	/**
 	 * Reads an entire file and converts it into a text string
 	 */
-	public static String readAsString( InputStream stream ) {
+	public static @Nullable String readAsString( InputStream stream ) {
 		StringBuilder code = new StringBuilder();
 		try {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(stream, UTF_8));
@@ -1062,7 +1073,7 @@ public class UtilIO {
 		return ret;
 	}
 
-	private static List<String> listJarPrefix( URL url, String prefix, String suffix ) {
+	private static List<String> listJarPrefix( URL url, @Nullable String prefix, @Nullable String suffix ) {
 		List<String> output = new ArrayList<>();
 
 		JarFile jarfile;
@@ -1094,7 +1105,7 @@ public class UtilIO {
 		}
 	}
 
-	private static List<String> listJarMime( URL url, String prefix, String type ) {
+	private static List<String> listJarMime( URL url, @Nullable String prefix, @Nullable String type ) {
 		List<String> output = new ArrayList<>();
 
 		FileNameMap fileNameMap = URLConnection.getFileNameMap();

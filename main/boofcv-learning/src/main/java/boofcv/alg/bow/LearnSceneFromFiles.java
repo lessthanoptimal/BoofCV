@@ -20,6 +20,7 @@ package boofcv.alg.bow;
 
 import boofcv.struct.learning.ClassificationHistogram;
 import boofcv.struct.learning.Confusion;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.*;
@@ -31,6 +32,7 @@ import java.util.*;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("NullAway.Init")
 public abstract class LearnSceneFromFiles {
 
 	protected Random rand;
@@ -47,9 +49,9 @@ public abstract class LearnSceneFromFiles {
 	double fractionCross;
 
 	// maps for each set of images
-	protected Map<String,List<String>> train;
-	protected Map<String,List<String>> cross;
-	protected Map<String,List<String>> test;
+	protected Map<String, List<String>> train;
+	protected Map<String, List<String>> cross;
+	protected Map<String, List<String>> test;
 
 	public Confusion evaluateTest() {
 		return evaluate(test);
@@ -62,20 +64,20 @@ public abstract class LearnSceneFromFiles {
 	 * @param set Set of classified images
 	 * @return Confusion matrix
 	 */
-	protected Confusion evaluate( Map<String,List<String>> set ) {
+	protected Confusion evaluate( Map<String, List<String>> set ) {
 		ClassificationHistogram histogram = new ClassificationHistogram(scenes.size());
 
 		int total = 0;
 		for (int i = 0; i < scenes.size(); i++) {
 			total += set.get(scenes.get(i)).size();
 		}
-		System.out.println("total images "+total);
+		System.out.println("total images " + total);
 
 		for (int sceneIdx = 0; sceneIdx < scenes.size(); sceneIdx++) {
 			String scene = scenes.get(sceneIdx);
 
 			List<String> images = set.get(scene);
-			System.out.println("  "+scene+" "+images.size());
+			System.out.println("  " + scene + " " + images.size());
 			for (int imageIdx = 0; imageIdx < images.size(); imageIdx++) {
 				String image = images.get(imageIdx);
 				int predicted = classify(image);
@@ -88,15 +90,15 @@ public abstract class LearnSceneFromFiles {
 
 	/**
 	 * Given an image compute which scene it belongs to
+	 *
 	 * @param path Path to input image
 	 * @return integer corresponding to the scene
 	 */
 	protected abstract int classify( String path );
 
-
-	public void loadSets( File dirTraining, File dirCross , File dirTest ) {
+	public void loadSets( File dirTraining, File dirCross, File dirTest ) {
 		train = findImages(dirTraining);
-		if( dirCross != null )
+		if (dirCross != null)
 			cross = findImages(dirCross);
 		test = findImages(dirTest);
 
@@ -104,52 +106,52 @@ public abstract class LearnSceneFromFiles {
 		extractKeys(test);
 	}
 
-	private void extractKeys( Map<String,List<String>> images ) {
+	private void extractKeys( Map<String, List<String>> images ) {
 		Set<String> keys = images.keySet();
 
-		for( String key : keys ) { // lint:forbidden ignore_line
-			if( !scenes.contains(key)) {
+		for (String key : keys) { // lint:forbidden ignore_line
+			if (!scenes.contains(key)) {
 				scenes.add(key);
 			}
 		}
 	}
 
 	public void loadThenSplit( File directory ) {
-		Map<String,List<String>> all = findImages(directory);
+		Map<String, List<String>> all = Objects.requireNonNull(findImages(directory));
 		train = new HashMap<>();
-		if( fractionCross != 0 )
+		if (fractionCross != 0)
 			cross = new HashMap<>();
 		test = new HashMap<>();
 
 		Set<String> keys = all.keySet();
 
-		for( String key : keys ) { // lint:forbidden ignore_line
+		for (String key : keys) { // lint:forbidden ignore_line
 			List<String> allImages = all.get(key);
 
 			// randomize the ordering to remove bias
-			Collections.shuffle(allImages,rand);
+			Collections.shuffle(allImages, rand);
 
 			int numTrain = (int)(allImages.size()*fractionTrain);
-			numTrain = Math.max(minimumTrain,numTrain);
+			numTrain = Math.max(minimumTrain, numTrain);
 			int numCross = (int)(allImages.size()*fractionCross);
-			numCross = Math.max(minimumCross,numCross);
-			int numTest = allImages.size()-numTrain-numCross;
+			numCross = Math.max(minimumCross, numCross);
+			int numTest = allImages.size() - numTrain - numCross;
 
-			if( numTest < minimumTest )
-				throw new RuntimeException("Not enough images to create test set. "+key+" total = "+allImages.size());
+			if (numTest < minimumTest)
+				throw new RuntimeException("Not enough images to create test set. " + key + " total = " + allImages.size());
 
 			createSubSet(key, allImages, train, 0, numTrain);
-			if( cross != null ) {
-				createSubSet(key, allImages, cross , numTrain, numCross+numTrain);
+			if (cross != null) {
+				createSubSet(key, allImages, cross, numTrain, numCross + numTrain);
 			}
-			createSubSet(key, allImages, test, numCross+numTrain,allImages.size());
+			createSubSet(key, allImages, test, numCross + numTrain, allImages.size());
 		}
 
 		scenes.addAll(keys);
 	}
 
-	private void createSubSet(String key, List<String> allImages, Map<String,List<String>> subset ,
-							  int start , int end ) {
+	private void createSubSet( String key, List<String> allImages, Map<String, List<String>> subset,
+							   int start, int end ) {
 		List<String> trainImages = new ArrayList<>();
 		for (int i = start; i < end; i++) {
 			trainImages.add(allImages.get(i));
@@ -161,36 +163,36 @@ public abstract class LearnSceneFromFiles {
 	 * Loads the paths to image files contained in subdirectories of the root directory. Each sub directory
 	 * is assumed to be a different category of images.
 	 */
-	public static Map<String,List<String>> findImages( File rootDir ) {
-		File files[] = rootDir.listFiles();
-		if( files == null )
+	public static @Nullable Map<String, List<String>> findImages( File rootDir ) {
+		File[] files = rootDir.listFiles();
+		if (files == null)
 			return null;
 
 		List<File> imageDirectories = new ArrayList<>();
-		for( File f : files ) { // lint:forbidden ignore_line
-			if( f.isDirectory() ) {
+		for (File f : files) { // lint:forbidden ignore_line
+			if (f.isDirectory()) {
 				imageDirectories.add(f);
 			}
 		}
-		Map<String,List<String>> out = new HashMap<>();
-		for( File d : imageDirectories ) { // lint:forbidden ignore_line
+		Map<String, List<String>> out = new HashMap<>();
+		for (File d : imageDirectories) { // lint:forbidden ignore_line
 			List<String> images = new ArrayList<>();
 
 			files = d.listFiles();
-			if( files == null )
+			if (files == null)
 				throw new RuntimeException("Should be a directory!");
 
-			for( File f : files ) { // lint:forbidden ignore_line
-				if( f.isHidden() || f.isDirectory() || f.getName().endsWith(".txt") ) {
+			for (File f : files) { // lint:forbidden ignore_line
+				if (f.isHidden() || f.isDirectory() || f.getName().endsWith(".txt")) {
 					continue;
 				}
 
-				images.add( f.getPath() );
+				images.add(f.getPath());
 			}
 
 			String key = d.getName().toLowerCase();
 
-			out.put(key,images);
+			out.put(key, images);
 		}
 
 		return out;

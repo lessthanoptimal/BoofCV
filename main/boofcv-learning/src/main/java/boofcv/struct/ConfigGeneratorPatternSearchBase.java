@@ -29,6 +29,7 @@ import java.util.Map;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("NullAway.Init")
 public abstract class ConfigGeneratorPatternSearchBase<Config extends Configuration> extends ConfigGenerator<Config> {
 	/**
 	 * Specifies how to discretize a continuous range
