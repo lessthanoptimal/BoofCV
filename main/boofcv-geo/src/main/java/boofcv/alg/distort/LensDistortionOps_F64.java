@@ -27,6 +27,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.RectangleLength2D_F64;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +57,7 @@ public class LensDistortionOps_F64 {
 											   O paramOriginal,
 											   D paramDesired,
 											   boolean desiredToOriginal,
-											   D paramMod ) {
+											   @Nullable D paramMod ) {
 		LensDistortionNarrowFOV original = LensDistortionFactory.narrow(paramOriginal);
 		LensDistortionNarrowFOV desired = LensDistortionFactory.narrow(paramDesired);
 

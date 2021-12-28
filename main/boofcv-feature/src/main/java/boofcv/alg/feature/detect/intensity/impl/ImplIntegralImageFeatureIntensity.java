@@ -19,8 +19,9 @@
 package boofcv.alg.feature.detect.intensity.impl;
 
 import boofcv.alg.transform.ii.DerivativeIntegralImage;
-import boofcv.alg.transform.ii.IntegralImageOps;
+import boofcv.alg.transform.ii.IntegralImageOps; //CONCURRENT_REMOVE_LINE
 import boofcv.alg.transform.ii.IntegralKernel;
+//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS32;
 import org.jetbrains.annotations.Nullable;
@@ -40,12 +41,10 @@ import javax.annotation.Generated;
 public class ImplIntegralImageFeatureIntensity {
 
 //CONCURRENT_OMIT_BEGIN
-
 	/**
 	 * Brute force approach which is easy to validate through visual inspection.
 	 */
-	public static void hessianNaive( GrayF32 integral, int skip, int size,
-									 GrayF32 intensity ) {
+	public static void hessianNaive( GrayF32 integral, int skip, int size, GrayF32 intensity ) {
 		final int w = intensity.width;
 		final int h = intensity.height;
 
