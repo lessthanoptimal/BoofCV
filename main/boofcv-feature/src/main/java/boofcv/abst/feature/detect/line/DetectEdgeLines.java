@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public interface DetectEdgeLines<D extends ImageBase<D>> {
-	void detect(D derivX , D derivY );
+	void detect( D derivX, D derivY );
 
 	List<LineParametric2D_F32> getFoundLines();
 }

@@ -26,6 +26,7 @@ import boofcv.struct.image.*;
  * Generic version of {@link HistogramFeatureOps} which determines image type at runtime.
  * See {@link }
  * </p>
+ *
  * @author Peter Abeles
  */
 public class GHistogramFeatureOps {
@@ -39,13 +40,13 @@ public class GHistogramFeatureOps {
 	 * @param histogram The output histogram.
 	 */
 	public static <T extends ImageGray<T>>
-	void histogram( T image ,  double minPixelValue , double maxPixelValue , TupleDesc_F64 histogram ) {
-		if( image.getClass() == GrayU8.class ) {
-			HistogramFeatureOps.histogram((GrayU8) image, (int) maxPixelValue, histogram);
-		} else if( image.getClass() == GrayU16.class ) {
-			HistogramFeatureOps.histogram((GrayU16) image, (int) maxPixelValue, histogram);
-		} else if( image.getClass() == GrayF32.class ) {
-			HistogramFeatureOps.histogram((GrayF32) image, (float) minPixelValue, (float) maxPixelValue, histogram);
+	void histogram( T image, double minPixelValue, double maxPixelValue, TupleDesc_F64 histogram ) {
+		if (image.getClass() == GrayU8.class) {
+			HistogramFeatureOps.histogram((GrayU8)image, (int)maxPixelValue, histogram);
+		} else if (image.getClass() == GrayU16.class) {
+			HistogramFeatureOps.histogram((GrayU16)image, (int)maxPixelValue, histogram);
+		} else if (image.getClass() == GrayF32.class) {
+			HistogramFeatureOps.histogram((GrayF32)image, (float)minPixelValue, (float)maxPixelValue, histogram);
 		} else {
 			throw new IllegalArgumentException("Unsupported band type");
 		}
@@ -59,14 +60,14 @@ public class GHistogramFeatureOps {
 	 * @param image Input image. Not modified.
 	 * @param histogram Output for the histogram. Must be correctly configured first.
 	 */
-	public static<T extends ImageGray<T>>
-	void histogram(Planar<T> image , Histogram_F64 histogram ) {
+	public static <T extends ImageGray<T>>
+	void histogram( Planar<T> image, Histogram_F64 histogram ) {
 		if (image.getNumBands() != histogram.getDimensions())
 			throw new IllegalArgumentException("Number of bands in the image and histogram must be the same");
 
-		if( image.getBandType() == GrayU8.class ) {
+		if (image.getBandType() == GrayU8.class) {
 			HistogramFeatureOps.histogram_U8((Planar<GrayU8>)image, histogram);
-		} else if( image.getBandType() == GrayF32.class ) {
+		} else if (image.getBandType() == GrayF32.class) {
 			HistogramFeatureOps.histogram_F32((Planar<GrayF32>)image, histogram);
 		} else {
 			throw new IllegalArgumentException("Umage type not yet supportd");
@@ -81,18 +82,17 @@ public class GHistogramFeatureOps {
 	 * @param length Length of usable portion of colors
 	 * @param histogram Output and histogram configuration.
 	 */
-	public static void histogram( double[] colors, int length , Histogram_F64 histogram )
-	{
-		if( length % histogram.getDimensions() != 0 )
+	public static void histogram( double[] colors, int length, Histogram_F64 histogram ) {
+		if (length%histogram.getDimensions() != 0)
 			throw new IllegalArgumentException("Length does not match dimensions");
 
-		int coordinate[] = new int[ histogram.getDimensions() ];
+		int[] coordinate = new int[histogram.getDimensions()];
 
 		histogram.fill(0);
 
 		for (int i = 0; i < length; ) {
 			for (int j = 0; j < coordinate.length; j++, i++) {
-				coordinate[j] = histogram.getDimensionIndex(j,colors[i]);
+				coordinate[j] = histogram.getDimensionIndex(j, colors[i]);
 			}
 
 			int index = histogram.getIndex(coordinate);

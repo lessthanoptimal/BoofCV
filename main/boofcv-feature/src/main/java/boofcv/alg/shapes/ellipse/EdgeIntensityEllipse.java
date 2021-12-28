@@ -34,10 +34,10 @@ import georegression.struct.curve.EllipseRotated_F64;
 public class EdgeIntensityEllipse<T extends ImageGray<T>> extends BaseIntegralEdge<T> {
 
 	// distance away from line in tangent direction it will sample
-	private double tangentDistance;
+	private final double tangentDistance;
 
 	// number of points along the contour it will sample
-	private int numContourPoints;
+	private final int numContourPoints;
 
 	// threshold for passing
 	double passThreshold;

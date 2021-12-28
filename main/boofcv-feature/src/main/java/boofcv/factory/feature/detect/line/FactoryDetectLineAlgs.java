@@ -69,8 +69,8 @@ public class FactoryDetectLineAlgs {
 
 		ModelMatcherPost<LinePolar2D_F32, Edgel> matcher = new Ransac<>(123123, 25, 1, manager, Edgel.class);
 		matcher.setModel(
-				()->new GridLineModelFitter((float)_config.thresholdAngle),
-				()->new GridLineModelDistance((float)_config.thresholdAngle));
+				() -> new GridLineModelFitter((float)_config.thresholdAngle),
+				() -> new GridLineModelDistance((float)_config.thresholdAngle));
 
 		GridRansacLineDetector<D> alg;
 		if (derivType == GrayF32.class) {

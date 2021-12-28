@@ -30,7 +30,7 @@ public class ConfigTrackerHybrid implements Configuration {
 	/**
 	 * KLT tracks can drift to being on top of each other. This will prune a few if that happens
 	 */
-	public boolean pruneCloseTracks=false;
+	public boolean pruneCloseTracks = false;
 
 	/**
 	 * If there are more than this number of unused tracks they will be randomly discarded. This is intended to
@@ -42,10 +42,10 @@ public class ConfigTrackerHybrid implements Configuration {
 	 * It will attempt to respawn old dropped tracks when the number of active tracks drops below this value.
 	 * The fractional part is relative to the number of tracks after the last spawn or most recent respawn.
 	 */
-	public ConfigLength thresholdRespawn = ConfigLength.relative(0.4,50);
+	public ConfigLength thresholdRespawn = ConfigLength.relative(0.4, 50);
 
 	/** Random seed */
-	public long seed=0xDEADBEEF;
+	public long seed = 0xDEADBEEF;
 
 	@Override public void checkValidity() {}
 

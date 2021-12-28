@@ -40,8 +40,8 @@ public class EdgeIntensityPolygon<T extends ImageGray<T>> {
 	private double tangentDistance;
 
 	// storage for points offset from corner
-	private Point2D_F64 offsetA = new Point2D_F64();
-	private Point2D_F64 offsetB = new Point2D_F64();
+	private final Point2D_F64 offsetA = new Point2D_F64();
+	private final Point2D_F64 offsetB = new Point2D_F64();
 
 	// average pixel intensity inside and outside the polygon's edge
 	private double averageInside;

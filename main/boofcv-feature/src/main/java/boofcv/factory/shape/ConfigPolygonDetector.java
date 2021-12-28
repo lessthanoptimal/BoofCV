@@ -32,7 +32,7 @@ public class ConfigPolygonDetector implements Configuration {
 	/**
 	 * Configuration for detecting polygons from their contour
 	 */
-	public ConfigPolygonFromContour detector = new ConfigPolygonFromContour(3,10000);
+	public ConfigPolygonFromContour detector = new ConfigPolygonFromContour(3, 10000);
 
 	/**
 	 * <p>
@@ -47,7 +47,7 @@ public class ConfigPolygonDetector implements Configuration {
 	public double minimumRefineEdgeIntensity = 6.0;
 
 	/**
-	 * If true then a contour based refinement will be run to improve the polygon estimate. 
+	 * If true then a contour based refinement will be run to improve the polygon estimate.
 	 */
 	public boolean refineContour = false;
 
@@ -65,11 +65,11 @@ public class ConfigPolygonDetector implements Configuration {
 	/**
 	 * Specifies the number of sides in the polygon and uses default settings for everything else
 	 */
-	public ConfigPolygonDetector(int minimumSides, int maximumSides) {
+	public ConfigPolygonDetector( int minimumSides, int maximumSides ) {
 		detector = new ConfigPolygonFromContour(minimumSides, maximumSides);
 	}
 
-	public ConfigPolygonDetector(boolean clockwise, int minimumSides, int maximumSides) {
+	public ConfigPolygonDetector( boolean clockwise, int minimumSides, int maximumSides ) {
 		detector = new ConfigPolygonFromContour(clockwise, minimumSides, maximumSides);
 	}
 

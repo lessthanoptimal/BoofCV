@@ -25,15 +25,14 @@ import boofcv.struct.feature.TupleDesc_U8;
 /**
  * Converts two types of region descriptors.
  *
- * @see ConvertDescriptors#positive(boofcv.struct.feature.TupleDesc_F64, boofcv.struct.feature.TupleDesc_U8)
- *
  * @author Peter Abeles
+ * @see ConvertDescriptors#positive(boofcv.struct.feature.TupleDesc_F64, boofcv.struct.feature.TupleDesc_U8)
  */
 public class ConvertTupleDescPositive_F64_U8 implements ConvertTupleDesc<TupleDesc_F64, TupleDesc_U8> {
 
 	int numElements;
 
-	public ConvertTupleDescPositive_F64_U8( int numElements) {
+	public ConvertTupleDescPositive_F64_U8( int numElements ) {
 		this.numElements = numElements;
 	}
 
@@ -43,7 +42,7 @@ public class ConvertTupleDescPositive_F64_U8 implements ConvertTupleDesc<TupleDe
 	}
 
 	@Override
-	public void convert(TupleDesc_F64 input, TupleDesc_U8 output) {
+	public void convert( TupleDesc_F64 input, TupleDesc_U8 output ) {
 		ConvertDescriptors.positive(input, output);
 	}
 

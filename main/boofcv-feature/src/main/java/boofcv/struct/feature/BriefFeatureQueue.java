@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,6 @@ package boofcv.struct.feature;
 
 import org.ddogleg.struct.DogArray;
 
-
 /**
  * {@link org.ddogleg.struct.DogArray} for {@link TupleDesc_B}.
  *
@@ -30,8 +29,8 @@ public class BriefFeatureQueue extends DogArray<TupleDesc_B> {
 
 	int numBits;
 
-	public BriefFeatureQueue(int numBits) {
-		super(()->new TupleDesc_B(numBits));
+	public BriefFeatureQueue( int numBits ) {
+		super(() -> new TupleDesc_B(numBits));
 		this.numBits = numBits;
 		reserve(10);
 	}

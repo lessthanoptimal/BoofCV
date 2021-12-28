@@ -38,10 +38,10 @@ import boofcv.struct.image.Planar;
 @SuppressWarnings({"NullAway.Init"})
 public class DescribePointSurfPlanar<II extends ImageGray<II>> {
 	// SURF algorithms
-	private DescribePointSurf<II> describe;
+	private final DescribePointSurf<II> describe;
 
 	// number of elements in the feature
-	private int descriptorLength;
+	private final int descriptorLength;
 
 	// integral of gray image
 	private II grayII;
@@ -49,10 +49,10 @@ public class DescribePointSurfPlanar<II extends ImageGray<II>> {
 	private Planar<II> colorII;
 
 	// storage for feature compute in each band
-	private TupleDesc_F64 bandDesc;
+	private final TupleDesc_F64 bandDesc;
 
 	// number of bands in the input image
-	private int numBands;
+	private final int numBands;
 
 	public DescribePointSurfPlanar( DescribePointSurf<II> describe,
 									int numBands ) {

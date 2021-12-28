@@ -59,7 +59,7 @@ public class ConfigSplitMergeLineFit extends BaseConfigPolyline {
 	/**
 	 * The minimum allowed length of a side as a fraction of the total contour length
 	 */
-	public ConfigLength minimumSide = ConfigLength.relative(0.025,10);
+	public ConfigLength minimumSide = ConfigLength.relative(0.025, 10);
 
 	/**
 	 * Does the contour loop?

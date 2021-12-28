@@ -21,7 +21,6 @@ package boofcv.alg.feature.detect.extract;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 
-
 /**
  * All pixels which have an intensity above the specified threshold are considered to be features. This will tend
  * to produce poor results because clusters are values will be above threshold.
@@ -41,19 +40,19 @@ public class ThresholdCornerExtractor {
 	/**
 	 * Selects pixels as corners which are above the threshold.
 	 */
-	public void process(GrayF32 intensity, QueueCorner corners ) {
+	public void process( GrayF32 intensity, QueueCorner corners ) {
 		corners.reset();
 
-		float data[] = intensity.data;
+		float[] data = intensity.data;
 
-		for( int y = 0; y < intensity.height; y++ ) {
+		for (int y = 0; y < intensity.height; y++) {
 			int startIndex = intensity.startIndex + y*intensity.stride;
 			int endIndex = startIndex + intensity.width;
 
-			for( int index = startIndex; index < endIndex; index++ ) {
-				if( data[index] > thresh ) {
-					int x = index-startIndex;
-					corners.append(x,y);
+			for (int index = startIndex; index < endIndex; index++) {
+				if (data[index] > thresh) {
+					int x = index - startIndex;
+					corners.append(x, y);
 				}
 			}
 		}
@@ -63,7 +62,7 @@ public class ThresholdCornerExtractor {
 		return thresh;
 	}
 
-	public void setThreshold(float threshold) {
+	public void setThreshold( float threshold ) {
 		this.thresh = threshold;
 	}
 }

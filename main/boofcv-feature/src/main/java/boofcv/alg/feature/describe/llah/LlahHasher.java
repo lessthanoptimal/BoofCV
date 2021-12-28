@@ -52,29 +52,30 @@ public abstract class LlahHasher {
 	/**
 	 * k^i in the hash function
 	 */
-	private long hashK;
+	private final long hashK;
 	/**
 	 * The maximum value of the hash code
 	 */
-	private int hashSize;
+	private final int hashSize;
 
 	// Used to compute all the combinations of a set
-	private Combinations<Point2D_F64> combinator = new Combinations<>();
+	private final Combinations<Point2D_F64> combinator = new Combinations<>();
 
 	/**
 	 * Configures the hash function. See JavaDoc for info on variables
 	 */
-	protected LlahHasher(long hashK, int hashSize) {
+	protected LlahHasher( long hashK, int hashSize ) {
 		this.hashK = hashK;
 		this.hashSize = hashSize;
 	}
 
 	/**
 	 * Returns the number of invariants given the number of points.
+	 *
 	 * @param numPoints Number of points the hash function is computed from
 	 * @return Number of invariants the feature will have
 	 */
-	public int getNumberOfInvariants(int numPoints ) {
+	public int getNumberOfInvariants( int numPoints ) {
 		return (int)Combinations.computeTotalCombinations(numPoints, getInvariantSampleSize());
 	}
 
@@ -83,11 +84,11 @@ public abstract class LlahHasher {
 	 *
 	 * @param points Set of points. Must be &ge; 4.
 	 */
-	public void computeHash(List<Point2D_F64> points , LlahFeature output ) {
+	public void computeHash( List<Point2D_F64> points, LlahFeature output ) {
 		int N = getInvariantSampleSize();
-		if( points.size() < N )
-			throw new IllegalArgumentException("Must be at least 5 points and not "+points.size());
-		combinator.init(points,N);
+		if (points.size() < N)
+			throw new IllegalArgumentException("Must be at least 5 points and not " + points.size());
+		combinator.init(points, N);
 		long hash = 0;
 		int i = 0;
 		long k = 1;
@@ -96,21 +97,21 @@ public abstract class LlahHasher {
 			int r = output.invariants[i++] = discretize(invariant);
 			hash += r*k;
 			k *= hashK;
-		} while( combinator.next() );
+		} while (combinator.next());
 
-		output.hashCode = (int)(hash % hashSize);
+		output.hashCode = (int)(hash%hashSize);
 	}
 
 	/**
 	 * Stores the computed invariants into an array
 	 */
-	public void computeInvariants( List<Point2D_F64> points , double[] invariants, int offset ) {
+	public void computeInvariants( List<Point2D_F64> points, double[] invariants, int offset ) {
 		int N = getInvariantSampleSize();
-		combinator.init(points,N);
+		combinator.init(points, N);
 		int i = 0;
 		do {
-			invariants[offset+i++] = computeInvariant(combinator);
-		} while( combinator.next() );
+			invariants[offset + i++] = computeInvariant(combinator);
+		} while (combinator.next());
 	}
 
 	/**
@@ -121,13 +122,13 @@ public abstract class LlahHasher {
 	/**
 	 * Computes the invariants given the set of points
 	 */
-	protected abstract double computeInvariant(Combinations<Point2D_F64> combinator);
+	protected abstract double computeInvariant( Combinations<Point2D_F64> combinator );
 
 	/**
 	 * Computes the discrete value from the continuous valued invariant
 	 */
 	public int discretize( double invariant ) {
-		return PrimitiveArrays.lowerBound(samples,0,samples.length,invariant);
+		return PrimitiveArrays.lowerBound(samples, 0, samples.length, invariant);
 	}
 
 	/**
@@ -140,8 +141,8 @@ public abstract class LlahHasher {
 	 * @param histMaxValue The maximum value in the histogram
 	 * @param numDiscrete Number of possible discrete values. Larger values indicate higher resolution in discretation
 	 */
-	public void learnDiscretization( int[] histogram , int histLength , double histMaxValue, int numDiscrete ) {
-		this.samples = new double[numDiscrete-1];
+	public void learnDiscretization( int[] histogram, int histLength, double histMaxValue, int numDiscrete ) {
+		this.samples = new double[numDiscrete - 1];
 
 		// Number of hits in the histogram
 		int total = 0;
@@ -153,12 +154,12 @@ public abstract class LlahHasher {
 		// then any value greater than samples[N-1] wil have a value of N
 		int locHist = 0;
 		for (int i = 1, j = 0; i < numDiscrete; i++) {
-			int target = (total-1)*i/numDiscrete;
+			int target = (total - 1)*i/numDiscrete;
 
-			while( locHist < target ) {
+			while (locHist < target) {
 				locHist += histogram[j++];
 			}
-			samples[i-1] = j*histMaxValue/histLength;
+			samples[i - 1] = j*histMaxValue/histLength;
 		}
 	}
 
@@ -171,7 +172,7 @@ public abstract class LlahHasher {
 
 	public static class Affine extends LlahHasher {
 
-		public Affine(long hashK, int hashSize) {
+		public Affine( long hashK, int hashSize ) {
 			super(hashK, hashSize);
 			// computed from random data
 			samples = new double[]{
@@ -189,18 +190,18 @@ public abstract class LlahHasher {
 		}
 
 		@Override
-		protected double computeInvariant(Combinations<Point2D_F64> combinator) {
+		protected double computeInvariant( Combinations<Point2D_F64> combinator ) {
 			Point2D_F64 p1 = combinator.get(0);
 			Point2D_F64 p2 = combinator.get(1);
 			Point2D_F64 p3 = combinator.get(2);
 			Point2D_F64 p4 = combinator.get(3);
-			return PerspectiveOps.invariantAffine(p1,p2,p3,p4);
+			return PerspectiveOps.invariantAffine(p1, p2, p3, p4);
 		}
 	}
 
 	public static class CrossRatio extends LlahHasher {
 
-		public CrossRatio(long hashK, int hashSize) {
+		public CrossRatio( long hashK, int hashSize ) {
 			super(hashK, hashSize);
 			// computed from random data
 			samples = new double[]{
@@ -218,13 +219,13 @@ public abstract class LlahHasher {
 		}
 
 		@Override
-		protected double computeInvariant(Combinations<Point2D_F64> combinator) {
+		protected double computeInvariant( Combinations<Point2D_F64> combinator ) {
 			Point2D_F64 p1 = combinator.get(0);
 			Point2D_F64 p2 = combinator.get(1);
 			Point2D_F64 p3 = combinator.get(2);
 			Point2D_F64 p4 = combinator.get(3);
 			Point2D_F64 p5 = combinator.get(4);
-			return PerspectiveOps.invariantCrossRatio(p1,p2,p3,p4,p5);
+			return PerspectiveOps.invariantCrossRatio(p1, p2, p3, p4, p5);
 		}
 	}
 }

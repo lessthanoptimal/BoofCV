@@ -74,7 +74,7 @@ public abstract class ComputeRegionMeanColor<T extends ImageBase<T>> {
 		// Initialize data structures
 		regionSums.resize(regionColor.size);
 		for (int i = 0; i < regionSums.size; i++) {
-			float v[] = regionSums.get(i);
+			float[] v = regionSums.get(i);
 			for (int j = 0; j < v.length; j++) {
 				v[j] = 0;
 			}

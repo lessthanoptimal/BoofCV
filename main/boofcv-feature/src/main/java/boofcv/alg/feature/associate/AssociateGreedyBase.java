@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,7 +38,6 @@ import org.ejml.data.DMatrixRMaj;
  * is then used to quickly perform a look up when doing forwards-backwards validation.</p>
  *
  * @param <D> Feature description type.
- *
  * @author Peter Abeles
  */
 public abstract class AssociateGreedyBase<D> {
@@ -52,7 +51,7 @@ public abstract class AssociateGreedyBase<D> {
 	/** Look up table with the index of dst features that have been assigned to src features. pairs[src] = dst */
 	@Getter DogArray_I32 pairs = new DogArray_I32(100);
 	// Score matrix in row-major format. rows = src.size, cols = dst.size
-	@Getter DMatrixRMaj scoreMatrix = new DMatrixRMaj(1,1);
+	@Getter DMatrixRMaj scoreMatrix = new DMatrixRMaj(1, 1);
 	/**
 	 * if true forwards-backwards validation is. For a match to be accepted it must be the best match in both directions
 	 */
@@ -68,42 +67,44 @@ public abstract class AssociateGreedyBase<D> {
 	 *
 	 * @param score Computes the association score.
 	 */
-	AssociateGreedyBase(ScoreAssociation<D> score) {
+	AssociateGreedyBase( ScoreAssociation<D> score ) {
 		this.score = score;
 	}
 
 	/**
 	 * Clears and allocates memory before association starts.
+	 *
 	 * @param sizeSrc size of src list
 	 * @param sizeDst size of dst list
 	 */
-	protected void setupForAssociate( int sizeSrc , int sizeDst ) {
+	protected void setupForAssociate( int sizeSrc, int sizeDst ) {
 		fitQuality.reset();
 		pairs.reset();
 
 		pairs.resize(sizeSrc);
 		fitQuality.resize(sizeSrc);
-		scoreMatrix.reshape(sizeSrc,sizeDst);
+		scoreMatrix.reshape(sizeSrc, sizeDst);
 	}
 
 	/**
 	 * Uses score matrix to validate the assignment of src feature `indexSrc`
+	 *
 	 * @param indexSrc Index of source feature being validated
 	 * @param sizeSrc size of src list
 	 * @param sizeDst size of dst list
 	 */
-	public final void forwardsBackwards( final int indexSrc, final int sizeSrc, final  int sizeDst) {
+	public final void forwardsBackwards( final int indexSrc, final int sizeSrc, final int sizeDst ) {
 		// Look up the index that this src feature was matched with
 		final int indexDst = pairs.data[indexSrc];
-		if( indexDst == -1 )
+		if (indexDst == -1)
 			return;
 
-		double scoreToBeat = scoreMatrix.data[indexSrc*sizeDst+indexDst];
+		double scoreToBeat = scoreMatrix.data[indexSrc*sizeDst + indexDst];
 		int indexScore = indexDst;
 
 		// compare the score against all the other possible matches in source
-		for( int indexSrcCmp = 0; indexSrcCmp < sizeSrc; indexSrcCmp++ , indexScore += sizeDst ) {
-			if( scoreMatrix.data[indexScore] <= scoreToBeat && indexSrcCmp != indexSrc) {
+		for (int indexSrcCmp = 0; indexSrcCmp < sizeSrc; indexSrcCmp++, indexScore += sizeDst) {
+			if (scoreMatrix.data[indexScore] <= scoreToBeat && indexSrcCmp != indexSrc) {
 				pairs.data[indexSrc] = -1;
 				fitQuality.data[indexSrc] = Double.MAX_VALUE;
 				break;
@@ -111,8 +112,8 @@ public abstract class AssociateGreedyBase<D> {
 		}
 	}
 
-	public void setMaxFitError(double maxFitError) {
-		if( maxFitError <= 0.0 )
+	public void setMaxFitError( double maxFitError ) {
+		if (maxFitError <= 0.0)
 			this.maxFitError = Double.MAX_VALUE;
 		else
 			this.maxFitError = maxFitError;

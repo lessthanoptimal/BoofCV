@@ -90,7 +90,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> implements Verbose
 
 	// finds the initial polygon around a target candidate
 	private PointsToPolyline contourToPolyline;
-	private DogArray_I32 splits = new DogArray_I32();
+	private final DogArray_I32 splits = new DogArray_I32();
 
 	// Used to prune false positives
 	private ContourEdgeIntensity<T> contourEdgeIntensity;
@@ -103,7 +103,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> implements Verbose
 
 	// work space for initial polygon
 	private Polygon2D_F64 polygonWork = new Polygon2D_F64(); // undistorted pixel coordinate
-	private Polygon2D_F64 polygonDistorted = new Polygon2D_F64(); // distorted pixel coordinates;
+	private final Polygon2D_F64 polygonDistorted = new Polygon2D_F64(); // distorted pixel coordinates;
 
 	/**
 	 * <p>Is the polygon sorted in clockwise direction?</p>
@@ -124,16 +124,16 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> implements Verbose
 	@Setter private PolygonHelper helper;
 
 	// storage space for contour in undistorted pixels
-	private DogArray<Point2D_I32> undistorted = new DogArray<>(Point2D_I32::new);
+	private final DogArray<Point2D_I32> undistorted = new DogArray<>(Point2D_I32::new);
 
 	/** type of input gray scale image it can process */
 	@Getter private Class<T> inputType;
 
 	// indicates which corners touch the border
-	private DogArray_B borderCorners = new DogArray_B();
+	private final DogArray_B borderCorners = new DogArray_B();
 
 	// temporary storage for a contour
-	private DogArray<Point2D_I32> contourTmp = new DogArray<>(Point2D_I32::new);
+	private final DogArray<Point2D_I32> contourTmp = new DogArray<>(Point2D_I32::new);
 	List<Point2D_I32> polygonPixel = new ArrayList<>();
 
 	// times for internal profiling

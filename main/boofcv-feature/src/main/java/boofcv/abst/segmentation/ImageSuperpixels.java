@@ -35,27 +35,30 @@ public interface ImageSuperpixels<T extends ImageBase<T>> {
 
 	/**
 	 * Segments the input image into superpixels and puts the output in labeled image.
+	 *
 	 * @param input (Input) image.
 	 * @param output (Output) Labeled image
 	 */
-	public void segment( T input , GrayS32 output );
+	void segment( T input, GrayS32 output );
 
 	/**
 	 * Returns the total number of image segments/superpixels found
+	 *
 	 * @return Number of superpixels
 	 */
-	public int getTotalSuperpixels();
+	int getTotalSuperpixels();
 
 	/**
 	 * Connectivity rule used to determine if a pixel is connected
+	 *
 	 * @return Connectivity rule
 	 */
-	public ConnectRule getRule();
+	ConnectRule getRule();
 
 	/**
 	 * Type of input image it can process
 	 *
 	 * @return Input image type
 	 */
-	public ImageType<T> getImageType();
+	ImageType<T> getImageType();
 }

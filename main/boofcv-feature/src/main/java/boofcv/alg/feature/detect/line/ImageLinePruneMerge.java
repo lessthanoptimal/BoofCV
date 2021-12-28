@@ -101,7 +101,7 @@ public class ImageLinePruneMerge {
 	public void pruneSimilar( float toleranceAngle, float toleranceDist, int imgWidth, int imgHeight ) {
 		sortByIntensity();
 
-		float theta[] = new float[lines.size()];
+		float[] theta = new float[lines.size()];
 		List<LineSegment2D_F32> segments = new ArrayList<>(lines.size());
 
 		for (int i = 0; i < lines.size(); i++) {

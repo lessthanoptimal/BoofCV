@@ -39,8 +39,7 @@ import boofcv.struct.image.ImageGray;
  */
 @SuppressWarnings({"NullAway.Init"})
 public abstract class ImplSsdCornerBase<D extends ImageGray<D>, D2 extends ImageGray<D2>>
-		implements GradientCornerIntensity<D>
-{
+		implements GradientCornerIntensity<D> {
 	// input image gradient
 	protected D derivX;
 	protected D derivY;
@@ -55,19 +54,19 @@ public abstract class ImplSsdCornerBase<D extends ImageGray<D>, D2 extends Image
 
 	Class<D> derivType;
 
-	protected ImplSsdCornerBase( int windowRadius , Class<D> derivType, Class<D2> secondDerivType ) {
+	protected ImplSsdCornerBase( int windowRadius, Class<D> derivType, Class<D2> secondDerivType ) {
 		this.radius = windowRadius;
 		this.derivType = derivType;
 
-		horizXX = GeneralizedImageOps.createSingleBand(secondDerivType,1,1);
-		horizXY = GeneralizedImageOps.createSingleBand(secondDerivType,1,1);
-		horizYY = GeneralizedImageOps.createSingleBand(secondDerivType,1,1);
+		horizXX = GeneralizedImageOps.createSingleBand(secondDerivType, 1, 1);
+		horizXY = GeneralizedImageOps.createSingleBand(secondDerivType, 1, 1);
+		horizYY = GeneralizedImageOps.createSingleBand(secondDerivType, 1, 1);
 	}
 
 	protected void setImageShape( int imageWidth, int imageHeight ) {
-		horizXX.reshape(imageWidth,imageHeight);
-		horizYY.reshape(imageWidth,imageHeight);
-		horizXY.reshape(imageWidth,imageHeight);
+		horizXX.reshape(imageWidth, imageHeight);
+		horizYY.reshape(imageWidth, imageHeight);
+		horizXY.reshape(imageWidth, imageHeight);
 	}
 
 	@Override
@@ -88,17 +87,18 @@ public abstract class ImplSsdCornerBase<D extends ImageGray<D>, D2 extends Image
 	public interface CornerIntensity_S32 {
 		/**
 		 * Computes the pixel's corner intensity.
+		 *
 		 * @return corner intensity.
 		 */
-		float compute(int totalXX, int totalXY , int totalYY );
+		float compute( int totalXX, int totalXY, int totalYY );
 	}
 
 	public interface CornerIntensity_F32 {
 		/**
 		 * Computes the pixel's corner intensity.
+		 *
 		 * @return corner intensity.
 		 */
-		float compute(float totalXX, float totalXY , float totalYY );
+		float compute( float totalXX, float totalXY, float totalYY );
 	}
-
 }

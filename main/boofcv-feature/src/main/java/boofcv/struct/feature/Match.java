@@ -32,7 +32,7 @@ public class Match extends Point2D_I32 {
 	 */
 	public double score;
 
-	public Match(int x, int y, double score) {
+	public Match( int x, int y, double score ) {
 		this.x = x;
 		this.y = y;
 		this.score = score;

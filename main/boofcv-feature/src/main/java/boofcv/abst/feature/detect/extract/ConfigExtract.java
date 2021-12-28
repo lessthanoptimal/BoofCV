@@ -55,23 +55,22 @@ public class ConfigExtract implements Configuration {
 	 */
 	public boolean detectMaximums = true;
 
-	public static ConfigExtract max( int radius, float threshold, int ignoreBorder , boolean useStrictRule ) {
-		var ret = new ConfigExtract(radius,threshold,ignoreBorder,useStrictRule);
+	public static ConfigExtract max( int radius, float threshold, int ignoreBorder, boolean useStrictRule ) {
+		var ret = new ConfigExtract(radius, threshold, ignoreBorder, useStrictRule);
 		ret.detectMaximums = true;
 		ret.detectMinimums = false;
 		return ret;
 	}
 
-	public static ConfigExtract min( int radius, float threshold, int ignoreBorder , boolean useStrictRule ) {
-		var ret = new ConfigExtract(radius,threshold,ignoreBorder,useStrictRule);
+	public static ConfigExtract min( int radius, float threshold, int ignoreBorder, boolean useStrictRule ) {
+		var ret = new ConfigExtract(radius, threshold, ignoreBorder, useStrictRule);
 		ret.detectMaximums = false;
 		ret.detectMinimums = true;
 		return ret;
 	}
 
-	public ConfigExtract(int radius, float threshold, int ignoreBorder, boolean useStrictRule,
-						 boolean detectMinimums, boolean detectMaximums)
-	{
+	public ConfigExtract( int radius, float threshold, int ignoreBorder, boolean useStrictRule,
+						  boolean detectMinimums, boolean detectMaximums ) {
 		this.radius = radius;
 		this.threshold = threshold;
 		this.ignoreBorder = ignoreBorder;
@@ -80,7 +79,7 @@ public class ConfigExtract implements Configuration {
 		this.detectMaximums = detectMaximums;
 	}
 
-	public ConfigExtract(int radius, float threshold, int ignoreBorder, boolean useStrictRule) {
+	public ConfigExtract( int radius, float threshold, int ignoreBorder, boolean useStrictRule ) {
 		this.radius = radius;
 		this.threshold = threshold;
 		this.ignoreBorder = ignoreBorder;
@@ -90,8 +89,8 @@ public class ConfigExtract implements Configuration {
 	/**
 	 * Constructor which defaults to an ignore border of 0 and to using a strict rule
 	 */
-	public ConfigExtract(int radius, float threshold) {
-		this(radius,threshold,0,true);
+	public ConfigExtract( int radius, float threshold ) {
+		this(radius, threshold, 0, true);
 	}
 
 	public ConfigExtract() {}
@@ -108,9 +107,9 @@ public class ConfigExtract implements Configuration {
 
 	@Override
 	public void checkValidity() {
-		if( radius <= 0 )
+		if (radius <= 0)
 			throw new IllegalArgumentException("Search radius must be >= 1");
-		if( ignoreBorder < 0 )
+		if (ignoreBorder < 0)
 			throw new IllegalArgumentException("Ignore border must be >= 0 ");
 	}
 }

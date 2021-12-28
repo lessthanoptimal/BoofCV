@@ -23,10 +23,9 @@ import boofcv.struct.Configuration;
 /**
  * Configuration for BRIEF descriptor.
  *
+ * @author Peter Abeles
  * @see boofcv.alg.feature.describe.DescribePointBrief
  * @see boofcv.alg.feature.describe.DescribePointBriefSO
- *
- * @author Peter Abeles
  */
 public class ConfigBrief implements Configuration {
 	/**
@@ -51,7 +50,7 @@ public class ConfigBrief implements Configuration {
 	 */
 	public boolean fixed = true;
 
-	public ConfigBrief(int radius, int numPoints, double blurSigma, int blurRadius, boolean fixed) {
+	public ConfigBrief( int radius, int numPoints, double blurSigma, int blurRadius, boolean fixed ) {
 		this.radius = radius;
 		this.numPoints = numPoints;
 		this.blurSigma = blurSigma;

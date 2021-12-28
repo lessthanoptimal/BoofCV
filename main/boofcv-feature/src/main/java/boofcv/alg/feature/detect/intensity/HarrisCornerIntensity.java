@@ -48,5 +48,5 @@ public interface HarrisCornerIntensity {
 	 *
 	 * @param kappa parameter
 	 */
-	void setKappa(float kappa);
+	void setKappa( float kappa );
 }

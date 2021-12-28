@@ -62,7 +62,7 @@ public class FactoryOrientation {
 	 * Creates integral image based orientation estimator
 	 */
 	public static <II extends ImageGray<II>>
-	OrientationIntegral<II> genericIntegral(ConfigOrientation2 config, Class<II> imageType) {
+	OrientationIntegral<II> genericIntegral( ConfigOrientation2 config, Class<II> imageType ) {
 		return switch (config.type) {
 			case AVERAGE -> FactoryOrientationAlgs.average_ii(config.averageIntegral, imageType);
 			case SLIDING -> FactoryOrientationAlgs.sliding_ii(config.slidingIntegral, imageType);

@@ -26,9 +26,8 @@ import boofcv.struct.feature.TupleDesc;
  *
  * @author Peter Abeles
  */
-public class ConvertTupleDoNothing <TD extends TupleDesc<TD>>
-	implements ConvertTupleDesc<TD, TD>
-{
+public class ConvertTupleDoNothing<TD extends TupleDesc<TD>>
+		implements ConvertTupleDesc<TD, TD> {
 	BoofLambdas.Factory<TD> factory;
 	Class<TD> type;
 

@@ -40,7 +40,7 @@ public class ConfigWatershed implements Configuration {
 
 	public ConfigWatershed() {}
 
-	public ConfigWatershed(ConnectRule connectRule, int minimumRegionSize) {
+	public ConfigWatershed( ConnectRule connectRule, int minimumRegionSize ) {
 		this.connectRule = connectRule;
 		this.minimumRegionSize = minimumRegionSize;
 	}

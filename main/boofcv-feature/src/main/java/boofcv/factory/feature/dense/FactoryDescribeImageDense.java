@@ -60,7 +60,7 @@ public class FactoryDescribeImageDense {
 			config = new ConfigDenseSurfFast();
 
 		DescribePointRadiusAngle<T, TupleDesc_F64> surf =
-				(DescribePointRadiusAngle)FactoryDescribePointRadiusAngle.surfFast(config.surf, imageType);
+				FactoryDescribePointRadiusAngle.surfFast(config.surf, imageType);
 
 		return new GenericDenseDescribeImageDense<>(surf, config.descriptorScale, config.sampling.periodX, config.sampling.periodY);
 	}
@@ -87,7 +87,7 @@ public class FactoryDescribeImageDense {
 		config.checkValidity();
 
 		DescribePointRadiusAngle<T, TupleDesc_F64> surf =
-				(DescribePointRadiusAngle)FactoryDescribePointRadiusAngle.surfStable(config.surf, imageType);
+				FactoryDescribePointRadiusAngle.surfStable(config.surf, imageType);
 
 		return new GenericDenseDescribeImageDense<>(surf, config.descriptorScale, config.sampling.periodX, config.sampling.periodY);
 	}

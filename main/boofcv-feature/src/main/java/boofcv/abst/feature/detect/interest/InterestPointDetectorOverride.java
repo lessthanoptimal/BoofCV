@@ -28,9 +28,7 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
-public class InterestPointDetectorOverride<T extends ImageGray<T>>
-		implements InterestPointDetector<T>
-{
+public class InterestPointDetectorOverride<T extends ImageGray<T>> implements InterestPointDetector<T> {
 	InterestPointDetector<T> detector;
 	OrientationImage<T> orientation;
 
@@ -41,15 +39,15 @@ public class InterestPointDetectorOverride<T extends ImageGray<T>>
 	 * @param detector Interest point detector and default scale and orientation.
 	 * @param orientation If not null then this will be used to estimate the feature's orientation.
 	 */
-	public InterestPointDetectorOverride(InterestPointDetector<T> detector, OrientationImage<T> orientation) {
+	public InterestPointDetectorOverride( InterestPointDetector<T> detector, OrientationImage<T> orientation ) {
 		this.detector = detector;
 		this.orientation = orientation;
 	}
 
 	@Override
-	public void detect(T input) {
+	public void detect( T input ) {
 		detector.detect(input);
-		if( orientation != null )
+		if (orientation != null)
 			orientation.setImage(input);
 	}
 
@@ -59,7 +57,7 @@ public class InterestPointDetectorOverride<T extends ImageGray<T>>
 	}
 
 	@Override
-	public int getSet(int index) {
+	public int getSet( int index ) {
 		return detector.getSet(index);
 	}
 
@@ -69,23 +67,23 @@ public class InterestPointDetectorOverride<T extends ImageGray<T>>
 	}
 
 	@Override
-	public Point2D_F64 getLocation(int featureIndex) {
+	public Point2D_F64 getLocation( int featureIndex ) {
 		return detector.getLocation(featureIndex);
 	}
 
 	@Override
-	public double getRadius(int featureIndex) {
+	public double getRadius( int featureIndex ) {
 		return detector.getRadius(featureIndex);
 	}
 
 	@Override
-	public double getOrientation(int featureIndex) {
-		if( orientation == null )
+	public double getOrientation( int featureIndex ) {
+		if (orientation == null)
 			return detector.getOrientation(featureIndex);
 
 		Point2D_F64 p = detector.getLocation(featureIndex);
 		orientation.setObjectRadius(getRadius(featureIndex));
-		return orientation.compute(p.x,p.y);
+		return orientation.compute(p.x, p.y);
 	}
 
 	@Override
@@ -95,7 +93,7 @@ public class InterestPointDetectorOverride<T extends ImageGray<T>>
 
 	@Override
 	public boolean hasOrientation() {
-		if( orientation == null )
+		if (orientation == null)
 			return detector.hasOrientation();
 		return true;
 	}

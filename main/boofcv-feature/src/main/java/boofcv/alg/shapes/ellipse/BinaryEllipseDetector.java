@@ -151,11 +151,7 @@ public class BinaryEllipseDetector<T extends ImageGray<T>> {
 			throw new IllegalArgumentException("Autorefine is true, no need to refine again");
 		if (ellipseRefiner == null)
 			throw new IllegalArgumentException("Refiner has not been passed in");
-		if (!ellipseRefiner.process(ellipse, ellipse)) {
-			return false;
-		} else {
-			return true;
-		}
+		return ellipseRefiner.process(ellipse, ellipse);
 	}
 
 	public BinaryEllipseDetectorPixel getEllipseDetector() {

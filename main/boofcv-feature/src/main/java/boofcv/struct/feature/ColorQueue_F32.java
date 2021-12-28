@@ -27,7 +27,7 @@ import org.ddogleg.struct.DogArray;
  */
 public class ColorQueue_F32 extends DogArray<float[]> {
 
-	public ColorQueue_F32(int numBands) {
-		super(float[].class,()->new float[numBands]);
+	public ColorQueue_F32( int numBands ) {
+		super(float[].class, () -> new float[numBands]);
 	}
 }

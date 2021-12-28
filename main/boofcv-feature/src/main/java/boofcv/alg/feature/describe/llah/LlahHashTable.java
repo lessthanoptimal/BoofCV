@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,23 +32,25 @@ public class LlahHashTable {
 
 	/**
 	 * Adds the feature to the map. If there's a collision it's added as the last element in the list
+	 *
 	 * @param feature Feature to be added
 	 */
 	public void add( LlahFeature feature ) {
 		LlahFeature f = map.get(feature.hashCode);
-		if( f != null ) {
-			while( f.next != null ) {
+		if (f != null) {
+			while (f.next != null) {
 				f = f.next;
 			}
 			f.next = feature;
 		} else {
-			map.put(feature.hashCode,feature);
+			map.put(feature.hashCode, feature);
 		}
 		feature.next = null; // just to be safe
 	}
 
 	/**
 	 * Looks up a feature which has the same hash and matching invariants
+	 *
 	 * @param hashCode Feature's hashcode
 	 * @return The found matching feature or null if there is no match
 	 */

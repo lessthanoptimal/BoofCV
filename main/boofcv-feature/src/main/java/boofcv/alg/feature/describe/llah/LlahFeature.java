@@ -41,23 +41,23 @@ public class LlahFeature {
 	 */
 	public int hashCode;
 
-	public LlahFeature(int numInvariants ) {
-		invariants = new int[ numInvariants ];
+	public LlahFeature( int numInvariants ) {
+		invariants = new int[numInvariants];
 	}
 
 	public void reset() {
 		this.next = null;
 		this.documentID = -1;
 		this.landmarkID = -1;
-		Arrays.fill(invariants,-1);
+		Arrays.fill(invariants, -1);
 	}
 
 	/**
 	 * Returns true if the invariants are identical
 	 */
-	public boolean doInvariantsMatch(LlahFeature f ) {
+	public boolean doInvariantsMatch( LlahFeature f ) {
 		for (int i = 0; i < invariants.length; i++) {
-			if( f.invariants[i] != this.invariants[i] )
+			if (f.invariants[i] != this.invariants[i])
 				return false;
 		}
 		return true;

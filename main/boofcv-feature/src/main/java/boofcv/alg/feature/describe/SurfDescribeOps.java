@@ -56,7 +56,7 @@ public class SurfDescribeOps {
 	public static <T extends ImageGray<T>>
 	void gradient( T ii, double tl_x, double tl_y, double samplePeriod,
 				   int regionSize, double kernelWidth,
-				   boolean useHaar, double[] derivX, double derivY[] ) {
+				   boolean useHaar, double[] derivX, double[] derivY ) {
 		ImplSurfDescribeOps.naiveGradient(ii, tl_x, tl_y, samplePeriod, regionSize, kernelWidth, useHaar, derivX, derivY);
 	}
 
@@ -144,9 +144,7 @@ public class SurfDescribeOps {
 		int y0 = c_y - kernelPaddingMinus;
 		if (y0 < 0) return false;
 		int y1 = c_y + kernelPaddingPlus;
-		if (y1 >= ii.height) return false;
-
-		return true;
+		return y1 < ii.height;
 	}
 
 	/**
@@ -186,10 +184,7 @@ public class SurfDescribeOps {
 		int x1 = (int)(tl_x + regionSize + 0.5) + r;
 		int y1 = (int)(tl_y + regionSize + 0.5) + r;
 
-		if (x1 >= width || y1 >= height)
-			return false;
-
-		return true;
+		return x1 < width && y1 < height;
 	}
 
 	/**

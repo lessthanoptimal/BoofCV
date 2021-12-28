@@ -59,7 +59,7 @@ public class ConfigPointTracker implements Configuration {
 	}
 
 	public enum TrackerType {
-		KLT,DDA,HYBRID
+		KLT, DDA, HYBRID
 	}
 
 	public ConfigPointTracker setTo( ConfigPointTracker src ) {

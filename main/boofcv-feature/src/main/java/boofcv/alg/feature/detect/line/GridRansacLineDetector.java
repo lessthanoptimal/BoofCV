@@ -71,10 +71,10 @@ public abstract class GridRansacLineDetector<D extends ImageGray<D>> {
 	protected int maxDetectLines;
 
 	// extracts lines
-	private ModelMatcher<LinePolar2D_F32, Edgel> robustMatcher;
+	private final ModelMatcher<LinePolar2D_F32, Edgel> robustMatcher;
 
 	// list of lines found in each
-	private MatrixOfList<LineSegment2D_F32> foundLines = new MatrixOfList<>(1, 1);
+	private final MatrixOfList<LineSegment2D_F32> foundLines = new MatrixOfList<>(1, 1);
 
 	/**
 	 * Specifies major configuration parameters.

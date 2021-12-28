@@ -28,7 +28,7 @@ import boofcv.struct.ConnectRule;
  */
 public class ConfigSegmentMeanShift implements Configuration {
 
- 	/**
+	/**
 	 * Radius of mean-shift region in pixels. Try 6
 	 */
 	public int spacialRadius = 6;
@@ -49,11 +49,10 @@ public class ConfigSegmentMeanShift implements Configuration {
 	 */
 	public ConnectRule connectRule = ConnectRule.FOUR;
 
-
 	public ConfigSegmentMeanShift() {
 	}
 
-	public ConfigSegmentMeanShift(int spacialRadius, float colorRadius, int minimumRegionSize, boolean fast) {
+	public ConfigSegmentMeanShift( int spacialRadius, float colorRadius, int minimumRegionSize, boolean fast ) {
 		this.spacialRadius = spacialRadius;
 		this.colorRadius = colorRadius;
 		this.minimumRegionSize = minimumRegionSize;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -17,7 +17,6 @@
  */
 
 package boofcv.abst.feature.detect.line;
-
 
 import boofcv.struct.image.ImageGray;
 import georegression.struct.line.LineSegment2D_F32;
@@ -39,5 +38,5 @@ public interface DetectLineSegment<T extends ImageGray<T>> {
 	 * @param input Input image.
 	 * @return List of found line segments.
 	 */
-	public List<LineSegment2D_F32> detect(T input);
+	List<LineSegment2D_F32> detect( T input );
 }

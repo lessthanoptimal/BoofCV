@@ -34,11 +34,11 @@ public class ConfigTemplateDescribe implements Configuration {
 	/**
 	 * The region's width
 	 */
-	public int width=11;
+	public int width = 11;
 	/**
 	 * The region's height.
 	 */
-	public int height=11;
+	public int height = 11;
 
 	@Override public void checkValidity() {}
 

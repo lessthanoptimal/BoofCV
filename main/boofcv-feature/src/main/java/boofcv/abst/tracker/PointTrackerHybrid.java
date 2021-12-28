@@ -149,13 +149,13 @@ public class PointTrackerHybrid<I extends ImageGray<I>, D extends ImageGray<D>, 
 
 	@Override public long getFrameID() {return tracker.getFrameID();}
 
-	@Override public int getTotalActive() { return tracker.getTracksActive().size();}
+	@Override public int getTotalActive() {return tracker.getTracksActive().size();}
 
-	@Override public int getTotalInactive() { return tracker.getTracksInactive().size();}
+	@Override public int getTotalInactive() {return tracker.getTracksInactive().size();}
 
-	@Override public void dropAllTracks() { tracker.dropAllTracks(); }
+	@Override public void dropAllTracks() {tracker.dropAllTracks();}
 
-	@Override public int getMaxSpawn() { return 0; } // returning zero here since there is no good answer.
+	@Override public int getMaxSpawn() {return 0;} // returning zero here since there is no good answer.
 
 	@Override public boolean dropTrack( PointTrack track ) {
 		if (tracker.dropTrack((HybridTrack<Desc>)track)) {

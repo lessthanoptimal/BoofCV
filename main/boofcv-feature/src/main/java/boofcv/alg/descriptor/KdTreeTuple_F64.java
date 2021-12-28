@@ -30,17 +30,17 @@ public class KdTreeTuple_F64 implements KdTreeDistance<TupleDesc_F64> {
 
 	int N;
 
-	public KdTreeTuple_F64(int n) {
+	public KdTreeTuple_F64( int n ) {
 		N = n;
 	}
 
 	@Override
-	public double distance(TupleDesc_F64 a, TupleDesc_F64 b) {
-		return DescriptorDistance.euclideanSq(a,b);
+	public double distance( TupleDesc_F64 a, TupleDesc_F64 b ) {
+		return DescriptorDistance.euclideanSq(a, b);
 	}
 
 	@Override
-	public double valueAt(TupleDesc_F64 point, int index) {
+	public double valueAt( TupleDesc_F64 point, int index ) {
 		return point.data[index];
 	}
 

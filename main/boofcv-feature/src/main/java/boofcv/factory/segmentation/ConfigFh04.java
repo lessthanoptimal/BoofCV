@@ -48,18 +48,18 @@ public class ConfigFh04 implements Configuration {
 
 	public ConfigFh04() {}
 
-	public ConfigFh04(float k, int minimumRegionSize) {
+	public ConfigFh04( float k, int minimumRegionSize ) {
 		K = k;
 		this.minimumRegionSize = minimumRegionSize;
 	}
 
-	public ConfigFh04(int k, int minimumRegionSize, ConnectRule connectRule) {
+	public ConfigFh04( int k, int minimumRegionSize, ConnectRule connectRule ) {
 		K = k;
 		this.minimumRegionSize = minimumRegionSize;
 		this.connectRule = connectRule;
 	}
 
-	public ConfigFh04(float k, int minimumRegionSize, ConnectRule connectRule, int approximateSortBins) {
+	public ConfigFh04( float k, int minimumRegionSize, ConnectRule connectRule, int approximateSortBins ) {
 		K = k;
 		this.minimumRegionSize = minimumRegionSize;
 		this.connectRule = connectRule;

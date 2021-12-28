@@ -280,7 +280,7 @@ public class DescribePointSurf<II extends ImageGray<II>> {
 	 */
 	public int getCanonicalWidth() {
 		// Rounds to closest int. Always positive so this rounding method works
-		int widthSampleInt = (int)(widthSample+0.5);
+		int widthSampleInt = (int)(widthSample + 0.5);
 		return widthLargeGrid*widthSubRegion + widthSampleInt - (widthSampleInt%2);
 	}
 

@@ -35,7 +35,7 @@ public abstract class DescribePointAbstract<T extends ImageBase<T>, TD extends T
 	protected Class<TD> type;
 	protected BoofLambdas.Factory<TD> factory;
 
-	protected DescribePointAbstract(){}
+	protected DescribePointAbstract() {}
 
 	protected DescribePointAbstract( BoofLambdas.Factory<TD> factory ) {
 		this.factory = factory;

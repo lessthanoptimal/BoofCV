@@ -79,7 +79,7 @@ public class HoughParametersPolar implements HoughTransformParameters {
 
 		int w2 = numBinsRange/2;
 
-		coordinate.x = (int)Math.round(distance*w2/r_max + w2);
+		coordinate.x = Math.round(distance*w2/r_max + w2);
 		coordinate.y = angle*numBinsAngle/Math.PI;
 	}
 
@@ -87,7 +87,7 @@ public class HoughParametersPolar implements HoughTransformParameters {
 	public void transformToLine( float x, float y, LineParametric2D_F32 line ) {
 		int w2 = numBinsRange/2;
 
-		float r = (float)(r_max*(x - w2)/w2);
+		float r = r_max*(x - w2)/w2;
 		float c = tableTrig.cosine(y);
 		float s = tableTrig.sine(y);
 

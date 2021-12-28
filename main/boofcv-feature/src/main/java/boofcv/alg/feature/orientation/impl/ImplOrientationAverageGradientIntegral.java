@@ -26,7 +26,6 @@ import boofcv.struct.sparse.GradientValue;
 import boofcv.struct.sparse.SparseGradientSafe;
 import boofcv.struct.sparse.SparseImageGradient;
 
-
 /**
  * <p>
  * Estimates the orientation of a region by computing the image derivative from an integral image.
@@ -35,100 +34,96 @@ import boofcv.struct.sparse.SparseImageGradient;
  *
  * @author Peter Abeles
  */
-public class ImplOrientationAverageGradientIntegral<T extends ImageGray<T>,G extends GradientValue>
-		extends OrientationIntegralBase<T,G>
-{
+public class ImplOrientationAverageGradientIntegral<T extends ImageGray<T>, G extends GradientValue>
+		extends OrientationIntegralBase<T, G> {
 	/**
-	 *
 	 * @param sampleRadius Radius of the region being considered in terms of Wavelet samples. Typically 6.
 	 * @param weightSigma Sigma for weighting distribution. Zero for unweighted.
 	 */
-	public ImplOrientationAverageGradientIntegral(double radiusToScale,
-												  int sampleRadius, double period,
-												  int kernelWidth, double weightSigma,
-												  Class<T> imageType) {
-		super(radiusToScale,sampleRadius,period,kernelWidth,weightSigma, true, imageType);
+	public ImplOrientationAverageGradientIntegral( double radiusToScale,
+												   int sampleRadius, double period,
+												   int kernelWidth, double weightSigma,
+												   Class<T> imageType ) {
+		super(radiusToScale, sampleRadius, period, kernelWidth, weightSigma, true, imageType);
 	}
 
 	@Override
-	public double compute(double c_x, double c_y) {
+	public double compute( double c_x, double c_y ) {
 
 		double period = scale*this.period;
-		double tl_x = c_x - sampleRadius *period;
-		double tl_y = c_y - sampleRadius *period;
+		double tl_x = c_x - sampleRadius*period;
+		double tl_y = c_y - sampleRadius*period;
 
-		SparseImageGradient<T,G> g;
+		SparseImageGradient<T, G> g;
 		// use a faster algorithm if it is entirely inside
-		if( !SurfDescribeOps.isInside(ii.width,ii.height,tl_x,tl_y, sampleWidth *period, kernelWidth *scale))  {
+		if (!SurfDescribeOps.isInside(ii.width, ii.height, tl_x, tl_y, sampleWidth*period, kernelWidth*scale)) {
 			g = new SparseGradientSafe<>(this.g);
 		} else {
 			g = this.g;
 		}
 
-		if( weights == null )
-			return computeUnweighted(tl_x,tl_y,period,g);
+		if (weights == null)
+			return computeUnweighted(tl_x, tl_y, period, g);
 		else
-			return computeWeighted(tl_x, tl_y, period,g);
+			return computeWeighted(tl_x, tl_y, period, g);
 	}
 
 	/**
 	 * Compute the gradient while checking for border conditions
 	 */
-	protected double computeUnweighted( double tl_x, double tl_y, 
-										double samplePeriod ,
-										SparseImageGradient<T,G> g)
-	{
+	protected double computeUnweighted( double tl_x, double tl_y,
+										double samplePeriod,
+										SparseImageGradient<T, G> g ) {
 		// add 0.5 to c_x and c_y to have it round
 		tl_x += 0.5;
 		tl_y += 0.5;
 
-		double Dx=0,Dy=0;
-		for(int y = 0; y < sampleWidth; y++ ) {
-			int pixelsY = (int)(tl_y + y * samplePeriod);
+		double Dx = 0, Dy = 0;
+		for (int y = 0; y < sampleWidth; y++) {
+			int pixelsY = (int)(tl_y + y*samplePeriod);
 
-			for(int x = 0; x < sampleWidth; x++ ) {
-				int pixelsX = (int)(tl_x + x * samplePeriod);
+			for (int x = 0; x < sampleWidth; x++) {
+				int pixelsX = (int)(tl_x + x*samplePeriod);
 
-				GradientValue v = g.compute(pixelsX,pixelsY);
+				GradientValue v = g.compute(pixelsX, pixelsY);
 				Dx += v.getX();
 				Dy += v.getY();
 			}
 		}
-		return Math.atan2(Dy,Dx);
+		return Math.atan2(Dy, Dx);
 	}
 
 	/**
 	 * Compute the gradient while checking for border conditions
 	 */
-	protected double computeWeighted( double tl_x, double tl_y, 
-									  double samplePeriod , 
-									  SparseImageGradient<T,G> g )
-	{
+	protected double computeWeighted( double tl_x, double tl_y,
+									  double samplePeriod,
+									  SparseImageGradient<T, G> g ) {
 		// add 0.5 to c_x and c_y to have it round
 		tl_x += 0.5;
 		tl_y += 0.5;
 
-		double Dx=0,Dy=0;
+		double Dx = 0, Dy = 0;
 		int i = 0;
-		for(int y = 0; y < sampleWidth; y++ ) {
-			int pixelsY = (int)(tl_y + y * samplePeriod);
+		for (int y = 0; y < sampleWidth; y++) {
+			int pixelsY = (int)(tl_y + y*samplePeriod);
 
-			for(int x = 0; x < sampleWidth; x++ , i++ ) {
-				int pixelsX = (int)(tl_x + x * samplePeriod);
+			for (int x = 0; x < sampleWidth; x++, i++) {
+				int pixelsX = (int)(tl_x + x*samplePeriod);
 
 				double w = weights.data[i];
-				GradientValue v = g.compute(pixelsX,pixelsY);
+				GradientValue v = g.compute(pixelsX, pixelsY);
 				Dx += w*v.getX();
 				Dy += w*v.getY();
 			}
 		}
 
-		return Math.atan2(Dy,Dx);
+		return Math.atan2(Dy, Dx);
 	}
 
 	@Override
 	public RegionOrientation copy() {
 		return new ImplOrientationAverageGradientIntegral<>(
-				objectRadiusToScale,sampleRadius,period,kernelWidth,weightSigma,getImageType());
+				objectRadiusToScale, sampleRadius, period, kernelWidth, weightSigma, getImageType());
 	}
 }

@@ -50,7 +50,7 @@ public class SplitMergeLineRefine_to_PointsToPolyline implements PointsToPolylin
 	// refine corner location
 	RefinePolyLineCorner refine;
 	// removes extra corners
-	private DogArray_I32 pruned = new DogArray_I32(); // corners after pruning
+	private final DogArray_I32 pruned = new DogArray_I32(); // corners after pruning
 	private MinimizeEnergyPrune pruner;
 
 	boolean convex = true;

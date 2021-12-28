@@ -27,20 +27,16 @@ import boofcv.struct.Configuration;
  * @author Peter Abeles
  */
 public class ConfigTrackerDda implements Configuration {
-	/**
-	 * Update the description each time its successfully matched?
-	 */
+	/** Update the description each time its successfully matched? */
 	public boolean updateDescription = false;
 	/**
 	 * If there are more than this number of inactive tracks then inactive tracks will be randomly discarded until
 	 * there is this many left.
 	 */
-	public int maxInactiveTracks =500;
+	public int maxInactiveTracks = 500;
 
-	/**
-	 * Random seed
-	 */
-	public long seed=0xDEADBEEF;
+	/** Random seed */
+	public long seed = 0xDEADBEEF;
 
 	@Override public void checkValidity() {}
 

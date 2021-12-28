@@ -41,16 +41,16 @@ public class DenseOpticalFlowKlt<I extends ImageGray<I>, D extends ImageGray<D>>
 
 	// Amount it adjusts the score for the center of a region.
 	// Visually this looks better, but only makes a small difference in benchmark performance
-	private static float MAGIC_ADJUSTMENT = 0.7f;
+	private static final float MAGIC_ADJUSTMENT = 0.7f;
 
-	private PyramidKltTracker<I, D> tracker;
+	private final PyramidKltTracker<I, D> tracker;
 	private PyramidKltFeature feature;
 
 	// goodness of fit for each template
 	float[] scores = new float[1];
 
 	// size of template
-	private int regionRadius;
+	private final int regionRadius;
 	// image shape
 	private int width, height;
 

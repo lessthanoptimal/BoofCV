@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,24 +20,23 @@ package boofcv.abst.feature.orientation;
 
 import boofcv.struct.image.ImageGray;
 
-
 /**
  * Estimates the orientation of a region directly from the image's pixels.
  *
  * @author Peter Abeles
  */
-public interface OrientationImage <T extends ImageGray<T>> extends RegionOrientation {
+public interface OrientationImage<T extends ImageGray<T>> extends RegionOrientation {
 	/**
 	 * Specifies input image data for estimating orientation.
 	 *
 	 * @param image Input image..
 	 */
-	public void setImage( T image );
+	void setImage( T image );
 
 	/**
 	 * Returns the type of image it can process.
 	 *
 	 * @return Type of image which can be processed
 	 */
-	public Class<T> getImageType();
+	Class<T> getImageType();
 }

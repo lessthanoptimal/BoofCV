@@ -40,16 +40,16 @@ public class ConfigShiTomasi implements Configuration {
 	 */
 	public int radius = 1;
 
-	public ConfigShiTomasi(boolean weighted, int radius) {
+	public ConfigShiTomasi( boolean weighted, int radius ) {
 		this.weighted = weighted;
 		this.radius = radius;
 	}
 
-	public ConfigShiTomasi(){}
+	public ConfigShiTomasi() {}
 
 	@Override
 	public void checkValidity() {
-		if( radius <= 0 )
+		if (radius <= 0)
 			throw new IllegalArgumentException("Radius must be greater than zero");
 	}
 

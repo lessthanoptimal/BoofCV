@@ -49,7 +49,7 @@ public class GeneralToInterestPoint<T extends ImageGray<T>, D extends ImageGray<
 	// list of points it found
 	protected DogArray<Point2D_F64> foundPoints = new DogArray<>(10, Point2D_F64::new);
 
-	public GeneralToInterestPoint( GeneralFeatureDetector<T, D> detector, double radius) {
+	public GeneralToInterestPoint( GeneralFeatureDetector<T, D> detector, double radius ) {
 		super(detector, detector.getImageType(), detector.getDerivType());
 		configure(detector, radius);
 	}

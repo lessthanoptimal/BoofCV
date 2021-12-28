@@ -115,8 +115,8 @@ public class CompleteSift {
 			// Would it reduce context switching?
 
 			// Gradient image is offset by one
-			GrayF32 derivX = gradient.getDerivX(p.octaveIdx, (byte)(p.scaleIdx-1));
-			GrayF32 derivY = gradient.getDerivY(p.octaveIdx, (byte)(p.scaleIdx-1));
+			GrayF32 derivX = gradient.getDerivX(p.octaveIdx, (byte)(p.scaleIdx - 1));
+			GrayF32 derivY = gradient.getDerivY(p.octaveIdx, (byte)(p.scaleIdx - 1));
 
 			orientation.setImageGradient(derivX, derivY);
 			describe.setImageGradient(derivX, derivY);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,7 +38,7 @@ public class FeatureSelectRandom<Point> implements FeatureSelectLimit<Point> {
 	final Random rand;
 
 	// Work space
-	private DogArray_I32 indexes = new DogArray_I32();
+	private final DogArray_I32 indexes = new DogArray_I32();
 
 	public FeatureSelectRandom( long seed ) {
 		rand = new Random(seed);

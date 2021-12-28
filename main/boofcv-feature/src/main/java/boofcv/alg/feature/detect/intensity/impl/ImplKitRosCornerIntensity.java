@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,6 @@ package boofcv.alg.feature.detect.intensity.impl;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 
-
 /**
  * Implementations of {@link boofcv.alg.feature.detect.intensity.KitRosCornerIntensity}.
  *
@@ -29,15 +28,14 @@ import boofcv.struct.image.GrayS16;
  */
 public class ImplKitRosCornerIntensity {
 
-	public static void process(GrayF32 featureIntensity,
-							   GrayF32 derivX, GrayF32 derivY,
-							   GrayF32 hessianXX, GrayF32 hessianYY , GrayF32 hessianXY )
-	{
+	public static void process( GrayF32 featureIntensity,
+								GrayF32 derivX, GrayF32 derivY,
+								GrayF32 hessianXX, GrayF32 hessianYY, GrayF32 hessianXY ) {
 
 		final int width = derivX.width;
 		final int height = derivY.height;
 
-		for( int y = 0; y < height; y++ ) {
+		for (int y = 0; y < height; y++) {
 			int indexX = derivX.startIndex + y*derivX.stride;
 			int indexY = derivY.startIndex + y*derivY.stride;
 			int indexXX = hessianXX.startIndex + y*hessianXX.stride;
@@ -46,7 +44,7 @@ public class ImplKitRosCornerIntensity {
 
 			int indexInten = featureIntensity.startIndex + y*featureIntensity.stride;
 
-			for( int x = 0; x < width; x++ ) {
+			for (int x = 0; x < width; x++) {
 				float dx = derivX.data[indexX++];
 				float dy = derivY.data[indexY++];
 				float dxx = hessianXX.data[indexXX++];
@@ -60,7 +58,7 @@ public class ImplKitRosCornerIntensity {
 				float top = Math.abs(dxx*dy2 - 2*dxy*dx*dy + dyy*dx2);
 				float bottom = dx2 + dy2;
 
-				if( bottom == 0.0 )
+				if (bottom == 0.0)
 					featureIntensity.data[indexInten++] = 0;
 				else
 					featureIntensity.data[indexInten++] = top/bottom;
@@ -68,14 +66,13 @@ public class ImplKitRosCornerIntensity {
 		}
 	}
 
-	public static void process(GrayF32 featureIntensity,
-							   GrayS16 derivX, GrayS16 derivY,
-							   GrayS16 hessianXX, GrayS16 hessianYY , GrayS16 hessianXY )
-	{
+	public static void process( GrayF32 featureIntensity,
+								GrayS16 derivX, GrayS16 derivY,
+								GrayS16 hessianXX, GrayS16 hessianYY, GrayS16 hessianXY ) {
 		final int width = derivX.width;
 		final int height = derivY.height;
 
-		for( int y = 0; y < height; y++ ) {
+		for (int y = 0; y < height; y++) {
 			int indexX = derivX.startIndex + y*derivX.stride;
 			int indexY = derivY.startIndex + y*derivY.stride;
 			int indexXX = hessianXX.startIndex + y*hessianXX.stride;
@@ -84,7 +81,7 @@ public class ImplKitRosCornerIntensity {
 
 			int indexInten = featureIntensity.startIndex + y*featureIntensity.stride;
 
-			for( int x = 0; x < width; x++ ) {
+			for (int x = 0; x < width; x++) {
 				int dx = derivX.data[indexX++];
 				int dy = derivY.data[indexY++];
 				int dxx = hessianXX.data[indexXX++];
@@ -98,7 +95,7 @@ public class ImplKitRosCornerIntensity {
 				float top = Math.abs(dxx*dy2 - 2*dxy*dx*dy + dyy*dx2);
 				float bottom = dx2 + dy2;
 
-				if( bottom == 0.0 )
+				if (bottom == 0.0)
 					featureIntensity.data[indexInten++] = 0;
 				else
 					featureIntensity.data[indexInten++] = top/bottom;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,12 +31,12 @@ public class HarrisCorner_F32 implements ImplSsdCornerBase.CornerIntensity_F32, 
 
 	float kappa;
 
-	public HarrisCorner_F32(float kappa) {
+	public HarrisCorner_F32( float kappa ) {
 		this.kappa = kappa;
 	}
 
 	@Override
-	public void setKappa(float kappa) {
+	public void setKappa( float kappa ) {
 		this.kappa = kappa;
 	}
 
@@ -44,7 +44,7 @@ public class HarrisCorner_F32 implements ImplSsdCornerBase.CornerIntensity_F32, 
 	public float compute( float totalXX, float totalXY, float totalYY ) {
 		// det(A) - kappa*trace(A)^2
 		float trace = totalXX + totalYY;
-		return (totalXX * totalYY - totalXY * totalXY) - kappa * trace*trace;
+		return (totalXX*totalYY - totalXY*totalXY) - kappa*trace*trace;
 	}
 
 	@Override

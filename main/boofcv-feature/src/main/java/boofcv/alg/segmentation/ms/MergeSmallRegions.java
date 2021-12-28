@@ -53,7 +53,7 @@ public class MergeSmallRegions<T extends ImageBase<T>> extends RegionMergeTree {
 	protected DogArray<Node> pruneGraph = new DogArray<>(Node::new);
 
 	// Relative location of neighbors according to connection rule
-	protected Point2D_I32 connect[];
+	protected Point2D_I32[] connect;
 
 	/**
 	 * Constructor

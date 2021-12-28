@@ -23,28 +23,28 @@ import boofcv.struct.Configuration;
 
 /**
  * Configuration for {@link DescribePointSift}
- * 
+ *
  * @author Peter Abeles
  */
 public class ConfigSiftDescribe implements Configuration {
 
-	/** Width of sub-region in samples.*/
-	public int widthSubregion=4;
+	/** Width of sub-region in samples. */
+	public int widthSubregion = 4;
 
 	/** Width of grid in subregions. */
-	public int widthGrid=4;
+	public int widthGrid = 4;
 
-	/** Number of histogram bins.*/
-	public int numHistogramBins=8;
+	/** Number of histogram bins. */
+	public int numHistogramBins = 8;
 
-	/** Conversion of sigma to pixels. Used to scale the descriptor sample region's width.*/
-	public double sigmaToPixels=1.0;
+	/** Conversion of sigma to pixels. Used to scale the descriptor sample region's width. */
+	public double sigmaToPixels = 1.0;
 
-	/** Sigma for Gaussian weighting function is set to this value * region width.*/
-	public double weightingSigmaFraction=0.5;
+	/** Sigma for Gaussian weighting function is set to this value * region width. */
+	public double weightingSigmaFraction = 0.5;
 
-	/** Maximum fraction a single element can have in descriptor. Helps with non-affine changes in lighting. See paper.*/
-	public double maxDescriptorElementValue=0.2;
+	/** Maximum fraction a single element can have in descriptor. Helps with non-affine changes in lighting. See paper. */
+	public double maxDescriptorElementValue = 0.2;
 
 	@Override public void checkValidity() {}
 

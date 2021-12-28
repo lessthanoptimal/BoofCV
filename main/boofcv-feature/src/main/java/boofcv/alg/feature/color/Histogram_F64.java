@@ -36,8 +36,6 @@ import boofcv.struct.feature.TupleDesc_F64;
  * hist.setRange(2,0,255);
  * GHistogramFeatureOps.histogram(image,hist);</pre>
  *
- *
- *
  * @author Peter Abeles
  */
 public class Histogram_F64 extends TupleDesc_F64 {
@@ -56,31 +54,32 @@ public class Histogram_F64 extends TupleDesc_F64 {
 	 *
 	 * @param lengths Number of elements in each dimension
 	 */
-	public Histogram_F64( int ...lengths ) {
+	public Histogram_F64( int... lengths ) {
 		this.length = lengths.clone();
 
 		this.strides = new int[lengths.length];
-		int N = lengths[lengths.length-1];
+		int N = lengths[lengths.length - 1];
 
 		for (int i = 1; i < lengths.length; i++) {
-			strides[strides.length-i-1] = N;
-			N *= lengths[lengths.length-i-1];
+			strides[strides.length - i - 1] = N;
+			N *= lengths[lengths.length - i - 1];
 		}
-		strides[strides.length-1] = 1;
+		strides[strides.length - 1] = 1;
 
 		data = new double[N];
 
-		valueMin = new double[ lengths.length ];
-		valueMax = new double[ lengths.length ];
+		valueMin = new double[lengths.length];
+		valueMax = new double[lengths.length];
 	}
 
 	/**
 	 * Returns true if the min and max value for each dimension has been set
+	 *
 	 * @return true if range has been set
 	 */
 	public boolean isRangeSet() {
 		for (int i = 0; i < getDimensions(); i++) {
-			if( valueMin[i] == 0 && valueMax[i] == 0 ) {
+			if (valueMin[i] == 0 && valueMax[i] == 0) {
 				return false;
 			}
 		}
@@ -90,6 +89,7 @@ public class Histogram_F64 extends TupleDesc_F64 {
 
 	/**
 	 * The number of dimensions in the histogram.
+	 *
 	 * @return dimensions
 	 */
 	public int getDimensions() {
@@ -98,6 +98,7 @@ public class Histogram_F64 extends TupleDesc_F64 {
 
 	/**
 	 * Number of elements/bins along the specified dimension
+	 *
 	 * @param dimension Which dimension
 	 * @return Number of bins
 	 */
@@ -112,31 +113,34 @@ public class Histogram_F64 extends TupleDesc_F64 {
 	 * @param min The minimum value
 	 * @param max The maximum value
 	 */
-	public void setRange( int dimension , double min , double max ) {
+	public void setRange( int dimension, double min, double max ) {
 		valueMin[dimension] = min;
 		valueMax[dimension] = max;
 	}
 
 	/**
 	 * Sets the minimum allowed value in a particular dimension
+	 *
 	 * @param dimension Which dimension
 	 * @param value minimum value
 	 */
-	public void setMinimum( int dimension , double value ) {
+	public void setMinimum( int dimension, double value ) {
 		valueMin[dimension] = value;
 	}
 
 	/**
 	 * Sets the maximum allowed value in a particular dimension
+	 *
 	 * @param dimension Which dimension
 	 * @param value maximum value
 	 */
-	public void setMaximum( int dimension , double value ) {
+	public void setMaximum( int dimension, double value ) {
 		valueMax[dimension] = value;
 	}
 
 	/**
 	 * Returns the minimum allowed value in a dimension
+	 *
 	 * @param dimension Which dimension
 	 * @return minimum value
 	 */
@@ -146,6 +150,7 @@ public class Histogram_F64 extends TupleDesc_F64 {
 
 	/**
 	 * Returns the maximum allowed value in a dimension
+	 *
 	 * @param dimension Which dimension
 	 * @return maximum value
 	 */
@@ -157,17 +162,17 @@ public class Histogram_F64 extends TupleDesc_F64 {
 	 * Given a value it returns the corresponding bin index in this histogram for the specified dimension. This
 	 * is for floating point values.
 	 *
-	 * @param dimension  Which dimension the value belongs to
+	 * @param dimension Which dimension the value belongs to
 	 * @param value Floating point value between min and max, inclusive.
 	 * @return The index/bin
 	 */
-	public int getDimensionIndex( int dimension , double value ) {
+	public int getDimensionIndex( int dimension, double value ) {
 		double min = valueMin[dimension];
 		double max = valueMax[dimension];
 
-		double fraction = ((value-min)/(max-min));
-		if( fraction >= 1.0 )
-			return length[dimension]-1;
+		double fraction = ((value - min)/(max - min));
+		if (fraction >= 1.0)
+			return length[dimension] - 1;
 		else {
 			return (int)(fraction*length[dimension]);
 		}
@@ -177,37 +182,40 @@ public class Histogram_F64 extends TupleDesc_F64 {
 	 * Given a value it returns the corresponding bin index in this histogram for integer values. The discretion
 	 * is taken in account and 1 is added to the range.
 	 *
-	 * @param dimension  Which dimension the value belongs to
+	 * @param dimension Which dimension the value belongs to
 	 * @param value Floating point value between min and max, inclusive.
 	 * @return The index/bin
 	 */
-	public int getDimensionIndex( int dimension , int value ) {
+	public int getDimensionIndex( int dimension, int value ) {
 		double min = valueMin[dimension];
 		double max = valueMax[dimension];
 
-		double fraction = ((value-min)/(max-min+1.0));
+		double fraction = ((value - min)/(max - min + 1.0));
 		return (int)(fraction*length[dimension]);
 	}
 
 	/**
 	 * For a 2D histogram it returns the array index for coordinate (i,j)
+	 *
 	 * @param i index along axis 0
 	 * @param j index along axis 1
 	 * @return array index
 	 */
-	public final int getIndex( int i , int j ) {
-		return i*strides[0]+j;
+	public final int getIndex( int i, int j ) {
+		return i*strides[0] + j;
 	}
+
 	/**
 	 * For a 3D histogram it returns the array index for coordinate (i,j,k)
+	 *
 	 * @param i index along axis 0
 	 * @param j index along axis 1
 	 * @param k index along axis 2
 	 * @return array index
 	 */
 
-	public final int getIndex( int i , int j , int k ) {
-		return i*strides[0]+j*strides[1] + k;
+	public final int getIndex( int i, int j, int k ) {
+		return i*strides[0] + j*strides[1] + k;
 	}
 
 	/**
@@ -227,32 +235,35 @@ public class Histogram_F64 extends TupleDesc_F64 {
 
 	/**
 	 * Returns the value at the 2D coordinate
+	 *
 	 * @param i index along axis-0
 	 * @param j index along axis-1
 	 * @return histogram value
 	 */
-	public double get( int i , int j ) {
-		return  data[getIndex(i,j)];
+	public double get( int i, int j ) {
+		return data[getIndex(i, j)];
 	}
 
 	/**
 	 * Returns the value at the 3D coordinate
+	 *
 	 * @param i index along axis-0
 	 * @param j index along axis-1
 	 * @param k index along axis-2
 	 * @return histogram value
 	 */
-	public double get( int i , int j , int k ) {
-		return  data[getIndex(i,j, k)];
+	public double get( int i, int j, int k ) {
+		return data[getIndex(i, j, k)];
 	}
 
 	/**
 	 * Returns the value at the N-D coordinate
+	 *
 	 * @param coordinate N-D coordinate
 	 * @return histogram value
 	 */
 	public double get( int[] coordinate ) {
-		return  data[getIndex(coordinate)];
+		return data[getIndex(coordinate)];
 	}
 
 	/**
@@ -261,7 +272,7 @@ public class Histogram_F64 extends TupleDesc_F64 {
 	@Override public Histogram_F64 copy() {
 		Histogram_F64 out = newInstance();
 
-		System.arraycopy(data,0,out.data,0,length.length);
+		System.arraycopy(data, 0, out.data, 0, length.length);
 
 		return out;
 	}
@@ -273,7 +284,7 @@ public class Histogram_F64 extends TupleDesc_F64 {
 		Histogram_F64 out = new Histogram_F64(length);
 
 		for (int i = 0; i < length.length; i++) {
-			out.setRange(i,valueMin[i],valueMax[i]);
+			out.setRange(i, valueMin[i], valueMax[i]);
 		}
 
 		return out;

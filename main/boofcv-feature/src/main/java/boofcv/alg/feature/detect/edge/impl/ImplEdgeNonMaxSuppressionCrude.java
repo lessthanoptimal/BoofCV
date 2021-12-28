@@ -27,7 +27,6 @@ import boofcv.struct.image.GrayI;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayS32;
 
-
 /**
  * <p>
  * Implementations of the crude version of non-maximum edge suppression. If the gradient is positive or negative
@@ -47,29 +46,28 @@ public class ImplEdgeNonMaxSuppressionCrude {
 	/**
 	 * Only processes the inner image. Ignoring the border.
 	 */
-	static public void inner4( GrayF32 intensity , GrayF32 derivX , GrayF32 derivY, GrayF32 output )
-	{
+	static public void inner4( GrayF32 intensity, GrayF32 derivX, GrayF32 derivY, GrayF32 output ) {
 		final int w = intensity.width;
-		final int h = intensity.height-1;
+		final int h = intensity.height - 1;
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(1,h,y->{
-		for( int y = 1; y < h; y++ ) {
-			int indexI = intensity.startIndex + y*intensity.stride+1;
-			int indexX = derivX.startIndex + y*derivX.stride+1;
-			int indexY = derivY.startIndex + y*derivY.stride+1;
-			int indexO = output.startIndex + y*output.stride+1;
+		for (int y = 1; y < h; y++) {
+			int indexI = intensity.startIndex + y*intensity.stride + 1;
+			int indexX = derivX.startIndex + y*derivX.stride + 1;
+			int indexY = derivY.startIndex + y*derivY.stride + 1;
+			int indexO = output.startIndex + y*output.stride + 1;
 
 			int end = indexI + w - 2;
-			for( ; indexI < end; indexI++ , indexX++, indexY++, indexO++ ) {
-				int dx,dy;
+			for (; indexI < end; indexI++, indexX++, indexY++, indexO++) {
+				int dx, dy;
 
-				if( derivX.data[indexX] > 0 ) dx = 1; else dx = -1;
-				if( derivY.data[indexY] > 0 ) dy = 1; else dy = -1;
+				if (derivX.data[indexX] > 0) dx = 1; else dx = -1;
+				if (derivY.data[indexY] > 0) dy = 1; else dy = -1;
 
 				float middle = intensity.data[indexI];
 
 				// suppress the value if either of its neighboring values are more than or equal to it
-				if( intensity.data[indexI-dx-dy*intensity.stride] > middle || intensity.data[indexI+dx+dy*intensity.stride] > middle ) {
+				if (intensity.data[indexI - dx - dy*intensity.stride] > middle || intensity.data[indexI + dx + dy*intensity.stride] > middle) {
 					output.data[indexO] = 0;
 				} else {
 					output.data[indexO] = middle;
@@ -82,29 +80,28 @@ public class ImplEdgeNonMaxSuppressionCrude {
 	/**
 	 * Only processes the inner image. Ignoring the border.
 	 */
-	static public void inner4( GrayF32 intensity , GrayS16 derivX , GrayS16 derivY, GrayF32 output )
-	{
+	static public void inner4( GrayF32 intensity, GrayS16 derivX, GrayS16 derivY, GrayF32 output ) {
 		final int w = intensity.width;
-		final int h = intensity.height-1;
+		final int h = intensity.height - 1;
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(1,h,y->{
-		for( int y = 1; y < h; y++ ) {
-			int indexI = intensity.startIndex + y*intensity.stride+1;
-			int indexX = derivX.startIndex + y*derivX.stride+1;
-			int indexY = derivY.startIndex + y*derivY.stride+1;
-			int indexO = output.startIndex + y*output.stride+1;
+		for (int y = 1; y < h; y++) {
+			int indexI = intensity.startIndex + y*intensity.stride + 1;
+			int indexX = derivX.startIndex + y*derivX.stride + 1;
+			int indexY = derivY.startIndex + y*derivY.stride + 1;
+			int indexO = output.startIndex + y*output.stride + 1;
 
 			int end = indexI + w - 2;
-			for( ; indexI < end; indexI++ , indexX++, indexY++, indexO++ ) {
-				int dx,dy;
+			for (; indexI < end; indexI++, indexX++, indexY++, indexO++) {
+				int dx, dy;
 
-				if( derivX.data[indexX] > 0 ) dx = 1; else dx = -1;
-				if( derivY.data[indexY] > 0 ) dy = 1; else dy = -1;
+				if (derivX.data[indexX] > 0) dx = 1; else dx = -1;
+				if (derivY.data[indexY] > 0) dy = 1; else dy = -1;
 
 				float middle = intensity.data[indexI];
 
 				// suppress the value if either of its neighboring values are more than or equal to it
-				if( intensity.data[indexI-dx-dy*intensity.stride] > middle || intensity.data[indexI+dx+dy*intensity.stride] > middle ) {
+				if (intensity.data[indexI - dx - dy*intensity.stride] > middle || intensity.data[indexI + dx + dy*intensity.stride] > middle) {
 					output.data[indexO] = 0;
 				} else {
 					output.data[indexO] = middle;
@@ -117,29 +114,28 @@ public class ImplEdgeNonMaxSuppressionCrude {
 	/**
 	 * Only processes the inner image. Ignoring the border.
 	 */
-	static public void inner4( GrayF32 intensity , GrayS32 derivX , GrayS32 derivY, GrayF32 output )
-	{
+	static public void inner4( GrayF32 intensity, GrayS32 derivX, GrayS32 derivY, GrayF32 output ) {
 		final int w = intensity.width;
-		final int h = intensity.height-1;
+		final int h = intensity.height - 1;
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(1,h,y->{
-		for( int y = 1; y < h; y++ ) {
-			int indexI = intensity.startIndex + y*intensity.stride+1;
-			int indexX = derivX.startIndex + y*derivX.stride+1;
-			int indexY = derivY.startIndex + y*derivY.stride+1;
-			int indexO = output.startIndex + y*output.stride+1;
+		for (int y = 1; y < h; y++) {
+			int indexI = intensity.startIndex + y*intensity.stride + 1;
+			int indexX = derivX.startIndex + y*derivX.stride + 1;
+			int indexY = derivY.startIndex + y*derivY.stride + 1;
+			int indexO = output.startIndex + y*output.stride + 1;
 
 			int end = indexI + w - 2;
-			for( ; indexI < end; indexI++ , indexX++, indexY++, indexO++ ) {
-				int dx,dy;
+			for (; indexI < end; indexI++, indexX++, indexY++, indexO++) {
+				int dx, dy;
 
-				if( derivX.data[indexX] > 0 ) dx = 1; else dx = -1;
-				if( derivY.data[indexY] > 0 ) dy = 1; else dy = -1;
+				if (derivX.data[indexX] > 0) dx = 1; else dx = -1;
+				if (derivY.data[indexY] > 0) dy = 1; else dy = -1;
 
 				float middle = intensity.data[indexI];
 
 				// suppress the value if either of its neighboring values are more than or equal to it
-				if( intensity.data[indexI-dx-dy*intensity.stride] > middle || intensity.data[indexI+dx+dy*intensity.stride] > middle ) {
+				if (intensity.data[indexI - dx - dy*intensity.stride] > middle || intensity.data[indexI + dx + dy*intensity.stride] > middle) {
 					output.data[indexO] = 0;
 				} else {
 					output.data[indexO] = middle;
@@ -152,69 +148,68 @@ public class ImplEdgeNonMaxSuppressionCrude {
 	/**
 	 * Just processes the image border.
 	 */
-	static public void border4( GrayF32 _intensity , GrayF32 derivX , GrayF32 derivY , GrayF32 output )
-	{
+	static public void border4( GrayF32 _intensity, GrayF32 derivX, GrayF32 derivY, GrayF32 output ) {
 		int w = _intensity.width;
-		int h = _intensity.height-1;
+		int h = _intensity.height - 1;
 
 		ImageBorder_F32 intensity = FactoryImageBorderAlgs.value(_intensity, 0);
 
 		// top border
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,w,x->{
-		for( int x = 0; x < w; x++ ) {
-			int dx,dy;
+		for (int x = 0; x < w; x++) {
+			int dx, dy;
 
-			if( derivX.get(x,0) > 0 ) dx = 1; else dx = -1;
-			if( derivY.get(x,0) > 0 ) dy = 1; else dy = -1;
+			if (derivX.get(x, 0) > 0) dx = 1; else dx = -1;
+			if (derivY.get(x, 0) > 0) dy = 1; else dy = -1;
 
-			float left = intensity.get(x-dx,-dy);
-			float middle = intensity.get(x,0);
-			float right = intensity.get(x+dx,dy);
+			float left = intensity.get(x - dx, -dy);
+			float middle = intensity.get(x, 0);
+			float right = intensity.get(x + dx, dy);
 
-			if( left > middle || right > middle ) {
-				output.set(x,0,0);
+			if (left > middle || right > middle) {
+				output.set(x, 0, 0);
 			} else {
-				output.set(x,0,middle);
+				output.set(x, 0, middle);
 			}
 		}
 		//CONCURRENT_ABOVE });
 
 		// bottom border
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,w,x->{
-		for( int x = 0; x < w; x++ ) {
-			int dx,dy;
+		for (int x = 0; x < w; x++) {
+			int dx, dy;
 
-			if( derivX.get(x,h) > 0 ) dx = 1; else dx = -1;
-			if( derivY.get(x,h) > 0 ) dy = 1; else dy = -1;
+			if (derivX.get(x, h) > 0) dx = 1; else dx = -1;
+			if (derivY.get(x, h) > 0) dy = 1; else dy = -1;
 
-			float left = intensity.get(x-dx,h-dy);
-			float middle = intensity.get(x,h);
-			float right = intensity.get(x+dx,h+dy);
+			float left = intensity.get(x - dx, h - dy);
+			float middle = intensity.get(x, h);
+			float right = intensity.get(x + dx, h + dy);
 
-			if( left > middle || right > middle ) {
-				output.set(x,h,0);
+			if (left > middle || right > middle) {
+				output.set(x, h, 0);
 			} else {
-				output.set(x,h,middle);
+				output.set(x, h, middle);
 			}
 		}
 		//CONCURRENT_ABOVE });
 
 		// left border
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(1,h,y->{
-		for( int y = 1; y < h; y++ ) {
-			int dx,dy;
+		for (int y = 1; y < h; y++) {
+			int dx, dy;
 
-			if( derivX.get(0,y) > 0 ) dx = 1; else dx = -1;
-			if( derivY.get(0,y) > 0 ) dy = 1; else dy = -1;
+			if (derivX.get(0, y) > 0) dx = 1; else dx = -1;
+			if (derivY.get(0, y) > 0) dy = 1; else dy = -1;
 
-			float left = intensity.get(-dx,y-dy);
-			float middle = intensity.get(0,y);
-			float right = intensity.get(dx,y+dy);
+			float left = intensity.get(-dx, y - dy);
+			float middle = intensity.get(0, y);
+			float right = intensity.get(dx, y + dy);
 
-			if( left > middle || right > middle ) {
-				output.set(0,y,0);
+			if (left > middle || right > middle) {
+				output.set(0, y, 0);
 			} else {
-				output.set(0,y,middle);
+				output.set(0, y, middle);
 			}
 		}
 		//CONCURRENT_ABOVE });
@@ -222,89 +217,90 @@ public class ImplEdgeNonMaxSuppressionCrude {
 		// right border
 		int ww = w - 1;
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(1,h,y->{
-		for( int y = 1; y < h; y++ ) {
-			int dx,dy;
+		for (int y = 1; y < h; y++) {
+			int dx, dy;
 
-			if( derivX.get(ww,y) > 0 ) dx = 1; else dx = -1;
-			if( derivY.get(ww,y) > 0 ) dy = 1; else dy = -1;
+			if (derivX.get(ww, y) > 0) dx = 1; else dx = -1;
+			if (derivY.get(ww, y) > 0) dy = 1; else dy = -1;
 
-			float left = intensity.get(ww-dx,y-dy);
-			float middle = intensity.get(ww,y);
-			float right = intensity.get(ww+dx,y+dy);
+			float left = intensity.get(ww - dx, y - dy);
+			float middle = intensity.get(ww, y);
+			float right = intensity.get(ww + dx, y + dy);
 
-			if( left > middle || right > middle ) {
-				output.set(ww,y,0);
+			if (left > middle || right > middle) {
+				output.set(ww, y, 0);
 			} else {
-				output.set(ww,y,middle);
+				output.set(ww, y, middle);
 			}
 		}
 		//CONCURRENT_ABOVE });
-	}	/**
+	}
+
+	/**
 	 * Just processes the image border.
 	 */
-	static public void border4( GrayF32 _intensity , GrayI derivX , GrayI derivY , GrayF32 output )
-	{
+	static public void border4( GrayF32 _intensity, GrayI derivX, GrayI derivY, GrayF32 output ) {
 		int w = _intensity.width;
-		int h = _intensity.height-1;
+		int h = _intensity.height - 1;
 
 		ImageBorder_F32 intensity = FactoryImageBorderAlgs.value(_intensity, 0);
 
 		// top border
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,w,x->{
-		for( int x = 0; x < w; x++ ) {
-			int dx,dy;
+		for (int x = 0; x < w; x++) {
+			int dx, dy;
 
-			if( derivX.get(x,0) > 0 ) dx = 1; else dx = -1;
-			if( derivY.get(x,0) > 0 ) dy = 1; else dy = -1;
+			if (derivX.get(x, 0) > 0) dx = 1; else dx = -1;
+			if (derivY.get(x, 0) > 0) dy = 1; else dy = -1;
 
-			float left = intensity.get(x-dx,-dy);
-			float middle = intensity.get(x,0);
-			float right = intensity.get(x+dx,dy);
+			float left = intensity.get(x - dx, -dy);
+			float middle = intensity.get(x, 0);
+			float right = intensity.get(x + dx, dy);
 
-			if( left > middle || right > middle ) {
-				output.set(x,0,0);
+			if (left > middle || right > middle) {
+				output.set(x, 0, 0);
 			} else {
-				output.set(x,0,middle);
+				output.set(x, 0, middle);
 			}
 		}
 		//CONCURRENT_ABOVE });
 
 		// bottom border
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,w,x->{
-		for( int x = 0; x < w; x++ ) {
-			int dx,dy;
+		for (int x = 0; x < w; x++) {
+			int dx, dy;
 
-			if( derivX.get(x,h) > 0 ) dx = 1; else dx = -1;
-			if( derivY.get(x,h) > 0 ) dy = 1; else dy = -1;
+			if (derivX.get(x, h) > 0) dx = 1; else dx = -1;
+			if (derivY.get(x, h) > 0) dy = 1; else dy = -1;
 
-			float left = intensity.get(x-dx,h-dy);
-			float middle = intensity.get(x,h);
-			float right = intensity.get(x+dx,h+dy);
+			float left = intensity.get(x - dx, h - dy);
+			float middle = intensity.get(x, h);
+			float right = intensity.get(x + dx, h + dy);
 
-			if( left > middle || right > middle ) {
-				output.set(x,h,0);
+			if (left > middle || right > middle) {
+				output.set(x, h, 0);
 			} else {
-				output.set(x,h,middle);
+				output.set(x, h, middle);
 			}
 		}
 		//CONCURRENT_ABOVE });
 
 		// left border
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(1,h,y->{
-		for( int y = 1; y < h; y++ ) {
-			int dx,dy;
+		for (int y = 1; y < h; y++) {
+			int dx, dy;
 
-			if( derivX.get(0,y) > 0 ) dx = 1; else dx = -1;
-			if( derivY.get(0,y) > 0 ) dy = 1; else dy = -1;
+			if (derivX.get(0, y) > 0) dx = 1; else dx = -1;
+			if (derivY.get(0, y) > 0) dy = 1; else dy = -1;
 
-			float left = intensity.get(-dx,y-dy);
-			float middle = intensity.get(0,y);
-			float right = intensity.get(dx,y+dy);
+			float left = intensity.get(-dx, y - dy);
+			float middle = intensity.get(0, y);
+			float right = intensity.get(dx, y + dy);
 
-			if( left > middle || right > middle ) {
-				output.set(0,y,0);
+			if (left > middle || right > middle) {
+				output.set(0, y, 0);
 			} else {
-				output.set(0,y,middle);
+				output.set(0, y, middle);
 			}
 		}
 		//CONCURRENT_ABOVE });
@@ -312,20 +308,20 @@ public class ImplEdgeNonMaxSuppressionCrude {
 		// right border
 		int ww = w - 1;
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(1,h,y->{
-		for( int y = 1; y < h; y++ ) {
-			int dx,dy;
+		for (int y = 1; y < h; y++) {
+			int dx, dy;
 
-			if( derivX.get(ww,y) > 0 ) dx = 1; else dx = -1;
-			if( derivY.get(ww,y) > 0 ) dy = 1; else dy = -1;
+			if (derivX.get(ww, y) > 0) dx = 1; else dx = -1;
+			if (derivY.get(ww, y) > 0) dy = 1; else dy = -1;
 
-			float left = intensity.get(ww-dx,y-dy);
-			float middle = intensity.get(ww,y);
-			float right = intensity.get(ww+dx,y+dy);
+			float left = intensity.get(ww - dx, y - dy);
+			float middle = intensity.get(ww, y);
+			float right = intensity.get(ww + dx, y + dy);
 
-			if( left > middle || right > middle ) {
-				output.set(ww,y,0);
+			if (left > middle || right > middle) {
+				output.set(ww, y, 0);
 			} else {
-				output.set(ww,y,middle);
+				output.set(ww, y, middle);
 			}
 		}
 		//CONCURRENT_ABOVE });

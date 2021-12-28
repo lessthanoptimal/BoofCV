@@ -120,7 +120,7 @@ public class SegmentFelzenszwalbHuttenlocher04<T extends ImageBase<T>> {
 	 * @param minimumSize Regions smaller than this are merged into larger regions
 	 * @param computeWeights Function used to compute the weight for all the edges.
 	 */
-	public SegmentFelzenszwalbHuttenlocher04(float k, int minimumSize, FhEdgeWeights<T> computeWeights) {
+	public SegmentFelzenszwalbHuttenlocher04( float k, int minimumSize, FhEdgeWeights<T> computeWeights ) {
 		K = k;
 		this.minimumSize = minimumSize;
 		this.computeWeights = computeWeights;
@@ -129,6 +129,7 @@ public class SegmentFelzenszwalbHuttenlocher04<T extends ImageBase<T>> {
 	/**
 	 * If this function is called the exact sort routine will not be used and instead an approximate routine will
 	 * be used.
+	 *
 	 * @param numBins Number of bins. Try 2000. More bins the more accurate it will be
 	 */
 	public void configureApproximateSort( int numBins ) {
@@ -143,12 +144,12 @@ public class SegmentFelzenszwalbHuttenlocher04<T extends ImageBase<T>> {
 	 * @param input Input image. Not modified.
 	 * @param output Output segmented image. Modified.
 	 */
-	public void process( T input , GrayS32 output ) {
-		if( output.isSubimage() )
+	public void process( T input, GrayS32 output ) {
+		if (output.isSubimage())
 			throw new IllegalArgumentException("Output can't be a sub-image");
 		InputSanityCheck.checkSameShape(input, output);
 
-		initialize(input,output);
+		initialize(input, output);
 
 		// compute edges weights
 //		long time0 = System.currentTimeMillis();
@@ -170,13 +171,13 @@ public class SegmentFelzenszwalbHuttenlocher04<T extends ImageBase<T>> {
 	/**
 	 * Predeclares all memory required and sets data structures to their initial values
 	 */
-	protected void initialize(T input , GrayS32 output ) {
+	protected void initialize( T input, GrayS32 output ) {
 		this.graph = output;
 		final int N = input.width*input.height;
 
 		regionSize.resize(N);
 		threshold.resize(N);
-		for( int i = 0; i < N; i++ ) {
+		for (int i = 0; i < N; i++) {
 			regionSize.data[i] = 1;
 			threshold.data[i] = K;
 			graph.data[i] = i; // assign a unique label to each pixel since they are all their own region initially
@@ -194,18 +195,18 @@ public class SegmentFelzenszwalbHuttenlocher04<T extends ImageBase<T>> {
 
 		// sort edges
 //		long time0 = System.currentTimeMillis();
-		if( sorterApprox != null ) {
-			sorterApprox.computeRange(edges.data,0,edges.size);
-			sorterApprox.sortObject(edges.data,0,edges.size);
+		if (sorterApprox != null) {
+			sorterApprox.computeRange(edges.data, 0, edges.size);
+			sorterApprox.sortObject(edges.data, 0, edges.size);
 		} else {
-			sorter.sort(edges.data,edges.size);
+			sorter.sort(edges.data, edges.size);
 		}
 //		long time1 = System.currentTimeMillis();
 
 //		System.out.println("Sort time " + (time1 - time0));
 
 		// examine each edge to see if it can connect two regions
-		for( int i = 0; i < edges.size(); i++ ) {
+		for (int i = 0; i < edges.size(); i++) {
 			// compare the two nodes connected by the edge to see if their regions they should be merged
 			Edge e = edges.get(i);
 
@@ -213,13 +214,13 @@ public class SegmentFelzenszwalbHuttenlocher04<T extends ImageBase<T>> {
 			int rootB = find(e.indexB);
 
 			// see if they are already part of the same segment
-			if( rootA == rootB )
+			if (rootA == rootB)
 				continue;
 
 			float threshA = threshold.get(rootA);
 			float threshB = threshold.get(rootB);
 
-			if( e.weight() <= threshA && e.weight() <= threshB )  {
+			if (e.weight() <= threshA && e.weight() <= threshB) {
 				// ----- Merge the two regions/components
 				int sizeA = regionSize.get(rootA);
 				int sizeB = regionSize.get(rootB);
@@ -246,21 +247,21 @@ public class SegmentFelzenszwalbHuttenlocher04<T extends ImageBase<T>> {
 	 * Look at the remaining regions and if there are any small ones marge them into a larger region
 	 */
 	protected void mergeSmallRegions() {
-		for( int i = 0; i < edgesNotMatched.size(); i++ ) {
+		for (int i = 0; i < edgesNotMatched.size(); i++) {
 			Edge e = edgesNotMatched.get(i);
 
 			int rootA = find(e.indexA);
 			int rootB = find(e.indexB);
 
 			// see if they are already part of the same segment
-			if( rootA == rootB )
+			if (rootA == rootB)
 				continue;
 
 			int sizeA = regionSize.get(rootA);
 			int sizeB = regionSize.get(rootB);
 
 			// merge if one of the regions is too small
-			if( sizeA < minimumSize || sizeB < minimumSize ) {
+			if (sizeA < minimumSize || sizeB < minimumSize) {
 				// Point everything towards rootA
 				graph.data[e.indexB] = rootA;
 				graph.data[rootB] = rootA;
@@ -278,11 +279,11 @@ public class SegmentFelzenszwalbHuttenlocher04<T extends ImageBase<T>> {
 	protected int find( int child ) {
 		int root = graph.data[child];
 
-		if( root == graph.data[root] )
+		if (root == graph.data[root])
 			return root;
 
 		int inputChild = child;
-		while( root != child ) {
+		while (root != child) {
 			child = root;
 			root = graph.data[child];
 		}
@@ -298,17 +299,17 @@ public class SegmentFelzenszwalbHuttenlocher04<T extends ImageBase<T>> {
 	protected void computeOutput() {
 		outputRegionId.reset();
 		outputRegionSizes.reset();
-		for( int y = 0; y < graph.height; y++ ) {
+		for (int y = 0; y < graph.height; y++) {
 			int indexGraph = graph.startIndex + y*graph.stride;
-			for( int x = 0; x < graph.width; x++ , indexGraph++) {
+			for (int x = 0; x < graph.width; x++, indexGraph++) {
 				int parent = graph.data[indexGraph];
-				if( parent == indexGraph ) {
+				if (parent == indexGraph) {
 					outputRegionId.add(indexGraph);
 					outputRegionSizes.add(regionSize.get(indexGraph));
 				} else {
 					// find the parent and set the child to it
 					int child = indexGraph;
-					while( parent != child ) {
+					while (parent != child) {
 						child = parent;
 						parent = graph.data[child];
 					}
@@ -346,7 +347,7 @@ public class SegmentFelzenszwalbHuttenlocher04<T extends ImageBase<T>> {
 		public int indexA;
 		public int indexB;
 
-		public Edge(int indexA, int indexB) {
+		public Edge( int indexA, int indexB ) {
 			this.indexA = indexA;
 			this.indexB = indexB;
 		}

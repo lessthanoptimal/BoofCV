@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,17 +31,16 @@ import org.ddogleg.struct.Stoppable;
  * @author Peter Abeles
  */
 public class Slic_to_ImageSuperpixels<T extends ImageBase<T>>
-		implements ImageSuperpixels<T> , Stoppable
-{
+		implements ImageSuperpixels<T>, Stoppable {
 	SegmentSlic<T> slic;
 
-	public Slic_to_ImageSuperpixels(SegmentSlic<T> slic) {
+	public Slic_to_ImageSuperpixels( SegmentSlic<T> slic ) {
 		this.slic = slic;
 	}
 
 	@Override
-	public void segment(T input, GrayS32 output) {
-		slic.process(input,output);
+	public void segment( T input, GrayS32 output ) {
+		slic.process(input, output);
 	}
 
 	@Override

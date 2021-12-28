@@ -25,25 +25,24 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Wrapper around {@link FastCornerDetector} for {@link GeneralFeatureIntensity}.
- * 
+ *
  * @author Peter Abeles
  */
 public class WrapperFastCornerIntensity<I extends ImageGray<I>, D extends ImageGray<D>>
-		extends BaseGeneralFeatureIntensity<I,D>
-{
+		extends BaseGeneralFeatureIntensity<I, D> {
 	FastCornerDetector<I> alg;
 
-	public WrapperFastCornerIntensity(FastCornerDetector<I> alg) {
-		super(alg.getImageType(),null);
+	public WrapperFastCornerIntensity( FastCornerDetector<I> alg ) {
+		super(alg.getImageType(), null);
 		this.alg = alg;
 	}
 
 	@Override
 	public void process( I input,
-						 @Nullable D derivX , @Nullable D derivY ,
-						 @Nullable D derivXX , @Nullable D derivYY , @Nullable D derivXY ) {
-		init(input.width,input.height);
-		alg.process(input,intensity);
+						 @Nullable D derivX, @Nullable D derivY,
+						 @Nullable D derivXX, @Nullable D derivYY, @Nullable D derivXY ) {
+		init(input.width, input.height);
+		alg.process(input, intensity);
 	}
 
 	// @formatter:off

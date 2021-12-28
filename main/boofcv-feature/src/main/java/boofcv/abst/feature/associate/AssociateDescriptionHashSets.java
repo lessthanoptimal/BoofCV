@@ -85,7 +85,7 @@ public class AssociateDescriptionHashSets<Desc> extends BaseAssociateDescription
 	 */
 	@Override public void addSource( Desc description, int set ) {
 		final SetStruct ss = lookupSetByID(set, true, createNewSetsFromSource);
-		if (ss==null)
+		if (ss == null)
 			return;
 
 		ss.src.add(description);
@@ -100,7 +100,7 @@ public class AssociateDescriptionHashSets<Desc> extends BaseAssociateDescription
 	 */
 	@Override public void addDestination( Desc description, int set ) {
 		final SetStruct ss = lookupSetByID(set, false, createNewSetsFromDestination);
-		if (ss==null)
+		if (ss == null)
 			return;
 
 		ss.dst.add(description);
@@ -110,7 +110,7 @@ public class AssociateDescriptionHashSets<Desc> extends BaseAssociateDescription
 	private @Nullable SetStruct lookupSetByID( int set, boolean src, boolean createNewSet ) {
 		final SetStruct ss;
 		int setIndex = setToIndex.get(set);
-		if (setIndex==-1) {
+		if (setIndex == -1) {
 			if (!createNewSet)
 				return null;
 			if (src)
@@ -158,7 +158,7 @@ public class AssociateDescriptionHashSets<Desc> extends BaseAssociateDescription
 			SetStruct set = sets.get(setIdx);
 
 			// See if it's impossible for there to be a match
-			if (set.src.size==0 || set.dst.size==0) {
+			if (set.src.size == 0 || set.dst.size == 0) {
 				// TODO save unassociated
 				continue;
 			}

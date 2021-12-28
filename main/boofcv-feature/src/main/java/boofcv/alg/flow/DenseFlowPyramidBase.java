@@ -38,13 +38,13 @@ import boofcv.struct.pyramid.PyramidFloat;
 public abstract class DenseFlowPyramidBase<T extends ImageGray<T>> {
 
 	// storage for normalized image
-	private GrayF32 norm1 = new GrayF32(1, 1);
-	private GrayF32 norm2 = new GrayF32(1, 1);
+	private final GrayF32 norm1 = new GrayF32(1, 1);
+	private final GrayF32 norm2 = new GrayF32(1, 1);
 
 	// parameters used to create pyramid
-	private double scale;
-	private double sigma;
-	private int maxLayers;
+	private final double scale;
+	private final double sigma;
+	private final int maxLayers;
 
 	// image pyramid and its derivative
 	protected PyramidFloat<GrayF32> pyr1;

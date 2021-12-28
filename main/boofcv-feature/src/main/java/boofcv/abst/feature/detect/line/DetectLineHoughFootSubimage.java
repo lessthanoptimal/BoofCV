@@ -171,13 +171,13 @@ public class DetectLineHoughFootSubimage<D extends ImageGray<D>>
 
 	private void processSubimage( int x0, int y0, int x1, int y1,
 								  List<LineParametric2D_F32> found ) {
-		D derivX = (D)this.derivX.subimage(x0, y0, x1, y1);
-		D derivY = (D)this.derivY.subimage(x0, y0, x1, y1);
+		D derivX = this.derivX.subimage(x0, y0, x1, y1);
+		D derivY = this.derivY.subimage(x0, y0, x1, y1);
 		GrayU8 binary = this.binary.subimage(x0, y0, x1, y1);
 
 		alg.transform(derivX, derivY, binary);
 		DogArray<LineParametric2D_F32> lines = alg.getLinesAll();
-		float intensity[] = alg.getFoundIntensity();
+		float[] intensity = alg.getFoundIntensity();
 
 		for (int i = 0; i < lines.size; i++) {
 			// convert from the sub-image coordinate system to original image coordinate system

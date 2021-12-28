@@ -46,16 +46,16 @@ public class ConfigSlic implements Configuration {
 	 */
 	public ConnectRule connectRule = ConnectRule.EIGHT;
 
-	public ConfigSlic(int numberOfRegions) {
+	public ConfigSlic( int numberOfRegions ) {
 		this.numberOfRegions = numberOfRegions;
 	}
 
-	public ConfigSlic(int numberOfRegions, float spacialWeight) {
+	public ConfigSlic( int numberOfRegions, float spacialWeight ) {
 		this.numberOfRegions = numberOfRegions;
 		this.spacialWeight = spacialWeight;
 	}
 
-	public ConfigSlic(){}
+	public ConfigSlic() {}
 
 	public ConfigSlic setTo( ConfigSlic src ) {
 		this.numberOfRegions = src.numberOfRegions;
@@ -67,7 +67,7 @@ public class ConfigSlic implements Configuration {
 
 	@Override
 	public void checkValidity() {
-		if( numberOfRegions <= 0 )
+		if (numberOfRegions <= 0)
 			throw new IllegalArgumentException("Number of regions must be greater than zero");
 	}
 }

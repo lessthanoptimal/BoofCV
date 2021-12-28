@@ -30,17 +30,17 @@ public class KdTreeTuple_F32 implements KdTreeDistance<TupleDesc_F32> {
 
 	int N;
 
-	public KdTreeTuple_F32( int n) {
+	public KdTreeTuple_F32( int n ) {
 		N = n;
 	}
 
 	@Override
-	public double distance(TupleDesc_F32 a, TupleDesc_F32 b) {
-		return DescriptorDistance.euclideanSq(a,b);
+	public double distance( TupleDesc_F32 a, TupleDesc_F32 b ) {
+		return DescriptorDistance.euclideanSq(a, b);
 	}
 
 	@Override
-	public double valueAt(TupleDesc_F32 point, int index) {
+	public double valueAt( TupleDesc_F32 point, int index ) {
 		return point.data[index];
 	}
 

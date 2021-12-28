@@ -115,11 +115,11 @@ public class SiftDetector {
 	double sigmaLower, sigmaTarget, sigmaUpper;
 
 	// finds features from 2D intensity image
-	private @Getter NonMaxLimiter extractor;
+	private final @Getter NonMaxLimiter extractor;
 
 	// Used to select features from the combined set when there are too many
-	private FeatureSelectLimitIntensity<SiftPoint> selectFeaturesAll;
-	private FastArray<SiftPoint> selectedAll = new FastArray<>(SiftPoint.class);
+	private final FeatureSelectLimitIntensity<SiftPoint> selectFeaturesAll;
+	private final FastArray<SiftPoint> selectedAll = new FastArray<>(SiftPoint.class);
 
 	/**
 	 * Configures SIFT detector
@@ -215,7 +215,7 @@ public class SiftDetector {
 	 * @param scaleIndex Which scale in the octave is it detecting features inside up.
 	 * Primarily provided here for use in child classes.
 	 */
-	protected void detectFeatures(int octaveIndex, int scaleIndex) {
+	protected void detectFeatures( int octaveIndex, int scaleIndex ) {
 		extractor.process(dogTarget);
 		FastAccess<NonMaxLimiter.LocalExtreme> found = extractor.getFeatures();
 

@@ -79,7 +79,7 @@ public abstract class AssociateNearestNeighbor<D>
 	@Override
 	public void setSource( FastAccess<D> listSrc ) {
 		this.sizeSrc = listSrc.size;
-		alg.setPoints((List)listSrc.toList(), true);
+		alg.setPoints(listSrc.toList(), true);
 	}
 
 	@Override

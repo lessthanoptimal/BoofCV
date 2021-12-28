@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,42 +32,41 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class DetectEdgeLinesToLines<T extends ImageGray<T>, D extends ImageGray<D>>
-	implements DetectLine<T>
-{
+		implements DetectLine<T> {
 	// line detector
 	DetectEdgeLines<D> detector;
 
 	// computes image gradient
-	ImageGradient<T,D> gradient;
+	ImageGradient<T, D> gradient;
 
 	// storage for image gradient
-	D derivX,derivY;
+	D derivX, derivY;
 
-	public DetectEdgeLinesToLines( DetectEdgeLines<D> detector ,
-								   ImageGradient<T,D> gradient ) {
+	public DetectEdgeLinesToLines( DetectEdgeLines<D> detector,
+								   ImageGradient<T, D> gradient ) {
 		this.detector = detector;
 		this.gradient = gradient;
 
-		derivX = gradient.getDerivativeType().createImage(1,1);
-		derivY = gradient.getDerivativeType().createImage(1,1);
+		derivX = gradient.getDerivativeType().createImage(1, 1);
+		derivY = gradient.getDerivativeType().createImage(1, 1);
 	}
 
 	/**
 	 * Constructor with default gradient technique
 	 */
-	public DetectEdgeLinesToLines( DetectEdgeLines<D> detector ,
-								   Class<T> imageType , Class<D> derivType ) {
-		this(detector,FactoryDerivative.sobel(imageType,derivType));
+	public DetectEdgeLinesToLines( DetectEdgeLines<D> detector,
+								   Class<T> imageType, Class<D> derivType ) {
+		this(detector, FactoryDerivative.sobel(imageType, derivType));
 	}
 
 	@Override
-	public List<LineParametric2D_F32> detect(T input) {
-		derivX.reshape(input.width,input.height);
-		derivY.reshape(input.width,input.height);
+	public List<LineParametric2D_F32> detect( T input ) {
+		derivX.reshape(input.width, input.height);
+		derivY.reshape(input.width, input.height);
 
-		gradient.process(input,derivX,derivY);
+		gradient.process(input, derivX, derivY);
 
-		detector.detect(derivX,derivY);
+		detector.detect(derivX, derivY);
 
 		return detector.getFoundLines();
 	}

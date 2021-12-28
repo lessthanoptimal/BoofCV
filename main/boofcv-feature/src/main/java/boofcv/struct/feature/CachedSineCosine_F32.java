@@ -18,7 +18,6 @@
 
 package boofcv.struct.feature;
 
-
 /**
  * Precomputes the output of sine/cosine operations. Given an angle it will
  * return an approximation much faster than computing it from scratch.
@@ -41,7 +40,7 @@ public class CachedSineCosine_F32 {
 	// sine table
 	public float[] s;
 
-	public CachedSineCosine_F32( float minAngle, float maxAngle, int size )  {
+	public CachedSineCosine_F32( float minAngle, float maxAngle, int size ) {
 		this.minAngle = minAngle;
 		this.maxAngle = maxAngle;
 		this.delta = (maxAngle - minAngle)/size;
@@ -49,7 +48,7 @@ public class CachedSineCosine_F32 {
 		c = new float[size];
 		s = new float[size];
 
-		for( int i = 0; i < size; i++ ) {
+		for (int i = 0; i < size; i++) {
 			float angle = (maxAngle - minAngle)*i/size + minAngle;
 			c[i] = (float)Math.cos(angle);
 			s[i] = (float)Math.sin(angle);
@@ -64,20 +63,19 @@ public class CachedSineCosine_F32 {
 		return interpolate(value, s);
 	}
 
-	private float interpolate(float value, float[] table) {
-		float v = value-minAngle;
+	private float interpolate( float value, float[] table ) {
+		float v = value - minAngle;
 		int i = (int)v;
-		if( i < 0 )
+		if (i < 0)
 			return table[0];
-		else if( i >= table.length-1 )
-			return table[table.length-1];
+		else if (i >= table.length - 1)
+			return table[table.length - 1];
 
-		float w = v-i;
-		return table[i]*(1f-w) + table[i+1]*w;
+		float w = v - i;
+		return table[i]*(1f - w) + table[i + 1]*w;
 	}
 
 	public int computeIndex( float angle ) {
-		return (int)((angle- minAngle)/delta);
+		return (int)((angle - minAngle)/delta);
 	}
-
 }

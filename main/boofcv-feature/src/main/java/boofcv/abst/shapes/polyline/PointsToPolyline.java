@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,19 +36,18 @@ public interface PointsToPolyline {
 	 *
 	 * @param input (Input) List of points in order
 	 * @param vertexes (Output) Indexes in the input list which are corners in the polyline
-	 *
 	 * @return true if successful or false if no fit could be found which matched the requirements
 	 */
-	boolean process(List<Point2D_I32> input , DogArray_I32 vertexes );
+	boolean process( List<Point2D_I32> input, DogArray_I32 vertexes );
 
 	/**
 	 * Specifies the minimum number of sides in a polyline that's returned
-
+	 *
 	 * By default the minimum is 3.
 	 *
 	 * @param minimum The minimum number of allowed vertices
 	 */
-	void setMinimumSides(int minimum );
+	void setMinimumSides( int minimum );
 
 	int getMinimumSides();
 
@@ -57,12 +56,12 @@ public interface PointsToPolyline {
 	 * For example, two possible interpretations are that it could abort if the number of sides is more
 	 * than this or to only considered up to this number of sides. The number of found sides
 	 * will never exceed this number.
-
+	 *
 	 * By default the maximum is Integer.MAX_VALUE.
 	 *
 	 * @param maximum The maximum number of allowed vertices
 	 */
-	void setMaximumSides(int maximum );
+	void setMaximumSides( int maximum );
 
 	int getMaximumSides();
 
