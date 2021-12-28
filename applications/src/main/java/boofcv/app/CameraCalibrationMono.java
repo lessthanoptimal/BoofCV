@@ -47,6 +47,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static boofcv.app.calib.AssistedCalibration.IMAGE_DIRECTORY;
 import static boofcv.app.calib.AssistedCalibration.OUTPUT_DIRECTORY;
@@ -56,6 +57,7 @@ import static boofcv.app.calib.AssistedCalibration.OUTPUT_DIRECTORY;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class CameraCalibrationMono extends BaseStandardInputApp {
 
 	protected String inputPattern;
@@ -468,6 +470,7 @@ public class CameraCalibrationMono extends BaseStandardInputApp {
 					name = baseName + i;
 				}
 			}
+			Objects.requireNonNull(outputDirectory);
 			BoofMiscOps.checkTrue(outputDirectory.mkdirs());
 			if (verbose)
 				System.out.println("Saving landmarks to " + outputDirectory.getPath());

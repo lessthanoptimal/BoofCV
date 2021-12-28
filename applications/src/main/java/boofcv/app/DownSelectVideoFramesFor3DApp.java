@@ -46,6 +46,7 @@ import java.io.File;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class DownSelectVideoFramesFor3DApp {
 	ConfigSelectFrames3D config = new ConfigSelectFrames3D();
 
@@ -106,6 +107,7 @@ public class DownSelectVideoFramesFor3DApp {
 			if (sequence == null) {
 				System.err.println("Failed to load video: " + pathInput);
 				System.exit(1);
+				throw new RuntimeException("Stupid null check");
 			}
 		} else {
 			var fileSequence = new LoadFileImageSequence<>(ImageType.PL_U8, pathInput, null);

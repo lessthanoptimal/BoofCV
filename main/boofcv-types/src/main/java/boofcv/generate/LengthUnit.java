@@ -18,7 +18,7 @@
 
 package boofcv.generate;
 
-import org.jetbrains.annotations.Nullable;
+import java.util.Objects;
 
 /**
  * Specifies how long and in what units something is.
@@ -27,10 +27,10 @@ import org.jetbrains.annotations.Nullable;
  */
 public class LengthUnit {
 	public double length;
-	public @Nullable Unit unit;
+	public Unit unit;
 
 	public LengthUnit( String string ) {
-		unit = null;
+		unit = Unit.UNKNOWN;
 		for (Unit u : Unit.values()) { // lint:forbidden ignore_line
 			if (string.endsWith(u.abbreviation)) {
 				unit = u;
@@ -39,6 +39,10 @@ public class LengthUnit {
 			}
 		}
 		length = Double.parseDouble(string);
+	}
+
+	public Unit getUnit() {
+		return Objects.requireNonNull(unit);
 	}
 
 	public double convert( Unit target ) {

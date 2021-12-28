@@ -50,6 +50,7 @@ import java.io.IOException;
 import static boofcv.gui.StandardAlgConfigPanel.addAlignLeft;
 import static boofcv.gui.StandardAlgConfigPanel.addLabeled;
 
+@SuppressWarnings({"NullAway.Init"})
 public class CreateCalibrationTargetGui extends JPanel
 		implements CalibrationTargetPanel.Listener, ActionListener {
 

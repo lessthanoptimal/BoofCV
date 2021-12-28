@@ -915,7 +915,7 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 		}
 	}
 
-	public static void main( String[] args ) {
+	public static void main( @Nullable String[] args ) {
 		SwingUtilities.invokeLater(() -> {
 			var app = new CalibrateMonocularPlanarApp();
 

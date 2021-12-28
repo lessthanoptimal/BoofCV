@@ -36,6 +36,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class CreateRandomDotDocumentPDF extends CreateFiducialDocumentPDF {
 
 	List<List<Point2D_F64>> markers;

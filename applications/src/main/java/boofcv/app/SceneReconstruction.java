@@ -84,6 +84,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class SceneReconstruction {
 	// TODO save and load vocabulary used in similar
 
@@ -160,10 +161,10 @@ public class SceneReconstruction {
 	boolean loadSparseScene = false;
 
 	// Storage for intermediate results
-	PairwiseImageGraph pairwise = null;
+	PairwiseImageGraph pairwise;
 	LookUpSimilarImages dbSimilar;
 	LookUpCameraInfo dbCams = new LookUpCameraInfo();
-	SceneStructureMetric scene = null;
+	SceneStructureMetric scene;
 	SparseSceneToDenseCloud<GrayU8> sparseToDense;
 
 	// List of all the independent scenes it was able to construct

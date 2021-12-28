@@ -19,6 +19,7 @@
 package boofcv.app;
 
 import boofcv.generate.Unit;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +29,9 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class PaperSize {
-	public static PaperSize FIT_CONTENT = new PaperSize("CONTENT", 0, 0, null);
+	public static PaperSize FIT_CONTENT = new PaperSize("CONTENT", 0, 0, Unit.UNKNOWN);
 	public static PaperSize A0 = new PaperSize("A0", 841, 1189, Unit.MILLIMETER);
 	public static PaperSize A1 = new PaperSize("A1", 594, 841, Unit.MILLIMETER);
 	public static PaperSize A2 = new PaperSize("A2", 420, 594, Unit.MILLIMETER);
@@ -73,7 +75,7 @@ public class PaperSize {
 	/**
 	 * Sees if the specified work matches any of the units full name or short name.
 	 */
-	public static PaperSize lookup( String word ) {
+	public static @Nullable PaperSize lookup( String word ) {
 		for (PaperSize paper : values) {
 			if (paper.name.compareToIgnoreCase(word) == 0) {
 				return paper;

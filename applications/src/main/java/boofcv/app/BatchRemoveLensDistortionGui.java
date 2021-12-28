@@ -40,6 +40,7 @@ import static boofcv.app.batch.BatchConvertControlPanel.KEY_OUTPUT;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class BatchRemoveLensDistortionGui extends JPanel implements BatchRemoveLensDistortion.Listener {
 
 	public static final String KEY_INTRINSIC = "intrinsic";

@@ -36,8 +36,8 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class CalibrationInfoPanel extends StandardAlgConfigPanel
-		implements ActionListener {
+@SuppressWarnings({"NullAway.Init"})
+public class CalibrationInfoPanel extends StandardAlgConfigPanel implements ActionListener {
 	JProgressBar geometryProgress;
 	JProgressBar fillProgress;
 	JProgressBar focusMeter;
@@ -97,6 +97,7 @@ public class CalibrationInfoPanel extends StandardAlgConfigPanel
 		add(forceSaveButton);
 	}
 
+	@SuppressWarnings("NullAway")
 	public void resetGui() {
 		BoofSwingUtil.checkGuiThread();
 		imageTemplate = null;

@@ -24,6 +24,7 @@ import boofcv.generate.Unit;
 import boofcv.pdf.PdfFiducialEngine;
 import boofcv.struct.image.GrayU8;
 import org.ddogleg.struct.DogArray_I64;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 
@@ -32,15 +33,16 @@ import java.io.IOException;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class CreateSquareFiducialDocumentPDF extends CreateFiducialDocumentPDF {
 
 	private FiducialSquareGenerator g;
 
 	public float blackBorderFractionalWidth;
 
-	DogArray_I64 binaryPatterns;
+	@Nullable DogArray_I64 binaryPatterns;
 	int gridWidth;
-	java.util.List<GrayU8> imagePatterns;
+	@Nullable java.util.List<GrayU8> imagePatterns;
 
 	String markerType = "";
 
@@ -81,8 +83,10 @@ public class CreateSquareFiducialDocumentPDF extends CreateFiducialDocumentPDF {
 	protected void render( int index ) {
 		if (binaryPatterns != null) {
 			g.generate(binaryPatterns.get(index), gridWidth);
-		} else {
+		} else if (imagePatterns != null) {
 			g.generate(imagePatterns.get(index));
+		} else {
+			throw new RuntimeException("BUG");
 		}
 	}
 }

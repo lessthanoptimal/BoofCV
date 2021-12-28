@@ -1,4 +1,9 @@
 
+// Disable error prone since the code where needs to be very concise
+tasks.withType(JavaCompile).configureEach {
+	options.errorprone.enabled = false
+}
+
 dependencies {
 	api project(':main:boofcv-core')
 	api project(':integration:boofcv-swing')

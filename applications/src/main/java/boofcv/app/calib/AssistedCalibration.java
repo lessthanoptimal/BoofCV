@@ -73,6 +73,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class AssistedCalibration {
 
 	public static final String OUTPUT_DIRECTORY = "calibration_data";
@@ -141,8 +142,7 @@ public class AssistedCalibration {
 	 * @param outputDirectory Root directory for where all output will be stored
 	 * @param imageDirectory Where images will be stored. Relative to outputDirectory
 	 */
-	public AssistedCalibration( AssistedCalibrationGui gui,
-								String outputDirectory, String imageDirectory ) {
+	public AssistedCalibration( AssistedCalibrationGui gui, String outputDirectory, String imageDirectory ) {
 		File outputDir = new File(outputDirectory);
 		if (outputDir.exists()) {
 			System.out.println("Deleting output directory " + outputDirectory);

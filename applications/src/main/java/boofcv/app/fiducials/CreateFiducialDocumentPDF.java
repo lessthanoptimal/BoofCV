@@ -39,6 +39,7 @@ import java.io.IOException;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class CreateFiducialDocumentPDF {
 
 	// objects for writing PDF document

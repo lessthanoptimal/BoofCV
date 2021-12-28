@@ -35,6 +35,7 @@ import java.text.ParseException;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class CreateSquareFiducialControlPanel extends StandardAlgConfigPanel implements ActionListener {
 
 	JComboBox<String> comboOutputFormat = new JComboBox<>(new String[]{"pdf", "png", "bmp", "jpg", "ppm", "pgm"});

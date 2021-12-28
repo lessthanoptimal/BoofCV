@@ -41,6 +41,7 @@ import java.io.IOException;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class CreateSquareFiducialGui extends JPanel implements CreateSquareFiducialControlPanel.Listener {
 
 	protected CreateSquareFiducialControlPanel controls;

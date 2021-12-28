@@ -45,6 +45,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class BatchRemoveLensDistortion {
 
 	@Option(name = "-c", aliases = {"--Camera"},

@@ -19,7 +19,6 @@
 package boofcv.generate;
 
 import lombok.Getter;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Set of standard units of measure, conversions between them, and their abbreviations
@@ -27,6 +26,7 @@ import org.jetbrains.annotations.Nullable;
  * @author Peter Abeles
  */
 public enum Unit {
+	UNKNOWN(Double.NaN,"?"),
 	MILLIMETER(0.001, "mm"),
 	CENTIMETER(0.01, "cm"),
 	METER(1, "m"),
@@ -47,7 +47,7 @@ public enum Unit {
 	/**
 	 * Sees if the specified work matches any of the units full name or short name.
 	 */
-	public static @Nullable Unit lookup( String word ) {
+	public static Unit lookup( String word ) {
 		Unit[] values = values();
 		for (int i = 0; i < values.length; i++) {
 			Unit unit = values[i];
@@ -58,7 +58,7 @@ public enum Unit {
 			}
 		}
 
-		return null;
+		return Unit.UNKNOWN;
 	}
 
 	public double convert( double value, Unit to ) {
