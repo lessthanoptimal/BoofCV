@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,18 +36,18 @@ import java.awt.image.BufferedImage;
 public class WebcamCaptureWebcamInterface implements WebcamInterface {
 	@Override
 	public <T extends ImageBase<T>> SimpleImageSequence<T>
-	open(String device, int width, int height, ImageType<T> imageType) {
+	open( String device, int width, int height, ImageType<T> imageType ) {
 
-		if( device != null ) {
+		if (device != null) {
 			Webcam webcam;
 			try {
 				int which = Integer.parseInt(device);
 				webcam = Webcam.getWebcams().get(which);
-			}catch (NumberFormatException ignore) {
+			} catch (NumberFormatException ignore) {
 				webcam = UtilWebcamCapture.findDevice(device);
 			}
-			if( webcam == null ) {
-				throw new RuntimeException("Can't find webcam with ID or name at "+device);
+			if (webcam == null) {
+				throw new RuntimeException("Can't find webcam with ID or name at " + device);
 			}
 
 			try {
@@ -57,33 +57,33 @@ public class WebcamCaptureWebcamInterface implements WebcamInterface {
 				webcam.open();
 
 				return new SimpleSequence<>(webcam, imageType);
-			} catch (RuntimeException ignore) {}
+			} catch (RuntimeException ignore) {
+			}
 		}
 		return new SimpleSequence<>(device, width, height, imageType);
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	public static class SimpleSequence<T extends ImageBase<T>> implements SimpleImageSequence<T> {
-
 		Webcam webcam;
-		int width,height;
+		int width, height;
 
 		T output;
 		BufferedImage bufferedImage;
 		int frames = 0;
 
-
-		public SimpleSequence(String device, int width, int height, ImageType<T> imageType) {
-			this(UtilWebcamCapture.openDefault(width,height),imageType);
+		public SimpleSequence( String device, int width, int height, ImageType<T> imageType ) {
+			this(UtilWebcamCapture.openDefault(width, height), imageType);
 		}
 
-		public SimpleSequence(Webcam webcam, ImageType<T> imageType) {
+		public SimpleSequence( Webcam webcam, ImageType<T> imageType ) {
 			this.webcam = webcam;
 
 			Dimension d = webcam.getDevice().getResolution();
 			width = d.width;
 			height = d.height;
 
-			output = imageType.createImage(width,height);
+			output = imageType.createImage(width, height);
 		}
 
 		@Override
@@ -104,7 +104,7 @@ public class WebcamCaptureWebcamInterface implements WebcamInterface {
 
 		@Override
 		public T next() {
-			if( bufferedImage == null )
+			if (bufferedImage == null)
 				bufferedImage = webcam.getImage();
 			ConvertBufferedImage.convertFrom(bufferedImage, output, true);
 			return output;
@@ -126,7 +126,7 @@ public class WebcamCaptureWebcamInterface implements WebcamInterface {
 		}
 
 		@Override
-		public void setLoop(boolean loop) {}
+		public void setLoop( boolean loop ) {}
 
 		@Override
 		public ImageType<T> getImageType() {

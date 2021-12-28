@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,8 +41,8 @@ import static org.jcodec.api.FrameGrab.createFrameGrab;
  *
  * @author Peter Abeles
  */
-public class JCodecSimplified<T extends ImageBase<T>> implements SimpleImageSequence<T>
-{
+@SuppressWarnings({"NullAway.Init"})
+public class JCodecSimplified<T extends ImageBase<T>> implements SimpleImageSequence<T> {
 	// For information on frame order see https://github.com/jcodec/jcodec/issues/165
 	// From issue:
 	//   That's b-frame reordering. FrameGrab is low-delay so it doesn't reorder frames for you.
@@ -59,14 +59,14 @@ public class JCodecSimplified<T extends ImageBase<T>> implements SimpleImageSequ
 	ImageType<T> typeOutput;
 
 	DogArray<PictureInfo> reorder = new DogArray<>(PictureInfo::new);
-	int width,height;
+	int width, height;
 	boolean endOfFile = false;
 	int frame = -1;
 
 	String filename;
 
-	public JCodecSimplified(String filename, ImageType<T> typeOutput) {
-		image = typeOutput.createImage(1,1);
+	public JCodecSimplified( String filename, ImageType<T> typeOutput ) {
+		image = typeOutput.createImage(1, 1);
 		this.typeOutput = typeOutput;
 		this.filename = filename;
 		reset();
@@ -95,7 +95,7 @@ public class JCodecSimplified<T extends ImageBase<T>> implements SimpleImageSequ
 		int bestIndex = 0;
 		for (int i = 1; i < reorder.size; i++) {
 			PictureInfo p = reorder.get(i);
-			if( best.timestamp > p.timestamp ) {
+			if (best.timestamp > p.timestamp) {
 				best = p;
 				bestIndex = i;
 			}
@@ -107,7 +107,7 @@ public class JCodecSimplified<T extends ImageBase<T>> implements SimpleImageSequ
 		reorder.removeSwap(bestIndex);
 
 		// load the next frame in the sequence
-		if( !endOfFile ) {
+		if (!endOfFile) {
 			try {
 				grabAndCopy(reorder.grow());
 			} catch (IOException e) {
@@ -127,8 +127,8 @@ public class JCodecSimplified<T extends ImageBase<T>> implements SimpleImageSequ
 
 	@Override
 	public <InternalImage> InternalImage getGuiImage() {
-		BufferedImage output = new BufferedImage(image.width,image.height,BufferedImage.TYPE_INT_RGB);
-		ConvertBufferedImage.convertTo(image,output,true);
+		BufferedImage output = new BufferedImage(image.width, image.height, BufferedImage.TYPE_INT_RGB);
+		ConvertBufferedImage.convertTo(image, output, true);
 		return (InternalImage)output;
 	}
 
@@ -142,7 +142,7 @@ public class JCodecSimplified<T extends ImageBase<T>> implements SimpleImageSequ
 	}
 
 	@Override
-	public void setLoop(boolean loop) {}
+	public void setLoop( boolean loop ) {}
 
 	@Override
 	public ImageType<T> getImageType() {
@@ -161,7 +161,7 @@ public class JCodecSimplified<T extends ImageBase<T>> implements SimpleImageSequ
 
 		// read in the full set of images to get correct order
 		endOfFile = false;
-		while( reorder.size < REORDER_LENGTH ) {
+		while (reorder.size < REORDER_LENGTH) {
 			try {
 				grabAndCopy(reorder.grow());
 			} catch (IOException e) {
@@ -171,7 +171,7 @@ public class JCodecSimplified<T extends ImageBase<T>> implements SimpleImageSequ
 			}
 		}
 
-		if( reorder.size > 0 ) {
+		if (reorder.size > 0) {
 			PictureInfo p = reorder.get(0);
 			width = p.picture.getWidth();
 			height = p.picture.getHeight();
@@ -180,7 +180,7 @@ public class JCodecSimplified<T extends ImageBase<T>> implements SimpleImageSequ
 
 	private void grabAndCopy( PictureInfo info ) throws IOException {
 		PictureWithMetadata p = grabber.getNativeFrameWithMetadata();
-		if( info.picture == null || !info.picture.compatible(p.getPicture())) {
+		if (info.picture == null || !info.picture.compatible(p.getPicture())) {
 			info.picture = p.getPicture().cloneCropped();
 		} else {
 			info.picture.copyFrom(p.getPicture());
@@ -188,8 +188,8 @@ public class JCodecSimplified<T extends ImageBase<T>> implements SimpleImageSequ
 		info.timestamp = p.getTimestamp();
 	}
 
-	private static class PictureInfo
-	{
+	@SuppressWarnings({"NullAway.Init"})
+	private static class PictureInfo {
 		Picture picture;
 		double timestamp;
 	}

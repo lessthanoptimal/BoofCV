@@ -55,7 +55,7 @@ public class JCodecMediaManager implements MediaManager {
 		try {
 			return new InputStreamReader(new FileInputStream(fileName),UTF_8);
 		} catch (FileNotFoundException e) {
-			return null;
+			throw new RuntimeException(e);
 		}
 	}
 
