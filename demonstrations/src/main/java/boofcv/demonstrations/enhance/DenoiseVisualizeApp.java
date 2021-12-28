@@ -45,6 +45,7 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlCoef;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -59,6 +60,7 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class DenoiseVisualizeApp<T extends ImageGray<T>, D extends ImageGray<D>, W extends WlCoef>
 		extends SelectAlgorithmAndInputPanel implements DenoiseInfoPanel.Listener {
 
@@ -71,9 +73,9 @@ public class DenoiseVisualizeApp<T extends ImageGray<T>, D extends ImageGray<D>,
 	Random rand = new Random(2234);
 
 	// selected spacial filter
-	BlurFilter<T> filter;
+	@Nullable BlurFilter<T> filter;
 	// selected wavelet filter
-	DenoiseWavelet<T> denoiser;
+	@Nullable DenoiseWavelet<T> denoiser;
 	WaveletDescription<W> waveletDesc;
 	List<WaveletDescription> waveletList = new ArrayList<>();
 
@@ -211,9 +213,11 @@ public class DenoiseVisualizeApp<T extends ImageGray<T>, D extends ImageGray<D>,
 			FilterImageInterface<T, T> filter = new WaveletDenoiseFilter<>(waveletTran, denoiser);
 
 			filter.process(noisy, output);
-		} else {
+		} else if (filter != null) {
 			filter.setRadius(blurRadius);
 			filter.process(noisy, output);
+		} else {
+			throw new RuntimeException("BUG");
 		}
 
 		final double algError = computeError((GrayF32)output, (GrayF32)input);

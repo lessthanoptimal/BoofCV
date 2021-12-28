@@ -36,6 +36,7 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F32;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -53,9 +54,9 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends DemonstrationBase
-	implements DeformKeypointPanel.Listener
-{
+		implements DeformKeypointPanel.Listener {
 
 	float clickTol = 10;
 
@@ -65,7 +66,7 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 
 	PointDeformKeyPoints alg;
 
-	ImageDistort<T,T> distortImage;
+	ImageDistort<T, T> distortImage;
 	BufferedImage distortedBuff;
 	boolean validTransform = false;
 
@@ -76,38 +77,38 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 	final List<Point2D_F32> pointsUndistorted = new ArrayList<>();
 	final List<Point2D_F32> pointsDistorted = new ArrayList<>();
 
-	public DeformImageKeyPointsApp(List<?> exampleInputs, ImageType<T> imageType) {
+	public DeformImageKeyPointsApp( List<?> exampleInputs, ImageType<T> imageType ) {
 		super(exampleInputs, imageType);
 
-		undistorted = imageType.createImage(1,1);
+		undistorted = imageType.createImage(1, 1);
 
-		distortImage = FactoryDistort.distort(true,InterpolationType.BILINEAR,
+		distortImage = FactoryDistort.distort(true, InterpolationType.BILINEAR,
 				BorderType.ZERO, imageType, imageType);
 
 		control = new DeformKeypointPanel(this);
 		handleAlgorithmChange();
 
-		gui.setPreferredSize(new Dimension(600,600));
+		gui.setPreferredSize(new Dimension(600, 600));
 
 		add(control, BorderLayout.WEST);
 		add(gui, BorderLayout.CENTER);
 
 		gui.addMouseWheelListener(new MouseAdapter() {
 			@Override
-			public void mouseWheelMoved(MouseWheelEvent e) {
-				control.setZoom(BoofSwingUtil.mouseWheelImageZoom(control.zoom,e));
+			public void mouseWheelMoved( MouseWheelEvent e ) {
+				control.setZoom(BoofSwingUtil.mouseWheelImageZoom(control.zoom, e));
 			}
 		});
 	}
 
 	@Override
-	protected void handleInputChange(int source, InputMethod method, final int width, final int height) {
+	protected void handleInputChange( int source, InputMethod method, final int width, final int height ) {
 		super.handleInputChange(source, method, width, height);
 
 		BoofSwingUtil.invokeNowOrLater(new Runnable() {
 			@Override
 			public void run() {
-				double zoom = BoofSwingUtil.selectZoomToShowAll(gui,width,height);
+				double zoom = BoofSwingUtil.selectZoomToShowAll(gui, width, height);
 				control.setZoom(zoom);
 				gui.getVerticalScrollBar().setValue(0);
 				gui.getHorizontalScrollBar().setValue(0);
@@ -116,79 +117,70 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 	}
 
 	@Override
-	public void processImage(int sourceID, long frameID, BufferedImage buffered, final ImageBase undistorted)
-	{
+	public void processImage( int sourceID, long frameID, BufferedImage buffered, final ImageBase undistorted ) {
 		// do this here instead of a reshape to ensure the number of bands is the same
 		distorted = (T)undistorted.createSameShape();
 
 		BufferedImage tmp = distortedBuff;
 		distortedBuff = ConvertBufferedImage.checkDeclare(
-				undistorted.width,undistorted.height,distortedBuff,buffered.getType());
+				undistorted.width, undistorted.height, distortedBuff, buffered.getType());
 
-		if( tmp != distortedBuff ) {
+		if (tmp != distortedBuff) {
 			distorted.reshape(undistorted.width, undistorted.height);
 			this.undistorted.reshape(undistorted.width, undistorted.height);
-			gui.setPreferredSize(new Dimension(undistorted.width,undistorted.height));
-			alg.setImageShape(undistorted.width,undistorted.height);
-			synchronized (pointsUndistorted){
+			gui.setPreferredSize(new Dimension(undistorted.width, undistorted.height));
+			alg.setImageShape(undistorted.width, undistorted.height);
+			synchronized (pointsUndistorted) {
 				validTransform = false;
 				pointsUndistorted.clear();
 				pointsDistorted.clear();
 			}
 		}
 
-		if( inputMethod == InputMethod.IMAGE ) {
+		if (inputMethod == InputMethod.IMAGE) {
 			this.undistorted.setTo((T)undistorted);
 		}
 		renderDistorted(buffered, (T)undistorted);
 	}
 
-	private void renderDistorted(BufferedImage buffered, T undistorted) {
+	private void renderDistorted( @Nullable BufferedImage buffered, T undistorted ) {
 		// if not enough points have been set it can blow up
-		if( !control.isShowOriginal() && validTransform ) {
+		if (!control.isShowOriginal() && validTransform) {
 			distortImage.apply(undistorted, distorted);
 			ConvertBufferedImage.convertTo(distorted, distortedBuff, true);
 		} else {
-			if( buffered != null )
-				distortedBuff.createGraphics().drawImage(buffered,0,0,undistorted.width,undistorted.height,null);
+			if (buffered != null)
+				distortedBuff.createGraphics().drawImage(buffered, 0, 0, undistorted.width, undistorted.height, null);
 			else {
 				ConvertBufferedImage.convertTo(undistorted, distortedBuff, true);
 			}
 		}
-		BoofSwingUtil.invokeNowOrLater(new Runnable() {
-			@Override
-			public void run() {
-				gui.setImage(distortedBuff);
-				gui.repaint();
-			}
+		BoofSwingUtil.invokeNowOrLater(() -> {
+			gui.setImage(distortedBuff);
+			gui.repaint();
 		});
 	}
 
 	@Override
 	public void handleVisualizationChange() {
 
-		if( inputMethod == InputMethod.IMAGE ) {
+		if (inputMethod == InputMethod.IMAGE) {
 			renderDistorted(null, undistorted);
 		}
-		BoofSwingUtil.invokeNowOrLater(new Runnable() {
-			@Override
-			public void run() {
-				gui.setScale(control.zoom);
-			}
-		});
+		BoofSwingUtil.invokeNowOrLater(() -> gui.setScale(control.zoom));
 	}
 
 	@Override
 	public void handleAlgorithmChange() {
 		alg = FactoryDistort.deformMls(control.getConfigMLS());
 		p2p.setTransform(alg);
-		alg.setImageShape(undistorted.width,undistorted.height);
+		alg.setImageShape(undistorted.width, undistorted.height);
 		controlPointsModified();
 	}
 
 	@Override
 	public void handleClearPoints() {
-		synchronized (pointsUndistorted){
+		synchronized (pointsUndistorted) {
 			pointsDistorted.clear();
 			pointsUndistorted.clear();
 		}
@@ -196,26 +188,26 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 	}
 
 	private void controlPointsModified() {
-		synchronized (pointsUndistorted){
+		synchronized (pointsUndistorted) {
 			try {
 				// transform needs to go from distorted image to undistorted image
 				alg.setSource(pointsDistorted);
 				alg.setDestination(pointsUndistorted);
 				validTransform = true;
-			} catch( RuntimeException e ) {
+			} catch (RuntimeException e) {
 //				System.out.println("Failed because of "+e.getMessage());
 //				System.out.println("   total points "+pointsDistorted.size());
 				validTransform = false;
 			}
 		}
 		distortImage.setModel(p2p);
-		if( inputMethod == InputMethod.IMAGE ) {
+		if (inputMethod == InputMethod.IMAGE) {
 			renderDistorted(null, undistorted);
 		}
 		gui.repaint();
 	}
 
-	class CustomImagePanel extends ImageZoomPanel implements MouseListener, MouseMotionListener{
+	class CustomImagePanel extends ImageZoomPanel implements MouseListener, MouseMotionListener {
 
 		int active = -1;
 		boolean selectedUndist;
@@ -231,10 +223,10 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 		}
 
 		@Override
-		protected void paintInPanel(AffineTransform tran, Graphics2D g2) {
+		protected void paintInPanel( AffineTransform tran, Graphics2D g2 ) {
 			BoofSwingUtil.antialiasing(g2);
 
-			if( active == -1 && !control.showPoints)
+			if (active == -1 && !control.showPoints)
 				return;
 
 			synchronized (pointsUndistorted) {
@@ -244,7 +236,7 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 				double r = clickTol/2.0;
 
 				for (int i = 0; i < pointsDistorted.size(); i++) {
-					if( active != -1 && i != active ) continue;
+					if (active != -1 && i != active) continue;
 
 					Point2D_F32 u = pointsUndistorted.get(i);
 					Point2D_F32 d = pointsDistorted.get(i);
@@ -256,17 +248,17 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 
 					g2.setStroke(strokeThick);
 					g2.setColor(Color.BLUE);
-					VisualizeShapes.drawArrow(x0,y0,x1,y1,r,line,g2);
+					VisualizeShapes.drawArrow(x0, y0, x1, y1, r, line, g2);
 					g2.setStroke(strokeThin);
 					g2.setColor(Color.LIGHT_GRAY);
-					VisualizeShapes.drawArrow(x0,y0,x1,y1,r,line,g2);
+					VisualizeShapes.drawArrow(x0, y0, x1, y1, r, line, g2);
 				}
 
 				for (int i = 0; i < pointsUndistorted.size(); i++) {
-					if( active != -1 && i != active ) continue;
+					if (active != -1 && i != active) continue;
 
 					Point2D_F32 p = pointsUndistorted.get(i);
-					c.setFrame(p.x*scale - r, p.y*scale - r, 2 * r, 2 * r);
+					c.setFrame(p.x*scale - r, p.y*scale - r, 2*r, 2*r);
 
 					g2.setColor(Color.RED);
 					g2.fill(c);
@@ -275,11 +267,11 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 		}
 
 		@Override
-		public void mouseClicked(MouseEvent e) {}
+		public void mouseClicked( MouseEvent e ) {}
 
 		@Override
-		public void mousePressed(MouseEvent e) {
-			if( !SwingUtilities.isLeftMouseButton(e) )
+		public void mousePressed( MouseEvent e ) {
+			if (!SwingUtilities.isLeftMouseButton(e))
 				return;
 
 			boolean delete = e.isControlDown();
@@ -292,8 +284,8 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 				float bestDistance = clickTol;
 				for (int i = 0; i < pointsDistorted.size(); i++) {
 					Point2D_F32 p = pointsDistorted.get(i);
-					float d = p.distance(x,y);
-					if( d < bestDistance ) {
+					float d = p.distance(x, y);
+					if (d < bestDistance) {
 						active = i;
 						bestDistance = d;
 						selectedUndist = false;
@@ -302,21 +294,21 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 
 				for (int i = 0; i < pointsUndistorted.size(); i++) {
 					Point2D_F32 p = pointsUndistorted.get(i);
-					float d = p.distance(x,y);
-					if( d < bestDistance ) {
+					float d = p.distance(x, y);
+					if (d < bestDistance) {
 						active = i;
 						bestDistance = d;
 						selectedUndist = true;
 					}
 				}
 
-				if( active < 0 ) {
+				if (active < 0) {
 					active = pointsDistorted.size();
 					selectedUndist = false;
-					pointsUndistorted.add( new Point2D_F32(x,y));
-					pointsDistorted.add( new Point2D_F32(x,y));
+					pointsUndistorted.add(new Point2D_F32(x, y));
+					pointsDistorted.add(new Point2D_F32(x, y));
 					controlPointsModified();
-				} else if( delete ) {
+				} else if (delete) {
 					pointsUndistorted.remove(active);
 					pointsDistorted.remove(active);
 					active = -1;
@@ -326,10 +318,10 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 		}
 
 		@Override
-		public void mouseReleased(MouseEvent e) {
-			if( !SwingUtilities.isLeftMouseButton(e) )
+		public void mouseReleased( MouseEvent e ) {
+			if (!SwingUtilities.isLeftMouseButton(e))
 				return;
-			if( active < 0 )
+			if (active < 0)
 				return;
 
 			active = -1;
@@ -337,16 +329,16 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 		}
 
 		@Override
-		public void mouseEntered(MouseEvent e) {}
+		public void mouseEntered( MouseEvent e ) {}
 
 		@Override
-		public void mouseExited(MouseEvent e) {}
+		public void mouseExited( MouseEvent e ) {}
 
 		@Override
-		public void mouseDragged(MouseEvent e) {
-			if( !SwingUtilities.isLeftMouseButton(e) )
+		public void mouseDragged( MouseEvent e ) {
+			if (!SwingUtilities.isLeftMouseButton(e))
 				return;
-			if( active < 0 )
+			if (active < 0)
 				return;
 
 			float x = (float)(e.getX()/scale);
@@ -354,7 +346,7 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 
 			synchronized (pointsUndistorted) {
 				Point2D_F32 u;
-				if( selectedUndist ) {
+				if (selectedUndist) {
 					u = pointsUndistorted.get(active);
 				} else {
 					u = pointsDistorted.get(active);
@@ -365,7 +357,7 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 		}
 
 		@Override
-		public void mouseMoved(MouseEvent e) {}
+		public void mouseMoved( MouseEvent e ) {}
 	}
 
 	public static void main( String[] args ) {
@@ -376,12 +368,12 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 		inputs.add(new PathLabel("Mona Lisa", UtilIO.pathExample("standard/mona_lisa.jpg")));
 		inputs.add(new PathLabel("Drawing Face", UtilIO.pathExample("drawings/drawing_face.png")));
 
-		DeformImageKeyPointsApp app = new DeformImageKeyPointsApp(inputs,type);
+		DeformImageKeyPointsApp app = new DeformImageKeyPointsApp(inputs, type);
 
 		app.openFile(new File(inputs.get(0).getPath()));
 
 		app.waitUntilInputSizeIsKnown();
 
-		ShowImages.showWindow(app, "Deform Image Key Points",true);
+		ShowImages.showWindow(app, "Deform Image Key Points", true);
 	}
 }

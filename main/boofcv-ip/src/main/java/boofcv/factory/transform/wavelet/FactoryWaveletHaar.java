@@ -20,7 +20,6 @@ package boofcv.factory.transform.wavelet;
 
 import boofcv.core.image.border.BorderIndex1D_Extend;
 import boofcv.struct.wavelet.*;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Coefficients for Haar wavelet.
@@ -30,7 +29,7 @@ import org.jetbrains.annotations.Nullable;
 public class FactoryWaveletHaar {
 
 	public static <C extends WlCoef>
-	@Nullable WaveletDescription<C> generate( boolean isInteger, int imageBits ) {
+	WaveletDescription<C> generate( boolean isInteger, int imageBits ) {
 		if (isInteger) {
 			if (imageBits <= 32) {
 				WlCoef_I32 forward = new WlCoef_I32();
@@ -56,7 +55,7 @@ public class FactoryWaveletHaar {
 				return new WaveletDescription(new BorderIndex1D_Extend(), forward, inverse);
 			}
 		}
-		return null;
+		throw new RuntimeException("Bug");
 	}
 
 	/**

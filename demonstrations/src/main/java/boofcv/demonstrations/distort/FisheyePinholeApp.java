@@ -70,17 +70,17 @@ import java.util.List;
  * @author Peter Abeles
  */
 // TODO Show which calibration file is being used
-	// TODO when a file is opened look for a calibration file
+// TODO when a file is opened look for a calibration file
+@SuppressWarnings({"NullAway.Init"})
 public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
-	implements PinholeSimplifiedPanel.Listener
-{
+		implements PinholeSimplifiedPanel.Listener {
 
 	NarrowToWidePtoP_F32 distorter = new NarrowToWidePtoP_F32();
-	ImageDistort<T,T> distortImage;
+	ImageDistort<T, T> distortImage;
 
 	// output image fort pinhole and equirectangular image
-	BufferedImage buffPinhole = new BufferedImage(1,1,BufferedImage.TYPE_INT_BGR);
-	BufferedImage buffFisheye = new BufferedImage(1,1,BufferedImage.TYPE_INT_BGR);
+	BufferedImage buffPinhole = new BufferedImage(1, 1, BufferedImage.TYPE_INT_BGR);
+	BufferedImage buffFisheye = new BufferedImage(1, 1, BufferedImage.TYPE_INT_BGR);
 
 	// BoofCV work image for rendering
 	T fisheye;
@@ -101,44 +101,44 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 
 	LensDistortionWideFOV fisheyeDistort;
 
-	public FisheyePinholeApp(List<?> exampleInputs, ImageType<T> imageType) {
+	public FisheyePinholeApp( List<?> exampleInputs, ImageType<T> imageType ) {
 		super(exampleInputs, imageType);
 
 		updateIntrinsic();
 
-		setPreferredSize(new Dimension(800,800));
+		setPreferredSize(new Dimension(800, 800));
 
 		BorderType borderType = BorderType.EXTENDED;
 		InterpolatePixel<T> interp =
-				FactoryInterpolation.createPixel(0, 255, InterpolationType.BILINEAR,borderType, imageType);
+				FactoryInterpolation.createPixel(0, 255, InterpolationType.BILINEAR, borderType, imageType);
 		distortImage = FactoryDistort.distort(true, interp, imageType);
 		distortImage.setRenderAll(true);
 
-		fisheye = imageType.createImage(1,1);
-		pinhole = imageType.createImage(camWidth,camHeight);
-		buffPinhole = new BufferedImage(camWidth,camHeight,BufferedImage.TYPE_INT_BGR);
-		panelPinhole.setPreferredSize( new Dimension(camWidth,camHeight));
+		fisheye = imageType.createImage(1, 1);
+		pinhole = imageType.createImage(camWidth, camHeight);
+		buffPinhole = new BufferedImage(camWidth, camHeight, BufferedImage.TYPE_INT_BGR);
+		panelPinhole.setPreferredSize(new Dimension(camWidth, camHeight));
 		panelPinhole.setImage(buffFisheye);
-		final PinholeSimplifiedPanel controlPinhole = new PinholeSimplifiedPanel(camWidth,camHeight,hfov,this);
+		final PinholeSimplifiedPanel controlPinhole = new PinholeSimplifiedPanel(camWidth, camHeight, hfov, this);
 
 		MouseAdapter adapter = new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent e) {
+			public void mouseClicked( MouseEvent e ) {
 				changeFocus(e);
 			}
 
 			@Override
-			public void mouseDragged(MouseEvent e) {
+			public void mouseDragged( MouseEvent e ) {
 				changeFocus(e);
 			}
 
-			private void changeFocus(MouseEvent e) {
+			private void changeFocus( MouseEvent e ) {
 				double scale = panelFisheye.scale;
 
 				double omniX = e.getX()/scale;
 				double omniY = e.getY()/scale;
 
-				if( !fisheye.isInBounds((int)omniX,(int)omniY))
+				if (!fisheye.isInBounds((int)omniX, (int)omniY))
 					return;
 				panelPinhole.grabFocus();
 				synchronized (imageLock) {
@@ -147,12 +147,12 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 
 					Rodrigues_F32 rotation = new Rodrigues_F32();
 
-					Vector3D_F32 canonical = new Vector3D_F32(0,0,1);
-					rotation.theta = UtilVector3D_F32.acute(new Vector3D_F32(norm),canonical);
-					GeometryMath_F32.cross(canonical,norm,rotation.unitAxisRotation);
+					Vector3D_F32 canonical = new Vector3D_F32(0, 0, 1);
+					rotation.theta = UtilVector3D_F32.acute(new Vector3D_F32(norm), canonical);
+					GeometryMath_F32.cross(canonical, norm, rotation.unitAxisRotation);
 					rotation.unitAxisRotation.normalize();
 
-					FMatrixRMaj R = ConvertRotation3D_F32.rodriguesToMatrix(rotation,null);
+					FMatrixRMaj R = ConvertRotation3D_F32.rodriguesToMatrix(rotation, null);
 					distorter.setRotationWideToNarrow(R);
 
 					distortImage.setModel(new PointToPixelTransform_F32(distorter));
@@ -164,7 +164,7 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 			}
 
 			@Override
-			public void mouseWheelMoved(MouseWheelEvent e) {
+			public void mouseWheelMoved( MouseWheelEvent e ) {
 				int notches = e.getWheelRotation();
 				controlPinhole.addToFOV(notches*2);
 			}
@@ -177,39 +177,39 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 
 		panelPinhole.setFocusable(true);
 		panelPinhole.grabFocus();
-		panelPinhole.setPreferredSize(new Dimension(camWidth,camHeight));
+		panelPinhole.setPreferredSize(new Dimension(camWidth, camHeight));
 
 		JPanel controlPanel = new JPanel();
-		controlPanel.setLayout(new BoxLayout(controlPanel,BoxLayout.Y_AXIS));
-		controlPanel.add( controlPinhole );
+		controlPanel.setLayout(new BoxLayout(controlPanel, BoxLayout.Y_AXIS));
+		controlPanel.add(controlPinhole);
 
 		imageView = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		imageView.setTopComponent(panelPinhole);
 		imageView.setBottomComponent(panelFisheye);
 		imageView.setDividerLocation(camHeight);
 
-		add(controlPanel, BorderLayout.WEST );
+		add(controlPanel, BorderLayout.WEST);
 		add(imageView, BorderLayout.CENTER);
 	}
 
 	@Override
-	public void openFile(File file) {
-		File intrinsicFile = new File( file.getParent() , "front.yaml");
+	public void openFile( File file ) {
+		File intrinsicFile = new File(file.getParent(), "front.yaml");
 		CameraUniversalOmni fisheyeModel = CalibrationIO.load(intrinsicFile);
 		fisheyeDistort = new LensDistortionUniversalOmni(fisheyeModel);
-		distorter.configure(new LensDistortionPinhole(cameraModel),fisheyeDistort);
+		distorter.configure(new LensDistortionPinhole(cameraModel), fisheyeDistort);
 
 		super.openFile(file);
 	}
 
 	@Override
-	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase input) {
+	public void processImage( int sourceID, long frameID, BufferedImage buffered, ImageBase input ) {
 		synchronized (imageLock) {
 			// create a copy of the input image for output purposes
 			if (buffFisheye.getWidth() != buffered.getWidth() || buffFisheye.getHeight() != buffered.getHeight()) {
 				buffFisheye = new BufferedImage(buffered.getWidth(), buffered.getHeight(), BufferedImage.TYPE_INT_BGR);
 
-				panelFisheye.setPreferredSize(new Dimension(buffered.getWidth(),buffered.getHeight()));
+				panelFisheye.setPreferredSize(new Dimension(buffered.getWidth(), buffered.getHeight()));
 				panelFisheye.setImageUI(buffFisheye);
 
 				distortImage.setModel(new PointToPixelTransform_F32(distorter));
@@ -223,15 +223,14 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 
 	private void rerenderPinhole() {
 //		long before = System.nanoTime();
-		distortImage.apply(fisheye,pinhole);
+		distortImage.apply(fisheye, pinhole);
 //		long after = System.nanoTime();
 //		System.out.println("Rendering time "+(after-before)/1e6+" ms");
 
-		ConvertBufferedImage.convertTo(pinhole,buffPinhole,true);
+		ConvertBufferedImage.convertTo(pinhole, buffPinhole, true);
 		panelPinhole.setImageUI(buffPinhole);
 		panelFisheye.repaint();
 	}
-
 
 	private void updateIntrinsic() {
 		cameraModel.width = camWidth;
@@ -246,7 +245,7 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 	}
 
 	@Override
-	public void updatedPinholeModel(int width, int height, double fov) {
+	public void updatedPinholeModel( int width, int height, double fov ) {
 		final boolean shapeChanged = camWidth != width || camHeight != height;
 
 		this.camWidth = width;
@@ -254,19 +253,19 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 		this.hfov = fov;
 
 		synchronized (imageLock) {
-			if( shapeChanged ) {
+			if (shapeChanged) {
 				panelPinhole.setPreferredSize(new Dimension(camWidth, camHeight));
-				pinhole.reshape(camWidth,camHeight);
-				buffPinhole = new BufferedImage(camWidth,camHeight,BufferedImage.TYPE_INT_BGR);
+				pinhole.reshape(camWidth, camHeight);
+				buffPinhole = new BufferedImage(camWidth, camHeight, BufferedImage.TYPE_INT_BGR);
 			}
 			updateIntrinsic();
-			distorter.configure(new LensDistortionPinhole(cameraModel),fisheyeDistort);
+			distorter.configure(new LensDistortionPinhole(cameraModel), fisheyeDistort);
 			distortImage.setModel(new PointToPixelTransform_F32(distorter));
 
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {
-					if( shapeChanged ) {
+					if (shapeChanged) {
 						panelPinhole.setPreferredSize(new Dimension(camWidth, camHeight));
 						panelPinhole.setMinimumSize(new Dimension(camWidth, camHeight));
 						panelPinhole.setMaximumSize(new Dimension(camWidth, camHeight));
@@ -275,12 +274,10 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 				}
 			});
 
-			if( inputMethod == InputMethod.IMAGE ) {
+			if (inputMethod == InputMethod.IMAGE) {
 				rerenderPinhole();
 			}
 		}
-
-
 	}
 
 	/**
@@ -303,23 +300,23 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 		}
 
 		@Override
-		public void paintComponent(Graphics g) {
+		public void paintComponent( Graphics g ) {
 			super.paintComponent(g);
 			Graphics2D g2 = BoofSwingUtil.antialiasing(g);
 
 			synchronized (imageLock) {
 				distorter.compute(camWidth/2, camHeight/2, center);
-				renderLine(0       ,0         ,camWidth, 0,pointsPerEdge,0);
-				renderLine(camWidth,0         ,camWidth, camHeight,pointsPerEdge,pointsPerEdge);
-				renderLine(camWidth,camHeight ,0       , camHeight,pointsPerEdge,pointsPerEdge*2);
-				renderLine(0       ,camHeight ,0       , 0,pointsPerEdge,pointsPerEdge*3);
+				renderLine(0, 0, camWidth, 0, pointsPerEdge, 0);
+				renderLine(camWidth, 0, camWidth, camHeight, pointsPerEdge, pointsPerEdge);
+				renderLine(camWidth, camHeight, 0, camHeight, pointsPerEdge, pointsPerEdge*2);
+				renderLine(0, camHeight, 0, 0, pointsPerEdge, pointsPerEdge*3);
 			}
 
-			circle.setFrame(center.x*scale-5,center.y*scale-5,10,10);
+			circle.setFrame(center.x*scale - 5, center.y*scale - 5, 10, 10);
 
 			g2.setStroke(stroke1);
 			g2.setColor(Color.BLACK);
-			for (int i = 0, j = corners.length-1; i < corners.length; j=i,i++) {
+			for (int i = 0, j = corners.length - 1; i < corners.length; j = i, i++) {
 				line0.setLine(corners[j].x*scale, corners[j].y*scale, corners[i].x*scale, corners[i].y*scale);
 				g2.draw(line0);
 			}
@@ -327,12 +324,12 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 
 			g2.setStroke(stroke0);
 			for (int i = 0; i < corners.length; i++) {
-				int j = (i+1)%corners.length;
-				if( i < pointsPerEdge)
+				int j = (i + 1)%corners.length;
+				if (i < pointsPerEdge)
 					g2.setColor(Color.BLUE);
-				else if( i < pointsPerEdge*2 )
+				else if (i < pointsPerEdge*2)
 					g2.setColor(Color.GREEN);
-				else if( i < pointsPerEdge*3 )
+				else if (i < pointsPerEdge*3)
 					g2.setColor(Color.cyan);
 				else
 					g2.setColor(Color.RED);
@@ -343,17 +340,17 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 			g2.draw(circle);
 		}
 
-		private void renderLine( double x0 , double y0 , double x1 , double y1 , int segments , int offset ) {
+		private void renderLine( double x0, double y0, double x1, double y1, int segments, int offset ) {
 			for (int i = 0; i < segments; i++) {
-				double x = (x1-x0)*i/segments + x0;
-				double y = (y1-y0)*i/segments + y0;
+				double x = (x1 - x0)*i/segments + x0;
+				double y = (y1 - y0)*i/segments + y0;
 
-				distorter.compute((float)x, (float)y, corners[i+offset]);
+				distorter.compute((float)x, (float)y, corners[i + offset]);
 			}
 		}
 	}
 
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 
 		ImageType type = ImageType.pl(3, GrayU8.class);
 
@@ -361,7 +358,7 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 		examples.add(new PathLabel("Dining Room", UtilIO.pathExample("fisheye/theta/front_table.jpg")));
 		examples.add(new PathLabel("Hike", UtilIO.pathExample("fisheye/theta/front_hike.jpg")));
 
-		FisheyePinholeApp app = new FisheyePinholeApp(examples,type);
+		FisheyePinholeApp app = new FisheyePinholeApp(examples, type);
 
 		app.openFile(new File(examples.get(0).getPath()));
 		app.display("Fisheye to Pinhole Camera");

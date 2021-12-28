@@ -52,12 +52,13 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class DetectCalibrationCircleHexagonalApp extends CommonDetectCalibrationApp {
 	CalibrationDetectorCircleHexagonalGrid detector;
 	ConfigCircleHexagonalGrid configDet = new ConfigCircleHexagonalGrid();
 	ConfigGridDimen configGrid;
 
-	Color colorId[];
+	Color[] colorId;
 	Line2D.Double line = new Line2D.Double();
 
 	public DetectCalibrationCircleHexagonalApp( int numRows, int numColumns,
@@ -166,8 +167,10 @@ public class DetectCalibrationCircleHexagonalApp extends CommonDetectCalibration
 				y0 = Math.min(e.center.y, y0);
 				y1 = Math.max(e.center.y, y1);
 			}
-			x0 *= scale; y0 *= scale;
-			x1 *= scale; y1 *= scale;
+			x0 *= scale;
+			y0 *= scale;
+			x1 *= scale;
+			y1 *= scale;
 
 			g2.setColor(Color.WHITE);
 			g2.setStroke(thick);

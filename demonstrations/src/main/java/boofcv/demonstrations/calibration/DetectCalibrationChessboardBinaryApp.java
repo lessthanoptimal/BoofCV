@@ -45,8 +45,8 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectCalibrationChessboardBinaryApp
-		extends CommonDetectCalibrationApp {
+@SuppressWarnings({"NullAway.Init"})
+public class DetectCalibrationChessboardBinaryApp extends CommonDetectCalibrationApp {
 	DetectChessboardBinaryPattern<GrayF32> alg;
 	ConfigGridDimen configGrid;
 	ConfigChessboardBinary configDet = new ConfigChessboardBinary();

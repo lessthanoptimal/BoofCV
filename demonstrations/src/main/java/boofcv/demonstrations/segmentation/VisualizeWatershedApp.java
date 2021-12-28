@@ -30,6 +30,7 @@ import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 
 import java.awt.image.BufferedImage;
+import java.util.Objects;
 
 /**
  * Visualizes watership
@@ -38,9 +39,10 @@ import java.awt.image.BufferedImage;
  */
 public class VisualizeWatershedApp {
 
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("segment/berkeley_horses.jpg"));
-		GrayU8 gray = new GrayU8(image.getWidth(),image.getHeight());
+		Objects.requireNonNull(image);
+		var gray = new GrayU8(image.getWidth(), image.getHeight());
 
 		ConvertBufferedImage.convertFrom(image, gray);
 
@@ -49,11 +51,11 @@ public class VisualizeWatershedApp {
 
 		GrayS32 pixelToRegion = alg.getOutput();
 
-		VisualizeRegions.watersheds(pixelToRegion,image,0);
+		VisualizeRegions.watersheds(pixelToRegion, image, 0);
 
 		alg.removeWatersheds();
 		int numRegions = alg.getTotalRegions();
-		BufferedImage outRegions = VisualizeRegions.regions(pixelToRegion,numRegions,null);
+		BufferedImage outRegions = VisualizeRegions.regions(pixelToRegion, numRegions, null);
 
 		ShowImages.showWindow(image, "Watershed");
 		ShowImages.showWindow(outRegions, "Regions");

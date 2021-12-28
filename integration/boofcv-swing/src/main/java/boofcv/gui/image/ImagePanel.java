@@ -237,6 +237,11 @@ public class ImagePanel extends JPanel {
 		return img;
 	}
 
+	public Dimension getImageDimension() {
+		Objects.requireNonNull(img);
+		return new Dimension(img.getWidth(), img.getHeight());
+	}
+
 	public ImagePanel setScaling( ScaleOptions scaling ) {
 		this.scaling = scaling;
 		return this;

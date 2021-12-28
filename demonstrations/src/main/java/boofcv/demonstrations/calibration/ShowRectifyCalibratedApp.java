@@ -46,6 +46,7 @@ import org.ejml.ops.ConvertMatrixData;
 import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * Given a set of stereo images and their intrinsic parameters, display the rectified images and a horizontal line
@@ -53,6 +54,7 @@ import java.util.ArrayList;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class ShowRectifyCalibratedApp extends SelectAlgorithmAndInputPanel {
 
 	ListDisplayPanel gui = new ListDisplayPanel();
@@ -158,11 +160,11 @@ public class ShowRectifyCalibratedApp extends SelectAlgorithmAndInputPanel {
 	public void changeInput( String name, int index ) {
 		PathLabel refs = inputRefs.get(index);
 
-		StereoParameters param = CalibrationIO.load(media.openFile(refs.getPath(0)));
+		StereoParameters param = Objects.requireNonNull(CalibrationIO.load(media.openFile(refs.getPath(0))));
 		BufferedImage origLeft = media.openImage(refs.getPath(1));
 		BufferedImage origRight = media.openImage(refs.getPath(2));
 
-		configure(origLeft, origRight, param);
+		configure(Objects.requireNonNull(origLeft), Objects.requireNonNull(origRight), param);
 	}
 
 	@Override

@@ -28,6 +28,7 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.Planar;
 
 import java.awt.image.BufferedImage;
+import java.util.Objects;
 
 /**
  * Visualizes average down sampling.
@@ -35,27 +36,28 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class VisualizeAverageDownSample {
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 		BufferedImage original = UtilImageIO.loadImage(UtilIO.pathExample("simple_objects.jpg"));
+		Objects.requireNonNull(original);
 
 		Planar<GrayF32> input = new Planar<>(GrayF32.class,
-				original.getWidth(),original.getHeight(),3);
+				original.getWidth(), original.getHeight(), 3);
 
-		ConvertBufferedImage.convertFromPlanar(original,input,true,GrayF32.class);
+		ConvertBufferedImage.convertFromPlanar(original, input, true, GrayF32.class);
 
 		Planar<GrayF32> output = new Planar<>(GrayF32.class,
-				original.getWidth()/3,original.getHeight()/3,3);
+				original.getWidth()/3, original.getHeight()/3, 3);
 		Planar<GrayF32> output2 = new Planar<>(GrayF32.class,
-				original.getWidth()/3,original.getHeight()/3,3);
+				original.getWidth()/3, original.getHeight()/3, 3);
 
 		AverageDownSampleOps.down(input, output);
-		new FDistort(input,output2).scaleExt().apply();
+		new FDistort(input, output2).scaleExt().apply();
 
 		BufferedImage outputFull = ConvertBufferedImage.convertTo_F32(output, null, true);
 		BufferedImage outputFull2 = ConvertBufferedImage.convertTo_F32(output2, null, true);
 
-		ShowImages.showWindow(original,"Original");
-		ShowImages.showWindow(outputFull,"3x small average");
-		ShowImages.showWindow(outputFull2,"3x small bilinear");
+		ShowImages.showWindow(original, "Original");
+		ShowImages.showWindow(outputFull, "3x small average");
+		ShowImages.showWindow(outputFull2, "3x small bilinear");
 	}
 }

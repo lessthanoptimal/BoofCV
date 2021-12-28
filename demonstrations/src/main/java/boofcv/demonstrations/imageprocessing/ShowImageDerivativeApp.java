@@ -49,8 +49,8 @@ import static boofcv.factory.filter.derivative.FactoryDerivative.*;
  *
  * @author Peter Abeles
  */
-public class ShowImageDerivativeApp<T extends ImageGray<T>, D extends ImageGray<D>>
-		extends DemonstrationBase {
+@SuppressWarnings({"NullAway.Init"})
+public class ShowImageDerivativeApp<T extends ImageGray<T>, D extends ImageGray<D>> extends DemonstrationBase {
 	Class<T> imageType;
 	Class<D> derivType;
 

@@ -38,6 +38,7 @@ import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Various functions for visualizing chessboard x-corners
@@ -174,8 +175,8 @@ public class VisualizeChessboardXCornerUtils {
 			if (lineInfo.isDisconnected() || lineInfo.parallel)
 				continue;
 
-			ChessboardCornerClusterFinder.Vertex va = lineInfo.endA.dst;
-			ChessboardCornerClusterFinder.Vertex vb = lineInfo.endB.dst;
+			ChessboardCornerClusterFinder.Vertex va = Objects.requireNonNull(lineInfo.endA).dst;
+			ChessboardCornerClusterFinder.Vertex vb = Objects.requireNonNull(lineInfo.endB).dst;
 
 			ChessboardCorner ca = foundCorners.get(va.index);
 			ChessboardCorner cb = foundCorners.get(vb.index);

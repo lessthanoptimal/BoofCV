@@ -36,6 +36,7 @@ import boofcv.struct.image.GrayS8;
 import boofcv.struct.image.GrayU8;
 
 import java.awt.image.BufferedImage;
+import java.util.Objects;
 
 /**
  * Visualizes steps in canny edge detector.
@@ -54,7 +55,7 @@ public class VisualizeCannySteps {
 
 	public static void main( String[] args ) {
 
-		BufferedImage input = UtilImageIO.loadImage(fileName);
+		BufferedImage input = Objects.requireNonNull(UtilImageIO.loadImage(fileName));
 		GrayF32 inputF32 = ConvertBufferedImage.convertFrom(input, (GrayF32)null);
 
 		GrayF32 blurred = new GrayF32(inputF32.width, inputF32.height);

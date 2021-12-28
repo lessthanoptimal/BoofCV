@@ -40,7 +40,7 @@ import java.util.Random;
  */
 public class VisualizeBinaryData {
 	public static BufferedImage renderContours( List<EdgeContour> edges, int[] colors,
-												int width, int height, BufferedImage out ) {
+												int width, int height, @Nullable BufferedImage out ) {
 		if (out == null) {
 			out = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		} else {
@@ -77,7 +77,7 @@ public class VisualizeBinaryData {
 	 * @return Rendered contours
 	 */
 	public static BufferedImage renderContours( List<Contour> contours, int colorExternal, int colorInternal,
-												int width, int height, BufferedImage out ) {
+												int width, int height, @Nullable BufferedImage out ) {
 		if (out == null) {
 			out = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		} else {
@@ -111,7 +111,8 @@ public class VisualizeBinaryData {
 	 * @param out (Optional) storage for output image
 	 * @return Rendered contours
 	 */
-	public static BufferedImage renderContours( List<Contour> contours, int[] colorExternal, int colorInternal,
+	public static BufferedImage renderContours( List<Contour> contours,
+												@Nullable int[] colorExternal, int colorInternal,
 												int width, int height, @Nullable BufferedImage out ) {
 		if (out == null) {
 			out = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
@@ -147,7 +148,6 @@ public class VisualizeBinaryData {
 	 * @param out (Output) Where the contours are rendered.
 	 */
 	public static void render( List<Contour> contours, int[] colors, BufferedImage out ) {
-
 		colors = checkColors(colors, contours.size());
 
 		for (int i = 0; i < contours.size(); i++) {
@@ -160,7 +160,7 @@ public class VisualizeBinaryData {
 		}
 	}
 
-	public static int[] checkColors( int[] colors, int size ) {
+	public static int[] checkColors( @Nullable int[] colors, int size ) {
 		if (colors == null) {
 			colors = new int[size];
 			Random rand = new Random(123);
@@ -212,7 +212,8 @@ public class VisualizeBinaryData {
 		}
 	}
 
-	public static void render( List<Contour> contours, Color internal, Color external, double stroke, double scale, Graphics2D g2 ) {
+	public static void render( List<Contour> contours, @Nullable Color internal, @Nullable Color external,
+							   double stroke, double scale, Graphics2D g2 ) {
 		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
@@ -276,7 +277,7 @@ public class VisualizeBinaryData {
 		}
 	}
 
-	public static BufferedImage renderLabeled( GrayS32 labelImage, int[] colors, BufferedImage out ) {
+	public static BufferedImage renderLabeled( GrayS32 labelImage, int[] colors, @Nullable BufferedImage out ) {
 
 		if (out == null) {
 			out = new BufferedImage(labelImage.getWidth(), labelImage.getHeight(), BufferedImage.TYPE_INT_RGB);
@@ -308,7 +309,7 @@ public class VisualizeBinaryData {
 	 * @param out Output image. If null a new image is declared
 	 * @return Colorized labeled image
 	 */
-	public static BufferedImage renderLabeledBG( GrayS32 labelImage, int numRegions, BufferedImage out ) {
+	public static BufferedImage renderLabeledBG( GrayS32 labelImage, int numRegions, @Nullable BufferedImage out ) {
 
 		int[] colors = new int[numRegions + 1];
 
@@ -329,7 +330,7 @@ public class VisualizeBinaryData {
 	 * @param out Output image. If null a new image is declared
 	 * @return Colorized labeled image
 	 */
-	public static BufferedImage renderLabeled( GrayS32 labelImage, int numRegions, BufferedImage out ) {
+	public static BufferedImage renderLabeled( GrayS32 labelImage, int numRegions, @Nullable BufferedImage out ) {
 
 		int[] colors = new int[numRegions];
 
@@ -377,7 +378,7 @@ public class VisualizeBinaryData {
 	 * @param out (Output) optional storage for output image
 	 * @return Output rendered binary image
 	 */
-	public static BufferedImage renderBinary( GrayU8 binaryImage, boolean invert, BufferedImage out ) {
+	public static BufferedImage renderBinary( GrayU8 binaryImage, boolean invert, @Nullable BufferedImage out ) {
 
 		if (out == null || (out.getWidth() != binaryImage.width || out.getHeight() != binaryImage.height)) {
 			out = new BufferedImage(binaryImage.getWidth(), binaryImage.getHeight(), BufferedImage.TYPE_BYTE_GRAY);

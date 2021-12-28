@@ -53,6 +53,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class RemoveLensDistortionApp<T extends ImageBase<T>> extends DemonstrationBase {
 
 	ListDisplayPanel gui = new ListDisplayPanel();
