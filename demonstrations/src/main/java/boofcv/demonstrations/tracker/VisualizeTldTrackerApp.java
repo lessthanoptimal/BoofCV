@@ -44,11 +44,11 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class VisualizeTldTrackerApp<T extends ImageGray<T>,D extends ImageGray<D>>
-		implements TldVisualizationPanel.Listener
-{
+@SuppressWarnings({"NullAway.Init"})
+public class VisualizeTldTrackerApp<T extends ImageGray<T>, D extends ImageGray<D>>
+		implements TldVisualizationPanel.Listener {
 
-	TldTracker<T,D> tracker;
+	TldTracker<T, D> tracker;
 
 	TldVisualizationPanel gui = new TldVisualizationPanel(this);
 
@@ -61,33 +61,33 @@ public class VisualizeTldTrackerApp<T extends ImageGray<T>,D extends ImageGray<D
 		Class<D> derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
 		InterpolatePixelS<T> interpolate = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
-		ImageGradient<T,D> gradient =  FactoryDerivative.sobel(imageType, derivType);
+		ImageGradient<T, D> gradient = FactoryDerivative.sobel(imageType, derivType);
 
 		tracker = new TldTracker<>(new ConfigTld(), interpolate, gradient, imageType, derivType);
 	}
 
 	public void process( final SimpleImageSequence<T> sequence ) {
 
-		if( !sequence.hasNext() )
+		if (!sequence.hasNext())
 			throw new IllegalArgumentException("Empty sequence");
 
 		image = sequence.next();
-		gui.setFrame((BufferedImage) sequence.getGuiImage());
-		ShowImages.showWindow(gui,"TLD Tracker",true);
+		gui.setFrame((BufferedImage)sequence.getGuiImage());
+		ShowImages.showWindow(gui, "TLD Tracker", true);
 
 //		tracker.initialize(image,274,159,356,292);
 //		gui.turnOffSelect();
 
 		paused = true;
 
-		while( paused ) {
+		while (paused) {
 			BoofMiscOps.sleep(10);
 		}
 
 		int totalFrames = 0;
 		long totalTime = 0;
 
-		while( sequence.hasNext() ) {
+		while (sequence.hasNext()) {
 			totalFrames++;
 
 			image = sequence.next();
@@ -97,20 +97,20 @@ public class VisualizeTldTrackerApp<T extends ImageGray<T>,D extends ImageGray<D
 			boolean success = tracker.track(image);
 			long after = System.nanoTime();
 
-			totalTime += after-before;
-			System.out.println("FPS = "+ totalFrames/(totalTime/2e9));
+			totalTime += after - before;
+			System.out.println("FPS = " + totalFrames/(totalTime/2e9));
 
-			gui.update(tracker,success);
+			gui.update(tracker, success);
 
-			if( !success ) {
+			if (!success) {
 				System.out.println("No rectangle found");
 			} else {
 				Rectangle2D_F64 r = tracker.getTargetRegion();
-				System.out.println("Target: "+r);
+				System.out.println("Target: " + r);
 			}
 			gui.repaint();
 
-			while( paused ) {
+			while (paused) {
 				BoofMiscOps.sleep(10);
 			}
 		}
@@ -118,8 +118,8 @@ public class VisualizeTldTrackerApp<T extends ImageGray<T>,D extends ImageGray<D
 	}
 
 	@Override
-	public void startTracking(int x0, int y0, int x1, int y1) {
-		tracker.initialize(image,x0,y0,x1,y1);
+	public void startTracking( int x0, int y0, int x1, int y1 ) {
+		tracker.initialize(image, x0, y0, x1, y1);
 		paused = false;
 	}
 
@@ -128,14 +128,13 @@ public class VisualizeTldTrackerApp<T extends ImageGray<T>,D extends ImageGray<D
 		paused = !paused;
 	}
 
-
 	public static void main( String[] args ) {
 		VisualizeTldTrackerApp app = new VisualizeTldTrackerApp(GrayU8.class);
 
 		String fileName = UtilIO.pathExample("tracking/track_book.mjpeg");
 
 		SimpleImageSequence<GrayU8> sequence =
-				DefaultMediaManager.INSTANCE.openVideo(fileName,ImageType.single(GrayU8.class));
+				DefaultMediaManager.INSTANCE.openVideo(fileName, ImageType.single(GrayU8.class));
 
 		app.process(sequence);
 	}

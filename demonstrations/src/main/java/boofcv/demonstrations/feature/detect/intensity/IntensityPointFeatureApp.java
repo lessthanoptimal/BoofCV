@@ -67,6 +67,7 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGray<D>>
 		extends DemonstrationBase {
 	// displays intensity image

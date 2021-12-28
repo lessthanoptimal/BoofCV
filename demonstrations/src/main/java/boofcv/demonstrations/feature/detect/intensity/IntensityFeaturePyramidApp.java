@@ -51,6 +51,7 @@ import java.util.ArrayList;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class IntensityFeaturePyramidApp<T extends ImageGray<T>, D extends ImageGray<D>>
 		extends SelectAlgorithmAndInputPanel {
 	ListDisplayPanel gui = new ListDisplayPanel();

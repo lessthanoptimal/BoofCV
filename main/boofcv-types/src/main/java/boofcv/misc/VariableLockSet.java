@@ -18,6 +18,8 @@
 
 package boofcv.misc;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -46,6 +48,15 @@ public class VariableLockSet {
 		}
 	}
 
+	public <T> @Nullable T selectNull( SelectObject<T> select ) {
+		lock.lock();
+		try {
+			return select.select();
+		} finally {
+			lock.unlock();
+		}
+	}
+
 	public void lock() {lock.lock();}
 
 	public void unlock() {lock.unlock();}
@@ -55,5 +66,9 @@ public class VariableLockSet {
 
 	@FunctionalInterface public interface SelectObject<T> {
 		T select();
+	}
+
+	@FunctionalInterface public interface SelectObjectNull<T> {
+		@Nullable T select();
 	}
 }

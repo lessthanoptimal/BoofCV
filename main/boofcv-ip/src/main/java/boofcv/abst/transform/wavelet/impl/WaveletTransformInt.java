@@ -28,7 +28,7 @@ import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.ImageDimension;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlCoef_I32;
-
+import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>
@@ -70,7 +70,7 @@ public class WaveletTransformInt<T extends GrayI<T>> implements WaveletTransform
 	}
 
 	@Override
-	public GrayS32 transform(T original, GrayS32 transformed) {
+	public GrayS32 transform(T original, @Nullable GrayS32 transformed) {
 
 		if( transformed == null ) {
 			ImageDimension d = UtilWavelet.transformDimension(original,numLevels);

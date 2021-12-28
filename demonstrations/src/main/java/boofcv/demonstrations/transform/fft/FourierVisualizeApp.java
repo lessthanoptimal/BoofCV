@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,17 +39,15 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-
 /**
  * Visualizes an FFT
  *
  * @author Peter Abeles
  */
-public class FourierVisualizeApp
-		<T extends GrayF<T>, W extends ImageInterleaved<W>>
-		extends DemonstrationBase
-{
-	DiscreteFourierTransform<T,W> fft;
+@SuppressWarnings({"NullAway.Init"})
+public class FourierVisualizeApp<T extends GrayF<T>, W extends ImageInterleaved<W>>
+		extends DemonstrationBase {
+	DiscreteFourierTransform<T, W> fft;
 
 	W transform;
 	T magnitude;
@@ -61,45 +59,45 @@ public class FourierVisualizeApp
 	BufferedImage buffOriginal;
 	BufferedImage buffVisualized;
 
-	public FourierVisualizeApp(java.util.List<PathLabel> examples , ImageDataType imageType) {
+	public FourierVisualizeApp( java.util.List<PathLabel> examples, ImageDataType imageType ) {
 		super(examples, ImageType.single(imageType));
 
-		add(gui,BorderLayout.CENTER);
-		add(controls,BorderLayout.WEST);
+		add(gui, BorderLayout.CENTER);
+		add(controls, BorderLayout.WEST);
 
 		transform = GeneralizedImageOps.createInterleaved(imageType, 1, 1, 2);
-		magnitude = GeneralizedImageOps.createSingleBand(imageType,1,1);
-		phase = GeneralizedImageOps.createSingleBand(imageType,1,1);
+		magnitude = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
+		phase = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
 		fft = GDiscreteFourierTransformOps.createTransform(imageType);
 	}
 
 	@Override
-	protected void handleInputChange( int source , InputMethod method , final int width , final int height ) {
-		transform.reshape(width,height);
-		magnitude.reshape(width,height);
-		phase.reshape(width,height);
+	protected void handleInputChange( int source, InputMethod method, final int width, final int height ) {
+		transform.reshape(width, height);
+		magnitude.reshape(width, height);
+		phase.reshape(width, height);
 
-		gui.setPreferredSize(new Dimension(width,height));
+		gui.setPreferredSize(new Dimension(width, height));
 	}
 
 	@Override
-	protected void configureVideo(int which, SimpleImageSequence sequence) {
+	protected void configureVideo( int which, SimpleImageSequence sequence ) {
 		sequence.setLoop(true);
 	}
 
 	@Override
-	public void processImage(int sourceID, long frameID, final BufferedImage buffered, ImageBase gray) {
+	public void processImage( int sourceID, long frameID, final BufferedImage buffered, ImageBase gray ) {
 		T image = (T)gray;
 
-		fft.forward(image,transform);
+		fft.forward(image, transform);
 
-		GDiscreteFourierTransformOps.shiftZeroFrequency(transform,true);
+		GDiscreteFourierTransformOps.shiftZeroFrequency(transform, true);
 
 		GDiscreteFourierTransformOps.magnitude(transform, magnitude);
 		GDiscreteFourierTransformOps.phase(transform, phase);
 
 		// Convert it to a log scale for visibility
-		GPixelMath.log(magnitude,1.0, magnitude);
+		GPixelMath.log(magnitude, 1.0, magnitude);
 
 		this.buffOriginal = buffered;
 
@@ -108,21 +106,21 @@ public class FourierVisualizeApp
 
 	private void updateImage() {
 		SwingUtilities.invokeLater(() -> {
-			BufferedImage b=null;
+			BufferedImage b = null;
 			switch (controls.view) {
 				case Original:
 					b = buffOriginal;
 					break;
 
 				case MAGNITUDE:
-					buffVisualized = ConvertBufferedImage.checkDeclare(magnitude.width,magnitude.height,
-							buffVisualized,BufferedImage.TYPE_INT_RGB);
+					buffVisualized = ConvertBufferedImage.checkDeclare(magnitude.width, magnitude.height,
+							buffVisualized, BufferedImage.TYPE_INT_RGB);
 					b = VisualizeImageData.grayMagnitude(magnitude, buffVisualized, -1);
 					break;
 
 				case PHASE:
-					buffVisualized = ConvertBufferedImage.checkDeclare(magnitude.width,magnitude.height,
-							buffVisualized,BufferedImage.TYPE_INT_RGB);
+					buffVisualized = ConvertBufferedImage.checkDeclare(magnitude.width, magnitude.height,
+							buffVisualized, BufferedImage.TYPE_INT_RGB);
 					b = VisualizeImageData.colorizeSign(phase, buffVisualized, Math.PI);
 					break;
 			}
@@ -146,7 +144,7 @@ public class FourierVisualizeApp
 		}
 
 		@Override
-		public void valueChanged(ListSelectionEvent e) {
+		public void valueChanged( ListSelectionEvent e ) {
 			view = FftView.values()[listPanel.getSelectedIndex()];
 			updateImage();
 		}
@@ -162,13 +160,13 @@ public class FourierVisualizeApp
 
 		java.util.List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel("Human Statue", UtilIO.pathExample("standard/kodim17.jpg")));
-		inputs.add(new PathLabel("boat",UtilIO.pathExample("standard/boat.jpg")));
-		inputs.add(new PathLabel("fingerprint",UtilIO.pathExample("standard/fingerprint.jpg")));
-		inputs.add(new PathLabel("shapes",UtilIO.pathExample("shapes/shapes01.png")));
-		inputs.add(new PathLabel("sunflowers",UtilIO.pathExample("sunflowers.jpg")));
+		inputs.add(new PathLabel("boat", UtilIO.pathExample("standard/boat.jpg")));
+		inputs.add(new PathLabel("fingerprint", UtilIO.pathExample("standard/fingerprint.jpg")));
+		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes/shapes01.png")));
+		inputs.add(new PathLabel("sunflowers", UtilIO.pathExample("sunflowers.jpg")));
 
-		SwingUtilities.invokeLater(()->{
-			FourierVisualizeApp app = new FourierVisualizeApp(inputs,ImageDataType.F32);
+		SwingUtilities.invokeLater(() -> {
+			FourierVisualizeApp app = new FourierVisualizeApp(inputs, ImageDataType.F32);
 //			FourierVisualizeApp app = new FourierVisualizeApp(inputs,ImageTypeInfo.F64);
 
 			app.openExample(inputs.get(0));

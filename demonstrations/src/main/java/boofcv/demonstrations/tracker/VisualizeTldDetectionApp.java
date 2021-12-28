@@ -44,6 +44,7 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
+import java.util.Objects;
 
 /**
  * Visualized {@link TldTracker}.
@@ -261,7 +262,7 @@ public class VisualizeTldDetectionApp<T extends ImageGray<T>,D extends ImageGray
 	public static void main(String[] args) {
 
 		BufferedImage image = UtilImageIO.loadImage("ValidationBoof/data/track_rect/TLD/01_david/00050.jpg");
-		new VisualizeTldDetectionApp(image,GrayU8.class);
+		new VisualizeTldDetectionApp(Objects.requireNonNull(image),GrayU8.class);
 
 //		String fileName = "/home/pja/Downloads/multi_face_turning/motinas_multi_face_turning.avi";
 

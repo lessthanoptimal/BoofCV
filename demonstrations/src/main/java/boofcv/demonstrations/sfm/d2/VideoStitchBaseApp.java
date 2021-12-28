@@ -51,6 +51,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends InvertibleTransform<IT>>
 		extends DemonstrationBase implements ImageMotionInfoPanel.AlgorithmListener {
 	// size of the image being stitched into

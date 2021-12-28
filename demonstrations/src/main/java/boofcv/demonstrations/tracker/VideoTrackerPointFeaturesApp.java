@@ -239,12 +239,8 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 							visualizeFlow.green = (rgb >> 8) & 0xFF;
 							visualizeFlow.blue = rgb & 0xFF;
 						}
-						case FLOW -> {
-							visualizeFlow.computeColor(p.pixel, tracksPrev.get(p.featureId), false);
-						}
-						case FLOW_LOG -> {
-							visualizeFlow.computeColor(p.pixel, tracksPrev.get(p.featureId), true);
-						}
+						case FLOW -> visualizeFlow.computeColor(p.pixel, tracksPrev.get(p.featureId), false);
+						case FLOW_LOG -> visualizeFlow.computeColor(p.pixel, tracksPrev.get(p.featureId), true);
 						default -> throw new RuntimeException("BUG");
 					}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,17 +26,17 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageDimension;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlCoef_F32;
-
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Implementation of {@link boofcv.abst.transform.wavelet.WaveletTransform} for {@link GrayF32}.
  *
  * @author Peter Abeles
  */
-public class WaveletTransformFloat32 implements WaveletTransform<GrayF32,GrayF32, WlCoef_F32> {
+public class WaveletTransformFloat32 implements WaveletTransform<GrayF32, GrayF32, WlCoef_F32> {
 
-	GrayF32 copy = new GrayF32(1,1);
-	GrayF32 temp = new GrayF32(1,1);
+	GrayF32 copy = new GrayF32(1, 1);
+	GrayF32 temp = new GrayF32(1, 1);
 	WaveletDescription<WlCoef_F32> desc;
 	// number of levels in the transform
 	int numLevels;
@@ -45,8 +45,8 @@ public class WaveletTransformFloat32 implements WaveletTransform<GrayF32,GrayF32
 	float minPixelValue;
 	float maxPixelValue;
 
-	public WaveletTransformFloat32(WaveletDescription<WlCoef_F32> desc, int numLevels,
-								   float minPixelValue , float maxPixelValue ) {
+	public WaveletTransformFloat32( WaveletDescription<WlCoef_F32> desc, int numLevels,
+									float minPixelValue, float maxPixelValue ) {
 		this.desc = desc;
 		this.numLevels = numLevels;
 		this.minPixelValue = minPixelValue;
@@ -54,28 +54,28 @@ public class WaveletTransformFloat32 implements WaveletTransform<GrayF32,GrayF32
 	}
 
 	@Override
-	public GrayF32 transform(GrayF32 original, GrayF32 transformed) {
+	public GrayF32 transform( GrayF32 original, @Nullable GrayF32 transformed ) {
 
-		if( transformed == null ) {
-			ImageDimension d = UtilWavelet.transformDimension(original,numLevels);
-			transformed = new GrayF32(d.width,d.height);
+		if (transformed == null) {
+			ImageDimension d = UtilWavelet.transformDimension(original, numLevels);
+			transformed = new GrayF32(d.width, d.height);
 		}
-		temp.reshape(transformed.width,transformed.height);
-		copy.reshape(original.width,original.height);
+		temp.reshape(transformed.width, transformed.height);
+		copy.reshape(original.width, original.height);
 		copy.setTo(original);
 
-		WaveletTransformOps.transformN(desc,copy,transformed,temp,numLevels);
+		WaveletTransformOps.transformN(desc, copy, transformed, temp, numLevels);
 
 		return transformed;
 	}
 
 	@Override
-	public void invert(GrayF32 transformed, GrayF32 original) {
-		temp.reshape(transformed.width,transformed.height);
-		copy.reshape(transformed.width,transformed.height);
+	public void invert( GrayF32 transformed, GrayF32 original ) {
+		temp.reshape(transformed.width, transformed.height);
+		copy.reshape(transformed.width, transformed.height);
 		copy.setTo(transformed);
 
-		WaveletTransformOps.inverseN(desc,copy,original,temp,numLevels,minPixelValue,maxPixelValue);
+		WaveletTransformOps.inverseN(desc, copy, original, temp, numLevels, minPixelValue, maxPixelValue);
 	}
 
 	@Override

@@ -24,7 +24,6 @@ import boofcv.struct.image.GrayI;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlCoef;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Creates different wavelet transform by specifying the image type.
@@ -35,41 +34,41 @@ import org.jetbrains.annotations.Nullable;
 public class GFactoryWavelet {
 
 	public static <C extends WlCoef, T extends ImageGray<T>>
-	@Nullable WaveletDescription<C> haar( Class<T> imageType ) {
+	WaveletDescription<C> haar( Class<T> imageType ) {
 		if (imageType == GrayF32.class)
 			return FactoryWaveletHaar.generate(false, 32);
 		else if (GrayI.class.isAssignableFrom(imageType)) {
 			return FactoryWaveletHaar.generate(true, 32);
 		} else {
-			return null;
+			throw new IllegalArgumentException("Image not supported");
 		}
 	}
 
 	public static <C extends WlCoef, T extends ImageGray<T>>
-	@Nullable WaveletDescription<C> daubJ( Class<T> imageType, int J ) {
+	WaveletDescription<C> daubJ( Class<T> imageType, int J ) {
 		if (imageType == GrayF32.class)
 			return (WaveletDescription<C>)FactoryWaveletDaub.daubJ_F32(J);
 		else {
-			return null;
+			throw new IllegalArgumentException("Image not supported");
 		}
 	}
 
 	public static <C extends WlCoef, T extends ImageGray<T>>
-	@Nullable WaveletDescription<C> biorthogoal( Class<T> imageType, int J, BorderType borderType ) {
+	WaveletDescription<C> biorthogoal( Class<T> imageType, int J, BorderType borderType ) {
 		if (imageType == GrayF32.class)
 			return (WaveletDescription<C>)FactoryWaveletDaub.biorthogonal_F32(J, borderType);
 		else if (GrayI.class.isAssignableFrom(imageType)) {
 			return (WaveletDescription<C>)FactoryWaveletDaub.biorthogonal_I32(J, borderType);
 		} else {
-			return null;
+			throw new IllegalArgumentException("Image not supported");
 		}
 	}
 
 	public static <C extends WlCoef, T extends ImageGray<T>>
-	@Nullable WaveletDescription<C> coiflet( Class<T> imageType, int J ) {
+	WaveletDescription<C> coiflet( Class<T> imageType, int J ) {
 		if (imageType == GrayF32.class)
 			return (WaveletDescription<C>)FactoryWaveletCoiflet.generate_F32(J);
 		else
-			return null;
+			throw new IllegalArgumentException("Image not supported");
 	}
 }

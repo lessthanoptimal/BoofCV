@@ -73,6 +73,7 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class CalibrateStereoPlanarApp extends JPanel {
 	protected @Nullable StereoImageSet inputImages;
 	protected final Object lockInput = new Object();
@@ -253,7 +254,7 @@ public class CalibrateStereoPlanarApp extends JPanel {
 					continue;
 				String fileName = left ? imageName : results.namesRight.get(imageIdx);
 				String outputName = FilenameUtils.getBaseName(fileName) + ".csv";
-				CalibrationIO.saveLandmarksCsv(imageName, detectorName, view.observations.get(imageName),
+				CalibrationIO.saveLandmarksCsv(imageName, detectorName, view.getObservation(imageName),
 						new File(destination, outputName));
 			}
 		});
@@ -465,7 +466,7 @@ public class CalibrateStereoPlanarApp extends JPanel {
 			algorithms.calibrationSuccess = false;
 		}
 		// Tell it to select the last image since that's what's being previewed already
-		SwingUtilities.invokeLater(() -> changeSelectedGUI(inputImages.size() - 1));
+		SwingUtilities.invokeLater(() -> changeSelectedGUI(Objects.requireNonNull(inputImages).size() - 1));
 	}
 
 	private void saveErrorsInResults() {
@@ -703,7 +704,7 @@ public class CalibrateStereoPlanarApp extends JPanel {
 			{
 				List<CalibrationObservation> all = algorithms.select(() ->
 						algorithms.calibrator.getCalibLeft().getObservations());
-				CalibrationObservation o = results.left.observations.get(imageName);
+				CalibrationObservation o = results.left.getObservation(imageName);
 				ImageResults errors = results.left.errors.get(imageName);
 				stereoPanel.panelLeft.setResults(o, errors, all);
 			}
@@ -711,7 +712,7 @@ public class CalibrateStereoPlanarApp extends JPanel {
 			{
 				List<CalibrationObservation> all = algorithms.select(() ->
 						algorithms.calibrator.getCalibRight().getObservations());
-				CalibrationObservation o = results.right.observations.get(imageName);
+				CalibrationObservation o = results.right.getObservation(imageName);
 				ImageResults errors = results.right.errors.get(imageName);
 				stereoPanel.panelRight.setResults(o, errors, all);
 			}
@@ -789,8 +790,8 @@ public class CalibrateStereoPlanarApp extends JPanel {
 			if (soft) {
 				// if a soft rule is applied then only remove if there are not enough observations in left and right
 				// images
-				boolean leftTooFew = results.select(() -> results.left.observations.get(imageName).size() < 4);
-				boolean rightTooFew = results.select(() -> results.right.observations.get(imageName).size() < 4);
+				boolean leftTooFew = results.select(() -> results.left.getObservation(imageName).size() < 4);
+				boolean rightTooFew = results.select(() -> results.right.getObservation(imageName).size() < 4);
 				if (!leftTooFew || !rightTooFew)
 					return;
 			}
@@ -801,8 +802,8 @@ public class CalibrateStereoPlanarApp extends JPanel {
 
 			results.safe(() -> {
 				results.used.set(selected, false);
-				results.left.observations.get(imageName).points.clear();
-				results.right.observations.get(imageName).points.clear();
+				results.left.getObservation(imageName).points.clear();
+				results.right.getObservation(imageName).points.clear();
 			});
 
 			// Visually show the changes
@@ -824,8 +825,8 @@ public class CalibrateStereoPlanarApp extends JPanel {
 			results.used.reset();
 			for (int i = 0; i < results.names.size(); i++) {
 				String imageName = results.names.get(i);
-				CalibrationObservation ol = results.left.observations.get(imageName);
-				CalibrationObservation or = results.right.observations.get(imageName);
+				CalibrationObservation ol = results.left.getObservation(imageName);
+				CalibrationObservation or = results.right.getObservation(imageName);
 				ol.setTo(results.left.original.get(i));
 				or.setTo(results.right.original.get(i));
 
@@ -1009,6 +1010,14 @@ public class CalibrateStereoPlanarApp extends JPanel {
 		protected final Map<String, CalibrationObservation> observations = new HashMap<>();
 		// Copy of original observation before any edits
 		protected final DogArray<CalibrationObservation> original = new DogArray<>(CalibrationObservation::new);
+
+		public ImageResults getError(String key) {
+			return Objects.requireNonNull(errors.get(key));
+		}
+
+		public CalibrationObservation getObservation(String key) {
+			return Objects.requireNonNull(observations.get(key));
+		}
 
 		public boolean add( String path, CalibrationObservation o ) {
 			observations.put(path, o);

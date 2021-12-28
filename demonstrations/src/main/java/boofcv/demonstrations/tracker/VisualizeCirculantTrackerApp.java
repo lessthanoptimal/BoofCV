@@ -32,12 +32,14 @@ import boofcv.struct.image.ImageType;
 import georegression.struct.shapes.RectangleLength2D_F32;
 
 import java.awt.image.BufferedImage;
+import java.util.Objects;
 
 /**
  * Visualizes {@link CirculantTracker}.
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class VisualizeCirculantTrackerApp<T extends ImageGray<T>>
 		implements CirculantVisualizationPanel.Listener {
 
@@ -115,13 +117,13 @@ public class VisualizeCirculantTrackerApp<T extends ImageGray<T>>
 	}
 
 	public static void main( String[] args ) {
-		VisualizeCirculantTrackerApp app = new VisualizeCirculantTrackerApp<>(GrayU8.class);
+		var app = new VisualizeCirculantTrackerApp<>(GrayU8.class);
 
 		String fileName = UtilIO.pathExample("tracking/track_book.mjpeg");
 
-		SimpleImageSequence<GrayU8> sequence = DefaultMediaManager.INSTANCE.
-				openVideo(fileName, ImageType.single(GrayU8.class));
+		SimpleImageSequence<GrayU8> sequence =
+				DefaultMediaManager.INSTANCE.openVideo(fileName, ImageType.single(GrayU8.class));
 
-		app.process(sequence);
+		app.process(Objects.requireNonNull(sequence));
 	}
 }

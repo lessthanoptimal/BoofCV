@@ -22,6 +22,7 @@ import boofcv.struct.border.BorderType;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlCoef;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>
@@ -43,7 +44,7 @@ public interface WaveletTransform
 	 * @param transformed Where the computed transform is stored. If null a new image is created. Modified.
 	 * @return Wavelet transform.
 	 */
-	public T transform( O original, T transformed );
+	T transform( O original, @Nullable T transformed );
 
 	/**
 	 * Applies the inverse wavelet transform to the specified image.
@@ -51,28 +52,28 @@ public interface WaveletTransform
 	 * @param transformed Wavelet transform of the image. Not modified.
 	 * @param original Reconstructed image from transform. Modified.
 	 */
-	public void invert( T transformed, O original );
+	void invert( T transformed, O original );
 
 	/**
 	 * Number of levels in the wavelet transform.
 	 *
 	 * @return number of levels.
 	 */
-	public int getLevels();
+	int getLevels();
 
 	/**
 	 * Returns how the borders are handled.
 	 *
 	 * @return Type of border used.
 	 */
-	public BorderType getBorderType();
+	BorderType getBorderType();
 
 	/**
 	 * Description of the wavelet.
 	 *
 	 * @return wavelet description.
 	 */
-	public WaveletDescription<C> getDescription();
+	WaveletDescription<C> getDescription();
 
-	public Class<O> getOriginalType();
+	Class<O> getOriginalType();
 }
