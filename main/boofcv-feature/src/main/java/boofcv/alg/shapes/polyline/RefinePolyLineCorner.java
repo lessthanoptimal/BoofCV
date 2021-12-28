@@ -56,7 +56,7 @@ public class RefinePolyLineCorner {
 	protected int searchRadius;
 
 	// local storage
-	private LineSegment2D_F64 work = new LineSegment2D_F64();
+	private final LineSegment2D_F64 work = new LineSegment2D_F64();
 
 	LineGeneral2D_F64 line0 = new LineGeneral2D_F64();
 	LineGeneral2D_F64 line1 = new LineGeneral2D_F64();

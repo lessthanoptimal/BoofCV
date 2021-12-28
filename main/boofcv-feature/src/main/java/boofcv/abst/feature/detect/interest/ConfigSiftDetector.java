@@ -33,7 +33,7 @@ public class ConfigSiftDetector implements Configuration {
 	/**
 	 * Configures non-maximum feature detector across the image
 	 */
-	public ConfigExtract extract = new ConfigExtract(2,0,1,true,true,true);
+	public ConfigExtract extract = new ConfigExtract(2, 0, 1, true, true, true);
 
 	/**
 	 * The maximum number of features it can detect in a single scale. Useful if you want to prevent high frequency
@@ -65,7 +65,7 @@ public class ConfigSiftDetector implements Configuration {
 	 */
 	public static ConfigSiftDetector createPaper() {
 		ConfigSiftDetector config = new ConfigSiftDetector();
-		config.extract = new ConfigExtract(1,0,1,true,true,true);
+		config.extract = new ConfigExtract(1, 0, 1, true, true, true);
 		config.extract.ignoreBorder = 1;
 		config.maxFeaturesPerScale = 0;
 		config.edgeR = 10;
@@ -75,7 +75,7 @@ public class ConfigSiftDetector implements Configuration {
 	public ConfigSiftDetector() {
 	}
 
-	public ConfigSiftDetector(int maxFeaturesPerScale) {
+	public ConfigSiftDetector( int maxFeaturesPerScale ) {
 		this.maxFeaturesPerScale = maxFeaturesPerScale;
 	}
 

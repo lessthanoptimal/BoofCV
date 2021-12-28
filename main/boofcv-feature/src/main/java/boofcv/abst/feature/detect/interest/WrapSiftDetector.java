@@ -60,13 +60,13 @@ public class WrapSiftDetector<T extends ImageGray<T>>
 		detector.process(ss);
 	}
 
-	@Override public int getNumberOfSets() { return 2; }
+	@Override public int getNumberOfSets() {return 2;}
 
 	@Override public int getSet( int index ) {
 		return detector.getDetections().get(index).white ? 0 : 1;
 	}
 
-	@Override public int getNumberOfFeatures() { return detector.getDetections().size(); }
+	@Override public int getNumberOfFeatures() {return detector.getDetections().size();}
 
 	@Override public Point2D_F64 getLocation( int featureIndex ) {
 		return detector.getDetections().get(featureIndex).pixel;
@@ -76,11 +76,11 @@ public class WrapSiftDetector<T extends ImageGray<T>>
 		return detector.getDetections().get(featureIndex).scale;
 	}
 
-	@Override public double getOrientation( int featureIndex ) { return 0; }
+	@Override public double getOrientation( int featureIndex ) {return 0;}
 
-	@Override public boolean hasScale() { return true; }
+	@Override public boolean hasScale() {return true;}
 
-	@Override public boolean hasOrientation() { return false; }
+	@Override public boolean hasOrientation() {return false;}
 
-	@Override public ImageType<T> getInputType() { return inputType; }
+	@Override public ImageType<T> getInputType() {return inputType;}
 }

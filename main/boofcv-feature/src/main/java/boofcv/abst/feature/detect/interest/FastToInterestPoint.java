@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -89,21 +89,21 @@ public class FastToInterestPoint<T extends ImageGray<T>>
 		}
 	}
 
-	@Override public int getSet( int index ) { return index < totalLow ? 0 : 1; }
+	@Override public int getSet( int index ) {return index < totalLow ? 0 : 1;}
 
-	@Override public boolean hasScale() { return false; }
+	@Override public boolean hasScale() {return false;}
 
-	@Override public boolean hasOrientation() { return false; }
+	@Override public boolean hasOrientation() {return false;}
 
-	@Override public ImageType<T> getInputType() { return ImageType.single(detector.getImageType()); }
+	@Override public ImageType<T> getInputType() {return ImageType.single(detector.getImageType());}
 
-	@Override public int getNumberOfSets() { return 2; }
+	@Override public int getNumberOfSets() {return 2;}
 
-	@Override public int getNumberOfFeatures() { return found.size; }
+	@Override public int getNumberOfFeatures() {return found.size;}
 
-	@Override public Point2D_F64 getLocation( int featureIndex ) { return found.get(featureIndex); }
+	@Override public Point2D_F64 getLocation( int featureIndex ) {return found.get(featureIndex);}
 
-	@Override public double getRadius( int featureIndex ) { return 1.0; }
+	@Override public double getRadius( int featureIndex ) {return 1.0;}
 
-	@Override public double getOrientation( int featureIndex ) { return 0; }
+	@Override public double getOrientation( int featureIndex ) {return 0;}
 }

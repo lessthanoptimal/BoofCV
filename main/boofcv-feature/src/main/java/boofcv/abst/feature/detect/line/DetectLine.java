@@ -18,7 +18,6 @@
 
 package boofcv.abst.feature.detect.line;
 
-
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import georegression.struct.line.LineParametric2D_F32;

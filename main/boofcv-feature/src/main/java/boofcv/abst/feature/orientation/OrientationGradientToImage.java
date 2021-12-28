@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,9 +28,8 @@ import boofcv.struct.image.ImageGray;
  * @author Peter Abeles
  */
 public class OrientationGradientToImage<T extends ImageGray<T>, D extends ImageGray<D>>
-	implements OrientationImage<T>
-{
-	ImageGradient<T,D> gradient;
+		implements OrientationImage<T> {
+	ImageGradient<T, D> gradient;
 	OrientationGradient<D> alg;
 
 	// storage for image gradient
@@ -40,25 +39,25 @@ public class OrientationGradientToImage<T extends ImageGray<T>, D extends ImageG
 	// Input image type
 	Class<T> inputType;
 
-	public OrientationGradientToImage(OrientationGradient<D> alg,
-									  ImageGradient<T, D> gradient,
-									  Class<T> inputType ,
-									  Class<D> gradientType ) {
+	public OrientationGradientToImage( OrientationGradient<D> alg,
+									   ImageGradient<T, D> gradient,
+									   Class<T> inputType,
+									   Class<D> gradientType ) {
 		this.alg = alg;
 		this.gradient = gradient;
 		this.inputType = inputType;
 
-		derivX = GeneralizedImageOps.createSingleBand(gradientType,1,1);
-		derivY = GeneralizedImageOps.createSingleBand(gradientType,1,1);
+		derivX = GeneralizedImageOps.createSingleBand(gradientType, 1, 1);
+		derivY = GeneralizedImageOps.createSingleBand(gradientType, 1, 1);
 	}
 
 	@Override
-	public void setImage(T image) {
-		derivX.reshape(image.width,image.height);
-		derivY.reshape(image.width,image.height);
+	public void setImage( T image ) {
+		derivX.reshape(image.width, image.height);
+		derivY.reshape(image.width, image.height);
 
-		gradient.process(image,derivX,derivY);
-		alg.setImage(derivX,derivY);
+		gradient.process(image, derivX, derivY);
+		alg.setImage(derivX, derivY);
 	}
 
 	@Override
@@ -67,18 +66,17 @@ public class OrientationGradientToImage<T extends ImageGray<T>, D extends ImageG
 	}
 
 	@Override
-	public void setObjectRadius(double radius) {
+	public void setObjectRadius( double radius ) {
 		alg.setObjectRadius(radius);
 	}
 
 	@Override
-	public double compute(double c_x, double c_y) {
-		return alg.compute(c_x,c_y);
+	public double compute( double c_x, double c_y ) {
+		return alg.compute(c_x, c_y);
 	}
 
 	@Override
 	public RegionOrientation copy() {
 		throw new RuntimeException("IMplement");
 	}
-
 }

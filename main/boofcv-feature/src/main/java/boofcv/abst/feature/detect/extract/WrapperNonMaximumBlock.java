@@ -34,16 +34,15 @@ public class WrapperNonMaximumBlock implements NonMaxSuppression {
 	// specific implementation
 	NonMaxBlock alg;
 
-
-	public WrapperNonMaximumBlock(NonMaxBlock alg ) {
+	public WrapperNonMaximumBlock( NonMaxBlock alg ) {
 		this.alg = alg;
 	}
 
 	@Override
 	public void process( GrayF32 intensity,
 						 @Nullable ListIntPoint2D candidateMin, @Nullable ListIntPoint2D candidateMax,
-						 @Nullable QueueCorner foundMin, @Nullable QueueCorner foundMax) {
-		alg.process(intensity, foundMin, foundMax );
+						 @Nullable QueueCorner foundMin, @Nullable QueueCorner foundMax ) {
+		alg.process(intensity, foundMin, foundMax);
 	}
 
 	@Override
@@ -57,12 +56,12 @@ public class WrapperNonMaximumBlock implements NonMaxSuppression {
 	}
 
 	@Override
-	public void setThresholdMinimum(float threshold) {
+	public void setThresholdMinimum( float threshold ) {
 		alg.setThresholdMin(threshold);
 	}
 
 	@Override
-	public void setThresholdMaximum(float threshold) {
+	public void setThresholdMaximum( float threshold ) {
 		alg.setThresholdMax(threshold);
 	}
 
@@ -72,7 +71,7 @@ public class WrapperNonMaximumBlock implements NonMaxSuppression {
 	}
 
 	@Override
-	public void setIgnoreBorder(int border) {
+	public void setIgnoreBorder( int border ) {
 		alg.setBorder(border);
 	}
 
@@ -82,7 +81,7 @@ public class WrapperNonMaximumBlock implements NonMaxSuppression {
 	}
 
 	@Override
-	public void setSearchRadius(int radius) {
+	public void setSearchRadius( int radius ) {
 		alg.setSearchRadius(radius);
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,15 +30,16 @@ import boofcv.struct.image.GrayF32;
  */
 @SuppressWarnings({"UnnecessaryParentheses"})
 public class ImplXCornerAbeles2019Intensity {
-	public static void process(GrayF32 input, GrayF32 intensity) {
+	public static void process( GrayF32 input, GrayF32 intensity ) {
 		final int radius = 3;
 		final int width = input.width;
 		final float[] src = input.data;
 
-		ImageMiscOps.fillBorder(intensity,0, radius);
+		ImageMiscOps.fillBorder(intensity, 0, radius);
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(radius,input.height-radius,y->{
 		for (int y = radius; y < input.height - radius; y++) {
+			// @formatter:off
 			int inputIdx0 = input.startIndex + (y-3)*input.stride + radius;
 			int inputIdx1 = input.startIndex + (y-2)*input.stride + radius;
 			int inputIdx2 = input.startIndex + (y-1)*input.stride + radius;
@@ -66,17 +67,17 @@ public class ImplXCornerAbeles2019Intensity {
 				float v14 = src[inputIdx1-2];     // (x-2, y-2 )
 				float v15 = src[inputIdx0-1];     // (x-1, y-3 )
 
-				float a = (v15+v00+v01);
-				float b = (v03+v04+v05);
-				float c = (v07+v08+v09);
-				float d = (v11+v12+v13);
+				float a = (v15 + v00 + v01);
+				float b = (v03 + v04 + v05);
+				float c = (v07 + v08 + v09);
+				float d = (v11 + v12 + v13);
 
-				float e = (v01+v02+v03);
-				float f = (v05+v06+v07);
-				float g = (v09+v10+v11);
-				float h = (v13+v14+v15);
+				float e = (v01 + v02 + v03);
+				float f = (v05 + v06 + v07);
+				float g = (v09 + v10 + v11);
+				float h = (v13 + v14 + v15);
 
-				intensity.data[outputIdx++] = Math.max(score(a,b,c,d), score(e,f,g,h));
+				intensity.data[outputIdx++] = Math.max(score(a, b, c, d), score(e, f, g, h));
 				inputIdx0++;
 				inputIdx1++;
 				inputIdx2++;
@@ -85,12 +86,13 @@ public class ImplXCornerAbeles2019Intensity {
 				inputIdx5++;
 				inputIdx6++;
 			}
+			// @formatter:on
 		}
 		//CONCURRENT_ABOVE });
 	}
 
-	private static float score(float a , float b , float c , float d ) {
-		float mean = (a+b+c+d)/4f;
-		return (a-mean)*(c-mean) + (b-mean)*(d-mean);
+	private static float score( float a, float b, float c, float d ) {
+		float mean = (a + b + c + d)/4f;
+		return (a - mean)*(c - mean) + (b - mean)*(d - mean);
 	}
 }

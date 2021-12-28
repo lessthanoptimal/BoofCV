@@ -36,10 +36,10 @@ public abstract class MatchScoreType {
 		}
 
 		@Override
-		public int compareTo(double scoreA, double scoreB) {
-			if( scoreA > scoreB )
+		public int compareTo( double scoreA, double scoreB ) {
+			if (scoreA > scoreB)
 				return 1;
-			else if( scoreA < scoreB )
+			else if (scoreA < scoreB)
 				return -1;
 			return 0;
 		}
@@ -56,15 +56,14 @@ public abstract class MatchScoreType {
 		}
 
 		@Override
-		public int compareTo(double scoreA, double scoreB) {
-			if( scoreA < scoreB )
+		public int compareTo( double scoreA, double scoreB ) {
+			if (scoreA < scoreB)
 				return 1;
-			else if( scoreA > scoreB )
+			else if (scoreA > scoreB)
 				return -1;
 			return 0;
 		}
 	};
-
 
 	/**
 	 * True if the best possible score has a value of zero
@@ -86,7 +85,7 @@ public abstract class MatchScoreType {
 	 *
 	 * @param scoreA match score
 	 * @param scoreB match score
-	 * @return  Returns a value of (-1,0,1) which indicates which score is better.
+	 * @return Returns a value of (-1,0,1) which indicates which score is better.
 	 */
-	public abstract int compareTo( double scoreA , double scoreB );
+	public abstract int compareTo( double scoreA, double scoreB );
 }

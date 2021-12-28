@@ -49,8 +49,8 @@ public class PyramidKltForHybrid<I extends ImageGray<I>, D extends ImageGray<D>>
 		this.config = config;
 		this.featureRadius = featureRadius;
 
-		InterpolateRectangle<I> interpInput = FactoryInterpolation.<I>bilinearRectangle(inputType);
-		InterpolateRectangle<D> interpDeriv = FactoryInterpolation.<D>bilinearRectangle(derivType);
+		InterpolateRectangle<I> interpInput = FactoryInterpolation.bilinearRectangle(inputType);
+		InterpolateRectangle<D> interpDeriv = FactoryInterpolation.bilinearRectangle(derivType);
 
 		KltTracker<I, D> klt = new KltTracker<>(interpInput, interpDeriv, config);
 		tracker = new PyramidKltTracker<>(klt);

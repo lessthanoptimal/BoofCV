@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,19 +35,19 @@ public class Fh04_to_ImageSuperpixels<T extends ImageBase<T>> implements ImageSu
 	SegmentFelzenszwalbHuttenlocher04<T> alg;
 	ConnectRule rule;
 
-	GrayS32 pixelToSegment = new GrayS32(1,1);
+	GrayS32 pixelToSegment = new GrayS32(1, 1);
 
-	public Fh04_to_ImageSuperpixels(SegmentFelzenszwalbHuttenlocher04<T> alg, ConnectRule rule) {
+	public Fh04_to_ImageSuperpixels( SegmentFelzenszwalbHuttenlocher04<T> alg, ConnectRule rule ) {
 		this.alg = alg;
 		this.rule = rule;
 	}
 
 	@Override
-	public void segment(T input, GrayS32 output) {
+	public void segment( T input, GrayS32 output ) {
 
 		pixelToSegment.reshape(input.width, input.height);
 
-		alg.process(input,pixelToSegment);
+		alg.process(input, pixelToSegment);
 
 		ImageSegmentationOps.regionPixelId_to_Compact(pixelToSegment, alg.getRegionId(), output);
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,6 @@ package boofcv.abst.feature.orientation;
 
 import boofcv.struct.image.ImageGray;
 
-
 /**
  * Estimate the orientation of an image from an {@link boofcv.alg.transform.ii.IntegralImageOps integral image}.
  *
@@ -32,12 +31,12 @@ public interface OrientationIntegral<II extends ImageGray<II>> extends RegionOri
 	 *
 	 * @param integralImage Input image transformed into an integral image.
 	 */
-	public void setImage( II integralImage );
+	void setImage( II integralImage );
 
 	/**
 	 * Returns the type of image it can process.
 	 *
 	 * @return Type of image which can be processed
 	 */
-	public Class<II> getImageType();
+	Class<II> getImageType();
 }

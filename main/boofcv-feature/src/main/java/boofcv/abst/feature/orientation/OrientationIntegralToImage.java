@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,8 +28,7 @@ import boofcv.struct.image.ImageGray;
  * @author Peter Abeles
  */
 public class OrientationIntegralToImage<T extends ImageGray<T>, II extends ImageGray<II>>
-	implements OrientationImage<T>
-{
+		implements OrientationImage<T> {
 	// algorithm which is being wrapped around
 	OrientationIntegral<II> alg;
 
@@ -39,17 +38,17 @@ public class OrientationIntegralToImage<T extends ImageGray<T>, II extends Image
 	// type of input image
 	Class<T> inputType;
 
-	public OrientationIntegralToImage(OrientationIntegral<II> alg,
-									  Class<T> inputType ,
-									  Class<II> integralType ) {
+	public OrientationIntegralToImage( OrientationIntegral<II> alg,
+									   Class<T> inputType,
+									   Class<II> integralType ) {
 		this.alg = alg;
 		this.inputType = inputType;
 		integralImage = GeneralizedImageOps.createSingleBand(integralType, 1, 1);
 	}
 
 	@Override
-	public void setImage(T image) {
-		integralImage.reshape(image.width,image.height);
+	public void setImage( T image ) {
+		integralImage.reshape(image.width, image.height);
 		GIntegralImageOps.transform(image, integralImage);
 		alg.setImage(integralImage);
 	}
@@ -60,13 +59,13 @@ public class OrientationIntegralToImage<T extends ImageGray<T>, II extends Image
 	}
 
 	@Override
-	public void setObjectRadius(double radius) {
+	public void setObjectRadius( double radius ) {
 		alg.setObjectRadius(radius);
 	}
 
 	@Override
-	public double compute(double c_x, double c_y) {
-		return alg.compute(c_x,c_y);
+	public double compute( double c_x, double c_y ) {
+		return alg.compute(c_x, c_y);
 	}
 
 	@Override

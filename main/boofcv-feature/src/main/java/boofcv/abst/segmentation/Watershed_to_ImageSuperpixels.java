@@ -43,15 +43,15 @@ import org.ddogleg.struct.DogArray_I32;
 @SuppressWarnings({"NullAway.Init"})
 public class Watershed_to_ImageSuperpixels<T extends ImageBase<T>> implements ImageSuperpixels<T> {
 
-	private WatershedVincentSoille1991 alg;
-	private ConnectRule rule;
+	private final WatershedVincentSoille1991 alg;
+	private final ConnectRule rule;
 
-	private GrayU8 converted = new GrayU8(1, 1);
+	private final GrayU8 converted = new GrayU8(1, 1);
 
 	private MergeSmallRegions<GrayU8> pruneSmall;
 
-	private DogArray_I32 regionMemberCount = new DogArray_I32();
-	private DogArray<float[]> regionColor = new ColorQueue_F32(1);
+	private final DogArray_I32 regionMemberCount = new DogArray_I32();
+	private final DogArray<float[]> regionColor = new ColorQueue_F32(1);
 
 	private int numRegions;
 

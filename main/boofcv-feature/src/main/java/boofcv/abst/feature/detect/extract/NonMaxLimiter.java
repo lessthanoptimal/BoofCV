@@ -69,7 +69,7 @@ public class NonMaxLimiter {
 
 		selector.setSampler(new SampleIntensity<>() {
 			@Override
-			public float sample( @Nullable GrayF32 intensity, int index, LocalExtreme p ) { return p.intensity;}
+			public float sample( @Nullable GrayF32 intensity, int index, LocalExtreme p ) {return p.intensity;}
 
 			@Override public int getX( LocalExtreme p ) {return p.location.x;}
 

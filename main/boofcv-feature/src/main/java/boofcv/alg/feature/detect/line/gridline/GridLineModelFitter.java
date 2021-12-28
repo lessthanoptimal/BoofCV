@@ -18,7 +18,6 @@
 
 package boofcv.alg.feature.detect.line.gridline;
 
-
 import georegression.fitting.line.FitLine_F32;
 import georegression.metric.UtilAngle;
 import georegression.struct.line.LinePolar2D_F32;
@@ -33,19 +32,19 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class GridLineModelFitter implements ModelGenerator<LinePolar2D_F32,Edgel> {
+public class GridLineModelFitter implements ModelGenerator<LinePolar2D_F32, Edgel> {
 
 	// maximum allowed difference in angle
 	float angleTol;
 
-	public GridLineModelFitter(float angleTol) {
+	public GridLineModelFitter( float angleTol ) {
 		this.angleTol = angleTol;
 	}
 
 	@Override
-	public boolean generate(List<Edgel> dataSet, LinePolar2D_F32 model ) {
+	public boolean generate( List<Edgel> dataSet, LinePolar2D_F32 model ) {
 
-		if( dataSet.size() == 2 ) {
+		if (dataSet.size() == 2) {
 			Edgel a = dataSet.get(0);
 			Edgel b = dataSet.get(1);
 
@@ -56,12 +55,12 @@ public class GridLineModelFitter implements ModelGenerator<LinePolar2D_F32,Edgel
 			double lineAngle = UtilAngle.atanSafe(-dx, dy);
 
 			// see if their orientations are aligned with the line's angle
-			if(UtilAngle.distHalf(lineAngle, a.theta) > angleTol || UtilAngle.distHalf(lineAngle, b.theta) > angleTol)
+			if (UtilAngle.distHalf(lineAngle, a.theta) > angleTol || UtilAngle.distHalf(lineAngle, b.theta) > angleTol)
 				return false;
 		}
 
 		// edgel extends Point2D_F32 so this should be legal
-		FitLine_F32.polar((List)dataSet,model);
+		FitLine_F32.polar((List)dataSet, model);
 
 		return true;
 	}

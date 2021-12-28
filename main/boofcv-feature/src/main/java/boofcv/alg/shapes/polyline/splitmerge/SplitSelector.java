@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,7 @@ public interface SplitSelector {
 	 * @param indexB End of line
 	 * @param results Where to split
 	 */
-	void selectSplitPoint(List<Point2D_I32> contour , int indexA , int indexB , PolylineSplitMerge.SplitResults results );
+	void selectSplitPoint( List<Point2D_I32> contour, int indexA, int indexB, PolylineSplitMerge.SplitResults results );
 
 	/**
 	 * Compares two scores against each other
@@ -46,5 +46,5 @@ public interface SplitSelector {
 	 * @param scoreB Score
 	 * @return 1 = scoreA is best, 0 both equal, -1 scoreB is best
 	 */
-	int compareScore( double scoreA , double scoreB );
+	int compareScore( double scoreA, double scoreB );
 }

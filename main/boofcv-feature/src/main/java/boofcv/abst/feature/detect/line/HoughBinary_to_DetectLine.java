@@ -34,16 +34,15 @@ import java.util.List;
 /**
  * Converts {@link HoughTransformBinary} into {@link DetectLine}
  *
+ * @author Peter Abeles
  * @see HoughTransformBinary
  * @see boofcv.alg.feature.detect.line.HoughParametersPolar
- *
- * @author Peter Abeles
  */
 @SuppressWarnings({"NullAway.Init"})
 public class HoughBinary_to_DetectLine<I extends ImageGray<I>, D extends ImageGray<D>> implements DetectLine<I> {
 	HoughTransformBinary hough;
 	// binary image with lines marked in it
-	GrayU8 binary = new GrayU8(1,1);
+	GrayU8 binary = new GrayU8(1, 1);
 
 	// Compute a binary image from the input
 	InputToBinary<I> binarization;
@@ -54,40 +53,39 @@ public class HoughBinary_to_DetectLine<I extends ImageGray<I>, D extends ImageGr
 	public boolean nonMaxSuppression = true;
 
 	// computes image gradient
-	ImageGradient<I,D> gradient;
+	ImageGradient<I, D> gradient;
 	D derivX, derivY;
 
 	// storage for gradient intensity image
-	GrayF32 edgeIntensity = new GrayF32(1,1);
-	GrayF32 suppressed = new GrayF32(1,1);
+	GrayF32 edgeIntensity = new GrayF32(1, 1);
+	GrayF32 suppressed = new GrayF32(1, 1);
 
-
-	public HoughBinary_to_DetectLine(HoughTransformBinary hough, InputToBinary<I> thresholder ) {
+	public HoughBinary_to_DetectLine( HoughTransformBinary hough, InputToBinary<I> thresholder ) {
 		this.hough = hough;
 		this.binarization = thresholder;
 	}
 
-	public HoughBinary_to_DetectLine(HoughTransformBinary hough, ImageGradient<I,D> gradient ) {
+	public HoughBinary_to_DetectLine( HoughTransformBinary hough, ImageGradient<I, D> gradient ) {
 		this.hough = hough;
 		this.gradient = gradient;
-		this.derivX = gradient.getDerivativeType().createImage(1,1);
-		this.derivY = gradient.getDerivativeType().createImage(1,1);
+		this.derivX = gradient.getDerivativeType().createImage(1, 1);
+		this.derivY = gradient.getDerivativeType().createImage(1, 1);
 	}
 
 	@Override
-	public List<LineParametric2D_F32> detect(I input) {
+	public List<LineParametric2D_F32> detect( I input ) {
 
-		if( isEdge() ) {
-			gradient.process(input,derivX,derivY);
+		if (isEdge()) {
+			gradient.process(input, derivX, derivY);
 			GGradientToEdgeFeatures.intensityAbs(derivX, derivY, edgeIntensity);
-			if( nonMaxSuppression ) {
+			if (nonMaxSuppression) {
 				GGradientToEdgeFeatures.nonMaxSuppressionCrude4(edgeIntensity, derivX, derivY, suppressed);
 				ThresholdImageOps.threshold(suppressed, binary, thresholdEdge, false);
 			} else {
 				ThresholdImageOps.threshold(edgeIntensity, binary, thresholdEdge, false);
 			}
 		} else {
-			binarization.process(input,binary);
+			binarization.process(input, binary);
 		}
 
 		hough.transform(binary);

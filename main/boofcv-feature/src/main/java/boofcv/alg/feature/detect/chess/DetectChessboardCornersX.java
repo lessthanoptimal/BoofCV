@@ -112,7 +112,7 @@ public class DetectChessboardCornersX {
 
 	SearchLocalPeak<GrayF32> meanShift;
 
-	private DogArray<ChessboardCorner> corners = new DogArray<>(ChessboardCorner::new);
+	private final DogArray<ChessboardCorner> corners = new DogArray<>(ChessboardCorner::new);
 	List<ChessboardCorner> filtered = new ArrayList<>();
 
 	// storage for corner detector output

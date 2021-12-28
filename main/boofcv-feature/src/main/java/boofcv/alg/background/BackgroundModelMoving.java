@@ -171,5 +171,4 @@ public abstract class BackgroundModelMoving
 	}
 
 	protected abstract void _segment( MotionModel currentToWorld, T frame, GrayU8 segmented );
-
 }

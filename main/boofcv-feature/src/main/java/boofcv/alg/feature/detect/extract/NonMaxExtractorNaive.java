@@ -21,7 +21,6 @@ package boofcv.alg.feature.detect.extract;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 
-
 /**
  * <p/>
  * Extracts corners at local maximums that are above a threshold. Basic unoptimized implementation.
@@ -42,11 +41,11 @@ public class NonMaxExtractorNaive {
 	// should it use a strict rule for defining the local max?
 	protected boolean useStrictRule;
 
-	public NonMaxExtractorNaive(boolean useStrictRule) {
+	public NonMaxExtractorNaive( boolean useStrictRule ) {
 		this.useStrictRule = useStrictRule;
 	}
 
-	public void setSearchRadius(int radius) {
+	public void setSearchRadius( int radius ) {
 		this.radius = radius;
 	}
 
@@ -54,11 +53,11 @@ public class NonMaxExtractorNaive {
 		return thresh;
 	}
 
-	public void setThreshold(float thresh) {
+	public void setThreshold( float thresh ) {
 		this.thresh = thresh;
 	}
 
-	public void setBorder(int border) {
+	public void setBorder( int border ) {
 		this.border = border;
 	}
 
@@ -70,7 +69,7 @@ public class NonMaxExtractorNaive {
 		return useStrictRule;
 	}
 
-	public void process(GrayF32 intensityImage, QueueCorner peaks) {
+	public void process( GrayF32 intensityImage, QueueCorner peaks ) {
 
 		if (useStrictRule)
 			strictRule(intensityImage, peaks);
@@ -78,14 +77,14 @@ public class NonMaxExtractorNaive {
 			notStrictRule(intensityImage, peaks);
 	}
 
-	private void strictRule(GrayF32 intensityImage, QueueCorner corners) {
+	private void strictRule( GrayF32 intensityImage, QueueCorner corners ) {
 		final int imgWidth = intensityImage.getWidth();
 		final int imgHeight = intensityImage.getHeight();
 
 		final float[] inten = intensityImage.data;
 
 		for (int y = border; y < imgHeight - border; y++) {
-			int center = intensityImage.startIndex + y * intensityImage.stride + border;
+			int center = intensityImage.startIndex + y*intensityImage.stride + border;
 			for (int x = border; x < imgWidth - border; x++) {
 
 				float val = inten[center++];
@@ -105,7 +104,7 @@ public class NonMaxExtractorNaive {
 
 				escape:
 				for (int i = y0; i <= y1; i++) {
-					int index = intensityImage.startIndex + i * intensityImage.stride + x0;
+					int index = intensityImage.startIndex + i*intensityImage.stride + x0;
 					for (int j = x0; j <= x1; j++, index++) {
 						// don't compare the center point against itself
 						if (i == y && j == x)
@@ -126,14 +125,14 @@ public class NonMaxExtractorNaive {
 		}
 	}
 
-	private void notStrictRule(GrayF32 intensityImage, QueueCorner corners) {
+	private void notStrictRule( GrayF32 intensityImage, QueueCorner corners ) {
 		final int imgWidth = intensityImage.getWidth();
 		final int imgHeight = intensityImage.getHeight();
 
 		final float[] inten = intensityImage.data;
 
 		for (int y = border; y < imgHeight - border; y++) {
-			int center = intensityImage.startIndex + y * intensityImage.stride + border;
+			int center = intensityImage.startIndex + y*intensityImage.stride + border;
 			for (int x = border; x < imgWidth - border; x++) {
 
 				float val = inten[center++];
@@ -153,7 +152,7 @@ public class NonMaxExtractorNaive {
 
 				escape:
 				for (int i = y0; i <= y1; i++) {
-					int index = intensityImage.startIndex + i * intensityImage.stride + x0;
+					int index = intensityImage.startIndex + i*intensityImage.stride + x0;
 					for (int j = x0; j <= x1; j++, index++) {
 
 						if (val < inten[index]) {

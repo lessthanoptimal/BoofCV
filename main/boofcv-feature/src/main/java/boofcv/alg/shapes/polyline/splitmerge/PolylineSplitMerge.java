@@ -463,10 +463,7 @@ public class PolylineSplitMerge {
 
 		double d = p0.distance(p1);
 
-		if (length >= d*convexTest) {
-			return false;
-		}
-		return true;
+		return !(length >= d*convexTest);
 	}
 
 	/**

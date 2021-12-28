@@ -29,6 +29,7 @@ public interface TupleDesc<T extends TupleDesc> extends Serializable {
 
 	/**
 	 * Sets this tuple to be the same as the provided tuple
+	 *
 	 * @param source The tuple which this one is to become a copy of.
 	 */
 	void setTo( T source );

@@ -478,10 +478,7 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 	public boolean isFullyInside( float x, float y ) {
 		if (x < allowedLeft || x > allowedRight)
 			return false;
-		if (y < allowedTop || y > allowedBottom)
-			return false;
-
-		return true;
+		return !(y < allowedTop) && !(y > allowedBottom);
 	}
 
 	/**
@@ -492,10 +489,7 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 	public boolean isFullyOutside( float x, float y ) {
 		if (x < outsideLeft || x > outsideRight)
 			return true;
-		if (y < outsideTop || y > outsideBottom)
-			return true;
-
-		return false;
+		return y < outsideTop || y > outsideBottom;
 	}
 
 	/**

@@ -239,7 +239,7 @@ public class FactoryDescribePointRadiusAngle {
 			config = new ConfigTemplateDescribe();
 
 		return switch (config.type) {
-			case PIXEL -> new DescribePointRawPixels_RadiusAngle<T,TD>(
+			case PIXEL -> new DescribePointRawPixels_RadiusAngle<T, TD>(
 					FactoryDescribeAlgs.pixelRegion(config.width, config.height, imageType), imageType);
 			case NCC -> new DescribeNCC_RadiusAngle(
 					FactoryDescribeAlgs.pixelRegionNCC(config.width, config.height, imageType), imageType);

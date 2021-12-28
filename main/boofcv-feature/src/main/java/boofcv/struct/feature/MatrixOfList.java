@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,6 @@
 
 package boofcv.struct.feature;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,24 +27,23 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class MatrixOfList<T> {
-	public List<T> grid[];
+	public List<T>[] grid;
 	public int width;
 	public int height;
 
-	public MatrixOfList(int width, int height) {
+	public MatrixOfList( int width, int height ) {
 		this.width = width;
 		this.height = height;
-		grid = new ArrayList[ width*height ];
-		for( int i = 0; i < grid.length; i++ ) {
+		grid = new ArrayList[width*height];
+		for (int i = 0; i < grid.length; i++) {
 			grid[i] = new ArrayList<>();
 		}
 	}
 
-
-	public void reshape( int width , int height ) {
-		if( width*height > grid.length ) {
-			grid = new ArrayList[ width*height ];
-			for( int i = 0; i < grid.length; i++ ) {
+	public void reshape( int width, int height ) {
+		if (width*height > grid.length) {
+			grid = new ArrayList[width*height];
+			for (int i = 0; i < grid.length; i++) {
 				grid[i] = new ArrayList<>();
 			}
 		}
@@ -55,12 +53,12 @@ public class MatrixOfList<T> {
 
 	public void reset() {
 		final int N = width*height;
-		for( int i = 0; i < N; i++ ) {
+		for (int i = 0; i < N; i++) {
 			grid[i].clear();
 		}
 	}
 
-	public List<T> get( int x , int y ) {
+	public List<T> get( int x, int y ) {
 		return grid[y*width + x];
 	}
 
@@ -76,14 +74,14 @@ public class MatrixOfList<T> {
 		List<T> ret = new ArrayList<>();
 
 		final int N = width*height;
-		for( int i = 0; i < N; i++ ) {
+		for (int i = 0; i < N; i++) {
 			ret.addAll(grid[i]);
 		}
 
 		return ret;
 	}
 
-	public boolean isInBounds(int x, int y) {
-		return( x >= 0 && x < width && y >= 0 && y < height );
+	public boolean isInBounds( int x, int y ) {
+		return (x >= 0 && x < width && y >= 0 && y < height);
 	}
 }

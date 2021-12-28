@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,24 +41,22 @@ import java.util.List;
  * positives might be returned.
  * </p>
  *
+ * @author Peter Abeles
  * @see HoughTransformGradient
  * @see boofcv.alg.feature.detect.line.HoughParametersFootOfNorm
- *
- * @author Peter Abeles
  */
 public class HoughGradient_to_DetectLine<I extends ImageGray<I>, D extends ImageGray<D>>
-	implements DetectLine<I>
-{
+		implements DetectLine<I> {
 	HoughTransformGradient<D> hough;
 	// computes image gradient
-	ImageGradient<I,D> gradient;
+	ImageGradient<I, D> gradient;
 	D derivX, derivY;
 
 	// storage for gradient intensity image
-	GrayF32 edgeIntensity = new GrayF32(1,1);
-	GrayF32 suppressed = new GrayF32(1,1);
+	GrayF32 edgeIntensity = new GrayF32(1, 1);
+	GrayF32 suppressed = new GrayF32(1, 1);
 	// storage for edge binary image
-	GrayU8 binary = new GrayU8(1,1);
+	GrayU8 binary = new GrayU8(1, 1);
 
 	// Minimum edge intensity to be used when computing edge mask
 	public float thresholdEdge = 20.0f;
@@ -68,29 +66,29 @@ public class HoughGradient_to_DetectLine<I extends ImageGray<I>, D extends Image
 	Class<I> inputType;
 	Class<D> derivType;
 
-	public HoughGradient_to_DetectLine( HoughTransformGradient hough, ImageGradient<I,D> gradient,
+	public HoughGradient_to_DetectLine( HoughTransformGradient hough, ImageGradient<I, D> gradient,
 										Class<I> inputType ) {
 		this.hough = hough;
 		this.gradient = gradient;
 		this.inputType = inputType;
 		this.derivType = GImageDerivativeOps.getDerivativeType(inputType);
 
-		derivX = GeneralizedImageOps.createSingleBand(derivType,1,1);
-		derivY = GeneralizedImageOps.createSingleBand(derivType,1,1);
+		derivX = GeneralizedImageOps.createSingleBand(derivType, 1, 1);
+		derivY = GeneralizedImageOps.createSingleBand(derivType, 1, 1);
 	}
 
 	@Override
-	public List<LineParametric2D_F32> detect(I input) {
-		gradient.process(input,derivX,derivY);
+	public List<LineParametric2D_F32> detect( I input ) {
+		gradient.process(input, derivX, derivY);
 		GGradientToEdgeFeatures.intensityAbs(derivX, derivY, edgeIntensity);
-		if( nonMaxSuppression ) {
+		if (nonMaxSuppression) {
 			GGradientToEdgeFeatures.nonMaxSuppressionCrude4(edgeIntensity, derivX, derivY, suppressed);
 			ThresholdImageOps.threshold(suppressed, binary, thresholdEdge, false);
 		} else {
 			ThresholdImageOps.threshold(edgeIntensity, binary, thresholdEdge, false);
 		}
 
-		hough.transform(derivX,derivY,binary);
+		hough.transform(derivX, derivY, binary);
 
 		return hough.getLinesMerged();
 	}
@@ -104,7 +102,7 @@ public class HoughGradient_to_DetectLine<I extends ImageGray<I>, D extends Image
 		return thresholdEdge;
 	}
 
-	public void setThresholdEdge(float thresholdEdge) {
+	public void setThresholdEdge( float thresholdEdge ) {
 		this.thresholdEdge = thresholdEdge;
 	}
 
@@ -136,7 +134,7 @@ public class HoughGradient_to_DetectLine<I extends ImageGray<I>, D extends Image
 		return nonMaxSuppression;
 	}
 
-	public void setNonMaxSuppression(boolean nonMaxSuppression) {
+	public void setNonMaxSuppression( boolean nonMaxSuppression ) {
 		this.nonMaxSuppression = nonMaxSuppression;
 	}
 }

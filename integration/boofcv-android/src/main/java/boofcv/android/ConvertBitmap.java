@@ -270,7 +270,7 @@ public class ConvertBitmap {
 		} else if (input instanceof ImageGray) {
 			grayToBitmap((ImageGray)input, output, storage);
 		} else if (input instanceof ImageInterleaved) {
-			interleavedToBitmap(input, output, storage);
+			interleavedToBitmap((ImageInterleaved)input, output, storage);
 		} else {
 			throw new IllegalArgumentException("Unsupported input image type");
 		}
@@ -287,21 +287,17 @@ public class ConvertBitmap {
 		}
 
 		switch (color) {
-			case RGB: {
+			case RGB -> {
 				boofToBitmap(input, output, storage);
+				return;
 			}
-			return;
-
-			case YUV: {
+			case YUV -> {
 				if (input instanceof ImageInterleaved) {
-					interleavedYuvToBitmap(input, output, storage);
+					interleavedYuvToBitmap((ImageInterleaved)input, output, storage);
 					return;
 				}
 			}
-			break;
-
-			default:
-				break;
+			default -> {}
 		}
 		throw new IllegalArgumentException("Unsupported input image type");
 	}
@@ -416,17 +412,18 @@ public class ConvertBitmap {
 
 		if (input.getImageType().getDataType() == ImageDataType.U8) {
 			switch (output.getConfig()) {
-				case ARGB_8888:
+				case ARGB_8888 -> {
 					ImplConvertBitmap.interleavedYuvToArgb8888((InterleavedU8)input, storage.data);
 					output.copyPixelsFromBuffer(ByteBuffer.wrap(storage.data));
 					return;
-				case RGB_565:
+				}
+				case RGB_565 -> {
 					ImplConvertBitmap.interleavedYuvToRGB565((InterleavedU8)input, storage.data);
 					output.copyPixelsFromBuffer(ByteBuffer.wrap(storage.data));
 					return;
-
-				default:
-					break;
+				}
+				default -> {
+				}
 			}
 		}
 		throw new IllegalArgumentException("Unsupported BoofCV Type");

@@ -29,26 +29,26 @@ import javax.annotation.Generated;
  * <p>
  * Implementation of {@link ImplSsdCornerBase} for {@link GrayF32}.
  * </p>
- * 
+ *
  *
  * <p>DO NOT MODIFY. Automatically generated code created by GenerateImplSsdCorner</p>
  *
  * @author Peter Abeles
  */
 @Generated("boofcv.alg.feature.detect.intensity.impl.GenerateImplSsdCorner")
-public class ImplSsdCorner_F32 extends ImplSsdCornerBox<GrayF32,GrayF32> {
+public class ImplSsdCorner_F32 extends ImplSsdCornerBox<GrayF32, GrayF32> {
 
 	private GrowArray<WorkSpace> workspaces = new GrowArray<>(() -> new WorkSpace(0));
 	private CornerIntensity_F32 intensity;
 
-	public ImplSsdCorner_F32(int windowRadius, CornerIntensity_F32 intensity) {
+	public ImplSsdCorner_F32( int windowRadius, CornerIntensity_F32 intensity ) {
 		super(windowRadius, GrayF32.class, GrayF32.class);
 		this.intensity = intensity;
 	}
 
 	@Override
-	protected void setImageShape(int imageWidth, int imageHeight) {
-		super.setImageShape(imageWidth,imageHeight);
+	protected void setImageShape( int imageWidth, int imageHeight ) {
+		super.setImageShape(imageWidth, imageHeight);
 		workspaces = new GrowArray<>(() -> new WorkSpace(imageWidth));
 	}
 
@@ -204,5 +204,4 @@ public class ImplSsdCorner_F32 extends ImplSsdCornerBox<GrayF32,GrayF32> {
 			zz = new float[size];
 		}
 	}
-
 }

@@ -32,27 +32,24 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class DescribeImageDense_Convert<T extends ImageBase<T>, TD extends TupleDesc<TD>>
-		implements DescribeImageDense<T, TD>
-{
+		implements DescribeImageDense<T, TD> {
 	DescribeImageDense describer;
 	ImageBase workspace;
 
 	ImageType<T> inputType;
 
-	public DescribeImageDense_Convert(DescribeImageDense describer , ImageType<T> inputType )
-	{
+	public DescribeImageDense_Convert( DescribeImageDense describer, ImageType<T> inputType ) {
 		ImageType describerType = describer.getImageType();
 
-		if( inputType.getFamily() != describerType.getFamily() )
+		if (inputType.getFamily() != describerType.getFamily())
 			throw new IllegalArgumentException("Image types must have the same family");
-		if( inputType.getDataType() == describerType.getDataType() )
+		if (inputType.getDataType() == describerType.getDataType())
 			throw new IllegalArgumentException("Data types are the same. Why do you want to use this class?");
 
-		workspace = describerType.createImage(1,1);
+		workspace = describerType.createImage(1, 1);
 		this.describer = describer;
 		this.inputType = inputType;
 	}
-
 
 	@Override
 	public TD createDescription() {
@@ -65,9 +62,9 @@ public class DescribeImageDense_Convert<T extends ImageBase<T>, TD extends Tuple
 	}
 
 	@Override
-	public void process(T input) {
-		workspace.reshape(input.width,input.height);
-		GConvertImage.convert(input,workspace);
+	public void process( T input ) {
+		workspace.reshape(input.width, input.height);
+		GConvertImage.convert(input, workspace);
 		describer.process(workspace);
 	}
 

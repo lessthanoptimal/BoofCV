@@ -55,11 +55,11 @@ public class FeatureLaplacePyramid<T extends ImageGray<T>, D extends ImageGray<D
 		implements InterestPointScaleSpacePyramid<T> {
 
 	// used to compute feature intensity across scale space
-	private ImageFunctionSparse<T> sparseLaplace;
+	private final ImageFunctionSparse<T> sparseLaplace;
 
 	// generalized feature detector. Used to find candidate features in each scale's image
-	private GeneralFeatureDetector<T, D> detector;
-	private float baseThreshold;
+	private final GeneralFeatureDetector<T, D> detector;
+	private final float baseThreshold;
 	// location of recently computed features in layers
 	protected int spaceIndex = 0;
 	protected List<Point2D_I16> maximums = new ArrayList<>();

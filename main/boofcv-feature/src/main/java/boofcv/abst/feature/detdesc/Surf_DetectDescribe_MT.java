@@ -44,7 +44,7 @@ public class Surf_DetectDescribe_MT<T extends ImageGray<T>, II extends ImageGray
 								   Class<T> inputType ) {
 		super(detector, orientation, describe, inputType);
 
-		threadData = new GrowArray<>(()->new ThreadData((OrientationIntegral)orientation.copy(), describe.copy()));
+		threadData = new GrowArray<>(() -> new ThreadData((OrientationIntegral)orientation.copy(), describe.copy()));
 	}
 
 	@Override

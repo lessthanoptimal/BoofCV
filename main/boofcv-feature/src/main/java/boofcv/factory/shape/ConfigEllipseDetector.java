@@ -59,7 +59,7 @@ public class ConfigEllipseDetector implements Configuration {
 
 	/**
 	 * Refinement: maximum number of refinement iterations it will performance. Set to zero to disable
- 	 */
+	 */
 	public int maxIterations = 5;
 
 	/**

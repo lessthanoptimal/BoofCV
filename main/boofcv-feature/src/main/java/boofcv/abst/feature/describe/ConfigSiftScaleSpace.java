@@ -18,7 +18,6 @@
 
 package boofcv.abst.feature.describe;
 
-
 import boofcv.alg.feature.detect.interest.SiftScaleSpace;
 import boofcv.struct.Configuration;
 

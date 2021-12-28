@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,29 +31,29 @@ import boofcv.struct.image.ImageGray;
  * @author Peter Abeles
  */
 public abstract class ImplSsdCornerBox<D extends ImageGray<D>, D2 extends ImageGray<D2>>
-		extends ImplSsdCornerBase<D,D2>
-{
-	protected ImplSsdCornerBox(int windowRadius , Class<D> derivType, Class<D2> secondDerivType ) {
-		super(windowRadius,derivType,secondDerivType);
+		extends ImplSsdCornerBase<D, D2> {
+	protected ImplSsdCornerBox( int windowRadius, Class<D> derivType, Class<D2> secondDerivType ) {
+		super(windowRadius, derivType, secondDerivType);
 	}
-	@Override
-	public void process(D derivX, D derivY, GrayF32 intensity ) {
-		InputSanityCheck.checkSameShape(derivX,derivY);
-		intensity.reshape(derivX.width,derivY.height);
 
-		setImageShape(derivX.getWidth(),derivX.getHeight());
+	@Override
+	public void process( D derivX, D derivY, GrayF32 intensity ) {
+		InputSanityCheck.checkSameShape(derivX, derivY);
+		intensity.reshape(derivX.width, derivY.height);
+
+		setImageShape(derivX.getWidth(), derivX.getHeight());
 		this.derivX = derivX;
 		this.derivY = derivY;
 
 		// there is no intensity computed along the border. Make sure it's always zero
 		// In the future it might be better to fill it with meaningful data, even if it's
 		// from a partial region
-		ImageMiscOps.fillBorder(intensity,0,radius);
+		ImageMiscOps.fillBorder(intensity, 0, radius);
 		horizontal();
 		vertical(intensity);
 	}
 
 	protected abstract void horizontal();
 
-	protected abstract void vertical(GrayF32 intensity);
+	protected abstract void vertical( GrayF32 intensity );
 }

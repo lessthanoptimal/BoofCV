@@ -25,25 +25,25 @@ package boofcv.numerics;
  * @author Peter Abeles
  */
 public class InterpolateArray {
-	public double data[];
+	public double[] data;
 	public double value;
-	private int end;
+	private final int end;
 
-	public InterpolateArray(double[] data) {
+	public InterpolateArray( double[] data ) {
 		this.data = data;
-		end = data.length-1;
+		end = data.length - 1;
 	}
 
 	public boolean interpolate( double where ) {
-		if( where < 0 )
+		if (where < 0)
 			return false;
 		int index = (int)where;
-		if( index >= end )
+		if (index >= end)
 			return false;
 
-		double w = where-index;
+		double w = where - index;
 
-		value = data[index]*(1.0-w) + data[index+1]*w;
+		value = data[index]*(1.0 - w) + data[index + 1]*w;
 		return true;
 	}
 }

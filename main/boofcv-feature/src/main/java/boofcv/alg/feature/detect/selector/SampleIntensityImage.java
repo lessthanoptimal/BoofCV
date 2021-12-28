@@ -41,8 +41,9 @@ public class SampleIntensityImage {
 			return intensity.unsafe_get(p.x, p.y);
 		}
 
-		@Override public int getX( Point2D_I16 p ) { return p.x; }
-		@Override public int getY( Point2D_I16 p ) { return p.y; }
+		@Override public int getX( Point2D_I16 p ) {return p.x;}
+
+		@Override public int getY( Point2D_I16 p ) {return p.y;}
 	}
 
 	/**
@@ -55,8 +56,9 @@ public class SampleIntensityImage {
 			return intensity.unsafe_get((int)p.x, (int)p.y);
 		}
 
-		@Override public int getX( Point2D_F32 p ) { return (int)p.x; }
-		@Override public int getY( Point2D_F32 p ) { return (int)p.y; }
+		@Override public int getX( Point2D_F32 p ) {return (int)p.x;}
+
+		@Override public int getY( Point2D_F32 p ) {return (int)p.y;}
 	}
 
 	/**
@@ -69,7 +71,8 @@ public class SampleIntensityImage {
 			return intensity.unsafe_get((int)p.x, (int)p.y);
 		}
 
-		@Override public int getX( Point2D_F64 p ) { return (int)p.x; }
-		@Override public int getY( Point2D_F64 p ) { return (int)p.y; }
+		@Override public int getX( Point2D_F64 p ) {return (int)p.x;}
+
+		@Override public int getY( Point2D_F64 p ) {return (int)p.y;}
 	}
 }

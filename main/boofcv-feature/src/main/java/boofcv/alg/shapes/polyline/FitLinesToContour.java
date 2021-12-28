@@ -64,11 +64,11 @@ public class FitLinesToContour {
 	DogArray<LineGeneral2D_F64> lines = new DogArray<>(LineGeneral2D_F64::new);
 	DogArray<Point2D_F64> pointsFit = new DogArray<>(Point2D_F64::new);
 
-	private LinePolar2D_F64 linePolar = new LinePolar2D_F64();
+	private final LinePolar2D_F64 linePolar = new LinePolar2D_F64();
 
-	private Point2D_F64 intersection = new Point2D_F64();
+	private final Point2D_F64 intersection = new Point2D_F64();
 
-	private DogArray_I32 workCorners = new DogArray_I32();
+	private final DogArray_I32 workCorners = new DogArray_I32();
 
 	int anchor0;
 	int anchor1;

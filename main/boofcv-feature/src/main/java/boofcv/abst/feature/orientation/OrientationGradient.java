@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,6 @@ package boofcv.abst.feature.orientation;
 
 import boofcv.struct.image.ImageGray;
 
-
 /**
  * Estimates the orientation of a region from the image gradient.
  *
@@ -34,12 +33,12 @@ public interface OrientationGradient<D extends ImageGray<D>> extends RegionOrien
 	 * @param derivX Image derivative along x-axis.
 	 * @param derivY Image derivative along y-axis.
 	 */
-	public void setImage( D derivX , D derivY );
+	void setImage( D derivX, D derivY );
 
 	/**
 	 * Returns the type of image it can process.
 	 *
 	 * @return Type of image which can be processed
 	 */
-	public Class<D> getImageType();
+	Class<D> getImageType();
 }

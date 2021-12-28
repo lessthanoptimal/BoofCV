@@ -19,9 +19,8 @@
 package boofcv.alg.feature.detect.intensity.impl;
 
 import boofcv.alg.transform.ii.DerivativeIntegralImage;
-import boofcv.alg.transform.ii.IntegralImageOps; //CONCURRENT_REMOVE_LINE
+import boofcv.alg.transform.ii.IntegralImageOps;
 import boofcv.alg.transform.ii.IntegralKernel;
-//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS32;
 import org.jetbrains.annotations.Nullable;
@@ -41,11 +40,12 @@ import javax.annotation.Generated;
 public class ImplIntegralImageFeatureIntensity {
 
 //CONCURRENT_OMIT_BEGIN
+
 	/**
 	 * Brute force approach which is easy to validate through visual inspection.
 	 */
-	public static void hessianNaive( GrayF32 integral, int skip , int size ,
-									 GrayF32 intensity) {
+	public static void hessianNaive( GrayF32 integral, int skip, int size,
+									 GrayF32 intensity ) {
 		final int w = intensity.width;
 		final int h = intensity.height;
 
@@ -71,7 +71,7 @@ public class ImplIntegralImageFeatureIntensity {
 	/**
 	 * Only computes the fast hessian along the border using a brute force approach
 	 */
-	public static void hessianBorder( GrayF32 integral, int skip , int size ,
+	public static void hessianBorder( GrayF32 integral, int skip, int size,
 									  GrayF32 intensity,
 									  @Nullable IntegralKernel storageKerXX,
 									  @Nullable IntegralKernel storageKerYY,
@@ -85,7 +85,7 @@ public class ImplIntegralImageFeatureIntensity {
 		IntegralKernel kerXY = DerivativeIntegralImage.kernelDerivXY(size, storageKerXY);
 
 		int radiusFeature = size/2;
-		final int borderOrig = radiusFeature+ 1 + (skip-(radiusFeature+1)%skip);
+		final int borderOrig = radiusFeature + 1 + (skip - (radiusFeature + 1)%skip);
 		final int border = borderOrig/skip;
 
 		float norm = 1.0f/(size*size);
@@ -97,7 +97,7 @@ public class ImplIntegralImageFeatureIntensity {
 				int xx = x*skip;
 				computeHessian(integral, intensity, kerXX, kerYY, kerXY, norm, y, yy, x, xx);
 			}
-			for (int x = w-border; x < w; x++) {
+			for (int x = w - border; x < w; x++) {
 				int xx = x*skip;
 				computeHessian(integral, intensity, kerXX, kerYY, kerXY, norm, y, yy, x, xx);
 			}
@@ -105,14 +105,14 @@ public class ImplIntegralImageFeatureIntensity {
 		//CONCURRENT_ABOVE });
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(border, w - border, x -> {
-		for (int x = border; x < w-border; x++) {
+		for (int x = border; x < w - border; x++) {
 			int xx = x*skip;
 
 			for (int y = 0; y < border; y++) {
 				int yy = y*skip;
 				computeHessian(integral, intensity, kerXX, kerYY, kerXY, norm, y, yy, x, xx);
 			}
-			for (int y = h-border; y < h; y++) {
+			for (int y = h - border; y < h; y++) {
 				int yy = y*skip;
 				computeHessian(integral, intensity, kerXX, kerYY, kerXY, norm, y, yy, x, xx);
 			}
@@ -120,8 +120,8 @@ public class ImplIntegralImageFeatureIntensity {
 		//CONCURRENT_ABOVE });
 	}
 
-//CONCURRENT_OMIT_BEGIN
-	public static void computeHessian(GrayF32 integral, GrayF32 intensity, IntegralKernel kerXX, IntegralKernel kerYY, IntegralKernel kerXY, float norm, int y, int yy, int x, int xx) {
+	//CONCURRENT_OMIT_BEGIN
+	public static void computeHessian( GrayF32 integral, GrayF32 intensity, IntegralKernel kerXX, IntegralKernel kerYY, IntegralKernel kerXY, float norm, int y, int yy, int x, int xx ) {
 		float Dxx = IntegralImageOps.convolveSparse(integral, kerXX, xx, yy);
 		float Dyy = IntegralImageOps.convolveSparse(integral, kerYY, xx, yy);
 		float Dxy = IntegralImageOps.convolveSparse(integral, kerXY, xx, yy);
@@ -139,8 +139,8 @@ public class ImplIntegralImageFeatureIntensity {
 	/**
 	 * Optimizes intensity for the inner image.
 	 */
-	public static void hessianInner( GrayF32 integral, int skip , int size ,
-									 GrayF32 intensity) {
+	public static void hessianInner( GrayF32 integral, int skip, int size,
+									 GrayF32 intensity ) {
 		final int w = intensity.width;
 		final int h = intensity.height;
 
@@ -189,15 +189,15 @@ public class ImplIntegralImageFeatureIntensity {
 			int indexY3 = indexY2 + integral.stride;
 			int indexY4 = indexY3 + blockSmall*integral.stride;
 
-			for (int x = border; x < endX; x++ , indexDst++) {
+			for (int x = border; x < endX; x++, indexDst++) {
 				float Dxx = integral.data[indexBottom + blockW3] - integral.data[indexTop + blockW3] - integral.data[indexBottom] + integral.data[indexTop];
-				Dxx -= 3*(integral.data[indexBottom + blockW2] - integral.data[indexTop + blockW2] - integral.data[indexBottom+blockSmall] + integral.data[indexTop + blockSmall]);
+				Dxx -= 3*(integral.data[indexBottom + blockW2] - integral.data[indexTop + blockW2] - integral.data[indexBottom + blockSmall] + integral.data[indexTop + blockSmall]);
 
 				float Dyy = integral.data[indexR + rowOff3] - integral.data[indexL + rowOff3] - integral.data[indexR] + integral.data[indexL];
 				Dyy -= 3*(integral.data[indexR + rowOff2] - integral.data[indexL + rowOff2] - integral.data[indexR + rowOff1] + integral.data[indexL + rowOff1]);
 
-				int x3 = blockSmall+1;
-				int x4 = x3+blockSmall;
+				int x3 = blockSmall + 1;
+				int x4 = x3 + blockSmall;
 
 				float Dxy = integral.data[indexY2 + blockSmall] - integral.data[indexY1 + blockSmall] - integral.data[indexY2] + integral.data[indexY1];
 				Dxy -= integral.data[indexY2 + x4] - integral.data[indexY1 + x4] - integral.data[indexY2 + x3] + integral.data[indexY1 + x3];
@@ -224,11 +224,12 @@ public class ImplIntegralImageFeatureIntensity {
 	}
 
 //CONCURRENT_OMIT_BEGIN
+
 	/**
 	 * Brute force approach which is easy to validate through visual inspection.
 	 */
-	public static void hessianNaive( GrayS32 integral, int skip , int size ,
-									 GrayF32 intensity) {
+	public static void hessianNaive( GrayS32 integral, int skip, int size,
+									 GrayF32 intensity ) {
 		final int w = intensity.width;
 		final int h = intensity.height;
 
@@ -254,7 +255,7 @@ public class ImplIntegralImageFeatureIntensity {
 	/**
 	 * Only computes the fast hessian along the border using a brute force approach
 	 */
-	public static void hessianBorder( GrayS32 integral, int skip , int size ,
+	public static void hessianBorder( GrayS32 integral, int skip, int size,
 									  GrayF32 intensity,
 									  @Nullable IntegralKernel storageKerXX,
 									  @Nullable IntegralKernel storageKerYY,
@@ -268,7 +269,7 @@ public class ImplIntegralImageFeatureIntensity {
 		IntegralKernel kerXY = DerivativeIntegralImage.kernelDerivXY(size, storageKerXY);
 
 		int radiusFeature = size/2;
-		final int borderOrig = radiusFeature+ 1 + (skip-(radiusFeature+1)%skip);
+		final int borderOrig = radiusFeature + 1 + (skip - (radiusFeature + 1)%skip);
 		final int border = borderOrig/skip;
 
 		float norm = 1.0f/(size*size);
@@ -280,7 +281,7 @@ public class ImplIntegralImageFeatureIntensity {
 				int xx = x*skip;
 				computeHessian(integral, intensity, kerXX, kerYY, kerXY, norm, y, yy, x, xx);
 			}
-			for (int x = w-border; x < w; x++) {
+			for (int x = w - border; x < w; x++) {
 				int xx = x*skip;
 				computeHessian(integral, intensity, kerXX, kerYY, kerXY, norm, y, yy, x, xx);
 			}
@@ -288,14 +289,14 @@ public class ImplIntegralImageFeatureIntensity {
 		//CONCURRENT_ABOVE });
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(border, w - border, x -> {
-		for (int x = border; x < w-border; x++) {
+		for (int x = border; x < w - border; x++) {
 			int xx = x*skip;
 
 			for (int y = 0; y < border; y++) {
 				int yy = y*skip;
 				computeHessian(integral, intensity, kerXX, kerYY, kerXY, norm, y, yy, x, xx);
 			}
-			for (int y = h-border; y < h; y++) {
+			for (int y = h - border; y < h; y++) {
 				int yy = y*skip;
 				computeHessian(integral, intensity, kerXX, kerYY, kerXY, norm, y, yy, x, xx);
 			}
@@ -303,8 +304,8 @@ public class ImplIntegralImageFeatureIntensity {
 		//CONCURRENT_ABOVE });
 	}
 
-//CONCURRENT_OMIT_BEGIN
-	public static void computeHessian(GrayS32 integral, GrayF32 intensity, IntegralKernel kerXX, IntegralKernel kerYY, IntegralKernel kerXY, float norm, int y, int yy, int x, int xx) {
+	//CONCURRENT_OMIT_BEGIN
+	public static void computeHessian( GrayS32 integral, GrayF32 intensity, IntegralKernel kerXX, IntegralKernel kerYY, IntegralKernel kerXY, float norm, int y, int yy, int x, int xx ) {
 		float Dxx = IntegralImageOps.convolveSparse(integral, kerXX, xx, yy);
 		float Dyy = IntegralImageOps.convolveSparse(integral, kerYY, xx, yy);
 		float Dxy = IntegralImageOps.convolveSparse(integral, kerXY, xx, yy);
@@ -322,8 +323,8 @@ public class ImplIntegralImageFeatureIntensity {
 	/**
 	 * Optimizes intensity for the inner image.
 	 */
-	public static void hessianInner( GrayS32 integral, int skip , int size ,
-									 GrayF32 intensity) {
+	public static void hessianInner( GrayS32 integral, int skip, int size,
+									 GrayF32 intensity ) {
 		final int w = intensity.width;
 		final int h = intensity.height;
 
@@ -372,15 +373,15 @@ public class ImplIntegralImageFeatureIntensity {
 			int indexY3 = indexY2 + integral.stride;
 			int indexY4 = indexY3 + blockSmall*integral.stride;
 
-			for (int x = border; x < endX; x++ , indexDst++) {
+			for (int x = border; x < endX; x++, indexDst++) {
 				float Dxx = integral.data[indexBottom + blockW3] - integral.data[indexTop + blockW3] - integral.data[indexBottom] + integral.data[indexTop];
-				Dxx -= 3*(integral.data[indexBottom + blockW2] - integral.data[indexTop + blockW2] - integral.data[indexBottom+blockSmall] + integral.data[indexTop + blockSmall]);
+				Dxx -= 3*(integral.data[indexBottom + blockW2] - integral.data[indexTop + blockW2] - integral.data[indexBottom + blockSmall] + integral.data[indexTop + blockSmall]);
 
 				float Dyy = integral.data[indexR + rowOff3] - integral.data[indexL + rowOff3] - integral.data[indexR] + integral.data[indexL];
 				Dyy -= 3*(integral.data[indexR + rowOff2] - integral.data[indexL + rowOff2] - integral.data[indexR + rowOff1] + integral.data[indexL + rowOff1]);
 
-				int x3 = blockSmall+1;
-				int x4 = x3+blockSmall;
+				int x3 = blockSmall + 1;
+				int x4 = x3 + blockSmall;
 
 				float Dxy = integral.data[indexY2 + blockSmall] - integral.data[indexY1 + blockSmall] - integral.data[indexY2] + integral.data[indexY1];
 				Dxy -= integral.data[indexY2 + x4] - integral.data[indexY1 + x4] - integral.data[indexY2 + x3] + integral.data[indexY1 + x3];
@@ -405,5 +406,4 @@ public class ImplIntegralImageFeatureIntensity {
 		}
 		//CONCURRENT_ABOVE });
 	}
-
 }

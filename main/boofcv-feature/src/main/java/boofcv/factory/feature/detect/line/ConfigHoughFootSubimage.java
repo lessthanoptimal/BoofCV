@@ -59,13 +59,13 @@ public class ConfigHoughFootSubimage implements Configuration {
 	public ConfigHoughFootSubimage() {
 	}
 
-	public ConfigHoughFootSubimage(int maxLines) {
+	public ConfigHoughFootSubimage( int maxLines ) {
 		this.maxLines = maxLines;
 	}
 
-	public ConfigHoughFootSubimage(int localMaxRadius, int minCounts, int minDistanceFromOrigin,
-								   float thresholdEdge, int maxLines, int totalHorizontalDivisions,
-								   int totalVerticalDivisions) {
+	public ConfigHoughFootSubimage( int localMaxRadius, int minCounts, int minDistanceFromOrigin,
+									float thresholdEdge, int maxLines, int totalHorizontalDivisions,
+									int totalVerticalDivisions ) {
 		this.localMaxRadius = localMaxRadius;
 		this.minCounts = minCounts;
 		this.minDistanceFromOrigin = minDistanceFromOrigin;

@@ -29,33 +29,37 @@ public interface SearchLocalPeak<T extends ImageGray<T>> {
 
 	/**
 	 * Specifies the image which is to be searched
+	 *
 	 * @param image input image
 	 */
-	public void setImage( T image );
+	void setImage( T image );
 
 	/**
 	 * How far around the center it consider when searching for the peak
+	 *
 	 * @param radius Search radius
 	 */
-	public void setSearchRadius( int radius );
+	void setSearchRadius( int radius );
 
 	/**
 	 * Initial point for the search
+	 *
 	 * @param x initial x-coordinate
 	 * @param y initial y-coordinate
 	 */
-	public void search( float x , float y );
+	void search( float x, float y );
 
 	/**
 	 * Location of the found peak. x-coordinate
+	 *
 	 * @return x-coordinate
 	 */
-	public float getPeakX();
+	float getPeakX();
 
 	/**
 	 * Location of the found peak. y-coordinate
+	 *
 	 * @return y-coordinate
 	 */
-	public float getPeakY();
-
+	float getPeakY();
 }

@@ -45,7 +45,7 @@ public class ConfigAverageIntegral implements ConfigOrientation {
 	/** Sigma for weighting. zero for unweighted. less than zero for automatic. Try -1. */
 	public double weightSigma = -1;
 
-	public ConfigAverageIntegral(int radius, double samplePeriod, int sampleWidth, double weightSigma) {
+	public ConfigAverageIntegral( int radius, double samplePeriod, int sampleWidth, double weightSigma ) {
 		this.radius = radius;
 		this.samplePeriod = samplePeriod;
 		this.sampleWidth = sampleWidth;

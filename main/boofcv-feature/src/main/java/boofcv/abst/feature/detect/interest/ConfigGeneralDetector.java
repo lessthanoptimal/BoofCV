@@ -38,38 +38,38 @@ public class ConfigGeneralDetector extends ConfigExtract {
 	 */
 	public ConfigSelectLimit selector = ConfigSelectLimit.selectBestN();
 
-	public ConfigGeneralDetector(int maxFeatures,
-								 int radius, float threshold, int ignoreBorder, boolean useStrictRule,
-								 boolean detectMinimums, boolean detectMaximums) {
+	public ConfigGeneralDetector( int maxFeatures,
+								  int radius, float threshold, int ignoreBorder, boolean useStrictRule,
+								  boolean detectMinimums, boolean detectMaximums ) {
 		super(radius, threshold, ignoreBorder, useStrictRule, detectMinimums, detectMaximums);
 		this.maxFeatures = maxFeatures;
 	}
 
-	public ConfigGeneralDetector(int maxFeatures, int radius, float threshold, int ignoreBorder, boolean useStrictRule) {
+	public ConfigGeneralDetector( int maxFeatures, int radius, float threshold, int ignoreBorder, boolean useStrictRule ) {
 		super(radius, threshold, ignoreBorder, useStrictRule);
 		this.maxFeatures = maxFeatures;
 	}
 
-	public ConfigGeneralDetector(int maxFeatures, int radius, float threshold) {
+	public ConfigGeneralDetector( int maxFeatures, int radius, float threshold ) {
 		super(radius, threshold);
 		this.maxFeatures = maxFeatures;
 	}
 
-	public ConfigGeneralDetector(int maxFeatures, ConfigExtract config ) {
+	public ConfigGeneralDetector( int maxFeatures, ConfigExtract config ) {
 		this.maxFeatures = maxFeatures;
-		if( config != null ) {
+		if (config != null) {
 			super.setTo(config);
 		}
 	}
 
-	public ConfigGeneralDetector(ConfigGeneralDetector original ) {
+	public ConfigGeneralDetector( ConfigGeneralDetector original ) {
 		this.setTo(original);
 	}
 
 	public ConfigGeneralDetector() {
 	}
 
-	public ConfigGeneralDetector setTo(ConfigGeneralDetector orig) {
+	public ConfigGeneralDetector setTo( ConfigGeneralDetector orig ) {
 		super.setTo(orig);
 		this.maxFeatures = orig.maxFeatures;
 		this.selector.setTo(orig.selector);

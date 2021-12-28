@@ -34,16 +34,16 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DescribeImageDenseHoG<T extends ImageBase<T>> implements DescribeImageDense<T,TupleDesc_F64> {
+public class DescribeImageDenseHoG<T extends ImageBase<T>> implements DescribeImageDense<T, TupleDesc_F64> {
 
 	BaseDenseHog<T> hog;
 
-	public DescribeImageDenseHoG(BaseDenseHog<T> hog) {
+	public DescribeImageDenseHoG( BaseDenseHog<T> hog ) {
 		this.hog = hog;
 	}
 
 	@Override
-	public void process(T input) {
+	public void process( T input ) {
 		hog.setInput(input);
 		hog.process();
 

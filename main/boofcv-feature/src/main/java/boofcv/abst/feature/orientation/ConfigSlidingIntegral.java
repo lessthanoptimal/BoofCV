@@ -35,8 +35,8 @@ public class ConfigSlidingIntegral implements ConfigOrientation.Integral {
 	/** How often the image is sampled. This number is scaled. Typically 0.65. */
 	public double samplePeriod = 0.65;
 
-	/** Angular window that is slide across. Try PI/3  */
-	public double windowSize = Math.PI / 3.0;
+	/** Angular window that is slide across. Try PI/3 */
+	public double windowSize = Math.PI/3.0;
 
 	/** Radius of the region being considered in terms of samples. Typically 8. */
 	public int radius = 8;
@@ -47,8 +47,8 @@ public class ConfigSlidingIntegral implements ConfigOrientation.Integral {
 	/** Size of kernel doing the sampling. Typically 6. */
 	public int sampleWidth = 6;
 
-	public ConfigSlidingIntegral(double samplePeriod, double windowSize, int radius,
-								 double weightSigma, int sampleWidth) {
+	public ConfigSlidingIntegral( double samplePeriod, double windowSize, int radius,
+								  double weightSigma, int sampleWidth ) {
 		this.samplePeriod = samplePeriod;
 		this.windowSize = windowSize;
 		this.radius = radius;

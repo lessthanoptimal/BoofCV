@@ -62,29 +62,29 @@ public class BroxWarpingSpacial<T extends ImageGray<T>> extends DenseFlowPyramid
 	protected float gamma;
 
 	// relaxation parameter for SOR  0 < w < 2. Recommended default is 1.9
-	private float SOR_RELAXATION;
+	private final float SOR_RELAXATION;
 
 	// number of iterations for inner and outer loops
-	private int numOuter;
-	private int numInner;
+	private final int numOuter;
+	private final int numInner;
 	// maximum number of iterations for SOR
-	private int maxIterationsSor;
+	private final int maxIterationsSor;
 	// convergence tolerance for SOR
-	private float convergeTolerance;
+	private final float convergeTolerance;
 
 	// derivative of first image
-	private GrayF32 deriv1X = new GrayF32(1, 1);
-	private GrayF32 deriv1Y = new GrayF32(1, 1);
+	private final GrayF32 deriv1X = new GrayF32(1, 1);
+	private final GrayF32 deriv1Y = new GrayF32(1, 1);
 
 	// derivatives of second image
-	private GrayF32 deriv2X = new GrayF32(1, 1);
-	private GrayF32 deriv2Y = new GrayF32(1, 1);
-	private GrayF32 deriv2XX = new GrayF32(1, 1);
-	private GrayF32 deriv2YY = new GrayF32(1, 1);
-	private GrayF32 deriv2XY = new GrayF32(1, 1);
+	private final GrayF32 deriv2X = new GrayF32(1, 1);
+	private final GrayF32 deriv2Y = new GrayF32(1, 1);
+	private final GrayF32 deriv2XX = new GrayF32(1, 1);
+	private final GrayF32 deriv2YY = new GrayF32(1, 1);
+	private final GrayF32 deriv2XY = new GrayF32(1, 1);
 
-	private ImageGradient<GrayF32, GrayF32> gradient = FactoryDerivative.three(GrayF32.class, GrayF32.class);
-	private ImageHessian<GrayF32> hessian = FactoryDerivative.hessianThree(GrayF32.class);
+	private final ImageGradient<GrayF32, GrayF32> gradient = FactoryDerivative.three(GrayF32.class, GrayF32.class);
+	private final ImageHessian<GrayF32> hessian = FactoryDerivative.hessianThree(GrayF32.class);
 
 	// flow estimation at the start of the iteration
 	protected GrayF32 flowU = new GrayF32(1, 1); // flow along x-axis

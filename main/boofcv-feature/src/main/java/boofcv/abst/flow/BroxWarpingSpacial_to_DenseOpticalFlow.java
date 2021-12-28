@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,19 +30,18 @@ import boofcv.struct.image.ImageType;
  * @author Peter Abeles
  */
 public class BroxWarpingSpacial_to_DenseOpticalFlow<T extends ImageGray<T>>
-	implements DenseOpticalFlow<T>
-{
+		implements DenseOpticalFlow<T> {
 	BroxWarpingSpacial<T> brox;
 	Class<T> imageType;
 
-	public BroxWarpingSpacial_to_DenseOpticalFlow(BroxWarpingSpacial<T> brox,
-												  Class<T> imageType ) {
+	public BroxWarpingSpacial_to_DenseOpticalFlow( BroxWarpingSpacial<T> brox,
+												   Class<T> imageType ) {
 		this.brox = brox;
 		this.imageType = imageType;
 	}
 
 	@Override
-	public void process(T source, T destination, ImageFlow flow) {
+	public void process( T source, T destination, ImageFlow flow ) {
 
 		brox.process(source, destination);
 
@@ -50,9 +49,9 @@ public class BroxWarpingSpacial_to_DenseOpticalFlow<T extends ImageGray<T>>
 		GrayF32 flowY = brox.getFlowY();
 
 		int index = 0;
-		for( int y = 0; y < flow.height; y++){
-			for( int x = 0; x < flow.width; x++, index++ ){
-				ImageFlow.D d = flow.unsafe_get(x,y);
+		for (int y = 0; y < flow.height; y++) {
+			for (int x = 0; x < flow.width; x++, index++) {
+				ImageFlow.D d = flow.unsafe_get(x, y);
 				d.x = flowX.data[index];
 				d.y = flowY.data[index];
 			}

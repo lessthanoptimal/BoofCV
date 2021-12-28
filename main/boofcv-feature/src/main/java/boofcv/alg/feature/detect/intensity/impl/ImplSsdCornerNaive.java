@@ -37,16 +37,16 @@ import org.jetbrains.annotations.Nullable;
 public class ImplSsdCornerNaive<T extends ImageGray<T>> implements GradientCornerIntensity<T> {
 
 	// feature's radius
-	private int radius;
+	private final int radius;
 
 	private @Nullable Kernel2D_S32 weights;
 
-	public ImplSsdCornerNaive(int imageWidth, int imageHeight,
-							  int windowRadius, boolean weighted) {
+	public ImplSsdCornerNaive( int imageWidth, int imageHeight,
+							   int windowRadius, boolean weighted ) {
 		this.radius = windowRadius;
 
-		if( weighted )
-			weights = FactoryKernelGaussian.gaussian(Kernel2D_S32.class,-1,radius);
+		if (weighted)
+			weights = FactoryKernelGaussian.gaussian(Kernel2D_S32.class, -1, radius);
 	}
 
 	@Override
@@ -54,14 +54,13 @@ public class ImplSsdCornerNaive<T extends ImageGray<T>> implements GradientCorne
 		return radius;
 	}
 
-
 	@Override
 	public int getIgnoreBorder() {
 		return radius;
 	}
 
 	@Override
-	public void process(T derivX, T derivY, GrayF32 intensity ) {
+	public void process( T derivX, T derivY, GrayF32 intensity ) {
 
 		final int imgHeight = derivX.getHeight();
 		final int imgWidth = derivX.getWidth();
@@ -75,34 +74,34 @@ public class ImplSsdCornerNaive<T extends ImageGray<T>> implements GradientCorne
 
 				for (int i = -radius; i <= radius; i++) {
 					for (int j = -radius; j <= radius; j++) {
-						
-						double dx = GeneralizedImageOps.get(derivX,col + j, row + i);
-						double dy = GeneralizedImageOps.get(derivY,col + j, row + i);
+
+						double dx = GeneralizedImageOps.get(derivX, col + j, row + i);
+						double dy = GeneralizedImageOps.get(derivY, col + j, row + i);
 
 						double w = 1;
-						
-						if( weights != null )
-							w = weights.get(j+radius,i+radius);
-						
-						dxdx += w * dx * dx;
-						dydy += w * dy * dy;
-						dxdy += w * dx * dy;
+
+						if (weights != null)
+							w = weights.get(j + radius, i + radius);
+
+						dxdx += w*dx*dx;
+						dydy += w*dy*dy;
+						dxdy += w*dx*dy;
 						totalW += w;
 					}
 				}
 
-				if( weights != null ) {
+				if (weights != null) {
 					dxdx /= totalW;
 					dydy /= totalW;
 					dxdy /= totalW;
 				}
 
 				// compute the eigen values
-				double left = (dxdx + dydy) * 0.5;
-				double b = (dxdx - dydy) * 0.5;
-				double right = Math.sqrt(b * b + dxdy * dxdy);
+				double left = (dxdx + dydy)*0.5;
+				double b = (dxdx - dydy)*0.5;
+				double right = Math.sqrt(b*b + dxdy*dxdy);
 
-				intensity.set(col, row, (float) (left - right));
+				intensity.set(col, row, (float)(left - right));
 			}
 		}
 	}
@@ -111,5 +110,4 @@ public class ImplSsdCornerNaive<T extends ImageGray<T>> implements GradientCorne
 	public Class<T> getInputType() {
 		throw new RuntimeException("Unknown");
 	}
-
 }

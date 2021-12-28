@@ -37,32 +37,32 @@ public class ScalePoint {
 	/** Feature intensity where it was selected */
 	public @Getter @Setter float intensity = Float.NaN;
 
-	public ScalePoint(double x, double y, double scale) {
-		this.pixel.setTo(x,y);
+	public ScalePoint( double x, double y, double scale ) {
+		this.pixel.setTo(x, y);
 		this.scale = scale;
 	}
 
-	public ScalePoint(double x, double y, double scale, boolean white ) {
+	public ScalePoint( double x, double y, double scale, boolean white ) {
 		setTo(x, y, scale, white);
 	}
 
 	public ScalePoint() {}
 
-	public void setTo(double x, double y, double scale) {
-		this.pixel.setTo(x,y);
+	public void setTo( double x, double y, double scale ) {
+		this.pixel.setTo(x, y);
 		this.scale = scale;
 		this.intensity = Float.NaN;
 	}
 
-	public void setTo(double x, double y, double scale, boolean white ) {
-		this.pixel.setTo(x,y);
+	public void setTo( double x, double y, double scale, boolean white ) {
+		this.pixel.setTo(x, y);
 		this.scale = scale;
 		this.white = white;
 		this.intensity = Float.NaN;
 	}
 
-	public void setTo(double x, double y, double scale, boolean white, float intensity ) {
-		this.pixel.setTo(x,y);
+	public void setTo( double x, double y, double scale, boolean white, float intensity ) {
+		this.pixel.setTo(x, y);
 		this.scale = scale;
 		this.white = white;
 		this.intensity = intensity;
@@ -74,7 +74,7 @@ public class ScalePoint {
 		return ret;
 	}
 
-	public void setTo(ScalePoint p) {
+	public void setTo( ScalePoint p ) {
 		this.scale = p.scale;
 		this.pixel.setTo(p.pixel);
 		this.white = p.white;

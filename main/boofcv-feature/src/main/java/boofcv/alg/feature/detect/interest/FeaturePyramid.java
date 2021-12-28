@@ -171,9 +171,9 @@ public class FeaturePyramid<T extends ImageGray<T>, D extends ImageGray<D>>
 		int index2 = (spaceIndex + 2)%3;
 
 		List<Point2D_I16> candidates = maximums[index1];
-		ImageBorder_F32 inten0 = (ImageBorder_F32)FactoryImageBorderAlgs.value(intensities[index0], 0);
+		ImageBorder_F32 inten0 = FactoryImageBorderAlgs.value(intensities[index0], 0);
 		GrayF32 inten1 = intensities[index1];
-		ImageBorder_F32 inten2 = (ImageBorder_F32)FactoryImageBorderAlgs.value(intensities[index2], 0);
+		ImageBorder_F32 inten2 = FactoryImageBorderAlgs.value(intensities[index2], 0);
 
 		float scale0 = (float)ss.scale[layerID - 1];
 		float scale1 = (float)ss.scale[layerID];

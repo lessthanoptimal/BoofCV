@@ -35,15 +35,15 @@ import org.ddogleg.struct.FastArray;
 public class AssociateUniqueByScoreAlg {
 
 	// type of match score being processed
-	private MatchScoreType type;
+	private final MatchScoreType type;
 
 	// should it check for ambiguity in source and/or destination
-	private boolean checkSource;
-	private boolean checkDestination;
+	private final boolean checkSource;
+	private final boolean checkDestination;
 
 	// storage for the index of the best match found so far
-	private DogArray_I32 solutions = new DogArray_I32();
-	private DogArray_F64 scores = new DogArray_F64();
+	private final DogArray_I32 solutions = new DogArray_I32();
+	private final DogArray_F64 scores = new DogArray_F64();
 
 	// storage for found solutions
 	private final FastArray<AssociatedIndex> firstPass = new FastArray<>(AssociatedIndex.class);

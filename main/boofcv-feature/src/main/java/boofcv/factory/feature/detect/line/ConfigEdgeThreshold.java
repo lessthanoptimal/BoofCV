@@ -52,6 +52,6 @@ public class ConfigEdgeThreshold implements Configuration {
 
 	@Override
 	public void checkValidity() {
-		assert(threshold >=0.0f);
+		assert (threshold >= 0.0f);
 	}
 }

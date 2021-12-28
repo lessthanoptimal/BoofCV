@@ -34,8 +34,8 @@ public class ConfigPolylineSplitMerge extends BaseConfigPolyline {
 	/**
 	 * How many corners past the max it will fit a polygon to. This enables it to recover from mistakes.
 	 * Relative: Maximum number of sides.
- 	 */
-	public ConfigLength extraConsider = ConfigLength.relative(1.0,0);
+	 */
+	public ConfigLength extraConsider = ConfigLength.relative(1.0, 0);
 
 	/**
 	 * Used to adjust the penalty for adding a new corner. Larger numbers will bias it towards shapes with fewer
@@ -44,7 +44,7 @@ public class ConfigPolylineSplitMerge extends BaseConfigPolyline {
 	public double cornerScorePenalty = 0.025;
 
 	/**
-	 *If the error forside is less than this it is considered a perfect fit and the side won't be split. Adjust
+	 * If the error forside is less than this it is considered a perfect fit and the side won't be split. Adjust
 	 * this value to improve the speed. Try setting to zero if corners are precise enough.
 	 */
 	public double thresholdSideSplitScore = 0.2;
@@ -67,7 +67,7 @@ public class ConfigPolylineSplitMerge extends BaseConfigPolyline {
 	 * Maximum allowed error along a single side in Eclidean distance in pixels.
 	 * Relative to number of pixels in contour.
 	 */
-	public ConfigLength maxSideError = ConfigLength.relative(0.05,3);
+	public ConfigLength maxSideError = ConfigLength.relative(0.05, 3);
 
 	/**
 	 * Extra refinement that it does after the initial polyline has been found. Set to a value above zero to use

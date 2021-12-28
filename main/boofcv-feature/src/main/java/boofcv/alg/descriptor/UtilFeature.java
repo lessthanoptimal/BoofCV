@@ -43,14 +43,14 @@ public class UtilFeature {
 	 * why would you be using this function?
 	 */
 	public static <TD extends TupleDesc<TD>>
-	DogArray<TD> createArray( final DescriptorInfo<TD> detDesc , int initialMax ) {
+	DogArray<TD> createArray( final DescriptorInfo<TD> detDesc, int initialMax ) {
 		DogArray<TD> ret = new DogArray<>(detDesc::createDescription);
 		ret.reserve(initialMax);
 		return ret;
 	}
 
 	public static DogArray<TupleDesc_F64> createArrayF64( final int length ) {
-		return new DogArray<>(()->new TupleDesc_F64(length));
+		return new DogArray<>(() -> new TupleDesc_F64(length));
 	}
 
 	/**
@@ -61,12 +61,12 @@ public class UtilFeature {
 	 * @param combined Storage for combined output. If null a new instance will be declared.
 	 * @return Resulting combined.
 	 */
-	public static TupleDesc_F64 combine( List<TupleDesc_F64> inputs , TupleDesc_F64 combined ) {
+	public static TupleDesc_F64 combine( List<TupleDesc_F64> inputs, TupleDesc_F64 combined ) {
 		int N = 0;
 		for (int i = 0; i < inputs.size(); i++) {
 			N += inputs.get(i).size();
 		}
-		if( combined == null ) {
+		if (combined == null) {
 			combined = new TupleDesc_F64(N);
 		} else {
 			if (N != combined.size())
@@ -75,8 +75,8 @@ public class UtilFeature {
 
 		int start = 0;
 		for (int i = 0; i < inputs.size(); i++) {
-			double v[] = inputs.get(i).data;
-			System.arraycopy(v,0,combined.data,start,v.length);
+			double[] v = inputs.get(i).data;
+			System.arraycopy(v, 0, combined.data, start, v.length);
 			start += v.length;
 		}
 
@@ -101,7 +101,7 @@ public class UtilFeature {
 			double v = desc.data[i];
 			norm += v*v;
 		}
-		if( norm == 0 )
+		if (norm == 0)
 			return;
 
 		norm = Math.sqrt(norm);
@@ -127,7 +127,7 @@ public class UtilFeature {
 			double v = desc.data[i];
 			sum += v;
 		}
-		if( sum == 0 )
+		if (sum == 0)
 			return;
 
 		for (int i = 0; i < desc.size(); i++) {
@@ -137,81 +137,81 @@ public class UtilFeature {
 
 	/**
 	 * Adds the feature descriptor and its set to the association algorithm
+	 *
 	 * @param descriptors (Input) Descriptor of each feature
 	 * @param sets (Input) Set each feature belongs in
 	 * @param association (Output) association algorithm which is having its source configured
 	 */
 	public static <TD extends TupleDesc<TD>>
-	void setSource(FastAccess<TD> descriptors , DogArray_I32 sets , AssociateDescriptionArraySets<TD> association )
-	{
-		assert(descriptors.size==sets.size);
+	void setSource( FastAccess<TD> descriptors, DogArray_I32 sets, AssociateDescriptionArraySets<TD> association ) {
+		assert (descriptors.size == sets.size);
 
 		association.clearSource();
 		final int N = descriptors.size;
 		for (int i = 0; i < N; i++) {
-			association.addSource(descriptors.data[i],sets.data[i]);
+			association.addSource(descriptors.data[i], sets.data[i]);
 		}
 	}
 
 	/**
 	 * Adds the feature descriptor and its set to the association algorithm
+	 *
 	 * @param descriptors (Input) Descriptor of each feature
 	 * @param sets (Input) Set each feature belongs in
 	 * @param association (Output) association algorithm which is having its destination configured
 	 */
 	public static <TD extends TupleDesc<TD>>
-	void setDestination(FastAccess<TD> descriptors , DogArray_I32 sets , AssociateDescriptionArraySets<TD> association )
-	{
-		assert(descriptors.size==sets.size);
+	void setDestination( FastAccess<TD> descriptors, DogArray_I32 sets, AssociateDescriptionArraySets<TD> association ) {
+		assert (descriptors.size == sets.size);
 
 		association.clearDestination();
 		final int N = descriptors.size;
 		for (int i = 0; i < N; i++) {
-			association.addDestination(descriptors.data[i],sets.data[i]);
+			association.addDestination(descriptors.data[i], sets.data[i]);
 		}
 	}
 
 	/**
 	 * Adds the feature descriptor and its set to the association algorithm
+	 *
 	 * @param descriptors (Input) Descriptor of each feature
 	 * @param sets (Input) Set each feature belongs in
 	 * @param locs (Input) Pixel coordinate that each feature was found at
 	 * @param association (Output) association algorithm which is having its source configured
 	 */
 	public static <TD extends TupleDesc<TD>>
-	void setSource(FastAccess<TD> descriptors , DogArray_I32 sets , FastAccess<Point2D_F64> locs,
-				   AssociateDescriptionSets2D<TD> association )
-	{
-		assert(descriptors.size==sets.size);
-		assert(descriptors.size==locs.size);
+	void setSource( FastAccess<TD> descriptors, DogArray_I32 sets, FastAccess<Point2D_F64> locs,
+					AssociateDescriptionSets2D<TD> association ) {
+		assert (descriptors.size == sets.size);
+		assert (descriptors.size == locs.size);
 
 		association.clearSource();
 		final int N = descriptors.size;
 		for (int i = 0; i < N; i++) {
 			Point2D_F64 l = locs.data[i];
-			association.addSource(descriptors.data[i],l.x,l.y,sets.data[i]);
+			association.addSource(descriptors.data[i], l.x, l.y, sets.data[i]);
 		}
 	}
 
 	/**
 	 * Adds the feature descriptor and its set to the association algorithm
+	 *
 	 * @param descriptors (Input) Descriptor of each feature
 	 * @param sets (Input) Set each feature belongs in
 	 * @param locs (Input) Pixel coordinate that each feature was found at
 	 * @param association (Output) association algorithm which is having its destination configured
 	 */
 	public static <TD extends TupleDesc<TD>>
-	void setDestination(FastAccess<TD> descriptors , DogArray_I32 sets , FastAccess<Point2D_F64> locs,
-						AssociateDescriptionSets2D<TD> association )
-	{
-		assert(descriptors.size==sets.size);
-		assert(descriptors.size==locs.size);
+	void setDestination( FastAccess<TD> descriptors, DogArray_I32 sets, FastAccess<Point2D_F64> locs,
+						 AssociateDescriptionSets2D<TD> association ) {
+		assert (descriptors.size == sets.size);
+		assert (descriptors.size == locs.size);
 
 		association.clearDestination();
 		final int N = descriptors.size;
 		for (int i = 0; i < N; i++) {
 			Point2D_F64 l = locs.data[i];
-			association.addDestination(descriptors.data[i],l.x,l.y,sets.data[i]);
+			association.addDestination(descriptors.data[i], l.x, l.y, sets.data[i]);
 		}
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,13 +35,12 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class DescribeImageDenseSift<T extends ImageGray<T>, D extends ImageGray<D>>
-		implements DescribeImageDense<T,TupleDesc_F64>
-{
+		implements DescribeImageDense<T, TupleDesc_F64> {
 	// dense SIFT implementation
 	DescribeDenseSiftAlg<D> alg;
 
 	// computes the image gradient
-	ImageGradient<T,D> gradient;
+	ImageGradient<T, D> gradient;
 
 	// type of input image
 	ImageType<T> inputType;
@@ -55,37 +54,36 @@ public class DescribeImageDenseSift<T extends ImageGray<T>, D extends ImageGray<
 	D derivY;
 
 	/**
-	 *
 	 * @param alg Reference to the algorithm that is wrapped
 	 * @param periodX How often the image is samples in pixels. X-axis
 	 * @param periodY How often the image is samples in pixels. Y-axis
 	 * @param inputType Type of input image
 	 */
-	public DescribeImageDenseSift(DescribeDenseSiftAlg<D> alg,
-								  double periodX , double periodY ,
-								  Class<T> inputType ) {
+	public DescribeImageDenseSift( DescribeDenseSiftAlg<D> alg,
+								   double periodX, double periodY,
+								   Class<T> inputType ) {
 		this.alg = alg;
 		this.periodX = periodX;
 		this.periodY = periodY;
 		this.inputType = ImageType.single(inputType);
 
 		Class<D> gradientType = alg.getDerivType();
-		gradient = FactoryDerivative.three(inputType,gradientType);
+		gradient = FactoryDerivative.three(inputType, gradientType);
 
-		derivX = GeneralizedImageOps.createSingleBand(gradientType,1,1);
-		derivY = GeneralizedImageOps.createSingleBand(gradientType,1,1);
+		derivX = GeneralizedImageOps.createSingleBand(gradientType, 1, 1);
+		derivY = GeneralizedImageOps.createSingleBand(gradientType, 1, 1);
 	}
 
 	@Override
-	public void process(T input) {
+	public void process( T input ) {
 		alg.setPeriodColumns(periodX);
 		alg.setPeriodRows(periodY);
 
-		derivX.reshape(input.width,input.height);
-		derivY.reshape(input.width,input.height);
-		gradient.process(input,derivX,derivY);
+		derivX.reshape(input.width, input.height);
+		derivY.reshape(input.width, input.height);
+		gradient.process(input, derivX, derivY);
 
-		alg.setImageGradient(derivX,derivY);
+		alg.setImageGradient(derivX, derivY);
 		alg.process();
 	}
 

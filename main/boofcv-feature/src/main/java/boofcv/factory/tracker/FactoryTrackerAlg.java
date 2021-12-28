@@ -60,8 +60,8 @@ public class FactoryTrackerAlg {
 		if (derivType == null)
 			derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
-		InterpolateRectangle<I> interpInput = FactoryInterpolation.<I>bilinearRectangle(imageType);
-		InterpolateRectangle<D> interpDeriv = FactoryInterpolation.<D>bilinearRectangle(derivType);
+		InterpolateRectangle<I> interpInput = FactoryInterpolation.bilinearRectangle(imageType);
+		InterpolateRectangle<D> interpDeriv = FactoryInterpolation.bilinearRectangle(derivType);
 
 		return new KltTracker<>(interpInput, interpDeriv, config);
 	}

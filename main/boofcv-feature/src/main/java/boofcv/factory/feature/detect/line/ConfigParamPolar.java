@@ -35,7 +35,7 @@ public class ConfigParamPolar implements Configuration {
 	 */
 	public int numBinsAngle = 180;
 
-	public ConfigParamPolar(double resolutionRange, int numBinsAngle) {
+	public ConfigParamPolar( double resolutionRange, int numBinsAngle ) {
 		this.resolutionRange = resolutionRange;
 		this.numBinsAngle = numBinsAngle;
 	}

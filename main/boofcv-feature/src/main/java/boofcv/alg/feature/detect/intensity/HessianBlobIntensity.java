@@ -46,7 +46,7 @@ public class HessianBlobIntensity {
 	/**
 	 * Different types of Hessian blob detectors
 	 */
-	public static enum Type {
+	public enum Type {
 		/**
 		 * Compute the determinant. Maximum are features.
 		 */

@@ -61,8 +61,8 @@ public interface NonMaxSuppression {
 	 * the recommended procedure since it will force an exception to be thrown if a mistake was made.
 	 *
 	 * @param intensity (Input) Feature intensity image. Not modified.
-	 * @param candidateMin  (Input) (Optional) List of candidate local minimum features. Can be null if not used.
-	 * @param candidateMax  (Input) (Optional) List of candidate local maximum features  Can be null if not used.
+	 * @param candidateMin (Input) (Optional) List of candidate local minimum features. Can be null if not used.
+	 * @param candidateMax (Input) (Optional) List of candidate local maximum features  Can be null if not used.
 	 * @param foundMin (Output) Storage for found minimums. Can be null if not used.
 	 * @param foundMax (Output) Storage for found maximums. Can be null if not used.
 	 */
@@ -96,14 +96,14 @@ public interface NonMaxSuppression {
 	 *
 	 * @param threshold The new selection threshold.
 	 */
-	void setThresholdMinimum(float threshold);
+	void setThresholdMinimum( float threshold );
 
 	/**
 	 * Change the feature selection threshold for finding local maximums.
 	 *
 	 * @param threshold The new selection threshold.
 	 */
-	void setThresholdMaximum(float threshold);
+	void setThresholdMaximum( float threshold );
 
 	/**
 	 * Defines the region inside the image in which a pixel can be an extreme.
@@ -111,7 +111,7 @@ public interface NonMaxSuppression {
 	 *
 	 * @param border Border size in pixels.
 	 */
-	void setIgnoreBorder(int border);
+	void setIgnoreBorder( int border );
 
 	/**
 	 * Returns the size of the image border.
@@ -125,7 +125,7 @@ public interface NonMaxSuppression {
 	 *
 	 * @param radius Radius in pixels
 	 */
-	public void setSearchRadius(int radius);
+	void setSearchRadius( int radius );
 
 	/**
 	 * Describes how large the region is that is being searched. The radius is the number of
@@ -133,16 +133,15 @@ public interface NonMaxSuppression {
 	 *
 	 * @return Search radius
 	 */
-	public int getSearchRadius();
+	int getSearchRadius();
 
 	/**
 	 * True if it can detect local maximums.
 	 */
-	public boolean canDetectMaximums();
+	boolean canDetectMaximums();
 
 	/**
 	 * True if it can detect local minimums.
 	 */
-	public boolean canDetectMinimums();
-
+	boolean canDetectMinimums();
 }

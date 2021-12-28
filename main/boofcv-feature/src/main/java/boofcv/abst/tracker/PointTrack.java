@@ -34,7 +34,7 @@ public class PointTrack {
 	/** Location of the track in the image */
 	public final Point2D_F64 pixel = new Point2D_F64();
 
-	/**  The type of feature it belongs to */
+	/** The type of feature it belongs to */
 	public int detectorSetId;
 
 	/** Unique ID associated with this feature */

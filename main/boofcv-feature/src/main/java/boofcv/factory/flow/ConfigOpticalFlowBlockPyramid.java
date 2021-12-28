@@ -39,7 +39,7 @@ public class ConfigOpticalFlowBlockPyramid implements Configuration {
 	/** Difference in scale between layers in the pyramid. A value of 1 means a single layer. */
 	public double pyramidScale = 0.75;
 
-	/** The maximum number of layers in the pyramid  */
+	/** The maximum number of layers in the pyramid */
 	public int maxPyramidLayers = 20;
 
 	public ConfigOpticalFlowBlockPyramid() {}

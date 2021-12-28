@@ -37,8 +37,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public interface DescribeImageDense<T extends ImageBase<T>, TD extends TupleDesc<TD>>
-	extends DescriptorInfo<TD>
-{
+		extends DescriptorInfo<TD> {
 	/**
 	 * Processes the image and computes the dense image features.
 	 *

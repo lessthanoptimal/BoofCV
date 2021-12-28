@@ -117,10 +117,8 @@ public class ConnectLinesGrid {
 		Iterator<LineSegment2D_F32> iter = lines.iterator();
 		while (iter.hasNext()) {
 			LineSegment2D_F32 l = iter.next();
-			boolean connected = false;
+			boolean connected = connectTry(l, x + 1, y);
 
-			if (connectTry(l, x + 1, y))
-				connected = true;
 			if (!connected && connectTry(l, x + 1, y + 1))
 				connected = true;
 			if (!connected && connectTry(l, x, y + 1))

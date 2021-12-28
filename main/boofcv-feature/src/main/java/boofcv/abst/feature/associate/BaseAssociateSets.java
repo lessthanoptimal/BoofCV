@@ -34,7 +34,6 @@ public abstract class BaseAssociateSets<Desc> implements Associate<Desc> {
 
 	Associate<Desc> _associator;
 
-
 	// Stores sorted descriptors by sets
 	protected final DogArray<SetStruct> sets;
 

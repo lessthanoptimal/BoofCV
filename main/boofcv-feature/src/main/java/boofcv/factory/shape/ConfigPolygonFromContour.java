@@ -68,7 +68,7 @@ public class ConfigPolygonFromContour implements Configuration {
 	 * Specifies the minimum allowed contour length. Relative lengths will be relative with to the image's
 	 * width and height.
 	 */
-	public ConfigLength minimumContour = ConfigLength.relative(0.05,4);
+	public ConfigLength minimumContour = ConfigLength.relative(0.05, 4);
 
 	/**
 	 * Will the found polygons be in clockwise order?
@@ -78,19 +78,19 @@ public class ConfigPolygonFromContour implements Configuration {
 	/**
 	 * Specifies the number of sides in the polygon and uses default settings for everything else
 	 */
-	public ConfigPolygonFromContour(int minimumSides, int maximumSides) {
+	public ConfigPolygonFromContour( int minimumSides, int maximumSides ) {
 		contourToPoly.minimumSides = minimumSides;
 		contourToPoly.maximumSides = maximumSides;
 	}
 
-	public ConfigPolygonFromContour(boolean clockwise, int minimumSides, int maximumSides) {
+	public ConfigPolygonFromContour( boolean clockwise, int minimumSides, int maximumSides ) {
 		contourToPoly.minimumSides = minimumSides;
 		contourToPoly.maximumSides = maximumSides;
 
 		this.clockwise = clockwise;
 	}
 
-	public ConfigPolygonFromContour(){}
+	public ConfigPolygonFromContour() {}
 
 	public ConfigPolygonFromContour setTo( ConfigPolygonFromContour src ) {
 		this.canTouchBorder = src.canTouchBorder;

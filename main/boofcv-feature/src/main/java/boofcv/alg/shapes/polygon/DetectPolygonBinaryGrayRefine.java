@@ -49,15 +49,15 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 	AdjustPolygonForThresholdBias adjustForBias;
 
 	// Refines the edges using the contour alone
-	private @Nullable RefinePolygonToContour refineContour;
+	private final @Nullable RefinePolygonToContour refineContour;
 
 	// Refines the edges using the gray scale image
-	private @Nullable RefinePolygonToGray<T> refineGray;
+	private final @Nullable RefinePolygonToGray<T> refineGray;
 
 	// Used to remove false positives
-	private EdgeIntensityPolygon<T> edgeIntensity;
+	private final EdgeIntensityPolygon<T> edgeIntensity;
 
-	private Polygon2D_F64 work = new Polygon2D_F64();
+	private final Polygon2D_F64 work = new Polygon2D_F64();
 
 	// useful for customization
 	AdjustBeforeRefineEdge functionAdjust;

@@ -39,7 +39,7 @@ public class AssociateNearestNeighbor_MT<D>
 	// Nearest Neighbor algorithm and storage for the results
 	private final List<Helper> available = new ArrayList<>();
 
-	private Class<D> descType;
+	private final Class<D> descType;
 
 	public AssociateNearestNeighbor_MT( NearestNeighbor<D> alg, Class<D> descType ) {
 		super(alg);
@@ -49,7 +49,7 @@ public class AssociateNearestNeighbor_MT<D>
 	@Override
 	public void setSource( FastAccess<D> listSrc ) {
 		this.sizeSrc = listSrc.size;
-		alg.setPoints((List)listSrc.toList(), true);
+		alg.setPoints(listSrc.toList(), true);
 	}
 
 	@Override
@@ -154,8 +154,8 @@ public class AssociateNearestNeighbor_MT<D>
 	private class Helper {
 		NearestNeighbor.Search<D> search;
 		DogArray<AssociatedIndex> matches = new DogArray<>(10, AssociatedIndex::new);
-		private NnData<D> result = new NnData<>();
-		private DogArray<NnData<D>> result2 = new DogArray(NnData::new);
+		private final NnData<D> result = new NnData<>();
+		private final DogArray<NnData<D>> result2 = new DogArray(NnData::new);
 
 		Helper() {
 			search = alg.createSearch();

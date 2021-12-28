@@ -71,11 +71,7 @@ public class NewSplitMerge_to_PointsToPolyline implements PointsToPolyline {
 
 		vertexes.setTo(best.splits);
 
-		if (refine != null && !refine.fit(input, vertexes)) {
-			return false;
-		}
-
-		return true;
+		return refine == null || refine.fit(input, vertexes);
 	}
 
 	@Override

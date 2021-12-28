@@ -91,7 +91,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 	// selects point features
 	private GeneralFeatureDetector<I, D> detector;
 	// list of corners which should be ignored by the corner detector
-	private QueueCorner excludeList = new QueueCorner(10);
+	private final QueueCorner excludeList = new QueueCorner(10);
 
 	// number of features tracked so far
 	private long totalFeatures = 0;
@@ -412,7 +412,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 		if (active.remove((PyramidKltFeature)track.getDescription())) {
 			// only recycle the description if it is in the active list. This avoids the problem of adding the
 			// same description multiple times
-			unused.add((PyramidKltFeature)track.getDescription());
+			unused.add(track.getDescription());
 			return true;
 		}
 		return false;

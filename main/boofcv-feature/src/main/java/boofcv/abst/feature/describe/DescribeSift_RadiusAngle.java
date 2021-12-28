@@ -36,8 +36,7 @@ import boofcv.struct.image.ImageType;
  * @author Peter Abeles
  */
 public class DescribeSift_RadiusAngle<T extends ImageGray<T>>
-	implements DescribePointRadiusAngle<T,TupleDesc_F64>
-{
+		implements DescribePointRadiusAngle<T, TupleDesc_F64> {
 	// expected type of input image. All image types are converted to floats since that's what
 	// the scale-space requires
 	ImageType<T> imageType;
@@ -51,7 +50,7 @@ public class DescribeSift_RadiusAngle<T extends ImageGray<T>>
 	DescribePointSift<GrayF32> describe;
 
 	// used as temporary storage for the input image if it needs to be converted
-	GrayF32 imageFloat = new GrayF32(1,1);
+	GrayF32 imageFloat = new GrayF32(1, 1);
 
 	public DescribeSift_RadiusAngle( SiftScaleSpace scaleSpace,
 									 DescribePointSift<GrayF32> describe,
@@ -64,13 +63,13 @@ public class DescribeSift_RadiusAngle<T extends ImageGray<T>>
 	}
 
 	@Override
-	public void setImage(T image) {
+	public void setImage( T image ) {
 		GrayF32 input;
-		if( image instanceof GrayF32) {
+		if (image instanceof GrayF32) {
 			input = (GrayF32)image;
 		} else {
-			imageFloat.reshape(image.width,image.height);
-			GConvertImage.convert(image,imageFloat);
+			imageFloat.reshape(image.width, image.height);
+			GConvertImage.convert(image, imageFloat);
 			input = imageFloat;
 		}
 
@@ -79,18 +78,18 @@ public class DescribeSift_RadiusAngle<T extends ImageGray<T>>
 	}
 
 	@Override
-	public boolean process(double x, double y, double orientation, double radius, TupleDesc_F64 description) {
+	public boolean process( double x, double y, double orientation, double radius, TupleDesc_F64 description ) {
 
 		// get the blur sigma for the radius
-		double sigma = radius / BoofDefaults.SIFT_SCALE_TO_RADIUS;
+		double sigma = radius/BoofDefaults.SIFT_SCALE_TO_RADIUS;
 
 		// find the image which the blur factor closest to this sigma
 		UnrollSiftScaleSpaceGradient.ImageScale image = gradient.lookup(sigma);
 
 		// compute the descriptor
-		describe.setImageGradient(image.derivX,image.derivY);
-		describe.process(x/image.imageToInput,y/image.imageToInput,sigma/image.imageToInput,
-				orientation,description);
+		describe.setImageGradient(image.derivX, image.derivY);
+		describe.process(x/image.imageToInput, y/image.imageToInput, sigma/image.imageToInput,
+				orientation, description);
 
 		return true;
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,22 +28,21 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public class HornSchunck_to_DenseOpticalFlow<T extends ImageBase<T>,D extends ImageBase<D>>
-	implements DenseOpticalFlow<T>
-{
-	HornSchunck<T,D> hornSchunck;
+public class HornSchunck_to_DenseOpticalFlow<T extends ImageBase<T>, D extends ImageBase<D>>
+		implements DenseOpticalFlow<T> {
+	HornSchunck<T, D> hornSchunck;
 
 	ImageType<T> imageType;
 
-	public HornSchunck_to_DenseOpticalFlow( HornSchunck<T,D> hornSchunck,
+	public HornSchunck_to_DenseOpticalFlow( HornSchunck<T, D> hornSchunck,
 											ImageType<T> imageType ) {
 		this.hornSchunck = hornSchunck;
 		this.imageType = imageType;
 	}
 
 	@Override
-	public void process(T source, T destination, ImageFlow flow) {
-		hornSchunck.process(source,destination, flow);
+	public void process( T source, T destination, ImageFlow flow ) {
+		hornSchunck.process(source, destination, flow);
 	}
 
 	@Override

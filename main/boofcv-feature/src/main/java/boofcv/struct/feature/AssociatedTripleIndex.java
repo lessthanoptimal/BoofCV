@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,13 +29,13 @@ import lombok.Setter;
 public class AssociatedTripleIndex {
 
 	/** Index of feature in each view */
-	public @Getter @Setter int a,b,c;
+	public @Getter @Setter int a, b, c;
 
-	public AssociatedTripleIndex(AssociatedTripleIndex original ) {
+	public AssociatedTripleIndex( AssociatedTripleIndex original ) {
 		setTo(original);
 	}
 
-	public AssociatedTripleIndex(int a , int b , int c ) {
+	public AssociatedTripleIndex( int a, int b, int c ) {
 		this.a = a;
 		this.b = b;
 		this.c = c;
@@ -43,7 +43,7 @@ public class AssociatedTripleIndex {
 
 	public AssociatedTripleIndex() {}
 
-	public void setTo( int a , int b , int c ) {
+	public void setTo( int a, int b, int c ) {
 		this.a = a;
 		this.b = b;
 		this.c = c;

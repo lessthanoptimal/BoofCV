@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,6 @@ import boofcv.struct.image.ImageGray;
 
 import java.util.List;
 
-
 /**
  * Interest point detector for {@link boofcv.struct.gss.GaussianScaleSpace Scale Space} images.
  *
@@ -37,12 +36,12 @@ public interface InterestPointScaleSpace<T extends ImageGray<T>, D extends Image
 	 *
 	 * @param ss Scale space of an image
 	 */
-	public void detect( GaussianScaleSpace<T,D> ss );
+	void detect( GaussianScaleSpace<T, D> ss );
 
 	/**
 	 * Returns all the found interest points
 	 *
 	 * @return List of found interest points.
 	 */
-	public List<ScalePoint> getInterestPoints();
+	List<ScalePoint> getInterestPoints();
 }

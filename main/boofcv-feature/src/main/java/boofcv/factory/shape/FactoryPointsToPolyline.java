@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,9 +33,9 @@ public class FactoryPointsToPolyline {
 	 * Generic function for create polyline algorithms based on configuration type
 	 */
 	public static PointsToPolyline create( BaseConfigPolyline config ) {
-		if( config instanceof ConfigSplitMergeLineFit ) {
+		if (config instanceof ConfigSplitMergeLineFit) {
 			return splitMerge((ConfigSplitMergeLineFit)config);
-		} else if( config instanceof ConfigPolylineSplitMerge ) {
+		} else if (config instanceof ConfigPolylineSplitMerge) {
 			return splitMerge((ConfigPolylineSplitMerge)config);
 		} else {
 			throw new RuntimeException("Unknown");
@@ -45,21 +45,20 @@ public class FactoryPointsToPolyline {
 	/**
 	 * Use a split-merge strategy to fit the contour
 	 *
-	 * @see SplitMergeLineFit
-	 *
 	 * @param config Configuration. null if use default
 	 * @return {@link SplitMergeLineRefine_to_PointsToPolyline}
+	 * @see SplitMergeLineFit
 	 */
 	@Deprecated
-	public static PointsToPolyline splitMerge(@Nullable ConfigSplitMergeLineFit config ) {
-		if( config == null )
+	public static PointsToPolyline splitMerge( @Nullable ConfigSplitMergeLineFit config ) {
+		if (config == null)
 			config = new ConfigSplitMergeLineFit();
 		config.checkValidity();
 		return new SplitMergeLineRefine_to_PointsToPolyline(config);
 	}
 
-	public static PointsToPolyline splitMerge(@Nullable ConfigPolylineSplitMerge config ) {
-		if( config == null )
+	public static PointsToPolyline splitMerge( @Nullable ConfigPolylineSplitMerge config ) {
+		if (config == null)
 			config = new ConfigPolylineSplitMerge();
 		config.checkValidity();
 		return new NewSplitMerge_to_PointsToPolyline(config);

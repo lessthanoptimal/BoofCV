@@ -32,7 +32,7 @@ import boofcv.struct.image.ImageType;
  * @author Peter Abeles
  */
 // TODO Rename to DetectorInterestPoint? or DetectorPointSO
-public interface InterestPointDetector< T extends ImageBase> extends FoundPointSO, FeatureSets {
+public interface InterestPointDetector<T extends ImageBase> extends FoundPointSO, FeatureSets {
 
 	/**
 	 * Detects interest points inside the provided image.

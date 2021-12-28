@@ -68,7 +68,8 @@ public class FactoryDetectPoint {
 		config.general.detectMinimums = false;
 		switch (config.type) {
 			case FAST, LAPLACIAN -> config.general.detectMinimums = true;
-			default -> {}
+			default -> {
+			}
 		}
 
 		return switch (config.type) {

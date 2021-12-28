@@ -30,14 +30,23 @@ import georegression.struct.point.Point2D_F64;
 public abstract class InterestPointDetectorAbstract<T extends ImageBase<T>> implements InterestPointDetector<T> {
 	// @formatter:on
 	@Override public void detect( T input ) {}
+
 	@Override public int getNumberOfSets() {return 1;}
+
 	@Override public int getSet( int index ) {return 0;}
+
 	@Override public boolean hasScale() {return false;}
+
 	@Override public boolean hasOrientation() {return false;}
+
 	@Override public int getNumberOfFeatures() {return 0;}
+
 	@Override public Point2D_F64 getLocation( int featureIndex ) {throw new RuntimeException("implement");}
+
 	@Override public double getRadius( int featureIndex ) {return 0;}
+
 	@Override public double getOrientation( int featureIndex ) {return 0;}
+
 	@Override public ImageType<T> getInputType() {throw new RuntimeException("implement");}
 	// @formatter:off
 }

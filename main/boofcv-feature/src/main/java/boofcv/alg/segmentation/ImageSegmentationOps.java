@@ -60,7 +60,7 @@ public class ImageSegmentationOps {
 	 * @param totalRegions Total number of regions
 	 * @param counts Storage for pixel counts
 	 */
-	public static void countRegionPixels( GrayS32 labeled, int totalRegions, int counts[] ) {
+	public static void countRegionPixels( GrayS32 labeled, int totalRegions, int[] counts ) {
 
 		Arrays.fill(counts, 0, totalRegions, 0);
 

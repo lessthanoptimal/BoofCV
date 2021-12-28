@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,28 +30,27 @@ import boofcv.struct.image.ImageType;
  * @author Peter Abeles
  */
 public class HornSchunckPyramid_to_DenseOpticalFlow<T extends ImageGray<T>>
-	implements DenseOpticalFlow<T>
-{
+		implements DenseOpticalFlow<T> {
 	HornSchunckPyramid<T> hornSchunck;
 	Class<T> imageType;
 
-	public HornSchunckPyramid_to_DenseOpticalFlow(HornSchunckPyramid<T> hornSchunck, Class<T> imageType ) {
+	public HornSchunckPyramid_to_DenseOpticalFlow( HornSchunckPyramid<T> hornSchunck, Class<T> imageType ) {
 		this.hornSchunck = hornSchunck;
 		this.imageType = imageType;
 	}
 
 	@Override
-	public void process(T source, T destination, ImageFlow flow) {
+	public void process( T source, T destination, ImageFlow flow ) {
 
-		hornSchunck.process(source,destination);
+		hornSchunck.process(source, destination);
 
 		GrayF32 flowX = hornSchunck.getFlowX();
 		GrayF32 flowY = hornSchunck.getFlowY();
 
 		int index = 0;
-		for( int y = 0; y < flow.height; y++){
-			for( int x = 0; x < flow.width; x++, index++ ){
-				ImageFlow.D d = flow.unsafe_get(x,y);
+		for (int y = 0; y < flow.height; y++) {
+			for (int x = 0; x < flow.width; x++, index++) {
+				ImageFlow.D d = flow.unsafe_get(x, y);
 				d.x = flowX.data[index];
 				d.y = flowY.data[index];
 			}

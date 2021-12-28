@@ -67,12 +67,12 @@ public class ConfigHoughGradient implements Configuration {
 	public ConfigHoughGradient() {
 	}
 
-	public ConfigHoughGradient(int maxLines) {
+	public ConfigHoughGradient( int maxLines ) {
 		this.maxLines = maxLines;
 	}
 
-	public ConfigHoughGradient(int localMaxRadius, int minCounts, int minDistanceFromOrigin,
-							   float thresholdEdge, int maxLines) {
+	public ConfigHoughGradient( int localMaxRadius, int minCounts, int minDistanceFromOrigin,
+								float thresholdEdge, int maxLines ) {
 		this.localMaxRadius = localMaxRadius;
 		this.minCounts = minCounts;
 		this.minDistanceFromOrigin = minDistanceFromOrigin;

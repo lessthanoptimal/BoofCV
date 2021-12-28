@@ -43,22 +43,22 @@ public class ConfigHarrisCorner implements Configuration {
 	 */
 	public double kappa = 0.04;
 
-	public ConfigHarrisCorner(){}
+	public ConfigHarrisCorner() {}
 
-	public ConfigHarrisCorner(boolean weighted, int radius, double kappa) {
+	public ConfigHarrisCorner( boolean weighted, int radius, double kappa ) {
 		this.weighted = weighted;
 		this.radius = radius;
 		this.kappa = kappa;
 	}
 
-	public ConfigHarrisCorner(boolean weighted, int radius) {
+	public ConfigHarrisCorner( boolean weighted, int radius ) {
 		this.weighted = weighted;
 		this.radius = radius;
 	}
 
 	@Override
 	public void checkValidity() {
-		if( radius <= 0 )
+		if (radius <= 0)
 			throw new IllegalArgumentException("Radius must be greater than zero");
 	}
 

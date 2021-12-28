@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,6 @@ package boofcv.alg.feature.detect.intensity.impl;
 
 import boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity;
 
-
 /**
  * <p>
  * Implementation of {@link boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity}.
@@ -28,14 +27,13 @@ import boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity;
  *
  * @author Peter Abeles
  */
-public class ShiTomasiCorner_F32 implements ImplSsdCornerBase.CornerIntensity_F32, ShiTomasiCornerIntensity
-{
+public class ShiTomasiCorner_F32 implements ImplSsdCornerBase.CornerIntensity_F32, ShiTomasiCornerIntensity {
 	@Override
 	public float compute( float totalXX, float totalXY, float totalYY ) {
 		// compute the smallest eigenvalue
-		float left = (totalXX + totalYY) * 0.5f;
-		float b = (totalXX - totalYY) * 0.5f;
-		float right = (float)Math.sqrt(b * b + totalXY * totalXY);
+		float left = (totalXX + totalYY)*0.5f;
+		float b = (totalXX - totalYY)*0.5f;
+		float right = (float)Math.sqrt(b*b + totalXY*totalXY);
 
 		// the smallest eigenvalue will be minus the right side
 		return left - right;

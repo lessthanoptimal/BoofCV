@@ -53,14 +53,18 @@ public class FactorySegmentationAlg {
 	ComputeRegionMeanColor<T> regionMeanColor( ImageType<T> imageType ) {
 		if (imageType.getFamily() == ImageType.Family.GRAY) {
 			switch (imageType.getDataType()) {
-				case U8: return (ComputeRegionMeanColor)new ComputeRegionMeanColor.U8();
-				case F32: return (ComputeRegionMeanColor)new ComputeRegionMeanColor.F32();
+				case U8:
+					return (ComputeRegionMeanColor)new ComputeRegionMeanColor.U8();
+				case F32:
+					return (ComputeRegionMeanColor)new ComputeRegionMeanColor.F32();
 			}
 		} else if (imageType.getFamily() == ImageType.Family.PLANAR) {
 			int N = imageType.getNumBands();
 			switch (imageType.getDataType()) {
-				case U8: return (ComputeRegionMeanColor)new ComputeRegionMeanColor.PL_U8(N);
-				case F32: return (ComputeRegionMeanColor)new ComputeRegionMeanColor.PL_F32(N);
+				case U8:
+					return (ComputeRegionMeanColor)new ComputeRegionMeanColor.PL_U8(N);
+				case F32:
+					return (ComputeRegionMeanColor)new ComputeRegionMeanColor.PL_F32(N);
 			}
 		}
 
@@ -113,25 +117,33 @@ public class FactorySegmentationAlg {
 		if (imageType.getFamily() == ImageType.Family.GRAY) {
 			if (rule == ConnectRule.FOUR) {
 				switch (imageType.getDataType()) {
-					case U8: return (FhEdgeWeights)new FhEdgeWeights4_U8();
-					case F32: return (FhEdgeWeights)new FhEdgeWeights4_F32();
+					case U8:
+						return (FhEdgeWeights)new FhEdgeWeights4_U8();
+					case F32:
+						return (FhEdgeWeights)new FhEdgeWeights4_F32();
 				}
 			} else if (rule == ConnectRule.EIGHT) {
 				switch (imageType.getDataType()) {
-					case U8: return (FhEdgeWeights)new FhEdgeWeights8_U8();
-					case F32: return (FhEdgeWeights)new FhEdgeWeights8_F32();
+					case U8:
+						return (FhEdgeWeights)new FhEdgeWeights8_U8();
+					case F32:
+						return (FhEdgeWeights)new FhEdgeWeights8_F32();
 				}
 			}
 		} else if (imageType.getFamily() == ImageType.Family.PLANAR) {
 			if (rule == ConnectRule.FOUR) {
 				switch (imageType.getDataType()) {
-					case U8: return (FhEdgeWeights)new FhEdgeWeights4_PLU8();
-					case F32: return (FhEdgeWeights)new FhEdgeWeights4_PLF32();
+					case U8:
+						return (FhEdgeWeights)new FhEdgeWeights4_PLU8();
+					case F32:
+						return (FhEdgeWeights)new FhEdgeWeights4_PLF32();
 				}
 			} else if (rule == ConnectRule.EIGHT) {
 				switch (imageType.getDataType()) {
-					case U8: return (FhEdgeWeights)new FhEdgeWeights8_PLU8();
-					case F32: return (FhEdgeWeights)new FhEdgeWeights8_PLF32();
+					case U8:
+						return (FhEdgeWeights)new FhEdgeWeights8_PLU8();
+					case F32:
+						return (FhEdgeWeights)new FhEdgeWeights8_PLF32();
 				}
 			}
 		}
@@ -164,17 +176,21 @@ public class FactorySegmentationAlg {
 
 		if (imageType.getFamily() == ImageType.Family.GRAY) {
 			switch (imageType.getDataType()) {
-				case U8: return (SegmentSlic)new SegmentSlic_U8(config.numberOfRegions,
+				case U8:
+					return (SegmentSlic)new SegmentSlic_U8(config.numberOfRegions,
 							config.spacialWeight, config.totalIterations, config.connectRule);
-				case F32: return (SegmentSlic)new SegmentSlic_F32(config.numberOfRegions,
+				case F32:
+					return (SegmentSlic)new SegmentSlic_F32(config.numberOfRegions,
 							config.spacialWeight, config.totalIterations, config.connectRule);
 			}
 		} else if (imageType.getFamily() == ImageType.Family.PLANAR) {
 			int N = imageType.getNumBands();
 			switch (imageType.getDataType()) {
-				case U8: return (SegmentSlic)new SegmentSlic_PlU8(config.numberOfRegions,
+				case U8:
+					return (SegmentSlic)new SegmentSlic_PlU8(config.numberOfRegions,
 							config.spacialWeight, config.totalIterations, config.connectRule, N);
-				case F32: return (SegmentSlic)new SegmentSlic_PlF32(config.numberOfRegions,
+				case F32:
+					return (SegmentSlic)new SegmentSlic_PlF32(config.numberOfRegions,
 							config.spacialWeight, config.totalIterations, config.connectRule, N);
 			}
 		}

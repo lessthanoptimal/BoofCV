@@ -203,9 +203,9 @@ public class FactoryAssociation {
 	}
 
 	public static <TD extends TupleDesc<TD>> KdTreeDistance<TD> kdtreeDistance( int dof, Class<TD> type ) {
-		if (type==TupleDesc_F64.class) {
+		if (type == TupleDesc_F64.class) {
 			return (KdTreeDistance)new KdTreeTuple_F64(dof);
-		} else if (type==TupleDesc_F32.class) {
+		} else if (type == TupleDesc_F32.class) {
 			return (KdTreeDistance)new KdTreeTuple_F32(dof);
 		} else {
 			throw new IllegalArgumentException("Type isn't known yet");
