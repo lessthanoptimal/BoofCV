@@ -31,6 +31,7 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.geometry.UtilPoint2D_I32;
 import georegression.struct.point.Point2D_I32;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -40,6 +41,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Displays an image and lets the user click on it to show the closest HOG descriptor
@@ -47,6 +49,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class VisualizeHogDescriptorApp<T extends ImageBase<T>> extends DemonstrationBase {
 	ControlHogDescriptorPanel controlPanel = new ControlHogDescriptorPanel(this);
 	VisualizePanel imagePanel = new VisualizePanel();
@@ -58,10 +61,10 @@ public class VisualizeHogDescriptorApp<T extends ImageBase<T>> extends Demonstra
 	Color[] colors;
 	float[] cos, sin;
 
-	Point2D_I32 selectedPixel;
+	@Nullable Point2D_I32 selectedPixel;
 	int selectedIndex;
-	TupleDesc_F64 targetDesc;
-	Point2D_I32 targetLocation;
+	@Nullable TupleDesc_F64 targetDesc;
+	@Nullable Point2D_I32 targetLocation;
 
 	T input;
 
@@ -131,7 +134,7 @@ public class VisualizeHogDescriptorApp<T extends ImageBase<T>> extends Demonstra
 
 	private void updateDescriptor() {
 		synchronized (hogLock) {
-			hog = (DescribeImageDenseHoG<T>)FactoryDescribeImageDense.hog(config, getImageType(0));
+			hog = (DescribeImageDenseHoG<T>)FactoryDescribeImageDense.hog(config, (ImageType)getImageType(0));
 		}
 
 		int numAngles = config.orientationBins;
@@ -247,7 +250,8 @@ public class VisualizeHogDescriptorApp<T extends ImageBase<T>> extends Demonstra
 
 			synchronized (hogLock) {
 				if (isRegionSelected()) {
-					renderHog(targetLocation.x, targetLocation.y, targetDesc, (Graphics2D)g);
+					Objects.requireNonNull(targetLocation);
+					renderHog(targetLocation.x, targetLocation.y, Objects.requireNonNull(targetDesc), (Graphics2D)g);
 				}
 			}
 		}

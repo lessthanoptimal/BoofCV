@@ -35,6 +35,7 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_I32;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -48,6 +49,7 @@ import java.util.ArrayList;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class VisualizeRegionDescriptionApp<T extends ImageGray<T>>
 		extends DemonstrationBase implements SelectRegionDescriptionPanel.Listener {
 	BufferedImage image;
@@ -61,7 +63,7 @@ public class VisualizeRegionDescriptionApp<T extends ImageGray<T>>
 	private TupleDescPanel tuplePanel = new TupleDescPanel();
 
 	// most recently requested pixel description. Used when the algorithm is changed
-	private Point2D_I32 targetPt;
+	private @Nullable Point2D_I32 targetPt;
 	private double targetRadius;
 	private double targetOrientation;
 
@@ -111,7 +113,7 @@ public class VisualizeRegionDescriptionApp<T extends ImageGray<T>>
 	}
 
 	@Override
-	public synchronized void descriptionChanged( Point2D_I32 pt, double radius, double orientation ) {
+	public synchronized void descriptionChanged( @Nullable Point2D_I32 pt, double radius, double orientation ) {
 		if (pt == null || radius < 1) {
 			targetPt = null;
 		} else {
@@ -141,29 +143,16 @@ public class VisualizeRegionDescriptionApp<T extends ImageGray<T>>
 	private void createAlgorithm() {
 		Class<T> imageType = super.getImageType(0).getImageClass();
 		synchronized (lock) {
-			switch (controls.selectedDescriptor) {
-				case 0:
-					describe = FactoryDescribePointRadiusAngle.surfStable(null, imageType);
-					break;
-				case 1:
-					describe = FactoryDescribePointRadiusAngle.surfColorStable(null, ImageType.pl(3, imageType));
-					break;
-				case 2:
-					describe = FactoryDescribePointRadiusAngle.sift(null, null, imageType);
-					break;
-				case 3:
-					describe = FactoryDescribePointRadiusAngle.brief(new ConfigBrief(true), imageType);
-					break;
-				case 4:
-					describe = FactoryDescribePointRadiusAngle.brief(new ConfigBrief(false), imageType);
-					break;
-				case 5:
-					describe = FactoryDescribePointRadiusAngle.pixel(5, 5, imageType);
-					break;
-				case 6:
-					describe = FactoryDescribePointRadiusAngle.pixelNCC(5, 5, imageType);
-					break;
-			}
+			describe = switch (controls.selectedDescriptor) {
+				case 0 -> FactoryDescribePointRadiusAngle.surfStable(null, imageType);
+				case 1 -> FactoryDescribePointRadiusAngle.surfColorStable(null, ImageType.pl(3, imageType));
+				case 2 -> FactoryDescribePointRadiusAngle.sift(null, null, imageType);
+				case 3 -> FactoryDescribePointRadiusAngle.brief(new ConfigBrief(true), imageType);
+				case 4 -> FactoryDescribePointRadiusAngle.brief(new ConfigBrief(false), imageType);
+				case 5 -> FactoryDescribePointRadiusAngle.pixel(5, 5, imageType);
+				case 6 -> FactoryDescribePointRadiusAngle.pixelNCC(5, 5, imageType);
+				default -> throw new IllegalArgumentException("Unknown selection");
+			};
 		}
 	}
 

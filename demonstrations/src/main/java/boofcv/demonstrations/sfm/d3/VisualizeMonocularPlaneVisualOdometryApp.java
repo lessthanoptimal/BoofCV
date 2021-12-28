@@ -49,6 +49,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -57,13 +58,14 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Visualizes {@link MonocularPlaneVisualOdometry}.
  *
  * @author Peter Abeles
  */
-@SuppressWarnings("rawtypes")
+@SuppressWarnings({"rawtypes", "NullAway.Init"})
 public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageGray<I>>
 		extends VideoProcessAppBase<I> implements VisualizeApp, VisualOdometryPanel.Listener {
 
@@ -184,10 +186,10 @@ public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageGray<I>>
 			if (line1.charAt(0) != '/')
 				line1 = path + "/" + line1;
 
-			config = CalibrationIO.load(media.openFile(lineConfig));
-			SimpleImageSequence<I> video = media.openVideo(line1, imageType);
+			config = CalibrationIO.load(media.openFileNotNull(lineConfig));
+			SimpleImageSequence<I> video = media.openVideoNotNull(line1, imageType);
 
-			process(video);
+			process(Objects.requireNonNull(video));
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -267,7 +269,7 @@ public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageGray<I>>
 	}
 
 	@Override
-	public void refreshAll( Object[] cookies ) {
+	public void refreshAll( @Nullable Object[] cookies ) {
 
 		numFaults = 0;
 		if (cookies != null)

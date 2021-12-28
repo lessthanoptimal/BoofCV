@@ -27,6 +27,8 @@ import boofcv.struct.Configuration;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Objects;
+
 /**
  * Configuration for {@link SquareBinary_to_FiducialDetector}.
  *
@@ -75,7 +77,7 @@ public class ConfigFiducialBinary implements Configuration {
 		((ConfigPolylineSplitMerge)squareDetector.detector.contourToPoly).thresholdSideSplitScore = 0;
 		squareDetector.detector.minimumContour = ConfigLength.fixed(20);
 
-		squareDetector.refineGray.cornerOffset = 0;
+		Objects.requireNonNull(squareDetector.refineGray).cornerOffset = 0;
 	}
 
 	public ConfigFiducialBinary() {}

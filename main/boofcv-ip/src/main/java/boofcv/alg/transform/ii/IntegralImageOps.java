@@ -25,6 +25,7 @@ import boofcv.alg.transform.ii.impl.ImplIntegralImageOps;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.*;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>
@@ -43,7 +44,7 @@ public class IntegralImageOps {
 	 * @param transformed Integral image. If null a new image will be created. Modified.
 	 * @return Integral image.
 	 */
-	public static GrayF32 transform( GrayF32 input, GrayF32 transformed ) {
+	public static GrayF32 transform( GrayF32 input, @Nullable GrayF32 transformed ) {
 		transformed = InputSanityCheck.checkDeclare(input, transformed);
 
 		ImplIntegralImageOps.transform(input, transformed);
@@ -58,7 +59,7 @@ public class IntegralImageOps {
 	 * @param transformed Integral image. If null a new image will be created. Modified.
 	 * @return Integral image.
 	 */
-	public static GrayF64 transform( GrayF64 input, GrayF64 transformed ) {
+	public static GrayF64 transform( GrayF64 input, @Nullable GrayF64 transformed ) {
 		transformed = InputSanityCheck.checkDeclare(input, transformed);
 
 		ImplIntegralImageOps.transform(input, transformed);
@@ -73,7 +74,7 @@ public class IntegralImageOps {
 	 * @param transformed Integral image. If null a new image will be created. Modified.
 	 * @return Integral image.
 	 */
-	public static GrayS32 transform( GrayU8 input, GrayS32 transformed ) {
+	public static GrayS32 transform( GrayU8 input, @Nullable GrayS32 transformed ) {
 		transformed = InputSanityCheck.checkDeclare(input, transformed, GrayS32.class);
 
 		ImplIntegralImageOps.transform(input, transformed);
@@ -88,7 +89,7 @@ public class IntegralImageOps {
 	 * @param transformed Integral image. If null a new image will be created. Modified.
 	 * @return Integral image.
 	 */
-	public static GrayS32 transform( GrayS32 input, GrayS32 transformed ) {
+	public static GrayS32 transform( GrayS32 input, @Nullable GrayS32 transformed ) {
 		transformed = InputSanityCheck.checkDeclare(input, transformed, GrayS32.class);
 
 		ImplIntegralImageOps.transform(input, transformed);
@@ -103,7 +104,7 @@ public class IntegralImageOps {
 	 * @param transformed Integral image. If null a new image will be created. Modified.
 	 * @return Integral image.
 	 */
-	public static GrayS64 transform( GrayS64 input, GrayS64 transformed ) {
+	public static GrayS64 transform( GrayS64 input, @Nullable GrayS64 transformed ) {
 		transformed = InputSanityCheck.checkDeclare(input, transformed, GrayS64.class);
 
 		ImplIntegralImageOps.transform(input, transformed);
@@ -121,7 +122,7 @@ public class IntegralImageOps {
 	 */
 	public static GrayF32 convolve( GrayF32 integral,
 									IntegralKernel kernel,
-									GrayF32 output ) {
+									@Nullable GrayF32 output ) {
 		output = InputSanityCheck.checkDeclare(integral, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -143,7 +144,7 @@ public class IntegralImageOps {
 	 */
 	public static GrayF64 convolve( GrayF64 integral,
 									IntegralKernel kernel,
-									GrayF64 output ) {
+									@Nullable GrayF64 output ) {
 		output = InputSanityCheck.checkDeclare(integral, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -165,7 +166,7 @@ public class IntegralImageOps {
 	 */
 	public static GrayS32 convolve( GrayS32 integral,
 									IntegralKernel kernel,
-									GrayS32 output ) {
+									@Nullable GrayS32 output ) {
 		output = InputSanityCheck.checkDeclare(integral, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -187,7 +188,7 @@ public class IntegralImageOps {
 	 */
 	public static GrayS64 convolve( GrayS64 integral,
 									IntegralKernel kernel,
-									GrayS64 output ) {
+									@Nullable GrayS64 output ) {
 		output = InputSanityCheck.checkDeclare(integral, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -210,7 +211,7 @@ public class IntegralImageOps {
 	 */
 	public static GrayF32 convolveBorder( GrayF32 integral,
 										  IntegralKernel kernel,
-										  GrayF32 output, int borderX, int borderY ) {
+										  @Nullable GrayF32 output, int borderX, int borderY ) {
 		output = InputSanityCheck.checkDeclare(integral, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -233,7 +234,7 @@ public class IntegralImageOps {
 	 */
 	public static GrayF64 convolveBorder( GrayF64 integral,
 										  IntegralKernel kernel,
-										  GrayF64 output, int borderX, int borderY ) {
+										  @Nullable GrayF64 output, int borderX, int borderY ) {
 		output = InputSanityCheck.checkDeclare(integral, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -256,7 +257,7 @@ public class IntegralImageOps {
 	 */
 	public static GrayS32 convolveBorder( GrayS32 integral,
 										  IntegralKernel kernel,
-										  GrayS32 output, int borderX, int borderY ) {
+										  @Nullable GrayS32 output, int borderX, int borderY ) {
 		output = InputSanityCheck.checkDeclare(integral, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -279,7 +280,7 @@ public class IntegralImageOps {
 	 */
 	public static GrayS64 convolveBorder( GrayS64 integral,
 										  IntegralKernel kernel,
-										  GrayS64 output, int borderX, int borderY ) {
+										  @Nullable GrayS64 output, int borderX, int borderY ) {
 		output = InputSanityCheck.checkDeclare(integral, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {

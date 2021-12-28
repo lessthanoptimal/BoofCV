@@ -36,9 +36,9 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class VideoProcessAppBase<I extends ImageBase<I>>
-		extends SelectAlgorithmAndInputPanel implements VisualizeApp, MouseListener , ChangeListener
-{
+		extends SelectAlgorithmAndInputPanel implements VisualizeApp, MouseListener, ChangeListener {
 	protected SimpleImageSequence<I> sequence;
 
 	volatile boolean requestStop = false;
@@ -51,14 +51,14 @@ public abstract class VideoProcessAppBase<I extends ImageBase<I>>
 
 	protected ImageType<I> imageType;
 
-	protected VideoProcessAppBase(int numAlgFamilies, Class<I> imageClass) {
+	protected VideoProcessAppBase( int numAlgFamilies, Class<I> imageClass ) {
 		super(numAlgFamilies);
 
 		this.imageType = new ImageType<>(ImageType.Family.GRAY, ImageDataType.classToType(imageClass), 1);
 		addToToolbar(createSelectDelay());
 	}
 
-	protected VideoProcessAppBase(int numAlgFamilies, ImageType<I> imageType) {
+	protected VideoProcessAppBase( int numAlgFamilies, ImageType<I> imageType ) {
 		super(numAlgFamilies);
 
 		this.imageType = imageType;
@@ -69,7 +69,7 @@ public abstract class VideoProcessAppBase<I extends ImageBase<I>>
 		JPanel ret = new JPanel();
 		ret.setLayout(new BoxLayout(ret, BoxLayout.X_AXIS));
 
-		periodSpinner = new JSpinner(new SpinnerNumberModel(framePeriod,0,1000,10));
+		periodSpinner = new JSpinner(new SpinnerNumberModel(framePeriod, 0, 1000, 10));
 		periodSpinner.setMaximumSize(periodSpinner.getPreferredSize());
 		periodSpinner.addChangeListener(this);
 
@@ -85,27 +85,26 @@ public abstract class VideoProcessAppBase<I extends ImageBase<I>>
 
 	protected abstract void process( SimpleImageSequence<I> sequence );
 
-	protected abstract void updateAlg(I frame, BufferedImage buffImage );
+	protected abstract void updateAlg( I frame, BufferedImage buffImage );
 
-	protected abstract void updateAlgGUI( I frame , BufferedImage imageGUI , double fps );
+	protected abstract void updateAlgGUI( I frame, BufferedImage imageGUI, double fps );
 
 	@Override
-	public void changeInput(String name, int index) {
+	public void changeInput( String name, int index ) {
 		stopWorker();
-		SimpleImageSequence<I> video = media.openVideo(inputRefs.get(index).getPath(), imageType);
+		SimpleImageSequence<I> video = media.openVideoNotNull(inputRefs.get(index).getPath(), imageType);
 		process(video);
 	}
 
 	protected void stopWorker() {
 		requestStop = true;
-		while( isRunning ) {
+		while (isRunning) {
 			BoofMiscOps.sleep(10);
 		}
 		requestStop = false;
 	}
 
-	private class WorkThread extends Thread
-	{
+	private class WorkThread extends Thread {
 		@Override
 		public void run() {
 			isRunning = true;
@@ -115,40 +114,40 @@ public abstract class VideoProcessAppBase<I extends ImageBase<I>>
 
 			handleRunningStatus(0);
 
-			while( requestStop == false ) {
+			while (requestStop == false) {
 				long startTime = System.currentTimeMillis();
-				if( !isPaused ) {
+				if (!isPaused) {
 					// periodically reset the FPS
-					if( totalFrames > 20 ) {
+					if (totalFrames > 20) {
 						totalFrames = 0;
 						totalTrackerTime = 0;
 					}
 
-					if( sequence.hasNext() ) {
+					if (sequence.hasNext()) {
 						I frame = sequence.next();
 
 						BufferedImage buffImage = sequence.getGuiImage();
 
 						long startTracker = System.nanoTime();
 						updateAlg(frame, buffImage);
-						totalTrackerTime += System.nanoTime()-startTracker;
+						totalTrackerTime += System.nanoTime() - startTracker;
 						totalFrames++;
 
-						updateAlgGUI(frame,buffImage,1e9/(totalTrackerTime/totalFrames));
+						updateAlgGUI(frame, buffImage, 1e9/(totalTrackerTime/totalFrames));
 
 						gui.repaint();
-
 					} else {
 						break;
 					}
 				}
-				while( System.currentTimeMillis()-startTime < framePeriod ) {
+				while (System.currentTimeMillis() - startTime < framePeriod) {
 					synchronized (this) {
 						try {
-							long period = System.currentTimeMillis()-startTime-10;
-							if( period > 0 )
+							long period = System.currentTimeMillis() - startTime - 10;
+							if (period > 0)
 								wait(period);
-						} catch (InterruptedException ignore) {}
+						} catch (InterruptedException ignore) {
+						}
 					}
 				}
 			}
@@ -166,8 +165,8 @@ public abstract class VideoProcessAppBase<I extends ImageBase<I>>
 	abstract protected void handleRunningStatus( int status );
 
 	@Override
-	public void mouseClicked(MouseEvent e) {
-		if( !isRunning )
+	public void mouseClicked( MouseEvent e ) {
+		if (!isRunning)
 			return;
 
 		setPause(!isPaused);
@@ -176,29 +175,28 @@ public abstract class VideoProcessAppBase<I extends ImageBase<I>>
 	protected void setPause( boolean paused ) {
 		isPaused = paused;
 
-		if( isPaused )
+		if (isPaused)
 			handleRunningStatus(1);
 		else
 			handleRunningStatus(0);
 	}
 
 	@Override
-	public void mousePressed(MouseEvent e) {}
+	public void mousePressed( MouseEvent e ) {}
 
 	@Override
-	public void mouseReleased(MouseEvent e) {}
+	public void mouseReleased( MouseEvent e ) {}
 
 	@Override
-	public void mouseEntered(MouseEvent e) {}
+	public void mouseEntered( MouseEvent e ) {}
 
 	@Override
-	public void mouseExited(MouseEvent e) {}
+	public void mouseExited( MouseEvent e ) {}
 
 	@Override
-	public void stateChanged(ChangeEvent e) {
-		if( e.getSource() == periodSpinner ) {
+	public void stateChanged( ChangeEvent e ) {
+		if (e.getSource() == periodSpinner) {
 			framePeriod = ((Number)periodSpinner.getValue()).intValue();
 		}
 	}
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,53 +50,51 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class DemoImageThresholdingApp<T extends ImageGray<T>>
 		extends DemonstrationBase
-		implements ThresholdControlPanel.Listener
-{
-	GrayU8 imageBinary = new GrayU8(1,1);
+		implements ThresholdControlPanel.Listener {
+	GrayU8 imageBinary = new GrayU8(1, 1);
 	BufferedImage visualizedBinary;
 	BufferedImage inputCopy;
 
 	ShapeVisualizePanel gui = new ShapeVisualizePanel();
 	ControlPanel controlPanel = new ControlPanel();
 
-	public DemoImageThresholdingApp(List<String> examples, Class<T> imageType) {
+	public DemoImageThresholdingApp( List<String> examples, Class<T> imageType ) {
 		super(examples, ImageType.single(imageType));
 
-		gui.setPreferredSize(new Dimension(800,600));
+		gui.setPreferredSize(new Dimension(800, 600));
 //		gui.setCentering(true);
 
-		add(controlPanel,BorderLayout.WEST);
-		add(gui,BorderLayout.CENTER);
+		add(controlPanel, BorderLayout.WEST);
+		add(gui, BorderLayout.CENTER);
 	}
 
 	@Override
-	protected void configureVideo(int which, SimpleImageSequence sequence) {
+	protected void configureVideo( int which, SimpleImageSequence sequence ) {
 		super.configureVideo(which, sequence);
 		sequence.setLoop(true);
 	}
 
 	@Override
-	protected void handleInputChange(int source, InputMethod method, int width, int height)
-	{
+	protected void handleInputChange( int source, InputMethod method, int width, int height ) {
 		imageBinary.reshape(width, height);
-		visualizedBinary = ConvertBufferedImage.checkDeclare(width, height, visualizedBinary,BufferedImage.TYPE_INT_BGR);
+		visualizedBinary = ConvertBufferedImage.checkDeclare(width, height, visualizedBinary, BufferedImage.TYPE_INT_BGR);
 
-		controlPanel.setImageSize(width,height);
+		controlPanel.setImageSize(width, height);
 	}
 
 	@Override
-	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase input)
-	{
-		inputCopy = ConvertBufferedImage.checkCopy(buffered,inputCopy);
+	public void processImage( int sourceID, long frameID, BufferedImage buffered, ImageBase input ) {
+		inputCopy = ConvertBufferedImage.checkCopy(buffered, inputCopy);
 		ConfigThreshold config = controlPanel.threshold.createConfig();
-		InputToBinary inputToBinary = FactoryThresholdBinary.threshold(config,input.imageType.getImageClass());
+		InputToBinary inputToBinary = FactoryThresholdBinary.threshold(config, input.imageType.getImageClass());
 
 		long time0 = System.nanoTime();
-		inputToBinary.process(input,imageBinary);
+		inputToBinary.process(input, imageBinary);
 		long time1 = System.nanoTime();
-		double processingTimeMS = (time1-time0)*1e-6;
+		double processingTimeMS = (time1 - time0)*1e-6;
 
 		VisualizeBinaryData.renderBinary(imageBinary, false, visualizedBinary);
 
@@ -108,9 +106,9 @@ public class DemoImageThresholdingApp<T extends ImageGray<T>>
 	}
 
 	public void changeView() {
-		switch( controlPanel.view ) {
-			case 0: gui.setImage(inputCopy); break;
-			case 1: gui.setImage(visualizedBinary); break;
+		switch (controlPanel.view) {
+			case 0 -> gui.setImage(inputCopy);
+			case 1 -> gui.setImage(visualizedBinary);
 		}
 		gui.repaint();
 	}
@@ -128,49 +126,46 @@ public class DemoImageThresholdingApp<T extends ImageGray<T>>
 		int view = 1;
 
 		public ControlPanel() {
-			selectZoom = spinner(1,MIN_ZOOM,MAX_ZOOM,1);
-			imageView = combo(view,"Input","Binary");
+			selectZoom = spinner(1, MIN_ZOOM, MAX_ZOOM, 1);
+			imageView = combo(view, "Input", "Binary");
 
 			threshold.setBorder(BorderFactory.createEmptyBorder());
 			threshold.addHistogramGraph();
 
-			addLabeled(processingTimeLabel,"Time (ms)");
-			addLabeled(imageSizeLabel,"Image Size");
-			addLabeled(imageView,"View");
-			addLabeled(selectZoom,"Zoom");
+			addLabeled(processingTimeLabel, "Time (ms)");
+			addLabeled(imageSizeLabel, "Image Size");
+			addLabeled(imageView, "View");
+			addLabeled(selectZoom, "Zoom");
 			add(threshold);
 		}
 
 		@Override
-		public void actionPerformed(ActionEvent e) {
+		public void actionPerformed( ActionEvent e ) {
 			view = imageView.getSelectedIndex();
 			changeView();
 		}
 
 		@Override
-		public void stateChanged(ChangeEvent e) {
+		public void stateChanged( ChangeEvent e ) {
 			if (e.getSource() == selectZoom) {
-				zoom = ((Number) selectZoom.getValue()).doubleValue();
+				zoom = ((Number)selectZoom.getValue()).doubleValue();
 				gui.setScale(zoom);
 			}
 		}
 	}
 
-	public static void main( String[] args )
-	{
+	public static void main( String[] args ) {
 		java.util.List<PathLabel> examples = new ArrayList<>();
 		examples.add(new PathLabel("particles", UtilIO.pathExample("particles01.jpg")));
-		examples.add(new PathLabel("shapes",UtilIO.pathExample("shapes/shapes01.png")));
-		examples.add(new PathLabel("stained",UtilIO.pathExample("segment/stained_handwriting.jpg")));
-		examples.add(new PathLabel("Chessboard Movie",UtilIO.pathExample("fiducial/chessboard/movie.mjpeg")));
+		examples.add(new PathLabel("shapes", UtilIO.pathExample("shapes/shapes01.png")));
+		examples.add(new PathLabel("stained", UtilIO.pathExample("segment/stained_handwriting.jpg")));
+		examples.add(new PathLabel("Chessboard Movie", UtilIO.pathExample("fiducial/chessboard/movie.mjpeg")));
 
-		SwingUtilities.invokeLater(()->{
-			DemoImageThresholdingApp app = new DemoImageThresholdingApp(examples,GrayF32.class);
+		SwingUtilities.invokeLater(() -> {
+			var app = new DemoImageThresholdingApp(examples, GrayF32.class);
 
 			app.openExample(examples.get(0));
 			app.display("Thresholding Demo");
 		});
 	}
-
-
 }

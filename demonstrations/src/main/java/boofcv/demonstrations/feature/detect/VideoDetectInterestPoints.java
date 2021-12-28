@@ -37,6 +37,7 @@ import georegression.struct.point.Point2D_F64;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.Objects;
 
 /**
  * Displays detected corners in a video sequence
@@ -101,6 +102,7 @@ public class VideoDetectInterestPoints<T extends ImageGray<T>> extends ProcessIm
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
 	void perform( String fileName, Class<T> imageType, Class<D> derivType ) {
 		SimpleImageSequence<T> sequence = BoofVideoManager.loadManagerDefault().load(fileName, ImageType.single(imageType));
+		Objects.requireNonNull(sequence);
 
 //		int maxCorners = 200;
 		int radius = 2;
@@ -115,7 +117,7 @@ public class VideoDetectInterestPoints<T extends ImageGray<T>> extends ProcessIm
 //		FeatureScaleSpace<T,D> feature = FactoryInterestPointAlgs.hessianScaleSpace(radius,1,maxCorners,defaultType,derivType);
 //		detector = FactoryInterestPoint.wrapDetector(feature,new double[]{1,2,4,6,8,12},defaultType);
 
-		VideoDetectInterestPoints<T> display = new VideoDetectInterestPoints<>(sequence, detector, orientation);
+		var display = new VideoDetectInterestPoints<>(sequence, detector, orientation);
 
 		display.process();
 	}

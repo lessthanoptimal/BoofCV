@@ -66,6 +66,7 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class DetectFiducialSquareHammingApp extends DemonstrationBase implements ShapeGuiListener {
 	// TODO Visualize the squares it collects when processing an image
 

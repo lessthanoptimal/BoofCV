@@ -48,7 +48,7 @@ public class VariableLockSet {
 		}
 	}
 
-	public <T> @Nullable T selectNull( SelectObject<T> select ) {
+	public <T> @Nullable T selectNull( SelectObjectNull<T> select ) {
 		lock.lock();
 		try {
 			return select.select();

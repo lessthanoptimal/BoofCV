@@ -28,6 +28,8 @@ import boofcv.struct.Configuration;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Objects;
+
 /**
  * Calibration parameters for chessboard style calibration grid.
  *
@@ -73,6 +75,7 @@ public class ConfigChessboardBinary implements Configuration {
 		square.detector.canTouchBorder = true;
 
 		// defaults for if the user toggles it to lines
+		Objects.requireNonNull(square.refineGray);
 		square.refineGray.cornerOffset = 1;
 		square.refineGray.sampleRadius = 3;
 		square.refineGray.lineSamples = 15;

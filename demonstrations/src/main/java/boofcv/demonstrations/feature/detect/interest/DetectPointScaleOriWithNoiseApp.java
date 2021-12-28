@@ -113,7 +113,7 @@ public class DetectPointScaleOriWithNoiseApp<T extends ImageGray<T>, D extends I
 
 	@Override
 	public void refreshAll( Object[] cookies ) {
-		setActiveAlgorithm(0, null, cookies[0]);
+		setActiveAlgorithm(0, "", cookies[0]);
 	}
 
 	@Override

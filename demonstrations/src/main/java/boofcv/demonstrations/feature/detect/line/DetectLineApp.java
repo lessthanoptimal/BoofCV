@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,6 +37,7 @@ import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import georegression.struct.line.LineParametric2D_F32;
 import georegression.struct.line.LineSegment2D_F32;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -55,6 +56,7 @@ import java.util.List;
  */
 // todo configure: blur, edge threshold, non-max radius,  min counts
 // todo show binary image, transform
+@SuppressWarnings({"NullAway.Init"})
 public class DetectLineApp<T extends ImageGray<T>, D extends ImageGray<D>>
 		extends DemonstrationBase {
 	Class<T> imageType;
@@ -68,8 +70,8 @@ public class DetectLineApp<T extends ImageGray<T>, D extends ImageGray<D>>
 	final ImageLinePanel gui = new ImageLinePanel();
 	final ControlPanel controls = new ControlPanel();
 
-	DetectLine<T> lineDetector;
-	DetectLineSegment<T> segmentDetector;
+	@Nullable DetectLine<T> lineDetector;
+	@Nullable DetectLineSegment<T> segmentDetector;
 	final Object lockDetector = new Object();
 
 	public DetectLineApp( List<PathLabel> examples, Class<T> imageType, Class<D> derivType ) {

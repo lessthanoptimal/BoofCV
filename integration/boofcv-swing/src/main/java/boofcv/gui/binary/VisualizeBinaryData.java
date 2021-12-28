@@ -39,8 +39,10 @@ import java.util.Random;
  * @author Peter Abeles
  */
 public class VisualizeBinaryData {
-	public static BufferedImage renderContours( List<EdgeContour> edges, int[] colors,
-												int width, int height, @Nullable BufferedImage out ) {
+	public static BufferedImage renderContours( List<EdgeContour> edges,
+												@Nullable int[] colors,
+												int width, int height,
+												@Nullable BufferedImage out ) {
 		if (out == null) {
 			out = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		} else {

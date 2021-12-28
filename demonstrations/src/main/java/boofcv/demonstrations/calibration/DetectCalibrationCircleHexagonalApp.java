@@ -67,7 +67,7 @@ public class DetectCalibrationCircleHexagonalApp extends CommonDetectCalibration
 		super(exampleInputs);
 		setUpGui(new DetectCalibrationCirclePanel(numRows, numColumns, circleDiameter, centerDistance, true));
 		configGrid = new ConfigGridDimen(numRows, numColumns, circleDiameter, centerDistance);
-		controlPanel.threshold.setConfiguration(configDet.thresholding);
+		controlPanel.getThreshold().setConfiguration(configDet.thresholding);
 
 		declareDetector();
 
@@ -76,7 +76,7 @@ public class DetectCalibrationCircleHexagonalApp extends CommonDetectCalibration
 
 	@Override
 	public void declareDetector() {
-		configDet.thresholding = controlPanel.threshold.createConfig();
+		configDet.thresholding = controlPanel.getThreshold().createConfig();
 
 		configGrid.numRows = controlPanel.getGridRows();
 		configGrid.numCols = controlPanel.getGridColumns();

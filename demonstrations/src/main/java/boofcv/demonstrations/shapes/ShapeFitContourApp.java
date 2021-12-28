@@ -39,6 +39,7 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.curve.EllipseRotated_F64;
 import georegression.struct.point.Point2D_I32;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -53,17 +54,15 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class ShapeFitContourApp
-		extends DemonstrationBase
-		implements ThresholdControlPanel.Listener
-{
+@SuppressWarnings({"NullAway.Init"})
+public class ShapeFitContourApp extends DemonstrationBase implements ThresholdControlPanel.Listener {
 	// displays intensity image
 	VisualizePanel gui = new VisualizePanel();
 
 	// converted input image
-	GrayU8 inputPrev = new GrayU8(1,1);
-	GrayU8 binary = new GrayU8(1,1);
-	GrayU8 filtered = new GrayU8(1,1);
+	GrayU8 inputPrev = new GrayU8(1, 1);
+	GrayU8 binary = new GrayU8(1, 1);
+	GrayU8 filtered = new GrayU8(1, 1);
 	// if it has processed an image or not
 	boolean processImage = false;
 
@@ -73,17 +72,17 @@ public class ShapeFitContourApp
 	List<Contour> contours;
 
 	BufferedImage original;
-	BufferedImage work = new BufferedImage(1,1,BufferedImage.TYPE_INT_RGB);
+	BufferedImage work = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
 
 	ShapeFitContourPanel controlPanel;
 
-	public ShapeFitContourApp(List<String> examples ) {
+	public ShapeFitContourApp( List<String> examples ) {
 		super(examples, ImageType.single(GrayU8.class));
 
 		this.gui.autoScaleCenterOnSetImage = false;
 		controlPanel = new ShapeFitContourPanel(this);
 
-		gui.setListener(scale->{
+		gui.setListener(scale -> {
 			controlPanel.setZoom(scale);
 		});
 
@@ -91,22 +90,23 @@ public class ShapeFitContourApp
 		add(BorderLayout.CENTER, gui);
 
 		ConfigThreshold config = controlPanel.getThreshold().createConfig();
-		inputToBinary = FactoryThresholdBinary.threshold(config,GrayU8.class);
+		inputToBinary = FactoryThresholdBinary.threshold(config, GrayU8.class);
 	}
 
 	@Override
-	public synchronized void processImage(int sourceID, long frameID, final BufferedImage buffered, ImageBase input) {
-		if( buffered != null ) {
-			original = ConvertBufferedImage.checkCopy(buffered,original);
-			work = ConvertBufferedImage.checkDeclare(buffered,work);
+	public synchronized void processImage( int sourceID, long frameID,
+										   final @Nullable BufferedImage buffered, @Nullable ImageBase input ) {
+		if (buffered != null && input != null) {
+			original = ConvertBufferedImage.checkCopy(buffered, original);
+			work = ConvertBufferedImage.checkDeclare(buffered, work);
 
 			binary.reshape(input.getWidth(), input.getHeight());
-			filtered.reshape(input.getWidth(),input.getHeight());
+			filtered.reshape(input.getWidth(), input.getHeight());
 			inputPrev.setTo((GrayU8)input);
 
 			SwingUtilities.invokeLater(() -> {
 				Dimension d = gui.getPreferredSize();
-				if( d.getWidth() < buffered.getWidth() || d.getHeight() < buffered.getHeight() ) {
+				if (d.getWidth() < buffered.getWidth() || d.getHeight() < buffered.getHeight()) {
 					gui.setPreferredSize(new Dimension(buffered.getWidth(), buffered.getHeight()));
 				}
 			});
@@ -118,20 +118,20 @@ public class ShapeFitContourApp
 	}
 
 	public synchronized void viewUpdated() {
-		if( contours == null )
+		if (contours == null)
 			return;
 
 		int view = controlPanel.getSelectedView();
 
 		Graphics2D g2 = work.createGraphics();
 
-		if( view == 0 ) {
+		if (view == 0) {
 			g2.drawImage(original, 0, 0, null);
-		} else if( view == 1 ){
-			VisualizeBinaryData.renderBinary(binary,false,work);
+		} else if (view == 1) {
+			VisualizeBinaryData.renderBinary(binary, false, work);
 		} else {
 			g2.setColor(Color.BLACK);
-			g2.fillRect(0,0,work.getWidth(),work.getHeight());
+			g2.fillRect(0, 0, work.getWidth(), work.getHeight());
 		}
 
 		SwingUtilities.invokeLater(new Runnable() {
@@ -144,18 +144,17 @@ public class ShapeFitContourApp
 		});
 	}
 
-
 	public void process( final GrayU8 input ) {
 
 		// threshold the input image
-		inputToBinary.process(input,binary);
+		inputToBinary.process(input, binary);
 
 		// reduce noise with some filtering
 		BinaryImageOps.erode8(binary, 1, filtered);
 		BinaryImageOps.dilate8(filtered, 1, binary);
 
 		// Find the contour around the shapes
-		contours = BinaryImageOps.contour(binary, ConnectRule.EIGHT,null);
+		contours = BinaryImageOps.contour(binary, ConnectRule.EIGHT, null);
 		processImage = true;
 
 		viewUpdated();
@@ -164,83 +163,83 @@ public class ShapeFitContourApp
 	@Override
 	public void imageThresholdUpdated() {
 		ConfigThreshold config = controlPanel.getThreshold().createConfig();
-		inputToBinary = FactoryThresholdBinary.threshold(config,GrayU8.class);
+		inputToBinary = FactoryThresholdBinary.threshold(config, GrayU8.class);
 		reprocessImageOnly();
 	}
 
-	protected void renderVisuals( Graphics2D g2 , double scale ) {
+	protected void renderVisuals( Graphics2D g2, double scale ) {
 		BoofSwingUtil.antialiasing(g2);
 
 		int activeAlg = controlPanel.getSelectedAlgorithm();
 
 		g2.setStroke(new BasicStroke(3));
 
-		if( controlPanel.contoursVisible ) {
+		if (controlPanel.contoursVisible) {
 			g2.setStroke(new BasicStroke(1));
 			VisualizeBinaryData.render(contours, null, Color.CYAN, 1.0, scale, g2);
 		}
 
-		if( activeAlg == 0 ) {
+		if (activeAlg == 0) {
 
 			double cornerPalty = controlPanel.getCornerPenalty();
 			int minimumSplitPixels = controlPanel.getMinimumSplitPixels();
 
-			for( Contour c : contours ) {
+			for (Contour c : contours) {
 				List<PointIndex_I32> vertexes = ShapeFittingOps.fitPolygon(
-						c.external, true, minimumSplitPixels,cornerPalty);
+						c.external, true, minimumSplitPixels, cornerPalty);
 
 				g2.setColor(Color.RED);
 				visualizePolygon(g2, scale, vertexes);
 
-				for( List<Point2D_I32> internal : c.internal ) {
-					vertexes = ShapeFittingOps.fitPolygon(internal, true, minimumSplitPixels,cornerPalty);
+				for (List<Point2D_I32> internal : c.internal) {
+					vertexes = ShapeFittingOps.fitPolygon(internal, true, minimumSplitPixels, cornerPalty);
 
 					g2.setColor(Color.GREEN);
 					visualizePolygon(g2, scale, vertexes);
 				}
 			}
-		} else if( activeAlg == 1 ) {
+		} else if (activeAlg == 1) {
 			// Filter small contours since they can generate really wacky ellipses
-			for( Contour c : contours ) {
-				if( c.external.size() > 10) {
-					FitData<EllipseRotated_F64> ellipse = ShapeFittingOps.fitEllipse_I32(c.external,0,false,null);
+			for (Contour c : contours) {
+				if (c.external.size() > 10) {
+					FitData<EllipseRotated_F64> ellipse = ShapeFittingOps.fitEllipse_I32(c.external, 0, false, null);
 
 					g2.setColor(Color.RED);
 					g2.setStroke(new BasicStroke(2.5f));
-					VisualizeShapes.drawEllipse(ellipse.shape,scale, g2);
+					VisualizeShapes.drawEllipse(ellipse.shape, scale, g2);
 				}
 
-				for( List<Point2D_I32> internal : c.internal ) {
-					if( internal.size() <= 10 )
+				for (List<Point2D_I32> internal : c.internal) {
+					if (internal.size() <= 10)
 						continue;
-					FitData<EllipseRotated_F64> ellipse = ShapeFittingOps.fitEllipse_I32(internal,0,false,null);
+					FitData<EllipseRotated_F64> ellipse = ShapeFittingOps.fitEllipse_I32(internal, 0, false, null);
 
 					g2.setColor(Color.GREEN);
 					g2.setStroke(new BasicStroke(2.5f));
-					VisualizeShapes.drawEllipse(ellipse.shape,scale, g2);
+					VisualizeShapes.drawEllipse(ellipse.shape, scale, g2);
 				}
 			}
 		}
 	}
 
-	private void visualizePolygon(Graphics2D g2, double scale, List<PointIndex_I32> vertexes) {
+	private void visualizePolygon( Graphics2D g2, double scale, List<PointIndex_I32> vertexes ) {
 		g2.setStroke(new BasicStroke(2));
-		VisualizeShapes.drawPolygon(vertexes, true,scale, g2);
+		VisualizeShapes.drawPolygon(vertexes, true, scale, g2);
 
-		if( controlPanel.isCornersVisible() ) {
+		if (controlPanel.isCornersVisible()) {
 			g2.setColor(Color.BLUE);
 			g2.setStroke(new BasicStroke(2f));
 			for (PointIndex_I32 p : vertexes) {
-				VisualizeFeatures.drawCircle(g2, scale * (p.x+0.5), scale * (p.y+0.5), 5);
+				VisualizeFeatures.drawCircle(g2, scale*(p.x + 0.5), scale*(p.y + 0.5), 5);
 			}
 		}
 	}
 
 	class VisualizePanel extends ShapeVisualizePanel {
 		@Override
-		protected void paintInPanel(AffineTransform tran, Graphics2D g2) {
-			synchronized ( ShapeFitContourApp.this ) {
-				renderVisuals(g2,scale);
+		protected void paintInPanel( AffineTransform tran, Graphics2D g2 ) {
+			synchronized (ShapeFitContourApp.this) {
+				renderVisuals(g2, scale);
 			}
 		}
 	}

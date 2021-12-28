@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,6 +49,7 @@ import java.util.Random;
 /**
  * Demonstrates the affects of different binary operations on an image.
  */
+@SuppressWarnings({"NullAway.Init"})
 public class DemoBinaryBlobLabelOpsApp<T extends ImageGray<T>> extends SelectAlgorithmAndInputPanel
 		implements SelectHistogramThresholdPanel.Listener {
 

@@ -28,6 +28,8 @@ import boofcv.struct.Configuration;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Objects;
+
 /**
  * Configuration that describes how to detect a Hamming marker.
  *
@@ -58,7 +60,7 @@ public class ConfigFiducialHammingDetector implements Configuration {
 		((ConfigPolylineSplitMerge)squareDetector.detector.contourToPoly).thresholdSideSplitScore = 0;
 		squareDetector.detector.minimumContour = ConfigLength.fixed(20);
 
-		squareDetector.refineGray.cornerOffset = 0;
+		Objects.requireNonNull(squareDetector.refineGray).cornerOffset = 0;
 	}
 
 	public ConfigFiducialHammingDetector() {}

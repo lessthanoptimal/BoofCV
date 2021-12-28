@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,8 +34,8 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class ImageCorruptPanel extends StandardAlgConfigPanel implements ChangeListener {
-
 	Random rand = new Random(8383);
 
 	// specifies amount of noise to add to the image

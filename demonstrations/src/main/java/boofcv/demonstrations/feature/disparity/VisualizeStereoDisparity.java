@@ -81,6 +81,7 @@ import static boofcv.gui.BoofSwingUtil.saveDisparityDialog;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGray<D>>
 		extends DemonstrationBase
 		implements ControlPanelDisparityDisplay.Listener {
@@ -123,7 +124,7 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 
 	// instance of the selected algorithm
 	private StereoDisparity<T, D> activeAlg;
-	private DisparitySmoother<T,D> smoother;
+	private DisparitySmoother<T, D> smoother;
 
 	// camera calibration matrix of rectified images
 	private DMatrixRMaj rectK;
@@ -209,12 +210,12 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 	@Override
 	public void processFiles( String[] files ) {
 		if (files.length == 3) {
-			origCalib = CalibrationIO.load(media.openFile(files[0]));
-			origLeft = media.openImage(files[1]);
-			origRight = media.openImage(files[2]);
+			origCalib = CalibrationIO.load(media.openFileNotNull(files[0]));
+			origLeft = media.openImageNotNull(files[1]);
+			origRight = media.openImageNotNull(files[2]);
 		} else if (files.length == 2) {
-			origLeft = media.openImage(files[0]);
-			origRight = media.openImage(files[1]);
+			origLeft = media.openImageNotNull(files[0]);
+			origRight = media.openImageNotNull(files[1]);
 
 			// Guess something "reasonable"
 			// baseline of 1 and distortion free cameras with a 90 HFOV
@@ -263,7 +264,6 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 			smoother.process(rectLeft, disparityImage, disparityRange);
 			long time1 = System.nanoTime();
 			elapsedTime = time1 - time0;
-
 		} catch (RuntimeException e) {
 			e.printStackTrace();
 			BoofSwingUtil.warningDialog(this, e);

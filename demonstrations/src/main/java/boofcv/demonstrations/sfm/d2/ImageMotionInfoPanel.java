@@ -33,6 +33,7 @@ import java.awt.*;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class ImageMotionInfoPanel extends StandardAlgConfigPanel {
 
 	/** User requested that the algorithm's configuration be changed */

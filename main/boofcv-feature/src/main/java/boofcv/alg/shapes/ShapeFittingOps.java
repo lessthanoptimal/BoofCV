@@ -99,7 +99,7 @@ public class ShapeFittingOps {
 	 */
 	public static FitData<EllipseRotated_F64> fitEllipse_F64( List<Point2D_F64> points, int iterations,
 															  boolean computeError,
-															  FitData<EllipseRotated_F64> outputStorage ) {
+															  @Nullable FitData<EllipseRotated_F64> outputStorage ) {
 
 		if (outputStorage == null) {
 			outputStorage = new FitData<>(new EllipseRotated_F64());
@@ -157,7 +157,7 @@ public class ShapeFittingOps {
 	 */
 	public static FitData<EllipseRotated_F64> fitEllipse_I32( List<Point2D_I32> points, int iterations,
 															  boolean computeError,
-															  FitData<EllipseRotated_F64> outputStorage ) {
+															  @Nullable FitData<EllipseRotated_F64> outputStorage ) {
 
 		List<Point2D_F64> pointsF = convert_I32_F64(points);
 
@@ -215,7 +215,7 @@ public class ShapeFittingOps {
 	 * @return The found circle fit.
 	 */
 	public static FitData<Circle2D_F64> averageCircle_I32( List<Point2D_I32> points, DogArray_F64 optional,
-														   FitData<Circle2D_F64> outputStorage ) {
+														   @Nullable FitData<Circle2D_F64> outputStorage ) {
 		if (outputStorage == null) {
 			outputStorage = new FitData<>(new Circle2D_F64());
 		}

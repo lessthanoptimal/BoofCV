@@ -38,6 +38,7 @@ import boofcv.struct.image.ImageType;
 import georegression.struct.shapes.Rectangle2D_F64;
 
 import java.awt.image.BufferedImage;
+import java.util.Objects;
 
 /**
  * Shows TLD track data
@@ -129,13 +130,13 @@ public class VisualizeTldTrackerApp<T extends ImageGray<T>, D extends ImageGray<
 	}
 
 	public static void main( String[] args ) {
-		VisualizeTldTrackerApp app = new VisualizeTldTrackerApp(GrayU8.class);
+		var app = new VisualizeTldTrackerApp(GrayU8.class);
 
 		String fileName = UtilIO.pathExample("tracking/track_book.mjpeg");
 
 		SimpleImageSequence<GrayU8> sequence =
 				DefaultMediaManager.INSTANCE.openVideo(fileName, ImageType.single(GrayU8.class));
 
-		app.process(sequence);
+		app.process(Objects.requireNonNull(sequence));
 	}
 }

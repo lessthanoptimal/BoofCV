@@ -44,6 +44,7 @@ import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.*;
 import georegression.struct.point.Point2D_I16;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -85,7 +86,7 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 	AnyImageDerivative<T, D> deriv;
 
 	// For the optional image blur
-	BlurStorageFilter<T> blurFilter;
+	@Nullable BlurStorageFilter<T> blurFilter;
 	T blurred;
 
 	// used to compute feature intensity
@@ -296,6 +297,7 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 		reprocessImageOnly();
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	class ControlPanel extends DetectBlackShapePanel implements ActionListener, ChangeListener {
 		JComboBox<String> comboView;
 		JComboBox<String> comboAlgorithm;
@@ -308,7 +310,7 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 		JSpinner spinnerRadiusNonMax;
 		JSpinner spinnerBlurSigma;
 
-		String selected = null;
+		String selected;
 		int radiusCorner = 2;
 		boolean logIntensity = false;
 		boolean weighted = false;

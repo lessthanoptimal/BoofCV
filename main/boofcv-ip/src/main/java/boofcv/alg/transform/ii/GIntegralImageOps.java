@@ -19,7 +19,7 @@
 package boofcv.alg.transform.ii;
 
 import boofcv.struct.image.*;
-
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Provides a mechanism to call {@link IntegralImageOps} with unknown types at compile time.
@@ -53,7 +53,7 @@ public class GIntegralImageOps {
 	 * @return Integral image.
 	 */
 	public static <I extends ImageGray<I>, T extends ImageGray>
-	T transform( I input , T transformed ) {
+	T transform( I input , @Nullable T transformed ) {
 		if( input instanceof GrayF32) {
 			return (T)IntegralImageOps.transform((GrayF32)input,(GrayF32)transformed);
 		} else if( input instanceof GrayF64) {

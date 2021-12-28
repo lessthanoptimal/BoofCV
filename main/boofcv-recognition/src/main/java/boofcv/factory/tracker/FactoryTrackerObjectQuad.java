@@ -113,7 +113,7 @@ public class FactoryTrackerObjectQuad {
 											  double maxPixelValue,
 											  MeanShiftLikelihoodType modelType,
 											  ImageType<T> imageType ) {
-		PixelLikelihood<T> likelihood= switch (modelType) {
+		PixelLikelihood<T> likelihood = switch (modelType) {
 			case HISTOGRAM -> FactoryTrackerObjectAlgs.likelihoodHistogramCoupled(maxPixelValue, numBins, imageType);
 			case HISTOGRAM_INDEPENDENT_RGB_to_HSV -> {
 				if (imageType.getNumBands() != 3)

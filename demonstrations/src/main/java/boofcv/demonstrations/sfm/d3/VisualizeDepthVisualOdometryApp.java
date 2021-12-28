@@ -59,6 +59,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Visualizes data from {@link DepthVisualOdometry}.
@@ -73,7 +74,7 @@ import java.util.List;
 // TODO Add feature point cloud to VO view?
 // TODO Click on polygon to get the frame it was generated from?
 // TODO Add log to file option for location and 3D cloud
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({"rawtypes", "unchecked", "NullAway.Init"})
 public class VisualizeDepthVisualOdometryApp
 		extends DemonstrationBase implements VisualOdometryPanel2.Listener, ActionListener {
 	VisualOdometryPanel2 statusPanel;
@@ -158,9 +159,8 @@ public class VisualizeDepthVisualOdometryApp
 	public void openFile( File file ) {
 		inputFilePath = file.getPath();
 
-		Reader r = media.openFile(file.getPath());
-		BufferedReader in = new BufferedReader(r);
-		try {
+		try (Reader r = media.openFileNotNull(file.getPath())) {
+			BufferedReader in = new BufferedReader(r);
 			String path = file.getParent();
 
 			String lineConfig = in.readLine();
@@ -175,7 +175,7 @@ public class VisualizeDepthVisualOdometryApp
 			if (line2.charAt(0) != '/')
 				line2 = path + "/" + line2;
 
-			config = CalibrationIO.load(media.openFile(lineConfig));
+			config = CalibrationIO.load(media.openFileNotNull(lineConfig));
 			openVideo(false, line1, line2);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
@@ -184,7 +184,7 @@ public class VisualizeDepthVisualOdometryApp
 
 	@Override
 	public void reprocessInput() {
-		openFile(new File(inputFilePath));
+		openFile(new File(Objects.requireNonNull(inputFilePath)));
 	}
 
 	@Override

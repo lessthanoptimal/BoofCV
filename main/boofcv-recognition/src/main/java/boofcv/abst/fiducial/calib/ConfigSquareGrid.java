@@ -25,6 +25,8 @@ import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
 
+import java.util.Objects;
+
 /**
  * Calibration parameters for square-grid style calibration grid.
  *
@@ -53,6 +55,7 @@ public class ConfigSquareGrid implements Configuration {
 		((ConfigPolylineSplitMerge)square.detector.contourToPoly).cornerScorePenalty = 0.5;
 		square.detector.minimumContour = ConfigLength.fixed(10);
 
+		Objects.requireNonNull(square.refineGray);
 		square.refineGray.cornerOffset = 1;
 		square.refineGray.lineSamples = 15;
 		square.refineGray.convergeTolPixels = 0.2;

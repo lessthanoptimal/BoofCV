@@ -258,7 +258,7 @@ public class FactoryFiducial {
 	 * QR Code but with the ability to estimate it's 3D pose using PnP. Implements {@link FiducialDetector}.
 	 */
 	public static <T extends ImageGray<T>>
-	QrCodeDetectorPnP<T> qrcode3D( ConfigQrCode config, Class<T> imageType ) {
+	QrCodeDetectorPnP<T> qrcode3D( @Nullable ConfigQrCode config, Class<T> imageType ) {
 		return new QrCodeDetectorPnP<>(qrcode(config, imageType));
 	}
 

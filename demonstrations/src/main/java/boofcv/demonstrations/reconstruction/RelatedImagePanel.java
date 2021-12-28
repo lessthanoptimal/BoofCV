@@ -35,6 +35,7 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.List;
+import java.util.Objects;
 
 import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
 import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS;
@@ -237,6 +238,7 @@ public class RelatedImagePanel extends JPanel {
 		}
 
 		public double getImageScale() {
+			Objects.requireNonNull(img);
 			double previewScale = img.getWidth()/(double)dbShape.width;
 			return previewScale*scale;
 		}

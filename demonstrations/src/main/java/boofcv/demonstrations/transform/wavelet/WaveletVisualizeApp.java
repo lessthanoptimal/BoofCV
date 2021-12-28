@@ -79,6 +79,8 @@ public class WaveletVisualizeApp<T extends ImageGray<T>, W extends ImageGray<W>,
 		imageInv = (T)image.createNew(image.width, image.height);
 
 		SwingUtilities.invokeLater(() -> {
+			if (image == null)
+				return;
 			setPreferredSize(new Dimension(image.width + 50, image.height + 20));
 			processedImage = true;
 		});
@@ -94,7 +96,7 @@ public class WaveletVisualizeApp<T extends ImageGray<T>, W extends ImageGray<W>,
 		setActiveAlgorithm(0, "", cookies[0]);
 	}
 
-	private void addWaveletDesc( String name, WaveletDescription desc ) {
+	private void addWaveletDesc( String name, @Nullable WaveletDescription desc ) {
 		if (desc != null)
 			addAlgorithm(0, name, desc);
 	}

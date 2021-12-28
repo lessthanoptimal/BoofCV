@@ -300,6 +300,12 @@ public class UtilIO {
 		return url;
 	}
 
+	public static URL ensureUrlNotNull( @Nullable String path ) {
+		if (path == null)
+			throw new RuntimeException("Null path provided");
+		return Objects.requireNonNull(ensureURL(path));
+	}
+
 	public static @Nullable String ensureFilePath( String path ) {
 		URL url = ensureURL(path);
 		if (url == null)
@@ -325,8 +331,9 @@ public class UtilIO {
 		}
 	}
 
-	public static @Nullable String systemToUnix( String path ) {
-		if (path == null) return null;
+	public static String systemToUnix( String path ) {
+		if (path == null)
+			throw new RuntimeException("Path can't be null");
 		if (File.separatorChar == '\\') {
 			return path.replace('\\', '/');
 		} else {

@@ -91,6 +91,7 @@ import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>> extends DemonstrationBase {
 	// Main GUI elements for the app
 	ControlPanel controls = new ControlPanel();
@@ -803,7 +804,7 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>> extends De
 				case 0 -> controlMonoTrack;
 				case 1 -> controlDualTrack;
 				case 2 -> controlQuad;
-				default -> null;
+				default -> throw new IllegalArgumentException("Unknown");
 			};
 		}
 	}

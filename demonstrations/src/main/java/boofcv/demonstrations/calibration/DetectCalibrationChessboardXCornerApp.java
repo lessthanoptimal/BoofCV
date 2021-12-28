@@ -66,8 +66,8 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
  *
  * @author Peter Abeles
  */
-public class DetectCalibrationChessboardXCornerApp
-		extends DemonstrationBase {
+@SuppressWarnings({"NullAway.Init"})
+public class DetectCalibrationChessboardXCornerApp extends DemonstrationBase {
 	private ConfigChessboardX configDetector = new ConfigChessboardX();
 	private ConfigGridDimen configGridDimen = new ConfigGridDimen(5, 7, 1);
 
@@ -282,6 +282,9 @@ public class DetectCalibrationChessboardXCornerApp
 		@Override
 		protected void paintInPanel( AffineTransform tran, Graphics2D g2 ) {
 			super.paintInPanel(tran, g2);
+			if (img == null)
+				return;
+
 			BoofSwingUtil.antialiasing(g2);
 
 			if (controlPanel.translucent > 0) {
