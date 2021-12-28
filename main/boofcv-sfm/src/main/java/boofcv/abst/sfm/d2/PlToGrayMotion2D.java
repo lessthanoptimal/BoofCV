@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,8 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class PlToGrayMotion2D<T extends ImageGray<T>, IT extends InvertibleTransform>
+@SuppressWarnings({"NullAway.Init"})
+public class PlToGrayMotion2D<T extends ImageGray<T>, IT extends InvertibleTransform<IT>>
 		implements ImageMotion2D<Planar<T>, IT>, AccessPointTracks {
 	// motion estimation algorithm for a single band image
 	ImageMotion2D<T, IT> motion;

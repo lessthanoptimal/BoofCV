@@ -35,6 +35,7 @@ import org.ejml.data.DMatrixRMaj;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class StereoConsistencyCheck {
 
 	// convert from original image pixels into rectified image pixels

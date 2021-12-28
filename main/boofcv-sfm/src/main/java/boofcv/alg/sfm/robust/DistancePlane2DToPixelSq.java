@@ -35,6 +35,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class DistancePlane2DToPixelSq implements DistanceFromModel<Se2_F64, PlanePtPixel> {
 
 	// motion from key frame to current frame in plane 2D reference frame

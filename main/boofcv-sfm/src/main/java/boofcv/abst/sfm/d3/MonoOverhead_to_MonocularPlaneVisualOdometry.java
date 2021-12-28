@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,6 +44,7 @@ import java.util.Set;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class MonoOverhead_to_MonocularPlaneVisualOdometry<T extends ImageBase<T>>
 		implements MonocularPlaneVisualOdometry<T>, AccessPointTracks3D {
 	// motion estimation algorithm

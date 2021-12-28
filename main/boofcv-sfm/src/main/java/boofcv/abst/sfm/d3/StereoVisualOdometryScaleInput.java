@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,6 +35,7 @@ import java.util.Set;
  * @author Peter Abeles
  */
 // TODO more efficient scaling algorithm
+@SuppressWarnings({"NullAway.Init"})
 public class StereoVisualOdometryScaleInput<T extends ImageBase<T>> implements StereoVisualOdometry<T> {
 
 	double scaleFactor;

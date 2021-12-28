@@ -39,6 +39,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 // TODO Make PnPJacobianRodrigues and this class share a common parent for common functions?
+@SuppressWarnings({"NullAway.Init"})
 public class PnPStereoJacobianRodrigues implements FunctionNtoMxN<DMatrixRMaj> {
 
 	// transformation from world to left camera frame

@@ -25,6 +25,7 @@ import boofcv.struct.image.ImageBase;
 import georegression.struct.InvertibleTransform;
 import org.ddogleg.fitting.modelset.ModelFitter;
 import org.ddogleg.fitting.modelset.ModelMatcher;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,14 +39,14 @@ import java.util.List;
  * @param <IT> Motion model data type
  * @author Peter Abeles
  */
-@SuppressWarnings("unchecked")
-public class ImageMotionPointTrackerKey<I extends ImageBase<I>, IT extends InvertibleTransform> {
+@SuppressWarnings({"unchecked", "NullAway.Init"})
+public class ImageMotionPointTrackerKey<I extends ImageBase<I>, IT extends InvertibleTransform<IT>> {
 	// feature tracker
 	protected PointTracker<I> tracker;
 	// Fits a model to the tracked features
 	protected ModelMatcher<IT, AssociatedPair> modelMatcher;
 	// Refines the model using the complete inlier set
-	protected ModelFitter<IT, AssociatedPair> modelRefiner;
+	protected @Nullable ModelFitter<IT, AssociatedPair> modelRefiner;
 
 	// transform from the world frame to the key frame
 	protected IT worldToKey;
@@ -72,7 +73,7 @@ public class ImageMotionPointTrackerKey<I extends ImageBase<I>, IT extends Inver
 	 */
 	public ImageMotionPointTrackerKey( PointTracker<I> tracker,
 									   ModelMatcher<IT, AssociatedPair> modelMatcher,
-									   ModelFitter<IT, AssociatedPair> modelRefiner,
+									   @Nullable ModelFitter<IT, AssociatedPair> modelRefiner,
 									   IT model,
 									   int thresholdOutlierPrune ) {
 		this.tracker = tracker;
@@ -80,14 +81,13 @@ public class ImageMotionPointTrackerKey<I extends ImageBase<I>, IT extends Inver
 		this.modelRefiner = modelRefiner;
 		this.thresholdOutlierPrune = thresholdOutlierPrune;
 
-		worldToKey = (IT)model.createInstance();
-		keyToCurr = (IT)model.createInstance();
-		worldToCurr = (IT)model.createInstance();
+		worldToKey = model.createInstance();
+		keyToCurr = model.createInstance();
+		worldToCurr = model.createInstance();
 		reset();
 	}
 
-	protected ImageMotionPointTrackerKey() {
-	}
+	protected ImageMotionPointTrackerKey() {}
 
 	/**
 	 * Makes the current frame the first frame and discards its past history

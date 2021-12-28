@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -65,10 +65,9 @@ public class MaxGeoKeyFrameManager implements VisOdomKeyFrameManager {
 	QuickSort_S32 sorter = new QuickSort_S32(); // Used this to avoid calling new like other sorts do
 
 	// if not null it prints debugging messages to this stream
-	protected PrintStream verbose;
+	protected @Nullable PrintStream verbose;
 
-	public MaxGeoKeyFrameManager() {
-	}
+	public MaxGeoKeyFrameManager() {}
 
 	public MaxGeoKeyFrameManager( double minimumCoverage ) {
 		this.minimumCoverage = minimumCoverage;

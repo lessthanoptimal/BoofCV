@@ -71,6 +71,7 @@ import static java.util.Objects.requireNonNull;
  *
  * * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> implements VerbosePrint {
 	/**
 	 * Specifies the minimum quality of the 3D information between two views for it to be used as a stereo pair.
@@ -222,10 +223,11 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 		Objects.requireNonNull(computeFused.getStereoDisparity(), "Must call setStereoDisparity() first");
 
 		if (listener != null) {
+			Listener<T> _listener = this.listener;
 			computeFused.setListener(( left, right, rectLeft, rectRight, disparity, mask, parameters, rect ) -> {
 				String leftID = indexSbaToViewID.get(left);
 				String rightID = indexSbaToViewID.get(right);
-				this.listener.handlePairDisparity(leftID, rightID, rectLeft, rectRight, disparity, mask, parameters);
+				_listener.handlePairDisparity(leftID, rightID, rectLeft, rectRight, disparity, mask, parameters);
 			});
 		} else {
 			computeFused.setListener(null);
@@ -283,7 +285,7 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 				averageQuality += pair.quality3D;
 
 				// Look up information that the "center" under consideration is connected to
-				ViewInfo connected = mapScores.get(pair.other(center.relations).id);
+				ViewInfo connected = Objects.requireNonNull(mapScores.get(pair.other(center.relations).id));
 				BundleAdjustmentCamera connectedCamera = scene.cameras.get(connected.metric.camera).model;
 
 				// Compute the transform from view-1 to view-2
@@ -329,7 +331,7 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 			for (int pairIdx = 0; pairIdx < pairs.size(); pairIdx++) {
 				StereoPairGraph.Edge pair = pairs.get(pairIdx);
 
-				ViewInfo connected = mapScores.get(pair.other(center.relations).id);
+				ViewInfo connected = Objects.requireNonNull(mapScores.get(pair.other(center.relations).id));
 
 				// If the view has already been prune then there can't be any overlap
 				if (connected.used)
@@ -490,6 +492,7 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 	}
 
 	/** Information on each view that's used to select and compute the disparity images */
+	@SuppressWarnings({"NullAway.Init"})
 	public static class ViewInfo {
 		// Reference to the known extrinsic and intrinsic parameters
 		SceneStructureMetric.View metric;
@@ -504,6 +507,7 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 		// Indicates if it has already been used to compute a disparity image or not
 		boolean used;
 
+		@SuppressWarnings({"NullAway"})
 		void reset() {
 			metric = null;
 			relations = null;

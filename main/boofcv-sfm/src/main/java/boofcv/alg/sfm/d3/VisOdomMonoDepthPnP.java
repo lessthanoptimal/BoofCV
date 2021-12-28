@@ -40,9 +40,11 @@ import georegression.transform.se.SePointOps_F64;
 import lombok.Getter;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.struct.DogArray;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Full 6-DOF visual odometry where a ranging device is assumed for pixels in the primary view and the motion is estimated
@@ -61,6 +63,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 		extends VisOdomBundlePnPBase<VisOdomMonoDepthPnP.Track> {
 
@@ -70,10 +73,10 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 	private final @Getter ImagePixelTo3D pixelTo3D;
 
 	// non-linear refinement of pose estimate
-	private final RefinePnP refine;
+	private final @Nullable RefinePnP refine;
 
 	private BFrame frameCurrent;
-	private BFrame framePrevious;
+	private @Nullable BFrame framePrevious;
 
 	// estimate the camera motion up to a scale factor from two sets of point correspondences
 	private final ModelMatcher<Se3_F64, Point2D3D> motionEstimator;
@@ -98,7 +101,7 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 	 */
 	public VisOdomMonoDepthPnP( ModelMatcher<Se3_F64, Point2D3D> motionEstimator,
 								ImagePixelTo3D pixelTo3D,
-								RefinePnP refine,
+								@Nullable RefinePnP refine,
 								PointTracker<T> tracker ) {
 		this.motionEstimator = motionEstimator;
 		this.pixelTo3D = pixelTo3D;
@@ -402,7 +405,7 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 	private boolean estimateMotion( List<PointTrack> active ) {
 		Point2Transform2_F64 pixelToNorm = cameraModels.get(0).pixelToNorm;
 
-		framePrevious.frame_to_world.invert(world_to_prev);
+		Objects.requireNonNull(framePrevious).frame_to_world.invert(world_to_prev);
 
 		// Create a list of observations for PnP
 		// normalized image coordinates and 3D in the previous keyframe's reference frame

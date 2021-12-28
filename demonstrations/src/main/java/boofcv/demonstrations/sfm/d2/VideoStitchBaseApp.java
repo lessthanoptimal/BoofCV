@@ -51,7 +51,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends InvertibleTransform>
+public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends InvertibleTransform<IT>>
 		extends DemonstrationBase implements ImageMotionInfoPanel.AlgorithmListener {
 	// size of the image being stitched into
 	int stitchWidth;

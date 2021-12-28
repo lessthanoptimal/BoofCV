@@ -53,6 +53,7 @@ import java.util.Set;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment.BTrack> implements VerbosePrint {
 
 	/** discard tracks after they have not been in the inlier set for this many updates in a row */
@@ -101,9 +102,9 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 	protected @Getter TriangulateNViewsMetric triangulateN;
 
 	// Internal profiling
-	protected @Getter @Setter PrintStream profileOut;
+	protected @Getter @Setter @Nullable PrintStream profileOut;
 	// Verbose debug information
-	protected @Getter PrintStream verbose;
+	protected @Getter @Nullable PrintStream verbose;
 
 	// Total number of tracks dropped due to large bundle adjustment errors
 	protected int totalDroppedTracksBadBundle;
@@ -346,6 +347,7 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 	/**
 	 * Contains the camera's lens distortion model
 	 */
+	@SuppressWarnings({"NullAway.Init"})
 	protected static class CameraModel {
 		/** converts from pixel to normalized image coordinates */
 		protected Point2Transform2_F64 pixelToNorm;

@@ -70,7 +70,7 @@ public class FactoryMotion2D {
 	 * @return ImageMotion2D
 	 */
 	@SuppressWarnings({"unchecked", "rawtypes"})
-	public static <I extends ImageBase<I>, IT extends InvertibleTransform>
+	public static <I extends ImageBase<I>, IT extends InvertibleTransform<IT>>
 	ImageMotion2D<I, IT> createMotion2D( int ransacIterations, double inlierThreshold, int outlierPrune,
 										 int absoluteMinimumTracks, double respawnTrackFraction,
 										 double respawnCoverageFraction,
@@ -129,7 +129,7 @@ public class FactoryMotion2D {
 	 * @return StitchingFromMotion2D
 	 */
 	@SuppressWarnings("unchecked")
-	public static <I extends ImageBase<I>, IT extends InvertibleTransform>
+	public static <I extends ImageBase<I>, IT extends InvertibleTransform<IT>>
 	StitchingFromMotion2D<I, IT>
 	createVideoStitch( double maxJumpFraction, ImageMotion2D<I, IT> motion2D, ImageType<I> imageType ) {
 		StitchingTransform<IT> transform;

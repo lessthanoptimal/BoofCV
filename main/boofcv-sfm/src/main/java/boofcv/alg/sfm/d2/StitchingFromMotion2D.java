@@ -47,8 +47,8 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author Peter Abeles
  */
-
-public class StitchingFromMotion2D<I extends ImageBase<I>, IT extends InvertibleTransform> {
+@SuppressWarnings({"NullAway.Init"})
+public class StitchingFromMotion2D<I extends ImageBase<I>, IT extends InvertibleTransform<IT>> {
 	// REFERENCE FRAME NOTES:
 	//
 	// World references to the stitched image

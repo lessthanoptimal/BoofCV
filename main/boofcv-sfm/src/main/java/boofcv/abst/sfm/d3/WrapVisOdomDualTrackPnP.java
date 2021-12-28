@@ -19,6 +19,7 @@
 package boofcv.abst.sfm.d3;
 
 import boofcv.abst.sfm.AccessPointTracks3D;
+import boofcv.abst.tracker.PointTrack;
 import boofcv.alg.feature.associate.AssociateStereo2D;
 import boofcv.alg.geo.DistanceFromModelMultiView;
 import boofcv.alg.geo.PerspectiveOps;
@@ -37,6 +38,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -91,7 +93,8 @@ public class WrapVisOdomDualTrackPnP<T extends ImageGray<T>> implements StereoVi
 	public void getTrackPixel( int index, Point2D_F64 pixel ) {
 		// If this throws a null pointer exception then that means there's a bug. The only way a visible track
 		// could have a null trackerTrack is if the trackerTrack was dropped. In that case it's no longer visible
-		pixel.setTo(visualOdometry.getVisibleTracks().get(index).visualTrack.pixel);
+		PointTrack track = Objects.requireNonNull(visualOdometry.getVisibleTracks().get(index).visualTrack);
+		pixel.setTo(track.pixel);
 	}
 
 	@Override
@@ -107,7 +110,7 @@ public class WrapVisOdomDualTrackPnP<T extends ImageGray<T>> implements StereoVi
 
 	@Override public boolean isTrackNew( int index ) {
 		VisOdomDualTrackPnP.TrackInfo track = visualOdometry.getVisibleTracks().get(index);
-		return track.visualTrack.spawnFrameID == visualOdometry.getFrameID();
+		return Objects.requireNonNull(track.visualTrack).spawnFrameID == visualOdometry.getFrameID();
 	}
 
 	@Override

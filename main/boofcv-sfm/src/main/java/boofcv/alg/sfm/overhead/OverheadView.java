@@ -49,6 +49,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class OverheadView<T extends ImageBase<T>> {
 
 	/**
@@ -71,8 +72,7 @@ public class OverheadView<T extends ImageBase<T>> {
 	 */
 	public double cellSize;
 
-	public OverheadView() {
-	}
+	public OverheadView() {}
 
 	public OverheadView( T image, double centerX, double centerY, double cellSize ) {
 		this.image = image;

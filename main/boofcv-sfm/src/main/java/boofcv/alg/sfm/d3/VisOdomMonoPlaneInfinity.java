@@ -64,6 +64,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 
 	// Motion estimator for points on plane. Motion estimated is from key-frame to current-frame

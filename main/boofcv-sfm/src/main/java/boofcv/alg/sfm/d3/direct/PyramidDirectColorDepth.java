@@ -39,6 +39,7 @@ import lombok.Getter;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class PyramidDirectColorDepth<T extends ImageGray<T>> {
 
 	private final ImageType<Planar<T>> imageType;
@@ -201,6 +202,8 @@ public class PyramidDirectColorDepth<T extends ImageGray<T>> {
 		return fractionInBounds;
 	}
 
+
+	@SuppressWarnings({"NullAway.Init"})
 	public static class LayerTo3D implements ImagePixelTo3D {
 		ImagePixelTo3D orig;
 
