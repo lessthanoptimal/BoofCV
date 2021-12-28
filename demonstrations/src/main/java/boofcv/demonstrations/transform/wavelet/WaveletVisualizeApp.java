@@ -35,6 +35,7 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlCoef;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -46,12 +47,12 @@ import java.util.ArrayList;
  *
  * @author Peter Abeles
  */
-public class WaveletVisualizeApp
-		<T extends ImageGray<T>, W extends ImageGray<W>, C extends WlCoef>
+@SuppressWarnings({"NullAway.Init"})
+public class WaveletVisualizeApp<T extends ImageGray<T>, W extends ImageGray<W>, C extends WlCoef>
 		extends SelectAlgorithmAndInputPanel {
 	int numLevels = 3;
 
-	T image;
+	@Nullable T image;
 	T imageInv;
 
 	Class<T> imageType;
@@ -90,7 +91,7 @@ public class WaveletVisualizeApp
 
 	@Override
 	public void refreshAll( Object[] cookies ) {
-		setActiveAlgorithm(0, null, cookies[0]);
+		setActiveAlgorithm(0, "", cookies[0]);
 	}
 
 	private void addWaveletDesc( String name, WaveletDescription desc ) {

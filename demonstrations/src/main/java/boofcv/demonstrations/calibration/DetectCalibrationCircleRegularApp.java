@@ -51,6 +51,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class DetectCalibrationCircleRegularApp extends CommonDetectCalibrationApp {
 	CalibrationDetectorCircleRegularGrid detector;
 	ConfigGridDimen configGrid;

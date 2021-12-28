@@ -35,6 +35,7 @@ import boofcv.struct.border.BorderType;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Factory for implementations of {@link TrackerObjectQuad}, a high level interface for tracking user specified
@@ -48,22 +49,23 @@ public class FactoryTrackerObjectQuad {
 	/**
 	 * Create an instance of {@link TldTracker  Tracking-Learning-Detection (TLD)} tracker for the
 	 * {@link TrackerObjectQuad} interface.
+	 *
 	 * @param config Configuration for the tracker
 	 * @param <T> Image input type
 	 * @param <D> Image derivative type
 	 * @return TrackerObjectQuad
 	 */
-	public static <T extends ImageGray<T>,D extends ImageGray<D>>
-	TrackerObjectQuad<T> tld(ConfigTrackerTld config , Class<T> imageType ) {
-		if( config == null )
+	public static <T extends ImageGray<T>, D extends ImageGray<D>>
+	TrackerObjectQuad<T> tld( ConfigTrackerTld config, Class<T> imageType ) {
+		if (config == null)
 			config = new ConfigTrackerTld();
 
 		Class<D> derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
 		InterpolatePixelS<T> interpolate = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
-		ImageGradient<T,D> gradient =  FactoryDerivative.sobel(imageType, derivType);
+		ImageGradient<T, D> gradient = FactoryDerivative.sobel(imageType, derivType);
 
-		TldTracker<T,D> tracker = new TldTracker<>(config.parameters, interpolate, gradient, imageType, derivType);
+		TldTracker<T, D> tracker = new TldTracker<>(config.parameters, interpolate, gradient, imageType, derivType);
 
 		return new Tld_to_TrackerObjectQuad<>(tracker, imageType);
 	}
@@ -71,23 +73,24 @@ public class FactoryTrackerObjectQuad {
 	/**
 	 * Create an instance of {@link SparseFlowObjectTracker  Sparse Flow Object Tracker} for the
 	 * {@link TrackerObjectQuad} interface.
+	 *
 	 * @param config Configuration for the tracker,  Null for default.
 	 * @param <T> Image input type
 	 * @param <D> Image derivative type. Null for default.
 	 * @return TrackerObjectQuad
 	 */
-	public static <T extends ImageGray<T>,D extends ImageGray<D>>
-	TrackerObjectQuad<T> sparseFlow( ConfigSfot config, Class<T> imageType , Class<D> derivType ) {
+	public static <T extends ImageGray<T>, D extends ImageGray<D>>
+	TrackerObjectQuad<T> sparseFlow( @Nullable ConfigSfot config, Class<T> imageType, @Nullable Class<D> derivType ) {
 
-		if( derivType == null )
+		if (derivType == null)
 			derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
-		if( config == null )
+		if (config == null)
 			config = new ConfigSfot();
 
-		ImageGradient<T, D> gradient = FactoryDerivative.sobel(imageType,derivType);
+		ImageGradient<T, D> gradient = FactoryDerivative.sobel(imageType, derivType);
 
-		SparseFlowObjectTracker<T,D> tracker = new SparseFlowObjectTracker<>(config, imageType, derivType, gradient);
+		SparseFlowObjectTracker<T, D> tracker = new SparseFlowObjectTracker<>(config, imageType, derivType, gradient);
 
 		return new Sfot_to_TrackObjectQuad<>(tracker, imageType);
 	}
@@ -96,47 +99,36 @@ public class FactoryTrackerObjectQuad {
 	 * Very basic and very fast implementation of mean-shift which uses a fixed sized rectangle for its region.
 	 * Works best when the target is composed of a single color.
 	 *
-	 * @see TrackerMeanShiftLikelihood
-	 *
 	 * @param maxIterations Maximum number of mean-shift iterations. Try 30.
 	 * @param numBins Number of bins in the histogram color model. Try 5.
 	 * @param maxPixelValue Maximum number of pixel values. For 8-bit images this will be 256
 	 * @param modelType Type of color model used.
 	 * @param imageType Type of image
 	 * @return TrackerObjectQuad based on {@link TrackerMeanShiftLikelihood}.
+	 * @see TrackerMeanShiftLikelihood
 	 */
 	public static <T extends ImageBase<T>>
-	TrackerObjectQuad<T> meanShiftLikelihood(int maxIterations,
-											 int numBins,
-											 double maxPixelValue,
-											 MeanShiftLikelihoodType modelType,
-											 ImageType<T> imageType) {
-		PixelLikelihood<T> likelihood;
-
-		switch( modelType ) {
-			case HISTOGRAM:
-				likelihood = FactoryTrackerObjectAlgs.likelihoodHistogramCoupled(maxPixelValue,numBins,imageType);
-				break;
-
-			case HISTOGRAM_INDEPENDENT_RGB_to_HSV:
-				if( imageType.getNumBands() != 3 )
+	TrackerObjectQuad<T> meanShiftLikelihood( int maxIterations,
+											  int numBins,
+											  double maxPixelValue,
+											  MeanShiftLikelihoodType modelType,
+											  ImageType<T> imageType ) {
+		PixelLikelihood<T> likelihood= switch (modelType) {
+			case HISTOGRAM -> FactoryTrackerObjectAlgs.likelihoodHistogramCoupled(maxPixelValue, numBins, imageType);
+			case HISTOGRAM_INDEPENDENT_RGB_to_HSV -> {
+				if (imageType.getNumBands() != 3)
 					throw new IllegalArgumentException("Expected RGB image as input with 3-bands");
-				likelihood = FactoryTrackerObjectAlgs.
-						likelihoodHueSatHistIndependent(maxPixelValue, numBins, (ImageType) imageType);
-				break;
-
-			case HISTOGRAM_RGB_to_HSV:
-				if( imageType.getNumBands() != 3 )
+				yield FactoryTrackerObjectAlgs.likelihoodHueSatHistIndependent(maxPixelValue, numBins, (ImageType)imageType);
+			}
+			case HISTOGRAM_RGB_to_HSV -> {
+				if (imageType.getNumBands() != 3)
 					throw new IllegalArgumentException("Expected RGB image as input with 3-bands");
-				likelihood = FactoryTrackerObjectAlgs.likelihoodHueSatHistCoupled(maxPixelValue,numBins,(ImageType)imageType);
-				break;
+				yield FactoryTrackerObjectAlgs.likelihoodHueSatHistCoupled(maxPixelValue, numBins, (ImageType)imageType);
+			}
+			default -> throw new IllegalArgumentException("Unknown likelihood model " + modelType);
+		};
 
-			default:
-				throw new IllegalArgumentException("Unknown likelihood model "+modelType);
-		}
-
-		TrackerMeanShiftLikelihood<T> alg =
-				new TrackerMeanShiftLikelihood<>(likelihood, maxIterations, 0.1f);
+		var alg = new TrackerMeanShiftLikelihood<>(likelihood, maxIterations, 0.1f);
 
 		return new Msl_to_TrackerObjectQuad<>(alg, likelihood, imageType);
 	}
@@ -146,16 +138,15 @@ public class FactoryTrackerObjectQuad {
 	 * The tracker can also be configured to estimate gradual changes in scale. The track region is
 	 * composed of a rotated rectangle.
 	 *
-	 * @see TrackerMeanShiftComaniciu2003
-	 *
 	 * @param config Tracker configuration
 	 * @param <T> Image type
 	 * @return TrackerObjectQuad based on Comaniciu2003
+	 * @see TrackerMeanShiftComaniciu2003
 	 */
 	public static <T extends ImageBase<T>>
-	TrackerObjectQuad<T> meanShiftComaniciu2003(ConfigComaniciu2003 config, ImageType<T> imageType ) {
+	TrackerObjectQuad<T> meanShiftComaniciu2003( ConfigComaniciu2003 config, ImageType<T> imageType ) {
 
-		TrackerMeanShiftComaniciu2003<T> alg = FactoryTrackerObjectAlgs.meanShiftComaniciu2003(config,imageType);
+		TrackerMeanShiftComaniciu2003<T> alg = FactoryTrackerObjectAlgs.meanShiftComaniciu2003(config, imageType);
 
 		return new Comaniciu2003_to_TrackerObjectQuad<>(alg, imageType);
 	}
@@ -165,15 +156,14 @@ public class FactoryTrackerObjectQuad {
 	 * Discrete Fourier Transform (DCF), and linear classifiers to track a target. Fixed sized rectangular target
 	 * and only estimates translation. Can't detect when it loses track or re-aquire track.
 	 *
-	 * @see CirculantTracker
-	 *
 	 * @param config Configuration
 	 * @return CirculantTracker
+	 * @see CirculantTracker
 	 */
 	public static <T extends ImageGray<T>>
-	TrackerObjectQuad<T> circulant( ConfigCirculantTracker config , Class<T> imageType ) {
+	TrackerObjectQuad<T> circulant( ConfigCirculantTracker config, Class<T> imageType ) {
 
-		CirculantTracker<T> alg = FactoryTrackerObjectAlgs.circulant(config,imageType);
+		CirculantTracker<T> alg = FactoryTrackerObjectAlgs.circulant(config, imageType);
 
 		return new Circulant_to_TrackerObjectQuad<>(alg, ImageType.single(imageType));
 	}

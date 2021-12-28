@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,6 +32,7 @@ import java.awt.event.ActionListener;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class GeneralExtractConfigPanel extends StandardAlgConfigPanel implements ActionListener, ChangeListener {
 	JComboBox selectImage;
 	JSpinner selectSeparation;

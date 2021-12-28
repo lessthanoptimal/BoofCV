@@ -56,6 +56,7 @@ import java.util.ArrayList;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class CompareFeatureExtractorApp<T extends ImageGray<T>, D extends ImageGray<D>>
 		extends SelectAlgorithmAndInputPanel implements GeneralExtractConfigPanel.Listener {
 	T grayImage;

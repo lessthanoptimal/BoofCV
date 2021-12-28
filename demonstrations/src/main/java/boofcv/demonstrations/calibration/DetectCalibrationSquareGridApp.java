@@ -44,6 +44,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class DetectCalibrationSquareGridApp extends CommonDetectCalibrationApp {
 	DetectSquareGridFiducial<GrayF32> alg;
 	ConfigSquareGrid configDet = new ConfigSquareGrid();

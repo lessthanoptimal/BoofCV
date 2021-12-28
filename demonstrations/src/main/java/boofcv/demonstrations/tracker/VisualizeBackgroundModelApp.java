@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,10 +44,10 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class VisualizeBackgroundModelApp extends DemonstrationBase
-	implements BackgroundControlPanel.Listener
-{
-	GrayU8 segmented = new GrayU8(1,1);
+		implements BackgroundControlPanel.Listener {
+	GrayU8 segmented = new GrayU8(1, 1);
 	BufferedImage visualized;
 	BufferedImage original;
 
@@ -55,74 +55,74 @@ public class VisualizeBackgroundModelApp extends DemonstrationBase
 	BackgroundModelStationary<GrayU8> background;
 
 	BackgroundControlPanel controls = new BackgroundControlPanel(this);
-	ImageGridPanel imagePanels = new ImageGridPanel(1,2);
+	ImageGridPanel imagePanels = new ImageGridPanel(1, 2);
 
-	public VisualizeBackgroundModelApp(List<?> exampleInputs ) {
+	public VisualizeBackgroundModelApp( List<?> exampleInputs ) {
 		super(exampleInputs, ImageType.single(GrayU8.class));
 		super.allowImages = false;
 
-		add(BorderLayout.WEST,controls);
-		add(BorderLayout.CENTER,imagePanels);
+		add(BorderLayout.WEST, controls);
+		add(BorderLayout.CENTER, imagePanels);
 
 		imagePanels.setScaleToFit(true);
 	}
 
 	@Override
-	protected void handleInputChange(int source, InputMethod method, int width, int height) {
+	protected void handleInputChange( int source, InputMethod method, int width, int height ) {
 		synchronized (lockBackground) {
 			background.reset();
 		}
-		imagePanels.setPreferredSize(new Dimension(width*2,height));
+		imagePanels.setPreferredSize(new Dimension(width*2, height));
 	}
 
 	@Override
-	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase input) {
+	public void processImage( int sourceID, long frameID, BufferedImage buffered, ImageBase input ) {
 
 		visualized = ConvertBufferedImage.checkDeclare(buffered, visualized);
 		original = ConvertBufferedImage.checkCopy(buffered, original);
 
-		segmented.reshape(input.width,input.height);
+		segmented.reshape(input.width, input.height);
 
 		final double fps;
 		synchronized (lockBackground) {
 			long timeBefore = System.nanoTime();
-			background.updateBackground((GrayU8) input, segmented);
+			background.updateBackground((GrayU8)input, segmented);
 			long timeAfter = System.nanoTime();
-			fps = 1000.0/((timeAfter-timeBefore)*1e-6);
+			fps = 1000.0/((timeAfter - timeBefore)*1e-6);
 		}
 
 		VisualizeBinaryData.renderBinary(segmented, false, visualized);
 
 		BoofSwingUtil.invokeNowOrLater(() -> {
-			imagePanels.setImage(0,0,visualized);
-			imagePanels.setImage(0,1,original);
+			imagePanels.setImage(0, 0, visualized);
+			imagePanels.setImage(0, 1, original);
 			imagePanels.repaint();
 			controls.setFPS(fps);
 		});
 	}
 
 	@Override
-	public void modelChanged(ConfigBackgroundGaussian config, boolean stationary) {
+	public void modelChanged( ConfigBackgroundGaussian config, boolean stationary ) {
 		synchronized (lockBackground) {
 			background = FactoryBackgroundModel.stationaryGaussian(config, ImageType.single(GrayU8.class));
 		}
 	}
 
 	@Override
-	public void modelChanged(ConfigBackgroundBasic config, boolean stationary) {
+	public void modelChanged( ConfigBackgroundBasic config, boolean stationary ) {
 		synchronized (lockBackground) {
 			background = FactoryBackgroundModel.stationaryBasic(config, ImageType.single(GrayU8.class));
 		}
 	}
 
 	@Override
-	public void modelChanged(ConfigBackgroundGmm config, boolean stationary) {
+	public void modelChanged( ConfigBackgroundGmm config, boolean stationary ) {
 		synchronized (lockBackground) {
 			background = FactoryBackgroundModel.stationaryGmm(config, ImageType.single(GrayU8.class));
 		}
 	}
 
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 
 		List<String> examples = new ArrayList<>();
 		examples.add(UtilIO.pathExample("background/street_intersection.mp4"));

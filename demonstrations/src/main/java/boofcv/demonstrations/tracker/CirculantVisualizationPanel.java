@@ -40,7 +40,8 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class CirculantVisualizationPanel extends JPanel implements MouseListener, MouseMotionListener  {
+@SuppressWarnings({"NullAway.Init"})
+public class CirculantVisualizationPanel extends JPanel implements MouseListener, MouseMotionListener {
 	BufferedImage frame;
 	CenterPanel centerPanel = new CenterPanel();
 
@@ -53,20 +54,20 @@ public class CirculantVisualizationPanel extends JPanel implements MouseListener
 	BufferedImage template;
 	BufferedImage response;
 
-	GrayF32 tmp = new GrayF32(1,1);
+	GrayF32 tmp = new GrayF32(1, 1);
 
-	public CirculantVisualizationPanel(Listener listener) {
+	public CirculantVisualizationPanel( Listener listener ) {
 		setLayout(new BorderLayout());
 		this.listener = listener;
 
 		JPanel right = new JPanel();
-		right.setLayout(new  BoxLayout(right,BoxLayout.Y_AXIS));
-		right.setPreferredSize(new Dimension(150,400));
+		right.setLayout(new BoxLayout(right, BoxLayout.Y_AXIS));
+		right.setPreferredSize(new Dimension(150, 400));
 
 		right.add(new TemplatePanel());
 		right.add(new ResponsePanel());
 
-		add(centerPanel,BorderLayout.CENTER);
+		add(centerPanel, BorderLayout.CENTER);
 		add(right, BorderLayout.EAST);
 
 		centerPanel.addMouseListener(this);
@@ -75,27 +76,27 @@ public class CirculantVisualizationPanel extends JPanel implements MouseListener
 	}
 
 	public void setSelectRectangle( boolean value ) {
-		if( value )
+		if (value)
 			numClicks = 0;
 		else
 			numClicks = 2;
 	}
 
-	public void setFrame( final BufferedImage frame) {
-		SwingUtilities.invokeLater( new Runnable() {
+	public void setFrame( final BufferedImage frame ) {
+		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
 				CirculantVisualizationPanel.this.frame = frame;
-				centerPanel.setPreferredSize(new Dimension(frame.getWidth(),frame.getHeight()));
+				centerPanel.setPreferredSize(new Dimension(frame.getWidth(), frame.getHeight()));
 				centerPanel.setMinimumSize(centerPanel.getPreferredSize());
 				centerPanel.revalidate();
 			}
 		});
 	}
 
-	public synchronized void update( final CirculantTracker tracker  ) {
+	public synchronized void update( final CirculantTracker tracker ) {
 
-		if( hasSelected ) {
+		if (hasSelected) {
 			RectangleLength2D_F32 r = tracker.getTargetLocation();
 			selected.x0 = (int)r.x0;
 			selected.y0 = (int)r.y0;
@@ -105,19 +106,19 @@ public class CirculantVisualizationPanel extends JPanel implements MouseListener
 			GrayF64 template = tracker.getTargetTemplate();
 			GrayF64 response = tracker.getResponse();
 
-			if( this.template == null ) {
-				this.template = new BufferedImage(template.width,template.height,BufferedImage.TYPE_INT_RGB);
-				this.response = new BufferedImage(template.width,template.height,BufferedImage.TYPE_INT_RGB);
-				tmp.reshape(template.width,template.height);
+			if (this.template == null) {
+				this.template = new BufferedImage(template.width, template.height, BufferedImage.TYPE_INT_RGB);
+				this.response = new BufferedImage(template.width, template.height, BufferedImage.TYPE_INT_RGB);
+				tmp.reshape(template.width, template.height);
 			}
 
-			ConvertImage.convert(template,tmp);
+			ConvertImage.convert(template, tmp);
 			PixelMath.plus(tmp, 0.5f, tmp);
-			PixelMath.multiply(tmp,255,0,255,tmp);
-			ConvertBufferedImage.convertTo(tmp,this.template,true);
+			PixelMath.multiply(tmp, 255, 0, 255, tmp);
+			ConvertBufferedImage.convertTo(tmp, this.template, true);
 
-			ConvertImage.convert(response,tmp);
-			VisualizeImageData.colorizeSign(tmp,this.response,-1);
+			ConvertImage.convert(response, tmp);
+			VisualizeImageData.colorizeSign(tmp, this.response, -1);
 		}
 
 		repaint();
@@ -129,13 +130,13 @@ public class CirculantVisualizationPanel extends JPanel implements MouseListener
 	}
 
 	@Override
-	public void mouseDragged(MouseEvent e) {
+	public void mouseDragged( MouseEvent e ) {
 
 	}
 
 	@Override
-	public void mouseMoved(MouseEvent e) {
-		if( numClicks == 1 ) {
+	public void mouseMoved( MouseEvent e ) {
+		if (numClicks == 1) {
 			selected.x1 = e.getX();
 			selected.y1 = e.getY();
 			centerPanel.repaint();
@@ -144,71 +145,70 @@ public class CirculantVisualizationPanel extends JPanel implements MouseListener
 
 	private class CenterPanel extends JPanel {
 		@Override
-		protected synchronized void paintComponent(Graphics g) {
+		protected synchronized void paintComponent( Graphics g ) {
 			super.paintComponent(g);
 			Graphics2D g2 = (Graphics2D)g;
 
-			g2.drawImage(frame,0,0,null);
+			g2.drawImage(frame, 0, 0, null);
 
-			 if( hasSelected ) {
-				drawRectangle(g2,selected,Color.RED,3);
-			} else if( numClicks == 1 ) {
-				 drawRectangle(g2,selected,Color.BLUE,3);
-			 }
+			if (hasSelected) {
+				drawRectangle(g2, selected, Color.RED, 3);
+			} else if (numClicks == 1) {
+				drawRectangle(g2, selected, Color.BLUE, 3);
+			}
 		}
 	}
 
 	private class TemplatePanel extends JPanel {
 
 		@Override
-		protected synchronized void paintComponent(Graphics g) {
+		protected synchronized void paintComponent( Graphics g ) {
 			super.paintComponent(g);
 
-			if( template == null )return;
+			if (template == null) return;
 
 			Graphics2D g2 = (Graphics2D)g;
 
 //			g2.setTransform(AffineTransform.getScaleInstance(2,2));
-			g2.drawImage(template,0,0,null);
+			g2.drawImage(template, 0, 0, null);
 		}
 	}
 
 	private class ResponsePanel extends JPanel {
 
 		@Override
-		protected synchronized void paintComponent(Graphics g) {
+		protected synchronized void paintComponent( Graphics g ) {
 			super.paintComponent(g);
-			if( response == null )return;
+			if (response == null) return;
 
 			Graphics2D g2 = (Graphics2D)g;
 
 //			g2.setTransform(AffineTransform.getScaleInstance(2,2));
-			g2.drawImage(response,0,0,null);
+			g2.drawImage(response, 0, 0, null);
 		}
 	}
 
-
-	private void drawRectangle(Graphics2D g2 , ImageRectangle r , Color c , int size) {
+	private void drawRectangle( Graphics2D g2, ImageRectangle r, Color c, int size ) {
 		g2.setColor(c);
 		g2.setStroke(new BasicStroke(size));
 
-		g2.drawLine(r.x0,r.y0,r.x1,r.y0);
-		g2.drawLine(r.x1,r.y0,r.x1,r.y1);
-		g2.drawLine(r.x1,r.y1,r.x0,r.y1);
-		g2.drawLine(r.x0,r.y1,r.x0,r.y0);
+		g2.drawLine(r.x0, r.y0, r.x1, r.y0);
+		g2.drawLine(r.x1, r.y0, r.x1, r.y1);
+		g2.drawLine(r.x1, r.y1, r.x0, r.y1);
+		g2.drawLine(r.x0, r.y1, r.x0, r.y0);
 	}
 
 	@Override
-	public void mouseClicked(MouseEvent e) {
-		if( numClicks == 0 ) {
-			selected.x0 = selected.x1 =  e.getX();
-			selected.y0 = selected.y1 =  e.getY();
+	public void mouseClicked( MouseEvent e ) {
+		if (numClicks == 0) {
+			selected.x0 = selected.x1 = e.getX();
+			selected.y0 = selected.y1 = e.getY();
 			centerPanel.repaint();
-		} else if( numClicks == 1 ) {
+		} else if (numClicks == 1) {
 			selected.x1 = e.getX();
 			selected.y1 = e.getY();
 			hasSelected = true;
-			listener.startTracking(selected.x0,selected.y0,selected.x1,selected.y1);
+			listener.startTracking(selected.x0, selected.y0, selected.x1, selected.y1);
 		} else {
 			listener.togglePause();
 		}
@@ -216,20 +216,19 @@ public class CirculantVisualizationPanel extends JPanel implements MouseListener
 	}
 
 	@Override
-	public void mousePressed(MouseEvent e) {}
+	public void mousePressed( MouseEvent e ) {}
 
 	@Override
-	public void mouseReleased(MouseEvent e) {}
+	public void mouseReleased( MouseEvent e ) {}
 
 	@Override
-	public void mouseEntered(MouseEvent e) {}
+	public void mouseEntered( MouseEvent e ) {}
 
 	@Override
-	public void mouseExited(MouseEvent e) {}
+	public void mouseExited( MouseEvent e ) {}
 
-	public static interface Listener
-	{
-		public void startTracking(int x0, int y0, int x1, int y1);
+	public static interface Listener {
+		public void startTracking( int x0, int y0, int x1, int y1 );
 
 		public void togglePause();
 	}

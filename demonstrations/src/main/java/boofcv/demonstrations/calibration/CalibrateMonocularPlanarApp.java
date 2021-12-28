@@ -75,6 +75,7 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class CalibrateMonocularPlanarApp extends JPanel {
 	public static final String CALIBRATION_TARGET = "calibration_target.yaml";
 	public static final String INTRINSICS = "intrinsics.yaml";
@@ -215,7 +216,7 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 				String detectorName = detectorSet.select(() -> detectorSet.detector.getClass().getSimpleName());
 				for (String imageName : results.imagePaths) {
 					String outputName = FilenameUtils.getBaseName(imageName) + ".csv";
-					CalibrationIO.saveLandmarksCsv(imageName, detectorName, results.imageObservations.get(imageName),
+					CalibrationIO.saveLandmarksCsv(imageName, detectorName, results.getObservation(imageName),
 							new File(destination, outputName));
 				}
 			});
@@ -405,6 +406,8 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 
 		CalibrationObservation imageObservations = getObservationsForSelected();
 		ImageResults imageResults = getResultsForSelected();
+		if (imageObservations == null || imageResults == null)
+			return;
 		getCalibrationPanel().setResults(imageObservations, imageResults, results.allUsedObservations);
 		getCalibrationPanel().repaint();
 	}
@@ -522,7 +525,7 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 			results.safe(() -> {
 				for (int usedIdx = 0; usedIdx < results.usedImages.size(); usedIdx++) {
 					String image = results.imagePaths.get(results.usedImages.get(usedIdx));
-					detectorSet.calibrator.addImage(results.imageObservations.get(image));
+					detectorSet.calibrator.addImage(results.getObservation(image));
 				}
 			});
 
@@ -586,7 +589,7 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 			double maxError = 0.0;
 			for (int i = 0; i < results.usedImages.size(); i++) {
 				String image = results.imagePaths.get(results.usedImages.get(i));
-				ImageResults r = results.imageResults.get(image);
+				ImageResults r = results.getResults(image);
 				averageError += r.meanError;
 				maxError = Math.max(maxError, r.maxError);
 			}
@@ -595,7 +598,7 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 			text += String.format("%-10s | %8s\n", "image", "max (px)");
 			for (int i = 0; i < results.usedImages.size(); i++) {
 				String image = results.imagePaths.get(results.usedImages.get(i));
-				ImageResults r = results.imageResults.get(image);
+				ImageResults r = results.getResults(image);
 				text += String.format("%-12s %8.3f\n", new File(image).getName(), r.maxError);
 			}
 
@@ -663,7 +666,7 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 			results.safe(() -> {
 				// Remove all points from this image, which will remove it from the active list
 				String image = results.imagePaths.get(selected);
-				results.imageObservations.get(image).points.clear();
+				results.getObservation(image).points.clear();
 
 				// This image is no longer used for calibration
 				int usedIdx = results.usedImages.indexOf(selected);
@@ -688,7 +691,7 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 				// Revert by mindlessly copying
 				CalibrationObservation o = results.originalObservations.get(i);
 				String image = results.imagePaths.get(i);
-				results.imageObservations.get(image).setTo(o);
+				results.getObservation(image).setTo(o);
 
 				// If the image has enough points, use it
 				if (o.size() >= 4)
@@ -717,12 +720,13 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 		BoofSwingUtil.checkGuiThread();
 
 		int selected = imageListPanel.selectedImage;
-		return results.select(() -> {
+		return results.selectNull(() -> {
 			if (selected < 0 || selected >= results.imagePaths.size())
 				return null;
 			return results.imageObservations.get(results.imagePaths.get(selected));
 		});
 	}
+
 
 	protected @Nullable ImageResults getResultsForSelected() {
 		BoofSwingUtil.checkGuiThread();
@@ -731,10 +735,10 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 			return null;
 
 		int selected = imageListPanel.selectedImage;
-		return results.select(() -> {
+		return results.selectNull(() -> {
 			if (selected < 0 || selected >= results.imagePaths.size())
 				return null;
-			return results.imageResults.get(results.imagePaths.get(selected));
+			return results.getResults(results.imagePaths.get(selected));
 		});
 	}
 
@@ -890,6 +894,14 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 		protected final DogArray_I32 usedImages = new DogArray_I32();
 		// Copy of original observation before any edits
 		protected final DogArray<CalibrationObservation> originalObservations = new DogArray<>(CalibrationObservation::new);
+
+		public CalibrationObservation getObservation( String key ) {
+			return Objects.requireNonNull(imageObservations.get(key));
+		}
+
+		public ImageResults getResults( String key ) {
+			return Objects.requireNonNull(imageResults.get(key));
+		}
 
 		public void reset() {
 			safe(() -> {
