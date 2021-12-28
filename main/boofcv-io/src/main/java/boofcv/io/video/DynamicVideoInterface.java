@@ -25,6 +25,7 @@ import boofcv.io.wrapper.images.JpegByteImageSequence;
 import boofcv.io.wrapper.images.LoadFileImageSequence;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,10 +40,11 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("NullAway.Init")
 public class DynamicVideoInterface implements VideoInterface {
 
-	VideoInterface jcodec;
-	VideoInterface ffmpeg;
+	@Nullable VideoInterface jcodec;
+	@Nullable VideoInterface ffmpeg;
 	BoofMjpegVideo mjpeg = new BoofMjpegVideo();
 
 	public DynamicVideoInterface() {
@@ -56,7 +58,7 @@ public class DynamicVideoInterface implements VideoInterface {
 	}
 
 	@Override
-	public <T extends ImageBase<T>> SimpleImageSequence<T> load( String fileName, ImageType<T> imageType ) {
+	public <T extends ImageBase<T>> @Nullable SimpleImageSequence<T> load( String fileName, ImageType<T> imageType ) {
 		URL url = UtilIO.ensureURL(fileName);
 		if (url == null)
 			throw new RuntimeException("Can't open " + fileName);

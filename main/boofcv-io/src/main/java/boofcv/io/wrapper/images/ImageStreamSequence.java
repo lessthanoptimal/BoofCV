@@ -38,8 +38,8 @@ import java.io.*;
  *
  * @author Peter Abeles
  */
-public class ImageStreamSequence<T extends ImageBase<T>>
-		implements SimpleImageSequence<T> {
+@SuppressWarnings({"NullAway.Init"})
+public class ImageStreamSequence<T extends ImageBase<T>> implements SimpleImageSequence<T> {
 	// If the data set was read from a file it can then be restarted
 	String fileName;
 
@@ -119,6 +119,7 @@ public class ImageStreamSequence<T extends ImageBase<T>>
 		return original;
 	}
 
+	@SuppressWarnings("NullAway")
 	@Override
 	public void close() {
 		try {

@@ -26,6 +26,7 @@ import boofcv.io.video.DynamicVideoInterface;
 import boofcv.io.video.VideoInterface;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -49,14 +50,14 @@ public class DefaultMediaManager implements MediaManager {
 	VideoInterface videoInterface = new DynamicVideoInterface();
 	WebcamInterface webcamInterface = new DynamicWebcamInterface();
 
-	@Override public Reader openFile( String fileName ) {
+	@Override public @Nullable Reader openFile( String fileName ) {
 		InputStream stream = UtilIO.openStream(fileName);
 		if (stream == null)
 			return null;
 		return new InputStreamReader(stream, StandardCharsets.UTF_8);
 	}
 
-	@Override public BufferedImage openImage( String fileName ) {
+	@Override public @Nullable BufferedImage openImage( String fileName ) {
 		BufferedImage b = cachedImage.get(fileName);
 
 		if (b == null) {
@@ -75,8 +76,8 @@ public class DefaultMediaManager implements MediaManager {
 		return c;
 	}
 
-	@Override public <T extends ImageBase<T>> SimpleImageSequence<T>
-	openVideo( String fileName, ImageType<T> type ) {
+	@Override public <T extends ImageBase<T>>
+	@Nullable SimpleImageSequence<T> openVideo( String fileName, ImageType<T> type ) {
 		return videoInterface.load(fileName, type);
 	}
 

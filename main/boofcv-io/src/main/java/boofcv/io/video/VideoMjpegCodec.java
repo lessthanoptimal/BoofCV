@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.io.video;
 
+import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -44,55 +45,56 @@ public class VideoMjpegCodec {
 
 			DataInputStream in = new DataInputStream(new ByteArrayInputStream(b));
 
-			while( findMarker(in,SOI) && in.available() > 0 ) {
+			while (findMarker(in, SOI) && in.available() > 0) {
 				byte data[] = readJpegData(in, EOI);
 				ret.add(data);
 			}
-		} catch (IOException ignore) {}
+		} catch (IOException ignore) {
+		}
 		return ret;
 	}
 
 	/**
 	 * Read a single frame at a time
 	 */
-	public byte[] readFrame( DataInputStream in ) {
+	public @Nullable byte[] readFrame( DataInputStream in ) {
 		try {
-			if( findMarker(in,SOI) && in.available() > 0 ) {
+			if (findMarker(in, SOI) && in.available() > 0) {
 				return readJpegData(in, EOI);
 			}
-		} catch (IOException ignore) {}
+		} catch (IOException ignore) {
+		}
 		return null;
 	}
 
-
-	public static byte[] convertToByteArray(InputStream streamIn) throws IOException {
+	public static byte[] convertToByteArray( InputStream streamIn ) throws IOException {
 		ByteArrayOutputStream temp = new ByteArrayOutputStream(1024);
-		byte[] data = new byte[ 1024 ];
+		byte[] data = new byte[1024];
 		int length;
-		while( ( length = streamIn.read(data)) != -1 ) {
-			temp.write(data,0,length);
+		while ((length = streamIn.read(data)) != -1) {
+			temp.write(data, 0, length);
 		}
 		return temp.toByteArray();
 	}
 
-	private boolean findMarker( DataInputStream in , byte marker ) throws IOException {
+	private boolean findMarker( DataInputStream in, byte marker ) throws IOException {
 		boolean foundFF = false;
 
-		while( in.available() > 0 )  {
+		while (in.available() > 0) {
 			byte b = in.readByte();
-			if( foundFF ) {
-				if( b == marker ) {
+			if (foundFF) {
+				if (b == marker) {
 					return true;
-				} else if( b != (byte)0xFF )
+				} else if (b != (byte)0xFF)
 					foundFF = false;
-			} else if( b == (byte)0xFF ) {
+			} else if (b == (byte)0xFF) {
 				foundFF = true;
 			}
 		}
 		return foundFF;
 	}
 
-	private byte[] readJpegData(DataInputStream in, byte marker) throws IOException {
+	private byte[] readJpegData( DataInputStream in, byte marker ) throws IOException {
 		ByteArrayOutputStream bout = new ByteArrayOutputStream(1024);
 
 		// add the SOI marker back into it
@@ -101,17 +103,17 @@ public class VideoMjpegCodec {
 
 		boolean foundFF = false;
 
-		while( in.available() > 0 ) {
+		while (in.available() > 0) {
 			byte d = in.readByte();
-			if( foundFF ) {
-				if( d == marker )
+			if (foundFF) {
+				if (d == marker)
 					break;
 				else {
 					bout.write(0xFF);
 					bout.write(d);
 					foundFF = false;
 				}
-			} else if( d ==(byte)0xFF ) {
+			} else if (d == (byte)0xFF) {
 				foundFF = true;
 			} else {
 				bout.write(d);
@@ -119,6 +121,4 @@ public class VideoMjpegCodec {
 		}
 		return bout.toByteArray();
 	}
-
-
 }

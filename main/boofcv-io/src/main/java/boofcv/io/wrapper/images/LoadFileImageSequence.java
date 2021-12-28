@@ -23,6 +23,7 @@ import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -31,7 +32,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Collections;
-
+import java.util.Objects;
 
 /**
  * Loads all the images in a directory that have the specified suffix. If requested it can
@@ -40,10 +41,11 @@ import java.util.Collections;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("NullAway.Init")
 public class LoadFileImageSequence<T extends ImageBase<T>> implements SimpleImageSequence<T> {
 
 	String directoryName;
-	String suffix;
+	@Nullable String suffix;
 
 	int index;
 	java.util.List<String> fileNames = new ArrayList<>();
@@ -55,7 +57,7 @@ public class LoadFileImageSequence<T extends ImageBase<T>> implements SimpleImag
 	int scalefactor;
 	BufferedImage scaled;
 	// reference to output GUI image
-	BufferedImage imageGUI;
+	@Nullable BufferedImage imageGUI;
 
 	boolean loop = false;
 	boolean forwards = true;
@@ -64,20 +66,20 @@ public class LoadFileImageSequence<T extends ImageBase<T>> implements SimpleImag
 	 * Will load an image sequence with no modification.
 	 *
 	 * @param directory The directory containing the images.
-	 * @param suffix	The suffix that the images have.
+	 * @param suffix The suffix that the images have.
 	 */
-	public LoadFileImageSequence(ImageType<T> type, String directory, String suffix) {
+	public LoadFileImageSequence( ImageType<T> type, String directory, @Nullable String suffix ) {
 		this(type, directory, suffix, 1);
 	}
 
 	/**
 	 * Will load an image sequence and then scale the images
 	 *
-	 * @param directory   The directory containing the images.
-	 * @param suffix	  The suffix that the images have.
+	 * @param directory The directory containing the images.
+	 * @param suffix The suffix that the images have.
 	 * @param scalefactor How much the images will be scaled down by.
 	 */
-	public LoadFileImageSequence(ImageType<T> type, String directory, String suffix, int scalefactor) {
+	public LoadFileImageSequence( ImageType<T> type, String directory, @Nullable String suffix, int scalefactor ) {
 		this.directoryName = directory;
 		this.suffix = suffix;
 		this.scalefactor = scalefactor;
@@ -91,7 +93,7 @@ public class LoadFileImageSequence<T extends ImageBase<T>> implements SimpleImag
 	}
 
 	@Override
-	public void setLoop(boolean loop) {
+	public void setLoop( boolean loop ) {
 		this.loop = loop;
 	}
 
@@ -103,21 +105,21 @@ public class LoadFileImageSequence<T extends ImageBase<T>> implements SimpleImag
 		File dir = new File(directoryName);
 
 		if (!dir.isDirectory())
-			throw new IllegalArgumentException("directory must specify a directory. path = "+directoryName);
+			throw new IllegalArgumentException("directory must specify a directory. path = " + directoryName);
 
 		fileNames.clear();
 
 		File[] files;
-		if( suffix != null )
+		if (suffix != null)
 			files = dir.listFiles(new Filter());
 		else
 			files = dir.listFiles();
 
-		if( files == null )
+		if (files == null)
 			return;
 
 		for (File f : files) {
-			if( UtilImageIO.isImage(f))
+			if (UtilImageIO.isImage(f))
 				fileNames.add(f.getAbsolutePath());
 		}
 
@@ -139,7 +141,7 @@ public class LoadFileImageSequence<T extends ImageBase<T>> implements SimpleImag
 	 */
 	@Override
 	public boolean hasNext() {
-		if( loop )
+		if (loop)
 			return true;
 		else
 			return index < fileNames.size();
@@ -152,14 +154,14 @@ public class LoadFileImageSequence<T extends ImageBase<T>> implements SimpleImag
 	 */
 	@Override
 	public T next() {
-		if( loop ) {
-			if( forwards ) {
-				if( index >= fileNames.size() ) {
-					index = fileNames.size()-1;
+		if (loop) {
+			if (forwards) {
+				if (index >= fileNames.size()) {
+					index = fileNames.size() - 1;
 					forwards = false;
 				}
 			} else {
-				if( index < 0 ) {
+				if (index < 0) {
 					index = 0;
 					forwards = true;
 				}
@@ -167,24 +169,24 @@ public class LoadFileImageSequence<T extends ImageBase<T>> implements SimpleImag
 		}
 
 		int indexbefore = index;
-		if( forwards )
+		if (forwards)
 			imageGUI = UtilImageIO.loadImage(fileNames.get(index++));
 		else
 			imageGUI = UtilImageIO.loadImage(fileNames.get(index--));
 
-		if( imageGUI == null )
-			throw new RuntimeException("Could not load image at index "+indexbefore);
+		if (imageGUI == null)
+			throw new RuntimeException("Could not load image at index " + indexbefore);
 
-		image = type.createImage(imageGUI.getWidth(),imageGUI.getHeight());
-		ConvertBufferedImage.convertFrom(imageGUI, image,true);
+		image = type.createImage(imageGUI.getWidth(), imageGUI.getHeight());
+		ConvertBufferedImage.convertFrom(imageGUI, image, true);
 
 		// no changes needed so return the original
 		if (scalefactor == 1)
 			return image;
 
 		// scale down the image
-		int width = image.getWidth() / scalefactor;
-		int height = image.getHeight() / scalefactor;
+		int width = image.getWidth()/scalefactor;
+		int height = image.getHeight()/scalefactor;
 
 		if (scaled == null || scaled.getWidth() != width || scaled.getHeight() != height) {
 			scaled = new BufferedImage(width, height, imageGUI.getType());
@@ -192,7 +194,7 @@ public class LoadFileImageSequence<T extends ImageBase<T>> implements SimpleImag
 		Graphics2D g2 = scaled.createGraphics();
 
 		AffineTransform affine = new AffineTransform();
-		affine.setToScale(1.0 / scalefactor, 1.0 / scalefactor);
+		affine.setToScale(1.0/scalefactor, 1.0/scalefactor);
 
 		g2.drawImage(imageGUI, affine, null);
 		imageGUI = scaled;
@@ -206,7 +208,7 @@ public class LoadFileImageSequence<T extends ImageBase<T>> implements SimpleImag
 
 	@Override
 	public BufferedImage getGuiImage() {
-		return imageGUI;
+		return Objects.requireNonNull(imageGUI);
 	}
 
 	@Override
@@ -216,13 +218,14 @@ public class LoadFileImageSequence<T extends ImageBase<T>> implements SimpleImag
 
 	@Override
 	public int getFrameNumber() {
-		return index-1;
+		return index - 1;
 	}
 
 	@Override
 	public void close() {
 	}
 
+	@SuppressWarnings("NullAway")
 	@Override
 	public void reset() {
 		index = 0;
@@ -239,14 +242,14 @@ public class LoadFileImageSequence<T extends ImageBase<T>> implements SimpleImag
 		return index;
 	}
 
-	public void setIndex(int index) {
+	public void setIndex( int index ) {
 		this.index = index;
 	}
 
 	private class Filter implements FilenameFilter {
 
 		@Override
-		public boolean accept(File dir, String name) {
+		public boolean accept( File dir, String name ) {
 			return name.contains(suffix);
 		}
 	}

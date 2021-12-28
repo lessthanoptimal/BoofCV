@@ -123,6 +123,7 @@ public class RecognitionIO {
 				listImageIds = recognizer.getImageIds();
 			}
 		}
+		Objects.requireNonNull(listImageIds);
 
 		if (!listImageIds.isEmpty()) {
 			UtilIO.saveListStringYaml(listImageIds, new File(dir, IMAGE_ID_NAME));

@@ -31,10 +31,7 @@ import java.io.UncheckedIOException;
 import java.io.Writer;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static boofcv.io.calibration.CalibrationIO.createYmlObject;
 
@@ -161,7 +158,7 @@ public class SerializeConfigYaml {
 				if (key.startsWith("BoofCV"))
 					continue;
 				T config = (T)Class.forName(key).getConstructor().newInstance();
-				deserialize(config, (Map<String, Object>)state.get(key));
+				deserialize(config, (Map<String, Object>)Objects.requireNonNull(state.get(key)));
 				config.serializeInitialize();
 				return config;
 			}
@@ -181,7 +178,7 @@ public class SerializeConfigYaml {
 				if (ftype.isEnum()) {
 					f.set(parent, state.get(key));
 				} else if (ftype.isPrimitive()) {
-					Object value = state.get(key);
+					Object value = Objects.requireNonNull(state.get(key));
 					if (ftype == boolean.class)
 						f.set(parent, ((Boolean)value).booleanValue());
 					else if (ftype == byte.class)
@@ -204,7 +201,7 @@ public class SerializeConfigYaml {
 					f.set(parent, state.get(key));
 				} else if (FastArray.class.isAssignableFrom(ftype)) {
 					// See if the list is empty and there's nothing to do
-					List listOfStates = (List)state.get(key);
+					List listOfStates = (List)Objects.requireNonNull(state.get(key));
 					if (listOfStates.isEmpty())
 						continue;
 
@@ -228,7 +225,7 @@ public class SerializeConfigYaml {
 					}
 				} else {
 					Object child = ftype.getConstructor().newInstance();
-					deserialize(child, (Map<String, Object>)state.get(key));
+					deserialize(child, (Map<String, Object>)Objects.requireNonNull(state.get(key)));
 					Class c = child.getClass();
 					c.getMethod("setTo", c).invoke(f.get(parent), child);
 				}

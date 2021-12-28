@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,10 +25,7 @@ import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static boofcv.io.calibration.CalibrationIO.createYmlObject;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -138,7 +135,7 @@ public class FiducialIO {
 		if( def.markerHeight <= 0)
 			def.markerHeight = def.markerWidth;
 
-		List<List<List<Double>>> listMarkers = (List<List<List<Double>>>)data.get("markers");
+		List<List<List<Double>>> listMarkers = (List<List<List<Double>>>)Objects.requireNonNull(data.get("markers"));
 
 		for (int markerIdx = 0; markerIdx < listMarkers.size(); markerIdx++) {
 			List<List<Double>> listYaml = listMarkers.get(markerIdx);

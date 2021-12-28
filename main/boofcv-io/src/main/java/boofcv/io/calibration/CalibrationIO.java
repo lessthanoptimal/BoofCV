@@ -282,15 +282,16 @@ public class CalibrationIO {
 		} else if (model.equals(MODEL_BROWN)) {
 			CameraPinholeBrown parameters = new CameraPinholeBrown();
 
-			loadPinhole((Map<String, Object>)data.get("pinhole"), parameters);
+			loadPinhole((Map<String, Object>)Objects.requireNonNull(data.get("pinhole")), parameters);
 
 			Map<String, Object> distortion = getOrThrow(data, "radial_tangential");
 			if (distortion.containsKey("radial")) {
 				List<Double> list = (List<Double>)distortion.get("radial");
 				if (list != null) {
-					parameters.radial = new double[list.size()];
+					double[] radial = new double[list.size()];
+					parameters.radial = radial;
 					for (int i = 0; i < list.size(); i++) {
-						parameters.radial[i] = list.get(i);
+						radial[i] = list.get(i);
 					}
 				}
 			}
@@ -480,7 +481,7 @@ public class CalibrationIO {
 		return coefficients;
 	}
 
-	public static Se3_F64 loadSe3( Map<String, Object> map, Se3_F64 transform ) {
+	public static Se3_F64 loadSe3( Map<String, Object> map, @Nullable Se3_F64 transform ) {
 		if (transform == null)
 			transform = new Se3_F64();
 
@@ -644,6 +645,8 @@ public class CalibrationIO {
 
 	public static CameraPinholeBrown loadOpenCV( String path ) {
 		URL url = UtilIO.ensureURL(path);
+		if (url == null)
+			throw new RuntimeException("Unknown path=" + path);
 		return loadOpenCV(url);
 	}
 

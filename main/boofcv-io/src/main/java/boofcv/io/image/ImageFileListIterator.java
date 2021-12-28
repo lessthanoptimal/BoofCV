@@ -77,6 +77,9 @@ public class ImageFileListIterator<T extends ImageBase<T>> implements Iterator<T
 
 	public T loadImage( int index ) {
 		BufferedImage buffered = UtilImageIO.loadImage(paths.get(index));
+		if (buffered == null)
+			throw new RuntimeException("Unknown path="+paths.get(index));
+
 		ConvertBufferedImage.convertFrom(buffered, true, image);
 		return image;
 	}

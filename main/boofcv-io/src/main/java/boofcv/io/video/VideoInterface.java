@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.io.video;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Abstract interface for loading video streams.
@@ -29,6 +29,6 @@ import boofcv.struct.image.ImageType;
  * @author Peter Abeles
  */
 public interface VideoInterface {
-
-	public <T extends ImageBase<T>> SimpleImageSequence<T> load( String fileName , ImageType<T> imageType );
+	<T extends ImageBase<T>>
+	@Nullable SimpleImageSequence<T> load( String fileName, ImageType<T> imageType );
 }

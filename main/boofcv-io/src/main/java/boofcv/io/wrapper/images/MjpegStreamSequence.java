@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,10 +23,12 @@ import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.video.VideoMjpegCodec;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import org.jetbrains.annotations.Nullable;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.util.Objects;
 
 /**
  * Instead of loading and decompressing the whole MJPEG at once, it loads the images
@@ -34,31 +36,30 @@ import java.io.*;
  *
  * @author Peter Abeles
  */
-public class MjpegStreamSequence<T extends ImageBase<T>>
-		implements SimpleImageSequence<T>
-{
+@SuppressWarnings("NullAway.Init")
+public class MjpegStreamSequence<T extends ImageBase<T>> implements SimpleImageSequence<T> {
 	VideoMjpegCodec codec = new VideoMjpegCodec();
 	DataInputStream in;
-	BufferedImage original;
-	BufferedImage next;
+	@Nullable BufferedImage original;
+	@Nullable BufferedImage next;
 	T image;
 	int frameNumber;
 	ImageType<T> imageType;
 
-	public MjpegStreamSequence( InputStream in , ImageType<T> imageType ) {
+	public MjpegStreamSequence( InputStream in, ImageType<T> imageType ) {
 		this.in = new DataInputStream(in);
 		this.imageType = imageType;
-		image = imageType.createImage(1,1);
+		image = imageType.createImage(1, 1);
 		readNext();
 	}
 
-	public MjpegStreamSequence( String fileName , ImageType<T> imageType ) throws FileNotFoundException {
-		this(new DataInputStream(new BufferedInputStream(new FileInputStream(fileName),1024*200)),imageType);
+	public MjpegStreamSequence( String fileName, ImageType<T> imageType ) throws FileNotFoundException {
+		this(new DataInputStream(new BufferedInputStream(new FileInputStream(fileName), 1024*200)), imageType);
 	}
 
 	private void readNext() {
 		byte[] data = codec.readFrame(in);
-		if( data == null ) {
+		if (data == null) {
 			next = null;
 		} else {
 			try {
@@ -72,12 +73,12 @@ public class MjpegStreamSequence<T extends ImageBase<T>>
 
 	@Override
 	public int getWidth() {
-		return next.getWidth();
+		return Objects.requireNonNull(next).getWidth();
 	}
 
 	@Override
 	public int getHeight() {
-		return next.getHeight();
+		return Objects.requireNonNull(next).getHeight();
 	}
 
 	@Override
@@ -87,9 +88,9 @@ public class MjpegStreamSequence<T extends ImageBase<T>>
 
 	@Override
 	public T next() {
-		original = next;
-		image.reshape(original.getWidth(),original.getHeight());
-		ConvertBufferedImage.convertFrom(original,image, true);
+		original = Objects.requireNonNull(next);
+		image.reshape(original.getWidth(), original.getHeight());
+		ConvertBufferedImage.convertFrom(original, image, true);
 		readNext();
 		return getImage();
 	}
@@ -101,24 +102,26 @@ public class MjpegStreamSequence<T extends ImageBase<T>>
 
 	@Override
 	public BufferedImage getGuiImage() {
-		return original;
+		return Objects.requireNonNull(original);
 	}
 
+	@SuppressWarnings("NullAway")
 	@Override
 	public void close() {
 		try {
 			in.close();
-		} catch (IOException ignore) {}
+		} catch (IOException ignore) {
+		}
 		in = null;
 	}
 
 	@Override
 	public int getFrameNumber() {
-		return frameNumber-1;
+		return frameNumber - 1;
 	}
 
 	@Override
-	public void setLoop(boolean loop) {
+	public void setLoop( boolean loop ) {
 		throw new RuntimeException("Can't loop");
 	}
 

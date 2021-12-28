@@ -22,6 +22,7 @@ import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.images.MjpegStreamSequence;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.FileNotFoundException;
 
@@ -32,7 +33,7 @@ import java.io.FileNotFoundException;
  */
 public class BoofMjpegVideo implements VideoInterface {
 	@Override
-	public <T extends ImageBase<T>> SimpleImageSequence<T> load( String fileName, ImageType<T> imageType ) {
+	public <T extends ImageBase<T>> @Nullable SimpleImageSequence<T> load( String fileName, ImageType<T> imageType ) {
 		try {
 			return new MjpegStreamSequence<>(fileName, imageType);
 		} catch (FileNotFoundException e) {

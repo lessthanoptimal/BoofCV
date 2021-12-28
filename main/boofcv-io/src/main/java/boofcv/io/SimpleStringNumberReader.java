@@ -29,62 +29,68 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("NullAway.Init")
 public class SimpleStringNumberReader {
 
 	char commentChar;
 	Reader input;
 
-	char buffer[] = new char[1024];
+	char[] buffer = new char[1024];
 	List<Object> sequence;
 
 	int where;
-	
+
 	Object current;
 
-	public SimpleStringNumberReader(char commentChar) {
+	public SimpleStringNumberReader( char commentChar ) {
 		this.commentChar = commentChar;
 	}
-	
-	public boolean read( Reader input )  {
+
+	public boolean read( Reader input ) {
 		this.input = input;
 		try {
 			sequence = new ArrayList<>();
 			where = 0;
 			int v = input.read();
 
-			while( v >= 0 ) {
-				if( v == commentChar ) {
+			while (v >= 0) {
+				if (v == commentChar) {
 					skipLine();
 				} else {
 					parseLine(v);
 				}
 				v = input.read();
 			}
-		} catch( IOException e ) {
+		} catch (IOException e) {
 			return false;
 		}
 
-		this.input = null;
-		
+		dereferenceInput();
+
 		return true;
 	}
-	
-	public int remainingTokens() {
-		return sequence.size()-where;
+
+	@SuppressWarnings("NullAway")
+	private void dereferenceInput() {
+		this.input = null;
 	}
-	
+
+	public int remainingTokens() {
+		return sequence.size() - where;
+	}
+
 	public boolean next() {
-		if( sequence.size() > where ) {
+		if (sequence.size() > where) {
 			current = sequence.get(where++);
 			return true;
 		}
 		return false;
 	}
-	
+
 	public boolean isString() {
 		return current instanceof String;
 	}
-	
+
 	public String getString() {
 		return (String)current;
 	}
@@ -94,28 +100,28 @@ public class SimpleStringNumberReader {
 	}
 
 	public String nextString() {
-		if( !next() )
+		if (!next())
 			throw new RuntimeException("There is no next token!");
-		if( !isString())
-			throw new RuntimeException("The token is a double not a string. "+current);
+		if (!isString())
+			throw new RuntimeException("The token is a double not a string. " + current);
 		return (String)current;
 	}
 
 	public double nextDouble() {
-		if( !next() )
+		if (!next())
 			throw new RuntimeException("There is no next token!");
-		if( isString())
-			throw new RuntimeException("The token is a string not a double. "+current);
+		if (isString())
+			throw new RuntimeException("The token is a string not a double. " + current);
 		return (Double)current;
 	}
-	
+
 	private void parseLine( int v ) throws IOException {
 		int size = 0;
 
-		while( v >= 0 && v != '\n' ) {
-			if( Character.isWhitespace(v) ) {
-				if( size > 0 ) {
-					addString(new String(buffer,0,size));
+		while (v >= 0 && v != '\n') {
+			if (Character.isWhitespace(v)) {
+				if (size > 0) {
+					addString(new String(buffer, 0, size));
 					size = 0;
 				}
 			} else {
@@ -123,24 +129,24 @@ public class SimpleStringNumberReader {
 			}
 			v = input.read();
 		}
-		if( size > 0 ) {
-			addString(new String(buffer,0,size));
+		if (size > 0) {
+			addString(new String(buffer, 0, size));
 		}
 	}
-	
+
 	private void skipLine() throws IOException {
-		
+
 		int v = input.read();
-	
-		while( v >= 0 && v != '\n' ) {
+
+		while (v >= 0 && v != '\n') {
 			v = input.read();
 		}
 	}
-	
+
 	private void addString( String s ) {
 		try {
-			sequence.add( Double.parseDouble(s) );
-		} catch( NumberFormatException e ) {
+			sequence.add(Double.parseDouble(s));
+		} catch (NumberFormatException e) {
 			sequence.add(s);
 		}
 	}

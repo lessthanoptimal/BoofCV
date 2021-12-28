@@ -218,6 +218,8 @@ public abstract class ConfigGenerator<Config extends Configuration> {
 				if (i + 1 < names.length)
 					config = field.get(config);
 			}
+			Objects.requireNonNull(field);
+			Objects.requireNonNull(fieldType);
 
 			// Double are used as a common data type with floats
 			if (fieldType == float.class && value.getClass() == Double.class)
