@@ -48,7 +48,8 @@ public class ConvertYuv420_888 {
 	@SuppressWarnings({"MissingCasesInEnumSwitch"})
 	public static void yuvToBoof( ByteBuffer bufferY, ByteBuffer bufferU, ByteBuffer bufferV,
 								  int width, int height, int strideY, int strideUV, int stridePixelUV,
-								  ColorFormat colorOutput, ImageBase output, GrowArray<DogArray_I8> workArrays ) {
+								  ColorFormat colorOutput, ImageBase output,
+								  @Nullable GrowArray<DogArray_I8> workArrays ) {
 		if (output instanceof GrayU8) {
 			yuvToGray(bufferY, width, height, strideY, (GrayU8)output);
 			return;

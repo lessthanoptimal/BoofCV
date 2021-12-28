@@ -20,6 +20,7 @@ package boofcv.android.camera;
 
 import android.content.Context;
 import android.hardware.Camera;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -34,16 +35,17 @@ import java.io.IOException;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 	private final String TAG = "CameraPreview";
 
 	SurfaceView mSurfaceView;
 	SurfaceHolder mHolder;
-	Camera mCamera;
+	@Nullable Camera mCamera;
 	Camera.PreviewCallback previewCallback;
 	boolean hidden;
 
-	public CameraPreview(Context context, Camera.PreviewCallback previewCallback, boolean hidden ) {
+	public CameraPreview( Context context, Camera.PreviewCallback previewCallback, boolean hidden ) {
 		super(context);
 		this.previewCallback = previewCallback;
 		this.hidden = hidden;
@@ -58,7 +60,7 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 		mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 	}
 
-	public void setCamera(Camera camera) {
+	public void setCamera( @Nullable Camera camera ) {
 		mCamera = camera;
 		if (mCamera != null) {
 			// We purposely disregard child measurements so that the SurfaceView will center the camera
@@ -70,8 +72,8 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 	}
 
 	@Override
-	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		if( hidden ) {
+	protected void onMeasure( int widthMeasureSpec, int heightMeasureSpec ) {
+		if (hidden) {
 			this.setMeasuredDimension(2, 2);
 		} else {
 			// We purposely disregard child measurements because want it to act as a
@@ -81,12 +83,11 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 			final int height = resolveSize(getSuggestedMinimumHeight(), heightMeasureSpec);
 			setMeasuredDimension(width, height);
 		}
-
 	}
 
 	@Override
-	protected void onLayout(boolean changed, int l, int t, int r, int b) {
-		if( mCamera == null )
+	protected void onLayout( boolean changed, int l, int t, int r, int b ) {
+		if (mCamera == null)
 			return;
 
 		if (changed && getChildCount() > 0) {
@@ -100,20 +101,20 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 			int previewHeight = size.height;
 
 			// Center the child SurfaceView within the parent.
-			if (width * previewHeight > height * previewWidth) {
-				final int scaledChildWidth = previewWidth * height / previewHeight;
-				l = (width - scaledChildWidth) / 2;
+			if (width*previewHeight > height*previewWidth) {
+				final int scaledChildWidth = previewWidth*height/previewHeight;
+				l = (width - scaledChildWidth)/2;
 				t = 0;
-				r = (width + scaledChildWidth) / 2;
+				r = (width + scaledChildWidth)/2;
 				b = height;
 			} else {
-				final int scaledChildHeight = previewHeight * width / previewWidth;
+				final int scaledChildHeight = previewHeight*width/previewWidth;
 				l = 0;
-				t = (height - scaledChildHeight) / 2;
+				t = (height - scaledChildHeight)/2;
 				r = width;
-				b = (height + scaledChildHeight) / 2;
+				b = (height + scaledChildHeight)/2;
 			}
-			child.layout(l,t,r,b);
+			child.layout(l, t, r, b);
 //			Log.w("BoofCV","onLayout did stuff");
 		} else {
 //			Log.w("BoofCV","onLayout nothing done");
@@ -121,7 +122,7 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 	}
 
 	@Override
-	public void surfaceCreated(SurfaceHolder holder) {
+	public void surfaceCreated( SurfaceHolder holder ) {
 
 		// The Surface has been created, acquire the camera and tell it where
 		// to draw.
@@ -135,7 +136,7 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 	}
 
 	@Override
-	public void surfaceDestroyed(SurfaceHolder holder) {
+	public void surfaceDestroyed( SurfaceHolder holder ) {
 		// Surface will be destroyed when we return, so stop the preview.
 		if (mCamera != null) {
 			mCamera.stopPreview();
@@ -143,14 +144,14 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 	}
 
 	@Override
-	public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
-		if( mCamera == null )
+	public void surfaceChanged( SurfaceHolder holder, int format, int w, int h ) {
+		if (mCamera == null)
 			return;
 
 		// If your preview can change or rotate, take care of those events here.
 		// Make sure to stop the preview before resizing or reformatting it.
 
-		if (mHolder.getSurface() == null){
+		if (mHolder.getSurface() == null) {
 			// preview surface does not exist
 			return;
 		}
@@ -158,7 +159,7 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 		// stop preview before making changes
 		try {
 			mCamera.stopPreview();
-		} catch (Exception e){
+		} catch (Exception e) {
 			// ignore: tried to stop a non-existent preview
 		}
 
@@ -167,13 +168,15 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 	}
 
 	private void startPreview() {
+		@Nullable Camera camera = mCamera;
+		if (camera == null)
+			return;
 		try {
-			mCamera.setPreviewDisplay(mHolder);
-			mCamera.setPreviewCallback(previewCallback);
-			mCamera.startPreview();
-		} catch (Exception e){
+			camera.setPreviewDisplay(mHolder);
+			camera.setPreviewCallback(previewCallback);
+			camera.startPreview();
+		} catch (Exception e) {
 			Log.e(TAG, "Error starting camera preview: " + e.getMessage());
 		}
 	}
-
 }

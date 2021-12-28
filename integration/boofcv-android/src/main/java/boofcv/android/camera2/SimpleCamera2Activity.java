@@ -31,6 +31,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.Size;
@@ -44,6 +45,7 @@ import boofcv.struct.calib.CameraPinhole;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -85,15 +87,16 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class SimpleCamera2Activity extends Activity {
 	private static final String TAG = "SimpleCamera2";
 
-	private CameraCaptureSession mPreviewSession;
-	protected TextureView mTextureView;
-	protected View mView;
+	private @Nullable CameraCaptureSession mPreviewSession;
+	protected @Nullable TextureView mTextureView;
+	protected @Nullable View mView;
 
 	//######## START  Variables owned by lock
-	private CameraOpen open = new CameraOpen();
+	private final CameraOpen open = new CameraOpen();
 	//######## END
 
 	// width and height of the view the camera is displayed in
@@ -114,8 +117,8 @@ public abstract class SimpleCamera2Activity extends Activity {
 	/**
 	 * An additional thread for running tasks that shouldn't block the UI.
 	 */
-	private HandlerThread mBackgroundThread;
-	private Handler mBackgroundHandler;
+	private @Nullable HandlerThread mBackgroundThread;
+	private @Nullable Handler mBackgroundHandler;
 
 	protected DisplayMetrics displayMetrics;
 
@@ -130,15 +133,16 @@ public abstract class SimpleCamera2Activity extends Activity {
 			Log.i(TAG, "startCamera(TextureView=" + (view != null) + ")");
 		this.mTextureView = view;
 		this.mView = null;
-		this.mTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
+		Objects.requireNonNull(this.mTextureView).setSurfaceTextureListener(mSurfaceTextureListener);
 	}
 
-	protected void startCameraView( View view ) {
+	protected void startCameraView( @Nullable View view ) {
 		if (verbose)
 			Log.i(TAG, "startCamera(View=" + (view != null) + ")");
 		this.mView = view;
 		this.mTextureView = null;
-		view.addOnLayoutChangeListener(mViewLayoutChangeListener);
+		if (view != null)
+			view.addOnLayoutChangeListener(mViewLayoutChangeListener);
 	}
 
 	protected void startCamera() {
@@ -162,6 +166,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 	 * Stops the background thread and its {@link Handler}.
 	 */
 	private void stopBackgroundThread() {
+		Objects.requireNonNull(mBackgroundThread);
 		mBackgroundThread.quitSafely();
 		try {
 			mBackgroundThread.join();
@@ -207,7 +212,8 @@ public abstract class SimpleCamera2Activity extends Activity {
 					if (open.mCameraDevice != null) {
 						open.closeCamera();
 					}
-				} break;
+				}
+				break;
 
 				case OPEN:
 					throw new RuntimeException("Camera is opened. Was not cleaned up correctly onPause()");
@@ -424,6 +430,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 
 				this.cameraToDisplayDensity = displayDensityAdjusted();
 
+				Objects.requireNonNull(open.mCameraSize);
 				if (verbose)
 					Log.i(TAG, "selected cameraId=" + cameraId + " orientation=" + open.mSensorOrientation +
 							" res=" + open.mCameraSize.getWidth() + "x" + open.mCameraSize.getHeight());
@@ -642,10 +649,12 @@ public abstract class SimpleCamera2Activity extends Activity {
 	}
 
 	private void createCaptureSession() throws CameraAccessException {
-		configureCamera(open.mCameraDevice, open.mCameraCharacterstics, open.mPreviewRequestBuilder);
-
 		mPreviewSession = null;
-		open.mCameraDevice.createCaptureSession(open.surfaces,
+		@Nullable CameraDevice cameraDevice = open.mCameraDevice;
+		if (cameraDevice == null)
+			return;
+		configureCamera(cameraDevice, open.mCameraCharacterstics, open.mPreviewRequestBuilder);
+		cameraDevice.createCaptureSession(open.surfaces,
 				new CameraCaptureSession.StateCallback() {
 
 					@Override
@@ -940,7 +949,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 					float widthToPixel = pixelSize.getWidth()/physicalSize.getWidth();
 					float heightToPixel = pixelSize.getHeight()/physicalSize.getHeight();
 
-					float s = open.mCameraSize.getWidth()/(float)activeSize.width();
+					float s = Objects.requireNonNull(open.mCameraSize).getWidth()/(float)activeSize.width();
 
 					intrinsic.fx = fl*widthToPixel*s;
 					intrinsic.fy = fl*heightToPixel*s;
@@ -955,7 +964,8 @@ public abstract class SimpleCamera2Activity extends Activity {
 
 			// We don't have the mCameraCharacterstics to make an informed decision with, so we will just guess
 			// that it's 60 degrees. That's often reasonable.
-			intrinsic.setTo( PerspectiveOps.createIntrinsic(
+			Objects.requireNonNull(open.mCameraSize);
+			intrinsic.setTo(PerspectiveOps.createIntrinsic(
 					open.mCameraSize.getWidth(), open.mCameraSize.getHeight(),
 					60, null));
 			return true;
@@ -965,7 +975,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 	}
 
 	// This is run in the background handler and not the looper
-	private ImageReader.OnImageAvailableListener onAvailableListener = imageReader -> {
+	private final ImageReader.OnImageAvailableListener onAvailableListener = imageReader -> {
 		if (imageReader.getMaxImages() == 0) {
 			Log.e(TAG, "No images available. Has image.close() not been called?");
 			return;
@@ -1084,12 +1094,13 @@ public abstract class SimpleCamera2Activity extends Activity {
 	/**
 	 * All these variables are owned by the camera open lock
 	 */
+	@SuppressWarnings({"NullAway.Init"})
 	static class CameraOpen {
 		ReentrantLock mLock = new ReentrantLock();
 		CameraState state = CameraState.CLOSED;
-		CameraDevice mCameraDevice;
+		@Nullable CameraDevice mCameraDevice;
 		List<Surface> surfaces;
-		Size mCameraSize; // size of camera preview
+		@Nullable Size mCameraSize; // size of camera preview
 		String cameraId; // the camera that was selected to view
 		int mSensorOrientation; // sensor's orientation
 		// describes physical properties of the camera
@@ -1101,13 +1112,16 @@ public abstract class SimpleCamera2Activity extends Activity {
 
 		public void closeCamera() {
 			state = CameraState.CLOSED;
-			mCameraDevice.close();
+			@Nullable CameraDevice cameraDevice = this.mCameraDevice;
+			if (cameraDevice != null)
+				cameraDevice.close();
 			mPreviewReader.close();
 			// TODO do targets need to be removed from mPreviewRequestBuilder?
 
 			clearCamera();
 		}
 
+		@SuppressWarnings({"NullAway"})
 		public void clearCamera() {
 			if (!mLock.isLocked())
 				throw new RuntimeException("Calling clearCamera() when not locked!");

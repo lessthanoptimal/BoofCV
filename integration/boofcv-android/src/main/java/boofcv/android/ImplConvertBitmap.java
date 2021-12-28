@@ -495,7 +495,8 @@ public class ImplConvertBitmap {
 			case ARGB_4444:
 				throw new RuntimeException("Isn't 4444 deprecated?");
 
-			default: throw new RuntimeException("Unsupported format: "+config);
+			default:
+				throw new RuntimeException("Unsupported format: " + config);
 		}
 	}
 
@@ -544,7 +545,8 @@ public class ImplConvertBitmap {
 			case ARGB_4444:
 				throw new RuntimeException("Isn't 4444 deprecated?");
 
-			default: throw new RuntimeException("Unsupported format: "+config);
+			default:
+				throw new RuntimeException("Unsupported format: " + config);
 		}
 	}
 
@@ -590,7 +592,7 @@ public class ImplConvertBitmap {
 					}
 				} else {
 					throw new IllegalArgumentException(
-							"Expected 3 or 4 bands in output. Not "+output.getNumBands());
+							"Expected 3 or 4 bands in output. Not " + output.getNumBands());
 				}
 			}
 			break;
@@ -621,7 +623,8 @@ public class ImplConvertBitmap {
 			case ARGB_4444:
 				throw new RuntimeException("Isn't 4444 deprecated?");
 
-			default: throw new RuntimeException("Unsupported format: "+config);
+			default:
+				throw new RuntimeException("Unsupported format: " + config);
 		}
 	}
 
@@ -667,7 +670,7 @@ public class ImplConvertBitmap {
 					}
 				} else {
 					throw new IllegalArgumentException(
-							"Expected 3 or 4 bands in output. Not "+output.getNumBands());
+							"Expected 3 or 4 bands in output. Not " + output.getNumBands());
 				}
 			}
 			break;
@@ -698,7 +701,8 @@ public class ImplConvertBitmap {
 			case ARGB_4444:
 				throw new RuntimeException("Isn't 4444 deprecated?");
 
-			default: throw new RuntimeException("Unsupported format: "+config);
+			default:
+				throw new RuntimeException("Unsupported format: " + config);
 		}
 	}
 
@@ -706,7 +710,7 @@ public class ImplConvertBitmap {
 		final int h = outputImage.height;
 		final int w = outputImage.width;
 
-		byte[] output = outputImage.data;;
+		byte[] output = outputImage.data;
 		int indexSrc = 0;
 
 		switch (config) {
@@ -737,7 +741,7 @@ public class ImplConvertBitmap {
 					}
 				} else {
 					throw new IllegalArgumentException(
-							"Expected 3 or 4 bands in output. Not "+outputImage.getNumBands());
+							"Expected 3 or 4 bands in output. Not " + outputImage.getNumBands());
 				}
 			}
 			break;
@@ -768,7 +772,8 @@ public class ImplConvertBitmap {
 			case ARGB_4444:
 				throw new RuntimeException("Isn't 4444 deprecated?");
 
-			default: throw new RuntimeException("Unsupported format: "+config);
+			default:
+				throw new RuntimeException("Unsupported format: " + config);
 		}
 	}
 
@@ -776,7 +781,7 @@ public class ImplConvertBitmap {
 		final int h = outputImage.height;
 		final int w = outputImage.width;
 
-		float[] output = outputImage.data;;
+		float[] output = outputImage.data;
 		int indexSrc = 0;
 
 		switch (config) {
@@ -787,10 +792,10 @@ public class ImplConvertBitmap {
 						int end = indexDst + w*4;
 						// for (int x = 0; x < w; x++, indexSrc++) {
 						while (indexDst < end) {
-							output[indexDst++] = input[indexSrc++]&0xFF;
-							output[indexDst++] = input[indexSrc++]&0xFF;
-							output[indexDst++] = input[indexSrc++]&0xFF;
-							output[indexDst++] = input[indexSrc++]&0xFF;
+							output[indexDst++] = input[indexSrc++] & 0xFF;
+							output[indexDst++] = input[indexSrc++] & 0xFF;
+							output[indexDst++] = input[indexSrc++] & 0xFF;
+							output[indexDst++] = input[indexSrc++] & 0xFF;
 						}
 					}
 				} else if (outputImage.getNumBands() == 3) {
@@ -799,15 +804,15 @@ public class ImplConvertBitmap {
 						int end = indexDst + w*3;
 						// for (int x = 0; x < w; x++, indexSrc++) {
 						while (indexDst < end) {
-							output[indexDst++] = input[indexSrc++]&0xFF;
-							output[indexDst++] = input[indexSrc++]&0xFF;
-							output[indexDst++] = input[indexSrc++]&0xFF;
+							output[indexDst++] = input[indexSrc++] & 0xFF;
+							output[indexDst++] = input[indexSrc++] & 0xFF;
+							output[indexDst++] = input[indexSrc++] & 0xFF;
 							indexSrc++;
 						}
 					}
 				} else {
 					throw new IllegalArgumentException(
-							"Expected 3 or 4 bands in output. Not "+outputImage.getNumBands());
+							"Expected 3 or 4 bands in output. Not " + outputImage.getNumBands());
 				}
 			}
 			break;
@@ -838,7 +843,8 @@ public class ImplConvertBitmap {
 			case ARGB_4444:
 				throw new RuntimeException("Isn't 4444 deprecated?");
 
-			default: throw new RuntimeException("Unsupported format: "+config);
+			default:
+				throw new RuntimeException("Unsupported format: " + config);
 		}
 	}
 
@@ -884,7 +890,8 @@ public class ImplConvertBitmap {
 			case ARGB_4444:
 				throw new RuntimeException("Isn't 4444 deprecated?");
 
-			default: throw new RuntimeException("Unsupported format: "+config);
+			default:
+				throw new RuntimeException("Unsupported format: " + config);
 		}
 	}
 
@@ -930,7 +937,8 @@ public class ImplConvertBitmap {
 			case ARGB_4444:
 				throw new RuntimeException("Isn't 4444 deprecated?");
 
-			default: throw new RuntimeException("Unsupported format: "+config);
+			default:
+				throw new RuntimeException("Unsupported format: " + config);
 		}
 	}
 
@@ -1002,7 +1010,8 @@ public class ImplConvertBitmap {
 			case ARGB_4444:
 				throw new RuntimeException("Isn't 4444 deprecated?");
 
-			default: throw new RuntimeException("Unsupported format: "+config);
+			default:
+				throw new RuntimeException("Unsupported format: " + config);
 		}
 	}
 
@@ -1074,7 +1083,8 @@ public class ImplConvertBitmap {
 			case ARGB_4444:
 				throw new RuntimeException("Isn't 4444 deprecated?");
 
-			default: throw new RuntimeException("Unsupported format: "+config);
+			default:
+				throw new RuntimeException("Unsupported format: " + config);
 		}
 	}
 
@@ -1141,7 +1151,8 @@ public class ImplConvertBitmap {
 			case ARGB_4444:
 				throw new RuntimeException("Isn't 4444 deprecated?");
 
-			default: throw new RuntimeException("Unsupported format: "+config);
+			default:
+				throw new RuntimeException("Unsupported format: " + config);
 		}
 	}
 
@@ -1208,7 +1219,8 @@ public class ImplConvertBitmap {
 			case ARGB_4444:
 				throw new RuntimeException("Isn't 4444 deprecated?");
 
-			default: throw new RuntimeException("Unsupported format: " + config);
+			default:
+				throw new RuntimeException("Unsupported format: " + config);
 		}
 	}
 

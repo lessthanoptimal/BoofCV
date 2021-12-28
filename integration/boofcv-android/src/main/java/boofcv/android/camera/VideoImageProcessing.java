@@ -30,6 +30,7 @@ import org.ddogleg.struct.DogArray_I8;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class VideoImageProcessing<T extends ImageBase<T>> extends VideoRenderProcessing<T> {
 
 	// output image which is modified by processing thread
@@ -37,28 +38,28 @@ public abstract class VideoImageProcessing<T extends ImageBase<T>> extends Video
 	// output image which is displayed by the GUI
 	private Bitmap outputGUI;
 	// storage used during image convert
-	private DogArray_I8 storage = new DogArray_I8();
+	private final DogArray_I8 storage = new DogArray_I8();
 
 	/**
 	 * Constructor
 	 *
 	 * @param imageType Type of image the video stream is to be converted to
 	 */
-	protected VideoImageProcessing(ImageType<T> imageType) {
+	protected VideoImageProcessing( ImageType<T> imageType ) {
 		super(imageType);
 	}
 
 	@Override
-	protected void declareImages( int width , int height ) {
-		super.declareImages(width,height);
-		output = Bitmap.createBitmap(width,height,Bitmap.Config.ARGB_8888 );
-		outputGUI = Bitmap.createBitmap(width,height,Bitmap.Config.ARGB_8888 );
+	protected void declareImages( int width, int height ) {
+		super.declareImages(width, height);
+		output = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+		outputGUI = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 	}
 
 	@Override
-	protected void process(T gray) {
-		process(gray,output,storage);
-		synchronized ( lockGui ) {
+	protected void process( T gray ) {
+		process(gray, output, storage);
+		synchronized (lockGui) {
 			Bitmap tmp = output;
 			output = outputGUI;
 			outputGUI = tmp;
@@ -66,9 +67,9 @@ public abstract class VideoImageProcessing<T extends ImageBase<T>> extends Video
 	}
 
 	@Override
-	protected void render(Canvas canvas, double imageToOutput) {
-		synchronized ( lockGui ) {
-			canvas.drawBitmap(outputGUI,0,0,null);
+	protected void render( Canvas canvas, double imageToOutput ) {
+		synchronized (lockGui) {
+			canvas.drawBitmap(outputGUI, 0, 0, null);
 		}
 	}
 
@@ -79,5 +80,5 @@ public abstract class VideoImageProcessing<T extends ImageBase<T>> extends Video
 	 * @param output (Output) Storage for Bitmap image which is to be displayed.
 	 * @param storage Array which can be used when converting the boofcv image into a Bitmap.
 	 */
-	protected abstract void process( T image , Bitmap output , DogArray_I8 storage );
+	protected abstract void process( T image, Bitmap output, DogArray_I8 storage );
 }
