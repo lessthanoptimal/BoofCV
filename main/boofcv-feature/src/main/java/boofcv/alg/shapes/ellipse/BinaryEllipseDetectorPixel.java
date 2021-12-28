@@ -99,7 +99,7 @@ public class BinaryEllipseDetectorPixel {
 	private final ClosestPointEllipseAngle_F64 closestPoint = new ClosestPointEllipseAngle_F64(1e-4f, 15);
 
 	// transforms which can be used to handle lens distortion
-	protected PixelTransform<Point2D_F32> distToUndist;
+	protected @Nullable PixelTransform<Point2D_F32> distToUndist;
 	protected Point2D_F32 distortedPoint = new Point2D_F32();
 
 	private @Nullable PrintStream verbose = null;
@@ -131,7 +131,7 @@ public class BinaryEllipseDetectorPixel {
 	 *
 	 * @param distToUndist Transform from distorted to undistorted image.
 	 */
-	public void setLensDistortion( PixelTransform<Point2D_F32> distToUndist ) {
+	public void setLensDistortion( @Nullable PixelTransform<Point2D_F32> distToUndist ) {
 		this.distToUndist = distToUndist;
 	}
 

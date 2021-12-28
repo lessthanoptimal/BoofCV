@@ -35,6 +35,7 @@ import org.ddogleg.struct.DogArray;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("NullAway.Init")
 public class TemplateMatching<T extends ImageBase<T>> {
 
 	// computes an intensity image identifying matches
@@ -59,18 +60,18 @@ public class TemplateMatching<T extends ImageBase<T>> {
 	private DogArray<Match> results = new DogArray<>(10, Match::new);
 
 	// shape of input image
-	int imageWidth,imageHeight;
+	int imageWidth, imageHeight;
 
 	/**
 	 * Specifies internal algorithm
 	 *
 	 * @param match Provide template matching intensity algorithm
 	 */
-	public TemplateMatching(TemplateMatchingIntensity<T> match) {
+	public TemplateMatching( TemplateMatchingIntensity<T> match ) {
 		this.match = match;
 
 		ConfigExtract config;
-		if( match.isMaximize() ) {
+		if (match.isMaximize()) {
 			config = new ConfigExtract(2, -Float.MAX_VALUE, 0, true);
 		} else {
 			config = new ConfigExtract(2, -Float.MAX_VALUE, 0, true, true, false);
@@ -84,19 +85,19 @@ public class TemplateMatching<T extends ImageBase<T>> {
 	 *
 	 * @param radius Distance in pixels. Try using the template's radius or 2
 	 */
-	public void setMinimumSeparation(int radius) {
+	public void setMinimumSeparation( int radius ) {
 		extractor.setSearchRadius(radius);
 	}
 
 	/**
 	 * Specifies the template to search for and the maximum number of matches to return.
 	 *
-	 * @param template   Template being searched for
-	 * @param mask       Optional mask. Same size as template. 0 = pixel is transparent, values larger than zero
-	 *                   determine how influential the pixel is. Can be null.
+	 * @param template Template being searched for
+	 * @param mask Optional mask. Same size as template. 0 = pixel is transparent, values larger than zero
+	 * determine how influential the pixel is. Can be null.
 	 * @param maxMatches The maximum number of matches it will return
 	 */
-	public void setTemplate(T template, T mask , int maxMatches) {
+	public void setTemplate( T template, T mask, int maxMatches ) {
 		this.template = template;
 		this.mask = mask;
 		this.maxMatches = maxMatches;
@@ -107,7 +108,7 @@ public class TemplateMatching<T extends ImageBase<T>> {
 	 *
 	 * @param image Image being processed
 	 */
-	public void setImage(T image ) {
+	public void setImage( T image ) {
 		match.setInputImage(image);
 		this.imageWidth = image.width;
 		this.imageHeight = image.height;
@@ -119,10 +120,10 @@ public class TemplateMatching<T extends ImageBase<T>> {
 	public void process() {
 
 		// compute match intensities
-		if( mask == null )
+		if (mask == null)
 			match.process(template);
 		else
-			match.process(template,mask);
+			match.process(template, mask);
 
 		GrayF32 intensity = match.getIntensity();
 		int offsetX = 0;
@@ -134,7 +135,7 @@ public class TemplateMatching<T extends ImageBase<T>> {
 			int x1 = imageWidth - match.getBorderX1();
 			int y0 = match.getBorderY0();
 			int y1 = imageHeight - match.getBorderY1();
-			intensity = intensity.subimage(x0, y0, x1+1, y1+1, null);
+			intensity = intensity.subimage(x0, y0, x1 + 1, y1 + 1, null);
 		} else {
 			offsetX = match.getBorderX0();
 			offsetY = match.getBorderY0();
@@ -142,10 +143,10 @@ public class TemplateMatching<T extends ImageBase<T>> {
 
 		// find local peaks in intensity image
 		candidates.reset();
-		if( match.isMaximize() )
-			extractor.process(intensity, null,null,null, candidates);
+		if (match.isMaximize())
+			extractor.process(intensity, null, null, null, candidates);
 		else
-			extractor.process(intensity, null,null,candidates, null);
+			extractor.process(intensity, null, null, candidates, null);
 
 		// select the best matches
 		if (scores.length < candidates.size) {

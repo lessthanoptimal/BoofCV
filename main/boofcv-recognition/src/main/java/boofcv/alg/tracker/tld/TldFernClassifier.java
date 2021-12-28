@@ -30,6 +30,7 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class TldFernClassifier<T extends ImageGray<T>> {
 
 	// maximum value of a fern for P and N. Used for re-normalization
@@ -80,8 +81,7 @@ public class TldFernClassifier<T extends ImageGray<T>> {
 		}
 	}
 
-	protected TldFernClassifier() {
-	}
+	protected TldFernClassifier() {}
 
 	/**
 	 * Discard all information on fern values and their probabilities

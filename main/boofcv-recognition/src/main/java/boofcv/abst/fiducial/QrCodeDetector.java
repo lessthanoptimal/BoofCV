@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,6 +32,7 @@ public interface QrCodeDetector<T extends ImageGray<T>> {
 
 	/**
 	 * Processes the image and searches for fiducials
+	 *
 	 * @param image The image being processed
 	 */
 	void process( T image );
@@ -52,6 +53,7 @@ public interface QrCodeDetector<T extends ImageGray<T>> {
 
 	/**
 	 * Type of image it can process
+	 *
 	 * @return input image type
 	 */
 	Class<T> getImageType();

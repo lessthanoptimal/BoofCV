@@ -216,12 +216,12 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 		synchronized (detected) {
 			this.detected.reset();
 			for (QrCode d : detector.getDetections()) {
-				this.detected.grow().set(d);
+				this.detected.grow().setTo(d);
 			}
 			this.failures.reset();
 			for (QrCode d : detector.getFailures()) {
 				if (d.failureCause.ordinal() >= QrCode.Failure.READING_BITS.ordinal())
-					this.failures.grow().set(d);
+					this.failures.grow().setTo(d);
 			}
 //			System.out.println("Failed "+failures.size());
 //			for( QrCode qr : failures.toList() ) {

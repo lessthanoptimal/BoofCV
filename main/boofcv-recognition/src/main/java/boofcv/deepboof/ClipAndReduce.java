@@ -35,6 +35,7 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class ClipAndReduce<T extends ImageBase<T>> {
 
 	// storage for clipped sub-region

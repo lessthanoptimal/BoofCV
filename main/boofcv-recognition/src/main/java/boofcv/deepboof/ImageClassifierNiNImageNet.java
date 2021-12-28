@@ -46,6 +46,7 @@ import static deepboof.misc.TensorOps.WI;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class ImageClassifierNiNImageNet extends BaseImageClassifier {
 
 	// normalization parameters

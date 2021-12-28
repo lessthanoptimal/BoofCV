@@ -172,7 +172,7 @@ public class TestQrCodeEncoder extends BoofStandardJUnit {
 
 		QrCode qr = new QrCodeEncoder().setMask(QrCodeMaskPattern.M011).addBytes(message).fixate();
 
-		qr.message = null;
+		qr.message = "";
 		QrCodeDecoderBits decoder = new QrCodeDecoderBits(EciEncoding.UTF8);
 		assertTrue(decoder.applyErrorCorrection(qr));
 		assertTrue(decoder.decodeMessage(qr));

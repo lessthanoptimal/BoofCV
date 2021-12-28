@@ -39,6 +39,7 @@ import java.util.Set;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class WrapFeatureToSceneRecognition<Image extends ImageBase<Image>, TD extends TupleDesc<TD>>
 		implements SceneRecognition<Image> {
 	/** Detects image features */

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,27 +27,26 @@ import boofcv.struct.image.ImageGray;
  * @author Peter Abeles
  */
 public class SquareBinary_to_FiducialDetector<T extends ImageGray<T>>
-	extends SquareBase_to_FiducialDetector<T,DetectFiducialSquareBinary<T>>
-{
+		extends SquareBase_to_FiducialDetector<T, DetectFiducialSquareBinary<T>> {
 	private double targetWidth;
 
-	public SquareBinary_to_FiducialDetector(DetectFiducialSquareBinary<T> detector, double targetWidth) {
+	public SquareBinary_to_FiducialDetector( DetectFiducialSquareBinary<T> detector, double targetWidth ) {
 		super(detector);
 		this.targetWidth = targetWidth;
 	}
 
 	@Override
-	public double getSideWidth(int which) {
+	public double getSideWidth( int which ) {
 		return targetWidth;
 	}
 
 	@Override
-	public double getSideHeight(int which) {
+	public double getSideHeight( int which ) {
 		return targetWidth;
 	}
 
 	@Override
-	public double getWidth(int which) {
+	public double getWidth( int which ) {
 		return targetWidth;
 	}
 }

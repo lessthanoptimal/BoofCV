@@ -26,6 +26,7 @@ import lombok.Setter;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class FiducialImageGenerator {
 	/** size of marker in document units */
 	@Getter @Setter protected double markerWidth = 0;

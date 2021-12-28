@@ -24,6 +24,7 @@ import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
 import lombok.Getter;
 import lombok.Setter;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -75,7 +76,7 @@ public class MultiToSingleFiducialCalibration implements DetectSingleFiducialCal
 		return multi.getLayout(targetMarker);
 	}
 
-	@Override public void setLensDistortion( LensDistortionNarrowFOV distortion, int width, int height ) {
+	@Override public void setLensDistortion( @Nullable LensDistortionNarrowFOV distortion, int width, int height ) {
 		multi.setLensDistortion(distortion, width, height);
 	}
 }

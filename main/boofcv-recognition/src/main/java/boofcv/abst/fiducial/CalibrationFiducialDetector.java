@@ -46,8 +46,8 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class CalibrationFiducialDetector<T extends ImageGray<T>>
-		extends FiducialDetectorPnP<T> {
+@SuppressWarnings({"NullAway.Init"})
+public class CalibrationFiducialDetector<T extends ImageGray<T>> extends FiducialDetectorPnP<T> {
 	// detects the calibration target
 	private DetectSingleFiducialCalibration detector;
 
@@ -71,9 +71,9 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 	private double width;
 
 	// The 4 corners which are selected to be the boundary
-	int boundaryIndexes[];
+	int[] boundaryIndexes;
 
-	Point2Transform2_F64 pointUndistToDist;
+	@Nullable Point2Transform2_F64 pointUndistToDist;
 
 	/**
 	 * Configure it to detect chessboard style targets
@@ -232,7 +232,7 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 	}
 
 	@Override
-	public void setLensDistortion( LensDistortionNarrowFOV distortion, int width, int height ) {
+	public void setLensDistortion( @Nullable LensDistortionNarrowFOV distortion, int width, int height ) {
 		super.setLensDistortion(distortion, width, height);
 
 		if (distortion == null)
@@ -303,9 +303,7 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 	}
 
 	@Override
-	public String getMessage( int which ) {
-		return null;
-	}
+	public String getMessage( int which ) {return "";}
 
 	@Override
 	public ImageType<T> getInputType() {

@@ -26,25 +26,25 @@ import java.io.Serializable;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class HistogramScene implements Serializable {
 	/**
 	 * Normalized word frequency histogram. Normalized so that it sums up to 1.
 	 */
-	public double histogram[];
+	public double[] histogram;
 	/**
 	 * The type of scene the image was representative of
 	 */
 	public int type;
 
-	public HistogramScene(int numWords) {
+	public HistogramScene( int numWords ) {
 		histogram = new double[numWords];
 	}
 
-	public HistogramScene() {
-	}
+	public HistogramScene() {}
 
 	public void setHistogram( double original[] ) {
-		System.arraycopy(original,0,histogram,0,histogram.length);
+		System.arraycopy(original, 0, histogram, 0, histogram.length);
 	}
 
 	public double[] getHistogram() {
@@ -55,7 +55,7 @@ public class HistogramScene implements Serializable {
 		return type;
 	}
 
-	public void setType(int type) {
+	public void setType( int type ) {
 		this.type = type;
 	}
 }

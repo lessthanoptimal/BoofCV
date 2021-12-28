@@ -35,10 +35,7 @@ import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * From a set of {@link ChessboardCorner ChessboardCorners} find all the chessboard grids in view. Assumptions
@@ -78,7 +75,7 @@ import java.util.Set;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings({"WeakerAccess", "ForLoopReplaceableByForEach"})
+@SuppressWarnings({"WeakerAccess", "ForLoopReplaceableByForEach", "NullAway.Init"})
 public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements VerbosePrint {
 
 	/** Tolerance for deciding if two directions are the same. 0 to 1. Higher is more tolerant */
@@ -138,7 +135,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements Ve
 	private final DogArray<PairIdx> pairs = new DogArray<>(PairIdx.class, PairIdx::new);
 	private final DogArray_B matched = new DogArray_B();
 
-	PrintStream verbose = null;
+	@Nullable PrintStream verbose = null;
 
 	public ChessboardCornerClusterFinder( Class<T> imageType ) {
 		this(new ChessboardCornerEdgeIntensity<>(imageType));
@@ -305,8 +302,8 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements Ve
 			if (line.isDisconnected() || line.parallel)
 				continue;
 
-			Vertex va = line.endA.dst;
-			Vertex vb = line.endB.dst;
+			Vertex va = Objects.requireNonNull(line.endA).dst;
+			Vertex vb = Objects.requireNonNull(line.endB).dst;
 
 			ChessboardCorner ca = corners.get(va.index);
 			ChessboardCorner cb = corners.get(vb.index);
@@ -330,6 +327,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements Ve
 	 * Prints the graph. Used for debugging the code.
 	 */
 	public void printDualGraph() {
+		Objects.requireNonNull(verbose);
 		verbose.println("============= Dual");
 		int l = BoofMiscOps.numDigits(vertexes.size);
 		String format = "%" + l + "d";
@@ -773,6 +771,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements Ve
 							break;
 						}
 					}
+					Objects.requireNonNull(va);
 
 					// Search for an edge in v which has a connection to 'va' and is ccw of 'e'
 					boolean matched = false;
@@ -1012,8 +1011,8 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements Ve
 		}
 
 		public int find( LineInfo line ) {
-			Vertex va = line.endA.dst;
-			Vertex vb = line.endB.dst;
+			Vertex va = Objects.requireNonNull(line.endA).dst;
+			Vertex vb = Objects.requireNonNull(line.endB).dst;
 
 			for (int i = 0; i < edges.size(); i++) {
 				Edge e = edges.get(i);
@@ -1039,6 +1038,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements Ve
 		}
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	public static class Edge {
 
 		// Descriptor of the line
@@ -1050,6 +1050,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements Ve
 		// Vertex this is connected to
 		public Vertex dst;
 
+		@SuppressWarnings({"NullAway"})
 		public void reset() {
 			line = null;
 			direction = Double.NaN;
@@ -1074,8 +1075,8 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements Ve
 
 		public boolean xcorner;
 
-		public Edge endA;
-		public Edge endB;
+		public @Nullable Edge endA;
+		public @Nullable Edge endB;
 
 		public void reset() {
 			invalidateIntensity();

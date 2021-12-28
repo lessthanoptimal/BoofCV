@@ -19,9 +19,11 @@
 package boofcv.alg.fiducial.calib.squares;
 
 import org.ddogleg.struct.DogArray;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static boofcv.misc.CircularIndex.addOffset;
 
@@ -142,7 +144,7 @@ public class SquareCrossClustersIntoGrids {
 	 * Converts the list of rows into a grid. Since it is a chessboard pattern some of the grid
 	 * elements will be null.
 	 */
-	private SquareGrid assembleGrid( List<List<SquareNode>> listRows ) {
+	private @Nullable SquareGrid assembleGrid( List<List<SquareNode>> listRows ) {
 		SquareGrid grid = grids.grow();
 		grid.reset();
 
@@ -219,7 +221,7 @@ public class SquareCrossClustersIntoGrids {
 	/**
 	 * Adds the first row to the list of rows when the seed element has only one edge
 	 */
-	List<SquareNode> firstRow1( SquareNode seed ) {
+	@Nullable List<SquareNode> firstRow1( SquareNode seed ) {
 		for (int i = 0; i < seed.square.size(); i++) {
 			if (isOpenEdge(seed, i)) {
 				List<SquareNode> list = new ArrayList<>();
@@ -254,7 +256,7 @@ public class SquareCrossClustersIntoGrids {
 	/**
 	 * Adds the first row to the list of rows when the seed element has two edges
 	 */
-	List<SquareNode> firstRow2( SquareNode seed ) {
+	@Nullable List<SquareNode> firstRow2( SquareNode seed ) {
 		int indexLower = lowerEdgeIndex(seed);
 		int indexUpper = addOffset(indexLower, 1, seed.square.size());
 
@@ -436,7 +438,7 @@ public class SquareCrossClustersIntoGrids {
 			seed = n;
 			break;
 		}
-		return seed;
+		return Objects.requireNonNull(seed);
 	}
 
 	public DogArray<SquareGrid> getGrids() {

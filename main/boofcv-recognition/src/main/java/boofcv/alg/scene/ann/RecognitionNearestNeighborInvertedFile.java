@@ -60,6 +60,7 @@ import java.util.Set;
  * @param <Point> Data type for the 'point'. Typically this is a Tuple.
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class RecognitionNearestNeighborInvertedFile<Point> implements VerbosePrint {
 	/** A nearest-neighbor search to look up the closest fit to each word */
 	protected @Getter NearestNeighbor<Point> nearestNeighbor;
@@ -96,7 +97,7 @@ public class RecognitionNearestNeighborInvertedFile<Point> implements VerbosePri
 	DogArray_F32 tmpDescWeights = new DogArray_F32();
 
 	// If not null then print verbose information here
-	PrintStream verbose;
+	@Nullable PrintStream verbose;
 
 	/**
 	 * Initializes the data structures.

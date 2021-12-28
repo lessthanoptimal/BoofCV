@@ -30,9 +30,11 @@ import boofcv.struct.image.ImageBase;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.DogArray_F64;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * <p>Provides everything you need to convert a image based fiducial detector into one which can estimate
@@ -44,13 +46,13 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public abstract class FiducialDetectorPnP<T extends ImageBase<T>>
-		implements FiducialDetector<T> {
+@SuppressWarnings({"NullAway.Init"})
+public abstract class FiducialDetectorPnP<T extends ImageBase<T>> implements FiducialDetector<T> {
 
-	private LensDistortionNarrowFOV lensDistortion;
+	private @Nullable LensDistortionNarrowFOV lensDistortion;
 
 	// transform to remove lens distortion
-	protected Point2Transform2_F64 pixelToNorm;
+	protected @Nullable Point2Transform2_F64 pixelToNorm;
 
 	// 2D-3D pairs for just the detected points
 	private List<Point2D3D> detected2D3D = new ArrayList<>();
@@ -61,9 +63,9 @@ public abstract class FiducialDetectorPnP<T extends ImageBase<T>>
 	boolean hasCameraModel = false;
 
 	// non-linear refinement of pose estimate
-	private Estimate1ofPnP estimatePnP = FactoryMultiView.computePnPwithEPnP(10,0.2);
-//	private Estimate1ofPnP estimatePnP = FactoryMultiView.pnp_1(EnumPNP.IPPE,0,0);
-	private RefinePnP refinePnP = FactoryMultiView.pnpRefine(1e-8,100);
+	private Estimate1ofPnP estimatePnP = FactoryMultiView.computePnPwithEPnP(10, 0.2);
+	//	private Estimate1ofPnP estimatePnP = FactoryMultiView.pnp_1(EnumPNP.IPPE,0,0);
+	private RefinePnP refinePnP = FactoryMultiView.pnpRefine(1e-8, 100);
 	private WorldToCameraToPixel w2p = new WorldToCameraToPixel();
 
 	// when computing the pose, this is the initial estimate before non-linear refinement
@@ -80,41 +82,43 @@ public abstract class FiducialDetectorPnP<T extends ImageBase<T>>
 
 	/**
 	 * Width of the fiducial. used to compute stability
+	 *
 	 * @param which specifies which fiducial
 	 * @return the width
 	 */
-	public abstract double getSideWidth(int which );
+	public abstract double getSideWidth( int which );
 
 	/**
 	 * Height of the fiducial. used to compute stability
+	 *
 	 * @param which specifies which fiducial
 	 * @return the height
 	 */
-	public abstract double getSideHeight(int which );
+	public abstract double getSideHeight( int which );
 
 	/**
 	 * Estimates the stability by perturbing each land mark by the specified number of pixels in the distorted image.
 	 */
 	@Override
-	public boolean computeStability(int which, double disturbance, FiducialStability results) {
+	public boolean computeStability( int which, double disturbance, FiducialStability results ) {
 
-		if( !getFiducialToCamera(which, targetToCamera))
+		if (!getFiducialToCamera(which, targetToCamera))
 			return false;
 
 		stability.setShape(getSideWidth(which), getSideHeight(which));
 
-		stability.computeStability(targetToCamera,disturbance,results);
+		stability.computeStability(targetToCamera, disturbance, results);
 		return true;
 	}
 
 	@Override
-	public void setLensDistortion(LensDistortionNarrowFOV distortion, int width , int height ) {
-		if( distortion != null ) {
+	public void setLensDistortion( @Nullable LensDistortionNarrowFOV distortion, int width, int height ) {
+		if (distortion != null) {
 			this.hasCameraModel = true;
 			this.lensDistortion = distortion;
 			this.pixelToNorm = lensDistortion.undistort_F64(true, false);
 			Point2Transform2_F64 normToPixel = lensDistortion.distort_F64(false, true);
-			stability.setTransforms(pixelToNorm,normToPixel);
+			stability.setTransforms(pixelToNorm, normToPixel);
 		} else {
 			this.hasCameraModel = false;
 			this.lensDistortion = null;
@@ -123,17 +127,17 @@ public abstract class FiducialDetectorPnP<T extends ImageBase<T>>
 	}
 
 	@Override
-	public LensDistortionNarrowFOV getLensDistortion() {
+	public @Nullable LensDistortionNarrowFOV getLensDistortion() {
 		return lensDistortion;
 	}
 
 	@Override
-	public boolean getFiducialToCamera(int which, Se3_F64 fiducialToCamera) {
-		if( !hasCameraModel )
+	public boolean getFiducialToCamera( int which, Se3_F64 fiducialToCamera ) {
+		if (!hasCameraModel)
 			return false;
 
 		detectedPixels = getDetectedControl(which);
-		if( detectedPixels.size() < 3 )
+		if (detectedPixels.size() < 3)
 			return false;
 
 		// 2D-3D point associations
@@ -145,15 +149,16 @@ public abstract class FiducialDetectorPnP<T extends ImageBase<T>>
 	/**
 	 * Create the list of observed points in 2D3D
 	 */
-	private void createDetectedList(int which, List<PointIndex2D_F64> pixels) {
+	private void createDetectedList( int which, List<PointIndex2D_F64> pixels ) {
+		Objects.requireNonNull(pixelToNorm);
 		detected2D3D.clear();
 		List<Point2D3D> all = getControl3D(which);
 		for (int i = 0; i < pixels.size(); i++) {
 			Point2D_F64 a = pixels.get(i).p;
 			Point2D3D b = all.get(i);
 
-			pixelToNorm.compute(a.x,a.y, b.observation);
-			detected2D3D.add( b );
+			pixelToNorm.compute(a.x, a.y, b.observation);
+			detected2D3D.add(b);
 		}
 	}
 
@@ -164,14 +169,14 @@ public abstract class FiducialDetectorPnP<T extends ImageBase<T>>
 	 * Do a simple form of robust estimation. Prune points which are greater than 3 standard deviations
 	 * and likely noise the recompute the pose
 	 */
-	protected boolean estimatePose( int which ,List<Point2D3D> points , Se3_F64 fiducialToCamera ) {
-		if( !estimatePnP.process(points, initialEstimate) ) {
+	protected boolean estimatePose( int which, List<Point2D3D> points, Se3_F64 fiducialToCamera ) {
+		if (!estimatePnP.process(points, initialEstimate)) {
 			return false;
 		}
 		filtered.clear();
 		// Don't bother if there are hardly any points to work with
-		if( points.size() > 6 ) {
-			w2p.configure(lensDistortion, initialEstimate);
+		if (points.size() > 6) {
+			w2p.configure(Objects.requireNonNull(lensDistortion), initialEstimate);
 
 			// compute the error for each point in image pixels
 			errors.reset();
@@ -190,7 +195,7 @@ public abstract class FiducialDetectorPnP<T extends ImageBase<T>>
 			// prune points 3 standard deviations away
 			// Don't prune if 3 standard deviations is less than 1.5 pixels since that's about what
 			// you would expect and you might make the solution worse
-			double sigma3 = Math.max(1.5,4 * stdev);
+			double sigma3 = Math.max(1.5, 4*stdev);
 
 			for (int i = 0; i < points.size(); i++) {
 				if (errors.get(i) < sigma3) {
@@ -213,10 +218,11 @@ public abstract class FiducialDetectorPnP<T extends ImageBase<T>>
 	 * Returns a list of detected control points in the image for the specified fiducial. Observations
 	 * will be in distorted image pixels.
 	 */
-	public abstract List<PointIndex2D_F64> getDetectedControl(int which );
+	public abstract List<PointIndex2D_F64> getDetectedControl( int which );
 
 	/**
 	 * 3D location of control points in the fiducial reference frame
+	 *
 	 * @return 3D location of control points
 	 */
 	protected abstract List<Point2D3D> getControl3D( int which );

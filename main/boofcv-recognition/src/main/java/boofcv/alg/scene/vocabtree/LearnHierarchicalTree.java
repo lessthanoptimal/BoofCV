@@ -63,7 +63,7 @@ public class LearnHierarchicalTree<Point> implements VerbosePrint {
 	protected int totalPoints;
 
 	// If not null then verbose debug information is printed
-	protected PrintStream verbose;
+	protected @Nullable PrintStream verbose;
 
 	/**
 	 * Constructor which specifies factories for internal data structures which are dynamic bsaed on the

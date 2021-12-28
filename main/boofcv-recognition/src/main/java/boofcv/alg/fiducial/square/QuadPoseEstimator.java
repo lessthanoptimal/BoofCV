@@ -49,6 +49,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class QuadPoseEstimator {
 
 	// if the target is less than or equals to this number of pixels along a side then it is considered small
@@ -62,11 +63,11 @@ public class QuadPoseEstimator {
 	public static final double FUDGE_FACTOR = 0.5;
 
 	// provides set of hypotheses from 3 points
-	private EstimateNofPnP p3p;
+	private final EstimateNofPnP p3p;
 	// iterative refinement
-	private RefinePnP refine;
+	private final RefinePnP refine;
 
-	private Estimate1ofPnP epnp = FactoryMultiView.pnp_1(EnumPNP.EPNP, 50, 0);
+	private final Estimate1ofPnP epnp = FactoryMultiView.pnp_1(EnumPNP.EPNP, 50, 0);
 
 	// transforms from distorted pixel observation normalized image coordinates
 	protected Point2Transform2_F64 pixelToNorm;
@@ -79,16 +80,16 @@ public class QuadPoseEstimator {
 	// observation in undistorted pixels
 	protected List<Point2D_F64> listObs = new ArrayList<>();
 
-	private List<Point2D3D> inputP3P = new ArrayList<>();
-	private DogArray<Se3_F64> solutions = new DogArray(Se3_F64::new);
-	private Se3_F64 outputFiducialToCamera = new Se3_F64();
-	private Se3_F64 foundEPNP = new Se3_F64();
+	private final List<Point2D3D> inputP3P = new ArrayList<>();
+	private final DogArray<Se3_F64> solutions = new DogArray(Se3_F64::new);
+	private final Se3_F64 outputFiducialToCamera = new Se3_F64();
+	private final Se3_F64 foundEPNP = new Se3_F64();
 
 	// error for outputFiducialToCamera
 	private double outputError;
 
-	private Point3D_F64 cameraP3 = new Point3D_F64();
-	private Point2D_F64 predicted = new Point2D_F64();
+	private final Point3D_F64 cameraP3 = new Point3D_F64();
+	private final Point2D_F64 predicted = new Point2D_F64();
 
 	// storage for when it searches for the best solution
 	protected double bestError;

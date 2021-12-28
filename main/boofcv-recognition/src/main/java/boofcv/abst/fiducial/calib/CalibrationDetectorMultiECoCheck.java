@@ -32,6 +32,7 @@ import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import lombok.Getter;
 import org.ddogleg.struct.FastAccess;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -111,7 +112,7 @@ public class CalibrationDetectorMultiECoCheck implements DetectMultiFiducialCali
 		return layout;
 	}
 
-	@Override public void setLensDistortion( LensDistortionNarrowFOV distortion, int width, int height ) {
+	@Override public void setLensDistortion( @Nullable LensDistortionNarrowFOV distortion, int width, int height ) {
 		throw new IllegalArgumentException("Not handled yet");
 	}
 }

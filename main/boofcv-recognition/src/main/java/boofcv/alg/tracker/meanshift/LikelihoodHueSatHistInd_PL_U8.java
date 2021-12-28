@@ -35,6 +35,7 @@ import georegression.struct.shapes.RectangleLength2D_I32;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class LikelihoodHueSatHistInd_PL_U8 implements PixelLikelihood<Planar<GrayU8>> {
 	// each band in the image
 	private GrayU8 imageRed;

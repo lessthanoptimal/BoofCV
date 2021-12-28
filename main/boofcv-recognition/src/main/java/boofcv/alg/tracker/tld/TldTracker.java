@@ -29,7 +29,9 @@ import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import georegression.struct.shapes.Rectangle2D_F64;
 import org.ddogleg.struct.DogArray;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.Random;
 
 /**
@@ -63,6 +65,7 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class TldTracker<T extends ImageGray<T>, D extends ImageGray<D>> {
 	// specified configuration parameters for the tracker
 	private final ConfigTld config;
@@ -269,7 +272,7 @@ public class TldTracker<T extends ImageGray<T>, D extends ImageGray<D>> {
 			// It can reinitialize if there is a single detection
 			detection.detectionCascade(cascadeRegions);
 			if (detection.isSuccess() && !detection.isAmbiguous()) {
-				TldRegion region = detection.getBest();
+				TldRegion region = Objects.requireNonNull(detection.getBest());
 
 				reacquiring = false;
 				valid = false;
@@ -328,27 +331,27 @@ public class TldTracker<T extends ImageGray<T>, D extends ImageGray<D>> {
 	 * @return true a hypothesis was found, false if it failed to find a hypothesis
 	 */
 	protected boolean hypothesisFusion( boolean trackingWorked, boolean detectionWorked ) {
-
 		valid = false;
 
 		boolean uniqueDetection = detectionWorked && !detection.isAmbiguous();
-		TldRegion detectedRegion = detection.getBest();
 
 		double confidenceTarget;
 
 		if (trackingWorked) {
+			@Nullable TldRegion detectedRegion = detection.getBest();
 
 			// get the scores from tracking and detection
 			double scoreTrack = template.computeConfidence(trackerRegion_I32);
 			double scoreDetected = 0;
 
 			if (uniqueDetection) {
-				scoreDetected = detectedRegion.confidence;
+				scoreDetected = Objects.requireNonNull(detectedRegion).confidence;
 			}
 
 			double adjustment = strongMatch ? 0.07 : 0.02;
 
 			if (uniqueDetection && scoreDetected > scoreTrack + adjustment) {
+				Objects.requireNonNull(detectedRegion);
 				// if there is a unique detection and it has higher confidence than the
 				// track region, use the detected region
 				TldHelperFunctions.convertRegion(detectedRegion.rect, targetRegion);
@@ -370,7 +373,7 @@ public class TldTracker<T extends ImageGray<T>, D extends ImageGray<D>> {
 			}
 		} else if (uniqueDetection) {
 			// just go with the best detected region
-			detectedRegion = detection.getBest();
+			TldRegion detectedRegion = Objects.requireNonNull(detection.getBest());
 			TldHelperFunctions.convertRegion(detectedRegion.rect, targetRegion);
 			confidenceTarget = detectedRegion.confidence;
 			strongMatch = confidenceTarget > config.confidenceThresholdStrong;

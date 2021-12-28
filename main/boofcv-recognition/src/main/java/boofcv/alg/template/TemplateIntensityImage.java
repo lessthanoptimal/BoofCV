@@ -21,21 +21,22 @@ package boofcv.alg.template;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
+import org.jetbrains.annotations.Nullable;
 
 /**
- * Class which computes the templates intensity across the entire image
+ * Class which computes the templates' intensity across the entire image
  *
  * @author Peter Abeles
  */
-public class TemplateIntensityImage<T extends ImageBase<T>>
-		implements TemplateMatchingIntensity<T> {
+@SuppressWarnings({"NullAway.Init"})
+public class TemplateIntensityImage<T extends ImageBase<T>> implements TemplateMatchingIntensity<T> {
 	// Match intensity image
 	protected GrayF32 intensity = new GrayF32(1, 1);
 
 	// references to the input
 	protected T image;
 	protected T template;
-	protected T mask;
+	protected @Nullable T mask;
 
 	// thickness of the border along the lower extents of the image
 	protected int borderX0, borderY0;
@@ -74,7 +75,7 @@ public class TemplateIntensityImage<T extends ImageBase<T>>
 		processInner(w, h);
 
 		// deference to avoid causing a memory leak
-		this.template = null;
+		dereferenceImages();
 	}
 
 	protected void processInner( int w, int h ) {
@@ -110,6 +111,11 @@ public class TemplateIntensityImage<T extends ImageBase<T>>
 		processInnerMask(w, h);
 
 		// deference to avoid causing a memory leak
+		dereferenceImages();
+	}
+
+	@SuppressWarnings("NullAway")
+	private void dereferenceImages() {
 		this.template = null;
 		this.mask = null;
 	}

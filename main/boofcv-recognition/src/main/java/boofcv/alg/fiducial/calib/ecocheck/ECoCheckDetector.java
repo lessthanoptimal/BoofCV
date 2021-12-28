@@ -134,7 +134,7 @@ public class ECoCheckDetector<T extends ImageGray<T>> implements VerbosePrint {
 	Point2D_F64 pixel = new Point2D_F64();
 
 	// Verbose print debugging
-	PrintStream verbose;
+	@Nullable PrintStream verbose;
 	// If true it will print profiling information to verbose out
 	boolean runtimeProfiling;
 

@@ -23,6 +23,7 @@ package boofcv.alg.fiducial.calib.squares;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class SquareEdge {
 	// destinations
 	public SquareNode a;
@@ -72,6 +73,7 @@ public class SquareEdge {
 	/**
 	 * Discards previous settings.
 	 */
+	@SuppressWarnings("NullAway")
 	public void reset() {
 		a = b = null;
 		sideA = sideB = -1;

@@ -22,6 +22,8 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 
+import java.util.Objects;
+
 /**
  * <p>
  * Scores the difference between the template and the image using sum of squared error (SSE).
@@ -32,6 +34,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("NullAway.Init")
 public abstract class TemplateSumSquaredError<T extends ImageBase<T>>
 		implements TemplateIntensityImage.EvaluatorMethod<T> {
 	TemplateIntensityImage<T> o;
@@ -68,6 +71,7 @@ public abstract class TemplateSumSquaredError<T extends ImageBase<T>>
 
 		@Override
 		public float evaluateMask( int tl_x, int tl_y ) {
+			Objects.requireNonNull(o.mask);
 			float total = 0;
 
 			// Reduce chance of numerical overflow and delay conversion to float
@@ -117,7 +121,7 @@ public abstract class TemplateSumSquaredError<T extends ImageBase<T>>
 
 		@Override
 		public float evaluateMask( int tl_x, int tl_y ) {
-
+			Objects.requireNonNull(o.mask);
 			float total = 0;
 
 			// Reduce chance of numerical overflow and delay conversion to float

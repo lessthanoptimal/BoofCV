@@ -18,6 +18,7 @@
 
 package boofcv.alg.fiducial.qrcode;
 
+import boofcv.struct.distort.DoNothing2Transform2_F64;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.geo.PointIndex2D_F64;
@@ -138,7 +139,7 @@ public class TestQrPose3DUtils extends BoofStandardJUnit {
 			public Point2Transform2_F64 copyConcurrent() {
 				return null;
 			}
-		}, null);
+		}, new DoNothing2Transform2_F64());
 		return alg;
 	}
 }

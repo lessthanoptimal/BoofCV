@@ -33,6 +33,7 @@ import georegression.struct.shapes.RectangleLength2D_I32;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class LikelihoodHueSatHistCoupled_PL_U8 implements PixelLikelihood<Planar<GrayU8>> {
 	// each band in the image
 	private GrayU8 imageRed;
@@ -52,7 +53,7 @@ public class LikelihoodHueSatHistCoupled_PL_U8 implements PixelLikelihood<Planar
 
 	// Hue has a range of 0 to 2*pi and this is a discretized histogram
 	// Saturation has a range of 0 to 1 and this is a discretized histogram
-	protected float bins[];
+	protected float[] bins;
 
 	// size of the hue and saturation bins
 	protected float sizeH, sizeS;

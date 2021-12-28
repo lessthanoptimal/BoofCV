@@ -24,6 +24,7 @@ import org.ddogleg.sorting.QuickSelect;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_F64;
 import org.ddogleg.struct.DogArray_I32;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +36,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class TldDetection<T extends ImageGray<T>> {
 
 	// Detects rectangles: Removes candidates don't match the fern descriptors
@@ -68,7 +70,7 @@ public class TldDetection<T extends ImageGray<T>> {
 	private final TldHelperFunctions helper = new TldHelperFunctions();
 
 	// the most likely region
-	private TldRegion best;
+	private @Nullable TldRegion best;
 	// is it ambiguous which region is the best?
 	protected boolean ambiguous;
 	// was it successful at selecting a single region?
@@ -86,8 +88,7 @@ public class TldDetection<T extends ImageGray<T>> {
 		nonmax = new TldNonMaximalSuppression(config.regionConnect);
 	}
 
-	protected TldDetection() {
-	}
+	protected TldDetection() {}
 
 	/**
 	 * Detects the object inside the image. Eliminates candidate regions using a cascade of tests
@@ -216,7 +217,7 @@ public class TldDetection<T extends ImageGray<T>> {
 		}
 	}
 
-	public TldRegion selectBest() {
+	public @Nullable TldRegion selectBest() {
 		TldRegion best = null;
 		double bestConfidence = 0;
 
@@ -250,7 +251,7 @@ public class TldDetection<T extends ImageGray<T>> {
 		return !ambiguousRegions.isEmpty();
 	}
 
-	public TldRegion getBest() {
+	public @Nullable TldRegion getBest() {
 		return best;
 	}
 

@@ -50,6 +50,7 @@ import java.util.Set;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class FeatureSceneRecognitionNister2006<TD extends TupleDesc<TD>> implements FeatureSceneRecognition<TD> {
 	/** Configuration for this class */
 	@Getter ConfigRecognitionNister2006 config;
@@ -74,7 +75,7 @@ public class FeatureSceneRecognitionNister2006<TD extends TupleDesc<TD>> impleme
 	int tupleDOF;
 
 	// If not null then print verbose information
-	PrintStream verbose;
+	@Nullable PrintStream verbose;
 
 	// Internal Profiling. All times in milliseconds
 	@Getter long timeLearnDescribeMS;

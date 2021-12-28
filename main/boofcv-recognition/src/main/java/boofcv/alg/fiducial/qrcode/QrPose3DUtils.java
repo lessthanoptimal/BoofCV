@@ -24,6 +24,7 @@ import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -172,8 +173,9 @@ public class QrPose3DUtils {
 	/**
 	 * Specifies transform from pixel to normalize image coordinates
 	 */
-	public void setLensDistortion( Point2Transform2_F64 pixelToNorm, Point2Transform2_F64 undistToDist ) {
-		if (pixelToNorm == null) {
+	public void setLensDistortion( @Nullable Point2Transform2_F64 pixelToNorm,
+								   @Nullable Point2Transform2_F64 undistToDist ) {
+		if (pixelToNorm == null || undistToDist == null) {
 			this.pixelToNorm = new DoNothing2Transform2_F64();
 			this.undistToDist = new DoNothing2Transform2_F64();
 		} else {

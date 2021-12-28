@@ -33,6 +33,7 @@ import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +43,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class CalibrationDetectorSquareGrid implements DetectSingleFiducialCalibration {
 
 	DetectSquareGridFiducial<GrayF32> detector;
@@ -132,7 +134,7 @@ public class CalibrationDetectorSquareGrid implements DetectSingleFiducialCalibr
 	}
 
 	@Override
-	public void setLensDistortion( LensDistortionNarrowFOV distortion, int width, int height ) {
+	public void setLensDistortion( @Nullable LensDistortionNarrowFOV distortion, int width, int height ) {
 		if (distortion == null)
 			detector.getDetectorSquare().setLensDistortion(width, height, null, null);
 		else {

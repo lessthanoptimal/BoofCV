@@ -35,7 +35,7 @@ public class FiducialStability {
 	 */
 	public double orientation;
 
-	public FiducialStability(double location, double orientation) {
+	public FiducialStability( double location, double orientation ) {
 		this.location = location;
 		this.orientation = orientation;
 	}

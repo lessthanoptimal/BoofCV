@@ -22,6 +22,7 @@ import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -58,5 +59,5 @@ public interface DetectSingleFiducialCalibration {
 	 * Explicitly handles lens distortion when detecting image features. If used, features will be found in
 	 * undistorted pixel coordinates
 	 */
-	void setLensDistortion(LensDistortionNarrowFOV distortion, int width, int height );
+	void setLensDistortion( @Nullable LensDistortionNarrowFOV distortion, int width, int height );
 }

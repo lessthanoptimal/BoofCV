@@ -24,7 +24,6 @@ import boofcv.alg.shapes.ellipse.BinaryEllipseDetector;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.curve.EllipseRotated_F64;
-import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.DogArray;
 
 import java.util.ArrayList;
@@ -293,10 +292,6 @@ public abstract class DetectCircleGrid<T extends ImageGray<T>> {
 	 */
 	public List<Grid> getGrids() {
 		return validGrids;
-	}
-
-	public List<Point2D_F64> getCalibrationPoints() {
-		return null;
 	}
 
 	public GrayU8 getBinary() {

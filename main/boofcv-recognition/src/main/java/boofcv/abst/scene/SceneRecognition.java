@@ -87,6 +87,7 @@ public interface SceneRecognition<T extends ImageBase<T>> extends VerbosePrint {
 	ImageType<T> getImageType();
 
 	/** References a match in the database to the query image */
+	@SuppressWarnings({"NullAway.Init"})
 	class Match {
 		/** ID of matching image */
 		public String id;

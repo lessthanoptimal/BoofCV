@@ -33,23 +33,23 @@ import java.util.Arrays;
  * With hard assignment a single word is selected. With soft a fraction is assigned to each word based on
  * a distance metric. See {@link AssignCluster} for the details.
  * </p>
+ *
  * @author Peter Abeles
  */
-public class FeatureToWordHistogram_F64
-		implements FeatureToWordHistogram<TupleDesc_F64>
-{
+@SuppressWarnings({"NullAway.Init"})
+public class FeatureToWordHistogram_F64 implements FeatureToWordHistogram<TupleDesc_F64> {
 	// Assigns a feature to a word
-	private AssignCluster<double[]> assignment;
+	private final AssignCluster<double[]> assignment;
 
 	// should it use hard or soft assignment
-	private boolean hardAssignment;
+	private final boolean hardAssignment;
 
 	// total number of features which have been assigned to the histogram
 	private int total;
-	private double histogram[];
+	private final double[] histogram;
 
 	// internal work space
-	private double temp[];
+	private double[] temp;
 
 	// used to catch a common bug
 	private boolean processed;
@@ -60,13 +60,13 @@ public class FeatureToWordHistogram_F64
 	 * @param assignment Specifies the assignment algorithm
 	 * @param hardAssignment true for hard assignment and false for soft assignment
 	 */
-	public FeatureToWordHistogram_F64(AssignCluster<double[]> assignment, boolean hardAssignment ) {
+	public FeatureToWordHistogram_F64( AssignCluster<double[]> assignment, boolean hardAssignment ) {
 		this.assignment = assignment;
 		this.hardAssignment = hardAssignment;
 
-		histogram = new double[ assignment.getNumberOfClusters() ];
-		if( !hardAssignment ) {
-			temp = new double[ assignment.getNumberOfClusters() ];
+		histogram = new double[assignment.getNumberOfClusters()];
+		if (!hardAssignment) {
+			temp = new double[assignment.getNumberOfClusters()];
 		}
 	}
 
@@ -74,15 +74,15 @@ public class FeatureToWordHistogram_F64
 	public void reset() {
 		total = 0;
 		processed = false;
-		Arrays.fill(histogram,0);
+		Arrays.fill(histogram, 0);
 	}
 
 	@Override
 	public void addFeature( TupleDesc_F64 feature ) {
-		if( hardAssignment ) {
+		if (hardAssignment) {
 			histogram[assignment.assign(feature.getData())] += 1;
 		} else {
-			assignment.assign(feature.getData(),temp);
+			assignment.assign(feature.getData(), temp);
 			for (int i = 0; i < histogram.length; i++) {
 				histogram[i] += temp[i];
 			}
@@ -104,11 +104,12 @@ public class FeatureToWordHistogram_F64
 
 	/**
 	 * Histogram of word frequencies. Normalized such that the sum is equal to 1.
+	 *
 	 * @return histogram
 	 */
 	@Override
 	public double[] getHistogram() {
-		if( !processed )
+		if (!processed)
 			throw new RuntimeException("Must call process first before histogram is valid");
 		return histogram;
 	}
