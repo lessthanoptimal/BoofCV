@@ -81,10 +81,10 @@ public class ChessboardCornerClusterToGrid implements VerbosePrint {
 	@Getter @Setter boolean requireCornerSquares = false;
 
 	// Used to optionally print extra debugging information
-	PrintStream verbose;
+	@Nullable PrintStream verbose;
 
 	// optional check on the shape
-	@Setter CheckShape checkShape;
+	@Setter @Nullable CheckShape checkShape;
 
 	/** Storage for elements in the sparse grid. Elements are not ordered. */
 	@Getter DogArray<GridElement> sparseGrid = new DogArray<>(GridElement::new, GridElement::reset);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import lombok.Getter;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings({"MissingOverride"})
+@SuppressWarnings({"MissingOverride", "NullAway.Init"})
 public abstract class DisparitySparseRectifiedScoreBM_S32<T extends ImageGray<T>>
 		extends DisparitySparseRectifiedScoreBM<int[], T> {
 	// Fit scores as a function of disparity. scores[0] = score at disparity of disparityMin

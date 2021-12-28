@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -106,6 +106,7 @@ public interface BlockRowScore<T extends ImageBase<T>, ScoreArray, ImageData> {
 
 	ImageType<T> getImageType();
 
+	@SuppressWarnings({"NullAway.Init"})
 	abstract class ArrayS32<T extends ImageBase<T>, ImageData> implements BlockRowScore<T, int[], ImageData> {
 		protected int maxPerPixel;
 		T left, right;
@@ -179,6 +180,7 @@ public interface BlockRowScore<T extends ImageBase<T>, ScoreArray, ImageData> {
 		}
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	abstract class ArrayS32_BS32<T extends GrayI<T>, ImageData> extends ArrayS32<T, ImageData> {
 		ImageBorder_S32<T> borderLeft;
 		ImageBorder_S32<T> borderRight;
@@ -201,6 +203,7 @@ public interface BlockRowScore<T extends ImageBase<T>, ScoreArray, ImageData> {
 		}
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	abstract class ArrayS32_BS64 extends ArrayS32<GrayS64, long[]> {
 		ImageBorder_S64 borderLeft;
 		ImageBorder_S64 borderRight;
@@ -223,6 +226,7 @@ public interface BlockRowScore<T extends ImageBase<T>, ScoreArray, ImageData> {
 		}
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	abstract class ArrayF32<T extends ImageBase<T>> implements BlockRowScore<T, float[], float[]> {
 		T left, right;
 
@@ -288,6 +292,7 @@ public interface BlockRowScore<T extends ImageBase<T>, ScoreArray, ImageData> {
 		}
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	abstract class ArrayS32_BF32 extends ArrayF32<GrayF32> {
 		ImageBorder_F32 borderLeft;
 		ImageBorder_F32 borderRight;

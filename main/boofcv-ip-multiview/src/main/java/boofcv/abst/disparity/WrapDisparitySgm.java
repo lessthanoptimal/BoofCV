@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,11 +23,12 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import org.jetbrains.annotations.Nullable;
 
 public class WrapDisparitySgm<DI extends ImageGray<DI>> implements StereoDisparity<GrayU8, DI> {
 
 	SgmStereoDisparity<GrayU8,?> sgm;
-	GrayF32 subpixel;
+	@Nullable GrayF32 subpixel;
 
 	public WrapDisparitySgm( SgmStereoDisparity<GrayU8,?> sgm, boolean subPixel) {
 		this.sgm = sgm;

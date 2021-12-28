@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,8 +41,6 @@ public class DisparitySmootherSpeckleFilter<Image extends ImageBase<Image>, Disp
 	@Getter ConfigSpeckleFilter config;
 
 	@Nullable PrintStream out;
-
-	Class<Disp> dispType;
 
 	@SuppressWarnings("unchecked")
 	public DisparitySmootherSpeckleFilter( ConnectedSpeckleFiller<Disp> filler, ConfigSpeckleFilter config ) {

@@ -30,6 +30,7 @@ import boofcv.struct.image.Planar;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class SgmCostBase<T extends ImageBase<T>> implements SgmDisparityCost<T> {
 	protected T left, right;
 	protected GrayU16 costXD;

@@ -63,14 +63,14 @@ public class EllipsesIntoClusters {
 	 * Configures clustering
 	 *
 	 * @param maxDistanceToMajorAxisRatio The maximum distance away the center of another ellipse that will be
-	 *                                   considered specifies as a multiple of the ellipse's major axis
+	 * considered specifies as a multiple of the ellipse's major axis
 	 * @param sizeSimilarityTolerance How similar two ellipses must be to be connected. 0 to 1.0. 1.0 = perfect
-	 *                                match and 0.0 = infinite difference in size
+	 * match and 0.0 = infinite difference in size
 	 * @param edgeIntensitySimilarityTolerance How similar the intensity of the ellipses edges need to be.
-	 *                                         0 to 1.0. 1.0 = perfect
+	 * 0 to 1.0. 1.0 = perfect
 	 */
 	public EllipsesIntoClusters( double maxDistanceToMajorAxisRatio,
-								 double sizeSimilarityTolerance ,
+								 double sizeSimilarityTolerance,
 								 double edgeIntensitySimilarityTolerance ) {
 
 		this.maxDistanceToMajorAxisRatio = maxDistanceToMajorAxisRatio;
@@ -85,7 +85,7 @@ public class EllipsesIntoClusters {
 	 * @param ellipses Set of unordered ellipses
 	 * @param output Resulting found clusters. Cleared automatically. Returned lists are recycled on next call.
 	 */
-	public void process(List<EllipseInfo> ellipses , List<List<Node>> output ) {
+	public void process( List<EllipseInfo> ellipses, List<List<Node>> output ) {
 
 		init(ellipses);
 
@@ -98,7 +98,7 @@ public class EllipsesIntoClusters {
 			// remove noise
 			removeSingleConnections(c);
 
-			if( c.size() >= minimumClusterSize) {
+			if (c.size() >= minimumClusterSize) {
 				output.add(c);
 			}
 		}
@@ -107,7 +107,7 @@ public class EllipsesIntoClusters {
 	/**
 	 * Internal function which connects ellipses together
 	 */
-	void connect(List<EllipseInfo> ellipses) {
+	void connect( List<EllipseInfo> ellipses ) {
 		for (int i = 0; i < ellipses.size(); i++) {
 			EllipseInfo info1 = ellipses.get(i);
 			EllipseRotated_F64 e1 = info1.ellipse;
@@ -115,49 +115,49 @@ public class EllipsesIntoClusters {
 
 			// Only search the maximum of the major axis times two
 			// add a fudge factor. won't ever be perfect
-			double maxDistance = e1.a * maxDistanceToMajorAxisRatio;
+			double maxDistance = e1.a*maxDistanceToMajorAxisRatio;
 			maxDistance *= maxDistance;
 
 			searchResults.reset();
-			search.findNearest( ellipses.get(i), maxDistance, Integer.MAX_VALUE, searchResults );
+			search.findNearest(ellipses.get(i), maxDistance, Integer.MAX_VALUE, searchResults);
 
 			// if this node already has a cluster look it up, otherwise create a new one
 			List<Node> cluster1;
 
-			if( node1.cluster == -1 ) {
+			if (node1.cluster == -1) {
 				node1.cluster = clusters.size;
 				cluster1 = clusters.grow();
 				cluster1.clear();
-				cluster1.add( node1 );
+				cluster1.add(node1);
 			} else {
-				cluster1 = clusters.get( node1.cluster );
+				cluster1 = clusters.get(node1.cluster);
 			}
 
-			double edge1 = info1.averageOutside-info1.averageInside;
+			double edge1 = info1.averageOutside - info1.averageInside;
 
 			// only accept ellipses which have a similar size
 			for (int j = 0; j < searchResults.size(); j++) {
 				NnData<EllipseInfo> d = searchResults.get(j);
 				EllipseInfo info2 = ellipses.get(d.index);
 				EllipseRotated_F64 e2 = info2.ellipse;
-				if( e2 == e1 )
+				if (e2 == e1)
 					continue;
 
 				// see of they are already connected
-				if( node1.connections.indexOf(d.index) != -1 ) {
+				if (node1.connections.indexOf(d.index) != -1) {
 					continue;
 				}
 
 				// test the appearance of the ellipses edge
-				double edge2 = info2.averageOutside-info2.averageInside;
-				double intensityRatio = Math.abs(edge1-edge2)/Math.max(edge1,edge2);
+				double edge2 = info2.averageOutside - info2.averageInside;
+				double intensityRatio = Math.abs(edge1 - edge2)/Math.max(edge1, edge2);
 
-				if( intensityRatio > edgeIntensitySimilarityTolerance)
+				if (intensityRatio > edgeIntensitySimilarityTolerance)
 					continue;
 
 				// the initial search was based on size of major axis. Now prune and take in account the distance
 				// from the minor axis
-				if( axisAdjustedDistanceSq(e1,e2) > maxDistance ) {
+				if (axisAdjustedDistanceSq(e1, e2) > maxDistance) {
 					continue;
 				}
 
@@ -165,43 +165,43 @@ public class EllipsesIntoClusters {
 				//      somehow work into aspect ratio test?
 
 				// smallest shape divided by largest shape
-				double ratioA = e1.a > e2.a ? e2.a / e1.a : e1.a / e2.a;
-				double ratioB = e1.b > e2.b ? e2.b / e1.b : e1.b / e2.b;
+				double ratioA = e1.a > e2.a ? e2.a/e1.a : e1.a/e2.a;
+				double ratioB = e1.b > e2.b ? e2.b/e1.b : e1.b/e2.b;
 
-				if( ratioA < sizeSimilarityTolerance && ratioB < sizeSimilarityTolerance ) {
+				if (ratioA < sizeSimilarityTolerance && ratioB < sizeSimilarityTolerance) {
 					continue;
 				}
 
 				// axis ratio similarity check
 				double ratioC = (e1.a*e2.b)/(e1.b*e2.a);
-				if( ratioC > 1 ) ratioC = 1.0/ratioC;
+				if (ratioC > 1) ratioC = 1.0/ratioC;
 
-				if( ratioC < ratioSimilarityTolerance ) {
+				if (ratioC < ratioSimilarityTolerance) {
 					continue;
 				}
 
 				// Apply rule which combines two features
-				if( intensityRatio + (1-ratioC) >
-						(edgeIntensitySimilarityTolerance/1.5+(1-ratioSimilarityTolerance)) )
+				if (intensityRatio + (1 - ratioC) >
+						(edgeIntensitySimilarityTolerance/1.5 + (1 - ratioSimilarityTolerance)))
 					continue;
 
 				int indexNode2 = d.index;
 				Node node2 = nodes.get(indexNode2);
 
 				// node2 isn't in a cluster already. Add it to this one
-				if( node2.cluster == -1 ) {
+				if (node2.cluster == -1) {
 					node2.cluster = node1.cluster;
-					cluster1.add( node2 );
-					node1.connections.add( indexNode2 );
-					node2.connections.add( i );
-				} else if( node2.cluster != node1.cluster ) {
+					cluster1.add(node2);
+					node1.connections.add(indexNode2);
+					node2.connections.add(i);
+				} else if (node2.cluster != node1.cluster) {
 					// Node2 is in a different cluster. Merge the clusters
-					joinClusters( node1.cluster , node2.cluster );
-					node1.connections.add( indexNode2 );
-					node2.connections.add( i );
+					joinClusters(node1.cluster, node2.cluster);
+					node1.connections.add(indexNode2);
+					node2.connections.add(i);
 				} else {
-					node1.connections.add( indexNode2 );
-					node2.connections.add( i );
+					node1.connections.add(indexNode2);
+					node2.connections.add(i);
 				}
 			}
 		}
@@ -217,26 +217,26 @@ public class EllipsesIntoClusters {
 
 		open.addAll(cluster);
 
-		while( !open.isEmpty() ) {
-			for (int i = open.size()-1; i >= 0; i--) {
+		while (!open.isEmpty()) {
+			for (int i = open.size() - 1; i >= 0; i--) {
 				Node n = open.get(i);
 
-				if( n.connections.size == 1 ) {
+				if (n.connections.size == 1) {
 					// clear it's connections and remove it from the cluster
-					int index = findNode(n.which,cluster);
+					int index = findNode(n.which, cluster);
 					cluster.remove(index);
 
 					// Remove the reference to this node from its one connection
-					int parent = findNode(n.connections.get(0),cluster);
+					int parent = findNode(n.connections.get(0), cluster);
 					n.connections.reset();
-					if( parent == -1 ) throw new RuntimeException("BUG!");
+					if (parent == -1) throw new RuntimeException("BUG!");
 					Node p = cluster.get(parent);
 					int edge = p.connections.indexOf(n.which);
-					if( edge == -1 ) throw new RuntimeException("BUG!");
+					if (edge == -1) throw new RuntimeException("BUG!");
 					p.connections.remove(edge);
 
 					// if the parent now only has one connection
-					if( p.connections.size == 1) {
+					if (p.connections.size == 1) {
 						future.add(p);
 					}
 				}
@@ -248,9 +248,9 @@ public class EllipsesIntoClusters {
 		}
 	}
 
-	static int findNode( int target , List<Node> cluster ) {
+	static int findNode( int target, List<Node> cluster ) {
 		for (int i = 0; i < cluster.size(); i++) {
-			if( cluster.get(i).which == target ) {
+			if (cluster.get(i).which == target) {
 				return i;
 			}
 		}
@@ -262,7 +262,7 @@ public class EllipsesIntoClusters {
 	 * same size then there is no change. If the minor axis is much smaller and ellipse b lies along that
 	 * axis then the returned distance will be greater.
 	 */
-	static double axisAdjustedDistanceSq(EllipseRotated_F64 a , EllipseRotated_F64 b ) {
+	static double axisAdjustedDistanceSq( EllipseRotated_F64 a, EllipseRotated_F64 b ) {
 		double dx = b.center.x - a.center.x;
 		double dy = b.center.y - a.center.y;
 
@@ -280,7 +280,7 @@ public class EllipsesIntoClusters {
 	/**
 	 * Recycles and initializes all internal data structures
 	 */
-	void init(List<EllipseInfo> ellipses) {
+	void init( List<EllipseInfo> ellipses ) {
 		nodes.resize(ellipses.size());
 		clusters.reset();
 
@@ -291,22 +291,23 @@ public class EllipsesIntoClusters {
 			n.cluster = -1;
 		}
 
-		nn.setPoints(ellipses,true);
+		nn.setPoints(ellipses, true);
 	}
 
 	/**
 	 * Moves all the members of 'food' into 'mouth'
+	 *
 	 * @param mouth The group which will not be changed.
 	 * @param food All members of this group are put into mouth
 	 */
-	void joinClusters( int mouth , int food ) {
+	void joinClusters( int mouth, int food ) {
 
 		List<Node> listMouth = clusters.get(mouth);
 		List<Node> listFood = clusters.get(food);
 
 		// put all members of food into mouth
 		for (int i = 0; i < listFood.size(); i++) {
-			listMouth.add( listFood.get(i) );
+			listMouth.add(listFood.get(i));
 			listFood.get(i).cluster = mouth;
 		}
 
@@ -318,7 +319,7 @@ public class EllipsesIntoClusters {
 		return maxDistanceToMajorAxisRatio;
 	}
 
-	public void setMaxDistanceToMajorAxisRatio(double maxDistanceToMajorAxisRatio) {
+	public void setMaxDistanceToMajorAxisRatio( double maxDistanceToMajorAxisRatio ) {
 		this.maxDistanceToMajorAxisRatio = maxDistanceToMajorAxisRatio;
 	}
 
@@ -326,7 +327,7 @@ public class EllipsesIntoClusters {
 		return sizeSimilarityTolerance;
 	}
 
-	public void setSizeSimilarityTolerance(double sizeSimilarityTolerance) {
+	public void setSizeSimilarityTolerance( double sizeSimilarityTolerance ) {
 		this.sizeSimilarityTolerance = sizeSimilarityTolerance;
 	}
 
@@ -334,12 +335,11 @@ public class EllipsesIntoClusters {
 		return minimumClusterSize;
 	}
 
-	public void setMinimumClusterSize(int minimumClusterSize) {
+	public void setMinimumClusterSize( int minimumClusterSize ) {
 		this.minimumClusterSize = minimumClusterSize;
 	}
 
-	public static class Node
-	{
+	public static class Node {
 		/**
 		 * index of the ellipse in the input list
 		 */
@@ -358,17 +358,19 @@ public class EllipsesIntoClusters {
 	private static class KdTreeEllipseInfo implements KdTreeDistance<EllipseInfo> {
 
 		@Override
-		public double distance(EllipseInfo a, EllipseInfo b) {
+		public double distance( EllipseInfo a, EllipseInfo b ) {
 			return a.ellipse.center.distance2(b.ellipse.center);
 		}
 
 		@Override
-		public double valueAt(EllipseInfo point, int index) {
-			switch( index ) {
-				case 0: return point.ellipse.center.x;
-				case 1: return point.ellipse.center.y;
+		public double valueAt( EllipseInfo point, int index ) {
+			switch (index) {
+				case 0:
+					return point.ellipse.center.x;
+				case 1:
+					return point.ellipse.center.y;
 			}
-			throw new IllegalArgumentException("Out of bounds. "+index);
+			throw new IllegalArgumentException("Out of bounds. " + index);
 		}
 
 		@Override

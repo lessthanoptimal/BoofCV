@@ -54,6 +54,7 @@ import static boofcv.misc.BoofMiscOps.checkTrue;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class MultiBaselineDisparityMedian implements VerbosePrint {
 
 	// Disparity parameters for fused view
@@ -74,7 +75,7 @@ public class MultiBaselineDisparityMedian implements VerbosePrint {
 	// Storage for transform from rectified to unrectified pixels
 	private final Homography2D_F64 rect = new Homography2D_F64();
 
-	PrintStream verbose;
+	@Nullable PrintStream verbose;
 
 	/**
 	 * Must call before adding images. Specifies the size of the original image before rectification and clears

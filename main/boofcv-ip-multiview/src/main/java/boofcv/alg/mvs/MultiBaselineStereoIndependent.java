@@ -40,6 +40,7 @@ import org.ejml.dense.row.CommonOps_DDRM;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
+import java.util.Objects;
 import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
@@ -68,6 +69,7 @@ import static java.util.Objects.requireNonNull;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> implements VerbosePrint {
 
 	/** Provides access to intermediate stereo results */
@@ -80,7 +82,7 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 	@Getter @Setter @Nullable DisparitySmoother<Image, GrayF32> disparitySmoother = null;
 
 	/** Used to retrieve images by their ID */
-	@Getter @Setter LookUpImages lookUpImages = null;
+	@Getter @Setter @Nullable LookUpImages lookUpImages = null;
 
 	//------------ Profiling information
 	/** Sum of disparity calculations */
@@ -229,7 +231,7 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 	private boolean computeDisparity( Image image1, int rightIdx, String rightID, StereoResults info ) {
 		long time0 = System.nanoTime();
 		// Look up the second image in the stereo image
-		if (!lookUpImages.loadImage(rightID, image2)) {
+		if (!Objects.requireNonNull(lookUpImages).loadImage(rightID, image2)) {
 			if (verbose != null) verbose.println("Failed to load second image[" + rightIdx + "]");
 			return false;
 		}
@@ -313,6 +315,7 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 	/**
 	 * Results of disparity computation
 	 */
+	@SuppressWarnings({"NullAway.Init"})
 	static class StereoResults {
 		// disparity image
 		GrayF32 disparity;

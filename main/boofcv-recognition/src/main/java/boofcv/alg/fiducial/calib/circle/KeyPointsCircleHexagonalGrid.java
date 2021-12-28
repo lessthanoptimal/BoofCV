@@ -53,13 +53,17 @@ public class KeyPointsCircleHexagonalGrid {
 	DogArray<PointIndex2D_F64> keypoints = new DogArray<>(PointIndex2D_F64::new);
 
 	// used to compute tangent lines between two ellipses
-	private final TangentLinesTwoEllipses_F64 tangentFinder = new TangentLinesTwoEllipses_F64(GrlConstants.TEST_F64,10);
+	private final TangentLinesTwoEllipses_F64 tangentFinder = new TangentLinesTwoEllipses_F64(GrlConstants.TEST_F64, 10);
 
 	// storage for tangent points on ellipses
-	private final Point2D_F64 A0 = new Point2D_F64(); private final Point2D_F64 A1 = new Point2D_F64();
-	private final Point2D_F64 A2 = new Point2D_F64(); private final Point2D_F64 A3 = new Point2D_F64();
-	private final Point2D_F64 B0 = new Point2D_F64(); private final Point2D_F64 B1 = new Point2D_F64();
-	private final Point2D_F64 B2 = new Point2D_F64(); private final Point2D_F64 B3 = new Point2D_F64();
+	private final Point2D_F64 A0 = new Point2D_F64();
+	private final Point2D_F64 A1 = new Point2D_F64();
+	private final Point2D_F64 A2 = new Point2D_F64();
+	private final Point2D_F64 A3 = new Point2D_F64();
+	private final Point2D_F64 B0 = new Point2D_F64();
+	private final Point2D_F64 B1 = new Point2D_F64();
+	private final Point2D_F64 B2 = new Point2D_F64();
+	private final Point2D_F64 B3 = new Point2D_F64();
 
 	// local work space for center of intersections
 	private final LineGeneral2D_F64 lineA = new LineGeneral2D_F64();
@@ -68,30 +72,31 @@ public class KeyPointsCircleHexagonalGrid {
 
 	/**
 	 * Computes key points from the grid of ellipses
+	 *
 	 * @param grid Grid of ellipses
 	 * @return true if successful or false if it failed
 	 */
-	public boolean process(Grid grid ) {
+	public boolean process( Grid grid ) {
 		// reset and initialize data structures
 		init(grid);
 
 		// add tangent points from adjacent ellipses
-		if( !horizontal(grid) )
+		if (!horizontal(grid))
 			return false;
-		if( !vertical(grid) )
+		if (!vertical(grid))
 			return false;
-		if( !diagonalLR(grid) )
+		if (!diagonalLR(grid))
 			return false;
-		if( !diagonalRL(grid) )
+		if (!diagonalRL(grid))
 			return false;
 
 		return computeEllipseCenters();
 	}
 
-	void init(Grid grid) {
+	void init( Grid grid ) {
 		int totalEllipses = 0;
 		for (int i = 0; i < grid.ellipses.size(); i++) {
-			if( grid.ellipses.get(i) != null )
+			if (grid.ellipses.get(i) != null)
 				totalEllipses++;
 		}
 
@@ -101,13 +106,13 @@ public class KeyPointsCircleHexagonalGrid {
 		}
 	}
 
-	boolean horizontal(Grid grid) {
+	boolean horizontal( Grid grid ) {
 		for (int i = 0; i < grid.rows; i++) {
-			for (int j = 0; j < grid.columns-2; j++) {
-				if( i%2==0 && j%2==1 ) continue;
-				if( i%2==1 && j%2==0 ) continue;
+			for (int j = 0; j < grid.columns - 2; j++) {
+				if (i%2 == 0 && j%2 == 1) continue;
+				if (i%2 == 1 && j%2 == 0) continue;
 
-				if (!addTangents(grid, i, j, i, j+2))
+				if (!addTangents(grid, i, j, i, j + 2))
 					return false;
 			}
 		}
@@ -115,13 +120,13 @@ public class KeyPointsCircleHexagonalGrid {
 		return true;
 	}
 
-	boolean vertical(Grid grid) {
-		for (int i = 0; i < grid.rows-2; i++) {
+	boolean vertical( Grid grid ) {
+		for (int i = 0; i < grid.rows - 2; i++) {
 			for (int j = 0; j < grid.columns; j++) {
-				if( i%2==0 && j%2==1 ) continue;
-				if( i%2==1 && j%2==0 ) continue;
+				if (i%2 == 0 && j%2 == 1) continue;
+				if (i%2 == 1 && j%2 == 0) continue;
 
-				if (!addTangents(grid, i, j, i+2, j))
+				if (!addTangents(grid, i, j, i + 2, j))
 					return false;
 			}
 		}
@@ -129,13 +134,13 @@ public class KeyPointsCircleHexagonalGrid {
 		return true;
 	}
 
-	boolean diagonalLR(Grid grid) {
-		for (int i = 0; i < grid.rows-1; i++) {
-			for (int j = 0; j < grid.columns-1; j++) {
-				if( i%2==0 && j%2==1 ) continue;
-				if( i%2==1 && j%2==0 ) continue;
+	boolean diagonalLR( Grid grid ) {
+		for (int i = 0; i < grid.rows - 1; i++) {
+			for (int j = 0; j < grid.columns - 1; j++) {
+				if (i%2 == 0 && j%2 == 1) continue;
+				if (i%2 == 1 && j%2 == 0) continue;
 
-				if (!addTangents(grid, i, j, i+1, j+1))
+				if (!addTangents(grid, i, j, i + 1, j + 1))
 					return false;
 			}
 		}
@@ -143,13 +148,13 @@ public class KeyPointsCircleHexagonalGrid {
 		return true;
 	}
 
-	boolean diagonalRL(Grid grid) {
-		for (int i = 0; i < grid.rows-1; i++) {
+	boolean diagonalRL( Grid grid ) {
+		for (int i = 0; i < grid.rows - 1; i++) {
 			for (int j = 1; j < grid.columns; j++) {
-				if( i%2==0 && j%2==1 ) continue;
-				if( i%2==1 && j%2==0 ) continue;
+				if (i%2 == 0 && j%2 == 1) continue;
+				if (i%2 == 1 && j%2 == 0) continue;
 
-				if (!addTangents(grid, i, j, i+1, j-1))
+				if (!addTangents(grid, i, j, i + 1, j - 1))
 					return false;
 			}
 		}
@@ -160,19 +165,19 @@ public class KeyPointsCircleHexagonalGrid {
 	/**
 	 * Computes tangent points to the two ellipses specified by the grid coordinates
 	 */
-	private boolean addTangents(Grid grid, int rowA, int colA, int rowB, int colB) {
-		EllipseRotated_F64 a = grid.get(rowA,colA);
-		EllipseRotated_F64 b = grid.get(rowB,colB);
+	private boolean addTangents( Grid grid, int rowA, int colA, int rowB, int colB ) {
+		EllipseRotated_F64 a = grid.get(rowA, colA);
+		EllipseRotated_F64 b = grid.get(rowB, colB);
 
-		if( a == null || b == null ) {
+		if (a == null || b == null) {
 			return false;
 		}
 
-		if( !tangentFinder.process(a,b, A0, A1, A2, A3, B0, B1, B2, B3) ) {
+		if (!tangentFinder.process(a, b, A0, A1, A2, A3, B0, B1, B2, B3)) {
 			return false;
 		}
-		Tangents ta = tangents.get(grid.getIndexOfHexEllipse(rowA,colA));
-		Tangents tb = tangents.get(grid.getIndexOfHexEllipse(rowB,colB));
+		Tangents ta = tangents.get(grid.getIndexOfHexEllipse(rowA, colA));
+		Tangents tb = tangents.get(grid.getIndexOfHexEllipse(rowB, colB));
 
 		// add tangent points from the two lines which do not cross the center line
 		ta.grow().setTo(A0);
@@ -195,28 +200,28 @@ public class KeyPointsCircleHexagonalGrid {
 //			System.out.println("tangent id "+tangentIdx);
 			Tangents t = tangents.get(tangentIdx);
 			PointIndex2D_F64 keyPoint = keypoints.grow();
-			keyPoint.setTo(0,0,tangentIdx);
+			keyPoint.setTo(0, 0, tangentIdx);
 			Point2D_F64 center = keyPoint.p;
 			double totalWeight = 0;
 
 			for (int i = 0; i < t.size(); i += 2) {
-				UtilLine2D_F64.convert(t.get(i),t.get(i+1),lineA);
+				UtilLine2D_F64.convert(t.get(i), t.get(i + 1), lineA);
 
-				for (int j = i+2; j < t.size(); j += 2) {
-					UtilLine2D_F64.convert(t.get(j),t.get(j+1),lineB);
+				for (int j = i + 2; j < t.size(); j += 2) {
+					UtilLine2D_F64.convert(t.get(j), t.get(j + 1), lineB);
 
 					// way each intersection based on the acute angle. lines which are nearly parallel will
 					// be unstable estimates
-					double w = UtilVector2D_F64.acute(lineA.A,lineA.B,lineB.A,lineB.B);
-					if( w > Math.PI/2.0 )
-						w = Math.PI-w;
+					double w = UtilVector2D_F64.acute(lineA.A, lineA.B, lineB.A, lineB.B);
+					if (w > Math.PI/2.0)
+						w = Math.PI - w;
 
 					// If there is perfect data and no noise there will be duplicated lines. With noise there will
 					// be very similar lines
-					if( w <= 0.02 )
+					if (w <= 0.02)
 						continue;
 
-					if( null == Intersection2D_F64.intersection(lineA,lineB, location) ) {
+					if (null == Intersection2D_F64.intersection(lineA, lineB, location)) {
 						return false;
 					}
 
@@ -228,7 +233,7 @@ public class KeyPointsCircleHexagonalGrid {
 				}
 			}
 
-			if( totalWeight == 0 )
+			if (totalWeight == 0)
 				return false;
 
 			center.x /= totalWeight;
@@ -240,6 +245,7 @@ public class KeyPointsCircleHexagonalGrid {
 
 	/**
 	 * Returns the location of each key point in the image from the most recently processed grid.
+	 *
 	 * @return detected image location
 	 */
 	public DogArray<PointIndex2D_F64> getKeyPoints() {

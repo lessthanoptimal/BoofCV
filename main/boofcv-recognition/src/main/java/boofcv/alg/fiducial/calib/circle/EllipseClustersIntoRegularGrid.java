@@ -27,7 +27,7 @@ import java.util.List;
 /**
  * <p>Given a cluster of ellipses (created with {@link EllipsesIntoClusters}) order the ellipses into an regular
  * grid. Must be a proper grid too. That means number of rows and columns both need to be 2 or more.</p>
- * 
+ *
  * <p>Unlike the {@link EllipseClustersIntoHexagonalGrid asymmetric} grid the return grid object will be dense
  * with every element filled as expected.</p>
  *
@@ -39,20 +39,20 @@ public class EllipseClustersIntoRegularGrid extends EllipseClustersIntoGrid {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void process(List<EllipseRotated_F64> ellipses , List<List<EllipsesIntoClusters.Node>> clusters ) {
+	public void process( List<EllipseRotated_F64> ellipses, List<List<EllipsesIntoClusters.Node>> clusters ) {
 
 		foundGrids.reset();
 
 		for (int i = 0; i < clusters.size(); i++) {
 			List<EllipsesIntoClusters.Node> cluster = clusters.get(i);
 			int clusterSize = cluster.size();
-			if( clusterSize < 2 )
+			if (clusterSize < 2)
 				continue;
 			computeNodeInfo(ellipses, cluster);
 
 			// finds all the nodes in the outside of the cluster
-			if( !findContour(false) ) {
-				if( verbose ) System.out.println("Contour find failed");
+			if (!findContour(false)) {
+				if (verbose) System.out.println("Contour find failed");
 				continue;
 			}
 
@@ -60,55 +60,55 @@ public class EllipseClustersIntoRegularGrid extends EllipseClustersIntoGrid {
 			NodeInfo corner = selectSeedCorner();
 			corner.marked = true;
 
-			boolean ccw = UtilAngle.distanceCCW(direction(corner,corner.right),direction(corner,corner.left)) > Math.PI;
+			boolean ccw = UtilAngle.distanceCCW(direction(corner, corner.right), direction(corner, corner.left)) > Math.PI;
 
 			// find the row and column which the corner is a member of
-			List<NodeInfo> cornerRow = findLine(corner,corner.left,clusterSize, null,ccw);
-			List<NodeInfo> cornerColumn = findLine(corner,corner.right,clusterSize, null,!ccw);
+			List<NodeInfo> cornerRow = findLine(corner, corner.left, clusterSize, null, ccw);
+			List<NodeInfo> cornerColumn = findLine(corner, corner.right, clusterSize, null, !ccw);
 
-			if( cornerRow == null || cornerColumn == null ) {
-				if( verbose )System.out.println("Corner row/column line find failed");
+			if (cornerRow == null || cornerColumn == null) {
+				if (verbose) System.out.println("Corner row/column line find failed");
 				continue;
 			}
 
 			// Go down the columns and find each of the rows
 			List<List<NodeInfo>> gridByRows = new ArrayList<>();
-			gridByRows.add( cornerRow );
+			gridByRows.add(cornerRow);
 
 			boolean failed = false;
 			for (int j = 1; j < cornerColumn.size(); j++) {
-				List<NodeInfo> prev = gridByRows.get( j - 1);
+				List<NodeInfo> prev = gridByRows.get(j - 1);
 				NodeInfo seed = cornerColumn.get(j);
-				NodeInfo next = selectSeedNext(prev.get(0),prev.get(1), seed,ccw);
-				if( next == null ) {
-					if( verbose )
+				NodeInfo next = selectSeedNext(prev.get(0), prev.get(1), seed, ccw);
+				if (next == null) {
+					if (verbose)
 						System.out.println("Outer column with a row that has only one element");
 					failed = true;
 					break;
 				}
-				List<NodeInfo> row = findLine( seed , next, clusterSize, null,ccw);
-				gridByRows.add( row );
+				List<NodeInfo> row = findLine(seed, next, clusterSize, null, ccw);
+				gridByRows.add(row);
 			}
-			if( failed )
+			if (failed)
 				continue;
 
 			// perform sanity checks
-			if( !checkGridSize(gridByRows, cluster.size()) ) {
-				if( verbose ) {
+			if (!checkGridSize(gridByRows, cluster.size())) {
+				if (verbose) {
 					System.out.println("grid size check failed");
 					for (int j = 0; j < gridByRows.size(); j++) {
-						System.out.println("  row "+gridByRows.get(j).size());
+						System.out.println("  row " + gridByRows.get(j).size());
 					}
 				}
 				continue;
 			}
 
-			if( checkDuplicates(gridByRows) ) {
-				if( verbose ) System.out.println("contains duplicates");
+			if (checkDuplicates(gridByRows)) {
+				if (verbose) System.out.println("contains duplicates");
 				continue;
 			}
 
-			createRegularGrid(gridByRows,foundGrids.grow());
+			createRegularGrid(gridByRows, foundGrids.grow());
 		}
 	}
 
@@ -116,12 +116,12 @@ public class EllipseClustersIntoRegularGrid extends EllipseClustersIntoGrid {
 	 * Makes sure the found grid is the same size as the original cluster. If it's not then.
 	 * not all the nodes were used. All lists must have he same size too.
 	 */
-	static boolean checkGridSize(List<List<NodeInfo>> grid ,
-								 int clusterSize ) {
+	static boolean checkGridSize( List<List<NodeInfo>> grid,
+								  int clusterSize ) {
 		int total = 0;
 		int expected = grid.get(0).size();
 		for (int i = 0; i < grid.size(); i++) {
-			if( expected != grid.get(i).size() )
+			if (expected != grid.get(i).size())
 				return false;
 			total += grid.get(i).size();
 		}
@@ -133,7 +133,7 @@ public class EllipseClustersIntoRegularGrid extends EllipseClustersIntoGrid {
 	 * Combines the inner and outer grid into one grid for output. See {@link Grid} for a discussion
 	 * on how elements are ordered internally.
 	 */
-	static void createRegularGrid( List<List<NodeInfo>> gridByRows , Grid g) {
+	static void createRegularGrid( List<List<NodeInfo>> gridByRows, Grid g ) {
 		g.reset();
 
 		g.columns = gridByRows.get(0).size();
@@ -142,7 +142,7 @@ public class EllipseClustersIntoRegularGrid extends EllipseClustersIntoGrid {
 		for (int row = 0; row < g.rows; row++) {
 			List<NodeInfo> list = gridByRows.get(row);
 			for (int i = 0; i < g.columns; i++) {
-				g.ellipses.add(list.get(i).ellipse );
+				g.ellipses.add(list.get(i).ellipse);
 			}
 		}
 	}

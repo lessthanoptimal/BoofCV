@@ -23,6 +23,7 @@ import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Factory for creating different blur image filters.
@@ -69,7 +70,8 @@ public class FactoryBlurFilter {
 		return mean(ImageType.single(type), radiusX, radiusY);
 	}
 
-	public static <T extends ImageBase<T>> BlurStorageFilter<T> meanB( ImageType<T> type, int radiusX, int radiusY, ImageBorder<T> border ) {
+	public static <T extends ImageBase<T>> BlurStorageFilter<T> meanB( ImageType<T> type, int radiusX, int radiusY,
+																	   @Nullable ImageBorder<T> border ) {
 		BlurStorageFilter<T> filter = new BlurStorageFilter<>("meanB", type, radiusX, radiusY);
 		filter.setBorder(border);
 		return filter;

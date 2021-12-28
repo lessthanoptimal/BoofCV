@@ -30,6 +30,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class SelectDisparityBasicWta<Array , Disparity extends ImageGray>
 		implements DisparitySelect<Array,Disparity>
 {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,7 @@ import org.ejml.UtilEjml;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings({"MissingOverride"})
+@SuppressWarnings({"MissingOverride", "NullAway.Init"})
 public class SparseScoreRectifiedNcc<T extends ImageGray<T>> extends DisparitySparseRectifiedScoreBM<float[],T>
 {
 	// Storage for temporary images used to compute local mean and stdev
