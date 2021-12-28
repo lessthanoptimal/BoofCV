@@ -41,7 +41,7 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "NullAway.Init"})
 public abstract class ConfigGenerator<Config extends Configuration> {
 
 	/** Total number of different configurations it will generate */

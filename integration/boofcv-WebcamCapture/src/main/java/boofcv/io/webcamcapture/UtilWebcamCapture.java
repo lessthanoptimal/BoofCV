@@ -19,6 +19,7 @@
 package boofcv.io.webcamcapture;
 
 import com.github.sarxos.webcam.Webcam;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.util.List;
@@ -61,7 +62,7 @@ public class UtilWebcamCapture {
 		return webcam;
 	}
 
-	public static Webcam findDevice( String deviceName ) {
+	public static @Nullable Webcam findDevice( String deviceName ) {
 		List<Webcam> found = Webcam.getWebcams();
 
 		for( Webcam cam : found ) {

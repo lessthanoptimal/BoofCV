@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.io.webcamcapture;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.StandardAlgConfigPanel;
 import com.github.sarxos.webcam.Webcam;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -42,7 +43,7 @@ public class OpenWebcamDialog extends StandardAlgConfigPanel {
 	JDialog dialog;
 
 	JComboBox<String> comboCameras;
-	Webcam selectedCamera;
+	@Nullable Webcam selectedCamera;
 
 	JFormattedTextField fieldWidth, fieldHeight;
 	int width, height;
@@ -216,7 +217,7 @@ public class OpenWebcamDialog extends StandardAlgConfigPanel {
 //		});
 	}
 
-	public static Selection showDialog( Window owner ) {
+	public static @Nullable Selection showDialog( @Nullable Window owner ) {
 		if (Webcam.getWebcams().size() == 0) {
 			JOptionPane.showMessageDialog(owner, "No webcams found!");
 			return null;
@@ -268,10 +269,6 @@ public class OpenWebcamDialog extends StandardAlgConfigPanel {
 		concluded = true;
 	}
 
-	public Webcam getSelectedCamera() {
-		return selectedCamera;
-	}
-
 	public int getSelectedWidth() {
 		return width;
 	}
@@ -280,6 +277,7 @@ public class OpenWebcamDialog extends StandardAlgConfigPanel {
 		return height;
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	public static class Selection {
 		public Webcam camera;
 		public int width, height;

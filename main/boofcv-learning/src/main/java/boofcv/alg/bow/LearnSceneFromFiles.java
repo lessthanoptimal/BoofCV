@@ -69,14 +69,14 @@ public abstract class LearnSceneFromFiles {
 
 		int total = 0;
 		for (int i = 0; i < scenes.size(); i++) {
-			total += set.get(scenes.get(i)).size();
+			total += Objects.requireNonNull(set.get(scenes.get(i))).size();
 		}
 		System.out.println("total images " + total);
 
 		for (int sceneIdx = 0; sceneIdx < scenes.size(); sceneIdx++) {
 			String scene = scenes.get(sceneIdx);
 
-			List<String> images = set.get(scene);
+			List<String> images = Objects.requireNonNull(set.get(scene));
 			System.out.println("  " + scene + " " + images.size());
 			for (int imageIdx = 0; imageIdx < images.size(); imageIdx++) {
 				String image = images.get(imageIdx);
@@ -97,10 +97,10 @@ public abstract class LearnSceneFromFiles {
 	protected abstract int classify( String path );
 
 	public void loadSets( File dirTraining, File dirCross, File dirTest ) {
-		train = findImages(dirTraining);
+		train = Objects.requireNonNull(findImages(dirTraining));
 		if (dirCross != null)
-			cross = findImages(dirCross);
-		test = findImages(dirTest);
+			cross = Objects.requireNonNull(findImages(dirCross));
+		test = Objects.requireNonNull(findImages(dirTest));
 
 		extractKeys(train);
 		extractKeys(test);
@@ -126,7 +126,7 @@ public abstract class LearnSceneFromFiles {
 		Set<String> keys = all.keySet();
 
 		for (String key : keys) { // lint:forbidden ignore_line
-			List<String> allImages = all.get(key);
+			List<String> allImages = Objects.requireNonNull(all.get(key));
 
 			// randomize the ordering to remove bias
 			Collections.shuffle(allImages, rand);

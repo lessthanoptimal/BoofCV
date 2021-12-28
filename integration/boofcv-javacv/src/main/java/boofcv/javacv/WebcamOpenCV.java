@@ -35,18 +35,17 @@ import org.ddogleg.struct.DogArray_I8;
 public class WebcamOpenCV implements WebcamInterface {
 	@Override
 	public <T extends ImageBase<T>> SimpleImageSequence<T>
-	open(String device, int width, int height, ImageType<T> imageType)
-	{
+	open( String device, int width, int height, ImageType<T> imageType ) {
 		OpenCVFrameGrabber grabber = null;
-		if( device != null ) {
+		if (device != null) {
 			try {
 				int which = Integer.parseInt(device);
 				grabber = new OpenCVFrameGrabber(which);
-			}catch (NumberFormatException ignore) {
+			} catch (NumberFormatException ignore) {
 				grabber = new OpenCVFrameGrabber(0);
 			}
-			if( grabber == null ) {
-				throw new RuntimeException("Can't find webcam with ID or name at "+device);
+			if (grabber == null) {
+				throw new RuntimeException("Can't find webcam with ID or name at " + device);
 			}
 		} else {
 			grabber = new OpenCVFrameGrabber(0);
@@ -59,7 +58,7 @@ public class WebcamOpenCV implements WebcamInterface {
 	public static class SimpleSequence<T extends ImageBase<T>> implements SimpleImageSequence<T> {
 
 		OpenCVFrameGrabber grabber;
-		int width,height;
+		int width, height;
 
 		T output;
 
@@ -69,7 +68,7 @@ public class WebcamOpenCV implements WebcamInterface {
 
 		boolean bgr_to_rgb;
 
-		public SimpleSequence(OpenCVFrameGrabber grabber, ImageType<T> imageType) {
+		public SimpleSequence( OpenCVFrameGrabber grabber, ImageType<T> imageType ) {
 			this.grabber = grabber;
 
 			try {
@@ -82,7 +81,7 @@ public class WebcamOpenCV implements WebcamInterface {
 
 			width = grabber.getImageWidth();
 			height = grabber.getImageHeight();
-			output = imageType.createImage(width,height);
+			output = imageType.createImage(width, height);
 		}
 
 		@Override
@@ -100,7 +99,7 @@ public class WebcamOpenCV implements WebcamInterface {
 			try {
 				Frame image = grabber.grab();
 				frameNumber = grabber.getFrameNumber();
-				ConvertOpenCvFrame.convert(image,output,bgr_to_rgb,work);
+				ConvertOpenCvFrame.convert(image, output, bgr_to_rgb, work);
 				return true;
 			} catch (FrameGrabber.Exception e) {
 				return false;
@@ -119,7 +118,7 @@ public class WebcamOpenCV implements WebcamInterface {
 
 		@Override
 		public <InternalImage> InternalImage getGuiImage() {
-			return null;
+			throw new RuntimeException("Implement");
 		}
 
 		@Override
@@ -137,7 +136,7 @@ public class WebcamOpenCV implements WebcamInterface {
 		}
 
 		@Override
-		public void setLoop(boolean loop) {
+		public void setLoop( boolean loop ) {
 
 		}
 
