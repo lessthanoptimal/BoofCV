@@ -58,8 +58,12 @@ subprojects {
     // Prevents tons of errors if someone is using ASCII
     tasks.withType(JavaCompile).configureEach { options.encoding = "UTF-8" }
     // Creates Java 8 byte code
-    if (project.ext.build_java11)
-        tasks.withType(JavaCompile).configureEach { options.release = 11 }
+    if (project.ext.build_java11) {
+        tasks.withType(JavaCompile).configureEach {
+            sourceCompatibility = 15
+            options.release = 11
+        }
+    }
 
     // Enable incremental compile. Should make single file changes faster
     tasks.withType(JavaCompile) { options.incremental = true }
@@ -213,7 +217,7 @@ subprojects {
 
         // Disable ErrorProne for benchmarks and auto code generators
 //        options.errorprone.enabled = false
-        if (name.startsWith("compileBenchmark") || name.startsWith("compileGenerate") ) {
+        if (name.startsWith("compileBenchmark") || name.startsWith("compileGenerate")) {
             options.errorprone.enabled = false
             return
         }
