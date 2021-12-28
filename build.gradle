@@ -227,7 +227,7 @@ subprojects {
 
     javadoc {
         configure(options) {
-            links = ['http://docs.oracle.com/javase/8/docs/api/',
+            links = ['https://docs.oracle.com/en/java/javase/11/docs/api/',
                      'http://ejml.org/javadoc/',
                      'http://ddogleg.org/javadoc/',
                      'http://georegression.org/javadoc/']
