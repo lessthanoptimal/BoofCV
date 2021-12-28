@@ -131,7 +131,7 @@ public class ExampleImageFilter {
 	}
 
 	public static void main( String[] args ) {
-		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("standard/kodim17.jpg"));
+		BufferedImage image = UtilImageIO.loadImageNotNull(UtilIO.pathExample("standard/kodim17.jpg"));
 
 		// produces the same results
 		procedural(ConvertBufferedImage.convertFromSingle(image, null, GrayU8.class));

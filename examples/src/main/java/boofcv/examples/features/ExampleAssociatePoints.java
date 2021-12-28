@@ -63,9 +63,9 @@ public class ExampleAssociatePoints<T extends ImageGray<T>, TD extends TupleDesc
 
 	Class<T> imageType;
 
-	public ExampleAssociatePoints(DetectDescribePoint<T, TD> detDesc,
-								  AssociateDescription<TD> associate,
-								  Class<T> imageType) {
+	public ExampleAssociatePoints( DetectDescribePoint<T, TD> detDesc,
+								   AssociateDescription<TD> associate,
+								   Class<T> imageType ) {
 		this.detDesc = detDesc;
 		this.associate = associate;
 		this.imageType = imageType;
@@ -74,8 +74,7 @@ public class ExampleAssociatePoints<T extends ImageGray<T>, TD extends TupleDesc
 	/**
 	 * Detect and associate point features in the two images. Display the results.
 	 */
-	public void associate( BufferedImage imageA , BufferedImage imageB )
-	{
+	public void associate( BufferedImage imageA, BufferedImage imageB ) {
 		T inputA = ConvertBufferedImage.convertFromSingle(imageA, null, imageType);
 		T inputB = ConvertBufferedImage.convertFromSingle(imageB, null, imageType);
 
@@ -84,12 +83,12 @@ public class ExampleAssociatePoints<T extends ImageGray<T>, TD extends TupleDesc
 		pointsB = new ArrayList<>();
 
 		// stores the description of detected interest points
-		DogArray<TD> descA = UtilFeature.createArray(detDesc,100);
-		DogArray<TD> descB = UtilFeature.createArray(detDesc,100);
+		DogArray<TD> descA = UtilFeature.createArray(detDesc, 100);
+		DogArray<TD> descB = UtilFeature.createArray(detDesc, 100);
 
 		// describe each image using interest points
-		describeImage(inputA,pointsA,descA);
-		describeImage(inputB,pointsB,descB);
+		describeImage(inputA, pointsA, descA);
+		describeImage(inputB, pointsB, descB);
 
 		// Associate features between the two images
 		associate.setSource(descA);
@@ -98,21 +97,20 @@ public class ExampleAssociatePoints<T extends ImageGray<T>, TD extends TupleDesc
 
 		// display the results
 		AssociationPanel panel = new AssociationPanel(20);
-		panel.setAssociation(pointsA,pointsB,associate.getMatches());
-		panel.setImages(imageA,imageB);
+		panel.setAssociation(pointsA, pointsB, associate.getMatches());
+		panel.setImages(imageA, imageB);
 
-		ShowImages.showWindow(panel,"Associated Features",true);
+		ShowImages.showWindow(panel, "Associated Features", true);
 	}
 
 	/**
 	 * Detects features inside the two images and computes descriptions at those points.
 	 */
-	private void describeImage(T input, List<Point2D_F64> points, DogArray<TD> descs )
-	{
+	private void describeImage( T input, List<Point2D_F64> points, DogArray<TD> descs ) {
 		detDesc.detect(input);
 
-		for( int i = 0; i < detDesc.getNumberOfFeatures(); i++ ) {
-			points.add( detDesc.getLocation(i).copy() );
+		for (int i = 0; i < detDesc.getNumberOfFeatures(); i++) {
+			points.add(detDesc.getLocation(i).copy());
 			descs.grow().setTo(detDesc.getDescription(i));
 		}
 	}
@@ -124,18 +122,18 @@ public class ExampleAssociatePoints<T extends ImageGray<T>, TD extends TupleDesc
 
 		// select which algorithms to use
 		DetectDescribePoint detDesc = FactoryDetectDescribe.
-				surfStable(new ConfigFastHessian(1, 2, 300, 1, 9, 4, 4), null,null, imageType);
+				surfStable(new ConfigFastHessian(1, 2, 300, 1, 9, 4, 4), null, null, imageType);
 //				sift(new ConfigCompleteSift(0,5,600));
 
 		ScoreAssociation scorer = FactoryAssociation.defaultScore(detDesc.getDescriptionType());
-		AssociateDescription associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true),scorer);
+		AssociateDescription associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true), scorer);
 
 		// load and match images
-		ExampleAssociatePoints app = new ExampleAssociatePoints(detDesc,associate,imageType);
+		ExampleAssociatePoints app = new ExampleAssociatePoints(detDesc, associate, imageType);
 
-		BufferedImage imageA = UtilImageIO.loadImage(UtilIO.pathExample("stitch/kayak_01.jpg"));
-		BufferedImage imageB = UtilImageIO.loadImage(UtilIO.pathExample("stitch/kayak_03.jpg"));
+		BufferedImage imageA = UtilImageIO.loadImageNotNull(UtilIO.pathExample("stitch/kayak_01.jpg"));
+		BufferedImage imageB = UtilImageIO.loadImageNotNull(UtilIO.pathExample("stitch/kayak_03.jpg"));
 
-		app.associate(imageA,imageB);
+		app.associate(imageA, imageB);
 	}
 }

@@ -54,7 +54,7 @@ public class ExampleDetectBlackEllipse {
 		BinaryEllipseDetector<GrayU8> detector = FactoryShapeDetector.ellipse(null, GrayU8.class);
 
 		for (String fileName : images) {
-			BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample(fileName));
+			BufferedImage image = UtilImageIO.loadImageNotNull(UtilIO.pathExample(fileName));
 
 			GrayU8 input = ConvertBufferedImage.convertFromSingle(image, null, GrayU8.class);
 			GrayU8 binary = new GrayU8(input.width, input.height);

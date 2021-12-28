@@ -45,18 +45,18 @@ import java.util.List;
 public class ExampleCannyEdge {
 
 	public static void main( String[] args ) {
-		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("simple_objects.jpg"));
+		BufferedImage image = UtilImageIO.loadImageNotNull(UtilIO.pathExample("simple_objects.jpg"));
 
-		GrayU8 gray = ConvertBufferedImage.convertFrom(image,(GrayU8)null);
+		GrayU8 gray = ConvertBufferedImage.convertFrom(image, (GrayU8)null);
 		GrayU8 edgeImage = gray.createSameShape();
 
 		// Create a canny edge detector which will dynamically compute the threshold based on maximum edge intensity
 		// It has also been configured to save the trace as a graph. This is the graph created while performing
 		// hysteresis thresholding.
-		CannyEdge<GrayU8,GrayS16> canny = FactoryEdgeDetectors.canny(2,true, true, GrayU8.class, GrayS16.class);
+		CannyEdge<GrayU8, GrayS16> canny = FactoryEdgeDetectors.canny(2, true, true, GrayU8.class, GrayS16.class);
 
 		// The edge image is actually an optional parameter. If you don't need it just pass in null
-		canny.process(gray,0.1f,0.3f,edgeImage);
+		canny.process(gray, 0.1f, 0.3f, edgeImage);
 
 		// First get the contour created by canny
 		List<EdgeContour> edgeContours = canny.getContours();
@@ -67,15 +67,15 @@ public class ExampleCannyEdge {
 
 		// display the results
 		BufferedImage visualBinary = VisualizeBinaryData.renderBinary(edgeImage, false, null);
-		BufferedImage visualCannyContour = VisualizeBinaryData.renderContours(edgeContours,null,
-				gray.width,gray.height,null);
-		BufferedImage visualEdgeContour = new BufferedImage(gray.width, gray.height,BufferedImage.TYPE_INT_RGB);
-		VisualizeBinaryData.render(contours, (int[]) null, visualEdgeContour);
+		BufferedImage visualCannyContour = VisualizeBinaryData.renderContours(edgeContours, null,
+				gray.width, gray.height, null);
+		BufferedImage visualEdgeContour = new BufferedImage(gray.width, gray.height, BufferedImage.TYPE_INT_RGB);
+		VisualizeBinaryData.render(contours, (int[])null, visualEdgeContour);
 
 		ListDisplayPanel panel = new ListDisplayPanel();
-		panel.addImage(visualBinary,"Binary Edges from Canny");
+		panel.addImage(visualBinary, "Binary Edges from Canny");
 		panel.addImage(visualCannyContour, "Canny Trace Graph");
-		panel.addImage(visualEdgeContour,"Contour from Canny Binary");
-		ShowImages.showWindow(panel,"Canny Edge", true);
+		panel.addImage(visualEdgeContour, "Contour from Canny Binary");
+		ShowImages.showWindow(panel, "Canny Edge", true);
 	}
 }

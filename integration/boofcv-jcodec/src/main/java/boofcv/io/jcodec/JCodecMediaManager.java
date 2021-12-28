@@ -65,10 +65,7 @@ public class JCodecMediaManager implements MediaManager {
 		BufferedImage b = cachedImage.get(fileName);
 		
 		if( b == null ) {
-			b = UtilImageIO.loadImage(fileName);
-			
-			if( b == null )
-				throw new RuntimeException("Image cannot be found! "+fileName);
+			b = UtilImageIO.loadImageNotNull(fileName);
 			
 			cachedImage.put(fileName,b);
 		}

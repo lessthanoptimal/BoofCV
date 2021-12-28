@@ -78,7 +78,7 @@ public class ExampleFiducialHamming {
 			System.out.println("processing: " + name);
 
 			// Load the image
-			BufferedImage buffered = UtilImageIO.loadImage(new File(directory, name).getPath());
+			BufferedImage buffered = UtilImageIO.loadImageNotNull(new File(directory, name).getPath());
 
 			// Convert to a BoofCV format
 			GrayF32 input = ConvertBufferedImage.convertFrom(buffered, (GrayF32)null);

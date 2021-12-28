@@ -46,7 +46,7 @@ public class ExampleMorphologicalThinning {
 		ListDisplayPanel uberPanel = new ListDisplayPanel();
 		for (String path : images) {
 			// load and convert the image into a usable format
-			BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample(path));
+			BufferedImage image = UtilImageIO.loadImageNotNull(UtilIO.pathExample(path));
 
 			// convert into a usable format
 			GrayF32 input = ConvertBufferedImage.convertFromSingle(image, null, GrayF32.class);

@@ -228,14 +228,14 @@ public class ExampleImageStitching {
 
 	public static void main( String[] args ) {
 		BufferedImage imageA, imageB;
-		imageA = UtilImageIO.loadImage(UtilIO.pathExample("stitch/mountain_rotate_01.jpg"));
-		imageB = UtilImageIO.loadImage(UtilIO.pathExample("stitch/mountain_rotate_03.jpg"));
+		imageA = UtilImageIO.loadImageNotNull(UtilIO.pathExample("stitch/mountain_rotate_01.jpg"));
+		imageB = UtilImageIO.loadImageNotNull(UtilIO.pathExample("stitch/mountain_rotate_03.jpg"));
 		stitch(imageA, imageB, GrayF32.class);
-		imageA = UtilImageIO.loadImage(UtilIO.pathExample("stitch/kayak_01.jpg"));
-		imageB = UtilImageIO.loadImage(UtilIO.pathExample("stitch/kayak_03.jpg"));
+		imageA = UtilImageIO.loadImageNotNull(UtilIO.pathExample("stitch/kayak_01.jpg"));
+		imageB = UtilImageIO.loadImageNotNull(UtilIO.pathExample("stitch/kayak_03.jpg"));
 		stitch(imageA, imageB, GrayF32.class);
-		imageA = UtilImageIO.loadImage(UtilIO.pathExample("scale/rainforest_01.jpg"));
-		imageB = UtilImageIO.loadImage(UtilIO.pathExample("scale/rainforest_02.jpg"));
+		imageA = UtilImageIO.loadImageNotNull(UtilIO.pathExample("scale/rainforest_01.jpg"));
+		imageB = UtilImageIO.loadImageNotNull(UtilIO.pathExample("scale/rainforest_02.jpg"));
 		stitch(imageA, imageB, GrayF32.class);
 	}
 }

@@ -100,7 +100,7 @@ public class ExampleDenseImageFeatures {
 	}
 
 	public static void main( String[] args ) {
-		BufferedImage buffered = UtilImageIO.loadImage(UtilIO.pathExample("segment/berkeley_man.jpg"));
+		BufferedImage buffered = UtilImageIO.loadImageNotNull(UtilIO.pathExample("segment/berkeley_man.jpg"));
 		GrayF32 input = ConvertBufferedImage.convertFrom(buffered, (GrayF32)null);
 
 		HighLevel(input);

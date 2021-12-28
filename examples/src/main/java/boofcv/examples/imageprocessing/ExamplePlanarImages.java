@@ -126,7 +126,7 @@ public class ExamplePlanarImages {
 	}
 
 	public static void main( String[] args ) {
-		BufferedImage input = UtilImageIO.loadImage(UtilIO.pathExample("apartment_building_02.jpg"));
+		BufferedImage input = UtilImageIO.loadImageNotNull(UtilIO.pathExample("apartment_building_02.jpg"));
 
 		ExamplePlanarImages.independent(input);
 		ExamplePlanarImages.pixelAccess(input);

@@ -80,7 +80,7 @@ public class ExampleAssociateThreeView {
 	/**
 	 * Initializes data structures to use the feature descriptor
 	 */
-	public<T extends ImageBase<T>> void initialize( DetectDescribePoint<GrayU8, TupleDesc_F64> detDesc ) {
+	public <T extends ImageBase<T>> void initialize( DetectDescribePoint<GrayU8, TupleDesc_F64> detDesc ) {
 		this.detDesc = detDesc;
 		features01 = UtilFeature.createArray(detDesc, 100);
 		features02 = UtilFeature.createArray(detDesc, 100);
@@ -154,7 +154,7 @@ public class ExampleAssociateThreeView {
 
 		// Convert the matched indexes into AssociatedTriple which contain the actual pixel coordinates
 		var associated = new DogArray<>(AssociatedTriple::new);
-		associatedIdx.forEach(p->associated.grow().setTo(
+		associatedIdx.forEach(p -> associated.grow().setTo(
 				example.locations01.get(p.a), example.locations02.get(p.b), example.locations03.get(p.c)));
 
 		System.out.println("Total Matched Triples = " + associated.size);
@@ -162,9 +162,9 @@ public class ExampleAssociateThreeView {
 		// Show remaining associations from RANSAC
 		var triplePanel = new AssociatedTriplePanel();
 		triplePanel.setImages(
-				UtilImageIO.loadImage(UtilIO.pathExample("triple/" + name + "01.jpg")),
-				UtilImageIO.loadImage(UtilIO.pathExample("triple/" + name + "02.jpg")),
-				UtilImageIO.loadImage(UtilIO.pathExample("triple/" + name + "03.jpg")));
+				UtilImageIO.loadImageNotNull(UtilIO.pathExample("triple/" + name + "01.jpg")),
+				UtilImageIO.loadImageNotNull(UtilIO.pathExample("triple/" + name + "02.jpg")),
+				UtilImageIO.loadImageNotNull(UtilIO.pathExample("triple/" + name + "03.jpg")));
 		triplePanel.setAssociation(associated.toList());
 		ShowImages.showWindow(triplePanel, "Associations", true);
 	}

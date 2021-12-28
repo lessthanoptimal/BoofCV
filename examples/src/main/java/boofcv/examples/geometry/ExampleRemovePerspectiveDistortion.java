@@ -42,7 +42,7 @@ import java.awt.image.BufferedImage;
 public class ExampleRemovePerspectiveDistortion {
 	public static void main( String[] args ) {
 		// load a color image
-		BufferedImage buffered = UtilImageIO.loadImage(UtilIO.pathExample("goals_and_stuff.jpg"));
+		BufferedImage buffered = UtilImageIO.loadImageNotNull(UtilIO.pathExample("goals_and_stuff.jpg"));
 		Planar<GrayF32> input = ConvertBufferedImage.convertFromPlanar(buffered, null, true, GrayF32.class);
 
 		RemovePerspectiveDistortion<Planar<GrayF32>> removePerspective =

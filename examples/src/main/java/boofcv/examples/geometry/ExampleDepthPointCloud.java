@@ -53,9 +53,9 @@ public class ExampleDepthPointCloud {
 
 		VisualDepthParameters param = CalibrationIO.load(nameCalib);
 
-		BufferedImage buffered = UtilImageIO.loadImage(nameRgb);
+		BufferedImage buffered = UtilImageIO.loadImageNotNull(nameRgb);
 		Planar<GrayU8> rgb = ConvertBufferedImage.convertFromPlanar(buffered, null, true, GrayU8.class);
-		GrayU16 depth = ConvertBufferedImage.convertFrom(UtilImageIO.loadImage(nameDepth), null, GrayU16.class);
+		GrayU16 depth = ConvertBufferedImage.convertFrom(UtilImageIO.loadImageNotNull(nameDepth), null, GrayU16.class);
 
 		var cloud = new DogArray<>(Point3D_F64::new);
 		var cloudColor = new DogArray<>(() -> new int[3]);

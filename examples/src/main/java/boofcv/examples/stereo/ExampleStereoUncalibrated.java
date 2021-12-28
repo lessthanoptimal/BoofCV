@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -106,8 +106,8 @@ public class ExampleStereoUncalibrated {
 //		String name = "skull_";
 //		String name = "turkey_";
 
-		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/" + name + "01.jpg"));
-		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/" + name + "02.jpg"));
+		BufferedImage buff01 = UtilImageIO.loadImageNotNull(UtilIO.pathExample("triple/" + name + "01.jpg"));
+		BufferedImage buff02 = UtilImageIO.loadImageNotNull(UtilIO.pathExample("triple/" + name + "02.jpg"));
 
 		Planar<GrayU8> color01 = ConvertBufferedImage.convertFrom(buff01, true, ImageType.pl(3, GrayU8.class));
 		Planar<GrayU8> color02 = ConvertBufferedImage.convertFrom(buff02, true, ImageType.pl(3, GrayU8.class));

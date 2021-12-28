@@ -96,7 +96,7 @@ public class ExampleImageConvert {
 	 * Load and generate images
 	 */
 	public void createImages() {
-		image = UtilImageIO.loadImage(UtilIO.pathExample("standard/barbara.jpg"));
+		image = UtilImageIO.loadImageNotNull(UtilIO.pathExample("standard/barbara.jpg"));
 
 		gray = ConvertBufferedImage.convertFromSingle(image, null, GrayU8.class);
 		derivX = GeneralizedImageOps.createSingleBand(GrayS16.class, gray.getWidth(), gray.getHeight());

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,7 +41,7 @@ import java.util.List;
  */
 public class ExampleDetectQrCode {
 	public static void main( String[] args ) {
-		BufferedImage input = UtilImageIO.loadImage(UtilIO.pathExample("fiducial/qrcode/image01.jpg"));
+		BufferedImage input = UtilImageIO.loadImageNotNull(UtilIO.pathExample("fiducial/qrcode/image01.jpg"));
 		GrayU8 gray = ConvertBufferedImage.convertFrom(input, (GrayU8)null);
 
 		QrCodeDetector<GrayU8> detector = FactoryFiducial.qrcode(null, GrayU8.class);
@@ -53,7 +53,8 @@ public class ExampleDetectQrCode {
 
 		Graphics2D g2 = input.createGraphics();
 		int strokeWidth = Math.max(4, input.getWidth()/200); // in large images the line can be too thin
-		g2.setColor(Color.GREEN); g2.setStroke(new BasicStroke(strokeWidth));
+		g2.setColor(Color.GREEN);
+		g2.setStroke(new BasicStroke(strokeWidth));
 		for (QrCode qr : detections) {
 			// The message encoded in the marker
 			System.out.println("message: " + qr.message);

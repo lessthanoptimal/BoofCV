@@ -36,7 +36,7 @@ import java.awt.image.BufferedImage;
  */
 public class ExampleColorSpace {
 	public static void main( String[] args ) {
-		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("sunflowers.jpg"));
+		BufferedImage image = UtilImageIO.loadImageNotNull(UtilIO.pathExample("sunflowers.jpg"));
 
 		// Convert input image into a BoofCV RGB image
 		Planar<GrayF32> rgb = ConvertBufferedImage.convertFromPlanar(image, null, true, GrayF32.class);

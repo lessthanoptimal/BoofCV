@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -75,7 +75,7 @@ public class ExampleFiducialRandomDots {
 		detector.setLensDistortion(LensDistortionFactory.narrow(intrinsic), intrinsic.width, intrinsic.height);
 
 		// It's now ready to start processing images. Let's load an image
-		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("fiducial/random_dots/image02.jpg"));
+		BufferedImage image = UtilImageIO.loadImageNotNull(UtilIO.pathExample("fiducial/random_dots/image02.jpg"));
 		GrayU8 gray = ConvertBufferedImage.convertFrom(image, false, ImageType.SB_U8);
 
 		detector.detect(gray);

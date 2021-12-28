@@ -121,9 +121,9 @@ public class ExampleComputeTrifocalTensor {
 		// Show inlier associations from RANSAC
 		var triplePanel = new AssociatedTriplePanel();
 		triplePanel.setImages(
-				UtilImageIO.loadImage(UtilIO.pathExample("triple/" + name + "01.jpg")),
-				UtilImageIO.loadImage(UtilIO.pathExample("triple/" + name + "02.jpg")),
-				UtilImageIO.loadImage(UtilIO.pathExample("triple/" + name + "03.jpg")));
+				UtilImageIO.loadImageNotNull(UtilIO.pathExample("triple/" + name + "01.jpg")),
+				UtilImageIO.loadImageNotNull(UtilIO.pathExample("triple/" + name + "02.jpg")),
+				UtilImageIO.loadImageNotNull(UtilIO.pathExample("triple/" + name + "03.jpg")));
 		triplePanel.setAssociation(inliers);
 		ShowImages.showWindow(triplePanel, "Inliers", true);
 	}

@@ -46,7 +46,7 @@ import java.awt.image.BufferedImage;
  */
 public class ExampleWatershedWithSeeds {
 	public static void main( String[] args ) {
-		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("particles01.jpg"));
+		BufferedImage image = UtilImageIO.loadImageNotNull(UtilIO.pathExample("particles01.jpg"));
 		GrayU8 input = ConvertBufferedImage.convertFromSingle(image, null, GrayU8.class);
 
 		// declare working data

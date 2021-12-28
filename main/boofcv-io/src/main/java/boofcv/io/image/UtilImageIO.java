@@ -34,6 +34,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import static boofcv.io.UtilIO.UTF8;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -77,6 +78,10 @@ public class UtilImageIO {
 	 */
 	public static @Nullable BufferedImage loadImage( String fileName ) {
 		return loadImage(UtilIO.ensureURL(fileName));
+	}
+
+	public static BufferedImage loadImageNotNull( String fileName ) {
+		return Objects.requireNonNull(loadImage(UtilIO.ensureURL(fileName)), "Couldn't load '"+fileName+"'");
 	}
 
 	public static @Nullable BufferedImage loadImage( String directory, String fileName ) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,16 +46,16 @@ import java.util.List;
 public class ExampleFitEllipse {
 	public static void main( String[] args ) {
 		// load and convert the image into a usable format
-		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("particles01.jpg"));
+		BufferedImage image = UtilImageIO.loadImageNotNull(UtilIO.pathExample("particles01.jpg"));
 		GrayF32 input = ConvertBufferedImage.convertFromSingle(image, null, GrayF32.class);
 
-		GrayU8 binary = new GrayU8(input.width,input.height);
+		GrayU8 binary = new GrayU8(input.width, input.height);
 
 		// the mean pixel value is often a reasonable threshold when creating a binary image
 		double mean = ImageStatistics.mean(input);
 
 		// create a binary image by thresholding
-		ThresholdImageOps.threshold(input, binary, (float) mean, true);
+		ThresholdImageOps.threshold(input, binary, (float)mean, true);
 
 		// reduce noise with some filtering
 		GrayU8 filtered = BinaryImageOps.erode8(binary, 1, null);
@@ -69,12 +69,12 @@ public class ExampleFitEllipse {
 		g2.setStroke(new BasicStroke(3));
 		g2.setColor(Color.RED);
 
-		for( Contour c : contours ) {
-			FitData<EllipseRotated_F64> ellipse = ShapeFittingOps.fitEllipse_I32(c.external,0,false,null);
+		for (Contour c : contours) {
+			FitData<EllipseRotated_F64> ellipse = ShapeFittingOps.fitEllipse_I32(c.external, 0, false, null);
 			VisualizeShapes.drawEllipse(ellipse.shape, g2);
 		}
 
 //		ShowImages.showWindow(VisualizeBinaryData.renderBinary(filtered, false, null),"Binary",true);
-		ShowImages.showWindow(image,"Ellipses",true);
+		ShowImages.showWindow(image, "Ellipses", true);
 	}
 }

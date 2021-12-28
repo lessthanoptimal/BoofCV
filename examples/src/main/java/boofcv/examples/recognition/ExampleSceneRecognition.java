@@ -119,7 +119,7 @@ public class ExampleSceneRecognition {
 		int queryImage = 9;
 
 		// Add the target which the other images are being matched against
-		gui.addImage(UtilImageIO.loadImage(images.get(queryImage)), "Query", ScaleOptions.ALL);
+		gui.addImage(UtilImageIO.loadImageNotNull(images.get(queryImage)), "Query", ScaleOptions.ALL);
 
 		// Look up images
 		DogArray<SceneRecognition.Match> matches = new DogArray<>(SceneRecognition.Match::new);
@@ -127,7 +127,7 @@ public class ExampleSceneRecognition {
 		for (int i = 0; i < matches.size; i++) {
 			String file = matches.get(i).id;
 			double error = matches.get(i).error;
-			BufferedImage image = UtilImageIO.loadImage(file);
+			BufferedImage image = UtilImageIO.loadImageNotNull(file);
 			String name = FilenameUtils.getBaseName(new File(file).getName());
 			gui.addImage(image, String.format("%20s Error %6.3f", name, error), ScaleOptions.ALL);
 		}
