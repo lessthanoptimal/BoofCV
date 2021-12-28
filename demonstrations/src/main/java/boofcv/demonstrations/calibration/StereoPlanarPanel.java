@@ -208,6 +208,8 @@ public class StereoPlanarPanel extends JPanel
 
 		BufferedImage imageLeft = UtilImageIO.loadImage(listLeft.get(selected).getPath());
 		BufferedImage imageRight = UtilImageIO.loadImage(listRight.get(selected).getPath());
+		if (imageLeft == null || imageRight == null)
+			throw new RuntimeException("Couldn't find left and/or right image");
 
 		leftView.setImage(imageLeft);
 		rightView.setImage(imageRight);

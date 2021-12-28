@@ -47,6 +47,7 @@ import org.ddogleg.struct.FastArray;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Visualizes the difference between two "equivalent" descriptions after conversion by associating image features.
@@ -133,8 +134,8 @@ public class CompareConvertedDescriptionsApp {
 		ScoreAssociation<TupleDesc_F64> scoreA = FactoryAssociation.scoreSad(TupleDesc_F64.class);
 		ScoreAssociation<TupleDesc_S8> scoreB = FactoryAssociation.scoreSad(TupleDesc_S8.class);
 
-		BufferedImage image1 = UtilImageIO.loadImage(file1);
-		BufferedImage image2 = UtilImageIO.loadImage(file2);
+		BufferedImage image1 = Objects.requireNonNull(UtilImageIO.loadImage(file1));
+		BufferedImage image2 = Objects.requireNonNull(UtilImageIO.loadImage(file2));
 
 		visualize("Original", image1, image2, detector, describeA, scoreA);
 		visualize("Modified", image1, image2, detector, describeB, scoreB);

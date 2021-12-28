@@ -60,8 +60,8 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
  *
  * @author Peter Abeles
  */
-public class DetectXCornersVisualizeApp
-		extends DemonstrationBase {
+@SuppressWarnings({"NullAway.Init"})
+public class DetectXCornersVisualizeApp extends DemonstrationBase {
 	// displays intensity image
 	DisplayPanel imagePanel = new DisplayPanel();
 	ControlPanel controlPanel;

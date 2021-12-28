@@ -152,7 +152,7 @@ public class FactoryDescribePointRadiusAngle {
 	 * @see DescribePointSurfPlanar
 	 */
 	public static <T extends ImageBase<T>, II extends ImageGray<II>>
-	DescribePointRadiusAngle<T, TupleDesc_F64> surfColorStable( ConfigSurfDescribe.Stability config, ImageType<T> imageType ) {
+	DescribePointRadiusAngle<T, TupleDesc_F64> surfColorStable( @Nullable ConfigSurfDescribe.Stability config, ImageType<T> imageType ) {
 
 		Class bandType = imageType.getImageClass();
 		Class<II> integralType = GIntegralImageOps.getIntegralType(bandType);

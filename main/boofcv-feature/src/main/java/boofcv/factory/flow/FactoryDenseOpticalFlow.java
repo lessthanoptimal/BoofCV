@@ -150,7 +150,7 @@ public class FactoryDenseOpticalFlow {
 	}
 
 	public static <T extends ImageGray<T>>
-	DenseOpticalFlow<T> broxWarping( ConfigBroxWarping config, Class<T> imageType ) {
+	DenseOpticalFlow<T> broxWarping( @Nullable ConfigBroxWarping config, Class<T> imageType ) {
 		if (config == null)
 			config = new ConfigBroxWarping();
 

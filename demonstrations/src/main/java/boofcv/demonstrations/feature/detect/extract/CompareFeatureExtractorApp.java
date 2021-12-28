@@ -50,6 +50,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * Displays a window showing the selected corner-laplace features across different scale spaces.
@@ -129,7 +130,7 @@ public class CompareFeatureExtractorApp<T extends ImageGray<T>, D extends ImageG
 
 	@Override
 	public void refreshAll( Object[] cookies ) {
-		setActiveAlgorithm(0, null, cookies[0]);
+		setActiveAlgorithm(0, "", cookies[0]);
 	}
 
 	@Override
@@ -225,7 +226,7 @@ public class CompareFeatureExtractorApp<T extends ImageGray<T>, D extends ImageG
 				case 1 -> imagePanel.setImage(intensityImage);
 				case 2 -> imagePanel.setImage(workImage);
 			}
-			BufferedImage b = imagePanel.getImage();
+			BufferedImage b = Objects.requireNonNull(imagePanel.getImage());
 			imagePanel.setPreferredSize(new Dimension(b.getWidth(), b.getHeight()));
 			imagePanel.repaint();
 

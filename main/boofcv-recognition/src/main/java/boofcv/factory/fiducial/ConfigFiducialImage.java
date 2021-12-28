@@ -25,6 +25,8 @@ import boofcv.struct.Configuration;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Objects;
+
 /**
  * Configuration for {@link boofcv.abst.fiducial.SquareImage_to_FiducialDetector}.
  *
@@ -64,7 +66,7 @@ public class ConfigFiducialImage implements Configuration {
 		((ConfigPolylineSplitMerge)squareDetector.detector.contourToPoly).cornerScorePenalty = 0.2;
 		((ConfigPolylineSplitMerge)squareDetector.detector.contourToPoly).thresholdSideSplitScore = 0;
 		squareDetector.detector.minimumContour = ConfigLength.fixed(20);
-		squareDetector.refineGray.cornerOffset = 0;
+		Objects.requireNonNull(squareDetector.refineGray).cornerOffset = 0;
 	}
 
 	public ConfigFiducialImage() {}

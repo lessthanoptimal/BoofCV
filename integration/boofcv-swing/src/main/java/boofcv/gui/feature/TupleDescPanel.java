@@ -19,25 +19,27 @@
 package boofcv.gui.feature;
 
 import boofcv.struct.feature.TupleDesc;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Objects;
 
 /**
  * Visualizes the a {@link boofcv.struct.feature.TupleDesc_F64}.
  *
  * @author Peter Abeles
  */
-@SuppressWarnings({"NullAway.Init"})
+@SuppressWarnings({"NullAway.Init", "rawtypes"})
 public class TupleDescPanel extends JPanel {
 
-	TupleDesc desc;
+	@Nullable TupleDesc desc;
 
 	public TupleDesc getDesc() {
-		return desc;
+		return Objects.requireNonNull(desc);
 	}
 
-	public void setDescription( TupleDesc desc ) {
+	public void setDescription( @Nullable TupleDesc desc ) {
 		this.desc = desc;
 	}
 
@@ -47,7 +49,7 @@ public class TupleDescPanel extends JPanel {
 
 		Graphics2D g2 = (Graphics2D)g;
 
-		TupleDesc desc = this.desc;
+		@Nullable TupleDesc desc = this.desc;
 		if (desc == null) {
 			g2.setColor(Color.WHITE);
 			g2.fillRect(0, 0, getWidth(), getHeight());

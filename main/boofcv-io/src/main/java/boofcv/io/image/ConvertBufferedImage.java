@@ -41,7 +41,7 @@ public class ConvertBufferedImage {
 	/**
 	 * If the provided image does not have the same shape and same type a new one is declared and returned.
 	 */
-	public static BufferedImage checkDeclare( int width, int height, BufferedImage image, int type ) {
+	public static BufferedImage checkDeclare( int width, int height, @Nullable BufferedImage image, int type ) {
 		// webcam images can have type 0, which is unknown
 		if (type == 0) {
 			type = BufferedImage.TYPE_INT_RGB;
@@ -82,7 +82,7 @@ public class ConvertBufferedImage {
 	 * @param output (Optional) Storage for copy.
 	 * @return The copied image. May be a new instance
 	 */
-	public static BufferedImage checkCopy( BufferedImage original, BufferedImage output ) {
+	public static BufferedImage checkCopy( BufferedImage original, @Nullable BufferedImage output ) {
 		ColorModel cm = original.getColorModel();
 		boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
 

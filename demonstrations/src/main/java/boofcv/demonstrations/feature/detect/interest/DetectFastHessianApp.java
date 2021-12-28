@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,6 +33,7 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 
 import java.awt.image.BufferedImage;
+import java.util.Objects;
 
 /**
  * Displays a window showing the selected corner-laplace features across diffferent scale spaces.
@@ -76,7 +77,7 @@ public class DetectFastHessianApp {
 	}
 
 	public static void main( String[] args ) {
-		BufferedImage input = UtilImageIO.loadImage(fileName);
+		BufferedImage input = Objects.requireNonNull(UtilImageIO.loadImage(fileName));
 
 		doStuff(GrayF32.class, input);
 //		doStuff(GrayU8.class,input);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,9 +38,9 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
+@SuppressWarnings({"NullAway.Init"})
 public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends DemonstrationBase
-		implements ThresholdControlPanel.Listener
-{
+		implements ThresholdControlPanel.Listener {
 	protected Class<T> imageClass;
 
 	protected DetectBlackShapePanel controls;
@@ -53,20 +53,20 @@ public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends De
 	protected final Object bufferedImageLock = new Object();
 	protected BufferedImage original;
 	protected BufferedImage work;
-	protected GrayU8 binary = new GrayU8(1,1);
+	protected GrayU8 binary = new GrayU8(1, 1);
 
 	// how many input images have been saved to disk
 	protected int saveCounter = 0;
 	protected boolean saveRequested = false;
 
-	protected DetectBlackShapeAppBase(List<String> examples , Class<T> imageType) {
+	protected DetectBlackShapeAppBase( List<String> examples, Class<T> imageType ) {
 		super(examples, ImageType.single(imageType));
 		this.imageClass = imageType;
 
 
 		JMenuItem menuSaveInput = new JMenuItem("Save Input");
 		menuSaveInput.addActionListener(e -> requestSaveInputImage());
-		BoofSwingUtil.setMenuItemKeys(menuSaveInput,KeyEvent.VK_S,KeyEvent.VK_Y);
+		BoofSwingUtil.setMenuItemKeys(menuSaveInput, KeyEvent.VK_S, KeyEvent.VK_Y);
 
 		JMenu menu = new JMenu("Data");
 		menu.setMnemonic(KeyEvent.VK_D);
@@ -74,26 +74,26 @@ public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends De
 		menuBar.add(menu);
 	}
 
-	protected void setupGui(ImageZoomPanel guiImage, DetectBlackShapePanel controls) {
+	protected void setupGui( ImageZoomPanel guiImage, DetectBlackShapePanel controls ) {
 		this.guiImage = guiImage;
 		this.controls = controls;
 
 		this.guiImage.autoScaleCenterOnSetImage = false;
-		guiImage.setPreferredSize(new Dimension(800,800));
+		guiImage.setPreferredSize(new Dimension(800, 800));
 
 		add(BorderLayout.WEST, controls);
 		add(BorderLayout.CENTER, guiImage);
 
 		createDetector(true);
 
-		guiImage.setListener(scale->{
+		guiImage.setListener(scale -> {
 			DetectBlackShapeAppBase.this.controls.setZoom(scale);
 		});
 
 		guiImage.getImagePanel().addMouseListener(new MouseAdapter() {
 			@Override
-			public void mousePressed(MouseEvent e) {
-				if( SwingUtilities.isLeftMouseButton(e)) {
+			public void mousePressed( MouseEvent e ) {
+				if (SwingUtilities.isLeftMouseButton(e)) {
 					if (inputMethod == InputMethod.VIDEO) {
 						streamPaused = !streamPaused;
 					}
@@ -105,15 +105,15 @@ public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends De
 	protected abstract void createDetector( boolean initializing );
 
 	@Override
-	protected void handleInputChange( int source , InputMethod method , final int width , final int height ) {
+	protected void handleInputChange( int source, InputMethod method, final int width, final int height ) {
 		// reset the scaling and ensure the entire new image is visible
 		BoofSwingUtil.invokeNowOrLater(() -> {
-			double zoom = BoofSwingUtil.selectZoomToShowAll(guiImage,width,height);
-			controls.setImageSize(width,height);
+			double zoom = BoofSwingUtil.selectZoomToShowAll(guiImage, width, height);
+			controls.setImageSize(width, height);
 			controls.setZoom(zoom);
 			milliBinary = 0;
 			guiImage.setScale(zoom);
-			guiImage.updateSize(width,height);
+			guiImage.updateSize(width, height);
 			guiImage.getHorizontalScrollBar().setValue(0);
 			guiImage.getVerticalScrollBar().setValue(0);
 		});
@@ -122,7 +122,7 @@ public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends De
 	double milliBinary = 0;
 
 	@Override
-	public void processImage(int sourceID, long frameID, final BufferedImage buffered, ImageBase input) {
+	public void processImage( int sourceID, long frameID, final BufferedImage buffered, ImageBase input ) {
 		System.out.flush();
 
 		synchronized (bufferedImageLock) {
@@ -130,7 +130,7 @@ public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends De
 			work = ConvertBufferedImage.checkDeclare(buffered, work);
 		}
 
-		if( saveRequested ) {
+		if (saveRequested) {
 			saveInputImage();
 			saveRequested = false;
 		}
@@ -143,17 +143,17 @@ public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends De
 			inputToBinary.process((T)input, binary);
 			long middle = System.nanoTime();
 
-			double a = (middle-before)*1e-6;
-			if( milliBinary == 0 ) {
+			double a = (middle - before)*1e-6;
+			if (milliBinary == 0) {
 				milliBinary = a;
 			} else {
-				milliBinary = 0.95*milliBinary+0.05*a;
+				milliBinary = 0.95*milliBinary + 0.05*a;
 			}
 //			System.out.printf(" binary %7.2f ",milliBinary);
 
 			detectorProcess((T)input, binary);
 			long after = System.nanoTime();
-			timeInSeconds = (after-before)*1e-9;
+			timeInSeconds = (after - before)*1e-9;
 		}
 
 		SwingUtilities.invokeLater(() -> {
@@ -162,7 +162,7 @@ public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends De
 		});
 	}
 
-	protected abstract void detectorProcess(T input , GrayU8 binary );
+	protected abstract void detectorProcess( T input, GrayU8 binary );
 
 	/**
 	 * Makes a request that the input image be saved. This request might be carried out immediately
@@ -170,28 +170,29 @@ public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends De
 	 */
 	public void requestSaveInputImage() {
 		saveRequested = false;
-		switch( inputMethod ) {
+		switch (inputMethod) {
 			case IMAGE:
 				new Thread(() -> saveInputImage()).start();
 				break;
 
 			case VIDEO:
 			case WEBCAM:
-				if( streamPaused ) {
+				if (streamPaused) {
 					saveInputImage();
 				} else {
 					saveRequested = true;
 				}
 				break;
 
-			default: break;
+			default:
+				break;
 		}
 	}
 
 	protected void saveInputImage() {
 		synchronized (bufferedImageLock) {
-			String fileName = String.format("saved_input%03d.png",saveCounter++);
-			System.out.println("Input image saved to "+fileName);
+			String fileName = String.format("saved_input%03d.png", saveCounter++);
+			System.out.println("Input image saved to " + fileName);
 			UtilImageIO.saveImage(original, fileName);
 		}
 	}
@@ -216,7 +217,7 @@ public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends De
 			}
 		}
 
-		if( active != guiImage.getImage() )
+		if (active != guiImage.getImage())
 			guiImage.setImage(active);
 		guiImage.setScale(controls.zoom);
 

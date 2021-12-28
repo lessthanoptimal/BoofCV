@@ -45,10 +45,12 @@ import georegression.struct.line.LineSegment2D_F32;
 import org.ddogleg.fitting.modelset.ModelManager;
 import org.ddogleg.fitting.modelset.ModelMatcherPost;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Computes the Hough Polar transform and displays some of its steps and the detected lines
@@ -65,7 +67,8 @@ public class VisualizeLineRansac<I extends ImageGray<I>, D extends ImageGray<D>>
 		this.derivType = derivType;
 	}
 
-	public void process( BufferedImage image ) {
+	public void process( @Nullable BufferedImage image ) {
+		Objects.requireNonNull(image);
 //		int regionSize = 40;
 
 		I input = GeneralizedImageOps.createSingleBand(imageType, image.getWidth(), image.getHeight());

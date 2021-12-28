@@ -62,8 +62,8 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectFiducialSquareBinaryApp
-		extends DemonstrationBase implements ShapeGuiListener {
+@SuppressWarnings({"NullAway.Init"})
+public class DetectFiducialSquareBinaryApp extends DemonstrationBase implements ShapeGuiListener {
 	Detector detector;
 	VisualizePanel guiImage;
 

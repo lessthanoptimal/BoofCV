@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,7 @@ import javax.swing.*;
 import static boofcv.gui.BoofSwingUtil.MAX_ZOOM;
 import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
 
+@SuppressWarnings({"NullAway.Init"})
 public abstract class DetectBlackShapePanel extends StandardAlgConfigPanel {
 
 	protected JSpinner selectZoom;
@@ -37,26 +38,25 @@ public abstract class DetectBlackShapePanel extends StandardAlgConfigPanel {
 	public double zoom = 1;
 
 	public void setZoom( double _zoom ) {
-		_zoom = Math.max(MIN_ZOOM,_zoom);
-		_zoom = Math.min(MAX_ZOOM,_zoom);
-		if( _zoom == zoom )
+		_zoom = Math.max(MIN_ZOOM, _zoom);
+		_zoom = Math.min(MAX_ZOOM, _zoom);
+		if (_zoom == zoom)
 			return;
 		zoom = _zoom;
 
 		BoofSwingUtil.invokeNowOrLater(() -> selectZoom.setValue(zoom));
 	}
 
-	public void setImageSize( final int width , final int height ) {
-		BoofSwingUtil.invokeNowOrLater(() -> imageSizeLabel.setText(width+" x "+height));
+	public void setImageSize( final int width, final int height ) {
+		BoofSwingUtil.invokeNowOrLater(() -> imageSizeLabel.setText(width + " x " + height));
 	}
 
 	public void setProcessingTimeS( double seconds ) {
-		processingTimeLabel.setText(String.format("%7.1f",(seconds*1000)));
+		processingTimeLabel.setText(String.format("%7.1f", (seconds*1000)));
 	}
 
-	public void setProcessingTimeMS(double ms ) {
+	public void setProcessingTimeMS( double ms ) {
 		BoofSwingUtil.checkGuiThread();
-		processingTimeLabel.setText(String.format("%7.1f",ms));
+		processingTimeLabel.setText(String.format("%7.1f", ms));
 	}
-
 }

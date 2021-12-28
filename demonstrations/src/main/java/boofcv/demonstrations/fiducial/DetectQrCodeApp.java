@@ -69,6 +69,7 @@ import static boofcv.alg.fiducial.qrcode.QrCode.Failure.ALIGNMENT;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class DetectQrCodeApp<T extends ImageGray<T>>
 		extends DetectBlackShapeAppBase<T> implements ShapeGuiListener, DetectQrCodeMessagePanel.Listener {
 	QrCodePreciseDetector<T> detector;

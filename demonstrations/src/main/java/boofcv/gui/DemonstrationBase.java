@@ -45,6 +45,7 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -57,6 +58,7 @@ import static boofcv.io.UtilIO.systemToUnix;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class DemonstrationBase extends JPanel {
 	protected JMenuBar menuBar;
 	JMenuItem menuItemFile, menuItemWebcam, menuItemQuit;
@@ -77,13 +79,13 @@ public abstract class DemonstrationBase extends JPanel {
 	// When set to true the input's size is known and the GUI should be adjusted
 	volatile boolean inputSizeKnown = false;
 
-	protected String inputFilePath;
+	protected @Nullable String inputFilePath;
 	protected String[] inputFileSet;
 
 	// Storage for input list of input streams. always synchronize before manipulating
 	private final List<CacheSequenceStream> inputStreams = new ArrayList<>();
 
-	private ProcessThread threadProcess; // controls by synchronized(inputStreams)
+	private @Nullable ProcessThread threadProcess; // controls by synchronized(inputStreams)
 	// threadpool is used mostly for profiling purposes. This way there isn't a million threads being created
 	protected LinkedBlockingQueue threadQueue = new LinkedBlockingQueue();
 	protected ThreadPoolExecutor threadPool = new ThreadPoolExecutor(1, 1, 50, TimeUnit.MILLISECONDS,
@@ -254,7 +256,7 @@ public abstract class DemonstrationBase extends JPanel {
 	 * Updates the list in recent menu
 	 */
 	protected void updateRecentItems() {
-		BoofSwingUtil.updateRecentItems(this, menuRecent, (info)->{
+		BoofSwingUtil.updateRecentItems(this, menuRecent, ( info ) -> {
 			if (useCustomOpenFiles) {
 				openFiles(BoofMiscOps.toFileList(info.files), true);
 			} else if (info.files.size() == 1) {
@@ -290,7 +292,7 @@ public abstract class DemonstrationBase extends JPanel {
 					openVideo(false, p.path);
 			}
 		} else if (o instanceof String) {
-			String path = massageExampleFilePath((String)o);
+			String path = Objects.requireNonNull(massageExampleFilePath((String)o));
 			openFile(new File(path), false);
 		} else {
 			throw new IllegalArgumentException("Unknown example object type. Please override openExample()");
@@ -422,7 +424,8 @@ public abstract class DemonstrationBase extends JPanel {
 //				System.out.println("  invalid URL");
 				url = null;
 			}
-		} catch (MalformedURLException ignore) {}
+		} catch (MalformedURLException ignore) {
+		}
 
 		if (url == null) {
 //			System.out.println("Invalid URL");
@@ -490,7 +493,7 @@ public abstract class DemonstrationBase extends JPanel {
 			e.printStackTrace();
 			return;
 		}
-		File current = new File(UtilIO.ensureURL(path).getFile());
+		File current = new File(UtilIO.ensureUrlNotNull(path).getFile());
 		File parent = current.getParentFile();
 		if (parent == null)
 			return;
@@ -1041,6 +1044,7 @@ public abstract class DemonstrationBase extends JPanel {
 			else
 				openVideo(true, inputFileSet);
 		} else if (inputMethod == InputMethod.IMAGE) {
+			Objects.requireNonNull(inputFilePath);
 			BufferedImage buff = inputStreams.get(0).getBufferedImage();
 			openImage(true, new File(inputFilePath).getName(), buff);// TODO still does a pointless image conversion
 		} else if (inputMethod == InputMethod.IMAGE_SET) {

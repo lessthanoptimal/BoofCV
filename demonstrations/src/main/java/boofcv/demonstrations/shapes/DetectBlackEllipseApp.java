@@ -44,19 +44,19 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectBlackEllipseApp<T extends ImageGray<T>> extends DetectBlackShapeAppBase
-{
+@SuppressWarnings({"NullAway.Init"})
+public class DetectBlackEllipseApp<T extends ImageGray<T>> extends DetectBlackShapeAppBase {
 
 	BinaryEllipseDetector<T> detector;
 
-	public DetectBlackEllipseApp(List<String> examples , Class<T> imageType) {
+	public DetectBlackEllipseApp( List<String> examples, Class<T> imageType ) {
 		super(examples, imageType);
-		setupGui(new VisualizePanel(), new DetectEllipseControlPanel(this) );
+		setupGui(new VisualizePanel(), new DetectEllipseControlPanel(this));
 	}
 
 	@Override
 	protected void createDetector( boolean initializing ) {
-		if( !initializing )
+		if (!initializing)
 			BoofSwingUtil.checkGuiThread();
 
 		DetectEllipseControlPanel controls = (DetectEllipseControlPanel)DetectBlackEllipseApp.this.controls;
@@ -67,8 +67,8 @@ public class DetectBlackEllipseApp<T extends ImageGray<T>> extends DetectBlackSh
 	}
 
 	@Override
-	protected void detectorProcess(ImageGray input, GrayU8 binary) {
-		detector.process((T) input, binary);
+	protected void detectorProcess( ImageGray input, GrayU8 binary ) {
+		detector.process((T)input, binary);
 	}
 
 	public void configUpdate() {
@@ -90,10 +90,10 @@ public class DetectBlackEllipseApp<T extends ImageGray<T>> extends DetectBlackSh
 
 	class VisualizePanel extends ShapeVisualizePanel {
 		@Override
-		protected void paintInPanel(AffineTransform tran, Graphics2D g2) {
+		protected void paintInPanel( AffineTransform tran, Graphics2D g2 ) {
 			DetectEllipseControlPanel controls = (DetectEllipseControlPanel)DetectBlackEllipseApp.this.controls;
 
-			synchronized ( DetectBlackEllipseApp.this ) {
+			synchronized (DetectBlackEllipseApp.this) {
 				BoofSwingUtil.antialiasing(g2);
 
 				if (controls.bShowContour) {
@@ -101,7 +101,7 @@ public class DetectBlackEllipseApp<T extends ImageGray<T>> extends DetectBlackSh
 					List<Contour> contours = BinaryImageOps.convertContours(contour);
 
 					g2.setStroke(new BasicStroke(1));
-					VisualizeBinaryData.render(contours, null,Color.CYAN, 1.0,scale, g2);
+					VisualizeBinaryData.render(contours, null, Color.CYAN, 1.0, scale, g2);
 				}
 
 				if (controls.bShowShapes) {
@@ -111,14 +111,14 @@ public class DetectBlackEllipseApp<T extends ImageGray<T>> extends DetectBlackSh
 					g2.setStroke(new BasicStroke(3));
 
 					for (BinaryEllipseDetector.EllipseInfo p : ellipses) {
-						VisualizeShapes.drawEllipse(p.ellipse,scale,g2);
+						VisualizeShapes.drawEllipse(p.ellipse, scale, g2);
 					}
 				}
 			}
 		}
 	}
 
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 
 		List<String> examples = new ArrayList<>();
 		examples.add(UtilIO.pathExample("fiducial/circle_hexagonal/image00.jpg"));
@@ -128,13 +128,10 @@ public class DetectBlackEllipseApp<T extends ImageGray<T>> extends DetectBlackSh
 		examples.add(UtilIO.pathExample("fiducial/circle_hexagonal/image01.jpg"));
 		examples.add(UtilIO.pathExample("fiducial/circle_hexagonal/movie.mp4"));
 
-		DetectBlackEllipseApp app = new DetectBlackEllipseApp(examples,GrayF32.class);
+		DetectBlackEllipseApp app = new DetectBlackEllipseApp(examples, GrayF32.class);
 
 		app.openFile(new File(examples.get(0)));
 
 		app.display("Detect Black Ellipses");
 	}
-
-
-
 }

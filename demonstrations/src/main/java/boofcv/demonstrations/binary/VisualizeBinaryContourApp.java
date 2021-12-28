@@ -49,6 +49,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class VisualizeBinaryContourApp<T extends ImageGray<T>> extends DemonstrationBase
 		implements ThresholdControlPanel.Listener {
 	VisualizePanel guiImage;

@@ -66,7 +66,7 @@ public class DetectCalibrationCircleRegularApp extends CommonDetectCalibrationAp
 		super(exampleInputs);
 		setUpGui(new DetectCalibrationCirclePanel(numRows, numColumns, circleDiameter, centerDistance, false));
 		configGrid = new ConfigGridDimen(numRows, numColumns, circleDiameter, centerDistance);
-		controlPanel.threshold.setConfiguration(configDet.thresholding);
+		controlPanel.getThreshold().setConfiguration(configDet.thresholding);
 		declareDetector();
 
 		colorId = new Color[]{Color.RED, Color.BLUE, Color.CYAN, Color.ORANGE};
@@ -74,7 +74,7 @@ public class DetectCalibrationCircleRegularApp extends CommonDetectCalibrationAp
 
 	@Override
 	public void declareDetector() {
-		configDet.thresholding = controlPanel.threshold.createConfig();
+		configDet.thresholding = controlPanel.getThreshold().createConfig();
 		configGrid.numRows = controlPanel.getGridRows();
 		configGrid.numCols = controlPanel.getGridColumns();
 		configGrid.shapeSize = ((DetectCalibrationCirclePanel)controlPanel).getCircleDiameter();

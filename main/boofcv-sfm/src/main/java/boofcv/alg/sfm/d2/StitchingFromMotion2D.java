@@ -313,7 +313,7 @@ public class StitchingFromMotion2D<I extends ImageBase<I>, IT extends Invertible
 	 *
 	 * @return Transformation
 	 */
-	public Homography2D_F64 getWorldToCurr( Homography2D_F64 storage ) {
+	public Homography2D_F64 getWorldToCurr( @Nullable Homography2D_F64 storage ) {
 		return converter.convertH(worldToCurr, storage);
 	}
 

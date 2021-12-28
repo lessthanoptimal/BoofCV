@@ -48,22 +48,22 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class DetectBlackPolygonApp<T extends ImageGray<T>>
-		extends DetectBlackShapeAppBase implements ShapeGuiListener
-{
+		extends DetectBlackShapeAppBase implements ShapeGuiListener {
 	DetectPolygonBinaryGrayRefine<T> detector;
 	DetectBlackPolygonAppControlPanel controlPanel = new DetectBlackPolygonAppControlPanel(this);
 
-	public DetectBlackPolygonApp(List<String> examples , Class<T> imageType) {
+	public DetectBlackPolygonApp( List<String> examples, Class<T> imageType ) {
 		super(examples, imageType);
 
 		controlPanel.polygonPanel.thresholdPanel.addHistogramGraph();
-		setupGui(new VisualizePanel(),controlPanel);
+		setupGui(new VisualizePanel(), controlPanel);
 	}
 
 	@Override
-	protected void createDetector(boolean initializing) {
-		if( !initializing)
+	protected void createDetector( boolean initializing ) {
+		if (!initializing)
 			BoofSwingUtil.checkGuiThread();
 
 		synchronized (this) {
@@ -99,10 +99,11 @@ public class DetectBlackPolygonApp<T extends ImageGray<T>>
 	}
 
 	int count = 0;
+
 	@Override
-	protected void detectorProcess(ImageGray input, GrayU8 binary) {
+	protected void detectorProcess( ImageGray input, GrayU8 binary ) {
 //		System.out.println("processing image "+count++);
-		detector.process((T) input, binary);
+		detector.process((T)input, binary);
 		detector.refineAll();
 
 		controlPanel.polygonPanel.thresholdPanel.updateHistogram(input);
@@ -110,13 +111,13 @@ public class DetectBlackPolygonApp<T extends ImageGray<T>>
 
 	class VisualizePanel extends ShapeVisualizePanel {
 		@Override
-		protected void paintInPanel(AffineTransform tran, Graphics2D g2) {
+		protected void paintInPanel( AffineTransform tran, Graphics2D g2 ) {
 
 			DetectBlackPolygonAppControlPanel controls = (DetectBlackPolygonAppControlPanel)DetectBlackPolygonApp.this.controls;
 
 			BoofSwingUtil.antialiasing(g2);
 
-			synchronized ( DetectBlackPolygonApp.this ) {
+			synchronized (DetectBlackPolygonApp.this) {
 
 				if (controls.bShowContour) {
 					g2.setStroke(new BasicStroke(1));
@@ -126,18 +127,18 @@ public class DetectBlackPolygonApp<T extends ImageGray<T>>
 					List<Contour> contours = BinaryImageOps.convertContours(contour);
 
 
-					VisualizeBinaryData.render(contours, null,Color.CYAN, 1.0,scale, g2);
+					VisualizeBinaryData.render(contours, null, Color.CYAN, 1.0, scale, g2);
 				}
 
 				if (controls.bShowLines) {
-					List<Polygon2D_F64> polygons = detector.getPolygons(null,null);
+					List<Polygon2D_F64> polygons = detector.getPolygons(null, null);
 
 					g2.setColor(Color.RED);
 					g2.setStroke(new BasicStroke(3));
 					for (Polygon2D_F64 p : polygons) {
-						int red = 255 * ((p.size() - 3) % 4) / 3;
-						int green = 255 * (p.size()% 5) / 4;
-						int blue = 255 * ((p.size() + 2) % 6) / 5;
+						int red = 255*((p.size() - 3)%4)/3;
+						int green = 255*(p.size()%5)/4;
+						int blue = 255*((p.size() + 2)%6)/5;
 
 						g2.setColor(new Color(red, green, blue));
 
@@ -146,14 +147,14 @@ public class DetectBlackPolygonApp<T extends ImageGray<T>>
 				}
 
 				if (controls.bShowCorners) {
-					List<Polygon2D_F64> polygons = detector.getPolygons(null,null);
+					List<Polygon2D_F64> polygons = detector.getPolygons(null, null);
 
 					g2.setColor(Color.BLUE);
 					g2.setStroke(new BasicStroke(1));
 					for (Polygon2D_F64 p : polygons) {
 						for (int i = 0; i < p.size(); i++) {
 							Point2D_F64 c = p.get(i);
-							VisualizeFeatures.drawCircle(g2, scale * c.x, scale * c.y, 5);
+							VisualizeFeatures.drawCircle(g2, scale*c.x, scale*c.y, 5);
 						}
 					}
 				}
@@ -161,7 +162,7 @@ public class DetectBlackPolygonApp<T extends ImageGray<T>>
 		}
 	}
 
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 
 		List<String> examples = new ArrayList<>();
 		examples.add(UtilIO.pathExample("shapes/polygons01.jpg"));
@@ -173,14 +174,11 @@ public class DetectBlackPolygonApp<T extends ImageGray<T>>
 		examples.add(UtilIO.pathExample("calibration/stereo/Bumblebee2_Square/left10.jpg"));
 		examples.add(UtilIO.pathExample("fiducial/square_grid/movie.mp4"));
 
-		DetectBlackPolygonApp app = new DetectBlackPolygonApp(examples,GrayF32.class);
+		DetectBlackPolygonApp app = new DetectBlackPolygonApp(examples, GrayF32.class);
 
 		app.openFile(new File(examples.get(0)));
 
 		app.waitUntilInputSizeIsKnown();
 		app.display("Detect Black Polygons");
 	}
-
-
-
 }

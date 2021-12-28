@@ -43,12 +43,14 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 import org.ddogleg.struct.DogArray;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Visualizes {@link DetectFiducialSquareBinary}
@@ -60,11 +62,11 @@ public class VisualizeSquareBinaryFiducial {
 	final static int gridWidth = 4;
 	final static double borderWidth = 0.25;
 
-	public void process( String nameImage, String nameIntrinsic ) {
+	public void process( String nameImage, @Nullable String nameIntrinsic ) {
 
 		CameraPinholeBrown intrinsic = nameIntrinsic == null ? null : (CameraPinholeBrown)CalibrationIO.load(nameIntrinsic);
-		GrayF32 input = UtilImageIO.loadImage(nameImage, GrayF32.class);
-		GrayF32 undistorted = new GrayF32(input.width, input.height);
+		GrayF32 input = Objects.requireNonNull(UtilImageIO.loadImage(nameImage, GrayF32.class));
+		var undistorted = new GrayF32(input.width, input.height);
 
 		InputToBinary<GrayF32> inputToBinary = FactoryThresholdBinary.globalOtsu(0, 255, 1.0, true, GrayF32.class);
 		Detector detector = new Detector(gridWidth, borderWidth, inputToBinary);

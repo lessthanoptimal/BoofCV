@@ -68,6 +68,7 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class DetectECoCheckApp extends DemonstrationBase {
 	// TODO colorize anonymous differently
 	// TODO mark decoded squares

@@ -63,6 +63,7 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static boofcv.gui.BoofSwingUtil.*;
 
@@ -71,7 +72,7 @@ import static boofcv.gui.BoofSwingUtil.*;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings({"unchecked", "SynchronizationOnLocalVariableOrMethodParameter"})
+@SuppressWarnings({"unchecked", "SynchronizationOnLocalVariableOrMethodParameter", "NullAway.Init"})
 public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 		extends DetectBlackShapeAppBase<T> {
 	// TODO list all markers found
@@ -149,8 +150,8 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 
 	@Override
 	public void openFile( File file ) {
-		if (FilenameUtils.getExtension(file.getName()).toLowerCase().equals("yaml")) {
-			loadDefinition(UtilIO.ensureURL(file.getPath()));
+		if (FilenameUtils.getExtension(file.getName()).equalsIgnoreCase("yaml")) {
+			loadDefinition(Objects.requireNonNull(UtilIO.ensureURL(file.getPath())));
 		} else {
 			super.openFile(file);
 		}
@@ -176,7 +177,7 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 		if (method != InputMethod.IMAGE && method != InputMethod.VIDEO)
 			return;
 
-		URL url = UtilIO.ensureURL(inputFilePath);
+		URL url = UtilIO.ensureUrlNotNull(inputFilePath);
 
 		if (url != null) {
 			// This "should" work with any URL protocol
@@ -271,6 +272,7 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 		});
 	}
 
+	@SuppressWarnings("NullAway")
 	@Override
 	public void viewUpdated() {
 		final Uchiya_to_FiducialDetector<T> tracker = this.tracker;

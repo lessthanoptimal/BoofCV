@@ -242,10 +242,9 @@ public class VisualizeImageData {
 	 * @param invalidColor RGB value for invalid pixels. Try 0xFF << 8 for green
 	 * @return Rendered image.
 	 */
-	public static BufferedImage disparity( ImageGray disparity, BufferedImage dst,
+	public static BufferedImage disparity( ImageGray disparity, @Nullable BufferedImage dst,
 										   int disparityRange, int invalidColor ) {
-		if (dst == null)
-			dst = new BufferedImage(disparity.getWidth(), disparity.getHeight(), BufferedImage.TYPE_INT_RGB);
+		dst = ConvertBufferedImage.checkDeclare(disparity.width, disparity.height, dst, BufferedImage.TYPE_INT_RGB);
 
 		if (disparity.getDataType().isInteger()) {
 			return disparity((GrayI)disparity, dst, disparityRange, invalidColor);
@@ -281,8 +280,10 @@ public class VisualizeImageData {
 		return dst;
 	}
 
-	private static BufferedImage disparity( GrayF32 src, BufferedImage dst,
+	private static BufferedImage disparity( GrayF32 src, @Nullable BufferedImage dst,
 											int range, int invalidColor ) {
+		dst = ConvertBufferedImage.checkDeclare(src.width, src.height, dst, BufferedImage.TYPE_INT_RGB);
+
 		for (int y = 0; y < src.height; y++) {
 			for (int x = 0; x < src.width; x++) {
 				float v = src.unsafe_get(x, y);
@@ -351,7 +352,7 @@ public class VisualizeImageData {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static BufferedImage graySign( GrayF32 src, BufferedImage dst, float maxAbsValue ) {
+	public static BufferedImage graySign( GrayF32 src, @Nullable BufferedImage dst, float maxAbsValue ) {
 		dst = checkInputs(src, dst);
 
 		if (maxAbsValue < 0)
@@ -439,7 +440,8 @@ public class VisualizeImageData {
 	 * @param maxAbsValue The largest absolute value of any pixel in the image. Set to < 0 if not known.
 	 * @return visualized gradient
 	 */
-	public static BufferedImage colorizeGradient( GrayS16 derivX, GrayS16 derivY, int maxAbsValue, BufferedImage output ) {
+	public static BufferedImage colorizeGradient( GrayS16 derivX, GrayS16 derivY, int maxAbsValue,
+												  @Nullable BufferedImage output ) {
 		InputSanityCheck.checkSameShape(derivX, derivY);
 
 		if (output == null)
@@ -499,11 +501,11 @@ public class VisualizeImageData {
 	 * @param maxAbsValue The largest absolute value of any pixel in the image. Set to < 0 if not known.
 	 * @return visualized gradient
 	 */
-	public static BufferedImage colorizeGradient( GrayF32 derivX, GrayF32 derivY, float maxAbsValue, BufferedImage output ) {
+	public static BufferedImage colorizeGradient( GrayF32 derivX, GrayF32 derivY, float maxAbsValue,
+												  @Nullable BufferedImage output ) {
 		InputSanityCheck.checkSameShape(derivX, derivY);
 
-		if (output == null)
-			output = new BufferedImage(derivX.width, derivX.height, BufferedImage.TYPE_INT_RGB);
+		output = ConvertBufferedImage.checkDeclare(derivX.width, derivX.height, output, BufferedImage.TYPE_INT_RGB);
 
 		WritableRaster raster = output.getRaster();
 		DataBufferInt buffer = (DataBufferInt)raster.getDataBuffer();

@@ -32,6 +32,8 @@ import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 /**
  * Base class for implementations of {@link SceneStructure}. Contains data structures
  * common to all implementations
@@ -129,6 +131,10 @@ public abstract class SceneStructureCommon implements SceneStructure {
 
 	public DogArray<Camera> getCameras() {
 		return cameras;
+	}
+
+	public <T extends BundleAdjustmentCamera>T getCameraModel(int cameraIndex) {
+		return Objects.requireNonNull(cameras.get(cameraIndex).getModel());
 	}
 
 	/**

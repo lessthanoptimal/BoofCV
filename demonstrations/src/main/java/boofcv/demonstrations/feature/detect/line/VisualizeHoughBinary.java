@@ -58,6 +58,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class VisualizeHoughBinary<I extends ImageGray<I>, D extends ImageGray<D>>
 		extends DemonstrationBase {
 
@@ -221,6 +222,7 @@ public class VisualizeHoughBinary<I extends ImageGray<I>, D extends ImageGray<D>
 		});
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	protected class Visualization extends ImageLinePanelZoom {
 		BufferedImage input;
 		Ellipse2D.Double c = new Ellipse2D.Double();

@@ -39,11 +39,13 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.PyramidFloat;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * Displays the feature intensity for each layer in a scale-space. The scale-space can be represented as a
@@ -56,7 +58,7 @@ public class IntensityFeaturePyramidApp<T extends ImageGray<T>, D extends ImageG
 		extends SelectAlgorithmAndInputPanel {
 	ListDisplayPanel gui = new ListDisplayPanel();
 
-	PyramidFloat<T> pyramid;
+	@Nullable PyramidFloat<T> pyramid;
 
 	BufferedImage input;
 	T workImage;
@@ -65,7 +67,7 @@ public class IntensityFeaturePyramidApp<T extends ImageGray<T>, D extends ImageG
 	AnyImageDerivative<T, D> anyDerivative;
 	boolean processedImage = false;
 
-	GeneralFeatureIntensity<T, D> intensity;
+	@Nullable GeneralFeatureIntensity<T, D> intensity;
 
 	public IntensityFeaturePyramidApp( Class<T> imageType, Class<D> derivType ) {
 		super(2);
@@ -99,7 +101,7 @@ public class IntensityFeaturePyramidApp<T extends ImageGray<T>, D extends ImageG
 				return;
 		} else if (indexFamily == 1) {
 			// setup the pyramid
-			double scales[] = new double[25];
+			double[] scales = new double[25];
 			for (int i = 0; i < scales.length; i++) {
 				scales[i] = Math.exp(i*0.15);
 			}
@@ -115,6 +117,8 @@ public class IntensityFeaturePyramidApp<T extends ImageGray<T>, D extends ImageG
 			if (intensity == null)
 				return;
 		}
+		Objects.requireNonNull(pyramid);
+		Objects.requireNonNull(intensity);
 
 		// setup the feature intensity
 		gui.reset();
@@ -173,8 +177,8 @@ public class IntensityFeaturePyramidApp<T extends ImageGray<T>, D extends ImageG
 		intensity = null;
 		pyramid = null;
 
-		setActiveAlgorithm(0, null, cookies[0]);
-		setActiveAlgorithm(1, null, cookies[1]);
+		setActiveAlgorithm(0, "", cookies[0]);
+		setActiveAlgorithm(1, "", cookies[1]);
 	}
 
 	@Override

@@ -54,10 +54,9 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class VisualizeAssociationMatchesApp
-		<Image extends ImageGray<Image>, TD extends TupleDesc<TD>>
+@SuppressWarnings({"NullAway.Init"})
+public class VisualizeAssociationMatchesApp<Image extends ImageGray<Image>, TD extends TupleDesc<TD>>
 		extends DemonstrationBase {
-
 	// algorithms
 	InterestPointDetector<Image> detector;
 	DescribePointRadiusAngle<Image, TD> descriptor;
@@ -329,16 +328,16 @@ public class VisualizeAssociationMatchesApp
 			labelSize.setText(width + " x " + height);
 		}
 
-		public void setCountLeft( int total) {
-			labelCountLeft.setText(""+total);
+		public void setCountLeft( int total ) {
+			labelCountLeft.setText("" + total);
 		}
 
-		public void setCountRight( int total) {
-			labelCountRight.setText(""+total);
+		public void setCountRight( int total ) {
+			labelCountRight.setText("" + total);
 		}
 
-		public void setCountMatched( int total) {
-			labelCountMatched.setText(""+total);
+		public void setCountMatched( int total ) {
+			labelCountMatched.setText("" + total);
 		}
 	}
 

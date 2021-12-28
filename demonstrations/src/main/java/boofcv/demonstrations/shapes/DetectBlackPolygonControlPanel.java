@@ -25,6 +25,7 @@ import boofcv.factory.shape.ConfigRefinePolygonLineToImage;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.controls.JConfigLength;
 import boofcv.struct.ConnectRule;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -74,7 +75,8 @@ public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
 	}
 
 	public DetectBlackPolygonControlPanel(ShapeGuiListener owner,
-										  ConfigPolygonDetector configPolygon, ConfigThreshold configThreshold ) {
+										  ConfigPolygonDetector configPolygon,
+										  @Nullable ConfigThreshold configThreshold ) {
 		setBorder(BorderFactory.createEmptyBorder());
 		this.owner = owner;
 		this.config = configPolygon;

@@ -24,6 +24,7 @@ import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.ViewedImageInfoPanel;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -33,6 +34,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.Objects;
 
 /**
  * Shows calibration grid detector status, configure display, and adjust parameters.
@@ -68,7 +70,7 @@ public class DetectCalibrationPanel extends StandardAlgConfigPanel
 	JCheckBox showContour;
 
 	// selects threshold to create binary image from
-	ThresholdControlPanel threshold;
+	@Nullable ThresholdControlPanel threshold;
 
 	boolean doShowPoints = true;
 	boolean doShowNumbers = true;
@@ -270,7 +272,7 @@ public class DetectCalibrationPanel extends StandardAlgConfigPanel
 	}
 
 	public ThresholdControlPanel getThreshold() {
-		return threshold;
+		return Objects.requireNonNull(threshold);
 	}
 
 	public interface Listener {

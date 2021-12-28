@@ -48,12 +48,14 @@ import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
 import org.ddogleg.struct.DogArray;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Visualizes results from detecting square fiducials.
@@ -65,16 +67,16 @@ public class VisualizeSquareFiducial {
 
 	static InputToBinary<GrayF32> inputToBinary = FactoryThresholdBinary.threshold(configThreshold, GrayF32.class);
 
-	public void process( String nameImage, String nameIntrinsic ) {
+	public void process( String nameImage, @Nullable String nameIntrinsic ) {
 
 		CameraPinholeBrown intrinsic = nameIntrinsic == null ? null : (CameraPinholeBrown)CalibrationIO.load(nameIntrinsic);
-		GrayF32 input = UtilImageIO.loadImage(nameImage, GrayF32.class);
+		GrayF32 input = Objects.requireNonNull(UtilImageIO.loadImage(nameImage, GrayF32.class));
 		GrayF32 undistorted = new GrayF32(input.width, input.height);
 
 		Detector detector = new Detector();
 
 		if (intrinsic != null) {
-			CameraPinholeBrown paramUndist = new CameraPinholeBrown();
+			var paramUndist = new CameraPinholeBrown();
 			ImageDistort<GrayF32, GrayF32> undistorter = LensDistortionOps.changeCameraModel(
 					AdjustmentType.EXPAND, BorderType.EXTENDED, intrinsic, new CameraPinhole(intrinsic), paramUndist,
 					ImageType.single(GrayF32.class));

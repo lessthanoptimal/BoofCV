@@ -30,11 +30,11 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class VisualizeHogCells {
-
 	DescribeDenseHogFastAlg<?> hog;
-	Color colors[];
-	float cos[], sin[];
+	Color[] colors;
+	float[] cos, sin;
 
 	boolean localMax = false;
 	boolean showGrid = false;
@@ -209,7 +209,7 @@ public class VisualizeHogCells {
 	}
 
 	public void setShowLog( boolean logIntensity ) {
-		Color colors[] = new Color[256];
+		Color[] colors = new Color[256];
 		if (logIntensity) {
 			double k = 255.0/Math.log(255);
 			for (int i = 0; i < colors.length; i++) {

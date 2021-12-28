@@ -46,6 +46,7 @@ import georegression.struct.point.Point2D_I16;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.Objects;
 
 /**
  * Displays detected corners in a video sequence
@@ -129,6 +130,7 @@ public class VideoDetectCorners<T extends ImageGray<T>, D extends ImageGray<D>> 
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
 	void perform( String fileName, Class<T> imageType, Class<D> derivType ) {
 		SimpleImageSequence<T> sequence = BoofVideoManager.loadManagerDefault().load(fileName, ImageType.single(imageType));
+		Objects.requireNonNull(sequence);
 
 		int maxCorners = 200;
 		int radius = 2;
@@ -146,7 +148,7 @@ public class VideoDetectCorners<T extends ImageGray<T>, D extends ImageGray<D>> 
 
 		FeatureSelectLimitIntensity<Point2D_I16> selector = new FeatureSelectNBest<>(new SampleIntensityImage.I16());
 
-		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<>(intensity, null, extractor, selector);
+		var detector = new GeneralFeatureDetector<>(intensity, null, extractor, selector);
 		detector.setFeatureLimit(maxCorners);
 
 		VideoDetectCorners<T, D> display = new VideoDetectCorners<>(sequence, detector, derivType);

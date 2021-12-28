@@ -43,6 +43,7 @@ import georegression.struct.curve.EllipseRotated_F64;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -434,7 +435,7 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase imple
 	}
 
 	public static void drawNumbers( Graphics2D g2, List<PointIndex2D_F64> foundTarget,
-									Point2Transform2_F32 transform,
+									@Nullable Point2Transform2_F32 transform,
 									double scale ) {
 
 		Font regular = new Font("Serif", Font.PLAIN, 16);

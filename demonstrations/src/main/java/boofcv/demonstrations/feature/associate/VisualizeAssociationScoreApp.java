@@ -61,6 +61,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends ImageGray<D>>
 		extends DemonstrationBase {
 	// These classes process the input images and compute association score
@@ -241,6 +242,7 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 		SwingUtilities.invokeLater(() -> progressMonitor.setProgress(progress + 2));
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	public class VisualizeScorePanel extends ControlPanelDetDescAssocBase implements ActionListener {
 		JLabel labelSize = new JLabel();
 

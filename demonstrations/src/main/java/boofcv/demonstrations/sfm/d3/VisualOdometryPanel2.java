@@ -23,6 +23,7 @@ import boofcv.gui.d3.Orientation3D;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -37,6 +38,7 @@ import java.awt.event.ItemListener;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class VisualOdometryPanel2
 		extends StandardAlgConfigPanel
 		implements ItemListener, ActionListener, ChangeListener {
@@ -64,7 +66,7 @@ public class VisualOdometryPanel2
 	int stopFrame = -1;
 
 	boolean paused;
-	Se3_F64 prevToWorld;
+	@Nullable Se3_F64 prevToWorld;
 	double integral;
 
 	Listener listener;

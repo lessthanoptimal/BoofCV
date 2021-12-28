@@ -36,10 +36,32 @@ public interface MediaManager {
 
 	@Nullable Reader openFile( String fileName );
 
+	default Reader openFileNotNull( String fileName ) {
+		Reader r = openFile(fileName);
+		if (r == null)
+			throw new RuntimeException("Failed to open file=" + fileName);
+		return r;
+	}
+
 	@Nullable BufferedImage openImage( String fileName );
+
+	default BufferedImage openImageNotNull( String fileName ) {
+		BufferedImage image = openImage(fileName);
+		if (image == null)
+			throw new RuntimeException("Failed to open image=" + fileName);
+		return image;
+	}
 
 	<T extends ImageBase<T>>
 	@Nullable SimpleImageSequence<T> openVideo( String fileName, ImageType<T> imageInfo );
+
+	default <T extends ImageBase<T>> SimpleImageSequence<T>
+	openVideoNotNull( String fileName, ImageType<T> imageInfo ) {
+		SimpleImageSequence<T> video = openVideo(fileName, imageInfo);
+		if (video == null)
+			throw new RuntimeException("Failed to open video=" + fileName);
+		return video;
+	}
 
 	/**
 	 * Opens the specified webcam.
@@ -52,4 +74,12 @@ public interface MediaManager {
 	 */
 	<T extends ImageBase<T>>
 	@Nullable SimpleImageSequence<T> openCamera( String device, int width, int height, ImageType<T> imageType );
+
+	default <T extends ImageBase<T>> SimpleImageSequence<T>
+	openCameraNotNull( String fileName, int width, int height, ImageType<T> imageType ) {
+		SimpleImageSequence<T> camera = openCamera(fileName, width, height, imageType);
+		if (camera == null)
+			throw new RuntimeException("Failed to open camera=" + fileName);
+		return camera;
+	}
 }

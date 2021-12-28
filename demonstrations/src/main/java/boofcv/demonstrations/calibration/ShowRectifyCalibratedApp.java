@@ -160,7 +160,7 @@ public class ShowRectifyCalibratedApp extends SelectAlgorithmAndInputPanel {
 	public void changeInput( String name, int index ) {
 		PathLabel refs = inputRefs.get(index);
 
-		StereoParameters param = Objects.requireNonNull(CalibrationIO.load(media.openFile(refs.getPath(0))));
+		StereoParameters param = CalibrationIO.load(media.openFileNotNull(refs.getPath(0)));
 		BufferedImage origLeft = media.openImage(refs.getPath(1));
 		BufferedImage origRight = media.openImage(refs.getPath(2));
 

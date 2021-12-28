@@ -21,6 +21,7 @@ package boofcv.factory.shape;
 import boofcv.alg.shapes.edge.EdgeIntensityPolygon;
 import boofcv.alg.shapes.polygon.DetectPolygonFromContour;
 import boofcv.struct.Configuration;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Configuration for {@link DetectPolygonFromContour} for use in {@link FactoryShapeDetector}.
@@ -60,7 +61,7 @@ public class ConfigPolygonDetector implements Configuration {
 	/**
 	 * Configuration for sub-pixel refinement of line. If null then this step is skipped.
 	 */
-	public ConfigRefinePolygonLineToImage refineGray = new ConfigRefinePolygonLineToImage();
+	public @Nullable ConfigRefinePolygonLineToImage refineGray = new ConfigRefinePolygonLineToImage();
 
 	/**
 	 * Specifies the number of sides in the polygon and uses default settings for everything else
@@ -80,7 +81,13 @@ public class ConfigPolygonDetector implements Configuration {
 		this.minimumRefineEdgeIntensity = src.minimumRefineEdgeIntensity;
 		this.refineContour = src.refineContour;
 		this.adjustForThresholdBias = src.adjustForThresholdBias;
-		this.refineGray.setTo(src.refineGray);
+		if (src.refineGray == null) {
+			this.refineGray = null;
+		} else {
+			if (this.refineGray == null)
+				this.refineGray = new ConfigRefinePolygonLineToImage();
+			this.refineGray.setTo(src.refineGray);
+		}
 		return this;
 	}
 

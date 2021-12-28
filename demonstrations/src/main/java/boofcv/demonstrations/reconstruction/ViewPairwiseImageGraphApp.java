@@ -38,6 +38,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static boofcv.io.UtilIO.systemToUnix;
 
@@ -46,6 +47,7 @@ import static boofcv.io.UtilIO.systemToUnix;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class ViewPairwiseImageGraphApp extends DemonstrationBase {
 	public static final int PREVIEW_PIXELS = 500*400;
 
@@ -93,6 +95,7 @@ public class ViewPairwiseImageGraphApp extends DemonstrationBase {
 		stopAllInputProcessing();
 		threadPool.execute(() -> {
 			setMenuBarEnabled(false);
+			Objects.requireNonNull(inputFilePath);
 			System.out.println("Loading pairwise graph at: " + inputFilePath);
 			graph = MultiViewIO.load(inputFilePath, (PairwiseImageGraph)null);
 			db = MultiViewIO.loadSimilarImages(new File(new File(inputFilePath).getParentFile(),"similar.yaml").getPath());
@@ -136,6 +139,8 @@ public class ViewPairwiseImageGraphApp extends DemonstrationBase {
 	 * Sees if it can find the image path by looking at the saved file location
 	 */
 	protected void smartFindImagePath() {
+		Objects.requireNonNull(inputFilePath);
+
 		File parent = new File(inputFilePath).getParentFile();
 		if (checkImagePath(parent.getPath()))
 			return;

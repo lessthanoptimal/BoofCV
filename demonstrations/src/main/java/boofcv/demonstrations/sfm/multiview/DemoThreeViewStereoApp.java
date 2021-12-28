@@ -89,7 +89,7 @@ import static boofcv.misc.BoofMiscOps.checkTrue;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({"rawtypes", "unchecked", "NullAway.Init"})
 public class DemoThreeViewStereoApp<TD extends TupleDesc<TD>> extends DemonstrationBase {
 
 	JPanel gui = new JPanel();
@@ -600,7 +600,7 @@ public class DemoThreeViewStereoApp<TD extends TupleDesc<TD>> extends Demonstrat
 
 				controls.addText("SBA Intrinsic\n");
 				for (int i = 0; i < 3; i++) {
-					BundlePinholeSimplified c = structureEstimator.structure.cameras.get(i).getModel();
+					BundlePinholeSimplified c = structureEstimator.structure.getCameraModel(i);
 					controls.addText(String.format("  f=%.1f k1=%.2f k2=%.2f\n", c.f, c.k1, c.k2));
 				}
 				controls.addText(String.format("SBA Obs %4d Pts %d\n", numObs, numPoints));
@@ -629,10 +629,10 @@ public class DemoThreeViewStereoApp<TD extends TupleDesc<TD>> extends Demonstrat
 			System.out.println("Computing rectification: views " + view0 + " " + view1);
 			SceneStructureMetric structure = structureEstimator.getStructure();
 
-			BundleAdjustmentOps.convert((BundleAdjustmentCamera)structure.getCameras().get(view0).getModel(),
+			BundleAdjustmentOps.convert((BundleAdjustmentCamera)structure.getCameraModel(view0),
 					dimensions[view0].width, dimensions[view0].height, intrinsic01);
 
-			BundleAdjustmentOps.convert((BundleAdjustmentCamera)structure.getCameras().get(view1).getModel(),
+			BundleAdjustmentOps.convert((BundleAdjustmentCamera)structure.getCameraModel(view1),
 					dimensions[view1].width, dimensions[view1].height, intrinsic02);
 
 			Se3_F64 w_to_0 = structure.getParentToView(view0);

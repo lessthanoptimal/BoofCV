@@ -52,6 +52,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class DetectPolylineApp<T extends ImageGray<T>>
 		extends DetectBlackShapeAppBase implements ShapeGuiListener {
 	PolylineAppControlPanel controlPanel = new PolylineAppControlPanel(this);

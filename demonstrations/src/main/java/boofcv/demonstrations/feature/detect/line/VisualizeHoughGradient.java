@@ -60,8 +60,8 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class VisualizeHoughGradient<I extends ImageGray<I>, D extends ImageGray<D>>
-		extends DemonstrationBase {
+@SuppressWarnings({"NullAway.Init"})
+public class VisualizeHoughGradient<I extends ImageGray<I>, D extends ImageGray<D>> extends DemonstrationBase {
 
 	Class<I> imageType;
 	Class<D> derivType;

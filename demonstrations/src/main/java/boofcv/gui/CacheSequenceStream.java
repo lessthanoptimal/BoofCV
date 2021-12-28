@@ -29,16 +29,15 @@ import java.awt.image.BufferedImage;
  * Cache for output from {@link SimpleImageSequence}. Stores both the boofcv image and the associated
  * BufferedImage. Storage for two sets of images are stored. One for the IO thread and one for the algorithm.
  *
- *
- *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class CacheSequenceStream<T extends ImageBase<T>> {
 
 	SimpleImageSequence<T> sequence;
 	ImageType<T> imageType;
-	T queueBoof[];
-	BufferedImage queueBuff[];
+	T[] queueBoof;
+	BufferedImage[] queueBuff;
 
 	int selected;
 
@@ -48,19 +47,19 @@ public class CacheSequenceStream<T extends ImageBase<T>> {
 		queueBuff = new BufferedImage[2];
 
 		for (int i = 0; i < 2; i++) {
-			queueBoof[i] = imageType.createImage(1,1);
-			queueBuff[i] = new BufferedImage(1,1,BufferedImage.TYPE_INT_RGB);
+			queueBoof[i] = imageType.createImage(1, 1);
+			queueBuff[i] = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
 		}
 		this.imageType = imageType;
 	}
 
-	public void setSequence(SimpleImageSequence<T> sequence) {
+	public void setSequence( SimpleImageSequence<T> sequence ) {
 		this.sequence = sequence;
 	}
 
 	public void reset() {
 		selected = 0;
-		if( sequence != null )
+		if (sequence != null)
 			sequence.reset();
 	}
 
@@ -69,13 +68,13 @@ public class CacheSequenceStream<T extends ImageBase<T>> {
 	}
 
 	public void cacheNext() {
-		selected = (selected+1)%queueBoof.length;
+		selected = (selected + 1)%queueBoof.length;
 		sequence.next();
 		T sBoof = sequence.getImage();
 		BufferedImage sBuff = sequence.getGuiImage();
 
 		queueBoof[selected].setTo(sBoof);
-		queueBuff[selected] = ConvertBufferedImage.checkCopy(sBuff,queueBuff[selected]);
+		queueBuff[selected] = ConvertBufferedImage.checkCopy(sBuff, queueBuff[selected]);
 	}
 
 	public T getBoofImage() {
@@ -87,17 +86,17 @@ public class CacheSequenceStream<T extends ImageBase<T>> {
 	}
 
 	public void setBufferedImage( BufferedImage buff ) {
-		queueBuff[selected] = ConvertBufferedImage.checkCopy(buff,queueBuff[selected]);
+		queueBuff[selected] = ConvertBufferedImage.checkCopy(buff, queueBuff[selected]);
 	}
 
 	public int getWidth() {
-		if( sequence == null )
+		if (sequence == null)
 			return queueBoof[selected].getWidth();
 		return sequence.getWidth();
 	}
 
 	public int getHeight() {
-		if( sequence == null )
+		if (sequence == null)
 			return queueBoof[selected].getHeight();
 		return sequence.getHeight();
 	}
