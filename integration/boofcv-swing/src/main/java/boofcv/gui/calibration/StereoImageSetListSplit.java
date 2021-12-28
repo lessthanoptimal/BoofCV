@@ -19,12 +19,12 @@
 package boofcv.gui.calibration;
 
 import boofcv.io.image.UtilImageIO;
-import boofcv.misc.BoofMiscOps;
 import org.apache.commons.io.FilenameUtils;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Implements {@link StereoImageSet} for a single list of images which are split in half
@@ -51,15 +51,14 @@ public class StereoImageSetListSplit implements StereoImageSet {
 
 	@Override public BufferedImage loadLeft() {
 		BufferedImage image = UtilImageIO.loadImage(paths.get(selected));
-		BoofMiscOps.checkTrue(image != null);
+		Objects.requireNonNull(image);
 		BufferedImage half = new BufferedImage(splitX, image.getHeight(), image.getType());
 		half.createGraphics().drawImage(image, 0, 0, null);
 		return half;
 	}
 
 	@Override public BufferedImage loadRight() {
-		BufferedImage image = UtilImageIO.loadImage(paths.get(selected));
-		BoofMiscOps.checkTrue(image != null);
+		BufferedImage image = Objects.requireNonNull(UtilImageIO.loadImage(paths.get(selected)));
 		int width = image.getWidth() - splitX;
 		int height = image.getHeight();
 		BufferedImage half = new BufferedImage(width, image.getHeight(), image.getType());

@@ -40,6 +40,7 @@ import java.io.File;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class OpenStereoSequencesChooser extends JSpringPanel {
 
 	// TODO open Videos
@@ -233,7 +234,7 @@ public class OpenStereoSequencesChooser extends JSpringPanel {
 	/**
 	 * Finds the first image in the sequence in the directory
 	 */
-	private File findFirstImageInDirectory( File directory ) {
+	private @Nullable File findFirstImageInDirectory( File directory ) {
 		String first = null;
 		File[] files = directory.listFiles();
 		if (files == null)
@@ -289,7 +290,7 @@ public class OpenStereoSequencesChooser extends JSpringPanel {
 	 * Lets the listener know what the user has chosen to do.
 	 */
 	public interface Listener {
-		void selectedInputs( File left, File right, File calibration );
+		void selectedInputs( File left, @Nullable File right, @Nullable File calibration );
 
 		void userCanceled();
 	}
@@ -297,6 +298,7 @@ public class OpenStereoSequencesChooser extends JSpringPanel {
 	/**
 	 * Output object. Contains everything the user has selected
 	 */
+	@SuppressWarnings({"NullAway.Init"})
 	public static class Selected {
 		public File left;
 		public @Nullable File right;
@@ -307,6 +309,7 @@ public class OpenStereoSequencesChooser extends JSpringPanel {
 		}
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	public static class DefaultListener implements Listener {
 		JDialog dialog;
 		public boolean canceled = false;
@@ -317,7 +320,7 @@ public class OpenStereoSequencesChooser extends JSpringPanel {
 		}
 
 		@Override
-		public void selectedInputs( File left, File right, File calibration ) {
+		public void selectedInputs( File left, @Nullable File right, @Nullable File calibration ) {
 			this.selected.left = left;
 			this.selected.right = right;
 			this.selected.calibration = calibration;
@@ -340,7 +343,7 @@ public class OpenStereoSequencesChooser extends JSpringPanel {
 	 * @param path Path to input file
 	 * @return The selected stereo files or null of it canceled
 	 */
-	public static @Nullable Selected showDialog( Window owner, boolean sequences, boolean justImages, File path ) {
+	public static @Nullable Selected showDialog( @Nullable Window owner, boolean sequences, boolean justImages, File path ) {
 		if (!sequences)
 			throw new RuntimeException("Not yet supported");
 

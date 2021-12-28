@@ -191,19 +191,11 @@ public class ShowImages {
 
 	public static ImagePanel showWindow( ImageGray<?> img, Colorization type, String title, boolean closeOnExit ) {
 		double max = GImageStatistics.maxAbs(img);
-		BufferedImage buff;
-		switch (type) {
-			case MAGNITUDE:
-				buff = VisualizeImageData.grayMagnitude(img, null, max);
-				break;
-
-			case SIGN:
-				buff = VisualizeImageData.colorizeSign(img, null, max);
-				break;
-
-			default:
-				throw new IllegalArgumentException("Unknown type. " + type);
-		}
+		BufferedImage buff = switch (type) {
+			case MAGNITUDE -> VisualizeImageData.grayMagnitude(img, null, max);
+			case SIGN -> VisualizeImageData.colorizeSign(img, null, max);
+			default -> throw new IllegalArgumentException("Unknown type. " + type);
+		};
 
 		return showWindow(buff, title, closeOnExit);
 	}

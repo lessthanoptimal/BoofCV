@@ -23,6 +23,7 @@ import boofcv.gui.controls.JConfigLength;
 import boofcv.gui.controls.JSpinnerNumber;
 import boofcv.misc.BoofLambdas;
 import boofcv.struct.ConfigLength;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
@@ -260,7 +261,7 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 		return checkbox(text, value, null);
 	}
 
-	public JCheckBox checkbox( String text, boolean value, String tooltip ) {
+	public JCheckBox checkbox( String text, boolean value, @Nullable String tooltip ) {
 		JCheckBox c = new JCheckBox(text);
 		c.setSelected(value);
 		c.addActionListener(this);
@@ -364,11 +365,11 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 		addLabeled(target, text, null);
 	}
 
-	public void addLabeled( JComponent target, String text, String tooltip ) {
+	public void addLabeled( JComponent target, String text, @Nullable String tooltip ) {
 		addLabeled(target, text, tooltip, this);
 	}
 
-	public static void addLabeled( JComponent target, String text, String tooltip, JPanel owner ) {
+	public static void addLabeled( JComponent target, String text, @Nullable String tooltip, JPanel owner ) {
 		JLabel label = new JLabel(text);
 		label.setLabelFor(target);
 		JPanel p = new JPanel();

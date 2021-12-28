@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,6 +31,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class ImageBinaryPanel extends JPanel {
 
 	// the image being displayed
@@ -47,8 +48,7 @@ public class ImageBinaryPanel extends JPanel {
 		setMaximumSize(getPreferredSize());
 	}
 
-	protected ImageBinaryPanel() {
-	}
+	protected ImageBinaryPanel() {}
 
 	@Override
 	public synchronized void paintComponent(Graphics g) {

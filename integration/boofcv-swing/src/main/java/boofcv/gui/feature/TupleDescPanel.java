@@ -28,6 +28,7 @@ import java.awt.*;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class TupleDescPanel extends JPanel {
 
 	TupleDesc desc;

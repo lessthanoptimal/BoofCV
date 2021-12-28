@@ -40,7 +40,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "NullAway.Init"})
 public abstract class SelectAlgorithmAndInputPanel extends JPanel
 		implements ActionListener, VisualizeApp {
 	JToolBar toolbar;
@@ -156,7 +156,7 @@ public abstract class SelectAlgorithmAndInputPanel extends JPanel
 	}
 
 	/**
-	 * Used to add the main GUI to this panel.  Must use this function.
+	 * Used to add the main GUI to this panel. Must use this function.
 	 * Algorithm change events will not be posted until this function has been set.
 	 *
 	 * @param gui The main GUI being displayed.

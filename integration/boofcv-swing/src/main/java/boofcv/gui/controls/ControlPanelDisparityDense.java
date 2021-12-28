@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,6 +37,7 @@ import java.awt.*;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class ControlPanelDisparityDense extends StandardAlgConfigPanel {
 
 	private final static String[] ERRORS_BLOCK = new String[]{"SAD", "Census", "NCC"};
@@ -108,7 +109,8 @@ public class ControlPanelDisparityDense extends StandardAlgConfigPanel {
 		handleErrorSelected(true);
 	}
 
-	public static ControlPanelDisparityDense createRange( int disparityMin, int disparityRange, Class imageType ) {
+	public static ControlPanelDisparityDense createRange( int disparityMin, int disparityRange,
+														  Class imageType ) {
 		ConfigDisparityBMBest5 configBM = new ConfigDisparityBMBest5();
 		ConfigDisparitySGM configSGM = new ConfigDisparitySGM();
 		ConfigSpeckleFilter configSpeckle = new ConfigSpeckleFilter();
@@ -418,10 +420,9 @@ public class ControlPanelDisparityDense extends StandardAlgConfigPanel {
 		}
 	}
 
-	static class ControlsSAD extends StandardAlgConfigPanel {
+	static class ControlsSAD extends StandardAlgConfigPanel {}
 
-	}
-
+	@SuppressWarnings({"NullAway.Init"})
 	class ControlsCensus extends StandardAlgConfigPanel {
 		JComboBox<String> comboVariant = combo(0, (Object[])CensusVariants.values());
 		ConfigDisparityError.Census settings;
@@ -447,6 +448,7 @@ public class ControlPanelDisparityDense extends StandardAlgConfigPanel {
 		}
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	class ControlsNCC extends StandardAlgConfigPanel {
 		JSpinner spinnerEps = spinner(0.0, 0, 1.0, 0.001, "0.0E0", 10);
 		ConfigDisparityError.NCC settings;
@@ -472,6 +474,7 @@ public class ControlPanelDisparityDense extends StandardAlgConfigPanel {
 		}
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	class ControlsMutualInfo extends StandardAlgConfigPanel {
 		JSpinner spinnerBlur = spinner(1, 0, 10, 1);
 		JSpinner spinnerPyramidWidth = spinner(20, 20, 10000, 50);
@@ -517,14 +520,14 @@ public class ControlPanelDisparityDense extends StandardAlgConfigPanel {
 			setBorder(BorderFactory.createEmptyBorder());
 			addLabeled(spinnerSimilar, "Simularity",
 					"How similar two pixel values need to be considered connected.");
-			addLabeled(lengthRegion, "Region","Maximum region size for removal");
+			addLabeled(lengthRegion, "Region", "Maximum region size for removal");
 		}
 
 		@Override
 		public void controlChanged( final Object source ) {
 			if (source == spinnerSimilar) {
 				configSpeckle.similarTol = ((Number)spinnerSimilar.getValue()).floatValue();
-			} else if (source==lengthRegion) {
+			} else if (source == lengthRegion) {
 				configSpeckle.maximumArea.setTo(lengthRegion.getValue());
 			} else {
 				throw new RuntimeException("Unknown");
@@ -546,7 +549,7 @@ public class ControlPanelDisparityDense extends StandardAlgConfigPanel {
 	}
 
 	public static void main( String[] args ) {
-		ControlPanelDisparityDense controls = ControlPanelDisparityDense.createRange(0, 150, null);
+		ControlPanelDisparityDense controls = ControlPanelDisparityDense.createRange(0, 150, GrayU8.class);
 		ShowImages.showWindow(controls, "Controls");
 	}
 }

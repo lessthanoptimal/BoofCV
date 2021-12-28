@@ -60,7 +60,7 @@ public class Se3FromEssentialGenerator implements ModelGenerator<Se3_F64,Associa
 	}
 
 	/**
-	 * Computes the camera motion from the set of observations.  The motion is from the first
+	 * Computes the camera motion from the set of observations. The motion is from the first
 	 * into the second camera frame.
 	 *
 	 * @param dataSet Associated pairs in normalized camera coordinates.

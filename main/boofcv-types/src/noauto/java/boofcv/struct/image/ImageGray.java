@@ -48,7 +48,7 @@ import java.lang.reflect.Array;
  * </p>
  * <p>
  * Sub-images are images that are a rectangular image inside of a larger image. The original image and the sub-image
- * share the same data array, so an operation in one will affect the other.  They are useful when only part of
+ * share the same data array, so an operation in one will affect the other. They are useful when only part of
  * the image needs to be processed. All image processing operations support sub-images.
  * </p>
  * <p>

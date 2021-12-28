@@ -30,7 +30,7 @@ import java.util.List;
 
 /**
  * Computes a local histogram weighted using a Gaussian function. The weighting function is shaped using a rotated
- * rectangle, where the sigma along each axis is set by the rectangle's width and height.   For use with
+ * rectangle, where the sigma along each axis is set by the rectangle's width and height.  For use with
  * {@link TrackerMeanShiftComaniciu2003}.
  *
  * The histogram is stored in a row major format.

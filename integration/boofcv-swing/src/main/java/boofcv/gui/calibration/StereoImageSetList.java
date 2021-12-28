@@ -24,6 +24,7 @@ import boofcv.misc.BoofMiscOps;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Implements {@link StereoImageSet} for two sets of image paths in lists.
@@ -50,13 +51,11 @@ public class StereoImageSetList implements StereoImageSet {
 
 	@Override public BufferedImage loadLeft() {
 		BufferedImage image = UtilImageIO.loadImage(left.get(selected));
-		BoofMiscOps.checkTrue(image != null);
-		return image;
+		return Objects.requireNonNull(image);
 	}
 
 	@Override public BufferedImage loadRight() {
 		BufferedImage image = UtilImageIO.loadImage(right.get(selected));
-		BoofMiscOps.checkTrue(image != null);
-		return image;
+		return Objects.requireNonNull(image);
 	}
 }

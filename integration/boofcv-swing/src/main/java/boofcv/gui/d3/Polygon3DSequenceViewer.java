@@ -43,8 +43,9 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class Polygon3DSequenceViewer extends JPanel implements KeyListener, MouseListener,
-		MouseMotionListener {
+@SuppressWarnings({"NullAway.Init"})
+public class Polygon3DSequenceViewer extends JPanel
+		implements KeyListener, MouseListener, MouseMotionListener {
 
 	// the shapes it's drawing
 	final List<Poly> polygons = new ArrayList<>();
@@ -53,7 +54,7 @@ public class Polygon3DSequenceViewer extends JPanel implements KeyListener, Mous
 	final Se3_F64 worldToCamera = new Se3_F64();
 
 	// intrinsic camera calibration
-	DMatrixRMaj K = new DMatrixRMaj(3,3);
+	DMatrixRMaj K = new DMatrixRMaj(3, 3);
 
 	// how far it moves in the world frame for each key press
 	double stepSize;
@@ -72,7 +73,7 @@ public class Polygon3DSequenceViewer extends JPanel implements KeyListener, Mous
 
 	CameraPinhole camera = new CameraPinhole();
 
-	public Polygon3DSequenceViewer( ) {
+	public Polygon3DSequenceViewer() {
 		addKeyListener(this);
 		addMouseListener(this);
 		addMouseMotionListener(this);
@@ -81,7 +82,7 @@ public class Polygon3DSequenceViewer extends JPanel implements KeyListener, Mous
 		camera.fy = 300;
 	}
 
-	public void setFocalLength(double focalLength) {
+	public void setFocalLength( double focalLength ) {
 		camera.fx = focalLength;
 		camera.fy = focalLength;
 	}
@@ -90,7 +91,7 @@ public class Polygon3DSequenceViewer extends JPanel implements KeyListener, Mous
 		return stepSize;
 	}
 
-	public void setStepSize(double stepSize) {
+	public void setStepSize( double stepSize ) {
 		this.stepSize = stepSize;
 	}
 
@@ -110,15 +111,15 @@ public class Polygon3DSequenceViewer extends JPanel implements KeyListener, Mous
 	 *
 	 * @param polygon shape being added
 	 */
-	public void add( Color color , Point3D_F64... polygon ) {
+	public void add( Color color, Point3D_F64... polygon ) {
 
-		final Poly p = new Poly(polygon.length,color);
+		final Poly p = new Poly(polygon.length, color);
 
-		for( int i = 0; i < polygon.length; i++ )
+		for (int i = 0; i < polygon.length; i++)
 			p.pts[i] = polygon[i].copy();
 
 		synchronized (polygons) {
-			polygons.add( p );
+			polygons.add(p);
 		}
 	}
 
@@ -129,18 +130,18 @@ public class Polygon3DSequenceViewer extends JPanel implements KeyListener, Mous
 	 */
 	public void add( Point3D_F64... polygon ) {
 
-		final Poly p = new Poly(polygon.length,Color.BLACK);
+		final Poly p = new Poly(polygon.length, Color.BLACK);
 
-		for( int i = 0; i < polygon.length; i++ )
+		for (int i = 0; i < polygon.length; i++)
 			p.pts[i] = polygon[i].copy();
 
 		synchronized (polygons) {
-			polygons.add( p );
+			polygons.add(p);
 		}
 	}
 
 	@Override
-	public void paintComponent(Graphics g) {
+	public void paintComponent( Graphics g ) {
 		super.paintComponent(g);
 
 		Graphics2D g2 = BoofSwingUtil.antialiasing(g);
@@ -149,14 +150,14 @@ public class Polygon3DSequenceViewer extends JPanel implements KeyListener, Mous
 		camera.height = getHeight();
 		camera.cx = camera.width/2;
 		camera.cy = camera.height/2;
-		PerspectiveOps.pinholeToMatrix(camera,K);
+		PerspectiveOps.pinholeToMatrix(camera, K);
 
 		synchronized (polygons) {
 			renderPolygons(g2);
 		}
 	}
 
-	private void renderPolygons(Graphics2D g2) {
+	private void renderPolygons( Graphics2D g2 ) {
 		// Create a local copy of the camera so that mouse doesn't need to block on polygons rendering
 		Se3_F64 worldToCamera;
 		synchronized (this.worldToCamera) {
@@ -203,7 +204,7 @@ public class Polygon3DSequenceViewer extends JPanel implements KeyListener, Mous
 	}
 
 	@Override
-	public void keyTyped(KeyEvent e) {
+	public void keyTyped( KeyEvent e ) {
 		synchronized (worldToCamera) {
 			Vector3D_F64 T = worldToCamera.getT();
 
@@ -228,34 +229,33 @@ public class Polygon3DSequenceViewer extends JPanel implements KeyListener, Mous
 	}
 
 	@Override
-	public void keyPressed(KeyEvent e) {}
+	public void keyPressed( KeyEvent e ) {}
 
 	@Override
-	public void keyReleased(KeyEvent e) {}
+	public void keyReleased( KeyEvent e ) {}
 
 	@Override
-	public void mouseClicked(MouseEvent e) {
+	public void mouseClicked( MouseEvent e ) {
 		grabFocus();
 	}
 
 	@Override
-	public void mousePressed(MouseEvent e) {
+	public void mousePressed( MouseEvent e ) {
 		prevX = e.getX();
 		prevY = e.getY();
-
 	}
 
 	@Override
-	public void mouseReleased(MouseEvent e) {}
+	public void mouseReleased( MouseEvent e ) {}
 
 	@Override
-	public void mouseEntered(MouseEvent e) {}
+	public void mouseEntered( MouseEvent e ) {}
 
 	@Override
-	public void mouseExited(MouseEvent e) {}
+	public void mouseExited( MouseEvent e ) {}
 
 	@Override
-	public void mouseDragged(MouseEvent e) {
+	public void mouseDragged( MouseEvent e ) {
 		double rotX = 0;
 		double rotY = 0;
 		double rotZ = 0;
@@ -264,9 +264,9 @@ public class Polygon3DSequenceViewer extends JPanel implements KeyListener, Mous
 		rotX += (prevY - e.getY())*0.005;
 
 		Se3_F64 rotTran = new Se3_F64();
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,rotX,rotY,rotZ,rotTran.getR());
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, rotX, rotY, rotZ, rotTran.getR());
 		synchronized (worldToCamera) {
-			Se3_F64 temp = worldToCamera.concat(rotTran,null);
+			Se3_F64 temp = worldToCamera.concat(rotTran, null);
 			worldToCamera.setTo(temp);
 		}
 
@@ -277,17 +277,16 @@ public class Polygon3DSequenceViewer extends JPanel implements KeyListener, Mous
 	}
 
 	@Override
-	public void mouseMoved(MouseEvent e) {}
+	public void mouseMoved( MouseEvent e ) {}
 
-	private static class Poly
-	{
+	@SuppressWarnings({"NullAway.Init"})
+	private static class Poly {
 		Point3D_F64[] pts;
 		Color color;
 
-		public Poly() {
-		}
+		public Poly() {}
 
-		public Poly(int length, Color color) {
+		public Poly( int length, Color color ) {
 			this.pts = new Point3D_F64[length];
 			this.color = color;
 		}

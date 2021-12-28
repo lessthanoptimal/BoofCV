@@ -26,15 +26,17 @@ import java.awt.*;
 import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.util.Objects;
 
 /**
  * Simple JPanel for displaying buffered images.
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class ImagePanel extends JPanel {
 	// the image being displayed
-	protected BufferedImage img;
+	protected @Nullable BufferedImage img;
 	// should it re-size the image based on the panel's size
 	protected ScaleOptions scaling = ScaleOptions.DOWN;
 
@@ -197,7 +199,7 @@ public class ImagePanel extends JPanel {
 	 *
 	 * @param image The new image which will be displayed.
 	 */
-	public void setImageUI( final BufferedImage image ) {
+	public void setImageUI( final @Nullable BufferedImage image ) {
 		BoofSwingUtil.invokeNowOrLater(() -> {
 			repaintJustImage(ImagePanel.this.img, adjustmentGUI);
 			ImagePanel.this.img = image;
@@ -220,7 +222,7 @@ public class ImagePanel extends JPanel {
 		repaintJustImage(img, new ScaleOffset());
 	}
 
-	protected void repaintJustImage( BufferedImage img, ScaleOffset workspace ) {
+	protected void repaintJustImage( @Nullable BufferedImage img, ScaleOffset workspace ) {
 		if (img == null) {
 			repaint();
 			return;
@@ -231,7 +233,7 @@ public class ImagePanel extends JPanel {
 				(int)(img.getWidth()*workspace.scale + 0.5) + 2, (int)(img.getHeight()*workspace.scale + 0.5) + 2);
 	}
 
-	public BufferedImage getImage() {
+	public @Nullable BufferedImage getImage() {
 		return img;
 	}
 
@@ -241,6 +243,7 @@ public class ImagePanel extends JPanel {
 	}
 
 	public void autoSetPreferredSize() {
+		Objects.requireNonNull(img);
 		setPreferredSize(new Dimension(img.getWidth(), img.getHeight()));
 	}
 

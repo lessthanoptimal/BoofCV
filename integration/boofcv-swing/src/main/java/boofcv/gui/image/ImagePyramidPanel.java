@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,14 +29,13 @@ import boofcv.struct.pyramid.ImagePyramid;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
-
 /**
  * Displays an {@link ImagePyramid} by listing each of its layers and showing them one at a time.
  * Each layer can be scaled up to the size of the original layer if desired.
  *
  * @author Peter Abeles
  */
-@SuppressWarnings({"unchecked"})
+@SuppressWarnings({"unchecked", "NullAway.Init"})
 public class ImagePyramidPanel<T extends ImageGray<T>> extends ListDisplayPanel {
 
 	// the image pyramid.
@@ -49,22 +48,21 @@ public class ImagePyramidPanel<T extends ImageGray<T>> extends ListDisplayPanel 
 	boolean scaleUp;
 
 	// show scales or blur factor
-	boolean showScales=true;
+	boolean showScales = true;
 
-	public ImagePyramidPanel(ImagePyramid<T> pyramid, boolean scaleUp) {
-		set(pyramid,scaleUp);
+	public ImagePyramidPanel( ImagePyramid<T> pyramid, boolean scaleUp ) {
+		set(pyramid, scaleUp);
 		render();
-		setPreferredSize(new Dimension(pyramid.getWidth(0),pyramid.getHeight(0)));
+		setPreferredSize(new Dimension(pyramid.getWidth(0), pyramid.getHeight(0)));
 	}
 
-	public ImagePyramidPanel() {
-	}
+	public ImagePyramidPanel() {}
 
-	public void setShowScales(boolean showScales) {
+	public void setShowScales( boolean showScales ) {
 		this.showScales = showScales;
 	}
 
-	public void set(ImagePyramid<T> pyramid, boolean scaleUp) {
+	public void set( ImagePyramid<T> pyramid, boolean scaleUp ) {
 		this.pyramid = pyramid;
 		this.scaleUp = scaleUp;
 	}
@@ -75,10 +73,10 @@ public class ImagePyramidPanel<T extends ImageGray<T>> extends ListDisplayPanel 
 	public void render() {
 		reset();
 
-		if( pyramid == null )
+		if (pyramid == null)
 			return;
 
-		if( scaleUp ) {
+		if (scaleUp) {
 			scaleUpLayers();
 		} else {
 			doNotScaleLayers();
@@ -88,30 +86,30 @@ public class ImagePyramidPanel<T extends ImageGray<T>> extends ListDisplayPanel 
 	private void doNotScaleLayers() {
 		int N = pyramid.getNumLayers();
 
-		for( int i = 0; i < N; i++ ) {
-			BufferedImage b = ConvertBufferedImage.convertTo(pyramid.getLayer(i),null,true);
-			addImage(b,String.format("%5.2f",pyramid.getScale(i)));
+		for (int i = 0; i < N; i++) {
+			BufferedImage b = ConvertBufferedImage.convertTo(pyramid.getLayer(i), null, true);
+			addImage(b, String.format("%5.2f", pyramid.getScale(i)));
 		}
 	}
 
 	private void scaleUpLayers() {
 		T l = pyramid.getLayer(0);
-		if( upscale == null ) {
-			interp = (InterpolatePixelS<T>) FactoryInterpolation.nearestNeighborPixelS(l.getClass());
-			upscale = (T)l.createNew(l.width,l.height);
+		if (upscale == null) {
+			interp = (InterpolatePixelS<T>)FactoryInterpolation.nearestNeighborPixelS(l.getClass());
+			upscale = (T)l.createNew(l.width, l.height);
 		} else {
-			upscale.reshape(l.width,l.height);
+			upscale.reshape(l.width, l.height);
 		}
 
 		int N = pyramid.getNumLayers();
 
-		for( int i = 0; i < N; i++ ) {
-			new FDistort(pyramid.getLayer(i),upscale).interpNN().scaleExt().apply();
-			BufferedImage b = ConvertBufferedImage.convertTo(upscale,null,true);
-			if( showScales )
-				addImage(b,String.format("%5.2f",pyramid.getScale(i)));
+		for (int i = 0; i < N; i++) {
+			new FDistort(pyramid.getLayer(i), upscale).interpNN().scaleExt().apply();
+			BufferedImage b = ConvertBufferedImage.convertTo(upscale, null, true);
+			if (showScales)
+				addImage(b, String.format("%5.2f", pyramid.getScale(i)));
 			else
-				addImage(b,String.format("%5.2f",pyramid.getSigma(i)));
+				addImage(b, String.format("%5.2f", pyramid.getSigma(i)));
 		}
 	}
 }

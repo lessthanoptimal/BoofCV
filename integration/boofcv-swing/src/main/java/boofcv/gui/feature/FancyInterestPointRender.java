@@ -137,6 +137,7 @@ public class FancyInterestPointRender {
 		circles.add(p);
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	public static class VString {
 		int x, y;
 		String value;

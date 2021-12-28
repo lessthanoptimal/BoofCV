@@ -22,7 +22,7 @@ import org.ddogleg.struct.FastAccess;
 
 /**
  * <p>
- * Generalized interface for associating features.  Finds matches for each feature in the source
+ * Generalized interface for associating features. Finds matches for each feature in the source
  * list to one in the destination list. There is only one match found for each member of source, but multiple
  * matches can be found for destination. If the best match has an error which is too high then a member of
  * source might not be matched.

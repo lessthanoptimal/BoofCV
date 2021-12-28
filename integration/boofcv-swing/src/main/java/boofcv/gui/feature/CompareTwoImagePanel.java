@@ -22,6 +22,7 @@ import georegression.geometry.UtilPoint2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.DogArray_I32;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -37,6 +38,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class CompareTwoImagePanel extends JPanel implements MouseListener, MouseMotionListener {
 
 	// how close a click needs to be to a point
@@ -60,7 +62,7 @@ public abstract class CompareTwoImagePanel extends JPanel implements MouseListen
 	protected double scaleLeft, scaleRight;
 
 	// where it first clicked when selecting a region
-	protected Point2D_I32 firstClick;
+	protected @Nullable Point2D_I32 firstClick;
 	// current position of the mouse while being dragged
 	protected Point2D_I32 mousePosition = new Point2D_I32();
 
@@ -237,7 +239,7 @@ public abstract class CompareTwoImagePanel extends JPanel implements MouseListen
 
 	@Override
 	public void mouseReleased( MouseEvent e ) {
-		if (!selectRegion) {
+		if (!selectRegion || firstClick == null) {
 			return;
 		}
 
@@ -246,10 +248,10 @@ public abstract class CompareTwoImagePanel extends JPanel implements MouseListen
 		int rightBeginX = leftEndX + borderSize;
 		selectedIsLeft = e.getX() < leftEndX;
 
-		int x0 = e.getX() < firstClick.x ? e.getX() : firstClick.x;
-		int x1 = e.getX() >= firstClick.x ? e.getX() : firstClick.x;
-		int y0 = e.getY() < firstClick.y ? e.getY() : firstClick.y;
-		int y1 = e.getY() >= firstClick.y ? e.getY() : firstClick.y;
+		int x0 = Math.min(e.getX(), firstClick.x);
+		int x1 = Math.max(e.getX(), firstClick.x);
+		int y0 = Math.min(e.getY(), firstClick.y);
+		int y1 = Math.max(e.getY(), firstClick.y);
 
 		double scale = selectedIsLeft ? scaleLeft : scaleRight;
 

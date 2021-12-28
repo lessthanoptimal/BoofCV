@@ -39,6 +39,7 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class AssociatedTriplePanel extends JPanel {
 
 	// lock for all the data structures below

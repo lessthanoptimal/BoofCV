@@ -98,7 +98,7 @@ public class EssentialNister5 {
 	 * Computes the essential matrix from point correspondences.
 	 *
 	 * @param points Input: List of points correspondences in normalized image coordinates
-	 * @param solutions Output: Storage for the found solutions.  .
+	 * @param solutions Output: Storage for the found solutions. .
 	 * @return true for success or false if a fault has been detected
 	 */
 	public boolean process( List<AssociatedPair> points , DogArray<DMatrixRMaj> solutions ) {

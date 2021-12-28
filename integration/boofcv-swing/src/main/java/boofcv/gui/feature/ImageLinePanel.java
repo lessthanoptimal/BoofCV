@@ -29,6 +29,7 @@ import java.awt.*;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Draws lines over an image. Used for displaying the output of line detection algorithms.
@@ -46,6 +47,7 @@ public class ImageLinePanel extends ImagePanel {
 	}
 
 	public synchronized void setLines( List<LineParametric2D_F32> lines ) {
+		Objects.requireNonNull(img);
 		this.lines.clear();
 		for (LineParametric2D_F32 p : lines) {
 			LineSegment2D_F32 s = LineImageOps.convert(p, img.getWidth(), img.getHeight());

@@ -36,6 +36,7 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class ConfusionMatrixPanel extends JPanel {
 	DMatrixRMaj temp = new DMatrixRMaj(1, 1);
 	DMatrixRMaj confusion = new DMatrixRMaj(1, 1);

@@ -31,8 +31,8 @@ import static boofcv.alg.distort.kanbra.KannalaBrandtUtils_F64.polytrig;
 //CUSTOM ignore KannalaBrandtUtils_F64
 
 /**
- * Forward projection model for {@link CameraKannalaBrandt}.  Takes a 3D point in camera unit sphere
- * coordinates and converts it into a distorted pixel coordinate.  There are no checks to see if
+ * Forward projection model for {@link CameraKannalaBrandt}. Takes a 3D point in camera unit sphere
+ * coordinates and converts it into a distorted pixel coordinate. There are no checks to see if
  * it is physically possible to perform the forward projection, e.g. point could be outside the FOV.
  *
  * @author Peter Abeles

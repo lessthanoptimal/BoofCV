@@ -42,7 +42,7 @@ public interface VideoProcessing {
 	 * Invoked by Android GUI thread. Should be run as fast as possible to avoid making the GUI feel sluggish.
 	 *
 	 * @param canvas Use this canvas to draw results onto. Already be adjusted for the display and camera
-	 * preview size.  .
+	 * preview size. .
 	 */
 	void onDraw( Canvas canvas );
 

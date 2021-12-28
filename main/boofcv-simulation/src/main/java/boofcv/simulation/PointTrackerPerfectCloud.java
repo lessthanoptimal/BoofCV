@@ -53,6 +53,7 @@ import java.util.Objects;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class PointTrackerPerfectCloud<T extends ImageBase<T>> implements PointTracker<T> {
 
 	// Points in the point cloud

@@ -21,14 +21,15 @@ package boofcv.gui.image;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.struct.image.GrayS32;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
+import java.util.Objects;
 import java.util.Random;
-
 
 /**
  * Displays labeled binary images. In these images each detected object is given a unique number. Each
@@ -36,17 +37,18 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class ImageBinaryLabeledPanel extends JPanel implements MouseListener {
 
 	// the image being displayed
-	protected BufferedImage img;
+	protected @Nullable BufferedImage img;
 	protected GrayS32 labelImage;
-	int colors[];
+	int[] colors;
 
-	public ImageBinaryLabeledPanel(GrayS32 labelImage, int maxValues , long randSeed ) {
+	public ImageBinaryLabeledPanel( GrayS32 labelImage, int maxValues, long randSeed ) {
 		this();
 		this.labelImage = labelImage;
-		img = new BufferedImage(labelImage.getWidth(), labelImage.getHeight(),BufferedImage.TYPE_INT_RGB);
+		img = new BufferedImage(labelImage.getWidth(), labelImage.getHeight(), BufferedImage.TYPE_INT_RGB);
 
 		setPreferredSize(new Dimension(labelImage.getWidth(), labelImage.getHeight()));
 		setMinimumSize(getPreferredSize());
@@ -54,7 +56,7 @@ public class ImageBinaryLabeledPanel extends JPanel implements MouseListener {
 
 		Random rand = new Random(randSeed);
 
-		colors = BinaryImageOps.selectRandomColors(maxValues,rand);
+		colors = BinaryImageOps.selectRandomColors(maxValues, rand);
 		VisualizeBinaryData.renderLabeled(labelImage, colors, img);
 	}
 
@@ -63,45 +65,45 @@ public class ImageBinaryLabeledPanel extends JPanel implements MouseListener {
 	}
 
 	@Override
-	public void paintComponent(Graphics g) {
+	public void paintComponent( Graphics g ) {
 		//draw the image
 		if (img != null)
 			g.drawImage(img, 0, 0, this);
 	}
 
-	public void setImage(GrayS32 binaryImage) {
+	public void setImage( GrayS32 binaryImage ) {
 		this.labelImage = binaryImage;
 	}
 
 	public BufferedImage getImage() {
-		return img;
+		return Objects.requireNonNull(img);
 	}
 
 	@Override
-	public void mouseClicked(MouseEvent e) {
-		if( labelImage.isInBounds(e.getX(),e.getY()) ) {
-			int val = labelImage.get(e.getX(),e.getY());
-			System.out.println("Label at ("+e.getX()+","+e.getY()+") = "+val);
+	public void mouseClicked( MouseEvent e ) {
+		if (labelImage.isInBounds(e.getX(), e.getY())) {
+			int val = labelImage.get(e.getX(), e.getY());
+			System.out.println("Label at (" + e.getX() + "," + e.getY() + ") = " + val);
 		}
 	}
 
 	@Override
-	public void mousePressed(MouseEvent e) {
+	public void mousePressed( MouseEvent e ) {
 		//To change body of implemented methods use File | Settings | File Templates.
 	}
 
 	@Override
-	public void mouseReleased(MouseEvent e) {
+	public void mouseReleased( MouseEvent e ) {
 		//To change body of implemented methods use File | Settings | File Templates.
 	}
 
 	@Override
-	public void mouseEntered(MouseEvent e) {
+	public void mouseEntered( MouseEvent e ) {
 		//To change body of implemented methods use File | Settings | File Templates.
 	}
 
 	@Override
-	public void mouseExited(MouseEvent e) {
+	public void mouseExited( MouseEvent e ) {
 		//To change body of implemented methods use File | Settings | File Templates.
 	}
 }

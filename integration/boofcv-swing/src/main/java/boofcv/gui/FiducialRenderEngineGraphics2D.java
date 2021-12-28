@@ -34,6 +34,7 @@ import java.awt.image.BufferedImage;
 /**
  * Implementation of {@link boofcv.alg.drawing.FiducialRenderEngine} for a {@link java.awt.image.BufferedImage}.
  */
+@SuppressWarnings({"NullAway.Init"})
 public class FiducialRenderEngineGraphics2D extends FiducialRenderEngine {
 	@Getter protected BufferedImage image = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
 	protected Graphics2D g2;

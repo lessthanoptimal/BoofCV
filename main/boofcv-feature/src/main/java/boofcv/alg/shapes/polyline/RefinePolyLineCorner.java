@@ -31,7 +31,7 @@ import java.util.List;
 /**
  * <p>
  * Optimizing corner placements to a pixel level when given a contour and integer list of approximate
- * corner locations which define set of line segments.   Corners are optimized by searching for another near by
+ * corner locations which define set of line segments.  Corners are optimized by searching for another near by
  * pixel in the provided contour which reduces the distance of the contour from the line segments. This
  * is intended to optimize the output from {@link SplitMergeLineFit}. Can be configured to
  * handle case where line segments form a loop or have disconnected end points.

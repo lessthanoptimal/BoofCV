@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,10 +30,10 @@ import java.awt.event.MouseWheelListener;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class ViewedImageInfoPanel extends StandardAlgConfigPanel
-		implements ChangeListener, MouseWheelListener
-{
-	double zoomMin,zoomMax,zoomInc;
+		implements ChangeListener, MouseWheelListener {
+	double zoomMin, zoomMax, zoomInc;
 
 	protected JLabel processingTimeLabel = new JLabel();
 
@@ -47,13 +47,13 @@ public class ViewedImageInfoPanel extends StandardAlgConfigPanel
 
 	Listener listener;
 
-	double zoom=1;
+	double zoom = 1;
 
 	public ViewedImageInfoPanel() {
-		this(BoofSwingUtil.MIN_ZOOM,BoofSwingUtil.MAX_ZOOM,0.5,true);
+		this(BoofSwingUtil.MIN_ZOOM, BoofSwingUtil.MAX_ZOOM, 0.5, true);
 	}
 
-	public ViewedImageInfoPanel(double zoomMin , double zoomMax, double zoomInc , boolean showClick ) {
+	public ViewedImageInfoPanel( double zoomMin, double zoomMax, double zoomInc, boolean showClick ) {
 
 		this.zoomMin = zoomMin;
 		this.zoomMax = zoomMax;
@@ -72,25 +72,25 @@ public class ViewedImageInfoPanel extends StandardAlgConfigPanel
 		selectZoom.addChangeListener(this);
 		selectZoom.setMaximumSize(selectZoom.getPreferredSize());
 
-		addLabeled(textImageSize,"Input Shape");
-		addLabeled(processingTimeLabel,"Time (ms)");
-		if( showClick ) {
+		addLabeled(textImageSize, "Input Shape");
+		addLabeled(processingTimeLabel, "Time (ms)");
+		if (showClick) {
 			addLabeled(textCursorX, "Click X");
 			addLabeled(textCursorY, "Click Y");
 		}
-		addLabeled(selectZoom,"Zoom");
+		addLabeled(selectZoom, "Zoom");
 	}
 
-	public void setImageSize( int width , int height ) {
-		textImageSize.setText(String.format("%d x %d",width,height));
+	public void setImageSize( int width, int height ) {
+		textImageSize.setText(String.format("%d x %d", width, height));
 	}
 
-	public void setCursor( double x , double y ) {
+	public void setCursor( double x, double y ) {
 		textCursorX.setText(String.format("%5.3f", x));
 		textCursorY.setText(String.format("%5.3f", y));
 	}
 
-	public void setListener(Listener listener) {
+	public void setListener( Listener listener ) {
 		this.listener = listener;
 	}
 
@@ -99,10 +99,10 @@ public class ViewedImageInfoPanel extends StandardAlgConfigPanel
 	}
 
 	@Override
-	public void stateChanged(ChangeEvent e) {
-		if( selectZoom == e.getSource() ) {
+	public void stateChanged( ChangeEvent e ) {
+		if (selectZoom == e.getSource()) {
 			zoom = ((Number)selectZoom.getValue()).doubleValue();
-			if( listener != null )
+			if (listener != null)
 				listener.zoomChanged(zoom);
 		} else {
 			super.stateChanged(e);
@@ -110,31 +110,31 @@ public class ViewedImageInfoPanel extends StandardAlgConfigPanel
 	}
 
 	@Override
-	public void mouseWheelMoved(MouseWheelEvent e) {
-		setScale(BoofSwingUtil.mouseWheelImageZoom(zoom,e));
+	public void mouseWheelMoved( MouseWheelEvent e ) {
+		setScale(BoofSwingUtil.mouseWheelImageZoom(zoom, e));
 	}
 
-	public void setScale(double scale) {
+	public void setScale( double scale ) {
 		BoofSwingUtil.checkGuiThread();
-		if( ((Number)selectZoom.getValue()).doubleValue() == scale )
+		if (((Number)selectZoom.getValue()).doubleValue() == scale)
 			return;
 
 		double curr = scale;
 
-		if( curr < zoomMin ) curr = zoomMin;
-		if( curr > zoomMax) curr = zoomMax;
+		if (curr < zoomMin) curr = zoomMin;
+		if (curr > zoomMax) curr = zoomMax;
 
 		selectZoom.setValue(curr);
 	}
 
 	public void setProcessingTimeS( double seconds ) {
 		BoofSwingUtil.checkGuiThread();
-		processingTimeLabel.setText(String.format("%7.1f",(seconds*1000)));
+		processingTimeLabel.setText(String.format("%7.1f", (seconds*1000)));
 	}
 
-	public void setProcessingTimeMS(double ms ) {
+	public void setProcessingTimeMS( double ms ) {
 		BoofSwingUtil.checkGuiThread();
-		processingTimeLabel.setText(String.format("%7.1f",ms));
+		processingTimeLabel.setText(String.format("%7.1f", ms));
 	}
 
 	public interface Listener {

@@ -24,6 +24,7 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.PyramidFloat;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -33,19 +34,21 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Panel for visualizing points inside a pyramidal scale space.
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class ScaleSpacePyramidPointPanel extends JPanel implements MouseListener {
 
 	private PyramidFloat ss;
 	BufferedImage background;
 	List<ScalePoint> points = new ArrayList<>();
 	List<ScalePoint> unused = new ArrayList<>();
-	BufferedImage levelImage;
+	@Nullable BufferedImage levelImage;
 	List<ScalePoint> levelPoints = new ArrayList<>();
 
 	int activeLevel = 0;
@@ -132,6 +135,7 @@ public class ScaleSpacePyramidPointPanel extends JPanel implements MouseListener
 		if (activeLevel == 0)
 			showAll(g);
 		else {
+			Objects.requireNonNull(levelImage);
 			g.drawImage(levelImage, 0, 0, levelImage.getWidth(), levelImage.getHeight(), null);
 			VisualizeFeatures.drawScalePoints((Graphics2D)g, levelPoints, scaleToRadius);
 		}

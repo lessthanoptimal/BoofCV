@@ -40,6 +40,7 @@ import java.awt.*;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class ControlPanelDdaTracker extends ControlPanelDetDescAssocBase {
 
 	private final JPanel controlPanel = new JPanel(new BorderLayout());

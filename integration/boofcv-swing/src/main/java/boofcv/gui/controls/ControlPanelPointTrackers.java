@@ -25,15 +25,18 @@ import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Objects;
 
 /**
  * Control panel for selecting any {@link boofcv.abst.tracker.PointTracker}
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class ControlPanelPointTrackers extends StandardAlgConfigPanel {
 	ConfigPointTracker.TrackerType selectedFamily = ConfigPointTracker.TrackerType.KLT;
 
@@ -45,7 +48,7 @@ public class ControlPanelPointTrackers extends StandardAlgConfigPanel {
 	ControlPanelHybridTracker controlHybrid;
 
 	// The previously set component in mainPanel
-	JComponent previous;
+	@Nullable JComponent previous;
 
 	Listener listener;
 
@@ -71,8 +74,7 @@ public class ControlPanelPointTrackers extends StandardAlgConfigPanel {
 
 		cFamily = combo(selectedFamily.ordinal(), (Object[])ConfigPointTracker.TrackerType.values());
 		ConfigPointTracker.TrackerType selected = selectedFamily;
-		selectedFamily = null; // so that it will update
-		changeFamily(selected);
+		changeFamily(selected, true);
 
 		addLabeled(cFamily, "Family", "Which high level point tracker type");
 		add(mainPanel);
@@ -87,7 +89,7 @@ public class ControlPanelPointTrackers extends StandardAlgConfigPanel {
 			case KLT -> {
 				config.klt.setTo(controlKlt.configKlt);
 				config.detDesc.typeDetector = ConfigDetectInterestPoint.Type.POINT;
-				config.detDesc.detectPoint.setTo(controlKlt.configDetect);
+				config.detDesc.detectPoint.setTo(Objects.requireNonNull(controlKlt.configDetect));
 			}
 			case DDA -> {
 				config.dda.setTo(controlDda.configDDA);
@@ -105,8 +107,8 @@ public class ControlPanelPointTrackers extends StandardAlgConfigPanel {
 		return FactoryPointTracker.tracker(createConfiguration(), imageType.getImageClass(), null);
 	}
 
-	private void changeFamily( ConfigPointTracker.TrackerType which ) {
-		if (which == selectedFamily)
+	private void changeFamily( ConfigPointTracker.TrackerType which, boolean forced ) {
+		if (!forced && which == selectedFamily)
 			return;
 		if (previous != null)
 			mainPanel.remove(previous);
@@ -125,7 +127,7 @@ public class ControlPanelPointTrackers extends StandardAlgConfigPanel {
 	@Override
 	public void controlChanged( final Object source ) {
 		if (source == cFamily) {
-			changeFamily(ConfigPointTracker.TrackerType.values()[cFamily.getSelectedIndex()]);
+			changeFamily(ConfigPointTracker.TrackerType.values()[cFamily.getSelectedIndex()], false);
 		}
 		listener.changePointTracker();
 	}

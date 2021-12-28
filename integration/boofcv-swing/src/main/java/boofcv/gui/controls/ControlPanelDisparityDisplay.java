@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,16 +36,16 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class ControlPanelDisparityDisplay extends StandardAlgConfigPanel
-		implements ChangeListener, ActionListener
-{
+		implements ChangeListener, ActionListener {
 	// which image to show
 	public int selectedView;
 
 	public double zoom = 1;
 
-	public boolean concurrent=true;
-	public boolean recompute=true;
+	public boolean concurrent = true;
+	public boolean recompute = true;
 
 	// scale factor for input images
 	public int inputScale = 100;
@@ -57,38 +57,38 @@ public class ControlPanelDisparityDisplay extends StandardAlgConfigPanel
 	protected JLabel imageSizeLabel = new JLabel();
 
 	// For zooming in and out of images
-	protected JSpinner selectZoom = spinner(1,MIN_ZOOM,MAX_ZOOM,0.1);
+	protected JSpinner selectZoom = spinner(1, MIN_ZOOM, MAX_ZOOM, 0.1);
 
 	// how much the input should be scaled down by
-	JSpinner inputScaleSpinner = spinner(inputScale,5,100,10);
+	JSpinner inputScaleSpinner = spinner(inputScale, 5, 100, 10);
 	// selects which image to view
-	JComboBox viewSelector = combo(selectedView,"Disparity","Left","Right","View 3D");
+	JComboBox viewSelector = combo(selectedView, "Disparity", "Left", "Right", "View 3D");
 
 	public ControlCustomCloud controlCloud = new ControlCustomCloud();
 
-	JCheckBox checkRecompute  = checkbox("Recompute",recompute);
-	JCheckBox checkConcurrent = checkbox("concurrent",concurrent);
+	JCheckBox checkRecompute = checkbox("Recompute", recompute);
+	JCheckBox checkConcurrent = checkbox("concurrent", concurrent);
 
 	public ControlPanelDisparityDense controlDisparity;
 
 	// listener for changes in states
 	Listener listener;
 
-	public ControlPanelDisparityDisplay(int disparityMin , int disparityRange, Class imageType ) {
-		controlDisparity = ControlPanelDisparityDense.createRange(disparityMin,disparityRange,imageType);
-		controlDisparity.setListener(()->listener.algorithmChanged());
+	public ControlPanelDisparityDisplay( int disparityMin, int disparityRange, Class imageType ) {
+		controlDisparity = ControlPanelDisparityDense.createRange(disparityMin, disparityRange, imageType);
+		controlDisparity.setListener(() -> listener.algorithmChanged());
 
 		// Slim it down a little bit
 		controlCloud.setBorder(BorderFactory.createEmptyBorder());
-		controlCloud.setCallbackModified(()->listener.changeView3D());
-		controlCloud.setCallbackBackground(()->listener.changeBackgroundColor());
+		controlCloud.setCallbackModified(() -> listener.changeView3D());
+		controlCloud.setCallbackBackground(() -> listener.changeBackgroundColor());
 
 		controlCloud.handleViewChange();
 
 		addLabeled(processingTimeLabel, "Time (ms)");
-		addLabeled(imageSizeLabel,"Image Size");
+		addLabeled(imageSizeLabel, "Image Size");
 		addLabeled(viewSelector, "View");
-		addLabeled(selectZoom,"Zoom");
+		addLabeled(selectZoom, "Zoom");
 		add(controlCloud);
 		add(controlDisparity);
 		addLabeled(inputScaleSpinner, "Scale Input");
@@ -96,7 +96,7 @@ public class ControlPanelDisparityDisplay extends StandardAlgConfigPanel
 		addAlignLeft(checkConcurrent);
 		addVerticalGlue();
 
-		setPreferredSize(new Dimension(200,0));
+		setPreferredSize(new Dimension(200, 0));
 	}
 
 	/**
@@ -104,8 +104,8 @@ public class ControlPanelDisparityDisplay extends StandardAlgConfigPanel
 	 */
 	public void enableAlgControls( boolean enable ) {
 		BoofSwingUtil.checkGuiThread();
-		BoofSwingUtil.recursiveEnable(controlDisparity,enable);
-		if( enable )
+		BoofSwingUtil.recursiveEnable(controlDisparity, enable);
+		if (enable)
 			controlDisparity.updateControlEnabled();
 		inputScaleSpinner.setEnabled(enable);
 		checkRecompute.setEnabled(enable);
@@ -113,9 +113,9 @@ public class ControlPanelDisparityDisplay extends StandardAlgConfigPanel
 	}
 
 	public void setZoom( double _zoom ) {
-		_zoom = Math.max(MIN_ZOOM,_zoom);
-		_zoom = Math.min(MAX_ZOOM,_zoom);
-		if( _zoom == zoom )
+		_zoom = Math.max(MIN_ZOOM, _zoom);
+		_zoom = Math.min(MAX_ZOOM, _zoom);
+		if (_zoom == zoom)
 			return;
 		zoom = _zoom;
 
@@ -123,15 +123,15 @@ public class ControlPanelDisparityDisplay extends StandardAlgConfigPanel
 	}
 
 	@Override
-	public void stateChanged(ChangeEvent e) {
-		if( listener == null )
+	public void stateChanged( ChangeEvent e ) {
+		if (listener == null)
 			return;
 
-		if( e.getSource() == inputScaleSpinner) {
-			inputScale = ((Number) inputScaleSpinner.getValue()).intValue();
+		if (e.getSource() == inputScaleSpinner) {
+			inputScale = ((Number)inputScaleSpinner.getValue()).intValue();
 			listener.changeInputScale();
-		} else if( e.getSource() == selectZoom ) {
-			zoom = ((Number) selectZoom.getValue()).doubleValue();
+		} else if (e.getSource() == selectZoom) {
+			zoom = ((Number)selectZoom.getValue()).doubleValue();
 			listener.changeZoom();
 		} else {
 			throw new RuntimeException("Egads");
@@ -139,55 +139,55 @@ public class ControlPanelDisparityDisplay extends StandardAlgConfigPanel
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		if( listener == null )
+	public void actionPerformed( ActionEvent e ) {
+		if (listener == null)
 			return;
 
-		if( e.getSource() == viewSelector ) {
+		if (e.getSource() == viewSelector) {
 			selectedView = viewSelector.getSelectedIndex();
 			controlCloud.handleViewChange();
 			listener.disparityGuiChange();
-		} else if( e.getSource() == checkRecompute ) {
+		} else if (e.getSource() == checkRecompute) {
 			recompute = checkRecompute.isSelected();
 			listener.recompute();
-		} else if( e.getSource() == checkConcurrent ) {
+		} else if (e.getSource() == checkConcurrent) {
 			concurrent = checkConcurrent.isSelected();
 			listener.recompute();
 		}
 	}
 
-	public void setImageSize( final int width , final int height ) {
-		BoofSwingUtil.invokeNowOrLater(() -> imageSizeLabel.setText(width+" x "+height));
+	public void setImageSize( final int width, final int height ) {
+		BoofSwingUtil.invokeNowOrLater(() -> imageSizeLabel.setText(width + " x " + height));
 	}
 
-	public void setProcessingTimeMS(double ms ) {
+	public void setProcessingTimeMS( double ms ) {
 		BoofSwingUtil.checkGuiThread();
-		processingTimeLabel.setText(String.format("%7.1f",ms));
+		processingTimeLabel.setText(String.format("%7.1f", ms));
 	}
 
-	public void setListener(Listener listener ) {
+	public void setListener( Listener listener ) {
 		this.listener = listener;
 	}
 
 	public class ControlCustomCloud extends ControlPanelPointCloud {
 
-		private void handleViewChange(){
+		private void handleViewChange() {
 			setColorButtonColor(getActiveBackgroundColor());
 			// disable controls which can't be used
-			boolean view3D = selectedView==3;
+			boolean view3D = selectedView == 3;
 			comboColorizer.setEnabled(view3D);
 			sliderOffsetColor.setEnabled(view3D);
 			sliderPeriodColor.setEnabled(view3D);
 			sliderSpeed3D.setEnabled(view3D);
 			// Color is useful for disparity and 3D
-			bColorBackGround.setEnabled(selectedView==0||selectedView==3);
+			bColorBackGround.setEnabled(selectedView == 0 || selectedView == 3);
 		}
 
 		@Override
 		public int getActiveBackgroundColor() {
-			if( selectedView == 0 ) {
+			if (selectedView == 0) {
 				return backgroundColorDisparity;
-			} else if( selectedView == 3 ) {
+			} else if (selectedView == 3) {
 				return backgroundColor3D;
 			} else {
 				return bColorBackGround.getBackground().getRGB();
@@ -195,10 +195,10 @@ public class ControlPanelDisparityDisplay extends StandardAlgConfigPanel
 		}
 
 		@Override
-		public void setColorButtonColor(int colorRGB) {
-			if( selectedView == 0 ) {
+		public void setColorButtonColor( int colorRGB ) {
+			if (selectedView == 0) {
 				backgroundColorDisparity = colorRGB;
-			} else if( selectedView == 3 ) {
+			} else if (selectedView == 3) {
 				backgroundColor3D = colorRGB;
 			} else {
 				return;
@@ -207,8 +207,7 @@ public class ControlPanelDisparityDisplay extends StandardAlgConfigPanel
 		}
 	}
 
-	public interface Listener
-	{
+	public interface Listener {
 		void algorithmChanged();
 		void recompute();
 		void disparityGuiChange();

@@ -18,6 +18,8 @@
 
 package boofcv.gui;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -36,6 +38,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class JavaRuntimeLauncher {
 
 	String classPath;
@@ -63,7 +66,7 @@ public class JavaRuntimeLauncher {
 	 *
 	 * @param pathJars List of paths to all the jars
 	 */
-	public JavaRuntimeLauncher( List<String> pathJars ) {
+	public JavaRuntimeLauncher( @Nullable List<String> pathJars ) {
 
 		String sep = System.getProperty("path.separator");
 

@@ -34,8 +34,8 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class RenderCalibrationTargetsGraphics2D extends RenderCalibrationTargets {
-
 	int padding;
 	double unitsToPixels;
 

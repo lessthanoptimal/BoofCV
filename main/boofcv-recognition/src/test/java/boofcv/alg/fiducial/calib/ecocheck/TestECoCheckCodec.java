@@ -53,7 +53,7 @@ public class TestECoCheckCodec extends BoofStandardJUnit {
 		assertEquals(6, alg.gridBitLength);
 
 		// Try a larger constellation
-		// marker = 10bits, cell = 16 bits.  5-words to encode the message
+		// marker = 10bits, cell = 16 bits. 5-words to encode the message
 		alg.configure(1020, 30000);
 		assertEquals(10, alg.markerBitCount);
 		assertEquals(15, alg.cellBitCount);

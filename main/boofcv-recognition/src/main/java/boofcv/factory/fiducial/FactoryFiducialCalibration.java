@@ -47,7 +47,7 @@ public class FactoryFiducialCalibration {
 	}
 
 	/**
-	 * Detector for a grid of square targets.  All squares must be entirely visible inside the image.
+	 * Detector for a grid of square targets. All squares must be entirely visible inside the image.
 	 *
 	 * @param config Configuration for chessboard detector
 	 * @return Square grid target detector.

@@ -30,7 +30,7 @@ import java.util.List;
  * <p>
  * Given a grid of detected line segments connect line segments together if they appear to be
  * apart of the same line. First lines inside the same segment are considered and connected together
- * then lines in neighboring segments are linked together.  Connectivity rules are inspired by [1] with
+ * then lines in neighboring segments are linked together. Connectivity rules are inspired by [1] with
  * a couple of departures and optimizations.
  * </p>
  *

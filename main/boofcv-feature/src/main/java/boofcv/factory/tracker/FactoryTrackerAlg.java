@@ -100,7 +100,7 @@ public class FactoryTrackerAlg {
 	 * @param detector Feature detector and describer.
 	 * @param associate Association algorithm.
 	 * @param kltConfig Configuration for KLT
-	 * @param imageType Input image type.   @return Feature tracker
+	 * @param imageType Input image type.  @return Feature tracker
 	 * @see HybridTrackerScalePoint
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>, Desc extends TupleDesc<Desc>>

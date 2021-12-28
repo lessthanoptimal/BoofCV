@@ -93,7 +93,7 @@ public class SegmentMeanShift<T extends ImageBase<T>>
 	}
 
 	/**
-	 * Performs mean-shift segmentation on the input image.  The
+	 * Performs mean-shift segmentation on the input image. The
 	 * total number of regions can be found by calling {@link #getNumberOfRegions()}.
 	 *
 	 * @param image Image

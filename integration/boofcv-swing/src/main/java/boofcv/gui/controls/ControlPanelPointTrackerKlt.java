@@ -26,6 +26,7 @@ import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.feature.ControlPanelPointDetector;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
@@ -34,9 +35,10 @@ import javax.swing.*;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class ControlPanelPointTrackerKlt extends StandardAlgConfigPanel {
 	public ConfigPKlt configKlt;
-	public ConfigPointDetector configDetect ;
+	public @Nullable ConfigPointDetector configDetect ;
 
 	private final Listener listener;
 
@@ -47,13 +49,13 @@ public class ControlPanelPointTrackerKlt extends StandardAlgConfigPanel {
 	private final JSpinner spinnerMaxError;
 	private final JSpinner spinnerDescRadius;
 	private final JSpinner spinnerForwardsBackwards;
-	public final ControlPanelPointDetector controlDetector;
+	public final @Nullable ControlPanelPointDetector controlDetector;
 
 	public ControlPanelPointTrackerKlt(Listener listener) {
 		this(listener,new ConfigPointDetector(),ConfigPKlt.levels(4));
 	}
 
-	public ControlPanelPointTrackerKlt(Listener listener, ConfigPointDetector configDetect, ConfigPKlt configKlt ) {
+	public ControlPanelPointTrackerKlt(Listener listener, @Nullable ConfigPointDetector configDetect, ConfigPKlt configKlt ) {
 		this.listener = listener;
 		this.configDetect = configDetect;
 		this.configKlt = configKlt;
@@ -68,7 +70,7 @@ public class ControlPanelPointTrackerKlt extends StandardAlgConfigPanel {
 		spinnerDescRadius = spinner(this.configKlt.templateRadius,1,100,1);
 		spinnerForwardsBackwards = spinner(this.configKlt.toleranceFB,-1,100.0,1.0);
 		if( configDetect != null ) {
-			controlDetector = new ControlPanelPointDetector(this.configDetect, listener::changedPointTrackerKlt);
+			controlDetector = new ControlPanelPointDetector(configDetect, listener::changedPointTrackerKlt);
 			controlDetector.setBorder(BorderFactory.createTitledBorder("Detect"));
 			// KLT controls the maximum number of detected features so disable that option
 			controlDetector.getControlGeneralCorner().getSpinnerMaxFeatures().setEnabled(false);

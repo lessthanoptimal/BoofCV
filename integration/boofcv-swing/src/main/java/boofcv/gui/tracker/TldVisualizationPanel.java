@@ -36,6 +36,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class TldVisualizationPanel extends JPanel implements MouseListener {
 
 	BufferedImage frame;
