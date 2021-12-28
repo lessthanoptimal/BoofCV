@@ -105,11 +105,11 @@ public class ExampleSegmentSuperpixels {
 	}
 
 	public static void main( String[] args ) {
-		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("segment/berkeley_horses.jpg"));
-//		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("segment/berkeley_kangaroo.jpg"));
-//		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("segment/berkeley_man.jpg"));
-//		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("segment/mountain_pines_people.jpg"));
-//		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("particles01.jpg"));
+		BufferedImage image = UtilImageIO.loadImageNotNull(UtilIO.pathExample("segment/berkeley_horses.jpg"));
+//		BufferedImage image = UtilImageIO.loadImageNotNull(UtilIO.pathExample("segment/berkeley_kangaroo.jpg"));
+//		BufferedImage image = UtilImageIO.loadImageNotNull(UtilIO.pathExample("segment/berkeley_man.jpg"));
+//		BufferedImage image = UtilImageIO.loadImageNotNull(UtilIO.pathExample("segment/mountain_pines_people.jpg"));
+//		BufferedImage image = UtilImageIO.loadImageNotNull(UtilIO.pathExample("particles01.jpg"));
 
 		// you probably don't want to segment along the image's alpha channel and the code below assumes 3 channels
 		image = ConvertBufferedImage.stripAlphaChannel(image);

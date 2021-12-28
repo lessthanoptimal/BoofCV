@@ -117,8 +117,8 @@ public class ExampleCalibrateStereo {
 		Collections.sort(right);
 
 		for (int i = 0; i < left.size(); i++) {
-			BufferedImage l = UtilImageIO.loadImage(left.get(i));
-			BufferedImage r = UtilImageIO.loadImage(right.get(i));
+			BufferedImage l = UtilImageIO.loadImageNotNull(left.get(i));
+			BufferedImage r = UtilImageIO.loadImageNotNull(right.get(i));
 
 			GrayF32 imageLeft = ConvertBufferedImage.convertFrom(l, (GrayF32)null);
 			GrayF32 imageRight = ConvertBufferedImage.convertFrom(r, (GrayF32)null);

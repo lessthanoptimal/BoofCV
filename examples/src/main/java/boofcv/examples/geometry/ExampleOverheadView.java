@@ -43,7 +43,7 @@ import java.awt.image.BufferedImage;
  */
 public class ExampleOverheadView {
 	public static void main( String[] args ) {
-		BufferedImage input = UtilImageIO.loadImage(UtilIO.pathExample("road/left01.png"));
+		BufferedImage input = UtilImageIO.loadImageNotNull(UtilIO.pathExample("road/left01.png"));
 
 		Planar<GrayU8> imageRGB = ConvertBufferedImage.convertFromPlanar(input, null, true, GrayU8.class);
 

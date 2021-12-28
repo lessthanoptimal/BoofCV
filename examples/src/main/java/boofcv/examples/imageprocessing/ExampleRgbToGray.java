@@ -42,7 +42,7 @@ import java.awt.image.BufferedImage;
 public class ExampleRgbToGray {
 	public static void main( String[] args ) {
 		// load the image and convert it into a BoofCV data type
-		BufferedImage buffered = UtilImageIO.loadImage(UtilIO.pathExample("segment/berkeley_man.jpg"));
+		BufferedImage buffered = UtilImageIO.loadImageNotNull(UtilIO.pathExample("segment/berkeley_man.jpg"));
 		Planar<GrayU8> color = ConvertBufferedImage.convertFrom(buffered, true, ImageType.pl(3, GrayU8.class));
 
 		// Declare storage space for converted gray scale images

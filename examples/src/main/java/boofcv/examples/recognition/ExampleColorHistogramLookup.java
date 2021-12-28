@@ -74,8 +74,7 @@ public class ExampleColorHistogramLookup {
 		Planar<GrayF32> hsv = new Planar<>(GrayF32.class, 1, 1, 3);
 
 		for (String path : images) {
-			BufferedImage buffered = UtilImageIO.loadImage(path);
-			if (buffered == null) throw new RuntimeException("Can't load image!");
+			BufferedImage buffered = UtilImageIO.loadImageNotNull(path);
 
 			rgb.reshape(buffered.getWidth(), buffered.getHeight());
 			hsv.reshape(buffered.getWidth(), buffered.getHeight());
@@ -120,8 +119,7 @@ public class ExampleColorHistogramLookup {
 		Planar<GrayF32> hsv = new Planar<>(GrayF32.class, 1, 1, 3);
 
 		for (File f : images) {
-			BufferedImage buffered = UtilImageIO.loadImage(f.getPath());
-			if (buffered == null) throw new RuntimeException("Can't load image!");
+			BufferedImage buffered = UtilImageIO.loadImageNotNull(f.getPath());
 
 			rgb.reshape(buffered.getWidth(), buffered.getHeight());
 			hsv.reshape(buffered.getWidth(), buffered.getHeight());
@@ -152,8 +150,7 @@ public class ExampleColorHistogramLookup {
 		Planar<GrayF32> rgb = new Planar<>(GrayF32.class, 1, 1, 3);
 
 		for (File f : images) {
-			BufferedImage buffered = UtilImageIO.loadImage(f.getPath());
-			if (buffered == null) throw new RuntimeException("Can't load image!");
+			BufferedImage buffered = UtilImageIO.loadImageNotNull(f.getPath());
 
 			rgb.reshape(buffered.getWidth(), buffered.getHeight());
 			ConvertBufferedImage.convertFrom(buffered, rgb, true);
@@ -183,8 +180,7 @@ public class ExampleColorHistogramLookup {
 
 		GrayU8 gray = new GrayU8(1, 1);
 		for (File f : images) {
-			BufferedImage buffered = UtilImageIO.loadImage(f.getPath());
-			if (buffered == null) throw new RuntimeException("Can't load image!");
+			BufferedImage buffered = UtilImageIO.loadImageNotNull(f.getPath());
 
 			gray.reshape(buffered.getWidth(), buffered.getHeight());
 			ConvertBufferedImage.convertFrom(buffered, gray, true);
@@ -233,18 +229,11 @@ public class ExampleColorHistogramLookup {
 		ListDisplayPanel gui = new ListDisplayPanel();
 
 		// Add the target which the other images are being matched against
-		gui.addImage(UtilImageIO.loadImage(images.get(target)), "Target", ScaleOptions.ALL);
+		gui.addImage(UtilImageIO.loadImageNotNull(images.get(target)), "Target", ScaleOptions.ALL);
 
 		// The results will be the 10 best matches, but their order can be arbitrary. For display purposes
 		// it's better to do it from best fit to worst fit
-		Collections.sort(results.toList(), (Comparator<NnData>)( o1, o2 ) -> {
-			if (o1.distance < o2.distance)
-				return -1;
-			else if (o1.distance > o2.distance)
-				return 1;
-			else
-				return 0;
-		});
+		Collections.sort(results.toList(), Comparator.comparingDouble(( NnData o ) -> o.distance));
 
 		// Add images to GUI -- first match is always the target image, so skip it
 		for (int i = 1; i < results.size; i++) {

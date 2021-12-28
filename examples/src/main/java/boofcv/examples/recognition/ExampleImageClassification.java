@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -62,9 +62,7 @@ public class ExampleImageClassification {
 
 		for (String path : images) {
 			File f = new File(path);
-			BufferedImage buffered = UtilImageIO.loadImage(path);
-			if (buffered == null)
-				throw new RuntimeException("Couldn't find input image");
+			BufferedImage buffered = UtilImageIO.loadImageNotNull(path);
 
 			Planar<GrayF32> image = new Planar<>(GrayF32.class, buffered.getWidth(), buffered.getHeight(), 3);
 			ConvertBufferedImage.convertFromPlanar(buffered, image, true, GrayF32.class);

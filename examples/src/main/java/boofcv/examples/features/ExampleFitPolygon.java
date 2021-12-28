@@ -63,40 +63,40 @@ public class ExampleFitPolygon {
 	/**
 	 * Fits polygons to found contours around binary blobs.
 	 */
-	public static void fitBinaryImage(GrayF32 input) {
+	public static void fitBinaryImage( GrayF32 input ) {
 
-		GrayU8 binary = new GrayU8(input.width,input.height);
-		BufferedImage polygon = new BufferedImage(input.width,input.height,BufferedImage.TYPE_INT_RGB);
+		GrayU8 binary = new GrayU8(input.width, input.height);
+		BufferedImage polygon = new BufferedImage(input.width, input.height, BufferedImage.TYPE_INT_RGB);
 
 		// the mean pixel value is often a reasonable threshold when creating a binary image
 		double mean = ImageStatistics.mean(input);
 
 		// create a binary image by thresholding
-		ThresholdImageOps.threshold(input, binary, (float) mean, true);
+		ThresholdImageOps.threshold(input, binary, (float)mean, true);
 
 		// reduce noise with some filtering
 		GrayU8 filtered = BinaryImageOps.erode8(binary, 1, null);
 		filtered = BinaryImageOps.dilate8(filtered, 1, null);
 
 		// Find internal and external contour around each shape
-		List<Contour> contours = BinaryImageOps.contour(filtered, ConnectRule.EIGHT,null);
+		List<Contour> contours = BinaryImageOps.contour(filtered, ConnectRule.EIGHT, null);
 
 		// Fit a polygon to each shape and draw the results
 		Graphics2D g2 = polygon.createGraphics();
 		g2.setStroke(new BasicStroke(2));
 
-		for( Contour c : contours ) {
+		for (Contour c : contours) {
 			// Fit the polygon to the found external contour. Note loop = true
-			List<PointIndex_I32> vertexes = ShapeFittingOps.fitPolygon(c.external,true, minSide,cornerPenalty);
+			List<PointIndex_I32> vertexes = ShapeFittingOps.fitPolygon(c.external, true, minSide, cornerPenalty);
 
 			g2.setColor(Color.RED);
-			VisualizeShapes.drawPolygon(vertexes,true,g2);
+			VisualizeShapes.drawPolygon(vertexes, true, g2);
 
 			// handle internal contours now
 			g2.setColor(Color.BLUE);
-			for( List<Point2D_I32> internal : c.internal ) {
-				vertexes = ShapeFittingOps.fitPolygon(internal,true, minSide,cornerPenalty);
-				VisualizeShapes.drawPolygon(vertexes,true,g2);
+			for (List<Point2D_I32> internal : c.internal) {
+				vertexes = ShapeFittingOps.fitPolygon(internal, true, minSide, cornerPenalty);
+				VisualizeShapes.drawPolygon(vertexes, true, g2);
 			}
 		}
 
@@ -110,13 +110,13 @@ public class ExampleFitPolygon {
 	 */
 	public static void fitCannyEdges( GrayF32 input ) {
 
-		BufferedImage displayImage = new BufferedImage(input.width,input.height,BufferedImage.TYPE_INT_RGB);
+		BufferedImage displayImage = new BufferedImage(input.width, input.height, BufferedImage.TYPE_INT_RGB);
 
 		// Finds edges inside the image
-		CannyEdge<GrayF32,GrayF32> canny =
+		CannyEdge<GrayF32, GrayF32> canny =
 				FactoryEdgeDetectors.canny(2, true, true, GrayF32.class, GrayF32.class);
 
-		canny.process(input,0.1f,0.3f,null);
+		canny.process(input, 0.1f, 0.3f, null);
 		List<EdgeContour> contours = canny.getContours();
 
 		Graphics2D g2 = displayImage.createGraphics();
@@ -125,12 +125,12 @@ public class ExampleFitPolygon {
 		// used to select colors for each line
 		Random rand = new Random(234);
 
-		for( EdgeContour e : contours ) {
+		for (EdgeContour e : contours) {
 			g2.setColor(new Color(rand.nextInt()));
 
-			for(EdgeSegment s : e.segments ) {
+			for (EdgeSegment s : e.segments) {
 				// fit line segments to the point sequence. Note that loop is false
-				List<PointIndex_I32> vertexes = ShapeFittingOps.fitPolygon(s.points,false, minSide,cornerPenalty);
+				List<PointIndex_I32> vertexes = ShapeFittingOps.fitPolygon(s.points, false, minSide, cornerPenalty);
 
 				VisualizeShapes.drawPolygon(vertexes, false, g2);
 			}
@@ -145,14 +145,14 @@ public class ExampleFitPolygon {
 	 */
 	public static void fitCannyBinary( GrayF32 input ) {
 
-		BufferedImage displayImage = new BufferedImage(input.width,input.height,BufferedImage.TYPE_INT_RGB);
-		GrayU8 binary = new GrayU8(input.width,input.height);
+		BufferedImage displayImage = new BufferedImage(input.width, input.height, BufferedImage.TYPE_INT_RGB);
+		GrayU8 binary = new GrayU8(input.width, input.height);
 
 		// Finds edges inside the image
-		CannyEdge<GrayF32,GrayF32> canny =
+		CannyEdge<GrayF32, GrayF32> canny =
 				FactoryEdgeDetectors.canny(2, false, true, GrayF32.class, GrayF32.class);
 
-		canny.process(input,0.1f,0.3f,binary);
+		canny.process(input, 0.1f, 0.3f, binary);
 
 		// Only external contours are relevant
 		List<Contour> contours = BinaryImageOps.contourExternal(binary, ConnectRule.EIGHT);
@@ -163,11 +163,11 @@ public class ExampleFitPolygon {
 		// used to select colors for each line
 		Random rand = new Random(234);
 
-		for( Contour c : contours ) {
-			List<PointIndex_I32> vertexes = ShapeFittingOps.fitPolygon(c.external,true, minSide,cornerPenalty);
+		for (Contour c : contours) {
+			List<PointIndex_I32> vertexes = ShapeFittingOps.fitPolygon(c.external, true, minSide, cornerPenalty);
 
 			g2.setColor(new Color(rand.nextInt()));
-			VisualizeShapes.drawPolygon(vertexes,true,g2);
+			VisualizeShapes.drawPolygon(vertexes, true, g2);
 		}
 
 		gui.addImage(displayImage, "Canny Contour");
@@ -175,13 +175,13 @@ public class ExampleFitPolygon {
 
 	public static void main( String[] args ) {
 		// load and convert the image into a usable format
-		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("shapes/shapes02.png"));
+		BufferedImage image = UtilImageIO.loadImageNotNull(UtilIO.pathExample("shapes/shapes02.png"));
 		GrayF32 input = ConvertBufferedImage.convertFromSingle(image, null, GrayF32.class);
 
 		fitCannyEdges(input);
 		fitCannyBinary(input);
 		fitBinaryImage(input);
-		gui.addImage(image,"Original");
+		gui.addImage(image, "Original");
 
 		ShowImages.showWindow(gui, "Polygon from Contour", true);
 	}

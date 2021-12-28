@@ -104,7 +104,7 @@ public class ExampleSegmentColor {
 	}
 
 	public static void main( String[] args ) {
-		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("sunflowers.jpg"));
+		BufferedImage image = UtilImageIO.loadImageNotNull(UtilIO.pathExample("sunflowers.jpg"));
 
 		// Let the user select a color
 		printClickedColor(image);

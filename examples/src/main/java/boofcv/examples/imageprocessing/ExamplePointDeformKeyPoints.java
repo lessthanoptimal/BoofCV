@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,7 +49,7 @@ import java.util.List;
  */
 public class ExamplePointDeformKeyPoints {
 	public static void main( String[] args ) {
-		BufferedImage orig = UtilImageIO.loadImage(UtilIO.pathExample("standard/man_mls.jpg"));
+		BufferedImage orig = UtilImageIO.loadImageNotNull(UtilIO.pathExample("standard/man_mls.jpg"));
 		BufferedImage bufferedOut = new BufferedImage(orig.getWidth(), orig.getHeight(), BufferedImage.TYPE_INT_RGB);
 
 		Planar<GrayF32> input = ConvertBufferedImage.convertFrom(orig, true, ImageType.pl(3, GrayF32.class));

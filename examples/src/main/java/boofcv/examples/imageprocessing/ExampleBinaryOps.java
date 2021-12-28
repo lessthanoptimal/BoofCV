@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,7 +46,7 @@ import java.util.List;
 public class ExampleBinaryOps {
 	public static void main( String[] args ) {
 		// load and convert the image into a usable format
-		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("particles01.jpg"));
+		BufferedImage image = UtilImageIO.loadImageNotNull(UtilIO.pathExample("particles01.jpg"));
 
 		// convert into a usable format
 		GrayF32 input = ConvertBufferedImage.convertFromSingle(image, null, GrayF32.class);

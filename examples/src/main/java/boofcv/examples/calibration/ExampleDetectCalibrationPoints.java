@@ -47,7 +47,7 @@ public class ExampleDetectCalibrationPoints {
 //		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Square");
 		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess");
 
-		BufferedImage orig = UtilImageIO.loadImage(directory + "/left01.jpg");
+		BufferedImage orig = UtilImageIO.loadImageNotNull(directory + "/left01.jpg");
 		GrayF32 input = ConvertBufferedImage.convertFrom(orig, (GrayF32)null);
 
 		// To select different types of detectors add or remove comments below

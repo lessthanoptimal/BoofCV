@@ -58,7 +58,7 @@ public class ExampleCornerFeature {
 		GeneralFeatureDetector<GrayU8, GrayS16> detector = FactoryDetectPoint.createShiTomasi(configNonMax, configCorner, GrayS16.class);
 		ImageGradient<GrayU8, GrayS16> sobel = FactoryDerivative.sobel(GrayU8.class, GrayS16.class);
 
-		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess/frame05.jpg"));
+		BufferedImage image = UtilImageIO.loadImageNotNull(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess/frame05.jpg"));
 
 		// Convert the image into a usable format and predeclare memory
 		GrayU8 gray = ConvertBufferedImage.convertFrom(image, (GrayU8)null);

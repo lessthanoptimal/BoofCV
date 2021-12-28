@@ -50,17 +50,17 @@ import java.awt.image.BufferedImage;
  */
 public class ExampleNonMaximumSupression {
 
-	public static BufferedImage renderNonMax( GrayF32 intensity, int radius , float threshold) {
+	public static BufferedImage renderNonMax( GrayF32 intensity, int radius, float threshold ) {
 		// Create and configure the feature detector
-		NonMaxSuppression nonmax = FactoryFeatureExtractor.nonmax(new ConfigExtract(radius, threshold ));
+		NonMaxSuppression nonmax = FactoryFeatureExtractor.nonmax(new ConfigExtract(radius, threshold));
 
 		// We will only searching for the maximums. Other variants will look for minimums or will exclude previous
 		// candidate detections from being detected twice
 		QueueCorner maximums = new QueueCorner();
-		nonmax.process(intensity, null, null, null, maximums );
+		nonmax.process(intensity, null, null, null, maximums);
 
 		// Visualize the intensity image
-		BufferedImage output = new BufferedImage(intensity.width,intensity.height, BufferedImage.TYPE_INT_RGB);
+		BufferedImage output = new BufferedImage(intensity.width, intensity.height, BufferedImage.TYPE_INT_RGB);
 		VisualizeImageData.colorizeSign(intensity, output, -1);
 
 		// render each maximum with a circle
@@ -73,8 +73,8 @@ public class ExampleNonMaximumSupression {
 		return output;
 	}
 
-	public static void main(String[] args) {
-		BufferedImage buffered = UtilImageIO.loadImage(UtilIO.pathExample("standard/boat.jpg"));
+	public static void main( String[] args ) {
+		BufferedImage buffered = UtilImageIO.loadImageNotNull(UtilIO.pathExample("standard/boat.jpg"));
 
 		GrayF32 input = ConvertBufferedImage.convertFrom(buffered, (GrayF32)null);
 
@@ -85,22 +85,22 @@ public class ExampleNonMaximumSupression {
 		GImageDerivativeOps.gradient(DerivativeType.SOBEL, input, derivX, derivY, BorderType.EXTENDED);
 
 		// From the gradient compute intensity of shi-tomasi features
-		GeneralFeatureIntensity<GrayF32,GrayF32> featureIntensity =
-				FactoryIntensityPoint.shiTomasi(3,false, GrayF32.class);
+		GeneralFeatureIntensity<GrayF32, GrayF32> featureIntensity =
+				FactoryIntensityPoint.shiTomasi(3, false, GrayF32.class);
 
-		featureIntensity.process(input, derivX, derivY, null, null , null);
+		featureIntensity.process(input, derivX, derivY, null, null, null);
 		GrayF32 intensity = featureIntensity.getIntensity();
 
 		ListDisplayPanel panel = new ListDisplayPanel();
 		panel.addImage(buffered, "Input Image");
 		// hack to just show intensity - no features can be detected
-		panel.addImage(renderNonMax(intensity, 10, Float.MAX_VALUE),  "Intensity Image");
+		panel.addImage(renderNonMax(intensity, 10, Float.MAX_VALUE), "Intensity Image");
 
 		// Detect maximums with different settings and visualize the results
-		panel.addImage(renderNonMax(intensity, 3, -Float.MAX_VALUE),  "Radius 3");
-		panel.addImage(renderNonMax(intensity, 3, 30000),    "Radius 3  threshold");
+		panel.addImage(renderNonMax(intensity, 3, -Float.MAX_VALUE), "Radius 3");
+		panel.addImage(renderNonMax(intensity, 3, 30000), "Radius 3  threshold");
 		panel.addImage(renderNonMax(intensity, 20, -Float.MAX_VALUE), "Radius 10");
-		panel.addImage(renderNonMax(intensity, 20, 30000),   "Radius 10 threshold");
+		panel.addImage(renderNonMax(intensity, 20, 30000), "Radius 10 threshold");
 
 		ShowImages.showWindow(panel, "Non-Maximum Suppression", true);
 	}

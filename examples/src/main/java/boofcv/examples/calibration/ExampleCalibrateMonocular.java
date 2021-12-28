@@ -86,14 +86,12 @@ public class ExampleCalibrateMonocular {
 				/*includeTangential*/ false);
 
 		for (String n : images) {
-			BufferedImage input = UtilImageIO.loadImage(n);
-			if (input != null) {
-				GrayF32 image = ConvertBufferedImage.convertFrom(input, (GrayF32)null);
-				if (detector.process(image)) {
-					calibrationAlg.addImage(detector.getDetectedPoints().copy());
-				} else {
-					System.err.println("Failed to detect target in " + n);
-				}
+			BufferedImage input = UtilImageIO.loadImageNotNull(n);
+			GrayF32 image = ConvertBufferedImage.convertFrom(input, (GrayF32)null);
+			if (detector.process(image)) {
+				calibrationAlg.addImage(detector.getDetectedPoints().copy());
+			} else {
+				System.err.println("Failed to detect target in " + n);
 			}
 		}
 		// process and compute intrinsic parameters

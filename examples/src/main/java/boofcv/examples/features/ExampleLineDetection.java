@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -61,39 +61,38 @@ public class ExampleLineDetection {
 	 * @param buffered Input image.
 	 * @param imageType Type of image processed by line detector.
 	 */
-	public static<T extends ImageGray<T>>
-	void detectLines( BufferedImage buffered , Class<T> imageType )
-	{
+	public static <T extends ImageGray<T>>
+	void detectLines( BufferedImage buffered, Class<T> imageType ) {
 		// convert the line into a single band image
-		T input = ConvertBufferedImage.convertFromSingle(buffered, null, imageType );
+		T input = ConvertBufferedImage.convertFromSingle(buffered, null, imageType);
 		T blurred = input.createSameShape();
 
 		// Blur smooths out gradient and improves results
-		GBlurImageOps.gaussian(input,blurred,0,5,null);
+		GBlurImageOps.gaussian(input, blurred, 0, 5, null);
 
 		// Detect edges of objects using gradient based hough detectors. If you have nice binary lines which are thin
 		// there's another type of hough detector available
 		DetectLine<T> detectorPolar = FactoryDetectLine.houghLinePolar(
-				new ConfigHoughGradient(maxLines),null, imageType);
+				new ConfigHoughGradient(maxLines), null, imageType);
 		DetectLine<T> detectorFoot = FactoryDetectLine.houghLineFoot(
-				new ConfigHoughGradient(maxLines),null, imageType);
+				new ConfigHoughGradient(maxLines), null, imageType);
 		DetectLine<T> detectorFootSub = FactoryDetectLine.houghLineFootSub(
-				new ConfigHoughFootSubimage(3, 8, 5, edgeThreshold,maxLines, 2, 2), imageType);
+				new ConfigHoughFootSubimage(3, 8, 5, edgeThreshold, maxLines, 2, 2), imageType);
 
-		detectLines(buffered,blurred,detectorPolar,"Hough Polar");
-		detectLines(buffered,blurred,detectorFoot,"Hough Foot");
-		detectLines(buffered,blurred,detectorFootSub,"Hough Foot-Sub");
+		detectLines(buffered, blurred, detectorPolar, "Hough Polar");
+		detectLines(buffered, blurred, detectorFoot, "Hough Foot");
+		detectLines(buffered, blurred, detectorFootSub, "Hough Foot-Sub");
 	}
 
 	private static <T extends ImageGray<T>>
-	void detectLines( BufferedImage buffered, T gray , DetectLine<T> detector , String name ) {
+	void detectLines( BufferedImage buffered, T gray, DetectLine<T> detector, String name ) {
 		List<LineParametric2D_F32> found = detector.detect(gray);
 
 		// display the results
 		ImageLinePanel gui = new ImageLinePanel();
 		gui.setImage(buffered);
 		gui.setLines(found);
-		gui.setPreferredSize(new Dimension(gray.getWidth(),gray.getHeight()));
+		gui.setPreferredSize(new Dimension(gray.getWidth(), gray.getHeight()));
 
 		listPanel.addItem(gui, name);
 	}
@@ -104,12 +103,11 @@ public class ExampleLineDetection {
 	 * @param image Input image.
 	 * @param imageType Type of image processed by line detector.
 	 */
-	public static<T extends ImageGray<T>, D extends ImageGray<D>>
-	void detectLineSegments( BufferedImage image ,
-							 Class<T> imageType )
-	{
+	public static <T extends ImageGray<T>, D extends ImageGray<D>>
+	void detectLineSegments( BufferedImage image,
+							 Class<T> imageType ) {
 		// convert the line into a single band image
-		T input = ConvertBufferedImage.convertFromSingle(image, null, imageType );
+		T input = ConvertBufferedImage.convertFromSingle(image, null, imageType);
 
 		// Comment/uncomment to try a different type of line detector
 		DetectLineSegment<T> detector = FactoryDetectLine.lineRansac(new ConfigLineRansac(40, 30, 2.36, true), imageType);
@@ -120,13 +118,13 @@ public class ExampleLineDetection {
 		ImageLinePanel gui = new ImageLinePanel();
 		gui.setImage(image);
 		gui.setLineSegments(found);
-		gui.setPreferredSize(new Dimension(image.getWidth(),image.getHeight()));
+		gui.setPreferredSize(new Dimension(image.getWidth(), image.getHeight()));
 
 		listPanel.addItem(gui, "Line Segments");
 	}
-	
+
 	public static void main( String[] args ) {
-		BufferedImage input = UtilImageIO.loadImage(UtilIO.pathExample("simple_objects.jpg"));
+		BufferedImage input = UtilImageIO.loadImageNotNull(UtilIO.pathExample("simple_objects.jpg"));
 
 		detectLines(input, GrayU8.class);
 

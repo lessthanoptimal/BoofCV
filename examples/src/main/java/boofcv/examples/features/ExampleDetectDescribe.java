@@ -101,10 +101,10 @@ public class ExampleDetectDescribe {
 		AssociateDescription associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true), scorer);
 
 		// load and match images
-		ExampleAssociatePoints app = new ExampleAssociatePoints(detDesc, associate, imageType);
+		var app = new ExampleAssociatePoints(detDesc, associate, imageType);
 
-		BufferedImage imageA = UtilImageIO.loadImage(UtilIO.pathExample("stitch/kayak_01.jpg"));
-		BufferedImage imageB = UtilImageIO.loadImage(UtilIO.pathExample("stitch/kayak_03.jpg"));
+		BufferedImage imageA = UtilImageIO.loadImageNotNull(UtilIO.pathExample("stitch/kayak_01.jpg"));
+		BufferedImage imageB = UtilImageIO.loadImageNotNull(UtilIO.pathExample("stitch/kayak_03.jpg"));
 
 		app.associate(imageA, imageB);
 	}

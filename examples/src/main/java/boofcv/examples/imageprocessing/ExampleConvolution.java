@@ -44,7 +44,7 @@ public class ExampleConvolution {
 	private static final ListDisplayPanel panel = new ListDisplayPanel();
 
 	public static void main( String[] args ) {
-		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("sunflowers.jpg"));
+		BufferedImage image = UtilImageIO.loadImageNotNull(UtilIO.pathExample("sunflowers.jpg"));
 
 		GrayU8 gray = ConvertBufferedImage.convertFromSingle(image, null, GrayU8.class);
 

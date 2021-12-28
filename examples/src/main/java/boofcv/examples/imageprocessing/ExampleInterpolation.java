@@ -45,7 +45,7 @@ public class ExampleInterpolation {
 		imagePath = "eye01.jpg";
 //		imagePath = "small_sunflower.jpg";
 
-		BufferedImage buffered = UtilImageIO.loadImage(UtilIO.pathExample(imagePath));
+		BufferedImage buffered = UtilImageIO.loadImageNotNull(UtilIO.pathExample(imagePath));
 		ListDisplayPanel gui = new ListDisplayPanel();
 
 		gui.addImage(buffered, "Original");

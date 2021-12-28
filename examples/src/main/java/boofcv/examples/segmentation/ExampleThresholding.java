@@ -44,7 +44,7 @@ import java.awt.image.BufferedImage;
 public class ExampleThresholding {
 
 	public static void threshold( String imageName ) {
-		BufferedImage image = UtilImageIO.loadImage(imageName);
+		BufferedImage image = UtilImageIO.loadImageNotNull(imageName);
 
 		// convert into a usable format
 		GrayF32 input = ConvertBufferedImage.convertFromSingle(image, null, GrayF32.class);

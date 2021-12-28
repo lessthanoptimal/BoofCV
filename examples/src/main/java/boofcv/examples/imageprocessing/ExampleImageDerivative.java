@@ -39,7 +39,7 @@ import java.awt.image.BufferedImage;
  */
 public class ExampleImageDerivative {
 	public static void main( String[] args ) {
-		BufferedImage input = UtilImageIO.loadImage(UtilIO.pathExample("simple_objects.jpg"));
+		BufferedImage input = UtilImageIO.loadImageNotNull(UtilIO.pathExample("simple_objects.jpg"));
 
 		// We will use floating point images here, but GrayU8 with GrayS16 for derivatives also works
 		GrayF32 grey = new GrayF32(input.getWidth(), input.getHeight());
