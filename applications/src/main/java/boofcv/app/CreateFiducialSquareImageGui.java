@@ -25,6 +25,7 @@ import boofcv.gui.BoofSwingUtil;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.GrayU8;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.image.BufferedImage;
@@ -80,7 +81,7 @@ public class CreateFiducialSquareImageGui extends CreateSquareFiducialGui {
 			imagePanel.setImageRepaint(null);
 		} else {
 			FiducialSquareGenerator generator = (FiducialSquareGenerator)this.generator;
-			BufferedImage buffered = UtilImageIO.loadImage(path);
+			BufferedImage buffered = UtilImageIO.loadImageNotNull(path);
 			GrayU8 gray = ConvertBufferedImage.convertFrom(buffered, (GrayU8)null);
 			generator.setBlackBorder(controls.borderFraction);
 			generator.generate(gray);
@@ -89,13 +90,14 @@ public class CreateFiducialSquareImageGui extends CreateSquareFiducialGui {
 		}
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	class ControlPanel extends CreateSquareFiducialControlPanel {
 
 		DefaultListModel<String> listModel = new DefaultListModel<>();
 		JList<String> listPatterns = new JList<>(listModel);
 		java.util.List<String> patterns = new ArrayList<>();
 
-		String selectedPattern = null;
+		@Nullable String selectedPattern = null;
 
 		public ControlPanel( Listener listener ) {
 			super(listener);

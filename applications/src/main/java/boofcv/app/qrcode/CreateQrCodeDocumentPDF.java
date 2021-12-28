@@ -33,6 +33,7 @@ import java.util.ArrayList;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class CreateQrCodeDocumentPDF extends CreateFiducialDocumentPDF {
 
 	java.util.List<QrCode> markers;

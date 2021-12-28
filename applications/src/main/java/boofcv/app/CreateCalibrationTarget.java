@@ -45,9 +45,10 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class CreateCalibrationTarget {
 	@Option(name = "-t", aliases = {"--Type"}, usage = "Type of calibration target.")
-	String _type = null;
+	String _type;
 	CalibrationPatterns type;
 
 	@Option(name = "-r", aliases = {"--Rows"}, usage = "Number of rows")
@@ -58,7 +59,7 @@ public class CreateCalibrationTarget {
 
 	@Option(name = "-u", aliases = {"--Units"}, usage = "Name of document units. default: cm")
 	String _unit = Unit.CENTIMETER.abbreviation;
-	Unit unit;
+	Unit unit = Unit.UNKNOWN;
 
 	@Option(name = "-p", aliases = {"--PaperSize"}, usage = "Size of paper used. See below for predefined document sizes. "
 			+ "You can manually specify any size using the following notation. W:H  where W is the width and H is the height. "
@@ -123,7 +124,7 @@ public class CreateCalibrationTarget {
 		System.out.println();
 		System.out.println("Document Types");
 		for (PaperSize p : PaperSize.values()) {
-			System.out.printf("  %12s  %5.0f %5.0f %s\n", p.getName(), p.width, p.height, p.unit.abbreviation);
+			System.out.printf("  %12s  %5.0f %5.0f %s\n", p.getName(), p.width, p.height, p.getUnit().abbreviation);
 		}
 		System.out.println();
 		System.out.println("Units");
@@ -172,20 +173,23 @@ public class CreateCalibrationTarget {
 			failExit("Must specify a known document type " + _type);
 		}
 
-		unit = Unit.lookup(_unit);
-		if (unit == null) {
+		Unit unit = Unit.lookup(_unit);
+		if (unit == Unit.UNKNOWN) {
 			System.err.println("Must specify a valid unit or use default");
 			System.exit(1);
+			return; // make it very obvious to the compiler that this does not continue
 		}
-		paperSize = PaperSize.lookup(_paperSize);
+		this.unit = unit;
+		PaperSize paperSize = PaperSize.lookup(_paperSize);
 		if (paperSize == null) {
-			String words[] = _paperSize.split(":");
+			String[] words = _paperSize.split(":");
 			if (words.length != 2) failExit("Expected two value+unit separated by a :");
-			LengthUnit w = new LengthUnit(words[0]);
-			LengthUnit h = new LengthUnit(words[1]);
+			var w = new LengthUnit(words[0]);
+			var h = new LengthUnit(words[1]);
 			if (w.unit != h.unit) failExit("Same units must be specified for width and height");
-			paperSize = new PaperSize(w.length, h.length, w.unit);
+			paperSize = new PaperSize(w.length, h.length, w.getUnit());
 		}
+		this.paperSize = paperSize;
 
 		if (rows <= 0 || columns <= 0)
 			failExit("Must the number of rows and columns");

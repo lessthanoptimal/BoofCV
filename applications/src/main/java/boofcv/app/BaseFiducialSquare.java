@@ -45,11 +45,12 @@ import java.io.IOException;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class BaseFiducialSquare {
 
 	@Option(name = "-u", aliases = {"--Units"}, usage = "Name of document units. default: cm")
 	protected String _unit = Unit.CENTIMETER.abbreviation;
-	public Unit unit;
+	public Unit unit = Unit.UNKNOWN;
 
 	@Option(name = "-p", aliases = {"--PaperSize"}, usage = "Size of paper used. See below for predefined document sizes. "
 			+ "You can manually specify any size using the following notation. W:H  where W is the width and H is the height. "
@@ -182,11 +183,12 @@ public abstract class BaseFiducialSquare {
 			if (spaceBetween == 0)
 				spaceBetween = markerWidth/4;
 
-			unit = unit == null ? Unit.lookup(_unit) : unit;
-			if (unit == null) {
+
+			unit = unit == Unit.UNKNOWN ? Unit.lookup(_unit) : unit;
+			if (unit == Unit.UNKNOWN) {
 				failExit("Must specify a valid unit or use default");
 			}
-			paperSize = PaperSize.lookup(_paperSize);
+			PaperSize paperSize = PaperSize.lookup(_paperSize);
 			if (paperSize == null) {
 				String[] words = _paperSize.split(":");
 				if (words.length != 2) failExit("Expected two value+unit separated by a :");
@@ -195,6 +197,7 @@ public abstract class BaseFiducialSquare {
 				if (w.unit != h.unit) failExit("Same units must be specified for width and height");
 				paperSize = new PaperSize(w.length, h.length, w.unit);
 			}
+			this.paperSize = paperSize;
 		}
 	}
 

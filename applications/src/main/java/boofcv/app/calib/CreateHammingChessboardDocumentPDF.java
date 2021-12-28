@@ -37,6 +37,7 @@ import java.util.ArrayList;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class CreateHammingChessboardDocumentPDF extends CreateFiducialDocumentPDF {
 
 	@Getter HammingChessboardGenerator g;

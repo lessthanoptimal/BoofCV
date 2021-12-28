@@ -31,6 +31,7 @@ import boofcv.struct.border.BorderType;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -41,6 +42,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class ImageSelectorAndSaver {
 
 	public static int LENGTH = 50;
@@ -56,7 +58,7 @@ public class ImageSelectorAndSaver {
 	GrayF32 difference = new GrayF32(LENGTH, LENGTH);
 	GrayF32 tempImage = new GrayF32(LENGTH, LENGTH);
 
-	BufferedImage bestImage;
+	@Nullable BufferedImage bestImage;
 	double bestScore;
 
 	double currentScore;

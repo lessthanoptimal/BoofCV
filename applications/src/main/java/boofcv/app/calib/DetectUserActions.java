@@ -27,6 +27,7 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class DetectUserActions {
 
 	//-------------- motion parameters
@@ -47,6 +48,7 @@ public class DetectUserActions {
 		thresholdDistance = size*0.005;
 	}
 
+	@SuppressWarnings("NullAway")
 	public void resetActionState() {
 		points = null;
 		numMissed = 0;

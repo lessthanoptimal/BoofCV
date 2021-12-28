@@ -38,8 +38,6 @@ import static boofcv.alg.feature.detect.intensity.impl.ImplIntegralImageFeatureI
  */
 @Generated("boofcv.alg.feature.detect.intensity.impl.ImplIntegralImageFeatureIntensity")
 public class ImplIntegralImageFeatureIntensity_MT {
-
-
 	/**
 	 * Only computes the fast hessian along the border using a brute force approach
 	 */

@@ -182,6 +182,7 @@ public interface CalibrationView {
 		}
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	class CircleHexagonalGrid implements CalibrationView {
 
 		int gridRows, gridCols;
@@ -267,6 +268,7 @@ public interface CalibrationView {
 		}
 	}
 
+	@SuppressWarnings("NullAway.Init")
 	class CircleRegularGrid implements CalibrationView {
 
 		int gridRows, gridCols;

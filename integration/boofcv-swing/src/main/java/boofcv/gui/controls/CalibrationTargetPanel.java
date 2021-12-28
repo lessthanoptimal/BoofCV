@@ -32,6 +32,7 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
+import java.util.Objects;
 
 /**
  * Used to specify the calibration target's parameters
@@ -82,7 +83,7 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel {
 	public void setConfigurationTo( ConfigCalibrationTarget target ) {
 		BoofSwingUtil.checkGuiThread();
 
-		this.selected = target.type;
+		this.selected = Objects.requireNonNull(target.type);
 		switch (selected) {
 			case CHESSBOARD -> configChessboard.setTo(target.grid);
 			case SQUARE_GRID -> configSquare.setTo(target.grid);

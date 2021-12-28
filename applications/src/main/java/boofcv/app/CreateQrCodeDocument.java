@@ -28,6 +28,7 @@ import boofcv.generate.LengthUnit;
 import boofcv.generate.Unit;
 import boofcv.gui.BoofSwingUtil;
 import org.apache.commons.io.FilenameUtils;
+import org.jetbrains.annotations.Nullable;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
@@ -35,6 +36,7 @@ import org.kohsuke.args4j.Option;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Application for generating calibration targets
@@ -42,15 +44,16 @@ import java.util.List;
  * @author Peter Abeles
  */
 // TODO Support multiple QR's in GUI
+@SuppressWarnings({"NullAway.Init"})
 public class CreateQrCodeDocument {
 
 	@Option(name = "-t", aliases = {"--Text", "--Message"},
 			usage = "Specifies the message(s) to encode. For each message at least one QR Code will be added to the paper(s)")
-	public List<String> messages;
+	public List<String> messages = new ArrayList<>();
 
 	@Option(name = "-m", aliases = {"--Mask"}, usage = "Specify which mask to use. Most people shouldn't use this flag. Options: 000, 001, 010, 011, 100, 101, 110, 111")
-	protected String _mask = null;
-	public QrCodeMaskPattern mask;
+	protected @Nullable String _mask = null;
+	public @Nullable QrCodeMaskPattern mask;
 
 	@Option(name = "-e", aliases = {"--Error"}, usage = "Error correction level. Options: L,M,Q,H. Robustness: 7%, 15%, 25%, 30%, respectively ")
 	protected String _error = "M";
@@ -63,11 +66,11 @@ public class CreateQrCodeDocument {
 	@Option(name = "-n", aliases = {"--Encoding"}, usage =
 			"Type of data that can be encoded. Default is auto select. Options: NUMERIC, ALPHANUMERIC, BYTE, KANJI")
 	protected String _encoding = "AUTO";
-	public QrCode.Mode encoding;
+	public @Nullable QrCode.Mode encoding;
 
 	@Option(name = "-u", aliases = {"--Units"}, usage = "Name of document units. default: cm")
 	protected String _unit = Unit.CENTIMETER.abbreviation;
-	public Unit unit;
+	public Unit unit = Unit.UNKNOWN;
 
 	@Option(name = "-p", aliases = {"--PaperSize"}, usage = "Size of paper used. See below for predefined document sizes. "
 			+ "You can manually specify any size using the following notation. W:H  where W is the width and H is the height. "
@@ -144,13 +147,13 @@ public class CreateQrCodeDocument {
 	public void finishParsing() {
 
 		mask = _mask == null ? null : QrCodeMaskPattern.lookupMask(_mask);
-		error = _error == null ? null : QrCode.ErrorLevel.lookup(_error);
+		error = QrCode.ErrorLevel.lookup(_error);
 
 		if (version == 0 || version > 40 || version < -1) {
 			failExit("Version must be from 1 to 40 or set to -1 for auto select");
 		}
 
-		encoding = _encoding == null ? null : QrCode.Mode.lookup(_encoding);
+		encoding = QrCode.Mode.lookup(_encoding);
 
 		getFileTypeFromFileName();
 
@@ -161,19 +164,20 @@ public class CreateQrCodeDocument {
 				markerWidth = moduleWidth*QrCode.totalModules(version);
 			}
 
-			unit = unit == null ? Unit.lookup(_unit) : unit;
-			if (unit == null) {
+			unit = unit == Unit.UNKNOWN ? Unit.lookup(_unit) : unit;
+			if (unit == Unit.UNKNOWN ) {
 				failExit("Must specify a valid unit or use default");
 			}
-			paperSize = PaperSize.lookup(_paperSize);
+			PaperSize paperSize = PaperSize.lookup(_paperSize);
 			if (paperSize == null) {
 				String[] words = _paperSize.split(":");
 				if (words.length != 2) failExit("Expected two value+unit separated by a :");
 				LengthUnit w = new LengthUnit(words[0]);
 				LengthUnit h = new LengthUnit(words[1]);
 				if (w.unit != h.unit) failExit("Same units must be specified for width and height");
-				paperSize = new PaperSize(w.length, h.length, w.unit);
+				paperSize = new PaperSize(w.length, h.length, w.getUnit());
 			}
+			this.paperSize = paperSize;
 		}
 	}
 
@@ -187,6 +191,7 @@ public class CreateQrCodeDocument {
 
 		System.out.println("   File Name    : " + fileName);
 		if (fileType.equals("pdf")) {
+			Objects.requireNonNull(unit);
 			System.out.println("   Document     : PDF");
 			System.out.println("   paper        : " + paperSize);
 			System.out.println("   info         : " + !disablePrintInfo);
@@ -231,6 +236,7 @@ public class CreateQrCodeDocument {
 
 		switch (fileType) {
 			case "pdf" -> {
+				Objects.requireNonNull(unit);
 				CreateQrCodeDocumentPDF renderer = new CreateQrCodeDocumentPDF(fileName, paperSize, unit);
 				renderer.markerWidth = markerWidth;
 				renderer.spaceBetween = spaceBetween;

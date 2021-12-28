@@ -85,6 +85,7 @@ public class CreateFiducialSquareImage extends BaseFiducialSquareBorder {
 		if (image == null) {
 			System.err.println("Can't read image. Path = " + imagePaths.get(patternID));
 			System.exit(1);
+			throw new RuntimeException("Stupid compiler");
 		}
 
 		// If it is larger than 240x240 resize it

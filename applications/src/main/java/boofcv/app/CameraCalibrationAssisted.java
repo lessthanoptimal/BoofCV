@@ -19,6 +19,7 @@
 package boofcv.app;
 
 import boofcv.io.webcamcapture.OpenWebcamDialog;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
@@ -28,7 +29,7 @@ import javax.swing.*;
  * @author Peter Abeles
  */
 public class CameraCalibrationAssisted {
-	public static void main( String[] args ) {
+	public static void main( @Nullable String[] args ) {
 		SwingUtilities.invokeLater(() -> {
 			// Let the user select which camera and at what resolution
 			final OpenWebcamDialog.Selection selected = OpenWebcamDialog.showDialog(null);

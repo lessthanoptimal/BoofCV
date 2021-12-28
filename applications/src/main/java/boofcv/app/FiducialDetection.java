@@ -45,6 +45,7 @@ import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.so.Quaternion_F64;
 import org.ddogleg.struct.DogArray_F64;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -52,12 +53,14 @@ import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Command line application for detecting different types of fiducials in different types of input methods.
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class FiducialDetection extends BaseStandardInputApp {
 
 	public static final int DEFAULT_THRESHOLD = 100;
@@ -366,7 +369,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 		detector = FactoryFiducial.calibSquareGrid(null, config, GrayU8.class);
 	}
 
-	private static CameraPinholeBrown handleIntrinsic( CameraPinholeBrown intrinsic, int width, int height ) {
+	private static CameraPinholeBrown handleIntrinsic( @Nullable CameraPinholeBrown intrinsic, int width, int height ) {
 		if (intrinsic == null) {
 			System.out.println();
 			System.out.println("SERIOUSLY YOU NEED TO CALIBRATE THE CAMERA YOURSELF!");
@@ -542,11 +545,11 @@ public class FiducialDetection extends BaseStandardInputApp {
 		if (inputType == InputType.VIDEO || inputType == InputType.WEBCAM) {
 			if (inputType == InputType.WEBCAM) {
 				String device = getCameraDeviceString();
-				sequence = media.openCamera(device, desiredWidth, desiredHeight, ImageType.single(GrayU8.class));
+				sequence = Objects.requireNonNull(media.openCamera(device, desiredWidth, desiredHeight, ImageType.single(GrayU8.class)));
 			} else {
 				// just assume 30ms is appropriate. Should let the use specify this number
 				pause = 30;
-				sequence = media.openVideo(filePath, ImageType.single(GrayU8.class));
+				sequence = Objects.requireNonNull(media.openVideo(filePath, ImageType.single(GrayU8.class)));
 				sequence.setLoop(true);
 			}
 			intrinsic = handleIntrinsic(intrinsic, sequence.getWidth(), sequence.getHeight());
@@ -555,10 +558,12 @@ public class FiducialDetection extends BaseStandardInputApp {
 			if (buffered == null) {
 				System.err.println("Can't find image or it can't be read. " + filePath);
 				System.exit(1);
+				throw new RuntimeException("Stupid null check");
 			}
 			intrinsic = handleIntrinsic(intrinsic, buffered.getWidth(), buffered.getHeight());
 		}
-
+		Objects.requireNonNull(intrinsic);
+		Objects.requireNonNull(buffered);
 
 		var gui = new ImagePanel();
 		gui.setPreferredSize(new Dimension(intrinsic.width, intrinsic.height));

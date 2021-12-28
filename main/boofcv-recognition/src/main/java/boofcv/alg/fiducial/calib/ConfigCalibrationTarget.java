@@ -24,6 +24,7 @@ import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.factory.fiducial.ConfigHammingChessboard;
 import boofcv.factory.fiducial.ConfigHammingGrid;
 import boofcv.struct.Configuration;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Describes the calibration target.
@@ -32,6 +33,7 @@ import boofcv.struct.Configuration;
  */
 public class ConfigCalibrationTarget implements Configuration {
 	/** Which type of calibration target */
+	@Nullable
 	public CalibrationPatterns type = CalibrationPatterns.CHESSBOARD;
 
 	/** Physical descrition of ECoCheck */
@@ -44,6 +46,8 @@ public class ConfigCalibrationTarget implements Configuration {
 	public ConfigGridDimen grid = new ConfigGridDimen();
 
 	public Configuration getActiveDescription() {
+		if (type == null)
+			return grid;
 		return switch (type) {
 			case ECOCHECK -> ecocheck;
 			case HAMMING_CHESSBOARD -> hammingChess;

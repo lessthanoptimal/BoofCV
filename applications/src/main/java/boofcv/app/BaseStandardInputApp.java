@@ -26,12 +26,13 @@ import com.github.sarxos.webcam.Webcam;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class BaseStandardInputApp {
 
 	protected InputType inputType = InputType.WEBCAM;
 
 	protected int cameraId = 0;
-	protected String cameraName = null;
+	protected String cameraName;
 	protected int desiredWidth = -1, desiredHeight = -1;
 
 	protected String filePath;

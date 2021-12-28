@@ -53,6 +53,7 @@ import java.util.Objects;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class CameraCalibrationStereo {
 	@Option(name = "-m", aliases = {"--Marker"}, usage = "Specifies which marker it should detect.")
 	public String markerType = CalibrationPatterns.CHESSBOARD.name();
@@ -302,6 +303,7 @@ public class CameraCalibrationStereo {
 		if (tmp == null) {
 			System.err.println("Can't determine image size for split images. Failed to load " + listImages.get(0));
 			System.exit(1);
+			throw new RuntimeException("Stupid null check");
 		}
 		return tmp.getWidth()/2;
 	}

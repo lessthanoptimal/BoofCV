@@ -24,6 +24,7 @@ import boofcv.app.PaperSize;
 import boofcv.generate.Unit;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.StandardAlgConfigPanel;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -38,6 +39,7 @@ import java.text.ParseException;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAble.Init"})
 public class CreateQrCodeControlPanel extends StandardAlgConfigPanel implements ActionListener {
 	JTextArea messageField = new JTextArea();
 	JComboBox<String> comboOutputFormat = new JComboBox<>(new String[]{"pdf", "png", "bmp", "jpg", "ppm", "pgm"});
@@ -55,9 +57,9 @@ public class CreateQrCodeControlPanel extends StandardAlgConfigPanel implements 
 
 	int version = -1;
 	String message = "Enter Text Here";
-	QrCode.ErrorLevel error = null;
-	QrCodeMaskPattern mask = null;
-	QrCode.Mode mode = null;
+	@Nullable QrCode.ErrorLevel error = null;
+	@Nullable QrCodeMaskPattern mask = null;
+	@Nullable QrCode.Mode mode = null;
 	PaperSize paperSize;
 	boolean fillGrid = false;
 	public boolean drawGrid = false;
