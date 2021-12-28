@@ -31,8 +31,8 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public abstract class SelectAlgorithmPanel extends JPanel
-		implements ActionListener {
+@SuppressWarnings({"NullAway.Init"})
+public abstract class SelectAlgorithmPanel extends JPanel implements ActionListener {
 	JToolBar toolbar;
 	JComboBox<String> algBox;
 	List<Object> algCookies = new ArrayList<>();
@@ -53,7 +53,7 @@ public abstract class SelectAlgorithmPanel extends JPanel
 	}
 
 	/**
-	 * Used to add the main GUI to this panel.  Must use this function.
+	 * Used to add the main GUI to this panel. Must use this function.
 	 * Algorithm change events will not be posted until this function has been set.
 	 *
 	 * @param gui The main GUI being displayed.

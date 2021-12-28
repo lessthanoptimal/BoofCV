@@ -126,7 +126,7 @@ public class Zhang99CalibrationMatrixFromHomographies {
 
 	/**
 	 * Sets up the system of equations which are to be solved. This equation is derived from
-	 * constraints (3) and (4) in the paper.  See section 3.1.
+	 * constraints (3) and (4) in the paper. See section 3.1.
 	 *
 	 * @param homographies set of observed homographies.
 	 */

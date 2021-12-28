@@ -33,7 +33,7 @@ import org.ddogleg.struct.DogArray;
 
 /**
  * <p>Computes {@link DescribePointSift SIFT} features in a regular grid across an entire image at a single
- * scale and orientation.  This is more computationally efficient than the more generic {@link DescribePointSift}
+ * scale and orientation. This is more computationally efficient than the more generic {@link DescribePointSift}
  * algorithm because it makes strong assumptions. If given the same center point, an orientation of 0, and
  * sigmaToPixels is 1, they should produce the same descriptor.</p>
  *

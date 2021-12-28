@@ -20,20 +20,23 @@ package boofcv.gui.image;
 
 import boofcv.io.image.ConvertBufferedImage;
 import georegression.struct.point.Point2D_F64;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.util.Objects;
 
 /**
  * Simple JPanel for displaying buffered images allows images to be zoomed in and out of
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class ImageZoomPanel extends JScrollPane {
 	// the image being displayed
-	protected BufferedImage img;
+	protected @Nullable BufferedImage img;
 	protected ImagePanel panel = new ImagePanel();
 
 	public boolean autoScaleCenterOnSetImage = true;
@@ -46,7 +49,7 @@ public class ImageZoomPanel extends JScrollPane {
 
 	protected ImageZoomListener listener;
 
-	public ImageZoomPanel( final BufferedImage img ) {
+	public ImageZoomPanel( final @Nullable BufferedImage img ) {
 		this.img = img;
 		setScale(1);
 	}
@@ -64,7 +67,7 @@ public class ImageZoomPanel extends JScrollPane {
 	}
 
 	public void autoScaleAndAlign() {
-		this.autoScaleAndAlign(img);
+		this.autoScaleAndAlign(Objects.requireNonNull(img));
 	}
 
 	/**
@@ -186,7 +189,7 @@ public class ImageZoomPanel extends JScrollPane {
 		}
 	}
 
-	public synchronized void setBufferedImageNoChange( BufferedImage image ) {
+	public synchronized void setBufferedImageNoChange( @Nullable BufferedImage image ) {
 		// assume the image was initially set before the GUI was invoked
 		if (checkEventDispatch && this.img != null) {
 			if (!SwingUtilities.isEventDispatchThread())
@@ -195,7 +198,7 @@ public class ImageZoomPanel extends JScrollPane {
 		this.img = image;
 	}
 
-	public BufferedImage getImage() {
+	public @Nullable BufferedImage getImage() {
 		return img;
 	}
 
@@ -218,7 +221,7 @@ public class ImageZoomPanel extends JScrollPane {
 	protected void paintOverPanel( Graphics2D g2 ) {}
 
 	public class ImagePanel extends JPanel {
-		SaveImageOnClick mouseListener = new SaveImageOnClick(ImageZoomPanel.this.getViewport());
+		@Nullable SaveImageOnClick mouseListener = new SaveImageOnClick(ImageZoomPanel.this.getViewport());
 
 		BufferedImage buffer = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
 

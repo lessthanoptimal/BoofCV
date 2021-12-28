@@ -28,7 +28,7 @@ import boofcv.struct.Configuration;
  */
 public class ConfigDenseSift implements Configuration {
 	/**
-	 * Specifies how the SIFT descriptor is computed.  All parameters are used but
+	 * Specifies how the SIFT descriptor is computed. All parameters are used but
 	 * {@link ConfigSiftDescribe#sigmaToPixels}
 	 */
 	public ConfigSiftDescribe sift = new ConfigSiftDescribe();

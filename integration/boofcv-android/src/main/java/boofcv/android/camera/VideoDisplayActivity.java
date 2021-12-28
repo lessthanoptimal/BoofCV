@@ -296,7 +296,7 @@ public abstract class VideoDisplayActivity extends Activity implements Camera.Pr
 	}
 
 	/**
-	 * Displays an indeterminate progress dialog.  If the dialog is already open this will change the message being
+	 * Displays an indeterminate progress dialog. If the dialog is already open this will change the message being
 	 * displayed. Function blocks until the dialog has been declared.
 	 *
 	 * @param message Text shown in dialog

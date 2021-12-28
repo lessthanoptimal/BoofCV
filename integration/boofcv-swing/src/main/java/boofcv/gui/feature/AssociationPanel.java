@@ -22,11 +22,13 @@ import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.FastAccess;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 /**
@@ -35,6 +37,7 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class AssociationPanel extends CompareTwoImagePanel implements MouseListener {
 
 	// lock for all the data structures below
@@ -188,12 +191,15 @@ public class AssociationPanel extends CompareTwoImagePanel implements MouseListe
 		}
 	}
 
-	private void drawAssociation( Graphics2D g2, double scaleLeft, double scaleRight, int rightX, Point2D_F64 l, Point2D_F64 r, Color color ) {
+	private void drawAssociation( Graphics2D g2, double scaleLeft, double scaleRight, int rightX,
+								  @Nullable Point2D_F64 l, @Nullable Point2D_F64 r, Color color ) {
 		if (r == null) {
+			Objects.requireNonNull(l);
 			int x1 = (int)(scaleLeft*l.x);
 			int y1 = (int)(scaleLeft*l.y);
 			VisualizeFeatures.drawPoint(g2, x1, y1, Color.RED);
 		} else if (l == null) {
+			Objects.requireNonNull(r);
 			int x2 = (int)(scaleRight*r.x) + rightX;
 			int y2 = (int)(scaleRight*r.y);
 			VisualizeFeatures.drawPoint(g2, x2, y2, Color.RED);

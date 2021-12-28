@@ -107,7 +107,7 @@ public class DescribePointSurfMod<II extends ImageGray<II>> extends DescribePoin
 
 	/**
 	 * <p>
-	 * An improved SURF descriptor as presented in CenSurE paper.  The sub-regions now overlap and more
+	 * An improved SURF descriptor as presented in CenSurE paper. The sub-regions now overlap and more
 	 * points are sampled in the sub-region to allow overlap.
 	 * </p>
 	 *

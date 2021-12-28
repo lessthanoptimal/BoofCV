@@ -42,25 +42,24 @@ import java.awt.*;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class ControlPanelHybridTracker extends ControlPanelDetDescAssocBase {
 	Listener listener;
 
 	int selectedSelection = 0;
-	JComboBox<String> spinnerSelection = combo(selectedSelection,"KLT","Detect","Describe","Associate");
+	JComboBox<String> spinnerSelection = combo(selectedSelection, "KLT", "Detect", "Describe", "Associate");
 
 	public ControlPanelPointTrackerKlt controlKlt;
 	protected ConfigPKlt configKlt = new ConfigPKlt();
 	protected ConfigTrackerHybrid configHybrid = new ConfigTrackerHybrid();
 
-	// Container that specific controls are inserted into
-	private ControlTracker controlTracker;
-	private JPanel controlPanel = new JPanel(new BorderLayout());
-	private JPanel ddaPanel = new JPanel();
+	private final JPanel controlPanel = new JPanel(new BorderLayout());
+	private final JPanel ddaPanel = new JPanel();
 
-	public ControlPanelHybridTracker(Listener listener) {
+	public ControlPanelHybridTracker( Listener listener ) {
 		this.listener = listener;
 
-		ddaPanel.setLayout(new BoxLayout(ddaPanel,BoxLayout.Y_AXIS));
+		ddaPanel.setLayout(new BoxLayout(ddaPanel, BoxLayout.Y_AXIS));
 
 		// Customize the tracker
 		configKlt.toleranceFB = 3;
@@ -77,11 +76,11 @@ public class ControlPanelHybridTracker extends ControlPanelDetDescAssocBase {
 		configDetDesc.typeDescribe = ConfigDescribeRegion.Type.TEMPLATE;
 	}
 
-	public ControlPanelHybridTracker(Listener listener,
-									 @Nullable ConfigTrackerHybrid configHybrid,
-									 @Nullable ConfigPKlt configKlt,
-									 @Nullable ConfigDetectDescribe configDetDesc,
-									 @Nullable ConfigAssociate configAssociate ) {
+	public ControlPanelHybridTracker( Listener listener,
+									  @Nullable ConfigTrackerHybrid configHybrid,
+									  @Nullable ConfigPKlt configKlt,
+									  @Nullable ConfigDetectDescribe configDetDesc,
+									  @Nullable ConfigAssociate configAssociate ) {
 		this.listener = listener;
 		ddaPanel.setLayout(new BoxLayout(ddaPanel, BoxLayout.Y_AXIS));
 
@@ -95,14 +94,15 @@ public class ControlPanelHybridTracker extends ControlPanelDetDescAssocBase {
 	public void initializeControlsGUI() {
 		super.associateWithPixels = true;
 		super.initializeControlsGUI();
-		controlTracker = new ControlTracker();
-		controlKlt = new ControlPanelPointTrackerKlt(()->listener.changedHybridTracker(),null,configKlt);
+		// Container that specific controls are inserted into
+		ControlTracker controlTracker = new ControlTracker();
+		controlKlt = new ControlPanelPointTrackerKlt(() -> listener.changedHybridTracker(), null, configKlt);
 		controlKlt.setBorder(BorderFactory.createEmptyBorder());
 
 		updateActiveControls(selectedSelection);
 
 		add(controlTracker);
-		addLabeled(spinnerSelection,"Component","Select a component of the tracker to modify");
+		addLabeled(spinnerSelection, "Component", "Select a component of the tracker to modify");
 		add(controlPanel);
 	}
 
@@ -110,7 +110,7 @@ public class ControlPanelHybridTracker extends ControlPanelDetDescAssocBase {
 		this.selectedSelection = which;
 		controlPanel.removeAll();
 		JPanel inside;
-		if( which == 0 ) {
+		if (which == 0) {
 			inside = controlKlt;
 		} else {
 			inside = ddaPanel;
@@ -122,7 +122,7 @@ public class ControlPanelHybridTracker extends ControlPanelDetDescAssocBase {
 			}
 			ddaPanel.validate();
 		}
-		if( inside != null ) {
+		if (inside != null) {
 			controlPanel.add(BorderLayout.CENTER, inside);
 		}
 		controlPanel.validate();
@@ -145,10 +145,10 @@ public class ControlPanelHybridTracker extends ControlPanelDetDescAssocBase {
 	}
 
 	@Override
-	protected void handleControlsUpdated() { listener.changedHybridTracker(); }
+	protected void handleControlsUpdated() {listener.changedHybridTracker();}
 
 	@Override
-	public void controlChanged(final Object source) {
+	public void controlChanged( final Object source ) {
 		if (source == comboDetect) {
 			configDetDesc.typeDetector =
 					ConfigDetectInterestPoint.Type.values()[comboDetect.getSelectedIndex()];
@@ -163,23 +163,23 @@ public class ControlPanelHybridTracker extends ControlPanelDetDescAssocBase {
 	}
 
 	public class ControlTracker extends StandardAlgConfigPanel {
-		JSpinner spinnerMaxInactive = spinner(configHybrid.maxInactiveTracks,0,5000,10);
-		JCheckBox checkPruneClose = checkbox("Prune Close",configHybrid.pruneCloseTracks);
-		JConfigLength jRespawn = configLength(configHybrid.thresholdRespawn,0,1000);
+		JSpinner spinnerMaxInactive = spinner(configHybrid.maxInactiveTracks, 0, 5000, 10);
+		JCheckBox checkPruneClose = checkbox("Prune Close", configHybrid.pruneCloseTracks);
+		JConfigLength jRespawn = configLength(configHybrid.thresholdRespawn, 0, 1000);
 
 		public ControlTracker() {
-			addLabeled(spinnerMaxInactive,"Max Inactive","Maximum number of inactive/not visible tracks kept around");
-			addAlignLeft(checkPruneClose,"Prune tracks if they get too close to each other");
-			addLabeled(jRespawn,"Respawn","Respawn tracks when the number of active tracks drops below this threshold");
+			addLabeled(spinnerMaxInactive, "Max Inactive", "Maximum number of inactive/not visible tracks kept around");
+			addAlignLeft(checkPruneClose, "Prune tracks if they get too close to each other");
+			addLabeled(jRespawn, "Respawn", "Respawn tracks when the number of active tracks drops below this threshold");
 		}
 
 		@Override
-		public void controlChanged(final Object source) {
-			if( source == spinnerMaxInactive) {
-				configHybrid.maxInactiveTracks = (Integer) spinnerMaxInactive.getValue();
-			} else if( source == checkPruneClose ) {
+		public void controlChanged( final Object source ) {
+			if (source == spinnerMaxInactive) {
+				configHybrid.maxInactiveTracks = (Integer)spinnerMaxInactive.getValue();
+			} else if (source == checkPruneClose) {
 				configHybrid.pruneCloseTracks = checkPruneClose.isSelected();
-			} else if( source == jRespawn ) {
+			} else if (source == jRespawn) {
 				configHybrid.thresholdRespawn.setTo(jRespawn.getValue());
 			} else {
 				throw new RuntimeException("BUG");

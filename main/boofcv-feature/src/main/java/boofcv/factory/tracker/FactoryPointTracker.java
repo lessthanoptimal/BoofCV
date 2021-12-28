@@ -412,7 +412,7 @@ public class FactoryPointTracker {
 	 * @param configDescribe Configuration for SURF descriptor
 	 * @param configOrientation Configuration for region orientation. If null then orientation isn't estimated
 	 * @param imageType Type of image the input is.
-	 * @param derivType Image derivative type.       @return SURF based tracker.
+	 * @param derivType Image derivative type.      @return SURF based tracker.
 	 * @see ShiTomasiCornerIntensity
 	 * @see DescribePointSurf
 	 */
@@ -460,7 +460,7 @@ public class FactoryPointTracker {
 	 * @param describe Feature description
 	 * @param associate Association algorithm.
 	 * @param kltConfig Configuration for KLT tracker
-	 * @param imageType Input image type.    @return Feature tracker
+	 * @param imageType Input image type.   @return Feature tracker
 	 * @see HybridTrackerScalePoint
 	 */
 	public static <I extends ImageGray<I>, Desc extends TupleDesc<Desc>>
@@ -483,7 +483,7 @@ public class FactoryPointTracker {
 	 * @param detector Feature detector and describer.
 	 * @param associate Association algorithm.
 	 * @param kltConfig Configuration for KLT tracker
-	 * @param imageType Input image type.    @return Feature tracker
+	 * @param imageType Input image type.   @return Feature tracker
 	 * @see HybridTrackerScalePoint
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>, Desc extends TupleDesc<Desc>>

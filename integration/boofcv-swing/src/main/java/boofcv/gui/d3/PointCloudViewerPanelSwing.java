@@ -88,7 +88,7 @@ public class PointCloudViewerPanelSwing extends JPanel
 	// If true then fog is rendered. This makes points fade to background color at a distance
 	boolean fog;
 
-	PointCloudViewer.Colorizer colorizer;
+	@Nullable PointCloudViewer.Colorizer colorizer;
 
 	// intrinsic camera parameters
 	float hfov = UtilAngle.radian(50);
@@ -146,13 +146,13 @@ public class PointCloudViewerPanelSwing extends JPanel
 		stepSize = keyStepSize;
 
 		addFocusListener(new FocusListener() {
-			ScheduledFuture<?> future;
+			@Nullable ScheduledFuture<?> future;
 			@Override
 			public void focusGained( FocusEvent e ) {
 				KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(keyboard);
 
 				// start a timed task which checks current key presses. Less OS dependent this way
-				if (pressedTask!=null)
+				if (pressedTask != null)
 					throw new RuntimeException("BUG! pressedTask is not null");
 				pressedTask = Executors.newScheduledThreadPool(1);
 				future = pressedTask.scheduleAtFixedRate(new KeyPressedTask(), 100, 30, TimeUnit.MILLISECONDS);
@@ -232,7 +232,7 @@ public class PointCloudViewerPanelSwing extends JPanel
 
 	public void addPoint( float x, float y, float z, int rgb ) {
 		synchronized (cloudXyz) {
-			cloudXyz.append(x,y,z);
+			cloudXyz.append(x, y, z);
 			cloudColor.add(rgb);
 		}
 	}
@@ -299,7 +299,9 @@ public class PointCloudViewerPanelSwing extends JPanel
 		}
 	}
 
-	private void renderCloud( CameraPinhole intrinsic, final PointCloudViewer.Colorizer colorizer, float maxDistanceSq ) {
+	private void renderCloud( CameraPinhole intrinsic,
+							  final @Nullable PointCloudViewer.Colorizer colorizer,
+							  float maxDistanceSq ) {
 		if (!rendering.lock.isLocked())
 			throw new RuntimeException("Must be locked already");
 
@@ -314,7 +316,7 @@ public class PointCloudViewerPanelSwing extends JPanel
 		final float cy = (float)intrinsic.cy;
 		// NOTE: To make this concurrent there needs to be a way to write the points and not run into race conditions
 		//       Each thread writing to its own image seems too expensive for large images and combining the results
-		cloudXyz.forIdx(0, cloudXyz.size(), (BoofLambdas.ProcessIndex<Point3D_F32>)( idx, worldPt)-> {
+		cloudXyz.forIdx(0, cloudXyz.size(), (BoofLambdas.ProcessIndex<Point3D_F32>)( idx, worldPt ) -> {
 			SePointOps_F32.transform(worldToCamera, worldPt, cameraPt);
 
 			// can't render if it's behind the camera
@@ -470,9 +472,9 @@ public class PointCloudViewerPanelSwing extends JPanel
 		final GrayS32 imageRgb = rendering.imageRgb;
 
 		int x0 = cx - dotRadius;
-		int x1 = cx + dotRadius+1;
+		int x1 = cx + dotRadius + 1;
 		int y0 = cy - dotRadius;
-		int y1 = cy + dotRadius+1;
+		int y1 = cy + dotRadius + 1;
 
 		if (x0 < 0) x0 = 0;
 		if (x1 > imageRgb.width) x1 = imageRgb.width;
@@ -493,7 +495,6 @@ public class PointCloudViewerPanelSwing extends JPanel
 
 	boolean shiftPressed = false;
 	boolean controlPressed = false;
-
 
 	private final ReentrantLock lockPressed = new ReentrantLock();
 	private final Set<Integer> pressed = new HashSet<>();
@@ -543,7 +544,7 @@ public class PointCloudViewerPanelSwing extends JPanel
 			multiplier *= controlPressed ? 1.0f/5.0f : 1.0f;
 
 			Integer[] keys = pressed.toArray(new Integer[0]);
-			for( int k : keys ) {
+			for (int k : keys) {
 				switch (k) {
 					case KeyEvent.VK_W -> z -= multiplier;
 					case KeyEvent.VK_S -> z += multiplier;
@@ -620,9 +621,9 @@ public class PointCloudViewerPanelSwing extends JPanel
 			// Roll if control is held down
 			int centerX = getWidth()/2;
 			int centerY = getHeight()/2;
-			double angle0 = Math.atan2(prevX-centerX, prevY-centerY);
-			double angle1 = Math.atan2(e.getX()-centerX, e.getY()-centerY);
-			rotZ += (float)(angle0-angle1);
+			double angle0 = Math.atan2(prevX - centerX, prevY - centerY);
+			double angle1 = Math.atan2(e.getX() - centerX, e.getY() - centerY);
+			rotZ += (float)(angle0 - angle1);
 		} else {
 			// otherwise pan and tilt
 			rotY += (e.getX() - prevX)*0.002f;

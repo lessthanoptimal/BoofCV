@@ -37,6 +37,7 @@ import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.FMatrixRMaj;
 import org.ejml.ops.ConvertMatrixData;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -50,19 +51,20 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class DisplayPinholeCalibrationPanel extends DisplayCalibrationPanel {
 
 	// which image is being displayed
 	int selectedImage;
 	// for displaying undistorted image
-	BufferedImage distorted;
+	@Nullable BufferedImage distorted;
 	BufferedImage undistorted;
 
 	// for displaying corrected image
 	Planar<GrayF32> origMS = new Planar<>(GrayF32.class, 1, 1, 3);
 	Planar<GrayF32> correctedMS = new Planar<>(GrayF32.class, 1, 1, 3);
 
-	ImageDistort<GrayF32, GrayF32> undoRadial;
+	@Nullable ImageDistort<GrayF32, GrayF32> undoRadial;
 
 	// int horizontal line
 	int lineY = -1;
@@ -85,7 +87,7 @@ public class DisplayPinholeCalibrationPanel extends DisplayCalibrationPanel {
 		});
 	}
 
-	@Override public synchronized void setBufferedImageNoChange( BufferedImage image ) {
+	@Override public synchronized void setBufferedImageNoChange( @Nullable BufferedImage image ) {
 		this.distorted = image;
 		undoRadialDistortion(distorted);
 	}
@@ -122,7 +124,7 @@ public class DisplayPinholeCalibrationPanel extends DisplayCalibrationPanel {
 		repaint();
 	}
 
-	private void undoRadialDistortion( BufferedImage image ) {
+	private void undoRadialDistortion( @Nullable BufferedImage image ) {
 		if (undoRadial == null || image == null)
 			return;
 

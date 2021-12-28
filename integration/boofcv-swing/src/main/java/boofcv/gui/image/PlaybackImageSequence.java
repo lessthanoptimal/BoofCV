@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.gui.image;
 
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.image.ImageGray;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.image.BufferedImage;
 
@@ -30,20 +31,17 @@ import java.awt.image.BufferedImage;
  */
 public class PlaybackImageSequence<T extends ImageGray<T>> extends ProcessImageSequence<T> {
 
-	ImagePanel panel;
+	@Nullable ImagePanel panel;
 
-
-	public PlaybackImageSequence(SimpleImageSequence<T> sequence) {
+	public PlaybackImageSequence( SimpleImageSequence<T> sequence ) {
 		super(sequence);
 	}
 
 	@Override
-	public void processFrame(T image) {
-
-	}
+	public void processFrame( T image ) {}
 
 	@Override
-	public void updateGUI(BufferedImage guiImage, T origImage) {
+	public void updateGUI( BufferedImage guiImage, T origImage ) {
 		if (panel == null) {
 			panel = ShowImages.showWindow(guiImage, "Image Sequence");
 			addComponent(panel);

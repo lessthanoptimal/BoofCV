@@ -33,10 +33,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
+import java.util.*;
 
 import static javax.swing.text.DefaultCaret.ALWAYS_UPDATE;
 
@@ -231,10 +229,10 @@ public class FileBrowser extends JSpringPanel {
 	}
 
 	/**
-	 * The parent directory has changed. Update the file list.  If file is null then it's assumed to be
+	 * The parent directory has changed. Update the file list. If file is null then it's assumed to be
 	 * the list of all devices. On unix there's only one which is / but on windows there can be multiple
 	 */
-	public void setDirectory( File file ) {
+	public void setDirectory( @Nullable File file ) {
 
 		List<File> roots = null;
 		if (file == null) {
@@ -254,7 +252,7 @@ public class FileBrowser extends JSpringPanel {
 		}
 
 		if (roots == null) {
-			setDirectoryNormal(file);
+			setDirectoryNormal(Objects.requireNonNull(file));
 		} else {
 			// Present the user with a list of file system roots
 			textFileName.setText("");
@@ -454,7 +452,7 @@ public class FileBrowser extends JSpringPanel {
 	}
 
 	public interface Listener {
-		void handleSelectedFile( File file );
+		void handleSelectedFile( @Nullable File file );
 
 		void handleDoubleClickedFile( File file );
 	}

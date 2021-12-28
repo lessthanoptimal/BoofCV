@@ -66,10 +66,8 @@ import java.io.UncheckedIOException;
 import java.net.URL;
 import java.text.NumberFormat;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.prefs.Preferences;
 
 public class BoofSwingUtil {
@@ -157,11 +155,12 @@ public class BoofSwingUtil {
 		return f;
 	}
 
-	public static File saveFileChooser( Component parent, FileTypes... filters ) {
+	public static @Nullable File saveFileChooser( Component parent, FileTypes... filters ) {
 		return fileChooser(null, parent, false, new File(".").getPath(), null, filters);
 	}
 
-	public static String[] openImageSetChooser( Window parent, OpenImageSetDialog.Mode mode, int numberOfImages ) {
+	public static @Nullable String[] openImageSetChooser( @Nullable Window parent,
+														  OpenImageSetDialog.Mode mode, int numberOfImages ) {
 		Preferences prefs;
 		if (parent == null) {
 			prefs = Preferences.userRoot();
@@ -179,7 +178,7 @@ public class BoofSwingUtil {
 		return response;
 	}
 
-	public static OpenStereoSequencesChooser.Selected openStereoChooser(
+	public static @Nullable OpenStereoSequencesChooser.Selected openStereoChooser(
 			Window parent, @Nullable Class<?> owner, boolean isSequence, boolean justImages ) {
 		Preferences prefs;
 		if (owner == null) {
@@ -199,7 +198,7 @@ public class BoofSwingUtil {
 		return response;
 	}
 
-	public static String getDefaultPath( Object parent, String key ) {
+	public static String getDefaultPath( @Nullable Object parent, @Nullable String key ) {
 		File defaultPath = BoofSwingUtil.directoryUserHome();
 		if (key == null)
 			return defaultPath.getPath();
@@ -213,7 +212,7 @@ public class BoofSwingUtil {
 		return prefs.get(key, defaultPath.getPath());
 	}
 
-	public static void saveDefaultPath( Object parent, String key, File file ) {
+	public static void saveDefaultPath( @Nullable Object parent, @Nullable String key, File file ) {
 		if (key == null)
 			return;
 		Preferences prefs;
@@ -231,23 +230,23 @@ public class BoofSwingUtil {
 	 * Opens a file choose when there is no parent component. Instead a string can be passed in so that the
 	 * preference is specific to the application still
 	 */
-	public static File openFileChooser( String preferenceName, FileTypes... filters ) {
+	public static @Nullable File openFileChooser( @Nullable String preferenceName, FileTypes... filters ) {
 		return fileChooser(preferenceName, null, true, new File(".").getPath(), null, filters);
 	}
 
-	public static File openFilePreview( String preferenceName, FileTypes... filters ) {
+	public static @Nullable File openFilePreview( @Nullable String preferenceName, FileTypes... filters ) {
 		return fileChooserPreview(preferenceName, null, true, new File(".").getPath(), filters);
 	}
 
-	public static File openFileChooser( Component parent, FileTypes... filters ) {
+	public static @Nullable File openFileChooser( @Nullable Component parent, FileTypes... filters ) {
 		return openFileChooser(parent, new File(".").getPath(), filters);
 	}
 
-	public static File openFilePreview( Component parent, FileTypes... filters ) {
+	public static @Nullable File openFilePreview( @Nullable Component parent, FileTypes... filters ) {
 		return fileChooserPreview(null, parent, true, new File(".").getPath(), filters);
 	}
 
-	public static File openFileChooser( Component parent, String defaultPath, FileTypes... filters ) {
+	public static @Nullable File openFileChooser( @Nullable Component parent, String defaultPath, FileTypes... filters ) {
 
 		// For now don't use the preview chooser if there are directories
 		boolean directories = false;
@@ -274,9 +273,12 @@ public class BoofSwingUtil {
 	 *
 	 * @param massageName A lambda that lets you change the name of the previous path. Useful when a file type is selected.
 	 */
-	public static File fileChooser( @Nullable String preferenceName, Component parent, boolean openFile, String defaultPath,
-									@Nullable BoofLambdas.MassageString massageName,
-									FileTypes... filters ) {
+	public static @Nullable File fileChooser( @Nullable String preferenceName,
+											  @Nullable Component parent,
+											  boolean openFile,
+											  String defaultPath,
+											  @Nullable BoofLambdas.MassageString massageName,
+											  FileTypes... filters ) {
 
 		if (preferenceName == null && parent != null) {
 			preferenceName = parent.getClass().getSimpleName();
@@ -351,7 +353,10 @@ public class BoofSwingUtil {
 	/**
 	 * File chooser with a preview. Work in progress for replacing the old file chooser
 	 */
-	public static File fileChooserPreview( String preferenceName, Component parent, boolean openFile, String defaultPath, FileTypes... filters ) {
+	public static @Nullable File fileChooserPreview( @Nullable String preferenceName,
+													 @Nullable Component parent,
+													 boolean openFile,
+													 String defaultPath, FileTypes... filters ) {
 
 		if (preferenceName == null && parent != null) {
 			preferenceName = parent.getClass().getSimpleName();
@@ -443,7 +448,7 @@ public class BoofSwingUtil {
 			for (var d : decoded) {
 				RecentFiles r = new RecentFiles();
 				r.name = (String)d.getOrDefault("name", "DefaultName");
-				r.files = (java.util.List<String>)d.get("files");
+				r.files = (java.util.List<String>)Objects.requireNonNull(d.get("files"));
 				results.add(r);
 			}
 			return results;
@@ -691,8 +696,8 @@ public class BoofSwingUtil {
 		return item;
 	}
 
-	public static void setMenuItemKeys( JMenuItem menu, int mnmonic, int accelerator ) {
-		menu.setMnemonic(mnmonic);
+	public static void setMenuItemKeys( JMenuItem menu, int mnemonic, int accelerator ) {
+		menu.setMnemonic(mnemonic);
 		menu.setAccelerator(KeyStroke.getKeyStroke(accelerator, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 	}
 
@@ -799,13 +804,13 @@ public class BoofSwingUtil {
 		return scale;
 	}
 
-	public static JButton button( String name, ActionListener action ) {
+	public static JButton button( String name, @Nullable ActionListener action ) {
 		var b = new JButton(name);
 		b.addActionListener(action);
 		return b;
 	}
 
-	public static JCheckBox checkbox( String name, boolean checked, ActionListener action ) {
+	public static JCheckBox checkbox( String name, boolean checked, @Nullable ActionListener action ) {
 		var b = new JCheckBox(name);
 		if (action != null)
 			b.addActionListener(action);
@@ -823,7 +828,7 @@ public class BoofSwingUtil {
 	/**
 	 * Opens a dialog, asks the user where to save the point cloud, then saves the point cloud
 	 */
-	public static void savePointCloudDialog( Component owner, String key, PointCloudViewer pcv ) {
+	public static void savePointCloudDialog( @Nullable Component owner, @Nullable String key, PointCloudViewer pcv ) {
 		String path = getDefaultPath(owner, key);
 
 		var fileChooser = new JFileChooser();
@@ -849,7 +854,7 @@ public class BoofSwingUtil {
 	/**
 	 * Opens a dialog, asks the user where to save the sequence of Se3
 	 */
-	public static void saveListSe3Dialog( Component owner, String key, PointCloudViewer pcv ) {
+	public static void saveListSe3Dialog( @Nullable Component owner, @Nullable String key, PointCloudViewer pcv ) {
 		String path = getDefaultPath(owner, key);
 
 		var fileChooser = new JFileChooser();
@@ -876,7 +881,7 @@ public class BoofSwingUtil {
 	 * Opens a dialog, asks the user where to save the disparity image, converts the image into a U16 format,
 	 * saves it as a PNG
 	 */
-	public static void saveDisparityDialog( JComponent owner, String key, ImageGray d ) {
+	public static void saveDisparityDialog( @Nullable JComponent owner, @Nullable String key, ImageGray d ) {
 
 		String path = getDefaultPath(owner, key);
 		var fileChooser = new JFileChooser();
@@ -908,10 +913,10 @@ public class BoofSwingUtil {
 	 * Renders camera views as squares from a {@link SceneStructureMetric}
 	 */
 	public static void visualizeCameras( SceneStructureMetric structure, PointCloudViewer viewer ) {
-		DogArray<Point3D_F64> vertexes = new DogArray<>(Point3D_F64::new);
-		Se3_F64 world_to_view = new Se3_F64();
-		Se3_F64 view_to_world = new Se3_F64();
-		Se3_F64 tmpSE3 = new Se3_F64();
+		var vertexes = new DogArray<>(Point3D_F64::new);
+		var world_to_view = new Se3_F64();
+		var view_to_world = new Se3_F64();
+		var tmpSE3 = new Se3_F64();
 		double r = 0.1;
 		structure.views.forEach(v -> {
 			structure.getWorldToView(v, world_to_view, tmpSE3).invert(view_to_world);
@@ -941,6 +946,7 @@ public class BoofSwingUtil {
 		});
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	public static class RecentFiles {
 		public String name;
 		public java.util.List<String> files;

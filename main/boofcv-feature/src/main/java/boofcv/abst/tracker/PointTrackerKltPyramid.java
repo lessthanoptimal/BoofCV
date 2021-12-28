@@ -108,7 +108,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 	 * @param templateRadius Radius of square templates that are tracked
 	 * @param performPruneClose If true it will prune tracks that are within the detection radius
 	 * @param pyramid The image pyramid which KLT is tracking inside of
-	 * @param detector Feature detector.  If null then no feature detector will be available and spawn won't work.
+	 * @param detector Feature detector. If null then no feature detector will be available and spawn won't work.
 	 * @param gradient Computes gradient image pyramid.
 	 * @param interpInput Interpolation used on input image
 	 * @param interpDeriv Interpolation used on gradient images

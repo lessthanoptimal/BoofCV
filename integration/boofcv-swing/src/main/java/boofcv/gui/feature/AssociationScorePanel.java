@@ -31,8 +31,8 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class AssociationScorePanel<D>
-		extends CompareTwoImagePanel implements MouseListener {
+@SuppressWarnings({"NullAway.Init"})
+public class AssociationScorePanel<D> extends CompareTwoImagePanel implements MouseListener {
 	// adjusts how close to the optimal answer a point needs to be before it is plotted
 	double containmentFraction;
 

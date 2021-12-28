@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.image.ImagePanel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.UtilImageIO;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -64,8 +65,8 @@ public class OpenImageSetDialog extends JPanel {
 
 	// handling the image preview
 	private final Object lockPreview = new Object();
-	PreviewThread previewThread;
-	String pendingPreview;
+	@Nullable PreviewThread previewThread;
+	@Nullable String pendingPreview;
 
 	public OpenImageSetDialog( JDialog dialog, Listener listener, File directory ) {
 		setLayout(new BorderLayout());
@@ -160,9 +161,8 @@ public class OpenImageSetDialog extends JPanel {
 	}
 
 	private class BrowserListener implements FileBrowser.Listener {
-
 		@Override
-		public void handleSelectedFile( File file ) {
+		public void handleSelectedFile( @Nullable File file ) {
 			if (file == null) {
 				showPreview("");
 			} else {
@@ -336,6 +336,7 @@ public class OpenImageSetDialog extends JPanel {
 		void userCanceled();
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	public static class DefaultListener implements Listener {
 
 		JDialog dialog;
@@ -364,17 +365,12 @@ public class OpenImageSetDialog extends JPanel {
 		EXACTLY
 	}
 
-	public static String[] showDialog( File directory, Mode mode, int numberOfImages, Window owner ) {
-		String title = "";
-		switch (mode) {
-			case EXACTLY:
-				title = "Select exactly " + numberOfImages + " images";
-				break;
-
-			case MINIMUM:
-				title = "Select at least " + numberOfImages + " images";
-				break;
-		}
+	public static @Nullable String[] showDialog( File directory, Mode mode, int numberOfImages,
+												 @Nullable Window owner ) {
+		String title = switch (mode) {
+			case EXACTLY -> "Select exactly " + numberOfImages + " images";
+			case MINIMUM -> "Select at least " + numberOfImages + " images";
+		};
 
 		JDialog dialog = new JDialog(owner, title, Dialog.ModalityType.APPLICATION_MODAL);
 		DefaultListener listener = new DefaultListener(dialog);

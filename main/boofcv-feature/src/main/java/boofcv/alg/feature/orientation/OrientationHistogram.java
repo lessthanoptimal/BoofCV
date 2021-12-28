@@ -30,7 +30,7 @@ import boofcv.struct.image.ImageGray;
  * <p>
  * Estimates the orientation by creating a histogram of discrete angles around
  * the entire circle. The angle with the largest sum of edge intensities is considered
- * to be the direction of the region.   If weighted a Gaussian kernel centered around the targeted
+ * to be the direction of the region.  If weighted a Gaussian kernel centered around the targeted
  * pixel is used.
  * </p>
  *

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,10 +35,8 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class ImageClassificationPanel extends JPanel
-		implements ListSelectionListener
-{
-
+@SuppressWarnings({"NullAway.Init"})
+public class ImageClassificationPanel extends JPanel implements ListSelectionListener {
 	JTextArea textArea = new JTextArea();
 
 	JScrollPane listScroll;
@@ -50,7 +48,7 @@ public class ImageClassificationPanel extends JPanel
 	final List<Image> results = new ArrayList<>();
 
 	public ImageClassificationPanel() {
-		super( new BorderLayout());
+		super(new BorderLayout());
 
 		listPanel = new JList(listModel);
 
@@ -63,9 +61,9 @@ public class ImageClassificationPanel extends JPanel
 		listScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
 		centerPanel = new JLayeredPane();
-		centerPanel.setPreferredSize(new Dimension(600,600));
-		centerPanel.add( textArea , 0);
-		centerPanel.add( centerImage , 1);
+		centerPanel.setPreferredSize(new Dimension(600, 600));
+		centerPanel.add(textArea, 0);
+		centerPanel.add(centerImage, 1);
 
 		centerImage.setScaling(ScaleOptions.DOWN);
 		centerImage.setOpaque(true);
@@ -75,22 +73,22 @@ public class ImageClassificationPanel extends JPanel
 		textArea.setLineWrap(false);
 		textArea.setOpaque(true);
 		textArea.setForeground(Color.BLACK);
-		textArea.setBackground(new Color(255,255,255,125));
+		textArea.setBackground(new Color(255, 255, 255, 125));
 
 		add(centerPanel, BorderLayout.CENTER);
 		add(listScroll, BorderLayout.WEST);
 	}
 
-	public void addImage(BufferedImage image , String name,
-						 List<ImageClassifier.Score> scores , List<String> categories ) {
+	public void addImage( BufferedImage image, String name,
+						  List<ImageClassifier.Score> scores, List<String> categories ) {
 		synchronized (results) {
 			final Image a = new Image();
 			a.image = image;
 			a.name = name;
-			for( ImageClassifier.Score score : scores ) {
-				a.results.add(String.format("%6.2f %s", score.score,categories.get(score.category)));
+			for (ImageClassifier.Score score : scores) {
+				a.results.add(String.format("%6.2f %s", score.score, categories.get(score.category)));
 			}
-			results.add( a );
+			results.add(a);
 
 			SwingUtilities.invokeLater(() -> {
 				listModel.addElement(a.name);
@@ -107,12 +105,12 @@ public class ImageClassificationPanel extends JPanel
 	}
 
 	@Override
-	public void valueChanged(ListSelectionEvent e) {
-		if( e.getValueIsAdjusting() )
+	public void valueChanged( ListSelectionEvent e ) {
+		if (e.getValueIsAdjusting())
 			return;
 
 		final int index = listPanel.getSelectedIndex();
-		if( index >= 0 ) {
+		if (index >= 0) {
 			final Image selected;
 			synchronized (results) {
 				selected = results.get(index);
@@ -122,23 +120,23 @@ public class ImageClassificationPanel extends JPanel
 				String text = "";
 				int N = Math.min(5, selected.results.size());
 				for (String s : selected.results.subList(0, N)) {
-					text += s+"\n";
+					text += s + "\n";
 				}
 				textArea.setText(text);
 
 				Dimension tp = textArea.getPreferredSize();
-				textArea.setBounds(0,0,tp.width,tp.height);
+				textArea.setBounds(0, 0, tp.width, tp.height);
 
-				int w = Math.min(selected.image.getWidth(),centerPanel.getWidth());
-				int h = Math.min(selected.image.getHeight(),centerPanel.getHeight());
+				int w = Math.min(selected.image.getWidth(), centerPanel.getWidth());
+				int h = Math.min(selected.image.getHeight(), centerPanel.getHeight());
 
-				centerImage.setBounds(0,0,w,h);
+				centerImage.setBounds(0, 0, w, h);
 				centerImage.setImageRepaint(selected.image);
 			});
 		}
 	}
 
-
+	@SuppressWarnings({"NullAway.Init"})
 	private static class Image {
 		BufferedImage image;
 		String name;

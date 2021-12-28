@@ -50,6 +50,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.util.Objects;
 
 /**
  * Used to display a calibrated fisheye camera. Shows a rendered pinhole camera view at the selected location
@@ -57,6 +58,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class DisplayFisheyeCalibrationPanel extends DisplayCalibrationPanel {
 
 	@Nullable NarrowToWidePtoP_F32 distorter;
@@ -108,7 +110,7 @@ public class DisplayFisheyeCalibrationPanel extends DisplayCalibrationPanel {
 	}
 
 	@Override
-	public synchronized void setBufferedImageNoChange( BufferedImage image ) {
+	public synchronized void setBufferedImageNoChange( @Nullable BufferedImage image ) {
 		super.setBufferedImageNoChange(image);
 		if (image == null)
 			return;
@@ -144,17 +146,19 @@ public class DisplayFisheyeCalibrationPanel extends DisplayCalibrationPanel {
 		this.pixelX = pixelX;
 		this.pixelY = pixelY;
 
-		Point3D_F32 norm = new Point3D_F32();
+		var norm = new Point3D_F32();
+		Objects.requireNonNull(fisheyeDistort);
 		fisheyeDistort.undistortPtoS_F32().compute((float)pixelX, (float)pixelY, norm);
 
-		Rodrigues_F32 rotation = new Rodrigues_F32();
+		var rotation = new Rodrigues_F32();
 
-		Vector3D_F32 canonical = new Vector3D_F32(0, 0, 1);
+		var canonical = new Vector3D_F32(0, 0, 1);
 		rotation.theta = UtilVector3D_F32.acute(new Vector3D_F32(norm), canonical);
 		GeometryMath_F32.cross(canonical, norm, rotation.unitAxisRotation);
 		rotation.unitAxisRotation.normalize();
 
 		FMatrixRMaj R = ConvertRotation3D_F32.rodriguesToMatrix(rotation, null);
+		Objects.requireNonNull(distorter);
 		distorter.setRotationWideToNarrow(R);
 		distortImage.setModel(new PointToPixelTransform_F32(distorter));
 	}
@@ -178,7 +182,7 @@ public class DisplayFisheyeCalibrationPanel extends DisplayCalibrationPanel {
 	protected void paintInPanel( AffineTransform tran, Graphics2D g2 ) {
 		drawFeatures(g2, scale);
 
-		if (!showUndistorted || bufferedRendered == null)
+		if (!showUndistorted || bufferedRendered == null || img == null)
 			return;
 
 		// Ensure that it is 1/2 the size of the input

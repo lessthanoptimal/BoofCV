@@ -47,7 +47,7 @@ import javax.swing.*;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"NullAway.Init"})
 public abstract class ControlPanelDetDescAssocBase extends StandardAlgConfigPanel {
 	protected JComboBox<String> comboDetect;
 	protected JComboBox<String> comboDescribe;

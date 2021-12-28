@@ -22,6 +22,7 @@ import boofcv.gui.BoofSwingUtil;
 import georegression.geometry.UtilPoint2D_I32;
 import georegression.struct.point.Point2D_I32;
 import lombok.Setter;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -29,6 +30,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
+import java.util.Objects;
 
 /**
  * Allows the user to select a point, its size, and orientation. First the user clicks on a point
@@ -37,13 +39,14 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class SelectRegionDescriptionPanel extends JPanel implements MouseListener, MouseMotionListener {
 
 	double clickTolerance = 10;
 
 	BufferedImage background;
-	Point2D_I32 target;
-	Point2D_I32 current;
+	@Nullable Point2D_I32 target;
+	@Nullable Point2D_I32 current;
 
 	// scale of background to view
 	double imageScale;
@@ -75,9 +78,10 @@ public class SelectRegionDescriptionPanel extends JPanel implements MouseListene
 	}
 
 	public Point2D_I32 getTarget() {
-		return target.copy();
+		return Objects.requireNonNull(target).copy();
 	}
 
+	@SuppressWarnings("NullAway")
 	public double getFeatureRadius() {
 		double r = UtilPoint2D_I32.distance(target, current);
 		if (r < 1)
@@ -85,6 +89,7 @@ public class SelectRegionDescriptionPanel extends JPanel implements MouseListene
 		return r;
 	}
 
+	@SuppressWarnings("NullAway")
 	public double getFeatureOrientation() {
 		double dy = current.y - target.y;
 		double dx = current.x - target.x;
@@ -108,7 +113,7 @@ public class SelectRegionDescriptionPanel extends JPanel implements MouseListene
 
 		g2.drawImage(background, 0, 0, dstWidth, dstHeight, 0, 0, background.getWidth(), background.getHeight(), null);
 
-		if (target != null) {
+		if (target != null && current != null) {
 			int x1 = (int)(imageScale*target.x);
 			int y1 = (int)(imageScale*target.y);
 			int x2 = (int)(imageScale*current.x);
@@ -153,7 +158,6 @@ public class SelectRegionDescriptionPanel extends JPanel implements MouseListene
 		imageScale = Math.min(scaleX, scaleY);
 	}
 
-
 	@Override
 	public void mousePressed( MouseEvent e ) {
 		int x = (int)(e.getX()/imageScale);
@@ -171,7 +175,7 @@ public class SelectRegionDescriptionPanel extends JPanel implements MouseListene
 			current = null;
 		} else {
 			boolean adjusted = false;
-			if (target != null) {
+			if (target != null && current != null) {
 				// if the user clicked on the center point enter drag mode
 				int targetX = (int)(target.x*imageScale);
 				int targetY = (int)(target.y*imageScale);
@@ -210,7 +214,7 @@ public class SelectRegionDescriptionPanel extends JPanel implements MouseListene
 
 	@Override
 	public void mouseDragged( MouseEvent e ) {
-		if (current == null) {
+		if (current == null || target == null) {
 			return;
 		}
 		int x = (int)(e.getX()/imageScale);
@@ -238,6 +242,6 @@ public class SelectRegionDescriptionPanel extends JPanel implements MouseListene
 
 	@FunctionalInterface
 	public interface Listener {
-		void descriptionChanged( Point2D_I32 pt, double radius, double orientation );
+		void descriptionChanged( @Nullable Point2D_I32 pt, double radius, double orientation );
 	}
 }

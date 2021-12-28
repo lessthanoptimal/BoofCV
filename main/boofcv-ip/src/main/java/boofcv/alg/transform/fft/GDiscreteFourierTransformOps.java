@@ -47,7 +47,7 @@ public class GDiscreteFourierTransformOps {
 	}
 
 	/**
-	 * Moves the zero-frequency component into the image center (width/2,height/2).  This function can
+	 * Moves the zero-frequency component into the image center (width/2,height/2). This function can
 	 * be called to undo the transform.
 	 *
 	 * @param transform the DFT which is to be shifted.

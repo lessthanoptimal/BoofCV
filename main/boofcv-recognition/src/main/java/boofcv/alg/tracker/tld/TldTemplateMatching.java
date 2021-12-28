@@ -94,7 +94,7 @@ public class TldTemplateMatching<T extends ImageGray<T>> {
 
 	/**
 	 * Adds a descriptor to the positive or negative list. If it is very similar to an existing one it is not
-	 * added.  Look at code for details
+	 * added. Look at code for details
 	 *
 	 * @param positive true for positive list and false for negative list
 	 * @param f The feature which is to be added

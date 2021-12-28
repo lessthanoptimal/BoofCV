@@ -39,7 +39,7 @@ import java.util.List;
  * <pre>
  * [ &lambda;[1,1]*x[1,1] , &lambda;[1,2]*x[1,2] , ... , &lambda;[1,M]*x[1,M] ]  = [ P[1] ] * [X[1], X[2], ... , X[N]
  * [ &lambda;[2,1]*x[1,1] , &lambda;[2,2]*x[1,2] , ... , &lambda;[2,M]*x[2,M] ]  = [ P[2] ]
- * [                                 ...                ]  = [ ... ]
+ * [                                 ...               ]  = [ ... ]
  * [ &lambda;[N,1]*x[1,1] , &lambda;[N,2]*x[1,2] , ... , &lambda;[N,M]*x[N,M] ]  = [ P[M] ]
  * </pre>
  * where &lambda; is the depth, x is homogenous pixel coordinate, P is 3x4 projective, X is 3D feature location in

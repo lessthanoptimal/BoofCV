@@ -24,6 +24,7 @@ import boofcv.io.UtilIO;
 import boofcv.misc.BoofMiscOps;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -282,7 +283,7 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 	}
 
 	@SuppressWarnings("JdkObsolete")
-	private TreePath searchTree( String text, DefaultMutableTreeNode node, boolean forward ) {
+	private @Nullable TreePath searchTree( String text, DefaultMutableTreeNode node, boolean forward ) {
 		Enumeration<TreeNode> e = ((DefaultMutableTreeNode)this.tree.getModel().getRoot()).breadthFirstEnumeration();
 		if (!forward) {
 			final var tmp = new ArrayDeque<TreeNode>();
@@ -566,6 +567,7 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		@Override public String toString() {return app.getSimpleName();}
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	public static class ActiveProcess extends Thread {
 		AppInfo info;
 		JavaRuntimeLauncher launcher;

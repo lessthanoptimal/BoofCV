@@ -44,13 +44,13 @@ import java.util.List;
  * <p>
  * The Fast Hessian (FH) [1] interest point detector is designed to be a fast multi-scale "blob" detector. FH
  * is intended for use as a feature detector for SURF [1]. It works  by computing an approximation of the
- * image Hessian's determinant using "box-lets" type features.  Unlike traditional scale-space algorithms
+ * image Hessian's determinant using "box-lets" type features. Unlike traditional scale-space algorithms
  * the feature itself is rescaled and is efficiently computed using an {@link boofcv.alg.transform.ii.IntegralImageOps integral image}.
  * </p>
  *
  * <p>
  * This class is intended to be a faithful implementation of the algorithm described in [1]. Deviations
- * from that paper are noted in the code an in the comments below.  This detector can be used to implement
+ * from that paper are noted in the code an in the comments below. This detector can be used to implement
  * the FH-9 and FH-15 detectors. For the FH-15 detector the input image needs to be doubled in size prior
  * to processing and the feature location rescaled.
  * </p>

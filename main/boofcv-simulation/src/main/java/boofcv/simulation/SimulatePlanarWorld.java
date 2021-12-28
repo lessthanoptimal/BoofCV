@@ -55,6 +55,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class SimulatePlanarWorld {
 
 	GrayF32 output = new GrayF32(1, 1);
@@ -330,6 +331,7 @@ public class SimulatePlanarWorld {
 		sphereToPixel.compute(p3.x, p3.y, p3.z, output);
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	public class SurfaceRect {
 		Se3_F64 rectToWorld;
 		Se3_F64 rectToCamera = new Se3_F64();

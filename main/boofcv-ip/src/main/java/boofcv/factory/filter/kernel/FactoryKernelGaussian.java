@@ -112,7 +112,7 @@ public class FactoryKernelGaussian {
 	 * @param isFloat True for F32 kernel and false for I32.
 	 * @param numBits Number of bits in each data element. 32 or 64
 	 * @param sigma The distributions stdev. If &le; 0 then the sigma will be computed from the radius.
-	 * @param radius Number of pixels in the kernel's radius. If &le; 0 then the sigma will be computed from the sigma.  @return The computed Gaussian kernel.
+	 * @param radius Number of pixels in the kernel's radius. If &le; 0 then the sigma will be computed from the sigma. @return The computed Gaussian kernel.
 	 */
 	public static <T extends KernelBase> T gaussian( int DOF, boolean isFloat, int numBits, double sigma, int radius ) {
 		if (radius <= 0)

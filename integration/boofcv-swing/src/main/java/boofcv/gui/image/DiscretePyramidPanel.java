@@ -27,24 +27,23 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
-
 /**
  * Displays the entire image pyramid in a single panel. With discrete pyramids it is possible
  * to show the whole pyramid inside a single window of a reasonable size.
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class DiscretePyramidPanel<T extends ImageGray<T>> extends JPanel {
 
 	BufferedImage img;
 	ImagePyramid<T> pyramid;
 
-	BufferedImage layers[];
+	BufferedImage[] layers;
 
-	public DiscretePyramidPanel() {
-	}
+	public DiscretePyramidPanel() {}
 
-	public DiscretePyramidPanel(PyramidDiscrete<T> pyramid) {
+	public DiscretePyramidPanel( PyramidDiscrete<T> pyramid ) {
 		setPyramid(pyramid);
 	}
 
@@ -52,54 +51,54 @@ public class DiscretePyramidPanel<T extends ImageGray<T>> extends JPanel {
 		this.pyramid = pyramid;
 
 		// create temporary buffers for each layer in the pyramid
-		layers = new BufferedImage[ pyramid.getNumLayers() ];
-		for( int i = 0; i < layers.length; i++ ) {
+		layers = new BufferedImage[pyramid.getNumLayers()];
+		for (int i = 0; i < layers.length; i++) {
 			int width = pyramid.getWidth(i);
 			int height = pyramid.getHeight(i);
-			layers[i] = new BufferedImage(width,height,BufferedImage.TYPE_3BYTE_BGR);
+			layers[i] = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
 		}
 
 		// compute the size of the panel
 		int width = pyramid.getWidth(0);
 		int height = pyramid.getHeight(0);
 
-		if( pyramid.getNumLayers() > 1 ) {
+		if (pyramid.getNumLayers() > 1) {
 			width += pyramid.getWidth(1);
 		}
 
-		img = new BufferedImage(width,height,BufferedImage.TYPE_3BYTE_BGR);
+		img = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
 
-		setPreferredSize(new Dimension(width,height));
+		setPreferredSize(new Dimension(width, height));
 	}
 
 	public void render() {
-		for( int i = 0; i < layers.length; i++ ) {
-			VisualizeImageData.standard(pyramid.getLayer(i),layers[i]);
+		for (int i = 0; i < layers.length; i++) {
+			VisualizeImageData.standard(pyramid.getLayer(i), layers[i]);
 		}
 
 		Graphics2D g2 = (Graphics2D)img.getGraphics();
 
-		g2.drawImage(layers[0],0,0,this);
+		g2.drawImage(layers[0], 0, 0, this);
 		int height = 0;
 		int width = layers[0].getWidth();
-		for( int i = 1; i < layers.length; i++ ) {
-			g2.drawImage(layers[i],width,height,this);
+		for (int i = 1; i < layers.length; i++) {
+			g2.drawImage(layers[i], width, height, this);
 			height += layers[i].getHeight();
 		}
 	}
 
 	@Override
-	public void paintComponent(Graphics g) {
-		if( img != null) {
+	public void paintComponent( Graphics g ) {
+		if (img != null) {
 			Graphics2D g2 = (Graphics2D)g;
 			g2.setColor(Color.WHITE);
-			g2.fillRect(0,0,getWidth(),getHeight());
-			
+			g2.fillRect(0, 0, getWidth(), getHeight());
+
 			double scale = img.getWidth()/(double)getWidth();
-			if( scale > 1 ) {
+			if (scale > 1) {
 				AffineTransform tran = new AffineTransform();
-				tran.setToScale(1.0/scale,1.0/scale);
-				g2.drawImage(img,tran,null);
+				tran.setToScale(1.0/scale, 1.0/scale);
+				g2.drawImage(img, tran, null);
 			} else {
 				g.drawImage(img, 0, 0, this);
 			}

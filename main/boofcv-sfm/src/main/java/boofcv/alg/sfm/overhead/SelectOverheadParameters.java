@@ -60,7 +60,7 @@ public class SelectOverheadParameters {
 	 *
 	 * @param cellSize Size of cells in plane in world units
 	 * @param maxCellsPerPixel Specifies minimum resolution of a region in overhead image. A pixel in the camera
-	 * can't overlap more than this number of cells.  Higher values allow lower
+	 * can't overlap more than this number of cells. Higher values allow lower
 	 * resolution regions. Try 4.
 	 * @param viewHeightFraction Reduce the view height by this fraction to avoid excessive unusable image space. Set to
 	 * 1.0 to maximize the viewing area and any value less than one to crop it.

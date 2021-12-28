@@ -22,12 +22,14 @@ import boofcv.concurrency.BoofConcurrency;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.dialogs.JSpringPanel;
 import com.github.weisj.darklaf.LafManager;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Objects;
 
 /**
  * Control panel
@@ -53,7 +55,7 @@ public class GlobalSettingsControls extends StandardAlgConfigPanel implements Ac
 
 	boolean changedTheme = false;
 
-	JDialog dialog;
+	@Nullable JDialog dialog;
 	boolean canceled = false;
 
 	public GlobalSettingsControls() {
@@ -77,7 +79,7 @@ public class GlobalSettingsControls extends StandardAlgConfigPanel implements Ac
 	private void handleSave() {
 		GlobalDemoSettings.SETTINGS = settings;
 		settings.save();
-		dialog.setVisible(false);
+		Objects.requireNonNull(dialog).setVisible(false);
 	}
 
 	private void handleReset() {
@@ -89,7 +91,7 @@ public class GlobalSettingsControls extends StandardAlgConfigPanel implements Ac
 
 	private void handleCancel() {
 		canceled = true;
-		dialog.setVisible(false);
+		Objects.requireNonNull(dialog).setVisible(false);
 	}
 
 	@Override public void controlChanged( final Object source ) {
@@ -107,7 +109,7 @@ public class GlobalSettingsControls extends StandardAlgConfigPanel implements Ac
 		}
 	}
 
-	public void showDialog( JFrame owner, Component parent ) {
+	public void showDialog( @Nullable JFrame owner, @Nullable Component parent ) {
 		canceled = false;
 
 		dialog = new JDialog(owner, "Demonstration Settings", Dialog.ModalityType.APPLICATION_MODAL);

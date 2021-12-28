@@ -18,6 +18,8 @@
 
 package boofcv.gui.dialogs;
 
+import org.jetbrains.annotations.Nullable;
+
 import javax.swing.*;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
@@ -78,7 +80,7 @@ public class JSpringPanel extends JPanel {
 		return panel;
 	}
 
-	public void constrainWestNorthEast( JComponent target, Component above, int offsetTop, int offsetSides ) {
+	public void constrainWestNorthEast( JComponent target, @Nullable Component above, int offsetTop, int offsetSides ) {
 
 		add(target);
 
@@ -91,7 +93,8 @@ public class JSpringPanel extends JPanel {
 		layout.putConstraint(SpringLayout.EAST, target, -offsetSides, SpringLayout.EAST, this);
 	}
 
-	public void constrainWestNorthEast( JComponent targetLeft, JComponent targetRight, Component above,
+	public void constrainWestNorthEast( JComponent targetLeft, JComponent targetRight,
+										@Nullable Component above,
 										int offsetTop, int spaceLR, int offsetSides ) {
 
 		add(targetLeft);
@@ -110,7 +113,7 @@ public class JSpringPanel extends JPanel {
 		layout.putConstraint(SpringLayout.EAST, targetRight, -offsetSides, SpringLayout.EAST, this);
 	}
 
-	public void constrainWestNorth( JComponent targetLeft, JComponent targetRight, Component above,
+	public void constrainWestNorth( JComponent targetLeft, JComponent targetRight, @Nullable Component above,
 									int offsetTop, int spaceLR, int offsetSides ) {
 		add(targetLeft);
 		add(targetRight);
@@ -138,7 +141,8 @@ public class JSpringPanel extends JPanel {
 		layout.putConstraint(SpringLayout.WEST, target, offsetLeft, SpringLayout.WEST, this);
 	}
 
-	public void constrainWestSouthEast( JComponent target, Component below, int offsetBelow, int offsetSides ) {
+	public void constrainWestSouthEast( JComponent target, @Nullable Component below,
+										int offsetBelow, int offsetSides ) {
 
 		add(target);
 		if (below == null)
@@ -164,7 +168,7 @@ public class JSpringPanel extends JPanel {
 		return spinner;
 	}
 
-	public void constrainTopCenter( JComponent target, JComponent top, int padTop ) {
+	public void constrainTopCenter( JComponent target, @Nullable JComponent top, int padTop ) {
 		add(target);
 		if (top == null) {
 			layout.putConstraint(SpringLayout.NORTH, target, padTop, SpringLayout.NORTH, this);
@@ -174,7 +178,7 @@ public class JSpringPanel extends JPanel {
 		layout.putConstraint(SpringLayout.HORIZONTAL_CENTER, target, 0, SpringLayout.HORIZONTAL_CENTER, this);
 	}
 
-	public void constrainTopStretchH( JComponent target, JComponent top, int padTop ) {
+	public void constrainTopStretchH( JComponent target, @Nullable JComponent top, int padTop ) {
 		add(target);
 		if (top == null) {
 			layout.putConstraint(SpringLayout.NORTH, target, padTop, SpringLayout.NORTH, this);
@@ -198,7 +202,7 @@ public class JSpringPanel extends JPanel {
 		layout.putConstraint(SpringLayout.EAST, target, -5, SpringLayout.EAST, this);
 	}
 
-	public void constrainStretchHV( JComponent target, JComponent top, JComponent bottom, int padV ) {
+	public void constrainStretchHV( JComponent target, @Nullable JComponent top, JComponent bottom, int padV ) {
 		add(target);
 
 		if (top == null) {
@@ -215,7 +219,7 @@ public class JSpringPanel extends JPanel {
 	/**
 	 * Constrain it to the top of it's bottom panel and prevent it from getting crushed below it's size
 	 */
-	public void constraintSouth( JComponent target, JComponent top, JComponent bottom, int padV ) {
+	public void constraintSouth( JComponent target, @Nullable JComponent top, @Nullable JComponent bottom, int padV ) {
 		if (bottom == null) {
 			layout.putConstraint(SpringLayout.SOUTH, target, -padV, SpringLayout.SOUTH, this);
 		} else {

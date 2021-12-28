@@ -18,11 +18,14 @@
 
 package boofcv.gui.image;
 
+import org.jetbrains.annotations.Nullable;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * Provides a list of input images which can be selected by the user. When a new image
@@ -31,11 +34,12 @@ import java.util.ArrayList;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class SelectInputImageToolBar extends JPanel implements ActionListener {
 	JComboBox<String> imageMenu;
 	java.util.List<Object> cookies = new ArrayList<>();
 
-	Listener listener;
+	@Nullable Listener listener;
 
 	public SelectInputImageToolBar( JComponent main ) {
 		super(new BorderLayout());
@@ -65,7 +69,7 @@ public class SelectInputImageToolBar extends JPanel implements ActionListener {
 	}
 
 	@Override
-	public void actionPerformed( ActionEvent e ) {
+	public void actionPerformed( @Nullable ActionEvent e ) {
 		if (listener == null)
 			return;
 
@@ -75,7 +79,7 @@ public class SelectInputImageToolBar extends JPanel implements ActionListener {
 
 		final Object cookie = cookies.get(imageMenu.getSelectedIndex());
 
-		new Thread(() -> listener.selectedImage(cookie)).start();
+		new Thread(() -> Objects.requireNonNull(listener).selectedImage(cookie)).start();
 	}
 
 	public void triggerEvent() {

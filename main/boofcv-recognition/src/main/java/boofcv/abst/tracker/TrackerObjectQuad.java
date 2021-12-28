@@ -26,7 +26,7 @@ import georegression.struct.shapes.Quadrilateral_F64;
  * <p>
  * High level interface for an object tracker where the object being tracked is specified using a quadrilateral. The
  * input is assumed to be a sequence of consecutive video images. When initialize is called the tracker is put
- * into its initial state ago and its past history is discarded.  The vertices in the quadrilateral are specified
+ * into its initial state ago and its past history is discarded. The vertices in the quadrilateral are specified
  * in a clock-wise direction (a,b,c,d).
  * </p>
  * <p>

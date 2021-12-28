@@ -28,6 +28,7 @@ import boofcv.struct.image.ImageType;
 import boofcv.struct.image.InterleavedU8;
 import lombok.Getter;
 import lombok.Setter;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.event.AncestorEvent;
@@ -38,6 +39,7 @@ import java.awt.event.WindowEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.Objects;
 
 import static boofcv.misc.BoofMiscOps.timeStr;
 
@@ -49,6 +51,7 @@ import static boofcv.misc.BoofMiscOps.timeStr;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("NullAway.Init")
 public class FilePreviewChooser extends JPanel {
 	private static final int PREVIEW_PIXELS = 300;
 
@@ -59,7 +62,7 @@ public class FilePreviewChooser extends JPanel {
 	ImagePanel preview = new ImagePanel(); // shows preview of selected image
 	JTextArea metadataText = new JTextArea();
 
-	File selected;
+	@Nullable File selected;
 
 	// Indicates if it's opening files (true) or saving files (false)
 	@Getter boolean openFile;
@@ -69,8 +72,8 @@ public class FilePreviewChooser extends JPanel {
 
 	// handling the image preview
 	private final Object lockPreview = new Object();
-	PreviewThread previewThread;
-	String pendingPreview;
+	@Nullable PreviewThread previewThread;
+	@Nullable String pendingPreview;
 
 	public FilePreviewChooser( boolean openFile ) {
 		setLayout(new BorderLayout());
@@ -123,7 +126,7 @@ public class FilePreviewChooser extends JPanel {
 				setSelectEnabled(bSelect.isEnabled());
 			}
 
-			@Override public void ancestorRemoved( AncestorEvent event ) { }
+			@Override public void ancestorRemoved( AncestorEvent event ) {}
 
 			@Override public void ancestorMoved( AncestorEvent event ) {}
 		});
@@ -136,7 +139,7 @@ public class FilePreviewChooser extends JPanel {
 		if (listener == null)
 			System.err.println("You didn't set a listener!");
 		else
-			listener.selectedFile(selected);
+			listener.selectedFile(Objects.requireNonNull(selected));
 	}
 
 	/**
@@ -158,9 +161,8 @@ public class FilePreviewChooser extends JPanel {
 	}
 
 	private class BrowserListener implements FileBrowser.Listener {
-
 		@Override
-		public void handleSelectedFile( File file ) {
+		public void handleSelectedFile( @Nullable File file ) {
 			// Do nothing if this file is already selected
 			if (selected == file)
 				return;
@@ -210,7 +212,7 @@ public class FilePreviewChooser extends JPanel {
 	/**
 	 * Start a new preview thread if one isn't already running. Carefully manipulate variables due to threading
 	 */
-	void showPreview( String path ) {
+	void showPreview( @Nullable String path ) {
 		synchronized (lockPreview) {
 			if (path == null) {
 				pendingPreview = null;
@@ -293,17 +295,18 @@ public class FilePreviewChooser extends JPanel {
 		}
 	}
 
-	private BufferedImage loadVideoPreview( String path ) {
+	private @Nullable BufferedImage loadVideoPreview( String path ) {
 		BufferedImage full = null;
 		try {
 			SimpleImageSequence<InterleavedU8> sequence =
-					DefaultMediaManager.INSTANCE.openVideo(path, ImageType.IL_U8);
+					Objects.requireNonNull(DefaultMediaManager.INSTANCE.openVideo(path, ImageType.IL_U8));
 
 			if (sequence.hasNext()) {
 				InterleavedU8 frame = sequence.next();
 				full = ConvertBufferedImage.convertTo(frame, null, true);
 			}
-		} catch (RuntimeException ignore) {}
+		} catch (RuntimeException ignore) {
+		}
 		return full;
 	}
 
@@ -316,6 +319,7 @@ public class FilePreviewChooser extends JPanel {
 		void userCanceled();
 	}
 
+	@SuppressWarnings("NullAway.Init")
 	public static class DefaultListener implements Listener {
 
 		JDialog dialog;
@@ -339,7 +343,7 @@ public class FilePreviewChooser extends JPanel {
 		}
 	}
 
-	public File showDialog( Component parent ) {
+	public @Nullable File showDialog( @Nullable Component parent ) {
 		String title = openFile ? "Open File" : "Save File";
 
 		JDialog dialog = new JDialog(null, title, Dialog.ModalityType.APPLICATION_MODAL);

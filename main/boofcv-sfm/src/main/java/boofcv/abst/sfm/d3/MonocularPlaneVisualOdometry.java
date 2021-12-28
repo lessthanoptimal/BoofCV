@@ -25,7 +25,7 @@ import georegression.struct.se.Se3_F64;
 
 /**
  * Estimates the camera's motion relative to the ground plane. The world being viewed is assumed to be planar.
- * The transform from the ground plane to the camera view is assumed to be known.  Both the intrinsic and
+ * The transform from the ground plane to the camera view is assumed to be known. Both the intrinsic and
  * extrinsic parameters are allowed to change between image frames. Since the transform between the ground and
  * camera is known, there is no scale ambiguity.
  *

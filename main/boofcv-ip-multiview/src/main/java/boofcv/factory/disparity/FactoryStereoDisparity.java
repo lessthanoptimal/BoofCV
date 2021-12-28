@@ -192,15 +192,14 @@ public class FactoryStereoDisparity {
 		maxError *= 3;
 
 		switch (config.errorType) {
-			case SAD: {
+			case SAD -> {
 				DisparitySelect select = createDisparitySelect(config, imageType, (int)maxError);
 				BlockRowScore rowScore = createScoreRowSad(config, imageType);
 				DisparityBlockMatchRowFormat alg = createBestFive(config, imageType, select, rowScore);
 				alg.setBorder(FactoryImageBorder.generic(config.border, rowScore.getImageType()));
 				return new WrapDisparityBlockMatchRowFormat(alg);
 			}
-
-			case CENSUS: {
+			case CENSUS -> {
 				DisparitySelect select = createDisparitySelect(config, imageType, (int)maxError);
 				FilterImageInterface censusTran = FactoryCensusTransform.variant(config.configCensus.variant, true, imageType);
 				BlockRowScore rowScore = createCensusRowScore(config, censusTran);
@@ -209,17 +208,14 @@ public class FactoryStereoDisparity {
 				alg.setBorder(FactoryImageBorder.generic(config.border, censusTran.getOutputType()));
 				return new WrapDisparityBlockMatchCensus<>(censusTran, alg);
 			}
-
-			case NCC: {
+			case NCC -> {
 				DisparitySelect select = createDisparitySelect(config, GrayF32.class, (int)maxError);
 				BlockRowScore rowScore = createScoreRowNcc(config, GrayF32.class);
 				DisparityBlockMatchRowFormat alg = createBestFive(config, GrayF32.class, select, rowScore);
 				alg.setBorder(FactoryImageBorder.generic(config.border, rowScore.getImageType()));
 				return new DisparityBlockMatchCorrelation(alg, imageType);
 			}
-
-			default:
-				throw new IllegalArgumentException("Unsupported error type " + config.errorType);
+			default -> throw new IllegalArgumentException("Unsupported error type " + config.errorType);
 		}
 	}
 
