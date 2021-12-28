@@ -261,6 +261,7 @@ public class ConvertBitmap {
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
 	 */
 	public static void boofToBitmap( ImageBase input, Bitmap output, @Nullable DogArray_I8 storage ) {
+		storage = resizeStorage(output, storage);
 		if (BOverrideConvertAndroid.invokeBoofToBitmap(ColorFormat.RGB, input, output, storage.data))
 			return;
 
@@ -269,7 +270,7 @@ public class ConvertBitmap {
 		} else if (input instanceof ImageGray) {
 			grayToBitmap((ImageGray)input, output, storage);
 		} else if (input instanceof ImageInterleaved) {
-			interleavedToBitmap((ImageInterleaved)input, output, storage);
+			interleavedToBitmap(input, output, storage);
 		} else {
 			throw new IllegalArgumentException("Unsupported input image type");
 		}
@@ -293,7 +294,7 @@ public class ConvertBitmap {
 
 			case YUV: {
 				if (input instanceof ImageInterleaved) {
-					interleavedYuvToBitmap((ImageInterleaved)input, output, storage);
+					interleavedYuvToBitmap(input, output, storage);
 					return;
 				}
 			}

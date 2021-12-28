@@ -32,10 +32,7 @@ import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.FastAccess;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Processes frames from {@link PointTracker} and converts the tracking results into a {@link LookUpSimilarImages}.
@@ -218,8 +215,7 @@ public class SimilarImagesFromTracks<Track> implements LookUpSimilarImages {
 	@Override
 	public void findSimilar( String target, @Nullable BoofLambdas.Filter<String> filter, List<String> similarImages ) {
 		similarImages.clear();
-		Frame f = frameMap.get(target);
-		BoofMiscOps.checkTrue(f != null, "Unknown image");
+		Frame f = Objects.requireNonNull(frameMap.get(target), "Unknown image");
 
 		// For later reference
 		this.recentQueryID = target;
@@ -295,6 +291,7 @@ public class SimilarImagesFromTracks<Track> implements LookUpSimilarImages {
 	/**
 	 * Describes how two frames are related to each other through common observations of the same feature
 	 */
+	@SuppressWarnings({"NullAway.Init"})
 	public static class Match {
 		// observation indexes for the same feature in each frame
 		public int[] src;
@@ -314,6 +311,7 @@ public class SimilarImagesFromTracks<Track> implements LookUpSimilarImages {
 			return src.length;
 		}
 
+		@SuppressWarnings({"NullAway"})
 		public void reset() {
 			src = null;
 			dst = null;

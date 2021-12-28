@@ -48,6 +48,7 @@ import java.util.*;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class SimilarImagesTrackThenMatch<Image extends ImageBase<Image>, TD extends TupleDesc<TD>>
 		extends SimilarImagesFromTracks<PointTrack> implements VerbosePrint {
 

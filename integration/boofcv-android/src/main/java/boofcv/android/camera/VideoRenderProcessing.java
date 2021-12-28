@@ -44,6 +44,7 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class VideoRenderProcessing<T extends ImageBase<T>> extends Thread implements VideoProcessing {
 
 	// Type of BoofCV iamge
@@ -213,7 +214,8 @@ public abstract class VideoRenderProcessing<T extends ImageBase<T>> extends Thre
 					wait();
 					if (requestStop)
 						break;
-				} catch (InterruptedException ignore) {}
+				} catch (InterruptedException ignore) {
+				}
 			}
 
 			// swap gray buffers so that convertPreview is modifying the copy which is not in use

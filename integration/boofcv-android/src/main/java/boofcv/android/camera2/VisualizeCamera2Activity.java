@@ -83,6 +83,7 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  * @see SimpleCamera2Activity
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 
 	private static final String TAG = "VisualizeCamera2";
@@ -422,7 +423,8 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 			case UNSAFE: {
 				if (image.getWidth() == bitmap.getWidth() && image.getHeight() == bitmap.getHeight())
 					ConvertBitmap.boofToBitmap(image, bitmap, bitmapTmp);
-			} break;
+			}
+			break;
 
 			case DOUBLE_BUFFER: {
 				// TODO if there are multiple processing threads bad stuff will happen here. Need one work buffer
@@ -442,9 +444,11 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 						bitmapLock.unlock();
 					}
 				}
-			} break;
+			}
+			break;
 
-			case NONE: break;
+			case NONE:
+				break;
 		}
 	}
 
@@ -479,7 +483,8 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 				}
 				break;
 
-			case NONE: break;
+			case NONE:
+				break;
 		}
 	}
 
@@ -502,9 +507,12 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 			setWillNotDraw(false);
 		}
 
-		@Override public void onDraw( Canvas canvas ) { onDrawFrame(this, canvas); }
+		@Override public void onDraw( Canvas canvas ) {onDrawFrame(this, canvas);}
+
 		@Override public void surfaceCreated( SurfaceHolder surfaceHolder ) {}
+
 		@Override public void surfaceChanged( SurfaceHolder surfaceHolder, int i, int i1, int i2 ) {}
+
 		@Override public void surfaceDestroyed( SurfaceHolder surfaceHolder ) {}
 	}
 

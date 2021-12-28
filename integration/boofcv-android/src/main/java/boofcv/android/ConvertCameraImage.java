@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,7 @@ import java.nio.ByteBuffer;
  */
 public class ConvertCameraImage {
 	public static void imageToBoof( Image yuv, ColorFormat colorOutput, ImageBase output,
-									@Nullable GrowArray<DogArray_I8> workArrays) {
+									@Nullable GrowArray<DogArray_I8> workArrays ) {
 		if (BOverrideConvertAndroid.invokeYuv420ToBoof(yuv, colorOutput, output))
 			return;
 

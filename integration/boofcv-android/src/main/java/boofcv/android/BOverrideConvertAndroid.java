@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.android;
 
 import android.graphics.Bitmap;
 import android.media.Image;
+import android.support.annotation.Nullable;
 import boofcv.alg.color.ColorFormat;
 import boofcv.override.BOverrideClass;
 import boofcv.override.BOverrideManager;
@@ -36,9 +37,9 @@ public class BOverrideConvertAndroid extends BOverrideClass {
 		BOverrideManager.register(BOverrideConvertAndroid.class);
 	}
 
-	public static YuvToBoof_420888 yuv420ToBoof;
-	public static BitmapToBoof bitmapToBoof;
-	public static BoofToBitmap boofToBitmap;
+	public static @Nullable YuvToBoof_420888 yuv420ToBoof;
+	public static @Nullable BitmapToBoof bitmapToBoof;
+	public static @Nullable BoofToBitmap boofToBitmap;
 
 	public interface YuvToBoof_420888<T extends ImageBase<T>> {
 		void yuvToBoof420( Image input, ColorFormat color, ImageBase output );

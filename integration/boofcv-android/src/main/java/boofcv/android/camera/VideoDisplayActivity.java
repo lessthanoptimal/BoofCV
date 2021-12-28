@@ -25,6 +25,7 @@ import android.graphics.Paint;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.Looper;
+import android.support.annotation.Nullable;
 import android.view.Surface;
 import android.view.SurfaceView;
 import android.view.Window;
@@ -54,16 +55,17 @@ import boofcv.misc.BoofMiscOps;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class VideoDisplayActivity extends Activity implements Camera.PreviewCallback {
 
-	protected Camera mCamera;
+	protected @Nullable Camera mCamera;
 	protected Camera.CameraInfo mCameraInfo = new Camera.CameraInfo();
 	private Visualization mDraw;
 	private CameraPreview mPreview;
-	protected VideoProcessing processing;
+	protected @Nullable VideoProcessing processing;
 
 	// Used to inform the user that its doing some calculations
-	ProgressDialog progressDialog;
+	@Nullable ProgressDialog progressDialog;
 	protected final Object lockProgress = new Object();
 
 	boolean hidePreview = true;
@@ -202,10 +204,18 @@ public abstract class VideoDisplayActivity extends Activity implements Camera.Pr
 				.getRotation();
 		int degrees = 0;
 		switch (rotation) {
-			case Surface.ROTATION_0: degrees = 0; break;
-			case Surface.ROTATION_90: degrees = 90; break;
-			case Surface.ROTATION_180: degrees = 180; break;
-			case Surface.ROTATION_270: degrees = 270; break;
+			case Surface.ROTATION_0:
+				degrees = 0;
+				break;
+			case Surface.ROTATION_90:
+				degrees = 90;
+				break;
+			case Surface.ROTATION_180:
+				degrees = 180;
+				break;
+			case Surface.ROTATION_270:
+				degrees = 270;
+				break;
 		}
 
 		int result;
@@ -231,9 +241,9 @@ public abstract class VideoDisplayActivity extends Activity implements Camera.Pr
 	 */
 	private class Visualization extends SurfaceView {
 
-		private Paint textPaint = new Paint();
+		private final Paint textPaint = new Paint();
 
-		double history[] = new double[10];
+		double[] history = new double[10];
 		int historyNum = 0;
 
 		Activity activity;
@@ -276,7 +286,8 @@ public abstract class VideoDisplayActivity extends Activity implements Camera.Pr
 			try {
 				canvas.restore();
 			} catch (IllegalStateException e) {
-				if (!e.getMessage().contains("Underflow in restore - more restores than saves"))
+				@Nullable String message = e.getMessage();
+				if (message != null && !message.contains("Underflow in restore - more restores than saves"))
 					throw e;
 			}
 			if (showFPS)
@@ -327,21 +338,24 @@ public abstract class VideoDisplayActivity extends Activity implements Camera.Pr
 	 */
 	protected void hideProgressDialog() {
 		// do nothing if the dialog is already being displayed
+		ProgressDialog dialog;
 		synchronized (lockProgress) {
 			if (progressDialog == null)
 				return;
+			dialog = progressDialog;
 		}
+
 
 		if (Looper.getMainLooper().getThread() == Thread.currentThread()) {
 			// if inside the UI thread just dismiss the dialog and avoid a potential locking condition
 			synchronized (lockProgress) {
-				progressDialog.dismiss();
+				dialog.dismiss();
 				progressDialog = null;
 			}
 		} else {
 			runOnUiThread(() -> {
 				synchronized (lockProgress) {
-					progressDialog.dismiss();
+					dialog.dismiss();
 					progressDialog = null;
 				}
 			});
