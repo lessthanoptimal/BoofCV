@@ -46,6 +46,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 
 	/** List of all tracks that can be feed into bundle adjustment */
@@ -189,7 +190,7 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 	}
 
 	/** Searches for a track that has the following tracker track. null is none were found */
-	public T findByTrackerTrack( PointTrack target ) {
+	public @Nullable T findByTrackerTrack( PointTrack target ) {
 		for (int i = 0; i < tracks.size; i++) {
 			if (tracks.get(i).visualTrack == target) {
 				return tracks.get(i);
@@ -308,16 +309,19 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 //					trackSet.size()+" vs track.size "+tracks.size);
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	public static class BObservation {
 		public final Point2D_F64 pixel = new Point2D_F64();
 		public BFrame frame;
 
+		@SuppressWarnings({"NullAway"})
 		public void reset() {
 			pixel.setTo(-1, -1);
 			frame = null;
 		}
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	public static class BTrack {
 		// the ID of the PointTrack which created this
 		public long id;
@@ -325,7 +329,7 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 		 * Reference to the a track in the image based tracker
 		 * if null that means the track is no longer being tracked by the tracker
 		 */
-		public PointTrack visualTrack;
+		public @Nullable PointTrack visualTrack;
 		public final Point4D_F64 worldLoc = new Point4D_F64();
 		public final DogArray<BObservation> observations = new DogArray<>(BObservation::new, BObservation::reset);
 		/** if true then the track has been an inlier at least once and should be considered for optimization */
@@ -342,7 +346,7 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 			return false;
 		}
 
-		public BObservation findObservationBy( BFrame frame ) {
+		public @Nullable BObservation findObservationBy( BFrame frame ) {
 			for (int i = 0; i < observations.size; i++) {
 				if (observations.data[i].frame == frame) {
 					return observations.data[i];
@@ -351,6 +355,7 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 			return null;
 		}
 
+		@SuppressWarnings({"NullAway"})
 		public void reset() {
 			worldLoc.setTo(0, 0, 0, 0);
 			observations.reset();
@@ -380,6 +385,7 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 	 * A BFrame is a key frame. Each keyframe represents the state at the time of a specific image frame in the
 	 * sequence.
 	 */
+	@SuppressWarnings({"NullAway.Init"})
 	public static class BFrame {
 		// ID of the image used to create the BFrame
 		public long id;
@@ -391,6 +397,7 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 		public final Se3_F64 frame_to_world = new Se3_F64();
 		public int listIndex; // index in the list of BFrames
 
+		@SuppressWarnings({"NullAway"})
 		public void reset() {
 			id = -1;
 			listIndex = -1;
@@ -399,12 +406,14 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 		}
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	public static class BCamera {
 		// array index
 		public int index;
 		public CameraPinholeBrown original;
 		public BundlePinholeBrown bundleCamera = new BundlePinholeBrown();
 
+		@SuppressWarnings({"NullAway"})
 		public void reset() {
 			index = -1;
 			original = null;

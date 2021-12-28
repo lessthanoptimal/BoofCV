@@ -42,6 +42,7 @@ import org.ejml.ops.ConvertMatrixData;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class StereoProcessingBase<T extends ImageGray<T>> {
 
 	// applied rectification to input images

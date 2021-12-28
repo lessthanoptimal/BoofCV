@@ -36,6 +36,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -88,7 +89,8 @@ public class WrapVisOdomMonoStereoDepthPnP<T extends ImageGray<T>>
 	public void getTrackPixel( int index, Point2D_F64 pixel ) {
 		// If this throws a null pointer exception then that means there's a bug. The only way a visible track
 		// could have a null trackerTrack is if the trackerTrack was dropped. In that case it's no longer visible
-		pixel.setTo(alg.getVisibleTracks().get(index).visualTrack.pixel);
+		PointTrack track = Objects.requireNonNull(alg.getVisibleTracks().get(index).visualTrack);
+		pixel.setTo(track.pixel);
 	}
 
 	@Override
@@ -104,7 +106,7 @@ public class WrapVisOdomMonoStereoDepthPnP<T extends ImageGray<T>>
 	@Override
 	public boolean isTrackNew( int index ) {
 		VisOdomMonoDepthPnP.Track track = alg.getVisibleTracks().get(index);
-		return track.visualTrack.spawnFrameID == alg.getFrameID();
+		return Objects.requireNonNull(track.visualTrack).spawnFrameID == alg.getFrameID();
 	}
 
 	@Override

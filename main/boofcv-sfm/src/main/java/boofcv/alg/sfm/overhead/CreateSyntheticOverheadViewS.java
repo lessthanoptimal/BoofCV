@@ -29,6 +29,7 @@ import georegression.struct.point.Point2D_F32;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class CreateSyntheticOverheadViewS<T extends ImageGray<T>> extends CreateSyntheticOverheadView<T> {
 	// computes interpolated pixel value
 	private final InterpolatePixelS<T> interp;

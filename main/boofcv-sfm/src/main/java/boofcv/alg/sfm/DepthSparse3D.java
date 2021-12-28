@@ -40,8 +40,8 @@ import georegression.struct.point.Point3D_F64;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class DepthSparse3D<T extends ImageGray<T>> {
-
 	// Storage for the depth image
 	protected T depthImage;
 

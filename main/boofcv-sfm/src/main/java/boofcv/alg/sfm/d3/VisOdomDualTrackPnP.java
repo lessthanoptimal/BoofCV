@@ -49,6 +49,7 @@ import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,6 +68,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class VisOdomDualTrackPnP<T extends ImageBase<T>, TD extends TupleDesc<TD>>
 		extends VisOdomBundlePnPBase<VisOdomDualTrackPnP.TrackInfo> {
 
@@ -85,7 +87,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>, TD extends TupleDesc<TD
 
 	// computes camera motion
 	private @Getter final ModelMatcher<Se3_F64, Stereo2D3D> matcher;
-	private @Getter final ModelFitter<Se3_F64, Stereo2D3D> modelRefiner;
+	private @Getter final @Nullable ModelFitter<Se3_F64, Stereo2D3D> modelRefiner;
 
 	// trackers for left and right cameras
 	private final PointTracker<T> trackerLeft;
@@ -154,7 +156,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>, TD extends TupleDesc<TD
 								AssociateDescription2D<TD> assocL2R,
 								Triangulate2ViewsMetric triangulate2,
 								ModelMatcher<Se3_F64, Stereo2D3D> matcher,
-								ModelFitter<Se3_F64, Stereo2D3D> modelRefiner ) {
+								@Nullable ModelFitter<Se3_F64, Stereo2D3D> modelRefiner ) {
 		if (!assocL2R.uniqueSource() || !assocL2R.uniqueDestination())
 			throw new IllegalArgumentException("Both unique source and destination must be ensure by association");
 
@@ -622,6 +624,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>, TD extends TupleDesc<TD
 	/**
 	 * A coupled track between the left and right cameras.
 	 */
+	@SuppressWarnings({"NullAway.Init"})
 	public static class TrackInfo extends BTrack {
 		// Image based tracks in left and right camera
 		public PointTrack visualRight;
@@ -631,8 +634,9 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>, TD extends TupleDesc<TD
 		// the last frame it was seen in
 		public long lastSeenRightFrame;
 
-		@Override
-		public void reset() {
+
+		@SuppressWarnings({"NullAway"})
+		@Override public void reset() {
 			super.reset();
 			visualRight = null;
 			lastStereoFrame = -1;

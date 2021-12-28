@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,6 +27,7 @@ import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.homography.Homography2D_F32;
 import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F32;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Factory for creating {@link StitchingTransform} of different motion models.
@@ -36,12 +37,12 @@ import georegression.struct.point.Point2D_F32;
 public class FactoryStitchingTransform {
 
 	public static StitchingTransform<Affine2D_F64> createAffine_F64() {
-
-		return new StitchingTransform<Affine2D_F64>() {
+		return new StitchingTransform<>() {
 			final Affine2D_F32 input_F32 = new Affine2D_F32();
 
 			@Override
-			public PixelTransform<Point2D_F32> convertPixel( Affine2D_F64 input, PixelTransform<Point2D_F32> output ) {
+			public PixelTransform<Point2D_F32> convertPixel( Affine2D_F64 input,
+															 @Nullable PixelTransform<Point2D_F32> output ) {
 
 				ConvertFloatType.convert(input, input_F32);
 
@@ -57,7 +58,8 @@ public class FactoryStitchingTransform {
 			}
 
 			@Override
-			public Homography2D_F64 convertH( Affine2D_F64 input, Homography2D_F64 output ) {
+			public Homography2D_F64 convertH( Affine2D_F64 input,
+											  @Nullable Homography2D_F64 output ) {
 				if (output == null)
 					output = new Homography2D_F64();
 				output.setTo(
@@ -70,10 +72,10 @@ public class FactoryStitchingTransform {
 	}
 
 	public static StitchingTransform<Affine2D_F32> createAffine_F32() {
-
-		return new StitchingTransform<Affine2D_F32>() {
+		return new StitchingTransform<>() {
 			@Override
-			public PixelTransform<Point2D_F32> convertPixel( Affine2D_F32 input, PixelTransform<Point2D_F32> output ) {
+			public PixelTransform<Point2D_F32> convertPixel( Affine2D_F32 input,
+															 @Nullable PixelTransform<Point2D_F32> output ) {
 				if (output != null) {
 					((PixelTransformAffine_F32)output).setTo(input);
 				} else {
@@ -84,7 +86,7 @@ public class FactoryStitchingTransform {
 			}
 
 			@Override
-			public Homography2D_F64 convertH( Affine2D_F32 input, Homography2D_F64 output ) {
+			public Homography2D_F64 convertH( Affine2D_F32 input, @Nullable Homography2D_F64 output ) {
 				if (output == null)
 					output = new Homography2D_F64();
 				output.setTo(
@@ -97,9 +99,10 @@ public class FactoryStitchingTransform {
 	}
 
 	public static StitchingTransform<Homography2D_F32> createHomography_F32() {
-		return new StitchingTransform<Homography2D_F32>() {
+		return new StitchingTransform<>() {
 			@Override
-			public PixelTransform<Point2D_F32> convertPixel( Homography2D_F32 input, PixelTransform<Point2D_F32> output ) {
+			public PixelTransform<Point2D_F32> convertPixel( Homography2D_F32 input,
+															 @Nullable PixelTransform<Point2D_F32> output ) {
 				if (output != null) {
 					((PixelTransformHomography_F32)output).setTo(input);
 				} else {
@@ -110,7 +113,7 @@ public class FactoryStitchingTransform {
 			}
 
 			@Override
-			public Homography2D_F64 convertH( Homography2D_F32 input, Homography2D_F64 output ) {
+			public Homography2D_F64 convertH( Homography2D_F32 input, @Nullable Homography2D_F64 output ) {
 				if (output == null)
 					output = new Homography2D_F64();
 				output.setTo(
@@ -123,9 +126,9 @@ public class FactoryStitchingTransform {
 	}
 
 	public static StitchingTransform<Homography2D_F64> createHomography_F64() {
-		return new StitchingTransform<Homography2D_F64>() {
+		return new StitchingTransform<>() {
 			@Override
-			public PixelTransform<Point2D_F32> convertPixel( Homography2D_F64 input, PixelTransform<Point2D_F32> output ) {
+			public PixelTransform<Point2D_F32> convertPixel( Homography2D_F64 input, @Nullable PixelTransform<Point2D_F32> output ) {
 				if (output != null) {
 					((PixelTransformHomography_F32)output).setTo(input);
 				} else {
@@ -136,7 +139,7 @@ public class FactoryStitchingTransform {
 			}
 
 			@Override
-			public Homography2D_F64 convertH( Homography2D_F64 input, Homography2D_F64 output ) {
+			public Homography2D_F64 convertH( Homography2D_F64 input, @Nullable Homography2D_F64 output ) {
 				if (output == null)
 					output = new Homography2D_F64();
 				output.setTo(input);

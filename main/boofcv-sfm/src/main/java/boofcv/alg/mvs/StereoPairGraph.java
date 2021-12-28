@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -83,9 +83,10 @@ public class StereoPairGraph {
 		public final List<Edge> pairs = new ArrayList<>();
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	public static class Edge {
 		/** Vertexes this edge is connected to */
-		public Vertex va = null, vb = null;
+		public Vertex va, vb;
 
 		/** How good the 3D information is between these two views. 0.0 = no 3D. 1.0 = best possible. */
 		public double quality3D = 0.0;

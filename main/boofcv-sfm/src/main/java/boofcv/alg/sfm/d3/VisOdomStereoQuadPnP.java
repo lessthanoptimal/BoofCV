@@ -81,14 +81,14 @@ import java.util.Set;
  *
  * @author Peter Abeles
  */
-public class VisOdomStereoQuadPnP<T extends ImageGray<T>, TD extends TupleDesc<TD>>
-		implements VerbosePrint {
+@SuppressWarnings({"NullAway.Init"})
+public class VisOdomStereoQuadPnP<T extends ImageGray<T>, TD extends TupleDesc<TD>> implements VerbosePrint {
 	// used to estimate each feature's 3D location using a stereo pair
 	private final Triangulate2ViewsMetric triangulate;
 	private final TriangulateNViewsMetric triangulateN;
 	/** computes camera motion */
 	private final @Getter ModelMatcher<Se3_F64, Stereo2D3D> matcher;
-	private final ModelFitter<Se3_F64, Stereo2D3D> modelRefiner;
+	private final @Nullable ModelFitter<Se3_F64, Stereo2D3D> modelRefiner;
 
 	private final DogArray<Stereo2D3D> modelFitData = new DogArray<>(10, Stereo2D3D::new);
 
@@ -133,9 +133,9 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>, TD extends TupleDesc<T
 	private final DogArray_I32 keyToTrackIdx = new DogArray_I32();
 
 	// Internal profiling
-	protected @Getter @Setter PrintStream profileOut;
+	protected @Getter @Setter @Nullable PrintStream profileOut;
 	// Verbose debug information
-	protected @Getter PrintStream verbose;
+	protected @Getter @Nullable PrintStream verbose;
 
 	// Work space variables
 	private final Se3_F64 prevLeft_to_world = new Se3_F64();
@@ -168,7 +168,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>, TD extends TupleDesc<T
 								 AssociateDescription2D<TD> assocL2R,
 								 Triangulate2ViewsMetric triangulate,
 								 ModelMatcher<Se3_F64, Stereo2D3D> matcher,
-								 ModelFitter<Se3_F64, Stereo2D3D> modelRefiner ) {
+								 @Nullable ModelFitter<Se3_F64, Stereo2D3D> modelRefiner ) {
 		this.detector = detector;
 		this.assocF2F = new AssociateDescriptionSets2D<>(assocF2F);
 		this.assocL2R = assocL2R;
@@ -664,7 +664,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>, TD extends TupleDesc<T
 		key_to_curr.setTo(structure.getParentToView(2));
 	}
 
-	public Se3_F64 getLeftToWorld() {return left_to_world; }
+	public Se3_F64 getLeftToWorld() {return left_to_world;}
 
 	/**
 	 * Storage for detected features inside an image
@@ -716,6 +716,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>, TD extends TupleDesc<T
 	/**
 	 * 3D coordinate of the feature and its observed location in each image
 	 */
+	@SuppressWarnings("NullAway.Init")
 	public static class TrackQuad {
 		// Unique ID for this feature
 		public long id;
@@ -732,6 +733,7 @@ public class VisOdomStereoQuadPnP<T extends ImageGray<T>, TD extends TupleDesc<T
 		// If it was an inlier in this frame
 		public boolean inlier;
 
+		@SuppressWarnings("NullAway")
 		public void reset() {
 			X.setTo(0, 0, 0);
 			v0 = v1 = v2 = v3 = null;

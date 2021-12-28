@@ -56,6 +56,7 @@ import org.ddogleg.struct.DogArray;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class CreateSyntheticOverheadView<T extends ImageBase<T>> {
 	// size of overhead image;
 	protected int overheadWidth;

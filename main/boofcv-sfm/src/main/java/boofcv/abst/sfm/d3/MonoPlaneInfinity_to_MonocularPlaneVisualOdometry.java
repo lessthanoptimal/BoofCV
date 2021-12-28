@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,6 +34,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -53,7 +54,7 @@ public class MonoPlaneInfinity_to_MonocularPlaneVisualOdometry<T extends ImageBa
 	Se3_F64 cameraToWorld = new Se3_F64();
 
 	// list of active tracks
-	List<PointTrack> active = null;
+	@Nullable List<PointTrack> active = null;
 
 	public MonoPlaneInfinity_to_MonocularPlaneVisualOdometry( VisOdomMonoPlaneInfinity<T> alg,
 															  DistancePlane2DToPixelSq distance,
@@ -77,7 +78,6 @@ public class MonoPlaneInfinity_to_MonocularPlaneVisualOdometry<T extends ImageBa
 
 	@Override
 	public boolean process( T input ) {
-
 		active = null;
 		fault = alg.process(input);
 
@@ -154,7 +154,7 @@ public class MonoPlaneInfinity_to_MonocularPlaneVisualOdometry<T extends ImageBa
 
 	@Override
 	public void getTrackPixel( int index, Point2D_F64 pixel ) {
-		pixel.setTo(active.get(index).pixel);
+		pixel.setTo(Objects.requireNonNull(active).get(index).pixel);
 	}
 
 	@Override

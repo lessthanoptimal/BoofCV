@@ -42,11 +42,11 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class PnPStereoDistanceReprojectionSq implements DistanceFromModelMultiView<Se3_F64, Stereo2D3D> {
 
 	// transform from world to left camera. Model being tested.
 	private Se3_F64 worldToLeft;
-
 
 	// storage for point in camera frame
 	private final Point3D_F64 X = new Point3D_F64();
@@ -59,7 +59,7 @@ public class PnPStereoDistanceReprojectionSq implements DistanceFromModelMultiVi
 
 	public PnPStereoDistanceReprojectionSq( NormalizedToPixelError leftPixelError,
 											NormalizedToPixelError rightPixelError,
-											Se3_F64 leftToRight) {
+											Se3_F64 leftToRight ) {
 		this.leftPixelError = leftPixelError;
 		this.rightPixelError = rightPixelError;
 		this.leftToRight = leftToRight;

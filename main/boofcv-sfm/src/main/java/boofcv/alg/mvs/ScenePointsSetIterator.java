@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,6 +33,7 @@ import org.ddogleg.struct.DogArray_I32;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class ScenePointsSetIterator<T extends PointIndex<T, P>, P extends GeoTuple<P>> implements IteratorReset<T> {
 	// Reference to the scene. Only it's points are used
 	SceneStructureCommon scene;

@@ -35,6 +35,7 @@ import georegression.transform.se.SePointOps_F64;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class CameraPlaneProjection {
 
 	// transform from plane to camera

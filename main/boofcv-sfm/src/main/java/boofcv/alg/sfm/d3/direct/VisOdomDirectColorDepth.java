@@ -50,7 +50,7 @@ import org.ejml.interfaces.linsol.LinearSolverDense;
  */
 // TODO Handle pathological situations that will basically never happen in real life
 // anything that makes the A matrix singular. dx or dy being zero will do the trick
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "NullAway.Init"})
 public class VisOdomDirectColorDepth<I extends ImageGray<I>, D extends ImageGray<D>> {
 	// Type of input images
 	private final ImageType<Planar<I>> imageType;

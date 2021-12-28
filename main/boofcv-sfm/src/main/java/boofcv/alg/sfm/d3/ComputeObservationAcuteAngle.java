@@ -29,6 +29,7 @@ import georegression.struct.se.Se3_F64;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class ComputeObservationAcuteAngle {
 
 	Se3_F64 fromAtoB;

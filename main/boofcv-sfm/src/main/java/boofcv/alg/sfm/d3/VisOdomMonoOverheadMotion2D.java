@@ -47,6 +47,7 @@ import org.ejml.data.DMatrixRMaj;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class VisOdomMonoOverheadMotion2D<T extends ImageBase<T>> {
 	// creates the overhead image
 	private final CreateSyntheticOverheadView<T> createOverhead;

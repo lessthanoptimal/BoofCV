@@ -35,6 +35,7 @@ import org.ddogleg.struct.FastAccess;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class AssociateStereo2D<Desc extends TupleDesc<Desc>>
 		extends StereoConsistencyCheck
 		implements AssociateDescription2D<Desc> {
@@ -57,7 +58,7 @@ public class AssociateStereo2D<Desc extends TupleDesc<Desc>>
 	private FastAccess<Desc> descriptionsLeft;
 	private FastAccess<Desc> descriptionsRight;
 
-	public AssociateStereo2D( ScoreAssociation<Desc> scorer, double locationTolerance) {
+	public AssociateStereo2D( ScoreAssociation<Desc> scorer, double locationTolerance ) {
 		super(locationTolerance, locationTolerance);
 		this.scorer = scorer;
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,7 +48,7 @@ import java.util.Set;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({"rawtypes", "unchecked", "NullAway.Init"})
 public class PyramidDirectColorDepth_to_DepthVisualOdometry<T extends ImageBase<T>, Depth extends ImageGray<Depth>>
 		implements DepthVisualOdometry<T, Depth> {
 	ImageType<T> inputType;
