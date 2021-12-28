@@ -50,6 +50,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import static boofcv.alg.geo.MultiViewOps.triangulatePoints;
@@ -82,6 +83,7 @@ import static boofcv.alg.geo.MultiViewOps.triangulatePoints;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("NullAway.Init")
 public class ThreeViewEstimateMetricScene implements VerbosePrint {
 	// TODO modify so that you can tell it if each view has the same intrinsics or not
 
@@ -100,7 +102,7 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 	public Estimate1ofTrifocalTensor trifocalEstimator;
 
 	// how much and where it should print to
-	private PrintStream verbose;
+	private @Nullable PrintStream verbose;
 
 	// Projective camera matrices
 	protected DMatrixRMaj P1 = CommonOps_DDRM.identity(3, 4);
@@ -185,6 +187,7 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 		return true;
 	}
 
+	@SuppressWarnings("NullAway")
 	private void init( int width, int height ) {
 		this.width = width;
 		this.height = height;
@@ -239,7 +242,7 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 		if (verbose != null) {
 			verbose.println("\nCamera");
 			for (int i = 0; i < structure.cameras.size; i++) {
-				verbose.println("  " + structure.cameras.data[i].getModel().toString());
+				verbose.println("  " + Objects.requireNonNull(structure.cameras.data[i].getModel()).toString());
 			}
 			verbose.println("\nworldToView");
 			for (int i = 0; i < structure.views.size; i++) {
@@ -276,13 +279,13 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 		List<Se3_F64> bestPose = new ArrayList<>();
 		List<BundlePinholeSimplified> bestCameras = new ArrayList<>();
 		for (int i = 0; i < structure.views.size; i++) {
-			BundlePinholeSimplified c = structure.cameras.data[i].getModel();
+			BundlePinholeSimplified c = Objects.requireNonNull(structure.cameras.data[i].getModel());
 			bestPose.add(structure.getParentToView(i).copy());
 			bestCameras.add(c.copy());
 		}
 
 		for (int i = 0; i < structure.cameras.size; i++) {
-			BundlePinholeSimplified c = structure.cameras.data[i].getModel();
+			BundlePinholeSimplified c = Objects.requireNonNull(structure.cameras.data[i].getModel());
 			c.f = listPinhole.get(i).fx;
 			c.k1 = c.k2 = 0;
 		}
@@ -310,7 +313,7 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 			if (verbose != null)
 				verbose.println("  recomputing old structure");
 			for (int i = 0; i < structure.cameras.size; i++) {
-				BundlePinholeSimplified c = structure.cameras.data[i].getModel();
+				BundlePinholeSimplified c = Objects.requireNonNull(structure.cameras.data[i].getModel());
 				c.setTo(bestCameras.get(i));
 				structure.getParentToView(i).setTo(bestPose.get(i));
 			}

@@ -308,7 +308,7 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 		listPoses.resize(inlierViews.size);
 
 		// Origin of local coordinate system
-		Se3_F64 world_to_view0 = graph.views.get(inlierViews.get(0).id).world_to_view;
+		Se3_F64 world_to_view0 = graph.lookupView(inlierViews.get(0).id).world_to_view;
 		world_to_view0.invert(view0_to_world);
 
 		for (int i = 0; i < inlierViews.size; i++) {
@@ -316,7 +316,7 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 			// create a list of the array indexes of all the views included in this inlier set
 			sceneViewIntIds.add(viewToIntegerID.get(viewID));
 			// also create a list of view locations for triangulation
-			view0_to_world.concat(graph.views.get(viewID).world_to_view, listPoses.get(i));
+			view0_to_world.concat(graph.lookupView(viewID).world_to_view, listPoses.get(i));
 		}
 	}
 

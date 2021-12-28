@@ -49,6 +49,7 @@ import java.util.Set;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class ScoreFundamentalVsRotation implements EpipolarScore3D {
 	/** Robust model matching algorithm. */
 	@Getter ModelMatcher<DMatrixRMaj, AssociatedPair> robust3D;
@@ -96,7 +97,7 @@ public class ScoreFundamentalVsRotation implements EpipolarScore3D {
 	boolean is3D;
 
 	// If not null then verbose output
-	PrintStream verbose;
+	@Nullable PrintStream verbose;
 
 	public ScoreFundamentalVsRotation( ModelMatcher<DMatrixRMaj, AssociatedPair> robust3D ) {
 		this.robust3D = robust3D;
@@ -121,7 +122,7 @@ public class ScoreFundamentalVsRotation implements EpipolarScore3D {
 
 		// determine if there's only one set of intrinsics for the two views
 		boolean sameCamera = cameraB == null;
-		if (sameCamera)
+		if (cameraB == null) // needed to get rid of NullAway false positive
 			cameraB = cameraA;
 		pinhole1.setTo(cameraA);
 		pinhole2.setTo(cameraB);

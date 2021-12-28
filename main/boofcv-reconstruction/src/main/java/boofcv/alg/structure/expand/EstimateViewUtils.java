@@ -45,6 +45,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class EstimateViewUtils {
 
 	/** Bundle Adjustment functions and configurations */
@@ -106,7 +107,7 @@ public class EstimateViewUtils {
 			camera3 = workGraph.cameras.get(targetCameraDB).intrinsic;
 			normalize3.setK(camera3.f, camera3.f, 0, 0, 0).setDistortion(camera3.k1, camera3.k2);
 		} else {
-			camera3 = null;
+			dereferenceCamera3();
 			normalize3.reset();
 		}
 
@@ -117,6 +118,11 @@ public class EstimateViewUtils {
 		local_to_global = view1_to_view2.T.norm();
 		BoofMiscOps.checkTrue(local_to_global != 0.0, "BUG! Two views are at the same location");
 		view1_to_view2.T.divide(local_to_global);
+	}
+
+	@SuppressWarnings("NullAway")
+	private void dereferenceCamera3() {
+		camera3 = null;
 	}
 
 	/**
@@ -162,7 +168,7 @@ public class EstimateViewUtils {
 		final SceneStructureMetric structure = metricSba.structure;
 		final SceneObservations observations = metricSba.observations;
 
-		// Even if the cameras are all the same, we will tell that they are different just because the book keeping
+		// Even if the cameras are all the same, we will tell that they are different just because the bookkeeping
 		// is so much easier and results are the same
 		structure.initialize(3, 3, usedThreeViewInliers.size);
 		observations.initialize(3);

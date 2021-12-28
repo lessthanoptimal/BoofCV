@@ -102,11 +102,11 @@ public class SceneWorkingGraph {
 	}
 
 	public View lookupView( String id ) {
-		return views.get(id);
+		return Objects.requireNonNull(views.get(id));
 	}
 
 	public boolean isSeedSet( String id ) {
-		return views.get(id).index < numSeedViews;
+		return Objects.requireNonNull(views.get(id)).index < numSeedViews;
 	}
 
 	public boolean isKnown( PairwiseImageGraph.View pview ) {
@@ -160,6 +160,7 @@ public class SceneWorkingGraph {
 	 * Observation (pixel coordinates) of an image feature inside of a {@link View}. Specifies which observation in
 	 * the view it's associated with, the view, and a copy of the actual obnervation.
 	 */
+	@SuppressWarnings("NullAway.Init")
 	public static class Observation {
 		// The view this feature was observed in
 		public View view;
@@ -175,6 +176,7 @@ public class SceneWorkingGraph {
 			this.observationIdx = observationIdx;
 		}
 
+		@SuppressWarnings("NullAway")
 		public void reset() {
 			this.view = null;
 			this.observationIdx = -1;
@@ -279,6 +281,7 @@ public class SceneWorkingGraph {
 	/**
 	 * Data structure related to an image. Points to image features, intrinsic parameters, and extrinsic parameters.
 	 */
+	@SuppressWarnings({"NullAway.Init"})
 	static public class View {
 		/** Reference to the {@link PairwiseImageGraph.View} that this view was generated from */
 		public PairwiseImageGraph.View pview;
@@ -331,6 +334,7 @@ public class SceneWorkingGraph {
 			return best;
 		}
 
+		@SuppressWarnings({"NullAway"})
 		public void reset() {
 			index = -1;
 			pview = null;

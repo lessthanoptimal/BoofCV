@@ -52,6 +52,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static boofcv.misc.BoofMiscOps.checkTrue;
 
@@ -60,6 +61,7 @@ import static boofcv.misc.BoofMiscOps.checkTrue;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class PairwiseGraphUtils {
 
 	public LookUpSimilarImages dbSimilar;
@@ -181,9 +183,9 @@ public class PairwiseGraphUtils {
 	 * Creates three feature look up tables: A -> B, A -> C, and B -> C
 	 */
 	public void createThreeViewLookUpTables() {
-		Motion connAB = seed.findMotion(viewB);
-		Motion connAC = seed.findMotion(viewC);
-		Motion connBC = viewB.findMotion(viewC);
+		Motion connAB = Objects.requireNonNull(seed.findMotion(viewB));
+		Motion connAC = Objects.requireNonNull(seed.findMotion(viewC));
+		Motion connBC = Objects.requireNonNull(viewB.findMotion(viewC));
 
 		PairwiseGraphUtils.createTableViewAtoB(seed, connAB, table_A_to_B);
 		PairwiseGraphUtils.createTableViewAtoB(seed, connAC, table_A_to_C);

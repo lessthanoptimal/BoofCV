@@ -26,6 +26,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Graph describing the relationship between image features using matching features from epipolar geometry.
@@ -53,7 +54,7 @@ public class PairwiseImageGraph {
 	}
 
 	public View lookupNode( String id ) {
-		return mapNodes.get(id);
+		return Objects.requireNonNull(mapNodes.get(id));
 	}
 
 	public Motion connect( View a, View b ) {
@@ -69,6 +70,7 @@ public class PairwiseImageGraph {
 	/**
 	 * Information associated with a single image/frame/view
 	 */
+	@SuppressWarnings("NullAway.Init")
 	public static class View {
 		/** Unique identifier for this view */
 		public String id;
@@ -131,6 +133,7 @@ public class PairwiseImageGraph {
 		}
 	}
 
+	@SuppressWarnings("NullAway.Init")
 	public static class Motion {
 		/** if this camera motion is known up to a metric transform. otherwise it will be projective */
 		public boolean is3D;
@@ -143,6 +146,7 @@ public class PairwiseImageGraph {
 		/** Index of motion in {@link #edges} */
 		public int index;
 
+		@SuppressWarnings("NullAway")
 		public void reset() {
 			is3D = false;
 			score3D = 0;

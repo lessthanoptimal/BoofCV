@@ -47,6 +47,7 @@ import static java.util.Objects.requireNonNull;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("NullAway.Init")
 public class ResolveSceneScaleAmbiguity implements VerbosePrint {
 	/** A window of size fraction*(number of estimates) will be done when searching for the true scale */
 	public double windowFraction = 0.1;
@@ -75,7 +76,7 @@ public class ResolveSceneScaleAmbiguity implements VerbosePrint {
 	// Storage for scale estimates from each feature
 	DogArray_F64 scales = new DogArray_F64();
 
-	PrintStream verbose;
+	@Nullable PrintStream verbose;
 
 	/**
 	 * Resets internal data structures and specifies number of features
@@ -203,6 +204,7 @@ public class ResolveSceneScaleAmbiguity implements VerbosePrint {
 	}
 
 	void printSceneInfo( SceneInfo scene ) {
+		Objects.requireNonNull(verbose);
 		List<Se3_F64> listWorldToView = Objects.requireNonNull(scene.listWorldToView);
 		verbose.print("Global Transforms: { ");
 		for (int i = 0; i < listWorldToView.size(); i++) {

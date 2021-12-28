@@ -60,6 +60,7 @@ import java.util.Set;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class ScoreFundamentalHomographyCompatibility implements EpipolarScore3D {
 	/** Robust model matching algorithm. Inlier set is used but not the error */
 	@Getter ModelMatcher<DMatrixRMaj, AssociatedPair> ransac3D;
@@ -99,7 +100,7 @@ public class ScoreFundamentalHomographyCompatibility implements EpipolarScore3D 
 	boolean is3D;
 
 	// If not null then verbose output
-	PrintStream verbose;
+	@Nullable PrintStream verbose;
 
 	// Workspace variables
 	Point3D_F64 e1 = new Point3D_F64();

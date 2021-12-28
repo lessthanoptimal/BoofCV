@@ -54,6 +54,7 @@ import static boofcv.misc.BoofMiscOps.checkEq;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("NullAway.Init")
 public class MetricSpawnSceneFromView implements VerbosePrint {
 
 	/** Computes the initial scene from the seed and some of it's neighbors */
@@ -74,7 +75,7 @@ public class MetricSpawnSceneFromView implements VerbosePrint {
 	/** The found metric scene. Only valid if {@link #process} returns true. */
 	private @Getter final SceneWorkingGraph scene = new SceneWorkingGraph();
 
-	PrintStream verbose;
+	@Nullable PrintStream verbose;
 
 	//------------ Internal Work Space
 	List<String> viewIds = new ArrayList<>();

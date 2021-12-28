@@ -37,6 +37,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class SparseSceneToDenseCloud<T extends ImageGray<T>> {
 
 	/** MVS algorithm */

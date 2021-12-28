@@ -69,7 +69,7 @@ import static boofcv.misc.BoofMiscOps.checkTrue;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings("IntegerDivisionInFloatingPointContext")
+@SuppressWarnings({"NullAway.Init"})
 public class ProjectiveInitializeAllCommon implements VerbosePrint {
 
 	/** Common algorithms for reconstructing the projective scene */
@@ -86,7 +86,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 	protected final FastArray<View> viewsByStructureIndex = new FastArray<>(View.class);
 
 	// Indicates if debugging information should be printed
-	private PrintStream verbose;
+	private @Nullable PrintStream verbose;
 
 	//-------------- Internal workspace variables
 	protected final int[] selectedTriple = new int[2];

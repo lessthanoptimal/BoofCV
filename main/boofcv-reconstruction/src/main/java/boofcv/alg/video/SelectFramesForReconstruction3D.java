@@ -69,6 +69,7 @@ import static java.util.Objects.requireNonNull;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements VerbosePrint {
 	// TODO Jump over frames which are destroyed by image glare
 	// TODO Score frames based on an estimate of blur. Try to select in focus frames
@@ -86,15 +87,15 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 	private @Getter final DogArray_I32 selectedFrames = new DogArray_I32();
 
 	/** Tracks features frame to frame */
-	@Getter @Setter @Nullable PointTracker<T> tracker;
+	@Getter @Setter PointTracker<T> tracker;
 
 	/** Descriptors of tracks */
 	final @Getter DescribePointRadiusAngle<T, TupleDesc_F64> descriptor;
 
 	/** Associates tracks to each other using their descriptors */
-	@Getter @Setter @Nullable AssociateDescription2D<TupleDesc_F64> associate;
+	@Getter @Setter AssociateDescription2D<TupleDesc_F64> associate;
 
-	@Getter @Setter @Nullable EpipolarScore3D scorer;
+	@Getter @Setter EpipolarScore3D scorer;
 
 	/** Indexes of pairs which are considered to be inliers for the dominant model */
 	public @Getter final DogArray_I32 inlierIdx = new DogArray_I32();
@@ -347,10 +348,7 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 	 * @return true if 3D
 	 */
 	boolean isScene3D() {
-		requireNonNull(scorer);
-
 		scorer.process(cameraA, cameraB, keyFrame.size(), currentFrame.size(), pairs.toList(), fundamental, inlierIdx);
-
 		return scorer.is3D();
 	}
 

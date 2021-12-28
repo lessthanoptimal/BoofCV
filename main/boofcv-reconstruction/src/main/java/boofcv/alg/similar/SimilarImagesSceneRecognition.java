@@ -61,6 +61,7 @@ import java.util.*;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class SimilarImagesSceneRecognition<Image extends ImageBase<Image>, TD extends TupleDesc<TD>>
 		implements LookUpSimilarImages, VerbosePrint {
 	/** Detects image features */
@@ -120,7 +121,7 @@ public class SimilarImagesSceneRecognition<Image extends ImageBase<Image>, TD ex
 	final DogArray<Point2D_F64> destinationPixels;
 
 	// If not null it will print verbose debugging info
-	PrintStream verbose;
+	@Nullable PrintStream verbose;
 
 	public SimilarImagesSceneRecognition( DetectDescribePoint<Image, TD> detector,
 										  AssociateDescriptionHashSets<TD> asscociator,

@@ -42,6 +42,7 @@ import java.util.*;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class GeneratePairwiseImageGraph implements VerbosePrint {
 	public final @Getter PairwiseImageGraph graph = new PairwiseImageGraph();
 	private List<String> imageIds;
@@ -49,7 +50,7 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 	/** Used to score if the two views have a 3D relationship or not */
 	public final @Getter EpipolarScore3D epipolarScore;
 
-	private PrintStream verbose;
+	private @Nullable PrintStream verbose;
 
 	//--------- Internal Workspace
 
@@ -106,7 +107,7 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 
 			// Find similar, but filter out images which have a lower index as those matches have already been considered
 			int _idxTgt = idxTgt;
-			dbSimilar.findSimilar(src, ( id ) -> imageToIndex.get(id) > _idxTgt, similar);
+			dbSimilar.findSimilar(src, ( id ) -> Objects.requireNonNull(imageToIndex.get(id)) > _idxTgt, similar);
 			dbSimilar.lookupPixelFeats(src, srcFeats);
 
 			if (verbose != null) verbose.println("similar.size=" + similar.size() + " feats.size=" + srcFeats.size);
@@ -117,7 +118,7 @@ public class GeneratePairwiseImageGraph implements VerbosePrint {
 				String dst = similar.get(idxSimilar);
 
 				// make sure it isn't considering the same motion twice
-				int dstIdx = imageToIndex.get(dst);
+				int dstIdx = Objects.requireNonNull(imageToIndex.get(dst));
 				if (dstIdx <= idxTgt)
 					throw new RuntimeException("BUG! should have been filtered by find similar");
 

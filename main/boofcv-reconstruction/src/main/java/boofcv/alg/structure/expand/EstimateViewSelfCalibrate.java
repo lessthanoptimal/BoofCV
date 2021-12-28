@@ -41,6 +41,7 @@ import java.util.Set;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class EstimateViewSelfCalibrate implements VerbosePrint {
 
 	/** If less than this number of features fail the physical constraint test, attempt to recover by removing them */
@@ -70,7 +71,7 @@ public class EstimateViewSelfCalibrate implements VerbosePrint {
 	DMatrixRMaj K_target = new DMatrixRMaj(3, 3);
 	BundlePinholeSimplified intrinsicTarget = new BundlePinholeSimplified();
 
-	PrintStream verbose;
+	@Nullable PrintStream verbose;
 
 	/**
 	 * Estimates the pose and intrinsics of a new view.
