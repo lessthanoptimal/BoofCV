@@ -29,12 +29,14 @@ import boofcv.io.wrapper.DefaultMediaManager;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Objects;
 
 /**
  * Base class for planar calibration
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class BaseCalibrationConfig {
 
 	MediaManager media = DefaultMediaManager.INSTANCE;
@@ -48,11 +50,10 @@ public class BaseCalibrationConfig {
 		this.media = media;
 	}
 
-	public BaseCalibrationConfig() {
-	}
+	public BaseCalibrationConfig() {}
 
 	protected void parseTarget( String where ) throws FileNotFoundException {
-		Reader input = media.openFile(where);
+		Reader input = Objects.requireNonNull(media.openFile(where));
 
 		SimpleStringNumberReader reader = new SimpleStringNumberReader('#');
 		if( !reader.read(input) )

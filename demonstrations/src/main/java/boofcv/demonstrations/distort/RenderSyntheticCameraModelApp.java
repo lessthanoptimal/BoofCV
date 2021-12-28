@@ -54,6 +54,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class RenderSyntheticCameraModelApp<T extends ImageBase<T>> extends DemonstrationBase
 		implements PinholePanel.Listener, UniversalPanel.Listener {
 

@@ -23,6 +23,7 @@ import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 import org.ddogleg.struct.DogArray;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.image.BufferedImage;
 
@@ -41,7 +42,7 @@ public class VisualizeRegions {
 	 * @param radius Thickness of watershed. 0 is 1 pixel wide. 1 is 3 pixels wide.
 	 * @return Output image.
 	 */
-	public static BufferedImage watersheds( GrayS32 segments, BufferedImage output, int radius ) {
+	public static BufferedImage watersheds( GrayS32 segments, @Nullable BufferedImage output, int radius ) {
 		if (output == null)
 			output = new BufferedImage(segments.width, segments.height, BufferedImage.TYPE_INT_RGB);
 
@@ -84,7 +85,7 @@ public class VisualizeRegions {
 	 * @param output Storage for output image. Can be null.
 	 * @return Output image.
 	 */
-	public static BufferedImage regions( GrayS32 pixelToRegion, int numRegions, BufferedImage output ) {
+	public static BufferedImage regions( GrayS32 pixelToRegion, int numRegions, @Nullable BufferedImage output ) {
 		return VisualizeBinaryData.renderLabeled(pixelToRegion, numRegions, output);
 	}
 
@@ -98,7 +99,7 @@ public class VisualizeRegions {
 	 */
 	public static BufferedImage regionsColor( GrayS32 pixelToRegion,
 											  DogArray<float[]> segmentColor,
-											  BufferedImage output ) {
+											  @Nullable BufferedImage output ) {
 		if (output == null)
 			output = new BufferedImage(pixelToRegion.width, pixelToRegion.height, BufferedImage.TYPE_INT_RGB);
 
@@ -136,7 +137,7 @@ public class VisualizeRegions {
 	 */
 	public static BufferedImage regionBorders( GrayS32 pixelToRegion,
 											   int borderColor,
-											   BufferedImage output ) {
+											   @Nullable BufferedImage output ) {
 		if (output == null)
 			output = new BufferedImage(pixelToRegion.width, pixelToRegion.height, BufferedImage.TYPE_INT_RGB);
 

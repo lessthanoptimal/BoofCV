@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,64 +45,62 @@ import java.util.ArrayList;
  *
  * @author Peter Abeles
  */
-public class VisualizeImageSegmentationApp <T extends ImageBase<T>>
-		extends DemonstrationBase
-{
+@SuppressWarnings({"NullAway.Init"})
+public class VisualizeImageSegmentationApp<T extends ImageBase<T>> extends DemonstrationBase {
 	BufferedImage inputImage;
-	BufferedImage outColor = new BufferedImage(1,1,BufferedImage.TYPE_INT_RGB);
-	BufferedImage outSegments = new BufferedImage(1,1,BufferedImage.TYPE_INT_RGB);
-	BufferedImage outBorder = new BufferedImage(1,1,BufferedImage.TYPE_INT_RGB);
+	BufferedImage outColor = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
+	BufferedImage outSegments = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
+	BufferedImage outBorder = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
 
-	ImageSuperpixels<T> alg = null;
+	ImageSuperpixels<T> alg;
 
 	T color;
-	GrayS32 pixelToRegion = new GrayS32(1,1);
+	GrayS32 pixelToRegion = new GrayS32(1, 1);
 
 	SegmentConfigPanel controls = new SegmentConfigPanel(this);
 	ImagePanel gui = new ImagePanel();
 
-	public VisualizeImageSegmentationApp(java.util.List<PathLabel> examples, ImageType<T> imageType ) {
-		super(true,false,examples,imageType);
+	public VisualizeImageSegmentationApp( java.util.List<PathLabel> examples, ImageType<T> imageType ) {
+		super(true, false, examples, imageType);
 		allowVideos = false;
-		color = imageType.createImage(1,1);
+		color = imageType.createImage(1, 1);
 
-		add(gui,BorderLayout.CENTER);
-		add(controls,BorderLayout.WEST);
+		add(gui, BorderLayout.CENTER);
+		add(controls, BorderLayout.WEST);
 
 		declareAlgorithm();
 	}
 
 	public void declareAlgorithm() {
-		alg = null;
 		ImageType<T> imageType = getImageType(0);
-		switch( controls.selectedAlgorithm ) {
-			case 0: alg = FactoryImageSegmentation.fh04(controls.configFh, imageType); break;
-			case 1: alg = FactoryImageSegmentation.slic(controls.configSlic, imageType); break;
-			case 2: alg = FactoryImageSegmentation.meanShift(controls.configMeanShift, imageType); break;
-			case 3: alg = FactoryImageSegmentation.watershed(controls.configWatershed, imageType); break;
-			default: throw new RuntimeException("BUG!");
-		}
+		alg = switch (controls.selectedAlgorithm) {
+			case 0 -> FactoryImageSegmentation.fh04(controls.configFh, imageType);
+			case 1 -> FactoryImageSegmentation.slic(controls.configSlic, imageType);
+			case 2 -> FactoryImageSegmentation.meanShift(controls.configMeanShift, imageType);
+			case 3 -> FactoryImageSegmentation.watershed(controls.configWatershed, imageType);
+			default -> throw new RuntimeException("BUG!");
+		};
 	}
 
 	@Override
-	protected void handleInputChange( int source , InputMethod method , final int width , final int height ) {
+	protected void handleInputChange( int source, InputMethod method, final int width, final int height ) {
 		color.reshape(width, height);
 		pixelToRegion.reshape(width, height);
 
-		outColor = new BufferedImage(color.width,color.height,BufferedImage.TYPE_INT_RGB);
-		outSegments = new BufferedImage(color.width,color.height,BufferedImage.TYPE_INT_RGB);
-		outBorder = new BufferedImage(color.width,color.height,BufferedImage.TYPE_INT_RGB);
+		outColor = new BufferedImage(color.width, color.height, BufferedImage.TYPE_INT_RGB);
+		outSegments = new BufferedImage(color.width, color.height, BufferedImage.TYPE_INT_RGB);
+		outBorder = new BufferedImage(color.width, color.height, BufferedImage.TYPE_INT_RGB);
 
 		handleGuiChange();
 
-		SwingUtilities.invokeLater(()->{
-			gui.setPreferredSize(new Dimension(width,height));
-			controls.setImageSize(width,height);
+		SwingUtilities.invokeLater(() -> {
+			gui.setPreferredSize(new Dimension(width, height));
+			controls.setImageSize(width, height);
 		});
 	}
 
 	@Override
-	public void processImage(int sourceID, long frameID, final BufferedImage buffered, ImageBase input) {
+	public void processImage( int sourceID, long frameID, final BufferedImage buffered, ImageBase input ) {
 		this.inputImage = buffered;
 
 		color.setTo((T)input);
@@ -122,11 +120,20 @@ public class VisualizeImageSegmentationApp <T extends ImageBase<T>>
 
 	public void handleGuiChange() {
 		switch (controls.selectedVisual) {
-			case 0:gui.setImage(outColor);break;
-			case 1:gui.setImage(outBorder);break;
-			case 2:gui.setImage(outSegments);break;
-			case 3:gui.setImage(inputImage);break;
-			default: throw new RuntimeException("Unknown mode");
+			case 0:
+				gui.setImage(outColor);
+				break;
+			case 1:
+				gui.setImage(outBorder);
+				break;
+			case 2:
+				gui.setImage(outSegments);
+				break;
+			case 3:
+				gui.setImage(inputImage);
+				break;
+			default:
+				throw new RuntimeException("Unknown mode");
 		}
 		gui.repaint();
 	}
@@ -135,14 +142,14 @@ public class VisualizeImageSegmentationApp <T extends ImageBase<T>>
 		controls.setComputing(true);
 		// local reference to segmentation to avoid alg getting changed in another thread
 		ImageSuperpixels<T> alg = this.alg;
-		if( alg == null )
+		if (alg == null)
 			return;
 		long before = System.nanoTime();
 		alg.segment(color, pixelToRegion);
 		long after = System.nanoTime();
 		controls.setComputing(false);
 
-		SwingUtilities.invokeLater(()->controls.setProcessingTimeMS((after-before)*1e-6));
+		SwingUtilities.invokeLater(() -> controls.setProcessingTimeMS((after - before)*1e-6));
 
 		int numSegments = alg.getTotalSuperpixels();
 
@@ -158,20 +165,20 @@ public class VisualizeImageSegmentationApp <T extends ImageBase<T>>
 		regionMemberCount.resize(numSegments);
 
 		ImageSegmentationOps.countRegionPixels(pixelToRegion, numSegments, regionMemberCount.data);
-		colorize.process(color,pixelToRegion,regionMemberCount,segmentColor);
+		colorize.process(color, pixelToRegion, regionMemberCount, segmentColor);
 
-		VisualizeRegions.regionsColor(pixelToRegion,segmentColor,outColor);
-		VisualizeRegions.regions(pixelToRegion,segmentColor.size(),outSegments);
+		VisualizeRegions.regionsColor(pixelToRegion, segmentColor, outColor);
+		VisualizeRegions.regions(pixelToRegion, segmentColor.size(), outSegments);
 
 		// Make edges appear black
-		ConvertBufferedImage.convertTo(color,outBorder,true);
-		VisualizeRegions.regionBorders(pixelToRegion,0x000000,outBorder);
+		ConvertBufferedImage.convertTo(color, outBorder, true);
+		VisualizeRegions.regionBorders(pixelToRegion, 0x000000, outBorder);
 
 		gui.repaint();
 	}
 
-	public static void main(String[] args) {
-		ImageType<Planar<GrayF32>> imageType = ImageType.pl(3,GrayF32.class);
+	public static void main( String[] args ) {
+		ImageType<Planar<GrayF32>> imageType = ImageType.pl(3, GrayF32.class);
 //		ImageType<Planar<GrayU8>> defaultType = ImageType.pl(3,GrayU8.class);
 //		ImageType<GrayF32> defaultType = ImageType.single(GrayF32.class);
 //		ImageType<GrayU8> defaultType = ImageType.single(GrayU8.class);
@@ -184,8 +191,8 @@ public class VisualizeImageSegmentationApp <T extends ImageBase<T>>
 		examples.add(new PathLabel("Sunflowers", UtilIO.pathExample("sunflowers.jpg")));
 		examples.add(new PathLabel("Shapes", UtilIO.pathExample("shapes/shapes01.png")));
 
-		SwingUtilities.invokeLater(()->{
-			VisualizeImageSegmentationApp app = new VisualizeImageSegmentationApp(examples,imageType);
+		SwingUtilities.invokeLater(() -> {
+			VisualizeImageSegmentationApp app = new VisualizeImageSegmentationApp(examples, imageType);
 
 			app.openExample(examples.get(0));
 			app.display("Image Segmentation");

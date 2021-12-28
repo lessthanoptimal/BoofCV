@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -183,7 +183,7 @@ public class ImageEnhanceApp extends DemonstrationBase {
 		}
 	}
 
-	@SuppressWarnings({"JdkObsolete"})
+	@SuppressWarnings({"JdkObsolete", "NullAway.Init"})
 	class ControlPanel extends StandardAlgConfigPanel implements ChangeListener, ActionListener {
 		protected JLabel processingTimeLabel = new JLabel();
 

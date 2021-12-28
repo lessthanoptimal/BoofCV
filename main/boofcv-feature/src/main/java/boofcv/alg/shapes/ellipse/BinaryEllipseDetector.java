@@ -193,7 +193,7 @@ public class BinaryEllipseDetector<T extends ImageGray<T>> {
 		return results;
 	}
 
-	public List<EllipseRotated_F64> getFoundEllipses( List<EllipseRotated_F64> storage ) {
+	public List<EllipseRotated_F64> getFoundEllipses( @Nullable List<EllipseRotated_F64> storage ) {
 		if (storage == null)
 			storage = new ArrayList<>();
 		for (int i = 0; i < results.size; i++) {

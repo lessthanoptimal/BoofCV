@@ -64,8 +64,8 @@ import static boofcv.gui.fiducial.VisualizeFiducial.drawLine;
  *
  * @author Peter Abeles
  */
-public abstract class CommonDetectCalibrationApp extends DemonstrationBase
-		implements DetectCalibrationPanel.Listener {
+@SuppressWarnings({"NullAway.Init"})
+public abstract class CommonDetectCalibrationApp extends DemonstrationBase implements DetectCalibrationPanel.Listener {
 	boolean success;
 
 	DetectCalibrationPanel controlPanel;

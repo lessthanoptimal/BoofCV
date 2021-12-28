@@ -24,6 +24,7 @@ import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.DogArray_B;
 import org.ddogleg.struct.DogArray_I32;
 import org.ejml.UtilEjml;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -36,6 +37,7 @@ import java.awt.geom.Ellipse2D;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class MouseSelectImageFeatures extends MouseAdapter {
 
 	final JComponent owner;
@@ -51,10 +53,9 @@ public class MouseSelectImageFeatures extends MouseAdapter {
 	/** Checks to see if the feature should be skipped */
 	public FeatureSkip featureSkip = ( idx ) -> false;
 	/** Called after the user has selected a region */
-	public BoofLambdas.ProcessCall handleSelected = ()->{};
+	public BoofLambdas.ProcessCall handleSelected = () -> {};
 	/** Specifies how many features there are */
 	public int numFeatures;
-
 
 	/** How far it will search in screen pixels when user clicks */
 	public int searchRadiusPixels = 20;
@@ -66,7 +67,7 @@ public class MouseSelectImageFeatures extends MouseAdapter {
 	protected boolean selectRegion = true;
 
 	// where it first clicked when selecting a region
-	protected Point2D_I32 selectedScreen0;
+	protected @Nullable Point2D_I32 selectedScreen0;
 	// current position of the mouse while being dragged
 	protected Point2D_I32 selectedScreen1 = new Point2D_I32();
 
@@ -167,7 +168,7 @@ public class MouseSelectImageFeatures extends MouseAdapter {
 	}
 
 	@Override public void mouseReleased( MouseEvent e ) {
-		if (!selectRegion) {
+		if (!selectRegion || selectedScreen0 == null) {
 			return;
 		}
 
@@ -181,7 +182,7 @@ public class MouseSelectImageFeatures extends MouseAdapter {
 		double y1 = Math.max(imagePixel0.y, imagePixel1.y);
 
 		// See if the user clicked. this is a bit of a hack
-		if (Math.abs(x1-x0) <= 2 || Math.abs(y1-y0) <= 2)
+		if (Math.abs(x1 - x0) <= 2 || Math.abs(y1 - y0) <= 2)
 			return;
 
 		// Find all the features inside this region
@@ -253,7 +254,7 @@ public class MouseSelectImageFeatures extends MouseAdapter {
 		// The user has selected some points. Configure the mask so that they will be displayed
 		if (!selected.isEmpty()) {
 			selectedMask.resize(numFeatures, false);
-			selected.forEach(idx->selectedMask.set(idx, true));
+			selected.forEach(idx -> selectedMask.set(idx, true));
 		}
 
 		handleSelected.process();

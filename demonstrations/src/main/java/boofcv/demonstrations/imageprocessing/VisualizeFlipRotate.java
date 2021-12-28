@@ -26,32 +26,33 @@ import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.GrayU8;
 
 import java.awt.image.BufferedImage;
+import java.util.Objects;
 
 /**
  * Visualizes flip and rotate operations
  *
  * @author Peter Abeles
  */
-public class  VisualizeFlipRotate {
-	public static void main(String[] args) {
+public class VisualizeFlipRotate {
+	public static void main( String[] args ) {
 		BufferedImage input = UtilImageIO.loadImage(UtilIO.pathExample("sunflowers.jpg"));
-		GrayU8 gray = ConvertBufferedImage.convertFrom(input,(GrayU8)null);
+		Objects.requireNonNull(input);
+		GrayU8 gray = ConvertBufferedImage.convertFrom(input, (GrayU8)null);
 
 		GrayU8 flipH = gray.clone();
 		GrayU8 flipV = gray.clone();
-		GrayU8 rotateCW = new GrayU8(gray.height,gray.width);
-		GrayU8 rotateCCW = new GrayU8(gray.height,gray.width);
+		GrayU8 rotateCW = new GrayU8(gray.height, gray.width);
+		GrayU8 rotateCCW = new GrayU8(gray.height, gray.width);
 
 		ImageMiscOps.flipHorizontal(flipH);
 		ImageMiscOps.flipVertical(flipV);
 		ImageMiscOps.rotateCW(gray, rotateCW);
 		ImageMiscOps.rotateCCW(gray, rotateCCW);
 
-		ShowImages.showWindow(gray,"Input");
-		ShowImages.showWindow(flipH,"Flip Horizontal");
-		ShowImages.showWindow(flipV,"Flip Vertical");
-		ShowImages.showWindow(rotateCW,"Rotate CW");
-		ShowImages.showWindow(rotateCCW,"Rotate CCW");
-
+		ShowImages.showWindow(gray, "Input");
+		ShowImages.showWindow(flipH, "Flip Horizontal");
+		ShowImages.showWindow(flipV, "Flip Vertical");
+		ShowImages.showWindow(rotateCW, "Rotate CW");
+		ShowImages.showWindow(rotateCCW, "Rotate CCW");
 	}
 }

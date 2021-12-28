@@ -273,7 +273,7 @@ public class UtilCalibrationGui {
 	}
 
 	public static void drawIndexes( Graphics2D g2, int fontSize, List<ChessboardCorner> points,
-									Point2Transform2_F32 transform,
+									@Nullable Point2Transform2_F32 transform,
 									int minLevel,
 									double scale ) {
 

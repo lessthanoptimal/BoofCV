@@ -65,6 +65,7 @@ import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, TD extends TupleDesc<TD>>
 		extends DemonstrationBase {
 
@@ -537,7 +538,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			heightOfLabels = labelID.getPreferredSize().height + labelScore.getPreferredSize().height + 10;
 
 			image = new VisualizeImage(imageID);
-			image.setPreferredSize(new Dimension(image.getImage().getWidth(), image.getImage().getHeight()));
+			image.setPreferredSize(image.getImageDimension());
 
 			add(image);
 			add(labelID);
@@ -567,13 +568,14 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 		}
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	class VisualizeImage extends ImagePanel {
 		ImageDimension dbShape = new ImageDimension();
 		DogArray<Point2D_F64> features = new DogArray<>(Point2D_F64::new);
 		DogArray_I32 words = new DogArray_I32();
 		DogArray_I32 mainFeatureIdx = new DogArray_I32();
 
-		String imageID;
+		@Nullable String imageID;
 
 		MouseSelectImageFeatures featureHandler = new MouseSelectImageFeatures(this);
 
@@ -675,6 +677,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 		}
 
 		public double getImageScale() {
+			Objects.requireNonNull(img);
 			double previewScale = img.getWidth()/(double)dbShape.width;
 			return previewScale*scale;
 		}

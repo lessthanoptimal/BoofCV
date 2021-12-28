@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,6 +32,7 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.PyramidFloat;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -45,13 +46,13 @@ public class DetectPointsInsidePyramidApp<T extends ImageGray<T>, D extends Imag
 		extends SelectAlgorithmAndInputPanel {
 	static int NUM_FEATURES = 100;
 
-	PyramidFloat<T> ss;
+	@Nullable PyramidFloat<T> ss;
 	Class<T> imageType;
 	ScaleSpacePyramidPointPanel panel;
 	boolean hasImage = false;
 
 	T workImage;
-	InterestPointScaleSpacePyramid<T> det = null;
+	@Nullable InterestPointScaleSpacePyramid<T> det = null;
 
 	public DetectPointsInsidePyramidApp( Class<T> imageType, Class<D> derivType ) {
 		super(2);
@@ -97,7 +98,7 @@ public class DetectPointsInsidePyramidApp<T extends ImageGray<T>, D extends Imag
 	}
 
 	@Override
-	public synchronized void setActiveAlgorithm( int indexFamily, String name, Object cookie ) {
+	public synchronized void setActiveAlgorithm( int indexFamily, @Nullable String name, Object cookie ) {
 		if (!hasImage)
 			return;
 
@@ -107,7 +108,7 @@ public class DetectPointsInsidePyramidApp<T extends ImageGray<T>, D extends Imag
 			if (ss == null)
 				return;
 		} else {
-			double scales[] = new double[]{1, 1.5, 2, 3, 4, 8, 12, 16, 24};
+			double[] scales = new double[]{1, 1.5, 2, 3, 4, 8, 12, 16, 24};
 			if (((Number)cookie).intValue() == 0)
 				ss = FactoryPyramid.scaleSpacePyramid(scales, imageType);
 			else

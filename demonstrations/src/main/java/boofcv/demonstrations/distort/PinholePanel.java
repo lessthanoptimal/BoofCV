@@ -23,6 +23,7 @@ import boofcv.gui.controls.JSpinnerNumber;
 import boofcv.struct.calib.CameraPinholeBrown;
 
 import javax.swing.event.ChangeEvent;
+import java.util.Objects;
 
 /**
  * Panel which lets you select all the pinhole with distortion camera parameters
@@ -73,6 +74,8 @@ public class PinholePanel extends StandardAlgConfigPanel {
 		Listener original = this.listener;
 		this.listener = (m)->{};
 
+		double[] radial = Objects.requireNonNull(model.radial);
+
 		selectWidth.spinner.setValue(model.width);
 		selectHeight.spinner.setValue(model.height);
 		selectFX.spinner.setValue(100.0*model.fx/model.width);
@@ -82,10 +85,10 @@ public class PinholePanel extends StandardAlgConfigPanel {
 		selectSkew.spinner.setValue(model.skew);
 		selectT1.spinner.setValue(model.t1);
 		selectT2.spinner.setValue(model.t2);
-		selectR1.spinner.setValue(model.radial[0]);
-		selectR2.spinner.setValue(model.radial[1]);
-		selectR3.spinner.setValue(model.radial[2]);
-		selectR4.spinner.setValue(model.radial[3]);
+		selectR1.spinner.setValue(radial[0]);
+		selectR2.spinner.setValue(radial[1]);
+		selectR3.spinner.setValue(radial[2]);
+		selectR4.spinner.setValue(radial[3]);
 
 		// re-enable
 		this.listener = original;
@@ -93,6 +96,8 @@ public class PinholePanel extends StandardAlgConfigPanel {
 
 	public CameraPinholeBrown getCameraModel() {
 		var model = new CameraPinholeBrown(4);
+
+		double[] radial = Objects.requireNonNull(model.radial);
 
 		model.width = selectWidth.vint();
 		model.height = selectHeight.vint();
@@ -103,10 +108,10 @@ public class PinholePanel extends StandardAlgConfigPanel {
 		model.skew = selectSkew.vdouble();
 		model.t1 = selectT1.vdouble();
 		model.t2 = selectT2.vdouble();
-		model.radial[0] = selectR1.vdouble();
-		model.radial[1] = selectR2.vdouble();
-		model.radial[2] = selectR3.vdouble();
-		model.radial[3] = selectR4.vdouble();
+		radial[0] = selectR1.vdouble();
+		radial[1] = selectR2.vdouble();
+		radial[2] = selectR3.vdouble();
+		radial[3] = selectR4.vdouble();
 
 		return model;
 	}

@@ -39,6 +39,7 @@ import java.awt.event.ItemListener;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class DetectCalibrationPanel extends StandardAlgConfigPanel
 		implements ChangeListener, ActionListener, ItemListener {
 	ViewedImageInfoPanel viewInfo = new ViewedImageInfoPanel();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,8 +43,8 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class VideoDetectInterestPoints<T extends ImageGray<T>>
-		extends ProcessImageSequence<T> {
+@SuppressWarnings({"NullAway.Init"})
+public class VideoDetectInterestPoints<T extends ImageGray<T>> extends ProcessImageSequence<T> {
 
 	InterestPointDetector<T> detector;
 	OrientationImageAverage<T> orientation;
