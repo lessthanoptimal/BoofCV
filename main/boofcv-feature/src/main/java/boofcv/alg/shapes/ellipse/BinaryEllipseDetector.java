@@ -85,8 +85,8 @@ public class BinaryEllipseDetector<T extends ImageGray<T>> {
 	 * @param distToUndist Transform from distorted to undistorted image.
 	 * @param undistToDist Transform from undistorted to distorted image.
 	 */
-	public void setLensDistortion( PixelTransform<Point2D_F32> distToUndist,
-								   PixelTransform<Point2D_F32> undistToDist ) {
+	public void setLensDistortion( @Nullable PixelTransform<Point2D_F32> distToUndist,
+								   @Nullable PixelTransform<Point2D_F32> undistToDist ) {
 		this.ellipseDetector.setLensDistortion(distToUndist);
 		if (this.ellipseRefiner != null)
 			this.ellipseRefiner.setTransform(undistToDist);

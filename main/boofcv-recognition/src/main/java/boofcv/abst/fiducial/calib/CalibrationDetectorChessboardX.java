@@ -31,6 +31,7 @@ import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
 import lombok.Getter;
 import org.ddogleg.struct.DogArray;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +42,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class CalibrationDetectorChessboardX implements DetectSingleFiducialCalibration {
 
 	@Getter int cornerRows, cornerCols;
@@ -48,7 +50,7 @@ public class CalibrationDetectorChessboardX implements DetectSingleFiducialCalib
 	@Getter DetectChessboardXCornerPatterns<GrayF32> detectorX;
 
 	// transform from input pixels to undistorted pixels
-	Point2Transform2_F64 pixel2undist;
+	@Nullable Point2Transform2_F64 pixel2undist;
 
 	List<Point2D_F64> layoutPoints;
 	CalibrationObservation detected;
@@ -101,7 +103,7 @@ public class CalibrationDetectorChessboardX implements DetectSingleFiducialCalib
 	}
 
 	@Override
-	public void setLensDistortion( LensDistortionNarrowFOV distortion, int width, int height ) {
+	public void setLensDistortion( @Nullable LensDistortionNarrowFOV distortion, int width, int height ) {
 		if (distortion == null)
 			pixel2undist = null;
 		else {

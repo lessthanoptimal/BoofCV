@@ -147,8 +147,7 @@ public class EllipseClustersIntoHexagonalGrid extends EllipseClustersIntoGrid {
 	/**
 	 * Pick a corner but avoid the pointy edges at the other end
 	 */
-	@Override
-	NodeInfo selectSeedCorner() {
+	@Override NodeInfo selectSeedCorner() {
 		NodeInfo best = null;
 		double bestScore = 0;
 		double minAngle = Math.PI + 0.1;
@@ -182,9 +181,7 @@ public class EllipseClustersIntoHexagonalGrid extends EllipseClustersIntoGrid {
 			}
 		}
 
-		if (best != null) {
-			best.marked = true;
-		}
+		Objects.requireNonNull(best).marked = true;
 		return best;
 	}
 

@@ -25,6 +25,7 @@ import boofcv.alg.misc.PixelMath;
 import boofcv.alg.transform.fft.DiscreteFourierTransformOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.InterleavedF32;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Correlation based template matching which uses FFT
@@ -80,7 +81,7 @@ public class TemplateCorrelationFFT
 	}
 
 	@Override
-	public void process( GrayF32 template, GrayF32 mask ) {
+	public void process( GrayF32 template, @Nullable GrayF32 mask ) {
 		if (template.width > fftImage.width || template.height > fftImage.height)
 			throw new IllegalArgumentException("Template must be smaller than or equal to the image");
 

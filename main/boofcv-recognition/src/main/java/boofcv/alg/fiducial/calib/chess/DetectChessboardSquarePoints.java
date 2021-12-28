@@ -43,6 +43,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class DetectChessboardSquarePoints<T extends ImageGray<T>> {
 
 	// detector for squares

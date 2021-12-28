@@ -38,6 +38,7 @@ import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.DogArray;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +50,7 @@ import java.util.List;
  * @see DetectCircleHexagonalGrid
  * @see KeyPointsCircleHexagonalGrid
  */
+@SuppressWarnings({"NullAway.Init"})
 public class CalibrationDetectorCircleHexagonalGrid implements DetectSingleFiducialCalibration {
 
 	// Detectors the grids
@@ -123,7 +125,7 @@ public class CalibrationDetectorCircleHexagonalGrid implements DetectSingleFiduc
 	}
 
 	@Override
-	public void setLensDistortion( LensDistortionNarrowFOV distortion, int width, int height ) {
+	public void setLensDistortion( @Nullable LensDistortionNarrowFOV distortion, int width, int height ) {
 		if (distortion == null)
 			detector.getEllipseDetector().setLensDistortion(null, null);
 		else {

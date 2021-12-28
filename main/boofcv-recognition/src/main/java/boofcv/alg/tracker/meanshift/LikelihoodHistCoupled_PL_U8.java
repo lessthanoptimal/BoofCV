@@ -38,6 +38,7 @@ import georegression.struct.shapes.RectangleLength2D_I32;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class LikelihoodHistCoupled_PL_U8 implements PixelLikelihood<Planar<GrayU8>> {
 	Planar<GrayU8> image;
 

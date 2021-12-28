@@ -25,9 +25,11 @@ import georegression.struct.point.Point2D_F64;
 import org.ddogleg.sorting.QuickSortComparator;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.FastArray;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * <p>Base class for ordering clusters of ellipses into grids</p>
@@ -80,7 +82,9 @@ public abstract class EllipseClustersIntoGrid {
 	 * @param next Second ellipse, specified direction of line relative to seed
 	 * @return All the nodes along the line
 	 */
-	protected static List<NodeInfo> findLine( NodeInfo seed, NodeInfo next, int clusterSize, List<NodeInfo> line, boolean ccw ) {
+	protected static @Nullable List<NodeInfo> findLine( NodeInfo seed,
+														@Nullable NodeInfo next, int clusterSize,
+														@Nullable List<NodeInfo> line, boolean ccw ) {
 		if (next == null)
 			return null;
 		if (line == null)
@@ -172,7 +176,7 @@ public abstract class EllipseClustersIntoGrid {
 	 * @param currentSeed First node in the current row
 	 * @return The found node or null if one was not found
 	 */
-	static protected NodeInfo selectSeedNext( NodeInfo prevSeed, NodeInfo prevNext,
+	static protected @Nullable NodeInfo selectSeedNext( NodeInfo prevSeed, NodeInfo prevNext,
 											  NodeInfo currentSeed, boolean ccw ) {
 		double referenceAngle = direction(prevNext, prevSeed);
 
@@ -210,7 +214,7 @@ public abstract class EllipseClustersIntoGrid {
 	/**
 	 * Finds the node which is an edge of 'n' that is closest to point 'p'
 	 */
-	protected static NodeInfo findClosestEdge( NodeInfo n, Point2D_F64 p ) {
+	protected static @Nullable NodeInfo findClosestEdge( NodeInfo n, Point2D_F64 p ) {
 		double bestDistance = Double.MAX_VALUE;
 		NodeInfo best = null;
 
@@ -423,7 +427,7 @@ public abstract class EllipseClustersIntoGrid {
 			}
 		}
 
-		best.marked = true;
+		Objects.requireNonNull(best).marked = true;
 		return best;
 	}
 
@@ -436,6 +440,7 @@ public abstract class EllipseClustersIntoGrid {
 		return foundGrids;
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	public static class NodeInfo {
 		EllipseRotated_F64 ellipse;
 
@@ -452,7 +457,7 @@ public abstract class EllipseClustersIntoGrid {
 		// used to indicate if it has been inspected already
 		boolean marked;
 
-		public Edge findEdge( NodeInfo target ) {
+		public @Nullable Edge findEdge( NodeInfo target ) {
 			for (int i = 0; i < edges.size; i++) {
 				if (edges.get(i).target == target) {
 					return edges.get(i);
@@ -465,6 +470,7 @@ public abstract class EllipseClustersIntoGrid {
 			return ellipse.center.distance(target.ellipse.center);
 		}
 
+		@SuppressWarnings("NullAway")
 		public void reset() {
 			contour = false;
 			ellipse = null;
@@ -475,12 +481,12 @@ public abstract class EllipseClustersIntoGrid {
 		}
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	public static class Edge {
 		NodeInfo target;
 		double angle;
 
-		public Edge() {
-		}
+		public Edge() {}
 
 		public Edge( NodeInfo target, double angle ) {
 			this.target = target;

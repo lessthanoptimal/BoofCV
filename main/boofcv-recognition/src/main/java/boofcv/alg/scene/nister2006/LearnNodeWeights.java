@@ -46,6 +46,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class LearnNodeWeights<Point> {
 	/** Tree which has been learned already but with unspecified weights */
 	protected @Getter HierarchicalVocabularyTree<Point> tree;

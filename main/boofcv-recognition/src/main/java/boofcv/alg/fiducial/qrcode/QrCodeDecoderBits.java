@@ -22,6 +22,7 @@ import org.ddogleg.struct.DogArray_I8;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Objects;
 
 import static boofcv.alg.fiducial.qrcode.EciEncoding.getEciCharacterSet;
 import static boofcv.alg.fiducial.qrcode.EciEncoding.guessEncoding;
@@ -46,11 +47,11 @@ public class QrCodeDecoderBits {
 	StringBuilder workString = new StringBuilder();
 
 	// Specified ECI encoding
-	String encodingEci;
+	@Nullable String encodingEci;
 
 	// If null the encoding of byte messages will attempt to be automatically determined, with a default
 	// of UTF-8. Otherwise this is the encoding used.
-	String forceEncoding;
+	@Nullable String forceEncoding;
 
 	/**
 	 * @param forceEncoding If null then the default byte encoding is used. If not null then the specified
@@ -69,7 +70,7 @@ public class QrCodeDecoderBits {
 //		System.out.println("decoder error "+qr.error);
 
 		QrCode.VersionInfo info = QrCode.VERSION_INFO[qr.version];
-		QrCode.BlockInfo block = info.levels.get(qr.error);
+		QrCode.BlockInfo block = Objects.requireNonNull(info.levels.get(qr.error));
 
 		int wordsBlockAllA = block.codewords;
 		int wordsBlockDataA = block.dataCodewords;
@@ -131,7 +132,6 @@ public class QrCodeDecoderBits {
 		bits.size = qr.corrected.length*8;
 
 		workString.setLength(0);
-		qr.message = null;
 
 		// if there isn't enough bits left to read the mode it must be done
 		int location = 0;

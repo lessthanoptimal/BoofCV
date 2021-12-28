@@ -50,6 +50,7 @@ import java.lang.reflect.Array;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class SparseFlowObjectTracker<Image extends ImageGray<Image>, Derivative extends ImageGray<Derivative>> {
 	// for the current image
 	private ImagePyramid<Image> currentImage;

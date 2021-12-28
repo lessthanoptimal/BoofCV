@@ -29,11 +29,10 @@ import boofcv.struct.image.ImageGray;
  * @author Peter Abeles
  */
 public class SquareImage_to_FiducialDetector<T extends ImageGray<T>>
-	extends SquareBase_to_FiducialDetector<T,DetectFiducialSquareImage<T>>
-{
+		extends SquareBase_to_FiducialDetector<T, DetectFiducialSquareImage<T>> {
 	DetectFiducialSquareImage<T> alg;
 
-	public SquareImage_to_FiducialDetector(DetectFiducialSquareImage<T> alg) {
+	public SquareImage_to_FiducialDetector( DetectFiducialSquareImage<T> alg ) {
 		super(alg);
 		this.alg = alg;
 	}
@@ -45,19 +44,19 @@ public class SquareImage_to_FiducialDetector<T extends ImageGray<T>>
 	 * @param threshold Threshold used to convert it into a binary image
 	 * @param lengthSide Length of a side on the square in world units.
 	 */
-	public void addPatternImage(T pattern, double threshold, double lengthSide) {
-		GrayU8 binary = new GrayU8(pattern.width,pattern.height);
-		GThresholdImageOps.threshold(pattern,binary,threshold,false);
+	public void addPatternImage( T pattern, double threshold, double lengthSide ) {
+		GrayU8 binary = new GrayU8(pattern.width, pattern.height);
+		GThresholdImageOps.threshold(pattern, binary, threshold, false);
 		alg.addPattern(binary, lengthSide);
 	}
 
 	@Override
-	public double getSideWidth(int which) {
+	public double getSideWidth( int which ) {
 		return getWidth(which);
 	}
 
 	@Override
-	public double getSideHeight(int which) {
+	public double getSideHeight( int which ) {
 		return getWidth(which);
 	}
 
@@ -67,12 +66,12 @@ public class SquareImage_to_FiducialDetector<T extends ImageGray<T>>
 	 * @param binary Binary image of the pattern. 0 = black, 1 = white.
 	 * @param lengthSide Length of a side on the square in world units.
 	 */
-	public void addPatternBinary(GrayU8 binary, double lengthSide) {
+	public void addPatternBinary( GrayU8 binary, double lengthSide ) {
 		alg.addPattern(binary, lengthSide);
 	}
 
 	@Override
-	public double getWidth(int which) {
+	public double getWidth( int which ) {
 		int index = (int)alg.getFound().get(which).id;
 		return alg.getTargets().get(index).lengthSide;
 	}

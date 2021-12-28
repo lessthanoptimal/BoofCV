@@ -34,6 +34,7 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("NullAway.Init")
 public class RandomDotMarkerGenerator {
 
 	/** used to draw the fiducial */

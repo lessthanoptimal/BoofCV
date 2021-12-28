@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,6 +30,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class QrCodeGenerator {
 
 	QrCode qr;
@@ -53,8 +54,7 @@ public class QrCodeGenerator {
 		this.markerWidth = markerWidth;
 	}
 
-	public QrCodeGenerator() {
-	}
+	public QrCodeGenerator() {}
 
 	public void setRender( FiducialRenderEngine render ) {
 		this.render = render;
@@ -123,6 +123,7 @@ public class QrCodeGenerator {
 		return this;
 	}
 
+	@SuppressWarnings("NullAway")
 	protected void initialize( QrCode qr ) {
 		this.qr = qr;
 		this.numModules = QrCode.totalModules(qr.version);

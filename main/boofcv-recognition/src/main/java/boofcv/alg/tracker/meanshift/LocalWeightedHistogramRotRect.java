@@ -37,6 +37,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  **/
+@SuppressWarnings({"NullAway.Init"})
 public class LocalWeightedHistogramRotRect<T extends ImageBase<T>> {
 
 	// Interpolation function

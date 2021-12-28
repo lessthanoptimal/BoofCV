@@ -22,6 +22,8 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 
+import java.util.Objects;
+
 /**
  * <p>
  * Scores the difference between the template and the image using sum of absolute difference (SAD) error.
@@ -32,6 +34,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("NullAway.Init")
 public abstract class TemplateSumAbsoluteDifference<T extends ImageBase<T>>
 		implements TemplateIntensityImage.EvaluatorMethod<T> {
 	TemplateIntensityImage<T> o;
@@ -64,6 +67,7 @@ public abstract class TemplateSumAbsoluteDifference<T extends ImageBase<T>>
 
 		@Override
 		public float evaluateMask( int tl_x, int tl_y ) {
+			Objects.requireNonNull(o.mask);
 			float total = 0;
 
 			for (int y = 0; y < o.template.height; y++) {
@@ -105,7 +109,7 @@ public abstract class TemplateSumAbsoluteDifference<T extends ImageBase<T>>
 
 		@Override
 		public float evaluateMask( int tl_x, int tl_y ) {
-
+			Objects.requireNonNull(o.mask);
 			float total = 0;
 
 			for (int y = 0; y < o.template.height; y++) {

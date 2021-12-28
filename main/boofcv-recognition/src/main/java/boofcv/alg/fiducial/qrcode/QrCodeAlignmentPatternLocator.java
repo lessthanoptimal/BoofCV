@@ -21,6 +21,7 @@ package boofcv.alg.fiducial.qrcode;
 import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.struct.image.ImageGray;
 import org.ddogleg.struct.FastArray;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Searches the image for alignment patterns. First it computes a transform that removes perspective distortion
@@ -33,6 +34,7 @@ import org.ddogleg.struct.FastArray;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 
 	// grid for quick look up of alignment patterns to adjust search
@@ -74,7 +76,7 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 	}
 
 	public void setLensDistortion( int width, int height,
-								   LensDistortionNarrowFOV model ) {
+								   @Nullable LensDistortionNarrowFOV model ) {
 		reader.setLensDistortion(width, height, model);
 	}
 

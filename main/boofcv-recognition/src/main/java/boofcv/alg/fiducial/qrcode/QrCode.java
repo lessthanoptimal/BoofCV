@@ -23,11 +23,9 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.DogArray;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static boofcv.alg.fiducial.qrcode.QrCode.ErrorLevel.*;
 
@@ -39,7 +37,7 @@ import static boofcv.alg.fiducial.qrcode.QrCode.ErrorLevel.*;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings({"MutablePublicArray"})
+@SuppressWarnings({"MutablePublicArray", "NullAway.Init"})
 public class QrCode implements Cloneable {
 
 	/**
@@ -82,7 +80,7 @@ public class QrCode implements Cloneable {
 	/**
 	 * Which masking pattern is applied
 	 */
-	public QrCodeMaskPattern mask = null;
+	public QrCodeMaskPattern mask;
 
 	/**
 	 * Alignment pattern information
@@ -97,22 +95,22 @@ public class QrCode implements Cloneable {
 	/**
 	 * The raw byte data encoded into the QR Code. data + ecc
 	 */
-	public byte[] rawbits = null;
+	public byte[] rawbits;
 
 	/**
 	 * Raw byte data after error correction has been applied to it. Only contains the data portion.
 	 */
-	public byte[] corrected = null;
+	public byte[] corrected;
 
 	/**
 	 * If applicable the message is decoded into a sequence of characters.
 	 */
-	public String message = null;
+	public String message = "";
 
 	/**
 	 * Specifies where the QR code parsing failed
 	 */
-	public Failure failureCause = null;
+	public Failure failureCause = Failure.NONE;
 
 	/**
 	 * Approximate bounding box for QR-Code. The bottom right corner is estimated by intersecting lines
@@ -396,6 +394,7 @@ public class QrCode implements Cloneable {
 	/**
 	 * Resets the QR-Code so that it's in its initial state.
 	 */
+	@SuppressWarnings({"NullAway"})
 	public void reset() {
 		for (int i = 0; i < 4; i++) {
 			ppCorner.get(i).setTo(0, 0);
@@ -419,7 +418,7 @@ public class QrCode implements Cloneable {
 	@Override
 	public QrCode clone() {
 		QrCode c = new QrCode();
-		c.set(this);
+		c.setTo(this);
 		return c;
 	}
 
@@ -428,7 +427,8 @@ public class QrCode implements Cloneable {
 	 *
 	 * @param o The target object
 	 */
-	public void set( QrCode o ) {
+	@SuppressWarnings("NullAway")
+	public void setTo( QrCode o ) {
 		this.version = o.version;
 		this.error = o.error;
 		this.mask = o.mask;
@@ -571,7 +571,7 @@ public class QrCode implements Cloneable {
 		 * @return total bytes that can be stored.
 		 */
 		public int totalDataBytes( ErrorLevel error ) {
-			BlockInfo b = levels.get(error);
+			BlockInfo b = Objects.requireNonNull(levels.get(error));
 			int remaining = codewords - b.codewords*b.blocks;
 			int blocksB = remaining/(b.codewords + 1);
 
@@ -656,7 +656,7 @@ public class QrCode implements Cloneable {
 				return UNKNOWN;
 		}
 
-		public static Mode lookup( String name ) {
+		public static @Nullable Mode lookup( String name ) {
 			name = name.toUpperCase();
 			Mode[] modes = values();
 			for (int modeIdx = 0; modeIdx < modes.length; modeIdx++) {

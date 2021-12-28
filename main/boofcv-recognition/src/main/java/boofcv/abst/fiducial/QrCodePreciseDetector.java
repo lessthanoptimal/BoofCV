@@ -34,11 +34,8 @@ import java.util.List;
 
 /**
  * A QR-Code detector which is designed to find the location of corners in the finder pattern precisely.
- *
- * @param <T>
  */
-public class QrCodePreciseDetector<T extends ImageGray<T>> implements QrCodeDetector<T>
-{
+public class QrCodePreciseDetector<T extends ImageGray<T>> implements QrCodeDetector<T> {
 	QrCodePositionPatternDetector<T> detectPositionPatterns;
 	QrCodeDecoderImage<T> decoder;
 	InputToBinary<T> inputToBinary;
@@ -51,36 +48,36 @@ public class QrCodePreciseDetector<T extends ImageGray<T>> implements QrCodeDete
 	protected MovingAverage milliBinary = new MovingAverage(0.8);
 	protected MovingAverage milliDecoding = new MovingAverage(0.8);
 
-	public QrCodePreciseDetector(InputToBinary<T> inputToBinary,
-								 QrCodePositionPatternDetector<T> detectPositionPatterns,
-								 String defaultEncoding,
-								 boolean copyBinary, Class<T> imageType) {
+	public QrCodePreciseDetector( InputToBinary<T> inputToBinary,
+								  QrCodePositionPatternDetector<T> detectPositionPatterns,
+								  @Nullable String defaultEncoding,
+								  boolean copyBinary, Class<T> imageType ) {
 		this.inputToBinary = inputToBinary;
 		this.detectPositionPatterns = detectPositionPatterns;
-		this.decoder = new QrCodeDecoderImage<>(defaultEncoding,imageType);
+		this.decoder = new QrCodeDecoderImage<>(defaultEncoding, imageType);
 		this.imageType = imageType;
-		this.contourHelper = new BinaryContourHelper(detectPositionPatterns.getSquareDetector().getDetector().getContourFinder(),copyBinary);
+		this.contourHelper = new BinaryContourHelper(detectPositionPatterns.getSquareDetector().getDetector().getContourFinder(), copyBinary);
 	}
 
 	@Override
-	public void process(T gray) {
+	public void process( T gray ) {
 		long time0 = System.nanoTime();
-		contourHelper.reshape(gray.width,gray.height);
-		inputToBinary.process(gray,contourHelper.withoutPadding());
+		contourHelper.reshape(gray.width, gray.height);
+		inputToBinary.process(gray, contourHelper.withoutPadding());
 		long time1 = System.nanoTime();
-		milliBinary.update((time1-time0)*1e-6);
+		milliBinary.update((time1 - time0)*1e-6);
 
-		if( profiler )
-			System.out.printf("qrcode: binary %5.2f ",milliBinary.getAverage());
+		if (profiler)
+			System.out.printf("qrcode: binary %5.2f ", milliBinary.getAverage());
 
-		detectPositionPatterns.process(gray,contourHelper.padded());
+		detectPositionPatterns.process(gray, contourHelper.padded());
 		time0 = System.nanoTime();
-		decoder.process(detectPositionPatterns.getPositionPatterns(),gray);
+		decoder.process(detectPositionPatterns.getPositionPatterns(), gray);
 		time1 = System.nanoTime();
-		milliDecoding.update((time1-time0)*1e-6);
+		milliDecoding.update((time1 - time0)*1e-6);
 
-		if( profiler )
-			System.out.printf(" decoding %5.1f\n",milliDecoding.getAverage());
+		if (profiler)
+			System.out.printf(" decoding %5.1f\n", milliDecoding.getAverage());
 	}
 
 	@Override
@@ -101,9 +98,9 @@ public class QrCodePreciseDetector<T extends ImageGray<T>> implements QrCodeDete
 	 * @param height Input image height. Used in sanity check only.
 	 * @param model distortion model. Null to remove a distortion model.
 	 */
-	public void setLensDistortion(int width , int height ,
-								  @Nullable LensDistortionNarrowFOV model) {
-		detectPositionPatterns.setLensDistortion(width, height,model);
+	public void setLensDistortion( int width, int height,
+								   @Nullable LensDistortionNarrowFOV model ) {
+		detectPositionPatterns.setLensDistortion(width, height, model);
 		decoder.setLensDistortion(width, height, model);
 	}
 

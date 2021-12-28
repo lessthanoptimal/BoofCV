@@ -22,6 +22,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.nn.alg.KdTreeDistance;
 import org.ddogleg.struct.DogArray_B;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Graph representation of square blobs. Each blob can be connected to at most 4 other shapes which are directly
@@ -30,6 +31,7 @@ import org.ddogleg.struct.DogArray_B;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class SquareNode {
 	public static final int RESET_GRAPH = -2;
 
@@ -70,6 +72,7 @@ public class SquareNode {
 	/**
 	 * Discards previous information
 	 */
+	@SuppressWarnings({"NullAway"})
 	public void reset() {
 		square = null;
 		touch = null;
@@ -118,7 +121,7 @@ public class SquareNode {
 		return smallest;
 	}
 
-	public SquareEdge findEdge( SquareNode target ) {
+	public @Nullable SquareEdge findEdge( SquareNode target ) {
 		int index = findEdgeIndex(target);
 		if (index >= 0)
 			return edges[index];

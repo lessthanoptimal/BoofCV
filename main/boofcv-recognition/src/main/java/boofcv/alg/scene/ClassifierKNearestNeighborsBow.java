@@ -45,6 +45,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 // todo add option to do weighted histogram from NN data
+@SuppressWarnings({"NullAway.Init"})
 public class ClassifierKNearestNeighborsBow<T extends ImageBase<T>, TD extends TupleDesc<TD>> {
 	// Used to look up the histograms in memory which are the most similar
 	private final NearestNeighbor<HistogramScene> nn;

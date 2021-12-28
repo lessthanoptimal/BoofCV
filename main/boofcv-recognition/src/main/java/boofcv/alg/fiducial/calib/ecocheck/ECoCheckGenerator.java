@@ -76,6 +76,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class ECoCheckGenerator {
 	// Design Notes:
 	// Encoding using both circles and squares were considered. Space was left between the shapes and they both ended

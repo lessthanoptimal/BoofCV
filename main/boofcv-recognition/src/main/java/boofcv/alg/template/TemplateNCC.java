@@ -23,11 +23,14 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import org.ejml.UtilEjml;
 
+import java.util.Objects;
+
 /**
  * Template matching which uses normalized cross correlation (NCC).
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("NullAway.Init")
 public abstract class TemplateNCC<T extends ImageBase<T>>
 		implements TemplateIntensityImage.EvaluatorMethod<T> {
 	// used to avoid divide by zero
@@ -93,7 +96,7 @@ public abstract class TemplateNCC<T extends ImageBase<T>>
 
 		@Override
 		public float evaluateMask( int tl_x, int tl_y ) {
-
+			Objects.requireNonNull(o.mask);
 			float top = 0;
 			float imageMean = 0;
 			float imageSigma = 0;
@@ -203,7 +206,7 @@ public abstract class TemplateNCC<T extends ImageBase<T>>
 
 		@Override
 		public float evaluateMask( int tl_x, int tl_y ) {
-
+			Objects.requireNonNull(o.mask);
 			float top = 0;
 			int imageSum = 0;
 			float imageSigma = 0;

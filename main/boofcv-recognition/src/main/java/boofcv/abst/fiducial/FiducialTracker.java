@@ -41,5 +41,4 @@ public interface FiducialTracker<T extends ImageBase<T>> extends FiducialDetecto
 	 * Removes all past history from the tracker and sets it back into its current state.
 	 */
 	void reset();
-
 }

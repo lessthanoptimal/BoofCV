@@ -44,6 +44,7 @@ import org.ejml.ops.DConvertMatrixStruct;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Wrapper around {@link ECoCheckDetector} for {@link FiducialDetector}.
@@ -177,13 +178,15 @@ public class ECoCheck_to_FiducialDetector<T extends ImageGray<T>> extends Fiduci
 	}
 
 	@Override protected List<Point2D3D> getControl3D( int which ) {
+		Objects.requireNonNull(pixelToNorm);
+
 		ECoCheckFound found = foundIndexToFound(which);
 		MarkerShape marker = markerShapes.get(found.markerID);
 		points2D3D.resetResize(found.corners.size);
 
 		ECoCheckUtils utils = detector.getUtils();
 
-		// length of longest side on the marker
+		// length of the longest side on the marker
 		double markerLength = Math.max(marker.getWidth(), marker.getHeight());
 
 		for (int i = 0; i < found.corners.size; i++) {

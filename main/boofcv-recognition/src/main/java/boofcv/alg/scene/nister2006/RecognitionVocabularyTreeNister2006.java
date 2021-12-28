@@ -64,6 +64,7 @@ import java.util.Set;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class RecognitionVocabularyTreeNister2006<Point> implements VerbosePrint {
 	/** Vocabulary Tree */
 	public @Getter HierarchicalVocabularyTree<Point> tree;
@@ -106,7 +107,7 @@ public class RecognitionVocabularyTreeNister2006<Point> implements VerbosePrint 
 	DogArray_I32 tmpDescWords = new DogArray_I32();
 
 	// If not null then print verbose information here
-	PrintStream verbose;
+	@Nullable PrintStream verbose;
 
 	/**
 	 * Configures the tree by adding LeafData to all the leaves in the tree then saves a reference for future use
@@ -320,12 +321,14 @@ public class RecognitionVocabularyTreeNister2006<Point> implements VerbosePrint 
 	/**
 	 * Used to sum the frequency of words (graph nodes) in the image
 	 */
+	@SuppressWarnings({"NullAway.Init"})
 	protected static class Frequency {
 		// Number of times this word/node appeared in this image
 		int totalAppearances;
 		// The node which is referenced
 		Node node;
 
+		@SuppressWarnings({"NullAway"})
 		public void reset() {
 			totalAppearances = 0;
 			node = null;

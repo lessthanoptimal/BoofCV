@@ -62,7 +62,7 @@ public class QrCodeDetectorPnP<T extends ImageGray<T>> extends FiducialDetectorP
 	}
 
 	@Override
-	public void setLensDistortion( LensDistortionNarrowFOV distortion, int width, int height ) {
+	public void setLensDistortion( @Nullable LensDistortionNarrowFOV distortion, int width, int height ) {
 		super.setLensDistortion(distortion, width, height);
 		if (distortion == null) {
 			poseUtils.setLensDistortion(null, null);

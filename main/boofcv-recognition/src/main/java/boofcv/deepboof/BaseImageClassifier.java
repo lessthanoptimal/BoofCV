@@ -37,6 +37,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class BaseImageClassifier implements ImageClassifier<Planar<GrayF32>> {
 
 	protected FunctionSequence<Tensor_F32, Function<Tensor_F32>> network;
@@ -63,14 +64,7 @@ public abstract class BaseImageClassifier implements ImageClassifier<Planar<Gray
 	protected DogArray<Score> categoryScores = new DogArray<>(Score::new);
 	protected int categoryBest;
 
-	Comparator<Score> comparator = ( o1, o2 ) -> {
-		if (o1.score < o2.score)
-			return 1;
-		else if (o1.score > o2.score)
-			return -1;
-		else
-			return 0;
-	};
+	Comparator<Score> comparator = ( o1, o2 ) -> Double.compare(o2.score, o1.score);
 
 	protected BaseImageClassifier( int imageSize ) {
 		this.imageSize = imageSize;

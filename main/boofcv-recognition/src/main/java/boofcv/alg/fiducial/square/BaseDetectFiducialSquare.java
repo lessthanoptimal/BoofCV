@@ -187,7 +187,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> implement
 	 * @param cache If there's lens distortion should it cache the transforms?  Speeds it up by about 12%. Ignored
 	 * if no lens distortion
 	 */
-	public void configure( LensDistortionNarrowFOV distortion, int width, int height, boolean cache ) {
+	public void configure( @Nullable LensDistortionNarrowFOV distortion, int width, int height, boolean cache ) {
 		if (distortion == null) {
 			removePerspective.setModel(new PointToPixelTransform_F32(transformHomography));
 			squareDetector.setLensDistortion(width, height, null, null);

@@ -29,8 +29,7 @@ import java.nio.charset.CharsetEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-
-
+import java.util.Objects;
 
 /**
  * Provides an easy to use interface for specifying QR-Code parameters and generating the raw data sequence. After
@@ -103,7 +102,8 @@ public class QrCodeEncoder {
 
 	public QrCodeEncoder setError( @Nullable QrCode.ErrorLevel level ) {
 		autoErrorCorrection = level == null;
-		qr.error = level;
+		if (level != null)
+			qr.error = level;
 		return this;
 	}
 
@@ -466,11 +466,6 @@ public class QrCodeEncoder {
 		return lengthBits;
 	}
 
-	// todo implement
-	public QrCode eci() {
-		return null;
-	}
-
 	/**
 	 * Call this function after you are done adding to the QR code
 	 *
@@ -547,7 +542,7 @@ public class QrCodeEncoder {
 				bestMask = mask;
 			}
 		}
-		return bestMask;
+		return Objects.requireNonNull(bestMask);
 	}
 
 	/**
@@ -657,19 +652,20 @@ public class QrCodeEncoder {
 			// the version is set but the error correction level isn't. Pick the one with
 			// the most error correction that can which can store all the data
 			if (autoErrorCorrection) {
-				qr.error = null;
+				@Nullable QrCode.ErrorLevel error = null;
 				QrCode.VersionInfo v = QrCode.VERSION_INFO[qr.version];
 				int dataBits = bitsAtVersion(qr.version);
 				int totalBytes = bitsToBytes(dataBits);
 				for (QrCode.ErrorLevel level : QrCode.ErrorLevel.values()) {
 					if (totalBytes <= v.totalDataBytes(level)) {
-						qr.error = level;
+						error = level;
 					}
 				}
-				if (qr.error == null) {
+				if (error == null) {
 					throw new IllegalArgumentException("You need to use a high version number to store the data. Tried " +
 							"all error correction levels at version " + qr.version + ". Total Data " + (packed.size/8));
 				}
+				qr.error = error;
 			}
 		}
 		// Sanity check
@@ -722,7 +718,7 @@ public class QrCodeEncoder {
 //		stream.print();System.out.println();
 
 		QrCode.VersionInfo info = QrCode.VERSION_INFO[qr.version];
-		QrCode.BlockInfo block = info.levels.get(qr.error);
+		QrCode.BlockInfo block = Objects.requireNonNull(info.levels.get(qr.error));
 
 		qr.rawbits = new byte[info.codewords];
 
@@ -829,6 +825,7 @@ public class QrCodeEncoder {
 		this.byteCharacterSet = byteCharacterSet;
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	private static class MessageSegment {
 		QrCode.Mode mode;
 		String message;

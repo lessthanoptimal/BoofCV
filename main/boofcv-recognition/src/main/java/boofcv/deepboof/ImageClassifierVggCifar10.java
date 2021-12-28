@@ -44,6 +44,7 @@ import static deepboof.misc.TensorOps.WI;
  * @author Peter Abeles
  * @see <a href="https://github.com/szagoruyko/cifar.torch">szagoruyko/cifar.torch</a>
  */
+@SuppressWarnings({"NullAway.Init"})
 public class ImageClassifierVggCifar10 extends BaseImageClassifier {
 
 	static final int inputSize = 32;

@@ -121,7 +121,7 @@ public abstract class SquareBase_to_FiducialDetector<T extends ImageGray<T>, Det
 	}
 
 	@Override
-	public void setLensDistortion( LensDistortionNarrowFOV distortion, int width, int height ) {
+	public void setLensDistortion( @Nullable LensDistortionNarrowFOV distortion, int width, int height ) {
 		super.setLensDistortion(distortion, width, height);
 		alg.configure(distortion, width, height, true);
 		if (distortion != null)
@@ -139,7 +139,7 @@ public abstract class SquareBase_to_FiducialDetector<T extends ImageGray<T>, Det
 	}
 
 	@Override
-	public String getMessage( int which ) {return null;}
+	public String getMessage( int which ) {return "";}
 
 	@Override
 	public boolean hasID() {

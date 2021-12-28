@@ -31,6 +31,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import lombok.Getter;
 import org.ddogleg.struct.DogArray_F32;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Reads binary values from the qr code's grid. Top left corner of the qr code is it's origin. +x = right and +y = down
@@ -38,6 +39,7 @@ import org.ddogleg.struct.DogArray_F32;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class QrCodeBinaryGridReader<T extends ImageGray<T>> {
 	// Number of points sampled at each bit
 	public static final int BIT_INTENSITY_SAMPLES = 5;
@@ -51,7 +53,7 @@ public class QrCodeBinaryGridReader<T extends ImageGray<T>> {
 
 	float threshold;
 
-	QrCode qr;
+	@Nullable QrCode qr;
 
 	public QrCodeBinaryGridReader( Class<T> imageType ) {
 		// use nearest neighbor to avoid shifting the location
@@ -65,7 +67,7 @@ public class QrCodeBinaryGridReader<T extends ImageGray<T>> {
 		imageHeight = image.height;
 	}
 
-	public void setLensDistortion( int width, int height, LensDistortionNarrowFOV model ) {
+	public void setLensDistortion( int width, int height, @Nullable LensDistortionNarrowFOV model ) {
 		interpolate = FactoryInterpolation.bilinearPixelS(
 				this.interpolate.getImageType().getImageClass(), BorderType.EXTENDED);
 		if (model != null) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -91,7 +91,7 @@ public class UchiyaMarkerTracker implements VerbosePrint {
 	@Getter @Setter boolean tracking = true;
 
 	/** Print tracking and debugging messages */
-	private PrintStream verbose = null;
+	private @Nullable PrintStream verbose = null;
 
 	// Storage for documents which have been lookd up
 	List<LlahOperations.FoundDocument> foundDocs = new ArrayList<>();
@@ -317,6 +317,7 @@ public class UchiyaMarkerTracker implements VerbosePrint {
 	/**
 	 * Contains information on a marker that's being tracked
 	 */
+	@SuppressWarnings("NullAway.Init")
 	public static class Track {
 		/** Reference to Tracking document */
 		public LlahDocument trackDoc;
@@ -330,6 +331,7 @@ public class UchiyaMarkerTracker implements VerbosePrint {
 		public final DogArray<PointIndex2D_F64> observed = new DogArray<>(PointIndex2D_F64::new);
 
 		/** Resets to initial state */
+		@SuppressWarnings("NullAway")
 		public void reset() {
 			trackDoc = null;
 			globalDoc = null;

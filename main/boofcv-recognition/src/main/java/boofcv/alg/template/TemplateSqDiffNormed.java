@@ -24,6 +24,8 @@ import boofcv.struct.image.ImageBase;
 import org.ejml.UtilEjml;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 /**
  * Template matching which uses squared difference normed
  *
@@ -31,6 +33,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("NullAway.Init")
 public abstract class TemplateSqDiffNormed<T extends ImageBase<T>>
 		implements TemplateIntensityImage.EvaluatorMethod<T> {
 	// used to avoid divide by zero
@@ -89,6 +92,7 @@ public abstract class TemplateSqDiffNormed<T extends ImageBase<T>>
 
 		@Override
 		public float evaluateMask( int tl_x, int tl_y ) {
+			Objects.requireNonNull(o.mask);
 			float imageSumSq = 0;
 
 			for (int y = 0; y < o.template.height; y++) {
@@ -178,6 +182,7 @@ public abstract class TemplateSqDiffNormed<T extends ImageBase<T>>
 
 		@Override
 		public float evaluateMask( int tl_x, int tl_y ) {
+			Objects.requireNonNull(o.mask);
 			double imageSumSq = 0;
 
 			for (int y = 0; y < o.template.height; y++) {
@@ -209,7 +214,7 @@ public abstract class TemplateSqDiffNormed<T extends ImageBase<T>>
 		}
 
 		@Override
-		public void setupTemplate( GrayU8 template, GrayU8 mask ) {
+		public void setupTemplate( GrayU8 template, @Nullable GrayU8 mask ) {
 			area = 0.0;
 			templateSumSq = 0.0;
 

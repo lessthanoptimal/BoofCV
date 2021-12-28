@@ -26,6 +26,7 @@ import org.ddogleg.struct.DogArray_F64;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 /**
@@ -170,7 +171,7 @@ public class TldLearning<T extends ImageGray<T>> {
 		TldHelperFunctions.convertRegion(targetRegion, targetRegion_I32);
 
 		if (detection.isSuccess()) {
-			TldRegion best = detection.getBest();
+			TldRegion best = Objects.requireNonNull(detection.getBest());
 
 			// see if it found the correct solution
 			double overlap = helper.computeOverlap(best.rect, targetRegion_I32);

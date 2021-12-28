@@ -50,6 +50,7 @@ import java.util.Set;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class FeatureSceneRecognitionNearestNeighbor<TD extends TupleDesc<TD>> implements FeatureSceneRecognition<TD> {
 	/** Configuration */
 	@Getter ConfigRecognitionNearestNeighbor config;
@@ -81,7 +82,7 @@ public class FeatureSceneRecognitionNearestNeighbor<TD extends TupleDesc<TD>> im
 	@Getter int tupleDOF;
 
 	// If not null then print verbose information
-	PrintStream verbose;
+	@Nullable PrintStream verbose;
 
 	public FeatureSceneRecognitionNearestNeighbor( ConfigRecognitionNearestNeighbor config, Factory<TD> factory ) {
 		this.config = config;

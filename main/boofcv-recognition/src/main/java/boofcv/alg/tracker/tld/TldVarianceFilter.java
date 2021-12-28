@@ -31,6 +31,7 @@ import boofcv.struct.image.*;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class TldVarianceFilter<T extends ImageGray<T>> {
 
 	// threshold for selecting candidate regions
@@ -58,8 +59,7 @@ public class TldVarianceFilter<T extends ImageGray<T>> {
 		}
 	}
 
-	protected TldVarianceFilter() {
-	}
+	protected TldVarianceFilter() {}
 
 	/**
 	 * Sets the input image. Must be called before other functions/

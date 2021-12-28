@@ -52,10 +52,11 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class TrackerMeanShiftComaniciu2003<T extends ImageBase<T>> {
 
 	// computes the histogram inside a rotated rectangle
-	private LocalWeightedHistogramRotRect<T> calcHistogram;
+	private final LocalWeightedHistogramRotRect<T> calcHistogram;
 	// the key-frame histogram which is being compared again
 	protected float[] keyHistogram;
 	// weight each element contributes
@@ -64,32 +65,32 @@ public class TrackerMeanShiftComaniciu2003<T extends ImageBase<T>> {
 	protected float scaleChange;
 
 	// most recently select target region
-	private RectangleRotate_F32 region = new RectangleRotate_F32();
+	private final RectangleRotate_F32 region = new RectangleRotate_F32();
 
 	// maximum allowed mean-shift iterations
-	private int maxIterations;
+	private final int maxIterations;
 	// minimum change stopping condition
-	private float minimumChange;
+	private final float minimumChange;
 
 	// storage for the track region at different sizes
-	private RectangleRotate_F32 region0 = new RectangleRotate_F32();
-	private RectangleRotate_F32 region1 = new RectangleRotate_F32();
-	private RectangleRotate_F32 region2 = new RectangleRotate_F32();
+	private final RectangleRotate_F32 region0 = new RectangleRotate_F32();
+	private final RectangleRotate_F32 region1 = new RectangleRotate_F32();
+	private final RectangleRotate_F32 region2 = new RectangleRotate_F32();
 	private float[] histogram0;
 	private float[] histogram1;
 	private float[] histogram2;
 
 	// weighting factor for change in scale. 0 to 1. 0 is 100% selected region
-	private float gamma;
+	private final float gamma;
 
 	// should it update the histogram after tracking?
-	private boolean updateHistogram;
+	private final boolean updateHistogram;
 
 	// if true assume the scale is constant
-	private boolean constantScale;
+	private final boolean constantScale;
 
 	// ratio of the original object size that the track can become
-	private float minimumSizeRatio;
+	private final float minimumSizeRatio;
 	// stores the minimum width that the object can be
 	private float minimumWidth;
 

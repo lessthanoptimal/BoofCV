@@ -689,6 +689,7 @@ public class ChessboardCornerClusterToGrid implements VerbosePrint {
 		verbose = BoofMiscOps.addPrefix(this, out);
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	public static class GridElement {
 		public Node node;
 		public int row, col;
@@ -699,6 +700,7 @@ public class ChessboardCornerClusterToGrid implements VerbosePrint {
 			return row != Integer.MAX_VALUE;
 		}
 
+		@SuppressWarnings({"NullAway"})
 		public void reset() {
 			node = null;
 			rowLength = colLength = -1;

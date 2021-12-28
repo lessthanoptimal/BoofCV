@@ -32,12 +32,10 @@ import org.jetbrains.annotations.Nullable;
  * will be detectors only, meaning that they are not trackers, meaning that each call to detect will produce
  * identical results only dependent on the input image and not the past history.
  *
- * @see FiducialTracker
- *
  * @author Peter Abeles
+ * @see FiducialTracker
  */
-public interface FiducialDetector<T extends ImageBase<T>>
-{
+public interface FiducialDetector<T extends ImageBase<T>> {
 	/**
 	 * Detects fiducials inside the image. Each call to this function only depends upon the input image. The
 	 * previous calls do not affect it's outcome.
@@ -48,6 +46,7 @@ public interface FiducialDetector<T extends ImageBase<T>>
 
 	/**
 	 * The total number of fiducial found
+	 *
 	 * @return number of targets found
 	 */
 	int totalFound();
@@ -62,7 +61,7 @@ public interface FiducialDetector<T extends ImageBase<T>>
 	 * @param which Fiducial's index
 	 * @param location (output) Storage for the transform. modified.
 	 */
-	void getCenter(int which , Point2D_F64 location );
+	void getCenter( int which, Point2D_F64 location );
 
 	/**
 	 * Used to retrieve the bounds around a marker in the image. How the bounds are defined is left up the
@@ -72,11 +71,12 @@ public interface FiducialDetector<T extends ImageBase<T>>
 	 * @param storage (Optional) Storage for fiducials.
 	 * @return Found marker. Points are owned by the caller and will not be modified in the future.
 	 */
-	Polygon2D_F64 getBounds(int which , @Nullable Polygon2D_F64 storage );
+	Polygon2D_F64 getBounds( int which, @Nullable Polygon2D_F64 storage );
 
 	/**
 	 * If applicable, returns the ID of the fiducial found. Call {@link #hasID()} to see if this function
 	 * returns a valid value.
+	 *
 	 * @param which Detected fiducial's index
 	 * @return ID of the fiducial
 	 */
@@ -96,17 +96,18 @@ public interface FiducialDetector<T extends ImageBase<T>>
 	 * image coordinates.
 	 *
 	 * @param distortion Lens distortion model. null if you want to remove a lens distortion model that had previously
-	 *                   been set.
+	 * been set.
 	 * @param width Input image's width.
 	 * @param height Input image's height
 	 */
-	void setLensDistortion( @Nullable LensDistortionNarrowFOV distortion , int width , int height );
+	void setLensDistortion( @Nullable LensDistortionNarrowFOV distortion, int width, int height );
 
 	/**
 	 * Returns the intrinsic parameters that it
+	 *
 	 * @return intrinsic parameters
 	 */
-	LensDistortionNarrowFOV getLensDistortion();
+	@Nullable LensDistortionNarrowFOV getLensDistortion();
 
 	/**
 	 * <p>Computes metrics which represents the fiducial's pose estimate stability given its current observed state.
@@ -124,7 +125,7 @@ public interface FiducialDetector<T extends ImageBase<T>>
 	 * @param results (output) Storage for stability metrics.
 	 * @return true if successful or false if it failed for some reason
 	 */
-	boolean computeStability(int which, double disturbance, FiducialStability results);
+	boolean computeStability( int which, double disturbance, FiducialStability results );
 
 	/**
 	 * Used to retrieve the transformation from the fiducial's reference frame to the camera's reference frame.
@@ -133,7 +134,7 @@ public interface FiducialDetector<T extends ImageBase<T>>
 	 * @param fiducialToCamera (output) Storage for the transform. modified.
 	 * @return true if could estimate the location or false if it couldn't
 	 */
-	boolean getFiducialToCamera(int which, Se3_F64 fiducialToCamera);
+	boolean getFiducialToCamera( int which, Se3_F64 fiducialToCamera );
 
 	/**
 	 * Returns the width of the fiducial in world units. If not square then it returns a reasonable
@@ -142,29 +143,29 @@ public interface FiducialDetector<T extends ImageBase<T>>
 	 * @param which Fiducial's index
 	 * @return Fiducial's width.
 	 */
-	double getWidth(int which);
+	double getWidth( int which );
 
 	/**
 	 * If true then 3D information is available for the fiducial. In general a len distortion model must be
-	 * provided by invoking {@link #setLensDistortion(LensDistortionNarrowFOV,int,int)}. The following functions are then
+	 * provided by invoking {@link #setLensDistortion(LensDistortionNarrowFOV, int, int)}. The following functions are then
 	 * enabled:
 	 * <ol>
 	 *     <li>{@link #computeStability}</li>
 	 *     <li>{@link #getFiducialToCamera}</li>
 	 * </ol>
-	 *
-	 * @return
 	 */
 	boolean is3D();
 
 	/**
 	 * If true then {@link #getId(int)} returns a valid unique number
+	 *
 	 * @return boolean
 	 */
 	boolean hasID();
 
 	/**
 	 * If true then {@link #getMessage(int)} returns a valid message
+	 *
 	 * @return boolean
 	 */
 	boolean hasMessage();

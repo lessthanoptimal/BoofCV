@@ -37,6 +37,7 @@ import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.DogArray;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +49,7 @@ import java.util.List;
  * @see DetectCircleRegularGrid
  * @see KeyPointsCircleRegularGrid
  */
+@SuppressWarnings({"NullAway.Init"})
 public class CalibrationDetectorCircleRegularGrid implements DetectSingleFiducialCalibration {
 
 	// Detectors the grids
@@ -120,7 +122,7 @@ public class CalibrationDetectorCircleRegularGrid implements DetectSingleFiducia
 	}
 
 	@Override
-	public void setLensDistortion( LensDistortionNarrowFOV distortion, int width, int height ) {
+	public void setLensDistortion( @Nullable LensDistortionNarrowFOV distortion, int width, int height ) {
 		if (distortion == null)
 			detector.getEllipseDetector().setLensDistortion(null, null);
 		else {

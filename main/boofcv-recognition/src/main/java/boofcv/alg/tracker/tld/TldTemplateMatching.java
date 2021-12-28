@@ -35,6 +35,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class TldTemplateMatching<T extends ImageGray<T>> {
 
 	// set of features for positive and negative examples
@@ -54,8 +55,7 @@ public class TldTemplateMatching<T extends ImageGray<T>> {
 		this.interpolate = interpolate;
 	}
 
-	protected TldTemplateMatching() {
-	}
+	protected TldTemplateMatching() {}
 
 	/**
 	 * Discard previous results and puts it back into its initial state

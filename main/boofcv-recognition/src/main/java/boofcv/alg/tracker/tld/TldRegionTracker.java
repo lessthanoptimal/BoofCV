@@ -46,6 +46,7 @@ import java.lang.reflect.Array;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class TldRegionTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 
 	// maximum allowed median forwards-backwards error in pixels squared
