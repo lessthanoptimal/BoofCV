@@ -50,6 +50,7 @@ import java.util.Set;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class EstimateViewKnownCalibration implements VerbosePrint {
 	// Contains functions for working with pairwise graph AND information for which view is being estimated
 	PairwiseGraphUtils pairwiseUtils;
@@ -85,7 +86,7 @@ public class EstimateViewKnownCalibration implements VerbosePrint {
 	final Point2D_F64 norm3 = new Point2D_F64();
 	final Point4D_F64 X = new Point4D_F64();
 
-	PrintStream verbose;
+	@Nullable PrintStream verbose;
 
 	public EstimateViewKnownCalibration() {
 		defaultConfiguration();

@@ -48,6 +48,7 @@ import java.util.Set;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class GenerateStereoPairGraphFromScene implements VerbosePrint {
 	/** The computed graph describing views with a stereo relationship */
 	final @Getter StereoPairGraph stereoGraph = new StereoPairGraph();
@@ -69,7 +70,7 @@ public class GenerateStereoPairGraphFromScene implements VerbosePrint {
 	final DogArray_F64 acuteAngles = new DogArray_F64();
 
 	// If not null then print verbose debug info
-	PrintStream verbose;
+	@Nullable PrintStream verbose;
 
 	/**
 	 * Computes a {@link StereoPairGraph} from the sparse scene graph

@@ -55,7 +55,7 @@ public class SimilarImagesData implements LookUpSimilarImages {
 	 * @param features List of image features. Pixel coordinates.
 	 */
 	public void add( String id, List<Point2D_F64> features ) {
-		Info info = new Info();
+		var info = new Info();
 		info.index = listImages.size();
 		info.features.copyAll(features, ( src, dst ) -> dst.setTo(src));
 		listImages.add(id);
@@ -70,8 +70,8 @@ public class SimilarImagesData implements LookUpSimilarImages {
 	 * @param matches List of matching image features
 	 */
 	public void setRelationship( String viewA, String viewB, List<AssociatedIndex> matches ) {
-		Info infoA = imageMap.get(viewA);
-		Info infoB = imageMap.get(viewB);
+		Info infoA = Objects.requireNonNull(imageMap.get(viewA));
+		Info infoB = Objects.requireNonNull(imageMap.get(viewB));
 
 		infoA.similarViews.add(viewB);
 		infoB.similarViews.add(viewA);
@@ -108,7 +108,7 @@ public class SimilarImagesData implements LookUpSimilarImages {
 	@Override
 	public void findSimilar( String target, @Nullable BoofLambdas.Filter<String> filter, List<String> similarImages ) {
 		similarImages.clear();
-		Info info = imageMap.get(target);
+		Info info = Objects.requireNonNull(imageMap.get(target));
 		for (int i = 0; i < info.similarViews.size(); i++) {
 			if (filter == null || filter.keep(info.similarViews.get(i))) {
 				similarImages.add(info.similarViews.get(i));
@@ -119,14 +119,15 @@ public class SimilarImagesData implements LookUpSimilarImages {
 	}
 
 	@Override public void lookupPixelFeats( String target, DogArray<Point2D_F64> features ) {
+		Info similarInfo = Objects.requireNonNull(imageMap.get(target));
 		features.reset();
-		features.copyAll(imageMap.get(target).features.toList(), ( src, dst ) -> dst.setTo(src));
+		features.copyAll(similarInfo.features.toList(), ( src, dst ) -> dst.setTo(src));
 	}
 
 	@Override public boolean lookupAssociated( String similarD, DogArray<AssociatedIndex> pairs ) {
 		Objects.requireNonNull(targetInfo, "Must call findSimilar first");
 
-		Info similarInfo = imageMap.get(similarD);
+		Info similarInfo = Objects.requireNonNull(imageMap.get(similarD));
 		boolean swapped = targetInfo.index > similarInfo.index;
 
 		if (swapped) {

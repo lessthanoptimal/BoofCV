@@ -511,12 +511,14 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 	/**
 	 * Contains information about which scenes contain this specific view
 	 */
+	@SuppressWarnings("NullAway.Init")
 	public static class ViewScenes {
 		/** String ID if the view in the pairwise graph */
 		public String id;
 		/** Indexes of scenes that contain this view */
 		public DogArray_I32 viewedBy = new DogArray_I32();
 
+		@SuppressWarnings("NullAway")
 		public void reset() {
 			id = null;
 			viewedBy.reset();

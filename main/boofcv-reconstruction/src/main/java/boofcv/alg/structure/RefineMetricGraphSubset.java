@@ -43,6 +43,7 @@ import java.util.*;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class RefineMetricGraphSubset implements VerbosePrint {
 
 	/** Used to refine the scene */
@@ -67,7 +68,7 @@ public class RefineMetricGraphSubset implements VerbosePrint {
 	// scale factor from local to world
 	@Getter double scaleLocalToWorld;
 
-	PrintStream verbose;
+	@Nullable PrintStream verbose;
 
 	List<CameraPinholeBrown> cameraPriors = new ArrayList<>();
 
@@ -132,7 +133,7 @@ public class RefineMetricGraphSubset implements VerbosePrint {
 	}
 
 	private void copyViewAndInlierSet( SceneWorkingGraph src, SceneWorkingGraph.View srcView, int infoIdx ) {
-		SceneWorkingGraph.View cpyView = srcToCpy.get(srcView.pview.id);
+		SceneWorkingGraph.View cpyView = Objects.requireNonNull(srcToCpy.get(srcView.pview.id));
 
 		BoofMiscOps.checkTrue(!srcView.inliers.isEmpty(), "BUG no inliers");
 
@@ -205,7 +206,7 @@ public class RefineMetricGraphSubset implements VerbosePrint {
 	 * Specifies the scene as being known.
 	 */
 	public void setViewKnown( String id ) {
-		viewsFixed.set(subgraph.views.get(id).index, true);
+		viewsFixed.set(Objects.requireNonNull(subgraph.views.get(id)).index, true);
 	}
 
 	/**
@@ -221,7 +222,7 @@ public class RefineMetricGraphSubset implements VerbosePrint {
 		// copy the results back over into the original views
 		for (int listIdx = 0; listIdx < srcViews.size(); listIdx++) {
 			SceneWorkingGraph.View srcView = srcViews.get(listIdx);
-			SceneWorkingGraph.View cpyView = srcToCpy.get(srcView.pview.id);
+			SceneWorkingGraph.View cpyView = Objects.requireNonNull(srcToCpy.get(srcView.pview.id));
 
 			// Skip if it's static and can't be optimized
 			if (viewsFixed.get(cpyView.index))

@@ -50,6 +50,7 @@ import java.util.*;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class SimilarImagesFromTracks<Track> implements LookUpSimilarImages {
 	/**
 	 * Maximum number of frames in forwards and backwards direction which will be searched for being related.
@@ -323,6 +324,7 @@ public class SimilarImagesFromTracks<Track> implements LookUpSimilarImages {
 	/**
 	 * Observations for a frame. Arrays are used to reduce memory footprint.
 	 */
+	@SuppressWarnings({"NullAway.Init"})
 	public static class Frame {
 		// Unique ID assigned to this frame
 		public String frameID;
@@ -374,6 +376,7 @@ public class SimilarImagesFromTracks<Track> implements LookUpSimilarImages {
 			return false;
 		}
 
+		@SuppressWarnings({"NullAway"})
 		public void reset() {
 			observations = null;
 			ids = null;

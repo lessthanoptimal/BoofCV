@@ -39,6 +39,7 @@ import java.util.Set;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class ExpandByOneView implements VerbosePrint {
 	// If not null then print debugging information
 	protected @Nullable PrintStream verbose;

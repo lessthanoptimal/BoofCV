@@ -305,7 +305,8 @@ public class PerspectiveOps {
 	 * @return camera parameters
 	 */
 	@SuppressWarnings("unchecked")
-	public static <C extends CameraPinhole> C matrixToPinhole( DMatrixRMaj K, int width, int height, C output ) {
+	public static <C extends CameraPinhole> C matrixToPinhole( DMatrixRMaj K, int width, int height,
+															   @Nullable C output ) {
 		return (C)ImplPerspectiveOps_F64.matrixToPinhole(K, width, height, output);
 	}
 
@@ -319,7 +320,8 @@ public class PerspectiveOps {
 	 * @return camera parameters
 	 */
 	@SuppressWarnings("unchecked")
-	public static <C extends CameraPinhole> C matrixToPinhole( FMatrixRMaj K, int width, int height, C output ) {
+	public static <C extends CameraPinhole> C matrixToPinhole( FMatrixRMaj K, int width, int height,
+															   @Nullable C output ) {
 		return (C)ImplPerspectiveOps_F32.matrixToPinhole(K, width, height, output);
 	}
 

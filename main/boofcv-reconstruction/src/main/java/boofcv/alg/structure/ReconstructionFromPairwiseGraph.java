@@ -254,7 +254,7 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 			// If any of the connected seeds are zero it's too close to another seed and you should pass over it
 			boolean skip = false;
 			for (int j = 0; j < s.seed.connections.size; j++) {
-				if (lookupInfo.get(s.seed.connections.get(j).other(s.seed).id).neighbor) {
+				if (Objects.requireNonNull(lookupInfo.get(s.seed.connections.get(j).other(s.seed).id)).neighbor) {
 					rejectedClose++;
 					skip = true;
 					break;
@@ -274,7 +274,7 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 
 			// zero the score of children so that they can't be a seed. This acts as a sort of non-maximum suppression
 			for (int j = 0; j < s.seed.connections.size; j++) {
-				lookupInfo.get(s.seed.connections.get(j).other(s.seed).id).neighbor = true;
+				Objects.requireNonNull(lookupInfo.get(s.seed.connections.get(j).other(s.seed).id)).neighbor = true;
 			}
 
 			successes++;
@@ -362,6 +362,7 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 	/**
 	 * Information related to a view acting as a seed to spawn a projective graph
 	 */
+	@SuppressWarnings("NullAway.Init")
 	protected static class SeedInfo implements Comparable<SeedInfo> {
 		// The potential initial seed
 		View seed;
@@ -372,6 +373,7 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 		// if it's a neighbor of a seed
 		boolean neighbor = false;
 
+		@SuppressWarnings("NullAway")
 		public void reset() {
 			seed = null;
 			score = 0;
@@ -385,12 +387,14 @@ public abstract class ReconstructionFromPairwiseGraph implements VerbosePrint {
 	/**
 	 * Contains information on a potential expansion
 	 */
+	@SuppressWarnings({"NullAway.Init"})
 	protected static class Expansion {
 		public SceneWorkingGraph scene;
 		public int openIdx;
 
 		public double score;
 
+		@SuppressWarnings({"NullAway"})
 		public void reset() {
 			scene = null;
 			openIdx = -1;

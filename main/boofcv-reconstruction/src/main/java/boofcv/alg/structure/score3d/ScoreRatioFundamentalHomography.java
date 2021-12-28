@@ -47,6 +47,7 @@ import java.util.Set;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class ScoreRatioFundamentalHomography implements EpipolarScore3D {
 
 	@Getter ModelMatcher<DMatrixRMaj, AssociatedPair> ransac3D;
@@ -75,7 +76,7 @@ public class ScoreRatioFundamentalHomography implements EpipolarScore3D {
 	@Getter int countH;
 
 	// If not null then verbose debugging information should be printed here
-	private PrintStream verbose;
+	private @Nullable PrintStream verbose;
 
 	public ScoreRatioFundamentalHomography( ModelMatcher<DMatrixRMaj, AssociatedPair> ransac3D,
 											ModelMatcher<Homography2D_F64, AssociatedPair> ransacH ) {

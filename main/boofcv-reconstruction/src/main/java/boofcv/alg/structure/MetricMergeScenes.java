@@ -30,6 +30,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -356,7 +357,7 @@ public class MetricMergeScenes implements VerbosePrint {
 	 * @param pview Which view is to be copied
 	 */
 	private void copyIntoSceneJustState( SceneWorkingGraph origScene, boolean markAsKnown, PairwiseImageGraph.View pview ) {
-		SceneWorkingGraph.View origView = origScene.views.get(pview.id);
+		SceneWorkingGraph.View origView = Objects.requireNonNull(origScene.views.get(pview.id));
 
 		SceneWorkingGraph.Camera origCamera = origScene.getViewCamera(origView);
 		SceneWorkingGraph.Camera copyCamera = workScene.cameras.get(origCamera.indexDB);
@@ -424,6 +425,7 @@ public class MetricMergeScenes implements VerbosePrint {
 	/**
 	 * Specifies which two 'views" in each scene reference the same pairwise view.
 	 */
+	@SuppressWarnings({"NullAway.Init"})
 	public static class CommonView {
 		public SceneWorkingGraph.View src;
 		public SceneWorkingGraph.View dst;

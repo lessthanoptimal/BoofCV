@@ -51,6 +51,7 @@ import java.util.Set;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("NullAway.Init")
 public class SceneMergingOperations implements VerbosePrint {
 	/**
 	 * <p>Storage for the number of common views between the scenes. Look at {@link #initializeViewCounts} for
@@ -476,7 +477,7 @@ public class SceneMergingOperations implements VerbosePrint {
 		// Go through each view and extract it's SE3
 		for (int viewIdx = 0; viewIdx < inliers.views.size; viewIdx++) {
 			PairwiseImageGraph.View pview = inliers.views.get(viewIdx);
-			SceneWorkingGraph.View wview = scene.views.get(pview.id);
+			SceneWorkingGraph.View wview = Objects.requireNonNull(scene.views.get(pview.id));
 			BundlePinholeSimplified cam = scene.getViewCamera(wview).intrinsic;
 
 			// Save the view's pose
@@ -521,7 +522,7 @@ public class SceneMergingOperations implements VerbosePrint {
 			viewPixels.resize(zeroViewPixels.size);
 
 			// camera model assumes pixels have been recentered
-			SceneWorkingGraph.View wview = workingGraph.views.get(inliers.views.get(viewIdx).id);
+			SceneWorkingGraph.View wview = Objects.requireNonNull(workingGraph.views.get(inliers.views.get(viewIdx).id));
 			SceneWorkingGraph.Camera camera = workingGraph.getViewCamera(wview);
 			CameraPinholeBrown cameraPrior = camera.prior;
 
@@ -688,17 +689,20 @@ public class SceneMergingOperations implements VerbosePrint {
 		public int sceneB;
 	}
 
+	@SuppressWarnings("NullAway.Init")
 	public static class SelectedViews {
 		public SceneWorkingGraph.View src;
 		public SceneWorkingGraph.View dst;
 	}
 
+	@SuppressWarnings("NullAway.Init")
 	public static class FailedMerged {
 		public SceneWorkingGraph src;
 		public SceneWorkingGraph dst;
 		public int viewCountSrc;
 		public int viewCountDst;
 
+		@SuppressWarnings("NullAway")
 		public void reset() {
 			src = null;
 			dst = null;

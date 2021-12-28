@@ -131,7 +131,7 @@ public class SelectNeighborsAroundView implements VerbosePrint {
 		// Add immediate neighbors to candidate list
 		for (int connIdx = 0; connIdx < seed.pview.connections.size; connIdx++) {
 			PairwiseImageGraph.Motion m = seed.pview.connections.get(connIdx);
-			View o = working.lookupView(m.other(seed.pview).id);
+			View o = working.views.get(m.other(seed.pview).id);
 			// No corresponding working view
 			if (o == null)
 				continue;
@@ -147,7 +147,7 @@ public class SelectNeighborsAroundView implements VerbosePrint {
 			View c = candidates.get(candIdx);
 			for (int connIdx = 0; connIdx < c.pview.connections.size; connIdx++) {
 				PairwiseImageGraph.Motion m = c.pview.connections.get(connIdx);
-				View o = working.lookupView(m.other(c.pview).id);
+				View o = working.views.get(m.other(c.pview).id);
 				// No corresponding working view
 				if (o == null)
 					continue;
@@ -177,7 +177,7 @@ public class SelectNeighborsAroundView implements VerbosePrint {
 	private void addEdgesOf( SceneWorkingGraph working, View c ) {
 		for (int connIdx = 0; connIdx < c.pview.connections.size; connIdx++) {
 			PairwiseImageGraph.Motion m = c.pview.connections.get(connIdx);
-			View o = working.lookupView(m.other(c.pview).id);
+			View o = working.views.get(m.other(c.pview).id);
 			// No corresponding working view
 			if (o == null)
 				continue;
@@ -464,6 +464,7 @@ public class SelectNeighborsAroundView implements VerbosePrint {
 	}
 
 	// TODO remove this
+	@SuppressWarnings({"NullAway.Init"})
 	static class EdgeScore {
 		// The motion this edge references
 		PairwiseImageGraph.Motion m;

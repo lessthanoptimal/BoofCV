@@ -109,7 +109,7 @@ public class SimilarImagesTrackThenMatch<Image extends ImageBase<Image>, TD exte
 	final Map<String, PairInfo> viewId_to_pairs = new HashMap<>();
 
 	// If not null it will print verbose debugging info
-	PrintStream verbose;
+	@Nullable PrintStream verbose;
 
 	public SimilarImagesTrackThenMatch( DescribePoint<Image, TD> describer,
 										AssociateDescriptionHashSets<TD> featureAssociator,
