@@ -31,6 +31,7 @@ import lombok.Getter;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class DisparitySparseRectifiedScoreBM<ArrayData, Input extends ImageGray<Input>> {
 	/** the minimum disparity value (inclusive) */
 	protected @Getter int disparityMin;
@@ -67,7 +68,7 @@ public abstract class DisparitySparseRectifiedScoreBM<ArrayData, Input extends I
 	protected final Input patchCompare;
 
 	// Radius around a pixel that is sampled. This is for functions like Census which define a pixel's value based on
-	// it's neighbors. For SAD this will be 0
+	// its neighbors. For SAD this will be 0
 	protected int sampleRadiusX = -1;
 	protected int sampleRadiusY = -1;
 

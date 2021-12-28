@@ -39,6 +39,7 @@ import java.util.ArrayList;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class RemovePerspectiveDistortion<T extends ImageBase<T>> {
 	FDistort distort;
 

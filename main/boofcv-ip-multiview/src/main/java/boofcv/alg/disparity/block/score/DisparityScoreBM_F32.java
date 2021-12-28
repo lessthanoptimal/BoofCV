@@ -37,6 +37,7 @@ import pabeles.concurrency.IntRangeObjectConsumer;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class DisparityScoreBM_F32<DI extends ImageGray<DI>>
 		extends DisparityBlockMatch<GrayF32, DI> {
 	// Computes disparity from scores. Concurrent code copies this
@@ -85,6 +86,7 @@ public class DisparityScoreBM_F32<DI extends ImageGray<DI>>
 		}
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	class WorkSpace {
 		// stores the local scores for the width of the region
 		float[] elementScore;

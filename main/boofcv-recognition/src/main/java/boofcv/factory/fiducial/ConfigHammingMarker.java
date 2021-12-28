@@ -41,6 +41,7 @@ import java.util.stream.Collectors;
  * @author Peter Abeles
  * @see boofcv.alg.fiducial.square.DetectFiducialSquareHamming
  */
+@SuppressWarnings({"NullAway.Init"})
 public class ConfigHammingMarker implements Configuration {
 	/** How wide the border is relative to the total fiducial width. Typically, the width of one square. */
 	public double borderWidthFraction = 0.25;

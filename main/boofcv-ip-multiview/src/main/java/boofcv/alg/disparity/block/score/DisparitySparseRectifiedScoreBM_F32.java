@@ -28,7 +28,7 @@ import lombok.Getter;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings({"MissingOverride"})
+@SuppressWarnings({"MissingOverride", "NullAway.Init"})
 public abstract class DisparitySparseRectifiedScoreBM_F32 extends DisparitySparseRectifiedScoreBM<float[], GrayF32> {
 
 	// Fit scores as a function of disparity. scores[0] = score at disparity of disparityMin

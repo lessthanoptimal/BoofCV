@@ -21,6 +21,7 @@ package boofcv.alg.fiducial.calib.chess;
 import boofcv.alg.feature.detect.chess.ChessboardCorner;
 import boofcv.core.graph.FeatureGraph2D;
 import org.ddogleg.struct.DogArray;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -66,7 +67,7 @@ public class ChessboardCornerGraph {
 		return n;
 	}
 
-	public Node findClosest( double x, double y ) {
+	public @Nullable Node findClosest( double x, double y ) {
 		double distance = Double.MAX_VALUE;
 		Node closest = null;
 		for (int i = 0; i < corners.size; i++) {
@@ -100,6 +101,7 @@ public class ChessboardCornerGraph {
 		corners.reset();
 	}
 
+	@SuppressWarnings({"NullAway.Init"})
 	public static class Node {
 		/**
 		 * Index in the node list
@@ -143,6 +145,7 @@ public class ChessboardCornerGraph {
 			edges[3] = tmp;
 		}
 
+		@SuppressWarnings("NullAway")
 		public void reset() {
 			index = -1;
 			corner = null;

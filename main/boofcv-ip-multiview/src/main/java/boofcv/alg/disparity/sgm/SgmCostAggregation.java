@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -57,6 +57,7 @@ import pabeles.concurrency.IntRangeObjectConsumer;
  * @see SgmDisparitySelector
  * @see SgmStereoDisparity
  */
+@SuppressWarnings({"NullAway.Init"})
 public class SgmCostAggregation {
 
 	// NOTATION

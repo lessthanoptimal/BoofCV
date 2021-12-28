@@ -45,6 +45,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public abstract class SelectDisparityWithChecksWta<Array, DI extends ImageGray<DI>>
 		implements DisparitySelect<Array, DI> {
 	// Number of unique values for texture

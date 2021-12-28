@@ -36,11 +36,12 @@ import boofcv.struct.image.Planar;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class SgmCostFromBlocks<T extends ImageBase<T>>
 		implements SgmDisparityCost<T>, DisparitySelect<int[], GrayU8>, Compare_S32 {
 	protected Planar<GrayU16> costYXD;
 	protected DisparityBlockMatchRowFormat<T, GrayU8> blockScore;
-	private GrayU8 dummy = null;
+	private final GrayU8 dummy = new GrayU8(0, 0);
 	private int maxRegionError = 0;
 	private int disparityMin;
 	private int disparityRange;
@@ -94,7 +95,7 @@ public class SgmCostFromBlocks<T extends ImageBase<T>>
 	}
 
 	@Override
-	public Class<GrayU8> getDisparityType() {return null;}
+	public Class<GrayU8> getDisparityType() {throw new RuntimeException("Not supported");}
 
 	@Override
 	public int compare( int scoreA, int scoreB ) {

@@ -140,9 +140,13 @@ public class KeyPointsCircleRegularGrid {
 		double dy0 = A0.y - a.center.y;
 
 		double z = slopeX*dy0 - slopeY*dx0;
-		if( z < 0 == (rowA == rowB)) {
-			Point2D_F64 tmp = A0; A0 = A3; A3 = tmp;
-			tmp = B0; B0 = B3; B3 = tmp;
+		if (z < 0 == (rowA == rowB)) {
+			Point2D_F64 tmp = A0;
+			A0 = A3;
+			A3 = tmp;
+			tmp = B0;
+			B0 = B3;
+			B3 = tmp;
 		}
 
 		// add tangent points from the two lines which do not cross the center line

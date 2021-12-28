@@ -33,6 +33,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class HammingGridGenerator {
 	/** How wide a checkerboard square is */
 	public @Setter @Getter double squareWidth = 1.0;
