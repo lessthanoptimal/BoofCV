@@ -711,6 +711,52 @@ public class GImageMiscOps {
 	}
 
 	/**
+	 * Transposes the image.
+	 */
+	public static void transpose( ImageBase imageA, ImageBase imageB ) {
+		if (imageA instanceof ImageGray) {
+			if (GrayI8.class.isAssignableFrom(imageA.getClass())) {
+				ImageMiscOps.transpose((GrayI8)imageA, (GrayI8)imageB);
+			} else if (GrayI16.class.isAssignableFrom(imageA.getClass())) {
+				ImageMiscOps.transpose((GrayI16)imageA, (GrayI16)imageB);
+			} else if (GrayS32.class.isAssignableFrom(imageA.getClass())) {
+				ImageMiscOps.transpose((GrayS32)imageA, (GrayS32)imageB);
+			} else if (GrayS64.class.isAssignableFrom(imageA.getClass())) {
+				ImageMiscOps.transpose((GrayS64)imageA, (GrayS64)imageB);
+			} else if (GrayF32.class.isAssignableFrom(imageA.getClass())) {
+				ImageMiscOps.transpose((GrayF32)imageA, (GrayF32)imageB);
+			} else if (GrayF64.class.isAssignableFrom(imageA.getClass())) {
+				ImageMiscOps.transpose((GrayF64)imageA, (GrayF64)imageB);
+			} else {
+				throw new IllegalArgumentException("Unknown or incompatible image type: " + imageA.getClass().getSimpleName());
+			}
+		} else if (imageA instanceof ImageInterleaved) {
+			if (InterleavedI8.class.isAssignableFrom(imageA.getClass())) {
+				ImageMiscOps.transpose((InterleavedI8)imageA, (InterleavedI8)imageB);
+			} else if (InterleavedI16.class.isAssignableFrom(imageA.getClass())) {
+				ImageMiscOps.transpose((InterleavedI16)imageA, (InterleavedI16)imageB);
+			} else if (InterleavedS32.class.isAssignableFrom(imageA.getClass())) {
+				ImageMiscOps.transpose((InterleavedS32)imageA, (InterleavedS32)imageB);
+			} else if (InterleavedS64.class.isAssignableFrom(imageA.getClass())) {
+				ImageMiscOps.transpose((InterleavedS64)imageA, (InterleavedS64)imageB);
+			} else if (InterleavedF32.class.isAssignableFrom(imageA.getClass())) {
+				ImageMiscOps.transpose((InterleavedF32)imageA, (InterleavedF32)imageB);
+			} else if (InterleavedF64.class.isAssignableFrom(imageA.getClass())) {
+				ImageMiscOps.transpose((InterleavedF64)imageA, (InterleavedF64)imageB);
+			} else {
+				throw new IllegalArgumentException("Unknown or incompatible image type: " + imageA.getClass().getSimpleName());
+			}
+		} else if (imageA instanceof Planar) {
+			Planar a = (Planar)imageA;
+			Planar b = (Planar)imageB;
+			for (int i = 0; i < a.getNumBands(); i++)
+				transpose(a.getBand(i), b.getBand(i));
+		} else {
+			throw new IllegalArgumentException("Unknown image type: " + imageA.getClass().getSimpleName());
+		}
+	}
+
+	/**
 	 * In-place 90 degree image rotation in the clockwise direction. Only works on
 	 * square images.
 	 */

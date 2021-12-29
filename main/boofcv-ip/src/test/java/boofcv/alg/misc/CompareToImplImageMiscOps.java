@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,7 +53,7 @@ public abstract class CompareToImplImageMiscOps extends CompareIdenticalFunction
 
 	@Test
 	void compareFunctions() {
-		super.performTests(27*6 + 4*8);
+		super.performTests(29*6 + 4*8);
 	}
 
 	@Override
@@ -127,6 +127,7 @@ public abstract class CompareToImplImageMiscOps extends CompareIdenticalFunction
 			case "flipVertical":
 			case "flipHorizontal":
 				break;
+			case "transpose":
 			case "rotateCW":
 			case "rotateCCW":
 				if (p.length == 1)

@@ -113,6 +113,9 @@ public class BenchmarkImageMiscOps {
 	@Benchmark public void flipHorizontal_F32() {ImageMiscOps.flipHorizontal(imgA_F32);}
 	@Benchmark public void flipVertical_U8() {ImageMiscOps.flipVertical(imgA_U8);}
 	@Benchmark public void flipVertical_F32() {ImageMiscOps.flipVertical(imgA_F32);}
+	@Benchmark public void transpose_2_U8() {ImageMiscOps.transpose(imgA_U8,imgB_U8);}
+	@Benchmark public void transpose_2_F32() {ImageMiscOps.transpose(imgA_F32,imgB_F32);}
+	@Benchmark public void transpose_2_IU8() {ImageMiscOps.transpose(imgA_IU8,imgB_IU8);}
 	@Benchmark public void rotateCW_U8() {ImageMiscOps.rotateCW(imgA_U8);}
 	@Benchmark public void rotateCW_F32() {ImageMiscOps.rotateCW(imgA_F32);}
 	@Benchmark public void rotateCW_2_U8() {ImageMiscOps.rotateCW(imgA_U8,imgB_U8);}
