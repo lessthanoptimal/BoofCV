@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,6 @@ import boofcv.generate.AutoTypeImage;
 import boofcv.generate.CodeGeneratorBase;
 
 import java.io.FileNotFoundException;
-
 
 /**
  * Generates functions inside of ImageMiscOps.
@@ -81,7 +80,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 	private void printAllGeneric() {
 		AutoTypeImage[] types = AutoTypeImage.getGenericTypes();
 
-		for( AutoTypeImage t : types ) {
+		for (AutoTypeImage t : types) {
 			imageType = t;
 			imageName = t.getSingleBandName();
 			imageNameI = t.getInterleavedName();
@@ -105,7 +104,9 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 			printFillGaussianInterleaved();
 			printFlipVertical();
 			printFlipHorizontal();
+			printTranspose_two();
 			printRotateCW_one();
+			printTranspose_two_interleaved();
 			printRotateCW_two();
 			printRotateCW_two_interleaved();
 			printRotateCCW_one();
@@ -119,7 +120,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 	private void printAllSpecific() {
 		AutoTypeImage[] types = AutoTypeImage.getSpecificTypes();
 
-		for( AutoTypeImage t : types ) {
+		for (AutoTypeImage t : types) {
 			imageType = t;
 			imageName = t.getSingleBandName();
 //			dataType = t.getDataType();
@@ -133,11 +134,11 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 
 	private void printCopyBorder() {
 		boolean useGenerics = imageType.isInteger() && imageType.getNumBits() < 32;
-		String borderName = "ImageBorder_"+imageType.getKernelType();
+		String borderName = "ImageBorder_" + imageType.getKernelType();
 		borderName += useGenerics ? "<T>" : "";
 
 		String imageNameSrc = useGenerics ? "T" : imageName;
-		String generic = useGenerics ? "< T extends "+imageName+"<T>> " : "";
+		String generic = useGenerics ? "< T extends " + imageName + "<T>> " : "";
 
 		out.print("\t/**\n" +
 				"\t * Copies a rectangular region from one image into another. The region can go outside the input image's border.<br>\n" +
@@ -153,10 +154,10 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t * @param border Border for input image\n" +
 				"\t * @param output output image\n" +
 				"\t */\n" +
-				"\tpublic static "+generic+"void copy( int srcX, int srcY, int dstX, int dstY, int width, int height,\n" +
-				"\t\t\t\t\t\t\t "+imageNameSrc+" input, "+borderName+" border, "+imageName+" output ) {\n" +
+				"\tpublic static " + generic + "void copy( int srcX, int srcY, int dstX, int dstY, int width, int height,\n" +
+				"\t\t\t\t\t\t\t " + imageNameSrc + " input, " + borderName + " border, " + imageName + " output ) {\n" +
 				"//\t\tconcurrent isn't faster in benchmark results\n" +
-				"//\t\tif( runConcurrent((dstY-srcY)*(dstX-srcX)) ) {\n" +
+				"//\t\tif (runConcurrent((dstY-srcY)*(dstX-srcX))) {\n" +
 				"//\t\t\tImplImageMiscOps_MT.copy(srcX, srcY, dstX, dstY, width, height, input, border, output);\n" +
 				"//\t\t} else {\n" +
 				"\t\tImplImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, input, border, output);\n" +
@@ -179,9 +180,9 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t * @param output output image\n" +
 				"\t */\n" +
 				"\tpublic static void copy( int srcX, int srcY, int dstX, int dstY, int width, int height,\n" +
-				"\t\t\t\t\t\t\t "+imageName+" input, "+imageName+" output ) {\n" +
+				"\t\t\t\t\t\t\t " + imageName + " input, " + imageName + " output ) {\n" +
 				"//\t\tconcurrent isn't faster in benchmark results\n" +
-				"//\t\tif( runConcurrent((dstY-srcY)*(dstX-srcX)) ) {\n" +
+				"//\t\tif (runConcurrent((dstY-srcY)*(dstX-srcX))) {\n" +
 				"//\t\t\tImplImageMiscOps_MT.copy(srcX, srcY, dstX, dstY, width, height, input, output);\n" +
 				"//\t\t} else {\n" +
 				"\t\tImplImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, input, output);\n" +
@@ -205,9 +206,9 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t * @param output output image\n" +
 				"\t */\n" +
 				"\tpublic static void copy( int srcX, int srcY, int dstX, int dstY, int width, int height,\n" +
-				"\t\t\t\t\t\t\t "+imageNameI+" input, "+imageNameI+" output ) {\n" +
+				"\t\t\t\t\t\t\t " + imageNameI + " input, " + imageNameI + " output ) {\n" +
 				"//\t\tconcurrent isn't faster in benchmark results\n" +
-				"//\t\tif( runConcurrent((dstY-srcY)*(dstX-srcX)) ) {\n" +
+				"//\t\tif (runConcurrent((dstY-srcY)*(dstX-srcX))) {\n" +
 				"//\t\t\tImplImageMiscOps_MT.copy(srcX, srcY, dstX, dstY, width, height, input, output);\n" +
 				"//\t\t} else {\n" +
 				"\t\tImplImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, input, output);\n" +
@@ -215,17 +216,16 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	private void printFill()
-	{
+	private void printFill() {
 		out.print("\t/**\n" +
 				"\t * Fills the whole image with the specified value\n" +
 				"\t *\n" +
 				"\t * @param image An image. Modified.\n" +
 				"\t * @param value The value that the image is being filled with.\n" +
 				"\t */\n" +
-				"\tpublic static void fill("+imageName+" image, "+imageType.getSumType()+" value) {\n" +
+				"\tpublic static void fill( " + imageName + " image, " + imageType.getSumType() + " value ) {\n" +
 				"//\t\tconcurrent isn't faster in benchmark results\n" +
-				"//\t\tif( runConcurrent(image) ) {\n" +
+				"//\t\tif (runConcurrent(image)) {\n" +
 				"//\t\t\tImplImageMiscOps_MT.fill(image, value);\n" +
 				"//\t\t} else {\n" +
 				"\t\tImplImageMiscOps.fill(image, value);\n" +
@@ -233,8 +233,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	private void printFillInterleaved()
-	{
+	private void printFillInterleaved() {
 		String imageName = imageType.getInterleavedName();
 		out.print("\t/**\n" +
 				"\t * Fills the whole image with the specified value\n" +
@@ -242,8 +241,8 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t * @param image An image. Modified.\n" +
 				"\t * @param value The value that the image is being filled with.\n" +
 				"\t */\n" +
-				"\tpublic static void fill("+imageName+" image, "+imageType.getSumType()+" value) {\n" +
-				"\t\tif( runConcurrent(image) ) {\n" +
+				"\tpublic static void fill( " + imageName + " image, " + imageType.getSumType() + " value ) {\n" +
+				"\t\tif (runConcurrent(image)) {\n" +
 				"\t\t\tImplImageMiscOps_MT.fill(image, value);\n" +
 				"\t\t} else {\n" +
 				"\t\t\tImplImageMiscOps.fill(image, value);\n" +
@@ -251,89 +250,84 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	private void printFillInterleaved_bands()
-	{
+	private void printFillInterleaved_bands() {
 		String imageName = imageType.getInterleavedName();
 		out.print(
 				"\t/**\n" +
-				"\t * Fills each band in the image with the specified values\n" +
-				"\t *\n" +
-				"\t * @param image An image. Modified.\n" +
-				"\t * @param values Array which contains the values each band is to be filled with.\n" +
-				"\t */\n" +
-				"\tpublic static void fill("+imageName+" image, "+imageType.getSumType()+"[] values) {\n" +
-				"\t\tif( runConcurrent(image) ) {\n" +
-				"\t\t\tImplImageMiscOps_MT.fill(image, values);\n" +
-				"\t\t} else {\n" +
-				"\t\t\tImplImageMiscOps.fill(image, values);\n" +
-				"\t\t}\n" +
-				"\t}\n\n");
+						"\t * Fills each band in the image with the specified values\n" +
+						"\t *\n" +
+						"\t * @param image An image. Modified.\n" +
+						"\t * @param values Array which contains the values each band is to be filled with.\n" +
+						"\t */\n" +
+						"\tpublic static void fill( " + imageName + " image, " + imageType.getSumType() + "[] values ) {\n" +
+						"\t\tif (runConcurrent(image)) {\n" +
+						"\t\t\tImplImageMiscOps_MT.fill(image, values);\n" +
+						"\t\t} else {\n" +
+						"\t\t\tImplImageMiscOps.fill(image, values);\n" +
+						"\t\t}\n" +
+						"\t}\n\n");
 	}
 
-	private void printFillBand_Interleaved()
-	{
+	private void printFillBand_Interleaved() {
 		String imageName = imageType.getInterleavedName();
 		out.print(
 				"\t/**\n" +
-				"\t * Fills one band in the image with the specified value\n" +
-				"\t *\n" +
-				"\t * @param image An image. Modified.\n" +
-				"\t * @param band Which band is to be filled with the specified value\n" +
-				"\t * @param value The value that the image is being filled with.\n" +
-				"\t */\n" +
-				"\tpublic static void fillBand("+imageName+" image, int band, "+imageType.getSumType()+" value) {\n" +
-				"\t\tif( runConcurrent(image) ) {\n" +
-				"\t\t\tImplImageMiscOps_MT.fillBand(image, band, value);\n" +
-				"\t\t} else {\n" +
-				"\t\t\tImplImageMiscOps.fillBand(image, band, value);\n" +
-				"\t\t}\n" +
-				"\t}\n\n");
+						"\t * Fills one band in the image with the specified value\n" +
+						"\t *\n" +
+						"\t * @param image An image. Modified.\n" +
+						"\t * @param band Which band is to be filled with the specified value\n" +
+						"\t * @param value The value that the image is being filled with.\n" +
+						"\t */\n" +
+						"\tpublic static void fillBand( " + imageName + " image, int band, " + imageType.getSumType() + " value ) {\n" +
+						"\t\tif (runConcurrent(image)) {\n" +
+						"\t\t\tImplImageMiscOps_MT.fillBand(image, band, value);\n" +
+						"\t\t} else {\n" +
+						"\t\t\tImplImageMiscOps.fillBand(image, band, value);\n" +
+						"\t\t}\n" +
+						"\t}\n\n");
 	}
 
-	private void printInsertBandInterleaved()
-	{
+	private void printInsertBandInterleaved() {
 		String singleName = imageType.getSingleBandName();
 		String interleavedName = imageType.getInterleavedName();
 		out.print(
 				"\t/**\n" +
-				"\t * Inserts a single band into a multi-band image overwriting the original band\n" +
-				"\t *\n" +
-				"\t * @param input Single band image\n" +
-				"\t * @param band Which band the image is to be inserted into\n" +
-				"\t * @param output The multi-band image which the input image is to be inserted into\n" +
-				"\t */\n" +
-				"\tpublic static void insertBand( "+singleName+" input, int band, "+interleavedName+" output) {\n" +
-				"\t\tif( runConcurrent(input) ) {\n" +
-				"\t\t\tImplImageMiscOps_MT.insertBand(input, band, output);\n" +
-				"\t\t} else {\n" +
-				"\t\t\tImplImageMiscOps.insertBand(input, band, output);\n" +
-				"\t\t}\n" +
-				"\t}\n\n");
+						"\t * Inserts a single band into a multi-band image overwriting the original band\n" +
+						"\t *\n" +
+						"\t * @param input Single band image\n" +
+						"\t * @param band Which band the image is to be inserted into\n" +
+						"\t * @param output The multi-band image which the input image is to be inserted into\n" +
+						"\t */\n" +
+						"\tpublic static void insertBand( " + singleName + " input, int band, " + interleavedName + " output) {\n" +
+						"\t\tif (runConcurrent(input)) {\n" +
+						"\t\t\tImplImageMiscOps_MT.insertBand(input, band, output);\n" +
+						"\t\t} else {\n" +
+						"\t\t\tImplImageMiscOps.insertBand(input, band, output);\n" +
+						"\t\t}\n" +
+						"\t}\n\n");
 	}
 
-	private void printExtractBandInterleaved()
-	{
+	private void printExtractBandInterleaved() {
 		String singleName = imageType.getSingleBandName();
 		String interleavedName = imageType.getInterleavedName();
 		out.print(
 				"\t/**\n" +
-				"\t * Extracts a single band from a multi-band image\n" +
-				"\t *\n" +
-				"\t * @param input Multi-band image.\n" +
-				"\t * @param band which bad is to be extracted\n" +
-				"\t * @param output The single band image. Modified.\n" +
-				"\t */\n" +
-				"\tpublic static void extractBand( "+interleavedName+" input, int band, "+singleName+" output) {\n" +
-				"\t\tif( runConcurrent(input) ) {\n" +
-				"\t\t\tImplImageMiscOps_MT.extractBand(input, band, output);\n" +
-				"\t\t} else {\n" +
-				"\t\t\tImplImageMiscOps.extractBand(input, band, output);\n" +
-				"\t\t}\n" +
-				"\t}\n\n");
+						"\t * Extracts a single band from a multi-band image\n" +
+						"\t *\n" +
+						"\t * @param input Multi-band image.\n" +
+						"\t * @param band which bad is to be extracted\n" +
+						"\t * @param output The single band image. Modified.\n" +
+						"\t */\n" +
+						"\tpublic static void extractBand( " + interleavedName + " input, int band, " + singleName + " output) {\n" +
+						"\t\tif (runConcurrent(input)) {\n" +
+						"\t\t\tImplImageMiscOps_MT.extractBand(input, band, output);\n" +
+						"\t\t} else {\n" +
+						"\t\t\tImplImageMiscOps.extractBand(input, band, output);\n" +
+						"\t\t}\n" +
+						"\t}\n\n");
 	}
 
-	private void printFillBorder()
-	{
+	private void printFillBorder() {
 		out.print("\t/**\n" +
 				"\t * Fills the outside border with the specified value\n" +
 				"\t *\n" +
@@ -341,17 +335,17 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t * @param value The value that the image is being filled with.\n" +
 				"\t * @param radius Border width.\n" +
 				"\t */\n" +
-				"\tpublic static void fillBorder("+imageName+" image, "+imageType.getSumType()+" value, int radius ) {\n" +
+				"\tpublic static void fillBorder( " + imageName + " image, " + imageType.getSumType() + " value, int radius ) {\n" +
 				"//\t\tconcurrent isn't faster in benchmark results\n" +
-				"//\t\tif( runConcurrent(image) ) {\n" +
+				"//\t\tif (runConcurrent(image)) {\n" +
 				"//\t\t\tImplImageMiscOps_MT.fillBorder(image, value, radius);\n" +
 				"//\t\t} else {\n" +
 				"\t\tImplImageMiscOps.fillBorder(image, value, radius);\n" +
 				"//\t\t}\n" +
 				"\t}\n\n");
 	}
-	private void printFillBorder2()
-	{
+
+	private void printFillBorder2() {
 		out.print("\t/**\n" +
 				"\t * Fills the border with independent border widths for each side\n" +
 				"\t *\n" +
@@ -362,9 +356,9 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t * @param borderX1 Width of border on right\n" +
 				"\t * @param borderY1 Width of border on bottom\n" +
 				"\t */\n" +
-				"\tpublic static void fillBorder("+imageName+" image, "+imageType.getSumType()+" value, int borderX0, int borderY0, int borderX1, int borderY1 ) {\n" +
+				"\tpublic static void fillBorder( " + imageName + " image, " + imageType.getSumType() + " value, int borderX0, int borderY0, int borderX1, int borderY1 ) {\n" +
 				"//\t\tconcurrent isn't faster in benchmark results\n" +
-				"//\t\tif( runConcurrent(image) ) {\n" +
+				"//\t\tif (runConcurrent(image)) {\n" +
 				"//\t\t\tImplImageMiscOps_MT.fillBorder(image, value, borderX0, borderY0, borderX1, borderY1);\n" +
 				"//\t\t} else {\n" +
 				"\t\tImplImageMiscOps.fillBorder(image, value, borderX0, borderY0, borderX1, borderY1);\n" +
@@ -372,9 +366,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-
-	private void printFillRectangle()
-	{
+	private void printFillRectangle() {
 		out.print("\t/**\n" +
 				"\t * Draws a filled rectangle that is aligned along the image axis inside the image.\n" +
 				"\t *\n" +
@@ -385,9 +377,9 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t * @param width Rectangle width\n" +
 				"\t * @param height Rectangle height\n" +
 				"\t */\n" +
-				"\tpublic static void fillRectangle("+imageName+" image, "+imageType.getSumType()+" value, int x0, int y0, int width, int height) {\n" +
+				"\tpublic static void fillRectangle( " + imageName + " image, " + imageType.getSumType() + " value, int x0, int y0, int width, int height ) {\n" +
 				"//\t\tconcurrent isn't faster in benchmark results\n" +
-				"//\t\tif( runConcurrent(image) ) {\n" +
+				"//\t\tif (runConcurrent(image)) {\n" +
 				"//\t\t\tImplImageMiscOps_MT.fillRectangle(image, value, x0, y0, width, height);\n" +
 				"//\t\t} else {\n" +
 				"\t\tImplImageMiscOps.fillRectangle(image, value, x0, y0, width, height);\n" +
@@ -395,8 +387,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	private void printFillRectangleInterleaved()
-	{
+	private void printFillRectangleInterleaved() {
 		String imageName = imageType.getInterleavedName();
 
 		out.print("\t/**\n" +
@@ -410,9 +401,9 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t * @param width Rectangle width\n" +
 				"\t * @param height Rectangle height\n" +
 				"\t */\n" +
-				"\tpublic static void fillRectangle("+imageName+" image, "+imageType.getSumType()+" value, int x0, int y0, int width, int height) {\n" +
+				"\tpublic static void fillRectangle( " + imageName + " image, " + imageType.getSumType() + " value, int x0, int y0, int width, int height ) {\n" +
 				"//\t\tconcurrent isn't faster in benchmark results\n" +
-				"//\t\tif( runConcurrent(image) ) {\n" +
+				"//\t\tif (runConcurrent(image)) {\n" +
 				"//\t\t\tImplImageMiscOps_MT.fillRectangle(image, value, x0, y0, width, height);\n" +
 				"//\t\t} else {\n" +
 				"\t\tImplImageMiscOps.fillRectangle(image, value, x0, y0, width, height);\n" +
@@ -431,9 +422,9 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t * @param img Image which is to be filled. Modified.\n" +
 				"\t * @param rand Random number generator\n" +
 				"\t * @param min Minimum value of the distribution, inclusive\n" +
-				"\t * @param max Maximum value of the distribution, "+maxInclusive+"\n" +
+				"\t * @param max Maximum value of the distribution, " + maxInclusive + "\n" +
 				"\t */\n" +
-				"\tpublic static void fillUniform("+imageName+" img, Random rand, "+sumType+" min, "+sumType+" max) {\n" +
+				"\tpublic static void fillUniform( " + imageName + " img, Random rand, " + sumType + " min, " + sumType + " max ) {\n" +
 				"\t\tImplImageMiscOps.fillUniform(img, rand, min, max);\n" +
 				"\t}\n\n");
 	}
@@ -450,9 +441,9 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t * @param img Image which is to be filled. Modified.\n" +
 				"\t * @param rand Random number generator\n" +
 				"\t * @param min Minimum value of the distribution, inclusive\n" +
-				"\t * @param max Maximum value of the distribution, "+maxInclusive+"\n" +
+				"\t * @param max Maximum value of the distribution, " + maxInclusive + "\n" +
 				"\t */\n" +
-				"\tpublic static void fillUniform("+imageName+" img, Random rand, "+sumType+" min, "+sumType+" max) {\n" +
+				"\tpublic static void fillUniform( " + imageName + " img, Random rand, " + sumType + " min, " + sumType + " max ) {\n" +
 				"\t\tImplImageMiscOps.fillUniform(img, rand, min, max);\n" +
 				"\t}\n\n");
 	}
@@ -473,8 +464,8 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t * @param lowerBound Lower bound of value clip\n" +
 				"\t * @param upperBound Upper bound of value clip\n" +
 				"\t */\n" +
-				"\tpublic static void fillGaussian("+imageName+" input, Random rand, double mean, double sigma, "
-				+sumType+" lowerBound, "+sumType+" upperBound ) {\n" +
+				"\tpublic static void fillGaussian( " + imageName + " input, Random rand, double mean, double sigma, "
+				+ sumType + " lowerBound, " + sumType + " upperBound ) {\n" +
 				"\t\tImplImageMiscOps.fillGaussian(input, rand, mean, sigma, lowerBound, upperBound);\n" +
 				"\t}\n\n");
 	}
@@ -496,8 +487,8 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t * @param lowerBound Lower bound of value clip\n" +
 				"\t * @param upperBound Upper bound of value clip\n" +
 				"\t */\n" +
-				"\tpublic static void fillGaussian("+imageName+" input, Random rand, double mean, double sigma, "
-				+sumType+" lowerBound, "+sumType+" upperBound ) {\n" +
+				"\tpublic static void fillGaussian( " + imageName + " input, Random rand, double mean, double sigma, "
+				+ sumType + " lowerBound, " + sumType + " upperBound ) {\n" +
 				"\t\tImplImageMiscOps.fillGaussian(input, rand, mean, sigma, lowerBound, upperBound);\n" +
 				"\t}\n\n");
 	}
@@ -509,7 +500,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 		out.print("\t/**\n" +
 				"\t * Adds uniform i.i.d noise to each pixel in the image. Noise range is min &le; X &lt; max.\n" +
 				"\t */\n" +
-				"\tpublic static void addUniform("+imageName+" input, Random rand, "+sumType+" min, "+sumType+" max) {\n" +
+				"\tpublic static void addUniform(" + imageName + " input, Random rand, " + sumType + " min, " + sumType + " max) {\n" +
 				"\t\tImplImageMiscOps.addUniform(input, rand, min, max);\n" +
 				"\t}\n\n");
 	}
@@ -522,7 +513,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 		out.print("\t/**\n" +
 				"\t * Adds uniform i.i.d noise to each pixel in the image. Noise range is min &le; X &lt; max.\n" +
 				"\t */\n" +
-				"\tpublic static void addUniform("+imageName+" input, Random rand, "+sumType+" min, "+sumType+" max) {\n" +
+				"\tpublic static void addUniform(" + imageName + " input, Random rand, " + sumType + " min, " + sumType + " max) {\n" +
 				"\t\tImplImageMiscOps.addUniform(input, rand, min, max);\n" +
 				"\t}\n\n");
 	}
@@ -531,7 +522,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 		String sumType = imageType.getSumType();
 
 		out.print("\t/**\n" +
-				"\t * Adds Gaussian/normal i.i.d noise to each pixel in the image. If a value exceeds the specified\n"+
+				"\t * Adds Gaussian/normal i.i.d noise to each pixel in the image. If a value exceeds the specified\n" +
 				"\t * it will be set to the closest bound.\n" +
 				"\t * @param image Input image. Modified.\n" +
 				"\t * @param rand Random number generator.\n" +
@@ -539,8 +530,8 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t * @param lowerBound Allowed lower bound\n" +
 				"\t * @param upperBound Allowed upper bound\n" +
 				"\t */\n" +
-				"\tpublic static void addGaussian("+imageName+" image, Random rand, double sigma, "
-				+sumType+" lowerBound, "+sumType+" upperBound ) {\n" +
+				"\tpublic static void addGaussian(" + imageName + " image, Random rand, double sigma, "
+				+ sumType + " lowerBound, " + sumType + " upperBound ) {\n" +
 				"\t\tImplImageMiscOps.addGaussian(image, rand, sigma, lowerBound, upperBound);\n" +
 				"\t}\n\n");
 	}
@@ -550,7 +541,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 		String sumType = imageType.getSumType();
 
 		out.print("\t/**\n" +
-				"\t * Adds Gaussian/normal i.i.d noise to each pixel in the image. If a value exceeds the specified\n"+
+				"\t * Adds Gaussian/normal i.i.d noise to each pixel in the image. If a value exceeds the specified\n" +
 				"\t * it will be set to the closest bound.\n" +
 				"\t * @param image Input image. Modified.\n" +
 				"\t * @param rand Random number generator.\n" +
@@ -558,18 +549,16 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t * @param lowerBound Allowed lower bound\n" +
 				"\t * @param upperBound Allowed upper bound\n" +
 				"\t */\n" +
-				"\tpublic static void addGaussian("+imageName+" image, Random rand, double sigma, "
-				+sumType+" lowerBound, "+sumType+" upperBound ) {\n" +
+				"\tpublic static void addGaussian(" + imageName + " image, Random rand, double sigma, "
+				+ sumType + " lowerBound, " + sumType + " upperBound ) {\n" +
 				"\t\tImplImageMiscOps.addGaussian(image, rand, sigma, lowerBound, upperBound);\n" +
 				"\t}\n\n");
 	}
 
 	private void printFlipVertical() {
-		out.print("\t/**\n" +
-				"\t * Flips the image from top to bottom\n" +
-				"\t */\n" +
-				"\tpublic static void flipVertical( "+imageName+" image ) {\n" +
-				"\t\tif( runConcurrent(image) ) {\n" +
+		out.print("\t/** Flips the image from top to bottom */\n" +
+				"\tpublic static void flipVertical( " + imageName + " image ) {\n" +
+				"\t\tif (runConcurrent(image)) {\n" +
 				"\t\t\tImplImageMiscOps_MT.flipVertical(image);\n" +
 				"\t\t} else {\n" +
 				"\t\t\tImplImageMiscOps.flipVertical(image);\n" +
@@ -578,11 +567,9 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 	}
 
 	private void printFlipHorizontal() {
-		out.print("\t/**\n" +
-				"\t * Flips the image from left to right\n" +
-				"\t */\n" +
-				"\tpublic static void flipHorizontal( "+imageName+" image ) {\n" +
-				"\t\tif( runConcurrent(image) ) {\n" +
+		out.print("\t/** Flips the image from left to right */\n" +
+				"\tpublic static void flipHorizontal( " + imageName + " image ) {\n" +
+				"\t\tif (runConcurrent(image)) {\n" +
 				"\t\t\tImplImageMiscOps_MT.flipHorizontal(image);\n" +
 				"\t\t} else {\n" +
 				"\t\t\tImplImageMiscOps.flipHorizontal(image);\n" +
@@ -590,13 +577,32 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
+	private void printTranspose_two() {
+		out.print("\t/** Transposes the image */\n" +
+				"\tpublic static void transpose( " + imageName + " input, " + imageName + " output ) {\n" +
+				"\t\t//if (runConcurrent(input)) {\n" +
+				"\t\t//\tImplImageMiscOps_MT.transpose(input, output);\n" +
+				"\t\t//} else {\n" +
+				"\t\tImplImageMiscOps.transpose(input, output);\n" +
+				"\t\t//}\n" +
+				"\t}\n\n");
+	}
+
+	private void printTranspose_two_interleaved() {
+		out.print("\t/** Transposes the image */\n" +
+				"\tpublic static void transpose( " + imageNameI + " input, " + imageNameI + " output ) {\n" +
+				"\t\tif (runConcurrent(input)) {\n" +
+				"\t\t\tImplImageMiscOps_MT.transpose(input, output);\n" +
+				"\t\t} else {\n" +
+				"\t\t\tImplImageMiscOps.transpose(input, output);\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
 	private void printRotateCW_one() {
-		out.print("\t/**\n" +
-				"\t * In-place 90 degree image rotation in the clockwise direction. Only works on\n" +
-				"\t * square images.\n" +
-				"\t */\n" +
-				"\tpublic static void rotateCW( "+imageName+" image ) {\n" +
-				"\t\tif( runConcurrent(image) ) {\n" +
+		out.print("\t/** In-place 90 degree image rotation in the clockwise direction. Only works on square images. */\n" +
+				"\tpublic static void rotateCW( " + imageName + " image ) {\n" +
+				"\t\tif (runConcurrent(image)) {\n" +
 				"\t\t\tImplImageMiscOps_MT.rotateCW(image);\n" +
 				"\t\t} else {\n" +
 				"\t\t\tImplImageMiscOps.rotateCW(image);\n" +
@@ -605,11 +611,9 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 	}
 
 	private void printRotateCW_two() {
-		out.print("\t/**\n" +
-				"\t * Rotates the image 90 degrees in the clockwise direction.\n" +
-				"\t */\n" +
-				"\tpublic static void rotateCW( "+imageName+" input, "+imageName+" output ) {\n" +
-				"\t\tif( runConcurrent(input) ) {\n" +
+		out.print("\t/** Rotates the image 90 degrees in the clockwise direction. */\n" +
+				"\tpublic static void rotateCW( " + imageName + " input, " + imageName + " output ) {\n" +
+				"\t\tif (runConcurrent(input)) {\n" +
 				"\t\t\tImplImageMiscOps_MT.rotateCW(input, output);\n" +
 				"\t\t} else {\n" +
 				"\t\t\tImplImageMiscOps.rotateCW(input, output);\n" +
@@ -618,11 +622,9 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 	}
 
 	private void printRotateCW_two_interleaved() {
-		out.print("\t/**\n" +
-				"\t * Rotates the image 90 degrees in the clockwise direction.\n" +
-				"\t */\n" +
-				"\tpublic static void rotateCW( "+imageNameI+" input, "+imageNameI+" output ) {\n" +
-				"\t\tif( runConcurrent(input) ) {\n" +
+		out.print("\t/** Rotates the image 90 degrees in the clockwise direction. */\n" +
+				"\tpublic static void rotateCW( " + imageNameI + " input, " + imageNameI + " output ) {\n" +
+				"\t\tif (runConcurrent(input)) {\n" +
 				"\t\t\tImplImageMiscOps_MT.rotateCW(input, output);\n" +
 				"\t\t} else {\n" +
 				"\t\t\tImplImageMiscOps.rotateCW(input, output);\n" +
@@ -631,12 +633,9 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 	}
 
 	private void printRotateCCW_one() {
-		out.print("\t/**\n" +
-				"\t * In-place 90 degree image rotation in the counter-clockwise direction. Only works on\n" +
-				"\t * square images.\n" +
-				"\t */\n" +
-				"\tpublic static void rotateCCW( "+imageName+" image ) {\n" +
-				"\t\tif( runConcurrent(image) ) {\n" +
+		out.print("\t/** In-place 90 degree image rotation in the counter-clockwise direction. Only works on square images. */\n" +
+				"\tpublic static void rotateCCW( " + imageName + " image ) {\n" +
+				"\t\tif (runConcurrent(image)) {\n" +
 				"\t\t\tImplImageMiscOps_MT.rotateCCW(image);\n" +
 				"\t\t} else {\n" +
 				"\t\t\tImplImageMiscOps.rotateCCW(image);\n" +
@@ -645,11 +644,9 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 	}
 
 	private void printRotateCCW_two() {
-		out.print("\t/**\n" +
-				"\t * Rotates the image 90 degrees in the counter-clockwise direction.\n" +
-				"\t */\n" +
-				"\tpublic static void rotateCCW( "+imageName+" input, "+imageName+" output ) {\n" +
-				"\t\tif( runConcurrent(input) ) {\n" +
+		out.print("\t/** Rotates the image 90 degrees in the counter-clockwise direction. */\n" +
+				"\tpublic static void rotateCCW( " + imageName + " input, " + imageName + " output ) {\n" +
+				"\t\tif (runConcurrent(input)) {\n" +
 				"\t\t\tImplImageMiscOps_MT.rotateCCW(input, output);\n" +
 				"\t\t} else {\n" +
 				"\t\t\tImplImageMiscOps.rotateCCW(input, output);\n" +
@@ -658,11 +655,9 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 	}
 
 	private void printRotateCCW_two_interleaved() {
-		out.print("\t/**\n" +
-				"\t * Rotates the image 90 degrees in the counter-clockwise direction.\n" +
-				"\t */\n" +
-				"\tpublic static void rotateCCW( "+imageNameI+" input, "+imageNameI+" output ) {\n" +
-				"\t\tif( runConcurrent(input) ) {\n" +
+		out.print("\t/** Rotates the image 90 degrees in the counter-clockwise direction. */\n" +
+				"\tpublic static void rotateCCW( " + imageNameI + " input, " + imageNameI + " output ) {\n" +
+				"\t\tif (runConcurrent(input)) {\n" +
 				"\t\t\tImplImageMiscOps_MT.rotateCCW(input, output);\n" +
 				"\t\t} else {\n" +
 				"\t\t\tImplImageMiscOps.rotateCCW(input, output);\n" +
@@ -671,11 +666,11 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 	}
 
 	private void printGrowBorder() {
-		String borderName = "ImageBorder_"+imageType.getKernelType();
+		String borderName = "ImageBorder_" + imageType.getKernelType();
 		String generic = "";
 		String srcType = imageName;
-		if( imageType.isInteger() && imageType.getNumBits() < 32 ) {
-			generic = "<T extends GrayI"+imageType.getNumBits()+"<T>>\n\t";
+		if (imageType.isInteger() && imageType.getNumBits() < 32) {
+			generic = "<T extends GrayI" + imageType.getNumBits() + "<T>>\n\t";
 			srcType = "T";
 			borderName += "<T>";
 		}
@@ -690,8 +685,8 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t * @param borderY1 (Input) Border y-axis upper extent\n" +
 				"\t * @param dst (Output) Output image. width=src.width+2*radiusX and height=src.height+2*radiusY\n" +
 				"\t */\n" +
-				"\tpublic static "+generic+"void growBorder("+srcType+" src, "+borderName+" border, int borderX0, int borderY0, int borderX1, int borderY1, "+srcType+" dst ) {\n" +
-				"\t\tif( runConcurrent(src) ) {\n" +
+				"\tpublic static " + generic + "void growBorder( " + srcType + " src, " + borderName + " border, int borderX0, int borderY0, int borderX1, int borderY1, " + srcType + " dst ) {\n" +
+				"\t\tif (runConcurrent(src)) {\n" +
 				"\t\t\tImplImageMiscOps_MT.growBorder(src, border, borderX0, borderY0, borderX1, borderY1, dst);\n" +
 				"\t\t} else {\n" +
 				"\t\t\tImplImageMiscOps.growBorder(src, border, borderX0, borderY0, borderX1, borderY1, dst);\n" +
@@ -709,8 +704,8 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t * @param finder (Input) Checks to see if the pixel value matches the criteria\n" +
 				"\t * @param process (Input) When a match is found this function is called and given the coordinates. true = continue\n" +
 				"\t */\n" +
-				"\tpublic static void findAndProcess( "+imageType.getSingleBandName()+" input, BoofLambdas.Match_"+suffix+
-					" finder, BoofLambdas.ProcessIIB process ) {\n" +
+				"\tpublic static void findAndProcess( " + imageType.getSingleBandName() + " input, BoofLambdas.Match_" + suffix +
+				" finder, BoofLambdas.ProcessIIB process ) {\n" +
 				"\t\tImplImageMiscOps.findAndProcess(input, finder, process);\n" +
 				"\t}\n\n");
 	}

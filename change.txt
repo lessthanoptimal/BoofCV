@@ -13,10 +13,12 @@ Build
 Misc
 - Config classes now must implement setTo() which returns 'this' to allow chaining and easy copies
 ImageProcessing
-- TODO ImageMiscOps.transpose()
+- Added ImageMiscOps.transpose()
 Background Model
 - Created threaded implementations of stationary and moving
 - Added internal benchmarks for moving
+QR Code
+- TODO added ability to decode transposed markers. Can be turned off.
 
 TODO Monocular SLAM
 TODO Stereo SLAM

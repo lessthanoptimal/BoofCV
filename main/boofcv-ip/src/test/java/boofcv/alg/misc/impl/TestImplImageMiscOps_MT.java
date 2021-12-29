@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,6 @@ package boofcv.alg.misc.impl;
 import boofcv.alg.misc.CompareToImplImageMiscOps;
 
 class TestImplImageMiscOps_MT extends CompareToImplImageMiscOps {
-
 	TestImplImageMiscOps_MT() {
 		super(ImplImageMiscOps_MT.class, 40, 50);
 	}
