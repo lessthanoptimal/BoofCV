@@ -39,10 +39,10 @@ public class ResidualsEpipolarMatrix implements FunctionNtoM {
 	// list of observations
 	protected List<AssociatedPair> obs;
 	// error function
-	protected ModelObservationResidual<DMatrixRMaj,AssociatedPair> residual;
+	protected ModelObservationResidual<DMatrixRMaj, AssociatedPair> residual;
 
 	// pre-declare temporary storage
-	protected DMatrixRMaj F = new DMatrixRMaj(3,3);
+	protected DMatrixRMaj F = new DMatrixRMaj(3, 3);
 
 	/**
 	 * Configures algorithm
@@ -50,9 +50,8 @@ public class ResidualsEpipolarMatrix implements FunctionNtoM {
 	 * @param param Converts parameters into epipolar matrix
 	 * @param residual Function for computing the residuals
 	 */
-	public ResidualsEpipolarMatrix(ModelCodec<DMatrixRMaj> param,
-								   ModelObservationResidual<DMatrixRMaj,AssociatedPair> residual)
-	{
+	public ResidualsEpipolarMatrix( ModelCodec<DMatrixRMaj> param,
+									ModelObservationResidual<DMatrixRMaj, AssociatedPair> residual ) {
 		this.param = param == null ? new ModelCodecSwapData(9) : param;
 		this.residual = residual;
 	}
@@ -72,11 +71,11 @@ public class ResidualsEpipolarMatrix implements FunctionNtoM {
 	}
 
 	@Override
-	public void process(double[] input, double[] output) {
+	public void process( double[] input, double[] output ) {
 		param.decode(input, F);
 
 		residual.setModel(F);
-		for( int i = 0; i < obs.size(); i++ ) {
+		for (int i = 0; i < obs.size(); i++) {
 			AssociatedPair p = obs.get(i);
 			output[i] = residual.computeResidual(p);
 		}

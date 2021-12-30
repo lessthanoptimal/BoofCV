@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,11 +28,10 @@ import org.ejml.data.DMatrixRMaj;
  *
  * @author Peter Abeles
  */
-public class MmmvSe3ToEssential extends MmmvModelChanger<Se3_F64, DMatrixRMaj, AssociatedPair>
-{
-	DMatrixRMaj E = new DMatrixRMaj(3,3);
+public class MmmvSe3ToEssential extends MmmvModelChanger<Se3_F64, DMatrixRMaj, AssociatedPair> {
+	DMatrixRMaj E = new DMatrixRMaj(3, 3);
 
-	public MmmvSe3ToEssential(ModelMatcherMultiview<Se3_F64, AssociatedPair> mmmv) {
+	public MmmvSe3ToEssential( ModelMatcherMultiview<Se3_F64, AssociatedPair> mmmv ) {
 		super(mmmv);
 	}
 
@@ -41,7 +40,7 @@ public class MmmvSe3ToEssential extends MmmvModelChanger<Se3_F64, DMatrixRMaj, A
 
 		Se3_F64 found = mmmv.getModelParameters();
 
-		MultiViewOps.createEssential(found.R,found.T,E);
+		MultiViewOps.createEssential(found.R, found.T, E);
 
 		return E;
 	}

@@ -28,20 +28,20 @@ import java.util.List;
 /**
  * Wrapper around {@link boofcv.abst.geo.Estimate1ofEpipolar} for {@link ModelGenerator}. Used for robust model
  * fitting with outliers.
- * 
+ *
  * @author Peter Abeles
  */
-public class GenerateEpipolarMatrix implements ModelGenerator<DMatrixRMaj,AssociatedPair> {
+public class GenerateEpipolarMatrix implements ModelGenerator<DMatrixRMaj, AssociatedPair> {
 
 	Estimate1ofEpipolar alg;
 
-	public GenerateEpipolarMatrix(Estimate1ofEpipolar alg) {
+	public GenerateEpipolarMatrix( Estimate1ofEpipolar alg ) {
 		this.alg = alg;
 	}
 
 	@Override
-	public boolean generate(List<AssociatedPair> dataSet, DMatrixRMaj model ) {
-		if( alg.process(dataSet,model) ) {
+	public boolean generate( List<AssociatedPair> dataSet, DMatrixRMaj model ) {
+		if (alg.process(dataSet, model)) {
 			return true;
 		}
 		return false;

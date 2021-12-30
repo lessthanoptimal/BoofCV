@@ -29,7 +29,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public interface GeoModelEstimatorN<Model,Sample> {
+public interface GeoModelEstimatorN<Model, Sample> {
 	/**
 	 * Estimates a set of models which fit the given a set of observations. A DogArray is used to store
 	 * the found models. Each time this function is invoked 'estimatedModels' is reset and new models are
@@ -39,7 +39,7 @@ public interface GeoModelEstimatorN<Model,Sample> {
 	 * @param estimatedModels Output: Storage for the set of estimated models. Modified.
 	 * @return true if successful
 	 */
-	public boolean process(List<Sample> points , DogArray<Model> estimatedModels );
+	public boolean process( List<Sample> points, DogArray<Model> estimatedModels );
 
 	/**
 	 * Minimum number of points required to estimate the model.

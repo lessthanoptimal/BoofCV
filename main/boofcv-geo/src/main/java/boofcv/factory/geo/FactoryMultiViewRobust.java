@@ -316,7 +316,7 @@ public class FactoryMultiViewRobust {
 		var manager = new ModelManagerHomography2D_F64();
 
 		LeastMedianOfSquares<Homography2D_F64, AssociatedPair> lmeds =
-				createLMEDS(configLMedS,manager,AssociatedPair.class);
+				createLMEDS(configLMedS, manager, AssociatedPair.class);
 
 		lmeds.setModel(
 				() -> new GenerateHomographyLinear(_configHomography.normalize),
@@ -416,7 +416,7 @@ public class FactoryMultiViewRobust {
 			}
 			case REPROJECTION_REFINE -> {
 				ransacTol = 3.0*configRansac.inlierThreshold*configRansac.inlierThreshold;
-				distance = ()->new DistanceTrifocalReprojectionSq(
+				distance = () -> new DistanceTrifocalReprojectionSq(
 						_configError.converge.gtol, _configError.converge.maxIterations);
 			}
 			case POINT_TRANSFER -> {
@@ -461,8 +461,8 @@ public class FactoryMultiViewRobust {
 		return new RansacProjective<>(configRansac.randSeed, manager, generator, distance, configRansac.iterations, ransacTol);
 	}
 
-	public static<Model, Point> LeastMedianOfSquares<Model, Point>
-	createLMEDS(ConfigLMedS configLMedS, ModelManager<Model> manager, Class<Point> pointType) {
+	public static <Model, Point> LeastMedianOfSquares<Model, Point>
+	createLMEDS( ConfigLMedS configLMedS, ModelManager<Model> manager, Class<Point> pointType ) {
 		LeastMedianOfSquares<Model, Point> alg = BoofConcurrency.isUseConcurrent() ?
 				new LeastMedianOfSquares_MT<>(configLMedS.randSeed, configLMedS.totalCycles, manager, pointType)
 				:
@@ -477,8 +477,8 @@ public class FactoryMultiViewRobust {
 	 * @param ransacTol inlier tolerance. The tolerance on config isn't used since that might have the wrong units. This
 	 * lets the user easily adjust the units without modifying the config.
 	 */
-	public static<Model, Point> Ransac<Model, Point>
-	createRansac(ConfigRansac configRansac, double ransacTol, ModelManager<Model> manager, Class<Point> pointType) {
+	public static <Model, Point> Ransac<Model, Point>
+	createRansac( ConfigRansac configRansac, double ransacTol, ModelManager<Model> manager, Class<Point> pointType ) {
 		return BoofConcurrency.isUseConcurrent() ?
 				new Ransac_MT<>(configRansac.randSeed, configRansac.iterations, ransacTol, manager, pointType)
 				:

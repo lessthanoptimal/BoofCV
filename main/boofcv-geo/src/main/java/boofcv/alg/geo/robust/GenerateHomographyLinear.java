@@ -18,7 +18,6 @@
 
 package boofcv.alg.geo.robust;
 
-
 import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.geo.AssociatedPair;
@@ -36,12 +35,11 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class GenerateHomographyLinear implements
-		ModelGenerator<Homography2D_F64,AssociatedPair> ,
-		ModelFitter<Homography2D_F64,AssociatedPair>
-{
+		ModelGenerator<Homography2D_F64, AssociatedPair>,
+		ModelFitter<Homography2D_F64, AssociatedPair> {
 
 	Estimate1ofEpipolar alg;
-	DMatrixRMaj H = new DMatrixRMaj(3,3);
+	DMatrixRMaj H = new DMatrixRMaj(3, 3);
 
 	public GenerateHomographyLinear( boolean normalizeInput ) {
 		alg = FactoryMultiView.homographyDLT(normalizeInput);
@@ -49,21 +47,21 @@ public class GenerateHomographyLinear implements
 	}
 
 	@Override
-	public boolean fitModel(List<AssociatedPair> dataSet, Homography2D_F64 initial, Homography2D_F64 found) {
-		if( !alg.process(dataSet,H) )
+	public boolean fitModel( List<AssociatedPair> dataSet, Homography2D_F64 initial, Homography2D_F64 found ) {
+		if (!alg.process(dataSet, H))
 			return false;
 
-		UtilHomography_F64.convert(H,found);
+		UtilHomography_F64.convert(H, found);
 		return true;
 	}
 
 	@Override
-	public boolean generate(List<AssociatedPair> dataSet, Homography2D_F64 model ) {
+	public boolean generate( List<AssociatedPair> dataSet, Homography2D_F64 model ) {
 
-		if( !alg.process(dataSet,H) )
+		if (!alg.process(dataSet, H))
 			return false;
 
-		UtilHomography_F64.convert(H,model);
+		UtilHomography_F64.convert(H, model);
 
 		return true;
 	}

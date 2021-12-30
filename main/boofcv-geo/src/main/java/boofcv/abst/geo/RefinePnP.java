@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,5 +28,4 @@ import org.ddogleg.fitting.modelset.ModelFitter;
  *
  * @author Peter Abeles
  */
-public interface RefinePnP extends ModelFitter<Se3_F64,Point2D3D> {
-}
+public interface RefinePnP extends ModelFitter<Se3_F64, Point2D3D> {}

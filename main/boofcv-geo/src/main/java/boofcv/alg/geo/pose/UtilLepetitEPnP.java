@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,21 +38,20 @@ public class UtilLepetitEPnP {
 	 * @param nullPts Null points that the camera point is a weighted sum of
 	 * @param cameraPts The output
 	 */
-	public static void computeCameraControl(double beta[],
-											List<Point3D_F64> nullPts[],
-											DogArray<Point3D_F64> cameraPts ,
-											int numControl )
-	{
+	public static void computeCameraControl( double[] beta,
+											 List<Point3D_F64>[] nullPts,
+											 DogArray<Point3D_F64> cameraPts,
+											 int numControl ) {
 		cameraPts.reset();
-		for( int i = 0; i < numControl; i++ ) {
-			cameraPts.grow().setTo(0,0,0);
+		for (int i = 0; i < numControl; i++) {
+			cameraPts.grow().setTo(0, 0, 0);
 		}
 
-		for( int i = 0; i < numControl; i++ ) {
+		for (int i = 0; i < numControl; i++) {
 			double b = beta[i];
 //			System.out.printf("%7.3f ", b);
 
-			for( int j = 0; j < numControl; j++ ) {
+			for (int j = 0; j < numControl; j++) {
 				Point3D_F64 s = cameraPts.get(j);
 				Point3D_F64 p = nullPts[i].get(j);
 				s.x += b*p.x;
@@ -65,43 +64,43 @@ public class UtilLepetitEPnP {
 	/**
 	 * Extracts the linear constraint matrix for case 1 from the full 6x10 constraint matrix.
 	 */
-	public static void constraintMatrix6x4( DMatrixRMaj L_6x10 , DMatrixRMaj L_6x4 ) {
+	public static void constraintMatrix6x4( DMatrixRMaj L_6x10, DMatrixRMaj L_6x4 ) {
 
 		int index = 0;
-		for( int i = 0; i < 6; i++ ) {
-			L_6x4.data[index++] = L_6x10.get(i,0);
-			L_6x4.data[index++] = L_6x10.get(i,1);
-			L_6x4.data[index++] = L_6x10.get(i,3);
-			L_6x4.data[index++] = L_6x10.get(i,6);
+		for (int i = 0; i < 6; i++) {
+			L_6x4.data[index++] = L_6x10.get(i, 0);
+			L_6x4.data[index++] = L_6x10.get(i, 1);
+			L_6x4.data[index++] = L_6x10.get(i, 3);
+			L_6x4.data[index++] = L_6x10.get(i, 6);
 		}
 	}
 
 	/**
 	 * Extracts the linear constraint matrix for case 2 from the full 6x10 constraint matrix.
 	 */
-	public static void constraintMatrix6x3( DMatrixRMaj L_6x10 , DMatrixRMaj L_6x3 ) {
+	public static void constraintMatrix6x3( DMatrixRMaj L_6x10, DMatrixRMaj L_6x3 ) {
 
 		int index = 0;
-		for( int i = 0; i < 6; i++ ) {
-			L_6x3.data[index++] = L_6x10.get(i,0);
-			L_6x3.data[index++] = L_6x10.get(i,1);
-			L_6x3.data[index++] = L_6x10.get(i,4);
+		for (int i = 0; i < 6; i++) {
+			L_6x3.data[index++] = L_6x10.get(i, 0);
+			L_6x3.data[index++] = L_6x10.get(i, 1);
+			L_6x3.data[index++] = L_6x10.get(i, 4);
 		}
 	}
 
 	/**
 	 * Extracts the linear constraint matrix for case 3 from the full 6x10 constraint matrix.
 	 */
-	public static void constraintMatrix6x6( DMatrixRMaj L_6x10 , DMatrixRMaj L_6x6 ) {
+	public static void constraintMatrix6x6( DMatrixRMaj L_6x10, DMatrixRMaj L_6x6 ) {
 
 		int index = 0;
-		for( int i = 0; i < 6; i++ ) {
-			L_6x6.data[index++] = L_6x10.get(i,0);
-			L_6x6.data[index++] = L_6x10.get(i,1);
-			L_6x6.data[index++] = L_6x10.get(i,2);
-			L_6x6.data[index++] = L_6x10.get(i,4);
-			L_6x6.data[index++] = L_6x10.get(i,5);
-			L_6x6.data[index++] = L_6x10.get(i,7);
+		for (int i = 0; i < 6; i++) {
+			L_6x6.data[index++] = L_6x10.get(i, 0);
+			L_6x6.data[index++] = L_6x10.get(i, 1);
+			L_6x6.data[index++] = L_6x10.get(i, 2);
+			L_6x6.data[index++] = L_6x10.get(i, 4);
+			L_6x6.data[index++] = L_6x10.get(i, 5);
+			L_6x6.data[index++] = L_6x10.get(i, 7);
 		}
 	}
 
@@ -113,41 +112,41 @@ public class UtilLepetitEPnP {
 	 * @param controlWorldPts List of world control points
 	 * @param nullPts Null points
 	 */
-	public static void constraintMatrix6x10( DMatrixRMaj L , DMatrixRMaj y ,
-											 DogArray<Point3D_F64> controlWorldPts ,
-											 List<Point3D_F64> nullPts[] ) {
+	public static void constraintMatrix6x10( DMatrixRMaj L, DMatrixRMaj y,
+											 DogArray<Point3D_F64> controlWorldPts,
+											 List<Point3D_F64>[] nullPts ) {
 		int row = 0;
-		for( int i = 0; i < 4; i++ ) {
+		for (int i = 0; i < 4; i++) {
 			Point3D_F64 ci = controlWorldPts.get(i);
 			Point3D_F64 vai = nullPts[0].get(i);
 			Point3D_F64 vbi = nullPts[1].get(i);
 			Point3D_F64 vci = nullPts[2].get(i);
 			Point3D_F64 vdi = nullPts[3].get(i);
 
-			for( int j = i+1; j < 4; j++ , row++) {
+			for (int j = i + 1; j < 4; j++, row++) {
 				Point3D_F64 cj = controlWorldPts.get(j);
 				Point3D_F64 vaj = nullPts[0].get(j);
 				Point3D_F64 vbj = nullPts[1].get(j);
 				Point3D_F64 vcj = nullPts[2].get(j);
 				Point3D_F64 vdj = nullPts[3].get(j);
 
-				y.set(row,0,ci.distance2(cj));
+				y.set(row, 0, ci.distance2(cj));
 
-				double xa = vai.x-vaj.x;
-				double ya = vai.y-vaj.y;
-				double za = vai.z-vaj.z;
+				double xa = vai.x - vaj.x;
+				double ya = vai.y - vaj.y;
+				double za = vai.z - vaj.z;
 
-				double xb = vbi.x-vbj.x;
-				double yb = vbi.y-vbj.y;
-				double zb = vbi.z-vbj.z;
+				double xb = vbi.x - vbj.x;
+				double yb = vbi.y - vbj.y;
+				double zb = vbi.z - vbj.z;
 
-				double xc = vci.x-vcj.x;
-				double yc = vci.y-vcj.y;
-				double zc = vci.z-vcj.z;
+				double xc = vci.x - vcj.x;
+				double yc = vci.y - vcj.y;
+				double zc = vci.z - vcj.z;
 
-				double xd = vdi.x-vdj.x;
-				double yd = vdi.y-vdj.y;
-				double zd = vdi.z-vdj.z;
+				double xd = vdi.x - vdj.x;
+				double yd = vdi.y - vdj.y;
+				double zd = vdi.z - vdj.z;
 
 				double da = xa*xa + ya*ya + za*za;
 				double db = xb*xb + yb*yb + zb*zb;
@@ -161,16 +160,16 @@ public class UtilLepetitEPnP {
 				double dbd = xb*xd + yb*yd + zb*zd;
 				double dcd = xc*xd + yc*yd + zc*zd;
 
-				L.set(row,0,da);
-				L.set(row,1,2*dab);
-				L.set(row,2,2*dac);
-				L.set(row,3,2*dad);
-				L.set(row,4,db);
-				L.set(row,5,2*dbc);
-				L.set(row,6,2*dbd);
-				L.set(row,7,dc);
-				L.set(row,8,2*dcd);
-				L.set(row,9,dd);
+				L.set(row, 0, da);
+				L.set(row, 1, 2*dab);
+				L.set(row, 2, 2*dac);
+				L.set(row, 3, 2*dad);
+				L.set(row, 4, db);
+				L.set(row, 5, 2*dbc);
+				L.set(row, 6, 2*dbd);
+				L.set(row, 7, dc);
+				L.set(row, 8, 2*dcd);
+				L.set(row, 9, dd);
 			}
 		}
 	}
@@ -178,27 +177,27 @@ public class UtilLepetitEPnP {
 	/**
 	 * Extracts the linear constraint matrix for case 1 from the full 6x10 constraint matrix.
 	 */
-	public static void constraintMatrix3x3a( DMatrixRMaj L_3x6 , DMatrixRMaj L_3x3 ) {
+	public static void constraintMatrix3x3a( DMatrixRMaj L_3x6, DMatrixRMaj L_3x3 ) {
 
 		int index = 0;
-		for( int i = 0; i < 3; i++ ) {
-			L_3x3.data[index++] = L_3x6.get(i,0);
-			L_3x3.data[index++] = L_3x6.get(i,1);
-			L_3x3.data[index++] = L_3x6.get(i,2);
+		for (int i = 0; i < 3; i++) {
+			L_3x3.data[index++] = L_3x6.get(i, 0);
+			L_3x3.data[index++] = L_3x6.get(i, 1);
+			L_3x3.data[index++] = L_3x6.get(i, 2);
 		}
 	}
 
 	/**
 	 * Extracts the linear constraint matrix for planar case 2 from the full 4x6 constraint matrix.
 	 */
-	public static void constraintMatrix3x3( DMatrixRMaj L_3x6 ,
+	public static void constraintMatrix3x3( DMatrixRMaj L_3x6,
 											DMatrixRMaj L_6x3 ) {
 
 		int index = 0;
-		for( int i = 0; i < 3; i++ ) {
-			L_6x3.data[index++] = L_3x6.get(i,0);
-			L_6x3.data[index++] = L_3x6.get(i,1);
-			L_6x3.data[index++] = L_3x6.get(i,3);
+		for (int i = 0; i < 3; i++) {
+			L_6x3.data[index++] = L_3x6.get(i, 0);
+			L_6x3.data[index++] = L_3x6.get(i, 1);
+			L_6x3.data[index++] = L_3x6.get(i, 3);
 		}
 	}
 
@@ -210,35 +209,35 @@ public class UtilLepetitEPnP {
 	 * @param controlWorldPts List of world control points
 	 * @param nullPts Null points
 	 */
-	public static void constraintMatrix3x6( DMatrixRMaj L , DMatrixRMaj y ,
-											DogArray<Point3D_F64> controlWorldPts ,
-											List<Point3D_F64> nullPts[] ) {
+	public static void constraintMatrix3x6( DMatrixRMaj L, DMatrixRMaj y,
+											DogArray<Point3D_F64> controlWorldPts,
+											List<Point3D_F64>[] nullPts ) {
 		int row = 0;
-		for( int i = 0; i < 3; i++ ) {
+		for (int i = 0; i < 3; i++) {
 			Point3D_F64 ci = controlWorldPts.get(i);
 			Point3D_F64 vai = nullPts[0].get(i);
 			Point3D_F64 vbi = nullPts[1].get(i);
 			Point3D_F64 vci = nullPts[2].get(i);
 
-			for( int j = i+1; j < 3; j++ , row++) {
+			for (int j = i + 1; j < 3; j++, row++) {
 				Point3D_F64 cj = controlWorldPts.get(j);
 				Point3D_F64 vaj = nullPts[0].get(j);
 				Point3D_F64 vbj = nullPts[1].get(j);
 				Point3D_F64 vcj = nullPts[2].get(j);
 
-				y.set(row,0,ci.distance2(cj));
+				y.set(row, 0, ci.distance2(cj));
 
-				double xa = vai.x-vaj.x;
-				double ya = vai.y-vaj.y;
-				double za = vai.z-vaj.z;
+				double xa = vai.x - vaj.x;
+				double ya = vai.y - vaj.y;
+				double za = vai.z - vaj.z;
 
-				double xb = vbi.x-vbj.x;
-				double yb = vbi.y-vbj.y;
-				double zb = vbi.z-vbj.z;
+				double xb = vbi.x - vbj.x;
+				double yb = vbi.y - vbj.y;
+				double zb = vbi.z - vbj.z;
 
-				double xc = vci.x-vcj.x;
-				double yc = vci.y-vcj.y;
-				double zc = vci.z-vcj.z;
+				double xc = vci.x - vcj.x;
+				double yc = vci.y - vcj.y;
+				double zc = vci.z - vcj.z;
 
 				double da = xa*xa + ya*ya + za*za;
 				double db = xb*xb + yb*yb + zb*zb;
@@ -248,12 +247,12 @@ public class UtilLepetitEPnP {
 				double dac = xa*xc + ya*yc + za*zc;
 				double dbc = xb*xc + yb*yc + zb*zc;
 
-				L.set(row,0,da);
-				L.set(row,1,2*dab);
-				L.set(row,2,2*dac);
-				L.set(row,3,db);
-				L.set(row,4,2*dbc);
-				L.set(row,5,dc);
+				L.set(row, 0, da);
+				L.set(row, 1, 2*dab);
+				L.set(row, 2, 2*dac);
+				L.set(row, 3, db);
+				L.set(row, 4, 2*dbc);
+				L.set(row, 5, dc);
 			}
 		}
 	}
@@ -261,14 +260,16 @@ public class UtilLepetitEPnP {
 	/**
 	 * Computes the residuals (difference between observed and predicted) given 4 control points.
 	 */
-	public static void residuals_Control4( DMatrixRMaj L_full , DMatrixRMaj y ,
-										   double beta[] , double r[] )
-	{
-		double b0 = beta[0]; double b1 = beta[1]; double b2 = beta[2]; double b3 = beta[3];
+	public static void residuals_Control4( DMatrixRMaj L_full, DMatrixRMaj y,
+										   double[] beta, double[] r ) {
+		double b0 = beta[0];
+		double b1 = beta[1];
+		double b2 = beta[2];
+		double b3 = beta[3];
 
-		final double ld[] = L_full.data;
+		final double[] ld = L_full.data;
 
-		for( int i = 0; i < 6; i++ ) {
+		for (int i = 0; i < 6; i++) {
 			int li = L_full.numCols*i;
 			double residual = -y.data[i];
 			residual += ld[li++]*b0*b0;
@@ -280,7 +281,7 @@ public class UtilLepetitEPnP {
 			residual += ld[li++]*b1*b3;
 			residual += ld[li++]*b2*b2;
 			residual += ld[li++]*b2*b3;
-			residual += ld[li  ]*b3*b3;
+			residual += ld[li]*b3*b3;
 
 			r[i] = residual;
 		}
@@ -289,14 +290,14 @@ public class UtilLepetitEPnP {
 	/**
 	 * Computes the residuals (difference between observed and predicted given 3 control points.
 	 */
-	public static void residuals_Control3( DMatrixRMaj L_full , DMatrixRMaj y ,
-										   double beta[] , double r[] )
-	{
-		double b0 = beta[0]; double b1 = beta[1]; double b2 = beta[2];
+	public static void residuals_Control3( DMatrixRMaj L_full, DMatrixRMaj y,
+										   double[] beta, double[] r ) {
+		// @formatter:off
+		double b0 = beta[0], b1 = beta[1], b2 = beta[2];
 
-		final double ld[] = L_full.data;
+		final double[] ld = L_full.data;
 
-		for( int i = 0; i < 3; i++ ) {
+		for (int i = 0; i < 3; i++) {
 			double residual = -y.data[i];
 			int li = L_full.numCols*i;
 			residual += ld[li++]*b0*b0;
@@ -308,46 +309,47 @@ public class UtilLepetitEPnP {
 
 			r[i] = residual;
 		}
+		// @formatter:on
 	}
 
 	/**
 	 * Computes the Jacobian given 4 control points.
 	 */
-	public static void jacobian_Control4( DMatrixRMaj L_full ,
-										  double beta[] , DMatrixRMaj A )
-	{
+	public static void jacobian_Control4( DMatrixRMaj L_full, double[] beta, DMatrixRMaj A ) {
+		// @formatter:off
 		int indexA = 0;
 
-		double b0 = beta[0]; double b1 = beta[1]; double b2 = beta[2]; double b3 = beta[3];
+		double b0 = beta[0], b1 = beta[1], b2 = beta[2], b3 = beta[3];
 
-		final double ld[] = L_full.data;
+		final double[] ld = L_full.data;
 
-		for( int i = 0; i < 6; i++ ) {
+		for (int i = 0; i < 6; i++) {
 			int li = L_full.numCols*i;
 			A.data[indexA++] = 2*ld[li+0]*b0 +   ld[li+1]*b1 +   ld[li+2]*b2 +   ld[li+3]*b3;
 			A.data[indexA++] =   ld[li+1]*b0 + 2*ld[li+4]*b1 +   ld[li+5]*b2 +   ld[li+6]*b3;
 			A.data[indexA++] =   ld[li+2]*b0 +   ld[li+5]*b1 + 2*ld[li+7]*b2 +   ld[li+8]*b3;
 			A.data[indexA++] =   ld[li+3]*b0 +   ld[li+6]*b1 +   ld[li+8]*b2 + 2*ld[li+9]*b3;
 		}
+		// @formatter:on
 	}
 
 	/**
 	 * Computes the Jacobian given 3 control points.
 	 */
-	public static void jacobian_Control3( DMatrixRMaj L_full ,
-										  double beta[] ,  DMatrixRMaj A)
-	{
+	public static void jacobian_Control3( DMatrixRMaj L_full, double[] beta, DMatrixRMaj A ) {
+		// @formatter:off
 		int indexA = 0;
 
-		double b0 = beta[0]; double b1 = beta[1]; double b2 = beta[2];
+		double b0 = beta[0], b1 = beta[1], b2 = beta[2];
 
-		final double ld[] = L_full.data;
+		final double[] ld = L_full.data;
 
-		for( int i = 0; i < 3; i++ ) {
+		for (int i = 0; i < 3; i++) {
 			int li = L_full.numCols*i;
 			A.data[indexA++] = 2*ld[li+0]*b0 +   ld[li+1]*b1 +   ld[li+2]*b2;
 			A.data[indexA++] =   ld[li+1]*b0 + 2*ld[li+3]*b1 +   ld[li+4]*b2;
 			A.data[indexA++] =   ld[li+2]*b0 +   ld[li+4]*b1 + 2*ld[li+5]*b2;
 		}
+		// @formatter:on
 	}
 }

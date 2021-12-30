@@ -35,22 +35,22 @@ public class UniOmniStoP_F64 implements Point3Transform2_F64 {
 	// principle point / image center
 	protected double cx, cy;
 	// other intrinsic parameters
-	protected double fx,fy,skew;
+	protected double fx, fy, skew;
 
 	// storage for distortion terms
 	protected RadialTangential_F64 distortion = new RadialTangential_F64();
 
-	public UniOmniStoP_F64(CameraUniversalOmni model) {
+	public UniOmniStoP_F64( CameraUniversalOmni model ) {
 		setModel(model);
 	}
 
 	public UniOmniStoP_F64() {
 	}
 
-	public void setModel(CameraUniversalOmni model) {
+	public void setModel( CameraUniversalOmni model ) {
 		this.mirrorOffset = (double)model.mirrorOffset;
 
-		distortion.setTo(model.radial,model.t1,model.t2);
+		distortion.setTo(model.radial, model.t1, model.t2);
 
 		this.cx = (double)model.cx;
 		this.cy = (double)model.cy;
@@ -60,7 +60,7 @@ public class UniOmniStoP_F64 implements Point3Transform2_F64 {
 	}
 
 	@Override
-	public void compute(double x, double y, double z, Point2D_F64 out) {
+	public void compute( double x, double y, double z, Point2D_F64 out ) {
 
 		double[] radial = distortion.radial;
 		double t1 = distortion.t1;
@@ -77,7 +77,7 @@ public class UniOmniStoP_F64 implements Point3Transform2_F64 {
 		double ri2 = r2;
 
 		double sum = 0;
-		for( int i = 0; i < radial.length; i++ ) {
+		for (int i = 0; i < radial.length; i++) {
 			sum += radial[i]*ri2;
 			ri2 *= r2;
 		}

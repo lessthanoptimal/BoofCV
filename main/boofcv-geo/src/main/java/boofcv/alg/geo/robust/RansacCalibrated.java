@@ -29,24 +29,22 @@ import org.ddogleg.fitting.modelset.ransac.Ransac;
  *
  * @author Peter Abeles
  */
-public class RansacCalibrated<Model,Point> extends Ransac<Model,Point>
-		implements ModelMatcherMultiview<Model,Point>
-{
-	private DistanceFromModelMultiView<Model,Point> modelDistance;
+public class RansacCalibrated<Model, Point> extends Ransac<Model, Point>
+		implements ModelMatcherMultiview<Model, Point> {
+	private DistanceFromModelMultiView<Model, Point> modelDistance;
 
 	public RansacCalibrated( long randSeed, int maxIterations, double thresholdFit,
 							 ModelManager<Model> modelManager,
 							 ModelGenerator<Model, Point> modelGenerator,
-							 DistanceFromModelMultiView<Model,Point> modelDistance)
-	{
-		super(randSeed,  maxIterations, thresholdFit, modelManager, modelDistance.getPointType());
+							 DistanceFromModelMultiView<Model, Point> modelDistance ) {
+		super(randSeed, maxIterations, thresholdFit, modelManager, modelDistance.getPointType());
 		this.modelDistance = modelDistance;
-		setModel(()->modelGenerator, ()->modelDistance);
+		setModel(() -> modelGenerator, () -> modelDistance);
 	}
 
 	@Override
-	public void setIntrinsic( int view , CameraPinhole intrinsic ) {
-		this.modelDistance.setIntrinsic(view,intrinsic);
+	public void setIntrinsic( int view, CameraPinhole intrinsic ) {
+		this.modelDistance.setIntrinsic(view, intrinsic);
 	}
 
 	@Override

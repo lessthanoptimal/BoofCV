@@ -32,7 +32,7 @@ public class RadialTangential_F64 {
 	/** Radial distortion parameters */
 	public double[] radial;
 
-	/** Tangential distortion parameters  */
+	/** Tangential distortion parameters */
 	@Getter @Setter public double t1, t2;
 
 	public RadialTangential_F64( RadialTangential_F64 original ) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,12 +47,12 @@ public class PRnPDirectLinearTransform {
 	protected NormalizationPoint2D N1 = new NormalizationPoint2D();
 
 	public SolveNullSpace<DMatrixRMaj> solverNullspace = new SolveNullSpaceSvd_DDRM();
-	private DMatrixRMaj ns = new DMatrixRMaj(12,1);
+	private DMatrixRMaj ns = new DMatrixRMaj(12, 1);
 
 	// if true it will normalize input 3D homogenous to have f-norm of 1
-	private boolean normalize3D=true;
+	private boolean normalize3D = true;
 
-	private DMatrixRMaj A = new DMatrixRMaj(12,12);
+	private DMatrixRMaj A = new DMatrixRMaj(12, 12);
 
 	/**
 	 * Computes projective camera matrix.
@@ -62,23 +62,23 @@ public class PRnPDirectLinearTransform {
 	 * @param solutionModel (Output) 3x4 camera matrix
 	 * @return true if succesfull
 	 */
-	public boolean process(List<Point4D_F64> worldPts , List<Point2D_F64> observed , DMatrixRMaj solutionModel ) {
-		if( worldPts.size() != observed.size() )
+	public boolean process( List<Point4D_F64> worldPts, List<Point2D_F64> observed, DMatrixRMaj solutionModel ) {
+		if (worldPts.size() != observed.size())
 			throw new IllegalArgumentException("Number of 3D and 2D points must match");
-		if( worldPts.size() < 5 )
+		if (worldPts.size() < 5)
 			throw new IllegalArgumentException("A minimum of 4 points are required");
 
 		LowLevelMultiViewOps.computeNormalization(observed, N1);
 
 		// if configured to do so normalize 3D points to have a F-norm of 1
-		if( normalize3D ) {
-			for( int i = 0; i < worldPts.size(); i++ ) {
+		if (normalize3D) {
+			for (int i = 0; i < worldPts.size(); i++) {
 				worldPts.get(i).normalize();
 			}
 		}
 		final int N = worldPts.size();
 
-		A.reshape(3*N,12);
+		A.reshape(3*N, 12);
 
 		for (int i = 0; i < N; i++) {
 			Point2D_F64 pixel = observed.get(i);
@@ -90,6 +90,7 @@ public class PRnPDirectLinearTransform {
 
 			// only need to fill in non-zero elements. zeros are already zero
 
+			// @formatter:off
 			int idx = i*3*12;
 			A.data[idx+4 ] = -X.x;
 			A.data[idx+5 ] = -X.y;
@@ -119,18 +120,19 @@ public class PRnPDirectLinearTransform {
 			A.data[idx+5 ] = x*X.y;
 			A.data[idx+6 ] = x*X.z;
 			A.data[idx+7 ] = x*X.w;
+			// @formatter:on
 		}
 
 		// Find the null-space, which will the camera matrix in distorted pixels
-		if( !solverNullspace.process(A,1,ns) )
+		if (!solverNullspace.process(A, 1, ns))
 			return false;
 
 		// P' = N*P
-		ns.reshape(3,4);
+		ns.reshape(3, 4);
 
 		// Remove the normalization
 		// P = inv(N)*P'
-		N1.remove(ns,solutionModel);
+		N1.remove(ns, solutionModel);
 
 		return true;
 	}
@@ -143,7 +145,7 @@ public class PRnPDirectLinearTransform {
 		return normalize3D;
 	}
 
-	public void setNormalize3D(boolean normalize3D) {
+	public void setNormalize3D( boolean normalize3D ) {
 		this.normalize3D = normalize3D;
 	}
 }

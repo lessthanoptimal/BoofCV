@@ -26,16 +26,17 @@ package boofcv.alg.geo;
  * <p>
  * Note that "residual = predicted - observed". Typically the "error = residual^T*residual".
  * </p>
+ *
  * @author Peter Abeles
  */
-public interface ModelObservationResidualN<Model,Observation> {
+public interface ModelObservationResidualN<Model, Observation> {
 
 	/**
 	 * Specify the model being evaluated
 	 *
 	 * @param model The model.
 	 */
-	public void setModel(Model model);
+	void setModel( Model model );
 
 	/**
 	 * Compute the residual errors for the observation
@@ -43,12 +44,12 @@ public interface ModelObservationResidualN<Model,Observation> {
 	 * @param observation Observation of point feature in two views
 	 * @return The new index. index + getN()
 	 */
-	public int computeResiduals(Observation observation , double residuals[] , int index );
+	int computeResiduals( Observation observation, double residuals[], int index );
 
 	/**
 	 * The number of outputs
 	 *
 	 * @return number of outputs
 	 */
-	public int getN();
+	int getN();
 }

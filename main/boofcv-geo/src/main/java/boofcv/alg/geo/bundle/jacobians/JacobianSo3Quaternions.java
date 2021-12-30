@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -72,6 +72,7 @@ public class JacobianSo3Quaternions implements JacobianSo3 {
 		double r2 = w*w + x*x + y*y + z*z;
 		double r = Math.sqrt(r2);
 
+		// @formatter:off
 		w /= r; x /= r; y /= r; z /= r;
 
 		double d_r = -2/r2;
@@ -137,6 +138,7 @@ public class JacobianSo3Quaternions implements JacobianSo3 {
 		Rz.data[6] =  2*x/r + R20*z*d_r;
 		Rz.data[7] =  2*y/r + R21*z*d_r;
 		Rz.data[8] =  2*z/r + R22*z*d_r;
+		// @formatter:on
 	}
 
 	@Override

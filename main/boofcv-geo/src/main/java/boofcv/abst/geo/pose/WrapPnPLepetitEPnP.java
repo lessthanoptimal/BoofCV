@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ import java.util.List;
 
 /**
  * Wrapper around {@link PnPLepetitEPnP} for {@link boofcv.abst.geo.Estimate1ofPnP}.
- * 
+ *
  * @author Peter Abeles
  */
 public class WrapPnPLepetitEPnP implements Estimate1ofPnP {
@@ -40,21 +40,21 @@ public class WrapPnPLepetitEPnP implements Estimate1ofPnP {
 	List<Point3D_F64> worldPts = new ArrayList<>();
 	List<Point2D_F64> observed = new ArrayList<>();
 
-	public WrapPnPLepetitEPnP(PnPLepetitEPnP alg ) {
+	public WrapPnPLepetitEPnP( PnPLepetitEPnP alg ) {
 		this.alg = alg;
 	}
 
 	@Override
-	public boolean process(List<Point2D3D> inputs , Se3_F64 solution ) {
-		for( int i = 0; i < inputs.size(); i++ ) {
+	public boolean process( List<Point2D3D> inputs, Se3_F64 solution ) {
+		for (int i = 0; i < inputs.size(); i++) {
 			Point2D3D pp = inputs.get(i);
-			
+
 			worldPts.add(pp.location);
 			observed.add(pp.observation);
 		}
-		
-		alg.process(worldPts,observed,solution);
-		
+
+		alg.process(worldPts, observed, solution);
+
 		worldPts.clear();
 		observed.clear();
 

@@ -35,5 +35,4 @@ import georegression.struct.se.Se3_F64;
  *
  * @author Peter Abeles
  */
-public interface Estimate1ofPnP extends GeoModelEstimator1<Se3_F64,Point2D3D> {
-}
+public interface Estimate1ofPnP extends GeoModelEstimator1<Se3_F64, Point2D3D> {}

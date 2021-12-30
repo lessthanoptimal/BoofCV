@@ -57,17 +57,17 @@ import org.ejml.dense.row.SpecializedOps_DDRM;
 public class Zhang99DecomposeHomography {
 
 	// Rows in rotation matrix
-	DMatrixRMaj r1 = new DMatrixRMaj(3,1);
-	DMatrixRMaj r2 = new DMatrixRMaj(3,1);
+	DMatrixRMaj r1 = new DMatrixRMaj(3, 1);
+	DMatrixRMaj r2 = new DMatrixRMaj(3, 1);
 	// storage for translation vector
-	DMatrixRMaj t = new DMatrixRMaj(3,1);
-	DMatrixRMaj temp = new DMatrixRMaj(3,1);
+	DMatrixRMaj t = new DMatrixRMaj(3, 1);
+	DMatrixRMaj temp = new DMatrixRMaj(3, 1);
 	// storage for rotation matrix
-	DMatrixRMaj R = new DMatrixRMaj(3,3);
+	DMatrixRMaj R = new DMatrixRMaj(3, 3);
 
 	// calibration matrix and its inverse
 	DMatrixRMaj K;
-	DMatrixRMaj K_inv = new DMatrixRMaj(3,3);
+	DMatrixRMaj K_inv = new DMatrixRMaj(3, 3);
 
 	/**
 	 * Specifies the calibration matrix.
@@ -76,7 +76,7 @@ public class Zhang99DecomposeHomography {
 	 */
 	public void setCalibrationMatrix( DMatrixRMaj K ) {
 		this.K = K;
-		CommonOps_DDRM.invert(K,K_inv);
+		CommonOps_DDRM.invert(K, K_inv);
 	}
 
 	/**
@@ -86,23 +86,22 @@ public class Zhang99DecomposeHomography {
 	 * @param H homography matrix.
 	 * @return Found camera motion.
 	 */
-	public Se3_F64 decompose( DMatrixRMaj H )
-	{
+	public Se3_F64 decompose( DMatrixRMaj H ) {
 		// step through each calibration grid and compute its parameters
 		DMatrixRMaj h[] = SpecializedOps_DDRM.splitIntoVectors(H, true);
 
 		// lambda = 1/norm(inv(K)*h1) or 1/norm(inv(K)*h2)
 		// use the average to attempt to reduce error
-		CommonOps_DDRM.mult(K_inv,h[0],temp);
+		CommonOps_DDRM.mult(K_inv, h[0], temp);
 		double lambda = NormOps_DDRM.normF(temp);
-		CommonOps_DDRM.mult(K_inv,h[1],temp);
+		CommonOps_DDRM.mult(K_inv, h[1], temp);
 		lambda += NormOps_DDRM.normF(temp);
 		lambda = 2.0/lambda;
 
 		// compute the column in the rotation matrix
-		CommonOps_DDRM.mult(lambda,K_inv,h[0],r1);
-		CommonOps_DDRM.mult(lambda,K_inv,h[1],r2);
-		CommonOps_DDRM.mult(lambda,K_inv,h[2],t);
+		CommonOps_DDRM.mult(lambda, K_inv, h[0], r1);
+		CommonOps_DDRM.mult(lambda, K_inv, h[1], r2);
+		CommonOps_DDRM.mult(lambda, K_inv, h[2], t);
 
 		Vector3D_F64 v1 = UtilVector3D_F64.convert(r1);
 		Vector3D_F64 v2 = UtilVector3D_F64.convert(r2);
@@ -113,8 +112,8 @@ public class Zhang99DecomposeHomography {
 		Se3_F64 ret = new Se3_F64();
 		// the R matrix is probably not a real rotation matrix. So find
 		// the closest real rotation matrix
-		ConvertRotation3D_F64.approximateRotationMatrix(R,ret.getR());
-		ret.getT().setTo(t.data[0],t.data[1],t.data[2]);
+		ConvertRotation3D_F64.approximateRotationMatrix(R, ret.getR());
+		ret.getT().setTo(t.data[0], t.data[1], t.data[2]);
 
 		return ret;
 	}

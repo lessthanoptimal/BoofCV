@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import org.ddogleg.fitting.modelset.DistanceFromModel;
  *
  * @author Peter Abeles
  */
-public interface DistanceFromModelViews<Model,Point,Camera> extends DistanceFromModel<Model,Point> {
+public interface DistanceFromModelViews<Model, Point, Camera> extends DistanceFromModel<Model, Point> {
 
 	/**
 	 * Specify parameters for a particular view
@@ -36,7 +36,8 @@ public interface DistanceFromModelViews<Model,Point,Camera> extends DistanceFrom
 	 * @param view which view this belongs to
 	 * @param viewInfo Information about this view. E.g. image dimension, intrinsic parameters, ...etc
 	 */
-	void setView(int view , Camera viewInfo );
+	void setView( int view, Camera viewInfo );
+
 	/**
 	 * Returns the new of views which need to be set
 	 */

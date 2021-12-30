@@ -30,33 +30,31 @@ import org.ddogleg.fitting.modelset.ransac.Ransac;
  *
  * @author Peter Abeles
  */
-public class LeastMedianOfSquaresMultiView<Model,Point> extends LeastMedianOfSquares<Model,Point>
-		implements ModelMatcherMultiview<Model,Point>
-{
+public class LeastMedianOfSquaresMultiView<Model, Point> extends LeastMedianOfSquares<Model, Point>
+		implements ModelMatcherMultiview<Model, Point> {
 
-	private DistanceFromModelMultiView<Model,Point> modelDistance;
+	private DistanceFromModelMultiView<Model, Point> modelDistance;
 
-	public LeastMedianOfSquaresMultiView(long randSeed, int totalCycles, double maxMedianError,
-										 double inlierFraction, ModelManager<Model> modelManager,
-										 ModelGenerator<Model, Point> generator,
-										 DistanceFromModelMultiView<Model,Point> errorMetric)
-	{
+	public LeastMedianOfSquaresMultiView( long randSeed, int totalCycles, double maxMedianError,
+										  double inlierFraction, ModelManager<Model> modelManager,
+										  ModelGenerator<Model, Point> generator,
+										  DistanceFromModelMultiView<Model, Point> errorMetric ) {
 		super(randSeed, totalCycles, maxMedianError, inlierFraction, modelManager, errorMetric.getPointType());
-		setModel(()->generator, ()->errorMetric);
+		setModel(() -> generator, () -> errorMetric);
 		this.modelDistance = errorMetric;
 	}
 
-	public LeastMedianOfSquaresMultiView(long randSeed, int totalCycles, ModelManager<Model> modelManager,
-										 ModelGenerator<Model, Point> generator,
-										 DistanceFromModelMultiView<Model, Point> errorMetric) {
+	public LeastMedianOfSquaresMultiView( long randSeed, int totalCycles, ModelManager<Model> modelManager,
+										  ModelGenerator<Model, Point> generator,
+										  DistanceFromModelMultiView<Model, Point> errorMetric ) {
 		super(randSeed, totalCycles, modelManager, errorMetric.getPointType());
-		setModel(()->generator, ()->errorMetric);
+		setModel(() -> generator, () -> errorMetric);
 		this.modelDistance = errorMetric;
 	}
 
 	@Override
-	public void setIntrinsic( int view , CameraPinhole intrinsic ) {
-		this.modelDistance.setIntrinsic(view,intrinsic);
+	public void setIntrinsic( int view, CameraPinhole intrinsic ) {
+		this.modelDistance.setIntrinsic(view, intrinsic);
 	}
 
 	@Override

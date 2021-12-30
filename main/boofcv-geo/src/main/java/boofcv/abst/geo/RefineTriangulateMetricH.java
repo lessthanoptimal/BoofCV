@@ -41,7 +41,7 @@ public interface RefineTriangulateMetricH {
 	 * @param refinedPt The refined estimated point position. Homogenous.
 	 * @return if successful or not
 	 */
-	boolean process( List<Point2D_F64> observations ,
-					 List<Se3_F64> listWorldToView ,
-					 Point4D_F64 worldPt , Point4D_F64 refinedPt );
+	boolean process( List<Point2D_F64> observations,
+					 List<Se3_F64> listWorldToView,
+					 Point4D_F64 worldPt, Point4D_F64 refinedPt );
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import org.ddogleg.fitting.modelset.ModelMatcher;
  *
  * @author Peter Abeles
  */
-public interface ModelMatcherMultiview<Model,Point> extends ModelMatcher<Model,Point> {
+public interface ModelMatcherMultiview<Model, Point> extends ModelMatcher<Model, Point> {
 
 	/**
 	 * Specify intrinsic parameters for a particular view
@@ -34,7 +34,7 @@ public interface ModelMatcherMultiview<Model,Point> extends ModelMatcher<Model,P
 	 * @param view which view this belongs to
 	 * @param intrinsic intrinsic prameters that it should be set to
 	 */
-	void setIntrinsic( int view , CameraPinhole intrinsic );
+	void setIntrinsic( int view, CameraPinhole intrinsic );
 
 	/**
 	 * Returns the new of views which need to be set

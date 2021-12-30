@@ -70,7 +70,7 @@ public abstract class FundamentalLinear {
 	protected FundamentalLinear( boolean computeFundamental ) {
 		this.computeFundamental = computeFundamental;
 
-		opEssential = (W)-> {
+		opEssential = ( W ) -> {
 			// project it into essential space
 			// the scale factor is arbitrary, but the first two singular values need
 			// to be the same. so just set them to one
@@ -79,7 +79,7 @@ public abstract class FundamentalLinear {
 			W.unsafe_set(2, 2, 0);
 		};
 
-		opFundamental = (W)-> {
+		opFundamental = ( W ) -> {
 			// the smallest singular value needs to be set to zero, unlike
 			W.set(2, 2, 0);
 		};

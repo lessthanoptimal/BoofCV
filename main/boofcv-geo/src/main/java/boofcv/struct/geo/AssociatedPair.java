@@ -20,7 +20,6 @@ package boofcv.struct.geo;
 
 import georegression.struct.point.Point2D_F64;
 
-
 /**
  * <p>
  * The observed location of a point feature in two camera views. Can be in pixels or normalized image coordinates.
@@ -52,8 +51,8 @@ public class AssociatedPair {
 	 * @param x2 image 2 location x-axis.
 	 * @param y2 image 2 location y-axis.
 	 */
-	public AssociatedPair(double x1, double y1,
-						  double x2, double y2) {
+	public AssociatedPair( double x1, double y1,
+						   double x2, double y2 ) {
 		p1 = new Point2D_F64(x1, y1);
 		p2 = new Point2D_F64(x2, y2);
 	}
@@ -64,8 +63,8 @@ public class AssociatedPair {
 	 * @param p1 image 1 location
 	 * @param p2 image 2 location
 	 */
-	public AssociatedPair(Point2D_F64 p1, Point2D_F64 p2) {
-		this(p1, p2,true);
+	public AssociatedPair( Point2D_F64 p1, Point2D_F64 p2 ) {
+		this(p1, p2, true);
 	}
 
 	/**
@@ -75,7 +74,7 @@ public class AssociatedPair {
 	 * @param p2 image 2 location
 	 * @param newInstance Should it create new points or save a reference to these instances.
 	 */
-	public AssociatedPair(Point2D_F64 p1, Point2D_F64 p2, boolean newInstance) {
+	public AssociatedPair( Point2D_F64 p1, Point2D_F64 p2, boolean newInstance ) {
 		if (newInstance) {
 			this.p1 = new Point2D_F64(p1);
 			this.p2 = new Point2D_F64(p2);
@@ -93,7 +92,7 @@ public class AssociatedPair {
 	/**
 	 * Assigns this object to be equal to the passed in values.
 	 */
-	public void setTo( Point2D_F64 p1 , Point2D_F64 p2 ) {
+	public void setTo( Point2D_F64 p1, Point2D_F64 p2 ) {
 		this.p1.setTo(p1);
 		this.p2.setTo(p2);
 	}
@@ -101,15 +100,15 @@ public class AssociatedPair {
 	/**
 	 * Assigns this object to be equal to the passed in values.
 	 */
-	public void setTo( double p1_x , double p1_y , double p2_x , double p2_y ) {
-		this.p1.setTo(p1_x,p1_y);
-		this.p2.setTo(p2_x,p2_y);
+	public void setTo( double p1_x, double p1_y, double p2_x, double p2_y ) {
+		this.p1.setTo(p1_x, p1_y);
+		this.p2.setTo(p2_x, p2_y);
 	}
 
 	/**
 	 * Changes the references to the passed in objects.
 	 */
-	public void assign( Point2D_F64 p1 , Point2D_F64 p2 ) {
+	public void assign( Point2D_F64 p1, Point2D_F64 p2 ) {
 		this.p1 = p1;
 		this.p2 = p2;
 	}
@@ -123,7 +122,7 @@ public class AssociatedPair {
 	}
 
 	public AssociatedPair copy() {
-		return new AssociatedPair(p1,p2,true);
+		return new AssociatedPair(p1, p2, true);
 	}
 
 	/**
@@ -143,8 +142,8 @@ public class AssociatedPair {
 	@Override
 	public String toString() {
 		return "AssociatedPair{" +
-				"p1=(" + p1.x + ", " + p1.y +")" +
-				", p2=(" + p2.x + ", " + p2.y +")" +
+				"p1=(" + p1.x + ", " + p1.y + ")" +
+				", p2=(" + p2.x + ", " + p2.y + ")" +
 				'}';
 	}
 }

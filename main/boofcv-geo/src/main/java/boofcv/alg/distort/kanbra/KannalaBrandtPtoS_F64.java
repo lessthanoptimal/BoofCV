@@ -121,8 +121,8 @@ public class KannalaBrandtPtoS_F64 implements Point2Transform3_F64, VerbosePrint
 
 		// go from angles to sphere point vector
 		double sintheta = Math.sin(theta);
-		out.x = sintheta * Math.cos(phi);
-		out.y = sintheta * Math.sin(phi);
+		out.x = sintheta*(double)Math.cos(phi);
+		out.y = sintheta*(double)Math.sin(phi);
 		out.z = Math.cos(theta);
 	}
 
@@ -148,7 +148,7 @@ public class KannalaBrandtPtoS_F64 implements Point2Transform3_F64, VerbosePrint
 		for (int i = 0; i < roots.size(); i++) {
 			Complex_F64 root = roots.get(i);
 			if (Math.abs(root.imaginary) <= realNumberTol && theta > root.real && root.real > -realNumberTol) {
-				theta = (double) root.real;
+				theta = (double)root.real;
 			}
 		}
 
@@ -175,8 +175,8 @@ public class KannalaBrandtPtoS_F64 implements Point2Transform3_F64, VerbosePrint
 			double sinphi = Math.sin(updatedphi);
 
 			// distortion terms. radial and tangential
-			double disRad = (double) (polynomial(model.radial, updatedTheta)*polytrig(model.radialTrig, cosphi, sinphi));
-			double disTan = (double) (polynomial(model.tangent, updatedTheta)*polytrig(model.tangentTrig, cosphi, sinphi));
+			double disRad = (double)(polynomial(model.radial, updatedTheta)*polytrig(model.radialTrig, cosphi, sinphi));
+			double disTan = (double)(polynomial(model.tangent, updatedTheta)*polytrig(model.tangentTrig, cosphi, sinphi));
 
 			// put it all together to get distorted (normalized) coordinates
 			double dx = (updatedR + disRad)*cosphi - disTan*sinphi;
@@ -231,7 +231,7 @@ public class KannalaBrandtPtoS_F64 implements Point2Transform3_F64, VerbosePrint
 			// Update the estimates for all the parameters
 			updatedTheta = theta + deltaTheta;
 			updatedphi = phi + deltaphi;
-			updatedR = (double) polynomial(model.symmetric, updatedTheta);
+			updatedR = (double)polynomial(model.symmetric, updatedTheta);
 		}
 	}
 
@@ -239,21 +239,20 @@ public class KannalaBrandtPtoS_F64 implements Point2Transform3_F64, VerbosePrint
 	 * Computes the Jacobian of the distorted coordinates [dx, dy].
 	 */
 	protected void jacobianOfDistorted( double theta, double cosphi, double sinphi, DMatrix2x2 gradient ) {
-
 		// Distorted Coordinates
 		// Xd = [dx, dy] = r(theta)*ur(phi) + deltaR(theta,phi)*ur(phi) + deltaT(theta,phi)*ut(phi)
 
 		// partials and forward functions
-		double sym = (double) polynomial(model.symmetric, theta);
-		double sym_dtheta = (double) polynomialDerivative(model.symmetric, theta);
+		double sym = (double)polynomial(model.symmetric, theta);
+		double sym_dtheta = (double)polynomialDerivative(model.symmetric, theta);
 
-		double deltaR = (double) (polynomial(model.radial, theta)*polytrig(model.radialTrig, cosphi, sinphi));
-		double deltaR_dtheta = (double) (polynomialDerivative(model.radial, theta)*polytrig(model.radialTrig, cosphi, sinphi));
-		double deltaR_dphi = (double) (polynomial(model.radial, theta)*polytrigDerivative(model.radialTrig, cosphi, sinphi));
+		double deltaR = (double)(polynomial(model.radial, theta)*polytrig(model.radialTrig, cosphi, sinphi));
+		double deltaR_dtheta = (double)(polynomialDerivative(model.radial, theta)*polytrig(model.radialTrig, cosphi, sinphi));
+		double deltaR_dphi = (double)(polynomial(model.radial, theta)*polytrigDerivative(model.radialTrig, cosphi, sinphi));
 
-		double deltaT = (double) (polynomial(model.tangent, theta)*polytrig(model.tangentTrig, cosphi, sinphi));
-		double deltaT_dtheta = (double) (polynomialDerivative(model.tangent, theta)*polytrig(model.tangentTrig, cosphi, sinphi));
-		double deltaT_dphi = (double) (polynomial(model.tangent, theta)*polytrigDerivative(model.tangentTrig, cosphi, sinphi));
+		double deltaT = (double)(polynomial(model.tangent, theta)*polytrig(model.tangentTrig, cosphi, sinphi));
+		double deltaT_dtheta = (double)(polynomialDerivative(model.tangent, theta)*polytrig(model.tangentTrig, cosphi, sinphi));
+		double deltaT_dphi = (double)(polynomial(model.tangent, theta)*polytrigDerivative(model.tangentTrig, cosphi, sinphi));
 
 		// dx/dtheta
 		gradient.a11 = (sym_dtheta + deltaR_dtheta)*cosphi - deltaT_dtheta*sinphi;

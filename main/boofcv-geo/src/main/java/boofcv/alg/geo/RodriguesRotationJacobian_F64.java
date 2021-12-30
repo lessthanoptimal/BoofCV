@@ -29,11 +29,11 @@ import org.ejml.data.DMatrixRMaj;
  */
 public class RodriguesRotationJacobian_F64 {
 	// partial for vector x component
-	public DMatrixRMaj Rx = new DMatrixRMaj(3,3);
+	public DMatrixRMaj Rx = new DMatrixRMaj(3, 3);
 	// partial for vector x component
-	public DMatrixRMaj Ry = new DMatrixRMaj(3,3);
+	public DMatrixRMaj Ry = new DMatrixRMaj(3, 3);
 	// partial for vector y component
-	public DMatrixRMaj Rz = new DMatrixRMaj(3,3);
+	public DMatrixRMaj Rz = new DMatrixRMaj(3, 3);
 
 	/**
 	 * Computes the Rodrigues coordinate Jacobian
@@ -42,24 +42,26 @@ public class RodriguesRotationJacobian_F64 {
 	 * @param y y-component of Rodrigues parametrization.
 	 * @param z z-component of Rodrigues parametrization.
 	 */
-	public void process( double x , double y , double z ) {
+	public void process( double x, double y, double z ) {
 
 		double theta2 = x*x + y*y + z*z;
 		double theta = Math.sqrt(theta2);
 		double theta4 = theta2*theta2;
 		double theta3 = theta2*theta;
 
-		if( theta4 == 0 ) {
-			Rx.zero();Ry.zero();Rz.zero();
+		if (theta4 == 0) {
+			Rx.zero();
+			Ry.zero();
+			Rz.zero();
 
-			Rx.set(1,2,-1);
-			Rx.set(2,1,1);
+			Rx.set(1, 2, -1);
+			Rx.set(2, 1, 1);
 
-			Ry.set(0,2,1);
-			Ry.set(2,0,-1);
+			Ry.set(0, 2, 1);
+			Ry.set(2, 0, -1);
 
-			Rz.set(0,1,-1);
-			Rz.set(1,0,1);
+			Rz.set(0, 1, -1);
+			Rz.set(1, 0, 1);
 		} else {
 			// computed using sage by differentiating:
 			// R = I + (hat(w)/theta)*sin(theta) + ((hat(w)/theta)^2)*(1-cos(theta))
@@ -68,7 +70,7 @@ public class RodriguesRotationJacobian_F64 {
 
 			double s = Math.sin(theta);
 			double c = Math.cos(theta);
-			double cm = c-1;
+			double cm = c - 1;
 
 			double xxx = x*x*x*s/theta3 + 2*cm*x*x*x/theta4;
 			double xxy = x*x*y*s/theta3 + 2*cm*x*x*y/theta4;

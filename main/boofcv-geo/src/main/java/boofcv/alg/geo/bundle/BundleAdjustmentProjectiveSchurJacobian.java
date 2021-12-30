@@ -260,17 +260,10 @@ public abstract class BundleAdjustmentProjectiveSchurJacobian<M extends DMatrix>
 //		double yy = P21*X +P22*Y + P23*Z + P24;
 //		double zz = P31*X +P32*Y + P33*Z + P34;
 
-		pointGradX[0] = P11;
-		pointGradX[1] = P12;
-		pointGradX[2] = P13;
-
-		pointGradY[0] = P21;
-		pointGradY[1] = P22;
-		pointGradY[2] = P23;
-
-		pointGradZ[0] = P31;
-		pointGradZ[1] = P32;
-		pointGradZ[2] = P33;
+		// @formatter:off
+		pointGradX[0] = P11; pointGradX[1] = P12; pointGradX[2] = P13;
+		pointGradY[0] = P21; pointGradY[1] = P22; pointGradY[2] = P23;
+		pointGradZ[0] = P31; pointGradZ[1] = P32; pointGradZ[2] = P33;
 
 		if (camGradX == null || camGradY == null || camGradZ == null)
 			return;
@@ -286,34 +279,25 @@ public abstract class BundleAdjustmentProjectiveSchurJacobian<M extends DMatrix>
 		camGradZ[0] = 0; camGradZ[1] = 0; camGradZ[2 ] = 0; camGradZ[3 ] = 0;
 		camGradZ[4] = 0; camGradZ[5] = 0; camGradZ[6 ] = 0; camGradZ[7 ] = 0;
 		camGradZ[8] = X; camGradZ[9] = Y; camGradZ[10] = Z; camGradZ[11] = 1;
+		// @formatter:on
 	}
 
 	static void partialCameraMatrixH( double X, double Y, double Z, double W,
 									  DMatrixRMaj P,
 									  double[] pointGradX, double[] pointGradY, double[] pointGradZ,
 									  @Nullable double[] camGradX, @Nullable double[] camGradY, @Nullable double[] camGradZ ) {
-		double P11 = P.data[0], P12 = P.data[1], P13 = P.data[2 ], P14 = P.data[3];
-		double P21 = P.data[4], P22 = P.data[5], P23 = P.data[6 ], P24 = P.data[7];
+		double P11 = P.data[0], P12 = P.data[1], P13 = P.data[2], P14 = P.data[3];
+		double P21 = P.data[4], P22 = P.data[5], P23 = P.data[6], P24 = P.data[7];
 		double P31 = P.data[8], P32 = P.data[9], P33 = P.data[10], P34 = P.data[11];
 
 //		pixelH.x = P11*X + P12*Y + P13*Z + P14*W;
 //		pixelH.y = P21*X + P22*Y + P23*Z + P24*W;
 //		pixelH.z = P31*X + P32*Y + P33*Z + P34*W;
 
-		pointGradX[0] = P11;
-		pointGradX[1] = P12;
-		pointGradX[2] = P13;
-		pointGradX[3] = P14;
-
-		pointGradY[0] = P21;
-		pointGradY[1] = P22;
-		pointGradY[2] = P23;
-		pointGradY[3] = P24;
-
-		pointGradZ[0] = P31;
-		pointGradZ[1] = P32;
-		pointGradZ[2] = P33;
-		pointGradZ[3] = P34;
+		// @formatter:off
+		pointGradX[0] = P11; pointGradX[1] = P12; pointGradX[2] = P13; pointGradX[3] = P14;
+		pointGradY[0] = P21; pointGradY[1] = P22; pointGradY[2] = P23; pointGradY[3] = P24;
+		pointGradZ[0] = P31; pointGradZ[1] = P32; pointGradZ[2] = P33; pointGradZ[3] = P34;
 
 		if (camGradX == null || camGradY == null || camGradZ == null)
 			return;
@@ -329,6 +313,7 @@ public abstract class BundleAdjustmentProjectiveSchurJacobian<M extends DMatrix>
 		camGradZ[0] = 0; camGradZ[1] = 0; camGradZ[2 ] = 0; camGradZ[3 ] = 0;
 		camGradZ[4] = 0; camGradZ[5] = 0; camGradZ[6 ] = 0; camGradZ[7 ] = 0;
 		camGradZ[8] = X; camGradZ[9] = Y; camGradZ[10] = Z; camGradZ[11] = W;
+		// @formatter:on
 	}
 
 	private void addToJacobian( DMatrix triplet, int col, int length, double[] a, double[] b ) {

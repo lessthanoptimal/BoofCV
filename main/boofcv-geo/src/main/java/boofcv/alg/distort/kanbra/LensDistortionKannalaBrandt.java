@@ -32,7 +32,8 @@ import boofcv.struct.distort.Point3Transform2_F64;
  */
 public class LensDistortionKannalaBrandt implements LensDistortionWideFOV {
 	CameraKannalaBrandt model;
-	public LensDistortionKannalaBrandt(CameraKannalaBrandt model ) {
+
+	public LensDistortionKannalaBrandt( CameraKannalaBrandt model ) {
 		this.model = model;
 	}
 

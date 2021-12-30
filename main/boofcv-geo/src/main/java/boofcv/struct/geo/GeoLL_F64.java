@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.struct.geo;
 
 /**
  * Geographic coordinate consisting of latitude (north-south coordinate) and longitude (west-east) .
-
+ *
  * <center>
  * <img src="doc-files/sphere_lat_lon.png"/>
  * </center>
@@ -44,7 +44,7 @@ public class GeoLL_F64 {
 		return lat;
 	}
 
-	public void setLat(double lat) {
+	public void setLat( double lat ) {
 		this.lat = lat;
 	}
 
@@ -52,7 +52,7 @@ public class GeoLL_F64 {
 		return lon;
 	}
 
-	public void setLon(double lon) {
+	public void setLon( double lon ) {
 		this.lon = lon;
 	}
 }

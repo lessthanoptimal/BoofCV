@@ -29,14 +29,14 @@ package boofcv.alg.geo;
  *
  * @author Peter Abeles
  */
-public interface ModelObservationResidual<Model,Observation> {
+public interface ModelObservationResidual<Model, Observation> {
 
 	/**
 	 * Specify the epipolar matrix being evaluated
 	 *
 	 * @param model The model being optimized
 	 */
-	public void setModel(Model model);
+	public void setModel( Model model );
 
 	/**
 	 * Compute the error for the observation
@@ -44,5 +44,5 @@ public interface ModelObservationResidual<Model,Observation> {
 	 * @param observation Observation of point feature in two views
 	 * @return residual Error magnitude
 	 */
-	public double computeResidual(Observation observation);
+	public double computeResidual( Observation observation );
 }

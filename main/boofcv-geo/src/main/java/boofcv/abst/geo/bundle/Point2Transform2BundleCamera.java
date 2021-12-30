@@ -40,7 +40,7 @@ public class Point2Transform2BundleCamera implements Point2Transform2_F64 {
 
 	@Override public void compute( double x, double y, Point2D_F64 out ) {
 		// Assume the input is in normalized image coordinates, which corresponds to (x,y,1.0)
-		model.project(x,y,1.0,out);
+		model.project(x, y, 1.0, out);
 	}
 
 	@Override public Point2Transform2_F64 copyConcurrent() {

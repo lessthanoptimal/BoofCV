@@ -25,24 +25,24 @@ import org.ejml.data.DMatrixRMaj;
  * For use in cases where the model is a matrix and there is a 1-to-1 relationship with model
  * parameters. Instead of copying the data over it simple puts parameter array reference into
  * the matrix.
- * 
+ *
  * @author Peter Abeles
  */
 public class ModelCodecSwapData implements ModelCodec<DMatrixRMaj> {
 	int paramLength;
 
-	public ModelCodecSwapData(int paramLength) {
+	public ModelCodecSwapData( int paramLength ) {
 		this.paramLength = paramLength;
 	}
 
 	@Override
-	public void decode(double[] input, DMatrixRMaj outputModel) {
+	public void decode( double[] input, DMatrixRMaj outputModel ) {
 		outputModel.data = input;
 	}
 
 	@Override
-	public void encode(DMatrixRMaj model, double[] param) {
-		System.arraycopy(model.data,0,param,0,paramLength);
+	public void encode( DMatrixRMaj model, double[] param ) {
+		System.arraycopy(model.data, 0, param, 0, paramLength);
 	}
 
 	@Override

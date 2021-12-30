@@ -24,7 +24,7 @@ import georegression.struct.point.Vector3D_F64;
  * A pair of line observations found in two different images. The line is described by a vector, which is the normal
  * of the plane defined by the line on the image plane and the camera's origin. The cross product of the two end
  * points (in homogeneous pixels) would define a line in this manor.
- * 
+ *
  * @author Peter Abeles
  */
 public class PairLineNorm {
@@ -48,8 +48,8 @@ public class PairLineNorm {
 	 * @param l1 image 1 location
 	 * @param l2 image 2 location
 	 */
-	public PairLineNorm(Vector3D_F64 l1, Vector3D_F64 l2) {
-		this(l1, l2,true);
+	public PairLineNorm( Vector3D_F64 l1, Vector3D_F64 l2 ) {
+		this(l1, l2, true);
 	}
 
 	/**
@@ -59,7 +59,7 @@ public class PairLineNorm {
 	 * @param l2 image 2 location
 	 * @param newInstance Should it create new lines or save a reference to these instances.
 	 */
-	public PairLineNorm(Vector3D_F64 l1, Vector3D_F64 l2, boolean newInstance) {
+	public PairLineNorm( Vector3D_F64 l1, Vector3D_F64 l2, boolean newInstance ) {
 		if (newInstance) {
 			this.l1 = l1.copy();
 			this.l2 = l2.copy();
@@ -72,7 +72,7 @@ public class PairLineNorm {
 	/**
 	 * Sets the value of p1 and p2 to be equal to the values of the passed in objects
 	 */
-	public void setTo( Vector3D_F64 l1 , Vector3D_F64 l2 ) {
+	public void setTo( Vector3D_F64 l1, Vector3D_F64 l2 ) {
 		this.l1.setTo(l1);
 		this.l2.setTo(l2);
 	}
@@ -80,7 +80,7 @@ public class PairLineNorm {
 	/**
 	 * Sets p1 and p2 to reference the passed in objects.
 	 */
-	public void assign( Vector3D_F64 l1 , Vector3D_F64 l2 ) {
+	public void assign( Vector3D_F64 l1, Vector3D_F64 l2 ) {
 		this.l1 = l1;
 		this.l2 = l2;
 	}
@@ -89,7 +89,7 @@ public class PairLineNorm {
 		return l1;
 	}
 
-	public void setL1(Vector3D_F64 l1) {
+	public void setL1( Vector3D_F64 l1 ) {
 		this.l1 = l1;
 	}
 
@@ -97,7 +97,7 @@ public class PairLineNorm {
 		return l2;
 	}
 
-	public void setL2(Vector3D_F64 l2) {
+	public void setL2( Vector3D_F64 l2 ) {
 		this.l2 = l2;
 	}
 }

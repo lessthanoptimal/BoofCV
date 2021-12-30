@@ -59,7 +59,7 @@ public class FactoryGeometryAlgs {
 	 * Creates a new instance of {@link HomographyDirectLinearTransform}. See class documentation
 	 * for information on parameters.
 	 */
-	public static HomographyDirectLinearTransform homography4(boolean normalize ) {
+	public static HomographyDirectLinearTransform homography4( boolean normalize ) {
 		return new HomographyDirectLinearTransform(normalize);
 	}
 

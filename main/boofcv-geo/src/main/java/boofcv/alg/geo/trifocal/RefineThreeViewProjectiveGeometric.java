@@ -58,10 +58,10 @@ public class RefineThreeViewProjectiveGeometric {
 	SceneObservations observations;
 
 	// first view is assumed to be [I|0]
-	DMatrixRMaj P1 = CommonOps_DDRM.identity(3,4);
+	DMatrixRMaj P1 = CommonOps_DDRM.identity(3, 4);
 
 	// convergence criteria for SBA
-	ConfigConverge converge = new ConfigConverge(1e-8,1e-8,200);
+	ConfigConverge converge = new ConfigConverge(1e-8, 1e-8, 200);
 	BundleAdjustment<SceneStructureProjective> sba;
 
 	// if true scaling is done before running bundle adjustment. Only set to false if pixel coordinate have
@@ -85,8 +85,8 @@ public class RefineThreeViewProjectiveGeometric {
 		sba = FactoryMultiView.bundleSparseProjective(configSBA);
 	}
 
-	public RefineThreeViewProjectiveGeometric(TriangulateNViewsProjective triangulator,
-											  BundleAdjustment<SceneStructureProjective> sba) {
+	public RefineThreeViewProjectiveGeometric( TriangulateNViewsProjective triangulator,
+											   BundleAdjustment<SceneStructureProjective> sba ) {
 		this.triangulator = triangulator;
 		this.sba = sba;
 	}
@@ -99,20 +99,19 @@ public class RefineThreeViewProjectiveGeometric {
 	 * @param P3 camera matrix for view 3. modified
 	 * @return true if successful
 	 */
-	public boolean refine(List<AssociatedTriple> listObs , DMatrixRMaj P2 , DMatrixRMaj P3 )
-	{
+	public boolean refine( List<AssociatedTriple> listObs, DMatrixRMaj P2, DMatrixRMaj P3 ) {
 		CommonOps_DDRM.setIdentity(P1);
 		initializeStructure(listObs, P2, P3);
 
-		if( scale ) {
-			scaler.applyScale(structure,observations);
+		if (scale) {
+			scaler.applyScale(structure, observations);
 		}
 
 //		sba.setVerbose(System.out,0);
-		sba.setParameters(structure,observations);
-		sba.configure(converge.ftol,converge.gtol,converge.maxIterations);
+		sba.setParameters(structure, observations);
+		sba.configure(converge.ftol, converge.gtol, converge.maxIterations);
 
-		if( !sba.optimize(structure) ) {
+		if (!sba.optimize(structure)) {
 			return false;
 		}
 
@@ -120,10 +119,10 @@ public class RefineThreeViewProjectiveGeometric {
 		P2.setTo(structure.views.data[1].worldToView);
 		P3.setTo(structure.views.data[2].worldToView);
 
-		if( scale ) {
+		if (scale) {
 			// don't use built in unscaling function because it undoes scaling on points. Those are disposable
-			scaler.pixelScaling.get(1).remove(P2,P2);
-			scaler.pixelScaling.get(2).remove(P3,P3);
+			scaler.pixelScaling.get(1).remove(P2, P2);
+			scaler.pixelScaling.get(2).remove(P3, P3);
 		}
 
 		return true;
@@ -132,7 +131,7 @@ public class RefineThreeViewProjectiveGeometric {
 	/**
 	 * Sets up data structures for SBA
 	 */
-	private void initializeStructure(List<AssociatedTriple> listObs, DMatrixRMaj P2, DMatrixRMaj P3) {
+	private void initializeStructure( List<AssociatedTriple> listObs, DMatrixRMaj P2, DMatrixRMaj P3 ) {
 		List<DMatrixRMaj> cameraMatrices = new ArrayList<>();
 		cameraMatrices.add(P1);
 		cameraMatrices.add(P2);
@@ -144,38 +143,38 @@ public class RefineThreeViewProjectiveGeometric {
 		triangObs.add(null);
 
 		structure = new SceneStructureProjective(true);
-		structure.initialize(3,listObs.size());
+		structure.initialize(3, listObs.size());
 		observations = new SceneObservations();
 		observations.initialize(3);
 
-		structure.setView(0,true, P1,0,0);
-		structure.setView(1,false,P2,0,0);
-		structure.setView(2,false,P3,0,0);
+		structure.setView(0, true, P1, 0, 0);
+		structure.setView(1, false, P2, 0, 0);
+		structure.setView(2, false, P3, 0, 0);
 
 		boolean needsPruning = false;
 		Point4D_F64 X = new Point4D_F64();
 		for (int i = 0; i < listObs.size(); i++) {
 			AssociatedTriple t = listObs.get(i);
 
-			triangObs.set(0,t.p1);
-			triangObs.set(1,t.p2);
-			triangObs.set(2,t.p3);
+			triangObs.set(0, t.p1);
+			triangObs.set(1, t.p2);
+			triangObs.set(2, t.p3);
 
 			// triangulation can fail if all 3 views have the same pixel value. This has been observed in
 			// simulated 3D scenes
-			if( triangulator.triangulate(triangObs,cameraMatrices,X)) {
-				observations.getView(0).add(i,(float)t.p1.x,(float)t.p1.y);
-				observations.getView(1).add(i,(float)t.p2.x,(float)t.p2.y);
-				observations.getView(2).add(i,(float)t.p3.x,(float)t.p3.y);
+			if (triangulator.triangulate(triangObs, cameraMatrices, X)) {
+				observations.getView(0).add(i, (float)t.p1.x, (float)t.p1.y);
+				observations.getView(1).add(i, (float)t.p2.x, (float)t.p2.y);
+				observations.getView(2).add(i, (float)t.p3.x, (float)t.p3.y);
 
-				structure.points.get(i).set(X.x,X.y,X.z,X.w);
+				structure.points.get(i).set(X.x, X.y, X.z, X.w);
 			} else {
 				needsPruning = true;
 			}
 		}
 
-		if( needsPruning ) {
-			PruneStructureFromSceneProjective pruner = new PruneStructureFromSceneProjective(structure,observations);
+		if (needsPruning) {
+			PruneStructureFromSceneProjective pruner = new PruneStructureFromSceneProjective(structure, observations);
 			pruner.prunePoints(1);
 		}
 	}
@@ -200,7 +199,7 @@ public class RefineThreeViewProjectiveGeometric {
 		return scale;
 	}
 
-	public void setScale(boolean scale) {
+	public void setScale( boolean scale ) {
 		this.scale = scale;
 	}
 

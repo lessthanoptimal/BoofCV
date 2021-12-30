@@ -59,17 +59,17 @@ public class P3PGrunert implements P3PLineDistance {
 	 *
 	 * @param rootFinder Root finder for real 4th order roots.
 	 */
-	public P3PGrunert(PolynomialRoots rootFinder) {
+	public P3PGrunert( PolynomialRoots rootFinder ) {
 		this.rootFinder = rootFinder;
 	}
 
 	@Override
-	public boolean process( Point2D_F64 obs1 , Point2D_F64 obs2, Point2D_F64 obs3,
-							double length23 , double length13 , double length12 ) {
+	public boolean process( Point2D_F64 obs1, Point2D_F64 obs2, Point2D_F64 obs3,
+							double length23, double length13, double length12 ) {
 
-		double cos12 = computeCosine(obs1,obs2);
-		double cos13 = computeCosine(obs1,obs3);
-		double cos23 = computeCosine(obs2,obs3);
+		double cos12 = computeCosine(obs1, obs2);
+		double cos13 = computeCosine(obs1, obs3);
+		double cos23 = computeCosine(obs2, obs3);
 
 		double a = length23, b = length13, c = length12;
 
@@ -80,20 +80,20 @@ public class P3PGrunert implements P3PLineDistance {
 		double a2_p_c2_div_b2 = a2_div_b2 + c2_div_b2;
 
 		poly.c[0] = -4*a2_div_b2*pow2(cos12) + pow2(a2_m_c2_div_b2 + 1);
-		poly.c[1] = 4*(-a2_m_c2_div_b2*(1 + a2_m_c2_div_b2)*cos13 + 2*a2_div_b2*pow2(cos12)*cos13 - (1-a2_p_c2_div_b2)*cos23*cos12);
-		poly.c[2] = 2*(pow2(a2_m_c2_div_b2) - 1 + 2*pow2(a2_m_c2_div_b2)*pow2(cos13) + 2*(1-c2_div_b2)*pow2(cos23) - 4*a2_p_c2_div_b2*cos12*cos13*cos23 + 2*(1-a2_div_b2)*pow2(cos12));
-		poly.c[3] = 4*(a2_m_c2_div_b2*(1-a2_m_c2_div_b2)*cos13 - (1 - a2_p_c2_div_b2)*cos23*cos12 + 2*c2_div_b2*pow2(cos23)*cos13);
+		poly.c[1] = 4*(-a2_m_c2_div_b2*(1 + a2_m_c2_div_b2)*cos13 + 2*a2_div_b2*pow2(cos12)*cos13 - (1 - a2_p_c2_div_b2)*cos23*cos12);
+		poly.c[2] = 2*(pow2(a2_m_c2_div_b2) - 1 + 2*pow2(a2_m_c2_div_b2)*pow2(cos13) + 2*(1 - c2_div_b2)*pow2(cos23) - 4*a2_p_c2_div_b2*cos12*cos13*cos23 + 2*(1 - a2_div_b2)*pow2(cos12));
+		poly.c[3] = 4*(a2_m_c2_div_b2*(1 - a2_m_c2_div_b2)*cos13 - (1 - a2_p_c2_div_b2)*cos23*cos12 + 2*c2_div_b2*pow2(cos23)*cos13);
 		poly.c[4] = -4*c2_div_b2*cos23*cos23 + pow2(a2_m_c2_div_b2 - 1);
 
 		// solve for real roots
 		solutions.reset();
-		if( !rootFinder.process(poly) )
+		if (!rootFinder.process(poly))
 			return false;
 
 		List<Complex_F64> roots = rootFinder.getRoots();
 		for (int rootIdx = 0; rootIdx < roots.size(); rootIdx++) {
 			Complex_F64 r = roots.get(rootIdx);
-			if( !r.isReal() ) {
+			if (!r.isReal()) {
 				continue;
 			}
 
@@ -116,9 +116,9 @@ public class P3PGrunert implements P3PLineDistance {
 		return a*a;
 	}
 
-	public static double computeCosine( Point2D_F64 a , Point2D_F64 b ) {
+	public static double computeCosine( Point2D_F64 a, Point2D_F64 b ) {
 		double top = a.x*b.x + a.y*b.y + 1;
-		double bottom = Math.sqrt(a.x*a.x + a.y*a.y + 1) * Math.sqrt(b.x*b.x + b.y*b.y + 1);
+		double bottom = Math.sqrt(a.x*a.x + a.y*a.y + 1)*Math.sqrt(b.x*b.x + b.y*b.y + 1);
 
 		return top/bottom;
 	}

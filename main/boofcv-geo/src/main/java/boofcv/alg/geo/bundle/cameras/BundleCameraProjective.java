@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,19 +29,19 @@ import org.jetbrains.annotations.Nullable;
  */
 public class BundleCameraProjective implements BundleAdjustmentCamera {
 	@Override
-	public void setIntrinsic(double[] parameters, int offset) {}
+	public void setIntrinsic( double[] parameters, int offset ) {}
 
 	@Override
-	public void getIntrinsic(double[] parameters, int offset) {}
+	public void getIntrinsic( double[] parameters, int offset ) {}
 
 	@Override
-	public void project(double camX, double camY, double camZ, Point2D_F64 output) {
+	public void project( double camX, double camY, double camZ, Point2D_F64 output ) {
 		output.x = camX/camZ;
 		output.y = camY/camZ;
 	}
 
 	@Override
-	public void jacobian(double camX, double camY, double camZ, double[] pointX, double[] pointY, boolean computeIntrinsic, @Nullable double[] calibX, @Nullable double[] calibY) {
+	public void jacobian( double camX, double camY, double camZ, double[] pointX, double[] pointY, boolean computeIntrinsic, @Nullable double[] calibX, @Nullable double[] calibY ) {
 		pointX[0] = 1/camZ;
 		pointX[1] = 0;
 		pointX[2] = -camX/(camZ*camZ);

@@ -38,5 +38,4 @@ import org.ejml.data.DMatrixRMaj;
  *
  * @author Peter Abeles
  */
-public interface EstimateNofEpipolar extends GeoModelEstimatorN<DMatrixRMaj,AssociatedPair> {
-}
+public interface EstimateNofEpipolar extends GeoModelEstimatorN<DMatrixRMaj, AssociatedPair> {}

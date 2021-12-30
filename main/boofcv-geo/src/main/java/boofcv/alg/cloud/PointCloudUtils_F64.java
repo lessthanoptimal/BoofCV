@@ -43,11 +43,10 @@ public class PointCloudUtils_F64 {
 	 */
 	public static DogArray<Point3dRgbI_F64> filter( AccessPointIndex<Point3D_F64> accessPoint,
 													AccessColorIndex accessColor,
-													int size ,
+													int size,
 													BoofLambdas.FilterInt filter,
-													@Nullable DogArray<Point3dRgbI_F64> output )
-	{
-		if (output==null)
+													@Nullable DogArray<Point3dRgbI_F64> output ) {
+		if (output == null)
 			output = new DogArray<>(Point3dRgbI_F64::new);
 
 		output.reset();

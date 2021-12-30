@@ -34,5 +34,4 @@ import org.ejml.data.DMatrixRMaj;
  *
  * @author Peter Abeles
  */
-public interface RefineEpipolar extends ModelFitter<DMatrixRMaj,AssociatedPair> {
-}
+public interface RefineEpipolar extends ModelFitter<DMatrixRMaj, AssociatedPair> {}

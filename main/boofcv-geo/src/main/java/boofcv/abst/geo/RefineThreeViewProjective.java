@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,6 +42,6 @@ public interface RefineThreeViewProjective {
 	 * @param refinedP3 (Output) Refined estimate of camera matrix from view 3
 	 * @return true if successful or false if it failed
 	 */
-	boolean process(List<AssociatedTriple> observations , DMatrixRMaj P2 , DMatrixRMaj P3,
-					DMatrixRMaj refinedP2 , DMatrixRMaj refinedP3 );
+	boolean process( List<AssociatedTriple> observations, DMatrixRMaj P2, DMatrixRMaj P3,
+					 DMatrixRMaj refinedP2, DMatrixRMaj refinedP3 );
 }

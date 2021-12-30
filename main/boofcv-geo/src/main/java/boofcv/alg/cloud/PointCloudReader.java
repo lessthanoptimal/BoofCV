@@ -156,22 +156,23 @@ public interface PointCloudReader {
 	static PointCloudReader wrap( Generic op, int size ) {
 		return new PointCloudReader() {
 			Point3dRgbI_F64 p = new Point3dRgbI_F64();
+
 			@Override public int size() {return size;}
 
 			@Override public void get( int index, Point3D_F32 point ) {
-				op.get(index,p);
-				point.x=(float)p.x;
-				point.y=(float)p.y;
-				point.z=(float)p.z;
+				op.get(index, p);
+				point.x = (float)p.x;
+				point.y = (float)p.y;
+				point.z = (float)p.z;
 			}
 
 			@Override public void get( int index, Point3D_F64 point ) {
-				op.get(index,p);
+				op.get(index, p);
 				point.setTo(p);
 			}
 
 			@Override public int getRGB( int index ) {
-				op.get(index,p);
+				op.get(index, p);
 				return p.rgb;
 			}
 		};

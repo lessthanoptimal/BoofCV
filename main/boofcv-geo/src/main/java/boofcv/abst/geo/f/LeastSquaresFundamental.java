@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,45 +47,45 @@ public class LeastSquaresFundamental implements RefineEpipolar {
 	int maxIterations;
 	double convergenceTol;
 
-	public LeastSquaresFundamental(double convergenceTol,
-								   int maxIterations,
-								   boolean useSampson) {
-		this( new ParamFundamentalEpipolar() , convergenceTol, maxIterations,useSampson);
+	public LeastSquaresFundamental( double convergenceTol,
+									int maxIterations,
+									boolean useSampson ) {
+		this(new ParamFundamentalEpipolar(), convergenceTol, maxIterations, useSampson);
 	}
 
-	public LeastSquaresFundamental(ModelCodec<DMatrixRMaj> paramModel,
-								   double convergenceTol,
-								   int maxIterations,
-								   boolean useSampson) {
+	public LeastSquaresFundamental( ModelCodec<DMatrixRMaj> paramModel,
+									double convergenceTol,
+									int maxIterations,
+									boolean useSampson ) {
 		this.paramModel = paramModel;
 		this.maxIterations = maxIterations;
 		this.convergenceTol = convergenceTol;
 
 		param = new double[paramModel.getParamLength()];
 
-		ModelObservationResidual<DMatrixRMaj,AssociatedPair> residual;
-		if( useSampson )
+		ModelObservationResidual<DMatrixRMaj, AssociatedPair> residual;
+		if (useSampson)
 			residual = new FundamentalResidualSampson();
 		else
 			residual = new FundamentalResidualSimple();
 
-		func = new ResidualsEpipolarMatrix(paramModel,residual);
+		func = new ResidualsEpipolarMatrix(paramModel, residual);
 
-		minimizer = FactoryOptimization.levenbergMarquardt(null,false);
+		minimizer = FactoryOptimization.levenbergMarquardt(null, false);
 	}
 
 	@Override
-	public boolean fitModel(List<AssociatedPair> obs, DMatrixRMaj F, DMatrixRMaj refinedF) {
+	public boolean fitModel( List<AssociatedPair> obs, DMatrixRMaj F, DMatrixRMaj refinedF ) {
 		func.setObservations(obs);
-		
+
 		paramModel.encode(F, param);
 
-		minimizer.setFunction(func,null);
+		minimizer.setFunction(func, null);
 
-		minimizer.initialize(param,0,convergenceTol*obs.size());
+		minimizer.initialize(param, 0, convergenceTol*obs.size());
 
-		for( int i = 0; i < maxIterations; i++ ) {
-			if( minimizer.iterate() )
+		for (int i = 0; i < maxIterations; i++) {
+			if (minimizer.iterate())
 				break;
 		}
 

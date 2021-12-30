@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,20 +48,20 @@ import static boofcv.misc.BoofMiscOps.pow2;
 public class EpipolarMinimizeGeometricError {
 
 	// Ft = inv(T2')*F*inv(T1)
-	DMatrixRMaj Ft = new DMatrixRMaj(3,3);
+	DMatrixRMaj Ft = new DMatrixRMaj(3, 3);
 
 	// [1 0 -x1;0 1 -y1; 0 0 1];
-	DMatrixRMaj T1 = new DMatrixRMaj(3,3);
+	DMatrixRMaj T1 = new DMatrixRMaj(3, 3);
 	// [1 0 -x2;0 1 -y2; 0 0 1];
-	DMatrixRMaj T2 = new DMatrixRMaj(3,3);
+	DMatrixRMaj T2 = new DMatrixRMaj(3, 3);
 
 	FundamentalExtractEpipoles extract = new FundamentalExtractEpipoles();
 	Point3D_F64 e1 = new Point3D_F64();
 	Point3D_F64 e2 = new Point3D_F64();
 
 	// rotation matrices
-	DMatrixRMaj R1 = new DMatrixRMaj(3,3);
-	DMatrixRMaj R2 = new DMatrixRMaj(3,3);
+	DMatrixRMaj R1 = new DMatrixRMaj(3, 3);
+	DMatrixRMaj R2 = new DMatrixRMaj(3, 3);
 
 	// lines
 	Vector3D_F64 l1 = new Vector3D_F64();
@@ -84,53 +84,52 @@ public class EpipolarMinimizeGeometricError {
 	 * @param p2 (Output) Point 2. Pixels
 	 * @return true if a solution was found or false if it failed
 	 */
-	public boolean process(DMatrixRMaj F21 ,
-						   double x1 , double y1, double x2, double y2,
-						   Point2D_F64 p1 , Point2D_F64 p2 )
-	{
+	public boolean process( DMatrixRMaj F21,
+							double x1, double y1, double x2, double y2,
+							Point2D_F64 p1, Point2D_F64 p2 ) {
 		// translations used to move points to the origin
-		assignTinv(T1,x1,y1);
-		assignTinv(T2,x2,y2);
+		assignTinv(T1, x1, y1);
+		assignTinv(T2, x2, y2);
 
 		// take F to the new coordinate system
 		// F1 = T2'*F*T1
-		PerspectiveOps.multTranA(T2,F21,T1,Ft);
+		PerspectiveOps.multTranA(T2, F21, T1, Ft);
 
-		extract.process(Ft,e1,e2);
+		extract.process(Ft, e1, e2);
 
 		// normalize so that e[x]*e[x] + e[y]*e[y] == 1
 		normalizeEpipole(e1);
 		normalizeEpipole(e2);
 
-		assignR(R1,e1);
-		assignR(R2,e2);
+		assignR(R1, e1);
+		assignR(R2, e2);
 
 		// Ft = R2*Ft*R1'
-		PerspectiveOps.multTranC(R2,Ft,R1,Ft);
+		PerspectiveOps.multTranC(R2, Ft, R1, Ft);
 
 		double f1 = e1.z;
 		double f2 = e2.z;
-		double a = Ft.get(1,1);
-		double b = Ft.get(1,2);
-		double c = Ft.get(2,1);
-		double d = Ft.get(2,2);
+		double a = Ft.get(1, 1);
+		double b = Ft.get(1, 2);
+		double c = Ft.get(2, 1);
+		double d = Ft.get(2, 2);
 
-		if( !solvePolynomial(f1,f2,a,b,c,d))
+		if (!solvePolynomial(f1, f2, a, b, c, d))
 			return false;
 
-		if( !selectBestSolution(rootFinder.getRoots(),f1,f2,a,b,c,d))
+		if (!selectBestSolution(rootFinder.getRoots(), f1, f2, a, b, c, d))
 			return false;
 
 		// find the closeset point on the two lines below to the origin
 		double t = solutionT;
-		l1.setTo(t*f1,1,-t);
-		l2.setTo(-f2*(c*t+d),a*t+b,c*t+d);
-		closestPointToOrigin(l1,e1); // recycle epipole storage
-		closestPointToOrigin(l2,e2);
+		l1.setTo(t*f1, 1, -t);
+		l2.setTo(-f2*(c*t + d), a*t + b, c*t + d);
+		closestPointToOrigin(l1, e1); // recycle epipole storage
+		closestPointToOrigin(l2, e2);
 
 		// original coordinates
-		originalCoordinates(T1,R1,e1);
-		originalCoordinates(T2,R2,e2);
+		originalCoordinates(T1, R1, e1);
+		originalCoordinates(T2, R2, e2);
 
 		// back to 2D coordinates
 		p1.setTo(e1.x/e1.z, e1.y/e1.z);
@@ -139,15 +138,15 @@ public class EpipolarMinimizeGeometricError {
 		return true;
 	}
 
-	void closestPointToOrigin( Vector3D_F64 l , Point3D_F64 p ) {
+	void closestPointToOrigin( Vector3D_F64 l, Point3D_F64 p ) {
 		p.x = -l.x*l.z;
 		p.y = -l.y*l.z;
 		p.z = l.x*l.x + l.y*l.y;
 	}
 
-	void originalCoordinates( DMatrixRMaj T , DMatrixRMaj R , Point3D_F64 p ) {
-		GeometryMath_F64.multTran(R,p,p);
-		GeometryMath_F64.mult(T,p,p);
+	void originalCoordinates( DMatrixRMaj T, DMatrixRMaj R, Point3D_F64 p ) {
+		GeometryMath_F64.multTran(R, p, p);
+		GeometryMath_F64.mult(T, p, p);
 	}
 
 	/**
@@ -160,10 +159,8 @@ public class EpipolarMinimizeGeometricError {
 	 * g = t*((a*t+b)^2 + f2^2*(c*t+d)^2)^2 - (a*d-b*c)*(1+f1^2*t^2)^2*(a*t+b)*(c*t+d)
 	 * g.expand().collect(t)
 	 * }
-	 *
 	 */
-	public boolean solvePolynomial( double f1, double f2 , double a , Double b , double c , double d )
-	{
+	public boolean solvePolynomial( double f1, double f2, double a, Double b, double c, double d ) {
 		double f1_2 = f1*f1;
 		double f1_4 = f1_2*f1_2;
 		double f2_2 = f2*f2;
@@ -190,8 +187,8 @@ public class EpipolarMinimizeGeometricError {
 		return rootFinder.process(poly);
 	}
 
-	boolean selectBestSolution( List<Complex_F64> roots ,
-								double f1, double f2 , double a , Double b , double c , double d ) {
+	boolean selectBestSolution( List<Complex_F64> roots,
+								double f1, double f2, double a, Double b, double c, double d ) {
 
 
 		// cost at t=infinty, must do better than this
@@ -201,16 +198,16 @@ public class EpipolarMinimizeGeometricError {
 		for (int i = 0; i < roots.size(); i++) {
 			Complex_F64 cr = roots.get(i);
 
-			if( !cr.isReal() )
+			if (!cr.isReal())
 				continue;
 
 			double t = cr.real;
 
-			double left = t*t/(1+f1*f1*t*t);
-			double right = pow2(c*t + d)/(pow2(a*t+b) + f2*f2*pow2(c*t+d));
+			double left = t*t/(1 + f1*f1*t*t);
+			double right = pow2(c*t + d)/(pow2(a*t + b) + f2*f2*pow2(c*t + d));
 
 			double squaredDistance = left + right;
-			if(squaredDistance < best ) {
+			if (squaredDistance < best) {
 				best = squaredDistance;
 				bestIndex = i;
 				solutionT = t;
@@ -220,22 +217,21 @@ public class EpipolarMinimizeGeometricError {
 		return bestIndex != -1;
 	}
 
-
-	static void assignTinv(DMatrixRMaj T , double x , double y )
-	{
+	// @formatter:off
+	static void assignTinv( DMatrixRMaj T, double x, double y ) {
 		T.data[0] = T.data[4] = T.data[8] = 1;
 		T.data[2] = x; T.data[5]= y;
 	}
 
-	static void assignR( DMatrixRMaj R , Point3D_F64 e )
-	{
+	static void assignR( DMatrixRMaj R , Point3D_F64 e ) {
 		R.data[0] =  e.x; R.data[1] = e.y;
 		R.data[3] = -e.y; R.data[4] = e.x;
 		R.data[8] = 1;
 	}
+	// @formatter:on
 
 	static void normalizeEpipole( Point3D_F64 e ) {
-		double n =e.x*e.x + e.y*e.y;
+		double n = e.x*e.x + e.y*e.y;
 		e.divideIP(Math.sqrt(n));
 	}
 }

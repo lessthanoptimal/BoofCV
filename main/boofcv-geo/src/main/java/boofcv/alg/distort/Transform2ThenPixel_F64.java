@@ -33,11 +33,11 @@ public class Transform2ThenPixel_F64 implements Point2Transform2_F64 {
 	double fx, fy, skew, cx, cy;
 	Point2Transform2_F64 first;
 
-	public Transform2ThenPixel_F64(Point2Transform2_F64 first) {
+	public Transform2ThenPixel_F64( Point2Transform2_F64 first ) {
 		this.first = first;
 	}
 
-	Transform2ThenPixel_F64(){}
+	Transform2ThenPixel_F64() {}
 
 	public Point2Transform2_F64 set( /**/double fx, /**/double fy, /**/double skew, /**/double cx, /**/double cy ) {
 		this.fx = (double)fx;
@@ -50,9 +50,10 @@ public class Transform2ThenPixel_F64 implements Point2Transform2_F64 {
 	}
 
 	@Override
-	public void compute(double x, double y, Point2D_F64 out) {
-		first.compute(x,y,out);
-		x = out.x; y = out.y;
+	public void compute( double x, double y, Point2D_F64 out ) {
+		first.compute(x, y, out);
+		x = out.x;
+		y = out.y;
 		out.x = fx*x + skew*y + cx;
 		out.y = fy*y + cy;
 	}

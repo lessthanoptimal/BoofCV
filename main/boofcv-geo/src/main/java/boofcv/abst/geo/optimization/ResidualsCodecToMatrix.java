@@ -30,13 +30,13 @@ import java.util.List;
  * @author Peter Abeles
  */
 @SuppressWarnings({"NullAway.Init"})
-public class ResidualsCodecToMatrix<Model,Observation> implements FunctionNtoM {
+public class ResidualsCodecToMatrix<Model, Observation> implements FunctionNtoM {
 	// converts parameters to and from the motion
 	protected ModelCodec<Model> param;
 	// list of observations
 	protected List<Observation> obs;
 	// error function
-	protected ModelObservationResidualN<Model,Observation> residual;
+	protected ModelObservationResidualN<Model, Observation> residual;
 
 	// pre-declare temporary storage
 	protected Model pose;
@@ -48,9 +48,9 @@ public class ResidualsCodecToMatrix<Model,Observation> implements FunctionNtoM {
 	 * @param residual Function for computing the residuals
 	 * @param storage Storage for converted model. Will be modified.
 	 */
-	public ResidualsCodecToMatrix(ModelCodec<Model> param,
-								  ModelObservationResidualN<Model, Observation> residual,
-								  Model storage) {
+	public ResidualsCodecToMatrix( ModelCodec<Model> param,
+								   ModelObservationResidualN<Model, Observation> residual,
+								   Model storage ) {
 		this.param = param;
 		this.residual = residual;
 		this.pose = storage;
@@ -71,13 +71,13 @@ public class ResidualsCodecToMatrix<Model,Observation> implements FunctionNtoM {
 	}
 
 	@Override
-	public void process(double[] input, double[] output) {
+	public void process( double[] input, double[] output ) {
 		param.decode(input, pose);
 
 		residual.setModel(pose);
 		int index = 0;
-		for( int i = 0; i < obs.size(); i++ ) {
-			index = residual.computeResiduals(obs.get(i),output,index);
+		for (int i = 0; i < obs.size(); i++) {
+			index = residual.computeResiduals(obs.get(i), output, index);
 		}
 	}
 }

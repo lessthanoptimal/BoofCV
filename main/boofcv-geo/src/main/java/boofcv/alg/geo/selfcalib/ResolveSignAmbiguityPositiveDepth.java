@@ -140,7 +140,7 @@ public class ResolveSignAmbiguityPositiveDepth implements VerbosePrint {
 			}
 		}
 
-		if (verbose != null) verbose.println("best="+best+" signChanged="+signChanged);
+		if (verbose != null) verbose.println("best=" + best + " signChanged=" + signChanged);
 	}
 
 	/**
@@ -219,7 +219,7 @@ public class ResolveSignAmbiguityPositiveDepth implements VerbosePrint {
 			result.view_1_to_3.T.scale(-1);
 		}
 
-		if (verbose != null) verbose.println("best="+best+" signChanged="+signChanged);
+		if (verbose != null) verbose.println("best=" + best + " signChanged=" + signChanged);
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {

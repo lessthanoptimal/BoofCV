@@ -35,7 +35,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class Se3FromEssentialGenerator implements ModelGenerator<Se3_F64,AssociatedPair> {
+public class Se3FromEssentialGenerator implements ModelGenerator<Se3_F64, AssociatedPair> {
 
 	// Estimates essential matrix from observations
 	Estimate1ofEpipolar computeEssential;
@@ -45,15 +45,15 @@ public class Se3FromEssentialGenerator implements ModelGenerator<Se3_F64,Associa
 	// decomposes essential matrix to extract motion
 	DecomposeEssential decomposeE = new DecomposeEssential();
 
-	DMatrixRMaj E = new DMatrixRMaj(3,3);
+	DMatrixRMaj E = new DMatrixRMaj(3, 3);
 
 	/**
 	 * Specifies how the essential matrix is computed
 	 *
 	 * @param computeEssential Algorithm for computing the essential matrix
 	 */
-	public Se3FromEssentialGenerator(Estimate1ofEpipolar computeEssential,
-									 Triangulate2ViewsMetricH triangulate ) {
+	public Se3FromEssentialGenerator( Estimate1ofEpipolar computeEssential,
+									  Triangulate2ViewsMetricH triangulate ) {
 		this.computeEssential = computeEssential;
 
 		selectBest = new SelectBestStereoTransformH(triangulate);
@@ -67,13 +67,13 @@ public class Se3FromEssentialGenerator implements ModelGenerator<Se3_F64,Associa
 	 * @param model The best pose according to the positive depth constraint.
 	 */
 	@Override
-	public boolean generate(List<AssociatedPair> dataSet, Se3_F64 model ) {
-		if( !computeEssential.process(dataSet,E) )
+	public boolean generate( List<AssociatedPair> dataSet, Se3_F64 model ) {
+		if (!computeEssential.process(dataSet, E))
 			return false;
 
 		// extract the possible motions
 		decomposeE.decompose(E);
-		selectBest.select(decomposeE.getSolutions(),dataSet,model);
+		selectBest.select(decomposeE.getSolutions(), dataSet, model);
 
 		return true;
 	}

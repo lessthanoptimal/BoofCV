@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,7 +45,7 @@ public class TriangulateRefineMetricHgLS implements RefineTriangulateMetricH {
 
 	final @Getter UnconstrainedLeastSquares<DMatrixRMaj> minimizer;
 
-	final DogArray<DMatrixRMaj> cameras = new DogArray<>(()->new DMatrixRMaj(3,4));
+	final DogArray<DMatrixRMaj> cameras = new DogArray<>(() -> new DMatrixRMaj(3, 4));
 
 	final double[] param = new double[4];
 	@Getter @Setter int maxIterations;
@@ -56,7 +56,7 @@ public class TriangulateRefineMetricHgLS implements RefineTriangulateMetricH {
 		this.convergenceTol = convergenceTol;
 		this.maxIterations = maxIterations;
 		minimizer = FactoryOptimization.levenbergMarquardt(null, false);
-		BoofMiscOps.checkEq(4,func.getNumOfInputsN());
+		BoofMiscOps.checkEq(4, func.getNumOfInputsN());
 	}
 
 	@Override
@@ -65,7 +65,7 @@ public class TriangulateRefineMetricHgLS implements RefineTriangulateMetricH {
 
 		cameras.resize(listWorldToView.size());
 		for (int i = 0; i < cameras.size; i++) {
-			PerspectiveOps.convertToMatrix(listWorldToView.get(i),cameras.get(i));
+			PerspectiveOps.convertToMatrix(listWorldToView.get(i), cameras.get(i));
 		}
 
 		func.setObservations(observations, cameras.toList());

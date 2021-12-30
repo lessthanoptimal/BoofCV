@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,13 +34,13 @@ import java.util.List;
 public class WrapFundamentalLinear7 implements EstimateNofEpipolar {
 	FundamentalLinear7 alg;
 
-	public WrapFundamentalLinear7(boolean fundamental) {
+	public WrapFundamentalLinear7( boolean fundamental ) {
 		alg = new FundamentalLinear7(fundamental);
 	}
 
 	@Override
-	public boolean process(List<AssociatedPair> points, DogArray<DMatrixRMaj> estimatedModels) {
-		return alg.process(points,estimatedModels);
+	public boolean process( List<AssociatedPair> points, DogArray<DMatrixRMaj> estimatedModels ) {
+		return alg.process(points, estimatedModels);
 	}
 
 	@Override

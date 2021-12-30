@@ -51,7 +51,7 @@ import java.util.List;
 public class SelfCalibrationLinearRotationSingle {
 
 	SingularValueDecomposition_F64<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(10, 10,
-					false, true, true);
+			false, true, true);
 
 	double singularThreshold = 1e-5;
 

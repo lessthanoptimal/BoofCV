@@ -69,107 +69,108 @@ public class ProjectiveStructureByFactorization {
 
 	// Convergence tolerances
 	int maxIterations = 10;
-	double minimumChangeTol=1e-6;
+	double minimumChangeTol = 1e-6;
 
 	// Depth for each feature in each view. rows = view, cols = features
-	DMatrixRMaj depths = new DMatrixRMaj(1,1);
-	DMatrixRMaj pixels = new DMatrixRMaj(1,1);
+	DMatrixRMaj depths = new DMatrixRMaj(1, 1);
+	DMatrixRMaj pixels = new DMatrixRMaj(1, 1);
 	// used to improve numerics. Pixel coordinate should be of an oder of magnitude of 1
 	double pixelScale; // See discussion in 18.4.4. By scaling pixels the algebraic error is closer to geometric
 
 	// Left side of equation = depth*[x,y,1]'
-	DMatrixRMaj A = new DMatrixRMaj(1,1);
-	DMatrixRMaj B = new DMatrixRMaj(1,1);
+	DMatrixRMaj A = new DMatrixRMaj(1, 1);
+	DMatrixRMaj B = new DMatrixRMaj(1, 1);
 	// matrix which stores projections
-	DMatrixRMaj P = new DMatrixRMaj(1,4);
+	DMatrixRMaj P = new DMatrixRMaj(1, 4);
 	// matrix which stores the points
-	DMatrixRMaj X = new DMatrixRMaj(3,1);
+	DMatrixRMaj X = new DMatrixRMaj(3, 1);
 
 	// SVD work spacce
-	SingularValueDecomposition_F64<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(10,10,true,true,true);
-	DMatrixRMaj U = new DMatrixRMaj(1,1);
-	DMatrixRMaj Vt = new DMatrixRMaj(1,1);
+	SingularValueDecomposition_F64<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(10, 10, true, true, true);
+	DMatrixRMaj U = new DMatrixRMaj(1, 1);
+	DMatrixRMaj Vt = new DMatrixRMaj(1, 1);
 
 	/**
 	 * Initializes internal data structures. Must be called first
+	 *
 	 * @param numFeatures Number of features
 	 * @param numViews Number of views
 	 */
-	public void initialize( int numFeatures , int numViews ) {
-		depths.reshape(numViews,numFeatures);
-		pixels.reshape(numViews*2,numFeatures);
+	public void initialize( int numFeatures, int numViews ) {
+		depths.reshape(numViews, numFeatures);
+		pixels.reshape(numViews*2, numFeatures);
 		pixelScale = 0;
 	}
 
 	/**
 	 * Sets pixel observations for a paricular view
+	 *
 	 * @param view the view
 	 * @param pixelsInView list of 2D pixel observations
 	 */
-	public void setPixels(int view , List<Point2D_F64> pixelsInView ) {
-		if( pixelsInView.size() != pixels.numCols )
-			throw new IllegalArgumentException("Pixel count must be constant and match "+pixels.numCols);
+	public void setPixels( int view, List<Point2D_F64> pixelsInView ) {
+		if (pixelsInView.size() != pixels.numCols)
+			throw new IllegalArgumentException("Pixel count must be constant and match " + pixels.numCols);
 
 		int row = view*2;
 		for (int i = 0; i < pixelsInView.size(); i++) {
 			Point2D_F64 p = pixelsInView.get(i);
-			pixels.set(row,i,p.x);
-			pixels.set(row+1,i,p.y);
-			pixelScale = Math.max(Math.abs(p.x),Math.abs(p.y));
+			pixels.set(row, i, p.x);
+			pixels.set(row + 1, i, p.y);
+			pixelScale = Math.max(Math.abs(p.x), Math.abs(p.y));
 		}
 	}
 
 	/**
 	 * Sets all depths to an initial value
-	 * @param value
 	 */
 	public void setAllDepths( double value ) {
-		CommonOps_DDRM.fill(depths,value);
+		CommonOps_DDRM.fill(depths, value);
 	}
 
 	/**
 	 * Sets depths for a particular value to the values in the passed in array
-	 * @param view
-	 * @param featureDepths
 	 */
-	public void setDepths( int view , double featureDepths[] ) {
-		if( featureDepths.length < depths.numCols )
-			throw new IllegalArgumentException("Pixel count must be constant and match "+pixels.numCols);
+	public void setDepths( int view, double featureDepths[] ) {
+		if (featureDepths.length < depths.numCols)
+			throw new IllegalArgumentException("Pixel count must be constant and match " + pixels.numCols);
 
 		int N = depths.numCols;
 		for (int i = 0; i < N; i++) {
-			depths.set(view,i, featureDepths[i]);
+			depths.set(view, i, featureDepths[i]);
 		}
 	}
 
 	/**
 	 * Assigns depth to the z value of all the features in the list. Features must be in the coordinate system
 	 * of the view for this to be correct
+	 *
 	 * @param view which view is features are in
 	 * @param locations Location of features in the view's reference frame
 	 */
-	public void setDepthsFrom3D(int view , List<Point3D_F64> locations ) {
-		if( locations.size() != pixels.numCols )
-			throw new IllegalArgumentException("Pixel count must be constant and match "+pixels.numCols);
+	public void setDepthsFrom3D( int view, List<Point3D_F64> locations ) {
+		if (locations.size() != pixels.numCols)
+			throw new IllegalArgumentException("Pixel count must be constant and match " + pixels.numCols);
 
 		int N = depths.numCols;
 		for (int i = 0; i < N; i++) {
-			depths.set(view,i, locations.get(i).z );
+			depths.set(view, i, locations.get(i).z);
 		}
 	}
 
 	/**
 	 * Performs iteration to find camera matrices and feature locations in world frame
+	 *
 	 * @return true if no exception was thrown. Does not mean it converged to a valid solution
 	 */
 	public boolean process() {
 		int numViews = depths.numRows;
 		int numFeatures = depths.numCols;
-		P.reshape(3*numViews,4);
-		X.reshape(4,numFeatures);
+		P.reshape(3*numViews, 4);
+		X.reshape(4, numFeatures);
 
-		A.reshape(numViews*3,numFeatures);
-		B.reshape(numViews*3,numFeatures);
+		A.reshape(numViews*3, numFeatures);
+		B.reshape(numViews*3, numFeatures);
 
 		// Scale depths so that they are close to unity
 		normalizeDepths(depths);
@@ -178,25 +179,25 @@ public class ProjectiveStructureByFactorization {
 		assignValuesToA(A);
 
 		for (int iter = 0; iter < maxIterations; iter++) {
-			if( !svd.decompose(A) )
+			if (!svd.decompose(A))
 				return false;
 
-			svd.getU(U,false);
-			svd.getV(Vt,true);
+			svd.getU(U, false);
+			svd.getV(Vt, true);
 			double sv[] = svd.getSingularValues();
 
-			SingularOps_DDRM.descendingOrder(U,false,sv,A.numCols,Vt,true);
+			SingularOps_DDRM.descendingOrder(U, false, sv, A.numCols, Vt, true);
 
 			// This is equivalent to forcing the rank to be 4
-			CommonOps_DDRM.extract(U,0,0,P);
-			CommonOps_DDRM.multCols(P,sv);
-			CommonOps_DDRM.extract(Vt,0,0,X);
+			CommonOps_DDRM.extract(U, 0, 0, P);
+			CommonOps_DDRM.multCols(P, sv);
+			CommonOps_DDRM.extract(Vt, 0, 0, X);
 
 			// Compute the new value of A
-			CommonOps_DDRM.mult(P,X,B);
+			CommonOps_DDRM.mult(P, X, B);
 
 			// See how much change there is
-			double delta = SpecializedOps_DDRM.diffNormF(A,B)/(A.numCols*A.numRows);
+			double delta = SpecializedOps_DDRM.diffNormF(A, B)/(A.numCols*A.numRows);
 
 			// swap arrays for the next iteration
 			DMatrixRMaj tmp = A;
@@ -204,7 +205,7 @@ public class ProjectiveStructureByFactorization {
 			B = tmp;
 
 			// exit if converged
-			if( delta <= minimumChangeTol )
+			if (delta <= minimumChangeTol)
 				break;
 		}
 
@@ -213,34 +214,35 @@ public class ProjectiveStructureByFactorization {
 
 	/**
 	 * Used to get found camera matrix for a view
+	 *
 	 * @param view Which view
 	 * @param cameraMatrix storage for 3x4 projective camera matrix
 	 */
-	public void getCameraMatrix(int view , DMatrixRMaj cameraMatrix ) {
-		cameraMatrix.reshape(3,4);
-		CommonOps_DDRM.extract(P,view*3,0,cameraMatrix);
+	public void getCameraMatrix( int view, DMatrixRMaj cameraMatrix ) {
+		cameraMatrix.reshape(3, 4);
+		CommonOps_DDRM.extract(P, view*3, 0, cameraMatrix);
 
 		for (int col = 0; col < 4; col++) {
-			cameraMatrix.data[cameraMatrix.getIndex(0,col)] *= pixelScale;
-			cameraMatrix.data[cameraMatrix.getIndex(1,col)] *= pixelScale;
+			cameraMatrix.data[cameraMatrix.getIndex(0, col)] *= pixelScale;
+			cameraMatrix.data[cameraMatrix.getIndex(1, col)] *= pixelScale;
 		}
 	}
 
 	/**
 	 * Returns location of 3D feature for a view
+	 *
 	 * @param feature Index of feature to retrieve
 	 * @param out (Output) Storage for 3D feature. homogenous coordinates
 	 */
-	public void getFeature3D( int feature , Point4D_F64 out ) {
-		out.x = X.get(0,feature);
-		out.y = X.get(1,feature);
-		out.z = X.get(2,feature);
-		out.w = X.get(3,feature);
+	public void getFeature3D( int feature, Point4D_F64 out ) {
+		out.x = X.get(0, feature);
+		out.y = X.get(1, feature);
+		out.z = X.get(2, feature);
+		out.w = X.get(3, feature);
 	}
 
 	/**
 	 * A[:,0] = depth*[x,y,1]'
-	 *
 	 */
 	public void assignValuesToA( DMatrixRMaj A ) {
 		for (int viewIdx = 0; viewIdx < depths.numRows; viewIdx++) {
@@ -248,12 +250,12 @@ public class ProjectiveStructureByFactorization {
 			int rowPixels = viewIdx*2;
 
 			for (int pointIdx = 0; pointIdx < depths.numCols; pointIdx++) {
-				double depth = depths.get(viewIdx,pointIdx);
+				double depth = depths.get(viewIdx, pointIdx);
 
 				// pixels are in homogenous coordinates A(:,i) = depth*(x,y,1)
-				A.set(rowA,pointIdx, depth*pixels.get(rowPixels,pointIdx)/pixelScale);
-				A.set(rowA+1,pointIdx, depth*pixels.get(rowPixels+1,pointIdx)/pixelScale);
-				A.set(rowA+2,pointIdx, depth);
+				A.set(rowA, pointIdx, depth*pixels.get(rowPixels, pointIdx)/pixelScale);
+				A.set(rowA + 1, pointIdx, depth*pixels.get(rowPixels + 1, pointIdx)/pixelScale);
+				A.set(rowA + 2, pointIdx, depth);
 			}
 		}
 	}
@@ -284,12 +286,12 @@ public class ProjectiveStructureByFactorization {
 		for (int col = 0; col < depths.numCols; col++) {
 			double norm = 0;
 			for (int row = 0; row < depths.numRows; row++) {
-				double v = depths.get(row,col);
+				double v = depths.get(row, col);
 				norm += v*v;
 			}
 			norm = Math.sqrt(norm);
 			for (int row = 0; row < depths.numRows; row++) {
-				depths.data[depths.getIndex(row,col)] /= norm;
+				depths.data[depths.getIndex(row, col)] /= norm;
 			}
 		}
 	}
@@ -298,7 +300,7 @@ public class ProjectiveStructureByFactorization {
 		return maxIterations;
 	}
 
-	public void setMaxIterations(int maxIterations) {
+	public void setMaxIterations( int maxIterations ) {
 		this.maxIterations = maxIterations;
 	}
 
@@ -306,7 +308,7 @@ public class ProjectiveStructureByFactorization {
 		return minimumChangeTol;
 	}
 
-	public void setMinimumChangeTol(double minimumChangeTol) {
+	public void setMinimumChangeTol( double minimumChangeTol ) {
 		this.minimumChangeTol = minimumChangeTol;
 	}
 }

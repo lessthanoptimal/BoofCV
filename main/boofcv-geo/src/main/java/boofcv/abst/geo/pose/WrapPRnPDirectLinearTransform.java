@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,6 +31,7 @@ import java.util.List;
 
 /**
  * Wrapper around {@link boofcv.alg.geo.pose.PRnPDirectLinearTransform} for {@link EstimateNofPrNP}
+ *
  * @author Peter Abeles
  */
 public class WrapPRnPDirectLinearTransform implements Estimate1ofPrNP {
@@ -39,20 +40,20 @@ public class WrapPRnPDirectLinearTransform implements Estimate1ofPrNP {
 	List<Point4D_F64> worldPts = new ArrayList<>();
 	List<Point2D_F64> observed = new ArrayList<>();
 
-	public WrapPRnPDirectLinearTransform(PRnPDirectLinearTransform alg) {
+	public WrapPRnPDirectLinearTransform( PRnPDirectLinearTransform alg ) {
 		this.alg = alg;
 	}
 
 	@Override
-	public boolean process(List<Point2D4D> inputs, DMatrixRMaj solution ) {
-		for( int i = 0; i < inputs.size(); i++ ) {
+	public boolean process( List<Point2D4D> inputs, DMatrixRMaj solution ) {
+		for (int i = 0; i < inputs.size(); i++) {
 			Point2D4D pp = inputs.get(i);
 
 			worldPts.add(pp.location);
 			observed.add(pp.observation);
 		}
 
-		alg.process(worldPts,observed,solution);
+		alg.process(worldPts, observed, solution);
 
 		worldPts.clear();
 		observed.clear();

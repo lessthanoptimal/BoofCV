@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,30 +41,30 @@ public class LeastSquaresHomography implements RefineEpipolar {
 	int maxIterations;
 	double convergenceTol;
 
-	public LeastSquaresHomography(double convergenceTol,
-								  int maxIterations,
-								  ModelObservationResidualN residuals ) {
+	public LeastSquaresHomography( double convergenceTol,
+								   int maxIterations,
+								   ModelObservationResidualN residuals ) {
 		this.maxIterations = maxIterations;
 		this.convergenceTol = convergenceTol;
-		this.func = new ResidualsEpipolarMatrixN(null,residuals);
+		this.func = new ResidualsEpipolarMatrixN(null, residuals);
 
-		minimizer = FactoryOptimization.levenbergMarquardt(null,false);
+		minimizer = FactoryOptimization.levenbergMarquardt(null, false);
 	}
 
 	@Override
-	public boolean fitModel(List<AssociatedPair> obs, DMatrixRMaj F, DMatrixRMaj refinedF) {
+	public boolean fitModel( List<AssociatedPair> obs, DMatrixRMaj F, DMatrixRMaj refinedF ) {
 
 		func.setObservations(obs);
-		minimizer.setFunction(func,null);
+		minimizer.setFunction(func, null);
 
-		minimizer.initialize(F.data,0,convergenceTol*obs.size());
+		minimizer.initialize(F.data, 0, convergenceTol*obs.size());
 
-		for( int i = 0; i < maxIterations; i++ ) {
-			if( minimizer.iterate() )
+		for (int i = 0; i < maxIterations; i++) {
+			if (minimizer.iterate())
 				break;
 		}
 
-		System.arraycopy(minimizer.getParameters(),0,refinedF.data,0,9);
+		System.arraycopy(minimizer.getParameters(), 0, refinedF.data, 0, 9);
 
 		return true;
 	}

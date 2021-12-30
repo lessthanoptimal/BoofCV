@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,17 +30,16 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class HomographyTLS_to_Epipolar implements Estimate1ofEpipolar
-{
+public class HomographyTLS_to_Epipolar implements Estimate1ofEpipolar {
 	HomographyTotalLeastSquares alg;
 
-	public HomographyTLS_to_Epipolar(HomographyTotalLeastSquares alg) {
+	public HomographyTLS_to_Epipolar( HomographyTotalLeastSquares alg ) {
 		this.alg = alg;
 	}
 
 	@Override
-	public boolean process(List<AssociatedPair> points, DMatrixRMaj H) {
-		return alg.process(points,H);
+	public boolean process( List<AssociatedPair> points, DMatrixRMaj H ) {
+		return alg.process(points, H);
 	}
 
 	@Override

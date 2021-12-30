@@ -48,13 +48,13 @@ public interface P3PLineDistance {
 	 * @param length12 Distance between points P1 and P2
 	 * @return true if successful or false if it failed to generate any solutions
 	 */
-	public boolean process( Point2D_F64 obs1 , Point2D_F64 obs2, Point2D_F64 obs3,
-							double length23 , double length13 , double length12 );
+	boolean process( Point2D_F64 obs1, Point2D_F64 obs2, Point2D_F64 obs3,
+							double length23, double length13, double length12 );
 
 	/**
 	 * Returns a set of solutions. Each solution contains the distance to the respective point.
 	 *
 	 * @return List of solutions.
 	 */
-	public DogArray<PointDistance3> getSolutions();
+	DogArray<PointDistance3> getSolutions();
 }

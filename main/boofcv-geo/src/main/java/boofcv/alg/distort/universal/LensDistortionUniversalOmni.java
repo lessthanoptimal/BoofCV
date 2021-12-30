@@ -32,7 +32,8 @@ import boofcv.struct.distort.Point3Transform2_F64;
  */
 public class LensDistortionUniversalOmni implements LensDistortionWideFOV {
 	CameraUniversalOmni model;
-	public LensDistortionUniversalOmni(CameraUniversalOmni model ) {
+
+	public LensDistortionUniversalOmni( CameraUniversalOmni model ) {
 		this.model = model;
 	}
 

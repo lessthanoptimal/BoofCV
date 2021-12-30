@@ -57,25 +57,24 @@ import java.util.List;
 public class Zhang99CalibrationMatrixFromHomographies {
 
 	// system of equations
-	private DMatrixRMaj A = new DMatrixRMaj(1,1);
+	private DMatrixRMaj A = new DMatrixRMaj(1, 1);
 
 	private SolveNullSpaceSvd_DDRM solverNull = new SolveNullSpaceSvd_DDRM();
 
 	// a vectorized description of the B = A^-T * A^-1 matrix.
-	private DMatrixRMaj b = new DMatrixRMaj(1,1);
+	private DMatrixRMaj b = new DMatrixRMaj(1, 1);
 	// the found calibration matrix
-	private DMatrixRMaj K = new DMatrixRMaj(3,3);
+	private DMatrixRMaj K = new DMatrixRMaj(3, 3);
 
 	/** if it should assume the skew is zero or not */
 	@Getter private boolean assumeZeroSkew;
 
-
 	/**
 	 * Configures calibration estimation.
 	 *
-	 * @param assumeZeroSkew  Assume that skew matrix is zero or not
+	 * @param assumeZeroSkew Assume that skew matrix is zero or not
 	 */
-	public Zhang99CalibrationMatrixFromHomographies(boolean assumeZeroSkew) {
+	public Zhang99CalibrationMatrixFromHomographies( boolean assumeZeroSkew ) {
 		setAssumeZeroSkew(assumeZeroSkew);
 	}
 
@@ -83,15 +82,16 @@ public class Zhang99CalibrationMatrixFromHomographies {
 
 	/**
 	 * Specifies if it should assume skew is zero or not
+	 *
 	 * @param zeroSkew true if skew is zero
 	 */
 	public void setAssumeZeroSkew( boolean zeroSkew ) {
 		this.assumeZeroSkew = zeroSkew;
 
-		if( assumeZeroSkew )
-			b.reshape(5,1);
+		if (assumeZeroSkew)
+			b.reshape(5, 1);
 		else
-			b.reshape(6,1);
+			b.reshape(6, 1);
 	}
 
 	/**
@@ -101,25 +101,25 @@ public class Zhang99CalibrationMatrixFromHomographies {
 	 * @param homographies Homographies computed from observations of the calibration grid.
 	 */
 	public void process( List<DMatrixRMaj> homographies ) {
-		if( assumeZeroSkew ) {
-			if( homographies.size() < 2 )
-				throw new IllegalArgumentException("At least two homographies are required. Found "+homographies.size());
-		} else if( homographies.size() < 3 ) {
-			throw new IllegalArgumentException("At least three homographies are required. Found "+homographies.size());
+		if (assumeZeroSkew) {
+			if (homographies.size() < 2)
+				throw new IllegalArgumentException("At least two homographies are required. Found " + homographies.size());
+		} else if (homographies.size() < 3) {
+			throw new IllegalArgumentException("At least three homographies are required. Found " + homographies.size());
 		}
 
-		if( assumeZeroSkew ) {
+		if (assumeZeroSkew) {
 			setupA_NoSkew(homographies);
-			if( !solverNull.process(A,1,b) )
+			if (!solverNull.process(A, 1, b))
 				throw new RuntimeException("SVD failed");
 			computeParam_ZeroSkew();
 		} else {
 			setupA(homographies);
-			if( !solverNull.process(A,1,b) )
+			if (!solverNull.process(A, 1, b))
 				throw new RuntimeException("SVD failed");
 			computeParam();
 		}
-		if(MatrixFeatures_DDRM.hasUncountable(K)) {
+		if (MatrixFeatures_DDRM.hasUncountable(K)) {
 			throw new RuntimeException("Failed!");
 		}
 	}
@@ -131,31 +131,31 @@ public class Zhang99CalibrationMatrixFromHomographies {
 	 * @param homographies set of observed homographies.
 	 */
 	private void setupA( List<DMatrixRMaj> homographies ) {
-		A.reshape(2*homographies.size(),6, false);
+		A.reshape(2*homographies.size(), 6, false);
 
-		DMatrixRMaj h1 = new DMatrixRMaj(3,1);
-		DMatrixRMaj h2 = new DMatrixRMaj(3,1);
+		DMatrixRMaj h1 = new DMatrixRMaj(3, 1);
+		DMatrixRMaj h2 = new DMatrixRMaj(3, 1);
 
-		DMatrixRMaj v12 = new DMatrixRMaj(1,6);
-		DMatrixRMaj v11 = new DMatrixRMaj(1,6);
-		DMatrixRMaj v22 = new DMatrixRMaj(1,6);
+		DMatrixRMaj v12 = new DMatrixRMaj(1, 6);
+		DMatrixRMaj v11 = new DMatrixRMaj(1, 6);
+		DMatrixRMaj v22 = new DMatrixRMaj(1, 6);
 
-		DMatrixRMaj v11m22 = new DMatrixRMaj(1,6);
+		DMatrixRMaj v11m22 = new DMatrixRMaj(1, 6);
 
-		for( int i = 0; i < homographies.size(); i++ ) {
+		for (int i = 0; i < homographies.size(); i++) {
 			DMatrixRMaj H = homographies.get(i);
 
-			CommonOps_DDRM.extract(H,0,3,0,1,h1,0,0);
-			CommonOps_DDRM.extract(H,0,3,1,2,h2,0,0);
+			CommonOps_DDRM.extract(H, 0, 3, 0, 1, h1, 0, 0);
+			CommonOps_DDRM.extract(H, 0, 3, 1, 2, h2, 0, 0);
 
 			// normalize H by the max value to reduce numerical error when computing A
 			// several numbers are multiplied against each other and could become quite large/small
 			double max1 = CommonOps_DDRM.elementMaxAbs(h1);
 			double max2 = CommonOps_DDRM.elementMaxAbs(h2);
-			double max = Math.max(max1,max2);
+			double max = Math.max(max1, max2);
 
-			CommonOps_DDRM.divide(h1,max);
-			CommonOps_DDRM.divide(h2,max);
+			CommonOps_DDRM.divide(h1, max);
+			CommonOps_DDRM.divide(h2, max);
 
 			// compute elements of A
 			computeV(h1, h2, v12);
@@ -164,8 +164,8 @@ public class Zhang99CalibrationMatrixFromHomographies {
 
 			CommonOps_DDRM.subtract(v11, v22, v11m22);
 
-			CommonOps_DDRM.insert( v12    , A, i*2   , 0);
-			CommonOps_DDRM.insert( v11m22 , A, i*2+1 , 0);
+			CommonOps_DDRM.insert(v12, A, i*2, 0);
+			CommonOps_DDRM.insert(v11m22, A, i*2 + 1, 0);
 		}
 	}
 
@@ -176,31 +176,31 @@ public class Zhang99CalibrationMatrixFromHomographies {
 	 * @param homographies set of observed homographies.
 	 */
 	private void setupA_NoSkew( List<DMatrixRMaj> homographies ) {
-		A.reshape(2*homographies.size(),5, false);
+		A.reshape(2*homographies.size(), 5, false);
 
-		DMatrixRMaj h1 = new DMatrixRMaj(3,1);
-		DMatrixRMaj h2 = new DMatrixRMaj(3,1);
+		DMatrixRMaj h1 = new DMatrixRMaj(3, 1);
+		DMatrixRMaj h2 = new DMatrixRMaj(3, 1);
 
-		DMatrixRMaj v12 = new DMatrixRMaj(1,5);
-		DMatrixRMaj v11 = new DMatrixRMaj(1,5);
-		DMatrixRMaj v22 = new DMatrixRMaj(1,5);
+		DMatrixRMaj v12 = new DMatrixRMaj(1, 5);
+		DMatrixRMaj v11 = new DMatrixRMaj(1, 5);
+		DMatrixRMaj v22 = new DMatrixRMaj(1, 5);
 
-		DMatrixRMaj v11m22 = new DMatrixRMaj(1,5);
+		DMatrixRMaj v11m22 = new DMatrixRMaj(1, 5);
 
-		for( int i = 0; i < homographies.size(); i++ ) {
+		for (int i = 0; i < homographies.size(); i++) {
 			DMatrixRMaj H = homographies.get(i);
 
-			CommonOps_DDRM.extract(H,0,3,0,1,h1,0,0);
-			CommonOps_DDRM.extract(H,0,3,1,2,h2,0,0);
+			CommonOps_DDRM.extract(H, 0, 3, 0, 1, h1, 0, 0);
+			CommonOps_DDRM.extract(H, 0, 3, 1, 2, h2, 0, 0);
 
 			// normalize H by the max value to reduce numerical error when computing A
 			// several numbers are multiplied against each other and could become quite large/small
 			double max1 = CommonOps_DDRM.elementMaxAbs(h1);
 			double max2 = CommonOps_DDRM.elementMaxAbs(h2);
-			double max = Math.max(max1,max2);
+			double max = Math.max(max1, max2);
 
-			CommonOps_DDRM.divide(h1,max);
-			CommonOps_DDRM.divide(h2,max);
+			CommonOps_DDRM.divide(h1, max);
+			CommonOps_DDRM.divide(h2, max);
 
 			// compute elements of A
 			computeV_NoSkew(h1, h2, v12);
@@ -209,51 +209,49 @@ public class Zhang99CalibrationMatrixFromHomographies {
 
 			CommonOps_DDRM.subtract(v11, v22, v11m22);
 
-			CommonOps_DDRM.insert( v12    , A, i*2   , 0);
-			CommonOps_DDRM.insert( v11m22 , A, i*2+1 , 0);
+			CommonOps_DDRM.insert(v12, A, i*2, 0);
+			CommonOps_DDRM.insert(v11m22, A, i*2 + 1, 0);
 		}
 	}
 
 	/**
 	 * This computes the v_ij vector found in the paper.
 	 */
-	private void computeV( DMatrixRMaj h1 ,DMatrixRMaj h2 , DMatrixRMaj v )
-	{
-		double h1x = h1.get(0,0);
-		double h1y = h1.get(1,0);
-		double h1z = h1.get(2,0);
+	private void computeV( DMatrixRMaj h1, DMatrixRMaj h2, DMatrixRMaj v ) {
+		double h1x = h1.get(0, 0);
+		double h1y = h1.get(1, 0);
+		double h1z = h1.get(2, 0);
 
-		double h2x = h2.get(0,0);
-		double h2y = h2.get(1,0);
-		double h2z = h2.get(2,0);
+		double h2x = h2.get(0, 0);
+		double h2y = h2.get(1, 0);
+		double h2z = h2.get(2, 0);
 
-		v.set(0,0,h1x*h2x);
-		v.set(0,1,h1x*h2y+h1y*h2x);
-		v.set(0,2,h1y*h2y);
-		v.set(0,3,h1z*h2x+h1x*h2z);
-		v.set(0,4,h1z*h2y+h1y*h2z);
-		v.set(0,5,h1z*h2z);
+		v.set(0, 0, h1x*h2x);
+		v.set(0, 1, h1x*h2y + h1y*h2x);
+		v.set(0, 2, h1y*h2y);
+		v.set(0, 3, h1z*h2x + h1x*h2z);
+		v.set(0, 4, h1z*h2y + h1y*h2z);
+		v.set(0, 5, h1z*h2z);
 	}
 
 	/**
 	 * This computes the v_ij vector found in the paper. Leaving out components that would
 	 * interact with B12, since that is known to be zero.
 	 */
-	private void computeV_NoSkew( DMatrixRMaj h1 ,DMatrixRMaj h2 , DMatrixRMaj v )
-	{
-		double h1x = h1.get(0,0);
-		double h1y = h1.get(1,0);
-		double h1z = h1.get(2,0);
+	private void computeV_NoSkew( DMatrixRMaj h1, DMatrixRMaj h2, DMatrixRMaj v ) {
+		double h1x = h1.get(0, 0);
+		double h1y = h1.get(1, 0);
+		double h1z = h1.get(2, 0);
 
-		double h2x = h2.get(0,0);
-		double h2y = h2.get(1,0);
-		double h2z = h2.get(2,0);
+		double h2x = h2.get(0, 0);
+		double h2y = h2.get(1, 0);
+		double h2z = h2.get(2, 0);
 
-		v.set(0,0,h1x*h2x);
-		v.set(0,1,h1y*h2y);
-		v.set(0,2,h1z*h2x+h1x*h2z);
-		v.set(0,3,h1z*h2y+h1y*h2z);
-		v.set(0,4,h1z*h2z);
+		v.set(0, 0, h1x*h2x);
+		v.set(0, 1, h1y*h2y);
+		v.set(0, 2, h1z*h2x + h1x*h2z);
+		v.set(0, 3, h1z*h2y + h1y*h2z);
+		v.set(0, 4, h1z*h2z);
 	}
 
 	/**
@@ -261,34 +259,34 @@ public class Zhang99CalibrationMatrixFromHomographies {
 	 */
 	private void computeParam() {
 		// reduce overflow/underflow
-		CommonOps_DDRM.divide(b,CommonOps_DDRM.elementMaxAbs(b));
+		CommonOps_DDRM.divide(b, CommonOps_DDRM.elementMaxAbs(b));
 
-		double B11 = b.get(0,0);
-		double B12 = b.get(1,0);
-		double B22 = b.get(2,0);
-		double B13 = b.get(3,0);
-		double B23 = b.get(4,0);
-		double B33 = b.get(5,0);
+		double B11 = b.get(0, 0);
+		double B12 = b.get(1, 0);
+		double B22 = b.get(2, 0);
+		double B13 = b.get(3, 0);
+		double B23 = b.get(4, 0);
+		double B33 = b.get(5, 0);
 
 		double temp0 = B12*B13 - B11*B23;
 		double temp1 = B11*B22 - B12*B12;
 
 		double v0 = temp0/temp1;
-		double lambda = B33-(B13*B13 + v0*temp0)/B11;
+		double lambda = B33 - (B13*B13 + v0*temp0)/B11;
 		// Using abs() inside is an adhoc modification to make it more stable
 		// If there is any good theoretical reason for it, that's a pure accident. Seems
 		// to work well in practice
-		double a = Math.sqrt(Math.abs(lambda / B11));
-		double b = Math.sqrt(Math.abs(lambda * B11 / temp1));
+		double a = Math.sqrt(Math.abs(lambda/B11));
+		double b = Math.sqrt(Math.abs(lambda*B11/temp1));
 		double c = -B12*b/B11;
 		double u0 = c*v0/a - B13/B11;
 
-		K.set(0,0,a);
-		K.set(0,1,c);
-		K.set(0,2,u0);
-		K.set(1,1,b);
-		K.set(1,2,v0);
-		K.set(2,2,1);
+		K.set(0, 0, a);
+		K.set(0, 1, c);
+		K.set(0, 2, u0);
+		K.set(1, 1, b);
+		K.set(1, 2, v0);
+		K.set(2, 2, 1);
 	}
 
 	/**
@@ -296,34 +294,33 @@ public class Zhang99CalibrationMatrixFromHomographies {
 	 */
 	private void computeParam_ZeroSkew() {
 		// reduce overflow/underflow
-		CommonOps_DDRM.divide(b,CommonOps_DDRM.elementMaxAbs(b));
+		CommonOps_DDRM.divide(b, CommonOps_DDRM.elementMaxAbs(b));
 
-		double B11 = b.get(0,0);
-		double B22 = b.get(1,0);
-		double B13 = b.get(2,0);
-		double B23 = b.get(3,0);
-		double B33 = b.get(4,0);
+		double B11 = b.get(0, 0);
+		double B22 = b.get(1, 0);
+		double B13 = b.get(2, 0);
+		double B23 = b.get(3, 0);
+		double B33 = b.get(4, 0);
 
 		double temp0 = -B11*B23;
 		double temp1 = B11*B22;
 
 		double v0 = temp0/temp1;
-		double lambda = B33-(B13*B13 + v0*temp0)/B11;
+		double lambda = B33 - (B13*B13 + v0*temp0)/B11;
 		// Using abs() inside is an adhoc modification to make it more stable
 		// If there is any good theoretical reason for it, that's a pure accident. Seems
 		// to work well in practice
-		double a = Math.sqrt(Math.abs(lambda / B11));
+		double a = Math.sqrt(Math.abs(lambda/B11));
 		double b = Math.sqrt(Math.abs(lambda*B11/temp1));
-		double u0 = - B13/B11;
+		double u0 = -B13/B11;
 
-		K.set(0,0,a);
-		K.set(0,1,0);
-		K.set(0,2,u0);
-		K.set(1,1,b);
-		K.set(1,2,v0);
-		K.set(2,2,1);
+		K.set(0, 0, a);
+		K.set(0, 1, 0);
+		K.set(0, 2, u0);
+		K.set(1, 1, b);
+		K.set(1, 2, v0);
+		K.set(2, 2, 1);
 	}
-
 
 	/**
 	 * Returns the computed calibration matrix.

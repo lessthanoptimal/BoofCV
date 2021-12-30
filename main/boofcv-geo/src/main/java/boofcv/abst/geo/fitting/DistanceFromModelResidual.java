@@ -25,34 +25,33 @@ import java.util.List;
 
 /**
  * Computes the error using {@link boofcv.alg.geo.ModelObservationResidual} for {@link DistanceFromModel}.
- * 
+ *
  * @author Peter Abeles
  */
 public class DistanceFromModelResidual<Model, Point>
-		implements DistanceFromModel<Model,Point>
-{
-	ModelObservationResidual<Model,Point> function;
+		implements DistanceFromModel<Model, Point> {
+	ModelObservationResidual<Model, Point> function;
 
-	public DistanceFromModelResidual(ModelObservationResidual<Model, Point> function) {
+	public DistanceFromModelResidual( ModelObservationResidual<Model, Point> function ) {
 		this.function = function;
 	}
 
 	@Override
-	public void setModel(Model F) {
+	public void setModel( Model F ) {
 		function.setModel(F);
 	}
 
 	@Override
-	public double distance(Point pt) {
+	public double distance( Point pt ) {
 		double r = function.computeResidual(pt);
 		return r*r;
 	}
 
 	@Override
-	public void distances(List<Point> associatedPairs, double[] distance) {
-		for( int i = 0; i < associatedPairs.size(); i++ ) {
+	public void distances( List<Point> associatedPairs, double[] distance ) {
+		for (int i = 0; i < associatedPairs.size(); i++) {
 			Point p = associatedPairs.get(i);
-			
+
 			double r = function.computeResidual(p);
 			distance[i] = r*r;
 		}

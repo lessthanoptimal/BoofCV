@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,7 @@ public class QueueMatrix extends DogArray<DMatrixRMaj> {
 	 * @param numRows Number of rows in each matrix.
 	 * @param numCols Number of columns in each matrix.
 	 */
-	public QueueMatrix( int numRows , int numCols ) {
-		super(DMatrixRMaj.class,()->new DMatrixRMaj(numRows,numCols));
+	public QueueMatrix( int numRows, int numCols ) {
+		super(DMatrixRMaj.class, () -> new DMatrixRMaj(numRows, numCols));
 	}
 }

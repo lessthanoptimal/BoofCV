@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,35 +31,39 @@ public interface LensDistortionNarrowFOV {
 
 	/**
 	 * Adds lens distortion
+	 *
 	 * @param pixelIn true if input is pixel coordinates or false if in normalized image coordinates
 	 * @param pixelOut true if output is pixel coordinates or false if in normalized image coordinates
 	 * @return Specified transform
 	 */
-	Point2Transform2_F64 distort_F64(boolean pixelIn, boolean pixelOut);
+	Point2Transform2_F64 distort_F64( boolean pixelIn, boolean pixelOut );
 
 	/**
 	 * Adds lens distortion
+	 *
 	 * @param pixelIn true if input is pixel coordinates or false if in normalized image coordinates
 	 * @param pixelOut true if output is pixel coordinates or false if in normalized image coordinates
 	 * @return Specified transform
 	 */
-	Point2Transform2_F32 distort_F32(boolean pixelIn, boolean pixelOut);
+	Point2Transform2_F32 distort_F32( boolean pixelIn, boolean pixelOut );
 
 	/**
 	 * Removes lens distortion
+	 *
 	 * @param pixelIn true if input is pixel coordinates or false if in normalized image coordinates
 	 * @param pixelOut true if output is pixel coordinates or false if in normalized image coordinates
 	 * @return Specified transform
 	 */
-	Point2Transform2_F64 undistort_F64(boolean pixelIn, boolean pixelOut);
+	Point2Transform2_F64 undistort_F64( boolean pixelIn, boolean pixelOut );
 
 	/**
 	 * Removes lens distortion
+	 *
 	 * @param pixelIn true if input is pixel coordinates or false if in normalized image coordinates
 	 * @param pixelOut true if output is pixel coordinates or false if in normalized image coordinates
 	 * @return Specified transform
 	 */
-	Point2Transform2_F32 undistort_F32(boolean pixelIn, boolean pixelOut);
+	Point2Transform2_F32 undistort_F32( boolean pixelIn, boolean pixelOut );
 
 	/**
 	 * Converts a pixel coordinate into a normalized image coordinate. Assumes that pixels have lens distortion

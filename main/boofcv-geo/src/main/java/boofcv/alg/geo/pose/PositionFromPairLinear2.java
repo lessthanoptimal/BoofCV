@@ -56,17 +56,17 @@ import java.util.List;
  */
 public class PositionFromPairLinear2 {
 	LinearSolverDense<DMatrixRMaj> solver = LinearSolverFactory_DDRM.leastSquares(300, 3);
-	
+
 	// storage for system of equations
-	DMatrixRMaj A = new DMatrixRMaj(3,3);
-	DMatrixRMaj x = new DMatrixRMaj(3,1);
-	DMatrixRMaj b = new DMatrixRMaj(3,1);
+	DMatrixRMaj A = new DMatrixRMaj(3, 3);
+	DMatrixRMaj x = new DMatrixRMaj(3, 1);
+	DMatrixRMaj b = new DMatrixRMaj(3, 1);
 
 	Point3D_F64 RX = new Point3D_F64();
-	
+
 	// found translation
 	Vector3D_F64 T = new Vector3D_F64();
-	
+
 	/**
 	 * Computes the translation given two or more feature observations and the known rotation
 	 *
@@ -75,48 +75,50 @@ public class PositionFromPairLinear2 {
 	 * @param observed Observations of point in current view. Normalized coordinates.
 	 * @return true if it succeeded.
 	 */
-	public boolean process( DMatrixRMaj R , List<Point3D_F64> worldPts , List<Point2D_F64> observed )
-	{
-		if( worldPts.size() != observed.size() )
+	public boolean process( DMatrixRMaj R, List<Point3D_F64> worldPts, List<Point2D_F64> observed ) {
+		if (worldPts.size() != observed.size())
 			throw new IllegalArgumentException("Number of worldPts and observed must be the same");
-		if( worldPts.size() < 2 )
+		if (worldPts.size() < 2)
 			throw new IllegalArgumentException("A minimum of two points are required");
-		
-		int N = worldPts.size();
-		
-		A.reshape(3*N,3); b.reshape(A.numRows, 1);
 
-		
-		for( int i = 0; i < N; i++ ) {
+		int N = worldPts.size();
+
+		A.reshape(3*N, 3);
+		b.reshape(A.numRows, 1);
+
+
+		for (int i = 0; i < N; i++) {
 			Point3D_F64 X = worldPts.get(i);
 			Point2D_F64 o = observed.get(i);
-			
+
 			int indexA = i*3*3;
 			int indexB = i*3;
 
-			A.data[indexA+1] = -1;
-			A.data[indexA+2] = o.y;
-			A.data[indexA+3] = 1;
-			A.data[indexA+5] = -o.x;
-			A.data[indexA+6] = -o.y;
-			A.data[indexA+7] = o.x;
+			// @formatter:off
+			A.data[indexA + 1] = -1;
+			A.data[indexA + 2] =  o.y;
+			A.data[indexA + 3] =  1;
+			A.data[indexA + 5] = -o.x;
+			A.data[indexA + 6] = -o.y;
+			A.data[indexA + 7] =  o.x;
 
-			GeometryMath_F64.mult(R,X,RX);
+			GeometryMath_F64.mult(R, X, RX);
 
 			b.data[indexB++] =   1*RX.y - o.y*RX.z;
 			b.data[indexB++] =  -1*RX.x + o.x*RX.z;
 			b.data[indexB  ] = o.y*RX.x - o.x*RX.y;
+			// @formatter:on
 		}
-		
-		if( !solver.setA(A) )
+
+		if (!solver.setA(A))
 			return false;
-		
-		solver.solve(b,x);
-		
+
+		solver.solve(b, x);
+
 		T.x = x.data[0];
 		T.y = x.data[1];
 		T.z = x.data[2];
-		
+
 		return true;
 	}
 

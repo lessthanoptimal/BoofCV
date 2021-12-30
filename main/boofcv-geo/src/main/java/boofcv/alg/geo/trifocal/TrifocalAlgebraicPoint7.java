@@ -67,9 +67,9 @@ public class TrifocalAlgebraicPoint7 extends TrifocalLinearPoint7 {
 	 * @param ftol Convergence tolerance. See {@link UnconstrainedLeastSquares} for details.
 	 * @param gtol Convergence tolerance. See {@link UnconstrainedLeastSquares} for details.
 	 */
-	public TrifocalAlgebraicPoint7(UnconstrainedLeastSquares optimizer,
-								   int maxIterations, double ftol,
-								   double gtol) {
+	public TrifocalAlgebraicPoint7( UnconstrainedLeastSquares optimizer,
+									int maxIterations, double ftol,
+									double gtol ) {
 		this.optimizer = optimizer;
 		this.maxIterations = maxIterations;
 		this.ftol = ftol;
@@ -77,8 +77,8 @@ public class TrifocalAlgebraicPoint7 extends TrifocalLinearPoint7 {
 	}
 
 	@Override
-	public boolean process(List<AssociatedTriple> observations, TrifocalTensor solution ) {
-		if( observations.size() < 7 )
+	public boolean process( List<AssociatedTriple> observations, TrifocalTensor solution ) {
+		if (observations.size() < 7)
 			throw new IllegalArgumentException("At least 7 correspondences must be provided");
 
 		// compute normalization to reduce numerical errors
@@ -104,33 +104,37 @@ public class TrifocalAlgebraicPoint7 extends TrifocalLinearPoint7 {
 	 */
 	private void minimizeWithGeometricConstraints() {
 		extractEpipoles.setTensor(solutionN);
-		extractEpipoles.extractEpipoles(e2,e3);
+		extractEpipoles.extractEpipoles(e2, e3);
 
 		// encode the parameters being optimized
+		// @formatter:off
 		param[0] = e2.x; param[1] = e2.y; param[2] = e2.z;
 		param[3] = e3.x; param[4] = e3.y; param[5] = e3.z;
+		// @formatter:on
 
 		// adjust the error function for the current inputs
 		errorFunction.init();
 
 		// set up the optimization algorithm
-		optimizer.setFunction(errorFunction,null);
-		optimizer.initialize(param,gtol,ftol);
+		optimizer.setFunction(errorFunction, null);
+		optimizer.initialize(param, gtol, ftol);
 
 		// optimize until convergence or the maximum number of iterations
 		UtilOptimize.process(optimizer, maxIterations);
 
 		// get the results and compute the trifocal tensor
 		double found[] = optimizer.getParameters();
-		paramToEpipoles(found,e2,e3);
+		paramToEpipoles(found, e2, e3);
 
-		enforce.process(e2,e3,A);
+		enforce.process(e2, e3, A);
 		enforce.extractSolution(solutionN);
 	}
 
 	private static void paramToEpipoles(double[] found , Point3D_F64 e2 , Point3D_F64 e3 ) {
+		// @formatter:off
 		e2.x = found[0]; e2.y = found[1]; e2.z = found[2];
 		e3.x = found[3]; e3.y = found[4]; e3.z = found[5];
+		// @formatter:on
 	}
 
 	/**
@@ -141,7 +145,7 @@ public class TrifocalAlgebraicPoint7 extends TrifocalLinearPoint7 {
 		Point3D_F64 e2 = new Point3D_F64();
 		Point3D_F64 e3 = new Point3D_F64();
 
-		DMatrixRMaj errors = new DMatrixRMaj(1,1);
+		DMatrixRMaj errors = new DMatrixRMaj(1, 1);
 
 		public void init() {
 			errors.numRows = A.numRows;
@@ -159,12 +163,12 @@ public class TrifocalAlgebraicPoint7 extends TrifocalLinearPoint7 {
 		}
 
 		@Override
-		public void process(double[] input, double[] output) {
+		public void process( double[] input, double[] output ) {
 			paramToEpipoles(input, e2, e3);
 
-			enforce.process(e2,e3,A);
+			enforce.process(e2, e3, A);
 			errors.data = output;
-			enforce.computeErrorVector(A,errors);
+			enforce.computeErrorVector(A, errors);
 		}
 	}
 }

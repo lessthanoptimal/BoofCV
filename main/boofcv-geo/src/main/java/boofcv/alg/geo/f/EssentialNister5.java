@@ -62,33 +62,33 @@ import java.util.List;
 public class EssentialNister5 {
 
 	// Linear system describing p'*E*q = 0
-	private final DMatrixRMaj Q = new DMatrixRMaj(5,9);
+	private final DMatrixRMaj Q = new DMatrixRMaj(5, 9);
 	// contains the span of A
-	private final DMatrixRMaj nullspace = new DMatrixRMaj(9,9);
+	private final DMatrixRMaj nullspace = new DMatrixRMaj(9, 9);
 	private final SolveNullSpace<DMatrixRMaj> solverNull = new SolveNullSpaceQRP_DDRM();
 
 	// where all the ugly equations go
 	private final HelperNister5 helper = new HelperNister5();
 
 	// the span containing E
-	private final double []X = new double[9];
-	private final double []Y = new double[9];
-	private final double []Z = new double[9];
-	private final double []W = new double[9];
+	private final double[] X = new double[9];
+	private final double[] Y = new double[9];
+	private final double[] Z = new double[9];
+	private final double[] W = new double[9];
 
 	// unknowns for E = x*X + y*Y + z*Z + W
-	private double x,y,z;
+	private double x, y, z;
 
 	// Solver for the linear system below
 	LinearSolverDense<DMatrixRMaj> solver = LinearSolverFactory_DDRM.linear(10);
 
 	// Storage for linear systems
-	private final DMatrixRMaj A1 = new DMatrixRMaj(10,10);
-	private final DMatrixRMaj A2 = new DMatrixRMaj(10,10);
-	private final DMatrixRMaj C = new DMatrixRMaj(10,10);
+	private final DMatrixRMaj A1 = new DMatrixRMaj(10, 10);
+	private final DMatrixRMaj A2 = new DMatrixRMaj(10, 10);
+	private final DMatrixRMaj C = new DMatrixRMaj(10, 10);
 
 	// Used for finding polynomial roots
-	private final FindRealRootsSturm sturm = new FindRealRootsSturm(11,-1,1e-10,20,20);
+	private final FindRealRootsSturm sturm = new FindRealRootsSturm(11, -1, 1e-10, 20, 20);
 	private final PolynomialRoots rootFinder = new WrapRealRootsSturm(sturm);
 
 	// private PolynomialRoots findRoots = new RootFinderCompanion();
@@ -101,21 +101,21 @@ public class EssentialNister5 {
 	 * @param solutions Output: Storage for the found solutions. .
 	 * @return true for success or false if a fault has been detected
 	 */
-	public boolean process( List<AssociatedPair> points , DogArray<DMatrixRMaj> solutions ) {
-		if( points.size() != 5 )
-			throw new IllegalArgumentException("Exactly 5 points are required, not "+points.size());
+	public boolean process( List<AssociatedPair> points, DogArray<DMatrixRMaj> solutions ) {
+		if (points.size() != 5)
+			throw new IllegalArgumentException("Exactly 5 points are required, not " + points.size());
 		solutions.reset();
 
 		// Computes the 4-vector span which contains E. See equations 7-9
 		computeSpan(points);
 
 		// Construct a linear system based on the 10 constraint equations. See equations 5,6, and 10 .
-		helper.setNullSpace(X,Y,Z,W);
+		helper.setNullSpace(X, Y, Z, W);
 		helper.setupA1(A1);
 		helper.setupA2(A2);
 
 		// instead of Gauss-Jordan elimination LU decomposition is used to solve the system
-		if( !solver.setA(A1) )
+		if (!solver.setA(A1))
 			return false;
 		solver.solve(A2, C);
 
@@ -123,7 +123,7 @@ public class EssentialNister5 {
 		helper.setDeterminantVectors(C);
 		helper.extractPolynomial(poly.getCoefficients());
 
-		if( !rootFinder.process(poly) )
+		if (!rootFinder.process(poly))
 			return false;
 
 		List<Complex_F64> zeros = rootFinder.getRoots();
@@ -131,14 +131,14 @@ public class EssentialNister5 {
 		for (int rootIdx = 0; rootIdx < zeros.size(); rootIdx++) {
 			Complex_F64 c = zeros.get(rootIdx);
 
-			if( !c.isReal() )
+			if (!c.isReal())
 				continue;
 
 			solveForXandY(c.real);
 
 			DMatrixRMaj E = solutions.grow();
 
-			for( int i = 0; i < 9; i++ ) {
+			for (int i = 0; i < 9; i++) {
 				E.data[i] = x*X[i] + y*Y[i] + z*Z[i] + W[i];
 			}
 		}
@@ -155,13 +155,15 @@ public class EssentialNister5 {
 		Q.reshape(points.size(), 9);
 		int index = 0;
 
-		for( int i = 0; i < points.size(); i++ ) {
+		for (int i = 0; i < points.size(); i++) {
 			AssociatedPair p = points.get(i);
 
 			Point2D_F64 a = p.p2;
 			Point2D_F64 b = p.p1;
 
 			// The points are assumed to be in homogeneous coordinates. This means z = 1
+
+			// @formatter:off
 			Q.data[index++] =  a.x*b.x;
 			Q.data[index++] =  a.x*b.y;
 			Q.data[index++] =  a.x;
@@ -171,23 +173,25 @@ public class EssentialNister5 {
 			Q.data[index++] =      b.x;
 			Q.data[index++] =      b.y;
 			Q.data[index++] =  1;
+			// @formatter:on
 		}
 
-		if( !solverNull.process(Q,4,nullspace) )
+		if (!solverNull.process(Q, 4, nullspace))
 			throw new RuntimeException("Nullspace solver should never fail, probably bad input");
 
 		// extract the span of solutions for E from the null space
-		for( int i = 0; i < 9; i++ ) {
-			X[i] = nullspace.unsafe_get(i,0);
-			Y[i] = nullspace.unsafe_get(i,1);
-			Z[i] = nullspace.unsafe_get(i,2);
-			W[i] = nullspace.unsafe_get(i,3);
+		for (int i = 0; i < 9; i++) {
+			X[i] = nullspace.unsafe_get(i, 0);
+			Y[i] = nullspace.unsafe_get(i, 1);
+			Z[i] = nullspace.unsafe_get(i, 2);
+			W[i] = nullspace.unsafe_get(i, 3);
 		}
 	}
 
-	DMatrixRMaj tmpA = new DMatrixRMaj(3,2);
-	DMatrixRMaj tmpY = new DMatrixRMaj(3,1);
-	DMatrixRMaj tmpX = new DMatrixRMaj(2,1);
+	DMatrixRMaj tmpA = new DMatrixRMaj(3, 2);
+	DMatrixRMaj tmpY = new DMatrixRMaj(3, 1);
+	DMatrixRMaj tmpX = new DMatrixRMaj(2, 1);
+
 	/**
 	 * Once z is known then x and y can be solved for using the B matrix
 	 */
@@ -207,10 +211,10 @@ public class EssentialNister5 {
 		tmpA.data[5] = ((helper.M04*z + helper.M05)*z + helper.M06)*z + helper.M07;
 		tmpY.data[2] = (((helper.M08*z + helper.M09)*z + helper.M10)*z + helper.M11)*z + helper.M12;
 
-		CommonOps_DDRM.scale(-1,tmpY);
-		CommonOps_DDRM.solve(tmpA,tmpY,tmpX);
+		CommonOps_DDRM.scale(-1, tmpY);
+		CommonOps_DDRM.solve(tmpA, tmpY, tmpX);
 
-		this.x = tmpX.get(0,0);
-		this.y = tmpX.get(1,0);
+		this.x = tmpX.get(0, 0);
+		this.y = tmpX.get(1, 0);
 	}
 }

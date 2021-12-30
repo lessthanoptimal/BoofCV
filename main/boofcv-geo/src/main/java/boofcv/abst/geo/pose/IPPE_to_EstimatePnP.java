@@ -39,12 +39,12 @@ public class IPPE_to_EstimatePnP implements Estimate1ofPnP {
 
 	DogArray<AssociatedPair> pairs = new DogArray<>(AssociatedPair::new);
 
-	public IPPE_to_EstimatePnP(Estimate1ofEpipolar homography) {
+	public IPPE_to_EstimatePnP( Estimate1ofEpipolar homography ) {
 		alg = new PnPInfinitesimalPlanePoseEstimation(homography);
 	}
 
 	@Override
-	public boolean process(List<Point2D3D> points, Se3_F64 estimatedModel) {
+	public boolean process( List<Point2D3D> points, Se3_F64 estimatedModel ) {
 
 		pairs.resize(points.size());
 
@@ -52,15 +52,15 @@ public class IPPE_to_EstimatePnP implements Estimate1ofPnP {
 			AssociatedPair pair = pairs.get(i);
 			Point2D3D p = points.get(i);
 
-			if( p.location.z != 0 ) {
+			if (p.location.z != 0) {
 				throw new IllegalArgumentException("All points must lie on the x-y plane. If data is planar rotate it first");
 			}
 
-			pair.p1.setTo(p.location.x,p.location.y);
+			pair.p1.setTo(p.location.x, p.location.y);
 			pair.p2.setTo(p.observation);
 		}
 
-		if( !alg.process(pairs.toList()))
+		if (!alg.process(pairs.toList()))
 			return false;
 
 		estimatedModel.setTo(alg.getWorldToCamera0());

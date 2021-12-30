@@ -44,10 +44,10 @@ public class UniOmniPtoS_F64 implements Point2Transform3_F64 {
 
 	private double tol = GrlConstants.DCONV_TOL_A;
 
-		// inverse of camera calibration matrix
-	protected DMatrixRMaj K_inv = new DMatrixRMaj(3,3);
+	// inverse of camera calibration matrix
+	protected DMatrixRMaj K_inv = new DMatrixRMaj(3, 3);
 
-	public UniOmniPtoS_F64(CameraUniversalOmni model) {
+	public UniOmniPtoS_F64( CameraUniversalOmni model ) {
 		this.setModel(model);
 	}
 
@@ -58,27 +58,27 @@ public class UniOmniPtoS_F64 implements Point2Transform3_F64 {
 		return tol;
 	}
 
-	public void setTol(double tol) {
+	public void setTol( double tol ) {
 		this.tol = tol;
 	}
 
-	public void setModel(CameraUniversalOmni model) {
+	public void setModel( CameraUniversalOmni model ) {
 		this.mirrorOffset = (double)model.mirrorOffset;
 
-		distortion.setTo(model.radial,model.t1,model.t2);
+		distortion.setTo(model.radial, model.t1, model.t2);
 
-		K_inv.set(0,0, (double)model.fx);
-		K_inv.set(1,1, (double)model.fy);
-		K_inv.set(0,1, (double)model.skew);
-		K_inv.set(0,2, (double)model.cx);
-		K_inv.set(1,2, (double)model.cy);
-		K_inv.set(2,2,1);
+		K_inv.set(0, 0, (double)model.fx);
+		K_inv.set(1, 1, (double)model.fy);
+		K_inv.set(0, 1, (double)model.skew);
+		K_inv.set(0, 2, (double)model.cx);
+		K_inv.set(1, 2, (double)model.cy);
+		K_inv.set(2, 2, 1);
 
 		CommonOps_DDRM.invert(K_inv);
 	}
 
 	@Override
-	public void compute(double x, double y, Point3D_F64 out) {
+	public void compute( double x, double y, Point3D_F64 out ) {
 		p2.x = x;
 		p2.y = y;
 
@@ -86,7 +86,7 @@ public class UniOmniPtoS_F64 implements Point2Transform3_F64 {
 		GeometryMath_F64.mult(K_inv, p2, p2);
 
 		// find the undistorted normalized image coordinate
-		removeRadial(p2.x, p2.y, distortion.radial, distortion.t1, distortion.t2, p2, tol );
+		removeRadial(p2.x, p2.y, distortion.radial, distortion.t1, distortion.t2, p2, tol);
 
 		// put into unit sphere coordinates
 		double u = p2.x;

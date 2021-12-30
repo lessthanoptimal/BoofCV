@@ -44,7 +44,7 @@ import java.util.List;
 public class Zhang99ComputeTargetHomography {
 
 	private final Estimate1ofEpipolar computeHomography = FactoryMultiView.homographyDLT(true);
-	private final DMatrixRMaj found = new DMatrixRMaj(3,3);
+	private final DMatrixRMaj found = new DMatrixRMaj(3, 3);
 
 	// location of calibration points in the target frame's in world units.
 	// the z-axis is assumed to be zero
@@ -62,21 +62,20 @@ public class Zhang99ComputeTargetHomography {
 	 * @param observedPoints List of ordered detected grid points in image pixels.
 	 * @return True if it computed a Homography and false if it failed to compute a homography matrix.
 	 */
-	public boolean computeHomography( CalibrationObservation observedPoints )
-	{
-		if( observedPoints.size() < 4)
+	public boolean computeHomography( CalibrationObservation observedPoints ) {
+		if (observedPoints.size() < 4)
 			throw new IllegalArgumentException("At least 4 points needed in each set of observations. " +
 					" Filter these first please");
 
 		List<AssociatedPair> pairs = new ArrayList<>();
-		for( int i = 0; i < observedPoints.size(); i++ ) {
+		for (int i = 0; i < observedPoints.size(); i++) {
 			int which = observedPoints.get(i).index;
 			Point2D_F64 obs = observedPoints.get(i).p;
 
-			pairs.add( new AssociatedPair(worldPoints.get(which),obs,true));
+			pairs.add(new AssociatedPair(worldPoints.get(which), obs, true));
 		}
 
-		if( !computeHomography.process(pairs,found) )
+		if (!computeHomography.process(pairs, found))
 			return false;
 
 		// todo do non-linear refinement. Take advantage of coordinates being fixed
@@ -86,6 +85,7 @@ public class Zhang99ComputeTargetHomography {
 
 	/**
 	 * Returns a copy of the found homography matrix.
+	 *
 	 * @return Homography matrix.
 	 */
 	public DMatrixRMaj getHomography() {

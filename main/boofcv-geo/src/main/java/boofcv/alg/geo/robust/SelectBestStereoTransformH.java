@@ -41,49 +41,48 @@ public class SelectBestStereoTransformH {
 
 	/**
 	 * Specifies how the essential matrix is computed
-	 *
 	 */
 	public SelectBestStereoTransformH( Triangulate2ViewsMetricH triangulate ) {
 		this.depthCheck = new PositiveDepthConstraintCheckH(triangulate);
 	}
 
 	public SelectBestStereoTransformH() {
-		this(FactoryMultiView.triangulate2ViewMetricH(new ConfigTriangulation(ConfigTriangulation.Type.GEOMETRIC)) );
+		this(FactoryMultiView.triangulate2ViewMetricH(new ConfigTriangulation(ConfigTriangulation.Type.GEOMETRIC)));
 	}
 
 	/**
 	 * Selects the transform which describes a view where observations appear in front of the camera the most
+	 *
 	 * @param candidatesAtoB List of possible transforms
 	 * @param observations observations in both stereo cameras in normalized image coordinates
 	 * @param model (Output) the selected transform from a to b
 	 */
-	public void select(List<Se3_F64> candidatesAtoB,
-					   List<AssociatedPair> observations ,
-					   Se3_F64 model ) {
+	public void select( List<Se3_F64> candidatesAtoB,
+						List<AssociatedPair> observations,
+						Se3_F64 model ) {
 
 		// use positive depth constraint to select the best one
 		Se3_F64 bestModel = null;
 		int bestCount = -1;
-		for( int i = 0; i < candidatesAtoB.size(); i++ ) {
+		for (int i = 0; i < candidatesAtoB.size(); i++) {
 			Se3_F64 s = candidatesAtoB.get(i);
 			int count = 0;
 			for (int pairIdx = 0; pairIdx < observations.size(); pairIdx++) {
 				AssociatedPair p = observations.get(pairIdx);
-				if( depthCheck.checkConstraint(p.p1,p.p2,s)) {
+				if (depthCheck.checkConstraint(p.p1, p.p2, s)) {
 					count++;
 				}
 			}
 
-			if( count > bestCount ) {
+			if (count > bestCount) {
 				bestCount = count;
 				bestModel = s;
 			}
 		}
 
-		if( bestModel == null )
+		if (bestModel == null)
 			throw new RuntimeException("BUG");
 
 		model.setTo(bestModel);
 	}
-
 }

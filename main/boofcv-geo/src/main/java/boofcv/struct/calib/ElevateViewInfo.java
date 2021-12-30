@@ -38,9 +38,9 @@ public class ElevateViewInfo {
 	 */
 	@Getter @Setter public int cameraID;
 
-	public ElevateViewInfo(){}
+	public ElevateViewInfo() {}
 
-	public ElevateViewInfo(int width, int height, int id) {
+	public ElevateViewInfo( int width, int height, int id ) {
 		shape.setTo(width, height);
 		this.cameraID = id;
 	}
@@ -50,13 +50,13 @@ public class ElevateViewInfo {
 		this.cameraID = src.cameraID;
 	}
 
-	public void setTo(int width, int height, int id) {
+	public void setTo( int width, int height, int id ) {
 		shape.setTo(width, height);
 		this.cameraID = id;
 	}
 
 	public void reset() {
-		shape.setTo(-1,-1);
+		shape.setTo(-1, -1);
 		cameraID = -1;
 	}
 }

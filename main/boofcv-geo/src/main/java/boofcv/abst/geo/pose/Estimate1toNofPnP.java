@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,10 +29,9 @@ import georegression.struct.se.Se3_F64;
  *
  * @author Peter Abeles
  */
-public class Estimate1toNofPnP extends GeoModelEstimator1toN<Se3_F64,Point2D3D>
-		implements EstimateNofPnP
-{
-	public Estimate1toNofPnP(GeoModelEstimator1<Se3_F64, Point2D3D> alg) {
+public class Estimate1toNofPnP extends GeoModelEstimator1toN<Se3_F64, Point2D3D>
+		implements EstimateNofPnP {
+	public Estimate1toNofPnP( GeoModelEstimator1<Se3_F64, Point2D3D> alg ) {
 		super(alg);
 	}
 }

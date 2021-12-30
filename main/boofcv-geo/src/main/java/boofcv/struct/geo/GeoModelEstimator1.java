@@ -27,7 +27,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public interface GeoModelEstimator1<Model,Sample> {
+public interface GeoModelEstimator1<Model, Sample> {
 	/**
 	 * Estimates the model given a set of observations.
 	 *
@@ -35,7 +35,7 @@ public interface GeoModelEstimator1<Model,Sample> {
 	 * @param estimatedModel Output: Storage for the estimated model. Modified.
 	 * @return true if successful
 	 */
-	boolean process( List<Sample> points , Model estimatedModel );
+	boolean process( List<Sample> points, Model estimatedModel );
 
 	/**
 	 * Minimum number of points required to estimate the model.

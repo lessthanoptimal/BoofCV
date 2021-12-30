@@ -54,8 +54,8 @@ public class Zhang99CameraKannalaBrandt implements Zhang99Camera {
 
 		// all zeros are a pathological case. Fill it with arbitrary small values.
 		for (int i = 0; i < numAsymmetric; i++) {
-			ret.model.radial[i] = (i%2==0) ? 0.005 : -0.005;
-			ret.model.tangent[i] = (i%2==0) ? 0.005 : -0.005;
+			ret.model.radial[i] = (i%2 == 0) ? 0.005 : -0.005;
+			ret.model.tangent[i] = (i%2 == 0) ? 0.005 : -0.005;
 		}
 
 		// Distortion terms are all initialized to zero or nearly zero. Stability could be improved if an initial
