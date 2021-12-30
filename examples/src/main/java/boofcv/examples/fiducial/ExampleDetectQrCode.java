@@ -20,6 +20,7 @@ package boofcv.examples.fiducial;
 
 import boofcv.abst.fiducial.QrCodeDetector;
 import boofcv.alg.fiducial.qrcode.QrCode;
+import boofcv.factory.fiducial.ConfigQrCode;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ShowImages;
@@ -44,7 +45,9 @@ public class ExampleDetectQrCode {
 		BufferedImage input = UtilImageIO.loadImageNotNull(UtilIO.pathExample("fiducial/qrcode/image01.jpg"));
 		GrayU8 gray = ConvertBufferedImage.convertFrom(input, (GrayU8)null);
 
-		QrCodeDetector<GrayU8> detector = FactoryFiducial.qrcode(null, GrayU8.class);
+		var config = new ConfigQrCode();
+//		config.considerTransposed = false; // by default, it will consider incorrectly encoded markers. Faster if false
+		QrCodeDetector<GrayU8> detector = FactoryFiducial.qrcode(config, GrayU8.class);
 
 		detector.process(gray);
 

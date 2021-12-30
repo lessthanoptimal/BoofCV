@@ -41,6 +41,13 @@ public class QrCodeDecoderImage<T extends ImageGray<T>> {
 	// used to compute error correction
 	QrCodeDecoderBits decoder;
 
+	/**
+	 * Should it consider a QR code which has been encoded with a transposed bit pattern?
+	 *
+	 * @see boofcv.factory.fiducial.ConfigQrCode#considerTransposed
+	 */
+	public boolean considerTransposed = true;
+
 	DogArray<QrCode> storageQR = new DogArray<>(QrCode::new);
 	List<QrCode> successes = new ArrayList<>();
 	List<QrCode> failures = new ArrayList<>();
@@ -50,6 +57,7 @@ public class QrCodeDecoderImage<T extends ImageGray<T>> {
 
 	// internal workspace
 	Point2D_F64 grid = new Point2D_F64();
+	Polygon2D_F64 tempTranspose = new Polygon2D_F64();
 
 	QrCodeAlignmentPatternLocator<T> alignmentLocator;
 	QrCodeBinaryGridReader<T> gridReader;
@@ -93,11 +101,49 @@ public class QrCodeDecoderImage<T extends ImageGray<T>> {
 					if (decode(gray, qr)) {
 						successes.add(qr);
 					} else {
-						failures.add(qr);
+						// Consider the possibility that the QR code was encoded incorrectly with transposed bits
+						boolean success = false;
+						if (considerTransposed) {
+							transposePositionPatterns(qr);
+							success = decode(gray, qr);
+						}
+
+						if (success) {
+							qr.bitsTransposed = true;
+							successes.add(qr);
+						} else {
+							failures.add(qr);
+						}
 					}
 				}
 			}
 		}
+	}
+
+	/**
+	 * Transposes the orientation of position patterns. This will make it read the bits in a different order
+	 * enabling it to read QR codes which were incorrectly encoded.
+	 *
+	 * NOTE: In theory this could be made a bit more efficient by only sampling the image once and transposing
+	 * the read bits instead. This is much easier to implement.
+	 */
+	void transposePositionPatterns( QrCode qr ) {
+		tempTranspose.setTo(qr.ppDown);
+		qr.ppDown.setTo(qr.ppRight);
+		qr.ppRight.setTo(tempTranspose);
+
+		transposeCorners(qr.ppCorner);
+		transposeCorners(qr.ppRight);
+		transposeCorners(qr.ppDown);
+	}
+
+	/** Transposes the order of corners in the quadrilateral */
+	private static void transposeCorners( Polygon2D_F64 c ) {
+		double tmpX = c.get(1).x;
+		double tmpY = c.get(1).y;
+
+		c.get(1).setTo(c.get(3));
+		c.get(3).setTo(tmpX, tmpY);
 	}
 
 	/**

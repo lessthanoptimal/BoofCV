@@ -97,8 +97,8 @@ public class FactoryFiducial {
 	 */
 	public static <T extends ImageGray<T>>
 	SquareHamming_to_FiducialDetector<T> squareHamming( ConfigHammingMarker configMarkers,
-													   @Nullable ConfigFiducialHammingDetector configDetector,
-													   Class<T> imageType ) {
+														@Nullable ConfigFiducialHammingDetector configDetector,
+														Class<T> imageType ) {
 		if (configDetector == null) {
 			configDetector = new ConfigFiducialHammingDetector();
 		}
@@ -223,10 +223,11 @@ public class FactoryFiducial {
 		InputToBinary<T> inputToBinary = FactoryThresholdBinary.threshold(config.threshold, imageType);
 
 		DetectPolygonBinaryGrayRefine<T> squareDetector = FactoryShapeDetector.polygon(config.polygon, imageType);
-		QrCodePositionPatternDetector<T> detectPositionPatterns =
-				new QrCodePositionPatternDetector<>(squareDetector, config.versionMaximum);
+		var detectPositionPatterns = new QrCodePositionPatternDetector<>(squareDetector, config.versionMaximum);
 
-		return new QrCodePreciseDetector<>(inputToBinary, detectPositionPatterns, config.forceEncoding, false, imageType);
+		var detector = new QrCodePreciseDetector<>(inputToBinary, detectPositionPatterns, config.forceEncoding, false, imageType);
+		detector.getDecoder().considerTransposed = config.considerTransposed;
+		return detector;
 	}
 
 	/**
