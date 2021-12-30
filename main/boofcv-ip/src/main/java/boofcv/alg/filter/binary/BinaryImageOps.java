@@ -69,7 +69,7 @@ public class BinaryImageOps {
 	 */
 	public static GrayU8 logicAnd( GrayU8 inputA, GrayU8 inputB, @Nullable GrayU8 output ) {
 		InputSanityCheck.checkSameShape(inputA, inputB);
-		output = InputSanityCheck.checkDeclare(inputA, output);
+		output = InputSanityCheck.declareOrReshape(inputA, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplBinaryImageOps_MT.logicAnd(inputA, inputB, output);
@@ -90,7 +90,7 @@ public class BinaryImageOps {
 	 */
 	public static GrayU8 logicOr( GrayU8 inputA, GrayU8 inputB, @Nullable GrayU8 output ) {
 		InputSanityCheck.checkSameShape(inputA, inputB);
-		output = InputSanityCheck.checkDeclare(inputA, output);
+		output = InputSanityCheck.declareOrReshape(inputA, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplBinaryImageOps_MT.logicOr(inputA, inputB, output);
@@ -111,7 +111,7 @@ public class BinaryImageOps {
 	 */
 	public static GrayU8 logicXor( GrayU8 inputA, GrayU8 inputB, @Nullable GrayU8 output ) {
 		InputSanityCheck.checkSameShape(inputA, inputB);
-		output = InputSanityCheck.checkDeclare(inputA, output);
+		output = InputSanityCheck.declareOrReshape(inputA, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplBinaryImageOps_MT.logicXor(inputA, inputB, output);
@@ -130,7 +130,7 @@ public class BinaryImageOps {
 	 * @return Output of logical operation.
 	 */
 	public static GrayU8 invert( GrayU8 input, @Nullable GrayU8 output ) {
-		output = InputSanityCheck.checkDeclare(input, output);
+		output = InputSanityCheck.declareOrReshape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplBinaryImageOps_MT.invert(input, output);
@@ -153,7 +153,7 @@ public class BinaryImageOps {
 	 * @return Output image.
 	 */
 	public static GrayU8 erode4( GrayU8 input, int numTimes, @Nullable GrayU8 output ) {
-		output = InputSanityCheck.checkDeclare(input, output);
+		output = InputSanityCheck.declareOrReshape(input, output);
 
 		if (numTimes <= 0)
 			throw new IllegalArgumentException("numTimes must be >= 1");
@@ -203,7 +203,7 @@ public class BinaryImageOps {
 	 * @return Output image.
 	 */
 	public static GrayU8 dilate4( GrayU8 input, int numTimes, @Nullable GrayU8 output ) {
-		output = InputSanityCheck.checkDeclare(input, output);
+		output = InputSanityCheck.declareOrReshape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplBinaryInnerOps_MT.dilate4(input, output);
@@ -253,7 +253,7 @@ public class BinaryImageOps {
 	 * @return Output image.
 	 */
 	public static GrayU8 edge4( GrayU8 input, GrayU8 output, boolean outsideZero ) {
-		output = InputSanityCheck.checkDeclare(input, output);
+		output = InputSanityCheck.declareOrReshape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplBinaryInnerOps_MT.edge4(input, output);
@@ -277,7 +277,7 @@ public class BinaryImageOps {
 	 * @return Output image.
 	 */
 	public static GrayU8 erode8( GrayU8 input, int numTimes, @Nullable GrayU8 output ) {
-		output = InputSanityCheck.checkDeclare(input, output);
+		output = InputSanityCheck.declareOrReshape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplBinaryInnerOps_MT.erode8(input, output);
@@ -323,7 +323,7 @@ public class BinaryImageOps {
 	 * @return Output image.
 	 */
 	public static GrayU8 dilate8( GrayU8 input, int numTimes, @Nullable GrayU8 output ) {
-		output = InputSanityCheck.checkDeclare(input, output);
+		output = InputSanityCheck.declareOrReshape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplBinaryInnerOps_MT.dilate8(input, output);
@@ -373,7 +373,7 @@ public class BinaryImageOps {
 	 * @return Output image.
 	 */
 	public static GrayU8 edge8( GrayU8 input, GrayU8 output, boolean outsideZero ) {
-		output = InputSanityCheck.checkDeclare(input, output);
+		output = InputSanityCheck.declareOrReshape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplBinaryInnerOps_MT.edge8(input, output);
@@ -395,7 +395,7 @@ public class BinaryImageOps {
 	 * @return Output image.
 	 */
 	public static GrayU8 removePointNoise( GrayU8 input, @Nullable GrayU8 output ) {
-		output = InputSanityCheck.checkDeclare(input, output);
+		output = InputSanityCheck.declareOrReshape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplBinaryInnerOps_MT.removePointNoise(input, output);
@@ -418,7 +418,7 @@ public class BinaryImageOps {
 	 */
 	public static GrayU8 thin( GrayU8 input, int maxIterations, @Nullable GrayU8 output ) {
 
-		output = InputSanityCheck.checkDeclare(input, output);
+		output = InputSanityCheck.declareOrReshape(input, output);
 
 		output.setTo(input);
 		BinaryThinning thinning = new BinaryThinning();
@@ -518,7 +518,7 @@ public class BinaryImageOps {
 	 * @return The binary image.
 	 */
 	public static GrayU8 labelToBinary( GrayS32 labelImage, GrayU8 binaryImage ) {
-		binaryImage = InputSanityCheck.checkDeclare(labelImage, binaryImage, GrayU8.class);
+		binaryImage = InputSanityCheck.declareOrReshape(labelImage, binaryImage, GrayU8.class);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplBinaryImageOps_MT.labelToBinary(labelImage, binaryImage);
@@ -540,7 +540,7 @@ public class BinaryImageOps {
 	 */
 	public static GrayU8 labelToBinary( GrayS32 labelImage, GrayU8 binaryImage,
 										boolean[] selectedBlobs ) {
-		binaryImage = InputSanityCheck.checkDeclare(labelImage, binaryImage, GrayU8.class);
+		binaryImage = InputSanityCheck.declareOrReshape(labelImage, binaryImage, GrayU8.class);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplBinaryImageOps_MT.labelToBinary(labelImage, binaryImage, selectedBlobs);

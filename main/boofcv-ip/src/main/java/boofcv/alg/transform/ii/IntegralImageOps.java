@@ -45,7 +45,7 @@ public class IntegralImageOps {
 	 * @return Integral image.
 	 */
 	public static GrayF32 transform( GrayF32 input, @Nullable GrayF32 transformed ) {
-		transformed = InputSanityCheck.checkDeclare(input, transformed);
+		transformed = InputSanityCheck.declareOrReshape(input, transformed);
 
 		ImplIntegralImageOps.transform(input, transformed);
 
@@ -60,7 +60,7 @@ public class IntegralImageOps {
 	 * @return Integral image.
 	 */
 	public static GrayF64 transform( GrayF64 input, @Nullable GrayF64 transformed ) {
-		transformed = InputSanityCheck.checkDeclare(input, transformed);
+		transformed = InputSanityCheck.declareOrReshape(input, transformed);
 
 		ImplIntegralImageOps.transform(input, transformed);
 
@@ -75,7 +75,7 @@ public class IntegralImageOps {
 	 * @return Integral image.
 	 */
 	public static GrayS32 transform( GrayU8 input, @Nullable GrayS32 transformed ) {
-		transformed = InputSanityCheck.checkDeclare(input, transformed, GrayS32.class);
+		transformed = InputSanityCheck.declareOrReshape(input, transformed, GrayS32.class);
 
 		ImplIntegralImageOps.transform(input, transformed);
 
@@ -90,7 +90,7 @@ public class IntegralImageOps {
 	 * @return Integral image.
 	 */
 	public static GrayS32 transform( GrayS32 input, @Nullable GrayS32 transformed ) {
-		transformed = InputSanityCheck.checkDeclare(input, transformed, GrayS32.class);
+		transformed = InputSanityCheck.declareOrReshape(input, transformed, GrayS32.class);
 
 		ImplIntegralImageOps.transform(input, transformed);
 
@@ -105,7 +105,7 @@ public class IntegralImageOps {
 	 * @return Integral image.
 	 */
 	public static GrayS64 transform( GrayS64 input, @Nullable GrayS64 transformed ) {
-		transformed = InputSanityCheck.checkDeclare(input, transformed, GrayS64.class);
+		transformed = InputSanityCheck.declareOrReshape(input, transformed, GrayS64.class);
 
 		ImplIntegralImageOps.transform(input, transformed);
 
@@ -123,7 +123,7 @@ public class IntegralImageOps {
 	public static GrayF32 convolve( GrayF32 integral,
 									IntegralKernel kernel,
 									@Nullable GrayF32 output ) {
-		output = InputSanityCheck.checkDeclare(integral, output);
+		output = InputSanityCheck.declareOrReshape(integral, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplIntegralImageConvolve_MT.convolve(integral, kernel, output);
@@ -145,7 +145,7 @@ public class IntegralImageOps {
 	public static GrayF64 convolve( GrayF64 integral,
 									IntegralKernel kernel,
 									@Nullable GrayF64 output ) {
-		output = InputSanityCheck.checkDeclare(integral, output);
+		output = InputSanityCheck.declareOrReshape(integral, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplIntegralImageConvolve_MT.convolve(integral, kernel, output);
@@ -167,7 +167,7 @@ public class IntegralImageOps {
 	public static GrayS32 convolve( GrayS32 integral,
 									IntegralKernel kernel,
 									@Nullable GrayS32 output ) {
-		output = InputSanityCheck.checkDeclare(integral, output);
+		output = InputSanityCheck.declareOrReshape(integral, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplIntegralImageConvolve_MT.convolve(integral, kernel, output);
@@ -189,7 +189,7 @@ public class IntegralImageOps {
 	public static GrayS64 convolve( GrayS64 integral,
 									IntegralKernel kernel,
 									@Nullable GrayS64 output ) {
-		output = InputSanityCheck.checkDeclare(integral, output);
+		output = InputSanityCheck.declareOrReshape(integral, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplIntegralImageConvolve_MT.convolve(integral, kernel, output);
@@ -212,7 +212,7 @@ public class IntegralImageOps {
 	public static GrayF32 convolveBorder( GrayF32 integral,
 										  IntegralKernel kernel,
 										  @Nullable GrayF32 output, int borderX, int borderY ) {
-		output = InputSanityCheck.checkDeclare(integral, output);
+		output = InputSanityCheck.declareOrReshape(integral, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplIntegralImageConvolve_MT.convolveBorder(integral, kernel, output, borderX, borderY);
@@ -235,7 +235,7 @@ public class IntegralImageOps {
 	public static GrayF64 convolveBorder( GrayF64 integral,
 										  IntegralKernel kernel,
 										  @Nullable GrayF64 output, int borderX, int borderY ) {
-		output = InputSanityCheck.checkDeclare(integral, output);
+		output = InputSanityCheck.declareOrReshape(integral, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplIntegralImageConvolve_MT.convolveBorder(integral, kernel, output, borderX, borderY);
@@ -258,7 +258,7 @@ public class IntegralImageOps {
 	public static GrayS32 convolveBorder( GrayS32 integral,
 										  IntegralKernel kernel,
 										  @Nullable GrayS32 output, int borderX, int borderY ) {
-		output = InputSanityCheck.checkDeclare(integral, output);
+		output = InputSanityCheck.declareOrReshape(integral, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplIntegralImageConvolve_MT.convolveBorder(integral, kernel, output, borderX, borderY);
@@ -281,7 +281,7 @@ public class IntegralImageOps {
 	public static GrayS64 convolveBorder( GrayS64 integral,
 										  IntegralKernel kernel,
 										  @Nullable GrayS64 output, int borderX, int borderY ) {
-		output = InputSanityCheck.checkDeclare(integral, output);
+		output = InputSanityCheck.declareOrReshape(integral, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplIntegralImageConvolve_MT.convolveBorder(integral, kernel, output, borderX, borderY);

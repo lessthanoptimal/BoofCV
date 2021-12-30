@@ -18,6 +18,7 @@
 
 package boofcv.alg.misc;
 
+import boofcv.alg.InputSanityCheck;
 import boofcv.alg.misc.impl.ImplImageMiscOps;
 import boofcv.alg.misc.impl.ImplImageMiscOps_MT;
 import boofcv.concurrency.BoofConcurrency;
@@ -27,6 +28,7 @@ import boofcv.struct.border.ImageBorder_F64;
 import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.border.ImageBorder_S64;
 import boofcv.struct.image.*;
+import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Generated;
 import java.util.Random;
@@ -358,12 +360,14 @@ public class ImageMiscOps {
 	}
 
 	/** Transposes the image */
-	public static void transpose( GrayI8 input, GrayI8 output ) {
+	public static <T extends GrayI8<T>> T transpose( T input, @Nullable T output ) {
+		output = (T)InputSanityCheck.declareOutput(input, output);
 		//if (runConcurrent(input)) {
 		//	ImplImageMiscOps_MT.transpose(input, output);
 		//} else {
 		ImplImageMiscOps.transpose(input, output);
 		//}
+		return output;
 	}
 
 	/** In-place 90 degree image rotation in the clockwise direction. Only works on square images. */
@@ -376,30 +380,36 @@ public class ImageMiscOps {
 	}
 
 	/** Transposes the image */
-	public static void transpose( InterleavedI8 input, InterleavedI8 output ) {
+	public static <T extends InterleavedI8<T>> T transpose( T input, @Nullable T output ) {
+		output = (T)InputSanityCheck.declareOutput(input, output);
 		if (runConcurrent(input)) {
 			ImplImageMiscOps_MT.transpose(input, output);
 		} else {
 			ImplImageMiscOps.transpose(input, output);
 		}
+		return output;
 	}
 
 	/** Rotates the image 90 degrees in the clockwise direction. */
-	public static void rotateCW( GrayI8 input, GrayI8 output ) {
+	public static <T extends GrayI8<T>> T rotateCW( T input, @Nullable T output ) {
+		output = (T)InputSanityCheck.declareOutput(input, output);
 		if (runConcurrent(input)) {
 			ImplImageMiscOps_MT.rotateCW(input, output);
 		} else {
 			ImplImageMiscOps.rotateCW(input, output);
 		}
+		return output;
 	}
 
 	/** Rotates the image 90 degrees in the clockwise direction. */
-	public static void rotateCW( InterleavedI8 input, InterleavedI8 output ) {
+	public static <T extends InterleavedI8<T>> T rotateCW( T input, @Nullable T output ) {
+		output = (T)InputSanityCheck.declareOutput(input, output);
 		if (runConcurrent(input)) {
 			ImplImageMiscOps_MT.rotateCW(input, output);
 		} else {
 			ImplImageMiscOps.rotateCW(input, output);
 		}
+		return output;
 	}
 
 	/** In-place 90 degree image rotation in the counter-clockwise direction. Only works on square images. */
@@ -412,21 +422,25 @@ public class ImageMiscOps {
 	}
 
 	/** Rotates the image 90 degrees in the counter-clockwise direction. */
-	public static void rotateCCW( GrayI8 input, GrayI8 output ) {
+	public static <T extends GrayI8<T>> T rotateCCW( T input, @Nullable T output ) {
+		output = (T)InputSanityCheck.declareOutput(input, output);
 		if (runConcurrent(input)) {
 			ImplImageMiscOps_MT.rotateCCW(input, output);
 		} else {
 			ImplImageMiscOps.rotateCCW(input, output);
 		}
+		return output;
 	}
 
 	/** Rotates the image 90 degrees in the counter-clockwise direction. */
-	public static void rotateCCW( InterleavedI8 input, InterleavedI8 output ) {
+	public static <T extends InterleavedI8<T>> T rotateCCW( T input, @Nullable T output ) {
+		output = (T)InputSanityCheck.declareOutput(input, output);
 		if (runConcurrent(input)) {
 			ImplImageMiscOps_MT.rotateCCW(input, output);
 		} else {
 			ImplImageMiscOps.rotateCCW(input, output);
 		}
+		return output;
 	}
 
 	/**
@@ -765,12 +779,14 @@ public class ImageMiscOps {
 	}
 
 	/** Transposes the image */
-	public static void transpose( GrayI16 input, GrayI16 output ) {
+	public static <T extends GrayI16<T>> T transpose( T input, @Nullable T output ) {
+		output = (T)InputSanityCheck.declareOutput(input, output);
 		//if (runConcurrent(input)) {
 		//	ImplImageMiscOps_MT.transpose(input, output);
 		//} else {
 		ImplImageMiscOps.transpose(input, output);
 		//}
+		return output;
 	}
 
 	/** In-place 90 degree image rotation in the clockwise direction. Only works on square images. */
@@ -783,30 +799,36 @@ public class ImageMiscOps {
 	}
 
 	/** Transposes the image */
-	public static void transpose( InterleavedI16 input, InterleavedI16 output ) {
+	public static <T extends InterleavedI16<T>> T transpose( T input, @Nullable T output ) {
+		output = (T)InputSanityCheck.declareOutput(input, output);
 		if (runConcurrent(input)) {
 			ImplImageMiscOps_MT.transpose(input, output);
 		} else {
 			ImplImageMiscOps.transpose(input, output);
 		}
+		return output;
 	}
 
 	/** Rotates the image 90 degrees in the clockwise direction. */
-	public static void rotateCW( GrayI16 input, GrayI16 output ) {
+	public static <T extends GrayI16<T>> T rotateCW( T input, @Nullable T output ) {
+		output = (T)InputSanityCheck.declareOutput(input, output);
 		if (runConcurrent(input)) {
 			ImplImageMiscOps_MT.rotateCW(input, output);
 		} else {
 			ImplImageMiscOps.rotateCW(input, output);
 		}
+		return output;
 	}
 
 	/** Rotates the image 90 degrees in the clockwise direction. */
-	public static void rotateCW( InterleavedI16 input, InterleavedI16 output ) {
+	public static <T extends InterleavedI16<T>> T rotateCW( T input, @Nullable T output ) {
+		output = (T)InputSanityCheck.declareOutput(input, output);
 		if (runConcurrent(input)) {
 			ImplImageMiscOps_MT.rotateCW(input, output);
 		} else {
 			ImplImageMiscOps.rotateCW(input, output);
 		}
+		return output;
 	}
 
 	/** In-place 90 degree image rotation in the counter-clockwise direction. Only works on square images. */
@@ -819,21 +841,25 @@ public class ImageMiscOps {
 	}
 
 	/** Rotates the image 90 degrees in the counter-clockwise direction. */
-	public static void rotateCCW( GrayI16 input, GrayI16 output ) {
+	public static <T extends GrayI16<T>> T rotateCCW( T input, @Nullable T output ) {
+		output = (T)InputSanityCheck.declareOutput(input, output);
 		if (runConcurrent(input)) {
 			ImplImageMiscOps_MT.rotateCCW(input, output);
 		} else {
 			ImplImageMiscOps.rotateCCW(input, output);
 		}
+		return output;
 	}
 
 	/** Rotates the image 90 degrees in the counter-clockwise direction. */
-	public static void rotateCCW( InterleavedI16 input, InterleavedI16 output ) {
+	public static <T extends InterleavedI16<T>> T rotateCCW( T input, @Nullable T output ) {
+		output = (T)InputSanityCheck.declareOutput(input, output);
 		if (runConcurrent(input)) {
 			ImplImageMiscOps_MT.rotateCCW(input, output);
 		} else {
 			ImplImageMiscOps.rotateCCW(input, output);
 		}
+		return output;
 	}
 
 	/**
@@ -1172,12 +1198,14 @@ public class ImageMiscOps {
 	}
 
 	/** Transposes the image */
-	public static void transpose( GrayS32 input, GrayS32 output ) {
+	public static <T extends GrayS32> T transpose( T input, @Nullable T output ) {
+		output = (T)InputSanityCheck.declareOutput(input, output);
 		//if (runConcurrent(input)) {
 		//	ImplImageMiscOps_MT.transpose(input, output);
 		//} else {
 		ImplImageMiscOps.transpose(input, output);
 		//}
+		return output;
 	}
 
 	/** In-place 90 degree image rotation in the clockwise direction. Only works on square images. */
@@ -1190,30 +1218,36 @@ public class ImageMiscOps {
 	}
 
 	/** Transposes the image */
-	public static void transpose( InterleavedS32 input, InterleavedS32 output ) {
+	public static <T extends InterleavedS32> T transpose( T input, @Nullable T output ) {
+		output = (T)InputSanityCheck.declareOutput(input, output);
 		if (runConcurrent(input)) {
 			ImplImageMiscOps_MT.transpose(input, output);
 		} else {
 			ImplImageMiscOps.transpose(input, output);
 		}
+		return output;
 	}
 
 	/** Rotates the image 90 degrees in the clockwise direction. */
-	public static void rotateCW( GrayS32 input, GrayS32 output ) {
+	public static <T extends GrayS32> T rotateCW( T input, @Nullable T output ) {
+		output = (T)InputSanityCheck.declareOutput(input, output);
 		if (runConcurrent(input)) {
 			ImplImageMiscOps_MT.rotateCW(input, output);
 		} else {
 			ImplImageMiscOps.rotateCW(input, output);
 		}
+		return output;
 	}
 
 	/** Rotates the image 90 degrees in the clockwise direction. */
-	public static void rotateCW( InterleavedS32 input, InterleavedS32 output ) {
+	public static <T extends InterleavedS32> T rotateCW( T input, @Nullable T output ) {
+		output = (T)InputSanityCheck.declareOutput(input, output);
 		if (runConcurrent(input)) {
 			ImplImageMiscOps_MT.rotateCW(input, output);
 		} else {
 			ImplImageMiscOps.rotateCW(input, output);
 		}
+		return output;
 	}
 
 	/** In-place 90 degree image rotation in the counter-clockwise direction. Only works on square images. */
@@ -1226,21 +1260,25 @@ public class ImageMiscOps {
 	}
 
 	/** Rotates the image 90 degrees in the counter-clockwise direction. */
-	public static void rotateCCW( GrayS32 input, GrayS32 output ) {
+	public static <T extends GrayS32> T rotateCCW( T input, @Nullable T output ) {
+		output = (T)InputSanityCheck.declareOutput(input, output);
 		if (runConcurrent(input)) {
 			ImplImageMiscOps_MT.rotateCCW(input, output);
 		} else {
 			ImplImageMiscOps.rotateCCW(input, output);
 		}
+		return output;
 	}
 
 	/** Rotates the image 90 degrees in the counter-clockwise direction. */
-	public static void rotateCCW( InterleavedS32 input, InterleavedS32 output ) {
+	public static <T extends InterleavedS32> T rotateCCW( T input, @Nullable T output ) {
+		output = (T)InputSanityCheck.declareOutput(input, output);
 		if (runConcurrent(input)) {
 			ImplImageMiscOps_MT.rotateCCW(input, output);
 		} else {
 			ImplImageMiscOps.rotateCCW(input, output);
 		}
+		return output;
 	}
 
 	/**
@@ -1578,12 +1616,14 @@ public class ImageMiscOps {
 	}
 
 	/** Transposes the image */
-	public static void transpose( GrayS64 input, GrayS64 output ) {
+	public static <T extends GrayS64> T transpose( T input, @Nullable T output ) {
+		output = (T)InputSanityCheck.declareOutput(input, output);
 		//if (runConcurrent(input)) {
 		//	ImplImageMiscOps_MT.transpose(input, output);
 		//} else {
 		ImplImageMiscOps.transpose(input, output);
 		//}
+		return output;
 	}
 
 	/** In-place 90 degree image rotation in the clockwise direction. Only works on square images. */
@@ -1596,30 +1636,36 @@ public class ImageMiscOps {
 	}
 
 	/** Transposes the image */
-	public static void transpose( InterleavedS64 input, InterleavedS64 output ) {
+	public static <T extends InterleavedS64> T transpose( T input, @Nullable T output ) {
+		output = (T)InputSanityCheck.declareOutput(input, output);
 		if (runConcurrent(input)) {
 			ImplImageMiscOps_MT.transpose(input, output);
 		} else {
 			ImplImageMiscOps.transpose(input, output);
 		}
+		return output;
 	}
 
 	/** Rotates the image 90 degrees in the clockwise direction. */
-	public static void rotateCW( GrayS64 input, GrayS64 output ) {
+	public static <T extends GrayS64> T rotateCW( T input, @Nullable T output ) {
+		output = (T)InputSanityCheck.declareOutput(input, output);
 		if (runConcurrent(input)) {
 			ImplImageMiscOps_MT.rotateCW(input, output);
 		} else {
 			ImplImageMiscOps.rotateCW(input, output);
 		}
+		return output;
 	}
 
 	/** Rotates the image 90 degrees in the clockwise direction. */
-	public static void rotateCW( InterleavedS64 input, InterleavedS64 output ) {
+	public static <T extends InterleavedS64> T rotateCW( T input, @Nullable T output ) {
+		output = (T)InputSanityCheck.declareOutput(input, output);
 		if (runConcurrent(input)) {
 			ImplImageMiscOps_MT.rotateCW(input, output);
 		} else {
 			ImplImageMiscOps.rotateCW(input, output);
 		}
+		return output;
 	}
 
 	/** In-place 90 degree image rotation in the counter-clockwise direction. Only works on square images. */
@@ -1632,21 +1678,25 @@ public class ImageMiscOps {
 	}
 
 	/** Rotates the image 90 degrees in the counter-clockwise direction. */
-	public static void rotateCCW( GrayS64 input, GrayS64 output ) {
+	public static <T extends GrayS64> T rotateCCW( T input, @Nullable T output ) {
+		output = (T)InputSanityCheck.declareOutput(input, output);
 		if (runConcurrent(input)) {
 			ImplImageMiscOps_MT.rotateCCW(input, output);
 		} else {
 			ImplImageMiscOps.rotateCCW(input, output);
 		}
+		return output;
 	}
 
 	/** Rotates the image 90 degrees in the counter-clockwise direction. */
-	public static void rotateCCW( InterleavedS64 input, InterleavedS64 output ) {
+	public static <T extends InterleavedS64> T rotateCCW( T input, @Nullable T output ) {
+		output = (T)InputSanityCheck.declareOutput(input, output);
 		if (runConcurrent(input)) {
 			ImplImageMiscOps_MT.rotateCCW(input, output);
 		} else {
 			ImplImageMiscOps.rotateCCW(input, output);
 		}
+		return output;
 	}
 
 	/**
@@ -1984,12 +2034,14 @@ public class ImageMiscOps {
 	}
 
 	/** Transposes the image */
-	public static void transpose( GrayF32 input, GrayF32 output ) {
+	public static <T extends GrayF32> T transpose( T input, @Nullable T output ) {
+		output = (T)InputSanityCheck.declareOutput(input, output);
 		//if (runConcurrent(input)) {
 		//	ImplImageMiscOps_MT.transpose(input, output);
 		//} else {
 		ImplImageMiscOps.transpose(input, output);
 		//}
+		return output;
 	}
 
 	/** In-place 90 degree image rotation in the clockwise direction. Only works on square images. */
@@ -2002,30 +2054,36 @@ public class ImageMiscOps {
 	}
 
 	/** Transposes the image */
-	public static void transpose( InterleavedF32 input, InterleavedF32 output ) {
+	public static <T extends InterleavedF32> T transpose( T input, @Nullable T output ) {
+		output = (T)InputSanityCheck.declareOutput(input, output);
 		if (runConcurrent(input)) {
 			ImplImageMiscOps_MT.transpose(input, output);
 		} else {
 			ImplImageMiscOps.transpose(input, output);
 		}
+		return output;
 	}
 
 	/** Rotates the image 90 degrees in the clockwise direction. */
-	public static void rotateCW( GrayF32 input, GrayF32 output ) {
+	public static <T extends GrayF32> T rotateCW( T input, @Nullable T output ) {
+		output = (T)InputSanityCheck.declareOutput(input, output);
 		if (runConcurrent(input)) {
 			ImplImageMiscOps_MT.rotateCW(input, output);
 		} else {
 			ImplImageMiscOps.rotateCW(input, output);
 		}
+		return output;
 	}
 
 	/** Rotates the image 90 degrees in the clockwise direction. */
-	public static void rotateCW( InterleavedF32 input, InterleavedF32 output ) {
+	public static <T extends InterleavedF32> T rotateCW( T input, @Nullable T output ) {
+		output = (T)InputSanityCheck.declareOutput(input, output);
 		if (runConcurrent(input)) {
 			ImplImageMiscOps_MT.rotateCW(input, output);
 		} else {
 			ImplImageMiscOps.rotateCW(input, output);
 		}
+		return output;
 	}
 
 	/** In-place 90 degree image rotation in the counter-clockwise direction. Only works on square images. */
@@ -2038,21 +2096,25 @@ public class ImageMiscOps {
 	}
 
 	/** Rotates the image 90 degrees in the counter-clockwise direction. */
-	public static void rotateCCW( GrayF32 input, GrayF32 output ) {
+	public static <T extends GrayF32> T rotateCCW( T input, @Nullable T output ) {
+		output = (T)InputSanityCheck.declareOutput(input, output);
 		if (runConcurrent(input)) {
 			ImplImageMiscOps_MT.rotateCCW(input, output);
 		} else {
 			ImplImageMiscOps.rotateCCW(input, output);
 		}
+		return output;
 	}
 
 	/** Rotates the image 90 degrees in the counter-clockwise direction. */
-	public static void rotateCCW( InterleavedF32 input, InterleavedF32 output ) {
+	public static <T extends InterleavedF32> T rotateCCW( T input, @Nullable T output ) {
+		output = (T)InputSanityCheck.declareOutput(input, output);
 		if (runConcurrent(input)) {
 			ImplImageMiscOps_MT.rotateCCW(input, output);
 		} else {
 			ImplImageMiscOps.rotateCCW(input, output);
 		}
+		return output;
 	}
 
 	/**
@@ -2390,12 +2452,14 @@ public class ImageMiscOps {
 	}
 
 	/** Transposes the image */
-	public static void transpose( GrayF64 input, GrayF64 output ) {
+	public static <T extends GrayF64> T transpose( T input, @Nullable T output ) {
+		output = (T)InputSanityCheck.declareOutput(input, output);
 		//if (runConcurrent(input)) {
 		//	ImplImageMiscOps_MT.transpose(input, output);
 		//} else {
 		ImplImageMiscOps.transpose(input, output);
 		//}
+		return output;
 	}
 
 	/** In-place 90 degree image rotation in the clockwise direction. Only works on square images. */
@@ -2408,30 +2472,36 @@ public class ImageMiscOps {
 	}
 
 	/** Transposes the image */
-	public static void transpose( InterleavedF64 input, InterleavedF64 output ) {
+	public static <T extends InterleavedF64> T transpose( T input, @Nullable T output ) {
+		output = (T)InputSanityCheck.declareOutput(input, output);
 		if (runConcurrent(input)) {
 			ImplImageMiscOps_MT.transpose(input, output);
 		} else {
 			ImplImageMiscOps.transpose(input, output);
 		}
+		return output;
 	}
 
 	/** Rotates the image 90 degrees in the clockwise direction. */
-	public static void rotateCW( GrayF64 input, GrayF64 output ) {
+	public static <T extends GrayF64> T rotateCW( T input, @Nullable T output ) {
+		output = (T)InputSanityCheck.declareOutput(input, output);
 		if (runConcurrent(input)) {
 			ImplImageMiscOps_MT.rotateCW(input, output);
 		} else {
 			ImplImageMiscOps.rotateCW(input, output);
 		}
+		return output;
 	}
 
 	/** Rotates the image 90 degrees in the clockwise direction. */
-	public static void rotateCW( InterleavedF64 input, InterleavedF64 output ) {
+	public static <T extends InterleavedF64> T rotateCW( T input, @Nullable T output ) {
+		output = (T)InputSanityCheck.declareOutput(input, output);
 		if (runConcurrent(input)) {
 			ImplImageMiscOps_MT.rotateCW(input, output);
 		} else {
 			ImplImageMiscOps.rotateCW(input, output);
 		}
+		return output;
 	}
 
 	/** In-place 90 degree image rotation in the counter-clockwise direction. Only works on square images. */
@@ -2444,21 +2514,25 @@ public class ImageMiscOps {
 	}
 
 	/** Rotates the image 90 degrees in the counter-clockwise direction. */
-	public static void rotateCCW( GrayF64 input, GrayF64 output ) {
+	public static <T extends GrayF64> T rotateCCW( T input, @Nullable T output ) {
+		output = (T)InputSanityCheck.declareOutput(input, output);
 		if (runConcurrent(input)) {
 			ImplImageMiscOps_MT.rotateCCW(input, output);
 		} else {
 			ImplImageMiscOps.rotateCCW(input, output);
 		}
+		return output;
 	}
 
 	/** Rotates the image 90 degrees in the counter-clockwise direction. */
-	public static void rotateCCW( InterleavedF64 input, InterleavedF64 output ) {
+	public static <T extends InterleavedF64> T rotateCCW( T input, @Nullable T output ) {
+		output = (T)InputSanityCheck.declareOutput(input, output);
 		if (runConcurrent(input)) {
 			ImplImageMiscOps_MT.rotateCCW(input, output);
 		} else {
 			ImplImageMiscOps.rotateCCW(input, output);
 		}
+		return output;
 	}
 
 	/**

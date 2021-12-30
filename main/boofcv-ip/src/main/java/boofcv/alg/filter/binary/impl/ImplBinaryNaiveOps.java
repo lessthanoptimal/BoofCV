@@ -82,7 +82,7 @@ public class ImplBinaryNaiveOps {
 	}
 
 	public static void erode8( GrayU8 input, GrayU8 output ) {
-		output = InputSanityCheck.checkDeclare(input, output);
+		output = InputSanityCheck.declareOrReshape(input, output);
 
 		for (int y = 0; y < input.height; y++) {
 			for (int x = 0; x < input.width; x++) {

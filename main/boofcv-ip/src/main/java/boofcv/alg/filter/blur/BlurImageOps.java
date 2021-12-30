@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -82,8 +82,8 @@ public class BlurImageOps {
 		if (radiusX <= 0 || radiusY <= 0)
 			throw new IllegalArgumentException("Radius must be > 0");
 
-		output = InputSanityCheck.checkDeclare(input, output);
-		storage = InputSanityCheck.checkDeclare(input, storage);
+		output = InputSanityCheck.declareOrReshape(input, output);
+		storage = InputSanityCheck.declareOrReshape(input, storage);
 
 		boolean processed = BOverrideBlurImageOps.invokeNativeMeanWeighted(input, output, radiusX, radiusY, storage);
 
@@ -112,8 +112,8 @@ public class BlurImageOps {
 		if (radiusX <= 0 || radiusY <= 0)
 			throw new IllegalArgumentException("Radius must be > 0");
 
-		output = InputSanityCheck.checkDeclare(input, output);
-		storage = InputSanityCheck.checkDeclare(input, storage);
+		output = InputSanityCheck.declareOrReshape(input, output);
+		storage = InputSanityCheck.declareOrReshape(input, storage);
 
 		boolean processed = BOverrideBlurImageOps.invokeNativeMeanBorder(input, output, radiusX, radiusY, binput, storage);
 
@@ -156,8 +156,8 @@ public class BlurImageOps {
 	public static GrayU8 gaussian( GrayU8 input, @Nullable GrayU8 output, 
 								  double sigmaX, int radiusX, double sigmaY, int radiusY,
 								  @Nullable GrayU8 storage ) {
-		output = InputSanityCheck.checkDeclare(input, output);
-		storage = InputSanityCheck.checkDeclare(input, storage);
+		output = InputSanityCheck.declareOrReshape(input, output);
+		storage = InputSanityCheck.declareOrReshape(input, storage);
 
 		boolean processed = BOverrideBlurImageOps.invokeNativeGaussian(input, output, sigmaX,radiusX,sigmaY,radiusY, storage);
 
@@ -204,8 +204,8 @@ public class BlurImageOps {
 	public static InterleavedU8 gaussian( InterleavedU8 input, @Nullable InterleavedU8 output, 
 								  double sigmaX, int radiusX, double sigmaY, int radiusY,
 								  @Nullable InterleavedU8 storage ) {
-		output = InputSanityCheck.checkDeclare(input, output);
-		storage = InputSanityCheck.checkDeclare(input, storage);
+		output = InputSanityCheck.declareOrReshape(input, output);
+		storage = InputSanityCheck.declareOrReshape(input, storage);
 
 		boolean processed = BOverrideBlurImageOps.invokeNativeGaussian(input, output, sigmaX,radiusX,sigmaY,radiusY, storage);
 
@@ -251,8 +251,8 @@ public class BlurImageOps {
 		if (radiusX <= 0 || radiusY <= 0)
 			throw new IllegalArgumentException("Radius must be > 0");
 
-		output = InputSanityCheck.checkDeclare(input, output);
-		storage = InputSanityCheck.checkDeclare(input, storage);
+		output = InputSanityCheck.declareOrReshape(input, output);
+		storage = InputSanityCheck.declareOrReshape(input, storage);
 
 		boolean processed = BOverrideBlurImageOps.invokeNativeMeanWeighted(input, output, radiusX, radiusY, storage);
 
@@ -281,8 +281,8 @@ public class BlurImageOps {
 		if (radiusX <= 0 || radiusY <= 0)
 			throw new IllegalArgumentException("Radius must be > 0");
 
-		output = InputSanityCheck.checkDeclare(input, output);
-		storage = InputSanityCheck.checkDeclare(input, storage);
+		output = InputSanityCheck.declareOrReshape(input, output);
+		storage = InputSanityCheck.declareOrReshape(input, storage);
 
 		boolean processed = BOverrideBlurImageOps.invokeNativeMeanBorder(input, output, radiusX, radiusY, binput, storage);
 
@@ -325,8 +325,8 @@ public class BlurImageOps {
 	public static GrayU16 gaussian( GrayU16 input, @Nullable GrayU16 output, 
 								  double sigmaX, int radiusX, double sigmaY, int radiusY,
 								  @Nullable GrayU16 storage ) {
-		output = InputSanityCheck.checkDeclare(input, output);
-		storage = InputSanityCheck.checkDeclare(input, storage);
+		output = InputSanityCheck.declareOrReshape(input, output);
+		storage = InputSanityCheck.declareOrReshape(input, storage);
 
 		boolean processed = BOverrideBlurImageOps.invokeNativeGaussian(input, output, sigmaX,radiusX,sigmaY,radiusY, storage);
 
@@ -373,8 +373,8 @@ public class BlurImageOps {
 	public static InterleavedU16 gaussian( InterleavedU16 input, @Nullable InterleavedU16 output, 
 								  double sigmaX, int radiusX, double sigmaY, int radiusY,
 								  @Nullable InterleavedU16 storage ) {
-		output = InputSanityCheck.checkDeclare(input, output);
-		storage = InputSanityCheck.checkDeclare(input, storage);
+		output = InputSanityCheck.declareOrReshape(input, output);
+		storage = InputSanityCheck.declareOrReshape(input, storage);
 
 		boolean processed = BOverrideBlurImageOps.invokeNativeGaussian(input, output, sigmaX,radiusX,sigmaY,radiusY, storage);
 
@@ -420,8 +420,8 @@ public class BlurImageOps {
 		if (radiusX <= 0 || radiusY <= 0)
 			throw new IllegalArgumentException("Radius must be > 0");
 
-		output = InputSanityCheck.checkDeclare(input, output);
-		storage = InputSanityCheck.checkDeclare(input, storage);
+		output = InputSanityCheck.declareOrReshape(input, output);
+		storage = InputSanityCheck.declareOrReshape(input, storage);
 
 		boolean processed = BOverrideBlurImageOps.invokeNativeMeanWeighted(input, output, radiusX, radiusY, storage);
 
@@ -450,8 +450,8 @@ public class BlurImageOps {
 		if (radiusX <= 0 || radiusY <= 0)
 			throw new IllegalArgumentException("Radius must be > 0");
 
-		output = InputSanityCheck.checkDeclare(input, output);
-		storage = InputSanityCheck.checkDeclare(input, storage);
+		output = InputSanityCheck.declareOrReshape(input, output);
+		storage = InputSanityCheck.declareOrReshape(input, storage);
 
 		boolean processed = BOverrideBlurImageOps.invokeNativeMeanBorder(input, output, radiusX, radiusY, binput, storage);
 
@@ -494,8 +494,8 @@ public class BlurImageOps {
 	public static GrayF32 gaussian( GrayF32 input, @Nullable GrayF32 output, 
 								  double sigmaX, int radiusX, double sigmaY, int radiusY,
 								  @Nullable GrayF32 storage ) {
-		output = InputSanityCheck.checkDeclare(input, output);
-		storage = InputSanityCheck.checkDeclare(input, storage);
+		output = InputSanityCheck.declareOrReshape(input, output);
+		storage = InputSanityCheck.declareOrReshape(input, storage);
 
 		boolean processed = BOverrideBlurImageOps.invokeNativeGaussian(input, output, sigmaX,radiusX,sigmaY,radiusY, storage);
 
@@ -542,8 +542,8 @@ public class BlurImageOps {
 	public static InterleavedF32 gaussian( InterleavedF32 input, @Nullable InterleavedF32 output, 
 								  double sigmaX, int radiusX, double sigmaY, int radiusY,
 								  @Nullable InterleavedF32 storage ) {
-		output = InputSanityCheck.checkDeclare(input, output);
-		storage = InputSanityCheck.checkDeclare(input, storage);
+		output = InputSanityCheck.declareOrReshape(input, output);
+		storage = InputSanityCheck.declareOrReshape(input, storage);
 
 		boolean processed = BOverrideBlurImageOps.invokeNativeGaussian(input, output, sigmaX,radiusX,sigmaY,radiusY, storage);
 
@@ -589,8 +589,8 @@ public class BlurImageOps {
 		if (radiusX <= 0 || radiusY <= 0)
 			throw new IllegalArgumentException("Radius must be > 0");
 
-		output = InputSanityCheck.checkDeclare(input, output);
-		storage = InputSanityCheck.checkDeclare(input, storage);
+		output = InputSanityCheck.declareOrReshape(input, output);
+		storage = InputSanityCheck.declareOrReshape(input, storage);
 
 		boolean processed = BOverrideBlurImageOps.invokeNativeMeanWeighted(input, output, radiusX, radiusY, storage);
 
@@ -619,8 +619,8 @@ public class BlurImageOps {
 		if (radiusX <= 0 || radiusY <= 0)
 			throw new IllegalArgumentException("Radius must be > 0");
 
-		output = InputSanityCheck.checkDeclare(input, output);
-		storage = InputSanityCheck.checkDeclare(input, storage);
+		output = InputSanityCheck.declareOrReshape(input, output);
+		storage = InputSanityCheck.declareOrReshape(input, storage);
 
 		boolean processed = BOverrideBlurImageOps.invokeNativeMeanBorder(input, output, radiusX, radiusY, binput, storage);
 
@@ -663,8 +663,8 @@ public class BlurImageOps {
 	public static GrayF64 gaussian( GrayF64 input, @Nullable GrayF64 output, 
 								  double sigmaX, int radiusX, double sigmaY, int radiusY,
 								  @Nullable GrayF64 storage ) {
-		output = InputSanityCheck.checkDeclare(input, output);
-		storage = InputSanityCheck.checkDeclare(input, storage);
+		output = InputSanityCheck.declareOrReshape(input, output);
+		storage = InputSanityCheck.declareOrReshape(input, storage);
 
 		boolean processed = BOverrideBlurImageOps.invokeNativeGaussian(input, output, sigmaX,radiusX,sigmaY,radiusY, storage);
 
@@ -711,8 +711,8 @@ public class BlurImageOps {
 	public static InterleavedF64 gaussian( InterleavedF64 input, @Nullable InterleavedF64 output, 
 								  double sigmaX, int radiusX, double sigmaY, int radiusY,
 								  @Nullable InterleavedF64 storage ) {
-		output = InputSanityCheck.checkDeclare(input, output);
-		storage = InputSanityCheck.checkDeclare(input, storage);
+		output = InputSanityCheck.declareOrReshape(input, output);
+		storage = InputSanityCheck.declareOrReshape(input, storage);
 
 		boolean processed = BOverrideBlurImageOps.invokeNativeGaussian(input, output, sigmaX,radiusX,sigmaY,radiusY, storage);
 
@@ -890,7 +890,7 @@ public class BlurImageOps {
 		if (radiusX <= 0 || radiusY <= 0)
 			throw new IllegalArgumentException("Radius must be > 0");
 
-		output = InputSanityCheck.checkDeclare(input, output);
+		output = InputSanityCheck.declareOrReshape(input, output);
 
 		boolean processed = BOverrideBlurImageOps.invokeNativeMedian(input, output, radiusX, radiusY);
 

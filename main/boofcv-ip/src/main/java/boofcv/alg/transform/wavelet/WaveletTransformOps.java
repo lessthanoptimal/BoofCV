@@ -77,7 +77,7 @@ public class WaveletTransformOps {
 			throw new IllegalArgumentException("Wavelet is too large for provided image.");
 		if( output.height < coef.scaling.length || output.height < coef.wavelet.length )
 			throw new IllegalArgumentException("Wavelet is too large for provided image.");
-		storage = InputSanityCheck.checkDeclare(output, storage);
+		storage = InputSanityCheck.declareOrReshape(output, storage);
 
 		// the faster routines can only be run on images which are not too small
 		int minSize = Math.max(coef.getScalingLength(),coef.getWaveletLength())*3;
@@ -118,7 +118,7 @@ public class WaveletTransformOps {
 		}
 
 		UtilWavelet.checkShape(desc.getForward(),input,output,numLevels);
-		storage = InputSanityCheck.checkDeclare(output, storage);
+		storage = InputSanityCheck.declareOrReshape(output, storage);
 		// modify the shape of a temporary image not the original
 		storage = storage.subimage(0,0,output.width,output.height, null);
 		storage.subImage = false;
@@ -165,7 +165,7 @@ public class WaveletTransformOps {
 			throw new IllegalArgumentException("Wavelet is too large for provided image.");
 		if( output.height < coef.scaling.length || output.height < coef.wavelet.length )
 			throw new IllegalArgumentException("Wavelet is too large for provided image.");
-		storage = InputSanityCheck.checkDeclare(input, storage);
+		storage = InputSanityCheck.declareOrReshape(input, storage);
 
 		// the faster routines can only be run on images which are not too small
 		int minSize = Math.max(coef.getScalingLength(),coef.getWaveletLength())*3;
@@ -211,7 +211,7 @@ public class WaveletTransformOps {
 		}
 
 		UtilWavelet.checkShape(desc.getForward(),output,input,numLevels);
-		storage = InputSanityCheck.checkDeclare(input, storage);
+		storage = InputSanityCheck.declareOrReshape(input, storage);
 		// modify the shape of a temporary image not the original
 		storage = storage.subimage(0,0,input.width,input.height, null);
 		storage.subImage = false;
@@ -278,7 +278,7 @@ public class WaveletTransformOps {
 			throw new IllegalArgumentException("Wavelet is too large for provided image.");
 		if( output.height < coef.scaling.length || output.height < coef.wavelet.length )
 			throw new IllegalArgumentException("Wavelet is too large for provided image.");
-		storage = InputSanityCheck.checkDeclare(output, storage);
+		storage = InputSanityCheck.declareOrReshape(output, storage);
 
 		// the faster routines can only be run on images which are not too small
 		int minSize = Math.max(coef.getScalingLength(),coef.getWaveletLength())*3;
@@ -319,7 +319,7 @@ public class WaveletTransformOps {
 		}
 
 		UtilWavelet.checkShape(desc.getForward(),input,output,numLevels);
-		storage = InputSanityCheck.checkDeclare(output, storage);
+		storage = InputSanityCheck.declareOrReshape(output, storage);
 		// modify the shape of a temporary image not the original
 		storage = storage.subimage(0,0,output.width,output.height, null);
 		storage.subImage = false;
@@ -366,7 +366,7 @@ public class WaveletTransformOps {
 			throw new IllegalArgumentException("Wavelet is too large for provided image.");
 		if( output.height < coef.scaling.length || output.height < coef.wavelet.length )
 			throw new IllegalArgumentException("Wavelet is too large for provided image.");
-		storage = InputSanityCheck.checkDeclare(input, storage);
+		storage = InputSanityCheck.declareOrReshape(input, storage);
 
 		// the faster routines can only be run on images which are not too small
 		int minSize = Math.max(coef.getScalingLength(),coef.getWaveletLength())*3;
@@ -412,7 +412,7 @@ public class WaveletTransformOps {
 		}
 
 		UtilWavelet.checkShape(desc.getForward(),output,input,numLevels);
-		storage = InputSanityCheck.checkDeclare(input, storage);
+		storage = InputSanityCheck.declareOrReshape(input, storage);
 		// modify the shape of a temporary image not the original
 		storage = storage.subimage(0,0,input.width,input.height, null);
 		storage.subImage = false;
