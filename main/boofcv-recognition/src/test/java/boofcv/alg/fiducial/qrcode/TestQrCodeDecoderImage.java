@@ -89,7 +89,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 		// transpose the image. This happens when an encoderer doesn't get the coordinate systems correct
 		GrayU8 transposedImage = ImageMiscOps.transpose(generator.getGray(), null);
 
-		// succeed when the flag is one by default
+		// It should succeed since the flag is on by default
 		var alg = new QrCodeDecoderImage<>(null, GrayU8.class);
 
 		alg.process(pps, transposedImage);

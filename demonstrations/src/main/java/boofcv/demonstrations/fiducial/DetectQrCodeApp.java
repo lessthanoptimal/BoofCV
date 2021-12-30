@@ -168,6 +168,7 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 		synchronized (this) {
 			ConfigQrCode config = controls.getConfigQr();
 			config.threshold = controls.getThreshold().createConfig();
+			config.considerTransposed = controls.checkTransposed.value;
 
 			detector = FactoryFiducial.qrcode(config, imageClass);
 			detector.setProfilerState(true);
