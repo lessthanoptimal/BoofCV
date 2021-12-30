@@ -76,7 +76,7 @@ public class PointTrackerPerfectCloud<T extends ImageBase<T>> implements PointTr
 	private final List<PointTrack> spawned = new ArrayList<>();
 
 	private final DogArray<Spawnable> spawnable = new DogArray<>(Spawnable::new);
-	private final DogArray<PointTrack> activeTracks = new DogArray<>(PointTrack::new,PointTrack::reset);
+	private final DogArray<PointTrack> activeTracks = new DogArray<>(PointTrack::new, PointTrack::reset);
 	private final TIntLongMap cloudIdx_to_id = new TIntLongHashMap();
 	private final TLongIntMap id_to_cloudIdx = new TLongIntHashMap();
 	private final TLongObjectMap<PointTrack> id_to_track = new TLongObjectHashMap<>();
@@ -88,8 +88,8 @@ public class PointTrackerPerfectCloud<T extends ImageBase<T>> implements PointTr
 	}
 
 	@Override public void process( T image ) {
-		Objects.requireNonNull(norm_to_pixel,"You must set norm_to_pixel first");
-		BoofMiscOps.checkTrue(width!=0 && height!=0, "You must specify width and height");
+		Objects.requireNonNull(norm_to_pixel, "You must set norm_to_pixel first");
+		BoofMiscOps.checkTrue(width != 0 && height != 0, "You must specify width and height");
 		frameID++;
 		observedID.clear();
 		dropped.clear();
@@ -98,7 +98,7 @@ public class PointTrackerPerfectCloud<T extends ImageBase<T>> implements PointTr
 
 		for (int cloudIdx = 0; cloudIdx < cloud.size(); cloudIdx++) {
 			Point3D_F64 X = cloud.get(cloudIdx);
-			world_to_view.transform(X,viewX);
+			world_to_view.transform(X, viewX);
 			if (viewX.z <= 0.0)
 				continue;
 			norm_to_pixel.compute(viewX.x/viewX.z, viewX.y/viewX.z, pixel);
@@ -131,13 +131,13 @@ public class PointTrackerPerfectCloud<T extends ImageBase<T>> implements PointTr
 	void dropUnobserved() {
 		// Make a list first to avoid modifying a data structure while traversing through it
 		DogArray_I64 dropList = new DogArray_I64();
-		for( long id : id_to_track.keys() ) { // lint:forbidden ignore_line
+		for (long id : id_to_track.keys()) { // lint:forbidden ignore_line
 			if (!observedID.contains(id)) {
 				dropList.add(id);
 			}
 		}
 		// Now actually drop the tracks
-		dropList.forEach(id->{
+		dropList.forEach(id -> {
 			PointTrack track = Objects.requireNonNull(id_to_track.remove(id));
 			// Don't worry about track being recycled since it won't be recycled until the next call to process
 			// and at that point drop is reset
@@ -181,13 +181,13 @@ public class PointTrackerPerfectCloud<T extends ImageBase<T>> implements PointTr
 	}
 
 	@Override public boolean dropTrack( PointTrack track ) {
-		for( long id : id_to_track.keys() ) { // lint:forbidden ignore_line
-			if (id_to_track.get(id)==track) {
+		for (long id : id_to_track.keys()) { // lint:forbidden ignore_line
+			if (id_to_track.get(id) == track) {
 				id_to_track.remove(id);
 				cloudIdx_to_id.remove(id_to_cloudIdx.get(id));
 				id_to_cloudIdx.remove(id);
 				int index = activeTracks.indexOf(track);
-				BoofMiscOps.checkTrue(index!=-1,"BUG! Track in map but not array");
+				BoofMiscOps.checkTrue(index != -1, "BUG! Track in map but not array");
 				activeTracks.removeSwap(index);
 				return true;
 			}
@@ -204,7 +204,7 @@ public class PointTrackerPerfectCloud<T extends ImageBase<T>> implements PointTr
 	}
 
 	@Override public List<PointTrack> getActiveTracks( @Nullable List<PointTrack> list ) {
-		if (list==null)
+		if (list == null)
 			list = new ArrayList<>();
 		list.clear();
 		list.addAll(activeTracks.toList());
@@ -212,14 +212,14 @@ public class PointTrackerPerfectCloud<T extends ImageBase<T>> implements PointTr
 	}
 
 	@Override public List<PointTrack> getInactiveTracks( @Nullable List<PointTrack> list ) {
-		if (list==null)
+		if (list == null)
 			list = new ArrayList<>();
 		list.clear();
 		return list;
 	}
 
 	@Override public List<PointTrack> getDroppedTracks( @Nullable List<PointTrack> list ) {
-		if (list==null)
+		if (list == null)
 			list = new ArrayList<>();
 		list.clear();
 		list.addAll(dropped);
@@ -227,7 +227,7 @@ public class PointTrackerPerfectCloud<T extends ImageBase<T>> implements PointTr
 	}
 
 	@Override public List<PointTrack> getNewTracks( @Nullable List<PointTrack> list ) {
-		if (list==null)
+		if (list == null)
 			list = new ArrayList<>();
 		list.clear();
 		list.addAll(spawned);
@@ -235,7 +235,7 @@ public class PointTrackerPerfectCloud<T extends ImageBase<T>> implements PointTr
 	}
 
 	@Override public void spawnTracks() {
-		spawnable.forEach(spawn->{
+		spawnable.forEach(spawn -> {
 			long id = totalTracks++;
 			cloudIdx_to_id.put(spawn.cloudIdx, id);
 			PointTrack track = activeTracks.grow();
@@ -244,7 +244,7 @@ public class PointTrackerPerfectCloud<T extends ImageBase<T>> implements PointTr
 			track.spawnFrameID = frameID;
 			track.lastSeenFrameID = frameID;
 			track.pixel.setTo(spawn.pixel);
-			id_to_track.put(id,track);
+			id_to_track.put(id, track);
 			spawned.add(track);
 		});
 	}
@@ -252,13 +252,13 @@ public class PointTrackerPerfectCloud<T extends ImageBase<T>> implements PointTr
 	@Override public ImageType<T> getImageType() {throw new IllegalArgumentException("Not implemented");}
 
 	public void setCamera( CameraPinhole intrinsic ) {
-		norm_to_pixel = new LensDistortionPinhole(intrinsic).distort_F64(false,true);
+		norm_to_pixel = new LensDistortionPinhole(intrinsic).distort_F64(false, true);
 		width = intrinsic.width;
 		height = intrinsic.height;
 	}
 
 	public void setCamera( CameraPinholeBrown intrinsic ) {
-		norm_to_pixel = new LensDistortionBrown(intrinsic).distort_F64(false,true);
+		norm_to_pixel = new LensDistortionBrown(intrinsic).distort_F64(false, true);
 		width = intrinsic.width;
 		height = intrinsic.height;
 	}
@@ -268,7 +268,7 @@ public class PointTrackerPerfectCloud<T extends ImageBase<T>> implements PointTr
 		public int cloudIdx;
 		public Point2D_F64 pixel = new Point2D_F64();
 
-		public void setTo(int cloudIdx, Point2D_F64 pixel) {
+		public void setTo( int cloudIdx, Point2D_F64 pixel ) {
 			this.cloudIdx = cloudIdx;
 			this.pixel.setTo(pixel);
 		}

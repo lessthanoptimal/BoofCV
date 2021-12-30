@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,10 +24,9 @@ package boofcv.errors;
  * @author Peter Abeles
  */
 public class BoofCheckFailure extends RuntimeException {
-	public BoofCheckFailure() {
-	}
+	public BoofCheckFailure() {}
 
-	public BoofCheckFailure( String message) {
+	public BoofCheckFailure( String message ) {
 		super(message);
 	}
 }

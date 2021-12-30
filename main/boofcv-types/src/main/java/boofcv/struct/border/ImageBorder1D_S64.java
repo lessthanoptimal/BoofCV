@@ -46,9 +46,9 @@ public class ImageBorder1D_S64 extends ImageBorder_S64 implements ImageBorder1D 
 		this.colWrap = colWrap;
 	}
 
-	@Override public BorderIndex1D getRowWrap() { return rowWrap; }
+	@Override public BorderIndex1D getRowWrap() {return rowWrap;}
 
-	@Override public BorderIndex1D getColWrap() { return colWrap; }
+	@Override public BorderIndex1D getColWrap() {return colWrap;}
 
 	@Override
 	public void setImage( GrayS64 image ) {

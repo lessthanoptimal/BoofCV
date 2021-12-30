@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,6 @@
 
 package boofcv.struct.wavelet;
 
-
 import boofcv.struct.border.BorderIndex1D;
 
 /**
@@ -28,7 +27,7 @@ import boofcv.struct.border.BorderIndex1D;
  */
 public class WaveletDescription<T extends WlCoef> {
 
-		// how image boundaries are handled
+	// how image boundaries are handled
 	public BorderIndex1D border;
 
 	// coefficients for the forward transform
@@ -36,7 +35,7 @@ public class WaveletDescription<T extends WlCoef> {
 	// coefficients for the inverse transform
 	public WlBorderCoef<T> inverse;
 
-	public WaveletDescription( BorderIndex1D border , T forward, WlBorderCoef<T> inverse) {
+	public WaveletDescription( BorderIndex1D border, T forward, WlBorderCoef<T> inverse ) {
 		this.border = border;
 		this.forward = forward;
 		this.inverse = inverse;

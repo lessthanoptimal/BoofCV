@@ -93,7 +93,7 @@ public interface BoofLambdas {
 		void process( int index, T object );
 	}
 
-	@FunctionalInterface interface ProcessIndex2<A,B> {
+	@FunctionalInterface interface ProcessIndex2<A, B> {
 		void process( int index, A objectA, B objectB );
 	}
 

@@ -274,9 +274,9 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 		frames.remove(index);
 	}
 
-	public BFrame getLastFrame() { return frames.get(frames.size - 1); }
+	public BFrame getLastFrame() {return frames.get(frames.size - 1);}
 
-	public BFrame getFirstFrame() { return frames.get(0);}
+	public BFrame getFirstFrame() {return frames.get(0);}
 
 	public BCamera getCamera( int index ) {return cameras.get(index);}
 

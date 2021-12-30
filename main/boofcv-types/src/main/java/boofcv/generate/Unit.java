@@ -26,7 +26,7 @@ import lombok.Getter;
  * @author Peter Abeles
  */
 public enum Unit {
-	UNKNOWN(Double.NaN,"?"),
+	UNKNOWN(Double.NaN, "?"),
 	MILLIMETER(0.001, "mm"),
 	CENTIMETER(0.01, "cm"),
 	METER(1, "m"),

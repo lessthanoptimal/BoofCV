@@ -207,10 +207,10 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 			indexSbaToViewID.put(center.relations.indexSba, center.relations.id);
 
 			// Compute the fused disparity from all the views, then add points to the point cloud
-			if (!computeFusedDisparityAddCloud(scene, center, indexSbaToViewID, imagePairIndexesSba) ) {
+			if (!computeFusedDisparityAddCloud(scene, center, indexSbaToViewID, imagePairIndexesSba)) {
 				// Failed to compute a fused disparity image
 				// Remove it from the lists
-				listCenters.remove(listCenters.size()-1);
+				listCenters.remove(listCenters.size() - 1);
 				indexSbaToViewID.remove(center.relations.indexSba);
 			}
 		}
@@ -394,9 +394,9 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 	 * Combing stereo information from all images in this cluster, compute a disparity image and add it to the cloud
 	 */
 	boolean computeFusedDisparityAddCloud( SceneStructureMetric scene, ViewInfo center,
-										TIntObjectMap<String> sbaIndexToName, DogArray_I32 pairIndexes ) {
+										   TIntObjectMap<String> sbaIndexToName, DogArray_I32 pairIndexes ) {
 		if (!computeFused.process(scene, center.relations.indexSba, pairIndexes, sbaIndexToName::get)) {
-			if (verbose != null) verbose.println("FAILED: fused disparity. center.index="+center.index);
+			if (verbose != null) verbose.println("FAILED: fused disparity. center.index=" + center.index);
 			return false;
 		}
 

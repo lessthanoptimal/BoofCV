@@ -128,13 +128,13 @@ public class PackedBigArrayPoint4D_F64 implements PackedArray<Point4D_F64> {
 	}
 
 	@Override public void forIdx( int idx0, int idx1, BoofLambdas.ProcessIndex<Point4D_F64> op ) {
-		dog.processByBlock(idx0*DOF, idx1*DOF, (array, arrayIdx0, arrayIdx1, offset )-> {
+		dog.processByBlock(idx0*DOF, idx1*DOF, ( array, arrayIdx0, arrayIdx1, offset ) -> {
 			int pointIndex = idx0 + offset/DOF;
 			for (int i = arrayIdx0; i < arrayIdx1; i += DOF) {
 				temp.x = array[i];
-				temp.y = array[i+1];
-				temp.z = array[i+2];
-				temp.w = array[i+3];
+				temp.y = array[i + 1];
+				temp.z = array[i + 2];
+				temp.w = array[i + 3];
 				op.process(pointIndex++, temp);
 			}
 		});

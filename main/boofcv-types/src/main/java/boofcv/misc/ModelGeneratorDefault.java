@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,8 @@ import org.ddogleg.fitting.modelset.ModelGenerator;
 import java.util.List;
 
 /** Provides default implementations of {@link ModelGenerator}. Primarily used for testing. */
-public class ModelGeneratorDefault<Model,Point>	implements ModelGenerator<Model,Point> {
+public class ModelGeneratorDefault<Model, Point> implements ModelGenerator<Model, Point> {
 	@Override public boolean generate( List<Point> dataSet, Model output ) {return true;}
+
 	@Override public int getMinimumPoints() {return 0;}
 }

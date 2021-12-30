@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ class TestGradientValue_F64 extends BoofStandardJUnit {
 	@Test
 	void set_get() {
 		var alg = new GradientValue_F64();
-		alg.set(2.3,4.5);
+		alg.setTo(2.3,4.5);
 		assertEquals(2.3, alg.getX(), UtilEjml.TEST_F64);
 		assertEquals(4.5, alg.getY(), UtilEjml.TEST_F64);
 	}

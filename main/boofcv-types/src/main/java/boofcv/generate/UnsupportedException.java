@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,18 +24,17 @@ package boofcv.generate;
  * @author Peter Abeles
  */
 public class UnsupportedException extends RuntimeException {
-	public UnsupportedException() {
-	}
+	public UnsupportedException() {}
 
-	public UnsupportedException(String message) {
+	public UnsupportedException( String message ) {
 		super(message);
 	}
 
-	public UnsupportedException(String message, Throwable cause) {
+	public UnsupportedException( String message, Throwable cause ) {
 		super(message, cause);
 	}
 
-	public UnsupportedException(Throwable cause) {
+	public UnsupportedException( Throwable cause ) {
 		super(cause);
 	}
 }

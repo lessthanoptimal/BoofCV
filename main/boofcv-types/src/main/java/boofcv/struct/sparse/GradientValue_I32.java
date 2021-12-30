@@ -29,7 +29,7 @@ public class GradientValue_I32 implements GradientValue {
 	public int y;
 
 	@Override
-	public void set( double dx, double dy ) {
+	public void setTo( double dx, double dy ) {
 		this.x = (int)dx;
 		this.y = (int)dy;
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,7 +42,7 @@ public class IteratorRange<T> implements IteratorReset<T> {
 		this.index = idx0;
 	}
 
-	public void reset(int idx0, int idx1 ) {
+	public void reset( int idx0, int idx1 ) {
 		this.idx0 = idx0;
 		this.idx1 = idx1;
 		this.index = idx0;

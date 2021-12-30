@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ class TestGradientValue_I32 extends BoofStandardJUnit {
 	@Test
 	void set_get() {
 		var alg = new GradientValue_I32();
-		alg.set(2.3,4.8);
+		alg.setTo(2.3,4.8);
 		assertEquals(2, alg.x);
 		assertEquals(4, alg.y);
 		assertEquals(2, alg.getX(), UtilEjml.TEST_F64);

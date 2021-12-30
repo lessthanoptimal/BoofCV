@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,6 @@
 
 package boofcv.struct.wavelet;
 
-
 /**
  * Inverse wavelet description which simply returns the same set of coefficients at all time.
  *
@@ -28,12 +27,12 @@ public class WlBorderCoefStandard<T extends WlCoef> implements WlBorderCoef<T> {
 
 	T coef;
 
-	public WlBorderCoefStandard(T coef ) {
+	public WlBorderCoefStandard( T coef ) {
 		this.coef = coef;
 	}
 
 	@Override
-	public T getBorderCoefficients(int index) {
+	public T getBorderCoefficients( int index ) {
 		return coef;
 	}
 

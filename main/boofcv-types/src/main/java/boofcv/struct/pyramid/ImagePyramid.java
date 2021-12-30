@@ -36,7 +36,7 @@ import boofcv.struct.image.ImageType;
  * where (x_i,y_i) is the pixel coordinate in layer 'i'. The offsets (offX_i,offY_i) vary depending on how
  * each layer in the pyramid samples the previous layers. This offset can be found by calling {@link #getSampleOffset(int)}.
  * </p>
- * 
+ *
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
@@ -49,10 +49,11 @@ public interface ImagePyramid<T extends ImageBase<T>> {
 
 	/**
 	 * Declares internal data structures for an image with the specified dimensions
+	 *
 	 * @param width image width
 	 * @param height image height
 	 */
-	void initialize( int width , int height );
+	void initialize( int width, int height );
 
 	/**
 	 * Returns the scale of the specified layer in the pyramid. Larger the scale
@@ -69,7 +70,7 @@ public interface ImagePyramid<T extends ImageBase<T>> {
 	 * @param layerNum which image is to be returned.
 	 * @return The image in the pyramid.
 	 */
-	T getLayer(int layerNum);
+	T getLayer( int layerNum );
 
 	/**
 	 * Returns the number of layers in the pyramid.
@@ -82,7 +83,7 @@ public interface ImagePyramid<T extends ImageBase<T>> {
 	 * @param layer The layer being requested.
 	 * @return The layer's width.
 	 */
-	int getWidth(int layer);
+	int getWidth( int layer );
 
 	/**
 	 * Returns the height of an image at ths specified layer.
@@ -90,7 +91,7 @@ public interface ImagePyramid<T extends ImageBase<T>> {
 	 * @param layer The layer being requested.
 	 * @return The layer's height.
 	 */
-	int getHeight(int layer);
+	int getHeight( int layer );
 
 	/**
 	 * Width of input image.
@@ -112,6 +113,7 @@ public interface ImagePyramid<T extends ImageBase<T>> {
 	/**
 	 * Set's this pyramid to be the same as input. The two pyramids must have the same structure or else an
 	 * exception will be thrown.
+	 *
 	 * @param input Input pyramid. Not modified.
 	 */
 	void setTo( ImagePyramid<T> input );
@@ -139,7 +141,7 @@ public interface ImagePyramid<T extends ImageBase<T>> {
 	/**
 	 * Creates a copy of the pyramids structure but not the pixel data
 	 */
-	<IP extends ImagePyramid<T>>IP copyStructure();
+	<IP extends ImagePyramid<T>> IP copyStructure();
 
 	/**
 	 * Checks to see if the pyramid has been initialized or not

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,20 +26,20 @@ package boofcv.errors;
 public class OperationNotSupportedException extends RuntimeException {
 	public OperationNotSupportedException() {}
 
-	public OperationNotSupportedException(String message) {
+	public OperationNotSupportedException( String message ) {
 		super(message);
 	}
 
-	public OperationNotSupportedException(String message, Throwable cause) {
+	public OperationNotSupportedException( String message, Throwable cause ) {
 		super(message, cause);
 	}
 
-	public OperationNotSupportedException(Throwable cause) {
+	public OperationNotSupportedException( Throwable cause ) {
 		super(cause);
 	}
 
-	public OperationNotSupportedException(String message, Throwable cause,
-										  boolean enableSuppression, boolean writableStackTrace) {
+	public OperationNotSupportedException( String message, Throwable cause,
+										   boolean enableSuppression, boolean writableStackTrace ) {
 		super(message, cause, enableSuppression, writableStackTrace);
 	}
 }

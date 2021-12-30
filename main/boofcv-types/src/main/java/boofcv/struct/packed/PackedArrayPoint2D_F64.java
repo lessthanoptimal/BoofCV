@@ -62,14 +62,14 @@ public class PackedArrayPoint2D_F64 implements PackedArray<Point2D_F64> {
 
 	@Override public Point2D_F64 getTemp( int index ) {
 		temp.x = array.data[index*2];
-		temp.y = array.data[index*2+1];
+		temp.y = array.data[index*2 + 1];
 
 		return temp;
 	}
 
 	@Override public void getCopy( int index, Point2D_F64 dst ) {
 		dst.x = array.data[index*2];
-		dst.y = array.data[index*2+1];
+		dst.y = array.data[index*2 + 1];
 	}
 
 	@Override public void copy( Point2D_F64 src, Point2D_F64 dst ) {
@@ -90,7 +90,7 @@ public class PackedArrayPoint2D_F64 implements PackedArray<Point2D_F64> {
 		idx1 *= DOF;
 		for (int i = idx0; i < idx1; i += DOF) {
 			temp.x = array.data[i];
-			temp.y = array.data[i+1];
+			temp.y = array.data[i + 1];
 			op.process(pointIndex++, temp);
 		}
 	}

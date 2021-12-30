@@ -29,7 +29,7 @@ import pabeles.concurrency.ConcurrencyOps;
 public class BoofConcurrency extends ConcurrencyOps {
 	/** If an image has fewer pixels than this it will not run a concurrent algorithm. The overhead makes it slower. */
 	public static int SMALL_IMAGE = 100*100;
-	/** f set to true it will use a concurrent algorithm  */
+	/** f set to true it will use a concurrent algorithm */
 	public static boolean USE_CONCURRENT = true;
 
 	/**

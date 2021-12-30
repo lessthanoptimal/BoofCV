@@ -40,9 +40,9 @@ public class ImageBorder1D_F64 extends ImageBorder_F64 implements ImageBorder1D 
 		this.colWrap = colWrap;
 	}
 
-	@Override public BorderIndex1D getRowWrap() { return rowWrap; }
+	@Override public BorderIndex1D getRowWrap() {return rowWrap;}
 
-	@Override public BorderIndex1D getColWrap() { return colWrap; }
+	@Override public BorderIndex1D getColWrap() {return colWrap;}
 
 	@Override
 	public void setImage( GrayF64 image ) {

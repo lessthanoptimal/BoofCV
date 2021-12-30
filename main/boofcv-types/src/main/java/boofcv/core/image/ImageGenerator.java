@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,6 @@ package boofcv.core.image;
 
 import boofcv.struct.image.ImageGray;
 
-
 /**
  * Creates a new instance of an image of a specific configuration.
  *
@@ -28,9 +27,9 @@ import boofcv.struct.image.ImageGray;
  */
 public interface ImageGenerator<T extends ImageGray<T>> {
 
-	public T[] createArray( int number );
+	T[] createArray( int number );
 
-	public T createInstance( int width , int height );
+	T createInstance( int width, int height );
 
-	public Class<T> getType();
+	Class<T> getType();
 }

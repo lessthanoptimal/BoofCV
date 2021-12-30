@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,17 +37,19 @@ public interface GImageMultiBand {
 
 	int getPixelStride();
 
-	int getIndex( int x , int y );
+	int getIndex( int x, int y );
 
-	void set( int x , int y , float[]value );
+	void set( int x, int y, float[] value );
 
-	void get( int x , int y , float[]value );
+	void get( int x, int y, float[] value );
 
-	Number get( int x , int y , int band );
+	Number get( int x, int y, int band );
 
-	void setF( int index , float[] value );
-	void getF( int index , float[] value );
+	void setF( int index, float[] value );
+
+	void getF( int index, float[] value );
+
 	float getF( int index );
 
-	<T extends ImageBase<T>>T getImage();
+	<T extends ImageBase<T>> T getImage();
 }

@@ -40,13 +40,13 @@ public class PointIndex_I32 extends Point2D_I32 {
 		this.index = index;
 	}
 
-	public void setTo(Point2D_I32 p, int index) {
+	public void setTo( Point2D_I32 p, int index ) {
 		this.setTo(p);
 		this.index = index;
 	}
 
-	public void setTo(int x, int y, int index) {
-		this.setTo(x,y);
+	public void setTo( int x, int y, int index ) {
+		this.setTo(x, y);
 		this.index = index;
 	}
 

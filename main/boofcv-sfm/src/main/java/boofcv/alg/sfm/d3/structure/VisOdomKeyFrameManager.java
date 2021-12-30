@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,7 +47,7 @@ public interface VisOdomKeyFrameManager extends VerbosePrint {
 	 * @return Returns a list of frames to discard. They are in sequential order from least to greatest.
 	 */
 	DogArray_I32 selectFramesToDiscard( PointTracker<?> tracker, int limit, int newFrames,
-										 VisOdomBundleAdjustment<?> sba );
+										VisOdomBundleAdjustment<?> sba );
 
 	/**
 	 * After the current frame becomes a keyframe new tracks are spawned from it. This passes in that new information

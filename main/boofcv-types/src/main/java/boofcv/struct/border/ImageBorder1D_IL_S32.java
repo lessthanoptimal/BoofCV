@@ -41,9 +41,9 @@ public class ImageBorder1D_IL_S32<T extends InterleavedInteger<T>>
 		this.colWrap = colWrap;
 	}
 
-	@Override public BorderIndex1D getRowWrap() { return rowWrap; }
+	@Override public BorderIndex1D getRowWrap() {return rowWrap;}
 
-	@Override public BorderIndex1D getColWrap() { return colWrap; }
+	@Override public BorderIndex1D getColWrap() {return colWrap;}
 
 	@Override
 	public void setImage( T image ) {

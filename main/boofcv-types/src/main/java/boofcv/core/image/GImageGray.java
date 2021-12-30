@@ -37,28 +37,29 @@ public interface GImageGray {
 
 	boolean isFloatingPoint();
 
-	Number get( int x , int y );
+	Number get( int x, int y );
 
 	/**
 	 * Set's pixel value using number. If native type of 'num' and image are the same then there is no loss in precision.
+	 *
 	 * @param x pixel coordinate x-value
 	 * @param y pixel coordinate y-value
 	 * @param num Value of the pixel
 	 */
-	void set( int x , int y , Number num );
+	void set( int x, int y, Number num );
 
 	/**
 	 * get which returns a double, has no bounds checking. Still slow, but faster than the super generic get. Also
 	 * doesn't create memory on each get
 	 */
-	double unsafe_getD(int x, int y);
+	double unsafe_getD( int x, int y );
 
-	float unsafe_getF(int x, int y );
+	float unsafe_getF( int x, int y );
 
 	/**
 	 * Sets pixel based on pixel value in data array
 	 */
-	void set( int index , float value );
+	void set( int index, float value );
 
 	float getF( int index );
 

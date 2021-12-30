@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,11 +26,11 @@ import java.util.AbstractList;
  * @author Peter Abeles
  */
 public class WrapArrayIntoList<T> extends AbstractList<T> {
-	
+
 	T[] data;
 	int size;
 
-	public WrapArrayIntoList(T[] data, int size) {
+	public WrapArrayIntoList( T[] data, int size ) {
 		this.data = data;
 		this.size = size;
 	}
@@ -46,7 +46,7 @@ public class WrapArrayIntoList<T> extends AbstractList<T> {
 	}
 
 	@Override
-	public T get(int index) {
+	public T get( int index ) {
 		return data[index];
 	}
 }

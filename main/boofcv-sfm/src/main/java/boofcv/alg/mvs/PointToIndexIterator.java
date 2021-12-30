@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class PointToIndexIterator<T extends PointIndex<T,P>, P extends GeoTuple<P>> implements IteratorReset<T> {
+public class PointToIndexIterator<T extends PointIndex<T, P>, P extends GeoTuple<P>> implements IteratorReset<T> {
 	List<P> list;
 	int idx0, idx1;
 	int index;
@@ -58,7 +58,7 @@ public class PointToIndexIterator<T extends PointIndex<T,P>, P extends GeoTuple<
 	}
 
 	@Override public T next() {
-		point.setTo(list.get(index),index++);
+		point.setTo(list.get(index), index++);
 		return point;
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,8 @@ import java.util.List;
 /**
  * Provides default implementations of ModelFitter functions.
  */
-public class ModelFitterDefault<Model,Point> implements ModelFitter<Model,Point> {
-	@Override public boolean fitModel( List<Point> dataSet, Model initial, Model found ) { return false; }
-	@Override public double getFitScore() { return 0; }
+public class ModelFitterDefault<Model, Point> implements ModelFitter<Model, Point> {
+	@Override public boolean fitModel( List<Point> dataSet, Model initial, Model found ) {return false;}
+
+	@Override public double getFitScore() {return 0;}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,15 +28,15 @@ import java.util.Arrays;
 public class RArray2D_F32 {
 	public float[][] data = new float[0][0];
 
-	public int cols,rows;
+	public int cols, rows;
 
 	public RArray2D_F32( int rows, int cols ) {
-		reshape(rows,cols);
+		reshape(rows, cols);
 	}
 
 	public void reshape( int rows, int cols ) {
 		// this could be done much more intelligently and recycling data when possible
-		if( data.length < rows || (data.length > 0 && data[0].length < cols) ) {
+		if (data.length < rows || (data.length > 0 && data[0].length < cols)) {
 			data = new float[rows][cols];
 		}
 		this.rows = rows;
@@ -45,12 +45,12 @@ public class RArray2D_F32 {
 
 	public void zero() {
 		for (int i = 0; i < rows; i++) {
-			Arrays.fill(data[i],0,cols,0);
+			Arrays.fill(data[i], 0, cols, 0);
 		}
 	}
 
-	public float get( int row , int col ) {
-		if( row < 0 || row >= rows || col < 0 || col >= cols )
+	public float get( int row, int col ) {
+		if (row < 0 || row >= rows || col < 0 || col >= cols)
 			throw new IllegalArgumentException("Out of bounds exception");
 
 		return data[row][col];

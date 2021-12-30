@@ -76,15 +76,15 @@ public class StereoVisualOdometryScaleInput<T extends ImageBase<T>> implements S
 		return alg.process(scaleLeft, scaleRight);
 	}
 
-	@Override public ImageType<T> getImageType() { return alg.getImageType(); }
+	@Override public ImageType<T> getImageType() {return alg.getImageType();}
 
-	@Override public void reset() { alg.reset(); }
+	@Override public void reset() {alg.reset();}
 
-	@Override public boolean isFault() { return alg.isFault(); }
+	@Override public boolean isFault() {return alg.isFault();}
 
-	@Override public Se3_F64 getCameraToWorld() { return alg.getCameraToWorld(); }
+	@Override public Se3_F64 getCameraToWorld() {return alg.getCameraToWorld();}
 
-	@Override public long getFrameID() { return alg.getFrameID(); }
+	@Override public long getFrameID() {return alg.getFrameID();}
 
 	@Override
 	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {

@@ -47,7 +47,7 @@ public class ConfigBundleUtils implements Configuration {
 	@Override public void checkValidity() {
 		converge.checkValidity();
 		triangulation.checkValidity();
-		BoofMiscOps.checkFraction(keepFraction,"keepFraction");
+		BoofMiscOps.checkFraction(keepFraction, "keepFraction");
 	}
 
 	public ConfigBundleUtils setTo( ConfigBundleUtils src ) {

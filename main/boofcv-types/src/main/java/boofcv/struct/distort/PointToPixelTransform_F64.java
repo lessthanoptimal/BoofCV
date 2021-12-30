@@ -29,14 +29,14 @@ import georegression.struct.point.Point2D_F64;
 public class PointToPixelTransform_F64 implements PixelTransform<Point2D_F64> {
 	Point2Transform2_F64 alg;
 
-	public PointToPixelTransform_F64( Point2Transform2_F64 alg ) { this.alg = alg; }
+	public PointToPixelTransform_F64( Point2Transform2_F64 alg ) {this.alg = alg;}
 
-	public PointToPixelTransform_F64(){}
+	public PointToPixelTransform_F64() {}
 
-	public void setTransform( Point2Transform2_F64 transform ) { this.alg = transform; }
+	public void setTransform( Point2Transform2_F64 transform ) {this.alg = transform;}
 
-	@Override public void compute( int x, int y, Point2D_F64 output ) { alg.compute(x, y, output); }
+	@Override public void compute( int x, int y, Point2D_F64 output ) {alg.compute(x, y, output);}
 
 	@Override
-	public PointToPixelTransform_F64 copyConcurrent() { return new PointToPixelTransform_F64(alg.copyConcurrent()); }
+	public PointToPixelTransform_F64 copyConcurrent() {return new PointToPixelTransform_F64(alg.copyConcurrent());}
 }

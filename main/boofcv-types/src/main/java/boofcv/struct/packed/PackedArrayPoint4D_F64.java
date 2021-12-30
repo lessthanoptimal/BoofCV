@@ -65,9 +65,9 @@ public class PackedArrayPoint4D_F64 implements PackedArray<Point4D_F64> {
 	@Override public Point4D_F64 getTemp( int index ) {
 		index *= 4;
 		temp.x = array.data[index];
-		temp.y = array.data[index+1];
-		temp.z = array.data[index+2];
-		temp.w = array.data[index+3];
+		temp.y = array.data[index + 1];
+		temp.z = array.data[index + 2];
+		temp.w = array.data[index + 3];
 
 		return temp;
 	}
@@ -75,9 +75,9 @@ public class PackedArrayPoint4D_F64 implements PackedArray<Point4D_F64> {
 	@Override public void getCopy( int index, Point4D_F64 dst ) {
 		index *= 4;
 		dst.x = array.data[index];
-		dst.y = array.data[index+1];
-		dst.z = array.data[index+2];
-		dst.w = array.data[index+3];
+		dst.y = array.data[index + 1];
+		dst.z = array.data[index + 2];
+		dst.w = array.data[index + 3];
 	}
 
 	@Override public void copy( Point4D_F64 src, Point4D_F64 dst ) {
@@ -98,9 +98,9 @@ public class PackedArrayPoint4D_F64 implements PackedArray<Point4D_F64> {
 		idx1 *= DOF;
 		for (int i = idx0; i < idx1; i += DOF) {
 			temp.x = array.data[i];
-			temp.y = array.data[i+1];
-			temp.z = array.data[i+2];
-			temp.w = array.data[i+3];
+			temp.y = array.data[i + 1];
+			temp.z = array.data[i + 2];
+			temp.w = array.data[i + 3];
 			op.process(pointIndex++, temp);
 		}
 	}
