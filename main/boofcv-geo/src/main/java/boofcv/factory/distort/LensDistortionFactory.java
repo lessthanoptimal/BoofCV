@@ -37,36 +37,35 @@ public class LensDistortionFactory {
 	 * Creates the {@link LensDistortionNarrowFOV lens distortion} for the specified camera parameters.
 	 * </p>
 	 */
-	public static LensDistortionNarrowFOV narrow(CameraModel param) {
-		if( param instanceof CameraPinholeBrown) {
+	public static LensDistortionNarrowFOV narrow( CameraModel param ) {
+		if (param instanceof CameraPinholeBrown) {
 			CameraPinholeBrown c = (CameraPinholeBrown)param;
 
 			if (c.isDistorted())
 				return new LensDistortionBrown(c);
 			else
 				return new LensDistortionPinhole(c);
-		} else if( param instanceof CameraPinhole) {
+		} else if (param instanceof CameraPinhole) {
 			CameraPinhole c = (CameraPinhole)param;
 
 			return new LensDistortionPinhole(c);
 		} else {
-			throw new IllegalArgumentException("Unknown camera model "+param.getClass().getSimpleName());
+			throw new IllegalArgumentException("Unknown camera model " + param.getClass().getSimpleName());
 		}
 	}
-
 
 	/**
 	 * <p>
 	 * Creates the {@link LensDistortionWideFOV lens distortion} for the specified camera parameters.
 	 * </p>
 	 */
-	public static LensDistortionWideFOV wide(CameraModel param ) {
-		if( param instanceof CameraUniversalOmni) {
+	public static LensDistortionWideFOV wide( CameraModel param ) {
+		if (param instanceof CameraUniversalOmni) {
 			return new LensDistortionUniversalOmni((CameraUniversalOmni)param);
-		} else if( param instanceof CameraKannalaBrandt) {
+		} else if (param instanceof CameraKannalaBrandt) {
 			return new LensDistortionKannalaBrandt((CameraKannalaBrandt)param);
 		} else {
-			throw new IllegalArgumentException("Unknown camera model "+param.getClass().getSimpleName());
+			throw new IllegalArgumentException("Unknown camera model " + param.getClass().getSimpleName());
 		}
 	}
 }

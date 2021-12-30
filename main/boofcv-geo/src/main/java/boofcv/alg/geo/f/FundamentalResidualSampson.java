@@ -37,18 +37,17 @@ import org.ejml.data.DMatrixRMaj;
  * @author Peter Abeles
  */
 @SuppressWarnings({"NullAway.Init"})
-public class FundamentalResidualSampson
-		implements ModelObservationResidual<DMatrixRMaj,AssociatedPair> {
+public class FundamentalResidualSampson implements ModelObservationResidual<DMatrixRMaj, AssociatedPair> {
 	DMatrixRMaj F;
 	Point3D_F64 temp = new Point3D_F64();
 
 	@Override
-	public void setModel(DMatrixRMaj F) {
+	public void setModel( DMatrixRMaj F ) {
 		this.F = F;
 	}
 
 	@Override
-	public double computeResidual(AssociatedPair observation) {
+	public double computeResidual( AssociatedPair observation ) {
 		double bottom = 0;
 
 		GeometryMath_F64.mult(F, observation.p1, temp);
@@ -57,10 +56,10 @@ public class FundamentalResidualSampson
 		GeometryMath_F64.multTran(F, observation.p2, temp);
 		bottom += temp.x*temp.x + temp.y*temp.y;
 
-		if( bottom == 0) {
+		if (bottom == 0) {
 			return Double.MAX_VALUE;
 		} else {
-			GeometryMath_F64.multTran(F,observation.p2,temp);
+			GeometryMath_F64.multTran(F, observation.p2, temp);
 
 			return (temp.x*observation.p1.x + temp.y*observation.p1.y + temp.z)/bottom;
 		}

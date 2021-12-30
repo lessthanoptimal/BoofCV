@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,19 +34,19 @@ public class WrapRefineThreeViewProjectiveGeometric implements RefineThreeViewPr
 
 	RefineThreeViewProjectiveGeometric alg;
 
-	public WrapRefineThreeViewProjectiveGeometric(RefineThreeViewProjectiveGeometric alg) {
+	public WrapRefineThreeViewProjectiveGeometric( RefineThreeViewProjectiveGeometric alg ) {
 		this.alg = alg;
 	}
 
 	@Override
-	public boolean process(List<AssociatedTriple> observations,
-						   DMatrixRMaj P2, DMatrixRMaj P3,
-						   DMatrixRMaj refinedP2, DMatrixRMaj refinedP3) {
+	public boolean process( List<AssociatedTriple> observations,
+							DMatrixRMaj P2, DMatrixRMaj P3,
+							DMatrixRMaj refinedP2, DMatrixRMaj refinedP3 ) {
 
 		refinedP2.setTo(P2);
 		refinedP3.setTo(P3);
 
-		return alg.refine(observations,refinedP2,refinedP3);
+		return alg.refine(observations, refinedP2, refinedP3);
 	}
 
 	public RefineThreeViewProjectiveGeometric getAlg() {

@@ -37,7 +37,7 @@ public class Wrap2ViewsTriangulateMetricDLTH implements Triangulate2ViewsMetricH
 	final @Getter TriangulateMetricLinearDLT alg = new TriangulateMetricLinearDLT();
 
 	@Override
-	public boolean triangulate( Point2D_F64 obsA, Point2D_F64 obsB,	Se3_F64 fromAtoB, Point4D_F64 foundInA ) {
+	public boolean triangulate( Point2D_F64 obsA, Point2D_F64 obsB, Se3_F64 fromAtoB, Point4D_F64 foundInA ) {
 		return GeometricResult.SUCCESS == alg.triangulate(obsA, obsB, fromAtoB, foundInA);
 	}
 }

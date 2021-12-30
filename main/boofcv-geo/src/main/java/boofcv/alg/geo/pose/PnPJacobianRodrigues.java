@@ -59,7 +59,7 @@ public class PnPJacobianRodrigues implements FunctionNtoMxN<DMatrixRMaj> {
 	private int indexX;
 	private int indexY;
 
-	public void setObservations(List<Point2D3D> observations) {
+	public void setObservations( List<Point2D3D> observations ) {
 		this.observations = observations;
 	}
 
@@ -74,12 +74,12 @@ public class PnPJacobianRodrigues implements FunctionNtoMxN<DMatrixRMaj> {
 	}
 
 	@Override
-	public void process(double[] input, DMatrixRMaj J) {
+	public void process( double[] input, DMatrixRMaj J ) {
 
 		this.output = J.data;
 
 		// initialize data structures
-		rodrigues.setParamVector(input[0],input[1],input[2]);
+		rodrigues.setParamVector(input[0], input[1], input[2]);
 		rodJacobian.process(input[0], input[1], input[2]);
 
 		worldToCamera.T.x = input[3];
@@ -89,18 +89,18 @@ public class PnPJacobianRodrigues implements FunctionNtoMxN<DMatrixRMaj> {
 		ConvertRotation3D_F64.rodriguesToMatrix(rodrigues, worldToCamera.getR());
 
 		// compute the gradient for each observation
-		for( int i = 0; i < observations.size(); i++ ) {
+		for (int i = 0; i < observations.size(); i++) {
 			Point2D3D o = observations.get(i);
 
-			SePointOps_F64.transform(worldToCamera,o.location, cameraPt);
+			SePointOps_F64.transform(worldToCamera, o.location, cameraPt);
 
 			indexX = 2*6*i;
 			indexY = indexX + 6;
 
 			// add gradient from rotation
-			addRodriguesJacobian(rodJacobian.Rx,o.location,cameraPt);
-			addRodriguesJacobian(rodJacobian.Ry,o.location,cameraPt);
-			addRodriguesJacobian(rodJacobian.Rz,o.location,cameraPt);
+			addRodriguesJacobian(rodJacobian.Rx, o.location, cameraPt);
+			addRodriguesJacobian(rodJacobian.Ry, o.location, cameraPt);
+			addRodriguesJacobian(rodJacobian.Rz, o.location, cameraPt);
 
 			// add gradient from translation
 			addTranslationJacobian(cameraPt);
@@ -109,7 +109,7 @@ public class PnPJacobianRodrigues implements FunctionNtoMxN<DMatrixRMaj> {
 
 	@Override
 	public DMatrixRMaj declareMatrixMxN() {
-		return new DMatrixRMaj(getNumOfOutputsM(),getNumOfInputsN());
+		return new DMatrixRMaj(getNumOfOutputsM(), getNumOfInputsN());
 	}
 
 	/**
@@ -123,8 +123,7 @@ public class PnPJacobianRodrigues implements FunctionNtoMxN<DMatrixRMaj> {
 	 * @param worldPt Location of point in world coordinates
 	 * @param cameraPt Location of point in camera coordinates
 	 */
-	private void addRodriguesJacobian( DMatrixRMaj Rj , Point3D_F64 worldPt , Point3D_F64 cameraPt )
-	{
+	private void addRodriguesJacobian( DMatrixRMaj Rj, Point3D_F64 worldPt, Point3D_F64 cameraPt ) {
 		// (1/z)*dot(R)*X
 		double Rx = (Rj.data[0]*worldPt.x + Rj.data[1]*worldPt.y + Rj.data[2]*worldPt.z)/cameraPt.z;
 		double Ry = (Rj.data[3]*worldPt.x + Rj.data[4]*worldPt.y + Rj.data[5]*worldPt.z)/cameraPt.z;
@@ -144,8 +143,7 @@ public class PnPJacobianRodrigues implements FunctionNtoMxN<DMatrixRMaj> {
 	 *
 	 * where T is translation, z = z-coordinate of point in camera frame
 	 */
-	private void addTranslationJacobian( Point3D_F64 cameraPt )
-	{
+	private void addTranslationJacobian( Point3D_F64 cameraPt ) {
 		double divZ = 1.0/cameraPt.z;
 		double divZ2 = 1.0/(cameraPt.z*cameraPt.z);
 

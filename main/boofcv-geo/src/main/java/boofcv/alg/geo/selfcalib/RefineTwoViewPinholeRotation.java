@@ -257,18 +257,18 @@ public class RefineTwoViewPinholeRotation implements VerbosePrint {
 		State state = new State();
 
 		// Intrinsic parameters in matrix form
-		DMatrixRMaj K1_inv = new DMatrixRMaj(3,3);
-		DMatrixRMaj K2 = new DMatrixRMaj(3,3);
+		DMatrixRMaj K1_inv = new DMatrixRMaj(3, 3);
+		DMatrixRMaj K2 = new DMatrixRMaj(3, 3);
 		// Rotation matrix
-		DMatrixRMaj R = new DMatrixRMaj(3,3);
+		DMatrixRMaj R = new DMatrixRMaj(3, 3);
 		// Homography for pixels
-		DMatrixRMaj H = new DMatrixRMaj(3,3);
+		DMatrixRMaj H = new DMatrixRMaj(3, 3);
 
 		// Predicted observation in view-2
 		Point2D_F64 predicted2 = new Point2D_F64();
 
 		// Storage for K2*R
-		DMatrixRMaj K2R = new DMatrixRMaj(3,3);
+		DMatrixRMaj K2R = new DMatrixRMaj(3, 3);
 
 		@Override public void process( double[] input, double[] output ) {
 			state.decode(input);
@@ -279,14 +279,14 @@ public class RefineTwoViewPinholeRotation implements VerbosePrint {
 			PerspectiveOps.pinholeToMatrix(state.intrinsic2, K2);
 			PerspectiveOps.invertCalibrationMatrix(K1_inv, K1_inv);
 
-			CommonOps_DDRM.mult(K2,R,K2R);
-			CommonOps_DDRM.mult(K2R,K1_inv, H);
+			CommonOps_DDRM.mult(K2, R, K2R);
+			CommonOps_DDRM.mult(K2R, K1_inv, H);
 
 			// x2 = H*x1
 			int errorIndex = 0;
 			for (int i = 0; i < associatedPixels.size(); i++) {
 				AssociatedPair pair = associatedPixels.get(i);
-				GeometryMath_F64.mult(H,pair.p1, predicted2);
+				GeometryMath_F64.mult(H, pair.p1, predicted2);
 				output[errorIndex++] = pair.p2.x - predicted2.x;
 				output[errorIndex++] = pair.p2.y - predicted2.y;
 

@@ -189,6 +189,7 @@ public class CameraKannalaBrandt extends CameraPinhole {
 
 	/**
 	 * Copies the value of 'src' into 'this'. After this call they will be identical
+	 *
 	 * @param src (input) Camera model
 	 */
 	public void setTo( CameraKannalaBrandt src ) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,19 +27,19 @@ import java.util.List;
 
 /**
  * Wrapper around either {@link FundamentalLinear8} for {@link boofcv.abst.geo.Estimate1ofEpipolar}.
- * 
+ *
  * @author Peter Abeles
  */
 public class WrapFundamentalLinear8 implements Estimate1ofEpipolar {
 	FundamentalLinear8 alg;
 
-	public WrapFundamentalLinear8(boolean fundamental ) {
+	public WrapFundamentalLinear8( boolean fundamental ) {
 		alg = new FundamentalLinear8(fundamental);
 	}
 
 	@Override
-	public boolean process(List<AssociatedPair> points, DMatrixRMaj estimatedModel) {
-		return alg.process(points,estimatedModel);
+	public boolean process( List<AssociatedPair> points, DMatrixRMaj estimatedModel ) {
+		return alg.process(points, estimatedModel);
 	}
 
 	@Override

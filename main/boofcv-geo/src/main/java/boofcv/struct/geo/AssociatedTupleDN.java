@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ public class AssociatedTupleDN implements AssociatedTuple {
 	public final DogArray<Point2D_F64> p;
 
 	public AssociatedTupleDN( int num ) {
-		p = new DogArray<>(num,Point2D_F64::new);
+		p = new DogArray<>(num, Point2D_F64::new);
 	}
 
 	public AssociatedTupleDN() {
@@ -54,12 +54,12 @@ public class AssociatedTupleDN implements AssociatedTuple {
 	}
 
 	@Override
-	public void set( int index , double x , double y ) {
-		p.data[index].setTo(x,y);
+	public void set( int index, double x, double y ) {
+		p.data[index].setTo(x, y);
 	}
 
 	@Override
-	public void set( int index , Point2D_F64 src ) {
+	public void set( int index, Point2D_F64 src ) {
 		p.data[index].setTo(src);
 	}
 
@@ -69,7 +69,7 @@ public class AssociatedTupleDN implements AssociatedTuple {
 	}
 
 	public void resize( int newSize ) {
-		if( p.size == newSize )
+		if (p.size == newSize)
 			return;
 		p.resize(newSize);
 	}

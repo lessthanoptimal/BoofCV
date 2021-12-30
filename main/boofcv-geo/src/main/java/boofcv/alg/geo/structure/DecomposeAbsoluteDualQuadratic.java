@@ -64,9 +64,11 @@ public class DecomposeAbsoluteDualQuadratic {
 		// Directly extract from the definition of Q
 		// Q = [w -w*p;-p'*w p'*w*p]
 		// w = k*k'
+		// @formatter:off
 		k.a11 = Q.a11; k.a12 = Q.a12; k.a13 = Q.a13;
 		k.a21 = Q.a21; k.a22 = Q.a22; k.a23 = Q.a23;
 		k.a31 = Q.a31; k.a32 = Q.a32; k.a33 = Q.a33;
+		// @formatter:on
 
 		if (!CommonOps_DDF3.invert(k, w_inv))
 			return false;
@@ -100,6 +102,7 @@ public class DecomposeAbsoluteDualQuadratic {
 	 * @param Q Storage for the recomputed Q
 	 */
 	public void recomputeQ( DMatrix4x4 Q ) {
+		// @formatter:off
 		CommonOps_DDF3.multTransB(k, k, w);
 
 		Q.a11 = w.a11; Q.a12 = w.a12; Q.a13 = w.a13;
@@ -113,6 +116,7 @@ public class DecomposeAbsoluteDualQuadratic {
 		Q.a41 = t.a1; Q.a42 = t.a2; Q.a43 = t.a3;
 
 		Q.a44 = -CommonOps_DDF3.dot(t, p);
+		// @formatter:on
 	}
 
 	/**

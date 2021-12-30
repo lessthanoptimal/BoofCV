@@ -94,7 +94,7 @@ public class CalibrationObservation {
 		// check to see if they are already ordered first to avoid wasting CPU
 		boolean ordered = true;
 		for (int i = 1; i < points.size(); i++) {
-			if (points.get(i-1).index >= points.get(i).index) {
+			if (points.get(i - 1).index >= points.get(i).index) {
 				ordered = false;
 				break;
 			}

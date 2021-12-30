@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,6 @@ package boofcv.alg.geo.robust;
 import georegression.struct.affine.Affine2D_F64;
 import org.ddogleg.fitting.modelset.ModelCodec;
 
-
 /**
  * Converts an {@link georegression.struct.affine.Affine2D_F64} to and from an array
  * parameterized format.
@@ -36,11 +35,11 @@ public class Affine2DCodec implements ModelCodec<Affine2D_F64> {
 	}
 
 	@Override
-	public void decode(double[] input, Affine2D_F64 model) {
+	public void decode( double[] input, Affine2D_F64 model ) {
 		decodeStatic(input, model);
 	}
 
-	public static void decodeStatic(double[] param, Affine2D_F64 model) {
+	public static void decodeStatic( double[] param, Affine2D_F64 model ) {
 		model.a11 = (float)param[0];
 		model.a12 = (float)param[1];
 		model.a21 = (float)param[2];
@@ -50,11 +49,11 @@ public class Affine2DCodec implements ModelCodec<Affine2D_F64> {
 	}
 
 	@Override
-	public void encode(Affine2D_F64 model, double[] param) {
+	public void encode( Affine2D_F64 model, double[] param ) {
 		encodeStatic(model, param);
 	}
 
-	public static void encodeStatic(Affine2D_F64 model, double[] param) {
+	public static void encodeStatic( Affine2D_F64 model, double[] param ) {
 		param[0] = model.a11;
 		param[1] = model.a12;
 		param[2] = model.a21;

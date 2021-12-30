@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,7 +41,7 @@ public interface RefineTriangulateProjective {
 	 * @param refinedPt The refined estimated point position.
 	 * @return if successful or not
 	 */
-	boolean process(List<Point2D_F64> observations,
-					List<DMatrixRMaj> cameraMatrices,
-					Point4D_F64 worldPt, Point4D_F64 refinedPt);
+	boolean process( List<Point2D_F64> observations,
+					 List<DMatrixRMaj> cameraMatrices,
+					 Point4D_F64 worldPt, Point4D_F64 refinedPt );
 }

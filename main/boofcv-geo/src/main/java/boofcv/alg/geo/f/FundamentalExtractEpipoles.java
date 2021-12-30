@@ -41,10 +41,10 @@ import org.jetbrains.annotations.Nullable;
  */
 public class FundamentalExtractEpipoles {
 	SingularValueDecomposition_F64<DMatrixRMaj> svd =
-			DecompositionFactory_DDRM.svd(true,true,false);
+			DecompositionFactory_DDRM.svd(true, true, false);
 
-	DMatrixRMaj U = new DMatrixRMaj(3,3);
-	DMatrixRMaj V = new DMatrixRMaj(3,3);
+	DMatrixRMaj U = new DMatrixRMaj(3, 3);
+	DMatrixRMaj V = new DMatrixRMaj(3, 3);
 
 	/**
 	 * Extracts the left and right epipoles.
@@ -53,19 +53,19 @@ public class FundamentalExtractEpipoles {
 	 * @param e1 (Output) right null space. Can be null.
 	 * @param e2 (Output) left null space. Can be null.
 	 */
-	public void process(DMatrixRMaj F , @Nullable Point3D_F64 e1 , @Nullable Point3D_F64 e2 ) {
+	public void process( DMatrixRMaj F, @Nullable Point3D_F64 e1, @Nullable Point3D_F64 e2 ) {
 
-		if( !svd.decompose(F) )
+		if (!svd.decompose(F))
 			throw new RuntimeException("SVD Failed?!");
 
-		svd.getU(U,false);
-		svd.getV(V,false);
+		svd.getU(U, false);
+		svd.getV(V, false);
 		double singular[] = svd.getSingularValues();
-		SingularOps_DDRM.descendingOrder(U,false,singular,3,V,false);
+		SingularOps_DDRM.descendingOrder(U, false, singular, 3, V, false);
 
-		if( e2 != null )
-			e2.setTo(U.get(0,2),U.get(1,2),U.get(2,2));
-		if( e1 != null )
-			e1.setTo(V.get(0,2),V.get(1,2),V.get(2,2));
+		if (e2 != null)
+			e2.setTo(U.get(0, 2), U.get(1, 2), U.get(2, 2));
+		if (e1 != null)
+			e1.setTo(V.get(0, 2), V.get(1, 2), V.get(2, 2));
 	}
 }

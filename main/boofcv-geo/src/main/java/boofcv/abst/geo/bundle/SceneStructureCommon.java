@@ -133,7 +133,7 @@ public abstract class SceneStructureCommon implements SceneStructure {
 		return cameras;
 	}
 
-	public <T extends BundleAdjustmentCamera>T getCameraModel(int cameraIndex) {
+	public <T extends BundleAdjustmentCamera> T getCameraModel( int cameraIndex ) {
 		return Objects.requireNonNull(cameras.get(cameraIndex).getModel());
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,11 +30,11 @@ public interface AssociatedTuple {
 
 	double getY( int index );
 
-	Point2D_F64 get(int index ) ;
+	Point2D_F64 get( int index );
 
-	void set( int index , double x , double y );
+	void set( int index, double x, double y );
 
-	void set( int index , Point2D_F64 src );
+	void set( int index, Point2D_F64 src );
 
 	int size();
 

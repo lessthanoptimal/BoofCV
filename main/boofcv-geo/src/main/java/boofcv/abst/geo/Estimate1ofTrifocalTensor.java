@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,5 +27,4 @@ import boofcv.struct.geo.TrifocalTensor;
  *
  * @author Peter Abeles
  */
-public interface Estimate1ofTrifocalTensor extends GeoModelEstimator1<TrifocalTensor,AssociatedTriple>  {
-}
+public interface Estimate1ofTrifocalTensor extends GeoModelEstimator1<TrifocalTensor, AssociatedTriple> {}

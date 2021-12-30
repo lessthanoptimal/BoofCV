@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,7 +50,7 @@ public class TriangulateRefineProjectiveLS implements RefineTriangulateProjectiv
 		this.convergenceTol = convergenceTol;
 		this.maxIterations = maxIterations;
 		minimizer = FactoryOptimization.levenbergMarquardt(null, false);
-		BoofMiscOps.checkEq(4,func.getNumOfInputsN());
+		BoofMiscOps.checkEq(4, func.getNumOfInputsN());
 	}
 
 	@Override

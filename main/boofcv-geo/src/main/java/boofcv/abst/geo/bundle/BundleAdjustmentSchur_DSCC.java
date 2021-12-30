@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,13 +27,11 @@ import org.ejml.data.DMatrixSparseCSC;
  * @author Peter Abeles
  */
 public class BundleAdjustmentSchur_DSCC<Structure extends SceneStructure>
-		extends BundleAdjustmentSchur<Structure,DMatrixSparseCSC>
-{
-	public BundleAdjustmentSchur_DSCC(UnconstrainedLeastSquaresSchur<DMatrixSparseCSC> minimizer,
-									  FunctionResiduals<Structure> function,
-									  Jacobian<Structure, DMatrixSparseCSC> jacobian,
-									  Codec<Structure> codec)
-	{
+		extends BundleAdjustmentSchur<Structure, DMatrixSparseCSC> {
+	public BundleAdjustmentSchur_DSCC( UnconstrainedLeastSquaresSchur<DMatrixSparseCSC> minimizer,
+									   FunctionResiduals<Structure> function,
+									   Jacobian<Structure, DMatrixSparseCSC> jacobian,
+									   Codec<Structure> codec ) {
 		super(minimizer, function, jacobian, codec);
 	}
 }

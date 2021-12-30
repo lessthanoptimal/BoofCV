@@ -83,7 +83,7 @@ public class LowLevelMultiViewOps {
 	 * @param normalize Output: 3x3 normalization matrix for first set of points. Modified.
 	 */
 	public static <In> void computeNormalizationLL( List<List<In>> points,
-													BoofLambdas.ConvertOut<In,Point2D_F64> convert,
+													BoofLambdas.ConvertOut<In, Point2D_F64> convert,
 													NormalizationPoint2D normalize ) {
 		double meanX = 0;
 		double meanY = 0;

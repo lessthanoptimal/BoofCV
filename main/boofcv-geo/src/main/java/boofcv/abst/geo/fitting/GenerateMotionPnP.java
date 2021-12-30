@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,20 +27,20 @@ import java.util.List;
 
 /**
  * Wrapper around {@link Estimate1ofPnP} for {@link ModelGenerator}.
- * 
+ *
  * @author Peter Abeles
  */
-public class GenerateMotionPnP implements ModelGenerator<Se3_F64,Point2D3D> {
+public class GenerateMotionPnP implements ModelGenerator<Se3_F64, Point2D3D> {
 
 	Estimate1ofPnP alg;
 
-	public GenerateMotionPnP(Estimate1ofPnP alg) {
+	public GenerateMotionPnP( Estimate1ofPnP alg ) {
 		this.alg = alg;
 	}
 
 	@Override
-	public boolean generate(List<Point2D3D> dataSet, Se3_F64 model ) {
-		return alg.process(dataSet,model);
+	public boolean generate( List<Point2D3D> dataSet, Se3_F64 model ) {
+		return alg.process(dataSet, model);
 	}
 
 	@Override

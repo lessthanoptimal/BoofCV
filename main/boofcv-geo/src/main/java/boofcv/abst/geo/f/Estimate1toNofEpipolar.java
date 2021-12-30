@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,10 +29,9 @@ import org.ejml.data.DMatrixRMaj;
  *
  * @author Peter Abeles
  */
-public class Estimate1toNofEpipolar extends GeoModelEstimator1toN<DMatrixRMaj,AssociatedPair>
-	implements EstimateNofEpipolar
-{
-	public Estimate1toNofEpipolar(GeoModelEstimator1<DMatrixRMaj, AssociatedPair> alg) {
+public class Estimate1toNofEpipolar extends GeoModelEstimator1toN<DMatrixRMaj, AssociatedPair>
+		implements EstimateNofEpipolar {
+	public Estimate1toNofEpipolar( GeoModelEstimator1<DMatrixRMaj, AssociatedPair> alg ) {
 		super(alg);
 	}
 }

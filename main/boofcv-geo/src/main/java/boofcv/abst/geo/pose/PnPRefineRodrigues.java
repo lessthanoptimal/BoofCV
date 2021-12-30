@@ -40,19 +40,18 @@ import java.util.List;
 public class PnPRefineRodrigues implements RefinePnP {
 
 	ModelCodec<Se3_F64> paramModel = new PnPRodriguesCodec();
-	ResidualsCodecToMatrix<Se3_F64,Point2D3D> func;
+	ResidualsCodecToMatrix<Se3_F64, Point2D3D> func;
 	PnPJacobianRodrigues jacobian = new PnPJacobianRodrigues();
 
-	double param[];
+	double[] param;
 	UnconstrainedLeastSquares minimizer;
 	int maxIterations;
 	double convergenceTol;
 
-	public PnPRefineRodrigues(double convergenceTol, int maxIterations )
-	{
+	public PnPRefineRodrigues( double convergenceTol, int maxIterations ) {
 		this.maxIterations = maxIterations;
 		this.convergenceTol = convergenceTol;
-		this.minimizer = FactoryOptimization.levenbergMarquardt(null,false);
+		this.minimizer = FactoryOptimization.levenbergMarquardt(null, false);
 
 		func = new ResidualsCodecToMatrix<>(paramModel, new PnPResidualReprojection(), new Se3_F64());
 
@@ -60,27 +59,27 @@ public class PnPRefineRodrigues implements RefinePnP {
 	}
 
 	@Override
-	public boolean fitModel(List<Point2D3D> obs, Se3_F64 worldToCamera, Se3_F64 refinedWorldToCamera) {
+	public boolean fitModel( List<Point2D3D> obs, Se3_F64 worldToCamera, Se3_F64 refinedWorldToCamera ) {
 
 		paramModel.encode(worldToCamera, param);
 
 		func.setObservations(obs);
 		jacobian.setObservations(obs);
 
-		minimizer.setFunction(func,jacobian);
+		minimizer.setFunction(func, jacobian);
 
-		minimizer.initialize(param,0,convergenceTol*obs.size());
+		minimizer.initialize(param, 0, convergenceTol*obs.size());
 
 		boolean updated = false;
-		for( int i = 0; i < maxIterations; i++ ) {
+		for (int i = 0; i < maxIterations; i++) {
 			boolean converged = minimizer.iterate();
-			if( converged || minimizer.isUpdated() ) {
+			if (converged || minimizer.isUpdated()) {
 				// save the results
 				paramModel.decode(minimizer.getParameters(), refinedWorldToCamera);
 				updated = true;
 			}
-			if( converged ) {
-				if( i == 0 ) {
+			if (converged) {
+				if (i == 0) {
 					// if it converted on the first iteration then that means it already
 					// meet convergence. use input to avoid introduction of small numerical errors
 					refinedWorldToCamera.setTo(worldToCamera);

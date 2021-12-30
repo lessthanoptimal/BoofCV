@@ -40,9 +40,9 @@ public interface Zhang99Camera {
 	 * @param observations (Input) Target observations
 	 * @return Initial estimate of camera model
 	 */
-	BundleAdjustmentCamera initializeCamera( DMatrixRMaj K ,
+	BundleAdjustmentCamera initializeCamera( DMatrixRMaj K,
 											 List<DMatrixRMaj> homographies,
 											 List<CalibrationObservation> observations );
 
-	CameraModel getCameraModel(BundleAdjustmentCamera bundleCam );
+	CameraModel getCameraModel( BundleAdjustmentCamera bundleCam );
 }

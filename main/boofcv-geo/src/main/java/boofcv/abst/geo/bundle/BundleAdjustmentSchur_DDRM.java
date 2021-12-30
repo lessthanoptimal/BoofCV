@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,13 +27,11 @@ import org.ejml.data.DMatrixRMaj;
  * @author Peter Abeles
  */
 public class BundleAdjustmentSchur_DDRM<Structure extends SceneStructure>
-		extends BundleAdjustmentSchur<Structure, DMatrixRMaj>
-{
-	public BundleAdjustmentSchur_DDRM(UnconstrainedLeastSquaresSchur<DMatrixRMaj> minimizer,
-									  FunctionResiduals<Structure> function,
-									  Jacobian<Structure, DMatrixRMaj> jacobian,
-									  Codec<Structure> codec)
-	{
+		extends BundleAdjustmentSchur<Structure, DMatrixRMaj> {
+	public BundleAdjustmentSchur_DDRM( UnconstrainedLeastSquaresSchur<DMatrixRMaj> minimizer,
+									   FunctionResiduals<Structure> function,
+									   Jacobian<Structure, DMatrixRMaj> jacobian,
+									   Codec<Structure> codec ) {
 		super(minimizer, function, jacobian, codec);
 	}
 }

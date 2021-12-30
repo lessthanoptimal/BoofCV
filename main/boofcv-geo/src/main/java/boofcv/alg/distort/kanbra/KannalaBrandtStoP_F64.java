@@ -54,7 +54,7 @@ public class KannalaBrandtStoP_F64 implements Point3Transform2_F64 {
 		double theta = Math.acos(z/UtilPoint3D_F64.norm(x, y, z)); // uses dot product
 
 		// compute symmetric projection function
-		double r = (double) polynomial(model.symmetric, theta);
+		double r = (double)polynomial(model.symmetric, theta);
 
 		// angle on the image plane of the incoming ray
 		double phi = Math.atan2(y, x);
@@ -65,8 +65,8 @@ public class KannalaBrandtStoP_F64 implements Point3Transform2_F64 {
 		double dx, dy;
 		if (model.isAsymmetricModel()) {
 			// distortion terms. radial and tangential
-			double disRad = (double) (polynomial(model.radial, theta)*polytrig(model.radialTrig, cosphi, sinphi));
-			double disTan = (double) (polynomial(model.tangent, theta)*polytrig(model.tangentTrig, cosphi, sinphi));
+			double disRad = (double)(polynomial(model.radial, theta)*polytrig(model.radialTrig, cosphi, sinphi));
+			double disTan = (double)(polynomial(model.tangent, theta)*polytrig(model.tangentTrig, cosphi, sinphi));
 
 			// put it all together to get normalized image coordinates
 			dx = (r + disRad)*cosphi - disTan*sinphi;
@@ -77,8 +77,8 @@ public class KannalaBrandtStoP_F64 implements Point3Transform2_F64 {
 		}
 
 		// project into pixels
-		out.x = (double) (model.fx*dx + model.skew*dy + model.cx);
-		out.y = (double) (model.fy*dy + model.cy);
+		out.x = (double)(model.fx*dx + model.skew*dy + model.cx);
+		out.y = (double)(model.fy*dy + model.cy);
 	}
 
 	@Override

@@ -31,14 +31,14 @@ public class SphereToNarrowPixel_F64 implements Point3Transform2_F64 {
 
 	Point2Transform2_F64 projToPixel;
 
-	public SphereToNarrowPixel_F64(Point2Transform2_F64 projToPixel) {
+	public SphereToNarrowPixel_F64( Point2Transform2_F64 projToPixel ) {
 		this.projToPixel = projToPixel;
 	}
 
 	@Override
-	public void compute(double x, double y, double z, Point2D_F64 out) {
+	public void compute( double x, double y, double z, Point2D_F64 out ) {
 		// ignore the whole z <= 0 issue with it being behind the camera. No way to tell it that it failed
-		projToPixel.compute(x/z,y/z, out);
+		projToPixel.compute(x/z, y/z, out);
 	}
 
 	@Override

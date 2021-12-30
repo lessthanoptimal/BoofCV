@@ -52,13 +52,13 @@ public class P3PFinsterwalder implements P3PLineDistance {
 	private DogArray<PointDistance3> solutions = new DogArray<>(4, PointDistance3::new);
 
 	// square of a,b,c
-	private double a2,b2,c2;
+	private double a2, b2, c2;
 
 	// cosine of the angle between lines (1,2) , (1,3) and (2,3)
-	private double cos12,cos13,cos23;
+	private double cos12, cos13, cos23;
 
 	// storage for intermediate results
-	double p,q;
+	double p, q;
 
 	// used to solve the 4th order polynomial
 	private PolynomialRoots rootFinder;
@@ -71,26 +71,28 @@ public class P3PFinsterwalder implements P3PLineDistance {
 	 *
 	 * @param rootFinder Root finder for a 3rd order polynomial with real roots
 	 */
-	public P3PFinsterwalder(PolynomialRoots rootFinder) {
+	public P3PFinsterwalder( PolynomialRoots rootFinder ) {
 		this.rootFinder = rootFinder;
 	}
 
 	@Override
-	public boolean process( Point2D_F64 obs1 , Point2D_F64 obs2, Point2D_F64 obs3,
-							double length23 , double length13 , double length12 ) {
+	public boolean process( Point2D_F64 obs1, Point2D_F64 obs2, Point2D_F64 obs3,
+							double length23, double length13, double length12 ) {
 
 		solutions.reset();
 
-		cos12 = computeCosine(obs1,obs2); // cos(gama)
-		cos13 = computeCosine(obs1,obs3); // cos(beta)
-		cos23 = computeCosine(obs2,obs3); // cos(alpha)
+		cos12 = computeCosine(obs1, obs2); // cos(gama)
+		cos13 = computeCosine(obs1, obs3); // cos(beta)
+		cos23 = computeCosine(obs2, obs3); // cos(alpha)
 
 		double a = length23, b = length13, c = length12;
 
 		double a2_d_b2 = (a/b)*(a/b);
 		double c2_d_b2 = (c/b)*(c/b);
 
-		a2=a*a;  b2=b*b;  c2 = c*c;
+		a2 = a*a;
+		b2 = b*b;
+		c2 = c*c;
 
 //		poly.c[0] = a2*(a2*pow2(sin13) - b2*pow2(sin23));
 //		poly.c[1] = b2*(b2-c2)*pow2(sin23) + a2*(a2 + 2*c2)*pow2(sin13) + 2*a2*b2*(-1 + cos23*cos13*cos12);
@@ -100,14 +102,14 @@ public class P3PFinsterwalder implements P3PLineDistance {
 		// Auto generated code + hand simplification. See P3PFinsterwalder.py  I prefer it over the equations found
 		// in the paper (commented out above) since it does not require sin(theta).
 		poly.c[0] = a2*(a2*(1 - pow2(cos13)) + b2*(pow2(cos23) - 1));
-		poly.c[1] = 2*a2*b2*(cos12*cos13*cos23 - 1) + a2*(a2 + 2*c2)*(1 - pow2(cos13)) + b2*(b2 - c2)*( 1 - pow2(cos23));
-		poly.c[2] = 2*c2*b2*(cos12*cos13*cos23 - 1) + c2*(c2 + 2*a2)*(1 - pow2(cos13)) + b2*(b2 - a2)*( 1 - pow2(cos12));
-		poly.c[3] = c2*(b2*(pow2(cos12) - 1) + c2*( 1 - pow2(cos13)));
+		poly.c[1] = 2*a2*b2*(cos12*cos13*cos23 - 1) + a2*(a2 + 2*c2)*(1 - pow2(cos13)) + b2*(b2 - c2)*(1 - pow2(cos23));
+		poly.c[2] = 2*c2*b2*(cos12*cos13*cos23 - 1) + c2*(c2 + 2*a2)*(1 - pow2(cos13)) + b2*(b2 - a2)*(1 - pow2(cos12));
+		poly.c[3] = c2*(b2*(pow2(cos12) - 1) + c2*(1 - pow2(cos13)));
 
-		if( poly.computeDegree() < 0 )
+		if (poly.computeDegree() < 0)
 			return false;
 
-		if( !rootFinder.process(poly) )
+		if (!rootFinder.process(poly))
 			return false;
 
 		// search for real roots
@@ -115,13 +117,13 @@ public class P3PFinsterwalder implements P3PLineDistance {
 		List<Complex_F64> roots = rootFinder.getRoots();
 		for (int rootIdx = 0; rootIdx < roots.size(); rootIdx++) {
 			Complex_F64 r = roots.get(rootIdx);
-			if( r.isReal() ) {
+			if (r.isReal()) {
 				root = r;
 				break;
 			}
 		}
 
-		if( root == null )
+		if (root == null)
 			return false;
 
 		double lambda = root.real;
@@ -131,43 +133,43 @@ public class P3PFinsterwalder implements P3PLineDistance {
 		double C = 1 - a2_d_b2 - lambda*c2_d_b2;
 		double D = -lambda*cos12;
 		double E = (a2_d_b2 + lambda*c2_d_b2)*cos13;
-		double F = -a2_d_b2 + lambda*(1-c2_d_b2);
+		double F = -a2_d_b2 + lambda*(1 - c2_d_b2);
 
 		p = Math.sqrt(B*B - A*C);
 		q = Math.signum(B*E - C*D)*Math.sqrt(E*E - C*F);
 
-		computeU((-B+p)/C,(-E+q)/C);
-		computeU((-B-p)/C,(-E-q)/C);
+		computeU((-B + p)/C, (-E + q)/C);
+		computeU((-B - p)/C, (-E - q)/C);
 
 		return true;
 	}
 
-	private void computeU( double m , double n ) {
+	private void computeU( double m, double n ) {
 		// The paper also has a few type-os in this section
 		double A = b2 - m*m*c2;
 		double B = c2*(cos13 - n)*m - b2*cos12;
 		double C = -c2*n*n + 2*c2*n*cos13 + b2 - c2;
 
 		double insideSqrt = B*B - A*C;
-		if( insideSqrt < 0 )
+		if (insideSqrt < 0)
 			return;
 
 		double u_large = -Math.signum(B)*(Math.abs(B) + Math.sqrt(insideSqrt))/A;
 		double u_small = C/(A*u_large);
 
-		computeSolution(u_large,u_large*m + n);
-		computeSolution(u_small,u_small*m + n);
+		computeSolution(u_large, u_large*m + n);
+		computeSolution(u_small, u_small*m + n);
 	}
 
-	private void computeSolution( double u , double v ) {
+	private void computeSolution( double u, double v ) {
 
 		double bottom = u*u + v*v - 2*u*v*cos23;
-		if( bottom == 0 )
+		if (bottom == 0)
 			return;
 
-		double inner = a2 / bottom;
+		double inner = a2/bottom;
 
-		if( inner >= 0 ) {
+		if (inner >= 0) {
 			PointDistance3 s = solutions.grow();
 			s.dist1 = Math.sqrt(inner);
 			s.dist2 = s.dist1*u;

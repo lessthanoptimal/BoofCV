@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,7 +50,7 @@ public class TriangulateRefineEpipolarLS implements RefineTriangulateEpipolar {
 		this.maxIterations = maxIterations;
 		this.convergenceTol = convergenceTol;
 		minimizer = FactoryOptimization.levenbergMarquardt(null, false);
-		BoofMiscOps.checkEq(3,func.getNumOfInputsN());
+		BoofMiscOps.checkEq(3, func.getNumOfInputsN());
 	}
 
 	@Override

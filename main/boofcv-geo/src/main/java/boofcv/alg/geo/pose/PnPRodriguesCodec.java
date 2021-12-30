@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,13 +40,13 @@ public class PnPRodriguesCodec implements ModelCodec<Se3_F64> {
 	SingularValueDecomposition<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(3, 3, true, true, false);
 
 	// storage for rotation matrix
-	DMatrixRMaj R = new DMatrixRMaj(3,3);
+	DMatrixRMaj R = new DMatrixRMaj(3, 3);
 
 	Rodrigues_F64 rotation = new Rodrigues_F64();
 
 	@Override
-	public void decode(double[] input, Se3_F64 outputModel) {
-		rotation.setParamVector(input[0],input[1],input[2]);
+	public void decode( double[] input, Se3_F64 outputModel ) {
+		rotation.setParamVector(input[0], input[1], input[2]);
 
 		ConvertRotation3D_F64.rodriguesToMatrix(rotation, outputModel.getR());
 
@@ -57,20 +57,20 @@ public class PnPRodriguesCodec implements ModelCodec<Se3_F64> {
 	}
 
 	@Override
-	public void encode(Se3_F64 input, double[] output) {
+	public void encode( Se3_F64 input, double[] output ) {
 
 		// force the "rotation matrix" to be an exact rotation matrix
 		// otherwise Rodrigues will have issues with the noise
-		if( !svd.decompose(input.getR()) )
+		if (!svd.decompose(input.getR()))
 			throw new RuntimeException("SVD failed");
 
-		DMatrixRMaj U = svd.getU(null,false);
-		DMatrixRMaj V = svd.getV(null,false);
+		DMatrixRMaj U = svd.getU(null, false);
+		DMatrixRMaj V = svd.getV(null, false);
 
 		CommonOps_DDRM.multTransB(U, V, R);
 
 		// extract Rodrigues coordinates
-		ConvertRotation3D_F64.matrixToRodrigues(R,rotation);
+		ConvertRotation3D_F64.matrixToRodrigues(R, rotation);
 
 		output[0] = rotation.unitAxisRotation.x*rotation.theta;
 		output[1] = rotation.unitAxisRotation.y*rotation.theta;

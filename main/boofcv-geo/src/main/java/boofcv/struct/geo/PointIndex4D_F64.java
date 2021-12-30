@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,13 +27,22 @@ import georegression.struct.point.Point4D_F64;
  */
 public class PointIndex4D_F64 extends PointIndex<PointIndex4D_F64, Point4D_F64> {
 
-	public PointIndex4D_F64( double x, double y, double z, double w, int index ) { this(); setTo(x, y, z, w, index); }
+	public PointIndex4D_F64( double x, double y, double z, double w, int index ) {
+		this();
+		setTo(x, y, z, w, index);
+	}
 
-	public PointIndex4D_F64( double x, double y, double z, double w ) { this(); setTo(x, y, z, w, 0);}
+	public PointIndex4D_F64( double x, double y, double z, double w ) {
+		this();
+		setTo(x, y, z, w, 0);
+	}
 
 	public PointIndex4D_F64() {super(new Point4D_F64());}
 
-	public PointIndex4D_F64( Point4D_F64 p, int index ) { this(); setTo(p, index); }
+	public PointIndex4D_F64( Point4D_F64 p, int index ) {
+		this();
+		setTo(p, index);
+	}
 
 	public void setTo( double x, double y, double z, double w, int index ) {
 		this.p.setTo(x, y, z, w);

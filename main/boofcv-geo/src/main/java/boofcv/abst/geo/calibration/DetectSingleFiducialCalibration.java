@@ -51,6 +51,7 @@ public interface DetectSingleFiducialCalibration {
 
 	/**
 	 * Returns the layout of the calibration points on the target
+	 *
 	 * @return List of calibration points
 	 */
 	List<Point2D_F64> getLayout();

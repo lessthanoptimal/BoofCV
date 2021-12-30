@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,20 +27,19 @@ import java.util.List;
 
 /**
  * Wrapper around {@link HomographyDirectLinearTransform} for {@link boofcv.abst.geo.Estimate1ofEpipolar}.
- * 
+ *
  * @author Peter Abeles
  */
-public class HomographyDLT_to_Epipolar implements Estimate1ofEpipolar
-{
+public class HomographyDLT_to_Epipolar implements Estimate1ofEpipolar {
 	HomographyDirectLinearTransform alg;
 
-	public HomographyDLT_to_Epipolar(HomographyDirectLinearTransform alg) {
+	public HomographyDLT_to_Epipolar( HomographyDirectLinearTransform alg ) {
 		this.alg = alg;
 	}
 
 	@Override
-	public boolean process(List<AssociatedPair> points, DMatrixRMaj H) {
-		return alg.process(points,H);
+	public boolean process( List<AssociatedPair> points, DMatrixRMaj H ) {
+		return alg.process(points, H);
 	}
 
 	@Override

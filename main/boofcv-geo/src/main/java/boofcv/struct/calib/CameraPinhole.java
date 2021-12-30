@@ -81,11 +81,11 @@ public class CameraPinhole extends CameraModel {
 	}
 
 	public CameraPinhole fsetK( DMatrixRMaj K ) {
-		this.fx = K.unsafe_get(0,0);
-		this.fy = K.unsafe_get(1,1);
-		this.skew = K.unsafe_get(0,1);
-		this.cx = K.unsafe_get(0,2);
-		this.cy = K.unsafe_get(1,2);
+		this.fx = K.unsafe_get(0, 0);
+		this.fy = K.unsafe_get(1, 1);
+		this.skew = K.unsafe_get(0, 1);
+		this.cx = K.unsafe_get(0, 2);
+		this.cy = K.unsafe_get(1, 2);
 
 		return this;
 	}

@@ -38,6 +38,7 @@ public class AssociatedPair3D {
 		p1 = new Point3D_F64();
 		p2 = new Point3D_F64();
 	}
+
 	/**
 	 * Creates a new associated point from the two provided points.
 	 *
@@ -79,7 +80,7 @@ public class AssociatedPair3D {
 		}
 	}
 
-	public static AssociatedPair3D wrap(Point3D_F64 p1, Point3D_F64 p2) {
+	public static AssociatedPair3D wrap( Point3D_F64 p1, Point3D_F64 p2 ) {
 		return new AssociatedPair3D(p1, p2, false);
 	}
 

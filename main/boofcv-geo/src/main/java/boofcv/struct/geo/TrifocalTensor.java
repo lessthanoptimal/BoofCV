@@ -30,12 +30,12 @@ import org.ejml.dense.row.SpecializedOps_DDRM;
  * @author Peter Abeles
  */
 public class TrifocalTensor {
-	public DMatrixRMaj T1 = new DMatrixRMaj(3,3);
-	public DMatrixRMaj T2 = new DMatrixRMaj(3,3);
-	public DMatrixRMaj T3 = new DMatrixRMaj(3,3);
+	public DMatrixRMaj T1 = new DMatrixRMaj(3, 3);
+	public DMatrixRMaj T2 = new DMatrixRMaj(3, 3);
+	public DMatrixRMaj T3 = new DMatrixRMaj(3, 3);
 
 	public DMatrixRMaj getT( int index ) {
-		switch( index ) {
+		switch (index) {
 			case 0:
 				return T1;
 
@@ -64,13 +64,13 @@ public class TrifocalTensor {
 	 * @param m Input: Trifocal tensor encoded in a vector
 	 */
 	public void convertFrom( DMatrixRMaj m ) {
-		if( m.getNumElements() != 27 )
+		if (m.getNumElements() != 27)
 			throw new IllegalArgumentException("Input matrix/vector must have 27 elements");
 
-		for( int i = 0; i < 9; i++ ) {
+		for (int i = 0; i < 9; i++) {
 			T1.data[i] = m.data[i];
-			T2.data[i] = m.data[i+9];
-			T3.data[i] = m.data[i+18];
+			T2.data[i] = m.data[i + 9];
+			T3.data[i] = m.data[i + 18];
 		}
 	}
 
@@ -83,13 +83,13 @@ public class TrifocalTensor {
 	 * @param m Output: Trifocal tensor encoded in a vector
 	 */
 	public void convertTo( DMatrixRMaj m ) {
-		if( m.getNumElements() != 27 )
+		if (m.getNumElements() != 27)
 			throw new IllegalArgumentException("Input matrix/vector must have 27 elements");
 
-		for( int i = 0; i < 9; i++ ) {
+		for (int i = 0; i < 9; i++) {
 			m.data[i] = T1.data[i];
-			m.data[i+9] = T2.data[i];
-			m.data[i+18] = T3.data[i];
+			m.data[i + 9] = T2.data[i];
+			m.data[i + 18] = T3.data[i];
 		}
 	}
 
@@ -120,14 +120,14 @@ public class TrifocalTensor {
 
 		double n = Math.sqrt(sum);
 
-		CommonOps_DDRM.scale(1.0/n,T1);
-		CommonOps_DDRM.scale(1.0/n,T2);
-		CommonOps_DDRM.scale(1.0/n,T3);
+		CommonOps_DDRM.scale(1.0/n, T1);
+		CommonOps_DDRM.scale(1.0/n, T2);
+		CommonOps_DDRM.scale(1.0/n, T3);
 	}
 
 	@Override
 	public String toString() {
-		return "TrifocalTensor {\nT1:\n"+T1+"\nT2:\n"+T2+"\nT3:\n"+T3+"}";
+		return "TrifocalTensor {\nT1:\n" + T1 + "\nT2:\n" + T2 + "\nT3:\n" + T3 + "}";
 	}
 
 	public void print() {

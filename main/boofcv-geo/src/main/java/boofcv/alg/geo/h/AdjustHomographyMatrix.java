@@ -40,22 +40,22 @@ public class AdjustHomographyMatrix {
 
 	protected SingularValueDecomposition_F64<DMatrixRMaj> svd = new SafeSvd_DDRM(DecompositionFactory_DDRM.svd(0, 0, true, true, false));
 
-	DMatrixRMaj H_t = new DMatrixRMaj(3,3);
+	DMatrixRMaj H_t = new DMatrixRMaj(3, 3);
 
-	public boolean adjust( DMatrixRMaj H , AssociatedPair p ) {
-		if( !findScaleH(H) )
+	public boolean adjust( DMatrixRMaj H, AssociatedPair p ) {
+		if (!findScaleH(H))
 			return false;
 
-		adjustHomographSign(p,H);
+		adjustHomographSign(p, H);
 
 		return true;
 	}
 
-	public boolean adjust( DMatrixRMaj H , PairLineNorm p ) {
-		if( !findScaleH(H) )
+	public boolean adjust( DMatrixRMaj H, PairLineNorm p ) {
+		if (!findScaleH(H))
 			return false;
 
-		adjustHomographSign(p,H);
+		adjustHomographSign(p, H);
 
 		return true;
 	}
@@ -64,13 +64,13 @@ public class AdjustHomographyMatrix {
 	 * The scale of H is found by computing the second smallest singular value.
 	 */
 	protected boolean findScaleH( DMatrixRMaj H ) {
-		if( !svd.decompose(H) )
+		if (!svd.decompose(H))
 			return false;
 
 		Arrays.sort(svd.getSingularValues(), 0, 3);
 
 		double scale = svd.getSingularValues()[1];
-		CommonOps_DDRM.divide(H,scale);
+		CommonOps_DDRM.divide(H, scale);
 
 		return true;
 	}
@@ -81,10 +81,10 @@ public class AdjustHomographyMatrix {
 	 *
 	 * @param p test point, used to determine the sign of the matrix.
 	 */
-	protected void adjustHomographSign( AssociatedPair p , DMatrixRMaj H ) {
+	protected void adjustHomographSign( AssociatedPair p, DMatrixRMaj H ) {
 		double val = GeometryMath_F64.innerProd(p.p2, H, p.p1);
 
-		if( val < 0 )
+		if (val < 0)
 			CommonOps_DDRM.scale(-1, H);
 	}
 
@@ -94,13 +94,13 @@ public class AdjustHomographyMatrix {
 	 *
 	 * @param p test point, used to determine the sign of the matrix.
 	 */
-	protected void adjustHomographSign( PairLineNorm p , DMatrixRMaj H ) {
+	protected void adjustHomographSign( PairLineNorm p, DMatrixRMaj H ) {
 
-		CommonOps_DDRM.transpose(H,H_t);
+		CommonOps_DDRM.transpose(H, H_t);
 
 		double val = GeometryMath_F64.innerProd(p.l1, H_t, p.l2);
 
-		if( val < 0 )
+		if (val < 0)
 			CommonOps_DDRM.scale(-1, H);
 	}
 }

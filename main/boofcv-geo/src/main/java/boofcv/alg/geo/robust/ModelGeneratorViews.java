@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import org.ddogleg.fitting.modelset.ModelGenerator;
  *
  * @author Peter Abeles
  */
-public interface ModelGeneratorViews<Model,Point,Camera> extends ModelGenerator<Model,Point> {
+public interface ModelGeneratorViews<Model, Point, Camera> extends ModelGenerator<Model, Point> {
 
 	/**
 	 * Specify parameters for a particular view
@@ -33,7 +33,7 @@ public interface ModelGeneratorViews<Model,Point,Camera> extends ModelGenerator<
 	 * @param view which view this belongs to
 	 * @param viewInfo Information about this view. E.g. image dimension, intrinsic parameters, ...etc
 	 */
-	void setView(int view , Camera viewInfo );
+	void setView( int view, Camera viewInfo );
 
 	/**
 	 * Returns the new of views which need to be set

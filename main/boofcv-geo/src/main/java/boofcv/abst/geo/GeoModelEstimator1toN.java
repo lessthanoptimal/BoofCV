@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,21 +29,21 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class GeoModelEstimator1toN<Model,Point> implements GeoModelEstimatorN<Model,Point> {
+public class GeoModelEstimator1toN<Model, Point> implements GeoModelEstimatorN<Model, Point> {
 
-	private GeoModelEstimator1<Model,Point> alg;
+	private GeoModelEstimator1<Model, Point> alg;
 
-	public GeoModelEstimator1toN(GeoModelEstimator1<Model, Point> alg) {
+	public GeoModelEstimator1toN( GeoModelEstimator1<Model, Point> alg ) {
 		this.alg = alg;
 	}
 
 	@Override
-	public boolean process(List<Point> points, DogArray<Model> estimatedModels) {
+	public boolean process( List<Point> points, DogArray<Model> estimatedModels ) {
 		estimatedModels.reset();
 
 		Model m = estimatedModels.grow();
 
-		if( alg.process(points,m) ) {
+		if (alg.process(points, m)) {
 			return true;
 		} else {
 			estimatedModels.reset();

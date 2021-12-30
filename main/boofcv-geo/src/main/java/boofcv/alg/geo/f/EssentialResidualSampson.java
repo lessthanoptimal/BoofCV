@@ -27,7 +27,6 @@ import georegression.struct.point.Point3D_F64;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 
-
 /**
  * <p>
  * Computes the Sampson distance residual for a set of observations given an esesntial matrix. For use

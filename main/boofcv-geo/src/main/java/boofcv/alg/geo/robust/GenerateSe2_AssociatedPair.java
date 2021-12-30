@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,30 +33,29 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class GenerateSe2_AssociatedPair implements
-		ModelGenerator<Se2_F64,AssociatedPair>
-{
+		ModelGenerator<Se2_F64, AssociatedPair> {
 	MotionTransformPoint<Se2_F64, Point2D_F64> estimate;
 
 	List<Point2D_F64> from = new ArrayList<>();
 	List<Point2D_F64> to = new ArrayList<>();
 
-	public GenerateSe2_AssociatedPair(MotionTransformPoint<Se2_F64, Point2D_F64> estimate) {
+	public GenerateSe2_AssociatedPair( MotionTransformPoint<Se2_F64, Point2D_F64> estimate ) {
 		this.estimate = estimate;
 	}
 
 	@Override
-	public boolean generate(List<AssociatedPair> dataSet, Se2_F64 output) {
+	public boolean generate( List<AssociatedPair> dataSet, Se2_F64 output ) {
 		from.clear();
 		to.clear();
 
-		for( int i = 0; i < dataSet.size(); i++ ) {
+		for (int i = 0; i < dataSet.size(); i++) {
 			AssociatedPair p = dataSet.get(i);
 
 			from.add(p.getP1());
 			to.add(p.getP2());
 		}
 
-		if( !estimate.process(from,to) )
+		if (!estimate.process(from, to))
 			return false;
 
 		output.setTo(estimate.getTransformSrcToDst());

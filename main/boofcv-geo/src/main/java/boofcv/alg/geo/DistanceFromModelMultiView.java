@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import org.ddogleg.fitting.modelset.DistanceFromModel;
  *
  * @author Peter Abeles
  */
-public interface DistanceFromModelMultiView<Model,Point> extends DistanceFromModel<Model,Point> {
+public interface DistanceFromModelMultiView<Model, Point> extends DistanceFromModel<Model, Point> {
 
 	void setIntrinsic( int view, CameraPinhole intrinsic );
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,17 +32,16 @@ import org.ejml.data.DMatrixRMaj;
  * @author Peter Abeles
  */
 public class EstimateNto1ofEpipolar
-		extends GeoModelEstimatorNto1<DMatrixRMaj,AssociatedPair>
-		implements Estimate1ofEpipolar
-{
-	public EstimateNto1ofEpipolar(GeoModelEstimatorN<DMatrixRMaj, AssociatedPair> alg,
-								  DistanceFromModel<DMatrixRMaj, AssociatedPair> distance,
-								  int numTest) {
-		super(alg, distance, new QueueMatrix(3,3), numTest);
+		extends GeoModelEstimatorNto1<DMatrixRMaj, AssociatedPair>
+		implements Estimate1ofEpipolar {
+	public EstimateNto1ofEpipolar( GeoModelEstimatorN<DMatrixRMaj, AssociatedPair> alg,
+								   DistanceFromModel<DMatrixRMaj, AssociatedPair> distance,
+								   int numTest ) {
+		super(alg, distance, new QueueMatrix(3, 3), numTest);
 	}
 
 	@Override
-	protected void copy(DMatrixRMaj src, DMatrixRMaj dst) {
+	protected void copy( DMatrixRMaj src, DMatrixRMaj dst ) {
 		dst.setTo(src);
 	}
 }

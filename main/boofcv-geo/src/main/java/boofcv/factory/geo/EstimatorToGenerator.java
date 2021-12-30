@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,17 +28,17 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class EstimatorToGenerator<Model,Point> implements ModelGenerator<Model,Point> {
+public class EstimatorToGenerator<Model, Point> implements ModelGenerator<Model, Point> {
 
-	GeoModelEstimator1<Model,Point> alg;
+	GeoModelEstimator1<Model, Point> alg;
 
-	public EstimatorToGenerator(GeoModelEstimator1<Model, Point> alg ) {
+	public EstimatorToGenerator( GeoModelEstimator1<Model, Point> alg ) {
 		this.alg = alg;
 	}
 
 	@Override
-	public boolean generate(List<Point> dataSet, Model out) {
-		return alg.process(dataSet,out);
+	public boolean generate( List<Point> dataSet, Model out ) {
+		return alg.process(dataSet, out);
 	}
 
 	@Override

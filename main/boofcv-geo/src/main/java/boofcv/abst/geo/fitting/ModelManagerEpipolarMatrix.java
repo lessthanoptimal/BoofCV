@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,11 +29,11 @@ import org.ejml.data.DMatrixRMaj;
 public class ModelManagerEpipolarMatrix implements ModelManager<DMatrixRMaj> {
 	@Override
 	public DMatrixRMaj createModelInstance() {
-		return new DMatrixRMaj(3,3);
+		return new DMatrixRMaj(3, 3);
 	}
 
 	@Override
-	public void copyModel(DMatrixRMaj src, DMatrixRMaj dst) {
+	public void copyModel( DMatrixRMaj src, DMatrixRMaj dst ) {
 		dst.setTo(src);
 	}
 }

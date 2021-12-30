@@ -44,7 +44,7 @@ public interface RefineTriangulateEpipolar {
 	 * @param refinedPt The refined estimated point position.
 	 * @return if successful or not
 	 */
-	boolean process(List<Point2D_F64> observations,
-					List<DMatrixRMaj> fundamentalWorldToCam ,
-					Point3D_F64 worldPt, Point3D_F64 refinedPt);
+	boolean process( List<Point2D_F64> observations,
+					 List<DMatrixRMaj> fundamentalWorldToCam,
+					 Point3D_F64 worldPt, Point3D_F64 refinedPt );
 }

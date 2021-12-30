@@ -32,19 +32,18 @@ import org.ejml.data.DMatrixRMaj;
  * @author Peter Abeles
  */
 @SuppressWarnings({"NullAway.Init"})
-public class FundamentalResidualSimple
-		implements ModelObservationResidual<DMatrixRMaj,AssociatedPair> {
+public class FundamentalResidualSimple implements ModelObservationResidual<DMatrixRMaj, AssociatedPair> {
 	DMatrixRMaj F;
 	Point3D_F64 temp = new Point3D_F64();
 
 	@Override
-	public void setModel(DMatrixRMaj F) {
+	public void setModel( DMatrixRMaj F ) {
 		this.F = F;
 	}
 
 	@Override
-	public double computeResidual(AssociatedPair observation) {
-		GeometryMath_F64.multTran(F,observation.p2,temp);
+	public double computeResidual( AssociatedPair observation ) {
+		GeometryMath_F64.multTran(F, observation.p2, temp);
 
 		return temp.x*observation.p1.x + temp.y*observation.p1.y + temp.z;
 	}

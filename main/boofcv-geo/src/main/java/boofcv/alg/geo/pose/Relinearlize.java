@@ -53,16 +53,16 @@ public class Relinearlize {
 	// contains the null space
 	DMatrixRMaj V;
 	// contains one possible solution
-	DMatrixRMaj x0 = new DMatrixRMaj(1,1);
+	DMatrixRMaj x0 = new DMatrixRMaj(1, 1);
 	// lookup table for indices
 	int table[] = new int[10*10];
 
 	SingularValueDecomposition<DMatrixRMaj> svd = DecompositionFactory_DDRM.svd(3, 3, false, true, false);
 
 	// used inside of solveConstraintMatrix
-	DMatrixRMaj AA = new DMatrixRMaj(1,1);
-	DMatrixRMaj yy = new DMatrixRMaj(1,1);
-	DMatrixRMaj xx = new DMatrixRMaj(1,1);
+	DMatrixRMaj AA = new DMatrixRMaj(1, 1);
+	DMatrixRMaj yy = new DMatrixRMaj(1, 1);
+	DMatrixRMaj xx = new DMatrixRMaj(1, 1);
 
 	// used to compute one possible solution
 	LinearSolverDense<DMatrixRMaj> pseudo = LinearSolverFactory_DDRM.pseudoInverse(true);
@@ -79,24 +79,24 @@ public class Relinearlize {
 	public void setNumberControl( int numControl ) {
 		this.numControl = numControl;
 
-		if( numControl == 4 ) {
-			x0.reshape(10,1,false);
-			AA.reshape(10,9,false);
-			yy.reshape(10,1,false);
-			xx.reshape(9,1,false);
+		if (numControl == 4) {
+			x0.reshape(10, 1, false);
+			AA.reshape(10, 9, false);
+			yy.reshape(10, 1, false);
+			xx.reshape(9, 1, false);
 			numNull = 3;
 		} else {
-			x0.reshape(6,1,false);
-			AA.reshape(4,2,false);
-			yy.reshape(4,1,false);
-			xx.reshape(2,1,false);
+			x0.reshape(6, 1, false);
+			AA.reshape(4, 2, false);
+			yy.reshape(4, 1, false);
+			xx.reshape(2, 1, false);
 			numNull = 1;
 		}
 
 		int index = 0;
-		for( int i = 0; i < numControl; i++ ) {
-			for( int j = i; j < numControl; j++ ) {
-				table[i*numControl+j] = table[j*numControl+i] = index++;
+		for (int i = 0; i < numControl; i++) {
+			for (int j = i; j < numControl; j++) {
+				table[i*numControl + j] = table[j*numControl + i] = index++;
 			}
 		}
 	}
@@ -108,28 +108,28 @@ public class Relinearlize {
 	 * @param y distances between world control points
 	 * @param betas Estimated betas. Output.
 	 */
-	public void process( DMatrixRMaj L_full , DMatrixRMaj y , double betas[] ) {
+	public void process( DMatrixRMaj L_full, DMatrixRMaj y, double betas[] ) {
 
 		svd.decompose(L_full);
 
 		// extract null space
-		V = svd.getV(null,true);
+		V = svd.getV(null, true);
 
 		// compute one possible solution
 		pseudo.setA(L_full);
-		pseudo.solve(y,x0);
+		pseudo.solve(y, x0);
 
 		// add additional constraints to reduce the number of possible solutions
 		DMatrixRMaj alphas = solveConstraintMatrix();
 
 		// compute the final solution
-		for( int i = 0; i < x0.numRows; i++ ) {
-			for( int j = 0; j < numNull; j++ ) {
-				x0.data[i] += alphas.data[j]*valueNull(j,i);
+		for (int i = 0; i < x0.numRows; i++) {
+			for (int j = 0; j < numNull; j++) {
+				x0.data[i] += alphas.data[j]*valueNull(j, i);
 			}
 		}
 
-		if( numControl == 4 ) {
+		if (numControl == 4) {
 			betas[0] = Math.sqrt(Math.abs(x0.data[0]));
 			betas[1] = Math.sqrt(Math.abs(x0.data[4]))*Math.signum(x0.data[1]);
 			betas[2] = Math.sqrt(Math.abs(x0.data[7]))*Math.signum(x0.data[2]);
@@ -148,22 +148,21 @@ public class Relinearlize {
 	 *
 	 * constraint:
 	 * x_{ii}*x_{jk} = x_{ik}*x_{ji}
-	 *
 	 */
 	protected DMatrixRMaj solveConstraintMatrix() {
 
 		int rowAA = 0;
-		for( int i = 0; i < numControl; i++ ) {
-			for( int j = i+1; j < numControl; j++ ) {
-				for( int k = j; k < numControl; k++ , rowAA++ ) {
+		for (int i = 0; i < numControl; i++) {
+			for (int j = i + 1; j < numControl; j++) {
+				for (int k = j; k < numControl; k++, rowAA++) {
 					// x_{ii}*x_{jk} = x_{ik}*x_{ji}
 					extractXaXb(getIndex(i, i), getIndex(j, k), XiiXjk);
 					extractXaXb(getIndex(i, k), getIndex(j, i), XikXji);
 
-					for( int l = 1; l <= AA.numCols; l++ ) {
-						AA.set(rowAA,l-1,XikXji[l]-XiiXjk[l]);
+					for (int l = 1; l <= AA.numCols; l++) {
+						AA.set(rowAA, l - 1, XikXji[l] - XiiXjk[l]);
 					}
-					yy.set(rowAA,XiiXjk[0]-XikXji[0]);
+					yy.set(rowAA, XiiXjk[0] - XikXji[0]);
 				}
 			}
 		}
@@ -173,15 +172,15 @@ public class Relinearlize {
 		return xx;
 	}
 
-	public double valueNull( int which , int index ) {
-		return V.get(V.numCols-numControl+which,index);
+	public double valueNull( int which, int index ) {
+		return V.get(V.numCols - numControl + which, index);
 	}
 
-	private int getIndex( int i , int j ) {
-		return table[i*numControl+j];
+	private int getIndex( int i, int j ) {
+		return table[i*numControl + j];
 	}
 
-	private void extractXaXb(int indexA, int indexB, double quadratic[]) {
+	private void extractXaXb( int indexA, int indexB, double quadratic[] ) {
 
 		double x0a = x0.get(indexA);
 		double v0a = valueNull(0, indexA);
@@ -189,23 +188,21 @@ public class Relinearlize {
 		double x0b = x0.get(indexB);
 		double v0b = valueNull(0, indexB);
 
-		if( numControl == 4 ) {
+		if (numControl == 4) {
 			double v1a = valueNull(1, indexA);
 			double v2a = valueNull(2, indexA);
-			
+
 			double v1b = valueNull(1, indexB);
 			double v2b = valueNull(2, indexB);
-			multiplyQuadratic4(x0a,v0a,v1a,v2a,x0b,v0b,v1b,v2b,quadratic);
+			multiplyQuadratic4(x0a, v0a, v1a, v2a, x0b, v0b, v1b, v2b, quadratic);
 		} else {
-			multiplyQuadratic2(x0a,v0a,x0b,v0b,quadratic);
+			multiplyQuadratic2(x0a, v0a, x0b, v0b, quadratic);
 		}
 	}
 
-
-	private void multiplyQuadratic4( double x0 , double x1 , double x2 , double x3 ,
-									 double y0 , double y1 , double y2 , double y3 ,
-									 double quadratic[] )
-	{
+	private void multiplyQuadratic4( double x0, double x1, double x2, double x3,
+									 double y0, double y1, double y2, double y3,
+									 double quadratic[] ) {
 		quadratic[0] = x0*y0;
 		quadratic[1] = x0*y1 + y0*x1;
 		quadratic[2] = x0*y2 + y0*x2;
@@ -218,10 +215,9 @@ public class Relinearlize {
 		quadratic[9] = x3*y3;
 	}
 
-	private void multiplyQuadratic2( double x0 , double x1 ,
-									 double y0 , double y1 ,
-									 double quadratic[] )
-	{
+	private void multiplyQuadratic2( double x0, double x1,
+									 double y0, double y1,
+									 double quadratic[] ) {
 		quadratic[0] = x0*y0;
 		quadratic[1] = x0*y1 + y0*x1;
 		quadratic[2] = x1*y1;

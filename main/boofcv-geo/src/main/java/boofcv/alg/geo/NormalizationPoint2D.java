@@ -160,10 +160,10 @@ public class NormalizationPoint2D {
 	}
 
 	public DMatrixRMaj matrix( @Nullable DMatrixRMaj M ) {
-		if (M==null)
+		if (M == null)
 			M = new DMatrixRMaj(3, 3);
 		else
-			M.reshape(3,3);
+			M.reshape(3, 3);
 		M.set(0, 0, 1.0/stdX);
 		M.set(1, 1, 1.0/stdY);
 		M.set(0, 2, -meanX/stdX);
@@ -173,10 +173,10 @@ public class NormalizationPoint2D {
 	}
 
 	public DMatrixRMaj matrixInv( @Nullable DMatrixRMaj M ) {
-		if (M==null)
+		if (M == null)
 			M = new DMatrixRMaj(3, 3);
 		else
-			M.reshape(3,3);
+			M.reshape(3, 3);
 		M.set(0, 0, stdX);
 		M.set(1, 1, stdY);
 		M.set(0, 2, meanX);
