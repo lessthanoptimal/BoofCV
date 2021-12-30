@@ -488,31 +488,23 @@ public class QrCode implements Cloneable {
 		}
 
 		public static ErrorLevel lookup( int value ) {
-			switch (value) {
-				case 0b01:
-					return L;
-				case 0b00:
-					return M;
-				case 0b11:
-					return Q;
-				case 0b10:
-					return H;
-			}
-			throw new IllegalArgumentException("Unknown");
+			return switch (value) {
+				case 0b01 -> L;
+				case 0b00 -> M;
+				case 0b11 -> Q;
+				case 0b10 -> H;
+				default -> throw new IllegalArgumentException("Unknown");
+			};
 		}
 
 		public static ErrorLevel lookup( String letter ) {
-			switch (letter) {
-				case "L":
-					return L;
-				case "M":
-					return M;
-				case "Q":
-					return Q;
-				case "H":
-					return H;
-			}
-			throw new IllegalArgumentException("Unknown");
+			return switch (letter) {
+				case "L" -> L;
+				case "M" -> M;
+				case "Q" -> Q;
+				case "H" -> H;
+				default -> throw new IllegalArgumentException("Unknown");
+			};
 		}
 
 		final int value;
