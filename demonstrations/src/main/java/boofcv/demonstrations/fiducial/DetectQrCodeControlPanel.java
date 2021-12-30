@@ -22,12 +22,11 @@ import boofcv.demonstrations.shapes.DetectBlackPolygonControlPanel;
 import boofcv.demonstrations.shapes.DetectBlackShapePanel;
 import boofcv.demonstrations.shapes.ThresholdControlPanel;
 import boofcv.factory.fiducial.ConfigQrCode;
+import boofcv.gui.controls.JCheckBoxValue;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import static boofcv.gui.BoofSwingUtil.MAX_ZOOM;
@@ -38,27 +37,19 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
  *
  * @author Peter Abeles
  */
-public class DetectQrCodeControlPanel extends DetectBlackShapePanel
-		implements ActionListener, ChangeListener {
-	DetectQrCodeApp owner;
+public class DetectQrCodeControlPanel extends DetectBlackShapePanel implements ActionListener, ChangeListener {
+	ConfigQrCode config = new ConfigQrCode();
+	DetectQrCodeApp<?> owner;
 
 	DetectQrCodeMessagePanel messagePanel;
 
 	// selects which image to view
-	JComboBox imageView;
+	JComboBox<String> imageView = new JComboBox<>();
 
 	JButton bRunAgain = new JButton("(ms)");
 
-	JSpinner spinnerMinimumVersion;
-	JSpinner spinnerMaximumVersion;
-
-	JCheckBox showMarkers;
-	JCheckBox showFailures;
-	JCheckBox showBits;
-	JCheckBox showSquares;
-	JCheckBox showPositionPattern;
-	JCheckBox showAlignmentPattern;
-	JCheckBox showContour;
+	JSpinner spinnerMinimumVersion = spinner(config.versionMinimum, 1, 40, 1);
+	JSpinner spinnerMaximumVersion = spinner(config.versionMaximum, 1, 40, 1);
 
 	boolean bShowMarkers = true;
 	boolean bShowBits = false;
@@ -68,11 +59,18 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 	boolean bShowContour = false;
 	boolean bShowFailures = true;
 
+	JCheckBox showMarkers = checkbox("Markers", bShowMarkers);
+	JCheckBox showFailures = checkbox("Failures", bShowFailures);
+	JCheckBox showBits = checkbox("Bits", bShowBits);
+	JCheckBox showSquares = checkbox("Squares", bShowSquares);
+	JCheckBox showPositionPattern = checkbox("Pos. Pattern", bShowPositionPattern);
+	JCheckBox showAlignmentPattern = checkbox("Align. Pattern", bShowAlignmentPattern);
+	JCheckBox showContour = checkbox("Contour", bShowContour);
+	JCheckBoxValue checkTransposed = checkboxWrap("Transposed", config.considerTransposed).tt("Consider markers with bits transposed");
+
 	DetectBlackPolygonControlPanel polygonPanel;
 
-	ConfigQrCode config = new ConfigQrCode();
-
-	public DetectQrCodeControlPanel( DetectQrCodeApp owner ) {
+	public DetectQrCodeControlPanel( DetectQrCodeApp<?> owner ) {
 		this.owner = owner;
 
 		messagePanel = new DetectQrCodeMessagePanel(owner);
@@ -84,29 +82,15 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 		bRunAgain.setMaximumSize(bRunAgain.getPreferredSize());
 		bRunAgain.setBorder(BorderFactory.createEmptyBorder(1, 4, 1, 4));
 
-		imageView = new JComboBox();
 		imageView.addItem("Input");
 		imageView.addItem("Binary");
 		imageView.addItem("Black");
 		imageView.addActionListener(this);
 		imageView.setMaximumSize(imageView.getPreferredSize());
 
-		selectZoom = new JSpinner(new SpinnerNumberModel(1, MIN_ZOOM, MAX_ZOOM, 1));
-		selectZoom.addChangeListener(this);
-		selectZoom.setMaximumSize(selectZoom.getPreferredSize());
+		selectZoom = spinner(1, MIN_ZOOM, MAX_ZOOM, 1.0);
 
-		spinnerMinimumVersion = spinner(config.versionMinimum, 1, 40, 1);
-		spinnerMaximumVersion = spinner(config.versionMaximum, 1, 40, 1);
-
-		showMarkers = checkbox("Markers", bShowMarkers);
-		showFailures = checkbox("Failures", bShowFailures);
-		showBits = checkbox("Bits", bShowBits);
-		showSquares = checkbox("Squares", bShowSquares);
-		showPositionPattern = checkbox("Pos. Pattern", bShowPositionPattern);
-		showAlignmentPattern = checkbox("Align. Pattern", bShowAlignmentPattern);
-		showContour = checkbox("Contour", bShowContour);
-
-		JPanel togglePanel = new JPanel(new GridLayout(0, 2));
+		var togglePanel = new JPanel(new GridLayout(0, 2));
 		togglePanel.add(showMarkers);
 		togglePanel.add(showFailures);
 		togglePanel.add(showSquares);
@@ -116,11 +100,11 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 		togglePanel.add(showContour);
 		togglePanel.setMaximumSize(togglePanel.getPreferredSize());
 
-		JTabbedPane tabbedPanel = new JTabbedPane();
+		var tabbedPanel = new JTabbedPane();
 		tabbedPanel.addTab("Message", messagePanel);
 		tabbedPanel.addTab("Controls", polygonPanel);
 
-		JPanel timePanel = new JPanel();
+		var timePanel = new JPanel();
 		timePanel.setLayout(new BoxLayout(timePanel, BoxLayout.X_AXIS));
 		timePanel.add(processingTimeLabel);
 		timePanel.add(bRunAgain);
@@ -132,52 +116,49 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 		add(togglePanel);
 		addLabeled(spinnerMinimumVersion, "Min. Version");
 		addLabeled(spinnerMaximumVersion, "Max. Version");
+		addAlignLeft(checkTransposed.check);
 		add(tabbedPanel);
 		addVerticalGlue();
-		setPreferredSize(new Dimension(225, 200));
+		setPreferredSize(new Dimension(250, 200));
 	}
 
-	@Override
-	public void actionPerformed( ActionEvent e ) {
-		if (e.getSource() == showMarkers) {
+	@Override public void controlChanged( final Object source ) {
+		if (source == showMarkers) {
 			bShowMarkers = showMarkers.isSelected();
 			owner.viewUpdated();
-		} else if (e.getSource() == showFailures) {
+		} else if (source == showFailures) {
 			bShowFailures = showFailures.isSelected();
 			owner.viewUpdated();
-		} else if (e.getSource() == showBits) {
+		} else if (source == showBits) {
 			bShowBits = showBits.isSelected();
 			owner.viewUpdated();
-		} else if (e.getSource() == imageView) {
+		} else if (source == imageView) {
 			selectedView = imageView.getSelectedIndex();
 			owner.viewUpdated();
-		} else if (e.getSource() == showSquares) {
+		} else if (source == showSquares) {
 			bShowSquares = showSquares.isSelected();
 			owner.viewUpdated();
-		} else if (e.getSource() == showPositionPattern) {
+		} else if (source == showPositionPattern) {
 			bShowPositionPattern = showPositionPattern.isSelected();
 			owner.viewUpdated();
-		} else if (e.getSource() == showAlignmentPattern) {
+		} else if (source == showAlignmentPattern) {
 			bShowAlignmentPattern = showAlignmentPattern.isSelected();
 			owner.viewUpdated();
-		} else if (e.getSource() == showContour) {
+		} else if (source == showContour) {
 			bShowContour = showContour.isSelected();
 			owner.viewUpdated();
+		} else {
+			if (source == selectZoom) {
+				zoom = ((Number)selectZoom.getValue()).doubleValue();
+				owner.viewUpdated();
+				return;
+			} else if (source == spinnerMinimumVersion) {
+				config.versionMinimum = ((Number)spinnerMinimumVersion.getValue()).intValue();
+			} else if (source == spinnerMaximumVersion) {
+				config.versionMaximum = ((Number)spinnerMaximumVersion.getValue()).intValue();
+			}
+			owner.configUpdate();
 		}
-	}
-
-	@Override
-	public void stateChanged( ChangeEvent e ) {
-		if (e.getSource() == selectZoom) {
-			zoom = ((Number)selectZoom.getValue()).doubleValue();
-			owner.viewUpdated();
-			return;
-		} else if (e.getSource() == spinnerMinimumVersion) {
-			config.versionMinimum = ((Number)spinnerMinimumVersion.getValue()).intValue();
-		} else if (e.getSource() == spinnerMaximumVersion) {
-			config.versionMaximum = ((Number)spinnerMaximumVersion.getValue()).intValue();
-		}
-		owner.configUpdate();
 	}
 
 	public ThresholdControlPanel getThreshold() {

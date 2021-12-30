@@ -18,7 +18,7 @@ Background Model
 - Created threaded implementations of stationary and moving
 - Added internal benchmarks for moving
 QR Code
-- TODO added ability to decode transposed markers. Can be turned off.
+- Added ability to decode transposed markers. Can be turned off.
 
 TODO Monocular SLAM
 TODO Stereo SLAM
