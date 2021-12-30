@@ -48,6 +48,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 	private void printPreamble() {
 		out.print("import boofcv.misc.BoofLambdas;\n" +
 				"import boofcv.struct.image.*;\n" +
+				"import boofcv.alg.InputSanityCheck;\n" +
 				"import boofcv.concurrency.BoofConcurrency;\n" +
 				"import boofcv.alg.misc.impl.ImplImageMiscOps;\n" +
 				"import boofcv.alg.misc.impl.ImplImageMiscOps_MT;\n" +
@@ -55,6 +56,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"import boofcv.struct.border.ImageBorder_F64;\n" +
 				"import boofcv.struct.border.ImageBorder_S32;\n" +
 				"import boofcv.struct.border.ImageBorder_S64;\n" +
+				"import org.jetbrains.annotations.Nullable;\n" +
 				"import javax.annotation.Generated;\n" +
 				"\n" +
 				"import java.util.Random;\n" +
@@ -578,24 +580,30 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 	}
 
 	private void printTranspose_two() {
+		String genericType = genericType(imageName);
 		out.print("\t/** Transposes the image */\n" +
-				"\tpublic static void transpose( " + imageName + " input, " + imageName + " output ) {\n" +
+				"\tpublic static <T extends " + genericType + "> T transpose( T input, @Nullable T output ) {\n" +
+				"\t\toutput = (T)InputSanityCheck.checkDeclareNoReshape(input, output);\n" +
 				"\t\t//if (runConcurrent(input)) {\n" +
 				"\t\t//\tImplImageMiscOps_MT.transpose(input, output);\n" +
 				"\t\t//} else {\n" +
 				"\t\tImplImageMiscOps.transpose(input, output);\n" +
 				"\t\t//}\n" +
+				"\t\treturn output;\n" +
 				"\t}\n\n");
 	}
 
 	private void printTranspose_two_interleaved() {
+		String genericType = genericType(imageNameI);
 		out.print("\t/** Transposes the image */\n" +
-				"\tpublic static void transpose( " + imageNameI + " input, " + imageNameI + " output ) {\n" +
+				"\tpublic static <T extends " + genericType + "> T transpose( T input, @Nullable T output ) {\n" +
+				"\t\toutput = (T)InputSanityCheck.checkDeclareNoReshape(input, output);\n" +
 				"\t\tif (runConcurrent(input)) {\n" +
 				"\t\t\tImplImageMiscOps_MT.transpose(input, output);\n" +
 				"\t\t} else {\n" +
 				"\t\t\tImplImageMiscOps.transpose(input, output);\n" +
 				"\t\t}\n" +
+				"\t\treturn output;\n" +
 				"\t}\n\n");
 	}
 
@@ -611,24 +619,30 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 	}
 
 	private void printRotateCW_two() {
+		String genericType = genericType(imageName);
 		out.print("\t/** Rotates the image 90 degrees in the clockwise direction. */\n" +
-				"\tpublic static void rotateCW( " + imageName + " input, " + imageName + " output ) {\n" +
+				"\tpublic static <T extends " + genericType + "> T rotateCW( T input, @Nullable T output ) {\n" +
+				"\t\toutput = (T)InputSanityCheck.checkDeclareNoReshape(input, output);\n" +
 				"\t\tif (runConcurrent(input)) {\n" +
 				"\t\t\tImplImageMiscOps_MT.rotateCW(input, output);\n" +
 				"\t\t} else {\n" +
 				"\t\t\tImplImageMiscOps.rotateCW(input, output);\n" +
 				"\t\t}\n" +
+				"\t\treturn output;\n" +
 				"\t}\n\n");
 	}
 
 	private void printRotateCW_two_interleaved() {
+		String genericType = genericType(imageNameI);
 		out.print("\t/** Rotates the image 90 degrees in the clockwise direction. */\n" +
-				"\tpublic static void rotateCW( " + imageNameI + " input, " + imageNameI + " output ) {\n" +
+				"\tpublic static <T extends " + genericType + "> T rotateCW( T input, @Nullable T output ) {\n" +
+				"\t\toutput = (T)InputSanityCheck.checkDeclareNoReshape(input, output);\n" +
 				"\t\tif (runConcurrent(input)) {\n" +
 				"\t\t\tImplImageMiscOps_MT.rotateCW(input, output);\n" +
 				"\t\t} else {\n" +
 				"\t\t\tImplImageMiscOps.rotateCW(input, output);\n" +
 				"\t\t}\n" +
+				"\t\treturn output;\n" +
 				"\t}\n\n");
 	}
 
@@ -644,24 +658,30 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 	}
 
 	private void printRotateCCW_two() {
+		String genericType = genericType(imageName);
 		out.print("\t/** Rotates the image 90 degrees in the counter-clockwise direction. */\n" +
-				"\tpublic static void rotateCCW( " + imageName + " input, " + imageName + " output ) {\n" +
+				"\tpublic static <T extends " + genericType + "> T rotateCCW( T input, @Nullable T output ) {\n" +
+				"\t\toutput = (T)InputSanityCheck.checkDeclareNoReshape(input, output);\n" +
 				"\t\tif (runConcurrent(input)) {\n" +
 				"\t\t\tImplImageMiscOps_MT.rotateCCW(input, output);\n" +
 				"\t\t} else {\n" +
 				"\t\t\tImplImageMiscOps.rotateCCW(input, output);\n" +
 				"\t\t}\n" +
+				"\t\treturn output;\n" +
 				"\t}\n\n");
 	}
 
 	private void printRotateCCW_two_interleaved() {
+		String genericType = genericType(imageNameI);
 		out.print("\t/** Rotates the image 90 degrees in the counter-clockwise direction. */\n" +
-				"\tpublic static void rotateCCW( " + imageNameI + " input, " + imageNameI + " output ) {\n" +
+				"\tpublic static <T extends " + genericType + "> T rotateCCW( T input, @Nullable T output ) {\n" +
+				"\t\toutput = (T)InputSanityCheck.checkDeclareNoReshape(input, output);\n" +
 				"\t\tif (runConcurrent(input)) {\n" +
 				"\t\t\tImplImageMiscOps_MT.rotateCCW(input, output);\n" +
 				"\t\t} else {\n" +
 				"\t\t\tImplImageMiscOps.rotateCCW(input, output);\n" +
 				"\t\t}\n" +
+				"\t\treturn output;\n" +
 				"\t}\n\n");
 	}
 
@@ -708,6 +728,14 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				" finder, BoofLambdas.ProcessIIB process ) {\n" +
 				"\t\tImplImageMiscOps.findAndProcess(input, finder, process);\n" +
 				"\t}\n\n");
+	}
+
+	private String genericType( String imageName ) {
+		String genericType = imageName;
+		if (imageType.isInteger() && (imageName.endsWith("I8") || imageName.endsWith("I16"))) {
+			genericType = imageName + "<T>";
+		}
+		return genericType;
 	}
 
 	public static void main( String[] args ) throws FileNotFoundException {

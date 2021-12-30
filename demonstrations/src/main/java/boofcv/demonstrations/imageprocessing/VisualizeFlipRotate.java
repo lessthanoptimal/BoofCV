@@ -19,6 +19,7 @@
 package boofcv.demonstrations.imageprocessing;
 
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
@@ -41,18 +42,21 @@ public class VisualizeFlipRotate {
 
 		GrayU8 flipH = gray.clone();
 		GrayU8 flipV = gray.clone();
-		GrayU8 rotateCW = new GrayU8(gray.height, gray.width);
-		GrayU8 rotateCCW = new GrayU8(gray.height, gray.width);
 
 		ImageMiscOps.flipHorizontal(flipH);
 		ImageMiscOps.flipVertical(flipV);
-		ImageMiscOps.rotateCW(gray, rotateCW);
-		ImageMiscOps.rotateCCW(gray, rotateCCW);
+		GrayU8 rotateCW = ImageMiscOps.rotateCW(gray, null);
+		GrayU8 rotateCCW = ImageMiscOps.rotateCCW(gray, null);
+		GrayU8 transposed = ImageMiscOps.transpose(gray, null);
 
-		ShowImages.showWindow(gray, "Input");
-		ShowImages.showWindow(flipH, "Flip Horizontal");
-		ShowImages.showWindow(flipV, "Flip Vertical");
-		ShowImages.showWindow(rotateCW, "Rotate CW");
-		ShowImages.showWindow(rotateCCW, "Rotate CCW");
+		var panel = new ListDisplayPanel();
+		panel.addImage(gray, "Input");
+		panel.addImage(flipH, "Flip Horizontal");
+		panel.addImage(flipV, "Flip Vertical");
+		panel.addImage(rotateCW, "Rotate CW");
+		panel.addImage(rotateCCW, "Rotate CCW");
+		panel.addImage(transposed, "Transposed");
+
+		ShowImages.showWindow(panel, "Flip-Rotate-Transpose", true);
 	}
 }

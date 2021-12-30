@@ -138,7 +138,7 @@ public class GradientToEdgeFeatures {
 	 */
 	static public GrayF32 nonMaxSuppressionCrude4( GrayF32 intensity, GrayF32 derivX, GrayF32 derivY, GrayF32 output ) {
 		InputSanityCheck.checkSameShape(intensity, derivX, derivY);
-		output = InputSanityCheck.checkDeclare(intensity, output);
+		output = InputSanityCheck.declareOrReshape(intensity, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplEdgeNonMaxSuppressionCrude_MT.inner4(intensity, derivX, derivY, output);
@@ -238,7 +238,7 @@ public class GradientToEdgeFeatures {
 	 */
 	static public GrayF32 nonMaxSuppressionCrude4( GrayF32 intensity, GrayS16 derivX, GrayS16 derivY, GrayF32 output ) {
 		InputSanityCheck.checkSameShape(intensity, derivX, derivY);
-		output = InputSanityCheck.checkDeclare(intensity, output);
+		output = InputSanityCheck.declareOrReshape(intensity, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplEdgeNonMaxSuppressionCrude_MT.inner4(intensity, derivX, derivY, output);
@@ -338,7 +338,7 @@ public class GradientToEdgeFeatures {
 	 */
 	static public GrayF32 nonMaxSuppressionCrude4( GrayF32 intensity, GrayS32 derivX, GrayS32 derivY, GrayF32 output ) {
 		InputSanityCheck.checkSameShape(intensity, derivX, derivY);
-		output = InputSanityCheck.checkDeclare(intensity, output);
+		output = InputSanityCheck.declareOrReshape(intensity, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplEdgeNonMaxSuppressionCrude_MT.inner4(intensity, derivX, derivY, output);
@@ -367,7 +367,7 @@ public class GradientToEdgeFeatures {
 	 * @return Discretized direction.
 	 */
 	static public GrayS8 discretizeDirection4( GrayF32 angle, GrayS8 discrete ) {
-		discrete = InputSanityCheck.checkDeclare(angle, discrete, GrayS8.class);
+		discrete = InputSanityCheck.declareOrReshape(angle, discrete, GrayS8.class);
 
 		final float A = (float)(Math.PI/8.0);
 		final float B = (float)(Math.PI/4.0);
@@ -410,7 +410,7 @@ public class GradientToEdgeFeatures {
 	 * @return Discretized direction.
 	 */
 	static public GrayS8 discretizeDirection8( GrayF32 angle, GrayS8 discrete ) {
-		discrete = InputSanityCheck.checkDeclare(angle, discrete, GrayS8.class);
+		discrete = InputSanityCheck.declareOrReshape(angle, discrete, GrayS8.class);
 
 		final float A = (float)(Math.PI/8.0);
 		final float B = (float)(Math.PI/4.0);
@@ -450,7 +450,7 @@ public class GradientToEdgeFeatures {
 	 */
 	static public GrayF32 nonMaxSuppression4( GrayF32 intensity, GrayS8 direction, GrayF32 output ) {
 		InputSanityCheck.checkSameShape(intensity, direction);
-		output = InputSanityCheck.checkDeclare(intensity, output);
+		output = InputSanityCheck.declareOrReshape(intensity, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplEdgeNonMaxSuppression_MT.inner4(intensity, direction, output);
@@ -476,7 +476,7 @@ public class GradientToEdgeFeatures {
 	 */
 	static public GrayF32 nonMaxSuppression8( GrayF32 intensity, GrayS8 direction, GrayF32 output ) {
 		InputSanityCheck.checkSameShape(intensity, direction);
-		output = InputSanityCheck.checkDeclare(intensity, output);
+		output = InputSanityCheck.declareOrReshape(intensity, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplEdgeNonMaxSuppression_MT.inner8(intensity, direction, output);

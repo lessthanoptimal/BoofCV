@@ -42,7 +42,7 @@ public class GrayImageOps {
 	 * @return Output image.
 	 */
 	public static GrayU8 invert(GrayU8 input, int max , GrayU8 output) {
-		output = InputSanityCheck.checkDeclare(input, output);
+		output = InputSanityCheck.declareOrReshape(input, output);
 
 		ImplGrayImageOps.invert(input,max,output);
 
@@ -64,7 +64,7 @@ public class GrayImageOps {
 	 * @return Output image.
 	 */
 	public static GrayU8 brighten(GrayU8 input, int beta, int max , GrayU8 output) {
-		output = InputSanityCheck.checkDeclare(input, output);
+		output = InputSanityCheck.declareOrReshape(input, output);
 
 		ImplGrayImageOps.brighten(input,beta,max,output);
 
@@ -85,7 +85,7 @@ public class GrayImageOps {
 	 * @return Output image.
 	 */
 	public static GrayU8 stretch(GrayU8 input, double gamma, int beta, int max , GrayU8 output) {
-		output = InputSanityCheck.checkDeclare(input, output);
+		output = InputSanityCheck.declareOrReshape(input, output);
 
 		ImplGrayImageOps.stretch(input,gamma,beta,max,output);
 
@@ -103,7 +103,7 @@ public class GrayImageOps {
 	 * @return Output image.
 	 */
 	public static GrayS16 invert(GrayS16 input, int max , GrayS16 output) {
-		output = InputSanityCheck.checkDeclare(input, output);
+		output = InputSanityCheck.declareOrReshape(input, output);
 
 		ImplGrayImageOps.invert(input,max,output);
 
@@ -125,7 +125,7 @@ public class GrayImageOps {
 	 * @return Output image.
 	 */
 	public static GrayS16 brighten(GrayS16 input, int beta, int max , GrayS16 output) {
-		output = InputSanityCheck.checkDeclare(input, output);
+		output = InputSanityCheck.declareOrReshape(input, output);
 
 		ImplGrayImageOps.brighten(input,beta,max,output);
 
@@ -146,7 +146,7 @@ public class GrayImageOps {
 	 * @return Output image.
 	 */
 	public static GrayS16 stretch(GrayS16 input, double gamma, int beta, int max , GrayS16 output) {
-		output = InputSanityCheck.checkDeclare(input, output);
+		output = InputSanityCheck.declareOrReshape(input, output);
 
 		ImplGrayImageOps.stretch(input,gamma,beta,max,output);
 
@@ -164,7 +164,7 @@ public class GrayImageOps {
 	 * @return Output image.
 	 */
 	public static GrayF32 invert(GrayF32 input, float max , GrayF32 output) {
-		output = InputSanityCheck.checkDeclare(input, output);
+		output = InputSanityCheck.declareOrReshape(input, output);
 
 		ImplGrayImageOps.invert(input,max,output);
 
@@ -186,7 +186,7 @@ public class GrayImageOps {
 	 * @return Output image.
 	 */
 	public static GrayF32 brighten(GrayF32 input, float beta, float max , GrayF32 output) {
-		output = InputSanityCheck.checkDeclare(input, output);
+		output = InputSanityCheck.declareOrReshape(input, output);
 
 		ImplGrayImageOps.brighten(input,beta,max,output);
 
@@ -207,7 +207,7 @@ public class GrayImageOps {
 	 * @return Output image.
 	 */
 	public static GrayF32 stretch(GrayF32 input, double gamma, float beta, float max , GrayF32 output) {
-		output = InputSanityCheck.checkDeclare(input, output);
+		output = InputSanityCheck.declareOrReshape(input, output);
 
 		ImplGrayImageOps.stretch(input,gamma,beta,max,output);
 

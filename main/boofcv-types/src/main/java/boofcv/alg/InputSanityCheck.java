@@ -45,10 +45,10 @@ public class InputSanityCheck {
 	}
 
 	/**
-	 * If the output has not been declared a new instance is declared. If an instance of the output
-	 * is provided its bounds are checked.
+	 * If the output has not been declared a new instance is declared. If output is not null then it will be
+	 * reshaped to match the input.
 	 */
-	public static <T extends ImageBase<T>> T checkDeclare( T input, @Nullable T output ) {
+	public static <T extends ImageBase<T>> T declareOrReshape( T input, @Nullable T output ) {
 		if (output == null) {
 			output = (T)input.createNew(input.width, input.height);
 		} else {
@@ -57,7 +57,14 @@ public class InputSanityCheck {
 		return output;
 	}
 
-	public static <T extends ImageGray<T>> T checkDeclare( @Nullable T image, int width, int height, Class<T> imageType ) {
+	public static <T extends ImageBase<T>> T declareOutput( T input, @Nullable T output ) {
+		if (output == null) {
+			return (T)input.createNew(input.width, input.height);
+		}
+		return output;
+	}
+
+	public static <T extends ImageGray<T>> T declareOrReshape( @Nullable T image, int width, int height, Class<T> imageType ) {
 		if (image == null)
 			image = GeneralizedImageOps.createSingleBand(imageType, width, height);
 		else
@@ -65,9 +72,9 @@ public class InputSanityCheck {
 		return image;
 	}
 
-	public static <T extends ImageInterleaved<T>> T checkDeclare( @Nullable T image,
-																  int width, int height, int numBands,
-																  Class<T> imageType ) {
+	public static <T extends ImageInterleaved<T>> T declareOrReshape( @Nullable T image,
+																	  int width, int height, int numBands,
+																	  Class<T> imageType ) {
 		if (image == null)
 			image = GeneralizedImageOps.createInterleaved(imageType, width, height, numBands);
 		else
@@ -75,9 +82,9 @@ public class InputSanityCheck {
 		return image;
 	}
 
-	public static <T extends ImageGray<T>> Planar<T> checkDeclare( @Nullable Planar<T> image,
-																   int width, int height, int numBands,
-																   Class<T> imageType ) {
+	public static <T extends ImageGray<T>> Planar<T> declareOrReshape( @Nullable Planar<T> image,
+																	   int width, int height, int numBands,
+																	   Class<T> imageType ) {
 		if (image == null)
 			image = new Planar<>(imageType, width, height, numBands);
 		else
@@ -90,7 +97,7 @@ public class InputSanityCheck {
 	 * is provided its bounds are checked.
 	 */
 	public static <In extends ImageGray, Out extends ImageGray>
-	Out checkDeclare( In input, @Nullable Out output, Class<Out> typeOut ) {
+	Out declareOrReshape( In input, @Nullable Out output, Class<Out> typeOut ) {
 		if (output == null) {
 			output = (Out)GeneralizedImageOps.createSingleBand(typeOut, input.width, input.height);
 		} else {
