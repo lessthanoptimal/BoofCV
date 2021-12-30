@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Masks that are applied to the QR code toe ensure that there are no regions with "structure" in them. Avoid
+ * Masks that are applied to QR codes to ensure that there are no regions with "structure" in them. Avoid
  * accidentally having patterns that look like a finder pattern or alignment pattern.
  *
  * @author Peter Abeles
