@@ -32,6 +32,7 @@ project.ext.junit_version = '5.8.1'
 project.ext.errorprone_version = '2.9.0'
 project.ext.nullaway_version = '0.9.3'
 project.ext.auto64to32_version = '3.1.0'
+project.ext.smakeyaml_version = '1.23'
 project.ext.jmh_version = '1.33'
 
 // Which native platforms are supported can be specified in the command line.  Otherwise

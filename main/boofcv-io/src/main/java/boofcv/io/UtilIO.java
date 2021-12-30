@@ -78,7 +78,7 @@ public class UtilIO {
 	public static List<String> loadListStringYaml( File file ) {
 		URL url = UtilIO.ensureURL(file.getPath());
 		if (url == null)
-			throw new RuntimeException("Unknown file="+file.getPath());
+			throw new RuntimeException("Unknown file=" + file.getPath());
 
 		try (var reader = new BufferedInputStream(url.openStream())) {
 			Yaml yaml = createYmlObject();
@@ -145,7 +145,7 @@ public class UtilIO {
 	public static void saveConfig( Configuration config, File file ) {
 		try (var stream = new FileOutputStream(file)) {
 			var output = new BufferedOutputStream(stream);
-			SerializeConfigYaml.serialize(config, null, new OutputStreamWriter(output, UTF_8));
+			new SerializeConfigYaml().serialize(config, null, new OutputStreamWriter(output, UTF_8));
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -174,7 +174,7 @@ public class UtilIO {
 
 		try (var stream = new FileOutputStream(file)) {
 			var output = new BufferedOutputStream(stream);
-			SerializeConfigYaml.serialize(config, canonical, new OutputStreamWriter(output, UTF_8));
+			new SerializeConfigYaml().serialize(config, canonical, new OutputStreamWriter(output, UTF_8));
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -186,11 +186,11 @@ public class UtilIO {
 	public static <T extends Configuration> T loadConfig( File file ) {
 		URL url = UtilIO.ensureURL(file.getPath());
 		if (url == null)
-			throw new RuntimeException("Unknown file="+file.getPath());
+			throw new RuntimeException("Unknown file=" + file.getPath());
 
 		try (InputStream stream = url.openStream()) {
 			var output = new BufferedInputStream(stream);
-			return (T)SerializeConfigYaml.deserialize(new InputStreamReader(output, UTF_8));
+			return (T)new SerializeConfigYaml().deserialize(new InputStreamReader(output, UTF_8));
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -568,7 +568,7 @@ public class UtilIO {
 	public static <T> T load( String fileName ) {
 		@Nullable URL url = UtilIO.ensureURL(fileName);
 		if (url == null)
-			throw new RuntimeException("Unknown path="+fileName);
+			throw new RuntimeException("Unknown path=" + fileName);
 
 		try (InputStream fileIn = url.openStream()) {
 			ObjectInputStream in = new ObjectInputStream(fileIn);
