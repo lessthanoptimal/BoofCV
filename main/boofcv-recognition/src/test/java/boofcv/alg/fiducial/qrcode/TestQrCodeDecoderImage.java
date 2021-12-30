@@ -19,6 +19,7 @@
 package boofcv.alg.fiducial.qrcode;
 
 import boofcv.alg.fiducial.calib.squares.SquareEdge;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofStandardJUnit;
@@ -40,12 +41,12 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 
 	@Test void withLensDistortion() {
 		// render a distorted image
-		QrCodeDistortedChecks helper = new QrCodeDistortedChecks();
+		var helper = new QrCodeDistortedChecks();
 
 		helper.render();
 
 		// find location of position patterns and create graph
-		DogArray<PositionPatternNode> pps = new DogArray<>(PositionPatternNode::new);
+		var pps = new DogArray<>(PositionPatternNode::new);
 
 		pps.grow().square = new Polygon2D_F64(4);
 		pps.grow().square = new Polygon2D_F64(4);
@@ -60,7 +61,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 		connect(pps.get(0), pps.get(1), 0, 2);
 
 		// Should fail when run on distorted image
-		QrCodeDecoderImage<GrayF32> decoder = new QrCodeDecoderImage<>(null, GrayF32.class);
+		var decoder = new QrCodeDecoderImage<>(null, GrayF32.class);
 		decoder.process(pps, helper.image);
 
 		assertEquals(0, decoder.successes.size());
@@ -77,6 +78,45 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 		assertEquals(found.message, "123");
 	}
 
+	@Test void transposed() {
+		String message = "TRANSPOSED";
+		QrCode expected = new QrCodeEncoder().addAlphanumeric(message).fixate();
+
+		var generator = new QrCodeGeneratorImage(4);
+		generator.render(expected);
+		DogArray<PositionPatternNode> pps = createPositionPatterns(generator);
+
+		// transpose the image. This happens when an encoderer doesn't get the coordinate systems correct
+		GrayU8 transposedImage = ImageMiscOps.transpose(generator.getGray(), null);
+
+		// succeed when the flag is one by default
+		var alg = new QrCodeDecoderImage<>(null, GrayU8.class);
+
+		alg.process(pps, transposedImage);
+		assertEquals(1, alg.successes.size());
+		assertEquals(message, alg.getFound().get(0).message);
+
+		// fail when you turn it off
+		alg.considerTransposed = false;
+		alg.process(pps, transposedImage);
+		assertEquals(0, alg.successes.size());
+	}
+
+	@Test void transposePositionPatterns() {
+		var qr = new QrCode();
+		qr.ppCorner = new Polygon2D_F64(0, 0, 1, 0, 1, 1, 0, 1);
+		qr.ppRight = new Polygon2D_F64(2, 0, 3, 0, 3, 1, 2, 1);
+		qr.ppDown = new Polygon2D_F64(0, 2, 1, 2, 1, 3, 0, 3);
+
+		new QrCodeDecoderImage<>(null, GrayU8.class).transposePositionPatterns(qr);
+
+		assertEquals(0.0, qr.ppCorner.get(1).distance(0, 1), UtilEjml.TEST_F64);
+		assertEquals(0.0, qr.ppRight.get(0).distance(0, 2), UtilEjml.TEST_F64);
+		assertEquals(0.0, qr.ppRight.get(1).distance(0, 3), UtilEjml.TEST_F64);
+		assertEquals(0.0, qr.ppDown.get(0).distance(2, 0), UtilEjml.TEST_F64);
+		assertEquals(0.0, qr.ppDown.get(1).distance(2, 1), UtilEjml.TEST_F64);
+	}
+
 	/**
 	 * Run the entire algorithm on a rendered image but just care about the message
 	 */
@@ -88,14 +128,11 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 					setMask(QrCodeMaskPattern.M011).
 					addNumeric(message).fixate();
 
-			QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
+			var generator = new QrCodeGeneratorImage(4);
 			generator.render(expected);
 			DogArray<PositionPatternNode> pps = createPositionPatterns(generator);
 
-//		ShowImages.showWindow(generator.gray,"QR Code", true);
-//		BoofMiscOps.sleep(100000);
-
-			QrCodeDecoderImage<GrayU8> decoder = new QrCodeDecoderImage<>(null, GrayU8.class);
+			var decoder = new QrCodeDecoderImage<>(null, GrayU8.class);
 			decoder.process(pps, generator.getGray());
 
 			assertEquals(1, decoder.successes.size());
@@ -118,14 +155,14 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 					setMask(QrCodeMaskPattern.M011).
 					addAlphanumeric(message).fixate();
 
-			QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
+			var generator = new QrCodeGeneratorImage(4);
 			generator.render(expected);
 			DogArray<PositionPatternNode> pps = createPositionPatterns(generator);
 
 //		ShowImages.showWindow(generator.getGray(),"QR Code", true);
 //		BoofMiscOps.sleep(100000);
 
-			QrCodeDecoderImage<GrayU8> decoder = new QrCodeDecoderImage<>(null, GrayU8.class);
+			var decoder = new QrCodeDecoderImage<>(null, GrayU8.class);
 			decoder.process(pps, generator.getGray());
 
 			assertEquals(1, decoder.successes.size());
@@ -144,14 +181,14 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 				setMask(QrCodeMaskPattern.M011).
 				addBytes(new byte[]{0x50, 0x70, 0x34, 0x2F}).fixate();
 
-		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
+		var generator = new QrCodeGeneratorImage(4);
 		generator.render(expected);
 		DogArray<PositionPatternNode> pps = createPositionPatterns(generator);
 
 //		ShowImages.showWindow(generator.getGray(),"QR Code", true);
 //		BoofMiscOps.sleep(100000);
 
-		QrCodeDecoderImage<GrayU8> decoder = new QrCodeDecoderImage<>(null, GrayU8.class);
+		var decoder = new QrCodeDecoderImage<>(null, GrayU8.class);
 		decoder.process(pps, generator.getGray());
 
 		assertEquals(1, decoder.successes.size());
@@ -169,14 +206,14 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 				setMask(QrCodeMaskPattern.M011).
 				addKanji("阿ん鞠ぷへ≦Ｋ").fixate();
 
-		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
+		var generator = new QrCodeGeneratorImage(4);
 		generator.render(expected);
 		DogArray<PositionPatternNode> pps = createPositionPatterns(generator);
 
 //		ShowImages.showWindow(generator.getGray(),"QR Code", true);
 //		BoofMiscOps.sleep(100000);
 
-		QrCodeDecoderImage<GrayU8> decoder = new QrCodeDecoderImage<>(null, GrayU8.class);
+		var decoder = new QrCodeDecoderImage<>(null, GrayU8.class);
 		decoder.process(pps, generator.getGray());
 
 		assertEquals(1, decoder.successes.size());
@@ -194,14 +231,14 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 				setMask(QrCodeMaskPattern.M011).
 				addKanji("阿ん鞠ぷへ≦Ｋ").addNumeric("1235").addAlphanumeric("AF").addBytes("efg").fixate();
 
-		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
+		var generator = new QrCodeGeneratorImage(4);
 		generator.render(expected);
 		DogArray<PositionPatternNode> pps = createPositionPatterns(generator);
 
 //		ShowImages.showWindow(generator.getGray(),"QR Code", true);
 //		BoofMiscOps.sleep(100000);
 
-		QrCodeDecoderImage<GrayU8> decoder = new QrCodeDecoderImage<>(null, GrayU8.class);
+		var decoder = new QrCodeDecoderImage<>(null, GrayU8.class);
 		decoder.process(pps, generator.getGray());
 
 		assertEquals(1, decoder.successes.size());
@@ -237,14 +274,14 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 				setMask(mask).
 				addNumeric("01234567").fixate();
 
-		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(4);
+		var generator = new QrCodeGeneratorImage(4);
 		int border = generator.borderModule*4;
 //		generator.renderData = false;
 		generator.render(expected);
 
 		DogArray<PositionPatternNode> pps = createPositionPatterns(generator);
 
-		QrCodeDecoderImage<GrayU8> decoder = new QrCodeDecoderImage<>(null, GrayU8.class);
+		var decoder = new QrCodeDecoderImage<>(null, GrayU8.class);
 
 //		ShowImages.showWindow(generator.getGray(),"QR Code");
 //		BoofMiscOps.sleep(100000);
@@ -284,7 +321,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 	}
 
 	private DogArray<PositionPatternNode> createPositionPatterns( QrCodeGeneratorImage generator ) {
-		DogArray<PositionPatternNode> pps = new DogArray<>(PositionPatternNode::new);
+		var pps = new DogArray<>(PositionPatternNode::new);
 
 		pps.grow().square = generator.qr.ppCorner;
 		pps.grow().square = generator.qr.ppRight;
@@ -300,13 +337,13 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 	}
 
 	@Test void setPositionPatterns() {
-		Polygon2D_F64 corner = new Polygon2D_F64(0, 0, 2, 0, 2, 2, 0, 2);
-		Polygon2D_F64 right = new Polygon2D_F64(5, 0, 7, 0, 7, 2, 5, 2);
-		Polygon2D_F64 bottom = new Polygon2D_F64(0, 5, 2, 5, 2, 7, 0, 7);
+		var corner = new Polygon2D_F64(0, 0, 2, 0, 2, 2, 0, 2);
+		var right = new Polygon2D_F64(5, 0, 7, 0, 7, 2, 5, 2);
+		var bottom = new Polygon2D_F64(0, 5, 2, 5, 2, 7, 0, 7);
 
-		PositionPatternNode n_corner = new PositionPatternNode();
-		PositionPatternNode n_right = new PositionPatternNode();
-		PositionPatternNode n_bottom = new PositionPatternNode();
+		var n_corner = new PositionPatternNode();
+		var n_right = new PositionPatternNode();
+		var n_bottom = new PositionPatternNode();
 
 		n_corner.square = corner;
 		n_right.square = right;
@@ -328,7 +365,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 	}
 
 	@Test void rotateUntilAt() {
-		Polygon2D_F64 square = new Polygon2D_F64(0, 0, 2, 0, 2, 2, 0, 2);
+		var square = new Polygon2D_F64(0, 0, 2, 0, 2, 2, 0, 2);
 		assertTrue(square.isCCW());
 		Polygon2D_F64 original = square.copy();
 
@@ -361,16 +398,10 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 	 * There was a bug where version 0 QR code was returned
 	 */
 	@Test void extractVersionInfo_version0() {
-		QrCodeDecoderImage<GrayU8> mock = new QrCodeDecoderImage<>(EciEncoding.UTF8, GrayU8.class) {
-			@Override
-			int estimateVersionBySize( QrCode qr ) {
-				return 0;
-			}
+		var mock = new QrCodeDecoderImage<>(EciEncoding.UTF8, GrayU8.class) {
+			@Override int estimateVersionBySize( QrCode qr ) {return 0;}
 
-			@Override
-			int decodeVersion() {
-				return 8;
-			}
+			@Override int decodeVersion() {return 8;}
 		};
 
 		QrCode qr = new QrCode();
@@ -384,7 +415,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 	 */
 	@Test void readFormatRegion0() {
 		var reader = new MockReader();
-		QrCodeDecoderImage<GrayU8> alg = new QrCodeDecoderImage<>(EciEncoding.UTF8, GrayU8.class);
+		var alg = new QrCodeDecoderImage<>(EciEncoding.UTF8, GrayU8.class);
 		alg.gridReader = reader;
 
 		alg.readFormatRegion0(new QrCode());
@@ -408,7 +439,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 	 */
 	@Test void readFormatRegion1() {
 		var reader = new MockReader();
-		QrCodeDecoderImage<GrayU8> alg = new QrCodeDecoderImage<>(EciEncoding.UTF8, GrayU8.class);
+		var alg = new QrCodeDecoderImage<>(EciEncoding.UTF8, GrayU8.class);
 		alg.gridReader = reader;
 
 		alg.readFormatRegion1(new QrCode());

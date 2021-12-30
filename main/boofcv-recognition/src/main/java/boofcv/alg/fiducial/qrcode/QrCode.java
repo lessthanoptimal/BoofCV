@@ -125,6 +125,12 @@ public class QrCode implements Cloneable {
 	 */
 	public Homography2D_F64 Hinv = new Homography2D_F64();
 
+	/**
+	 * True if the QR code was incorrectly encoded and the bits are transposed. If this is true then the position
+	 * patterns are stored in a transposed order. Bounds will not be affected.
+	 */
+	public boolean bitsTransposed;
+
 	static {
 		// Manually entered from QR Code table. There's no simple equation for these magic numbers
 		VERSION_INFO[1] = new VersionInfo(26, new int[0]);
@@ -413,6 +419,7 @@ public class QrCode implements Cloneable {
 		rawbits = null;
 		corrected = null;
 		message = null;
+		bitsTransposed = false;
 	}
 
 	@Override

@@ -54,6 +54,12 @@ public class ConfigQrCode implements Configuration {
 	 */
 	public @Nullable String forceEncoding = null;
 
+	/**
+	 * If true it will consider QR codes which have been incorrectly encoded with transposed bits. Set to false if
+	 * you know your markers are standard compliant and want a modest speed boost.
+	 */
+	public boolean considerTransposed = true;
+
 	{
 
 		// 40% slower but better at detecting fiducials by a few percentage points
@@ -103,6 +109,7 @@ public class ConfigQrCode implements Configuration {
 		this.versionMinimum = src.versionMinimum;
 		this.versionMaximum = src.versionMaximum;
 		this.forceEncoding = src.forceEncoding;
+		this.considerTransposed = src.considerTransposed;
 		return this;
 	}
 
