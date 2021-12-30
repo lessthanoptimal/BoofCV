@@ -32,10 +32,9 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.ejml.UtilEjml.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * @author Peter Abeles
- */
 class TestSerializeConfigYaml extends BoofStandardJUnit {
+	SerializeConfigYaml serialization = new SerializeConfigYaml();
+
 	@Test void encode_decode() {
 		var orig = new ConfigBoof();
 		orig.childA.valA = 88;
@@ -51,10 +50,10 @@ class TestSerializeConfigYaml extends BoofStandardJUnit {
 		orig.valC = "Test";
 
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
-		SerializeConfigYaml.serialize(orig, null, new OutputStreamWriter(stream, UTF_8));
+		serialization.serialize(orig, null, new OutputStreamWriter(stream, UTF_8));
 
 		Reader reader = new InputStreamReader(new ByteArrayInputStream(stream.toByteArray()), UTF_8);
-		ConfigBoof found = SerializeConfigYaml.deserialize(reader);
+		ConfigBoof found = serialization.deserialize(reader);
 
 		// See if the serialization/deserialization worked
 		checkIdentical(orig, found);
@@ -83,10 +82,10 @@ class TestSerializeConfigYaml extends BoofStandardJUnit {
 		orig.externals.get(0).stuff = "omg";
 
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
-		SerializeConfigYaml.serialize(orig, null, new OutputStreamWriter(stream, UTF_8));
+		serialization.serialize(orig, null, new OutputStreamWriter(stream, UTF_8));
 
 		Reader reader = new InputStreamReader(new ByteArrayInputStream(stream.toByteArray()), UTF_8);
-		ConfigLists found = SerializeConfigYaml.deserialize(reader);
+		ConfigLists found = serialization.deserialize(reader);
 
 		assertEquals(orig.valA, found.valA);
 		assertEquals(orig.strings.size(), found.strings.size());
@@ -95,6 +94,31 @@ class TestSerializeConfigYaml extends BoofStandardJUnit {
 		}
 		assertEquals(orig.externals.size(), found.externals.size());
 		assertEquals(orig.externals.get(0).stuff, found.externals.get(0).stuff);
+	}
+
+	@Test void encode_decode_FastArray() {
+		var orig = new ConfigLists();
+		orig.enums.add(EnumPNP.EPNP);
+		orig.enums.add(EnumPNP.EPNP);
+		orig.enums.add(EnumPNP.IPPE);
+
+		orig.externals.add(new ConfigExternal());
+		orig.externals.add(new ConfigExternal());
+		orig.externals.get(1).stuff = "Moo";
+
+		ByteArrayOutputStream stream = new ByteArrayOutputStream();
+		serialization.serialize(orig, null, new OutputStreamWriter(stream, UTF_8));
+		Reader reader = new InputStreamReader(new ByteArrayInputStream(stream.toByteArray()), UTF_8);
+		ConfigLists found = serialization.deserialize(reader);
+
+		assertEquals(orig.enums.size(), found.enums.size());
+		for (int i = 0; i < orig.enums.size(); i++) {
+			assertEquals(orig.enums.get(i), found.enums.get(i));
+		}
+		assertEquals(orig.externals.size(), found.externals.size());
+		for (int i = 0; i < orig.externals.size(); i++) {
+			assertEquals(orig.externals.get(i).stuff, found.externals.get(i).stuff);
+		}
 	}
 
 	/**
@@ -117,10 +141,10 @@ class TestSerializeConfigYaml extends BoofStandardJUnit {
 		orig.valC = "Test";
 
 		var stream = new ByteArrayOutputStream();
-		SerializeConfigYaml.serialize(orig, null, new OutputStreamWriter(stream, UTF_8));
+		serialization.serialize(orig, null, new OutputStreamWriter(stream, UTF_8));
 
 		Reader reader = new InputStreamReader(new ByteArrayInputStream(stream.toByteArray()), UTF_8);
-		ConfigBoof found = SerializeConfigYaml.deserialize(reader);
+		ConfigBoof found = serialization.deserialize(reader);
 
 		var defaultVals = new ConfigBoof();
 
@@ -149,13 +173,13 @@ class TestSerializeConfigYaml extends BoofStandardJUnit {
 		orig.valB = EnumPNP.IPPE;
 
 		// Nothing should be serialized if you provide the object you wish to serialize as the reference
-		assertTrue(SerializeConfigYaml.serialize(orig, orig).isEmpty());
+		assertTrue(serialization.serialize(orig, orig).isEmpty());
 
 		// Now try serializing using the default values as a reference
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
-		SerializeConfigYaml.serialize(orig, new ConfigBoof(), new OutputStreamWriter(stream, UTF_8));
+		serialization.serialize(orig, new ConfigBoof(), new OutputStreamWriter(stream, UTF_8));
 		Reader reader = new InputStreamReader(new ByteArrayInputStream(stream.toByteArray()), UTF_8);
-		ConfigBoof found = SerializeConfigYaml.deserialize(reader);
+		ConfigBoof found = serialization.deserialize(reader);
 
 		// See if the serialization/deserialization worked
 		checkIdentical(orig, found);
@@ -166,8 +190,9 @@ class TestSerializeConfigYaml extends BoofStandardJUnit {
 	public static class ConfigExternal {
 		public String stuff = "default";
 
-		public void setTo( ConfigExternal src ) {
+		public ConfigExternal setTo( ConfigExternal src ) {
 			this.stuff = src.stuff;
+			return this;
 		}
 	}
 
@@ -178,11 +203,12 @@ class TestSerializeConfigYaml extends BoofStandardJUnit {
 
 		public final ConfigExternal external = new ConfigExternal();
 
-		public void setTo( ConfigChild src ) {
+		public ConfigChild setTo( ConfigChild src ) {
 			this.valA = src.valA;
 			this.valB = src.valB;
 			this.valC = src.valC;
 			this.external.setTo(src.external);
+			return this;
 		}
 
 		@Override public void checkValidity() {}
@@ -196,14 +222,16 @@ class TestSerializeConfigYaml extends BoofStandardJUnit {
 		public ConfigChild childA = new ConfigChild();
 		public ConfigChild childB = new ConfigChild();
 
+		// list of fields that are active
 		private List<String> active = new ArrayList<>();
 
-		public void setTo( ConfigBoof src ) {
+		public ConfigBoof setTo( ConfigBoof src ) {
 			this.valA = src.valA;
 			this.valB = src.valB;
 			this.valC = src.valC;
 			childA.setTo(src.childA);
 			childB.setTo(src.childB);
+			return this;
 		}
 
 		@Override public List<String> serializeActiveFields() {return active;}
@@ -215,11 +243,16 @@ class TestSerializeConfigYaml extends BoofStandardJUnit {
 		public short valA;
 		public FastArray<String> strings = new FastArray<>(String.class);
 		public FastArray<ConfigExternal> externals = new FastArray<>(ConfigExternal.class);
+		public FastArray<EnumPNP> enums = new FastArray<>(EnumPNP.class);
 
 		public void setTo( ConfigLists src ) {
 			this.valA = src.valA;
 			strings.reset();
 			strings.addAll(src.strings);
+			externals.clear();
+			src.externals.forEach(v -> externals.add(new ConfigExternal().setTo(v)));
+			enums.clear();
+			enums.addAll(src.enums);
 		}
 
 		@Override public void checkValidity() {}
