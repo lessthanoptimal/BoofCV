@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ public class RecycleStack<T> {
 	List<T> list = new ArrayList<>();
 	Factory<T> factory;
 
-	public RecycleStack(Factory<T> factory) {
+	public RecycleStack( Factory<T> factory ) {
 		this.factory = factory;
 	}
 
@@ -44,25 +44,27 @@ public class RecycleStack<T> {
 	/**
 	 * Returns an instance. If there are instances queued up internally one of those is returned. Otherwise
 	 * a new instance is created.
+	 *
 	 * @return object instance
 	 */
 	public synchronized T pop() {
-		if( list.isEmpty() ) {
+		if (list.isEmpty()) {
 			return factory.newInstance();
 		} else {
-			return list.remove(list.size()-1);
+			return list.remove(list.size() - 1);
 		}
 	}
 
 	/**
 	 * Recycles the object for later use
+	 *
 	 * @param object The object that's to be recycled
 	 */
 	public synchronized void recycle( T object ) {
 		list.add(object);
 	}
 
-	public static interface Factory<T> {
-		public T newInstance();
+	public interface Factory<T> {
+		T newInstance();
 	}
 }

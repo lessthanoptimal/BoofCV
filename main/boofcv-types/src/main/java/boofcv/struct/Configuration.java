@@ -44,14 +44,14 @@ public interface Configuration extends Serializable {
 //	void setTo( Configuration src );
 
 	/**
-	 *  Optional function which is called after deserialization and performs initialization
+	 * Optional function which is called after deserialization and performs initialization
 	 */
-	default void serializeInitialize(){}
+	default void serializeInitialize() {}
 
 	/**
 	 * Optional functions that tells a serializer which fields are being used and not ignored.
 	 * a field is ignored when there a "type" and only members of the type are used. If empty then
 	 * it's assumed all fields are active.
 	 */
-	default List<String> serializeActiveFields(){return new ArrayList<>();}
+	default List<String> serializeActiveFields() {return new ArrayList<>();}
 }

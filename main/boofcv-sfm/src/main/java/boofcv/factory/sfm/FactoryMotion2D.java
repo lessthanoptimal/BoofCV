@@ -86,18 +86,18 @@ public class FactoryMotion2D {
 			manager = (ModelManager)new ModelManagerHomography2D_F64();
 			if (refineEstimate)
 				modelRefiner = (ModelFitter)new GenerateHomographyLinear(true);
-			fitter = ()->(ModelGenerator)new GenerateHomographyLinear(true);
-			distance = ()->(DistanceFromModel)new DistanceHomographySq();
+			fitter = () -> (ModelGenerator)new GenerateHomographyLinear(true);
+			distance = () -> (DistanceFromModel)new DistanceHomographySq();
 		} else if (motionModel instanceof Affine2D_F64) {
 			manager = (ModelManager)new ModelManagerAffine2D_F64();
 			if (refineEstimate)
 				modelRefiner = (ModelFitter)new GenerateAffine2D();
-			fitter = ()->(ModelGenerator)new GenerateAffine2D();
-			distance = ()->(DistanceFromModel)new DistanceAffine2DSq();
+			fitter = () -> (ModelGenerator)new GenerateAffine2D();
+			distance = () -> (DistanceFromModel)new DistanceAffine2DSq();
 		} else if (motionModel instanceof Se2_F64) {
 			manager = (ModelManager)new ModelManagerSe2_F64();
-			fitter = ()-> (ModelGenerator)new GenerateSe2_AssociatedPair(new MotionSe2PointSVD_F64());
-			distance = ()->(DistanceFromModel)new DistanceSe2Sq();
+			fitter = () -> (ModelGenerator)new GenerateSe2_AssociatedPair(new MotionSe2PointSVD_F64());
+			distance = () -> (DistanceFromModel)new DistanceSe2Sq();
 			// no refine, already optimal
 		} else {
 			throw new RuntimeException("Unknown model type: " + motionModel.getClass().getSimpleName());

@@ -29,7 +29,7 @@ public class GradientValue_F64 implements GradientValue {
 	public double y;
 
 	@Override
-	public void set( /**/double dx, /**/double dy ) {
+	public void setTo( /**/double dx, /**/double dy ) {
 		this.x = (double)dx;
 		this.y = (double)dy;
 	}

@@ -359,7 +359,7 @@ public class VisOdomMonoDepthPnP<T extends ImageBase<T>>
 //			}
 
 			// discard point if it can't localized
-			if (!pixelTo3D.process(pt.pixel.x, pt.pixel.y) ) {
+			if (!pixelTo3D.process(pt.pixel.x, pt.pixel.y)) {
 //				System.out.println("Dropped pixelTo3D  tt="+pt.featureId);
 				totalRejected++;
 				tracker.dropTrack(pt);

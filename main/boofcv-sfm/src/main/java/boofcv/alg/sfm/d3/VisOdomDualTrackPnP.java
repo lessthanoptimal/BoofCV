@@ -634,7 +634,6 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>, TD extends TupleDesc<TD
 		// the last frame it was seen in
 		public long lastSeenRightFrame;
 
-
 		@SuppressWarnings({"NullAway"})
 		@Override public void reset() {
 			super.reset();

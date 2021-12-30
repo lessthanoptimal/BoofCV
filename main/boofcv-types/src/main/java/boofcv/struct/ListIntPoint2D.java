@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,7 +40,7 @@ public class ListIntPoint2D {
 	/**
 	 * Specifies the image's width and height. used for encoding. Also resets the list.
 	 */
-	public void configure( int width , int height ) {
+	public void configure( int width, int height ) {
 		this.imageWidth = width;
 		points.reset();
 	}
@@ -48,14 +48,14 @@ public class ListIntPoint2D {
 	/**
 	 * Adds a new point to the list
 	 */
-	public void add( int x , int y ) {
-		points.add(y*imageWidth+x);
+	public void add( int x, int y ) {
+		points.add(y*imageWidth + x);
 	}
 
 	/**
 	 * Retrieves a point from the list
 	 */
-	public void get(int index , Point2D_I16 p ) {
+	public void get( int index, Point2D_I16 p ) {
 		int v = points.data[index];
 		p.x = (short)(v%imageWidth);
 		p.y = (short)(v/imageWidth);
@@ -64,7 +64,7 @@ public class ListIntPoint2D {
 	/**
 	 * Retrieves a point from the list
 	 */
-	public void get(int index , Point2D_I32 p ) {
+	public void get( int index, Point2D_I32 p ) {
 		int v = points.data[index];
 		p.x = v%imageWidth;
 		p.y = v/imageWidth;
@@ -73,7 +73,7 @@ public class ListIntPoint2D {
 	/**
 	 * Retrieves a point from the list
 	 */
-	public void get(int index , Point2D_F32 p ) {
+	public void get( int index, Point2D_F32 p ) {
 		int v = points.data[index];
 		p.x = (float)(v%imageWidth);
 		p.y = (float)(v/imageWidth);
@@ -82,7 +82,7 @@ public class ListIntPoint2D {
 	/**
 	 * Retrieves a point from the list
 	 */
-	public void get(int index , Point2D_F64 p ) {
+	public void get( int index, Point2D_F64 p ) {
 		int v = points.data[index];
 		p.x = (float)(v%imageWidth);
 		p.y = (float)(v/imageWidth);
@@ -92,18 +92,18 @@ public class ListIntPoint2D {
 	 * Returns the coordinate as a {@link Point2D_I32}. not recommended due to the creation of a new point
 	 * each call. Provided for backwards compatibility
 	 */
-	public Point2D_I32 get(int index) {
+	public Point2D_I32 get( int index ) {
 		Point2D_I32 p = new Point2D_I32();
-		get(index,p);
+		get(index, p);
 		return p;
 	}
 
 	/**
 	 * Copy points from 'this' into 'dst'
 	 */
-	public void copyInto(DogArray<Point2D_I16> dst ) {
+	public void copyInto( DogArray<Point2D_I16> dst ) {
 		for (int i = 0; i < points.size; i++) {
-			get(i,dst.grow());
+			get(i, dst.grow());
 		}
 	}
 

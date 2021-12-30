@@ -249,11 +249,11 @@ public class FactoryGImageMultiBand {
 
 		@Override public int getNumberOfBands() {return image.getNumBands();}
 
-		@Override public int getPixelStride() { return image.getNumBands(); }
+		@Override public int getPixelStride() {return image.getNumBands();}
 
-		@Override public int getIndex( int x, int y ) { return image.getIndex(x, y); }
+		@Override public int getIndex( int x, int y ) {return image.getIndex(x, y);}
 
-		@Override public <GT extends ImageBase<GT>> GT getImage() { return (GT)image; }
+		@Override public <GT extends ImageBase<GT>> GT getImage() {return (GT)image;}
 	}
 
 	@SuppressWarnings({"NullAway.Init"})

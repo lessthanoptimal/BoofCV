@@ -202,7 +202,6 @@ public class PyramidDirectColorDepth<T extends ImageGray<T>> {
 		return fractionInBounds;
 	}
 
-
 	@SuppressWarnings({"NullAway.Init"})
 	public static class LayerTo3D implements ImagePixelTo3D {
 		ImagePixelTo3D orig;

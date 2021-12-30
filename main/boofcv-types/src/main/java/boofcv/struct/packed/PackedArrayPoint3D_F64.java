@@ -64,8 +64,8 @@ public class PackedArrayPoint3D_F64 implements PackedArray<Point3D_F64> {
 	@Override public Point3D_F64 getTemp( int index ) {
 		index *= 3;
 		temp.x = array.data[index];
-		temp.y = array.data[index+1];
-		temp.z = array.data[index+2];
+		temp.y = array.data[index + 1];
+		temp.z = array.data[index + 2];
 
 		return temp;
 	}
@@ -73,8 +73,8 @@ public class PackedArrayPoint3D_F64 implements PackedArray<Point3D_F64> {
 	@Override public void getCopy( int index, Point3D_F64 dst ) {
 		index *= 3;
 		dst.x = array.data[index];
-		dst.y = array.data[index+1];
-		dst.z = array.data[index+2];
+		dst.y = array.data[index + 1];
+		dst.z = array.data[index + 2];
 	}
 
 	@Override public void copy( Point3D_F64 src, Point3D_F64 dst ) {
@@ -95,8 +95,8 @@ public class PackedArrayPoint3D_F64 implements PackedArray<Point3D_F64> {
 		idx1 *= DOF;
 		for (int i = idx0; i < idx1; i += DOF) {
 			temp.x = array.data[i];
-			temp.y = array.data[i+1];
-			temp.z = array.data[i+2];
+			temp.y = array.data[i + 1];
+			temp.z = array.data[i + 2];
 			op.process(pointIndex++, temp);
 		}
 	}

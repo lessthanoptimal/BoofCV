@@ -41,11 +41,7 @@ import pabeles.concurrency.GrowArray;
 @SuppressWarnings({"rawtypes", "unchecked"}) public class GeneralizedImageOps {
 
 	public static boolean isFloatingPoint( Class<?> imgType ) {
-		if (GrayF.class.isAssignableFrom(imgType)) {
-			return true;
-		} else {
-			return false;
-		}
+		return GrayF.class.isAssignableFrom(imgType);
 	}
 
 	public static double get( ImageBorder img, int x, int y ) {
@@ -118,7 +114,7 @@ import pabeles.concurrency.GrowArray;
 	}
 
 	public static <T extends ImageBase> T createImage( Class<T> type, int width, int height, int numBands ) {
-		if ((Class)type == Planar.class)
+		if (type == Planar.class)
 			throw new IllegalArgumentException("Can't use this function with planar because the data type needs to be specified too");
 
 		if (ImageGray.class.isAssignableFrom(type))

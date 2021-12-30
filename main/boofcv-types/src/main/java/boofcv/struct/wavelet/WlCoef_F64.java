@@ -30,9 +30,12 @@ public class WlCoef_F64 extends WlCoef {
 	// wavelet numbers
 	public double[] wavelet;
 
-	public WlCoef_F64() {scaling = new double[0]; wavelet = new double[0];}
+	public WlCoef_F64() {
+		scaling = new double[0];
+		wavelet = new double[0];
+	}
 
-	public WlCoef_F64(double[] scaling, int offsetScaling , double[] wavelet , int offsetWavelet ) {
+	public WlCoef_F64( double[] scaling, int offsetScaling, double[] wavelet, int offsetWavelet ) {
 		this.scaling = scaling;
 		this.wavelet = wavelet;
 		this.offsetScaling = offsetScaling;

@@ -50,7 +50,7 @@ public class InputSanityCheck {
 	 */
 	public static <T extends ImageBase<T>> T declareOrReshape( T input, @Nullable T output ) {
 		if (output == null) {
-			output = (T)input.createNew(input.width, input.height);
+			output = input.createNew(input.width, input.height);
 		} else {
 			output.reshape(input.width, input.height);
 		}
@@ -59,7 +59,7 @@ public class InputSanityCheck {
 
 	public static <T extends ImageBase<T>> T declareOutput( T input, @Nullable T output ) {
 		if (output == null) {
-			return (T)input.createNew(input.width, input.height);
+			return input.createNew(input.width, input.height);
 		}
 		return output;
 	}

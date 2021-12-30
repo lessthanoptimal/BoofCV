@@ -21,7 +21,6 @@ package boofcv.struct.gss;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.image.ImageGray;
 
-
 /**
  * <p>
  * Interface for computing the scale space of an image and its derivatives. The scale space
@@ -43,20 +42,20 @@ public interface GaussianScaleSpace<T extends ImageGray<T>, D extends ImageGray<
 	 *
 	 * @param scales All the scales. These are absolute and not relative to the previous level.
 	 */
-	public void setScales( double ... scales);
+	void setScales( double... scales );
 
 	/**
 	 * Returns the scale for the specified layer in the pyramid. This is equivalent to
 	 * the standard deviation of the Gaussian convolved across the original input image.
 	 */
-	public double getScale( int level );
+	double getScale( int level );
 
 	/**
 	 * Specifies the original un-scaled image.
 	 *
 	 * @param input Original image.
 	 */
-	public void setImage( T input );
+	void setImage( T input );
 
 	/**
 	 * Sets the active scale. Must call {@link #setImage(ImageGray)}
@@ -64,39 +63,42 @@ public interface GaussianScaleSpace<T extends ImageGray<T>, D extends ImageGray<
 	 *
 	 * @param index Index of active scale
 	 */
-	public void setActiveScale( int index );
+	void setActiveScale( int index );
 
 	/**
 	 * Returns number of scaled images inside of this scale space.
+	 *
 	 * @return Number of scales.
 	 */
-	public int getTotalScales();
+	int getTotalScales();
 
 	/**
 	 * Returns the value of the current active scale.
+	 *
 	 * @return active scale.
 	 */
-	public double getCurrentScale();
+	double getCurrentScale();
 
 	/**
 	 * Returns the scaled image at the active scale.
 	 *
 	 * @return scaled image.
 	 */
-	public T getScaledImage();
+	T getScaledImage();
 
 	/**
 	 * Change how image borders are handled.
+	 *
 	 * @param type The BorderType.
 	 */
-	public void setBorderType( BorderType type );
+	void setBorderType( BorderType type );
 
 	/**
 	 * Returns how image borders are processed.
 	 *
 	 * @return how image borders are processed.
 	 */
-	public BorderType getBorderType();
+	BorderType getBorderType();
 
 	/**
 	 * <p>
@@ -113,5 +115,5 @@ public interface GaussianScaleSpace<T extends ImageGray<T>, D extends ImageGray<
 	 * @param isX specifies which partial derivative is to be returned.
 	 * @return The image's derivative.
 	 */
-	public D getDerivative( boolean ...isX );
+	D getDerivative( boolean... isX );
 }

@@ -46,9 +46,9 @@ public class ImageBorder1D_S32<T extends GrayI<T>> extends ImageBorder_S32<T> im
 		this.colWrap = colWrap;
 	}
 
-	@Override public BorderIndex1D getRowWrap() { return rowWrap; }
+	@Override public BorderIndex1D getRowWrap() {return rowWrap;}
 
-	@Override public BorderIndex1D getColWrap() { return colWrap; }
+	@Override public BorderIndex1D getColWrap() {return colWrap;}
 
 	@Override
 	public void setImage( T image ) {

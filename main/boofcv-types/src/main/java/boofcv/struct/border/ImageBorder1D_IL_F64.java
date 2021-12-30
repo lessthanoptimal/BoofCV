@@ -40,9 +40,9 @@ public class ImageBorder1D_IL_F64 extends ImageBorder_IL_F64 implements ImageBor
 		this.colWrap = colWrap;
 	}
 
-	@Override public BorderIndex1D getRowWrap() { return rowWrap; }
+	@Override public BorderIndex1D getRowWrap() {return rowWrap;}
 
-	@Override public BorderIndex1D getColWrap() { return colWrap; }
+	@Override public BorderIndex1D getColWrap() {return colWrap;}
 
 	@Override
 	public void setImage( InterleavedF64 image ) {

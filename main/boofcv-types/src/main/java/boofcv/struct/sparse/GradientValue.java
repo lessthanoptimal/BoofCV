@@ -25,7 +25,7 @@ package boofcv.struct.sparse;
  */
 public interface GradientValue {
 
-	void set( double dx, double dy );
+	void setTo( double dx, double dy );
 
 	/**
 	 * Derivative along the x-axis

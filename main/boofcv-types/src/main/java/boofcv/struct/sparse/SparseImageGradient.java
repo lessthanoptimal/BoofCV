@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,7 @@ public interface SparseImageGradient<T extends ImageGray<T>, G extends GradientV
 	 * @param y y-axis pixel coordinate
 	 * @return Gradient at that point.
 	 */
-	public G compute( int x, int y );
+	G compute( int x, int y );
 
-	public Class<G> getGradientType();
+	Class<G> getGradientType();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,6 @@
 
 package boofcv.struct.wavelet;
 
-
 /**
  * Provides a different set of coefficients along the image's border and the inner portion.
  * This is required in conditions where simply remapping the indexes does not support the change.
@@ -31,10 +30,9 @@ public interface WlBorderCoef<T extends WlCoef> {
 	// negative is distance from upper border
 	T getBorderCoefficients( int index );
 
+	int getLowerLength();
 
-	public int getLowerLength();
-
-	public int getUpperLength();
+	int getUpperLength();
 
 	/**
 	 * Set of coefficients used inside the image where the scaling and wavelet signals do

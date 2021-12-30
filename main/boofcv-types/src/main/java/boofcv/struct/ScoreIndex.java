@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,12 +23,11 @@ package boofcv.struct;
  *
  * @author Peter Abeles
  */
-public class ScoreIndex implements Comparable<ScoreIndex>
-{
+public class ScoreIndex implements Comparable<ScoreIndex> {
 	public double score;
 	public int index;
 
-	public ScoreIndex(double score, int index) {
+	public ScoreIndex( double score, int index ) {
 		this.score = score;
 		this.index = index;
 	}
@@ -36,17 +35,17 @@ public class ScoreIndex implements Comparable<ScoreIndex>
 	public ScoreIndex() {
 	}
 
-	public ScoreIndex set(double score, int index) {
+	public ScoreIndex set( double score, int index ) {
 		this.score = score;
 		this.index = index;
 		return this;
 	}
 
 	@Override
-	public int compareTo(ScoreIndex o) {
-		if( score < o.score )
+	public int compareTo( ScoreIndex o ) {
+		if (score < o.score)
 			return -1;
-		else if( score > o.score )
+		else if (score > o.score)
 			return 1;
 		else
 			return 0;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,14 +48,14 @@ public abstract class KernelBase {
 		this.offset = offset;
 	}
 
-	protected KernelBase() { }
+	protected KernelBase() {}
 
 	/**
 	 * The radius is defined as the width divided by two.
 	 *
 	 * @return The kernel's radius.
 	 */
-	public int getRadius() { return width/2; }
+	public int getRadius() {return width/2;}
 
 	/**
 	 * Returns the dimension of this kernel, 1D or 2D.

@@ -106,7 +106,7 @@ public class PackedSetsPoint2D_I32 {
 	 * @param y coordinate
 	 */
 	public void addPointToTail( int x, int y ) {
-		if (sets.size==0) {
+		if (sets.size == 0) {
 			grow();
 		}
 		BlockIndexLength tail = sets.getTail();

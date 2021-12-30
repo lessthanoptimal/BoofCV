@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ public class ImageGrid<T> {
 	// length of a cell along each direction
 	@Getter public int lengthX, lengthY;
 
-	public ImageGrid(Factory<T> factory , DProcess<T> reset) {
+	public ImageGrid( Factory<T> factory, DProcess<T> reset ) {
 		cells = new DogArray<T>(factory, reset);
 	}
 
@@ -50,13 +50,13 @@ public class ImageGrid<T> {
 	 * @param imageWidth Image width in pixels
 	 * @param imageHeight Image height in pixels
 	 */
-	public void initialize( int targetLength , int imageWidth , int imageHeight ) {
+	public void initialize( int targetLength, int imageWidth, int imageHeight ) {
 		// Select grid's shape by trying to find the one which comes closest to the target cell size
 		rows = imageHeight/targetLength + (imageHeight%targetLength > 0 ? 1 : 0);
 		cols = imageWidth/targetLength + (imageWidth%targetLength > 0 ? 1 : 0);
 		// The actual cell size is designed to be close to the target and avoid edge cases
-		lengthY = (int)(imageHeight/(double)rows+0.5);
-		lengthX = (int)(imageWidth/(double)cols+0.5);
+		lengthY = (int)(imageHeight/(double)rows + 0.5);
+		lengthX = (int)(imageWidth/(double)cols + 0.5);
 
 		cells.reset();
 		cells.resize(rows*cols);
@@ -65,34 +65,31 @@ public class ImageGrid<T> {
 	/**
 	 * Returns the cell at the specified pixel. Coordinate must be inside image bounds
 	 */
-	public T getCellAtPixel( int pixelX , int pixelY )
-	{
+	public T getCellAtPixel( int pixelX, int pixelY ) {
 		int row = pixelY/lengthY;
 		int col = pixelX/lengthX;
-		if( row >= rows )
-			row = rows-1;
-		if( col >= cols )
-			col = cols-1;
-		return cells.data[ row*cols + col ];
+		if (row >= rows)
+			row = rows - 1;
+		if (col >= cols)
+			col = cols - 1;
+		return cells.data[row*cols + col];
 	}
 
 	/**
 	 * Returns the cell element at the specified grid coordinate
 	 */
-	public T get( int row , int col )
-	{
-		return cells.data[ row*cols + col ];
+	public T get( int row, int col ) {
+		return cells.data[row*cols + col];
 	}
 
 	/**
 	 * Goes through every cell in the grid and passes in data to the processor
 	 */
-	public void processCells( ProcessCell<T> processor )
-	{
+	public void processCells( ProcessCell<T> processor ) {
 		int i = 0;
 		for (int row = 0; row < rows; row++) {
-			for (int col = 0; col < cols; col++, i++ ) {
-				processor.process(row,col, cells.data[i] );
+			for (int col = 0; col < cols; col++, i++) {
+				processor.process(row, col, cells.data[i]);
 			}
 		}
 	}
@@ -100,17 +97,15 @@ public class ImageGrid<T> {
 	/**
 	 * Same as {@link #processCells} but threaded.
 	 */
-	public void processCellsThreads( ProcessCell<T> processor )
-	{
-		BoofConcurrency.loopFor(0,cells.size,cellIdx->{
+	public void processCellsThreads( ProcessCell<T> processor ) {
+		BoofConcurrency.loopFor(0, cells.size, cellIdx -> {
 			int row = cellIdx/cols;
 			int col = cellIdx%cols;
-			processor.process(row,col, cells.data[cellIdx] );
+			processor.process(row, col, cells.data[cellIdx]);
 		});
 	}
 
-	public interface ProcessCell<T>
-	{
-		void process( int row , int col , T data );
+	public interface ProcessCell<T> {
+		void process( int row, int col, T data );
 	}
 }
