@@ -278,7 +278,7 @@ public class QrCodeDecoderImage<T extends ImageGray<T>> {
 			else
 				readFormatRegion1(qr);
 			int bitField = this.bits.read(0, 15, false);
-			bitField ^= QrCodePolynomialMath.FORMAT_MASK;
+			bitField ^= QrCode.FORMAT_MASK;
 
 			int message;
 			if (QrCodePolynomialMath.checkFormatBits(bitField)) {

@@ -73,7 +73,6 @@ public class QrCodeGeneratorImage extends QrCodeGenerator {
 	@Override
 	protected void initialize( QrCode qr ) {
 		this.markerWidth = pixelsPerModule*QrCode.totalModules(qr.version);
-		;
 		super.initialize(qr);
 		renderer.configure(borderModule*pixelsPerModule, pixelsPerModule*numModules);
 		renderer.init();

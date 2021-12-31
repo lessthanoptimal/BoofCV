@@ -20,9 +20,6 @@ package boofcv.alg.fiducial.qrcode;
 
 import boofcv.alg.drawing.FiducialRenderEngine;
 import georegression.struct.point.Point2D_I32;
-import georegression.struct.shapes.Polygon2D_F64;
-
-import java.util.List;
 
 /**
  * Abstract class for creating qr codes. Contains the logic for rendering the QR Code but is missing
@@ -31,27 +28,12 @@ import java.util.List;
  * @author Peter Abeles
  */
 @SuppressWarnings({"NullAway.Init"})
-public class QrCodeGenerator {
+public class QrCodeGenerator extends QrGeneratorBase {
 
 	QrCode qr;
 
-	protected double markerWidth;
-
-	// used to toggle rendering of data
-	protected boolean renderData = true;
-
-	// derived constants
-	protected double moduleWidth;
-	protected int numModules;
-
-	// data mask
-	protected List<Point2D_I32> bitLocations;
-
-	// used to draw the fiducial
-	protected FiducialRenderEngine render;
-
 	public QrCodeGenerator( double markerWidth ) {
-		this.markerWidth = markerWidth;
+		super(markerWidth);
 	}
 
 	public QrCodeGenerator() {}
@@ -72,8 +54,8 @@ public class QrCodeGenerator {
 		positionPattern((numModules - 7)*moduleWidth, 0, qr.ppRight);
 		positionPattern(0, (numModules - 7)*moduleWidth, qr.ppDown);
 
-		timingPattern(7*moduleWidth, 6*moduleWidth, moduleWidth, 0);
-		timingPattern(6*moduleWidth, 7*moduleWidth, 0, moduleWidth);
+		timingPattern(7*moduleWidth, 6*moduleWidth, moduleWidth, 0, numModules - 7*2);
+		timingPattern(6*moduleWidth, 7*moduleWidth, 0, moduleWidth, numModules - 7*2);
 
 		formatInformation();
 
@@ -156,31 +138,10 @@ public class QrCodeGenerator {
 		}
 	}
 
-	private void positionPattern( double x, double y, Polygon2D_F64 where ) {
-		// draw the outside square
-		render.square(x, y, moduleWidth*7, moduleWidth);
-
-		// draw the inside square
-		render.square(x + moduleWidth*2, y + moduleWidth*2, moduleWidth*3);
-
-		where.get(0).setTo(x, y);
-		where.get(1).setTo(x + moduleWidth*7, y);
-		where.get(2).setTo(x + moduleWidth*7, y + moduleWidth*7);
-		where.get(3).setTo(x, y + moduleWidth*7);
-	}
-
-	private void timingPattern( double x, double y, double slopeX, double slopeY ) {
-		int length = numModules - 7*2;
-
-		for (int i = 1; i < length; i += 2) {
-			render.square(x + i*slopeX, y + i*slopeY, moduleWidth);
-		}
-	}
-
 	static PackedBits32 formatInformationBits( QrCode qr ) {
 		PackedBits32 bits = new PackedBits32(15);
 		bits.data[0] = QrCodePolynomialMath.encodeFormatBits(qr.error, qr.mask.bits);
-		bits.data[0] ^= QrCodePolynomialMath.FORMAT_MASK;
+		bits.data[0] ^= QrCode.FORMAT_MASK;
 		return bits;
 	}
 
@@ -232,7 +193,6 @@ public class QrCodeGenerator {
 	}
 
 	private void alignmentPattern( int gridX, int gridY ) {
-
 		double x = (gridX - 2)*moduleWidth;
 		double y = (gridY - 2)*moduleWidth;
 
@@ -243,9 +203,5 @@ public class QrCodeGenerator {
 		a.moduleX = gridX;
 		a.moduleY = gridY;
 		a.pixel.setTo((gridX + 0.5)*moduleWidth, (gridY + 0.5)*moduleWidth);
-	}
-
-	private void square( int row, int col ) {
-		render.square(col*moduleWidth, row*moduleWidth, moduleWidth);
 	}
 }

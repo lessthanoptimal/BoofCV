@@ -19,6 +19,7 @@
 package boofcv.alg.fiducial.microqr;
 
 import boofcv.alg.fiducial.qrcode.QrCode;
+import boofcv.alg.fiducial.qrcode.QrCodePolynomialMath;
 import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.jetbrains.annotations.Nullable;
@@ -36,8 +37,8 @@ import static boofcv.alg.fiducial.microqr.MicroQrCode.ErrorLevel.*;
  */
 public class MicroQrCode {
 
-	/** Bits that format information is XOR using */
-	public static final int FORMAT_XOR = 0b100010001000101;
+	/** Mask that's applied to format information when encoding */
+	public static final int FORMAT_MASK = 0b100010001000101;
 
 	/** Maximum possible version of a Micro QR Code */
 	public static final int MAX_VERSION = 4;
@@ -95,22 +96,28 @@ public class MicroQrCode {
 		return 1 + version*2;
 	}
 
+	/**
+	 * Encoded format information with ECC. Does NOT apply the mask.
+	 */
 	public int encodeFormatBits() {
-		int bits = encodeVersionAndECC();
+		int bits = encodeVersionAndEccLevel();
 		bits |= mask.bits << 3;
-
-		// TODO apply mask
-		// TODO apply ECC
-
-		return bits;
+		return QrCodePolynomialMath.encodeFormatBits(bits);
 	}
 
-	public boolean decodeFormatBits() {
-		return true;
+	/**
+	 * Decodes format bits and updates the QR Code
+	 *
+	 * @param bits Format bits without mask
+	 */
+	public void decodeFormatBits( int bits ) {
+		int corrected = QrCodePolynomialMath.correctFormatBits(bits);
+		mask = MicroQrCodeMaskPattern.lookupMask(corrected >> 3);
+		decodeVersionAndECC(corrected & 0x07);
 	}
 
 	/** Computes the 3-bit format which encodes marker version and ECC level */
-	public int encodeVersionAndECC() {
+	public int encodeVersionAndEccLevel() {
 		return switch (version) {
 			case 1 -> 0b000;
 			case 2 -> switch (error) {
@@ -127,14 +134,14 @@ public class MicroQrCode {
 				case L -> 0b101;
 				case M -> 0b110;
 				case Q -> 0b111;
-				default -> throw new IllegalArgumentException("Only L and M supported for version 3");
+				default -> throw new IllegalArgumentException("Unsupported error level " + error);
 			};
 			default -> throw new IllegalArgumentException("Only version 1 to 4 exist for Micro QR Code");
 		};
 	}
 
 	public void decodeVersionAndECC( int code ) {
-		switch (code) {
+		switch (code&0x07) {
 			case 0b000 -> version = 1;
 			case 0b001, 0b010 -> version = 2;
 			case 0b011, 0b100 -> version = 3;
@@ -142,38 +149,17 @@ public class MicroQrCode {
 		}
 
 		switch (version) {
+			case 1 -> error = DETECT;
 			case 2 -> error = code == 0b001 ? L : M;
 			case 3 -> error = code == 0b011 ? L : M;
 			case 4 -> error = switch (code & 0b011) {
 				case 1 -> L;
 				case 2 -> M;
 				case 3 -> Q;
-				default -> throw new IllegalArgumentException("Invalid code");
+				default -> throw new IllegalArgumentException(
+						"Invalid code: 0b" + Integer.toBinaryString(code & 0b011));
 			};
 		}
-	}
-
-	/**
-	 * Returns the encoded mode as specified for each version. Number of bits needed to encode also varies.
-	 */
-	public int modeEncoding() {
-		return switch (version) {
-			case 1 -> 0;
-			case 2 -> switch (mode) {
-				case NUMERIC -> 0;
-				case ALPHANUMERIC -> 1;
-				default -> throw new IllegalArgumentException("Version 2 does not support " + mode);
-			};
-			case 3, 4 -> switch (mode) {
-				case NUMERIC -> 0b00;
-				case ALPHANUMERIC -> 0b01;
-				case BYTE -> 0b10;
-				case KANJI -> 0b11;
-				default -> throw new IllegalArgumentException("Unknown " + mode);
-			};
-
-			default -> throw new IllegalArgumentException("Illegal version");
-		};
 	}
 
 	static {
@@ -197,6 +183,18 @@ public class MicroQrCode {
 
 	public static int totalModules( int version ) {
 		return version*2 + 11;
+	}
+
+	/**
+	 * Returns which error correction is allowed at a version.
+	 */
+	public static ErrorLevel[] allowedErrorCorrection( int version ) {
+		return switch (version) {
+			case 1 -> new ErrorLevel[]{ErrorLevel.DETECT};
+			case 2, 3 -> new ErrorLevel[]{ErrorLevel.L, ErrorLevel.M};
+			case 4 -> new ErrorLevel[]{ErrorLevel.L, ErrorLevel.M, ErrorLevel.Q};
+			default -> throw new IllegalArgumentException("Illegal level");
+		};
 	}
 
 	/** Error correction level */
