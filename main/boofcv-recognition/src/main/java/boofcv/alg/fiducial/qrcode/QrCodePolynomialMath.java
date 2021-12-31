@@ -35,7 +35,6 @@ import boofcv.alg.descriptor.DescriptorDistance;
 public class QrCodePolynomialMath {
 
 	public static final int FORMAT_GENERATOR = 0b10100110111;
-	public static final int FORMAT_MASK = 0b101010000010010;
 	public static final int VERSION_GENERATOR = 0b1111100100101;
 
 	/**
@@ -77,8 +76,17 @@ public class QrCodePolynomialMath {
 	 * @return encoded bit field
 	 */
 	public static int encodeFormatBits( QrCode.ErrorLevel level, int mask ) {
-		int message = (level.value << 3) | (mask & 0xFFFFFFF7);
-		message = message << 10;
+		return encodeFormatBits((level.value << 3) | (mask & 0xFFFFFFF7));
+	}
+
+	/**
+	 * Encodes the 5-bit format bits for QR and Micro QR. BCH(15,5)
+	 *
+	 * @param message5bits 5-bit message
+	 * @return encoded bit field
+	 */
+	public static int encodeFormatBits( int message5bits ) {
+		int message = message5bits << 10;
 		return message ^ bitPolyModulus(message, FORMAT_GENERATOR, 15, 5);
 	}
 

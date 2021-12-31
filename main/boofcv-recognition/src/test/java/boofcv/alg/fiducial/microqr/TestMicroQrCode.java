@@ -18,30 +18,30 @@
 
 package boofcv.alg.fiducial.microqr;
 
-import boofcv.alg.drawing.FiducialImageEngine;
-import boofcv.gui.image.ShowImages;
-import boofcv.misc.BoofMiscOps;
+import boofcv.alg.fiducial.microqr.MicroQrCode.ErrorLevel;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
-/**
- * @author Peter Abeles
- */
-public class TestMicroQrCodeDecoderImage extends BoofStandardJUnit {
-	@Test void basic() {
-		var engine = new FiducialImageEngine();
-		engine.configure(10, 100);
-		var generator = new MicroQrCodeGenerator();
-		generator.markerWidth = 100;
-		generator.setRender(engine);
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+public class TestMicroQrCode extends BoofStandardJUnit {
+	/**
+	 * Go through all possible version and error levels and see if they are correctly decoded
+	 */
+	@Test void encodeAndDecodeFormat() {
 		var qr = new MicroQrCode();
-		qr.version = 2;
-		qr.error = MicroQrCode.ErrorLevel.L;
+		var found = new MicroQrCode();
+		for (int version = 1; version <= 4; version++) {
+			qr.version = version;
+			ErrorLevel[] levels = MicroQrCode.allowedErrorCorrection(version);
+			for (ErrorLevel error : levels) {
+				qr.error = error;
 
-		generator.render(qr);
+				found.decodeFormatBits(qr.encodeFormatBits());
 
-		ShowImages.showWindow(engine.getGray(), "Micro QR");
-		BoofMiscOps.sleep(10_000);
+				assertEquals(qr.version, found.version);
+				assertEquals(qr.error, found.error);
+			}
+		}
 	}
 }

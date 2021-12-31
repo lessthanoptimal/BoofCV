@@ -39,21 +39,18 @@ import static boofcv.alg.fiducial.qrcode.QrCode.ErrorLevel.*;
  */
 @SuppressWarnings({"MutablePublicArray", "NullAway.Init"})
 public class QrCode implements Cloneable {
+	/** Mask that's applied to format information when encoding */
+	public static final int FORMAT_MASK = 0b101010000010010;
 
-	/**
-	 * Maximum possible version of a QR Code
-	 */
+	/** Maximum possible version of a QR Code */
 	public static final int MAX_VERSION = 40;
-	/**
-	 * The QR code version after which and including version information is encoded into the QR code
-	 */
+
+	/** The QR code version after which and including version information is encoded into the QR code */
 	public static final int VERSION_ENCODED_AT = 7;
 
 	public static final VersionInfo[] VERSION_INFO = new VersionInfo[MAX_VERSION + 1];
 
-	/**
-	 * Location of data bits in the code qr for each version. Precomputed for speed.
-	 */
+	/** Location of data bits in the code qr for each version. Precomputed for speed. */
 	public static final List<Point2D_I32>[] LOCATION_BITS = new ArrayList[MAX_VERSION + 1];
 
 	/**
@@ -77,39 +74,25 @@ public class QrCode implements Cloneable {
 	/** Level of error correction */
 	public ErrorLevel error;
 
-	/**
-	 * Which masking pattern is applied
-	 */
+	/** Which masking pattern is applied */
 	public QrCodeMaskPattern mask;
 
-	/**
-	 * Alignment pattern information
-	 */
+	/** Alignment pattern information */
 	public DogArray<Alignment> alignment = new DogArray<>(Alignment::new);
 
-	/**
-	 * Text encoding mode
-	 */
+	/** Text encoding mode */
 	public Mode mode = Mode.UNKNOWN;
 
-	/**
-	 * The raw byte data encoded into the QR Code. data + ecc
-	 */
+	/** The raw byte data encoded into the QR Code. data + ecc */
 	public byte[] rawbits;
 
-	/**
-	 * Raw byte data after error correction has been applied to it. Only contains the data portion.
-	 */
+	/** Raw byte data after error correction has been applied to it. Only contains the data portion. */
 	public byte[] corrected;
 
-	/**
-	 * If applicable the message is decoded into a sequence of characters.
-	 */
+	/** If applicable the message is decoded into a sequence of characters. */
 	public String message = "";
 
-	/**
-	 * Specifies where the QR code parsing failed
-	 */
+	/** Specifies where the QR code parsing failed */
 	public Failure failureCause = Failure.NONE;
 
 	/**
@@ -120,9 +103,7 @@ public class QrCode implements Cloneable {
 	 */
 	public Polygon2D_F64 bounds = new Polygon2D_F64(4);
 
-	/**
-	 * A homography transform from grid bit coordinates into image pixels.
-	 */
+	/** A homography transform from grid bit coordinates into image pixels. */
 	public Homography2D_F64 Hinv = new Homography2D_F64();
 
 	/**

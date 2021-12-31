@@ -18,6 +18,7 @@
 
 package boofcv.alg.fiducial.microqr;
 
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.fail;
@@ -25,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * @author Peter Abeles
  */
-public class TestMicroQrCodeGenerator {
+public class TestMicroQrCodeGenerator extends BoofStandardJUnit {
 	@Test void formatInformationBits() {
 		fail("Implement");
 	}

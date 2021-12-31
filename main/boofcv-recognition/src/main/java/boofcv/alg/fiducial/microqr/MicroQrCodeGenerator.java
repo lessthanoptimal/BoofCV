@@ -18,41 +18,27 @@
 
 package boofcv.alg.fiducial.microqr;
 
-import boofcv.alg.drawing.FiducialRenderEngine;
-import georegression.struct.shapes.Polygon2D_F64;
-import lombok.Getter;
-import lombok.Setter;
+import boofcv.alg.fiducial.qrcode.PackedBits32;
+import boofcv.alg.fiducial.qrcode.QrGeneratorBase;
 
 /**
  * Generates an image of a Micro QR Code.
  *
  * @author Peter Abeles
  */
-public class MicroQrCodeGenerator {
-	/** How wide the square which encloses the marker is */
-	public @Setter @Getter double markerWidth = 1.0;
-
-	/** Used to render the marker */
-	@Setter protected FiducialRenderEngine render;
-
-	// how wide each bit is
-	double moduleWidth;
-
-	// number of modules wide a marker is
-	int numModules;
-
+public class MicroQrCodeGenerator extends QrGeneratorBase {
 	public MicroQrCodeGenerator render( MicroQrCode qr ) {
 		numModules = MicroQrCode.totalModules(qr.version);
 		moduleWidth = markerWidth/numModules;
 
 		render.init();
 
-		positionPattern(qr.pp);
+		positionPattern(0, 0, qr.pp);
 
-		timingPattern(7*moduleWidth, 0, moduleWidth, 0);
-		timingPattern(0, 7*moduleWidth, 0, moduleWidth);
+		timingPattern(7*moduleWidth, 0, moduleWidth, 0, numModules - 7);
+		timingPattern(0, 7*moduleWidth, 0, moduleWidth, numModules - 7);
 
-		// TODO render format information
+		formatInformation(qr);
 
 		// TODO render data bits
 
@@ -64,24 +50,26 @@ public class MicroQrCodeGenerator {
 		return this;
 	}
 
-	private void positionPattern( Polygon2D_F64 where ) {
-		// draw the outside square
-		render.square(0.0, 0.0, moduleWidth*7, moduleWidth);
+	/** Renders format bits */
+	private void formatInformation( MicroQrCode qr ) {
+		PackedBits32 bits = formatInformationBits(qr);
 
-		// draw the inside square
-		render.square(moduleWidth*2, moduleWidth*2, moduleWidth*3);
-
-		where.get(0).setTo(0.0, 0.0);
-		where.get(1).setTo(moduleWidth*7, 0.0);
-		where.get(2).setTo(moduleWidth*7, moduleWidth*7);
-		where.get(3).setTo(0.0, moduleWidth*7);
+		for (int i = 0; i < 15; i++) {
+			if (bits.get(i) == 0) {
+				continue;
+			}
+			if (i < 8) {
+				square(i + 1, 8);
+			} else {
+				square(8, 15 - i);
+			}
+		}
 	}
 
-	private void timingPattern( double x, double y, double slopeX, double slopeY ) {
-		int length = numModules - 7;
-
-		for (int i = 1; i < length; i += 2) {
-			render.square(x + i*slopeX, y + i*slopeY, moduleWidth);
-		}
+	static PackedBits32 formatInformationBits( MicroQrCode qr ) {
+		var bits = new PackedBits32(15);
+		bits.data[0] = qr.encodeFormatBits();
+		bits.data[0] ^= MicroQrCode.FORMAT_MASK;
+		return bits;
 	}
 }
