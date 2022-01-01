@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -356,7 +356,7 @@ public class QrCode implements Cloneable {
 		VERSION_INFO[40].add(H, 45, 15, 20);
 
 		for (int version = 1; version <= MAX_VERSION; version++) {
-			QrCodeCodeWordLocations mask = new QrCodeCodeWordLocations(version);
+			QrCodeCodeWordLocations mask = QrCodeCodeWordLocations.qrcode(version);
 
 			LOCATION_BITS[version] = mask.bits;
 		}
@@ -439,25 +439,15 @@ public class QrCode implements Cloneable {
 		this.Hinv.setTo(o.Hinv);
 	}
 
-	/**
-	 * Error correction level
-	 */
+	/** Error correction level */
 	public enum ErrorLevel {
-		/**
-		 * Error correction of about 7%
-		 */
+		/** Error correction of about 7% */
 		L(0b01),
-		/**
-		 * Error correction of about 15%
-		 */
+		/** Error correction of about 15% */
 		M(0b00),
-		/**
-		 * Error correction of about 25%
-		 */
+		/** Error correction of about 25% */
 		Q(0b11),
-		/**
-		 * Error correction of about 30%
-		 */
+		/** Error correction of about 30% */
 		H(0b10);
 
 		ErrorLevel( int value ) {
@@ -491,28 +481,18 @@ public class QrCode implements Cloneable {
 		final int value;
 	}
 
-	/**
-	 * Information related to a specific alignment pattern. The center coordinate is stored.
-	 */
+	/** Information related to a specific alignment pattern. The center coordinate is stored. */
 	public static class Alignment {
-		/**
-		 * Pixel coordinate of this alignment pattern's center
-		 */
+		/** Pixel coordinate of this alignment pattern's center */
 		public Point2D_F64 pixel = new Point2D_F64();
 
-		/**
-		 * Center grid coordinate of alignment pattern.
-		 */
+		/** Center grid coordinate of alignment pattern. */
 		public int moduleX, moduleY;
 
-		/**
-		 * The found grid coordinate
-		 */
+		/** The found grid coordinate */
 		Point2D_F64 moduleFound = new Point2D_F64();
 
-		/**
-		 * Threshold value selected at this alignment pattern
-		 */
+		/** Threshold value selected at this alignment pattern */
 		public double threshold;
 
 		public void set( Alignment o ) {
@@ -563,15 +543,10 @@ public class QrCode implements Cloneable {
 	 * Specifies the format for a data block. Storage for data and ECC plus the number of blocks of each size.
 	 */
 	public static class BlockInfo {
-
-		/**
-		 * Code words per block
-		 */
+		/** Code words per block */
 		final public int codewords;
 
-		/**
-		 * Number of data codewords
-		 */
+		/** Number of data codewords */
 		final public int dataCodewords;
 
 		/**
@@ -592,13 +567,9 @@ public class QrCode implements Cloneable {
 	 * final mode is set to when decoding a QR code.
 	 */
 	public enum Mode {
-		/**
-		 * Place holder
-		 */
+		/** Place holder */
 		UNKNOWN(-1),
-		/**
-		 * The message has been encoded using multiple modes
-		 */
+		/** The message has been encoded using multiple modes */
 		MIXED(-2),
 		NUMERIC(0b0001),
 		ALPHANUMERIC(0b0010),

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,12 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestMicroQrCode extends BoofStandardJUnit {
+
+	@Test void totalModules() {
+		assertEquals(11, MicroQrCode.totalModules(1));
+		assertEquals(17, MicroQrCode.totalModules(4));
+	}
+
 	/**
 	 * Go through all possible version and error levels and see if they are correctly decoded
 	 */

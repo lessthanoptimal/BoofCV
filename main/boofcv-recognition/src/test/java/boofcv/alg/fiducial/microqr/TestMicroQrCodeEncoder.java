@@ -18,31 +18,33 @@
 
 package boofcv.alg.fiducial.microqr;
 
-import boofcv.alg.drawing.FiducialImageEngine;
-import boofcv.gui.image.ShowImages;
-import boofcv.misc.BoofMiscOps;
-import boofcv.testing.BoofStandardJUnit;
+import boofcv.alg.fiducial.qrcode.QrCodeEncoder;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public class TestMicroQrCodeDecoderImage extends BoofStandardJUnit {
-	@Test void basic() {
-		var engine = new FiducialImageEngine();
-		engine.configure(10, 100);
-		var generator = new MicroQrCodeGenerator();
-		generator.markerWidth = 100;
-		generator.setRender(engine);
-
+public class TestMicroQrCodeEncoder {
+	/**
+	 * In the qr code specification an example is given. This compares the computed results to that example
+	 */
+	@Test void numeric_specification() {
 		MicroQrCode qr = new MicroQrCodeEncoder().setVersion(2).
 				setError(MicroQrCode.ErrorLevel.L).
 				setMask(new MicroQrCodeMaskPattern.NONE(0b011)).
 				addNumeric("01234567").fixate();
 
-		generator.render(qr);
+		byte[] expected = new byte[]{
+				(byte)0b0100_0000, 0b0001_1000, (byte)0b1010_1100, (byte)0b1100_0011, 0b0000_0000,
+				(byte)0b1000_0110, 0b0000_1101, (byte)0b0010_0010, (byte)0b1010_1110, 0b0011_0000};
 
-		ShowImages.showWindow(engine.getGray(), "Micro QR");
-		BoofMiscOps.sleep(10_000);
+		QrCodeEncoder.flipBits8(expected, expected.length);
+
+		assertEquals(qr.rawbits.length, expected.length);
+		for (int i = 0; i < expected.length; i++) {
+			assertEquals(expected[i], qr.rawbits[i], "index=" + i);
+		}
 	}
 }

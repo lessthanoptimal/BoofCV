@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -82,12 +82,11 @@ public class QrCodeGenerator extends QrGeneratorBase {
 		}
 
 		if (renderData) {
-
 			if (qr.rawbits.length != QrCode.VERSION_INFO[qr.version].codewords)
 				throw new RuntimeException("Unexpected length of raw data.");
 
 			// mark which modules can store data
-			bitLocations = new QrCodeCodeWordLocations(qr.version).bits;
+			bitLocations = QrCodeCodeWordLocations.qrcode(qr.version).bits;
 
 			int numBytes = bitLocations.size()/8;
 			if (numBytes != qr.rawbits.length)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -534,7 +534,7 @@ public class QrCodeEncoder {
 			throw new RuntimeException("BUG in code");
 
 		// Bit value of 0 = white. 1 = black
-		QrCodeCodeWordLocations matrix = new QrCodeCodeWordLocations(qr.version);
+		QrCodeCodeWordLocations matrix = QrCodeCodeWordLocations.qrcode(qr.version);
 		for (QrCodeMaskPattern mask : QrCodeMaskPattern.values()) { // lint:forbidden ignore_line
 			double score = scoreMask(N, locations, bits, matrix, mask);
 			if (score < bestScore) {
@@ -722,7 +722,7 @@ public class QrCodeEncoder {
 
 		qr.rawbits = new byte[info.codewords];
 
-		// there are some times two different sizes of blocks. The smallest is written to first and the second
+		// there are sometimes two different sizes of blocks. The smallest is written to first and the second
 		// is larger and can be derived from the size of the first
 		int wordsBlockAllA = block.codewords;
 		int wordsBlockDataA = block.dataCodewords;

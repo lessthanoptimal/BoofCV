@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,6 @@
 
 package boofcv.alg.fiducial.microqr;
 
-import boofcv.alg.fiducial.qrcode.QrCode;
 import boofcv.alg.fiducial.qrcode.QrCodePolynomialMath;
 import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
@@ -26,7 +25,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 import static boofcv.alg.fiducial.microqr.MicroQrCode.ErrorLevel.*;
 
@@ -35,6 +33,7 @@ import static boofcv.alg.fiducial.microqr.MicroQrCode.ErrorLevel.*;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"MutablePublicArray", "NullAway.Init"})
 public class MicroQrCode {
 
 	/** Mask that's applied to format information when encoding */
@@ -56,7 +55,7 @@ public class MicroQrCode {
 	public Polygon2D_F64 pp = new Polygon2D_F64(4);
 
 	/** Text encoding mode */
-	public QrCode.Mode mode = QrCode.Mode.UNKNOWN;
+	public MicroQrCode.Mode mode = MicroQrCode.Mode.UNKNOWN;
 
 	/** Which mask is applied */
 	public MicroQrCodeMaskPattern mask = MicroQrCodeMaskPattern.M00;
@@ -91,8 +90,32 @@ public class MicroQrCode {
 	 */
 	public boolean bitsTransposed;
 
-	/** Number of zero bits used to endicate end of message */
+	public MicroQrCode() {
+		reset();
+	}
+
+	/**
+	 * Resets class variables into their initial state
+	 */
+	@SuppressWarnings({"NullAway"})
+	public void reset() {
+		for (int i = 0; i < 4; i++) {
+			pp.get(i).setTo(0, 0);
+		}
+		version = -1;
+		error = MicroQrCode.ErrorLevel.L;
+		mask = MicroQrCodeMaskPattern.M00;
+		mode = MicroQrCode.Mode.UNKNOWN;
+		rawbits = null;
+		corrected = null;
+		message = null;
+		bitsTransposed = false;
+	}
+
+	/** Number of zero bits used to indicate end of message */
 	public int terminatorBits() {
+		if (version < 1)
+			throw new IllegalArgumentException("Invalid version");
 		return 1 + version*2;
 	}
 
@@ -141,7 +164,7 @@ public class MicroQrCode {
 	}
 
 	public void decodeVersionAndECC( int code ) {
-		switch (code&0x07) {
+		switch (code & 0x07) {
 			case 0b000 -> version = 1;
 			case 0b001, 0b010 -> version = 2;
 			case 0b011, 0b100 -> version = 3;
@@ -162,27 +185,43 @@ public class MicroQrCode {
 		}
 	}
 
+	public int getMaxDataBits() {
+		return totalDataBits(version, error);
+	}
+
 	static {
 		// Manually entered from QR Code table. There's no simple equation for these magic numbers
 		VERSION_INFO[1] = new VersionInfo(5);
-		VERSION_INFO[1].add(DETECT, 5, 3);
+		VERSION_INFO[1].add(DETECT, 3);
 
 		VERSION_INFO[2] = new VersionInfo(10);
-		VERSION_INFO[2].add(L, 10, 5);
-		VERSION_INFO[2].add(M, 10, 4);
+		VERSION_INFO[2].add(L, 5);
+		VERSION_INFO[2].add(M, 4);
 
 		VERSION_INFO[3] = new VersionInfo(17);
-		VERSION_INFO[3].add(L, 17, 11);
-		VERSION_INFO[3].add(M, 17, 9);
+		VERSION_INFO[3].add(L, 11);
+		VERSION_INFO[3].add(M, 9);
 
 		VERSION_INFO[4] = new VersionInfo(24);
-		VERSION_INFO[4].add(L, 24, 16);
-		VERSION_INFO[4].add(M, 24, 14);
-		VERSION_INFO[4].add(Q, 24, 10);
+		VERSION_INFO[4].add(L, 16);
+		VERSION_INFO[4].add(M, 14);
+		VERSION_INFO[4].add(Q, 10);
 	}
 
 	public static int totalModules( int version ) {
-		return version*2 + 11;
+		return version*2 + 9;
+	}
+
+	/** Returns number of data bits which can be encoded */
+	public static int totalDataBits( int version, ErrorLevel level ) {
+		int bits = VERSION_INFO[version].levels.get(level).dataCodewords*8;
+
+		// last data code word is 4 bits in these cases
+		if (version == 1 || version == 3) {
+			bits -= 4;
+		}
+
+		return bits;
 	}
 
 	/**
@@ -194,6 +233,21 @@ public class MicroQrCode {
 			case 2, 3 -> new ErrorLevel[]{ErrorLevel.L, ErrorLevel.M};
 			case 4 -> new ErrorLevel[]{ErrorLevel.L, ErrorLevel.M, ErrorLevel.Q};
 			default -> throw new IllegalArgumentException("Illegal level");
+		};
+	}
+
+	/** Number of bits used to indicate the mode */
+	public static int modeIndicatorBits( int version ) {
+		if (version < 1)
+			throw new IllegalArgumentException("Invalid version " + version);
+		return version - 1;
+	}
+
+	public static Mode[] allowedModes( int version ) {
+		return switch (version) {
+			case 1 -> new Mode[]{Mode.NUMERIC};
+			case 2 -> new Mode[]{Mode.NUMERIC, Mode.ALPHANUMERIC};
+			default -> Mode.values();
 		};
 	}
 
@@ -219,17 +273,13 @@ public class MicroQrCode {
 	}
 
 	/**
-	 * Specifies the format for a data block. Storage for data and ECC plus the number of blocks of each size.
+	 * Specifies information about the data in this marker
 	 */
-	public static class BlockInfo {
-		/** Code words per block */
-		final public int codewords;
-
+	public static class DataInfo {
 		/** Number of data codewords */
 		final public int dataCodewords;
 
-		public BlockInfo( int codewords, int dataCodewords ) {
-			this.codewords = codewords;
+		public DataInfo( int dataCodewords ) {
 			this.dataCodewords = dataCodewords;
 		}
 	}
@@ -239,29 +289,14 @@ public class MicroQrCode {
 		final public int codewords;
 
 		// information for each error correction level
-		final public Map<ErrorLevel, BlockInfo> levels = new HashMap<>();
+		final public Map<ErrorLevel, DataInfo> levels = new HashMap<>();
 
 		public VersionInfo( int codewords ) {
 			this.codewords = codewords;
 		}
 
-		public void add( ErrorLevel level, int codeWords, int dataCodewords ) {
-			levels.put(level, new BlockInfo(codeWords, dataCodewords));
-		}
-
-		/**
-		 * Returns the total number of bytes in the data area that can be stored in at this version and error
-		 * correction level.
-		 *
-		 * @param error Error correction level
-		 * @return total bytes that can be stored.
-		 */
-		public int totalDataBytes( ErrorLevel error ) {
-			BlockInfo b = Objects.requireNonNull(levels.get(error));
-			int remaining = codewords - b.codewords;
-			int blocksB = remaining/(b.codewords + 1);
-
-			return b.dataCodewords + (b.dataCodewords + 1)*blocksB;
+		public void add( ErrorLevel level, int dataCodewords ) {
+			levels.put(level, new DataInfo(dataCodewords));
 		}
 	}
 
@@ -270,12 +305,12 @@ public class MicroQrCode {
 	 * final mode is set to when decoding a QR code.
 	 */
 	public enum Mode {
-		/** Place holder */
-		UNKNOWN(-1),
 		NUMERIC(0b0001),
 		ALPHANUMERIC(0b0010),
 		BYTE(0b0100),
-		KANJI(0b1000);
+		KANJI(0b1000),
+		/** Place holder */
+		UNKNOWN(-1);
 
 		final int bits;
 

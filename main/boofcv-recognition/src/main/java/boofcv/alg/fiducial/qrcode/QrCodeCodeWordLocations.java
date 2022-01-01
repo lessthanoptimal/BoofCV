@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.fiducial.qrcode;
 
+import boofcv.alg.fiducial.microqr.MicroQrCode;
 import georegression.struct.point.Point2D_I32;
 import org.ejml.data.BMatrixRMaj;
 
@@ -25,9 +26,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Pre-computes which pixels in a QR code are data bits or not. (0,0) is top left corner of QR code. +x are columns
- * and +y are rows. This is needed because there is no simple equation which says what modules encode data and which
- * ones do it.
+ * Pre-computes which pixels in a QR code or Micro QR code are data bits or not. (0,0) is top left corner
+ * of QR code. +x are columns and +y are rows. This is needed because there is no simple equation which
+ * says what modules encode data and which ones do it.
  *
  * @author Peter Abeles
  */
@@ -35,20 +36,34 @@ public class QrCodeCodeWordLocations extends BMatrixRMaj {
 
 	public List<Point2D_I32> bits = new ArrayList<>();
 
-	public QrCodeCodeWordLocations( int numModules, int[] alignment, boolean hasVersion ) {
-		super(numModules, numModules);
-		computeFeatureMask(numModules, alignment, hasVersion);
-		computeBitLocations();
+	public static QrCodeCodeWordLocations qrcode( int version ) {
+		int numModules = QrCode.totalModules(version);
+		int[] alignment = QrCode.VERSION_INFO[version].alignment;
+		boolean hasVersion = version >= QrCode.VERSION_ENCODED_AT;
+
+		var locations = new QrCodeCodeWordLocations(numModules);
+		locations.featureMaskQrCode(numModules, alignment, hasVersion);
+		locations.computeBitLocations(false);
+		return locations;
 	}
 
-	public QrCodeCodeWordLocations( int version ) {
-		this(QrCode.totalModules(version), QrCode.VERSION_INFO[version].alignment, version >= QrCode.VERSION_ENCODED_AT);
+	public static QrCodeCodeWordLocations microqr( int version ) {
+		int numModules = MicroQrCode.totalModules(version);
+
+		var locations = new QrCodeCodeWordLocations(numModules);
+		locations.featureMaskMicroQr(numModules);
+		locations.computeBitLocations(true);
+		return locations;
+	}
+
+	private QrCodeCodeWordLocations( int numModules ) {
+		super(numModules, numModules);
 	}
 
 	/**
-	 * Blocks out the location of features in the image. Needed for codeworld location extraction
+	 * Blocks out the location of features in the image. Needed for code world location extraction
 	 */
-	private void computeFeatureMask( int numModules, int[] alignment, boolean hasVersion ) {
+	private void featureMaskQrCode( int numModules, int[] alignment, boolean hasVersion ) {
 		// mark alignment patterns + format info
 		markSquare(0, 0, 9);
 		markRectangle(numModules - 8, 0, 9, 8);
@@ -82,6 +97,18 @@ public class QrCodeCodeWordLocations extends BMatrixRMaj {
 		}
 	}
 
+	/**
+	 * Blocks out the location of features in the image that can't store data.
+	 */
+	private void featureMaskMicroQr( int numModules ) {
+		// mark alignment patterns + format info
+		markSquare(0, 0, 9);
+
+		// timing pattern
+		markRectangle(8, 0, 1, numModules - 8);
+		markRectangle(0, 8, numModules - 8, 1);
+	}
+
 	private void markSquare( int row, int col, int width ) {
 		for (int i = 0; i < width; i++) {
 			for (int j = 0; j < width; j++) {
@@ -100,15 +127,16 @@ public class QrCodeCodeWordLocations extends BMatrixRMaj {
 
 	/**
 	 * Snakes through and specifies the location of each bit for all the code words in the grid.
+	 * @param isMicro true if micro Qr code
 	 */
-	private void computeBitLocations() {
+	private void computeBitLocations( boolean isMicro ) {
 		int N = numRows;
 		int row = N - 1;
 		int col = N - 1;
 		int direction = -1;
 
 		while (col > 0) {
-			if (col == 6)
+			if (col == 6 && !isMicro)
 				col -= 1;
 
 			if (!get(row, col)) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,7 +33,7 @@ public class TestQrCodeCodeWordLocations extends BoofStandardJUnit {
 	 * Used specification example to test bit ordering
 	 */
 	@Test void manualCheckOfBitOrderVersion2() {
-		QrCodeCodeWordLocations mask = setup(2);
+		QrCodeCodeWordLocations mask = QrCodeCodeWordLocations.qrcode(2);
 
 		// Module D11
 		assertEquals(0, mask.bits.get(8*10).distance2(20, 11));
@@ -69,14 +69,14 @@ public class TestQrCodeCodeWordLocations extends BoofStandardJUnit {
 	/**
 	 * See if the codewords fill in all the bits which are not filled by a pattern
 	 */
-	@Test void codeWordsFillAll() {
+	@Test void codeWordsFillAll_QRCode() {
 		for (int version = 2; version <= 40; version++) {
-			codeWordsFillAll(version);
+			codeWordsFillAll_QRCode(version);
 		}
 	}
 
-	public void codeWordsFillAll( int version ) {
-		QrCodeCodeWordLocations mask = setup(version);
+	public void codeWordsFillAll_QRCode( int version ) {
+		QrCodeCodeWordLocations mask = QrCodeCodeWordLocations.qrcode(version);
 
 		for (Point2D_I32 c : mask.bits) {
 			mask.set(c.y, c.x, true);
@@ -89,8 +89,24 @@ public class TestQrCodeCodeWordLocations extends BoofStandardJUnit {
 		assertEquals(0, countFalse(mask));
 	}
 
-	private QrCodeCodeWordLocations setup( int version ) {
-		return new QrCodeCodeWordLocations(version);
+	@Test void codeWordsFillAll_MicroQR() {
+		for (int version = 3; version <= 3; version++) {
+			codeWordsFillAll_MicroQR(version);
+		}
+	}
+
+	public void codeWordsFillAll_MicroQR( int version ) {
+		QrCodeCodeWordLocations mask = QrCodeCodeWordLocations.microqr(version);
+
+		for (Point2D_I32 c : mask.bits) {
+			mask.set(c.y, c.x, true);
+		}
+
+//		mask.print();
+//		printCodeWordsBits(mask);
+//		printCodeWords(mask);
+
+		assertEquals(0, countFalse(mask));
 	}
 
 	void printCodeWordsBits( QrCodeCodeWordLocations alg ) {
@@ -158,7 +174,7 @@ public class TestQrCodeCodeWordLocations extends BoofStandardJUnit {
 	}
 
 	private void dataCapability( int version, int expected ) {
-		QrCodeCodeWordLocations mask = setup(version);
+		QrCodeCodeWordLocations mask = QrCodeCodeWordLocations.qrcode(version);
 		int N = mask.numRows*mask.numCols - mask.sum();
 		assertEquals(expected, N);
 	}
