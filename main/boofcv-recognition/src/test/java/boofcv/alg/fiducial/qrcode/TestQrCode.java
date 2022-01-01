@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,7 +36,7 @@ public class TestQrCode extends BoofStandardJUnit {
 
 			// the number of bits determined by applying a mask to all static features should match the entered
 			// number of code words
-			int totalBits = new QrCodeCodeWordLocations(version).bits.size();
+			int totalBits = QrCodeCodeWordLocations.qrcode(version).bits.size();
 			assertEquals(totalBits/8, info.codewords);
 
 			// test values found at each error level

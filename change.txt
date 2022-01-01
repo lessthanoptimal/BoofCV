@@ -21,6 +21,7 @@ QR Code
 - Added ability to decode transposed markers. Can be turned off.
 Micro QR Code
 - TODO Added support
+- TODO add auto mask selection
 
 TODO Monocular SLAM
 TODO Stereo SLAM

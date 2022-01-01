@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,9 @@
 package boofcv.alg.fiducial.microqr;
 
 import boofcv.alg.fiducial.qrcode.PackedBits32;
+import boofcv.alg.fiducial.qrcode.QrCodeCodeWordLocations;
 import boofcv.alg.fiducial.qrcode.QrGeneratorBase;
+import georegression.struct.point.Point2D_I32;
 
 /**
  * Generates an image of a Micro QR Code.
@@ -40,7 +42,20 @@ public class MicroQrCodeGenerator extends QrGeneratorBase {
 
 		formatInformation(qr);
 
-		// TODO render data bits
+		if (renderData) {
+			if (qr.rawbits.length != MicroQrCode.VERSION_INFO[qr.version].codewords)
+				throw new RuntimeException("Unexpected length of raw data.");
+
+			// mark which modules can store data
+			bitLocations = QrCodeCodeWordLocations.microqr(qr.version).bits;
+
+			int numBytes = bitLocations.size()/8;
+			if (numBytes != qr.rawbits.length)
+				throw new RuntimeException("Egads. unexpected length of qrcode raw data");
+
+			// Render the output data
+			renderData(qr.mask, qr.rawbits);
+		}
 
 		qr.bounds.set(0, 0, 0);
 		qr.bounds.set(1, markerWidth, 0);
@@ -71,5 +86,29 @@ public class MicroQrCodeGenerator extends QrGeneratorBase {
 		bits.data[0] = qr.encodeFormatBits();
 		bits.data[0] ^= MicroQrCode.FORMAT_MASK;
 		return bits;
+	}
+
+	/**
+	 * Renders the raw data bit output while applying the selected mask
+	 */
+	private void renderData(MicroQrCodeMaskPattern mask, byte[] rawbits) {
+		int count = 0;
+
+		int length = bitLocations.size() - bitLocations.size()%8;
+		while (count < length) {
+			int bits = rawbits[count/8] & 0xFF;
+
+			int N = Math.min(8, bitLocations.size() - count);
+
+			for (int i = 0; i < N; i++) {
+				Point2D_I32 coor = bitLocations.get(count + i);
+				int value = mask.apply(coor.y, coor.x, ((bits >> i) & 0x01));
+//				int value = ((bits >> i ) & 0x01);
+				if (value > 0) {
+					square(coor.y, coor.x);
+				}
+			}
+			count += 8;
+		}
 	}
 }

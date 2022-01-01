@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -260,7 +260,7 @@ public class TestQrCodeEncoder extends BoofStandardJUnit {
 		int version = 1;
 		QrCodeEncoder.FoundFeatures features = new QrCodeEncoder.FoundFeatures();
 		int N = QrCode.totalModules(version);
-		QrCodeCodeWordLocations matrix = new QrCodeCodeWordLocations(version);
+		QrCodeCodeWordLocations matrix = QrCodeCodeWordLocations.qrcode(version);
 
 		QrCodeEncoder.detectAdjacentAndPositionPatterns(N, matrix, features);
 
@@ -269,7 +269,7 @@ public class TestQrCodeEncoder extends BoofStandardJUnit {
 		// lots of squares will have adjacent values be the same in this situation
 
 		// the matrix is modified. Make sure it's the same on output
-		QrCodeCodeWordLocations test = new QrCodeCodeWordLocations(version);
+		QrCodeCodeWordLocations test = QrCodeCodeWordLocations.qrcode(version);
 		for (int i = 0; i < N*N; i++) {
 			assertEquals(test.data[i], matrix.data[i]);
 		}
@@ -282,7 +282,7 @@ public class TestQrCodeEncoder extends BoofStandardJUnit {
 		int version = 1;
 		QrCodeEncoder.FoundFeatures features = new QrCodeEncoder.FoundFeatures();
 		int N = QrCode.totalModules(version);
-		QrCodeCodeWordLocations matrix = new QrCodeCodeWordLocations(version);
+		QrCodeCodeWordLocations matrix = QrCodeCodeWordLocations.qrcode(version);
 
 		matrix.set(10, 10, true);
 		matrix.set(11, 10, false);
@@ -315,7 +315,7 @@ public class TestQrCodeEncoder extends BoofStandardJUnit {
 		int version = 1;
 		QrCodeEncoder.FoundFeatures features = new QrCodeEncoder.FoundFeatures();
 		int N = QrCode.totalModules(version);
-		QrCodeCodeWordLocations matrix = new QrCodeCodeWordLocations(version);
+		QrCodeCodeWordLocations matrix = QrCodeCodeWordLocations.qrcode(version);
 
 		matrix.fill(false);
 		for (int i = 0; i < N; i++) {
