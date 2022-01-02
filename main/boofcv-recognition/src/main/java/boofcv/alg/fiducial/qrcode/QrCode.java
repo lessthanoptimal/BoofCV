@@ -567,10 +567,6 @@ public class QrCode implements Cloneable {
 	 * final mode is set to when decoding a QR code.
 	 */
 	public enum Mode {
-		/** Place holder */
-		UNKNOWN(-1),
-		/** The message has been encoded using multiple modes */
-		MIXED(-2),
 		NUMERIC(0b0001),
 		ALPHANUMERIC(0b0010),
 		BYTE(0b0100),
@@ -578,8 +574,13 @@ public class QrCode implements Cloneable {
 		ECI(0b0111),
 		STRUCTURE_APPENDED(0b0011),
 		FNC1_FIRST(0b0101),
-		FNC1_SECOND(0b1001);
+		FNC1_SECOND(0b1001),
+		/** Place holder */
+		UNKNOWN(-1),
+		/** The message has been encoded using multiple modes */
+		MIXED(-2);
 
+		// how this mode is encoded for a QR Code. Micro QR has a different approach.
 		final int bits;
 
 		Mode( int bits ) {

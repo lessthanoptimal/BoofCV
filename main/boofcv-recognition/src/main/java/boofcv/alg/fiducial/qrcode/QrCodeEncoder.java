@@ -23,7 +23,6 @@ import org.ddogleg.struct.DogArray_I8;
 import org.ejml.ops.CommonOps_BDRM;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -44,12 +43,6 @@ import static boofcv.alg.fiducial.qrcode.QrCodeCodecBitsUtils.*;
  */
 public class QrCodeEncoder {
 	// TODO support ECI
-
-	/**
-	 * All the possible values in alphanumeric mode.
-	 */
-	public static final String ALPHANUMERIC = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:";
-
 	// used to compute error correction
 	private final ReidSolomonCodes rscodes = new ReidSolomonCodes(8, 0b100011101);
 
@@ -110,39 +103,8 @@ public class QrCodeEncoder {
 	 * Select the encoding based on the letters in the message. A very simple algorithm is used internally.
 	 */
 	public QrCodeEncoder addAutomatic( String message ) {
-		// very simple coding algorithm. Doesn't try to compress by using multiple formats
-		if (containsKanji(message)) {
-			// split into kanji and non-kanji segments
-			int start = 0;
-			boolean kanji = isKanji(message.charAt(0));
-			for (int i = 0; i < message.length(); i++) {
-				if (isKanji(message.charAt(i))) {
-					if (!kanji) {
-						addAutomatic(message.substring(start, i));
-						start = i;
-						kanji = true;
-					}
-				} else {
-					if (kanji) {
-						addKanji(message.substring(start, i));
-						start = i;
-						kanji = false;
-					}
-				}
-			}
-			if (kanji) {
-				addKanji(message.substring(start));
-			} else {
-				addAutomatic(message.substring(start));
-			}
-			return this;
-		} else if (containsByte(message)) {
-			return addBytes(message);
-		} else if (containsAlphaNumeric(message)) {
-			return addAlphanumeric(message);
-		} else {
-			return addNumeric(message);
-		}
+		QrCodeCodecBitsUtils.addAutomatic(byteCharacterSet, message, segments);
+		return this;
 	}
 
 	/**
@@ -152,16 +114,8 @@ public class QrCodeEncoder {
 	 * @return The QR-Code
 	 */
 	public QrCodeEncoder addNumeric( String message ) {
-		byte[] numbers = new byte[message.length()];
-
-		for (int i = 0; i < message.length(); i++) {
-			char c = message.charAt(i);
-			int values = c - '0';
-			if (values < 0 || values > 9)
-				throw new RuntimeException("Expected each character to be a number from 0 to 9");
-			numbers[i] = (byte)values;
-		}
-		return addNumeric(numbers);
+		segments.add(createSegmentNumeric(message));
+		return this;
 	}
 
 	/**
@@ -171,31 +125,7 @@ public class QrCodeEncoder {
 	 * @return The QR-Code
 	 */
 	public QrCodeEncoder addNumeric( byte[] numbers ) {
-		for (int i = 0; i < numbers.length; i++) {
-			if (numbers[i] < 0 || numbers[i] > 9)
-				throw new IllegalArgumentException("All numbers must have a value from 0 to 9");
-		}
-
-		StringBuilder builder = new StringBuilder(numbers.length);
-		for (int i = 0; i < numbers.length; i++) {
-			builder.append(Integer.toString(numbers[i]));
-		}
-		MessageSegment segment = new MessageSegment();
-		segment.message = builder.toString();
-		segment.data = numbers;
-		segment.length = numbers.length;
-		segment.mode = QrCode.Mode.NUMERIC;
-
-		segment.encodedSizeBits += 4;
-		segment.encodedSizeBits += 10*(segment.length/3);
-		if (segment.length%3 == 2) {
-			segment.encodedSizeBits += 7;
-		} else if (segment.length%3 == 1) {
-			segment.encodedSizeBits += 4;
-		}
-
-		segments.add(segment);
-
+		segments.add(createSegmentNumeric(numbers));
 		return this;
 	}
 
@@ -216,22 +146,7 @@ public class QrCodeEncoder {
 	 * @return The QR-Code
 	 */
 	public QrCodeEncoder addAlphanumeric( String alphaNumeric ) {
-		byte[] values = alphanumericToValues(alphaNumeric);
-
-		MessageSegment segment = new MessageSegment();
-		segment.message = alphaNumeric;
-		segment.data = values;
-		segment.length = values.length;
-		segment.mode = QrCode.Mode.ALPHANUMERIC;
-
-		segment.encodedSizeBits += 4;
-		segment.encodedSizeBits += 11*(segment.length/2);
-		if (segment.length%2 == 1) {
-			segment.encodedSizeBits += 6;
-		}
-
-		segments.add(segment);
-
+		segments.add(QrCodeCodecBitsUtils.createSegmentAlphanumeric(alphaNumeric));
 		return this;
 	}
 
@@ -245,25 +160,6 @@ public class QrCodeEncoder {
 		QrCodeCodecBitsUtils.encodeAlphanumeric(numbers, length, lengthBits, packed);
 	}
 
-	public static byte[] alphanumericToValues( String data ) {
-		byte[] output = new byte[data.length()];
-
-		for (int i = 0; i < data.length(); i++) {
-			char c = data.charAt(i);
-			int value = ALPHANUMERIC.indexOf(c);
-			if (value < 0)
-				throw new IllegalArgumentException("Unsupported character '" + c + "' = " + (int)c);
-			output[i] = (byte)value;
-		}
-		return output;
-	}
-
-	public static char valueToAlphanumeric( int value ) {
-		if (value < 0 || value >= ALPHANUMERIC.length())
-			throw new RuntimeException("Value out of range");
-		return ALPHANUMERIC.charAt(value);
-	}
-
 	public QrCodeEncoder addBytes( String message ) {
 		return addBytes(message.getBytes(byteCharacterSet));
 	}
@@ -275,22 +171,7 @@ public class QrCodeEncoder {
 	 * @return The QR-Code
 	 */
 	public QrCodeEncoder addBytes( byte[] data ) {
-		StringBuilder builder = new StringBuilder(data.length);
-		for (int i = 0; i < data.length; i++) {
-			builder.append((char)data[i]);
-		}
-
-		MessageSegment segment = new MessageSegment();
-		segment.message = builder.toString();
-		segment.data = data;
-		segment.length = data.length;
-		segment.mode = QrCode.Mode.BYTE;
-
-		segment.encodedSizeBits += 4;
-		segment.encodedSizeBits += 8*segment.length;
-
-		segments.add(segment);
-
+		segments.add(createSegmentBytes(data));
 		return this;
 	}
 
@@ -311,24 +192,7 @@ public class QrCodeEncoder {
 	 * @return The QR-Code
 	 */
 	public QrCodeEncoder addKanji( String message ) {
-		byte[] bytes;
-		try {
-			bytes = message.getBytes("Shift_JIS");
-		} catch (UnsupportedEncodingException ex) {
-			throw new IllegalArgumentException(ex);
-		}
-
-		MessageSegment segment = new MessageSegment();
-		segment.message = message;
-		segment.data = bytes;
-		segment.length = message.length();
-		segment.mode = QrCode.Mode.KANJI;
-
-		segment.encodedSizeBits += 4;
-		segment.encodedSizeBits += 13*segment.length;
-
-		segments.add(segment);
-
+		segments.add(QrCodeCodecBitsUtils.createSegmentKanji(message));
 		return this;
 	}
 
@@ -504,7 +368,6 @@ public class QrCodeEncoder {
 	 * in vertical and horizontal directions
 	 */
 	static void detectAdjacentAndPositionPatterns( int N, QrCodeCodeWordLocations matrix, FoundFeatures features ) {
-
 		for (int foo = 0; foo < 2; foo++) {
 			for (int row = 0; row < N; row++) {
 				int index = row*N;
@@ -601,7 +464,7 @@ public class QrCodeEncoder {
 	private int bitsAtVersion( int version ) {
 		int total = 0;
 		for (int i = 0; i < segments.size(); i++) {
-			total += segments.get(i).sizeInBits(version);
+			total += sizeInBits(segments.get(i), version);
 		}
 		return total;
 	}
@@ -711,24 +574,15 @@ public class QrCodeEncoder {
 		this.byteCharacterSet = byteCharacterSet;
 	}
 
-	@SuppressWarnings({"NullAway.Init"})
-	private static class MessageSegment {
-		QrCode.Mode mode;
-		String message;
-		byte[] data;
-		int length;
-		// number of bits in the encoded message, excluding the length bits
-		int encodedSizeBits;
-
-		public int sizeInBits( int version ) {
-			int lengthBits = switch (mode) {
-				case NUMERIC -> getLengthBitsNumeric(version);
-				case ALPHANUMERIC -> getLengthBitsAlphanumeric(version);
-				case BYTE -> getLengthBitsBytes(version);
-				case KANJI -> getLengthBitsKanji(version);
-				default -> throw new RuntimeException("Egads");
-			};
-			return encodedSizeBits + lengthBits;
-		}
+	public int sizeInBits( MessageSegment segment, int version ) {
+		int lengthBits = switch (segment.mode) {
+			case NUMERIC -> getLengthBitsNumeric(version);
+			case ALPHANUMERIC -> getLengthBitsAlphanumeric(version);
+			case BYTE -> getLengthBitsBytes(version);
+			case KANJI -> getLengthBitsKanji(version);
+			default -> throw new RuntimeException("Egads");
+		};
+		// 4 bits for encoding the mode
+		return segment.encodedSizeBits + lengthBits + 4;
 	}
 }

@@ -384,7 +384,7 @@ public class QrCodeDecoderImage<T extends ImageGray<T>> {
 
 		// sum of pixel intensity in lower right
 		float sumLowerRight = 0.0f;
-		// Number of points which contrinute to the dum
+		// Number of points which contribute to the sum
 		int total = 0;
 
 		// measure the intensity around each bit's location

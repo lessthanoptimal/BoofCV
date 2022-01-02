@@ -19,10 +19,10 @@
 package boofcv.alg.fiducial.microqr;
 
 import boofcv.alg.fiducial.qrcode.QrCode;
+import boofcv.alg.fiducial.qrcode.QrCode.Mode;
 import boofcv.alg.fiducial.qrcode.QrCodePolynomialMath;
 import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -56,7 +56,7 @@ public class MicroQrCode {
 	public Polygon2D_F64 pp = new Polygon2D_F64(4);
 
 	/** Text encoding mode */
-	public MicroQrCode.Mode mode = MicroQrCode.Mode.UNKNOWN;
+	public Mode mode = Mode.UNKNOWN;
 
 	/** Which mask is applied */
 	public MicroQrCodeMaskPattern mask = MicroQrCodeMaskPattern.M00;
@@ -94,6 +94,10 @@ public class MicroQrCode {
 	/** Specifies where the QR code parsing failed */
 	public QrCode.Failure failureCause = QrCode.Failure.NONE;
 
+	/** Specifies the subset of allowed mode for Micro QR Codes. */
+	public static final Mode[] allowedModes = new Mode[]{
+			Mode.NUMERIC, Mode.ALPHANUMERIC, Mode.BYTE, Mode.KANJI};
+
 	public MicroQrCode() {
 		reset();
 	}
@@ -109,7 +113,7 @@ public class MicroQrCode {
 		version = -1;
 		error = MicroQrCode.ErrorLevel.L;
 		mask = MicroQrCodeMaskPattern.M00;
-		mode = MicroQrCode.Mode.UNKNOWN;
+		mode = Mode.UNKNOWN;
 		rawbits = null;
 		corrected = null;
 		message = null;
@@ -233,17 +237,19 @@ public class MicroQrCode {
 	 * Returns which error correction is allowed at a version.
 	 */
 	public static ErrorLevel[] allowedErrorCorrection( int version ) {
+		// Order here from most correction to least. When it automatically selects error correction this is
+		// important
 		return switch (version) {
 			case 1 -> new ErrorLevel[]{ErrorLevel.DETECT};
-			case 2, 3 -> new ErrorLevel[]{ErrorLevel.L, ErrorLevel.M};
-			case 4 -> new ErrorLevel[]{ErrorLevel.L, ErrorLevel.M, ErrorLevel.Q};
+			case 2, 3 -> new ErrorLevel[]{ErrorLevel.M, ErrorLevel.L};
+			case 4 -> new ErrorLevel[]{ErrorLevel.Q, ErrorLevel.M, ErrorLevel.L};
 			default -> throw new IllegalArgumentException("Illegal version=" + version);
 		};
 	}
 
 	/** Number of bits used to indicate the mode */
-	public static int modeIndicatorBits( int version ) {
-		if (version < 1)
+	public static int modeIndicatorBitCount( int version ) {
+		if (version < 1 || version > 4)
 			throw new IllegalArgumentException("Invalid version " + version);
 		return version - 1;
 	}
@@ -254,6 +260,15 @@ public class MicroQrCode {
 			case 2 -> new Mode[]{Mode.NUMERIC, Mode.ALPHANUMERIC};
 			default -> Mode.values();
 		};
+	}
+
+	/**
+	 * Looks up an allowed mode by value. Returns UNKNOWN if the value is out of range
+	 */
+	public static Mode valueToMode( int value ) {
+		if (value < 0 || value > 3)
+			return Mode.UNKNOWN;
+		return allowedModes[value];
 	}
 
 	/** Returns number of data code words */
@@ -307,41 +322,6 @@ public class MicroQrCode {
 
 		public void add( ErrorLevel level, int dataCodewords ) {
 			levels.put(level, new DataInfo(dataCodewords));
-		}
-	}
-
-	/**
-	 * The encoding mode. A QR Code can be encoded with multiple modes. The most complex character set is what the
-	 * final mode is set to when decoding a QR code.
-	 */
-	public enum Mode {
-		NUMERIC,
-		ALPHANUMERIC,
-		BYTE,
-		KANJI,
-		/** More than one mode is used in the marker */
-		MIXED,
-		/** Place holder */
-		UNKNOWN;
-
-		// declare it here since I think values() creates a new array each time
-		private final static Mode[] v = values();
-
-		public static Mode lookup( int value ) {
-			if ( value < 0 || value > 3)
-				return UNKNOWN;
-			return v[value];
-		}
-
-		public static @Nullable Mode lookup( String name ) {
-			name = name.toUpperCase();
-			Mode[] modes = values();
-			for (int modeIdx = 0; modeIdx < modes.length; modeIdx++) {
-				Mode m = modes[modeIdx];
-				if (m.toString().equals(name))
-					return m;
-			}
-			return null;
 		}
 	}
 }

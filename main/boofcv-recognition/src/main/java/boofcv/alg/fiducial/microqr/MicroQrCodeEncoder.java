@@ -19,18 +19,21 @@
 package boofcv.alg.fiducial.microqr;
 
 import boofcv.alg.fiducial.qrcode.PackedBits8;
+import boofcv.alg.fiducial.qrcode.QrCode;
 import boofcv.alg.fiducial.qrcode.QrCodeCodecBitsUtils;
 import boofcv.alg.fiducial.qrcode.ReidSolomonCodes;
+import lombok.Getter;
+import lombok.Setter;
 import org.ddogleg.struct.DogArray_I8;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-import static boofcv.alg.fiducial.qrcode.QrCodeCodecBitsUtils.*;
+import static boofcv.alg.fiducial.qrcode.QrCodeCodecBitsUtils.MessageSegment;
+import static boofcv.alg.fiducial.qrcode.QrCodeCodecBitsUtils.flipBits8;
 
 /**
  * Provides an easy to use interface for specifying QR-Code parameters and generating the raw data sequence. After
@@ -54,8 +57,8 @@ public class MicroQrCodeEncoder {
 
 	private boolean autoMask;
 
-	// Encoding for the byte character set. UTF-8 isn't standard compliant but is the most widely used
-	private Charset byteCharacterSet = StandardCharsets.UTF_8;
+	/** Encoding for the byte character set. UTF-8 isn't standard compliant but is the most widely used */
+	private @Getter @Setter Charset byteCharacterSet = StandardCharsets.UTF_8;
 
 	// workspace variables
 	PackedBits8 packed = new PackedBits8();
@@ -103,44 +106,13 @@ public class MicroQrCodeEncoder {
 	 * Select the encoding based on the letters in the message. A very simple algorithm is used internally.
 	 */
 	public MicroQrCodeEncoder addAutomatic( String message ) {
-		// very simple coding algorithm. Doesn't try to compress by using multiple formats
-		if (containsKanji(message)) {
-			// split into kanji and non-kanji segments
-			int start = 0;
-			boolean kanji = isKanji(message.charAt(0));
-			for (int i = 0; i < message.length(); i++) {
-				if (isKanji(message.charAt(i))) {
-					if (!kanji) {
-						addAutomatic(message.substring(start, i));
-						start = i;
-						kanji = true;
-					}
-				} else {
-					if (kanji) {
-						addKanji(message.substring(start, i));
-						start = i;
-						kanji = false;
-					}
-				}
-			}
-			if (kanji) {
-				addKanji(message.substring(start));
-			} else {
-				addAutomatic(message.substring(start));
-			}
-			return this;
-		} else if (containsByte(message)) {
-			return addBytes(message);
-		} else if (containsAlphaNumeric(message)) {
-			return addAlphanumeric(message);
-		} else {
-			return addNumeric(message);
-		}
+		QrCodeCodecBitsUtils.addAutomatic(byteCharacterSet, message, segments);
+		return this;
 	}
 
 	/** Encodes into packed the mode. Number of bits vary depending on the version */
-	private void encodeMode( MicroQrCode.Mode mode ) {
-		int bits = MicroQrCode.modeIndicatorBits(qr.version);
+	private void encodeMode( QrCode.Mode mode ) {
+		int bits = MicroQrCode.modeIndicatorBitCount(qr.version);
 		if (bits == 0)
 			return;
 		packed.append(mode.ordinal(), bits, false);
@@ -153,16 +125,8 @@ public class MicroQrCodeEncoder {
 	 * @return The QR-Code
 	 */
 	public MicroQrCodeEncoder addNumeric( String message ) {
-		byte[] numbers = new byte[message.length()];
-
-		for (int i = 0; i < message.length(); i++) {
-			char c = message.charAt(i);
-			int values = c - '0';
-			if (values < 0 || values > 9)
-				throw new RuntimeException("Expected each character to be a number from 0 to 9");
-			numbers[i] = (byte)values;
-		}
-		return addNumeric(numbers);
+		segments.add(QrCodeCodecBitsUtils.createSegmentNumeric(message));
+		return this;
 	}
 
 	/**
@@ -172,40 +136,17 @@ public class MicroQrCodeEncoder {
 	 * @return The QR-Code
 	 */
 	public MicroQrCodeEncoder addNumeric( byte[] numbers ) {
-		for (int i = 0; i < numbers.length; i++) {
-			if (numbers[i] < 0 || numbers[i] > 9)
-				throw new IllegalArgumentException("All numbers must have a value from 0 to 9");
-		}
-
-		StringBuilder builder = new StringBuilder(numbers.length);
-		for (int i = 0; i < numbers.length; i++) {
-			builder.append(Integer.toString(numbers[i]));
-		}
-		MessageSegment segment = new MessageSegment();
-		segment.message = builder.toString();
-		segment.data = numbers;
-		segment.length = numbers.length;
-		segment.mode = MicroQrCode.Mode.NUMERIC;
-
-		segment.encodedSizeBits += 10*(segment.length/3);
-		if (segment.length%3 == 2) {
-			segment.encodedSizeBits += 7;
-		} else if (segment.length%3 == 1) {
-			segment.encodedSizeBits += 4;
-		}
-
-		segments.add(segment);
-
+		segments.add(QrCodeCodecBitsUtils.createSegmentNumeric(numbers));
 		return this;
 	}
 
 	private void encodeNumeric( byte[] numbers, int length ) {
-		qr.mode = MicroQrCode.Mode.NUMERIC;
-		int lengthBits = getLengthBitsNumeric(qr.version);
-
 		// specify the mode
+		qr.mode = QrCode.Mode.NUMERIC;
 		encodeMode(qr.mode);
 
+		// Save the message
+		int lengthBits = getLengthBitsNumeric(qr.version);
 		QrCodeCodecBitsUtils.encodeNumeric(numbers, length, lengthBits, packed);
 	}
 
@@ -216,35 +157,20 @@ public class MicroQrCodeEncoder {
 	 * @return The QR-Code
 	 */
 	public MicroQrCodeEncoder addAlphanumeric( String alphaNumeric ) {
-		if (qr.version < 2)
-			throw new RuntimeException("Alphanumeric requires version >= 2");
-
-		byte[] values = alphanumericToValues(alphaNumeric);
-
-		MessageSegment segment = new MessageSegment();
-		segment.message = alphaNumeric;
-		segment.data = values;
-		segment.length = values.length;
-		segment.mode = MicroQrCode.Mode.ALPHANUMERIC;
-
-		segment.encodedSizeBits += 11*(segment.length/2);
-		if (segment.length%2 == 1) {
-			segment.encodedSizeBits += 6;
-		}
-
-		segments.add(segment);
-
+		segments.add(QrCodeCodecBitsUtils.createSegmentAlphanumeric(alphaNumeric));
 		return this;
 	}
 
 	private void encodeAlphanumeric( byte[] numbers, int length ) {
-		qr.mode = MicroQrCode.Mode.ALPHANUMERIC;
-
-		int lengthBits = getLengthBitsAlphanumeric(qr.version);
+		if (qr.version < 2)
+			throw new RuntimeException("Alphanumeric requires version >= 2");
 
 		// specify the mode
+		qr.mode = QrCode.Mode.ALPHANUMERIC;
 		encodeMode(qr.mode);
 
+		// Save the message
+		int lengthBits = getLengthBitsAlphanumeric(qr.version);
 		QrCodeCodecBitsUtils.encodeAlphanumeric(numbers, length, lengthBits, packed);
 	}
 
@@ -259,35 +185,20 @@ public class MicroQrCodeEncoder {
 	 * @return The QR-Code
 	 */
 	public MicroQrCodeEncoder addBytes( byte[] data ) {
-		if (qr.version < 3)
-			throw new RuntimeException("Bytes requires version >= 3");
-
-		StringBuilder builder = new StringBuilder(data.length);
-		for (int i = 0; i < data.length; i++) {
-			builder.append((char)data[i]);
-		}
-
-		MessageSegment segment = new MessageSegment();
-		segment.message = builder.toString();
-		segment.data = data;
-		segment.length = data.length;
-		segment.mode = MicroQrCode.Mode.BYTE;
-
-		segment.encodedSizeBits += 8*segment.length;
-
-		segments.add(segment);
-
+		segments.add(QrCodeCodecBitsUtils.createSegmentBytes(data));
 		return this;
 	}
 
 	private void encodeBytes( byte[] data, int length ) {
-		qr.mode = MicroQrCode.Mode.BYTE;
-
-		int lengthBits = getLengthBitsBytes(qr.version);
+		if (qr.version < 3)
+			throw new RuntimeException("Bytes requires version >= 3");
 
 		// specify the mode
+		qr.mode = QrCode.Mode.BYTE;
 		encodeMode(qr.mode);
 
+		// Save the message
+		int lengthBits = getLengthBitsBytes(qr.version);
 		QrCodeCodecBitsUtils.encodeBytes(data, length, lengthBits, packed);
 	}
 
@@ -298,38 +209,20 @@ public class MicroQrCodeEncoder {
 	 * @return The QR-Code
 	 */
 	public MicroQrCodeEncoder addKanji( String message ) {
-		if (qr.version < 3)
-			throw new RuntimeException("Kanji requires version >= 3");
-
-		byte[] bytes;
-		try {
-			bytes = message.getBytes("Shift_JIS");
-		} catch (UnsupportedEncodingException ex) {
-			throw new IllegalArgumentException(ex);
-		}
-
-		MessageSegment segment = new MessageSegment();
-		segment.message = message;
-		segment.data = bytes;
-		segment.length = message.length();
-		segment.mode = MicroQrCode.Mode.KANJI;
-
-		segment.encodedSizeBits += MicroQrCode.modeIndicatorBits(qr.version);
-		segment.encodedSizeBits += 13*segment.length;
-
-		segments.add(segment);
-
+		segments.add(QrCodeCodecBitsUtils.createSegmentKanji(message));
 		return this;
 	}
 
 	private void encodeKanji( byte[] bytes, int length ) {
-		qr.mode = MicroQrCode.Mode.KANJI;
-
-		int lengthBits = getLengthBitsKanji(qr.version);
+		if (qr.version < 3)
+			throw new IllegalArgumentException("Kanji requires version >= 3");
 
 		// specify the mode
+		qr.mode = QrCode.Mode.KANJI;
 		encodeMode(qr.mode);
 
+		// Save the message
+		int lengthBits = getLengthBitsKanji(qr.version);
 		QrCodeCodecBitsUtils.encodeKanji(bytes, length, lengthBits, packed);
 	}
 
@@ -369,7 +262,7 @@ public class MicroQrCodeEncoder {
 				case ALPHANUMERIC -> encodeAlphanumeric(m.data, m.length);
 				case BYTE -> encodeBytes(m.data, m.length);
 				case KANJI -> encodeKanji(m.data, m.length);
-				default -> throw new RuntimeException("Unknown");
+				default -> throw new RuntimeException("Unsupported: " + m.mode);
 			}
 		}
 
@@ -384,8 +277,8 @@ public class MicroQrCodeEncoder {
 
 		// add the terminator bits to the bit stream
 		int terminatorBits = qr.terminatorBits();
-		if (packed.size + terminatorBits <= maxBits) {
-			packed.append(0b0000, terminatorBits, false);
+		if (packed.size < maxBits) {
+			packed.append(0b0000, Math.min(terminatorBits, maxBits - packed.size), false);
 		}
 
 		bitsToMessage(packed);
@@ -403,9 +296,14 @@ public class MicroQrCodeEncoder {
 	 */
 	private void autoSelectVersionAndError() {
 		if (qr.version == -1) {
+			// Make sure the version is high enough for specific modes
+			int minimumVersion = ensureMinimumVersionForMode();
+
+			int maxEncodedSize = 0;
+
 			escape:
 			// select the smallest version which can store all the data
-			for (int version = 1; version <= 4; version++) {
+			for (int version = minimumVersion; version <= 4; version++) {
 				MicroQrCode.ErrorLevel[] errorsToTry;
 				if (autoErrorCorrection) {
 					errorsToTry = MicroQrCode.allowedErrorCorrection(version);
@@ -418,6 +316,7 @@ public class MicroQrCodeEncoder {
 
 					int maxDataBits = MicroQrCode.maxDataBits(version, error);
 					int encodedDataBits = bitsAtVersion(version);
+					maxEncodedSize = Math.max(maxEncodedSize, encodedDataBits);
 
 					// See if there's enough storage for this message
 					if (encodedDataBits > maxDataBits)
@@ -427,7 +326,7 @@ public class MicroQrCodeEncoder {
 				}
 			}
 			if (qr.version == -1) {
-				throw new IllegalArgumentException("Packet too to be encoded in a qr code");
+				throw new IllegalArgumentException("Packet too big to be encoded. size=" + maxEncodedSize + " (bits)");
 			}
 		} else {
 			// the version is set but the error correction level isn't. Pick the one with
@@ -436,13 +335,15 @@ public class MicroQrCodeEncoder {
 				qr.error = MicroQrCode.ErrorLevel.DETECT;
 			} else if (autoErrorCorrection) {
 				@Nullable MicroQrCode.ErrorLevel selected = null;
-				MicroQrCode.VersionInfo v = MicroQrCode.VERSION_INFO[qr.version];
 				int encodedDataBits = bitsAtVersion(qr.version);
 
+				// ErrorLevel is ordered from most to least correction
 				for (MicroQrCode.ErrorLevel error : MicroQrCode.allowedErrorCorrection(qr.version)) {
 					int maxDataBits = MicroQrCode.maxDataBits(qr.version, error);
+
 					if (encodedDataBits <= maxDataBits) {
 						selected = error;
+						break;
 					}
 				}
 
@@ -453,16 +354,34 @@ public class MicroQrCodeEncoder {
 				qr.error = selected;
 			}
 		}
+
 		// Sanity check
 		int dataBits = bitsAtVersion(qr.version);
 		int maxDataBits = MicroQrCode.maxDataBits(qr.version, qr.error);
 		if (dataBits > maxDataBits) {
 			int encodedBits = totalEncodedBitsNoOverHead();
 			throw new IllegalArgumentException("Version and error level can't encode all the data. " +
-					"Version = " + qr.version + " , Error = " + qr.error +
-					" , Encoded Bits = " + encodedBits + " , Overhead Bits = " + (dataBits - encodedBits) +
-					" , Data bits = " + dataBits + " , Limit bits = " + maxDataBits);
+					"Version=" + qr.version + ", Error=" + qr.error +
+					" , Encoded_Bits=" + encodedBits + ", Overhead_Bits=" + (dataBits - encodedBits) +
+					" , Data_bits=" + dataBits + ", Limit_bits=" + maxDataBits);
 		}
+	}
+
+	/**
+	 * Make sure the version is at least the minimum required for the encoding mode.
+	 */
+	private int ensureMinimumVersionForMode() {
+		int minimum = 0;
+		for (MessageSegment s : segments) {
+			int minVersion = switch (s.mode) {
+				case NUMERIC -> 1;
+				case ALPHANUMERIC -> 2;
+				case BYTE, KANJI -> 3;
+				default -> throw new RuntimeException("Unexpected mode " + s.mode);
+			};
+			minimum = Math.max(minVersion, minimum);
+		}
+		return minimum;
 	}
 
 	/**
@@ -471,7 +390,7 @@ public class MicroQrCodeEncoder {
 	private int bitsAtVersion( int version ) {
 		int total = 0;
 		for (int i = 0; i < segments.size(); i++) {
-			total += segments.get(i).sizeInBits(version);
+			total += sizeInBits(segments.get(i), version);
 		}
 		return total;
 	}
@@ -531,32 +450,14 @@ public class MicroQrCodeEncoder {
 		}
 	}
 
-	public Charset getByteCharacterSet() {
-		return byteCharacterSet;
-	}
-
-	public void setByteCharacterSet( Charset byteCharacterSet ) {
-		this.byteCharacterSet = byteCharacterSet;
-	}
-
-	@SuppressWarnings({"NullAway.Init"})
-	private static class MessageSegment {
-		MicroQrCode.Mode mode;
-		String message;
-		byte[] data;
-		int length;
-		// number of bits in the encoded message, excluding the length and mode bits
-		int encodedSizeBits;
-
-		public int sizeInBits( int version ) {
-			int lengthBits = switch (mode) {
-				case NUMERIC -> getLengthBitsNumeric(version);
-				case ALPHANUMERIC -> getLengthBitsAlphanumeric(version);
-				case BYTE -> getLengthBitsBytes(version);
-				case KANJI -> getLengthBitsKanji(version);
-				default -> throw new RuntimeException("Egads");
-			};
-			return encodedSizeBits + lengthBits + MicroQrCode.modeIndicatorBits(version);
-		}
+	public int sizeInBits( MessageSegment segment, int version ) {
+		int lengthBits = switch (segment.mode) {
+			case NUMERIC -> getLengthBitsNumeric(version);
+			case ALPHANUMERIC -> getLengthBitsAlphanumeric(version);
+			case BYTE -> getLengthBitsBytes(version);
+			case KANJI -> getLengthBitsKanji(version);
+			default -> throw new RuntimeException("Egads");
+		};
+		return segment.encodedSizeBits + lengthBits + MicroQrCode.modeIndicatorBitCount(version);
 	}
 }

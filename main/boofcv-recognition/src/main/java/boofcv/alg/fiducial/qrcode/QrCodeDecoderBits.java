@@ -40,8 +40,6 @@ public class QrCodeDecoderBits {
 	// storage fot the message's ecc
 	DogArray_I8 ecc = new DogArray_I8();
 
-	StringBuilder workString = new StringBuilder();
-
 	// Specified ECI encoding
 	@Nullable String encodingEci;
 
@@ -125,7 +123,7 @@ public class QrCodeDecoderBits {
 		bits.data = qr.corrected;
 		bits.size = qr.corrected.length*8;
 
-		workString.setLength(0);
+		utils.workString.setLength(0);
 
 		// if there isn't enough bits left to read the mode it must be done
 		int location = 0;
@@ -167,7 +165,7 @@ public class QrCodeDecoderBits {
 			return false;
 		}
 
-		qr.message = workString.toString();
+		qr.message = utils.workString.toString();
 		return true;
 	}
 
@@ -238,7 +236,7 @@ public class QrCodeDecoderBits {
 	 * @return Location it has read up to in bits
 	 */
 	private int decodeAlphanumeric( QrCode qr, PackedBits8 data, int bitLocation ) {
-		int lengthBits = QrCodeEncoder.getLengthBitsNumeric(qr.version);
+		int lengthBits = QrCodeEncoder.getLengthBitsAlphanumeric(qr.version);
 		return utils.decodeAlphanumeric(data, bitLocation, lengthBits);
 	}
 
@@ -250,7 +248,7 @@ public class QrCodeDecoderBits {
 	 * @return Location it has read up to in bits
 	 */
 	private int decodeByte( QrCode qr, PackedBits8 data, int bitLocation ) {
-		int lengthBits = QrCodeEncoder.getLengthBitsNumeric(qr.version);
+		int lengthBits = QrCodeEncoder.getLengthBitsBytes(qr.version);
 		utils.encodingEci = this.encodingEci;
 		return utils.decodeByte(data, bitLocation, lengthBits);
 	}
