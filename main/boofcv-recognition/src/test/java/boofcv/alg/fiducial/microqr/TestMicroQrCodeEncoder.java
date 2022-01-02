@@ -18,9 +18,9 @@
 
 package boofcv.alg.fiducial.microqr;
 
-import boofcv.alg.fiducial.qrcode.QrCodeEncoder;
 import org.junit.jupiter.api.Test;
 
+import static boofcv.alg.fiducial.qrcode.QrCodeCodecBitsUtils.flipBits8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -40,7 +40,7 @@ public class TestMicroQrCodeEncoder {
 				(byte)0b0100_0000, 0b0001_1000, (byte)0b1010_1100, (byte)0b1100_0011, 0b0000_0000,
 				(byte)0b1000_0110, 0b0000_1101, (byte)0b0010_0010, (byte)0b1010_1110, 0b0011_0000};
 
-		QrCodeEncoder.flipBits8(expected, expected.length);
+		flipBits8(expected, expected.length);
 
 		assertEquals(qr.rawbits.length, expected.length);
 		for (int i = 0; i < expected.length; i++) {

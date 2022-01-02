@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,7 +48,7 @@ public class QrCodeDecoderImage<T extends ImageGray<T>> {
 	 */
 	public boolean considerTransposed = true;
 
-	DogArray<QrCode> storageQR = new DogArray<>(QrCode::new);
+	DogArray<QrCode> storageQR = new DogArray<>(QrCode::new, QrCode::reset);
 	List<QrCode> successes = new ArrayList<>();
 	List<QrCode> failures = new ArrayList<>();
 
@@ -92,7 +92,6 @@ public class QrCodeDecoderImage<T extends ImageGray<T>> {
 			for (int j = 3, k = 0; k < 4; j = k, k++) {
 				if (ppn.edges[j] != null && ppn.edges[k] != null) {
 					QrCode qr = storageQR.grow();
-					qr.reset();
 
 					setPositionPatterns(ppn, j, k, qr);
 					computeBoundingBox(qr);

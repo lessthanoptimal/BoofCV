@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,7 @@ public class SquareNode {
 	// intersection of line 0 and 2  with 1 and 3.
 	public Point2D_F64 center = new Point2D_F64();
 	// length of sides. side = i and i+1
-	public double sideLengths[] = new double[4];
+	public double[] sideLengths = new double[4];
 	// the largest length
 	public double largestSide;
 	public double smallestSide;
@@ -53,7 +53,7 @@ public class SquareNode {
 	public int graph;
 
 	// edges in the graph. One for each side in the shape
-	public SquareEdge edges[] = new SquareEdge[4];
+	public SquareEdge[] edges = new SquareEdge[4];
 
 	/**
 	 * Finds the Euclidean distance squared of the closest corner to point p
