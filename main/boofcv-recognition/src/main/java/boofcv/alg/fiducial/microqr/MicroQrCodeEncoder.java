@@ -43,11 +43,7 @@ import static boofcv.alg.fiducial.qrcode.QrCodeEncoder.flipBits8;
  * @author Peter Abeles
  */
 public class MicroQrCodeEncoder {
-	// TODO support ECI
-
-	/**
-	 * All the possible values in alphanumeric mode.
-	 */
+	/** All the possible values in alphanumeric mode. */
 	public static final String ALPHANUMERIC = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:";
 
 	// used to compute error correction
@@ -184,6 +180,14 @@ public class MicroQrCodeEncoder {
 		return false;
 	}
 
+	/** Encodes into packed the mode. Number of bits vary depending on the version */
+	private void encodeMode( MicroQrCode.Mode mode ) {
+		int bits = MicroQrCode.modeIndicatorBits(qr.version);
+		if (bits == 0)
+			return;
+		packed.append(mode.ordinal(), bits, false);
+	}
+
 	/**
 	 * Creates a QR-Code which encodes a number sequence
 	 *
@@ -201,14 +205,6 @@ public class MicroQrCodeEncoder {
 			numbers[i] = (byte)values;
 		}
 		return addNumeric(numbers);
-	}
-
-	/** Encodes into packed the mode. Number of bits vary depending on the version */
-	private void encodeMode( MicroQrCode.Mode mode ) {
-		int bits = MicroQrCode.modeIndicatorBits(qr.version);
-		if (bits == 0)
-			return;
-		packed.append(mode.ordinal(), bits, false);
 	}
 
 	/**
@@ -233,7 +229,6 @@ public class MicroQrCodeEncoder {
 		segment.length = numbers.length;
 		segment.mode = MicroQrCode.Mode.NUMERIC;
 
-		segment.encodedSizeBits += MicroQrCode.modeIndicatorBits(qr.version);
 		segment.encodedSizeBits += 10*(segment.length/3);
 		if (segment.length%3 == 2) {
 			segment.encodedSizeBits += 7;
@@ -290,7 +285,6 @@ public class MicroQrCodeEncoder {
 		segment.length = values.length;
 		segment.mode = MicroQrCode.Mode.ALPHANUMERIC;
 
-		segment.encodedSizeBits += MicroQrCode.modeIndicatorBits(qr.version);
 		segment.encodedSizeBits += 11*(segment.length/2);
 		if (segment.length%2 == 1) {
 			segment.encodedSizeBits += 6;
@@ -369,7 +363,6 @@ public class MicroQrCodeEncoder {
 		segment.length = data.length;
 		segment.mode = MicroQrCode.Mode.BYTE;
 
-		segment.encodedSizeBits += MicroQrCode.modeIndicatorBits(qr.version);
 		segment.encodedSizeBits += 8*segment.length;
 
 		segments.add(segment);
@@ -496,7 +489,7 @@ public class MicroQrCodeEncoder {
 		if (packed.size != expectedBitSize)
 			throw new RuntimeException("Bad size code. " + packed.size + " vs " + expectedBitSize);
 
-		int maxBits = MicroQrCode.totalDataBits(qr.version, qr.error);
+		int maxBits = MicroQrCode.maxDataBits(qr.version, qr.error);
 
 		if (packed.size > maxBits) {
 			throw new IllegalArgumentException("The message is longer than the max possible size");
@@ -523,19 +516,20 @@ public class MicroQrCodeEncoder {
 	 */
 	private void autoSelectVersionAndError() {
 		if (qr.version == -1) {
-			MicroQrCode.ErrorLevel[] levelsToTry;
-			if (autoErrorCorrection) {
-				levelsToTry = MicroQrCode.allowedErrorCorrection(qr.version);
-			} else {
-				levelsToTry = new MicroQrCode.ErrorLevel[]{qr.error};
-			}
 			escape:
-			for (MicroQrCode.ErrorLevel error : levelsToTry) {
-				qr.error = error;
+			// select the smallest version which can store all the data
+			for (int version = 1; version <= 4; version++) {
+				MicroQrCode.ErrorLevel[] errorsToTry;
+				if (autoErrorCorrection) {
+					errorsToTry = MicroQrCode.allowedErrorCorrection(version);
+				} else {
+					errorsToTry = new MicroQrCode.ErrorLevel[]{qr.error};
+				}
 
-				// select the smallest version which can store all the data
-				for (int version = 1; version <= 4; version++) {
-					int maxDataBits = MicroQrCode.totalDataBits(version, error);
+				for (MicroQrCode.ErrorLevel error : errorsToTry) {
+					qr.error = error;
+
+					int maxDataBits = MicroQrCode.maxDataBits(version, error);
 					int encodedDataBits = bitsAtVersion(version);
 
 					// See if there's enough storage for this message
@@ -551,13 +545,15 @@ public class MicroQrCodeEncoder {
 		} else {
 			// the version is set but the error correction level isn't. Pick the one with
 			// the most error correction that can can store all the data
-			if (autoErrorCorrection) {
+			if (qr.version == 1) {
+				qr.error = MicroQrCode.ErrorLevel.DETECT;
+			} else if (autoErrorCorrection) {
 				@Nullable MicroQrCode.ErrorLevel selected = null;
 				MicroQrCode.VersionInfo v = MicroQrCode.VERSION_INFO[qr.version];
 				int encodedDataBits = bitsAtVersion(qr.version);
 
 				for (MicroQrCode.ErrorLevel error : MicroQrCode.allowedErrorCorrection(qr.version)) {
-					int maxDataBits = MicroQrCode.totalDataBits(qr.version, selected);
+					int maxDataBits = MicroQrCode.maxDataBits(qr.version, error);
 					if (encodedDataBits <= maxDataBits) {
 						selected = error;
 					}
@@ -572,7 +568,7 @@ public class MicroQrCodeEncoder {
 		}
 		// Sanity check
 		int dataBits = bitsAtVersion(qr.version);
-		int maxDataBits = MicroQrCode.totalDataBits(qr.version, qr.error);
+		int maxDataBits = MicroQrCode.maxDataBits(qr.version, qr.error);
 		if (dataBits > maxDataBits) {
 			int encodedBits = totalEncodedBitsNoOverHead();
 			throw new IllegalArgumentException("Version and error level can't encode all the data. " +
@@ -662,7 +658,7 @@ public class MicroQrCodeEncoder {
 		String message;
 		byte[] data;
 		int length;
-		// number of bits in the encoded message, excluding the length bits
+		// number of bits in the encoded message, excluding the length and mode bits
 		int encodedSizeBits;
 
 		public int sizeInBits( int version ) {
@@ -673,7 +669,7 @@ public class MicroQrCodeEncoder {
 				case KANJI -> getLengthBitsKanji(version);
 				default -> throw new RuntimeException("Egads");
 			};
-			return encodedSizeBits + lengthBits;
+			return encodedSizeBits + lengthBits + MicroQrCode.modeIndicatorBits(version);
 		}
 	}
 }

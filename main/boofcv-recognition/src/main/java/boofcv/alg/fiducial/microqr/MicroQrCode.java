@@ -18,6 +18,7 @@
 
 package boofcv.alg.fiducial.microqr;
 
+import boofcv.alg.fiducial.qrcode.QrCode;
 import boofcv.alg.fiducial.qrcode.QrCodePolynomialMath;
 import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
@@ -90,6 +91,9 @@ public class MicroQrCode {
 	 */
 	public boolean bitsTransposed;
 
+	/** Specifies where the QR code parsing failed */
+	public QrCode.Failure failureCause = QrCode.Failure.NONE;
+
 	public MicroQrCode() {
 		reset();
 	}
@@ -110,6 +114,7 @@ public class MicroQrCode {
 		corrected = null;
 		message = null;
 		bitsTransposed = false;
+		failureCause = QrCode.Failure.NONE;
 	}
 
 	/** Number of zero bits used to indicate end of message */
@@ -186,7 +191,7 @@ public class MicroQrCode {
 	}
 
 	public int getMaxDataBits() {
-		return totalDataBits(version, error);
+		return maxDataBits(version, error);
 	}
 
 	static {
@@ -213,7 +218,7 @@ public class MicroQrCode {
 	}
 
 	/** Returns number of data bits which can be encoded */
-	public static int totalDataBits( int version, ErrorLevel level ) {
+	public static int maxDataBits( int version, ErrorLevel level ) {
 		int bits = VERSION_INFO[version].levels.get(level).dataCodewords*8;
 
 		// last data code word is 4 bits in these cases
@@ -232,7 +237,7 @@ public class MicroQrCode {
 			case 1 -> new ErrorLevel[]{ErrorLevel.DETECT};
 			case 2, 3 -> new ErrorLevel[]{ErrorLevel.L, ErrorLevel.M};
 			case 4 -> new ErrorLevel[]{ErrorLevel.L, ErrorLevel.M, ErrorLevel.Q};
-			default -> throw new IllegalArgumentException("Illegal level");
+			default -> throw new IllegalArgumentException("Illegal version=" + version);
 		};
 	}
 
@@ -249,6 +254,11 @@ public class MicroQrCode {
 			case 2 -> new Mode[]{Mode.NUMERIC, Mode.ALPHANUMERIC};
 			default -> Mode.values();
 		};
+	}
+
+	/** Returns number of data code words */
+	public int getNumberOfDataCodeWords() {
+		return VERSION_INFO[version].levels.get(error).dataCodewords;
 	}
 
 	/** Error correction level */
@@ -305,30 +315,22 @@ public class MicroQrCode {
 	 * final mode is set to when decoding a QR code.
 	 */
 	public enum Mode {
-		NUMERIC(0b0001),
-		ALPHANUMERIC(0b0010),
-		BYTE(0b0100),
-		KANJI(0b1000),
+		NUMERIC,
+		ALPHANUMERIC,
+		BYTE,
+		KANJI,
+		/** More than one mode is used in the marker */
+		MIXED,
 		/** Place holder */
-		UNKNOWN(-1);
+		UNKNOWN;
 
-		final int bits;
+		// declare it here since I think values() creates a new array each time
+		private final static Mode[] v = values();
 
-		Mode( int bits ) {
-			this.bits = bits;
-		}
-
-		public static Mode lookup( int bits ) {
-			if (NUMERIC.bits == bits)
-				return NUMERIC;
-			else if (ALPHANUMERIC.bits == bits)
-				return ALPHANUMERIC;
-			else if (BYTE.bits == bits)
-				return BYTE;
-			else if (KANJI.bits == bits)
-				return KANJI;
-			else
+		public static Mode lookup( int value ) {
+			if ( value < 0 || value > 3)
 				return UNKNOWN;
+			return v[value];
 		}
 
 		public static @Nullable Mode lookup( String name ) {
