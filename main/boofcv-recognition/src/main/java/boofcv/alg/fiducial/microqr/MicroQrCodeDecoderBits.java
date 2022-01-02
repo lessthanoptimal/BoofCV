@@ -22,10 +22,15 @@ import boofcv.alg.fiducial.qrcode.PackedBits8;
 import boofcv.alg.fiducial.qrcode.QrCode;
 import boofcv.alg.fiducial.qrcode.QrCodeCodecBitsUtils;
 import boofcv.alg.fiducial.qrcode.ReidSolomonCodes;
+import boofcv.misc.BoofMiscOps;
+import lombok.Getter;
 import org.ddogleg.struct.DogArray_I8;
+import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.PrintStream;
 import java.util.Objects;
+import java.util.Set;
 
 import static boofcv.alg.fiducial.qrcode.QrCodeCodecBitsUtils.flipBits8;
 
@@ -34,7 +39,7 @@ import static boofcv.alg.fiducial.qrcode.QrCodeCodecBitsUtils.flipBits8;
  *
  * @author Peter Abeles
  */
-public class MicroQrCodeDecoderBits {
+public class MicroQrCodeDecoderBits implements VerbosePrint {
 	// used to compute error correction
 	ReidSolomonCodes rscodes = new ReidSolomonCodes(8, 0b100011101);
 	// storage for the data message
@@ -42,10 +47,12 @@ public class MicroQrCodeDecoderBits {
 	// storage fot the message's ecc
 	DogArray_I8 ecc = new DogArray_I8();
 
-	QrCodeCodecBitsUtils utils;
+	@Getter QrCodeCodecBitsUtils utils;
 
 	//------------------ Workspace
 	PackedBits8 decodeBits = new PackedBits8();
+
+	@Nullable PrintStream verbose = null;
 
 	/**
 	 * @param forceEncoding If null then the default byte encoding is used. If not null then the specified
@@ -91,6 +98,8 @@ public class MicroQrCodeDecoderBits {
 	}
 
 	public boolean decodeMessage( MicroQrCode qr ) {
+		if (verbose != null)
+			verbose.println("decode: version=" + qr.version + " error=" + qr.error + " corrected.length=" + qr.corrected.length);
 		decodeBits.data = qr.corrected;
 		decodeBits.size = qr.corrected.length*8;
 
@@ -107,21 +116,23 @@ public class MicroQrCodeDecoderBits {
 			if (terminator == 0)
 				break;
 
-			int modeLength = MicroQrCode.modeIndicatorBits(qr.version);
-			MicroQrCode.Mode mode;
+			int modeLength = MicroQrCode.modeIndicatorBitCount(qr.version);
+			QrCode.Mode mode;
 			if (modeLength >= 0) {
 				int modeBits = decodeBits.read(location, modeLength, true);
 				location += modeLength;
-				mode = MicroQrCode.Mode.lookup(modeBits);
+				mode = MicroQrCode.valueToMode(modeBits);
 
 				// See if something went really wrong
-				if (mode == MicroQrCode.Mode.UNKNOWN) {
+				if (mode == QrCode.Mode.UNKNOWN) {
+					if (verbose != null) verbose.println("mode=UNKNOWN Bad encoding?");
 					return false;
 				}
 			} else {
-				mode = MicroQrCode.Mode.NUMERIC;
+				mode = QrCode.Mode.NUMERIC;
 			}
 			qr.mode = updateModeLogic(qr.mode, mode);
+			if (verbose != null) verbose.println("_ mode=" + mode);
 
 			switch (mode) {
 				case NUMERIC -> location = decodeNumeric(qr, decodeBits, location);
@@ -129,12 +140,17 @@ public class MicroQrCodeDecoderBits {
 				case BYTE -> location = decodeByte(qr, decodeBits, location);
 				case KANJI -> location = decodeKanji(qr, decodeBits, location);
 				default -> {
+					if (verbose != null) verbose.println("Bad mode. mode=" + mode);
 					qr.failureCause = QrCode.Failure.UNKNOWN_MODE;
 					return false;
 				}
 			}
 
+			if (verbose != null)
+				verbose.println("_ work.length=" + utils.workString.length() + " location=" + location);
+
 			if (location < 0) {
+				if (verbose != null) verbose.println("_ Failed: cause=" + utils.failureCause);
 				qr.failureCause = utils.failureCause;
 				return false;
 			}
@@ -150,13 +166,13 @@ public class MicroQrCodeDecoderBits {
 	/**
 	 * If only one mode then that mode is used. If more than one mode is used then set to multiple
 	 */
-	private MicroQrCode.Mode updateModeLogic( MicroQrCode.Mode current, MicroQrCode.Mode candidate ) {
+	private QrCode.Mode updateModeLogic( QrCode.Mode current, QrCode.Mode candidate ) {
 		if (current == candidate)
 			return current;
-		else if (current == MicroQrCode.Mode.UNKNOWN) {
+		else if (current == QrCode.Mode.UNKNOWN) {
 			return candidate;
 		} else {
-			return MicroQrCode.Mode.MIXED;
+			return QrCode.Mode.MIXED;
 		}
 	}
 
@@ -180,7 +196,7 @@ public class MicroQrCodeDecoderBits {
 	 * @return Location it has read up to in bits
 	 */
 	private int decodeAlphanumeric( MicroQrCode qr, PackedBits8 data, int bitLocation ) {
-		int lengthBits = MicroQrCodeEncoder.getLengthBitsNumeric(qr.version);
+		int lengthBits = MicroQrCodeEncoder.getLengthBitsAlphanumeric(qr.version);
 		return utils.decodeAlphanumeric(data, bitLocation, lengthBits);
 	}
 
@@ -192,7 +208,7 @@ public class MicroQrCodeDecoderBits {
 	 * @return Location it has read up to in bits
 	 */
 	private int decodeByte( MicroQrCode qr, PackedBits8 data, int bitLocation ) {
-		int lengthBits = MicroQrCodeEncoder.getLengthBitsNumeric(qr.version);
+		int lengthBits = MicroQrCodeEncoder.getLengthBitsBytes(qr.version);
 		return utils.decodeByte(data, bitLocation, lengthBits);
 	}
 
@@ -204,7 +220,12 @@ public class MicroQrCodeDecoderBits {
 	 * @return Location it has read up to in bits
 	 */
 	private int decodeKanji( MicroQrCode qr, PackedBits8 data, int bitLocation ) {
-		int lengthBits = MicroQrCodeEncoder.getLengthBitsNumeric(qr.version);
+		int lengthBits = MicroQrCodeEncoder.getLengthBitsKanji(qr.version);
 		return utils.decodeByte(data, bitLocation, lengthBits);
+	}
+
+	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
+		this.verbose = BoofMiscOps.addPrefix(this, out);
+		BoofMiscOps.verboseChildren(out, configuration, utils);
 	}
 }

@@ -54,15 +54,11 @@ public class TestQrCodeEncoder extends BoofStandardJUnit {
 		}
 	}
 
-	@Test void checkAlphaNumericLookUpTable() {
-		assertEquals(45, QrCodeEncoder.ALPHANUMERIC.length());
-	}
-
 	/**
 	 * Compare only the data portion against an example from the specification
 	 */
 	@Test void alphanumeric_specification() {
-		QrCodeEncoder encoder = new QrCodeEncoder();
+		var encoder = new QrCodeEncoder();
 		encoder.setVersion(1).
 				setError(QrCode.ErrorLevel.H).
 				setMask(new QrCodeMaskPattern.NONE(0b011)).
@@ -78,27 +74,11 @@ public class TestQrCodeEncoder extends BoofStandardJUnit {
 		}
 	}
 
-	@Test void alphanumericToValues() {
-		byte[] found = QrCodeEncoder.alphanumericToValues("14AE%*+-./:");
-		byte[] expected = new byte[]{1, 4, 10, 14, 38, 39, 40, 41, 42, 43, 44};
-
-		assertArrayEquals(expected, found);
-	}
-
-	@Test void valueToAlphanumeric() {
-		byte[] input = new byte[]{1, 4, 10, 14, 38, 39, 40, 41, 42, 43, 44};
-		String expected = "14AE%*+-./:";
-		for (int i = 0; i < input.length; i++) {
-			char c = QrCodeEncoder.valueToAlphanumeric(input[i]);
-			assertEquals(expected.charAt(i), c);
-		}
-	}
-
 	/**
 	 * Test comparing against a data stream that was successfully decoded by another qr-code reader
 	 */
 	@Test void kanji() {
-		QrCodeEncoder encoder = new QrCodeEncoder();
+		var encoder = new QrCodeEncoder();
 		encoder.setVersion(2).setError(QrCode.ErrorLevel.M).
 				setMask(QrCodeMaskPattern.M011).
 				addKanji("阿ん鞠ぷへ≦Ｋ").fixate();
@@ -113,7 +93,7 @@ public class TestQrCodeEncoder extends BoofStandardJUnit {
 	}
 
 	@Test void automatic() {
-		QrCodeEncoder encoder = new QrCodeEncoder();
+		var encoder = new QrCodeEncoder();
 		QrCodeDecoderBits decoder = new QrCodeDecoderBits(EciEncoding.UTF8); // used to validate the message
 		QrCode qr = encoder.addAutomatic("123ASDdf阿ん鞠ぷへ≦Ｋ").fixate();
 		assertEquals(qr.message, "123ASDdf阿ん鞠ぷへ≦Ｋ");
@@ -145,12 +125,11 @@ public class TestQrCodeEncoder extends BoofStandardJUnit {
 	}
 
 	@Test void messageTooLong() {
-		assertThrows(IllegalArgumentException.class,
-				() ->
-						new QrCodeEncoder().setVersion(1).
-								setError(QrCode.ErrorLevel.M).
-								setMask(QrCodeMaskPattern.M011).
-								addAlphanumeric("01234567890123456789012345678901234567890123456789012345678901234567890123456789").fixate());
+		assertThrows(IllegalArgumentException.class, () ->
+				new QrCodeEncoder().setVersion(1).
+						setError(QrCode.ErrorLevel.M).
+						setMask(QrCodeMaskPattern.M011).
+						addAlphanumeric("01234567890123456789012345678901234567890123456789012345678901234567890123456789").fixate());
 	}
 
 	/**
@@ -195,8 +174,8 @@ public class TestQrCodeEncoder extends BoofStandardJUnit {
 	@Test void tooMuchData() {
 		QrCodeEncoder encoder = new QrCodeEncoder()
 				.setVersion(2).setError(QrCode.ErrorLevel.M).
-						setMask(QrCodeMaskPattern.M011).
-						addAlphanumeric("ASDASDJASD983405983094580SDF:LOEFLAWEQR");
+				setMask(QrCodeMaskPattern.M011).
+				addAlphanumeric("ASDASDJASD983405983094580SDF:LOEFLAWEQR");
 
 		assertThrows(RuntimeException.class, encoder::fixate);
 	}

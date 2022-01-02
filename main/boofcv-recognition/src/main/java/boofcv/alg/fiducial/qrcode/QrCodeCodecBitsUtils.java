@@ -18,12 +18,17 @@
 
 package boofcv.alg.fiducial.qrcode;
 
+import boofcv.misc.BoofMiscOps;
 import org.ddogleg.struct.DogArray_I8;
+import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
+import java.util.List;
+import java.util.Set;
 
 import static boofcv.alg.fiducial.qrcode.EciEncoding.guessEncoding;
 import static boofcv.alg.fiducial.qrcode.QrCode.Failure.JIS_UNAVAILABLE;
@@ -34,7 +39,7 @@ import static boofcv.alg.fiducial.qrcode.QrCode.Failure.KANJI_UNAVAILABLE;
  *
  * @author Peter Abeles
  */
-public class QrCodeCodecBitsUtils {
+public class QrCodeCodecBitsUtils implements VerbosePrint {
 	/** All the possible values in alphanumeric mode. */
 	public static final String ALPHANUMERIC = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:";
 
@@ -56,6 +61,8 @@ public class QrCodeCodecBitsUtils {
 
 	final static CharsetEncoder asciiEncoder = Charset.forName("ISO-8859-1").newEncoder();
 
+	@Nullable PrintStream verbose = null;
+
 	public QrCodeCodecBitsUtils( @Nullable String forceEncoding ) {
 		this.forceEncoding = forceEncoding;
 	}
@@ -72,6 +79,7 @@ public class QrCodeCodecBitsUtils {
 
 		while (length >= 3) {
 			if (data.size < bitLocation + 10) {
+				if (verbose != null) verbose.printf("overflow: numeric data.size=%d\n", data.size);
 				failureCause = QrCode.Failure.MESSAGE_OVERFLOW;
 				return -1;
 			}
@@ -126,6 +134,7 @@ public class QrCodeCodecBitsUtils {
 
 		while (length >= 2) {
 			if (data.size < bitLocation + 11) {
+				if (verbose != null) verbose.printf("overflow: alphanumeric data.size=%d\n", data.size);
 				failureCause = QrCode.Failure.MESSAGE_OVERFLOW;
 				return -1;
 			}
@@ -163,6 +172,7 @@ public class QrCodeCodecBitsUtils {
 		bitLocation += lengthBits;
 
 		if (length*8 > data.size - bitLocation) {
+			if (verbose != null) verbose.printf("overflow: byte data.size=%d\n", data.size);
 			failureCause = QrCode.Failure.MESSAGE_OVERFLOW;
 			return -1;
 		}
@@ -201,6 +211,7 @@ public class QrCodeCodecBitsUtils {
 
 		for (int i = 0; i < length; i++) {
 			if (data.size < bitLocation + 13) {
+				if (verbose != null) verbose.printf("overflow: kanji data.size=%d\n", data.size);
 				failureCause = QrCode.Failure.MESSAGE_OVERFLOW;
 				return -1;
 			}
@@ -297,7 +308,7 @@ public class QrCodeCodecBitsUtils {
 
 	public static char valueToAlphanumeric( int value ) {
 		if (value < 0 || value >= ALPHANUMERIC.length())
-			throw new RuntimeException("Value out of range");
+			throw new RuntimeException("Value out of range. value=" + value);
 		return ALPHANUMERIC.charAt(value);
 	}
 
@@ -367,5 +378,150 @@ public class QrCodeCodecBitsUtils {
 			int encoded = ((adjusted >> 8)*0xc0) + (adjusted & 0xff);
 			packed.append(encoded, 13, false);
 		}
+	}
+
+	public static MessageSegment createSegmentNumeric( String message ) {
+		byte[] numbers = new byte[message.length()];
+
+		for (int i = 0; i < message.length(); i++) {
+			char c = message.charAt(i);
+			int values = c - '0';
+			if (values < 0 || values > 9)
+				throw new RuntimeException("Expected each character to be a number from 0 to 9, not '" + c + "'");
+			numbers[i] = (byte)values;
+		}
+		return createSegmentNumeric(numbers);
+	}
+
+	public static MessageSegment createSegmentNumeric( byte[] numbers ) {
+		for (int i = 0; i < numbers.length; i++) {
+			if (numbers[i] < 0 || numbers[i] > 9)
+				throw new IllegalArgumentException("All numbers must have a value from 0 to 9");
+		}
+
+		var builder = new StringBuilder(numbers.length);
+		for (int i = 0; i < numbers.length; i++) {
+			builder.append(Integer.toString(numbers[i]));
+		}
+
+		var segment = new MessageSegment();
+		segment.message = builder.toString();
+		segment.data = numbers;
+		segment.length = numbers.length;
+		segment.mode = QrCode.Mode.NUMERIC;
+
+		segment.encodedSizeBits += 10*(segment.length/3);
+		if (segment.length%3 == 2) {
+			segment.encodedSizeBits += 7;
+		} else if (segment.length%3 == 1) {
+			segment.encodedSizeBits += 4;
+		}
+
+		return segment;
+	}
+
+	public static MessageSegment createSegmentAlphanumeric( String alphaNumeric ) {
+		byte[] values = alphanumericToValues(alphaNumeric);
+
+		var segment = new MessageSegment();
+		segment.message = alphaNumeric;
+		segment.data = values;
+		segment.length = values.length;
+		segment.mode = QrCode.Mode.ALPHANUMERIC;
+
+		segment.encodedSizeBits += 11*(segment.length/2);
+		if (segment.length%2 == 1) {
+			segment.encodedSizeBits += 6;
+		}
+
+		return segment;
+	}
+
+	public static MessageSegment createSegmentBytes( byte[] data ) {
+		var builder = new StringBuilder(data.length);
+		for (int i = 0; i < data.length; i++) {
+			builder.append((char)data[i]);
+		}
+
+		MessageSegment segment = new MessageSegment();
+		segment.message = builder.toString();
+		segment.data = data;
+		segment.length = data.length;
+		segment.mode = QrCode.Mode.BYTE;
+
+		segment.encodedSizeBits += 8*segment.length;
+
+		return segment;
+	}
+
+	public static MessageSegment createSegmentKanji( String message ) {
+		byte[] bytes;
+		try {
+			bytes = message.getBytes("Shift_JIS");
+		} catch (UnsupportedEncodingException ex) {
+			throw new IllegalArgumentException(ex);
+		}
+
+		var segment = new MessageSegment();
+		segment.message = message;
+		segment.data = bytes;
+		segment.length = message.length();
+		segment.mode = QrCode.Mode.KANJI;
+
+		segment.encodedSizeBits += 13*segment.length;
+		return segment;
+	}
+
+	/**
+	 * Select the encoding based on the letters in the message. A very simple algorithm is used internally.
+	 */
+	public static void addAutomatic( Charset byteCharacterSet,
+									 String message, List<MessageSegment> segments ) {
+		// very simple coding algorithm. Doesn't try to compress by using multiple formats
+		if (containsKanji(message)) {
+			// split into kanji and non-kanji segments
+			int start = 0;
+			boolean kanji = isKanji(message.charAt(0));
+			for (int i = 0; i < message.length(); i++) {
+				if (isKanji(message.charAt(i))) {
+					if (!kanji) {
+						addAutomatic(byteCharacterSet, message.substring(start, i), segments);
+						start = i;
+						kanji = true;
+					}
+				} else {
+					if (kanji) {
+						segments.add(createSegmentKanji(message.substring(start, i)));
+						start = i;
+						kanji = false;
+					}
+				}
+			}
+			if (kanji) {
+				segments.add(createSegmentKanji(message.substring(start)));
+			} else {
+				addAutomatic(byteCharacterSet, message.substring(start), segments);
+			}
+		} else if (containsByte(message)) {
+			segments.add(createSegmentBytes(message.getBytes(byteCharacterSet)));
+		} else if (containsAlphaNumeric(message)) {
+			segments.add(createSegmentAlphanumeric(message));
+		} else {
+			segments.add(createSegmentNumeric(message));
+		}
+	}
+
+	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
+		this.verbose = BoofMiscOps.addPrefix(this, out);
+	}
+
+	@SuppressWarnings({"NullAway.Init"})
+	public static class MessageSegment {
+		public QrCode.Mode mode;
+		public String message;
+		public byte[] data;
+		public int length;
+		// number of bits in the encoded message, excluding the length bits
+		public int encodedSizeBits;
 	}
 }
