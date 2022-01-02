@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,14 +21,10 @@ package boofcv.alg.fiducial.qrcode;
 import org.ddogleg.struct.DogArray_I8;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.UnsupportedEncodingException;
 import java.util.Objects;
 
 import static boofcv.alg.fiducial.qrcode.EciEncoding.getEciCharacterSet;
-import static boofcv.alg.fiducial.qrcode.EciEncoding.guessEncoding;
-import static boofcv.alg.fiducial.qrcode.QrCode.Failure.JIS_UNAVAILABLE;
-import static boofcv.alg.fiducial.qrcode.QrCode.Failure.KANJI_UNAVAILABLE;
-import static boofcv.alg.fiducial.qrcode.QrCodeEncoder.valueToAlphanumeric;
+import static boofcv.alg.fiducial.qrcode.QrCodeCodecBitsUtils.flipBits8;
 
 /**
  * After the data bits have been read this will decode them and extract a meaningful message.
@@ -49,16 +45,14 @@ public class QrCodeDecoderBits {
 	// Specified ECI encoding
 	@Nullable String encodingEci;
 
-	// If null the encoding of byte messages will attempt to be automatically determined, with a default
-	// of UTF-8. Otherwise this is the encoding used.
-	@Nullable String forceEncoding;
+	final QrCodeCodecBitsUtils utils;
 
 	/**
 	 * @param forceEncoding If null then the default byte encoding is used. If not null then the specified
 	 * encoding is used.
 	 */
 	public QrCodeDecoderBits( @Nullable String forceEncoding ) {
-		this.forceEncoding = forceEncoding;
+		this.utils = new QrCodeCodecBitsUtils(forceEncoding);
 	}
 
 	/**
@@ -101,14 +95,14 @@ public class QrCodeDecoderBits {
 		for (int idxBlock = 0; idxBlock < numberOfBlocks; idxBlock++) {
 			copyFromRawData(qr.rawbits, message, ecc, offsetBlock + idxBlock, stride, offsetEcc);
 
-			QrCodeEncoder.flipBits8(message);
-			QrCodeEncoder.flipBits8(ecc);
+			flipBits8(message);
+			flipBits8(ecc);
 
 			if (!rscodes.correct(message, ecc)) {
 				return false;
 			}
 
-			QrCodeEncoder.flipBits8(message);
+			flipBits8(message);
 			System.arraycopy(message.data, 0, qr.corrected, bytesDataRead, message.size);
 			bytesDataRead += message.size;
 		}
@@ -159,7 +153,7 @@ public class QrCodeDecoderBits {
 			}
 
 			if (location < 0) {
-				// cause is set inside of decoding function
+				qr.failureCause = utils.failureCause;
 				return false;
 			}
 		}
@@ -233,51 +227,7 @@ public class QrCodeDecoderBits {
 	 */
 	private int decodeNumeric( QrCode qr, PackedBits8 data, int bitLocation ) {
 		int lengthBits = QrCodeEncoder.getLengthBitsNumeric(qr.version);
-
-		int length = data.read(bitLocation, lengthBits, true);
-		bitLocation += lengthBits;
-
-		while (length >= 3) {
-			if (data.size < bitLocation + 10) {
-				qr.failureCause = QrCode.Failure.MESSAGE_OVERFLOW;
-				return -1;
-			}
-			int chunk = data.read(bitLocation, 10, true);
-			bitLocation += 10;
-
-			int valA = chunk/100;
-			int valB = (chunk - valA*100)/10;
-			int valC = chunk - valA*100 - valB*10;
-
-			workString.append((char)(valA + '0'));
-			workString.append((char)(valB + '0'));
-			workString.append((char)(valC + '0'));
-
-			length -= 3;
-		}
-
-		if (length == 2) {
-			if (data.size < bitLocation + 7) {
-				qr.failureCause = QrCode.Failure.MESSAGE_OVERFLOW;
-				return -1;
-			}
-			int chunk = data.read(bitLocation, 7, true);
-			bitLocation += 7;
-
-			int valA = chunk/10;
-			int valB = chunk - valA*10;
-			workString.append((char)(valA + '0'));
-			workString.append((char)(valB + '0'));
-		} else if (length == 1) {
-			if (data.size < bitLocation + 4) {
-				qr.failureCause = QrCode.Failure.MESSAGE_OVERFLOW;
-				return -1;
-			}
-			int valA = data.read(bitLocation, 4, true);
-			bitLocation += 4;
-			workString.append((char)(valA + '0'));
-		}
-		return bitLocation;
+		return utils.decodeNumeric(data, bitLocation, lengthBits);
 	}
 
 	/**
@@ -288,37 +238,8 @@ public class QrCodeDecoderBits {
 	 * @return Location it has read up to in bits
 	 */
 	private int decodeAlphanumeric( QrCode qr, PackedBits8 data, int bitLocation ) {
-		int lengthBits = QrCodeEncoder.getLengthBitsAlphanumeric(qr.version);
-
-		int length = data.read(bitLocation, lengthBits, true);
-		bitLocation += lengthBits;
-
-		while (length >= 2) {
-			if (data.size < bitLocation + 11) {
-				qr.failureCause = QrCode.Failure.MESSAGE_OVERFLOW;
-				return -1;
-			}
-			int chunk = data.read(bitLocation, 11, true);
-			bitLocation += 11;
-
-			int valA = chunk/45;
-			int valB = chunk - valA*45;
-
-			workString.append(valueToAlphanumeric(valA));
-			workString.append(valueToAlphanumeric(valB));
-			length -= 2;
-		}
-
-		if (length == 1) {
-			if (data.size < bitLocation + 6) {
-				qr.failureCause = QrCode.Failure.MESSAGE_OVERFLOW;
-				return -1;
-			}
-			int valA = data.read(bitLocation, 6, true);
-			bitLocation += 6;
-			workString.append(valueToAlphanumeric(valA));
-		}
-		return bitLocation;
+		int lengthBits = QrCodeEncoder.getLengthBitsNumeric(qr.version);
+		return utils.decodeAlphanumeric(data, bitLocation, lengthBits);
 	}
 
 	/**
@@ -329,35 +250,9 @@ public class QrCodeDecoderBits {
 	 * @return Location it has read up to in bits
 	 */
 	private int decodeByte( QrCode qr, PackedBits8 data, int bitLocation ) {
-		int lengthBits = QrCodeEncoder.getLengthBitsBytes(qr.version);
-
-		int length = data.read(bitLocation, lengthBits, true);
-		bitLocation += lengthBits;
-
-		if (length*8 > data.size - bitLocation) {
-			qr.failureCause = QrCode.Failure.MESSAGE_OVERFLOW;
-			return -1;
-		}
-
-		byte[] rawdata = new byte[length];
-
-		for (int i = 0; i < length; i++) {
-			rawdata[i] = (byte)data.read(bitLocation, 8, true);
-			bitLocation += 8;
-		}
-
-		// If ECI encoding is not specified use the default encoding. Unfortunately the specification is ignored
-		// by most people here and UTF-8 is used. If an encoding is specified then that is used.
-		String encoding = encodingEci == null ? (forceEncoding != null ? forceEncoding : guessEncoding(rawdata))
-				: encodingEci;
-
-		try {
-			workString.append(new String(rawdata, encoding));
-		} catch (UnsupportedEncodingException ignored) {
-			qr.failureCause = JIS_UNAVAILABLE;
-			return -1;
-		}
-		return bitLocation;
+		int lengthBits = QrCodeEncoder.getLengthBitsNumeric(qr.version);
+		utils.encodingEci = this.encodingEci;
+		return utils.decodeByte(data, bitLocation, lengthBits);
 	}
 
 	/**
@@ -369,42 +264,7 @@ public class QrCodeDecoderBits {
 	 */
 	private int decodeKanji( QrCode qr, PackedBits8 data, int bitLocation ) {
 		int lengthBits = QrCodeEncoder.getLengthBitsKanji(qr.version);
-
-		int length = data.read(bitLocation, lengthBits, true);
-		bitLocation += lengthBits;
-
-		byte[] rawdata = new byte[length*2];
-
-		for (int i = 0; i < length; i++) {
-			if (data.size < bitLocation + 13) {
-				qr.failureCause = QrCode.Failure.MESSAGE_OVERFLOW;
-				return -1;
-			}
-			int letter = data.read(bitLocation, 13, true);
-			bitLocation += 13;
-
-			letter = ((letter/0x0C0) << 8) | (letter%0x0C0);
-
-			if (letter < 0x01F00) {
-				// In the 0x8140 to 0x9FFC range
-				letter += 0x08140;
-			} else {
-				// In the 0xE040 to 0xEBBF range
-				letter += 0x0C140;
-			}
-			rawdata[i*2] = (byte)(letter >> 8);
-			rawdata[i*2 + 1] = (byte)letter;
-		}
-
-		// Shift_JIS may not be supported in some environments:
-		try {
-			workString.append(new String(rawdata, "Shift_JIS"));
-		} catch (UnsupportedEncodingException ignored) {
-			qr.failureCause = KANJI_UNAVAILABLE;
-			return -1;
-		}
-
-		return bitLocation;
+		return utils.decodeKanji(data, bitLocation, lengthBits);
 	}
 
 	/**

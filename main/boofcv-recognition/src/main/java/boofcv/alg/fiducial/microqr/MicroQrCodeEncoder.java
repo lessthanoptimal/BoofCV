@@ -19,18 +19,18 @@
 package boofcv.alg.fiducial.microqr;
 
 import boofcv.alg.fiducial.qrcode.PackedBits8;
+import boofcv.alg.fiducial.qrcode.QrCodeCodecBitsUtils;
 import boofcv.alg.fiducial.qrcode.ReidSolomonCodes;
 import org.ddogleg.struct.DogArray_I8;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-import static boofcv.alg.fiducial.qrcode.QrCodeEncoder.flipBits8;
+import static boofcv.alg.fiducial.qrcode.QrCodeCodecBitsUtils.*;
 
 /**
  * Provides an easy to use interface for specifying QR-Code parameters and generating the raw data sequence. After
@@ -43,9 +43,6 @@ import static boofcv.alg.fiducial.qrcode.QrCodeEncoder.flipBits8;
  * @author Peter Abeles
  */
 public class MicroQrCodeEncoder {
-	/** All the possible values in alphanumeric mode. */
-	public static final String ALPHANUMERIC = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:";
-
 	// used to compute error correction
 	private final ReidSolomonCodes rscodes = new ReidSolomonCodes(8, 0b100011101);
 
@@ -70,14 +67,6 @@ public class MicroQrCodeEncoder {
 	// Since QR Code version might not be known initially and the size of the length byte depends on the
 	// version, store the segments here until fixate is called.
 	private final List<MessageSegment> segments = new ArrayList<>();
-
-//	Set<Character.UnicodeBlock> japaneseUnicodeBlocks = new HashSet<>() {{
-//		add(Character.UnicodeBlock.HIRAGANA);
-//		add(Character.UnicodeBlock.KATAKANA);
-//		add(Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS);
-//	}};
-
-	CharsetEncoder asciiEncoder = Charset.forName("ISO-8859-1").newEncoder();
 
 	public MicroQrCodeEncoder() {
 		reset();
@@ -149,37 +138,6 @@ public class MicroQrCodeEncoder {
 		}
 	}
 
-	private boolean isKanji( char c ) {
-		return !asciiEncoder.canEncode(c);
-//		return japaneseUnicodeBlocks.contains(Character.UnicodeBlock.of(c));
-	}
-
-	private boolean containsKanji( String message ) {
-		for (int i = 0; i < message.length(); i++) {
-			if (isKanji(message.charAt(i))) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private boolean containsByte( String message ) {
-		for (int i = 0; i < message.length(); i++) {
-			if (ALPHANUMERIC.indexOf(message.charAt(i)) == -1)
-				return true;
-		}
-		return false;
-	}
-
-	private boolean containsAlphaNumeric( String message ) {
-		for (int i = 0; i < message.length(); i++) {
-			int c = (int)message.charAt(i) - '0';
-			if (c < 0 || c > 9)
-				return true;
-		}
-		return false;
-	}
-
 	/** Encodes into packed the mode. Number of bits vary depending on the version */
 	private void encodeMode( MicroQrCode.Mode mode ) {
 		int bits = MicroQrCode.modeIndicatorBits(qr.version);
@@ -248,23 +206,7 @@ public class MicroQrCodeEncoder {
 		// specify the mode
 		encodeMode(qr.mode);
 
-		// Specify the number of digits
-		packed.append(length, lengthBits, false);
-
-		// Append the digits
-		int index = 0;
-		while (length - index >= 3) {
-			int value = numbers[index]*100 + numbers[index + 1]*10 + numbers[index + 2];
-			packed.append(value, 10, false);
-			index += 3;
-		}
-		if (length - index == 2) {
-			int value = numbers[index]*10 + numbers[index + 1];
-			packed.append(value, 7, false);
-		} else if (length - index == 1) {
-			int value = numbers[index];
-			packed.append(value, 4, false);
-		}
+		QrCodeCodecBitsUtils.encodeNumeric(numbers, length, lengthBits, packed);
 	}
 
 	/**
@@ -303,39 +245,7 @@ public class MicroQrCodeEncoder {
 		// specify the mode
 		encodeMode(qr.mode);
 
-		// Specify the number of digits
-		packed.append(length, lengthBits, false);
-
-		// Append the digits
-		int index = 0;
-		while (length - index >= 2) {
-			int value = numbers[index]*45 + numbers[index + 1];
-			packed.append(value, 11, false);
-			index += 2;
-		}
-		if (length - index == 1) {
-			int value = numbers[index];
-			packed.append(value, 6, false);
-		}
-	}
-
-	public static byte[] alphanumericToValues( String data ) {
-		byte[] output = new byte[data.length()];
-
-		for (int i = 0; i < data.length(); i++) {
-			char c = data.charAt(i);
-			int value = ALPHANUMERIC.indexOf(c);
-			if (value < 0)
-				throw new IllegalArgumentException("Unsupported character '" + c + "' = " + (int)c);
-			output[i] = (byte)value;
-		}
-		return output;
-	}
-
-	public static char valueToAlphanumeric( int value ) {
-		if (value < 0 || value >= ALPHANUMERIC.length())
-			throw new RuntimeException("Value out of range");
-		return ALPHANUMERIC.charAt(value);
+		QrCodeCodecBitsUtils.encodeAlphanumeric(numbers, length, lengthBits, packed);
 	}
 
 	public MicroQrCodeEncoder addBytes( String message ) {
@@ -378,13 +288,7 @@ public class MicroQrCodeEncoder {
 		// specify the mode
 		encodeMode(qr.mode);
 
-		// Specify the number of digits
-		packed.append(length, lengthBits, false);
-
-		// Append the digits
-		for (int i = 0; i < length; i++) {
-			packed.append(data[i] & 0xff, 8, false);
-		}
+		QrCodeCodecBitsUtils.encodeBytes(data, length, lengthBits, packed);
 	}
 
 	/**
@@ -426,24 +330,7 @@ public class MicroQrCodeEncoder {
 		// specify the mode
 		encodeMode(qr.mode);
 
-		// Specify the number of characters
-		packed.append(length, lengthBits, false);
-
-		for (int i = 0; i < bytes.length; i += 2) {
-			int byte1 = bytes[i] & 0xFF;
-			int byte2 = bytes[i + 1] & 0xFF;
-			int code = (byte1 << 8) | byte2;
-			int adjusted;
-			if (code >= 0x8140 && code <= 0x9ffc) {
-				adjusted = code - 0x8140;
-			} else if (code >= 0xe040 && code <= 0xebbf) {
-				adjusted = code - 0xc140;
-			} else {
-				throw new IllegalArgumentException("Invalid byte sequence. At " + (i/2));
-			}
-			int encoded = ((adjusted >> 8)*0xc0) + (adjusted & 0xff);
-			packed.append(encoded, 13, false);
-		}
+		QrCodeCodecBitsUtils.encodeKanji(bytes, length, lengthBits, packed);
 	}
 
 	public static int getLengthBitsNumeric( int version ) {

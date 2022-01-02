@@ -21,6 +21,7 @@ package boofcv.alg.fiducial.qrcode;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
+import static boofcv.alg.fiducial.qrcode.QrCodeCodecBitsUtils.flipBits8;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -45,7 +46,7 @@ public class TestQrCodeEncoder extends BoofStandardJUnit {
 				(byte)0b11010100, (byte)0b11000001, (byte)0b11101101, 0b00110110,
 				(byte)0b11000111, (byte)0b10000111, 0b00101100, 0b01010101};
 
-		QrCodeEncoder.flipBits8(expected, expected.length);
+		flipBits8(expected, expected.length);
 
 		assertEquals(qr.rawbits.length, expected.length);
 		for (int i = 0; i < expected.length; i++) {
@@ -69,7 +70,7 @@ public class TestQrCodeEncoder extends BoofStandardJUnit {
 
 		byte[] expected = new byte[]{0b00100000, 0b00101001, (byte)0b11001110, (byte)0b11100111, 0b00100001, 0};
 
-		QrCodeEncoder.flipBits8(expected, expected.length);
+		flipBits8(expected, expected.length);
 
 		assertEquals(encoder.packed.size/8, expected.length);
 		for (int i = 0; i < expected.length; i++) {
