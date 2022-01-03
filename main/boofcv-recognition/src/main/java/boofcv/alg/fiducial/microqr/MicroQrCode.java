@@ -20,11 +20,15 @@ package boofcv.alg.fiducial.microqr;
 
 import boofcv.alg.fiducial.qrcode.QrCode;
 import boofcv.alg.fiducial.qrcode.QrCode.Mode;
+import boofcv.alg.fiducial.qrcode.QrCodeCodeWordLocations;
 import boofcv.alg.fiducial.qrcode.QrCodePolynomialMath;
 import georegression.struct.homography.Homography2D_F64;
+import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static boofcv.alg.fiducial.microqr.MicroQrCode.ErrorLevel.*;
@@ -43,7 +47,11 @@ public class MicroQrCode {
 	/** Maximum possible version of a Micro QR Code */
 	public static final int MAX_VERSION = 4;
 
+	/** Specifies characteristics of each version */
 	public static final VersionInfo[] VERSION_INFO = new VersionInfo[MAX_VERSION + 1];
+
+	/** Location of data bits in the code qr for each version. Precomputed for speed. */
+	public static final List<Point2D_I32>[] LOCATION_BITS = new ArrayList[MAX_VERSION + 1];
 
 	/**
 	 * Version of the marker. This can be from 1 to 4.
@@ -52,8 +60,11 @@ public class MicroQrCode {
 
 	public ErrorLevel error = ErrorLevel.L;
 
-	/** Location of position pattern in the image */
+	/** Location of position pattern (pp) in the image */
 	public Polygon2D_F64 pp = new Polygon2D_F64(4);
+
+	/** Locally computed threshold around the pp */
+	public double thresholdPP;
 
 	/** Text encoding mode */
 	public Mode mode = Mode.UNKNOWN;
@@ -91,6 +102,9 @@ public class MicroQrCode {
 	 */
 	public boolean bitsTransposed;
 
+	/** Number of bit errors detected when apply error correction to the message */
+	public int totalBitErrors;
+
 	/** Specifies where the QR code parsing failed */
 	public QrCode.Failure failureCause = QrCode.Failure.NONE;
 
@@ -118,6 +132,7 @@ public class MicroQrCode {
 		corrected = null;
 		message = null;
 		bitsTransposed = false;
+		totalBitErrors = 0;
 		failureCause = QrCode.Failure.NONE;
 	}
 
@@ -141,11 +156,14 @@ public class MicroQrCode {
 	 * Decodes format bits and updates the QR Code
 	 *
 	 * @param bits Format bits without mask
+	 * @return true if error correction didn't have a fault
 	 */
-	public void decodeFormatBits( int bits ) {
+	public boolean decodeFormatBits( int bits ) {
 		int corrected = QrCodePolynomialMath.correctFormatBits(bits);
+		if (corrected < 0)
+			return false;
 		mask = MicroQrCodeMaskPattern.lookupMask(corrected >> 3);
-		decodeVersionAndECC(corrected & 0x07);
+		return decodeVersionAndECC(corrected & 0x07);
 	}
 
 	/** Computes the 3-bit format which encodes marker version and ECC level */
@@ -172,7 +190,10 @@ public class MicroQrCode {
 		};
 	}
 
-	public void decodeVersionAndECC( int code ) {
+	/**
+	 * @return true if the code is valid
+	 */
+	public boolean decodeVersionAndECC( int code ) {
 		switch (code & 0x07) {
 			case 0b000 -> version = 1;
 			case 0b001, 0b010 -> version = 2;
@@ -184,14 +205,18 @@ public class MicroQrCode {
 			case 1 -> error = DETECT;
 			case 2 -> error = code == 0b001 ? L : M;
 			case 3 -> error = code == 0b011 ? L : M;
-			case 4 -> error = switch (code & 0b011) {
-				case 1 -> L;
-				case 2 -> M;
-				case 3 -> Q;
-				default -> throw new IllegalArgumentException(
-						"Invalid code: 0b" + Integer.toBinaryString(code & 0b011));
-			};
+			case 4 -> {
+				switch (code & 0b011) {
+					case 1 -> error = L;
+					case 2 -> error = M;
+					case 3 -> error = Q;
+					default -> {
+						return false;
+					}
+				}
+			}
 		}
+		return true;
 	}
 
 	public int getMaxDataBits() {
@@ -215,6 +240,10 @@ public class MicroQrCode {
 		VERSION_INFO[4].add(L, 16);
 		VERSION_INFO[4].add(M, 14);
 		VERSION_INFO[4].add(Q, 10);
+
+		for (int version = 1; version <= MAX_VERSION; version++) {
+			LOCATION_BITS[version] = QrCodeCodeWordLocations.microqr(version).bits;
+		}
 	}
 
 	public static int totalModules( int version ) {

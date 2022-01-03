@@ -363,7 +363,7 @@ public class QrCodeCodecBitsUtils implements VerbosePrint {
 		// Specify the number of characters
 		packed.append(length, lengthBits, false);
 
-		for (int i = 0; i < bytes.length; i += 2) {
+		for (int i = 0; i < length*2; i += 2) {
 			int byte1 = bytes[i] & 0xFF;
 			int byte2 = bytes[i + 1] & 0xFF;
 			int code = (byte1 << 8) | byte2;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -123,7 +123,8 @@ public class PackedBits8 implements PackedBits {
 		if (length < 0 || length > 32)
 			throw new IllegalArgumentException("Length can't exceed 32");
 		if (location + length > size)
-			throw new IllegalArgumentException("Attempting to read past the end");
+			throw new IllegalArgumentException("Attempting to read past the end. length=" + length +
+					" remaining=" + (size - location));
 
 		// TODO speed up by reading in byte chunks
 		int output = 0;

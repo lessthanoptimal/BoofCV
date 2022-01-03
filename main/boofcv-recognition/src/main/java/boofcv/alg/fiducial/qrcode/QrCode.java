@@ -356,9 +356,7 @@ public class QrCode implements Cloneable {
 		VERSION_INFO[40].add(H, 45, 15, 20);
 
 		for (int version = 1; version <= MAX_VERSION; version++) {
-			QrCodeCodeWordLocations mask = QrCodeCodeWordLocations.qrcode(version);
-
-			LOCATION_BITS[version] = mask.bits;
+			LOCATION_BITS[version] = QrCodeCodeWordLocations.qrcode(version).bits;
 		}
 	}
 

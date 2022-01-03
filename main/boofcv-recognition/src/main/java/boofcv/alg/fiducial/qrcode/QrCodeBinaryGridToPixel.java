@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,22 +43,22 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class QrCodeBinaryGridToPixel {
-	ModelGenerator<Homography2D_F64, AssociatedPair> generator = new GenerateHomographyLinear(true);
-	HomographyDirectLinearTransform dlt = new HomographyDirectLinearTransform(true);
+	final ModelGenerator<Homography2D_F64, AssociatedPair> generator = new GenerateHomographyLinear(true);
+	final HomographyDirectLinearTransform dlt = new HomographyDirectLinearTransform(true);
 
-	DogArray<AssociatedPair> storagePairs2D = new DogArray<>(AssociatedPair::new);
-	DogArray<AssociatedPair3D> storagePairs3D = new DogArray<>(AssociatedPair3D::new);
+	final DogArray<AssociatedPair> storagePairs2D = new DogArray<>(AssociatedPair::new);
+	final DogArray<AssociatedPair3D> storagePairs3D = new DogArray<>(AssociatedPair3D::new);
 
-	List<AssociatedPair> pairs2D = new ArrayList<>();
+	final List<AssociatedPair> pairs2D = new ArrayList<>();
 
-	DogArray<Point2D_F64> adjustments = new DogArray<>(Point2D_F64::new);
+	final DogArray<Point2D_F64> adjustments = new DogArray<>(Point2D_F64::new);
 
-	Homography2D_F64 H = new Homography2D_F64();
-	Homography2D_F64 Hinv = new Homography2D_F64();
-	Homography2D_F32 Hinv32 = new Homography2D_F32();
-	Homography2D_F32 H32 = new Homography2D_F32();
+	final Homography2D_F64 H = new Homography2D_F64();
+	public final Homography2D_F64 Hinv = new Homography2D_F64();
+	final Homography2D_F32 Hinv32 = new Homography2D_F32();
+	final Homography2D_F32 H32 = new Homography2D_F32();
 
-	Point2D_F64 tmp64 = new Point2D_F64();
+	final Point2D_F64 tmp64 = new Point2D_F64();
 
 	boolean adjustWithFeatures;
 
