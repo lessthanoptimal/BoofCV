@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,11 +49,11 @@ public abstract class QrGeneratorBase {
 	/** Used to render the marker */
 	@Setter protected FiducialRenderEngine render;
 
-	public QrGeneratorBase( double markerWidth ) {
+	protected QrGeneratorBase( double markerWidth ) {
 		this.markerWidth = markerWidth;
 	}
 
-	public QrGeneratorBase() {}
+	protected QrGeneratorBase() {}
 
 	protected void positionPattern( double x, double y, Polygon2D_F64 where ) {
 		// draw the outside square

@@ -18,7 +18,6 @@
 
 package boofcv.alg.fiducial.qrcode;
 
-import boofcv.alg.drawing.FiducialRenderEngine;
 import georegression.struct.point.Point2D_I32;
 
 /**
@@ -37,10 +36,6 @@ public class QrCodeGenerator extends QrGeneratorBase {
 	}
 
 	public QrCodeGenerator() {}
-
-	public void setRender( FiducialRenderEngine render ) {
-		this.render = render;
-	}
 
 	/**
 	 * Generates a QR Code with the specified message. An exception is thrown if the message is
