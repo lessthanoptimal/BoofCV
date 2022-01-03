@@ -25,6 +25,7 @@ import boofcv.alg.fiducial.qrcode.QrCodePolynomialMath;
 import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
+import org.ejml.dense.fixed.CommonOps_DDF3;
 
 import java.util.*;
 
@@ -36,7 +37,7 @@ import static boofcv.alg.fiducial.microqr.MicroQrCode.ErrorLevel.*;
  * @author Peter Abeles
  */
 @SuppressWarnings({"MutablePublicArray", "NullAway.Init"})
-public class MicroQrCode {
+public class MicroQrCode implements Cloneable {
 
 	/** Mask that's applied to format information when encoding */
 	public static final int FORMAT_MASK = 0b100010001000101;
@@ -120,7 +121,9 @@ public class MicroQrCode {
 	public void reset() {
 		for (int i = 0; i < 4; i++) {
 			pp.get(i).setTo(0, 0);
+			bounds.get(i).setTo(0, 0);
 		}
+		thresholdPP = 0;
 		version = -1;
 		error = MicroQrCode.ErrorLevel.L;
 		mask = MicroQrCodeMaskPattern.M00;
@@ -129,8 +132,37 @@ public class MicroQrCode {
 		corrected = null;
 		message = null;
 		bitsTransposed = false;
+		CommonOps_DDF3.setIdentity(Hinv);
 		totalBitErrors = 0;
 		failureCause = QrCode.Failure.NONE;
+	}
+
+	/**
+	 * Sets 'this' so that it's equivalent to 'o'.
+	 *
+	 * @param o The target object
+	 */
+	@SuppressWarnings("NullAway")
+	public MicroQrCode setTo( MicroQrCode o ) {
+		this.version = o.version;
+		this.error = o.error;
+		this.mask = o.mask;
+		this.mode = o.mode;
+		this.rawbits = o.rawbits == null ? null : o.rawbits.clone();
+		this.corrected = o.corrected == null ? null : o.corrected.clone();
+		this.message = o.message;
+		this.bitsTransposed = o.bitsTransposed;
+		this.pp.setTo(o.pp);
+		this.thresholdPP = o.thresholdPP;
+		this.failureCause = o.failureCause;
+		this.bounds.setTo(o.bounds);
+		this.Hinv.setTo(o.Hinv);
+		this.totalBitErrors = o.totalBitErrors;
+		return this;
+	}
+
+	@Override public MicroQrCode clone() {
+		return new MicroQrCode().setTo(this);
 	}
 
 	/** Number of zero bits used to indicate end of message */

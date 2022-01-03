@@ -405,11 +405,8 @@ public class QrCode implements Cloneable {
 		totalBitErrors = 0;
 	}
 
-	@Override
-	public QrCode clone() {
-		QrCode c = new QrCode();
-		c.setTo(this);
-		return c;
+	@Override public QrCode clone() {
+		return new QrCode().setTo(this);
 	}
 
 	/**
@@ -418,7 +415,7 @@ public class QrCode implements Cloneable {
 	 * @param o The target object
 	 */
 	@SuppressWarnings("NullAway")
-	public void setTo( QrCode o ) {
+	public QrCode setTo( QrCode o ) {
 		this.version = o.version;
 		this.error = o.error;
 		this.mask = o.mask;
@@ -439,7 +436,9 @@ public class QrCode implements Cloneable {
 			this.alignment.grow().set(o.alignment.get(i));
 		}
 		this.Hinv.setTo(o.Hinv);
+		this.bitsTransposed = o.bitsTransposed;
 		this.totalBitErrors = o.totalBitErrors;
+		return this;
 	}
 
 	/** Error correction level */

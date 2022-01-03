@@ -26,6 +26,7 @@ import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.alg.shapes.polygon.DetectPolygonFromContour;
 import boofcv.factory.interpolate.FactoryInterpolation;
+import boofcv.misc.BoofMiscOps;
 import boofcv.misc.MovingAverage;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.distort.PixelTransform;
@@ -41,9 +42,12 @@ import georegression.struct.point.Point2D_F32;
 import georegression.struct.shapes.Polygon2D_F64;
 import lombok.Getter;
 import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.PrintStream;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Detects position patterns for a QR code inside an image. This is done by detecting squares and seeing if they
@@ -53,7 +57,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
+public class QrCodePositionPatternDetector<T extends ImageGray<T>> implements VerbosePrint {
 
 	// used to subsample the input image
 	InterpolatePixelS<T> interpolate;
@@ -70,6 +74,8 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 
 	/** runtime profiling */
 	@Getter protected MovingAverage profilingMS = new MovingAverage(0.8);
+
+	@Nullable PrintStream verbose = null;
 
 	/**
 	 * Configures the detector
@@ -107,6 +113,9 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 		long time0 = System.nanoTime();
 		squaresToPositionList();
 		long time1 = System.nanoTime();
+
+		if (verbose != null)
+			verbose.printf("squares=%d position_pattern=%d\n", squareDetector.getPolygonInfo().size(), positionPatterns.size);
 
 		profilingMS.update((time1 - time0)*1e-6);
 	}
@@ -289,5 +298,9 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 		if (values[5] < threshold || values[6] > threshold)
 			return false;
 		return true;
+	}
+
+	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
+		this.verbose = BoofMiscOps.addPrefix(this, out);
 	}
 }
