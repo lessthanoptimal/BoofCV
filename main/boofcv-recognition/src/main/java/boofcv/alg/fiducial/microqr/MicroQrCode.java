@@ -26,10 +26,7 @@ import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static boofcv.alg.fiducial.microqr.MicroQrCode.ErrorLevel.*;
 
@@ -191,6 +188,8 @@ public class MicroQrCode {
 	}
 
 	/**
+	 * Decodes the version of error level
+	 *
 	 * @return true if the code is valid
 	 */
 	public boolean decodeVersionAndECC( int code ) {
@@ -259,7 +258,7 @@ public class MicroQrCode {
 
 	/** Returns number of data bits which can be encoded */
 	public static int maxDataBits( int version, ErrorLevel level ) {
-		int bits = VERSION_INFO[version].levels.get(level).dataCodewords*8;
+		int bits = VERSION_INFO[version].levels(level).dataCodewords*8;
 
 		// last data code word is 4 bits in these cases
 		if (version == 1 || version == 3) {
@@ -309,7 +308,7 @@ public class MicroQrCode {
 
 	/** Returns number of data code words */
 	public int getNumberOfDataCodeWords() {
-		return VERSION_INFO[version].levels.get(error).dataCodewords;
+		return VERSION_INFO[version].levels(error).dataCodewords;
 	}
 
 	/** Error correction level */
@@ -354,6 +353,10 @@ public class MicroQrCode {
 
 		public VersionInfo( int codewords ) {
 			this.codewords = codewords;
+		}
+
+		public DataInfo levels( ErrorLevel level ) {
+			return Objects.requireNonNull(levels.get(level));
 		}
 
 		public void add( ErrorLevel level, int dataCodewords ) {

@@ -44,7 +44,7 @@ public class MicroQrCodeGenerator extends QrGeneratorBase {
 
 		if (renderData) {
 			MicroQrCode.VersionInfo info = MicroQrCode.VERSION_INFO[qr.version];
-			MicroQrCode.DataInfo data = info.levels.get(qr.error);
+			MicroQrCode.DataInfo data = info.levels(qr.error);
 			int eccWords = info.codewords - data.dataCodewords;
 			int dataBits = qr.getMaxDataBits();
 
