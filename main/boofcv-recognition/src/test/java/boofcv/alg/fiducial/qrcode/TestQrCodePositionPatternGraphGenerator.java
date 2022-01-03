@@ -72,4 +72,11 @@ public class TestQrCodePositionPatternGraphGenerator extends BoofStandardJUnit {
 		assertEquals(0, n0.getNumberOfConnections());
 		assertEquals(0, n1.getNumberOfConnections());
 	}
+
+	/**
+	 * Call it mul
+	 */
+	@Test void multipleCalls() {
+
+	}
 }

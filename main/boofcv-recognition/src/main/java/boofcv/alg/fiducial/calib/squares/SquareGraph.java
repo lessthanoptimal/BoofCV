@@ -26,8 +26,8 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Vector2D_F64;
 import org.ddogleg.struct.DogArray;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 /**
  * Used for constructing a graph of squares that form a regular grid. Each square can have one edge per side.
@@ -35,8 +35,10 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class SquareGraph {
-	protected DogArray<SquareEdge> edges = new DogArray<>(SquareEdge::new, SquareEdge::reset);
-	protected List<SquareEdge> unused = new ArrayList<>();
+	// All edges which have been declared
+	protected DogArray<SquareEdge> declaredEdges = new DogArray<>(SquareEdge::new, SquareEdge::reset);
+	// Edges that were retired and ready to be reused
+	protected Deque<SquareEdge> unused = new ArrayDeque<>();
 
 	Vector2D_F64 vector0 = new Vector2D_F64();
 	Vector2D_F64 vector1 = new Vector2D_F64();
@@ -44,8 +46,11 @@ public class SquareGraph {
 	double parallelThreshold = UtilAngle.radian(45);
 
 	public void reset() {
-		unused.addAll(edges.toList());
-		edges.reset();
+		for (int i = 0; i < declaredEdges.size; i++) {
+			declaredEdges.get(i).reset();
+		}
+		unused.clear();
+		unused.addAll(declaredEdges.toList());
 	}
 
 	public static void computeNodeInfo( SquareNode n ) {
@@ -75,7 +80,7 @@ public class SquareGraph {
 	public void detachEdge( SquareEdge edge ) {
 		edge.a.edges[edge.sideA] = null;
 		edge.b.edges[edge.sideB] = null;
-		edge.distance = 0;
+		edge.reset();
 		unused.add(edge);
 	}
 
@@ -128,7 +133,6 @@ public class SquareGraph {
 	 */
 	void connect( SquareNode a, int indexA, SquareNode b, int indexB, double distance ) {
 		SquareEdge edge = getUnusedEdge();
-		edge.reset();
 
 		edge.a = a;
 		edge.sideA = indexA;
@@ -193,12 +197,10 @@ public class SquareGraph {
 	}
 
 	private SquareEdge getUnusedEdge() {
-		if (unused.size()>0) {
-			SquareEdge e = unused.remove(unused.size()-1);
-			e.reset();
-			return e;
+		if (!unused.isEmpty()) {
+			return unused.remove();
 		} else {
-			return edges.grow();
+			return declaredEdges.grow();
 		}
 	}
 
