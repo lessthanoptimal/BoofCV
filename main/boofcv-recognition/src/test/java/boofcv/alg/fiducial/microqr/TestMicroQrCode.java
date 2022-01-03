@@ -23,6 +23,7 @@ import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestMicroQrCode extends BoofStandardJUnit {
 
@@ -43,7 +44,7 @@ public class TestMicroQrCode extends BoofStandardJUnit {
 			for (ErrorLevel error : levels) {
 				qr.error = error;
 
-				found.decodeFormatBits(qr.encodeFormatBits());
+				assertTrue(found.decodeFormatBits(qr.encodeFormatBits()));
 
 				assertEquals(qr.version, found.version);
 				assertEquals(qr.error, found.error);

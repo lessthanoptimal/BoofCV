@@ -39,6 +39,7 @@ public class TestMicroQrCodeDecoderBits extends BoofStandardJUnit {
 		// perfect message with no errors
 		assertTrue(alg.applyErrorCorrection(qr));
 
+		assertEquals(0, qr.totalBitErrors);
 		int dataSize = qr.getNumberOfDataCodeWords();
 		for (int i = 0; i < dataSize; i++) {
 			assertEquals(original[i], qr.corrected[i]);
@@ -49,6 +50,7 @@ public class TestMicroQrCodeDecoderBits extends BoofStandardJUnit {
 		qr.corrected = null;
 
 		assertTrue(alg.applyErrorCorrection(qr));
+		assertTrue(qr.totalBitErrors > 0);
 
 		for (int i = 0; i < dataSize; i++) {
 			assertEquals(original[i], qr.corrected[i]);
@@ -73,7 +75,9 @@ public class TestMicroQrCodeDecoderBits extends BoofStandardJUnit {
 			var found = new MicroQrCode();
 			found.version = expected.version;
 			found.error = expected.error;
-			found.corrected = expected.rawbits.clone();
+			// Just copy the message data
+			found.corrected = new byte[expected.getNumberOfDataCodeWords()];
+			System.arraycopy(expected.rawbits, 0, found.corrected, 0, found.corrected.length);
 			assertTrue(alg.decodeMessage(found));
 
 			assertEquals(expected.message, found.message);

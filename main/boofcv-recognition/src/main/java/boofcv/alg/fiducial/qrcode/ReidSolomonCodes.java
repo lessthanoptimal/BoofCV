@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -343,5 +343,10 @@ public class ReidSolomonCodes {
 
 	private int syndromeLength() {
 		return generator.size - 1;
+	}
+
+	/** Number of bit errors */
+	public int getTotalErrors() {
+		return errorLocations.size;
 	}
 }

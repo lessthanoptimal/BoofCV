@@ -43,18 +43,24 @@ public class MicroQrCodeGenerator extends QrGeneratorBase {
 		formatInformation(qr);
 
 		if (renderData) {
-			if (qr.rawbits.length != MicroQrCode.VERSION_INFO[qr.version].codewords)
+			MicroQrCode.VersionInfo info = MicroQrCode.VERSION_INFO[qr.version];
+			MicroQrCode.DataInfo data = info.levels.get(qr.error);
+			int eccWords = info.codewords - data.dataCodewords;
+			int dataBits = qr.getMaxDataBits();
+
+			if (qr.rawbits.length != info.codewords)
 				throw new RuntimeException("Unexpected length of raw data.");
 
 			// mark which modules can store data
 			bitLocations = QrCodeCodeWordLocations.microqr(qr.version).bits;
 
-			int numBytes = bitLocations.size()/8;
+			int numBytes = bitLocations.size()/8 + (bitLocations.size()%8 == 0 ? 0 : 1);
 			if (numBytes != qr.rawbits.length)
 				throw new RuntimeException("Egads. unexpected length of qrcode raw data");
 
-			// Render the output data
-			renderData(qr.mask, qr.rawbits);
+			// Render the output data and handle situations where the last data word is only 4-bits
+			renderData(qr.mask, qr.rawbits, 0, 0, dataBits);
+			renderData(qr.mask, qr.rawbits, data.dataCodewords, dataBits, eccWords*8);
 		}
 
 		qr.bounds.set(0, 0, 0);
@@ -91,24 +97,19 @@ public class MicroQrCodeGenerator extends QrGeneratorBase {
 	/**
 	 * Renders the raw data bit output while applying the selected mask
 	 */
-	private void renderData(MicroQrCodeMaskPattern mask, byte[] rawbits) {
-		int count = 0;
+	private void renderData( MicroQrCodeMaskPattern mask, byte[] rawbits, int offsetByte, int offsetBits, int lengthBits ) {
+		for (int bitIdx = 0; bitIdx < lengthBits; bitIdx += 8) {
+			int bits = rawbits[offsetByte + bitIdx/8] & 0xFF;
 
-		int length = bitLocations.size() - bitLocations.size()%8;
-		while (count < length) {
-			int bits = rawbits[count/8] & 0xFF;
-
-			int N = Math.min(8, bitLocations.size() - count);
+			int N = Math.min(8, lengthBits - bitIdx);
 
 			for (int i = 0; i < N; i++) {
-				Point2D_I32 coor = bitLocations.get(count + i);
+				Point2D_I32 coor = bitLocations.get(offsetBits + bitIdx + i);
 				int value = mask.apply(coor.y, coor.x, ((bits >> i) & 0x01));
-//				int value = ((bits >> i ) & 0x01);
 				if (value > 0) {
 					square(coor.y, coor.x);
 				}
 			}
-			count += 8;
 		}
 	}
 }

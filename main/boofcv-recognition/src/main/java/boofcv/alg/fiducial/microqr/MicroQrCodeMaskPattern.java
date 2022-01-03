@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -81,7 +81,7 @@ public abstract class MicroQrCodeMaskPattern {
 	}
 
 	static class NONE extends MicroQrCodeMaskPattern {
-		public NONE( int bits ) { super(bits); }
+		public NONE( int bits ) {super(bits);}
 
 		@Override public int apply( int row, int col, int bitValue ) {
 			return bitValue;
@@ -89,7 +89,7 @@ public abstract class MicroQrCodeMaskPattern {
 	}
 
 	static class M00 extends MicroQrCodeMaskPattern {
-		public M00() { super(0b001); }
+		public M00() {super(0b001);}
 
 		@Override public int apply( int row, int col, int bitValue ) {
 			int mask = row%2;
@@ -98,7 +98,7 @@ public abstract class MicroQrCodeMaskPattern {
 	}
 
 	static class M01 extends MicroQrCodeMaskPattern {
-		public M01() { super(0b100); }
+		public M01() {super(0b100);}
 
 		@Override public int apply( int row, int col, int bitValue ) {
 			int mask = (row/2 + col/3)%2;
@@ -107,7 +107,7 @@ public abstract class MicroQrCodeMaskPattern {
 	}
 
 	static class M10 extends MicroQrCodeMaskPattern {
-		public M10() { super(0b110); }
+		public M10() {super(0b110);}
 
 		@Override public int apply( int row, int col, int bitValue ) {
 			return bitValue ^ (((row*col)%2 + (row*col)%3)%2 == 0 ? 1 : 0);
@@ -115,7 +115,7 @@ public abstract class MicroQrCodeMaskPattern {
 	}
 
 	static class M11 extends MicroQrCodeMaskPattern {
-		public M11() { super(0b111); }
+		public M11() {super(0b111);}
 
 		@Override public int apply( int row, int col, int bitValue ) {
 			int mask = ((row*col)%3 + (row + col)%2)%2;

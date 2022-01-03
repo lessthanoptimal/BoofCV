@@ -22,15 +22,19 @@ import boofcv.alg.fiducial.qrcode.PackedBits8;
 import boofcv.alg.fiducial.qrcode.QrCode;
 import boofcv.alg.fiducial.qrcode.QrCodeCodecBitsUtils;
 import boofcv.alg.fiducial.qrcode.ReidSolomonCodes;
+import boofcv.misc.BoofMiscOps;
 import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.struct.DogArray_I8;
+import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static boofcv.alg.fiducial.qrcode.QrCodeCodecBitsUtils.MessageSegment;
 import static boofcv.alg.fiducial.qrcode.QrCodeCodecBitsUtils.flipBits8;
@@ -45,7 +49,7 @@ import static boofcv.alg.fiducial.qrcode.QrCodeCodecBitsUtils.flipBits8;
  *
  * @author Peter Abeles
  */
-public class MicroQrCodeEncoder {
+public class MicroQrCodeEncoder implements VerbosePrint {
 	// used to compute error correction
 	private final ReidSolomonCodes rscodes = new ReidSolomonCodes(8, 0b100011101);
 
@@ -70,6 +74,8 @@ public class MicroQrCodeEncoder {
 	// Since QR Code version might not be known initially and the size of the length byte depends on the
 	// version, store the segments here until fixate is called.
 	private final List<MessageSegment> segments = new ArrayList<>();
+
+	@Nullable PrintStream verbose = null;
 
 	public MicroQrCodeEncoder() {
 		reset();
@@ -250,6 +256,8 @@ public class MicroQrCodeEncoder {
 	public MicroQrCode fixate() {
 		autoSelectVersionAndError();
 
+		if (verbose != null) verbose.printf("version=%d error=%s mask=%s\n", qr.version, qr.error, qr.mask);
+
 		// sanity check of code
 		int expectedBitSize = bitsAtVersion(qr.version);
 
@@ -264,12 +272,16 @@ public class MicroQrCodeEncoder {
 				case KANJI -> encodeKanji(m.data, m.length);
 				default -> throw new RuntimeException("Unsupported: " + m.mode);
 			}
-		}
 
+			if (verbose != null)
+				verbose.printf("_ segment: mode=%s message.size=%d packed.size=%d\n", m.mode, qr.message.length(), packed.size);
+		}
 		if (packed.size != expectedBitSize)
 			throw new RuntimeException("Bad size code. " + packed.size + " vs " + expectedBitSize);
 
 		int maxBits = MicroQrCode.maxDataBits(qr.version, qr.error);
+
+		if (verbose != null) verbose.printf("_ All Segments: packed.size=%d max=%d\n", packed.size, maxBits);
 
 		if (packed.size > maxBits) {
 			throw new IllegalArgumentException("The message is longer than the max possible size");
@@ -280,6 +292,7 @@ public class MicroQrCodeEncoder {
 		if (packed.size < maxBits) {
 			packed.append(0b0000, Math.min(terminatorBits, maxBits - packed.size), false);
 		}
+		if (verbose != null) verbose.printf("_ After Terminator: packed.size=%d\n", packed.size);
 
 		bitsToMessage(packed);
 
@@ -441,12 +454,19 @@ public class MicroQrCodeEncoder {
 	}
 
 	private void addPadding( DogArray_I8 queue, int dataBytes, int padding0, int padding1 ) {
+		if (verbose != null) verbose.printf("_ padding.size=%d\n", (queue.size - dataBytes));
+
 		boolean a = true;
 		for (int i = dataBytes; i < queue.size; i++, a = !a) {
 			if (a)
 				queue.data[i] = (byte)padding0;
 			else
 				queue.data[i] = (byte)padding1;
+		}
+
+		// Special case where the padding of the last character is 0000 since it's truncated
+		if (dataBytes < queue.size && (qr.version == 1 || qr.version == 3)) {
+			queue.data[queue.size - 1] = 0;
 		}
 	}
 
@@ -459,5 +479,9 @@ public class MicroQrCodeEncoder {
 			default -> throw new RuntimeException("Egads");
 		};
 		return segment.encodedSizeBits + lengthBits + MicroQrCode.modeIndicatorBitCount(version);
+	}
+
+	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
+		this.verbose = BoofMiscOps.addPrefix(this, out);
 	}
 }

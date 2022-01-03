@@ -75,7 +75,7 @@ public class MicroQrCodeDecoderBits implements VerbosePrint {
 
 		int wordsEcc = info.codewords - block.dataCodewords;
 
-		qr.corrected = new byte[info.codewords];
+		qr.corrected = new byte[block.dataCodewords];
 
 		ecc.resize(wordsEcc);
 		rscodes.generator(wordsEcc);
@@ -92,6 +92,8 @@ public class MicroQrCodeDecoderBits implements VerbosePrint {
 			return false;
 		}
 
+		qr.totalBitErrors = rscodes.getTotalErrors();
+
 		flipBits8(message);
 		System.arraycopy(message.data, 0, qr.corrected, 0, message.size);
 		return true;
@@ -101,7 +103,7 @@ public class MicroQrCodeDecoderBits implements VerbosePrint {
 		if (verbose != null)
 			verbose.println("decode: version=" + qr.version + " error=" + qr.error + " corrected.length=" + qr.corrected.length);
 		decodeBits.data = qr.corrected;
-		decodeBits.size = qr.corrected.length*8;
+		decodeBits.size = qr.getMaxDataBits();
 
 		utils.workString.setLength(0);
 
@@ -110,13 +112,21 @@ public class MicroQrCodeDecoderBits implements VerbosePrint {
 
 		// if there isn't enough bits left to read the mode it must be done
 		int location = 0;
-		while (location + terminatorBits < decodeBits.size) {
+		while (location <= decodeBits.size) {
 			// see if the terminator is all zeros and encoded data is at an end
-			int terminator = decodeBits.read(location, terminatorBits, true);
-			if (terminator == 0)
+			int adjustedTerminatorBits = Math.min(decodeBits.size - location, terminatorBits);
+			int terminator = decodeBits.read(location, adjustedTerminatorBits, false);
+			if (terminator == 0) {
+				location += terminatorBits;
 				break;
+			}
 
 			int modeLength = MicroQrCode.modeIndicatorBitCount(qr.version);
+			if (location + modeLength > decodeBits.size) {
+				if (verbose != null) verbose.println("reading mode overflowed");
+				qr.failureCause = QrCode.Failure.MESSAGE_OVERFLOW;
+				return false;
+			}
 			QrCode.Mode mode;
 			if (modeLength >= 0) {
 				int modeBits = decodeBits.read(location, modeLength, true);
@@ -156,10 +166,49 @@ public class MicroQrCodeDecoderBits implements VerbosePrint {
 			}
 		}
 
+		if (location < decodeBits.size && !checkPadding(location)) {
+			if (verbose != null) verbose.println("_ bad padding");
+			qr.failureCause = QrCode.Failure.READING_PADDING;
+			return false;
+		}
+
 		// NOTE: We could check padding for correctness here as an additional sanity check
 		//       I don't think this has ever caught an error with regular QR codes
 
 		qr.message = utils.workString.toString();
+		return true;
+	}
+
+	/**
+	 * Make sure the expected values have been filled in
+	 */
+	private boolean checkPadding( int location ) {
+		// We should handle this case but we don't
+		if (decodeBits.size - location < 8)
+			return true;
+
+		// Read until it's 8-bit aligned
+		int fillerBits = (8 - (location%8))%8;
+		if (fillerBits > 0) {
+			int filler = decodeBits.read(location, fillerBits, false);
+			if (filler != 0)
+				return false;
+		}
+		location += fillerBits;
+
+		// read the remaining full 8-bit padding. We should also handle the special 4-bit padding in some messages...
+		boolean even = true;
+		for (int bit = location + 8; bit <= decodeBits.size; bit += 8) {
+			int padding = decodeBits.read(bit - 8, 8, false);
+			if (even) {
+				if (padding != 0b00110111)
+					return false;
+			} else {
+				if (padding != 0b10001000)
+					return false;
+			}
+			even = !even;
+		}
 		return true;
 	}
 
@@ -221,7 +270,7 @@ public class MicroQrCodeDecoderBits implements VerbosePrint {
 	 */
 	private int decodeKanji( MicroQrCode qr, PackedBits8 data, int bitLocation ) {
 		int lengthBits = MicroQrCodeEncoder.getLengthBitsKanji(qr.version);
-		return utils.decodeByte(data, bitLocation, lengthBits);
+		return utils.decodeKanji(data, bitLocation, lengthBits);
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
