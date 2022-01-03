@@ -63,7 +63,7 @@ public abstract class MicroQrCodeMaskPattern {
 	public static MicroQrCodeMaskPattern lookupMask( int maskPattern ) {
 		return switch (maskPattern) {
 			case 0b00 -> M00;
-			case 0b01 -> M00;
+			case 0b01 -> M01;
 			case 0b10 -> M10;
 			case 0b11 -> M11;
 			default -> throw new RuntimeException("Unknown mask: " + maskPattern);
@@ -89,7 +89,7 @@ public abstract class MicroQrCodeMaskPattern {
 	}
 
 	static class M00 extends MicroQrCodeMaskPattern {
-		public M00() {super(0b001);}
+		public M00() {super(0b00);}
 
 		@Override public int apply( int row, int col, int bitValue ) {
 			int mask = row%2;
@@ -98,7 +98,7 @@ public abstract class MicroQrCodeMaskPattern {
 	}
 
 	static class M01 extends MicroQrCodeMaskPattern {
-		public M01() {super(0b100);}
+		public M01() {super(0b01);}
 
 		@Override public int apply( int row, int col, int bitValue ) {
 			int mask = (row/2 + col/3)%2;
@@ -107,7 +107,7 @@ public abstract class MicroQrCodeMaskPattern {
 	}
 
 	static class M10 extends MicroQrCodeMaskPattern {
-		public M10() {super(0b110);}
+		public M10() {super(0b10);}
 
 		@Override public int apply( int row, int col, int bitValue ) {
 			return bitValue ^ (((row*col)%2 + (row*col)%3)%2 == 0 ? 1 : 0);
@@ -115,7 +115,7 @@ public abstract class MicroQrCodeMaskPattern {
 	}
 
 	static class M11 extends MicroQrCodeMaskPattern {
-		public M11() {super(0b111);}
+		public M11() {super(0b11);}
 
 		@Override public int apply( int row, int col, int bitValue ) {
 			int mask = ((row*col)%3 + (row + col)%2)%2;

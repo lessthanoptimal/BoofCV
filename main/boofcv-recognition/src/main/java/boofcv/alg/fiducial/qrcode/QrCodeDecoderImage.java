@@ -137,7 +137,7 @@ public class QrCodeDecoderImage<T extends ImageGray<T>> {
 	}
 
 	/** Transposes the order of corners in the quadrilateral */
-	private static void transposeCorners( Polygon2D_F64 c ) {
+	public static void transposeCorners( Polygon2D_F64 c ) {
 		double tmpX = c.get(1).x;
 		double tmpY = c.get(1).y;
 

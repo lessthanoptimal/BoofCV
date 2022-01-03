@@ -18,27 +18,27 @@
 
 package boofcv.demonstrations.fiducial;
 
-import boofcv.abst.fiducial.QrCodePreciseDetector;
+import boofcv.BoofVerbose;
+import boofcv.abst.fiducial.MicroQrCodePreciseDetector;
 import boofcv.abst.filter.binary.BinaryContourFinder;
 import boofcv.alg.fiducial.calib.squares.SquareEdge;
 import boofcv.alg.fiducial.calib.squares.SquareNode;
-import boofcv.alg.fiducial.qrcode.PackedBits8;
+import boofcv.alg.fiducial.microqr.MicroQrCode;
 import boofcv.alg.fiducial.qrcode.PositionPatternNode;
 import boofcv.alg.fiducial.qrcode.QrCode;
-import boofcv.alg.fiducial.qrcode.QrCodeBinaryGridToPixel;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.demonstrations.shapes.DetectBlackShapeAppBase;
 import boofcv.demonstrations.shapes.ShapeGuiListener;
 import boofcv.demonstrations.shapes.ShapeVisualizePanel;
-import boofcv.factory.fiducial.ConfigQrCode;
+import boofcv.factory.fiducial.ConfigMicroQrCode;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.binary.VisualizeBinaryData;
-import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
@@ -47,7 +47,6 @@ import georegression.geometry.UtilPolygons2D_F64;
 import georegression.metric.Intersection2D_F64;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.DogArray;
 
@@ -70,23 +69,22 @@ import static boofcv.alg.fiducial.qrcode.QrCode.Failure.ALIGNMENT;
  * @author Peter Abeles
  */
 @SuppressWarnings({"NullAway.Init"})
-public class DetectQrCodeApp<T extends ImageGray<T>>
+public class DetectMicroQrApp<T extends ImageGray<T>>
 		extends DetectBlackShapeAppBase<T> implements ShapeGuiListener, DetectQrCodeMessagePanel.Listener {
-	QrCodePreciseDetector<T> detector;
+	MicroQrCodePreciseDetector<T> detector;
 
 	//--------- ONLY INVOKE IN THE GUI ------------
-	DetectQrCodeControlPanel controlPanel;
+	DetectMicroQrControlPanel controlPanel;
 	VisualizePanel gui = new VisualizePanel();
-	QrCodeBinaryGridToPixel locator = new QrCodeBinaryGridToPixel();
 
 	// Lock against detected
-	final DogArray<QrCode> detected = new DogArray<>(QrCode::new);
-	final DogArray<QrCode> failures = new DogArray<>(QrCode::new);
+	final DogArray<MicroQrCode> detected = new DogArray<>(MicroQrCode::new);
+	final DogArray<MicroQrCode> failures = new DogArray<>(MicroQrCode::new);
 
-	public DetectQrCodeApp( List<String> examples, Class<T> imageType ) {
+	public DetectMicroQrApp( List<String> examples, Class<T> imageType ) {
 		super(examples, imageType);
 
-		controlPanel = new DetectQrCodeControlPanel(this);
+		controlPanel = new DetectMicroQrControlPanel(this);
 		controlPanel.polygonPanel.removeControlNumberOfSides();
 		setupGui(gui, controlPanel);
 
@@ -136,10 +134,10 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 						System.out.println("Space down = " + spaceDown);
 
 						if (spaceDown) {
-							switch (DetectQrCodeApp.this.inputMethod) {
+							switch (DetectMicroQrApp.this.inputMethod) {
 								case VIDEO:
 								case WEBCAM:
-									DetectQrCodeApp.this.streamPaused = !DetectQrCodeApp.this.streamPaused;
+									DetectMicroQrApp.this.streamPaused = !DetectMicroQrApp.this.streamPaused;
 									break;
 								default:
 									break;
@@ -163,15 +161,15 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 		if (!initializing)
 			BoofSwingUtil.checkGuiThread();
 
-		DetectQrCodeControlPanel controls = (DetectQrCodeControlPanel)DetectQrCodeApp.this.controls;
+		DetectMicroQrControlPanel controls = (DetectMicroQrControlPanel)DetectMicroQrApp.this.controls;
 
 		synchronized (this) {
-			ConfigQrCode config = controls.getConfigQr();
+			ConfigMicroQrCode config = controls.getConfigQr();
 			config.threshold = controls.getThreshold().createConfig();
 			config.considerTransposed = controls.checkTransposed.value;
 
-			detector = FactoryFiducial.qrcode(config, imageClass);
-			detector.setProfilerState(true);
+			detector = FactoryFiducial.microqr(config, imageClass);
+			detector.setVerbose(System.out, BoofMiscOps.hashSet(BoofVerbose.RUNTIME));
 		}
 	}
 
@@ -208,6 +206,7 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 
 		// TODO Copy all data that's visualized outside so that GUI doesn't lock
 		synchronized (this) {
+//			detector.setVerbose(System.out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));
 			long before = System.nanoTime();
 			detector.process((T)input);
 			long after = System.nanoTime();
@@ -217,11 +216,11 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 		// create a local copy so that gui and processing thread's dont conflict
 		synchronized (detected) {
 			this.detected.reset();
-			for (QrCode d : detector.getDetections()) {
+			for (MicroQrCode d : detector.getDetections()) {
 				this.detected.grow().setTo(d);
 			}
 			this.failures.reset();
-			for (QrCode d : detector.getFailures()) {
+			for (MicroQrCode d : detector.getFailures()) {
 				if (d.failureCause.ordinal() >= QrCode.Failure.READING_BITS.ordinal())
 					this.failures.grow().setTo(d);
 			}
@@ -237,7 +236,7 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 			controls.setProcessingTimeS(timeInSeconds);
 			viewUpdated();
 			synchronized (detected) {
-				controlPanel.messagePanel.updateList(detected.toList(), failures.toList());
+//				controlPanel.messagePanel.updateList(detected.toList(), failures.toList());
 			}
 		});
 	}
@@ -257,7 +256,7 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 		final Point2D_F64 center = new Point2D_F64();
 
 		synchronized (detected) {
-			QrCode qr;
+			MicroQrCode qr;
 			if (failure) {
 				if (index >= failures.size)
 					return;
@@ -285,14 +284,13 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 	}
 
 	class VisualizePanel extends ShapeVisualizePanel {
-
 		@Override
 		protected void paintInPanel( AffineTransform tran, Graphics2D g2 ) {
 
-			DetectQrCodeControlPanel controls = (DetectQrCodeControlPanel)DetectQrCodeApp.this.controls;
+			var controls = (DetectMicroQrControlPanel)DetectMicroQrApp.this.controls;
 			BoofSwingUtil.antialiasing(g2);
 
-			synchronized (DetectQrCodeApp.this) {
+			synchronized (DetectMicroQrApp.this) {
 
 				if (controls.bShowContour) {
 					// todo copy after process() to avoid thread issues. or lock
@@ -306,17 +304,17 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 					if (controls.bShowMarkers) {
 						for (int i = 0; i < detected.size(); i++) {
 							g2.setColor(new Color(0x5011FF00, true));
-							QrCode qr = detected.get(i);
+							MicroQrCode qr = detected.get(i);
 							VisualizeShapes.fillPolygon(qr.bounds, scale, g2);
 
-							if (controls.bShowBits)
-								renderBinaryValues(g2, qr);
+//							if (controls.bShowBits)
+//								renderBinaryValues(g2, qr);
 						}
 					}
 
 					if (controls.bShowFailures) {
 						for (int i = 0; i < failures.size(); i++) {
-							QrCode qr = failures.get(i);
+							MicroQrCode qr = failures.get(i);
 							if (qr.failureCause.ordinal() < ALIGNMENT.ordinal())
 								continue;
 							switch (qr.failureCause) {
@@ -326,27 +324,27 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 							}
 							VisualizeShapes.fillPolygon(qr.bounds, scale, g2);
 
-							if (controls.bShowBits)
-								renderBinaryValues(g2, qr);
+//							if (controls.bShowBits)
+//								renderBinaryValues(g2, qr);
 						}
 					}
 				}
 
-				if (controls.bShowBits) {
-					synchronized (detected) {
-						for (int i = 0; i < detected.size(); i++) {
-							QrCode qr = detected.get(i);
-							renderBinaryValues(g2, qr);
-						}
-
-						for (int i = 0; i < failures.size(); i++) {
-							QrCode qr = failures.get(i);
-							if (qr.failureCause.ordinal() < ALIGNMENT.ordinal())
-								continue;
-							renderBinaryValues(g2, qr);
-						}
-					}
-				}
+//				if (controls.bShowBits) {
+//					synchronized (detected) {
+//						for (int i = 0; i < detected.size(); i++) {
+//							MicroQrCode qr = detected.get(i);
+//							renderBinaryValues(g2, qr);
+//						}
+//
+//						for (int i = 0; i < failures.size(); i++) {
+//							QrCode qr = failures.get(i);
+//							if (qr.failureCause.ordinal() < ALIGNMENT.ordinal())
+//								continue;
+//							renderBinaryValues(g2, qr);
+//						}
+//					}
+//				}
 
 				if (controls.bShowSquares) {
 					// todo copy after process() to avoid thread issues
@@ -356,13 +354,6 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 					g2.setStroke(new BasicStroke(3));
 					for (Polygon2D_F64 p : polygons) {
 						VisualizeShapes.drawPolygon(p, true, scale, g2);
-					}
-				}
-
-				if (controls.bShowAlignmentPattern) {
-					synchronized (detected) {
-						renderAlignmentPatterns(g2, detected.toList());
-						renderAlignmentPatterns(g2, failures.toList());
 					}
 				}
 
@@ -400,58 +391,6 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 					}
 				}
 			}
-		}
-
-		private void renderAlignmentPatterns( Graphics2D g2, List<QrCode> codes ) {
-			g2.setColor(Color.BLUE);
-			g2.setStroke(new BasicStroke(3));
-			for (QrCode qr : codes) {
-				double size = Math.sqrt(qr.ppCorner.areaSimple())/14.0;
-				for (int i = 0; i < qr.alignment.size; i++) {
-					QrCode.Alignment a = qr.alignment.get(i);
-					VisualizeFeatures.drawCircle(g2, a.pixel.x*scale, a.pixel.y*scale, size*scale);
-				}
-			}
-		}
-
-		/**
-		 * Draws the estimated value of each bit onto the image
-		 */
-		private void renderBinaryValues( Graphics2D g2, QrCode qr ) {
-			locator.setHomographyInv(qr.Hinv);
-
-			List<Point2D_I32> points = QrCode.LOCATION_BITS[qr.version];
-
-			PackedBits8 bits = new PackedBits8();
-			bits.data = qr.rawbits;
-			bits.size = qr.rawbits.length*8;
-
-			Point2D_F32 p = new Point2D_F32();
-			g2.setStroke(new BasicStroke(1));
-			for (int i = 0; i < bits.size; i++) {
-				Point2D_I32 c = points.get(i);
-				locator.gridToImage(c.y + 0.5f, c.x + 0.5f, p);
-				int value = qr.mask.apply(c.y, c.x, bits.get(i));
-
-				if (value == 1) {
-					renderCircleAt(g2, p, Color.BLACK, Color.LIGHT_GRAY);
-				} else if (value == 0) {
-					renderCircleAt(g2, p, Color.WHITE, Color.LIGHT_GRAY);
-				} else {
-					renderCircleAt(g2, p, Color.RED, Color.LIGHT_GRAY);
-				}
-			}
-
-//			int N = qr.totalModules();
-//			g2.setColor(Color.BLUE);
-//			locator.gridToImage(0,N-7,p);
-//			renderCircleAt(g2, p);
-//			locator.gridToImage(7,N-7,p);
-//			renderCircleAt(g2, p);
-//			locator.gridToImage(N-7,0,p);
-//			renderCircleAt(g2, p);
-//			locator.gridToImage(N-7,7,p);
-//			renderCircleAt(g2, p);
 		}
 
 		private void renderCircleAt( Graphics2D g2, Point2D_F32 p, Color center, Color border ) {
@@ -495,7 +434,7 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 		examples.add(UtilIO.pathExample("fiducial/qrcode/movie.mp4"));
 
 		SwingUtilities.invokeLater(() -> {
-			var app = new DetectQrCodeApp<>(examples, GrayF32.class);
+			var app = new DetectMicroQrApp<>(examples, GrayF32.class);
 			app.openExample(examples.get(0));
 			app.display("QR-Code Detector");
 		});

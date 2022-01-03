@@ -90,20 +90,29 @@ public class MicroQrCodeDecoderImage<T extends ImageGray<T>> implements VerboseP
 			qr.thresholdPP = ppn.grayThreshold;
 			qr.pp.setTo(ppn.square);
 
-			// try different orientations. We don't know which one is valid
 			boolean success = false;
-			for (int orientation = 0; orientation < 4; orientation++) {
-				if (verbose != null) verbose.printf("idx=%d orientation=%d pp=%s\n", i, orientation, qr.pp);
-				// Decode the entire marker now
-				if (decode(qr)) {
-					found.add(qr);
-					success = true;
-					break;
-				}
 
-				// Try another orientation
-				UtilPolygons2D_F64.shiftDown(qr.pp);
+			// consider that the encoder is non-standard and rendered a transposed marker
+			for (int transposed = 0; transposed < (considerTransposed ? 2 : 1); transposed++) {
+				if (transposed == 1)
+					QrCodeDecoderImage.transposeCorners(qr.pp);
+
+				// try different orientations. We don't know which one is valid
+				for (int orientation = 0; orientation < 4; orientation++) {
+					if (verbose != null) verbose.printf("idx=%d trans=%d orientation=%d pp=%s\n", i, transposed, orientation, qr.pp);
+					// Decode the entire marker now
+					if (decode(qr)) {
+						found.add(qr);
+						qr.bitsTransposed = transposed == 1;
+						success = true;
+						break;
+					}
+
+					// Try another orientation
+					UtilPolygons2D_F64.shiftDown(qr.pp);
+				}
 			}
+
 
 			if (!success) {
 				failures.add(qr);

@@ -76,26 +76,23 @@ public class MicroQrCodePreciseDetector<T extends ImageGray<T>> implements Micro
 		long time1 = System.nanoTime();
 		milliBinary.update((time1 - time0)*1e-6);
 
-		if (profiler != null) profiler.printf("qrcode: binary %5.2f ", milliBinary.getAverage());
-
 		// Find position patterns and create a graph
 		detectPositionPatterns.process(gray, contourHelper.padded());
 		List<PositionPatternNode> positionPatterns = detectPositionPatterns.getPositionPatterns().toList();
-
-		if (profiler != null) {
-			DetectPolygonFromContour<T> detectorPoly = detectPositionPatterns.getSquareDetector().getDetector();
-			profiler.printf(" contour %5.1f shapes %5.1f adjust_bias %5.2f PosPat %6.2f",
-					detectorPoly.getMilliContour(), detectorPoly.getMilliShapes(),
-					detectPositionPatterns.getSquareDetector().getMilliAdjustBias(),
-					detectPositionPatterns.getProfilingMS().getAverage());
-		}
 
 		time0 = System.nanoTime();
 		decoder.process(positionPatterns, gray);
 		time1 = System.nanoTime();
 		milliDecoding.update((time1 - time0)*1e-6);
 
-		if (profiler != null) profiler.printf(" decoding %5.1f\n", milliDecoding.getAverage());
+		if (profiler != null) {
+			DetectPolygonFromContour<T> detectorPoly = detectPositionPatterns.getSquareDetector().getDetector();
+			profiler.printf("qrcode: binary %5.2f contour %5.1f shapes %5.1f adjust_bias %5.2f PosPat %6.2f decoding %5.1f\n",
+					milliBinary.getAverage(),
+					detectorPoly.getMilliContour(), detectorPoly.getMilliShapes(),
+					detectPositionPatterns.getSquareDetector().getMilliAdjustBias(),
+					detectPositionPatterns.getProfilingMS().getAverage(), milliDecoding.getAverage());
+		}
 	}
 
 	@Override
@@ -141,6 +138,8 @@ public class MicroQrCodePreciseDetector<T extends ImageGray<T>> implements Micro
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
+		BoofMiscOps.verboseChildren(out, configuration, decoder, detectPositionPatterns);
+
 		if (configuration == null)
 			return;
 		if (configuration.contains(BoofVerbose.RUNTIME))
