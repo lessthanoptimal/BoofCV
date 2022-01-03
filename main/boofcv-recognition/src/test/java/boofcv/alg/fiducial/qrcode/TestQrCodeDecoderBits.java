@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,6 +38,7 @@ public class TestQrCodeDecoderBits extends BoofStandardJUnit {
 		// perfect message with no errors
 		assertTrue(alg.applyErrorCorrection(qr));
 
+		assertEquals(0, qr.totalBitErrors);
 		int dataSize = qr.getNumberOfDataBytes();
 		for (int i = 0; i < dataSize; i++) {
 			assertEquals(original[i], qr.corrected[i]);
@@ -48,6 +49,7 @@ public class TestQrCodeDecoderBits extends BoofStandardJUnit {
 		qr.corrected = null;
 
 		assertTrue(alg.applyErrorCorrection(qr));
+		assertTrue(qr.totalBitErrors > 0);
 
 		for (int i = 0; i < dataSize; i++) {
 			assertEquals(original[i], qr.corrected[i]);

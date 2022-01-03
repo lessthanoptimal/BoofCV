@@ -45,6 +45,9 @@ public class QrCodeDecoderBits {
 
 	final QrCodeCodecBitsUtils utils;
 
+	// Number of errors it found while applying error correction
+	int totalErrorBits;
+
 	/**
 	 * @param forceEncoding If null then the default byte encoding is used. If not null then the specified
 	 * encoding is used.
@@ -80,10 +83,15 @@ public class QrCodeDecoderBits {
 		ecc.resize(wordsEcc);
 		rscodes.generator(wordsEcc);
 
+		totalErrorBits = 0;
 		if (!decodeBlocks(qr, wordsBlockDataA, numBlocksA, 0, 0, totalDataBytes, totalBlocks))
 			return false;
 
-		return decodeBlocks(qr, wordsBlockDataB, numBlocksB, numBlocksA*wordsBlockDataA, numBlocksA, totalDataBytes, totalBlocks);
+		if (!decodeBlocks(qr, wordsBlockDataB, numBlocksB, numBlocksA*wordsBlockDataA, numBlocksA, totalDataBytes, totalBlocks))
+			return false;
+
+		qr.totalBitErrors = totalErrorBits;
+		return true;
 	}
 
 	private boolean decodeBlocks( QrCode qr, int bytesInDataBlock, int numberOfBlocks, int bytesDataRead,
@@ -99,6 +107,7 @@ public class QrCodeDecoderBits {
 			if (!rscodes.correct(message, ecc)) {
 				return false;
 			}
+			totalErrorBits += rscodes.getTotalErrors();
 
 			flipBits8(message);
 			System.arraycopy(message.data, 0, qr.corrected, bytesDataRead, message.size);

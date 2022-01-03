@@ -106,6 +106,9 @@ public class QrCode implements Cloneable {
 	/** A homography transform from grid bit coordinates into image pixels. */
 	public Homography2D_F64 Hinv = new Homography2D_F64();
 
+	/** Number of bit errors detected when apply error correction to the message */
+	public int totalBitErrors;
+
 	/**
 	 * True if the QR code was incorrectly encoded and the bits are transposed. If this is true then the position
 	 * patterns are stored in a transposed order. Bounds will not be affected.
@@ -399,6 +402,7 @@ public class QrCode implements Cloneable {
 		corrected = null;
 		message = null;
 		bitsTransposed = false;
+		totalBitErrors = 0;
 	}
 
 	@Override
@@ -435,6 +439,7 @@ public class QrCode implements Cloneable {
 			this.alignment.grow().set(o.alignment.get(i));
 		}
 		this.Hinv.setTo(o.Hinv);
+		this.totalBitErrors = o.totalBitErrors;
 	}
 
 	/** Error correction level */

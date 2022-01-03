@@ -53,19 +53,23 @@ public class TestQrCodePositionPatternDetector extends BoofStandardJUnit {
 		ThresholdImageOps.threshold(image, binary, 100, true);
 
 		QrCodePositionPatternDetector<GrayF32> alg = createAlg();
+		var graphGenerator = new QrCodePositionPatternGraphGenerator(2);
 
-		alg.process(image, binary);
+		// Run it multiple times to make sure reset is done correctly
+		for (int trial = 0; trial < 2; trial++) {
+			alg.process(image, binary);
 
-		List<PositionPatternNode> list = alg.getPositionPatterns().toList();
+			List<PositionPatternNode> list = alg.getPositionPatterns().toList();
 
-		// NOTE: This should be decoupled. These two classes used to be a single class
-		new QrCodePositionPatternGraphGenerator(2).process(list);
+			// NOTE: This should be decoupled. These two classes used to be a single class
+			graphGenerator.process(list);
 
-		assertEquals(3, list.size());
+			assertEquals(3, list.size());
 
-		checkNode(40 + 35, 60 + 35, 2, list);
-		checkNode(140 + 35, 60 + 35, 1, list);
-		checkNode(40 + 35, 150 + 35, 1, list);
+			checkNode(40 + 35, 60 + 35, 2, list);
+			checkNode(140 + 35, 60 + 35, 1, list);
+			checkNode(40 + 35, 150 + 35, 1, list);
+		}
 	}
 
 	@Test void withLensDistortion() {

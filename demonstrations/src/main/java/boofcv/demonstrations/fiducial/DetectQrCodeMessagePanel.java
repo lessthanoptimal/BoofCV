@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -132,8 +132,8 @@ public class DetectQrCodeMessagePanel extends StandardAlgConfigPanel
 			textArea.setText(String.format("Version %2d   Error %1s\nMask %4s   Mode %s\n\n%s",
 					qr.version, error, mask, mode, qr.failureCause.toString()));
 		} else {
-			textArea.setText(String.format("Version %2d   Error %1s\nMask %4s   Mode %s\n\n%s",
-					qr.version, error, mask, mode, qr.message));
+			textArea.setText(String.format("Version %2d   Error %1s\nMask %4s   Mode %s\nBit Errors %d\n\n%s",
+					qr.version, error, mask, mode, qr.totalBitErrors, qr.message));
 		}
 	}
 

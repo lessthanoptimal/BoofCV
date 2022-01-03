@@ -65,7 +65,8 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 	 * Returns a list of all the detected position pattern squares and the other PP that they are connected to.
 	 * If a lens distortion model is provided then coordinates will be in an undistorted image.
 	 */
-	@Getter DogArray<PositionPatternNode> positionPatterns = new DogArray<>(PositionPatternNode::new);
+	@Getter DogArray<PositionPatternNode> positionPatterns = new DogArray<>(
+			PositionPatternNode::new, PositionPatternNode::reset);
 
 	/** runtime profiling */
 	@Getter protected MovingAverage profilingMS = new MovingAverage(0.8);
@@ -98,7 +99,6 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 	 */
 	public void process( T gray, GrayU8 binary ) {
 		configureContourDetector(gray);
-		positionPatterns.reset();
 		interpolate.setImage(gray);
 
 		// detect squares
@@ -175,7 +175,6 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 			squareDetector.refine(info);
 
 			PositionPatternNode pp = this.positionPatterns.grow();
-			pp.reset();
 			pp.square = info.polygon;
 			pp.grayThreshold = grayThreshold;
 
