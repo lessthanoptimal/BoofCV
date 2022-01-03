@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,9 +37,7 @@ public class TestSquareGraph extends BoofStandardJUnit {
 		SquareNode a = new SquareNode();
 		a.square = new Polygon2D_F64(-1,1,  2,1,  2,-1,  -1,-1);
 
-		SquareGraph alg = new SquareGraph();
-
-		alg.computeNodeInfo(a);
+		SquareGraph.computeNodeInfo(a);
 
 		assertEquals(3,a.sideLengths[0], UtilEjml.TEST_F64);
 		assertEquals(2,a.sideLengths[1], UtilEjml.TEST_F64);
@@ -163,7 +161,7 @@ public class TestSquareGraph extends BoofStandardJUnit {
 
 		alg.detachEdge(e);
 
-		assertEquals(1, alg.edgeManager.getUnused().size());
+		assertEquals(1, alg.unused.size());
 		assertNull(a.edges[1]);
 		assertNull(b.edges[2]);
 	}

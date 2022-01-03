@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -223,9 +223,33 @@ public class FactoryFiducial {
 		InputToBinary<T> inputToBinary = FactoryThresholdBinary.threshold(config.threshold, imageType);
 
 		DetectPolygonBinaryGrayRefine<T> squareDetector = FactoryShapeDetector.polygon(config.polygon, imageType);
-		var detectPositionPatterns = new QrCodePositionPatternDetector<>(squareDetector, config.versionMaximum);
+		var detectPositionPatterns = new QrCodePositionPatternDetector<>(squareDetector);
 
 		var detector = new QrCodePreciseDetector<>(inputToBinary, detectPositionPatterns, config.forceEncoding, false, imageType);
+		detector.getGraphPositionPatterns().setMaxVersionQR(config.versionMaximum);
+		detector.getDecoder().considerTransposed = config.considerTransposed;
+		return detector;
+	}
+
+	/**
+	 * Returns a Micro QR Code detector
+	 *
+	 * @param config Configuration
+	 * @param imageType type of input image
+	 * @return the detector
+	 */
+	public static <T extends ImageGray<T>>
+	MicroQrCodePreciseDetector<T> microqr( @Nullable ConfigMicroQrCode config, Class<T> imageType ) {
+		if (config == null)
+			config = new ConfigMicroQrCode();
+
+		config.checkValidity();
+
+		InputToBinary<T> inputToBinary = FactoryThresholdBinary.threshold(config.threshold, imageType);
+
+		DetectPolygonBinaryGrayRefine<T> squareDetector = FactoryShapeDetector.polygon(config.polygon, imageType);
+		var detectPositionPatterns = new QrCodePositionPatternDetector<>(squareDetector);
+		var detector = new MicroQrCodePreciseDetector<>(inputToBinary, detectPositionPatterns, config.forceEncoding, false, imageType);
 		detector.getDecoder().considerTransposed = config.considerTransposed;
 		return detector;
 	}
@@ -261,6 +285,11 @@ public class FactoryFiducial {
 	public static <T extends ImageGray<T>>
 	QrCodeDetectorPnP<T> qrcode3D( @Nullable ConfigQrCode config, Class<T> imageType ) {
 		return new QrCodeDetectorPnP<>(qrcode(config, imageType));
+	}
+
+	public static <T extends ImageGray<T>>
+	MicroQrCodeDetectorPnP<T> microqr3D( @Nullable ConfigMicroQrCode config, Class<T> imageType ) {
+		return new MicroQrCodeDetectorPnP<>(microqr(config, imageType));
 	}
 
 	/**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -62,7 +62,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 
 		// Should fail when run on distorted image
 		var decoder = new QrCodeDecoderImage<>(null, GrayF32.class);
-		decoder.process(pps, helper.image);
+		decoder.process(pps.toList(), helper.image);
 
 		assertEquals(0, decoder.successes.size());
 
@@ -71,7 +71,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 		for (int i = 0; i < pps.size; i++) {
 			helper.distToUndist(pps.get(i).square);
 		}
-		decoder.process(pps, helper.image);
+		decoder.process(pps.toList(), helper.image);
 
 		assertEquals(1, decoder.successes.size());
 		QrCode found = decoder.getFound().get(0);
@@ -92,13 +92,13 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 		// It should succeed since the flag is on by default
 		var alg = new QrCodeDecoderImage<>(null, GrayU8.class);
 
-		alg.process(pps, transposedImage);
+		alg.process(pps.toList(), transposedImage);
 		assertEquals(1, alg.successes.size());
 		assertEquals(message, alg.getFound().get(0).message);
 
 		// fail when you turn it off
 		alg.considerTransposed = false;
-		alg.process(pps, transposedImage);
+		alg.process(pps.toList(), transposedImage);
 		assertEquals(0, alg.successes.size());
 	}
 
@@ -133,7 +133,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 			DogArray<PositionPatternNode> pps = createPositionPatterns(generator);
 
 			var decoder = new QrCodeDecoderImage<>(null, GrayU8.class);
-			decoder.process(pps, generator.getGray());
+			decoder.process(pps.toList(), generator.getGray());
 
 			assertEquals(1, decoder.successes.size());
 			QrCode found = decoder.getFound().get(0);
@@ -163,7 +163,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 //		BoofMiscOps.sleep(100000);
 
 			var decoder = new QrCodeDecoderImage<>(null, GrayU8.class);
-			decoder.process(pps, generator.getGray());
+			decoder.process(pps.toList(), generator.getGray());
 
 			assertEquals(1, decoder.successes.size());
 			QrCode found = decoder.getFound().get(0);
@@ -189,7 +189,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 //		BoofMiscOps.sleep(100000);
 
 		var decoder = new QrCodeDecoderImage<>(null, GrayU8.class);
-		decoder.process(pps, generator.getGray());
+		decoder.process(pps.toList(), generator.getGray());
 
 		assertEquals(1, decoder.successes.size());
 		QrCode found = decoder.getFound().get(0);
@@ -214,7 +214,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 //		BoofMiscOps.sleep(100000);
 
 		var decoder = new QrCodeDecoderImage<>(null, GrayU8.class);
-		decoder.process(pps, generator.getGray());
+		decoder.process(pps.toList(), generator.getGray());
 
 		assertEquals(1, decoder.successes.size());
 		QrCode found = decoder.getFound().get(0);
@@ -239,7 +239,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 //		BoofMiscOps.sleep(100000);
 
 		var decoder = new QrCodeDecoderImage<>(null, GrayU8.class);
-		decoder.process(pps, generator.getGray());
+		decoder.process(pps.toList(), generator.getGray());
 
 		assertEquals(1, decoder.successes.size());
 		QrCode found = decoder.getFound().get(0);
@@ -286,7 +286,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 //		ShowImages.showWindow(generator.getGray(),"QR Code");
 //		BoofMiscOps.sleep(100000);
 
-		decoder.process(pps, generator.getGray());
+		decoder.process(pps.toList(), generator.getGray());
 
 		assertEquals(1, decoder.successes.size());
 		QrCode found = decoder.getFound().get(0);

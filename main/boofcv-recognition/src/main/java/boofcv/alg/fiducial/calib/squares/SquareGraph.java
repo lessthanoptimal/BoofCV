@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,10 @@ import georegression.metric.UtilAngle;
 import georegression.struct.line.LineSegment2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Vector2D_F64;
-import org.ddogleg.struct.RecycleManager;
+import org.ddogleg.struct.DogArray;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Used for constructing a graph of squares that form a regular grid. Each square can have one edge per side.
@@ -32,14 +35,20 @@ import org.ddogleg.struct.RecycleManager;
  * @author Peter Abeles
  */
 public class SquareGraph {
-	protected RecycleManager<SquareEdge> edgeManager = new RecycleManager<>(SquareEdge.class);
+	protected DogArray<SquareEdge> edges = new DogArray<>(SquareEdge::new, SquareEdge::reset);
+	protected List<SquareEdge> unused = new ArrayList<>();
 
 	Vector2D_F64 vector0 = new Vector2D_F64();
 	Vector2D_F64 vector1 = new Vector2D_F64();
 
 	double parallelThreshold = UtilAngle.radian(45);
 
-	public void computeNodeInfo( SquareNode n ) {
+	public void reset() {
+		unused.addAll(edges.toList());
+		edges.reset();
+	}
+
+	public static void computeNodeInfo( SquareNode n ) {
 		// Under perspective distortion the geometric center is the intersection of the lines formed by
 		// opposing corners.
 		if (null == Intersection2D_F64.intersection(
@@ -64,12 +73,10 @@ public class SquareGraph {
 	 * Removes the edge from the two nodes and recycles the data structure
 	 */
 	public void detachEdge( SquareEdge edge ) {
-
 		edge.a.edges[edge.sideA] = null;
 		edge.b.edges[edge.sideB] = null;
 		edge.distance = 0;
-
-		edgeManager.recycleInstance(edge);
+		unused.add(edge);
 	}
 
 	/**
@@ -120,7 +127,7 @@ public class SquareGraph {
 	 * @param distance distance apart the center of the two nodes
 	 */
 	void connect( SquareNode a, int indexA, SquareNode b, int indexB, double distance ) {
-		SquareEdge edge = edgeManager.requestInstance();
+		SquareEdge edge = getUnusedEdge();
 		edge.reset();
 
 		edge.a = a;
@@ -185,8 +192,14 @@ public class SquareGraph {
 		return CircularIndex.addOffset(index, value, 4);
 	}
 
-	public RecycleManager<SquareEdge> getEdgeManager() {
-		return edgeManager;
+	private SquareEdge getUnusedEdge() {
+		if (unused.size()>0) {
+			SquareEdge e = unused.remove(unused.size()-1);
+			e.reset();
+			return e;
+		} else {
+			return edges.grow();
+		}
 	}
 
 	public double getParallelThreshold() {

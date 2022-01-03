@@ -81,8 +81,7 @@ public class SquareNode {
 		smallestSide = Double.MAX_VALUE;
 		graph = RESET_GRAPH;
 		for (int i = 0; i < edges.length; i++) {
-			if (edges[i] != null)
-				throw new RuntimeException("BUG!");
+			edges[i] = null;
 			sideLengths[i] = 0;
 		}
 	}

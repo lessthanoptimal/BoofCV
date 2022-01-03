@@ -18,13 +18,13 @@
 
 package boofcv.abst.fiducial;
 
-import boofcv.factory.fiducial.ConfigQrCode;
+import boofcv.factory.fiducial.ConfigMicroQrCode;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.struct.image.GrayF32;
 
-public class TestQrCodePreciseDetector extends GenericQrCodeDetectorChecks {
-	@Override protected QrCodeDetector<GrayF32> createDetector() {
-		var config = new ConfigQrCode();
-		return FactoryFiducial.qrcode(config,GrayF32.class);
+public class TestMicroQrCodePreciseDetector extends GenericMicroQrCodeDetectorChecks {
+	@Override protected MicroQrCodeDetector<GrayF32> createDetector() {
+		var config = new ConfigMicroQrCode();
+		return FactoryFiducial.microqr(config, GrayF32.class);
 	}
 }

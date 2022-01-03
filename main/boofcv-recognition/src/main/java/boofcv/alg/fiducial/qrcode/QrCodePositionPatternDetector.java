@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,6 @@ package boofcv.alg.fiducial.qrcode;
 import boofcv.abst.filter.binary.BinaryContourFinder;
 import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.fiducial.calib.squares.SquareGraph;
-import boofcv.alg.fiducial.calib.squares.SquareNode;
 import boofcv.alg.interpolate.InterpolatePixelDistortS;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
@@ -39,19 +38,16 @@ import georegression.geometry.UtilPoint2D_F64;
 import georegression.struct.line.LineParametric2D_F64;
 import georegression.struct.line.LineSegment2D_F64;
 import georegression.struct.point.Point2D_F32;
-import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
-import org.ddogleg.nn.FactoryNearestNeighbor;
-import org.ddogleg.nn.NearestNeighbor;
-import org.ddogleg.nn.NnData;
+import lombok.Getter;
 import org.ddogleg.struct.DogArray;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 /**
- * Detects position patterns for a QR code inside an image and forms a graph of ones which can potentially
- * be connected together. Squares are detected in the image and position patterns are found based on their appearance.
+ * Detects position patterns for a QR code inside an image. This is done by detecting squares and seeing if they
+ * have the expected shape.
  *
  * <p>If a lens distortion model is provided the returned pixel coordinates will be in an undistorted image</p>
  *
@@ -62,40 +58,26 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 	// used to subsample the input image
 	InterpolatePixelS<T> interpolate;
 
-	// maximum QR code version that it can detect
-	int maxVersionQR;
+	/** Used to detect black squares */
+	@Getter DetectPolygonBinaryGrayRefine<T> squareDetector;
 
-	// Detects squares inside the image
-	DetectPolygonBinaryGrayRefine<T> squareDetector;
+	/**
+	 * Returns a list of all the detected position pattern squares and the other PP that they are connected to.
+	 * If a lens distortion model is provided then coordinates will be in an undistorted image.
+	 */
+	@Getter DogArray<PositionPatternNode> positionPatterns = new DogArray<>(PositionPatternNode::new);
 
-	DogArray<PositionPatternNode> positionPatterns = new DogArray<>(PositionPatternNode::new);
-	SquareGraph graph = new SquareGraph();
-
-	// Nearst Neighbor Search related variables
-	private NearestNeighbor<SquareNode> nn = FactoryNearestNeighbor.kdtree(new SquareNode.KdTreeSquareNode());
-	private NearestNeighbor.Search<SquareNode> search = nn.createSearch();
-	private DogArray<NnData<SquareNode>> searchResults = new DogArray(NnData::new);
-
-	// Workspace for checking to see if two squares should be connected
-	protected LineSegment2D_F64 lineA = new LineSegment2D_F64();
-	protected LineSegment2D_F64 lineB = new LineSegment2D_F64();
-	protected LineSegment2D_F64 connectLine = new LineSegment2D_F64();
-	protected Point2D_F64 intersection = new Point2D_F64();
-
-	// runtime profiling
-	protected MovingAverage milliGraph = new MovingAverage(0.8);
-	protected boolean profiler = false;
+	/** runtime profiling */
+	@Getter protected MovingAverage profilingMS = new MovingAverage(0.8);
 
 	/**
 	 * Configures the detector
 	 *
 	 * @param squareDetector Square detector
-	 * @param maxVersionQR Maximum QR code version it can detect.
 	 */
-	public QrCodePositionPatternDetector( DetectPolygonBinaryGrayRefine<T> squareDetector, int maxVersionQR ) {
+	public QrCodePositionPatternDetector( DetectPolygonBinaryGrayRefine<T> squareDetector ) {
 
 		this.squareDetector = squareDetector;
-		this.maxVersionQR = maxVersionQR;
 
 		squareDetector.getDetector().setConvex(true);
 		squareDetector.getDetector().setOutputClockwiseUpY(false);
@@ -106,11 +88,6 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 
 	public void resetRuntimeProfiling() {
 		squareDetector.resetRuntimeProfiling();
-		milliGraph.reset();
-	}
-
-	public void setProfilerState( boolean active ) {
-		profiler = active;
 	}
 
 	/**
@@ -121,7 +98,6 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 	 */
 	public void process( T gray, GrayU8 binary ) {
 		configureContourDetector(gray);
-		recycleData();
 		positionPatterns.reset();
 		interpolate.setImage(gray);
 
@@ -130,23 +106,9 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 
 		long time0 = System.nanoTime();
 		squaresToPositionList();
-
 		long time1 = System.nanoTime();
 
-		// Create graph of neighboring squares
-		createPositionPatternGraph();
-//		long time2 = System.nanoTime();  // doesn't take very long
-
-		double milli = (time1 - time0)*1e-6;
-
-		milliGraph.update(milli);
-
-		if (profiler) {
-			DetectPolygonFromContour<T> detectorPoly = squareDetector.getDetector();
-			System.out.printf(" contour %5.1f shapes %5.1f adjust_bias %5.2f PosPat %6.2f",
-					detectorPoly.getMilliContour(), detectorPoly.getMilliShapes(), squareDetector.getMilliAdjustBias(),
-					milliGraph.getAverage());
-		}
+		profilingMS.update((time1 - time0)*1e-6);
 	}
 
 	/**
@@ -157,8 +119,7 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 	 * @param height Input image height. Used in sanity check only.
 	 * @param model distortion model. Null to remove a distortion model.
 	 */
-	public void setLensDistortion( int width, int height,
-								   @Nullable LensDistortionNarrowFOV model ) {
+	public void setLensDistortion( int width, int height, @Nullable LensDistortionNarrowFOV model ) {
 		interpolate = FactoryInterpolation.bilinearPixelS(
 				squareDetector.getInputType(), BorderType.EXTENDED);
 
@@ -190,18 +151,6 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 		contourFinder.setSaveInnerContour(false);
 	}
 
-	protected void recycleData() {
-		for (int i = 0; i < positionPatterns.size(); i++) {
-			SquareNode n = positionPatterns.get(i);
-			for (int j = 0; j < n.edges.length; j++) {
-				if (n.edges[j] != null) {
-					graph.detachEdge(n.edges[j]);
-				}
-			}
-		}
-		positionPatterns.reset();
-	}
-
 	/**
 	 * Takes the detected squares and turns it into a list of {@link PositionPatternNode}.
 	 */
@@ -230,96 +179,10 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 			pp.square = info.polygon;
 			pp.grayThreshold = grayThreshold;
 
-			graph.computeNodeInfo(pp);
+			SquareGraph.computeNodeInfo(pp);
 		}
 	}
 
-	/**
-	 * Connects together position patterns. For each square, finds all of its neighbors based on center distance.
-	 * Then considers them for connections
-	 */
-	private void createPositionPatternGraph() {
-		// Add items to NN search
-
-		nn.setPoints((List)positionPatterns.toList(), false);
-
-		for (int i = 0; i < positionPatterns.size(); i++) {
-			PositionPatternNode f = positionPatterns.get(i);
-
-			// The QR code version specifies the number of "modules"/blocks across the marker is
-			// A position pattern is 7 blocks. A version 1 qr code is 21 blocks. Each version past one increments
-			// by 4 blocks. The search is relative to the center of each position pattern, hence the - 7
-			double maximumQrCodeWidth = f.largestSide*(17 + 4*maxVersionQR - 7.0)/7.0;
-			double searchRadius = 1.2*maximumQrCodeWidth; // search 1/2 the width + some fudge factor
-			searchRadius *= searchRadius;
-
-			// Connect all the finder patterns which are near by each other together in a graph
-			search.findNearest(f, searchRadius, Integer.MAX_VALUE, searchResults);
-
-			if (searchResults.size > 1) {
-				for (int j = 0; j < searchResults.size; j++) {
-					NnData<SquareNode> r = searchResults.get(j);
-
-					if (r.point == f) continue; // skip over if it's the square that initiated the search
-
-					considerConnect(f, r.point);
-				}
-			}
-		}
-	}
-
-	/**
-	 * Connects the 'candidate' node to node 'n' if they meet several criteria. See code for details.
-	 */
-	void considerConnect( SquareNode node0, SquareNode node1 ) {
-		// Find the side on each line which intersects the line connecting the two centers
-		lineA.a = node0.center;
-		lineA.b = node1.center;
-
-		int intersection0 = graph.findSideIntersect(node0, lineA, intersection, lineB);
-		connectLine.a.setTo(intersection);
-		int intersection1 = graph.findSideIntersect(node1, lineA, intersection, lineB);
-		connectLine.b.setTo(intersection);
-
-		if (intersection1 < 0 || intersection0 < 0) {
-			return;
-		}
-
-		double side0 = node0.sideLengths[intersection0];
-		double side1 = node1.sideLengths[intersection1];
-
-		// it should intersect about in the middle of the line
-
-		double sideLoc0 = connectLine.a.distance(node0.square.get(intersection0))/side0;
-		double sideLoc1 = connectLine.b.distance(node1.square.get(intersection1))/side1;
-
-		if (Math.abs(sideLoc0 - 0.5) > 0.35 || Math.abs(sideLoc1 - 0.5) > 0.35)
-			return;
-
-		// see if connecting sides are of similar size
-		if (Math.abs(side0 - side1)/Math.max(side0, side1) > 0.25) {
-			return;
-		}
-
-		// Checks to see if the two sides selected above are closest to being parallel to each other.
-		// Perspective distortion will make the lines not parallel, but will still have a smaller
-		// acute angle than the adjacent sides
-		if (!graph.almostParallel(node0, intersection0, node1, intersection1)) {
-			return;
-		}
-
-		double ratio = Math.max(node0.smallestSide/node1.largestSide,
-				node1.smallestSide/node0.largestSide);
-
-//		System.out.println("ratio "+ratio);
-		if (ratio > 1.3)
-			return;
-
-		double angle = graph.acuteAngle(node0, intersection0, node1, intersection1);
-		double score = lineA.getLength()*(1.0 + angle/0.1);
-
-		graph.checkConnect(node0, intersection0, node1, intersection1, score);
-	}
 
 	/**
 	 * Determines if the found polygon looks like a position pattern. A horizontal and vertical line are sampled.
@@ -427,24 +290,5 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 		if (values[5] < threshold || values[6] > threshold)
 			return false;
 		return true;
-	}
-
-	/**
-	 * Returns a list of all the detected position pattern squares and the other PP that they are connected to.
-	 *
-	 * If a lens distortion model is provided then coordinates will be in an undistorted image.
-	 *
-	 * @return List of PP
-	 */
-	public DogArray<PositionPatternNode> getPositionPatterns() {
-		return positionPatterns;
-	}
-
-	public DetectPolygonBinaryGrayRefine<T> getSquareDetector() {
-		return squareDetector;
-	}
-
-	public SquareGraph getGraph() {
-		return graph;
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -111,7 +111,6 @@ public class SquaresIntoRegularClusters extends SquaresIntoClusters {
 	}
 
 	void computeNodeInfo( List<Polygon2D_F64> squares ) {
-
 		for (int i = 0; i < squares.size(); i++) {
 			SquareNode n = nodes.grow();
 			n.reset();
@@ -120,7 +119,7 @@ public class SquaresIntoRegularClusters extends SquaresIntoClusters {
 			if (n.square.size() != 4)
 				throw new RuntimeException("Squares have four corners not " + n.square.size());
 
-			graph.computeNodeInfo(n);
+			SquareGraph.computeNodeInfo(n);
 		}
 	}
 
