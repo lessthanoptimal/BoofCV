@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -61,7 +61,7 @@ public abstract class GenericFiducialDetectorChecks extends BoofStandardJUnit {
 
 	protected List<ImageType> types = new ArrayList<>();
 
-	Se3_F64 markerToWorld = eulerXyz(-0.2,0,1.2,0.1,Math.PI,0,null);
+	Se3_F64 markerToWorld = eulerXyz(-0.2, 0, 1.2, 0.1, Math.PI, 0, null);
 
 	protected double stabilityShrink = 0.2;
 	protected double tolAccuracyT = 0.015;
@@ -69,49 +69,52 @@ public abstract class GenericFiducialDetectorChecks extends BoofStandardJUnit {
 
 	/**
 	 * Renders everything in gray scale first then converts it
+	 *
 	 * @param intrinsic camera model
 	 * @param imageType image type for output
 	 * @return rendered image
 	 */
-	public ImageBase renderImage(CameraPinholeBrown intrinsic  , ImageType imageType) {
+	public ImageBase renderImage( CameraPinholeBrown intrinsic, ImageType imageType ) {
 		return renderImage(intrinsic, markerToWorld, imageType);
 	}
-	public ImageBase renderImage(CameraPinholeBrown intrinsic  , Se3_F64 markerToWorld, ImageType imageType) {
+
+	public ImageBase renderImage( CameraPinholeBrown intrinsic, Se3_F64 markerToWorld, ImageType imageType ) {
 
 		SimulatePlanarWorld simulator = new SimulatePlanarWorld();
 		simulator.setCamera(intrinsic);
 		simulator.setBackground(255);
 
-		simulator.addSurface(markerToWorld,1.5,renderFiducial());
+		simulator.addSurface(markerToWorld, 1.5, renderFiducial());
 
 		GrayF32 rendered = simulator.render();
 
-		if( rendered.getImageType().isSameType(imageType)) {
+		if (rendered.getImageType().isSameType(imageType)) {
 			return rendered;
 		}
 
-		switch( imageType.getFamily() ) {
+		switch (imageType.getFamily()) {
 			case GRAY: {
-				ImageBase output = imageType.createImage(rendered.width,rendered.height);
-				GConvertImage.convert(rendered,output);
+				ImageBase output = imageType.createImage(rendered.width, rendered.height);
+				GConvertImage.convert(rendered, output);
 				return output;
 			}
-			default: break;
+			default:
+				break;
 		}
 
 		throw new RuntimeException("Currently only gray scale images supported");
 	}
 
-	public CameraPinholeBrown loadDistortion(boolean distorted ) {
-		if( distorted ) {
-			return new CameraPinholeBrown(250,250,0,250,250,500,500).
-					fsetRadial(-0.1,-0.0005);
+	public CameraPinholeBrown loadDistortion( boolean distorted ) {
+		if (distorted) {
+			return new CameraPinholeBrown(250, 250, 0, 250, 250, 500, 500).
+					fsetRadial(-0.1, -0.0005);
 		} else {
-			return new CameraPinholeBrown(250,250,0,250,250,500,500);
+			return new CameraPinholeBrown(250, 250, 0, 250, 250, 500, 500);
 		}
 	}
 
-	public abstract<T extends ImageBase<T>> FiducialDetector<T> createDetector( ImageType<T> imageType );
+	public abstract <T extends ImageBase<T>> FiducialDetector<T> createDetector( ImageType<T> imageType );
 
 	public abstract GrayF32 renderFiducial();
 
@@ -122,41 +125,41 @@ public abstract class GenericFiducialDetectorChecks extends BoofStandardJUnit {
 	 * 2) Can it handle no distortion
 	 */
 	@Test void checkHandleNewIntrinsic() {
-		for( ImageType type : types ) {
+		for (ImageType type : types) {
 
 			// distorted camera model
 			CameraPinholeBrown instrinsic = loadDistortion(true);
 			LensDistortionBrown distortion = new LensDistortionBrown(instrinsic);
 
 			// render a distorted image
-			ImageBase image = renderImage(instrinsic,type);
+			ImageBase image = renderImage(instrinsic, type);
 
 			// give it an undistored model
 			FiducialDetector detector = createDetector(type);
 			assertFalse(detector.is3D());
 			detector.setLensDistortion(new LensDistortionBrown(loadDistortion(false)),
-					image.width,image.height);
+					image.width, image.height);
 			assertTrue(detector.is3D());
-			detect(detector,image);
+			detect(detector, image);
 
 			// it might not be able to detect the target
-			if( detector.totalFound() >= 1 ) {
+			if (detector.totalFound() >= 1) {
 				checkBounds(detector);
 			}
 
 			// Give it the correct model and this time it should work
-			detector.setLensDistortion(distortion,image.width,image.height);
+			detector.setLensDistortion(distortion, image.width, image.height);
 			assertTrue(detector.is3D());
-			detect(detector,image);
+			detect(detector, image);
 			checkBounds(detector);
 
-			assertTrue(detector.totalFound()>=1);
+			assertTrue(detector.totalFound() >= 1);
 
 			// Now remove the distortion model
-			detector.setLensDistortion(null,image.width,image.height);
+			detector.setLensDistortion(null, image.width, image.height);
 			assertFalse(detector.is3D());
-			detect(detector,image);
-			if( detector.totalFound() >= 1 ) {
+			detect(detector, image);
+			if (detector.totalFound() >= 1) {
 				checkBounds(detector);
 			}
 		}
@@ -170,37 +173,37 @@ public abstract class GenericFiducialDetectorChecks extends BoofStandardJUnit {
 		LensDistortionBrown lensDistorted = new LensDistortionBrown(loadDistortion(true));
 		LensDistortionBrown lensUndistorted = new LensDistortionBrown(loadDistortion(false));
 
-		for( ImageType type : types ) {
+		for (ImageType type : types) {
 
 			// render an undistorted image
-			ImageBase imageUn = renderImage(loadDistortion(false),type);
+			ImageBase imageUn = renderImage(loadDistortion(false), type);
 
 //			ShowImages.showWindow(imageUn,"adsasdf");
 //			BoofMiscOps.sleep(10000);
 
 			FiducialDetector detector = createDetector(type);
-			detector.setLensDistortion(lensUndistorted,imageUn.width,imageUn.height);
-			detect(detector,imageUn);
+			detector.setLensDistortion(lensUndistorted, imageUn.width, imageUn.height);
+			detect(detector, imageUn);
 
-			assertTrue(detector.totalFound()>=1);
+			assertTrue(detector.totalFound() >= 1);
 			Results results = extractResults(detector);
 
 			// feed it a distorted with and give the detector the undistortion model
-			ImageBase imageD = renderImage(loadDistortion(true),type);
-			detector.setLensDistortion(lensDistorted,imageD.width,imageD.height);
-			detect(detector,imageD);
+			ImageBase imageD = renderImage(loadDistortion(true), type);
+			detector.setLensDistortion(lensDistorted, imageD.width, imageD.height);
+			detect(detector, imageD);
 
 			// see if the results are the same
-			assertEquals(results.id.length,detector.totalFound());
+			assertEquals(results.id.length, detector.totalFound());
 			for (int i = 0; i < detector.totalFound(); i++) {
-				assertEquals(results.id[i],detector.getId(i));
+				assertEquals(results.id[i], detector.getId(i));
 				Se3_F64 pose = new Se3_F64();
 				detector.getFiducialToCamera(i, pose);
 
 				// make the error relative to the translation
 				double t = pose.getT().norm();
-				assertEquals(0,pose.getT().distance(results.pose.get(i).T),t*0.01);
-				assertTrue(MatrixFeatures_DDRM.isIdentical(pose.getR(),results.pose.get(i).R,0.01));
+				assertEquals(0, pose.getT().distance(results.pose.get(i).T), t*0.01);
+				assertTrue(MatrixFeatures_DDRM.isIdentical(pose.getR(), results.pose.get(i).R, 0.01));
 			}
 		}
 	}
@@ -210,9 +213,9 @@ public abstract class GenericFiducialDetectorChecks extends BoofStandardJUnit {
 		// this has to do with the marker coordinate system to image coordinate system
 		// marker is +y up   +x right +z up
 		// image is  +y down +x right +z out
-		Se3_F64 adjustment = SpecialEuclideanOps_F64.eulerXyz(0,0,0,0,0,Math.PI,null);
+		Se3_F64 adjustment = SpecialEuclideanOps_F64.eulerXyz(0, 0, 0, 0, 0, Math.PI, null);
 
-		for( boolean distorted : new boolean[]{false,true}) {
+		for (boolean distorted : new boolean[]{false, true}) {
 //			System.out.println("distorted = "+distorted);
 			LensDistortionBrown lensDistorted = new LensDistortionBrown(loadDistortion(distorted));
 
@@ -221,7 +224,7 @@ public abstract class GenericFiducialDetectorChecks extends BoofStandardJUnit {
 
 				ImageBase imageD = renderImage(loadDistortion(distorted), type);
 				detector.setLensDistortion(lensDistorted, imageD.width, imageD.height);
-				detect(detector,imageD);
+				detect(detector, imageD);
 
 //				ShowImages.showBlocking(imageD,"Distorted", 2_000);
 
@@ -231,13 +234,13 @@ public abstract class GenericFiducialDetectorChecks extends BoofStandardJUnit {
 				detector.getFiducialToCamera(0, pose);
 
 				pose.T.scale(markerToWorld.T.norm()/pose.T.norm());
-				Se3_F64 diff = adjustment.concat(markerToWorld.concat(pose.invert(null),null),null);
+				Se3_F64 diff = adjustment.concat(markerToWorld.concat(pose.invert(null), null), null);
 				double theta = ConvertRotation3D_F64.matrixToRodrigues(diff.R, null).theta;
 //				System.out.println("norm = "+diff.T.norm()+"  theta = "+theta);
 
 				// threshold selected through manual trial and error
-				assertEquals(0,diff.T.norm(), tolAccuracyT);
-				assertEquals(0,theta, tolAccuracyTheta);
+				assertEquals(0, diff.T.norm(), tolAccuracyT);
+				assertEquals(0, theta, tolAccuracyTheta);
 			}
 		}
 	}
@@ -248,52 +251,52 @@ public abstract class GenericFiducialDetectorChecks extends BoofStandardJUnit {
 	@Test void modifyInput() {
 		CameraPinholeBrown intrinsic = loadDistortion(true);
 		LensDistortionBrown lensDistorted = new LensDistortionBrown(intrinsic);
-		for( ImageType type : types ) {
+		for (ImageType type : types) {
 
-			ImageBase image = renderImage(intrinsic,type);
+			ImageBase image = renderImage(intrinsic, type);
 			ImageBase orig = image.clone();
 			FiducialDetector detector = createDetector(type);
 
-			detector.setLensDistortion(lensDistorted,image.width,image.height);
+			detector.setLensDistortion(lensDistorted, image.width, image.height);
 
-			detect(detector,image);
+			detect(detector, image);
 
-			BoofTesting.assertEquals(image,orig,0);
+			BoofTesting.assertEquals(image, orig, 0);
 		}
 	}
 
 	@Test void checkMultipleRuns() {
 		CameraPinholeBrown intrinsic = loadDistortion(true);
 		LensDistortionBrown lensDistorted = new LensDistortionBrown(intrinsic);
-		for( ImageType type : types ) {
+		for (ImageType type : types) {
 
-			ImageBase image = renderImage(intrinsic,type);
+			ImageBase image = renderImage(intrinsic, type);
 			FiducialDetector detector = createDetector(type);
 
-			detector.setLensDistortion(lensDistorted,image.width,image.height);
+			detector.setLensDistortion(lensDistorted, image.width, image.height);
 
-			detect(detector,image);
+			detect(detector, image);
 
-			assertTrue(detector.totalFound()>= 1);
+			assertTrue(detector.totalFound() >= 1);
 
 			Results results = extractResults(detector);
 
 			// run it again
-			detect(detector,image);
+			detect(detector, image);
 
 			// see if it produced exactly the same results
-			assertEquals(results.id.length,detector.totalFound());
+			assertEquals(results.id.length, detector.totalFound());
 			for (int i = 0; i < detector.totalFound(); i++) {
-				assertEquals(results.id[i],detector.getId(i));
+				assertEquals(results.id[i], detector.getId(i));
 
 				Point2D_F64 centerPixel = new Point2D_F64();
-				detector.getCenter(i,centerPixel);
+				detector.getCenter(i, centerPixel);
 				assertEquals(0.0, results.centerPixel.get(i).distance(centerPixel), 1e-8);
 
 				Se3_F64 pose = new Se3_F64();
 				detector.getFiducialToCamera(i, pose);
-				assertEquals(0,pose.getT().distance(results.pose.get(i).T),1e-8);
-				assertTrue(MatrixFeatures_DDRM.isIdentical(pose.getR(),results.pose.get(i).R,1e-8));
+				assertEquals(0, pose.getT().distance(results.pose.get(i).T), 1e-8);
+				assertTrue(MatrixFeatures_DDRM.isIdentical(pose.getR(), results.pose.get(i).R, 1e-8));
 			}
 		}
 	}
@@ -301,18 +304,18 @@ public abstract class GenericFiducialDetectorChecks extends BoofStandardJUnit {
 	@Test void checkSubImage() {
 		CameraPinholeBrown intrinsic = loadDistortion(true);
 		LensDistortionBrown lensDistorted = new LensDistortionBrown(intrinsic);
-		for( ImageType type : types ) {
+		for (ImageType type : types) {
 
-			ImageBase image = renderImage(intrinsic,type);
+			ImageBase image = renderImage(intrinsic, type);
 			FiducialDetector detector = createDetector(type);
 
-			detector.setLensDistortion(lensDistorted,image.width,image.height);
+			detector.setLensDistortion(lensDistorted, image.width, image.height);
 
-			detect(detector,image);
+			detect(detector, image);
 
-			assertTrue(detector.totalFound()>= 1);
+			assertTrue(detector.totalFound() >= 1);
 
-			long[] foundID = new long[ detector.totalFound() ];
+			long[] foundID = new long[detector.totalFound()];
 			List<Se3_F64> foundPose = new ArrayList<>();
 
 			for (int i = 0; i < detector.totalFound(); i++) {
@@ -323,16 +326,16 @@ public abstract class GenericFiducialDetectorChecks extends BoofStandardJUnit {
 			}
 
 			// run it again with a sub-image
-			detect(detector,BoofTesting.createSubImageOf(image));
+			detect(detector, BoofTesting.createSubImageOf(image));
 
 			// see if it produced exactly the same results
-			assertEquals(foundID.length,detector.totalFound());
+			assertEquals(foundID.length, detector.totalFound());
 			for (int i = 0; i < detector.totalFound(); i++) {
-				assertEquals(foundID[i],detector.getId(i));
+				assertEquals(foundID[i], detector.getId(i));
 				Se3_F64 pose = new Se3_F64();
 				detector.getFiducialToCamera(i, pose);
-				assertEquals(0,pose.getT().distance(foundPose.get(i).T),1e-8);
-				assertTrue(MatrixFeatures_DDRM.isIdentical(pose.getR(),foundPose.get(i).R,1e-8));
+				assertEquals(0, pose.getT().distance(foundPose.get(i).T), 1e-8);
+				assertTrue(MatrixFeatures_DDRM.isIdentical(pose.getR(), foundPose.get(i).R, 1e-8));
 			}
 		}
 	}
@@ -346,25 +349,25 @@ public abstract class GenericFiducialDetectorChecks extends BoofStandardJUnit {
 		// has to be undistorted otherwise rescaling the image won't work
 		CameraPinholeBrown intrinsic = loadDistortion(false);
 		LensDistortionBrown lensDistorted = new LensDistortionBrown(intrinsic);
-		for( ImageType type : types ) {
+		for (ImageType type : types) {
 
-			ImageBase image = renderImage(intrinsic,type);
+			ImageBase image = renderImage(intrinsic, type);
 			FiducialDetector detector = createDetector(type);
 
-			detector.setLensDistortion(lensDistorted,image.width,image.height);
+			detector.setLensDistortion(lensDistorted, image.width, image.height);
 
-//			ShowImages.showBlocking(image,"First Detect", 3_000);
+//			ShowImages.showBlocking(image, "First Detect", 3_000);
 
-			detect(detector,image);
+			detect(detector, image);
 			assertTrue(detector.totalFound() >= 1);
 
-			long[] foundIds      = new long[ detector.totalFound() ];
-			double[] location    = new double[ detector.totalFound() ];
-			double[] orientation = new double[ detector.totalFound() ];
+			long[] foundIds = new long[detector.totalFound()];
+			double[] location = new double[detector.totalFound()];
+			double[] orientation = new double[detector.totalFound()];
 
 			FiducialStability results = new FiducialStability();
 			for (int i = 0; i < detector.totalFound(); i++) {
-				detector.computeStability(i,0.2,results);
+				detector.computeStability(i, 0.2, results);
 
 				foundIds[i] = detector.getId(i);
 				location[i] = results.location;
@@ -374,22 +377,22 @@ public abstract class GenericFiducialDetectorChecks extends BoofStandardJUnit {
 			// by shrinking the image a small pixel error should result
 			// in a larger pose error, hence more unstable
 			ImageBase shrunk = image.createSameShape();
-			new FDistort(image,shrunk).affine(stabilityShrink,0,0,stabilityShrink,image.width/4,image.height/4).apply();
+			new FDistort(image, shrunk).affine(stabilityShrink, 0, 0, stabilityShrink, image.width/4, image.height/4).apply();
 
-//			ShowImages.showBlocking(shrunk,"Shrunk", 2_000);
+//			ShowImages.showBlocking(shrunk, "Shrunk", 2_000);
 
-			detect(detector,shrunk);
+			detect(detector, shrunk);
 
 			assertEquals(detector.totalFound(), foundIds.length);
 
 			for (int i = 0; i < detector.totalFound(); i++) {
-				detector.computeStability(i,0.2,results);
+				detector.computeStability(i, 0.2, results);
 
 				long id = detector.getId(i);
 
 				boolean matched = false;
 				for (int j = 0; j < foundIds.length; j++) {
-					if( foundIds[j] == id ) {
+					if (foundIds[j] == id) {
 						matched = true;
 						assertTrue(location[j] < results.location);
 						assertTrue(orientation[j] < results.orientation);
@@ -406,15 +409,14 @@ public abstract class GenericFiducialDetectorChecks extends BoofStandardJUnit {
 		// using undistorted
 		CameraPinholeBrown intrinsic = loadDistortion(false);
 		LensDistortionBrown lensDistorted = new LensDistortionBrown(intrinsic);
-		for( ImageType type : types ) {
-			ImageBase image = renderImage(intrinsic,type);
+		for (ImageType type : types) {
+			ImageBase image = renderImage(intrinsic, type);
 			FiducialDetector detector = createDetector(type);
-			detector.setLensDistortion(lensDistorted,image.width,image.height);
+			detector.setLensDistortion(lensDistorted, image.width, image.height);
 
-//			ShowImages.showWindow(image,"asdfasdf");
-//			BoofMiscOps.sleep(10_000);
+//			ShowImages.showBlocking(image, "asdfasdf", 5_000);
 
-			detect(detector,image);
+			detect(detector, image);
 
 			assertTrue(detector.totalFound() >= 1);
 			assertTrue(detector.is3D());
@@ -427,10 +429,10 @@ public abstract class GenericFiducialDetectorChecks extends BoofStandardJUnit {
 
 				Point2D_F64 rendered = new Point2D_F64();
 				WorldToCameraToPixel worldToPixel = PerspectiveOps.createWorldToPixel(lensDistorted, fidToCam);
-				worldToPixel.transform(new Point3D_F64(0,0,0),rendered);
+				worldToPixel.transform(new Point3D_F64(0, 0, 0), rendered);
 
 				// see if the reprojected is near the pixel location
-				assertEquals( 0.0, rendered.distance(found), pixelAndProjectedTol);
+				assertEquals(0.0, rendered.distance(found), pixelAndProjectedTol);
 			}
 		}
 	}
@@ -441,22 +443,22 @@ public abstract class GenericFiducialDetectorChecks extends BoofStandardJUnit {
 	@Test void is3dWithNoIntrinsic() {
 		FiducialDetector detector = createDetector(types.get(0));
 
-		assertFalse( detector.is3D() );
+		assertFalse(detector.is3D());
 	}
 
-	public void checkBounds(FiducialDetector detector) {
-		if( !supportsBounds )
+	public void checkBounds( FiducialDetector detector ) {
+		if (!supportsBounds)
 			return;
 
 		Polygon2D_F64 queue = new Polygon2D_F64();
 		for (int i = 0; i < detector.totalFound(); i++) {
 
 			// make sure it handles null correctly
-			Polygon2D_F64 listA = detector.getBounds(i,null);
-			Polygon2D_F64 listB = detector.getBounds(i,queue);
+			Polygon2D_F64 listA = detector.getBounds(i, null);
+			Polygon2D_F64 listB = detector.getBounds(i, queue);
 
 			assertSame(listB, queue);
-			assertEquals(listA.size(),listB.size());
+			assertEquals(listA.size(), listB.size());
 
 			Polygon2D_F64 polygon = new Polygon2D_F64(listA.size());
 			for (int j = 0; j < listA.size(); j++) {
@@ -475,8 +477,8 @@ public abstract class GenericFiducialDetectorChecks extends BoofStandardJUnit {
 
 			// in almost all cases the center should be inside
 			Point2D_F64 center = new Point2D_F64();
-			detector.getCenter(i,center);
-			Intersection2D_F64.containsConvex(polygon,center);
+			detector.getCenter(i, center);
+			Intersection2D_F64.containsConvex(polygon, center);
 		}
 	}
 
@@ -500,7 +502,7 @@ public abstract class GenericFiducialDetectorChecks extends BoofStandardJUnit {
 	/**
 	 * Function for calling detect. Primarily used to enable the FiducialTracker tests to recycle code
 	 */
-	protected void detect( FiducialDetector detector , ImageBase image ) {
+	protected void detect( FiducialDetector detector, ImageBase image ) {
 		detector.detect(image);
 	}
 
@@ -510,7 +512,7 @@ public abstract class GenericFiducialDetectorChecks extends BoofStandardJUnit {
 		public List<Point2D_F64> centerPixel = new ArrayList<>();
 
 		public Results( int N ) {
-			id = new long[ N ];
+			id = new long[N];
 		}
 	}
 }

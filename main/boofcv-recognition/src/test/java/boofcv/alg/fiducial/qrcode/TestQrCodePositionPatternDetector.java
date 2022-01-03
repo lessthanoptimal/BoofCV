@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,11 +28,8 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofStandardJUnit;
-import georegression.metric.UtilAngle;
 import georegression.struct.affine.Affine2D_F64;
-import georegression.struct.se.Se2_F64;
 import georegression.struct.shapes.Polygon2D_F64;
-import georegression.transform.se.SePointOps_F64;
 import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
@@ -60,6 +57,10 @@ public class TestQrCodePositionPatternDetector extends BoofStandardJUnit {
 		alg.process(image, binary);
 
 		List<PositionPatternNode> list = alg.getPositionPatterns().toList();
+
+		// NOTE: This should be decoupled. These two classes used to be a single class
+		new QrCodePositionPatternGraphGenerator(2).process(list);
+
 		assertEquals(3, list.size());
 
 		checkNode(40 + 35, 60 + 35, 2, list);
@@ -119,47 +120,6 @@ public class TestQrCodePositionPatternDetector extends BoofStandardJUnit {
 			}
 		}
 		fail("No match");
-	}
-
-	/**
-	 * Simple positive example
-	 */
-	@Test void considerConnect_positive() {
-		QrCodePositionPatternDetector<GrayF32> alg = createAlg();
-
-		SquareNode n0 = squareNode(40, 60, 70);
-		SquareNode n1 = squareNode(140, 60, 70);
-
-		alg.considerConnect(n0, n1);
-
-		assertEquals(1, n0.getNumberOfConnections());
-		assertEquals(1, n1.getNumberOfConnections());
-	}
-
-	/**
-	 * The two patterns are rotated 45 degrees relative to each other
-	 */
-	@Test void considerConnect_negative_rotated() {
-		QrCodePositionPatternDetector<GrayF32> alg = createAlg();
-
-		SquareNode n0 = squareNode(40, 60, 70);
-		SquareNode n1 = squareNode(140, 60, 70);
-
-		Se2_F64 translate = new Se2_F64(-175, -95, 0);
-		Se2_F64 rotate = new Se2_F64(0, 0, UtilAngle.radian(45));
-
-		Se2_F64 tmp = translate.concat(rotate, null);
-		Se2_F64 combined = tmp.concat(translate.invert(null), null);
-
-		for (int i = 0; i < 4; i++) {
-			SePointOps_F64.transform(combined, n1.square.get(i), n1.square.get(i));
-		}
-		SePointOps_F64.transform(combined, n1.center, n1.center);
-
-		alg.considerConnect(n0, n1);
-
-		assertEquals(0, n0.getNumberOfConnections());
-		assertEquals(0, n1.getNumberOfConnections());
 	}
 
 	@Test void checkPositionPatternAppearance() {
@@ -223,7 +183,7 @@ public class TestQrCodePositionPatternDetector extends BoofStandardJUnit {
 		DetectPolygonBinaryGrayRefine<GrayF32> squareDetector =
 				FactoryShapeDetector.polygon(config, GrayF32.class);
 
-		return new QrCodePositionPatternDetector<>(squareDetector, 2);
+		return new QrCodePositionPatternDetector<>(squareDetector);
 	}
 
 	private GrayF32 render( @Nullable Affine2D_F64 affine, PP... pps ) {

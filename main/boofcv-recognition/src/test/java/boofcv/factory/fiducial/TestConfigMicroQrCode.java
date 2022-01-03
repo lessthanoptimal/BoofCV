@@ -16,15 +16,8 @@
  * limitations under the License.
  */
 
-package boofcv.abst.fiducial;
+package boofcv.factory.fiducial;
 
-import boofcv.factory.fiducial.ConfigQrCode;
-import boofcv.factory.fiducial.FactoryFiducial;
-import boofcv.struct.image.GrayF32;
+import boofcv.struct.StandardConfigurationChecks;
 
-public class TestQrCodePreciseDetector extends GenericQrCodeDetectorChecks {
-	@Override protected QrCodeDetector<GrayF32> createDetector() {
-		var config = new ConfigQrCode();
-		return FactoryFiducial.qrcode(config,GrayF32.class);
-	}
-}
+public class TestConfigMicroQrCode extends StandardConfigurationChecks {}

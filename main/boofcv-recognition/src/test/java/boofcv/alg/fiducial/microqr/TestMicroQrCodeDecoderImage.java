@@ -74,13 +74,13 @@ public class TestMicroQrCodeDecoderImage extends BoofStandardJUnit {
 
 				// Process the image
 //				alg.decoder.setVerbose(System.out, null);
-				alg.process(patterns, engine.getGray());
+				alg.process(patterns.toList(), engine.getGray());
 
 				// Check results
-				assertEquals(1, alg.successes.size());
+				assertEquals(1, alg.found.size());
 				assertEquals(0, alg.failures.size());
-				assertEquals(version, alg.successes.get(0).version);
-				assertEquals(message, alg.successes.get(0).message);
+				assertEquals(version, alg.found.get(0).version);
+				assertEquals(message, alg.found.get(0).message);
 			}
 		}
 	}
@@ -97,10 +97,10 @@ public class TestMicroQrCodeDecoderImage extends BoofStandardJUnit {
 
 		var alg = new MicroQrCodeDecoderImage<>(null, GrayU8.class);
 		for (int i = 0; i < 4; i++) {
-			alg.process(patterns, image);
-			assertEquals(1, alg.successes.size());
+			alg.process(patterns.toList(), image);
+			assertEquals(1, alg.found.size());
 			assertEquals(0, alg.failures.size());
-			assertEquals("123LK", alg.successes.get(0).message);
+			assertEquals("123LK", alg.found.get(0).message);
 
 			// Rotate the polygon so that it now needs to compensate for that
 			UtilPolygons2D_F64.shiftDown(pp.square);
@@ -115,14 +115,14 @@ public class TestMicroQrCodeDecoderImage extends BoofStandardJUnit {
 		GrayU8 image = render(qr);
 
 		var patterns = new DogArray<>(PositionPatternNode::new);
-		PositionPatternNode pp = addPositionPattern(qr, patterns);
+		addPositionPattern(qr, patterns);
 
 		var alg = new MicroQrCodeDecoderImage<>(null, GrayU8.class);
-		alg.process(patterns, image);
+		alg.process(patterns.toList(), image);
 
-		assertEquals(1, alg.successes.size());
+		assertEquals(1, alg.found.size());
 		assertEquals(0, alg.failures.size());
-		assertEquals("123LK%$63", alg.successes.get(0).message);
+		assertEquals("123LK%$63", alg.found.get(0).message);
 	}
 
 	@Test void withLensDistortion() {

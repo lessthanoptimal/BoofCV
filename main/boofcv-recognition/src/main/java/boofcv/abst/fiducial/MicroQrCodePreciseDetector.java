@@ -18,46 +18,54 @@
 
 package boofcv.abst.fiducial;
 
+import boofcv.BoofVerbose;
 import boofcv.abst.filter.binary.BinaryContourHelper;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.distort.LensDistortionNarrowFOV;
-import boofcv.alg.fiducial.qrcode.*;
+import boofcv.alg.fiducial.microqr.MicroQrCode;
+import boofcv.alg.fiducial.microqr.MicroQrCodeDecoderImage;
+import boofcv.alg.fiducial.qrcode.PositionPatternNode;
+import boofcv.alg.fiducial.qrcode.QrCodePositionPatternDetector;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.alg.shapes.polygon.DetectPolygonFromContour;
+import boofcv.misc.BoofMiscOps;
 import boofcv.misc.MovingAverage;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import lombok.Getter;
+import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.PrintStream;
 import java.util.List;
+import java.util.Set;
 
 /**
  * A QR-Code detector which is designed to find the location of corners in the finder pattern precisely.
  */
-public class QrCodePreciseDetector<T extends ImageGray<T>> implements QrCodeDetector<T> {
+public class MicroQrCodePreciseDetector<T extends ImageGray<T>> implements MicroQrCodeDetector<T>, VerbosePrint {
 	@Getter QrCodePositionPatternDetector<T> detectPositionPatterns;
-	@Getter QrCodePositionPatternGraphGenerator graphPositionPatterns = new QrCodePositionPatternGraphGenerator();
-	@Getter QrCodeDecoderImage<T> decoder;
+	@Getter MicroQrCodeDecoderImage<T> decoder;
 	InputToBinary<T> inputToBinary;
 	Class<T> imageType;
 
 	BinaryContourHelper contourHelper;
 
 	// runtime profiling
-	boolean profiler = false;
+	@Nullable PrintStream profiler = null;
 	protected MovingAverage milliBinary = new MovingAverage(0.8);
 	protected MovingAverage milliDecoding = new MovingAverage(0.8);
 
-	public QrCodePreciseDetector( InputToBinary<T> inputToBinary,
-								  QrCodePositionPatternDetector<T> detectPositionPatterns,
-								  @Nullable String defaultEncoding,
-								  boolean copyBinary, Class<T> imageType ) {
+	public MicroQrCodePreciseDetector( InputToBinary<T> inputToBinary,
+									   QrCodePositionPatternDetector<T> detectPositionPatterns,
+									   @Nullable String defaultEncoding,
+									   boolean copyBinary, Class<T> imageType ) {
 		this.inputToBinary = inputToBinary;
 		this.detectPositionPatterns = detectPositionPatterns;
-		this.decoder = new QrCodeDecoderImage<>(defaultEncoding, imageType);
+		this.decoder = new MicroQrCodeDecoderImage<>(defaultEncoding, imageType);
 		this.imageType = imageType;
-		this.contourHelper = new BinaryContourHelper(detectPositionPatterns.getSquareDetector().getDetector().getContourFinder(), copyBinary);
+		this.contourHelper = new BinaryContourHelper(
+				detectPositionPatterns.getSquareDetector().getDetector().getContourFinder(), copyBinary);
 	}
 
 	@Override
@@ -68,17 +76,15 @@ public class QrCodePreciseDetector<T extends ImageGray<T>> implements QrCodeDete
 		long time1 = System.nanoTime();
 		milliBinary.update((time1 - time0)*1e-6);
 
-		if (profiler)
-			System.out.printf("qrcode: binary %5.2f ", milliBinary.getAverage());
+		if (profiler != null) profiler.printf("qrcode: binary %5.2f ", milliBinary.getAverage());
 
 		// Find position patterns and create a graph
 		detectPositionPatterns.process(gray, contourHelper.padded());
 		List<PositionPatternNode> positionPatterns = detectPositionPatterns.getPositionPatterns().toList();
-		graphPositionPatterns.process(positionPatterns);
 
-		if (profiler) {
+		if (profiler != null) {
 			DetectPolygonFromContour<T> detectorPoly = detectPositionPatterns.getSquareDetector().getDetector();
-			System.out.printf(" contour %5.1f shapes %5.1f adjust_bias %5.2f PosPat %6.2f",
+			profiler.printf(" contour %5.1f shapes %5.1f adjust_bias %5.2f PosPat %6.2f",
 					detectorPoly.getMilliContour(), detectorPoly.getMilliShapes(),
 					detectPositionPatterns.getSquareDetector().getMilliAdjustBias(),
 					detectPositionPatterns.getProfilingMS().getAverage());
@@ -89,17 +95,16 @@ public class QrCodePreciseDetector<T extends ImageGray<T>> implements QrCodeDete
 		time1 = System.nanoTime();
 		milliDecoding.update((time1 - time0)*1e-6);
 
-		if (profiler)
-			System.out.printf(" decoding %5.1f\n", milliDecoding.getAverage());
+		if (profiler != null) profiler.printf(" decoding %5.1f\n", milliDecoding.getAverage());
 	}
 
 	@Override
-	public List<QrCode> getDetections() {
+	public List<MicroQrCode> getDetections() {
 		return decoder.getFound();
 	}
 
 	@Override
-	public List<QrCode> getFailures() {
+	public List<MicroQrCode> getFailures() {
 		return decoder.getFailures();
 	}
 
@@ -120,10 +125,6 @@ public class QrCodePreciseDetector<T extends ImageGray<T>> implements QrCodeDete
 		return contourHelper.withoutPadding();
 	}
 
-	public void setProfilerState( boolean active ) {
-		profiler = active;
-	}
-
 	public void resetRuntimeProfiling() {
 		milliBinary.reset();
 		milliDecoding.reset();
@@ -137,5 +138,12 @@ public class QrCodePreciseDetector<T extends ImageGray<T>> implements QrCodeDete
 	@Override
 	public Class<T> getImageType() {
 		return imageType;
+	}
+
+	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
+		if (configuration == null)
+			return;
+		if (configuration.contains(BoofVerbose.RUNTIME))
+			this.profiler = BoofMiscOps.addPrefix(this, out);
 	}
 }

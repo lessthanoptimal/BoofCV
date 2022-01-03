@@ -80,13 +80,13 @@ public class QrCodeDecoderImage<T extends ImageGray<T>> {
 	 * @param pps position pattern graph
 	 * @param gray Gray input image
 	 */
-	public void process( DogArray<PositionPatternNode> pps, T gray ) {
+	public void process( List<PositionPatternNode> pps, T gray ) {
 		gridReader.setImage(gray);
 		storageQR.reset();
 		successes.clear();
 		failures.clear();
 
-		for (int i = 0; i < pps.size; i++) {
+		for (int i = 0; i < pps.size(); i++) {
 			PositionPatternNode ppn = pps.get(i);
 
 			for (int j = 3, k = 0; k < 4; j = k, k++) {

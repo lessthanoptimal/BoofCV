@@ -219,6 +219,12 @@ public class MicroQrCode {
 		return true;
 	}
 
+	/** Returns number of modules in the marker, i.e. number of squares wide */
+	public int getNumberOfModules() {
+		return totalModules(version);
+	}
+
+	/** Maximum number of data bits this marker can store */
 	public int getMaxDataBits() {
 		return maxDataBits(version, error);
 	}
@@ -246,6 +252,7 @@ public class MicroQrCode {
 		}
 	}
 
+	/** Number of modules (squares) across the marker is based on its version */
 	public static int totalModules( int version ) {
 		return version*2 + 9;
 	}

@@ -18,11 +18,13 @@
 
 package boofcv.alg.fiducial.microqr;
 
+import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.fiducial.qrcode.*;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageGray;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.point.Point2D_I32;
+import lombok.Getter;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_F32;
 import org.ddogleg.struct.VerbosePrint;
@@ -45,8 +47,8 @@ public class MicroQrCodeDecoderImage<T extends ImageGray<T>> implements VerboseP
 	public boolean considerTransposed = true;
 
 	DogArray<MicroQrCode> storageQR = new DogArray<>(MicroQrCode::new, MicroQrCode::reset);
-	List<MicroQrCode> successes = new ArrayList<>();
-	List<MicroQrCode> failures = new ArrayList<>();
+	@Getter List<MicroQrCode> found = new ArrayList<>();
+	@Getter List<MicroQrCode> failures = new ArrayList<>();
 
 	// storage for read in bits from the grid
 	PackedBits8 bits = new PackedBits8();
@@ -75,13 +77,13 @@ public class MicroQrCodeDecoderImage<T extends ImageGray<T>> implements VerboseP
 	 * @param pps List of potential markers
 	 * @param gray Original gray scale image
 	 */
-	public void process( DogArray<PositionPatternNode> pps, T gray ) {
+	public void process( List<PositionPatternNode> pps, T gray ) {
 		gridReader.setImage(gray);
 		storageQR.reset();
-		successes.clear();
+		found.clear();
 		failures.clear();
 
-		for (int i = 0; i < pps.size; i++) {
+		for (int i = 0; i < pps.size(); i++) {
 			PositionPatternNode ppn = pps.get(i);
 
 			MicroQrCode qr = storageQR.grow();
@@ -94,7 +96,7 @@ public class MicroQrCodeDecoderImage<T extends ImageGray<T>> implements VerboseP
 				if (verbose != null) verbose.printf("idx=%d orientation=%d pp=%s\n", i, orientation, qr.pp);
 				// Decode the entire marker now
 				if (decode(qr)) {
-					successes.add(qr);
+					found.add(qr);
 					success = true;
 					break;
 				}
@@ -260,6 +262,19 @@ public class MicroQrCodeDecoderImage<T extends ImageGray<T>> implements VerboseP
 			value = 0;
 		}
 		bits.set(bit, value);
+	}
+
+	/**
+	 * <p>Specifies transforms which can be used to change coordinates from distorted to undistorted and the opposite
+	 * coordinates. The undistorted image is never explicitly created.</p>
+	 *
+	 * @param width Input image width. Used in sanity check only.
+	 * @param height Input image height. Used in sanity check only.
+	 * @param model distortion model. Null to remove a distortion model.
+	 */
+	public void setLensDistortion( int width, int height, @Nullable LensDistortionNarrowFOV model ) {
+		alignmentLocator.setLensDistortion(width, height, model);
+		gridReader.setLensDistortion(width, height, model);
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
