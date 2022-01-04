@@ -41,6 +41,7 @@ import georegression.struct.line.LineSegment2D_F64;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.shapes.Polygon2D_F64;
 import lombok.Getter;
+import lombok.Setter;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
@@ -61,6 +62,9 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> implements Ve
 
 	// used to subsample the input image
 	InterpolatePixelS<T> interpolate;
+
+	/** Used to prune very large contours. This is tuned for QR codes which have two position patterns side by side */
+	@Getter @Setter double maxContourFraction = 4.0/3.0;
 
 	/** Used to detect black squares */
 	@Getter DetectPolygonBinaryGrayRefine<T> squareDetector;
@@ -154,7 +158,7 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> implements Ve
 		// determine the maximum possible size of a position pattern
 		// contour size is maximum when viewed head one. Assume the smallest qrcode is 3x this width
 		// 4 side in a square
-		int maxContourSize = Math.min(gray.width, gray.height)*4/3;
+		int maxContourSize = (int)(Math.min(gray.width, gray.height)*maxContourFraction);
 		BinaryContourFinder contourFinder = squareDetector.getDetector().getContourFinder();
 		contourFinder.setMaxContour(maxContourSize);
 		contourFinder.setSaveInnerContour(false);
