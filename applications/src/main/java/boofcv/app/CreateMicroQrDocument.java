@@ -24,7 +24,7 @@ import boofcv.alg.fiducial.microqr.MicroQrCodeMaskPattern;
 import boofcv.alg.fiducial.qrcode.QrCode;
 import boofcv.app.micrqr.CreateMicroQrDocumentImage;
 import boofcv.app.micrqr.CreateMicroQrDocumentPDF;
-import boofcv.app.qrcode.CreateQrCodeGui;
+import boofcv.app.micrqr.CreateMicroQrGui;
 import boofcv.generate.LengthUnit;
 import boofcv.generate.Unit;
 import boofcv.gui.BoofSwingUtil;
@@ -292,7 +292,7 @@ public class CreateMicroQrDocument {
 		try {
 			parser.parseArgument(args);
 			if (generator.guiMode) {
-				BoofSwingUtil.invokeNowOrLater(CreateQrCodeGui::new);
+				BoofSwingUtil.invokeNowOrLater(CreateMicroQrGui::new);
 			} else {
 				generator.finishParsing();
 				generator.run();
