@@ -40,7 +40,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Objects;
 
 /**
  * GUI for creating Micro QR codes
@@ -160,9 +159,9 @@ public class CreateMicroQrGui extends JPanel implements CreateMicroQrControlPane
 		}
 
 		generator.fileName = outputFile;
-		generator.error = Objects.requireNonNull(controls.error);
-		generator.mask = Objects.requireNonNull(controls.mask);
-		generator.encoding = Objects.requireNonNull(controls.mode);
+		generator.error = controls.error;
+		generator.mask = controls.mask;
+		generator.encoding = controls.mode;
 		generator.version = controls.version;
 		generator.paperSize = controls.paperSize;
 		generator.gridFill = controls.fillGrid;

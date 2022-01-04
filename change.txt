@@ -22,7 +22,6 @@ QR Code
 - Records number of bit errors detected by error correction
 Micro QR Code
 - Added support for reading and generating
-- TODO example code
 - TODO regression
 
 TODO Monocular SLAM

@@ -18,44 +18,48 @@
 
 package boofcv.examples.fiducial;
 
-import boofcv.alg.fiducial.qrcode.QrCode;
-import boofcv.alg.fiducial.qrcode.QrCodeEncoder;
-import boofcv.alg.fiducial.qrcode.QrCodeGeneratorImage;
+import boofcv.alg.drawing.FiducialImageEngine;
+import boofcv.alg.fiducial.microqr.MicroQrCode;
+import boofcv.alg.fiducial.microqr.MicroQrCodeEncoder;
+import boofcv.alg.fiducial.microqr.MicroQrCodeGenerator;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ConvertBufferedImage;
 
 import java.awt.image.BufferedImage;
 
 /**
- * A simple API is provided for creating your own QR Codes. Used extensively in BoofCV for testing purposes.
+ * A simple API is provided for creating your own Micro QR Code. Used extensively in BoofCV for testing purposes.
  * It's also easy to extending the rendering tools to support other file formats.
  *
  * @author Peter Abeles
- * @see boofcv.alg.fiducial.qrcode.QrCodeGenerator
+ * @see boofcv.alg.fiducial.microqr.MicroQrCodeGenerator
  */
-public class ExampleRenderQrCode {
+public class ExampleRenderMicroQrCode {
 	public static void main( String[] args ) {
-		// Uses a flow pattern to specify the QR Code. You can control all aspects of the QR
+		// Uses a flow pattern to specify the QR Code. You can control all aspects of the Micro QR
 		// like specifying the version, mask, and message types or let it select all of that for you.
-		QrCode qr = new QrCodeEncoder().
-				setError(QrCode.ErrorLevel.M).
-				addAutomatic("This is a Test ん鞠").fixate();
+		MicroQrCode qr = new MicroQrCodeEncoder().
+				setError(MicroQrCode.ErrorLevel.L).
+				addAutomatic("Test ん鞠").fixate();
 		// NOTE: The final function you call must be fixate(), that's how it knows it's done
 
-		// QrCodeGenerator is the base class with all the logic and the children tell it how to
-		// write in a specific format. QrCodeGeneratorImage is included with BoofCV and is used
-		// to create images
-		QrCodeGeneratorImage render = new QrCodeGeneratorImage(20);
+		// FiducialImageEngine is an interface for rending to images. You can also render to PDF and other formats.
+		var render = new FiducialImageEngine();
+		render.configure(/* border */10, /* width */150);
 
-		render.render(qr);
+		// This contains the logic for rendering the marker
+		var g = new MicroQrCodeGenerator();
+		g.markerWidth = 150;
+		g.setRender(render);
+		g.render(qr);
 
 		// Convert it to a BufferedImage for display purposes
 		BufferedImage image = ConvertBufferedImage.convertTo(render.getGray(), null);
 
 		// You can also save it to disk by uncommenting the line below
-//		UtilImageIO.saveImage(image, "qrcode.png");
+//		UtilImageIO.saveImage(image, "microqr.png");
 
 		// Display the image
-		ShowImages.showWindow(image, "Rendered QR Code", true);
+		ShowImages.showWindow(image, "Rendered Micro QR Code", true);
 	}
 }
