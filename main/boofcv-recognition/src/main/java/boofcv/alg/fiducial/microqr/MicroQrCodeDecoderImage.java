@@ -134,11 +134,20 @@ public class MicroQrCodeDecoderImage<T extends ImageGray<T>> implements VerboseP
 			return false;
 		}
 
+		// Save the mapping from marker to pixel space as well as the location inside the image
+		// Doing it here so if you look at a failed marker you know where it was
+		qr.Hinv.setTo(gridReader.getTransformGrid().Hinv);
+
 		if (!decodeFormatBitValues(qr)) {
+			// Set the bounds to the position pattern since we don't know the version and can't infer the bounds
+			qr.bounds.setTo(qr.pp);
 			if (verbose != null) verbose.print("_ failed: reading format\n");
 			qr.failureCause = QrCode.Failure.FORMAT;
 			return false;
 		}
+
+		// Save where the marker is now that the version is known
+		setBoundsOfMarker(qr);
 
 		if (verbose != null) verbose.printf("valid: version=%d error=%s mask=%s\n", qr.version, qr.error, qr.mask);
 
@@ -161,8 +170,6 @@ public class MicroQrCodeDecoderImage<T extends ImageGray<T>> implements VerboseP
 		}
 
 		if (verbose != null) verbose.printf("_ success: message='%s'\n", qr.message);
-		qr.Hinv.setTo(gridReader.getTransformGrid().Hinv);
-		setBoundsOfMarker(qr);
 
 		return true;
 	}

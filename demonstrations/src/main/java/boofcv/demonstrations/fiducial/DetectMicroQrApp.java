@@ -419,16 +419,15 @@ public class DetectMicroQrApp<T extends ImageGray<T>>
 
 	public static void main( String[] args ) {
 		List<String> examples = new ArrayList<>();
-		examples.add(UtilIO.pathExample("fiducial/qrcode/image01.jpg"));
-		examples.add(UtilIO.pathExample("fiducial/qrcode/image02.jpg"));
-		examples.add(UtilIO.pathExample("fiducial/qrcode/image03.jpg"));
-		examples.add(UtilIO.pathExample("fiducial/qrcode/image04.jpg"));
-		examples.add(UtilIO.pathExample("fiducial/qrcode/movie.mp4"));
+		examples.add(UtilIO.pathExample("fiducial/microqr/image01.jpg"));
+		examples.add(UtilIO.pathExample("fiducial/microqr/image02.jpg"));
+		examples.add(UtilIO.pathExample("fiducial/microqr/image03.jpg"));
+		examples.add(UtilIO.pathExample("fiducial/microqr/movie.mp4"));
 
 		SwingUtilities.invokeLater(() -> {
 			var app = new DetectMicroQrApp<>(examples, GrayF32.class);
 			app.openExample(examples.get(0));
-			app.display("QR-Code Detector");
+			app.display("Micro QR-Code Detector");
 		});
 	}
 }
