@@ -66,6 +66,9 @@ public class MicroQrCodePreciseDetector<T extends ImageGray<T>> implements Micro
 		this.imageType = imageType;
 		this.contourHelper = new BinaryContourHelper(
 				detectPositionPatterns.getSquareDetector().getDetector().getContourFinder(), copyBinary);
+
+		// Let it detect larger contours. 4x the smallest side of the image. throws in some fudge-factor
+		detectPositionPatterns.setMaxContourFraction(4.0);
 	}
 
 	@Override
