@@ -323,8 +323,8 @@ public class MicroQrCodeEncoder implements VerbosePrint {
 		MicroQrCodeMaskPattern bestMast = null;
 		int bestScore = -1;
 
-		for (MicroQrCodeMaskPattern mask : MicroQrCodeMaskPattern.values()) {
-			// sum up non-zero bits in right and bottom side, skipping the timming pattern
+		for (MicroQrCodeMaskPattern mask : MicroQrCodeMaskPattern.values()) { // lint:forbidden ignore_line
+			// sum up non-zero bits in right and bottom side, skipping the timing pattern
 			int right = 0;
 			int down = 0;
 			for (int index = 1; index < N; index++) {
@@ -445,7 +445,7 @@ public class MicroQrCodeEncoder implements VerbosePrint {
 	 */
 	private int ensureMinimumVersionForMode() {
 		int minimum = 0;
-		for (MessageSegment s : segments) {
+		for (MessageSegment s : segments) { // lint:forbidden ignore_line
 			int minVersion = switch (s.mode) {
 				case NUMERIC -> 1;
 				case ALPHANUMERIC -> 2;
