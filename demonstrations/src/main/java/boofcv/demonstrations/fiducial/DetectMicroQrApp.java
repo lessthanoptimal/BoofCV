@@ -45,7 +45,6 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.metric.Intersection2D_F64;
-import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.DogArray;
@@ -70,7 +69,7 @@ import static boofcv.alg.fiducial.qrcode.QrCode.Failure.ALIGNMENT;
  */
 @SuppressWarnings({"NullAway.Init"})
 public class DetectMicroQrApp<T extends ImageGray<T>>
-		extends DetectBlackShapeAppBase<T> implements ShapeGuiListener, DetectQrCodeMessagePanel.Listener {
+		extends DetectBlackShapeAppBase<T> implements ShapeGuiListener, DetectMicroQrMessagePanel.Listener {
 	MicroQrCodePreciseDetector<T> detector;
 
 	//--------- ONLY INVOKE IN THE GUI ------------
@@ -170,6 +169,7 @@ public class DetectMicroQrApp<T extends ImageGray<T>>
 
 			detector = FactoryFiducial.microqr(config, imageClass);
 			detector.setVerbose(System.out, BoofMiscOps.hashSet(BoofVerbose.RUNTIME));
+//			detector.setVerbose(System.out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));
 		}
 	}
 
@@ -219,6 +219,7 @@ public class DetectMicroQrApp<T extends ImageGray<T>>
 			for (MicroQrCode d : detector.getDetections()) {
 				this.detected.grow().setTo(d);
 			}
+
 			this.failures.reset();
 			for (MicroQrCode d : detector.getFailures()) {
 				if (d.failureCause.ordinal() >= QrCode.Failure.READING_BITS.ordinal())
@@ -236,7 +237,7 @@ public class DetectMicroQrApp<T extends ImageGray<T>>
 			controls.setProcessingTimeS(timeInSeconds);
 			viewUpdated();
 			synchronized (detected) {
-//				controlPanel.messagePanel.updateList(detected.toList(), failures.toList());
+				controlPanel.messagePanel.updateList(detected.toList(), failures.toList());
 			}
 		});
 	}
@@ -391,15 +392,6 @@ public class DetectMicroQrApp<T extends ImageGray<T>>
 					}
 				}
 			}
-		}
-
-		private void renderCircleAt( Graphics2D g2, Point2D_F32 p, Color center, Color border ) {
-			int x = (int)(scale*p.x + 0.5);
-			int y = (int)(scale*p.y + 0.5);
-			g2.setColor(center);
-			g2.fillOval(x - 3, y - 3, 7, 7);
-			g2.setColor(border);
-			g2.drawOval(x - 3, y - 3, 7, 7);
 		}
 	}
 

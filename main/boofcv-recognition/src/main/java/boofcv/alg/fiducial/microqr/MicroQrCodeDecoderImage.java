@@ -24,6 +24,7 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageGray;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.point.Point2D_I32;
+import georegression.transform.homography.HomographyPointOps_F64;
 import lombok.Getter;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_F32;
@@ -159,9 +160,22 @@ public class MicroQrCodeDecoderImage<T extends ImageGray<T>> implements VerboseP
 			return false;
 		}
 
-		if (verbose != null) verbose.printf("_ success: message='%s'", qr.message);
+		if (verbose != null) verbose.printf("_ success: message='%s'\n", qr.message);
 		qr.Hinv.setTo(gridReader.getTransformGrid().Hinv);
+		setBoundsOfMarker(qr);
+
 		return true;
+	}
+
+	/**
+	 * Specify the bounds using the position pattern and corner estimates using the homography
+	 */
+	private void setBoundsOfMarker( MicroQrCode qr ) {
+		int N = qr.getNumberOfModules();
+		qr.bounds.get(0).setTo(qr.pp.get(0));
+		HomographyPointOps_F64.transform(qr.Hinv, N, 0, qr.bounds.get(1));
+		HomographyPointOps_F64.transform(qr.Hinv, N, N, qr.bounds.get(2));
+		HomographyPointOps_F64.transform(qr.Hinv, 0, N, qr.bounds.get(3));
 	}
 
 	private boolean decodeFormatBitValues( MicroQrCode qr ) {
