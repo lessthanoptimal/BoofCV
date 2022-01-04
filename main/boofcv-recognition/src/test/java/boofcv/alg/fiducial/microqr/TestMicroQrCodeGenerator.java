@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,16 +18,24 @@
 
 package boofcv.alg.fiducial.microqr;
 
+import boofcv.alg.fiducial.qrcode.PackedBits32;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
  */
 public class TestMicroQrCodeGenerator extends BoofStandardJUnit {
+	/** Compare to reference from specification documentation*/
 	@Test void formatInformationBits() {
-		fail("Implement");
+		var qr = new MicroQrCode();
+		qr.version = 2;
+		qr.mask = MicroQrCodeMaskPattern.M01;
+		qr.error = MicroQrCode.ErrorLevel.L;
+
+		PackedBits32 found = MicroQrCodeGenerator.formatInformationBits(qr);
+		assertEquals(0b101_0000_1001_1001, found.data[0]);
 	}
 }

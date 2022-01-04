@@ -27,6 +27,7 @@ import georegression.geometry.UtilPolygons2D_F64;
 import org.ddogleg.struct.DogArray;
 import org.junit.jupiter.api.Test;
 
+import static boofcv.alg.fiducial.microqr.MicroQrCodeMaskPattern.M00;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -57,10 +58,7 @@ public class TestMicroQrCodeDecoderImage extends BoofStandardJUnit {
 				// Generate the QR code
 				var encoder = new MicroQrCodeEncoder();
 //				encoder.setVerbose(System.out, null);
-				MicroQrCode qr = encoder.setVersion(version).
-						setError(error).
-						setMask(MicroQrCodeMaskPattern.M00).
-						addNumeric(message).fixate();
+				MicroQrCode qr = encoder.setVersion(version).setError(error).setMask(M00).addNumeric(message).fixate();
 				generator.render(qr);
 
 				// Set up the "detected" position pattern

@@ -34,6 +34,7 @@ public abstract class MicroQrCodeMaskPattern {
 	public static final MicroQrCodeMaskPattern M01 = new M01();
 	public static final MicroQrCodeMaskPattern M10 = new M10();
 	public static final MicroQrCodeMaskPattern M11 = new M11();
+	public static final MicroQrCodeMaskPattern NONE = new NONE(0);
 
 	int bits;
 
