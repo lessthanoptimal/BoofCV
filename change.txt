@@ -19,9 +19,11 @@ Background Model
 - Added internal benchmarks for moving
 QR Code
 - Added ability to decode transposed markers. Can be turned off.
+- Records number of bit errors detected by error correction
 Micro QR Code
-- TODO Added support
-- TODO add auto mask selection
+- Added support for reading and generating
+- TODO example code
+- TODO regression
 
 TODO Monocular SLAM
 TODO Stereo SLAM

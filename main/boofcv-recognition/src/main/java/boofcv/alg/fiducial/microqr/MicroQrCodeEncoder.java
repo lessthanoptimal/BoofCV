@@ -23,10 +23,12 @@ import boofcv.alg.fiducial.qrcode.QrCode;
 import boofcv.alg.fiducial.qrcode.QrCodeCodecBitsUtils;
 import boofcv.alg.fiducial.qrcode.ReidSolomonCodes;
 import boofcv.misc.BoofMiscOps;
+import georegression.struct.point.Point2D_I32;
 import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.struct.DogArray_I8;
 import org.ddogleg.struct.VerbosePrint;
+import org.ejml.data.BMatrixRMaj;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
@@ -34,6 +36,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import static boofcv.alg.fiducial.qrcode.QrCodeCodecBitsUtils.MessageSegment;
@@ -296,12 +299,69 @@ public class MicroQrCodeEncoder implements VerbosePrint {
 
 		bitsToMessage(packed);
 
-		// TODO implement properly later
 		if (autoMask) {
-			qr.mask = MicroQrCodeMaskPattern.M00;
+			qr.mask = autoSelectMask(qr);
 		}
 
 		return qr;
+	}
+
+	/**
+	 * Selects the best mask using the approach described in ISO/IEC 18004:2015(E). Works by summing the number
+	 * of 1's in the right and bottom side then applying the formula below.
+	 */
+	static MicroQrCodeMaskPattern autoSelectMask( MicroQrCode qr ) {
+		// Fill in the unmasked array with values from the marker
+		int N = qr.getNumberOfModules();
+		BMatrixRMaj matrix = fillInBinaryMatrix(qr, N);
+
+		// Find the best pattern
+		return selectBestMask(N, matrix);
+	}
+
+	private static MicroQrCodeMaskPattern selectBestMask( int N, BMatrixRMaj matrix ) {
+		MicroQrCodeMaskPattern bestMast = null;
+		int bestScore = -1;
+
+		for (MicroQrCodeMaskPattern mask : MicroQrCodeMaskPattern.values()) {
+			// sum up non-zero bits in right and bottom side, skipping the timming pattern
+			int right = 0;
+			int down = 0;
+			for (int index = 1; index < N; index++) {
+				if (mask.apply(index, N - 1, matrix.get(index, N - 1) ? 1 : 0) == 1) {
+					right++;
+				}
+				if (mask.apply(N - 1, index, matrix.get(N - 1, index) ? 1 : 0) == 1) {
+					down++;
+				}
+			}
+
+			int score = Math.min(right, down)*16 + Math.max(right, down);
+			if (score > bestScore) {
+				bestScore = score;
+				bestMast = mask;
+			}
+		}
+
+		return Objects.requireNonNull(bestMast, "No valid mask?!");
+	}
+
+	/**
+	 * Create a matrix filled in with the raw bit values
+	 */
+	private static BMatrixRMaj fillInBinaryMatrix( MicroQrCode qr, int N ) {
+		var matrix = new BMatrixRMaj(N, N);
+
+		List<Point2D_I32> location = MicroQrCode.LOCATION_BITS[qr.version];
+		var bits = new PackedBits8();
+		bits.data = qr.rawbits;
+		bits.size = location.size();
+
+		for (int i = 0; i < location.size(); i++) {
+			Point2D_I32 p = location.get(i);
+			matrix.unsafe_set(p.y, p.x, bits.get(i) == 1);
+		}
+		return matrix;
 	}
 
 	/**

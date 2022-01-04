@@ -343,6 +343,11 @@ public class MicroQrCode implements Cloneable {
 		return VERSION_INFO[version].levels(error).dataCodewords;
 	}
 
+	/** Returns number of error code words */
+	public int getNumberOfErrorCodeWords() {
+		return VERSION_INFO[version].codewords - VERSION_INFO[version].levels(error).dataCodewords;
+	}
+
 	/** Error correction level */
 	public enum ErrorLevel {
 		/** Error detection only */
