@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.app;
 
+import boofcv.app.micrqr.CreateMicroQrGui;
 import boofcv.app.qrcode.CreateQrCodeGui;
 import boofcv.demonstrations.calibration.CalibrateMonocularPlanarApp;
 import boofcv.demonstrations.calibration.CalibrateStereoPlanarApp;
@@ -57,6 +58,7 @@ public class ApplicationLauncherGui extends JPanel {
 		logo.setPreferredSize(new Dimension(500, 250));
 
 		JButton bCreateQR = createButton("QR Code", CreateQrCodeGui::new);
+		JButton bCreateMicroQR = createButton("Micro QR", CreateMicroQrGui::new);
 		JButton bCreateDots = createButton("Random Dot", CreateFiducialRandomDotGui::new);
 		JButton bCreateCalib = createButton("Calibration", CreateCalibrationTargetGui::new);
 		JButton bCreateFidBin = createButton("Square Binary", CreateFiducialSquareBinaryGui::new);
@@ -96,7 +98,7 @@ public class ApplicationLauncherGui extends JPanel {
 		layout.putConstraint(SpringLayout.NORTH, logo, 0, SpringLayout.NORTH, this);
 
 		JComponent panelLeft = buttonPanel("Create / Print",
-				bCreateQR, bCreateDots, bCreateCalib, bCreateFidBin, bCreateFidImage, bCreateFidHamming);
+				bCreateMicroQR, bCreateQR, bCreateDots, bCreateCalib, bCreateFidBin, bCreateFidImage, bCreateFidHamming);
 		JComponent panelRight = buttonPanel("Tools",
 				bUtilAssisted, bUtilCalib, bUtilStereoCalib, bUtilScanQrCode, bUtilDown, bUtilUndist, bUtilViewCloud);
 
