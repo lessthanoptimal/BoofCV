@@ -18,7 +18,7 @@
 
 package boofcv.demonstrations.fiducial;
 
-import boofcv.alg.fiducial.qrcode.QrCode;
+import boofcv.alg.fiducial.microqr.MicroQrCode;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.StandardAlgConfigPanel;
 
@@ -34,17 +34,18 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectQrCodeMessagePanel extends StandardAlgConfigPanel
-		implements ListSelectionListener {
+public class DetectMicroQrMessagePanel extends StandardAlgConfigPanel implements ListSelectionListener {
+
+	// TODO merge with regular QR panel
 
 	Listener listener;
 	JList listDetected;
 	JTextArea textArea = new JTextArea();
 
-	List<QrCode> detected = new ArrayList<>();
-	List<QrCode> failures = new ArrayList<>();
+	List<MicroQrCode> detected = new ArrayList<>();
+	List<MicroQrCode> failures = new ArrayList<>();
 
-	public DetectQrCodeMessagePanel( Listener listener ) {
+	public DetectMicroQrMessagePanel( Listener listener ) {
 		this.listener = listener;
 
 		listDetected = new JList();
@@ -71,7 +72,7 @@ public class DetectQrCodeMessagePanel extends StandardAlgConfigPanel
 		addAlignCenter(splitPane);
 	}
 
-	public void updateList( List<QrCode> detected, List<QrCode> failures ) {
+	public void updateList( List<MicroQrCode> detected, List<MicroQrCode> failures ) {
 		BoofSwingUtil.checkGuiThread();
 
 		this.listDetected.removeListSelectionListener(this);
@@ -80,13 +81,13 @@ public class DetectQrCodeMessagePanel extends StandardAlgConfigPanel
 
 		this.detected.clear();
 		for (int i = 0; i < detected.size(); i++) {
-			QrCode qr = detected.get(i);
+			MicroQrCode qr = detected.get(i);
 			model.addElement(String.format("v%2d Mode %.5s %.10s", qr.version, qr.mode.toString(), qr.message));
 			this.detected.add(qr.clone());
 		}
 		this.failures.clear();
 		for (int i = 0; i < failures.size(); i++) {
-			QrCode qr = failures.get(i);
+			MicroQrCode qr = failures.get(i);
 			model.addElement(String.format("v%2d Cause: %s", qr.version, qr.failureCause.toString()));
 			this.failures.add(qr.clone());
 		}
@@ -111,19 +112,19 @@ public class DetectQrCodeMessagePanel extends StandardAlgConfigPanel
 
 			if (failed) {
 				selected -= detected.size();
-				QrCode qr = failures.get(selected);
+				MicroQrCode qr = failures.get(selected);
 				listener.selectedMarkerInList(selected, true);
 				setMarkerMessageText(qr, true);
 			} else {
 				listener.selectedMarkerInList(selected, false);
-				QrCode qr = detected.get(selected);
+				MicroQrCode qr = detected.get(selected);
 				setMarkerMessageText(qr, false);
 			}
 			textArea.invalidate();
 		}
 	}
 
-	private void setMarkerMessageText( QrCode qr, boolean failure ) {
+	private void setMarkerMessageText( MicroQrCode qr, boolean failure ) {
 		String mask = qr.mask == null ? "" : qr.mask.toString();
 		String mode = qr.mode == null ? "" : qr.mode.toString();
 		String error = qr.error == null ? "" : qr.error.toString();

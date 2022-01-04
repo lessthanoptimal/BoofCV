@@ -41,7 +41,7 @@ public class DetectMicroQrControlPanel extends DetectBlackShapePanel implements 
 	ConfigMicroQrCode config = new ConfigMicroQrCode();
 	DetectMicroQrApp<?> owner;
 
-	DetectQrCodeMessagePanel messagePanel;
+	DetectMicroQrMessagePanel messagePanel;
 
 	// selects which image to view
 	JComboBox<String> imageView = new JComboBox<>();
@@ -68,7 +68,7 @@ public class DetectMicroQrControlPanel extends DetectBlackShapePanel implements 
 	public DetectMicroQrControlPanel( DetectMicroQrApp<?> owner ) {
 		this.owner = owner;
 
-		messagePanel = new DetectQrCodeMessagePanel(owner);
+		messagePanel = new DetectMicroQrMessagePanel(owner);
 
 		polygonPanel = new DetectBlackPolygonControlPanel(owner, config.polygon, config.threshold);
 		polygonPanel.thresholdPanel.addHistogramGraph();
