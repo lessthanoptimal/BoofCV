@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,7 +45,6 @@ public class CreateQrCodeDocumentImage {
 	}
 
 	public void render( java.util.List<QrCode> markers ) {
-
 		for (int i = 0; i < markers.size(); i++) {
 			QrCodeGeneratorImage generator = new QrCodeGeneratorImage(moduleWidthPixels);
 			generator.setBorderModule(2);

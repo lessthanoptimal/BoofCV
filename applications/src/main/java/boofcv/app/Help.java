@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,6 +42,7 @@ public class Help {
 			BatchScanQrCodes.class,
 			CreateCalibrationTarget.class,
 			CreateQrCodeDocument.class,
+			CreateMicroQrDocument.class,
 			DownSelectVideoFramesFor3DApp.class,
 			SceneReconstruction.class,
 			PointCloudViewerApp.class,

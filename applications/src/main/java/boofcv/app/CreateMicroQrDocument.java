@@ -18,11 +18,12 @@
 
 package boofcv.app;
 
+import boofcv.alg.fiducial.microqr.MicroQrCode;
+import boofcv.alg.fiducial.microqr.MicroQrCodeEncoder;
+import boofcv.alg.fiducial.microqr.MicroQrCodeMaskPattern;
 import boofcv.alg.fiducial.qrcode.QrCode;
-import boofcv.alg.fiducial.qrcode.QrCodeEncoder;
-import boofcv.alg.fiducial.qrcode.QrCodeMaskPattern;
-import boofcv.app.qrcode.CreateQrCodeDocumentImage;
-import boofcv.app.qrcode.CreateQrCodeDocumentPDF;
+import boofcv.app.micrqr.CreateMicroQrDocumentImage;
+import boofcv.app.micrqr.CreateMicroQrDocumentPDF;
 import boofcv.app.qrcode.CreateQrCodeGui;
 import boofcv.generate.LengthUnit;
 import boofcv.generate.Unit;
@@ -39,28 +40,27 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Application for generating QR Code markers
+ * Application for generating Micro QR Code markers
  *
  * @author Peter Abeles
  */
-// TODO Support multiple QR's in GUI
 @SuppressWarnings({"NullAway.Init"})
-public class CreateQrCodeDocument {
+public class CreateMicroQrDocument {
 
 	@Option(name = "-t", aliases = {"--Text", "--Message"},
 			usage = "Specifies the message(s) to encode. For each message at least one QR Code will be added to the paper(s)")
 	public List<String> messages = new ArrayList<>();
 
-	@Option(name = "-m", aliases = {"--Mask"}, usage = "Specify which mask to use. Most people shouldn't use this flag. Options: 000, 001, 010, 011, 100, 101, 110, 111")
+	@Option(name = "-m", aliases = {"--Mask"}, usage = "Specify which mask to use. Most people shouldn't use this flag. Options: 00, 01, 10, 11")
 	protected @Nullable String _mask = null;
-	public @Nullable QrCodeMaskPattern mask;
+	public @Nullable MicroQrCodeMaskPattern mask;
 
-	@Option(name = "-e", aliases = {"--Error"}, usage = "Error correction level. Options: L,M,Q,H. Robustness: 7%, 15%, 25%, 30%, respectively ")
-	protected String _error = "M";
-	public QrCode.ErrorLevel error;
+	@Option(name = "-e", aliases = {"--Error"}, usage = "Error correction level. Options: L,M,Q. Robustness: 7%, 15%, 25%, respectively ")
+	protected String _error = "";
+	public @Nullable MicroQrCode.ErrorLevel error;
 
 	@Option(name = "-v", aliases = {"--Version"}, usage =
-			"QR-Code version. Determines size and amount of data. If unspecified it will be automatically selected based on the data. Values 1 to 40.")
+			"Micro QR-Code version. Determines size and amount of data. If unspecified it will be automatically selected based on the data. Values 1 to 4.")
 	public int version = -1;
 
 	@Option(name = "-n", aliases = {"--Encoding"}, usage =
@@ -79,7 +79,7 @@ public class CreateQrCodeDocument {
 	protected String _paperSize = PaperSize.LETTER.name;
 	public PaperSize paperSize;
 
-	@Option(name = "-w", aliases = {"--MarkerWidth"}, usage = "Width of the QR Code. In document units.")
+	@Option(name = "-w", aliases = {"--MarkerWidth"}, usage = "Width of the Micro QR Code. In document units.")
 	public float markerWidth = -1;
 
 	@Option(name = "-mw", aliases = {"--ModuleWidth"}, usage = "Specify size of QR Code by its module/cells. In document units.")
@@ -90,7 +90,7 @@ public class CreateQrCodeDocument {
 
 	@Option(name = "-o", aliases = {"--OutputName"}, usage = "Name of output file. Extension determines file type. E.g. qrcode.pdf. " +
 			"Valid extensions are pdf, png, jpg, gif, bmp")
-	public String fileName = "qrcode";
+	public String fileName = "microqr";
 
 	@Option(name = "--DisablePrintInfo", usage = "Disable printing information about the calibration target")
 	public boolean disablePrintInfo = false;
@@ -130,10 +130,10 @@ public class CreateQrCodeDocument {
 		System.out.println("Examples:");
 		System.out.println();
 
-		System.out.println("-t \"http://boofcv.org\" -t \"Hello There!\" -p LETTER -w 5 --GridFill -o document.pdf");
-		System.out.println("   creates PDF with a grid that will fill the entire page composed of two qr codes on letter sized paper");
+		System.out.println("-t \"123-09494\" -t \"Hello There!\" -p LETTER -w 5 --GridFill -o document.pdf");
+		System.out.println("   creates PDF with a grid that will fill the entire page composed of two micro qr codes on letter sized paper");
 		System.out.println();
-		System.out.println("-t \"http://boofcv.org\" -t \"Hello There!\" -o document.png");
+		System.out.println("-t \"123-09494\" -t \"Hello There!\" -o document.png");
 		System.out.println("   Creates two png images names document0.png and document1.png");
 		System.out.println();
 		System.exit(1);
@@ -146,11 +146,15 @@ public class CreateQrCodeDocument {
 
 	public void finishParsing() {
 
-		mask = _mask == null ? null : QrCodeMaskPattern.lookupMask(_mask);
-		error = QrCode.ErrorLevel.lookup(_error);
+		mask = _mask == null ? null : MicroQrCodeMaskPattern.lookupMask(_mask);
+		if (_error.isEmpty()) {
+			error = null;
+		} else {
+			error = MicroQrCode.ErrorLevel.lookup(_error);
+		}
 
-		if (version == 0 || version > 40 || version < -1) {
-			failExit("Version must be from 1 to 40 or set to -1 for auto select");
+		if (version == 0 || version > 4 || version < -1) {
+			failExit("Version must be from 1 to 4 or set to -1 for auto select");
 		}
 
 		encoding = QrCode.Mode.lookup(_encoding);
@@ -165,7 +169,7 @@ public class CreateQrCodeDocument {
 			}
 
 			unit = unit == Unit.UNKNOWN ? Unit.lookup(_unit) : unit;
-			if (unit == Unit.UNKNOWN ) {
+			if (unit == Unit.UNKNOWN) {
 				failExit("Must specify a valid unit or use default");
 			}
 			PaperSize paperSize = PaperSize.lookup(_paperSize);
@@ -204,14 +208,12 @@ public class CreateQrCodeDocument {
 		}
 		System.out.println();
 
-		List<QrCode> markers = new ArrayList<>();
+		var markers = new ArrayList<MicroQrCode>();
 		for (String message : messages) {
-			QrCodeEncoder encoder = new QrCodeEncoder();
+			var encoder = new MicroQrCodeEncoder();
 			if (mask != null)
 				encoder.setMask(mask);
 			encoder.setError(error);
-			if (version > 0)
-				encoder.setVersion(version);
 
 			if (encoding != null) {
 				switch (encoding) {
@@ -224,20 +226,31 @@ public class CreateQrCodeDocument {
 			} else {
 				encoder.addAutomatic(message);
 			}
-			QrCode qr = encoder.fixate();
-			markers.add(qr);
 
-			System.out.println("   Message");
-			System.out.println("     length    : " + qr.message.length());
-			System.out.println("     version   : " + qr.version);
-			System.out.println("     encoding  : " + qr.mode);
-			System.out.println("     error     : " + qr.error);
+			try {
+				MicroQrCode qr = encoder.fixate();
+				markers.add(qr);
+
+				System.out.println("   Message");
+				System.out.println("     length    : " + qr.message.length());
+				System.out.println("     version   : " + qr.version);
+				System.out.println("     encoding  : " + qr.mode);
+				System.out.println("     error     : " + qr.error);
+			} catch (Exception e) {
+				System.err.println("Failed fixating: '" + message + "'");
+				if (e.getMessage() != null) {
+					System.err.println("Description:     '" + e.getMessage() + "'");
+				} else {
+					e.printStackTrace(System.err);
+				}
+				System.exit(1);
+			}
 		}
 
 		switch (fileType) {
 			case "pdf" -> {
 				Objects.requireNonNull(unit);
-				CreateQrCodeDocumentPDF renderer = new CreateQrCodeDocumentPDF(fileName, paperSize, unit);
+				var renderer = new CreateMicroQrDocumentPDF(fileName, paperSize, unit);
 				renderer.markerWidth = markerWidth;
 				renderer.spaceBetween = spaceBetween;
 				renderer.gridFill = gridFill;
@@ -251,7 +264,7 @@ public class CreateQrCodeDocument {
 			}
 			default -> {
 				// TODO support the ability to specify how large the QR code is in pixels
-				CreateQrCodeDocumentImage renderer = new CreateQrCodeDocumentImage(fileName, 20);
+				var renderer = new CreateMicroQrDocumentImage(fileName, 20);
 //				renderer.setWhiteBorder((int)spaceBetween);
 //				renderer.setMarkerWidth((int)markerWidth);
 				renderer.render(markers);
@@ -269,8 +282,8 @@ public class CreateQrCodeDocument {
 	}
 
 	public static void main( String[] args ) {
-		CreateQrCodeDocument generator = new CreateQrCodeDocument();
-		CmdLineParser parser = new CmdLineParser(generator);
+		var generator = new CreateMicroQrDocument();
+		var parser = new CmdLineParser(generator);
 
 		if (args.length == 0) {
 			printHelpExit(parser);
