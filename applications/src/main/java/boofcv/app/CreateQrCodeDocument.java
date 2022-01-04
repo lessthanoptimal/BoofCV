@@ -57,7 +57,7 @@ public class CreateQrCodeDocument {
 
 	@Option(name = "-e", aliases = {"--Error"}, usage = "Error correction level. Options: L,M,Q,H. Robustness: 7%, 15%, 25%, 30%, respectively ")
 	protected String _error = "M";
-	public QrCode.ErrorLevel error;
+	public @Nullable QrCode.ErrorLevel error;
 
 	@Option(name = "-v", aliases = {"--Version"}, usage =
 			"QR-Code version. Determines size and amount of data. If unspecified it will be automatically selected based on the data. Values 1 to 40.")

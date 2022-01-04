@@ -18,13 +18,14 @@
 
 package boofcv.alg.fiducial.microqr;
 
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import static boofcv.alg.fiducial.microqr.MicroQrCodeMaskPattern.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class TestMicroQrCodeMaskPattern {
+public class TestMicroQrCodeMaskPattern extends BoofStandardJUnit {
 	/**
 	 * Exhaustively check to make sure the output is always 0 or 1 when given an input of 0 or 1
 	 */

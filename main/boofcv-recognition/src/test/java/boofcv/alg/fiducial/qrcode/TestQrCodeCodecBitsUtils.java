@@ -18,15 +18,13 @@
 
 package boofcv.alg.fiducial.qrcode;
 
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * @author Peter Abeles
- */
-public class TestQrCodeCodecBitsUtils {
+public class TestQrCodeCodecBitsUtils extends BoofStandardJUnit {
 
 	@Test void checkAlphaNumericLookUpTable() {
 		assertEquals(45, QrCodeCodecBitsUtils.ALPHANUMERIC.length());
