@@ -216,8 +216,25 @@ public class TestMicroQrCodeEncoder extends BoofStandardJUnit {
 		assertEquals(MicroQrCode.ErrorLevel.L, qr.error);
 	}
 
-	@Test void autoSelectMask() {
-		MicroQrCode qr = new MicroQrCodeEncoder().addAlphanumeric("123").fixate();
-		assertNotNull(qr.mask);
+	/**
+	 * Give it random markers and see if it selects different masks
+	 */
+	@Test void autoSelectMask_Random() {
+		int[] histogram = new int[4];
+
+		for (int i = 0; i < 100; i++) {
+			var qr = new MicroQrCode();
+			qr.version = rand.nextInt(4) + 1;
+			qr.error = MicroQrCode.allowedErrorCorrection(qr.version)[0];
+			int bits = qr.getMaxDataBits() + qr.getNumberOfErrorCodeWords()*8;
+			qr.rawbits = new byte[bits/8 + (bits%8 == 0 ? 0 : 1)];
+			rand.nextBytes(qr.rawbits);
+
+			histogram[MicroQrCodeEncoder.autoSelectMask(qr).bits] += 1;
+		}
+
+		for (int i = 0; i < 4; i++) {
+			assertTrue(histogram[i] > 10);
+		}
 	}
 }
