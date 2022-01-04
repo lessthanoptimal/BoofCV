@@ -51,4 +51,31 @@ public class TestMicroQrCode extends BoofStandardJUnit {
 			}
 		}
 	}
+
+	/**
+	 * Compare to a reference example in QR documentation
+	 */
+	@Test void encodeAndDecodeFormat_Reference0() {
+		var qr = new MicroQrCode();
+		qr.version = 2;
+		qr.mask = MicroQrCodeMaskPattern.M01;
+		qr.error = ErrorLevel.L;
+
+		int found = qr.encodeFormatBits();
+		assertEquals(0b001_0100_1101_1100, found);
+	}
+
+	@Test void encodeAndDecodeFormat_Reference1() {
+		var qr = new MicroQrCode();
+		qr.version = 1;
+		qr.error = ErrorLevel.DETECT;
+		qr.mask = MicroQrCodeMaskPattern.M11;
+
+		int found = qr.encodeFormatBits();
+		assertEquals(0b000_1111_0101_1001, found);
+
+		// Apply the mask and compare to expected results with the mask
+		found ^= MicroQrCode.FORMAT_MASK;
+		assertEquals(0b100_1011_0001_1100, found);
+	}
 }

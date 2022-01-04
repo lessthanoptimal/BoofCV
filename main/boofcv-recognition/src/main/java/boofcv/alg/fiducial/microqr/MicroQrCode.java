@@ -176,8 +176,8 @@ public class MicroQrCode implements Cloneable {
 	 * Encoded format information with ECC. Does NOT apply the mask.
 	 */
 	public int encodeFormatBits() {
-		int bits = encodeVersionAndEccLevel();
-		bits |= mask.bits << 3;
+		int bits = encodeVersionAndEccLevel() << 2;
+		bits |= mask.bits;
 		return QrCodePolynomialMath.encodeFormatBits(bits);
 	}
 
@@ -191,8 +191,8 @@ public class MicroQrCode implements Cloneable {
 		int corrected = QrCodePolynomialMath.correctFormatBits(bits);
 		if (corrected < 0)
 			return false;
-		mask = MicroQrCodeMaskPattern.lookupMask(corrected >> 3);
-		return decodeVersionAndECC(corrected & 0x07);
+		mask = MicroQrCodeMaskPattern.lookupMask(corrected & 0x03);
+		return decodeVersionAndECC((corrected >> 2)&0x07);
 	}
 
 	/** Computes the 3-bit format which encodes marker version and ECC level */

@@ -33,10 +33,10 @@ public class TestMicroQrCodeEncoder extends BoofStandardJUnit {
 	/**
 	 * In the qr code specification an example is given. This compares the computed results to that example
 	 */
-	@Test void numeric_specification() {
+	@Test void numeric_specification_NoMask() {
 		MicroQrCode qr = new MicroQrCodeEncoder().setVersion(2).
 				setError(MicroQrCode.ErrorLevel.L).
-				setMask(new MicroQrCodeMaskPattern.NONE(0b011)).
+				setMask(MicroQrCodeMaskPattern.NONE).
 				addNumeric("01234567").fixate();
 
 		byte[] expected = new byte[]{

@@ -64,8 +64,8 @@ public class TestMicroQrCodeDecoderBits extends BoofStandardJUnit {
 		assertFalse(alg.applyErrorCorrection(qr));
 	}
 
-	/** Have it decode a simple message at different versions */
-	@Test public void decodeKnownMessage() {
+	/** Decode a simple message at different versions */
+	@Test public void decodeAcrossVersions() {
 		var alg = new MicroQrCodeDecoderBits(EciEncoding.UTF8);
 
 		for (int version = 1; version <= 4; version++) {

@@ -93,7 +93,7 @@ public class MicroQrCodeDecoderImage<T extends ImageGray<T>> implements VerboseP
 			boolean success = false;
 
 			// consider that the encoder is non-standard and rendered a transposed marker
-			for (int transposed = 0; transposed < (considerTransposed ? 2 : 1); transposed++) {
+			escape:for (int transposed = 0; transposed < (considerTransposed ? 2 : 1); transposed++) {
 				if (transposed == 1)
 					QrCodeDecoderImage.transposeCorners(qr.pp);
 
@@ -105,7 +105,7 @@ public class MicroQrCodeDecoderImage<T extends ImageGray<T>> implements VerboseP
 						found.add(qr);
 						qr.bitsTransposed = transposed == 1;
 						success = true;
-						break;
+						break escape;
 					}
 
 					// Try another orientation
