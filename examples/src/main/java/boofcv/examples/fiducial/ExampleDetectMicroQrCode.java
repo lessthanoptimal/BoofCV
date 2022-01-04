@@ -18,9 +18,10 @@
 
 package boofcv.examples.fiducial;
 
-import boofcv.abst.fiducial.QrCodeDetector;
+import boofcv.abst.fiducial.MicroQrCodeDetector;
+import boofcv.alg.fiducial.microqr.MicroQrCode;
 import boofcv.alg.fiducial.qrcode.QrCode;
-import boofcv.factory.fiducial.ConfigQrCode;
+import boofcv.factory.fiducial.ConfigMicroQrCode;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ShowImages;
@@ -34,31 +35,31 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 
 /**
- * Shows you how to detect a QR Code inside an image and process the extracted data. Much of the information that
- * is computed while detecting and decoding a QR Code is saved inside the {@link QrCode} class. This can be useful
+ * Shows you how to detect a Micro QR Code inside an image and process the extracted data. Much of the information that
+ * is computed while detecting and decoding a QR Code is saved inside the {@link MicroQrCode} class. This can be useful
  * for application developers.
  *
  * @author Peter Abeles
  */
-public class ExampleDetectQrCode {
+public class ExampleDetectMicroQrCode {
 	public static void main( String[] args ) {
-		BufferedImage input = UtilImageIO.loadImageNotNull(UtilIO.pathExample("fiducial/qrcode/image01.jpg"));
+		BufferedImage input = UtilImageIO.loadImageNotNull(UtilIO.pathExample("fiducial/microqr/image01.jpg"));
 		GrayU8 gray = ConvertBufferedImage.convertFrom(input, (GrayU8)null);
 
-		var config = new ConfigQrCode();
+		var config = new ConfigMicroQrCode();
 //		config.considerTransposed = false; // by default, it will consider incorrectly encoded markers. Faster if false
-		QrCodeDetector<GrayU8> detector = FactoryFiducial.qrcode(config, GrayU8.class);
+		MicroQrCodeDetector<GrayU8> detector = FactoryFiducial.microqr(config, GrayU8.class);
 
 		detector.process(gray);
 
 		// Gets a list of all the qr codes it could successfully detect and decode
-		List<QrCode> detections = detector.getDetections();
+		List<MicroQrCode> detections = detector.getDetections();
 
 		Graphics2D g2 = input.createGraphics();
 		int strokeWidth = Math.max(4, input.getWidth()/200); // in large images the line can be too thin
 		g2.setColor(Color.GREEN);
 		g2.setStroke(new BasicStroke(strokeWidth));
-		for (QrCode qr : detections) {
+		for (MicroQrCode qr : detections) {
 			// The message encoded in the marker
 			System.out.println("message: '" + qr.message + "'");
 
@@ -67,16 +68,16 @@ public class ExampleDetectQrCode {
 		}
 
 		// List of objects it thinks might be a QR Code but failed for various reasons
-		List<QrCode> failures = detector.getFailures();
+		List<MicroQrCode> failures = detector.getFailures();
 		g2.setColor(Color.RED);
-		for (QrCode qr : failures) {
-			// If the 'cause' is ERROR_CORRECTION or higher, then there's a decent chance it's a real marker
+		for (MicroQrCode qr : failures) {
+			// If the 'cause' is ERROR_CORRECTION or later it might a real QR Code
 			if (qr.failureCause.ordinal() < QrCode.Failure.ERROR_CORRECTION.ordinal())
 				continue;
 
 			VisualizeShapes.drawPolygon(qr.bounds, true, 1, g2);
 		}
 
-		ShowImages.showWindow(input, "Example QR Codes", true);
+		ShowImages.showWindow(input, "Example Micro QR Codes", true);
 	}
 }

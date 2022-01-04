@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,7 +38,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Objects;
 
 /**
  * GUI for creating QR codes
@@ -46,7 +45,6 @@ import java.util.Objects;
  * @author Peter Abeles
  */
 public class CreateQrCodeGui extends JPanel implements CreateQrCodeControlPanel.Listener {
-
 	CreateQrCodeControlPanel controls = new CreateQrCodeControlPanel(this);
 	ImagePanel imagePanel = new ImagePanel();
 
@@ -159,9 +157,9 @@ public class CreateQrCodeGui extends JPanel implements CreateQrCodeControlPanel.
 		}
 
 		generator.fileName = outputFile;
-		generator.error = Objects.requireNonNull(controls.error);
-		generator.mask = Objects.requireNonNull(controls.mask);
-		generator.encoding = Objects.requireNonNull(controls.mode);
+		generator.error = controls.error;
+		generator.mask = controls.mask;
+		generator.encoding = controls.mode;
 		generator.version = controls.version;
 		generator.paperSize = controls.paperSize;
 		generator.gridFill = controls.fillGrid;
