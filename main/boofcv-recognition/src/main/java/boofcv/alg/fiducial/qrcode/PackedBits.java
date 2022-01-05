@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,4 +38,13 @@ public interface PackedBits {
 	int arrayLength();
 
 	int elementBits();
+
+	default void print() {
+		int size = length();
+		System.out.println("size = " + size);
+		for (int i = 0; i < size; i++) {
+			System.out.print(get(i));
+		}
+		System.out.println();
+	}
 }

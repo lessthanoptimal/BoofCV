@@ -261,6 +261,7 @@ public class MicroQrCodeDecoderImage<T extends ImageGray<T>> implements VerboseP
 
 			Point2D_I32 b = locationBits.get(bitIndex);
 
+			// Black bits are encoded as 1
 			int votes = 0;
 			votes += intensityBits.data[intensityIndex++] < threshold ? 1 : 0;
 			votes += intensityBits.data[intensityIndex++] < threshold ? 1 : 0;
