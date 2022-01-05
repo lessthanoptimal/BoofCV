@@ -20,7 +20,9 @@ package boofcv.alg.fiducial.microqr;
 
 import boofcv.alg.drawing.FiducialImageEngine;
 import boofcv.alg.fiducial.microqr.MicroQrCode.ErrorLevel;
+import boofcv.alg.fiducial.qrcode.PackedBits32;
 import boofcv.alg.fiducial.qrcode.PositionPatternNode;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.UtilPolygons2D_F64;
@@ -28,8 +30,8 @@ import org.ddogleg.struct.DogArray;
 import org.junit.jupiter.api.Test;
 
 import static boofcv.alg.fiducial.microqr.MicroQrCodeMaskPattern.M00;
+import static boofcv.alg.fiducial.microqr.MicroQrCodeMaskPattern.M01;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Peter Abeles
@@ -123,23 +125,52 @@ public class TestMicroQrCodeDecoderImage extends BoofStandardJUnit {
 		assertEquals("123LK%$63", alg.found.get(0).message);
 	}
 
-	@Test void withLensDistortion() {
-		fail("Implement");
-	}
-
+	/** Transposes the input image and sees if it can still be decoded by default */
 	@Test void transposed() {
-		fail("Implement");
+		MicroQrCode qr = new MicroQrCodeEncoder().addAutomatic("123LK").fixate();
+		GrayU8 image = render(qr);
+		GrayU8 imageTransposed = image.createSameShape();
+		ImageMiscOps.transpose(image, imageTransposed);
+
+		var patterns = new DogArray<>(PositionPatternNode::new);
+		addPositionPattern(qr, patterns);
+
+		var alg = new MicroQrCodeDecoderImage<>(null, GrayU8.class);
+
+		alg.process(patterns.toList(), imageTransposed);
+		assertEquals(1, alg.found.size());
+		assertEquals(0, alg.failures.size());
+		assertEquals("123LK", alg.found.get(0).message);
+
+		// It should fail now since it won't consider a transposed marker
+		alg.considerTransposed = false;
+		alg.process(patterns.toList(), imageTransposed);
+		assertEquals(0, alg.found.size());
+		assertEquals(1, alg.failures.size());
 	}
 
 	@Test void readFormatBitValues() {
-		fail("Implement");
+		String message = "12399";
+		MicroQrCode qr = new MicroQrCodeEncoder().setVersion(2).setError(ErrorLevel.L).setMask(M01).addNumeric(message).fixate();
+
+		GrayU8 image = render(qr);
+
+		var alg = new MicroQrCodeDecoderImage<>(null, GrayU8.class);
+		alg.gridReader.setImage(image);
+		alg.readFormatBitValues(qr);
+
+		assertEquals(15, alg.bits.size);
+
+		// Compare to directly computed values
+		var expected = new PackedBits32();
+		expected.resize(15);
+		expected.data[0] = qr.encodeFormatBits() ^ MicroQrCode.FORMAT_MASK;
+		for (int i = 9; i < 15; i++) {
+			assertEquals(expected.get(i), alg.bits.get(i));
+		}
 	}
 
-	@Test void bitIntensityToBitValue() {
-		fail("Implement");
-	}
-
-	private GrayU8 render(MicroQrCode qr) {
+	private GrayU8 render( MicroQrCode qr ) {
 		var engine = new FiducialImageEngine();
 		engine.configure(0, 100);
 		var generator = new MicroQrCodeGenerator();

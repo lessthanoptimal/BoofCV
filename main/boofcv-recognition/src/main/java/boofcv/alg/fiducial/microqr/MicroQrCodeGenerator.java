@@ -36,6 +36,7 @@ public class MicroQrCodeGenerator extends QrGeneratorBase {
 		render.init();
 
 		positionPattern(0, 0, qr.pp);
+		qr.thresholdPP = 127;
 
 		timingPattern(7*moduleWidth, 0, moduleWidth, 0, numModules - 7);
 		timingPattern(0, 7*moduleWidth, 0, moduleWidth, numModules - 7);
