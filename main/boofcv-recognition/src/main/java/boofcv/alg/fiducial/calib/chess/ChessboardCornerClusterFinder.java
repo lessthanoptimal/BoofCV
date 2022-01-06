@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -771,7 +771,10 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements Ve
 							break;
 						}
 					}
-					Objects.requireNonNull(va);
+
+					// There is no corresponding edge
+					if (va == null)
+						break;
 
 					// Search for an edge in v which has a connection to 'va' and is ccw of 'e'
 					boolean matched = false;
