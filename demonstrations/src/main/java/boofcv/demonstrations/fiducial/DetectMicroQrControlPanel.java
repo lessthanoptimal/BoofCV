@@ -53,7 +53,7 @@ public class DetectMicroQrControlPanel extends DetectBlackShapePanel implements 
 	boolean bShowSquares = false;
 	boolean bShowPositionPattern = true;
 	boolean bShowContour = false;
-	boolean bShowFailures = true;
+	boolean bShowFailures = false;
 
 	JCheckBox showMarkers = checkbox("Markers", bShowMarkers);
 	JCheckBox showFailures = checkbox("Failures", bShowFailures);

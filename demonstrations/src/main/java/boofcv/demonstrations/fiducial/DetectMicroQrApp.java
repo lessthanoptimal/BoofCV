@@ -422,6 +422,7 @@ public class DetectMicroQrApp<T extends ImageGray<T>>
 		examples.add(UtilIO.pathExample("fiducial/microqr/image01.jpg"));
 		examples.add(UtilIO.pathExample("fiducial/microqr/image02.jpg"));
 		examples.add(UtilIO.pathExample("fiducial/microqr/image03.jpg"));
+		examples.add(UtilIO.pathExample("fiducial/microqr/image04.jpg"));
 		examples.add(UtilIO.pathExample("fiducial/microqr/movie.mp4"));
 
 		SwingUtilities.invokeLater(() -> {

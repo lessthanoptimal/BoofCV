@@ -7,7 +7,7 @@ Date    : 2022/
 Version : 0.40
 
 Build
-- Added sanity check that makes sure autogenerate had been run already first and prints out a helpful message
+- Added sanity check that makes sure autogenerate has been run already first and prints out a helpful message
 - Fixed accidental Lombok dependency
 - Added Nullable again
 Misc
@@ -22,7 +22,6 @@ QR Code
 - Records number of bit errors detected by error correction
 Micro QR Code
 - Added support for reading and generating
-- TODO regression
 
 TODO Monocular SLAM
 TODO Stereo SLAM
