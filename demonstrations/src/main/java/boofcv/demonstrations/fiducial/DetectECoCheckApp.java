@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -441,9 +441,9 @@ public class DetectECoCheckApp extends DemonstrationBase {
 	public static void main( String[] args ) {
 		List<PathLabel> examples = new ArrayList<>();
 
-		examples.add(new PathLabel("Chessboard 1", UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess/frame06.jpg")));
-		examples.add(new PathLabel("Chessboard 2 ", UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess/left03.jpg")));
-		examples.add(new PathLabel("Chessboard 3 ", UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess/left06.jpg")));
+		examples.add(new PathLabel("Example 1", UtilIO.pathExample("calibration/stereo/Zed_ecocheck/left00.jpg")));
+		examples.add(new PathLabel("Example 2 ", UtilIO.pathExample("calibration/stereo/Zed_ecocheck/right00.jpg")));
+		examples.add(new PathLabel("Example 3 ", UtilIO.pathExample("calibration/stereo/Zed_ecocheck/left06.jpg")));
 
 		SwingUtilities.invokeLater(() -> {
 			var app = new DetectECoCheckApp(examples);
