@@ -16,25 +16,26 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.detect.intensity;
+package boofcv.factory.feature.interest;
 
-import boofcv.factory.feature.detect.intensity.FactoryIntensityPoint;
+import boofcv.abst.feature.detect.interest.ConfigPointDetector;
+import boofcv.abst.feature.detect.interest.PointDetectorTypes;
+import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofStandardJUnit;
+import org.junit.jupiter.api.Test;
 
-/**
- * @author Peter Abeles
- */
-@SuppressWarnings("unchecked")
-public class TestWrapperFastCornerIntensity extends ChecksGeneralFeatureIntensity {
-	public TestWrapperFastCornerIntensity() {
-		addTypes(GrayF32.class, GrayF32.class);
-		addTypes(GrayU8.class, GrayS16.class);
-	}
-
-	@Override
-	public GeneralFeatureIntensity createAlg( Class imageType, Class derivType ) {
-		return FactoryIntensityPoint.fast(10, 11, imageType);
+public class TestFactoryDetectPoint extends BoofStandardJUnit {
+	/**
+	 * Go through every detector type and see if any of them blow up
+	 */
+	@Test void checkBlowUp() {
+		var config = new ConfigPointDetector();
+		for (PointDetectorTypes type : PointDetectorTypes.values()) {
+			config.type = type;
+			FactoryDetectPoint.create(config, GrayU8.class, null);
+			FactoryDetectPoint.create(config, GrayF32.class, null);
+		}
 	}
 }

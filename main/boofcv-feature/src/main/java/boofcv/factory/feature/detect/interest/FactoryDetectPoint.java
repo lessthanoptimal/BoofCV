@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -163,7 +163,6 @@ public class FactoryDetectPoint {
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
 	GeneralFeatureDetector<T, D> createFast( ConfigGeneralDetector configDetector, @Nullable ConfigFastCorner configFast,
 											 Class<T> imageType ) {
-
 		if (configFast == null)
 			configFast = new ConfigFastCorner();
 		configFast.checkValidity();
@@ -182,7 +181,6 @@ public class FactoryDetectPoint {
 	 */
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
 	GeneralFeatureDetector<T, D> createMedian( @Nullable ConfigGeneralDetector configDetector, Class<T> imageType ) {
-
 		if (configDetector == null)
 			configDetector = new ConfigGeneralDetector();
 

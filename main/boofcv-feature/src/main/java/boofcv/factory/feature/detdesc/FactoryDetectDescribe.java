@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -102,7 +102,7 @@ public class FactoryDetectDescribe {
 			case SIFT -> FactoryDescribePointRadiusAngle.sift(config.scaleSpaceSift, config.describeSift, imageType);
 			case BRIEF -> FactoryDescribePointRadiusAngle.brief(config.describeBrief, imageType);
 			case TEMPLATE -> FactoryDescribePointRadiusAngle.template(config.describeTemplate, imageType);
-			default -> throw new IllegalArgumentException("Unknown descriptor");
+			default -> throw new IllegalArgumentException("Unknown descriptor: "+config.typeDescribe);
 		};
 
 		OrientationImage orientation = null;
