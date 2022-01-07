@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.app.fiducials;
 import boofcv.app.PaperSize;
 import boofcv.generate.Unit;
 import boofcv.pdf.PdfFiducialEngine;
+import georegression.struct.point.Point2D_F64;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -32,7 +33,10 @@ import org.apache.pdfbox.printing.PDFPageable;
 import java.awt.*;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintStream;
+import java.util.List;
 
 /**
  * Generates the fiducial PDF Document
@@ -228,6 +232,31 @@ public abstract class CreateFiducialDocumentPDF {
 			pcs.lineTo(pageWidth, y);
 		}
 		pcs.closeAndStroke();
+	}
+
+	public void saveLandmarks( double markerWidth, double markerHeight, List<Point2D_F64> corners, String description,
+							   String fileName ) {
+		double paperWidth = paper.convertWidth(units);
+		double paperHeight = paper.convertHeight(units);
+
+		double offsetX = paperWidth/2.0 - markerWidth/2.0;
+		double offsetY = paperHeight/2.0 - markerHeight/2.0;
+
+		double unitToPdf = units.conversionTo(Unit.CENTIMETER)*CM_TO_POINTS;
+
+		try (PrintStream out = new PrintStream(fileName)) {
+			out.println("# " + description);
+			out.println("# Marker landmark locations");
+			out.println("paper=" + paper.name);
+			out.println("units=" + units.name());
+			out.println("count=" + corners.size());
+			for (int cornerID = 0; cornerID < corners.size(); cornerID++) {
+				Point2D_F64 p = corners.get(cornerID);
+				out.printf("%d %.8f %.8f\n", cornerID, offsetX + p.x/unitToPdf, offsetY + p.y/unitToPdf);
+			}
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public void sendToPrinter() {

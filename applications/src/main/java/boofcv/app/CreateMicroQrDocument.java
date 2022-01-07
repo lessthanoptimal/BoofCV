@@ -107,6 +107,9 @@ public class CreateMicroQrDocument {
 	@Option(name = "--GUI", usage = "Ignore all other command line arguments and switch to GUI mode")
 	public boolean guiMode = false;
 
+	@Option(name = "--SaveCorners", usage = "Save location of marker corners in the document to corners.txt")
+	boolean saveCorners = false;
+
 	// if true it will send a document to the printer instead of saving it
 	public boolean sendToPrinter = false;
 	// specifies the file type
@@ -257,6 +260,13 @@ public class CreateMicroQrDocument {
 				renderer.drawGrid = drawGrid;
 				renderer.showInfo = !hideInfo;
 				renderer.render(markers);
+
+				if (saveCorners) {
+					renderer.saveLandmarks(renderer.markerWidth, renderer.markerWidth,
+							renderer.markers.get(0).bounds.vertexes.toList(),
+							"Marker Square Bounding Box", "microqr_corners.txt");
+				}
+
 				if (sendToPrinter) {
 					renderer.sendToPrinter();
 				} else

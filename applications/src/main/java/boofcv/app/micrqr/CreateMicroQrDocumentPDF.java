@@ -36,8 +36,8 @@ import java.util.ArrayList;
 @SuppressWarnings({"NullAway.Init"})
 public class CreateMicroQrDocumentPDF extends CreateFiducialDocumentPDF {
 
-	java.util.List<MicroQrCode> markers;
-	MicroQrCodeGenerator g;
+	public java.util.List<MicroQrCode> markers;
+	public MicroQrCodeGenerator g;
 
 	public CreateMicroQrDocumentPDF( String documentName, PaperSize paper, Unit units ) {
 		super(documentName, paper, units);
