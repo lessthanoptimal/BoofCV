@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -644,6 +644,10 @@ public class DemoThreeViewStereoApp<TD extends TupleDesc<TD>> extends Demonstrat
 			Planar<GrayU8> color2 = new Planar<>(GrayU8.class, dimensions[view1].width, dimensions[view1].height, 3);
 			ConvertBufferedImage.convertFrom(buff[view0], color1, true);
 			ConvertBufferedImage.convertFrom(buff[view1], color2, true);
+
+			// Make sure the number of bands match's the input images
+			rectColor1.reshape(color1.width, color1.height, color1.getNumBands());
+			rectColor2.reshape(color2.width, color2.height, color2.getNumBands());
 
 			// rectify a colored image
 			rectifyImages(color1, color2, leftToRight, intrinsic01, intrinsic02,

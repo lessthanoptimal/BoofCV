@@ -22,6 +22,8 @@ QR Code
 - Records number of bit errors detected by error correction
 Micro QR Code
 - Added support for reading and generating
+DemoThreeViewStereoApp
+- Fixed handling of gray images. Thanks mb for reporting the issue!
 
 TODO Monocular SLAM
 TODO Stereo SLAM
