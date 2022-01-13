@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -250,9 +250,10 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 		ConfigKMeans configKMeans = new ConfigKMeans();
 		configKMeans.maxIterations = MAX_KNN_ITERATIONS;
 		configKMeans.reseedAfterIterations = 20;
-		ComputeClusters<double[]> clusterer = FactoryClustering.kMeans(
-				configKMeans, desc.createDescription().size(), double[].class);
+		ComputeClusters<double[]> clusterer = FactoryClustering.kMeans_MT(
+				configKMeans, desc.createDescription().size(), 200, double[].class);
 		clusterer.setVerbose(true);
+		// The _MT tells it to use the threaded version. This can run MUCH faster.
 
 		int pointDof = desc.createDescription().size();
 		NearestNeighbor<HistogramScene> nn = FactoryNearestNeighbor.exhaustive(new KdTreeHistogramScene_F64(pointDof));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -183,8 +183,8 @@ public class ExampleMultiBaselineStereo {
 		var colorImage = new InterleavedU8(1, 1, 3);
 		imageLookup.loadImage(center.pview.id, colorImage);
 		// Since the fused image is in the original (i.e. distorted) pixel coordinates and is not rectified,
-		// that needs to be taken in account by undistoring the image to create the point cloud.
-		CameraPinholeBrown intrinsic = BundleAdjustmentOps.convert(example.scene.cameras.get(center.index).model,
+		// that needs to be taken in account by undistorting the image to create the point cloud.
+		CameraPinholeBrown intrinsic = BundleAdjustmentOps.convert(example.scene.cameras.get(center.cameraIdx).model,
 				colorImage.width, colorImage.height, null);
 		Point2Transform2_F64 pixel_to_norm = new LensDistortionBrown(intrinsic).distort_F64(true, false);
 		MultiViewStereoOps.disparityToCloud(fusedDisparity, fusedParam, new PointToPixelTransform_F64(pixel_to_norm),
