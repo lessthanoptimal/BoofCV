@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -101,8 +101,8 @@ public class SceneWorkingGraph {
 		this.open.addAll(src.open);
 	}
 
-	public View lookupView( String id ) {
-		return Objects.requireNonNull(views.get(id));
+	public @Nullable View lookupView( String id ) {
+		return views.get(id);
 	}
 
 	public boolean isSeedSet( String id ) {
