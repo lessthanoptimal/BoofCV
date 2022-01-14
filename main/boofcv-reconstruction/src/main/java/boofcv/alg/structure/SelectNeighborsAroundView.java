@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -369,7 +369,6 @@ public class SelectNeighborsAroundView implements VerbosePrint {
 		// For views with no features look at its neighbors to see if it's an inlier then add those
 		for (int i = 0; i < candidates.size(); i++) {
 			View origView = localWorking.lookupView(candidates.get(i).pview.id);
-			Objects.requireNonNull(origView);
 
 			if (hasFeatures.contains(origView.pview.id))
 				continue;
@@ -381,7 +380,7 @@ public class SelectNeighborsAroundView implements VerbosePrint {
 			connectionsLoop:
 			for (int connIdx = 0; connIdx < origView.pview.connections.size; connIdx++) {
 				PairwiseImageGraph.Motion m = origView.pview.connections.get(connIdx);
-				View v = working.lookupView(m.other(origView.pview).id);
+				View v = working.views.get(m.other(origView.pview).id);
 
 				// skip if there isn't a known metric upgrade yet
 				if (v == null)

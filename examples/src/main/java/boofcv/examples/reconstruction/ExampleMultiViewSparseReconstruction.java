@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -176,9 +176,9 @@ public class ExampleMultiViewSparseReconstruction {
 		Rodrigues_F64 rod = new Rodrigues_F64();
 		System.out.println("----------------------------------------------------------------------------");
 		for (PairwiseImageGraph.View pv : pairwise.nodes.toList()) {
-			var wv = working.lookupView(pv.id);
-			if (wv == null)
+			if (!working.containsView(pv.id))
 				continue;
+			SceneWorkingGraph.View wv = working.lookupView(pv.id);
 			int order = working.listViews.indexOf(wv);
 			ConvertRotation3D_F64.matrixToRodrigues(wv.world_to_view.R, rod);
 			BundlePinholeSimplified intrinsics = working.getViewCamera(wv).intrinsic;

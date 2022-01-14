@@ -101,8 +101,12 @@ public class SceneWorkingGraph {
 		this.open.addAll(src.open);
 	}
 
-	public @Nullable View lookupView( String id ) {
-		return views.get(id);
+	public boolean containsView( String id ) {
+		return views.containsKey(id);
+	}
+
+	public View lookupView( String id ) {
+		return Objects.requireNonNull(views.get(id));
 	}
 
 	public boolean isSeedSet( String id ) {
