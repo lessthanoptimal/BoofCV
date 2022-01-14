@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,7 +60,6 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings("NullAway") // for NullAway bug
 public class FactoryMultiViewRobust {
 
 	/**
