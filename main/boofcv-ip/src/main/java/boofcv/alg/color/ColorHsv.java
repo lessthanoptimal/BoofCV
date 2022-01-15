@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -106,19 +106,19 @@ public class ColorHsv {
 	 * @param v Value. Assumes to have a range of 0 to 255
 	 * @return RGB
 	 */
-	public static int hsvToRgb( double h , double s , double v ) {
-		int r,g,b;
-		if( s == 0 ) {
+	public static int hsvToRgb( double h, double s, double v ) {
+		int r, g, b;
+		if (s == 0) {
 			r = g = b = (int)(v + 0.5);
 		} else {
 			h /= d60_F64;
-			int h_int = (int) h;
+			int h_int = (int)h;
 			double remainder = h - h_int;
 
 			// adding 0.5 for rounding
-			double p = v * (1 - s) + 0.5;
-			double q = v * (1 - s * remainder) + 0.5;
-			double t = v * (1 - s * (1 - remainder)) + 0.5;
+			double p = v*(1 - s) + 0.5;
+			double q = v*(1 - s*remainder) + 0.5;
+			double t = v*(1 - s*(1 - remainder)) + 0.5;
 
 			if (h_int < 1) {
 				r = (int)v;
@@ -158,8 +158,8 @@ public class ColorHsv {
 	 * @param v Value
 	 * @param rgb (Output) RGB value
 	 */
-	public static void hsvToRgb( double h , double s , double v , double []rgb ) {
-		if( s == 0 ) {
+	public static void hsvToRgb( double h, double s, double v, double[] rgb ) {
+		if (s == 0) {
 			rgb[0] = v;
 			rgb[1] = v;
 			rgb[2] = v;
@@ -168,27 +168,27 @@ public class ColorHsv {
 		h /= d60_F64;
 		int h_int = (int)h;
 		double remainder = h - h_int;
-		double p = v * ( 1 - s );
-		double q = v * ( 1 - s * remainder );
-		double t = v * ( 1 - s * ( 1 - remainder ) );
+		double p = v*(1 - s);
+		double q = v*(1 - s*remainder);
+		double t = v*(1 - s*(1 - remainder));
 
-		if( h_int < 1 ) {
+		if (h_int < 1) {
 			rgb[0] = v;
 			rgb[1] = t;
 			rgb[2] = p;
-		} else if( h_int < 2 ) {
+		} else if (h_int < 2) {
 			rgb[0] = q;
 			rgb[1] = v;
 			rgb[2] = p;
-		} else if( h_int < 3 ) {
+		} else if (h_int < 3) {
 			rgb[0] = p;
 			rgb[1] = v;
 			rgb[2] = t;
-		} else if( h_int < 4 ) {
+		} else if (h_int < 4) {
 			rgb[0] = p;
 			rgb[1] = q;
 			rgb[2] = v;
-		} else if( h_int < 5 ) {
+		} else if (h_int < 5) {
 			rgb[0] = t;
 			rgb[1] = p;
 			rgb[2] = v;
@@ -207,8 +207,8 @@ public class ColorHsv {
 	 * @param v Value
 	 * @param rgb (Output) RGB value
 	 */
-	public static void hsvToRgb( float h , float s , float v , float []rgb ) {
-		if( s == 0 ) {
+	public static void hsvToRgb( float h, float s, float v, float[] rgb ) {
+		if (s == 0) {
 			rgb[0] = v;
 			rgb[1] = v;
 			rgb[2] = v;
@@ -217,27 +217,27 @@ public class ColorHsv {
 		h /= d60_F32;
 		int h_int = (int)h;
 		float remainder = h - h_int;
-		float p = v * ( 1 - s );
-		float q = v * ( 1 - s * remainder );
-		float t = v * ( 1 - s * ( 1 - remainder ) );
+		float p = v*(1 - s);
+		float q = v*(1 - s*remainder);
+		float t = v*(1 - s*(1 - remainder));
 
-		if( h_int < 1 ) {
+		if (h_int < 1) {
 			rgb[0] = v;
 			rgb[1] = t;
 			rgb[2] = p;
-		} else if( h_int < 2 ) {
+		} else if (h_int < 2) {
 			rgb[0] = q;
 			rgb[1] = v;
 			rgb[2] = p;
-		} else if( h_int < 3 ) {
+		} else if (h_int < 3) {
 			rgb[0] = p;
 			rgb[1] = v;
 			rgb[2] = t;
-		} else if( h_int < 4 ) {
+		} else if (h_int < 4) {
 			rgb[0] = p;
 			rgb[1] = q;
 			rgb[2] = v;
-		} else if( h_int < 5 ) {
+		} else if (h_int < 5) {
 			rgb[0] = t;
 			rgb[1] = p;
 			rgb[2] = v;
@@ -256,17 +256,17 @@ public class ColorHsv {
 	 * @param b blue
 	 * @param hsv (Output) HSV value.
 	 */
-	public static void rgbToHsv( double r , double g , double b , double []hsv ) {
+	public static void rgbToHsv( double r, double g, double b, double[] hsv ) {
 		// Maximum value
-		double max = r > g ? ( r > b ? r : b) : ( g > b ? g : b );
+		double max = r > g ? (r > b ? r : b) : (g > b ? g : b);
 		// Minimum value
-		double min = r < g ? ( r < b ? r : b) : ( g < b ? g : b );
+		double min = r < g ? (r < b ? r : b) : (g < b ? g : b);
 		double delta = max - min;
 
 		hsv[2] = max;
 
-		if( max != 0 )
-			hsv[1] = delta / max;
+		if (max != 0)
+			hsv[1] = delta/max;
 		else {
 			hsv[0] = Double.NaN;
 			hsv[1] = 0;
@@ -274,15 +274,15 @@ public class ColorHsv {
 		}
 
 		double h;
-		if( r == max )
-			h = ( g - b ) / delta;
-		else if( g == max )
-			h = 2 + ( b - r ) / delta;
+		if (r == max)
+			h = (g - b)/delta;
+		else if (g == max)
+			h = 2 + (b - r)/delta;
 		else
-			h = 4 + ( r - g ) / delta;
+			h = 4 + (r - g)/delta;
 
 		h *= d60_F64;
-		if( h < 0 )
+		if (h < 0)
 			h += PI2_F64;
 
 		hsv[0] = h;
@@ -296,17 +296,17 @@ public class ColorHsv {
 	 * @param b blue
 	 * @param hsv (Output) HSV value.
 	 */
-	public static void rgbToHsv( float r , float g , float b , float []hsv ) {
+	public static void rgbToHsv( float r, float g, float b, float[] hsv ) {
 		// Maximum value
-		float max = r > g ? ( r > b ? r : b) : ( g > b ? g : b );
+		float max = r > g ? (r > b ? r : b) : (g > b ? g : b);
 		// Minimum value
-		float min = r < g ? ( r < b ? r : b) : ( g < b ? g : b );
+		float min = r < g ? (r < b ? r : b) : (g < b ? g : b);
 		float delta = max - min;
 
 		hsv[2] = max;
 
-		if( max != 0 )
-			hsv[1] = delta / max;
+		if (max != 0)
+			hsv[1] = delta/max;
 		else {
 			hsv[0] = Float.NaN;
 			hsv[1] = 0;
@@ -314,15 +314,15 @@ public class ColorHsv {
 		}
 
 		float h;
-		if( r == max )
-			h = ( g - b ) / delta;
-		else if( g == max )
-			h = 2 + ( b - r ) / delta;
+		if (r == max)
+			h = (g - b)/delta;
+		else if (g == max)
+			h = 2 + (b - r)/delta;
 		else
-			h = 4 + ( r - g ) / delta;
+			h = 4 + (r - g)/delta;
 
 		h *= d60_F32;
-		if( h < 0 )
+		if (h < 0)
 			h += PI2_F32;
 
 		hsv[0] = h;
@@ -335,17 +335,17 @@ public class ColorHsv {
 	 * @param rgb (Output) Image in RGB format
 	 */
 	public static <T extends ImageGray<T>>
-	void hsvToRgb(Planar<T> hsv , Planar<T> rgb ) {
-		rgb.reshape(hsv.width,hsv.height,3);
+	void hsvToRgb( Planar<T> hsv, Planar<T> rgb ) {
+		rgb.reshape(hsv.width, hsv.height, 3);
 
-		if( hsv.getBandType() == GrayF32.class ) {
-			if(BoofConcurrency.USE_CONCURRENT ) {
-				ImplColorHsv_MT.hsvToRgb_F32((Planar<GrayF32>)hsv,(Planar<GrayF32>)rgb);
+		if (hsv.getBandType() == GrayF32.class) {
+			if (BoofConcurrency.USE_CONCURRENT) {
+				ImplColorHsv_MT.hsvToRgb_F32((Planar<GrayF32>)hsv, (Planar<GrayF32>)rgb);
 			} else {
-				ImplColorHsv.hsvToRgb_F32((Planar<GrayF32>)hsv,(Planar<GrayF32>)rgb);
+				ImplColorHsv.hsvToRgb_F32((Planar<GrayF32>)hsv, (Planar<GrayF32>)rgb);
 			}
 		} else {
-			throw new IllegalArgumentException("Unsupported band type "+hsv.getBandType().getSimpleName());
+			throw new IllegalArgumentException("Unsupported band type " + hsv.getBandType().getSimpleName());
 		}
 	}
 
@@ -356,17 +356,17 @@ public class ColorHsv {
 	 * @param hsv (Output) Image in HSV format
 	 */
 	public static <T extends ImageGray<T>>
-	void rgbToHsv(Planar<T> rgb , Planar<T> hsv ) {
-		hsv.reshape(rgb.width,rgb.height,3);
+	void rgbToHsv( Planar<T> rgb, Planar<T> hsv ) {
+		hsv.reshape(rgb.width, rgb.height, 3);
 
-		if( hsv.getBandType() == GrayF32.class ) {
-			if(BoofConcurrency.USE_CONCURRENT ) {
-				ImplColorHsv_MT.rgbToHsv_F32((Planar<GrayF32>)rgb,(Planar<GrayF32>)hsv);
+		if (hsv.getBandType() == GrayF32.class) {
+			if (BoofConcurrency.USE_CONCURRENT) {
+				ImplColorHsv_MT.rgbToHsv_F32((Planar<GrayF32>)rgb, (Planar<GrayF32>)hsv);
 			} else {
-				ImplColorHsv.rgbToHsv_F32((Planar<GrayF32>)rgb,(Planar<GrayF32>)hsv);
+				ImplColorHsv.rgbToHsv_F32((Planar<GrayF32>)rgb, (Planar<GrayF32>)hsv);
 			}
 		} else {
-			throw new IllegalArgumentException("Unsupported band type "+hsv.getBandType().getSimpleName());
+			throw new IllegalArgumentException("Unsupported band type " + hsv.getBandType().getSimpleName());
 		}
 	}
 }

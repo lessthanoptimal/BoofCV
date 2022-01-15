@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -121,7 +121,7 @@ public class ImplColorLab {
 	}
 
 	public static void labToRgb_F32( Planar<GrayF32> lab, Planar<GrayF32> rgb ) {
-		rgb.reshape(lab);
+		rgb.reshapeTo(lab);
 
 		GrayF32 L = lab.getBand(0);
 		GrayF32 A = lab.getBand(1);
@@ -155,7 +155,7 @@ public class ImplColorLab {
 	}
 
 	public static void labToRgb_U8( Planar<GrayF32> lab, Planar<GrayU8> rgb ) {
-		rgb.reshape(lab);
+		rgb.reshapeTo(lab);
 
 		GrayF32 L = lab.getBand(0);
 		GrayF32 A = lab.getBand(1);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,66 +34,66 @@ import boofcv.struct.image.*;
  */
 public class ColorRgb {
 
-	public static int rgbToGray_Weighted( int r , int g , int b ) {
+	public static int rgbToGray_Weighted( int r, int g, int b ) {
 		return (int)(0.299*r + 0.587*g + 0.114*b);
 	}
 
-	public static float rgbToGray_Weighted( float r , float g , float b ) {
+	public static float rgbToGray_Weighted( float r, float g, float b ) {
 		return 0.299f*r + 0.587f*g + 0.114f*b;
 	}
 
-	public static double rgbToGray_Weighted( double r , double g , double b ) {
+	public static double rgbToGray_Weighted( double r, double g, double b ) {
 		return 0.299*r + 0.587*g + 0.114*b;
 	}
 
-	public static void rgbToGray_Weighted( ImageMultiBand rgb , ImageGray gray ) {
-		gray.reshape(rgb.width,rgb.height);
-		switch( rgb.getImageType().getFamily() ) {
+	public static void rgbToGray_Weighted( ImageMultiBand rgb, ImageGray gray ) {
+		gray.reshape(rgb.width, rgb.height);
+		switch (rgb.getImageType().getFamily()) {
 			case PLANAR:
-				if( gray instanceof GrayU8 ) {
-					if(BoofConcurrency.USE_CONCURRENT ) {
-						ImplColorRgb_MT.rgbToGray_Weighted_U8((Planar<GrayU8>)rgb,(GrayU8)gray);
+				if (gray instanceof GrayU8) {
+					if (BoofConcurrency.USE_CONCURRENT) {
+						ImplColorRgb_MT.rgbToGray_Weighted_U8((Planar<GrayU8>)rgb, (GrayU8)gray);
 					} else {
-						ImplColorRgb.rgbToGray_Weighted_U8((Planar<GrayU8>)rgb,(GrayU8)gray);
+						ImplColorRgb.rgbToGray_Weighted_U8((Planar<GrayU8>)rgb, (GrayU8)gray);
 					}
-				} else if( gray instanceof GrayF32 ) {
-					if(BoofConcurrency.USE_CONCURRENT ) {
-						ImplColorRgb_MT.rgbToGray_Weighted_F32((Planar<GrayF32>)rgb,(GrayF32)gray);
+				} else if (gray instanceof GrayF32) {
+					if (BoofConcurrency.USE_CONCURRENT) {
+						ImplColorRgb_MT.rgbToGray_Weighted_F32((Planar<GrayF32>)rgb, (GrayF32)gray);
 					} else {
-						ImplColorRgb.rgbToGray_Weighted_F32((Planar<GrayF32>)rgb,(GrayF32)gray);
+						ImplColorRgb.rgbToGray_Weighted_F32((Planar<GrayF32>)rgb, (GrayF32)gray);
 					}
-				} else if( gray instanceof GrayF64 ) {
-					if(BoofConcurrency.USE_CONCURRENT ) {
-						ImplColorRgb_MT.rgbToGray_Weighted_F64((Planar<GrayF64>)rgb,(GrayF64)gray);
+				} else if (gray instanceof GrayF64) {
+					if (BoofConcurrency.USE_CONCURRENT) {
+						ImplColorRgb_MT.rgbToGray_Weighted_F64((Planar<GrayF64>)rgb, (GrayF64)gray);
 					} else {
-						ImplColorRgb.rgbToGray_Weighted_F64((Planar<GrayF64>)rgb,(GrayF64)gray);
+						ImplColorRgb.rgbToGray_Weighted_F64((Planar<GrayF64>)rgb, (GrayF64)gray);
 					}
 				} else {
-					throw new IllegalArgumentException("Unsupported type "+gray.getClass().getSimpleName());
+					throw new IllegalArgumentException("Unsupported type " + gray.getClass().getSimpleName());
 				}
 				break;
 
 			case INTERLEAVED:
-				if( gray instanceof GrayU8 ) {
-					if(BoofConcurrency.USE_CONCURRENT ) {
-						ImplColorRgb_MT.rgbToGray_Weighted((InterleavedU8)rgb,(GrayU8)gray);
+				if (gray instanceof GrayU8) {
+					if (BoofConcurrency.USE_CONCURRENT) {
+						ImplColorRgb_MT.rgbToGray_Weighted((InterleavedU8)rgb, (GrayU8)gray);
 					} else {
-						ImplColorRgb.rgbToGray_Weighted((InterleavedU8)rgb,(GrayU8)gray);
+						ImplColorRgb.rgbToGray_Weighted((InterleavedU8)rgb, (GrayU8)gray);
 					}
-				} else if( gray instanceof GrayF32 ) {
-					if(BoofConcurrency.USE_CONCURRENT ) {
-						ImplColorRgb_MT.rgbToGray_Weighted((InterleavedF32)rgb,(GrayF32)gray);
+				} else if (gray instanceof GrayF32) {
+					if (BoofConcurrency.USE_CONCURRENT) {
+						ImplColorRgb_MT.rgbToGray_Weighted((InterleavedF32)rgb, (GrayF32)gray);
 					} else {
-						ImplColorRgb.rgbToGray_Weighted((InterleavedF32)rgb,(GrayF32)gray);
+						ImplColorRgb.rgbToGray_Weighted((InterleavedF32)rgb, (GrayF32)gray);
 					}
-				} else if( gray instanceof GrayF64 ) {
-					if(BoofConcurrency.USE_CONCURRENT ) {
-						ImplColorRgb_MT.rgbToGray_Weighted((InterleavedF64)rgb,(GrayF64)gray);
+				} else if (gray instanceof GrayF64) {
+					if (BoofConcurrency.USE_CONCURRENT) {
+						ImplColorRgb_MT.rgbToGray_Weighted((InterleavedF64)rgb, (GrayF64)gray);
 					} else {
-						ImplColorRgb.rgbToGray_Weighted((InterleavedF64)rgb,(GrayF64)gray);
+						ImplColorRgb.rgbToGray_Weighted((InterleavedF64)rgb, (GrayF64)gray);
 					}
 				} else {
-					throw new IllegalArgumentException("Unsupported type "+gray.getClass().getSimpleName());
+					throw new IllegalArgumentException("Unsupported type " + gray.getClass().getSimpleName());
 				}
 				break;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,7 +53,7 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 	 * that stores each pixel's value. Any changes to pixel values in the original image or the sub-image will
 	 * affect the other. A sub-image must be a sub-set of the original image and cannot specify a bounds larger
 	 * than the original.
-	 *</p>
+	 * </p>
 	 *
 	 * <p>
 	 * When specifying the sub-image, the top-left corner is inclusive and the bottom right corner exclusive. Thus,
@@ -67,7 +67,7 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 	 * @param subimage Optional output for sub-image. If not null the subimage will be written into this image.
 	 * @return A sub-image of 'this' image.
 	 */
-	public abstract T subimage(int x0, int y0, int x1, int y1, @Nullable T subimage);
+	public abstract T subimage( int x0, int y0, int x1, int y1, @Nullable T subimage );
 
 	/**
 	 * Same as {@link #subimage(int, int, int, int, ImageBase)}, but sets the storage for the input subimage
@@ -79,8 +79,8 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 	 * @param y1 y-coordinate of bottom-right corner of the sub-image, exclusive.
 	 * @return A sub-image of 'this' image.
 	 */
-	public T subimage(int x0, int y0, int x1, int y1 ) {
-		return subimage(x0,y0,x1,y1,null);
+	public T subimage( int x0, int y0, int x1, int y1 ) {
+		return subimage(x0, y0, x1, y1, null);
 	}
 
 	/**
@@ -91,14 +91,16 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 	 * @param width Desired image width
 	 * @param height Desired image height
 	 */
-	public abstract void reshape(int width, int height);
+	public abstract void reshape( int width, int height );
 
 	/**
-	 * Reshapes this image so that it's shape matches the input image
+	 * Reshapes this image so that the width and height matches the input image. If both images are multi band
+	 * then the number of bands will also be matched.
+	 *
 	 * @param image Image whose shape will be matched
 	 */
-	public void matchShape( ImageBase image ) {
-		reshape(image.width,image.height);
+	public void reshapeTo( ImageBase image ) {
+		reshape(image.width, image.height);
 	}
 
 	/**
@@ -125,19 +127,20 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 	 * @param y pixel location y-axis
 	 * @return true if inside and false if outside
 	 */
-	public final boolean isInBounds(int x, int y) {
+	public final boolean isInBounds( int x, int y ) {
 		return x >= 0 && x < width && y >= 0 && y < height;
 	}
 
-	public int getIndex(int x, int y) {
-		return startIndex + y * stride + x;
+	public int getIndex( int x, int y ) {
+		return startIndex + y*stride + x;
 	}
 
 	public int indexToPixelX( int index ) {
-		return (index-startIndex)%stride;
+		return (index - startIndex)%stride;
 	}
+
 	public int indexToPixelY( int index ) {
-		return (index-startIndex)/stride;
+		return (index - startIndex)/stride;
 	}
 
 	/**
@@ -150,7 +153,7 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 	 * @param imgHeight height of the new image
 	 * @return new image
 	 */
-	public abstract T createNew(int imgWidth, int imgHeight);
+	public abstract T createNew( int imgWidth, int imgHeight );
 
 	/**
 	 * Description of the image data structure
@@ -168,7 +171,7 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 	 * @return new image with the same shape as this.
 	 */
 	public T createSameShape() {
-		return createNew(width,height);
+		return createNew(width, height);
 	}
 
 	/**
@@ -184,30 +187,32 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 	public void forEachXY( PixelXY function ) {
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
-				function.process(x,y);
+				function.process(x, y);
 			}
 		}
 	}
 
 	/**
 	 * Copies the row into the array.
+	 *
 	 * @param row Which row to copy.
 	 * @param col0 First column. Inclusive.
 	 * @param col1 Last column. Exclusive.
 	 * @param offset First index in output array
 	 * @param array Output array
 	 */
-	public abstract void copyRow( int row, int col0 , int col1 , int offset , Object array );
+	public abstract void copyRow( int row, int col0, int col1, int offset, Object array );
 
 	/**
 	 * Copies the column into the array.
+	 *
 	 * @param col Which column to copy.
 	 * @param row0 First row. Inclusive.
 	 * @param row1 Last row. Exclusive.
 	 * @param offset First index in output array
 	 * @param array Output array
 	 */
-	public abstract void copyCol(int col , int row0 , int row1 , int offset , Object array );
+	public abstract void copyCol( int col, int row0, int row1, int offset, Object array );
 
 	/**
 	 * Creates an identical image. Note that if this image is a sub-image portions of hte image which are not part
@@ -226,5 +231,7 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 	}
 
 	/** Lambda for each (x,y) coordinate in the image */
-	public @FunctionalInterface interface PixelXY { void process( int x, int y); }
+	public @FunctionalInterface interface PixelXY {
+		void process( int x, int y );
+	}
 }

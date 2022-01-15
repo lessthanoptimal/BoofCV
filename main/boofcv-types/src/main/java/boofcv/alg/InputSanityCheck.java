@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -121,7 +121,7 @@ public class InputSanityCheck {
 	public static void checkReshapeB( ImageMultiBand<?> imgA, ImageMultiBand<?> imgB ) {
 		if (imgA == imgB)
 			throw new IllegalArgumentException("Image's can't be the same instance");
-		imgB.reshape(imgA.width, imgA.height, imgA.getNumBands());
+		imgB.reshapeTo(imgA);
 	}
 
 	public static void checkSameShape( ImageBase<?> imgA, ImageBase<?> imgB ) {

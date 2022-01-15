@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -148,7 +148,7 @@ public class SgmCostAggregation {
 		if (pathsConsidered < 1 || pathsConsidered > 16)
 			throw new IllegalArgumentException("Number of paths must be 1 to 16, inclusive. Not " + pathsConsidered);
 		this.costYXD = costYXD;
-		aggregated.reshape(costYXD);
+		aggregated.reshapeTo(costYXD);
 		GImageMiscOps.fill(aggregated, 0);
 
 		this.lengthX = costYXD.getHeight();

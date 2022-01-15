@@ -646,8 +646,8 @@ public class DemoThreeViewStereoApp<TD extends TupleDesc<TD>> extends Demonstrat
 			ConvertBufferedImage.convertFrom(buff[view1], color2, true);
 
 			// Make sure the number of bands match's the input images
-			rectColor1.reshape(color1.width, color1.height, color1.getNumBands());
-			rectColor2.reshape(color2.width, color2.height, color2.getNumBands());
+			rectColor1.reshapeTo(color1);
+			rectColor2.reshapeTo(color2);
 
 			// rectify a colored image
 			rectifyImages(color1, color2, leftToRight, intrinsic01, intrinsic02,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -68,12 +68,13 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				"import boofcv.core.image.impl.ConvertInterleavedToSingle_MT;\n" +
 				"import boofcv.struct.image.*;\n" +
 				"\n" +
+				"import javax.annotation.processing.Generated;\n" +
+				"\n" +
 				"/**\n" +
 				" * <p>\n" +
 				" * Functions for converting between different image types. Pixel values are converted by typecasting.\n" +
 				" * When converting between signed and unsigned types, care should be taken to avoid numerical overflow.\n" +
 				" * </p>\n" +
-				" *\n" +
 				generateDocString("Peter Abeles") +
 				"@SuppressWarnings(\"Duplicates\")\n" +
 				"public class "+className+" {\n\n");
@@ -90,11 +91,11 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				"\t * @param output (Optional) The output image. If null a new image is created. Modified.\n" +
 				"\t * @return Converted image.\n" +
 				"\t */\n" +
-				"\tpublic static "+imageOut.getSingleBandName()+" convert("+imageIn.getSingleBandName()+" input, "+imageOut.getSingleBandName()+" output) {\n" +
+				"\tpublic static "+imageOut.getSingleBandName()+" convert( "+imageIn.getSingleBandName()+" input, "+imageOut.getSingleBandName()+" output ) {\n" +
 				"\t\tif (output == null) {\n" +
 				"\t\t\toutput = new "+imageOut.getSingleBandName()+"(input.width, input.height);\n" +
 				"\t\t} else {\n" +
-				"\t\t\toutput.reshape(input.width,input.height);\n" +
+				"\t\t\toutput.reshapeTo(input);\n" +
 				"\t\t}\n" +
 				"\n" +
 				"\t\t// threaded code is not significantly faster here\n" +
@@ -115,11 +116,11 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				"\t * @param output (Optional) The output image. If null a new image is created. Modified.\n" +
 				"\t * @return Converted image.\n" +
 				"\t */\n" +
-				"\tpublic static "+imageOut.getInterleavedName()+" convert("+imageIn.getInterleavedName()+" input, "+imageOut.getInterleavedName()+" output) {\n" +
+				"\tpublic static "+imageOut.getInterleavedName()+" convert( "+imageIn.getInterleavedName()+" input, "+imageOut.getInterleavedName()+" output ) {\n" +
 				"\t\tif (output == null) {\n" +
 				"\t\t\toutput = new "+imageOut.getInterleavedName()+"(input.width, input.height, input.numBands);\n" +
 				"\t\t} else {\n" +
-				"\t\t\toutput.reshape(input.width,input.height,input.numBands);\n" +
+				"\t\t\toutput.reshapeTo(input);\n" +
 				"\t\t}\n" +
 				"\n" +
 				"\t\t// threaded code is not significantly faster here\n" +
@@ -145,13 +146,13 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				"\t\tif (output == null) {\n" +
 				"\t\t\toutput = new "+imageName+"(input.width, input.height);\n" +
 				"\t\t} else {\n" +
-				"\t\t\toutput.reshape(input.width,input.height);\n" +
+				"\t\t\toutput.reshapeTo(input);\n" +
 				"\t\t}\n" +
 				"\n" +
 				"\t\tif( BoofConcurrency.USE_CONCURRENT ) {\n" +
-				"\t\t\tImplConvertPlanarToGray_MT.average(input,output);\n" +
+				"\t\t\tImplConvertPlanarToGray_MT.average(input, output);\n" +
 				"\t\t} else {\n" +
-				"\t\t\tImplConvertPlanarToGray.average(input,output);\n" +
+				"\t\t\tImplConvertPlanarToGray.average(input, output);\n" +
 				"\t\t}\n" +
 				"\n" +
 				"\t\treturn output;\n" +
@@ -175,13 +176,13 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				"\t\tif (output == null) {\n" +
 				"\t\t\toutput = new "+outputName+"(input.width, input.height);\n" +
 				"\t\t} else {\n" +
-				"\t\t\toutput.reshape(input.width,input.height);\n" +
+				"\t\t\toutput.reshapeTo(input);\n" +
 				"\t\t}\n" +
 				"\n" +
-				"\t\tif( BoofConcurrency.USE_CONCURRENT ) {\n" +
-				"\t\t\tConvertInterleavedToSingle_MT.average(input,output);\n" +
+				"\t\tif (BoofConcurrency.USE_CONCURRENT) {\n" +
+				"\t\t\tConvertInterleavedToSingle_MT.average(input, output);\n" +
 				"\t\t} else {\n" +
-				"\t\t\tConvertInterleavedToSingle.average(input,output);\n" +
+				"\t\t\tConvertInterleavedToSingle.average(input, output);\n" +
 				"\t\t}\n" +
 				"\n" +
 				"\t\treturn output;\n" +
@@ -203,13 +204,13 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				"\t\tif (output == null) {\n" +
 				"\t\t\toutput = new Planar<>("+bandName+".class,input.width, input.height,input.numBands);\n" +
 				"\t\t} else {\n" +
-				"\t\t\toutput.reshape(input.width,input.height,input.numBands);\n" +
+				"\t\t\toutput.reshapeTo(input);\n" +
 				"\t\t}\n" +
 				"\n" +
-				"\t\tif( BoofConcurrency.USE_CONCURRENT ) {\n" +
-				"\t\t\tImplConvertImage_MT.convert(input,output);\n" +
+				"\t\tif (BoofConcurrency.USE_CONCURRENT) {\n" +
+				"\t\t\tImplConvertImage_MT.convert(input, output);\n" +
 				"\t\t} else {\n" +
-				"\t\t\tImplConvertImage.convert(input,output);\n" +
+				"\t\t\tImplConvertImage.convert(input, output);\n" +
 				"\t\t}\n" +
 				"\n" +
 				"\t\treturn output;\n" +
@@ -233,13 +234,13 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				"\t\tif (output == null) {\n" +
 				"\t\t\toutput = new Planar<>("+bandName+".class,input.width, input.height,input.numBands);\n" +
 				"\t\t} else {\n" +
-				"\t\t\toutput.reshape(input.width,input.height,input.numBands);\n" +
+				"\t\t\toutput.reshapeTo(input);\n" +
 				"\t\t}\n" +
 				"\n" +
-				"\t\tif( BoofConcurrency.USE_CONCURRENT ) {\n" +
-				"\t\t\tImplConvertImage_MT.convert"+type+"(input,output);\n" +
+				"\t\tif (BoofConcurrency.USE_CONCURRENT) {\n" +
+				"\t\t\tImplConvertImage_MT.convert"+type+"(input, output);\n" +
 				"\t\t} else {\n" +
-				"\t\t\tImplConvertImage.convert"+type+"(input,output);\n" +
+				"\t\t\tImplConvertImage.convert"+type+"(input, output);\n" +
 				"\t\t}\n" +
 				"\n" +
 				"\t\treturn output;\n" +
@@ -261,13 +262,13 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				"\t\tif (output == null) {\n" +
 				"\t\t\toutput = new "+outputName+"(input.width, input.height,input.getNumBands());\n" +
 				"\t\t} else {\n" +
-				"\t\t\toutput.reshape(input.width,input.height,input.getNumBands());\n" +
+				"\t\t\toutput.reshapeTo(input);\n" +
 				"\t\t}\n" +
 				"\n" +
-				"\t\tif( BoofConcurrency.USE_CONCURRENT ) {\n" +
-				"\t\t\tImplConvertImage_MT.convert(input,output);\n" +
+				"\t\tif (BoofConcurrency.USE_CONCURRENT) {\n" +
+				"\t\t\tImplConvertImage_MT.convert(input, output);\n" +
 				"\t\t} else {\n" +
-				"\t\t\tImplConvertImage.convert(input,output);\n" +
+				"\t\t\tImplConvertImage.convert(input, output);\n" +
 				"\t\t}\n" +
 				"\n" +
 				"\t\treturn output;\n" +
@@ -291,13 +292,13 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				"\t\tif (output == null) {\n" +
 				"\t\t\toutput = new "+outputName+"(input.width, input.height,input.getNumBands());\n" +
 				"\t\t} else {\n" +
-				"\t\t\toutput.reshape(input.width,input.height,input.getNumBands());\n" +
+				"\t\t\toutput.reshapeTo(input);\n" +
 				"\t\t}\n" +
 				"\n" +
-				"\t\tif( BoofConcurrency.USE_CONCURRENT ) {\n" +
-				"\t\t\tImplConvertImage_MT.convert"+type+"(input,output);\n" +
+				"\t\tif (BoofConcurrency.USE_CONCURRENT) {\n" +
+				"\t\t\tImplConvertImage_MT.convert"+type+"(input, output);\n" +
 				"\t\t} else {\n" +
-				"\t\t\tImplConvertImage.convert"+type+"(input,output);\n" +
+				"\t\t\tImplConvertImage.convert"+type+"(input, output);\n" +
 				"\t\t}\n" +
 				"\n" +
 				"\t\treturn output;\n" +
@@ -319,14 +320,13 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				"\t * @param output (Optional) Storage for the output image. Can be null.\n" +
 				"\t * @return The converted output image.\n" +
 				"\t */\n" +
-				"\tpublic static GrayU8 convert("+imageIn.getSingleBandName()+" input , "+sumType+" min , "+sumType+" max , int numValues , GrayU8 output )\n" +
-				"\t{\n" +
+				"\tpublic static GrayU8 convert( "+imageIn.getSingleBandName()+" input, "+sumType+" min, "+sumType+" max, int numValues , GrayU8 output ) {\n" +
 				"\t\tif (output == null) {\n" +
 				"\t\t\toutput = new GrayU8(input.width, input.height);\n" +
 				"\t\t} else {\n" +
 				"\t\t\toutput.reshape(input.width,input.height);\n" +
 				"\t\t}\n" +
-				"\t\tif( numValues < 0 || numValues > 256 )\n" +
+				"\t\tif (numValues < 0 || numValues > 256)\n" +
 				"\t\t\tthrow new IllegalArgumentException(\"0 <= numValues <= 256\");\n" +
 				"\n" +
 				"\t\tnumValues -= 1;" +
@@ -347,8 +347,8 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 	}
 
 	public static void main( String[] args ) throws FileNotFoundException {
-		GenerateConvertImage app = new GenerateConvertImage();
-
-		app.generateCode();
+		var app = new GenerateConvertImage();
+		app.setModuleName("boofcv-ip");
+		app.generate();
 	}
 }

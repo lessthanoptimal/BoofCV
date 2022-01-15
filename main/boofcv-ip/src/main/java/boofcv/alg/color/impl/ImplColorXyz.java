@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,7 +33,7 @@ import boofcv.struct.image.Planar;
 @SuppressWarnings("Duplicates")
 public class ImplColorXyz {
 	public static void rgbToXyz_F32( Planar<GrayF32> rgb, Planar<GrayF32> xyz ) {
-		xyz.reshape(rgb);
+		xyz.reshapeTo(rgb);
 
 		GrayF32 R = rgb.getBand(0);
 		GrayF32 G = rgb.getBand(1);
@@ -62,7 +62,7 @@ public class ImplColorXyz {
 	}
 
 	public static void rgbToXyz_U8( Planar<GrayU8> rgb, Planar<GrayF32> xyz ) {
-		xyz.reshape(rgb);
+		xyz.reshapeTo(rgb);
 
 		GrayU8 R = rgb.getBand(0);
 		GrayU8 G = rgb.getBand(1);
@@ -91,7 +91,7 @@ public class ImplColorXyz {
 	}
 
 	public static void xyzToRgb_F32( Planar<GrayF32> xyz, Planar<GrayF32> rgb ) {
-		rgb.reshape(xyz);
+		rgb.reshapeTo(xyz);
 
 		GrayF32 X = xyz.getBand(0);
 		GrayF32 Y = xyz.getBand(1);
@@ -120,7 +120,7 @@ public class ImplColorXyz {
 	}
 
 	public static void xyzToRgb_U8( Planar<GrayF32> xyz, Planar<GrayU8> rgb ) {
-		rgb.reshape(xyz);
+		rgb.reshapeTo(xyz);
 
 		GrayF32 X = xyz.getBand(0);
 		GrayF32 Y = xyz.getBand(1);

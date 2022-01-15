@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,16 +53,15 @@ public abstract class ImageMultiBand<T extends ImageMultiBand<T>> extends ImageB
 	}
 
 	/**
-	 * Reshapes to match the (width,height,bands) of input image
+	 * If the input image is a ImageMultiBand then the shape with match (width, height, bands) if single band then
+	 * the number of bands will remain the same while just matching (width, height)
 	 */
-	public void reshape( ImageMultiBand image ) {
-		reshape(image.width, image.height, image.getNumBands());
-	}
-
-	/**
-	 * Reshapes to match the (width,height) of input image. Number of bands is left the same
-	 */
-	public void reshape( ImageGray image ) {
-		reshape(image.width, image.height);
+	@Override public void reshapeTo( ImageBase image ) {
+		if (image instanceof ImageMultiBand) {
+			var mb = (ImageMultiBand)image;
+			reshape(mb.width, mb.height, mb.getNumBands());
+		} else {
+			reshape(image.width, image.height);
+		}
 	}
 }

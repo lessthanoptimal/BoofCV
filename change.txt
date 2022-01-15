@@ -12,6 +12,7 @@ Build
 - Added Nullable again
 Misc
 - Config classes now must implement setTo() which returns 'this' to allow chaining and easy copies
+- ImageBase.reshapeTo() replaces reshapeTo()
 ImageProcessing
 - Added ImageMiscOps.transpose()
 Background Model
