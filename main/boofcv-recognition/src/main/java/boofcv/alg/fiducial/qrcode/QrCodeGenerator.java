@@ -27,7 +27,7 @@ import georegression.struct.point.Point2D_I32;
  * @author Peter Abeles
  */
 @SuppressWarnings({"NullAway.Init"})
-public class QrCodeGenerator extends QrGeneratorBase {
+public class QrCodeGenerator extends QrGeneratorBase<QrCodeGenerator> {
 
 	QrCode qr;
 

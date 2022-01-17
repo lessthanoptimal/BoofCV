@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -86,6 +86,10 @@ public class UtilImageIO {
 
 	public static @Nullable BufferedImage loadImage( String directory, String fileName ) {
 		return loadImage(new File(directory, fileName).getPath());
+	}
+
+	public static BufferedImage loadImageNotNull( String directory, String fileName ) {
+		return Objects.requireNonNull(loadImage(directory, fileName));
 	}
 
 	/**

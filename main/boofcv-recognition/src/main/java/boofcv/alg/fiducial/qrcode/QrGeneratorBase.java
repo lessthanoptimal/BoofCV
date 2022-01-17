@@ -22,7 +22,6 @@ import boofcv.alg.drawing.FiducialRenderEngine;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.List;
 
@@ -32,9 +31,9 @@ import java.util.List;
  * @author Peter Abeles
  */
 @SuppressWarnings({"NullAway.Init"})
-public abstract class QrGeneratorBase {
+public abstract class QrGeneratorBase<T extends QrGeneratorBase<T>> {
 	/** How wide the square which encloses the marker is */
-	public @Setter @Getter double markerWidth = 1.0;
+	public @Getter double markerWidth = 1.0;
 
 	// used to toggle rendering of data
 	protected boolean renderData = true;
@@ -47,7 +46,7 @@ public abstract class QrGeneratorBase {
 	protected List<Point2D_I32> bitLocations;
 
 	/** Used to render the marker */
-	@Setter protected FiducialRenderEngine render;
+	@Getter protected FiducialRenderEngine render;
 
 	protected QrGeneratorBase( double markerWidth ) {
 		this.markerWidth = markerWidth;
@@ -76,5 +75,17 @@ public abstract class QrGeneratorBase {
 
 	protected void square( int row, int col ) {
 		render.square(col*moduleWidth, row*moduleWidth, moduleWidth);
+	}
+
+	// Setters that allow for chained commands
+
+	public T setMarkerWidth( double value ) {
+		this.markerWidth = value;
+		return (T)this;
+	}
+
+	public T setRender( FiducialRenderEngine render ) {
+		this.render = render;
+		return (T)this;
 	}
 }

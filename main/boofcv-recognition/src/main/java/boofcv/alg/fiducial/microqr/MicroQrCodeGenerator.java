@@ -28,7 +28,7 @@ import georegression.struct.point.Point2D_I32;
  *
  * @author Peter Abeles
  */
-public class MicroQrCodeGenerator extends QrGeneratorBase {
+public class MicroQrCodeGenerator extends QrGeneratorBase<MicroQrCodeGenerator> {
 	public MicroQrCodeGenerator render( MicroQrCode qr ) {
 		numModules = MicroQrCode.totalModules(qr.version);
 		moduleWidth = markerWidth/numModules;

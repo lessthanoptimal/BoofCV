@@ -19,7 +19,6 @@
 package boofcv.examples.fiducial;
 
 import boofcv.abst.fiducial.FiducialDetector;
-import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.distort.brown.LensDistortionBrown;
 import boofcv.factory.fiducial.ConfigFiducialBinary;
 import boofcv.factory.fiducial.FactoryFiducial;
@@ -57,11 +56,11 @@ public class ExampleFiducialBinary {
 
 		// load the lens distortion parameters and the input image
 		CameraPinholeBrown param = CalibrationIO.load(new File(directory, "intrinsic.yaml"));
-		LensDistortionNarrowFOV lensDistortion = new LensDistortionBrown(param);
+		var lensDistortion = new LensDistortionBrown(param);
 
-		BufferedImage input = UtilImageIO.loadImage(directory, "image0000.jpg");
-//		BufferedImage input = UtilImageIO.loadImage(directory, "image0001.jpg");
-//		BufferedImage input = UtilImageIO.loadImage(directory, "image0002.jpg");
+		BufferedImage input = UtilImageIO.loadImageNotNull(directory, "image0000.jpg");
+//		BufferedImage input = UtilImageIO.loadImageNotNull(directory, "image0001.jpg");
+//		BufferedImage input = UtilImageIO.loadImageNotNull(directory, "image0002.jpg");
 		GrayF32 original = ConvertBufferedImage.convertFrom(input, true, ImageType.single(GrayF32.class));
 
 		// Detect the fiducial
