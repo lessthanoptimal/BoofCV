@@ -78,6 +78,7 @@ public class ConfigCalibrationTarget implements Configuration {
 				case ECOCHECK -> text += " ecocheck=" + ecocheck.toString();
 				case HAMMING_CHESSBOARD -> text += "hamming=" + hammingChess.toString();
 				case HAMMING_GRID -> text += "hamming=" + hammingGrid.toString();
+				default -> {}
 			}
 		}
 
