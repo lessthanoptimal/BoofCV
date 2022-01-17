@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -67,7 +67,8 @@ public class ExampleCalibrateStereo {
 	public void setupECoCheck() {
 		// Creates a detector and specifies its physical characteristics
 		detector = new MultiToSingleFiducialCalibration(FactoryFiducialCalibration.
-				ecocheck(null, ConfigECoCheckMarkers.singleShape(9, 7, 1, 30)));
+				ecocheck(null,
+						ConfigECoCheckMarkers.singleShape(/*rows*/ 9, /*cols*/ 7, /*markers*/ 1, /*square size*/ 30)));
 
 		String directory = UtilIO.pathExample("calibration/stereo/Zed_ecocheck");
 
@@ -80,7 +81,8 @@ public class ExampleCalibrateStereo {
 	 */
 	public void setupSquareGrid() {
 		// Creates a detector and specifies its physical characteristics
-		detector = FactoryFiducialCalibration.squareGrid(null, new ConfigGridDimen(4, 3, 30, 30));
+		detector = FactoryFiducialCalibration.squareGrid(null,
+				new ConfigGridDimen(/*rows*/ 4, /*cols*/ 3, /*shape size*/ 30, /*shape distance*/ 30));
 
 		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Square");
 
@@ -93,7 +95,8 @@ public class ExampleCalibrateStereo {
 	 */
 	public void setupChessboard() {
 		// Creates a detector and specifies its physical characteristics
-		detector = FactoryFiducialCalibration.chessboardX(null, new ConfigGridDimen(7, 5, 30));
+		detector = FactoryFiducialCalibration.chessboardX(null,
+				new ConfigGridDimen(/*rows*/ 7, /*cols*/ 5, /*shape size*/ 30));
 
 		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess");
 

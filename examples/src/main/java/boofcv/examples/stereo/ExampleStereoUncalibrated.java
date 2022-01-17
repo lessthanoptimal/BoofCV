@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -143,7 +143,7 @@ public class ExampleStereoUncalibrated {
 
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(fx, fy, 0, cx, cy);
 		DMatrixRMaj H = MultiViewOps.createProjectiveToMetric(K, v.x, v.y, v.z, 1, null);
-		DMatrixRMaj P2m = new DMatrixRMaj(3, 4);
+		var P2m = new DMatrixRMaj(3, 4);
 		CommonOps_DDRM.mult(P2, H, P2m);
 
 		// Decompose and get the initial estimate for translation

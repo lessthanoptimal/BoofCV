@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -78,7 +78,7 @@ public class ExampleStereoDisparity {
 										 int disparityMin, int disparityRange ) {
 		// A slower but more accuracy algorithm is selected
 		// All of these parameters should be turned
-		ConfigDisparityBMBest5 config = new ConfigDisparityBMBest5();
+		var config = new ConfigDisparityBMBest5();
 		config.errorType = DisparityError.CENSUS;
 		config.disparityMin = disparityMin;
 		config.disparityRange = disparityRange;
@@ -105,7 +105,7 @@ public class ExampleStereoDisparity {
 												  int disparityMin, int disparityRange ) {
 		// A slower but more accuracy algorithm is selected
 		// All of these parameters should be turned
-		ConfigDisparityBMBest5 config = new ConfigDisparityBMBest5();
+		var config = new ConfigDisparityBMBest5();
 		config.errorType = DisparityError.CENSUS;
 		config.disparityMin = disparityMin;
 		config.disparityRange = disparityRange;
@@ -149,8 +149,8 @@ public class ExampleStereoDisparity {
 		RectifyImageOps.allInsideLeft(param.left, rect1, rect2, rectK, null);
 
 		// undistorted and rectify images
-		FMatrixRMaj rect1_F32 = new FMatrixRMaj(3, 3);
-		FMatrixRMaj rect2_F32 = new FMatrixRMaj(3, 3);
+		var rect1_F32 = new FMatrixRMaj(3, 3);
+		var rect2_F32 = new FMatrixRMaj(3, 3);
 		ConvertMatrixData.convert(rect1, rect1_F32);
 		ConvertMatrixData.convert(rect2, rect2_F32);
 
@@ -192,7 +192,7 @@ public class ExampleStereoDisparity {
 		// show results
 		BufferedImage visualized = VisualizeImageData.disparity(disparity, null, disparityRange, 0);
 
-		ListDisplayPanel gui = new ListDisplayPanel();
+		var gui = new ListDisplayPanel();
 		gui.addImage(rectLeft, "Rectified");
 		gui.addImage(visualized, "Disparity");
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -55,20 +55,21 @@ public class ExampleCalibrateMonocular {
 		List<String> images;
 
 		// Regular Circle Example
-//		detector = FactoryFiducialCalibration.circleRegularGrid(null, new ConfigGridDimen(8, 10, 1.5, 2.5));
+//		detector = FactoryFiducialCalibration.circleRegularGrid(null, new ConfigGridDimen(/*numRows*/ 8, /*numCols*/ 10, 1.5, 2.5));
 //		images = UtilIO.listByPrefix(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_CircleRegular"),"image", null);
 
 		// Hexagonal Circle Example
-//		detector = FactoryFiducialCalibration.circleHexagonalGrid(null, new ConfigGridDimen(24, 28, 1, 1.2));
+//		detector = FactoryFiducialCalibration.circleHexagonalGrid(null, new ConfigGridDimen(/*numRows*/ 24, /*numCols*/ 28, 1, 1.2));
 //		images = UtilIO.listByPrefix(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_CircleHexagonal"),"image", null);
 
 		// Square Grid example
-//		detector = FactoryFiducialCalibration.squareGrid(null, new ConfigGridDimen(4, 3, 30, 30));
+//		detector = FactoryFiducialCalibration.squareGrid(null, new ConfigGridDimen(/*numRows*/ 4, /*numCols*/ 3, 30, 30));
 //		images = UtilIO.listByPrefix(UtilIO.pathExample("calibration/stereo/Bumblebee2_Square"),"left", null);
 
 		// ECoCheck Example
 //		detector = new MultiToSingleFiducialCalibration(FactoryFiducialCalibration.
-//				ecocheck(null, ConfigECoCheckMarkers.singleShape(9, 7, 1, 30)));
+//				ecocheck(null, ConfigECoCheckMarkers.
+//						singleShape(/*numRows*/ 9, /*numCols*/ 7, /*num markers*/ 1, /* square size */ 30)));
 //		images = UtilIO.listByPrefix(UtilIO.pathExample("calibration/stereo/Zed_ecocheck"), "left", null);
 
 		// Chessboard Example

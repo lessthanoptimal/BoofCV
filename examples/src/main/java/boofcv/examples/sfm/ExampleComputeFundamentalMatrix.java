@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -72,7 +72,7 @@ public class ExampleComputeFundamentalMatrix {
 	 */
 	public static DMatrixRMaj robustFundamental( List<AssociatedPair> matches,
 												 List<AssociatedPair> inliers, double inlierThreshold ) {
-		ConfigRansac configRansac = new ConfigRansac();
+		var configRansac = new ConfigRansac();
 		configRansac.inlierThreshold = inlierThreshold;
 		configRansac.iterations = 1000;
 		ConfigFundamental configFundamental = new ConfigFundamental();
@@ -94,7 +94,7 @@ public class ExampleComputeFundamentalMatrix {
 		inliers.addAll(ransac.getMatchSet());
 
 		// Improve the estimate of the fundamental matrix using non-linear optimization
-		DMatrixRMaj F = new DMatrixRMaj(3, 3);
+		var F = new DMatrixRMaj(3, 3);
 		ModelFitter<DMatrixRMaj, AssociatedPair> refine =
 				FactoryMultiView.fundamentalRefine(1e-8, 400, EpipolarError.SAMPSON);
 		if (!refine.fitModel(inliers, ransac.getModelParameters(), F))
@@ -113,7 +113,7 @@ public class ExampleComputeFundamentalMatrix {
 		// Use the 8-point algorithm since it will work with an arbitrary number of points
 		Estimate1ofEpipolar estimateF = FactoryMultiView.fundamental_1(EnumFundamental.LINEAR_8, 0);
 
-		DMatrixRMaj F = new DMatrixRMaj(3, 3);
+		var F = new DMatrixRMaj(3, 3);
 		if (!estimateF.process(matches, F))
 			throw new IllegalArgumentException("Failed");
 
@@ -127,15 +127,14 @@ public class ExampleComputeFundamentalMatrix {
 	 * fundamental matrix.
 	 */
 	public static List<AssociatedPair> computeMatches( BufferedImage left, BufferedImage right ) {
-		DetectDescribePoint detDesc = FactoryDetectDescribe.surfStable(
+		DetectDescribePoint<GrayF32, TupleDesc_F64> detDesc = FactoryDetectDescribe.surfStable(
 				new ConfigFastHessian(0, 2, 400, 1, 9, 4, 4), null, null, GrayF32.class);
 //		DetectDescribePoint detDesc = FactoryDetectDescribe.sift(null,new ConfigSiftDetector(2,0,200,5),null,null);
 
 		ScoreAssociation<TupleDesc_F64> scorer = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
 		AssociateDescription<TupleDesc_F64> associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true, 0.1), scorer);
 
-		ExampleAssociatePoints<GrayF32, TupleDesc_F64> findMatches =
-				new ExampleAssociatePoints<>(detDesc, associate, GrayF32.class);
+		var findMatches = new ExampleAssociatePoints<>(detDesc, associate, GrayF32.class);
 
 		findMatches.associate(left, right);
 
@@ -144,7 +143,7 @@ public class ExampleComputeFundamentalMatrix {
 
 		for (int i = 0; i < matchIndexes.size; i++) {
 			AssociatedIndex a = matchIndexes.get(i);
-			AssociatedPair p = new AssociatedPair(findMatches.pointsA.get(a.src), findMatches.pointsB.get(a.dst));
+			var p = new AssociatedPair(findMatches.pointsA.get(a.src), findMatches.pointsB.get(a.dst));
 			matches.add(p);
 		}
 
@@ -178,7 +177,7 @@ public class ExampleComputeFundamentalMatrix {
 		F.print();
 
 		// display the inlier matches found using the robust estimator
-		AssociationPanel panel = new AssociationPanel(20);
+		var panel = new AssociationPanel(20);
 		panel.setAssociation(inliers);
 		panel.setImages(imageA, imageB);
 

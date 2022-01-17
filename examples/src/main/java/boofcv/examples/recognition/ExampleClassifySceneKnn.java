@@ -121,7 +121,7 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 		}
 
 		// Use these clusters to assign features to words
-		FeatureToWordHistogram_F64 featuresToHistogram = new FeatureToWordHistogram_F64(assignment, HISTOGRAM_HARD);
+		var featuresToHistogram = new FeatureToWordHistogram_F64(assignment, HISTOGRAM_HARD);
 
 		// Storage for the work histogram in each image in the training set and their label
 		List<HistogramScene> memory;
@@ -139,7 +139,7 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 	private AssignCluster<double[]> computeClusters() {
 		System.out.println("Image Features");
 
-		// computes features in the training image set
+		// Compute features in the training image set
 		List<TupleDesc_F64> features = new ArrayList<>();
 		for (String scene : train.keySet()) {
 			List<String> imagePaths = train.get(scene);
@@ -174,7 +174,7 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 		List<HistogramScene> memory = UtilIO.load(HISTOGRAM_FILE_NAME);
 		AssignCluster<double[]> assignment = UtilIO.load(CLUSTER_FILE_NAME);
 
-		FeatureToWordHistogram_F64 featuresToHistogram = new FeatureToWordHistogram_F64(assignment, HISTOGRAM_HARD);
+		var featuresToHistogram = new FeatureToWordHistogram_F64(assignment, HISTOGRAM_HARD);
 
 
 		// Provide the training results to K-NN and it will preprocess these results for quick lookup later on
@@ -236,7 +236,7 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 
 	public static void main( String[] args ) {
 
-		ConfigDenseSurfFast surfFast = new ConfigDenseSurfFast(new DenseSampling(8, 8));
+		var surfFast = new ConfigDenseSurfFast(new DenseSampling(8, 8));
 //		ConfigDenseSurfStable surfStable = new ConfigDenseSurfStable(new DenseSampling(8,8));
 //		ConfigDenseSift sift = new ConfigDenseSift(new DenseSampling(6,6));
 //		ConfigDenseHoG hog = new ConfigDenseHoG();
@@ -247,7 +247,7 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 //				FactoryDescribeImageDense.sift(sift, GrayU8.class);
 //				FactoryDescribeImageDense.hog(hog, ImageType.single(GrayU8.class));
 
-		ConfigKMeans configKMeans = new ConfigKMeans();
+		var configKMeans = new ConfigKMeans();
 		configKMeans.maxIterations = MAX_KNN_ITERATIONS;
 		configKMeans.reseedAfterIterations = 20;
 		ComputeClusters<double[]> clusterer = FactoryClustering.kMeans_MT(
@@ -259,8 +259,8 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 		NearestNeighbor<HistogramScene> nn = FactoryNearestNeighbor.exhaustive(new KdTreeHistogramScene_F64(pointDof));
 		ExampleClassifySceneKnn example = new ExampleClassifySceneKnn(desc, clusterer, nn);
 
-		File trainingDir = new File(UtilIO.pathExample("learning/scene/train"));
-		File testingDir = new File(UtilIO.pathExample("learning/scene/test"));
+		var trainingDir = new File(UtilIO.pathExample("learning/scene/train"));
+		var testingDir = new File(UtilIO.pathExample("learning/scene/test"));
 
 		if (!trainingDir.exists() || !testingDir.exists()) {
 			String addressSrc = "http://boofcv.org/notwiki/largefiles/bow_data_v001.zip";

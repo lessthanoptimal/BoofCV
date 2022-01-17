@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,7 +33,6 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.feature.ColorQueue_F32;
 import boofcv.struct.image.*;
-import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
 
 import java.awt.image.BufferedImage;
@@ -57,7 +56,7 @@ public class ExampleSegmentSuperpixels {
 
 		// Storage for segmented image. Each pixel will be assigned a label from 0 to N-1, where N is the number
 		// of segments in the image
-		GrayS32 pixelToSegment = new GrayS32(color.width, color.height);
+		var pixelToSegment = new GrayS32(color.width, color.height);
 
 		// Segmentation magic happens here
 		alg.segment(color, pixelToSegment);
@@ -77,10 +76,10 @@ public class ExampleSegmentSuperpixels {
 		ImageType<T> type = color.getImageType();
 		ComputeRegionMeanColor<T> colorize = FactorySegmentationAlg.regionMeanColor(type);
 
-		DogArray<float[]> segmentColor = new ColorQueue_F32(type.getNumBands());
+		var segmentColor = new ColorQueue_F32(type.getNumBands());
 		segmentColor.resize(numSegments);
 
-		DogArray_I32 regionMemberCount = new DogArray_I32();
+		var regionMemberCount = new DogArray_I32();
 		regionMemberCount.resize(numSegments);
 
 		ImageSegmentationOps.countRegionPixels(pixelToRegion, numSegments, regionMemberCount.data);
@@ -92,12 +91,12 @@ public class ExampleSegmentSuperpixels {
 		BufferedImage outSegments = VisualizeRegions.regions(pixelToRegion, numSegments, null);
 
 		// Make region edges appear red
-		BufferedImage outBorder = new BufferedImage(color.width, color.height, BufferedImage.TYPE_INT_RGB);
+		var outBorder = new BufferedImage(color.width, color.height, BufferedImage.TYPE_INT_RGB);
 		ConvertBufferedImage.convertTo(color, outBorder, true);
 		VisualizeRegions.regionBorders(pixelToRegion, 0xFF0000, outBorder);
 
 		// Show the visualization results
-		ListDisplayPanel gui = new ListDisplayPanel();
+		var gui = new ListDisplayPanel();
 		gui.addImage(outColor, "Color of Segments");
 		gui.addImage(outBorder, "Region Borders");
 		gui.addImage(outSegments, "Regions");

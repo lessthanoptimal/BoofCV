@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,8 +50,8 @@ public class ExampleBinaryOps {
 
 		// convert into a usable format
 		GrayF32 input = ConvertBufferedImage.convertFromSingle(image, null, GrayF32.class);
-		GrayU8 binary = new GrayU8(input.width, input.height);
-		GrayS32 label = new GrayS32(input.width, input.height);
+		var binary = new GrayU8(input.width, input.height);
+		var label = new GrayS32(input.width, input.height);
 
 		// Select a global threshold using Otsu's method.
 		double threshold = GThresholdImageOps.computeOtsu(input, 0, 255);

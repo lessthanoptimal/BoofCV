@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -92,9 +92,9 @@ public class ExampleFiducialImage {
 
 		// print the results
 		Graphics2D g2 = input.createGraphics();
-		Se3_F64 targetToSensor = new Se3_F64();
-		Point2D_F64 locationPixel = new Point2D_F64();
-		Polygon2D_F64 bounds = new Polygon2D_F64();
+		var targetToSensor = new Se3_F64();
+		var locationPixel = new Point2D_F64();
+		var bounds = new Polygon2D_F64();
 		for (int i = 0; i < detector.totalFound(); i++) {
 			detector.getCenter(i, locationPixel);
 			detector.getBounds(i, bounds);

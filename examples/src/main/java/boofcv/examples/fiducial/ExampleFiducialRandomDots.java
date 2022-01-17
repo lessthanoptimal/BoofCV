@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -57,7 +57,7 @@ public class ExampleFiducialRandomDots {
 
 		// The only parameter that you have to set is markerLength. It's used to compute bounding
 		// boxes and similar. If you don't know what the width is just set it to 1.0
-		ConfigUchiyaMarker config = new ConfigUchiyaMarker();
+		var config = new ConfigUchiyaMarker();
 		config.markerWidth = defs.markerWidth;
 		config.markerHeight = defs.markerHeight;
 
@@ -82,9 +82,9 @@ public class ExampleFiducialRandomDots {
 
 		// Time to visualize the results
 		Graphics2D g2 = image.createGraphics();
-		Se3_F64 targetToSensor = new Se3_F64();
-		Polygon2D_F64 bounds = new Polygon2D_F64();
-		Point2D_F64 center = new Point2D_F64();
+		var targetToSensor = new Se3_F64();
+		var bounds = new Polygon2D_F64();
+		var center = new Point2D_F64();
 		for (int i = 0; i < detector.totalFound(); i++) {
 			detector.getBounds(i, bounds);
 			detector.getCenter(i, center);

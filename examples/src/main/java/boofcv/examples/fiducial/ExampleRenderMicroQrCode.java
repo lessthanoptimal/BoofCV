@@ -45,7 +45,7 @@ public class ExampleRenderMicroQrCode {
 
 		// FiducialImageEngine is an interface for rending to images. You can also render to PDF and other formats.
 		var render = new FiducialImageEngine();
-		render.configure(/* border */10, /* width */150);
+		render.configure(/* border */ 10, /* width */ 150);
 
 		// This contains the logic for rendering the marker
 		var g = new MicroQrCodeGenerator();

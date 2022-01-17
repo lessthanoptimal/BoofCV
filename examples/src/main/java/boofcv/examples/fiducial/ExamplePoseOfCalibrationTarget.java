@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,7 +46,6 @@ import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ejml.data.DMatrixRMaj;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -94,21 +93,21 @@ public class ExamplePoseOfCalibrationTarget {
 		// make the view more interest. From the side.
 		DMatrixRMaj rotY = ConvertRotation3D_F64.rotY(-Math.PI/2.0, null);
 		viewer.setCameraToWorld(new Se3_F64(rotY, new Vector3D_F64(0.75, 0, 1.25)).invert(null));
-		ImagePanel imagePanel = new ImagePanel(intrinsic.width, intrinsic.height);
-		JComponent viewerComponent = viewer.getComponent();
+		var imagePanel = new ImagePanel(intrinsic.width, intrinsic.height);
+		var viewerComponent = viewer.getComponent();
 		viewerComponent.setPreferredSize(new Dimension(intrinsic.width, intrinsic.height));
-		PanelGridPanel gui = new PanelGridPanel(1, imagePanel, viewerComponent);
+		var gui = new PanelGridPanel(1, imagePanel, viewerComponent);
 		gui.setMaximumSize(gui.getPreferredSize());
 		ShowImages.showWindow(gui, "Calibration Target Pose", true);
 
 		// Allows the user to click on the image and pause
-		MousePauseHelper pauseHelper = new MousePauseHelper(gui);
+		var pauseHelper = new MousePauseHelper(gui);
 
 		// saves the target's center location
-		List<Point3D_F64> path = new ArrayList<>();
+		var path = new ArrayList<Point3D_F64>();
 
 		// Process each frame in the video sequence
-		Se3_F64 targetToCamera = new Se3_F64();
+		var targetToCamera = new Se3_F64();
 		while (video.hasNext()) {
 			// detect calibration points
 			detector.detect(video.next());

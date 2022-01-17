@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,7 +46,7 @@ import java.io.File;
  * @author Peter Abeles
  */
 public class ExampleDetectBlackPolygon {
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 		String[] imagesConvex = new String[]{
 				"shapes/polygons01.jpg",
 				"shapes/shapes02.png",
@@ -58,7 +58,7 @@ public class ExampleDetectBlackPolygon {
 		ListDisplayPanel panel = new ListDisplayPanel();
 
 		// first configure the detector to only detect convex shapes with 3 to 7 sides
-		ConfigPolygonDetector config = new ConfigPolygonDetector(3,7);
+		ConfigPolygonDetector config = new ConfigPolygonDetector(3, 7);
 		DetectPolygonBinaryGrayRefine<GrayU8> detector = FactoryShapeDetector.polygon(config, GrayU8.class);
 
 		processImages(imagesConvex, detector, panel);
@@ -70,18 +70,17 @@ public class ExampleDetectBlackPolygon {
 
 		processImages(imagesConcave, detector, panel);
 
-		ShowImages.showWindow(panel,"Found Polygons",true);
+		ShowImages.showWindow(panel, "Found Polygons", true);
 	}
 
-	private static void processImages(String[] files,
-									  DetectPolygonBinaryGrayRefine<GrayU8> detector,
-									  ListDisplayPanel panel)
-	{
-		for( String fileName : files ) {
+	private static void processImages( String[] files,
+									   DetectPolygonBinaryGrayRefine<GrayU8> detector,
+									   ListDisplayPanel panel ) {
+		for (String fileName : files) {
 			BufferedImage image = UtilImageIO.loadImageNotNull(UtilIO.pathExample(fileName));
 
 			GrayU8 input = ConvertBufferedImage.convertFromSingle(image, null, GrayU8.class);
-			GrayU8 binary = new GrayU8(input.width,input.height);
+			GrayU8 binary = new GrayU8(input.width, input.height);
 
 			// Binarization is done outside to allows creative tricks. For example, when applied to a chessboard
 			// pattern where square touch each other, the binary image is eroded first so that they don't touch.
@@ -95,7 +94,7 @@ public class ExampleDetectBlackPolygon {
 			detector.process(input, binary);
 
 			// visualize results by drawing red polygons
-			java.util.List<Polygon2D_F64> found = detector.getPolygons(null,null);
+			java.util.List<Polygon2D_F64> found = detector.getPolygons(null, null);
 			Graphics2D g2 = image.createGraphics();
 			g2.setStroke(new BasicStroke(5));
 			for (int i = 0; i < found.size(); i++) {
@@ -105,7 +104,7 @@ public class ExampleDetectBlackPolygon {
 				VisualizeShapes.drawPolygonCorners(found.get(i), 3, g2, true);
 			}
 
-			panel.addImage(image,new File(fileName).getName());
+			panel.addImage(image, new File(fileName).getName());
 		}
 	}
 }

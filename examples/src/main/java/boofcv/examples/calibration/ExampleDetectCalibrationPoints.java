@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -55,7 +55,7 @@ public class ExampleDetectCalibrationPoints {
 
 		// For chessboard targets, tune RADIUS parameter for your images
 //		detector = FactoryFiducialCalibration.squareGrid(null, new ConfigGridDimen(4, 3, 30, 30));
-		detector = FactoryFiducialCalibration.chessboardX(null, new ConfigGridDimen(7, 5, 30));
+		detector = FactoryFiducialCalibration.chessboardX(null, new ConfigGridDimen(/*rows*/ 7, /*cols*/ 5, /*shape size*/ 30));
 
 		// process the image and check for failure condition
 		if (!detector.process(input))

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,6 @@ import java.util.List;
 public class ExampleCalibrateFisheye {
 	public static void main( String[] args ) {
 		DetectSingleFiducialCalibration detector;
-		List<String> images;
 
 		// Circle based calibration targets are not recommended because the sever lens distortion will change
 		// the apparent location of tangent points.
@@ -55,7 +54,7 @@ public class ExampleCalibrateFisheye {
 
 //		 Chessboard Example
 		detector = FactoryFiducialCalibration.chessboardX(null, new ConfigGridDimen(/*rows*/7, /*cols*/5, /*size*/30));
-		images = UtilIO.listAll(UtilIO.pathExample("calibration/fisheye/chessboard"));
+		List<String> images = UtilIO.listAll(UtilIO.pathExample("calibration/fisheye/chessboard"));
 
 		// Declare and setup the calibration algorithm
 		var calibrationAlg = new CalibrateMonoPlanar(detector.getLayout());
@@ -70,7 +69,9 @@ public class ExampleCalibrateFisheye {
 //		calibrationAlg.configureKannalaBrandt( /*zeroSkew*/ true, /*symmetric*/ 5, /*asymmetric*/ 0);
 
 		for (String n : images) {
-			BufferedImage input = UtilImageIO.loadImageNotNull(n);
+			BufferedImage input = UtilImageIO.loadImage(n);
+			if (input == null)
+				continue;
 			GrayF32 image = ConvertBufferedImage.convertFrom(input, (GrayF32)null);
 			if (detector.process(image)) {
 				calibrationAlg.addImage(detector.getDetectedPoints().copy());

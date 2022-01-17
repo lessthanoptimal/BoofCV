@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -68,7 +68,7 @@ public class ExampleBundleAdjustment {
 		// BundleAdjustmentObservations for image observations of 3D points
 		// ExampleMultiViewSceneReconstruction gives a better feel for these data structures or you can look
 		// at the source code of CodecBundleAdjustmentInTheLarge
-		CodecBundleAdjustmentInTheLarge parser = new CodecBundleAdjustmentInTheLarge();
+		var parser = new CodecBundleAdjustmentInTheLarge();
 
 		parser.parse(new File(UtilIO.pathExample("sfm/problem-16-22106-pre.txt")));
 
@@ -77,7 +77,7 @@ public class ExampleBundleAdjustment {
 				" parameters with " + parser.observations.getObservationCount() + " observations\n\n");
 
 		// Configure the sparse Levenberg-Marquardt solver
-		ConfigLevenbergMarquardt configLM = new ConfigLevenbergMarquardt();
+		var configLM = new ConfigLevenbergMarquardt();
 		// Important tuning parameter. Won't converge to a good solution if picked improperly. Small changes
 		// to this problem and speed up or slow down convergence and change the final result. This is true for
 		// basically all solvers.
@@ -85,7 +85,7 @@ public class ExampleBundleAdjustment {
 		// Improves Jacobian matrix's condition. Recommended in general but not important in this problem
 		configLM.hessianScaling = true;
 
-		ConfigBundleAdjustment configSBA = new ConfigBundleAdjustment();
+		var configSBA = new ConfigBundleAdjustment();
 		configSBA.configOptimizer = configLM;
 
 		// Create and configure the bundle adjustment solver
@@ -97,7 +97,7 @@ public class ExampleBundleAdjustment {
 
 		// Scaling each variable type so that it takes on a similar numerical value. This aids in optimization
 		// Not important for this problem but is for others
-		ScaleSceneStructure bundleScale = new ScaleSceneStructure();
+		var bundleScale = new ScaleSceneStructure();
 		bundleScale.applyScale(parser.scene, parser.observations);
 		bundleAdjustment.setParameters(parser.scene, parser.observations);
 

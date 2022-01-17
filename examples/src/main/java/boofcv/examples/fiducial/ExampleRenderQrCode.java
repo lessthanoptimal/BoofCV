@@ -45,7 +45,7 @@ public class ExampleRenderQrCode {
 		// QrCodeGenerator is the base class with all the logic and the children tell it how to
 		// write in a specific format. QrCodeGeneratorImage is included with BoofCV and is used
 		// to create images
-		QrCodeGeneratorImage render = new QrCodeGeneratorImage(20);
+		var render = new QrCodeGeneratorImage(/* pixel per module */ 20);
 
 		render.render(qr);
 
