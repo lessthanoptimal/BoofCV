@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,7 +64,7 @@ public class ConfigGridDimen implements Configuration {
 	public ConfigGridDimen() {
 	}
 
-	public ConfigGridDimen setTo( int numRows, int numCols, double shapeSize, double shapeDistance  ) {
+	public ConfigGridDimen setTo( int numRows, int numCols, double shapeSize, double shapeDistance ) {
 		this.numRows = numRows;
 		this.numCols = numCols;
 		this.shapeSize = shapeSize;
@@ -88,5 +88,14 @@ public class ConfigGridDimen implements Configuration {
 	public void checkValidity() {
 		if (numCols <= 0 || numRows <= 0)
 			throw new IllegalArgumentException("Must specify then number of rows and columns in the target");
+	}
+
+	@Override public String toString() {
+		return "ConfigGridDimen{" +
+				"numRows=" + numRows +
+				", numCols=" + numCols +
+				", shapeSize=" + shapeSize +
+				", shapeDistance=" + shapeDistance +
+				'}';
 	}
 }

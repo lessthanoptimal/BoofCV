@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -67,5 +67,20 @@ public class ConfigCalibrationTarget implements Configuration {
 		this.hammingGrid.setTo(src.hammingGrid);
 		this.grid.setTo(src.grid);
 		return this;
+	}
+
+	@Override public String toString() {
+		String text = "ConfigCalibrationTarget{" +
+				"type=" + type + " grid=" + grid.toString();
+
+		if (type != null) {
+			switch (type) {
+				case ECOCHECK -> text += " ecocheck=" + ecocheck.toString();
+				case HAMMING_CHESSBOARD -> text += "hamming=" + hammingChess.toString();
+				case HAMMING_GRID -> text += "hamming=" + hammingGrid.toString();
+			}
+		}
+
+		return text + "}";
 	}
 }
