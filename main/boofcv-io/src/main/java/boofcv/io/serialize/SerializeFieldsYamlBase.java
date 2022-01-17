@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -177,7 +177,14 @@ public class SerializeFieldsYamlBase {
 				Field f = type.getField(key);
 				Class ftype = f.getType();
 				if (ftype.isEnum()) {
-					f.set(parent, Enum.valueOf(ftype, (String)state.get(key)));
+					Object value = state.get(key);
+					// Older serialization code encoded it as an enum not as the enum's name. This was much more
+					// verbose. We still consider that case for backwards compatibility
+					if (value.getClass().isEnum()) {
+						f.set(parent, value);
+					} else {
+						f.set(parent, Enum.valueOf(ftype, (String)value));
+					}
 				} else if (ftype.isPrimitive()) {
 					deserializePrimitive(parent, state, key, f, ftype);
 				} else if (ftype.isArray()) {
