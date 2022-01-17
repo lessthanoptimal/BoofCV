@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -151,7 +151,9 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 
 		createNodes(root,"Fiducial / Markers",
 				FiducialTrackerDemoApp.class,
+				DetectECoCheckApp.class,
 				DetectQrCodeApp.class,
+				DetectMicroQrApp.class,
 				DetectUchiyaMarkerApp.class,
 				VisualizeSquareBinaryFiducial.class,
 				VisualizeSquareFiducial.class);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -71,6 +71,7 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>> extends Demonstratio
 	private static final String SQUARE_PICTURE = "Square Picture";
 	private static final String SQUARE_HAMMING = "Square Hamming";
 	private static final String QR_CODE = "QR Code";
+	private static final String MICRO_QR = "Micro QR Code";
 	private static final String RANDOM_DOTS = "Random Dots";
 	private static final String CALIB_CHESS = "Chessboard";
 	private static final String CALIB_SQUARE_GRID = "Square Grid";
@@ -235,6 +236,7 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>> extends Demonstratio
 				}
 			}
 			case QR_CODE -> detector = FactoryFiducial.qrcode3D(null, imageClass);
+			case MICRO_QR -> detector = FactoryFiducial.microqr3D(null, imageClass);
 			case CALIB_CHESS -> detector = FactoryFiducial.calibChessboardX(null, new ConfigGridDimen(7, 5, 0.03), imageClass);
 			case CALIB_SQUARE_GRID -> detector = FactoryFiducial.calibSquareGrid(null, new ConfigGridDimen(4, 3, 0.03, 0.03), imageClass);
 			case CALIB_CIRCLE_HEXAGONAL_GRID -> detector = FactoryFiducial.calibCircleHexagonalGrid(null, new ConfigGridDimen(24, 28, 1, 1.2), imageClass);
@@ -402,6 +404,7 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>> extends Demonstratio
 		inputs.add(new PathLabel(SQUARE_HAMMING, UtilIO.pathExample("fiducial/square_hamming/aruco_25h7/movie.mp4")));
 		inputs.add(new PathLabel(RANDOM_DOTS, UtilIO.pathExample("fiducial/random_dots/movie.mp4")));
 		inputs.add(new PathLabel(QR_CODE, UtilIO.pathExample("fiducial/qrcode/movie.mp4")));
+		inputs.add(new PathLabel(MICRO_QR, UtilIO.pathExample("fiducial/microqr/movie.mp4")));
 		inputs.add(new PathLabel(CALIB_CHESS, UtilIO.pathExample("fiducial/chessboard/movie.mjpeg")));
 		inputs.add(new PathLabel(CALIB_SQUARE_GRID, UtilIO.pathExample("fiducial/square_grid/movie.mp4")));
 		inputs.add(new PathLabel(CALIB_CIRCLE_HEXAGONAL_GRID, UtilIO.pathExample("fiducial/circle_hexagonal/movie.mp4")));

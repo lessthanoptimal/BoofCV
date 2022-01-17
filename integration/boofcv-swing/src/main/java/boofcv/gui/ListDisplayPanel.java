@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -127,14 +127,17 @@ public class ListDisplayPanel extends JPanel implements ListSelectionListener {
 
 		Dimension panelD = panel.getPreferredSize();
 
-		final boolean sizeChanged = bodyWidth != panelD.width || bodyHeight != panelD.height;
+		// fudge factor seems to be needed to show entire image. A couple minutes of work didn't find where
+		// the offset was coming from
+		int adjustedWidth = panelD.width + 70;
+		final boolean sizeChanged = bodyWidth != adjustedWidth || bodyHeight != panelD.height;
 
 		// make the preferred size large enough to hold all the images
-		bodyWidth = (int)Math.max(bodyWidth, panelD.getWidth());
+		bodyWidth = (int)Math.max(bodyWidth, adjustedWidth);
 		bodyHeight = (int)Math.max(bodyHeight, panelD.getHeight());
 
-		panels.add(panel);
-		SwingUtilities.invokeLater(() -> {
+		BoofSwingUtil.invokeNowOrLater(() -> {
+			panels.add(panel);
 			listModel.addElement(name);
 			if (listModel.size() == 1) {
 				listPanel.setSelectedIndex(0);

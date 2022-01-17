@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -74,7 +74,7 @@ public class RemoveLensDistortionApp<T extends ImageBase<T>> extends Demonstrati
 
 	@Override
 	public void openFile( File file ) {
-		File candidates[] = new File[]{
+		File[] candidates = new File[]{
 				new File(file.getParent(), "intrinsic.yaml"),
 				new File(file.getParent(), "intrinsicLeft.yaml"), // this is a bit of a hack...
 				new File(file.getParent(), file.getName() + ".yaml")};
@@ -138,17 +138,16 @@ public class RemoveLensDistortionApp<T extends ImageBase<T>> extends Demonstrati
 	}
 
 	public static void main( String[] args ) {
-		ImageType type = ImageType.pl(3, GrayU8.class);
-
 		java.util.List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel("Sony HX5V", UtilIO.pathExample("structure/dist_cyto_01.jpg")));
 		inputs.add(new PathLabel("BumbleBee2",
 				UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess/left01.jpg")));
 
-		RemoveLensDistortionApp app = new RemoveLensDistortionApp(inputs, type);
-
-		app.openFile(new File(inputs.get(0).getPath()));
-
-		app.display("Remove Lens Distortion");
+		SwingUtilities.invokeLater(() -> {
+			var app = new RemoveLensDistortionApp<>(inputs, ImageType.pl(3, GrayU8.class));
+			app.openFile(new File(inputs.get(0).getPath()));
+			app.waitUntilInputSizeIsKnown();
+			app.display("Remove Lens Distortion");
+		});
 	}
 }
