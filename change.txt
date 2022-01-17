@@ -3,16 +3,16 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
-Date    : 2022/
+Date    : 2022/Jan/17
 Version : 0.40
 
 Build
 - Added sanity check that makes sure autogenerate has been run already first and prints out a helpful message
 - Fixed accidental Lombok dependency
-- Added Nullable again
+- Added NullAway again
 Misc
 - Config classes now must implement setTo() which returns 'this' to allow chaining and easy copies
-- ImageBase.reshapeTo() replaces reshapeTo()
+- ImageBase.reshapeTo() replaces matchShape()
 ImageProcessing
 - Added ImageMiscOps.transpose()
 Background Model
@@ -25,12 +25,6 @@ Micro QR Code
 - Added support for reading and generating
 DemoThreeViewStereoApp
 - Fixed handling of gray images. Thanks mb for reporting the issue!
-
-TODO Monocular SLAM
-TODO Stereo SLAM
-TODO Added calibration targets Hamming Marker grid and chessboard, e.g. ChArUco and ArUco grids.
-TODO Applications for self calibration mono and stereo
-TODO Monocular VO
 
 ---------------------------------------------
 Date    : 2021/Oct/13

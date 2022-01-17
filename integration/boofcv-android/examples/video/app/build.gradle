@@ -6,7 +6,7 @@ android {
     defaultConfig {
         applicationId "org.boofcv.video"
         minSdkVersion 21
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -40,7 +40,7 @@ configurations {
 
 dependencies {
     ['boofcv-android', 'boofcv-core'].each {
-        String a -> api group: 'org.boofcv', name: a, version: '0.39.1' }
+        String a -> api group: 'org.boofcv', name: a, version: '0.40' }
 
     annotationProcessor 'org.projectlombok:lombok:1.18.16'
 
