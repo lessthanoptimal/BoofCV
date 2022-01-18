@@ -69,6 +69,7 @@ public class ApplicationLauncherGui extends JPanel {
 		JButton bUtilCalib = createButton("Mono Calibration", () -> CalibrateMonocularPlanarApp.main(null));
 		JButton bUtilStereoCalib = createButton("Stereo Calibration", () -> CalibrateStereoPlanarApp.main(null));
 		JButton bUtilScanQrCode = createButton("Batch QR Code", BatchScanQrCodesGui::new);
+		JButton bUtilScanMicroQr = createButton("Batch Micro QR", BatchScanMicroQrCodesGui::new);
 		JButton bUtilDown = createButton("Batch Downsize", BatchDownsizeImageGui::new);
 		JButton bUtilUndist = createButton("Batch Undistort", BatchRemoveLensDistortionGui::new);
 		JButton bUtilViewCloud = createButton("Cloud Viewer", PointCloudViewerApp::new);
@@ -100,7 +101,7 @@ public class ApplicationLauncherGui extends JPanel {
 		JComponent panelLeft = buttonPanel("Create / Print",
 				bCreateMicroQR, bCreateQR, bCreateDots, bCreateCalib, bCreateFidBin, bCreateFidImage, bCreateFidHamming);
 		JComponent panelRight = buttonPanel("Tools",
-				bUtilAssisted, bUtilCalib, bUtilStereoCalib, bUtilScanQrCode, bUtilDown, bUtilUndist, bUtilViewCloud);
+				bUtilAssisted, bUtilCalib, bUtilStereoCalib, bUtilScanQrCode, bUtilScanMicroQr, bUtilDown, bUtilUndist, bUtilViewCloud);
 
 		layout.putConstraint(SpringLayout.WEST, panelLeft, 60, SpringLayout.WEST, this);
 		layout.putConstraint(SpringLayout.NORTH, panelLeft, 0, SpringLayout.SOUTH, logo);

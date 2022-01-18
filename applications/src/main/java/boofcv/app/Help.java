@@ -40,6 +40,7 @@ public class Help {
 			CameraCalibrationMono.class,
 			CameraCalibrationStereo.class,
 			BatchScanQrCodes.class,
+			BatchScanMicroQrCodes.class,
 			CreateCalibrationTarget.class,
 			CreateQrCodeDocument.class,
 			CreateMicroQrDocument.class,

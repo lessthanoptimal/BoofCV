@@ -30,6 +30,7 @@ task applicationsJar(type: Jar) {
 
 	outputs.upToDateWhen { false }
 
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 	archiveFile.set(file('applications.jar'))
 
 	from sourceSets.main.output

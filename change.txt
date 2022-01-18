@@ -9,6 +9,8 @@ Version : 0.41
 - Build
   - Compiles using Java 17. bytecode is still Java 11
   - Updated to Gradle 7
+= Applications
+  - Batch scanning of Micro QR Codes
 - SLAM
   - TODO Monocular
   - TODO Stereo
