@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -167,7 +167,7 @@ public class RenderSyntheticCameraModelApp<T extends ImageBase<T>> extends Demon
 
 	class ControlPanel extends StandardAlgConfigPanel {
 		AdjustmentType adjustment = AdjustmentType.NONE;
-		JComboBox<String> selectAdjustment = combo(adjustment.ordinal(), AdjustmentType.values());
+		JComboBox<String> selectAdjustment = combo(adjustment.ordinal(), (Object[])AdjustmentType.values());
 		JComboBox<String> selectModel = combo(0, "Brown", "Universal");
 
 		JPanel modelPanel = new JPanel();

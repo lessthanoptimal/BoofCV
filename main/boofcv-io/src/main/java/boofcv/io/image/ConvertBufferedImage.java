@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.io.image;
 
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.*;
 import org.jetbrains.annotations.Nullable;
 
@@ -360,21 +361,16 @@ public class ConvertBufferedImage {
 			dst = new GrayU8(src.getWidth(), src.getHeight());
 		}
 
-		try {
-			DataBuffer buff = src.getRaster().getDataBuffer();
-			if (buff.getDataType() == DataBuffer.TYPE_BYTE) {
-				if (isKnownByteFormat(src)) {
-					ConvertRaster.bufferedToGray((DataBufferByte)buff, src.getRaster(), dst);
-				} else {
-					ConvertRaster.bufferedToGray(src, dst.data, dst.startIndex, dst.stride);
-				}
-			} else if (buff.getDataType() == DataBuffer.TYPE_INT) {
-				ConvertRaster.bufferedToGray((DataBufferInt)buff, src.getRaster(), dst);
+		DataBuffer buff = src.getRaster().getDataBuffer();
+		if (buff.getDataType() == DataBuffer.TYPE_BYTE) {
+			if (isKnownByteFormat(src)) {
+				ConvertRaster.bufferedToGray((DataBufferByte)buff, src.getRaster(), dst);
 			} else {
 				ConvertRaster.bufferedToGray(src, dst.data, dst.startIndex, dst.stride);
 			}
-		} catch (java.security.AccessControlException e) {
-			// Applets don't allow access to the raster()
+		} else if (buff.getDataType() == DataBuffer.TYPE_INT) {
+			ConvertRaster.bufferedToGray((DataBufferInt)buff, src.getRaster(), dst);
+		} else {
 			ConvertRaster.bufferedToGray(src, dst.data, dst.startIndex, dst.stride);
 		}
 
@@ -422,22 +418,17 @@ public class ConvertBufferedImage {
 			dst = new GrayF32(src.getWidth(), src.getHeight());
 		}
 
-		try {
-			DataBuffer buff = src.getRaster().getDataBuffer();
+		DataBuffer buff = src.getRaster().getDataBuffer();
 
-			if (buff.getDataType() == DataBuffer.TYPE_BYTE) {
-				if (isKnownByteFormat(src)) {
-					ConvertRaster.bufferedToGray((DataBufferByte)buff, src.getRaster(), dst);
-				} else {
-					ConvertRaster.bufferedToGray(src, dst.data, dst.startIndex, dst.stride);
-				}
-			} else if (buff.getDataType() == DataBuffer.TYPE_INT) {
-				ConvertRaster.bufferedToGray((DataBufferInt)buff, src.getRaster(), dst);
+		if (buff.getDataType() == DataBuffer.TYPE_BYTE) {
+			if (isKnownByteFormat(src)) {
+				ConvertRaster.bufferedToGray((DataBufferByte)buff, src.getRaster(), dst);
 			} else {
 				ConvertRaster.bufferedToGray(src, dst.data, dst.startIndex, dst.stride);
 			}
-		} catch (java.security.AccessControlException e) {
-			// Applets don't allow access to the raster()
+		} else if (buff.getDataType() == DataBuffer.TYPE_INT) {
+			ConvertRaster.bufferedToGray((DataBufferInt)buff, src.getRaster(), dst);
+		} else {
 			ConvertRaster.bufferedToGray(src, dst.data, dst.startIndex, dst.stride);
 		}
 
@@ -463,66 +454,51 @@ public class ConvertBufferedImage {
 			dst.reshape(src.getWidth(), src.getHeight());
 		}
 
-		try {
-			WritableRaster raster = src.getRaster();
+		WritableRaster raster = src.getRaster();
 
-			int numBands;
-			if (!isKnownByteFormat(src))
-				numBands = 3;
-			else
-				numBands = raster.getNumBands();
+		int numBands;
+		if (!isKnownByteFormat(src))
+			numBands = 3;
+		else
+			numBands = raster.getNumBands();
 
-			if (dst == null)
-				dst = new Planar<>(type, src.getWidth(), src.getHeight(), numBands);
-			else if (dst.getNumBands() != numBands)
-				dst.setNumberOfBands(numBands);
+		if (dst == null)
+			dst = new Planar<>(type, src.getWidth(), src.getHeight(), numBands);
+		else if (dst.getNumBands() != numBands)
+			dst.setNumberOfBands(numBands);
 
-			DataBuffer srcBuff = src.getRaster().getDataBuffer();
-			if (type == GrayU8.class) {
-				if (srcBuff.getDataType() == DataBuffer.TYPE_BYTE &&
-						isKnownByteFormat(src)) {
-					if (src.getType() == BufferedImage.TYPE_BYTE_GRAY) {
-						for (int i = 0; i < dst.getNumBands(); i++) {
-							ConvertRaster.bufferedToGray((DataBufferByte)srcBuff, raster, ((Planar<GrayU8>)dst).getBand(i));
-						}
-					} else {
-						ConvertRaster.bufferedToPlanar_U8((DataBufferByte)srcBuff, src.getRaster(), (Planar<GrayU8>)dst);
+		DataBuffer srcBuff = src.getRaster().getDataBuffer();
+		if (type == GrayU8.class) {
+			if (srcBuff.getDataType() == DataBuffer.TYPE_BYTE &&
+					isKnownByteFormat(src)) {
+				if (src.getType() == BufferedImage.TYPE_BYTE_GRAY) {
+					for (int i = 0; i < dst.getNumBands(); i++) {
+						ConvertRaster.bufferedToGray((DataBufferByte)srcBuff, raster, ((Planar<GrayU8>)dst).getBand(i));
 					}
-				} else if (srcBuff.getDataType() == DataBuffer.TYPE_INT) {
-					ConvertRaster.bufferedToPlanar_U8((DataBufferInt)srcBuff, src.getRaster(), (Planar<GrayU8>)dst);
 				} else {
-					ConvertRaster.bufferedToPlanar_U8(src, (Planar<GrayU8>)dst);
+					ConvertRaster.bufferedToPlanar_U8((DataBufferByte)srcBuff, src.getRaster(), (Planar<GrayU8>)dst);
 				}
-			} else if (type == GrayF32.class) {
-				if (srcBuff.getDataType() == DataBuffer.TYPE_BYTE &&
-						isKnownByteFormat(src)) {
-					if (src.getType() == BufferedImage.TYPE_BYTE_GRAY) {
-						for (int i = 0; i < dst.getNumBands(); i++)
-							ConvertRaster.bufferedToGray((DataBufferByte)srcBuff, raster, ((Planar<GrayF32>)dst).getBand(i));
-					} else {
-						ConvertRaster.bufferedToPlanar_F32((DataBufferByte)srcBuff, src.getRaster(), (Planar<GrayF32>)dst);
-					}
-				} else if (srcBuff.getDataType() == DataBuffer.TYPE_INT) {
-					ConvertRaster.bufferedToPlanar_F32((DataBufferInt)srcBuff, src.getRaster(), (Planar<GrayF32>)dst);
-				} else {
-					ConvertRaster.bufferedToPlanar_F32(src, (Planar<GrayF32>)dst);
-				}
+			} else if (srcBuff.getDataType() == DataBuffer.TYPE_INT) {
+				ConvertRaster.bufferedToPlanar_U8((DataBufferInt)srcBuff, src.getRaster(), (Planar<GrayU8>)dst);
 			} else {
-				throw new IllegalArgumentException("Band type not supported yet");
-			}
-		} catch (java.security.AccessControlException e) {
-			// Applets don't allow access to the raster()
-			if (dst == null)
-				dst = new Planar<>(type, src.getWidth(), src.getHeight(), 3);
-			else {
-				dst.setNumberOfBands(3);
-			}
-
-			if (type == GrayU8.class) {
 				ConvertRaster.bufferedToPlanar_U8(src, (Planar<GrayU8>)dst);
-			} else if (type == GrayF32.class) {
+			}
+		} else if (type == GrayF32.class) {
+			if (srcBuff.getDataType() == DataBuffer.TYPE_BYTE &&
+					isKnownByteFormat(src)) {
+				if (src.getType() == BufferedImage.TYPE_BYTE_GRAY) {
+					for (int i = 0; i < dst.getNumBands(); i++)
+						ConvertRaster.bufferedToGray((DataBufferByte)srcBuff, raster, ((Planar<GrayF32>)dst).getBand(i));
+				} else {
+					ConvertRaster.bufferedToPlanar_F32((DataBufferByte)srcBuff, src.getRaster(), (Planar<GrayF32>)dst);
+				}
+			} else if (srcBuff.getDataType() == DataBuffer.TYPE_INT) {
+				ConvertRaster.bufferedToPlanar_F32((DataBufferInt)srcBuff, src.getRaster(), (Planar<GrayF32>)dst);
+			} else {
 				ConvertRaster.bufferedToPlanar_F32(src, (Planar<GrayF32>)dst);
 			}
+		} else {
+			throw new IllegalArgumentException("Band type not supported yet");
 		}
 
 		// if requested, ensure the ordering of the bands
@@ -552,69 +528,52 @@ public class ConvertBufferedImage {
 		if (src == null)
 			throw new IllegalArgumentException("src is null!");
 
-		try {
-			WritableRaster raster = src.getRaster();
+		WritableRaster raster = src.getRaster();
 
-			int numBands;
-			if (!isKnownByteFormat(src))
-				numBands = 3;
-			else
-				numBands = raster.getNumBands();
+		int numBands;
+		if (!isKnownByteFormat(src))
+			numBands = 3;
+		else
+			numBands = raster.getNumBands();
 
-			dst.setNumberOfBands(numBands);
-			dst.reshape(src.getWidth(), src.getHeight());
+		dst.setNumberOfBands(numBands);
+		dst.reshape(src.getWidth(), src.getHeight());
 
-			DataBuffer buffer = src.getRaster().getDataBuffer();
-			if (dst instanceof InterleavedU8) {
-				if (buffer.getDataType() == DataBuffer.TYPE_BYTE) {
-					if (isKnownByteFormat(src)) {
-						if (src.getType() == BufferedImage.TYPE_BYTE_GRAY) {
-							ConvertRaster.bufferedToGray(src, ((InterleavedU8)dst).data, dst.startIndex, dst.stride);
-						} else {
-							ConvertRaster.bufferedToInterleaved((DataBufferByte)buffer, src.getRaster(), (InterleavedU8)dst);
-						}
+		DataBuffer buffer = src.getRaster().getDataBuffer();
+		if (dst instanceof InterleavedU8) {
+			if (buffer.getDataType() == DataBuffer.TYPE_BYTE) {
+				if (isKnownByteFormat(src)) {
+					if (src.getType() == BufferedImage.TYPE_BYTE_GRAY) {
+						ConvertRaster.bufferedToGray(src, ((InterleavedU8)dst).data, dst.startIndex, dst.stride);
 					} else {
-						ConvertRaster.bufferedToInterleaved(src, (InterleavedU8)dst);
+						ConvertRaster.bufferedToInterleaved((DataBufferByte)buffer, src.getRaster(), (InterleavedU8)dst);
 					}
-				} else if (buffer.getDataType() == DataBuffer.TYPE_INT) {
-					ConvertRaster.bufferedToInterleaved((DataBufferInt)buffer, src.getRaster(), (InterleavedU8)dst);
 				} else {
 					ConvertRaster.bufferedToInterleaved(src, (InterleavedU8)dst);
 				}
-			} else if (dst instanceof InterleavedF32) {
-				if (buffer.getDataType() == DataBuffer.TYPE_BYTE) {
-					if (isKnownByteFormat(src)) {
-						if (src.getType() == BufferedImage.TYPE_BYTE_GRAY) {
-							ConvertRaster.bufferedToGray(src, ((InterleavedF32)dst).data, dst.startIndex, dst.stride);
-						} else {
-							ConvertRaster.bufferedToInterleaved((DataBufferByte)buffer, src.getRaster(), (InterleavedF32)dst);
-						}
+			} else if (buffer.getDataType() == DataBuffer.TYPE_INT) {
+				ConvertRaster.bufferedToInterleaved((DataBufferInt)buffer, src.getRaster(), (InterleavedU8)dst);
+			} else {
+				ConvertRaster.bufferedToInterleaved(src, (InterleavedU8)dst);
+			}
+		} else if (dst instanceof InterleavedF32) {
+			if (buffer.getDataType() == DataBuffer.TYPE_BYTE) {
+				if (isKnownByteFormat(src)) {
+					if (src.getType() == BufferedImage.TYPE_BYTE_GRAY) {
+						ConvertRaster.bufferedToGray(src, ((InterleavedF32)dst).data, dst.startIndex, dst.stride);
 					} else {
-						ConvertRaster.bufferedToInterleaved(src, (InterleavedF32)dst);
+						ConvertRaster.bufferedToInterleaved((DataBufferByte)buffer, src.getRaster(), (InterleavedF32)dst);
 					}
-				} else if (buffer.getDataType() == DataBuffer.TYPE_INT) {
-					ConvertRaster.bufferedToInterleaved((DataBufferInt)buffer, src.getRaster(), (InterleavedF32)dst);
 				} else {
 					ConvertRaster.bufferedToInterleaved(src, (InterleavedF32)dst);
 				}
+			} else if (buffer.getDataType() == DataBuffer.TYPE_INT) {
+				ConvertRaster.bufferedToInterleaved((DataBufferInt)buffer, src.getRaster(), (InterleavedF32)dst);
 			} else {
-				throw new IllegalArgumentException("Data type not supported yet");
-			}
-		} catch (java.security.AccessControlException e) {
-			// force the number of bands to be something valid
-			if (dst.getNumBands() != 3 || dst.getNumBands() != 1) {
-				dst.setNumberOfBands(3);
-			}
-			dst.reshape(src.getWidth(), src.getHeight());
-
-			// Applets don't allow access to the raster()
-			if (dst instanceof InterleavedU8) {
-				ConvertRaster.bufferedToInterleaved(src, (InterleavedU8)dst);
-			} else if (dst instanceof InterleavedF32) {
 				ConvertRaster.bufferedToInterleaved(src, (InterleavedF32)dst);
-			} else {
-				throw new IllegalArgumentException("Unsupported dst image type");
 			}
+		} else {
+			throw new IllegalArgumentException("Data type not supported yet");
 		}
 
 		// if requested, ensure the ordering of the bands
@@ -685,19 +644,15 @@ public class ConvertBufferedImage {
 		dst = checkInputs(src, dst);
 
 		DataBuffer buffer = dst.getRaster().getDataBuffer();
-		try {
-			if (buffer.getDataType() == DataBuffer.TYPE_BYTE && isKnownByteFormat(dst)) {
-				ConvertRaster.grayToBuffered(src, (DataBufferByte)buffer, dst.getRaster());
-			} else if (buffer.getDataType() == DataBuffer.TYPE_INT) {
-				ConvertRaster.grayToBuffered(src, (DataBufferInt)buffer, dst.getRaster());
-			} else {
-				ConvertRaster.grayToBuffered(src, dst);
-			}
-			// hack so that it knows the buffer has been modified
-			dst.setRGB(0, 0, dst.getRGB(0, 0));
-		} catch (java.security.AccessControlException e) {
+		if (buffer.getDataType() == DataBuffer.TYPE_BYTE && isKnownByteFormat(dst)) {
+			ConvertRaster.grayToBuffered(src, (DataBufferByte)buffer, dst.getRaster());
+		} else if (buffer.getDataType() == DataBuffer.TYPE_INT) {
+			ConvertRaster.grayToBuffered(src, (DataBufferInt)buffer, dst.getRaster());
+		} else {
 			ConvertRaster.grayToBuffered(src, dst);
 		}
+		// hack so that it knows the buffer has been modified
+		dst.setRGB(0, 0, dst.getRGB(0, 0));
 
 		return dst;
 	}
@@ -714,21 +669,17 @@ public class ConvertBufferedImage {
 		dst = checkInputs(src, dst);
 
 		DataBuffer buffer = dst.getRaster().getDataBuffer();
-		try {
-			if (buffer.getDataType() == DataBuffer.TYPE_BYTE && isKnownByteFormat(dst)) {
-				ConvertRaster.grayToBuffered(src, (DataBufferByte)buffer, dst.getRaster());
-			} else if (buffer.getDataType() == DataBuffer.TYPE_INT) {
-				ConvertRaster.grayToBuffered(src, (DataBufferInt)buffer, dst.getRaster());
-			} else if (buffer.getDataType() == DataBuffer.TYPE_USHORT) {
-				ConvertRaster.grayToBuffered(src, (DataBufferUShort)buffer, dst.getRaster());
-			} else {
-				ConvertRaster.grayToBuffered(src, dst);
-			}
-			// hack so that it knows the buffer has been modified
-			dst.setRGB(0, 0, dst.getRGB(0, 0));
-		} catch (java.security.AccessControlException e) {
+		if (buffer.getDataType() == DataBuffer.TYPE_BYTE && isKnownByteFormat(dst)) {
+			ConvertRaster.grayToBuffered(src, (DataBufferByte)buffer, dst.getRaster());
+		} else if (buffer.getDataType() == DataBuffer.TYPE_INT) {
+			ConvertRaster.grayToBuffered(src, (DataBufferInt)buffer, dst.getRaster());
+		} else if (buffer.getDataType() == DataBuffer.TYPE_USHORT) {
+			ConvertRaster.grayToBuffered(src, (DataBufferUShort)buffer, dst.getRaster());
+		} else {
 			ConvertRaster.grayToBuffered(src, dst);
 		}
+		// hack so that it knows the buffer has been modified
+		dst.setRGB(0, 0, dst.getRGB(0, 0));
 
 		return dst;
 	}
@@ -746,19 +697,15 @@ public class ConvertBufferedImage {
 		dst = checkInputs(src, dst);
 
 		DataBuffer buffer = dst.getRaster().getDataBuffer();
-		try {
-			if (buffer.getDataType() == DataBuffer.TYPE_BYTE && isKnownByteFormat(dst)) {
-				ConvertRaster.grayToBuffered(src, (DataBufferByte)buffer, dst.getRaster());
-			} else if (buffer.getDataType() == DataBuffer.TYPE_INT) {
-				ConvertRaster.grayToBuffered(src, (DataBufferInt)buffer, dst.getRaster());
-			} else {
-				ConvertRaster.grayToBuffered(src, dst);
-			}
-			// hack so that it knows the buffer has been modified
-			dst.setRGB(0, 0, dst.getRGB(0, 0));
-		} catch (java.security.AccessControlException e) {
+		if (buffer.getDataType() == DataBuffer.TYPE_BYTE && isKnownByteFormat(dst)) {
+			ConvertRaster.grayToBuffered(src, (DataBufferByte)buffer, dst.getRaster());
+		} else if (buffer.getDataType() == DataBuffer.TYPE_INT) {
+			ConvertRaster.grayToBuffered(src, (DataBufferInt)buffer, dst.getRaster());
+		} else {
 			ConvertRaster.grayToBuffered(src, dst);
 		}
+		// hack so that it knows the buffer has been modified
+		dst.setRGB(0, 0, dst.getRGB(0, 0));
 
 		return dst;
 	}
@@ -780,19 +727,15 @@ public class ConvertBufferedImage {
 		}
 
 		DataBuffer buffer = dst.getRaster().getDataBuffer();
-		try {
-			if (buffer.getDataType() == DataBuffer.TYPE_BYTE && isKnownByteFormat(dst)) {
-				ConvertRaster.planarToBuffered_U8(src, (DataBufferByte)buffer, dst.getRaster());
-			} else if (buffer.getDataType() == DataBuffer.TYPE_INT) {
-				ConvertRaster.planarToBuffered_U8(src, (DataBufferInt)buffer, dst.getRaster());
-			} else {
-				ConvertRaster.planarToBuffered_U8(src, dst);
-			}
-			// hack so that it knows the buffer has been modified
-			dst.setRGB(0, 0, dst.getRGB(0, 0));
-		} catch (java.security.AccessControlException e) {
+		if (buffer.getDataType() == DataBuffer.TYPE_BYTE && isKnownByteFormat(dst)) {
+			ConvertRaster.planarToBuffered_U8(src, (DataBufferByte)buffer, dst.getRaster());
+		} else if (buffer.getDataType() == DataBuffer.TYPE_INT) {
+			ConvertRaster.planarToBuffered_U8(src, (DataBufferInt)buffer, dst.getRaster());
+		} else {
 			ConvertRaster.planarToBuffered_U8(src, dst);
 		}
+		// hack so that it knows the buffer has been modified
+		dst.setRGB(0, 0, dst.getRGB(0, 0));
 
 		return dst;
 	}
@@ -823,23 +766,19 @@ public class ConvertBufferedImage {
 		dst = checkInputs(src, dst);
 
 		DataBuffer buffer = dst.getRaster().getDataBuffer();
-		try {
-			if (buffer.getDataType() == DataBuffer.TYPE_BYTE && isKnownByteFormat(dst)) {
-				ConvertRaster.interleavedToBuffered(src, (DataBufferByte)buffer, dst.getRaster());
-				if (orderRgb)
-					ConvertRaster.orderBandsBufferedFromRGB((DataBufferByte)buffer, dst.getRaster(), dst.getType());
-			} else if (buffer.getDataType() == DataBuffer.TYPE_INT) {
-				ConvertRaster.interleavedToBuffered(src, (DataBufferInt)buffer, dst.getRaster());
-				if (orderRgb)
-					ConvertRaster.orderBandsBufferedFromRGB((DataBufferInt)buffer, dst.getRaster(), dst.getType());
-			} else {
-				ConvertRaster.interleavedToBuffered(src, dst);
-			}
-			// hack so that it knows the buffer has been modified
-			dst.setRGB(0, 0, dst.getRGB(0, 0));
-		} catch (java.security.AccessControlException e) {
+		if (buffer.getDataType() == DataBuffer.TYPE_BYTE && isKnownByteFormat(dst)) {
+			ConvertRaster.interleavedToBuffered(src, (DataBufferByte)buffer, dst.getRaster());
+			if (orderRgb)
+				ConvertRaster.orderBandsBufferedFromRGB((DataBufferByte)buffer, dst.getRaster(), dst.getType());
+		} else if (buffer.getDataType() == DataBuffer.TYPE_INT) {
+			ConvertRaster.interleavedToBuffered(src, (DataBufferInt)buffer, dst.getRaster());
+			if (orderRgb)
+				ConvertRaster.orderBandsBufferedFromRGB((DataBufferInt)buffer, dst.getRaster(), dst.getType());
+		} else {
 			ConvertRaster.interleavedToBuffered(src, dst);
 		}
+		// hack so that it knows the buffer has been modified
+		dst.setRGB(0, 0, dst.getRGB(0, 0));
 
 		return dst;
 	}
@@ -848,23 +787,19 @@ public class ConvertBufferedImage {
 		dst = checkInputs(src, dst);
 
 		DataBuffer buffer = dst.getRaster().getDataBuffer();
-		try {
-			if (buffer.getDataType() == DataBuffer.TYPE_BYTE && isKnownByteFormat(dst)) {
-				ConvertRaster.interleavedToBuffered(src, (DataBufferByte)buffer, dst.getRaster());
-				if (orderRgb)
-					ConvertRaster.orderBandsBufferedFromRGB((DataBufferByte)buffer, dst.getRaster(), dst.getType());
-			} else if (buffer.getDataType() == DataBuffer.TYPE_INT) {
-				ConvertRaster.interleavedToBuffered(src, (DataBufferInt)buffer, dst.getRaster());
-				if (orderRgb)
-					ConvertRaster.orderBandsBufferedFromRGB((DataBufferInt)buffer, dst.getRaster(), dst.getType());
-			} else {
-				ConvertRaster.interleavedToBuffered(src, dst);
-			}
-			// hack so that it knows the buffer has been modified
-			dst.setRGB(0, 0, dst.getRGB(0, 0));
-		} catch (java.security.AccessControlException e) {
+		if (buffer.getDataType() == DataBuffer.TYPE_BYTE && isKnownByteFormat(dst)) {
+			ConvertRaster.interleavedToBuffered(src, (DataBufferByte)buffer, dst.getRaster());
+			if (orderRgb)
+				ConvertRaster.orderBandsBufferedFromRGB((DataBufferByte)buffer, dst.getRaster(), dst.getType());
+		} else if (buffer.getDataType() == DataBuffer.TYPE_INT) {
+			ConvertRaster.interleavedToBuffered(src, (DataBufferInt)buffer, dst.getRaster());
+			if (orderRgb)
+				ConvertRaster.orderBandsBufferedFromRGB((DataBufferInt)buffer, dst.getRaster(), dst.getType());
+		} else {
 			ConvertRaster.interleavedToBuffered(src, dst);
 		}
+		// hack so that it knows the buffer has been modified
+		dst.setRGB(0, 0, dst.getRGB(0, 0));
 
 		return dst;
 	}
@@ -940,5 +875,10 @@ public class ConvertBufferedImage {
 	 */
 	public static boolean isSubImage( BufferedImage img ) {
 		return img.getRaster().getParent() != null;
+	}
+
+	/** Returns true if BuuferedImage sub images can be processed */
+	public static boolean isSubImageLegal() {
+		return BoofMiscOps.getJavaVersion() <= 8;
 	}
 }

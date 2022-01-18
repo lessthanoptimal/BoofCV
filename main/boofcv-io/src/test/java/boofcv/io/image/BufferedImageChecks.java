@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -230,7 +230,7 @@ public class BufferedImageChecks extends BoofStandardJUnit {
 	public static void checkEquals(WritableRaster imgA, ImageMultiBand imgB, float tol) {
 
 		GImageMultiBand genericB = FactoryGImageMultiBand.wrap(imgB);
-		float pixelB[] = new float[ imgB.getNumBands() ];
+		float[] pixelB = new float[ imgB.getNumBands() ];
 
 		if( imgA.getNumBands() != imgB.getNumBands()) {
 			throw new RuntimeException("Number of bands not equals");
@@ -308,7 +308,7 @@ public class BufferedImageChecks extends BoofStandardJUnit {
 	public static void checkEquals(BufferedImage imgA, ImageMultiBand imgB, boolean boofcvBandOrder , float tol) {
 
 		GImageMultiBand genericB = FactoryGImageMultiBand.wrap(imgB);
-		float pixelB[] = new float[ imgB.getNumBands() ];
+		float[] pixelB = new float[ imgB.getNumBands() ];
 
 		WritableRaster raster = imgA.getRaster();
 		if (raster.getDataBuffer().getDataType() == DataBuffer.TYPE_BYTE &&
@@ -335,7 +335,7 @@ public class BufferedImageChecks extends BoofStandardJUnit {
 			}
 		}
 
-		int bandOrder[];
+		int[] bandOrder;
 
 		if( boofcvBandOrder ) {
 			if( imgB.getNumBands() == 4 ) {
@@ -358,7 +358,7 @@ public class BufferedImageChecks extends BoofStandardJUnit {
 			}
 		}
 
-		int expected[] = new int[4];
+		int[] expected = new int[4];
 
 		for (int y = 0; y < imgA.getHeight(); y++) {
 			for (int x = 0; x < imgA.getWidth(); x++) {

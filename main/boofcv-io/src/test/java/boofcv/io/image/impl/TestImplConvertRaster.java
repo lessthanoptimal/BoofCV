@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.BoofTesting;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.io.image.BufferedImageChecks;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.*;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
@@ -51,7 +52,7 @@ public class TestImplConvertRaster extends BoofStandardJUnit {
 	 */
 	@Test
 	void checkerBuffered() {
-		Method methods[] = ImplConvertRaster.class.getDeclaredMethods();
+		Method[] methods = ImplConvertRaster.class.getDeclaredMethods();
 
 		// sanity check to make sure the functions are being found
 		int numFound = 0;
@@ -64,10 +65,10 @@ public class TestImplConvertRaster extends BoofStandardJUnit {
 				testBufferedTo(m);
 			else if (m.getName().contains("ToBuffered"))
 				testImageTo(m);
-			else if( m.getName().startsWith("orderBands"))
+			else if (m.getName().startsWith("orderBands"))
 				continue; // this is checked elsewhere
 			else
-				throw new RuntimeException("Unknown convert type. "+m.getName());
+				throw new RuntimeException("Unknown convert type. " + m.getName());
 
 			numFound++;
 		}
@@ -92,14 +93,14 @@ public class TestImplConvertRaster extends BoofStandardJUnit {
 		assertEquals(2005, out.get(0, 0));
 	}
 
-	private boolean isTestMethod(Method m) {
-		Class<?> types[] = m.getParameterTypes();
+	private boolean isTestMethod( Method m ) {
+		Class<?>[] types = m.getParameterTypes();
 
-		if( types.length == 2 ) { // TODO for old methods before conversion for JDK 9 limitations. Remove later
+		if (types.length == 2) { // TODO for old methods before conversion for JDK 9 limitations. Remove later
 			if (ImageBase.class.isAssignableFrom(types[0]) ||
 					ImageBase.class.isAssignableFrom(types[1]))
 				return true;
-		} else if( types.length == 3 ) {
+		} else if (types.length == 3) {
 			if (ImageBase.class.isAssignableFrom(types[0]) ||
 					ImageBase.class.isAssignableFrom(types[2]))
 				return true;
@@ -111,14 +112,14 @@ public class TestImplConvertRaster extends BoofStandardJUnit {
 		return false;
 	}
 
-	private void testBufferedTo(Method m) {
-		Class paramTypes[] = m.getParameterTypes();
+	private void testBufferedTo( Method m ) {
+		Class[] paramTypes = m.getParameterTypes();
 
-		BufferedImage input[];
+		BufferedImage[] input;
 
 		input = createBufferedTestImages(paramTypes[0]);
 
-		boolean canSubImage = !System.getProperty("java.version").startsWith("1.9");
+		boolean canSubImage = BoofMiscOps.getJavaVersion() < 8;
 
 		for (int i = 0; i < input.length; i++) {
 			// regular image
@@ -126,7 +127,7 @@ public class TestImplConvertRaster extends BoofStandardJUnit {
 			ImageBase output = createImage(m, imageType, input[i]);
 			BoofTesting.checkSubImage(this, "performBufferedTo", true, m, input[i], output);
 
-			if( canSubImage ) {
+			if (canSubImage) {
 				// subimage input
 				BufferedImage subimage = input[i].getSubimage(1, 2, imgWidth - 1, imgHeight - 2);
 				output = createImage(m, imageType, subimage);
@@ -135,7 +136,7 @@ public class TestImplConvertRaster extends BoofStandardJUnit {
 		}
 	}
 
-	static ImageBase createImage(Method m, Class imageType, BufferedImage inputBuff) {
+	static ImageBase createImage( Method m, Class imageType, BufferedImage inputBuff ) {
 
 		int numBands = inputBuff.getRaster().getNumBands();
 
@@ -143,7 +144,7 @@ public class TestImplConvertRaster extends BoofStandardJUnit {
 		if (ImageGray.class.isAssignableFrom(imageType)) {
 			output = GeneralizedImageOps.createSingleBand(imageType, inputBuff.getWidth(), inputBuff.getHeight());
 		} else if (ImageInterleaved.class.isAssignableFrom(imageType)) {
-			if( m.getName().contains("Gray")) {
+			if (m.getName().contains("Gray")) {
 				output = GeneralizedImageOps.createInterleaved(imageType, inputBuff.getWidth(), inputBuff.getHeight(), 1);
 			} else {
 				output = GeneralizedImageOps.createInterleaved(imageType, inputBuff.getWidth(), inputBuff.getHeight(), numBands);
@@ -166,7 +167,7 @@ public class TestImplConvertRaster extends BoofStandardJUnit {
 	/**
 	 * Creates a set of test BufferedImages with the appropriate rasters and number of bytes/channels.
 	 */
-	private BufferedImage[] createBufferedTestImages(Class<?> paramType) {
+	private BufferedImage[] createBufferedTestImages( Class<?> paramType ) {
 		BufferedImage[] input;
 		if (paramType == DataBufferByte.class) {
 			// the code is handled different when a different number of channels is used
@@ -179,7 +180,7 @@ public class TestImplConvertRaster extends BoofStandardJUnit {
 					createBufferedByType(imgWidth, imgHeight, BufferedImage.TYPE_INT_ARGB, rand),
 					createBufferedByType(imgWidth, imgHeight, BufferedImage.TYPE_INT_BGR, rand),
 					createBufferedByType(imgWidth, imgHeight, BufferedImage.TYPE_INT_RGB, rand)};
-		} else if( paramType == DataBufferUShort.class ) {
+		} else if (paramType == DataBufferUShort.class) {
 			input = new BufferedImage[]{createShortBuff(imgWidth, imgHeight, rand)};
 		} else if (paramType == BufferedImage.class) {
 			// just pick an arbitrary image type here
@@ -190,14 +191,14 @@ public class TestImplConvertRaster extends BoofStandardJUnit {
 		return input;
 	}
 
-	public void performBufferedTo(Method m, BufferedImage input, ImageBase output) {
+	public void performBufferedTo( Method m, BufferedImage input, ImageBase output ) {
 		try {
 			if (DataBuffer.class.isAssignableFrom(m.getParameterTypes()[0])) {
-				m.invoke(null, input.getRaster().getDataBuffer(),input.getRaster(), output);
+				m.invoke(null, input.getRaster().getDataBuffer(), input.getRaster(), output);
 
 				// read directly from raster if the raster is an input
-				if( ImageMultiBand.class.isAssignableFrom(output.getClass()) )
-					BufferedImageChecks.checkEquals(input.getRaster(),(ImageMultiBand)output,1);
+				if (ImageMultiBand.class.isAssignableFrom(output.getClass()))
+					BufferedImageChecks.checkEquals(input.getRaster(), (ImageMultiBand)output, 1);
 				else
 					BufferedImageChecks.checkEquals(input, output, false, 1f);
 			} else {
@@ -209,11 +210,11 @@ public class TestImplConvertRaster extends BoofStandardJUnit {
 		}
 	}
 
-	private void testImageTo(Method m) {
+	private void testImageTo( Method m ) {
 
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 
-		BufferedImage output[] = createBufferedTestImages(paramTypes[1]);
+		BufferedImage[] output = createBufferedTestImages(paramTypes[1]);
 
 		for (int i = 0; i < output.length; i++) {
 			ImageBase input = createImage(m, paramTypes[0], output[i]);
@@ -223,36 +224,34 @@ public class TestImplConvertRaster extends BoofStandardJUnit {
 		}
 	}
 
-	public void performImageTo(Method m, ImageBase input, BufferedImage output) {
+	public void performImageTo( Method m, ImageBase input, BufferedImage output ) {
 		try {
 			if (DataBuffer.class.isAssignableFrom(m.getParameterTypes()[1])) {
 				m.invoke(null, input, output.getRaster().getDataBuffer(), output.getRaster());
 
 				// read directly from raster if the raster is an input
 				if (Planar.class.isAssignableFrom(input.getClass()))
-					BufferedImageChecks.checkEquals(output.getRaster(), (Planar) input, 1);
+					BufferedImageChecks.checkEquals(output.getRaster(), (Planar)input, 1);
 				else
 					BufferedImageChecks.checkEquals(output, input, false, 1f);
 			} else if (Raster.class.isAssignableFrom(m.getParameterTypes()[1])) {
 				m.invoke(null, input, output.getRaster());
 
 				// read directly from raster if the raster is an input
-				if( Planar.class.isAssignableFrom(input.getClass()) )
-					BufferedImageChecks.checkEquals(output.getRaster(),(Planar)input,1);
+				if (Planar.class.isAssignableFrom(input.getClass()))
+					BufferedImageChecks.checkEquals(output.getRaster(), (Planar)input, 1);
 				else
-					BufferedImageChecks.checkEquals(output, input,false,  1f);
+					BufferedImageChecks.checkEquals(output, input, false, 1f);
 			} else {
 				m.invoke(null, input, output);
 				BufferedImageChecks.checkEquals(output, input, false, 1f);
 			}
-
 		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-
-	public static BufferedImage createByteBuff(int width, int height, int numBands, Random rand) {
+	public static BufferedImage createByteBuff( int width, int height, int numBands, Random rand ) {
 		BufferedImage ret;
 
 		if (numBands == 1) {
@@ -270,7 +269,7 @@ public class TestImplConvertRaster extends BoofStandardJUnit {
 		return ret;
 	}
 
-	public static BufferedImage createBufferedByType(int width, int height, int type, Random rand) {
+	public static BufferedImage createBufferedByType( int width, int height, int type, Random rand ) {
 		BufferedImage ret = new BufferedImage(width, height, type);
 
 		randomize(ret, rand);
@@ -278,43 +277,43 @@ public class TestImplConvertRaster extends BoofStandardJUnit {
 		return ret;
 	}
 
-	public static BufferedImage createByteIndexed(int width, int height, Random rand) {
-		BufferedImage ret = new BufferedImage(width,height,BufferedImage.TYPE_BYTE_INDEXED);
+	public static BufferedImage createByteIndexed( int width, int height, Random rand ) {
+		BufferedImage ret = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_INDEXED);
 
 		randomize(ret, rand);
 
 		return ret;
 	}
 
-	public static BufferedImage createByteBinary(int width, int height, Random rand) {
-		BufferedImage ret = new BufferedImage(width,height,BufferedImage.TYPE_BYTE_BINARY);
+	public static BufferedImage createByteBinary( int width, int height, Random rand ) {
+		BufferedImage ret = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_BINARY);
 
 		randomize(ret, rand);
 
 		return ret;
 	}
 
-	public static BufferedImage createIntBuff(int width, int height, Random rand) {
+	public static BufferedImage createIntBuff( int width, int height, Random rand ) {
 		BufferedImage ret = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		randomize(ret, rand);
 		return ret;
 	}
 
-	public static BufferedImage createShortBuff(int width, int height, Random rand) {
+	public static BufferedImage createShortBuff( int width, int height, Random rand ) {
 		BufferedImage ret = new BufferedImage(width, height, BufferedImage.TYPE_USHORT_GRAY);
 		randomize(ret, rand);
 		return ret;
 	}
 
-	public static void randomize(BufferedImage img, Random rand) {
+	public static void randomize( BufferedImage img, Random rand ) {
 		WritableRaster raster = img.getRaster();
 		DataBuffer buffer = raster.getDataBuffer();
-		if( buffer.getDataType() == DataBuffer.TYPE_BYTE ) {
+		if (buffer.getDataType() == DataBuffer.TYPE_BYTE) {
 			byte[] data = ((DataBufferByte)buffer).getData();
 			for (int i = 0; i < data.length; i++) {
 				data[i] = (byte)rand.nextInt();
 			}
-			img.setRGB(0,0,img.getRGB(0,0));
+			img.setRGB(0, 0, img.getRGB(0, 0));
 		} else {
 			for (int i = 0; i < img.getWidth(); i++) {
 				for (int j = 0; j < img.getHeight(); j++) {

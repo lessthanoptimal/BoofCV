@@ -25,7 +25,7 @@ allprojects {
 project.ext.commons_io_version = '2.11.0'
 project.ext.deepboof_version = '0.5.1'
 project.ext.lombok_version = '1.18.20'
-project.ext.jabel_version = '0.3.0'
+project.ext.jabel_version = '0.4.2'
 project.ext.guava_version = '31.0.1-jre'
 project.ext.args4j_version = '2.33'
 project.ext.junit_version = '5.8.1'
@@ -53,7 +53,7 @@ subprojects {
     java {
         withJavadocJar()
         withSourcesJar()
-        toolchain { languageVersion = JavaLanguageVersion.of(15) }
+        toolchain { languageVersion = JavaLanguageVersion.of(17) }
     }
 
     // Prevents tons of errors if someone is using ASCII
@@ -61,7 +61,7 @@ subprojects {
     // Creates Java 8 byte code
     if (project.ext.build_java11) {
         tasks.withType(JavaCompile).configureEach {
-            sourceCompatibility = 15
+            sourceCompatibility = 17
             options.release = 11
         }
     }
