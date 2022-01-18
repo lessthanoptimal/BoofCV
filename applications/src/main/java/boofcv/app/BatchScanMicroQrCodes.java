@@ -151,7 +151,7 @@ public class BatchScanMicroQrCodes {
 		try {
 			parser.parseArgument(args);
 			if (generator.guiMode) {
-				new BatchScanQrCodesGui();
+				new BatchScanMicroQrCodesGui();
 			} else {
 				generator.finishParsing();
 				try {
