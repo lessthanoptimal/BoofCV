@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -999,5 +999,16 @@ public class BoofMiscOps {
 			mask |= 1 << i;
 		}
 		return mask;
+	}
+
+	/**
+	 * Returns the major version of java or -1 if it failed.
+	 */
+	public static int getJavaVersion() {
+		try {
+			return Integer.parseInt(System.getProperty("java.version").split("\\.")[0]);
+		} catch (Exception e) {
+			return -1;
+		}
 	}
 }

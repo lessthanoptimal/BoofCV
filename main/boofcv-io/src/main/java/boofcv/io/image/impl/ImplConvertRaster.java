@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -338,7 +338,6 @@ public class ImplConvertRaster {
 
 		int srcStride = stride(src);
 		int srcOffset = getOffset(src);
-
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, dst.height, y -> {
 		for (int y = 0; y < dst.height; y++) {
