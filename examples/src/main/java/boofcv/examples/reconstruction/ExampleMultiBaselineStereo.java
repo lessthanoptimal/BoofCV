@@ -44,7 +44,6 @@ import boofcv.visualize.PointCloudViewer;
 import boofcv.visualize.VisualizeData;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point3D_F64;
-import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
@@ -86,8 +85,8 @@ public class ExampleMultiBaselineStereo {
 		// The final scene refined by bundle adjustment is created by the Working graph. However the 3D relationship
 		// between views is contained in the pairwise graph. A View in the working graph has a reference to the view
 		// in the pairwise graph. Using that we will find all connected views that have a 3D relationship
-		DogArray_I32 pairedViewIdxs = new DogArray_I32();
-		TIntObjectMap<String> sbaIndexToImageID = new TIntObjectHashMap<>();
+		var pairedViewIdxs = new DogArray_I32();
+		var sbaIndexToImageID = new TIntObjectHashMap<String>();
 
 		// This relationship between pairwise and working graphs might seem (and is) a bit convoluted. The Pairwise
 		// graph is the initial crude sketch of what might be connected. The working graph is an intermediate

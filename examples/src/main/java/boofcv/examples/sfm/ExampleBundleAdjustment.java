@@ -149,7 +149,7 @@ public class ExampleBundleAdjustment {
 		viewer.setCameraHFov(UtilAngle.radian(60));
 
 		// Give it a good initial pose. This was determined through trial and error
-		Se3_F64 cameraToWorld = new Se3_F64();
+		var cameraToWorld = new Se3_F64();
 		cameraToWorld.T.setTo(-10.848385, -6.957626, 2.9747992);
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, -2.734419, -0.27446, -0.24310, cameraToWorld.R);
 		viewer.setCameraToWorld(cameraToWorld);

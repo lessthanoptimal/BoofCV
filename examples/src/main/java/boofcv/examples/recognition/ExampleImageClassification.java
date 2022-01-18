@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -57,7 +57,7 @@ public class ExampleImageClassification {
 		List<String> images = UtilIO.listByPrefix(imagePath, null, ".jpg");
 		Collections.sort(images);
 
-		ImageClassificationPanel gui = new ImageClassificationPanel();
+		var gui = new ImageClassificationPanel();
 		ShowImages.showWindow(gui, "Image Classification", true);
 
 		for (String path : images) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,9 +54,9 @@ public class ExampleImageFilter {
 	private static final ListDisplayPanel panel = new ListDisplayPanel();
 
 	public static void procedural( GrayU8 input ) {
-		GrayU8 blurred = new GrayU8(input.width, input.height);
-		GrayS16 derivX = new GrayS16(input.width, input.height);
-		GrayS16 derivY = new GrayS16(input.width, input.height);
+		var blurred = new GrayU8(input.width, input.height);
+		var derivX = new GrayS16(input.width, input.height);
+		var derivY = new GrayS16(input.width, input.height);
 
 		// Gaussian blur: Convolve a Gaussian kernel
 		BlurImageOps.gaussian(input, blurred, -1, blurRadius, null);

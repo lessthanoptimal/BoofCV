@@ -173,7 +173,7 @@ public class ExampleMultiViewSparseReconstruction {
 		if (scene == null)
 			bundleAdjustmentRefine();
 
-		Rodrigues_F64 rod = new Rodrigues_F64();
+		var rod = new Rodrigues_F64();
 		System.out.println("----------------------------------------------------------------------------");
 		for (PairwiseImageGraph.View pv : pairwise.nodes.toList()) {
 			if (!working.containsView(pv.id))
@@ -394,10 +394,10 @@ public class ExampleMultiViewSparseReconstruction {
 			viewer.getComponent().setPreferredSize(new Dimension(600, 600));
 			ShowImages.showWindow(viewer.getComponent(), "Refined Scene", true);
 
-			DogArray<Point3dRgbI_F64> copy = new DogArray<>(Point3dRgbI_F64::new);
+			var copy = new DogArray<>(Point3dRgbI_F64::new);
 			viewer.copyCloud(copy);
 
-			try (FileOutputStream out = new FileOutputStream("saved_cloud.ply")) {
+			try (var out = new FileOutputStream("saved_cloud.ply")) {
 				PointCloudIO.save3D(PointCloudIO.Format.PLY, PointCloudReader.wrapF64RGB(copy.toList()), true, out);
 			} catch (IOException e) {
 				e.printStackTrace();

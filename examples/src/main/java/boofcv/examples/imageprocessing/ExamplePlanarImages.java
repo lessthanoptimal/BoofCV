@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -69,7 +69,7 @@ public class ExamplePlanarImages {
 
 		// Declare the BufferedImage manually to ensure that the color bands have the same ordering on input
 		// and output
-		BufferedImage output = new BufferedImage(image.width, image.height, input.getType());
+		var output = new BufferedImage(image.width, image.height, input.getType());
 		ConvertBufferedImage.convertTo(blurred, output, true);
 
 		gui.addImage(input, "Input");
@@ -107,7 +107,7 @@ public class ExamplePlanarImages {
 		// convert the BufferedImage into a Planar
 		Planar<GrayU8> image = ConvertBufferedImage.convertFromPlanar(input, null, true, GrayU8.class);
 
-		GrayU8 gray = new GrayU8(image.width, image.height);
+		var gray = new GrayU8(image.width, image.height);
 
 		// creates a gray scale image by averaging intensity value across pixels
 		ConvertImage.average(image, gray);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,8 +50,8 @@ public class ExampleWatershedWithSeeds {
 		GrayU8 input = ConvertBufferedImage.convertFromSingle(image, null, GrayU8.class);
 
 		// declare working data
-		GrayU8 binary = new GrayU8(input.width, input.height);
-		GrayS32 label = new GrayS32(input.width, input.height);
+		var binary = new GrayU8(input.width, input.height);
+		var label = new GrayS32(input.width, input.height);
 
 		// Try using the mean pixel value to create a binary image then erode it to separate the particles from
 		// each other
@@ -78,7 +78,7 @@ public class ExampleWatershedWithSeeds {
 		numRegions -= 1;
 		BufferedImage outRegions = VisualizeRegions.regions(output, numRegions, null);
 
-		ListDisplayPanel gui = new ListDisplayPanel();
+		var gui = new ListDisplayPanel();
 		gui.addImage(image, "Watersheds");
 		gui.addImage(outRegions, "Regions");
 		gui.addImage(outLabeled, "Seeds");

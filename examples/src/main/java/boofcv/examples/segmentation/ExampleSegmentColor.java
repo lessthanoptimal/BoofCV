@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,7 +45,7 @@ public class ExampleSegmentColor {
 	 * the HSV values, and calls the function below to display similar pixels.
 	 */
 	public static void printClickedColor( final BufferedImage image ) {
-		ImagePanel gui = new ImagePanel(image);
+		var gui = new ImagePanel(image);
 		gui.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked( MouseEvent e ) {
@@ -85,7 +85,7 @@ public class ExampleSegmentColor {
 		float adjustUnits = (float)(Math.PI/2.0);
 
 		// step through each pixel and mark how close it is to the selected color
-		BufferedImage output = new BufferedImage(input.width, input.height, BufferedImage.TYPE_INT_RGB);
+		var output = new BufferedImage(input.width, input.height, BufferedImage.TYPE_INT_RGB);
 		for (int y = 0; y < hsv.height; y++) {
 			for (int x = 0; x < hsv.width; x++) {
 				// Hue is an angle in radians, so simple subtraction doesn't work

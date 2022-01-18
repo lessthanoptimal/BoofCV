@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,19 +42,19 @@ public class ExampleImageDerivative {
 		BufferedImage input = UtilImageIO.loadImageNotNull(UtilIO.pathExample("simple_objects.jpg"));
 
 		// We will use floating point images here, but GrayU8 with GrayS16 for derivatives also works
-		GrayF32 grey = new GrayF32(input.getWidth(), input.getHeight());
+		var grey = new GrayF32(input.getWidth(), input.getHeight());
 		ConvertBufferedImage.convertFrom(input, grey);
 
 		// First order derivative, also known as the gradient
-		GrayF32 derivX = new GrayF32(grey.width, grey.height);
-		GrayF32 derivY = new GrayF32(grey.width, grey.height);
+		var derivX = new GrayF32(grey.width, grey.height);
+		var derivY = new GrayF32(grey.width, grey.height);
 
 		GImageDerivativeOps.gradient(DerivativeType.SOBEL, grey, derivX, derivY, BorderType.EXTENDED);
 
 		// Second order derivative, also known as the Hessian
-		GrayF32 derivXX = new GrayF32(grey.width, grey.height);
-		GrayF32 derivXY = new GrayF32(grey.width, grey.height);
-		GrayF32 derivYY = new GrayF32(grey.width, grey.height);
+		var derivXX = new GrayF32(grey.width, grey.height);
+		var derivXY = new GrayF32(grey.width, grey.height);
+		var derivYY = new GrayF32(grey.width, grey.height);
 
 		GImageDerivativeOps.hessian(DerivativeType.SOBEL, derivX, derivY, derivXX, derivXY, derivYY, BorderType.EXTENDED);
 
@@ -67,7 +67,7 @@ public class ExampleImageDerivative {
 		GrayF32 derivXYX = derivative.getDerivative(true, false, true);
 
 		// Visualize the results
-		ListDisplayPanel gui = new ListDisplayPanel();
+		var gui = new ListDisplayPanel();
 		gui.addImage(ConvertBufferedImage.convertTo(grey, null), "Input Grey");
 		gui.addImage(VisualizeImageData.colorizeSign(derivX, null, -1), "Sobel X");
 		gui.addImage(VisualizeImageData.colorizeSign(derivY, null, -1), "Sobel Y");

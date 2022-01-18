@@ -140,7 +140,7 @@ public class ExampleClassifySceneKnn extends LearnSceneFromFiles {
 		System.out.println("Image Features");
 
 		// Compute features in the training image set
-		List<TupleDesc_F64> features = new ArrayList<>();
+		var features = new ArrayList<TupleDesc_F64>();
 		for (String scene : train.keySet()) {
 			List<String> imagePaths = train.get(scene);
 			System.out.println("   " + scene);

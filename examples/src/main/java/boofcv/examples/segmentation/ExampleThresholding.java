@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,10 +48,10 @@ public class ExampleThresholding {
 
 		// convert into a usable format
 		GrayF32 input = ConvertBufferedImage.convertFromSingle(image, null, GrayF32.class);
-		GrayU8 binary = new GrayU8(input.width, input.height);
+		var binary = new GrayU8(input.width, input.height);
 
 		// Display multiple images in the same window
-		ListDisplayPanel gui = new ListDisplayPanel();
+		var gui = new ListDisplayPanel();
 
 		// Global Methods
 		GThresholdImageOps.threshold(input, binary, ImageStatistics.mean(input), true);

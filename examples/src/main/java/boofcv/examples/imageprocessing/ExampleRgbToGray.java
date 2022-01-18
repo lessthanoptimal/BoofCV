@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,8 +46,8 @@ public class ExampleRgbToGray {
 		Planar<GrayU8> color = ConvertBufferedImage.convertFrom(buffered, true, ImageType.pl(3, GrayU8.class));
 
 		// Declare storage space for converted gray scale images
-		GrayU8 weighted = new GrayU8(color.width, color.height);
-		GrayU8 unweighted = new GrayU8(color.width, color.height);
+		var weighted = new GrayU8(color.width, color.height);
+		var unweighted = new GrayU8(color.width, color.height);
 
 		// Now run a benchmark to demonstrate the speed differences between the two approaches. Both are very fast...
 		System.out.println("Running benchmark. Should take a few seconds on a modern computer.\n");
@@ -77,7 +77,7 @@ public class ExampleRgbToGray {
 				"and results might not be accurate or consistent.");
 
 		// Display the results
-		ListDisplayPanel gui = new ListDisplayPanel();
+		var gui = new ListDisplayPanel();
 		gui.addImage(weighted, "Weighted");
 		gui.addImage(unweighted, "Unweighted");
 		gui.addImage(buffered, "RGB");

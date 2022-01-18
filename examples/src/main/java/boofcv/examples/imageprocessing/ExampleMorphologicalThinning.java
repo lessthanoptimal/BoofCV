@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,7 +50,7 @@ public class ExampleMorphologicalThinning {
 
 			// convert into a usable format
 			GrayF32 input = ConvertBufferedImage.convertFromSingle(image, null, GrayF32.class);
-			GrayU8 binary = new GrayU8(input.width, input.height);
+			var binary = new GrayU8(input.width, input.height);
 
 			// Fixed threshold is best for B&W images, but the adaptive would improve results for the finger print
 			GThresholdImageOps.threshold(input, binary, 120, true);
@@ -63,7 +63,7 @@ public class ExampleMorphologicalThinning {
 			BufferedImage visualBinary = VisualizeBinaryData.renderBinary(binary, false, null);
 			BufferedImage visualThinned = VisualizeBinaryData.renderBinary(thinned, false, null);
 
-			ListDisplayPanel panel = new ListDisplayPanel();
+			var panel = new ListDisplayPanel();
 			panel.addImage(visualThinned, "Thinned");
 			panel.addImage(visualBinary, "Binary");
 			panel.addImage(image, "Original");

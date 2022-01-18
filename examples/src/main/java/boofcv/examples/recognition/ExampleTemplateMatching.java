@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -107,7 +107,7 @@ public class ExampleTemplateMatching {
 		GrayF32 templatePaint = UtilImageIO.loadImage(directory, "paint.png", GrayF32.class);
 
 		// create output image to show results
-		BufferedImage output = new BufferedImage(image.width, image.height, BufferedImage.TYPE_INT_BGR);
+		var output = new BufferedImage(image.width, image.height, BufferedImage.TYPE_INT_BGR);
 		ConvertBufferedImage.convertTo(image, output);
 		Graphics2D g2 = output.createGraphics();
 

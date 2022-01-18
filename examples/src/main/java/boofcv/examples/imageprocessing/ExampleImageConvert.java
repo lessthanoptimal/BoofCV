@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,7 +43,6 @@ import java.awt.image.BufferedImage;
  * @author Peter Abeles
  */
 public class ExampleImageConvert {
-
 	// image loaded from a file
 	BufferedImage image;
 	// gray scale image with element values from 0 to 255
@@ -57,7 +56,7 @@ public class ExampleImageConvert {
 		// in account the storage capabilities of these different class types.
 
 		// Going from an unsigned 8-bit image to unsigned 16-bit image is no problem
-		GrayU16 imageU16 = new GrayU16(gray.width, gray.height);
+		var imageU16 = new GrayU16(gray.width, gray.height);
 		ConvertImage.convert(gray, imageU16);
 
 		// You can convert back into the 8-bit image from the 16-bit image with no problem
@@ -66,12 +65,12 @@ public class ExampleImageConvert {
 
 		// Here is an example where you over flow the image after converting
 		// There won't be an exception or any error messages but the output image will be corrupted
-		GrayU8 imageBad = new GrayU8(derivX.width, derivX.height);
+		var imageBad = new GrayU8(derivX.width, derivX.height);
 		ConvertImage.convert(derivX, imageBad);
 
 		// One way to get around this problem rescale and adjust the pixel values so that they
 		// will be within a valid range.
-		GrayS16 scaledAbs = new GrayS16(derivX.width, derivX.height);
+		var scaledAbs = new GrayS16(derivX.width, derivX.height);
 		GPixelMath.abs(derivX, scaledAbs);
 		GPixelMath.multiply(scaledAbs, 255.0/ImageStatistics.max(scaledAbs), scaledAbs);
 
@@ -82,10 +81,10 @@ public class ExampleImageConvert {
 		// Let's see what all the bad image looks like
 		// ConvertBufferedImage is similar to ImageConvert in that it does a direct coversion with out
 		// adjusting the pixel's value
-		BufferedImage outBad = new BufferedImage(imageBad.width, imageBad.height, BufferedImage.TYPE_INT_RGB);
-		BufferedImage outScaled = new BufferedImage(imageBad.width, imageBad.height, BufferedImage.TYPE_INT_RGB);
+		var outBad = new BufferedImage(imageBad.width, imageBad.height, BufferedImage.TYPE_INT_RGB);
+		var outScaled = new BufferedImage(imageBad.width, imageBad.height, BufferedImage.TYPE_INT_RGB);
 
-		ListDisplayPanel panel = new ListDisplayPanel();
+		var panel = new ListDisplayPanel();
 		panel.addImage(ConvertBufferedImage.convertTo(scaledAbs, outScaled), "Scaled");
 		panel.addImage(colorX, "Visualized");
 		panel.addImage(ConvertBufferedImage.convertTo(imageBad, outBad), "Bad");
@@ -106,7 +105,7 @@ public class ExampleImageConvert {
 	}
 
 	public static void main( String[] args ) {
-		ExampleImageConvert app = new ExampleImageConvert();
+		var app = new ExampleImageConvert();
 		app.createImages();
 		app.convert();
 	}

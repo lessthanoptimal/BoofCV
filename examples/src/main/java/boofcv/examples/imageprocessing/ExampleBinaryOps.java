@@ -79,7 +79,7 @@ public class ExampleBinaryOps {
 		BufferedImage visualContour = VisualizeBinaryData.renderContours(contours, colorExternal, colorInternal,
 				input.width, input.height, null);
 
-		ListDisplayPanel panel = new ListDisplayPanel();
+		var panel = new ListDisplayPanel();
 		panel.addImage(visualBinary, "Binary Original");
 		panel.addImage(visualFiltered, "Binary Filtered");
 		panel.addImage(visualLabel, "Labeled Blobs");

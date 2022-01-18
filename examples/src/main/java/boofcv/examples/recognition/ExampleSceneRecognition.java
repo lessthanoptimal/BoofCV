@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -62,7 +62,7 @@ public class ExampleSceneRecognition {
 
 		// Except for real-time applications or when there are more than a few hundred images, you might want to
 		// just learn the dictionary from scratch
-		File saveDirectory = new File("example_recognition");
+		var saveDirectory = new File("example_recognition");
 
 		// Tell it to process gray U8 images
 		ImageType<GrayU8> imageType = ImageType.SB_U8;
@@ -113,7 +113,7 @@ public class ExampleSceneRecognition {
 					(WrapFeatureToSceneRecognition<GrayU8, ?>)recognizer, saveDirectory), "");
 		}
 
-		ListDisplayPanel gui = new ListDisplayPanel();
+		var gui = new ListDisplayPanel();
 
 		// Specifies which image it will try to look up. In the example, related images are in sets of 3.
 		int queryImage = 9;
@@ -122,7 +122,7 @@ public class ExampleSceneRecognition {
 		gui.addImage(UtilImageIO.loadImageNotNull(images.get(queryImage)), "Query", ScaleOptions.ALL);
 
 		// Look up images
-		DogArray<SceneRecognition.Match> matches = new DogArray<>(SceneRecognition.Match::new);
+		var matches = new DogArray<>(SceneRecognition.Match::new);
 		recognizer.query(imageIterator.loadImage(queryImage),/* filter */ ( id ) -> true,/* limit */ 5, matches);
 		for (int i = 0; i < matches.size; i++) {
 			String file = matches.get(i).id;

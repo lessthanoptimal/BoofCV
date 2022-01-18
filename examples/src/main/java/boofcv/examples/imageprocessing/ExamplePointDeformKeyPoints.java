@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,7 +38,6 @@ import georegression.struct.point.Point2D_F32;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Demonstration on how to use a key point based image deformation. A static image will be modified in real time
@@ -50,13 +49,13 @@ import java.util.List;
 public class ExamplePointDeformKeyPoints {
 	public static void main( String[] args ) {
 		BufferedImage orig = UtilImageIO.loadImageNotNull(UtilIO.pathExample("standard/man_mls.jpg"));
-		BufferedImage bufferedOut = new BufferedImage(orig.getWidth(), orig.getHeight(), BufferedImage.TYPE_INT_RGB);
+		var bufferedOut = new BufferedImage(orig.getWidth(), orig.getHeight(), BufferedImage.TYPE_INT_RGB);
 
 		Planar<GrayF32> input = ConvertBufferedImage.convertFrom(orig, true, ImageType.pl(3, GrayF32.class));
 		Planar<GrayF32> output = input.createSameShape();
 
-		List<Point2D_F32> src = new ArrayList<>();
-		List<Point2D_F32> dst = new ArrayList<>();
+		var src = new ArrayList<Point2D_F32>();
+		var dst = new ArrayList<Point2D_F32>();
 
 		src.add(new Point2D_F32(64, 241));
 		src.add(new Point2D_F32(266, 119));
@@ -71,7 +70,7 @@ public class ExamplePointDeformKeyPoints {
 			dst.add(p.copy());
 		}
 
-		ConfigDeformPointMLS config = new ConfigDeformPointMLS();
+		var config = new ConfigDeformPointMLS();
 		PointDeformKeyPoints deform = FactoryDistort.deformMls(config);
 		deform.setImageShape(input.width, input.height);
 

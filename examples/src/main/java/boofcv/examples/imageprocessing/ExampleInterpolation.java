@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,7 +46,7 @@ public class ExampleInterpolation {
 //		imagePath = "small_sunflower.jpg";
 
 		BufferedImage buffered = UtilImageIO.loadImageNotNull(UtilIO.pathExample(imagePath));
-		ListDisplayPanel gui = new ListDisplayPanel();
+		var gui = new ListDisplayPanel();
 
 		gui.addImage(buffered, "Original");
 
