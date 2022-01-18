@@ -3,6 +3,29 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
+Date    : 2022/
+Version : 0.41
+
+- Build
+  - Compiles using Java 17. bytecode is still Java 11
+  - Updated to Gradle 7
+- SLAM
+  - TODO Monocular
+  - TODO Stereo
+- Calibration
+  - TODO calibration targets Hamming Marker grid and chessboard, e.g. ChArUco and ArUco grids.
+- Testing
+  - TODO make sure Micro QR and QR are in JMH benchmarks
+- Concurrency
+  - TODO KLT tracker?
+- Regression
+  - TODO Template matching
+  - TODO Video stabilization
+
+TODO Applications for self calibration mono and stereo
+TODO Monocular VO
+
+---------------------------------------------
 Date    : 2022/Jan/17
 Version : 0.40
 
