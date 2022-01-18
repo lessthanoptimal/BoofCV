@@ -61,7 +61,7 @@ subprojects {
     // Creates Java 8 byte code
     if (project.ext.build_java11) {
         tasks.withType(JavaCompile).configureEach {
-//            sourceCompatibility = 15
+            sourceCompatibility = 15
             options.release = 11
         }
     }
