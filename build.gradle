@@ -260,11 +260,9 @@ subprojects {
     // Skip these codeless directories when publishing jars locally or to a remote destination
     if (['main', 'integration', 'checks'].contains(name)) {
         project.jar.enabled = false
-        project.uploadArchives.enabled = false
         project.tasks.publish.enabled = false
     }
     if (['autocode'].contains(name)) {
-        project.uploadArchives.enabled = false
         project.tasks.publish.enabled = false
     }
 
@@ -517,5 +515,5 @@ project(":main:boofcv-types") {
 
 wrapper {
     distributionType = Wrapper.DistributionType.BIN
-    gradleVersion = '6.8.3'
+    gradleVersion = '7.3.3'
 }
