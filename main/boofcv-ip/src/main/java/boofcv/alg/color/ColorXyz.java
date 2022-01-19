@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -141,7 +141,7 @@ public class ColorXyz {
 		if (v <= 0.04045) {
 			return (v/12.92);
 		}
-		return (Math.pow((v + 0.055)/1.055, 2.4));
+		return Math.pow((v + 0.055)/1.055, 2.4);
 	}
 
 	/**

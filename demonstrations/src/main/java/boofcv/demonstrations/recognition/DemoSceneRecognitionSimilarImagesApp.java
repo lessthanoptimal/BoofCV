@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -365,7 +365,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 		}
 
 		public void setProcessingTimeS( double seconds ) {
-			buildTimeLabel.setText(String.format("%7.1f", (seconds)));
+			buildTimeLabel.setText(String.format("%7.1f", seconds));
 		}
 
 		public void setQueryTimeMS( double milliseconds ) {

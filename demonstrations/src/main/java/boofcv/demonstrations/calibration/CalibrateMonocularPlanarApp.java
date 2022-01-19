@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -168,7 +168,7 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 		menuSettings.addActionListener(e -> new GlobalSettingsControls().showDialog(window, this));
 
 		var menuItemQuit = new JMenuItem("Quit", KeyEvent.VK_Q);
-		menuItemQuit.addActionListener((e -> System.exit(0)));
+		menuItemQuit.addActionListener(e -> System.exit(0));
 		BoofSwingUtil.setMenuItemKeys(menuItemQuit, KeyEvent.VK_Q, KeyEvent.VK_Q);
 
 		menuFile.addSeparator();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -174,10 +174,8 @@ public class FactoryWaveletDaub {
 	/**
 	 * Computes inverse coefficients 
 	 *
-	 * @param border
 	 * @param forward Forward coefficients.
 	 * @param inverse Inverse used in the inner portion of the data stream.
-	 * @return
 	 */
 	private static WlBorderCoef<WlCoef_F32> computeBorderCoefficients( BorderIndex1D border ,
 																	   WlCoef_F32 forward ,

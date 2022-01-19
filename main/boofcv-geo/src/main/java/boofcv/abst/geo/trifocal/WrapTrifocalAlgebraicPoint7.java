@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,7 +41,7 @@ public class WrapTrifocalAlgebraicPoint7 implements Estimate1ofTrifocalTensor {
 
 	@Override
 	public boolean process( List<AssociatedTriple> points, TrifocalTensor estimatedModel ) {
-		return (alg.process(points, estimatedModel));
+		return alg.process(points, estimatedModel);
 	}
 
 	@Override

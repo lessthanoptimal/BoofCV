@@ -29,7 +29,7 @@ project.ext.jabel_version = '0.4.2'
 project.ext.guava_version = '31.0.1-jre'
 project.ext.args4j_version = '2.33'
 project.ext.junit_version = '5.8.2'
-project.ext.errorprone_version = '2.9.0'
+project.ext.errorprone_version = '2.10.0'
 project.ext.nullaway_version = '0.9.5'
 project.ext.auto64to32_version = '3.1.0'
 project.ext.smakeyaml_version = '1.23'
@@ -180,6 +180,14 @@ subprojects {
     }
 
     tasks.withType(JavaCompile).configureEach {
+        // Disable ErrorProne for benchmarks and auto code generators and specific third party code
+        if (project.getName().contains("ffmpeg") || name.startsWith("compileBenchmark") ||
+                name.startsWith("compileGenerate") || name.startsWith("compileTest") ||
+                name.startsWith("compileExperimental")) {
+            options.errorprone.enabled = false
+            return
+        }
+
         options.errorprone.enabled = true
         options.errorprone.disableWarningsInGeneratedCode = true
         options.errorprone.disable("TypeParameterUnusedInFormals", "StringSplitter", "InconsistentCapitalization",
@@ -190,10 +198,9 @@ subprojects {
                 "ReferenceEquality", // This is done intentionally a TON. Good test but not here
                 "MutablePublicArray", // Done intentionally in every case
                 "CatchAndPrintStackTrace", // Should clean up, but done too often right now
-                "UnnecessaryParentheses", // Log SPAM due to JDK-14 Error Prone BUG
                 "SameNameButDifferent", // Lombok confuses it
                 "UnescapedEntity",
-                "EmptyBlockTag"
+                "EmptyBlockTag", // E.g. "@param name" is not defined. This should be cleaned up
         )
         options.errorprone.error("MissingOverride", "MissingCasesInEnumSwitch", "BadInstanceof",
                 "PublicConstructorForAbstractClass", "NarrowingCompoundAssignment", "JdkObsolete", "MissingSummary")
@@ -203,25 +210,12 @@ subprojects {
             options.errorprone.disable("MissingSummary")
         }
 
-        // Disable in third party code
-        if (project.getName().contains("ffmpeg")) {
-            options.errorprone.enabled = false
-        }
-
         if (name.startsWith("compileTest")) {
             options.errorprone.disable("IntLongMath", "ClassCanBeStatic", "UnnecessaryParentheses")
         }
 
         if (name.startsWith("compileBenchmark")) {
             options.errorprone.disable("StaticAssignmentInConstructor", "UnusedVariable")
-        }
-
-        // Disable ErrorProne for benchmarks and auto code generators
-//        options.errorprone.enabled = false
-        if (name.startsWith("compileBenchmark") || name.startsWith("compileGenerate") || name.startsWith("compileTest")
-                || name.startsWith("compileExperimental")) {
-            options.errorprone.enabled = false
-            return
         }
 
         options.errorprone {
@@ -242,8 +236,8 @@ subprojects {
         }
 
         // https://github.com/gradle/gradle/issues/11182 Error introduced in JDK 11
-        if (JavaVersion.current() >= JavaVersion.VERSION_1_9) {
-            options.addStringOption("-release", "8")
+        if (JavaVersion.current() >= JavaVersion.VERSION_11) {
+            options.addStringOption("-release", "11")
         }
 
         if (JavaVersion.current().isJava9Compatible()) {

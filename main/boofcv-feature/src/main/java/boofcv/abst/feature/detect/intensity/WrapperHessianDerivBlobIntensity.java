@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -91,7 +91,7 @@ public class WrapperHessianDerivBlobIntensity<I extends ImageGray<I>, D extends 
 
 	@Override
 	public boolean getRequiresHessian() {
-		return (true);
+		return true;
 	}
 
 	@Override
