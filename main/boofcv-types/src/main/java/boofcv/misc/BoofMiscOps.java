@@ -1011,4 +1011,19 @@ public class BoofMiscOps {
 			return -1;
 		}
 	}
+
+	/**
+	 * Converts a string into a byte array. No encoding is used and it is literally casting each character into a byte.
+	 * This is useful when you have a marker that really just encodes binary data.
+	 *
+	 * @param message String with raw bytes encoded inside of it.
+	 * @return byte array conversion of the string.
+	 */
+	public static byte[] stringToByteArray( String message ) {
+		byte[] data = new byte[message.length()];
+		for (int i = 0; i < message.length(); i++) {
+			data[i] = (byte)message.charAt(i);
+		}
+		return data;
+	}
 }

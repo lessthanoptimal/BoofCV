@@ -9,8 +9,10 @@ Version : 0.41
 - Build
   - Compiles using Java 17. bytecode is still Java 11
   - Updated to Gradle 7
-= Applications
+- Applications
   - Batch scanning of Micro QR Codes
+- QR Code
+  - If it can't determine encoding in byte mode it will use no encoding and leave values as is
 - SLAM
   - TODO Monocular
   - TODO Stereo
