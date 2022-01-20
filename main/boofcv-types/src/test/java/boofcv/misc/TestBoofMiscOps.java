@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -236,12 +236,25 @@ class TestBoofMiscOps extends BoofStandardJUnit {
 	}
 
 	@Test void similarity_string() {
-		assertEquals(1.0, BoofMiscOps.similarity("",""));
-		assertEquals(1.0, BoofMiscOps.similarity("foo","foo"));
-		assertEquals(1.0, BoofMiscOps.similarity("FFO","ffo"));
-		assertEquals(1.0, BoofMiscOps.similarity("123A","123a"));
+		assertEquals(1.0, BoofMiscOps.similarity("", ""));
+		assertEquals(1.0, BoofMiscOps.similarity("foo", "foo"));
+		assertEquals(1.0, BoofMiscOps.similarity("FFO", "ffo"));
+		assertEquals(1.0, BoofMiscOps.similarity("123A", "123a"));
 
-		assertTrue(BoofMiscOps.similarity("foooo","fooo") > BoofMiscOps.similarity("f","fooo"));
-		assertTrue(BoofMiscOps.similarity("asdf","abdf") > BoofMiscOps.similarity("asdfasdf","asdf"));
+		assertTrue(BoofMiscOps.similarity("foooo", "fooo") > BoofMiscOps.similarity("f", "fooo"));
+		assertTrue(BoofMiscOps.similarity("asdf", "abdf") > BoofMiscOps.similarity("asdfasdf", "asdf"));
+	}
+
+	@Test void stringToByteArray() {
+		int N = 400;
+		var builder = new StringBuilder();
+		for (int i = 0; i < N; i++) {
+			builder.append((char)i);
+		}
+
+		byte[] found = BoofMiscOps.stringToByteArray(builder.toString());
+		for (int i = 0; i < N; i++) {
+			assertEquals(i & 0xFF, found[i] & 0xFF);
+		}
 	}
 }

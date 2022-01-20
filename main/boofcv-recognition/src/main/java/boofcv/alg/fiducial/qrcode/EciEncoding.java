@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,7 +33,7 @@ public class EciEncoding {
 	 * you follow. In reality people use whatever they want and expect it to magically work. This attempts to
 	 * figure out if it's ISO8859_1, JIS, or UTF8. UTF-8 is the most common and is used if its ambiguous.
 	 *
-	 * @param message The raw byte message with an unknown encoding
+	 * @param message The raw byte message with an unknown encoding. "" indicates raw data that should not be changed.
 	 */
 	public static String guessEncoding( byte[] message ) {
 		// this function is inspired by a similarly named function in ZXing, but was written from scratch
@@ -63,7 +63,8 @@ public class EciEncoding {
 		if (isJis)
 			return JIS;
 
-		return UTF8;
+		// It has no idea. Probably raw data?
+		return "";
 	}
 
 	/**

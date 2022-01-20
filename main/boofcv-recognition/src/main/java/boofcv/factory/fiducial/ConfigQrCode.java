@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,6 +31,15 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Configuration for {@link boofcv.abst.fiducial.QrCodePreciseDetector}
  *
+ * <p>
+ * Notes on String encoding:<br>
+ * How strings are encoded for byte data is a complete mess and there is effectively no single standard that people
+ * follow. If you run into issues where the strings are encoded incorrectly you can force a specific encoding using
+ * 'forceEncoding'. Absolute worst case scenario, do the following: 1) forceEncoding="raw", 2) byteArray =
+ * {@link boofcv.misc.BoofMiscOps#stringToByteArray(String)} to get the raw bytes. 3) process the bytes the way
+ * you know is correct.
+  *</p>
+ *
  * @author Peter Abeles
  */
 public class ConfigQrCode implements Configuration {
@@ -48,9 +57,10 @@ public class ConfigQrCode implements Configuration {
 
 	/**
 	 * This forces the encoding in byte mode to use the specified encoding, unless one is specified by the ECI
-	 * mode. If null an attempt to automatically determine the encoding is done, but will default to UTF-8 if
-	 * there is any ambiguity. ISO 18004:2015 says it should be 8859-1 but
-	 * most encoders and decoders use UTF-8 instead
+	 * mode. If null an attempt to automatically determine the encoding is done, but if it can't find a reasonable
+	 * encoding it will default to "raw". ISO 18004:2015 says it should be 8859-1 but most encoders and decoders use
+	 * UTF-8 instead. If you want to force it to add the raw byte values without encoding set to "raw". This is
+	 * closer to what ISO/IEC 18004:2000(E) says you should do.
 	 */
 	public @Nullable String forceEncoding = null;
 

@@ -189,7 +189,16 @@ public class QrCodeCodecBitsUtils implements VerbosePrint {
 		String encoding = encodingEci == null ? (forceEncoding != null ? forceEncoding : guessEncoding(rawdata))
 				: encodingEci;
 		try {
-			workString.append(new String(rawdata, encoding));
+			if (encoding.isEmpty() || encoding.equalsIgnoreCase("raw")) {
+				// Handle raw mode where there is no encoding which could change the character's value.
+				// This is what the QR code specifications says you should use, but most ignore it
+				workString.ensureCapacity(workString.length() + rawdata.length);
+				for (int i = 0; i < rawdata.length; i++) {
+					workString.append((char)(rawdata[i] & 0xFF));
+				}
+			} else {
+				workString.append(new String(rawdata, encoding));
+			}
 		} catch (UnsupportedEncodingException ignored) {
 			failureCause = JIS_UNAVAILABLE;
 			return -1;

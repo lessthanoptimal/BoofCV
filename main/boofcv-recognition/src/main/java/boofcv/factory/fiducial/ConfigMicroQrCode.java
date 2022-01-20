@@ -42,9 +42,10 @@ public class ConfigMicroQrCode implements Configuration {
 
 	/**
 	 * This forces the encoding in byte mode to use the specified encoding, unless one is specified by the ECI
-	 * mode. If null an attempt to automatically determine the encoding is done, but will default to UTF-8 if
-	 * there is any ambiguity. ISO 18004:2015 says it should be 8859-1 but
-	 * most encoders and decoders use UTF-8 instead
+	 * mode. If null an attempt to automatically determine the encoding is done, but if it can't find a reasonable
+	 * encoding it will default to "raw". ISO 18004:2015 says it should be 8859-1 but most encoders and decoders use
+	 * UTF-8 instead. If you want to force it to add the raw byte values without encoding set to "raw". This is
+	 * closer to what ISO/IEC 18004:2000(E) says you should do.
 	 */
 	public @Nullable String forceEncoding = null;
 
