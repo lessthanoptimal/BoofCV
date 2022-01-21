@@ -28,11 +28,10 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.GrayU8;
 
 /**
- * When dealing with raw data embedded in a QR code things can get complicated. There is a standard, but it's widely
- * ignored and BoofCV does its best to guess what the encoding of byte should be. The defacto standard is UTF-8 which
- * will mangle beyond repair binary data. What you need to do is tell it to treat byte data as raw data and then
- * convert the string to a byte array. Of course now you if you encounter a marker encoded withe UTF-8 byte data
- * it's up to you to do the manual conversion back.
+ * When dealing with raw data embedded in a QR code things do get more complicated. You will need to convert
+ * the string message into a byte array. There is also the possibility that BoofCV incorrectly determined how
+ * the BYTE data was encoded. There is no standard that people follow so BoofCV does its best job to guess
+ * the encoding by looking at the bit format.
  *
  * @author Peter Abeles
  */
@@ -41,18 +40,17 @@ public class ExampleQrCodeRawData {
 		// Let's generate some random data. In the real world this could be a zip file or similar
 		byte[] originalData = new byte[500];
 		for (int i = 0; i < originalData.length; i++) {
-			originalData[i] = (byte)(i%0xBF);
-			// deliberately limit the range of values so that it will think it's UTF-8 encoding
+			originalData[i] = (byte)i;
 		}
 
 		// Generate a marking that's encoded with this raw data
 		QrCode original = new QrCodeEncoder().addBytes(originalData).fixate();
 		var gray = new QrCodeGeneratorImage(/* pixel per module */ 5).render(original).getGray();
 
-		// Decode the rendered image
+		// Let's detect and then decode the image
 		var config = new ConfigQrCode();
-		// This tells it to do no processing on byte data.
-		// Comment out the line below and see how it corrupts the data
+		// If you force the encoding to "raw" then you turn off the logic where it tries to determine the format
+		// This will make it impossible for BoofCV to corrupt the data. 99% of the time you don't need to do this...
 		config.forceEncoding = "raw";
 		QrCodeDetector<GrayU8> detector = FactoryFiducial.qrcode(config, GrayU8.class);
 		detector.process(gray);
