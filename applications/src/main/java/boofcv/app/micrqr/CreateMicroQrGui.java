@@ -211,7 +211,7 @@ public class CreateMicroQrGui extends JPanel implements CreateMicroQrControlPane
 		var render = new FiducialImageEngine();
 		try {
 			MicroQrCode qr = encoder.fixate();
-			render.configure(0, qr.getNumberOfModules()*10);
+			render.configure(20, qr.getNumberOfModules()*10);
 			var generator = new MicroQrCodeGenerator();
 			generator.setRender(render);
 			generator.markerWidth = qr.getNumberOfModules()*10;
