@@ -56,7 +56,7 @@ public class EciEncoding {
 //		System.out.printf("UTF-8=%s ISO=%s JIS=%s\n",isUtf8,isIso,isJis);
 
 		// If there is ambiguity do it based on how common it is and what the specification says
-		if (isUtf8)
+		if (isUtf8 && EciEncoding.isValidUTF8(message))
 			return UTF8;
 		if (isIso)
 			return ISO8859_1;
@@ -73,6 +73,35 @@ public class EciEncoding {
 	public static boolean isValidUTF8( int v ) {
 		// C0, C1, F5 - FF never appear
 		return (v >= 0 && v <= 0xBF) || (v >= 0xC2 && v <= 0xF4);
+	}
+
+	public static boolean isValidUTF8( byte[] message ) {
+		int index = 0;
+		while (index < message.length) {
+			// determine the number of bytes per letter
+			int letterSize;
+			int value = message[index] & 0xFF;
+			if (value >> 3 == 0b1111_0) {
+				letterSize = 4;
+			} else if (value >> 4 == 0b1110) {
+				letterSize = 3;
+			} else if (value >> 5 == 0b110) {
+				letterSize = 2;
+			} else if ((value >> 7) == 0) {
+				letterSize = 1;
+			} else {
+				return false;
+			}
+			// all multibyte UTF-9 characters start with 0b10xx_xxx
+			for (int i = 1; i < letterSize; i++) {
+				if ((message[index + i] & 0xFF) >> 6 != 0b10)
+					return false;
+			}
+			index += letterSize;
+			if (index == message.length)
+				return true;
+		}
+		return false;
 	}
 
 	/**

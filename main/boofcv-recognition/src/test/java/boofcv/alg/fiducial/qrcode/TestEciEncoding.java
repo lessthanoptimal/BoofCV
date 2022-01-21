@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Peter Abeles
  */
 public class TestEciEncoding extends BoofStandardJUnit {
-	@Test void isValidUTF8() {
+	@Test void isValidUTF8_value() {
 		for (int i = 0; i <= 0xFF; i++) {
 			if (i <= 0xBF)
 				assertTrue(EciEncoding.isValidUTF8(i));
@@ -39,6 +39,20 @@ public class TestEciEncoding extends BoofStandardJUnit {
 			else
 				assertFalse(EciEncoding.isValidUTF8(i));
 		}
+	}
+
+	@Test void isValidUTF8_string() {
+		assertTrue(EciEncoding.isValidUTF8("asdfafd".getBytes(StandardCharsets.UTF_8)));
+		assertTrue(EciEncoding.isValidUTF8("目asdfafd木要₹".getBytes(StandardCharsets.UTF_8)));
+
+		byte[] damaged = "a目sdfafd木".getBytes(StandardCharsets.UTF_8);
+		damaged[1] = (byte)(0b0110_0000);
+		assertFalse(EciEncoding.isValidUTF8(damaged));
+
+		// mess up one of the extended byte characters by changing the first two bits
+		damaged = "a目sdfafd木".getBytes(StandardCharsets.UTF_8);
+		damaged[2] |= 0b1100_000;
+		assertFalse(EciEncoding.isValidUTF8(damaged));
 	}
 
 	@Test void isValidJIS() {
