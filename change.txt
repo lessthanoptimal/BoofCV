@@ -13,6 +13,7 @@ Version : 0.41
   - Batch scanning of Micro QR Codes
 - QR Code
   - If it can't determine encoding in byte mode it will use no encoding and leave values as is
+  - Added an example demonstrating how raw data can be used ExampleQrCodeRawData
 - SLAM
   - TODO Monocular
   - TODO Stereo
