@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,28 +51,6 @@ public class PyramidKltTracker<InputImage extends ImageGray<InputImage>, Derivat
 	}
 
 	/**
-	 * Sets the feature's description up. The feature's (x,y) must have already been set
-	 * and {@link #setImage} been called.
-	 *
-	 * @param feature Feature's whose description is being setup.
-	 * @return true if there was sufficient information to create a feature or false if not
-	 */
-	public boolean setDescription( PyramidKltFeature feature ) {
-		for (int layer = 0; layer < image.getNumLayers(); layer++) {
-			float scale = (float)image.getScale(layer);
-			float x = feature.x/scale;
-			float y = feature.y/scale;
-
-			setupKltTracker(layer);
-
-			feature.desc[layer].setPosition(x, y);
-			if (!tracker.setDescription(feature.desc[layer]))
-				return false;
-		}
-		return true;
-	}
-
-	/**
 	 * Sets the current input images for the tracker to use.
 	 *
 	 * @param image Original image pyramid.
@@ -98,6 +76,28 @@ public class PyramidKltTracker<InputImage extends ImageGray<InputImage>, Derivat
 		this.image = image;
 		this.derivX = null;
 		this.derivY = null;
+	}
+
+	/**
+	 * Sets the feature's description up. The feature's (x,y) must have already been set
+	 * and {@link #setImage} been called.
+	 *
+	 * @param feature Feature's whose description is being setup.
+	 * @return true if there was sufficient information to create a feature or false if not
+	 */
+	public boolean setDescription( PyramidKltFeature feature ) {
+		for (int layer = 0; layer < image.getNumLayers(); layer++) {
+			float scale = (float)image.getScale(layer);
+			float x = feature.x/scale;
+			float y = feature.y/scale;
+
+			setupKltTracker(layer);
+
+			feature.desc[layer].setPosition(x, y);
+			if (!tracker.setDescription(feature.desc[layer]))
+				return false;
+		}
+		return true;
 	}
 
 	/**
@@ -169,5 +169,12 @@ public class PyramidKltTracker<InputImage extends ImageGray<InputImage>, Derivat
 			tracker.setImage(image.getLayer(layer), derivX[layer], derivY[layer]);
 		else
 			tracker.setImage(image.getLayer(layer), null, null);
+	}
+
+	/**
+	 * Creates a copy which can be run in parallel. Data structures which can be shared are shared.
+	 */
+	public PyramidKltTracker<InputImage, DerivativeImage> copyConcurrent() {
+		return new PyramidKltTracker<>(tracker.copy());
 	}
 }

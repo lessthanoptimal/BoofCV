@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,6 +46,7 @@ import boofcv.alg.tracker.dda.DetectDescribeAssociateTracker;
 import boofcv.alg.tracker.hybrid.HybridTrackerScalePoint;
 import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.alg.transform.ii.GIntegralImageOps;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.factory.feature.associate.ConfigAssociateGreedy;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribeAlgs;
@@ -165,9 +166,16 @@ public class FactoryPointTracker {
 
 		PyramidDiscrete<I> pyramid = FactoryPyramid.discreteGaussian(config.pyramidLevels, -1, 2, true, ImageType.single(imageType));
 
-		var ret = new PointTrackerKltPyramid<>(config.config, config.toleranceFB,
-				config.templateRadius, config.pruneClose, pyramid, detector,
-				gradient, interpInput, interpDeriv, derivType);
+		PointTrackerKltPyramid<I, D> ret;
+		if (BoofConcurrency.isUseConcurrent()) {
+			ret = new PointTrackerKltPyramid_MT<>(config.config, config.toleranceFB,
+					config.templateRadius, config.pruneClose, pyramid, detector,
+					gradient, interpInput, interpDeriv, derivType);
+		} else {
+			ret = new PointTrackerKltPyramid<>(config.config, config.toleranceFB,
+					config.templateRadius, config.pruneClose, pyramid, detector,
+					gradient, interpInput, interpDeriv, derivType);
+		}
 		ret.configMaxTracks = config.maximumTracks;
 		return ret;
 	}

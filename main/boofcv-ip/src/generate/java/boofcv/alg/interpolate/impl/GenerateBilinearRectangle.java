@@ -211,6 +211,10 @@ public class GenerateBilinearRectangle extends CodeGeneratorBase {
 				"\t\treturn this;\n" +
 				"\t}\n" +
 				"\n" +
+				"\t@Override public InterpolateRectangle<" + image.getSingleBandName() + "> copy() {\n" +
+				"\t\treturn new " + className + "();\n" +
+				"\t}\n" +
+				"\n" +
 				"\t@Override public ImageType<" + image.getSingleBandName() + "> getImageType() {\n" +
 				"\t\treturn ImageType.SB_" + image.getAbbreviatedType() + ";\n" +
 				"\t}\n");

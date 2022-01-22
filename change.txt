@@ -19,7 +19,7 @@ Version : 0.41
 - Testing
   - TODO make sure Micro QR and QR are in JMH benchmarks
 - Concurrency
-  - TODO KLT tracker?
+  - Added threaded KLT tracker
 - Regression
   - TODO Template matching
   - TODO Video stabilization

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,6 +60,9 @@ public class ConfigPKlt implements Configuration {
 	 */
 	public ConfigLength maximumTracks = ConfigLength.relative(0.002, 50);
 
+	/** If running a concurrent implementations, what's the minimum number of tracks for it to do parallel */
+	public int concurrentMinimumTracks = 20; // A guess and not tested
+
 	public ConfigPKlt() {}
 
 	public ConfigPKlt( int templateRadius ) {
@@ -88,6 +91,7 @@ public class ConfigPKlt implements Configuration {
 		this.pyramidLevels.setTo(src.pyramidLevels);
 		this.pruneClose = src.pruneClose;
 		this.maximumTracks.setTo(src.maximumTracks);
+		this.concurrentMinimumTracks = src.concurrentMinimumTracks;
 		return this;
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
+import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -67,7 +68,7 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 	protected InterpolateRectangle<D> interpDeriv;
 
 	// tracker configuration
-	protected ConfigKlt config;
+	protected @Getter ConfigKlt config;
 
 	// feature description curvature information
 	protected float Gxx, Gyy, Gxy;
@@ -104,8 +105,8 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 	float outsideTop;
 	float outsideBottom;
 
-	// error between template and the current track position in the image
-	float error;
+	/** error between template and the current track position in the image */
+	@Getter float error;
 
 	public KltTracker( InterpolateRectangle<I> interpInput,
 					   InterpolateRectangle<D> interpDeriv,
@@ -493,15 +494,9 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 	}
 
 	/**
-	 * Average absolute value of the difference between each pixel in the image and the template
-	 *
-	 * @return Average error
+	 * Creates a copy which can be run in parallel. Data structures which can be shared are shared.
 	 */
-	public float getError() {
-		return error;
-	}
-
-	public ConfigKlt getConfig() {
-		return config;
+	public KltTracker<I, D> copy() {
+		return new KltTracker<>(interpInput.copy(), interpDeriv.copy(), config);
 	}
 }

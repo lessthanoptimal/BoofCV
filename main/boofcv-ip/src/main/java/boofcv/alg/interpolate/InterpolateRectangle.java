@@ -53,8 +53,11 @@ public interface InterpolateRectangle<T extends ImageGray<T>> {
 	 */
 	void region( float tl_x, float tl_y, GrayF32 dest );
 
-	/** Creates a copy that can be run in parallel with the original */
+	/** Creates a copy that can be run in parallel with the original as long as the image isn't modified */
 	InterpolateRectangle<T> copyConcurrent();
+
+	/** Creates new instance that's configured the same but completely decoupled */
+	InterpolateRectangle<T> copy();
 
 	/** Type of image it can process */
 	ImageType<T> getImageType();
