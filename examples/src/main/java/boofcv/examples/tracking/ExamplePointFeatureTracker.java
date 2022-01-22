@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -77,7 +77,6 @@ public class ExamplePointFeatureTracker<T extends ImageGray<T>, D extends ImageG
 	 * Processes the sequence of images and displays the tracked features in a window
 	 */
 	public void process( SimpleImageSequence<T> sequence ) {
-
 		// Figure out how large the GUI window should be
 		T frame = sequence.next();
 		gui.setPreferredSize(new Dimension(frame.getWidth(), frame.getHeight()));
@@ -91,7 +90,7 @@ public class ExamplePointFeatureTracker<T extends ImageGray<T>, D extends ImageG
 			tracker.process(frame);
 
 			// if there are too few tracks spawn more
-			if (tracker.getActiveTracks(null).size() < 130)
+			if (tracker.getTotalActive() < 130)
 				tracker.spawnTracks();
 
 			// visualize tracking results
@@ -131,16 +130,15 @@ public class ExamplePointFeatureTracker<T extends ImageGray<T>, D extends ImageG
 	 * A simple way to create a Kanade-Lucas-Tomasi (KLT) tracker.
 	 */
 	public void createKLT() {
-		ConfigPKlt configKlt = new ConfigPKlt();
+		var configKlt = new ConfigPKlt();
 		configKlt.templateRadius = 3;
 		configKlt.pyramidLevels = ConfigDiscreteLevels.levels(4);
 
-		ConfigPointDetector configDetector = new ConfigPointDetector();
+		var configDetector = new ConfigPointDetector();
 		configDetector.type = PointDetectorTypes.SHI_TOMASI;
 		configDetector.general.maxFeatures = 600;
 		configDetector.general.radius = 6;
 		configDetector.general.threshold = 1;
-
 
 		tracker = FactoryPointTracker.klt(configKlt, configDetector, imageType, derivType);
 	}
@@ -149,7 +147,7 @@ public class ExamplePointFeatureTracker<T extends ImageGray<T>, D extends ImageG
 	 * Creates a SURF feature tracker.
 	 */
 	public void createSURF() {
-		ConfigFastHessian configDetector = new ConfigFastHessian();
+		var configDetector = new ConfigFastHessian();
 		configDetector.maxFeaturesPerScale = 250;
 		configDetector.extract.radius = 3;
 		configDetector.initialSampleStep = 2;
@@ -157,18 +155,18 @@ public class ExamplePointFeatureTracker<T extends ImageGray<T>, D extends ImageG
 	}
 
 	public static void main( String[] args ) throws FileNotFoundException {
-		Class imageType = GrayF32.class;
+		Class<GrayF32> imageType = GrayF32.class;
 
 		MediaManager media = DefaultMediaManager.INSTANCE;
 
 		int pause;
-		SimpleImageSequence sequence =
+		SimpleImageSequence<GrayF32> sequence =
 				media.openVideo(UtilIO.pathExample("zoom.mjpeg"), ImageType.single(imageType));
 		pause = 100;
 //				media.openCamera(null,640,480,ImageType.single(imageType)); pause = 5;
 		sequence.setLoop(true);
 
-		ExamplePointFeatureTracker app = new ExamplePointFeatureTracker(imageType, pause);
+		var app = new ExamplePointFeatureTracker<>(imageType, pause);
 
 		// Comment or un-comment to change the type of tracker being used
 		app.createKLT();
