@@ -51,11 +51,12 @@ public class QrCodePreciseDetector<T extends ImageGray<T>> implements QrCodeDete
 
 	public QrCodePreciseDetector( InputToBinary<T> inputToBinary,
 								  QrCodePositionPatternDetector<T> detectPositionPatterns,
-								  @Nullable String defaultEncoding,
+								  @Nullable String forceEncoding,
+								  String defaultEncoding,
 								  boolean copyBinary, Class<T> imageType ) {
 		this.inputToBinary = inputToBinary;
 		this.detectPositionPatterns = detectPositionPatterns;
-		this.decoder = new QrCodeDecoderImage<>(defaultEncoding, imageType);
+		this.decoder = new QrCodeDecoderImage<>(forceEncoding, defaultEncoding, imageType);
 		this.imageType = imageType;
 		this.contourHelper = new BinaryContourHelper(detectPositionPatterns.getSquareDetector().getDetector().getContourFinder(), copyBinary);
 	}

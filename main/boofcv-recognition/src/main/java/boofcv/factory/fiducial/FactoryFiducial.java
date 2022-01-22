@@ -225,7 +225,8 @@ public class FactoryFiducial {
 		DetectPolygonBinaryGrayRefine<T> squareDetector = FactoryShapeDetector.polygon(config.polygon, imageType);
 		var detectPositionPatterns = new QrCodePositionPatternDetector<>(squareDetector);
 
-		var detector = new QrCodePreciseDetector<>(inputToBinary, detectPositionPatterns, config.forceEncoding, false, imageType);
+		var detector = new QrCodePreciseDetector<>(inputToBinary, detectPositionPatterns,
+				config.forceEncoding, config.defaultEncoding, false, imageType);
 		detector.getGraphPositionPatterns().setMaxVersionQR(config.versionMaximum);
 		detector.getDecoder().considerTransposed = config.considerTransposed;
 		return detector;
@@ -249,7 +250,8 @@ public class FactoryFiducial {
 
 		DetectPolygonBinaryGrayRefine<T> squareDetector = FactoryShapeDetector.polygon(config.polygon, imageType);
 		var detectPositionPatterns = new QrCodePositionPatternDetector<>(squareDetector);
-		var detector = new MicroQrCodePreciseDetector<>(inputToBinary, detectPositionPatterns, config.forceEncoding, false, imageType);
+		var detector = new MicroQrCodePreciseDetector<>(inputToBinary, detectPositionPatterns,
+				config.forceEncoding, config.defaultEncoding, false, imageType);
 		detector.getDecoder().considerTransposed = config.considerTransposed;
 		return detector;
 	}

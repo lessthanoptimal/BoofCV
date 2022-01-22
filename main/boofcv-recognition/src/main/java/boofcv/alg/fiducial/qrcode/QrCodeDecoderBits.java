@@ -52,8 +52,8 @@ public class QrCodeDecoderBits {
 	 * @param forceEncoding If null then the default byte encoding is used. If not null then the specified
 	 * encoding is used.
 	 */
-	public QrCodeDecoderBits( @Nullable String forceEncoding ) {
-		this.utils = new QrCodeCodecBitsUtils(forceEncoding);
+	public QrCodeDecoderBits( @Nullable String forceEncoding, String defaultEncoding ) {
+		this.utils = new QrCodeCodecBitsUtils(forceEncoding, defaultEncoding);
 	}
 
 	/**

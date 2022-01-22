@@ -68,8 +68,8 @@ public class QrCodeDecoderImage<T extends ImageGray<T>> {
 	/**
 	 * @param forceEncoding Force the default encoding to be this. Null for default
 	 */
-	public QrCodeDecoderImage( @Nullable String forceEncoding, Class<T> imageType ) {
-		decoder = new QrCodeDecoderBits(forceEncoding);
+	public QrCodeDecoderImage( @Nullable String forceEncoding, String defaultEncoding, Class<T> imageType ) {
+		decoder = new QrCodeDecoderBits(forceEncoding, defaultEncoding);
 		gridReader = new QrCodeBinaryGridReader<>(imageType);
 		alignmentLocator = new QrCodeAlignmentPatternLocator<>(imageType);
 	}

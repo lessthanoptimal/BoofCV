@@ -26,9 +26,6 @@ import org.junit.jupiter.api.Test;
 import static boofcv.alg.fiducial.qrcode.QrCodeCodecBitsUtils.flipBits8;
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * @author Peter Abeles
- */
 public class TestMicroQrCodeEncoder extends BoofStandardJUnit {
 	/**
 	 * In the qr code specification an example is given. This compares the computed results to that example
@@ -53,12 +50,13 @@ public class TestMicroQrCodeEncoder extends BoofStandardJUnit {
 
 	@Test void automatic() {
 		var encoder = new MicroQrCodeEncoder();
-		var decoder = new MicroQrCodeDecoderBits(EciEncoding.UTF8); // used to validate the message
+		var decoder = new MicroQrCodeDecoderBits(null, EciEncoding.ISO8859_1); // used to validate the message
 		MicroQrCode qr = encoder.addAutomatic("142f阿ん鞠≦Ｋ").fixate();
 		assertEquals(qr.message, "142f阿ん鞠≦Ｋ");
 		assertTrue(decoder.applyErrorCorrection(qr));
 		assertTrue(decoder.decodeMessage(qr));
 		assertEquals(QrCode.Mode.MIXED, qr.mode);
+		assertEquals("UTF8", qr.byteEncoding);
 
 		encoder.reset();
 		qr = encoder.addAutomatic("123ASDdf").fixate();
@@ -66,6 +64,7 @@ public class TestMicroQrCodeEncoder extends BoofStandardJUnit {
 		assertTrue(decoder.applyErrorCorrection(qr));
 		assertTrue(decoder.decodeMessage(qr));
 		assertEquals(QrCode.Mode.BYTE, qr.mode);
+		assertEquals("UTF8", qr.byteEncoding);
 
 		encoder.reset();
 		qr = encoder.addAutomatic("123ASD").fixate();
@@ -73,6 +72,7 @@ public class TestMicroQrCodeEncoder extends BoofStandardJUnit {
 		assertTrue(decoder.applyErrorCorrection(qr));
 		assertTrue(decoder.decodeMessage(qr));
 		assertEquals(QrCode.Mode.ALPHANUMERIC, qr.mode);
+		assertEquals("", qr.byteEncoding);
 
 		encoder.reset();
 		qr = encoder.addAutomatic("123").fixate();
@@ -80,6 +80,7 @@ public class TestMicroQrCodeEncoder extends BoofStandardJUnit {
 		assertTrue(decoder.applyErrorCorrection(qr));
 		assertTrue(decoder.decodeMessage(qr));
 		assertEquals(QrCode.Mode.NUMERIC, qr.mode);
+		assertEquals("", qr.byteEncoding);
 	}
 
 	@Test void messageTooLong() {
@@ -111,7 +112,7 @@ public class TestMicroQrCodeEncoder extends BoofStandardJUnit {
 		MicroQrCode qr = new MicroQrCodeEncoder().setMask(MicroQrCodeMaskPattern.M10).addNumeric(message).fixate();
 
 		qr.message = "";
-		var decoder = new MicroQrCodeDecoderBits(EciEncoding.UTF8);
+		var decoder = new MicroQrCodeDecoderBits(EciEncoding.UTF8, EciEncoding.ISO8859_1);
 		assertTrue(decoder.applyErrorCorrection(qr));
 		assertTrue(decoder.decodeMessage(qr));
 
@@ -127,7 +128,7 @@ public class TestMicroQrCodeEncoder extends BoofStandardJUnit {
 		MicroQrCode qr = new MicroQrCodeEncoder().setMask(MicroQrCodeMaskPattern.M10).addBytes(message).fixate();
 
 		qr.message = "";
-		var decoder = new MicroQrCodeDecoderBits(EciEncoding.UTF8);
+		var decoder = new MicroQrCodeDecoderBits(EciEncoding.UTF8, "");
 		assertTrue(decoder.applyErrorCorrection(qr));
 		assertTrue(decoder.decodeMessage(qr));
 

@@ -68,7 +68,7 @@ public class TestQrCodeCodecBitsUtils extends BoofStandardJUnit {
 
 		var packed = new PackedBits8();
 		QrCodeCodecBitsUtils.encodeBytes(data, data.length, 8, packed);
-		var alg = new QrCodeCodecBitsUtils(encoding);
+		var alg = new QrCodeCodecBitsUtils(encoding, "");
 
 		alg.decodeByte(packed, 0, 8);
 

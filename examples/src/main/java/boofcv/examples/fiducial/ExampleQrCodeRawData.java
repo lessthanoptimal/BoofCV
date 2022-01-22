@@ -27,16 +27,18 @@ import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.GrayU8;
 
+import java.io.UnsupportedEncodingException;
+
 /**
- * When dealing with raw data embedded in a QR code things do get more complicated. You will need to convert
- * the string message into a byte array. There is also the possibility that BoofCV incorrectly determined how
- * the BYTE data was encoded. There is no standard that people follow so BoofCV does its best job to guess
- * the encoding by looking at the bit format.
+ * When dealing with binary data embedded in a QR code things do get more complicated. You will need to convert
+ * the string message into a byte array. By default, it's assumed that BYTE data is a text string and it will
+ * encode it into a string. In general the conversion to a string will not modify the data but it's not defined
+ * how illegal characters are encoded. To be safe you can force the encoding to be "raw".
  *
  * @author Peter Abeles
  */
 public class ExampleQrCodeRawData {
-	public static void main( String[] args ) {
+	public static void main( String[] args ) throws UnsupportedEncodingException {
 		// Let's generate some random data. In the real world this could be a zip file or similar
 		byte[] originalData = new byte[500];
 		for (int i = 0; i < originalData.length; i++) {
@@ -49,24 +51,35 @@ public class ExampleQrCodeRawData {
 
 		// Let's detect and then decode the image
 		var config = new ConfigQrCode();
-		// If you force the encoding to "raw" then you turn off the logic where it tries to determine the format
-		// This will make it impossible for BoofCV to corrupt the data. 99% of the time you don't need to do this...
+		// If you force the encoding to "raw" then you turn off auto encoding you know the bit values will not
+		// be modified. It's undefined how illegal values are handled in different encodings, but often still work.
 		config.forceEncoding = "raw";
 		QrCodeDetector<GrayU8> detector = FactoryFiducial.qrcode(config, GrayU8.class);
 		detector.process(gray);
 
 		for (QrCode qr : detector.getDetections()) {
+			// Only consider QR codes that are encoded with BYTE data
+			if (qr.mode != QrCode.Mode.BYTE)
+				continue;
+
 			// Convert the message from a String to byte data. This only works if the 'raw' encoding is used
-			byte[] found = BoofMiscOps.stringToByteArray(qr.message);
+			byte[] data;
+			if (qr.byteEncoding.equals("raw")) {
+				data = BoofMiscOps.stringRawToByteArray(qr.message);
+			} else {
+				// If it thought the byte data was UTF-8 you need to decode with UTF-8 because a single character
+				// can be multiple bytes.
+				data = qr.message.getBytes(qr.byteEncoding);
+			}
 
 			// See if the data got corrupted or not
-			boolean perfectMatch = found.length == originalData.length;
-			for (int i = 0; i < found.length; i++) {
-				perfectMatch &= found[i] == originalData[i];
+			boolean perfectMatch = data.length == originalData.length;
+			for (int i = 0; i < data.length; i++) {
+				perfectMatch &= data[i] == originalData[i];
 			}
 
 			// Print the results
-			System.out.println("Matched: " + perfectMatch);
+			System.out.println("Encoding: '" + qr.byteEncoding + "' Matched: " + perfectMatch);
 		}
 	}
 }

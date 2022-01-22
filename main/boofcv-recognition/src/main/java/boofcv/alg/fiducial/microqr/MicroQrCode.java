@@ -70,6 +70,13 @@ public class MicroQrCode implements Cloneable {
 	/** Which mask is applied */
 	public MicroQrCodeMaskPattern mask = MicroQrCodeMaskPattern.M00;
 
+	/**
+	 * Which string encoding was used decoding a {@link Mode#BYTE} message. If there is no BYTE encoding then
+	 * this will be an empty string. If there are multiple independent BYTE segments then this will
+	 * be the first one encountered.
+	 */
+	public String byteEncoding = "";
+
 	/** The raw byte data encoded into the QR Code. data + ecc */
 	public byte[] rawbits;
 
@@ -128,6 +135,7 @@ public class MicroQrCode implements Cloneable {
 		error = MicroQrCode.ErrorLevel.L;
 		mask = MicroQrCodeMaskPattern.M00;
 		mode = Mode.UNKNOWN;
+		byteEncoding = "";
 		rawbits = null;
 		corrected = null;
 		message = null;

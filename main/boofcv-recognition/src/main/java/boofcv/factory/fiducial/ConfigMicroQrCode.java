@@ -19,6 +19,7 @@
 package boofcv.factory.fiducial;
 
 import boofcv.abst.shapes.polyline.ConfigPolylineSplitMerge;
+import boofcv.alg.fiducial.qrcode.EciEncoding;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.ConfigThresholdLocalOtsu;
 import boofcv.factory.filter.binary.ThresholdType;
@@ -41,13 +42,18 @@ public class ConfigMicroQrCode implements Configuration {
 	public ConfigPolygonDetector polygon = new ConfigPolygonDetector();
 
 	/**
-	 * This forces the encoding in byte mode to use the specified encoding, unless one is specified by the ECI
-	 * mode. If null an attempt to automatically determine the encoding is done, but if it can't find a reasonable
-	 * encoding it will default to "raw". ISO 18004:2015 says it should be 8859-1 but most encoders and decoders use
-	 * UTF-8 instead. If you want to force it to add the raw byte values without encoding set to "raw". This is
-	 * closer to what ISO/IEC 18004:2000(E) says you should do.
+	 * If not null, then when decoding BYTE mode data it will always use this encoding. This can be desirable
+	 * if the automatic encoding detection is making a mistake or if you know the data is binary. For binary
+	 * data you should set this to "raw".
 	 */
 	public @Nullable String forceEncoding = null;
+
+	/**
+	 * Fore BYTE mode, if the auto encoding detection decides it's not UTF-8 then it will use this encoding.
+	 * Depending on which QR code standard you are following (few people follow either) it should be
+	 * {@link EciEncoding#ISO8859_1} or {@link EciEncoding#JIS}.
+	 */
+	public String defaultEncoding = EciEncoding.ISO8859_1;
 
 	/**
 	 * If true it will consider QR codes which have been incorrectly encoded with transposed bits. Set to false if
@@ -101,6 +107,7 @@ public class ConfigMicroQrCode implements Configuration {
 		this.threshold.setTo(src.threshold);
 		this.polygon.setTo(src.polygon);
 		this.forceEncoding = src.forceEncoding;
+		this.defaultEncoding = src.defaultEncoding;
 		this.considerTransposed = src.considerTransposed;
 		return this;
 	}
