@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,7 @@ import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.tracker.PointTrackerKltPyramid.PointTrackMod;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.tracker.klt.*;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.pyramid.ConfigDiscreteLevels;
@@ -185,6 +186,8 @@ class TestPointTrackerKltPyramid extends GenericChecksPointTracker<GrayF32> {
 		configDetector.general.radius = 3;
 		configDetector.general.threshold = 1000;
 
+		// Turn off threading since this should only test the single thread implementation
+		BoofConcurrency.setMaxThreads(0);
 		return FactoryPointTracker.klt(config, configDetector, GrayF32.class, GrayF32.class);
 	}
 

@@ -174,6 +174,10 @@ public class BilinearRectangle_S16 implements InterpolateRectangle<GrayS16> {
 		return this;
 	}
 
+	@Override public InterpolateRectangle<GrayS16> copy() {
+		return new BilinearRectangle_S16();
+	}
+
 	@Override public ImageType<GrayS16> getImageType() {
 		return ImageType.SB_S16;
 	}

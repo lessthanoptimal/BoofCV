@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -330,6 +330,27 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 		currPyr.update(image);
 
 		// track features
+		trackFeatures(image);
+
+		if (toleranceFB >= 0) {
+			// If there are no tracks it must have been reset or this is the first frame
+			if (activeTracks) {
+				backwardsTrackValidate();
+			} else {
+				this.prevPyr.update(image);
+			}
+		}
+
+		// If configured to, drop features which are close by each other
+		if (pruneClose != null) {
+			pruneCloseTracks();
+		}
+	}
+
+	/**
+	 * Tracks features in the forward direction
+	 */
+	protected void trackFeatures( I image ) {
 		tracker.setImage(currPyr.basePyramid, currPyr.derivX, currPyr.derivY);
 		for (int i = active.size() - 1; i >= 0; i--) {
 			PyramidKltFeature t = active.get(i);
@@ -352,20 +373,6 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 				dropped.add(t);
 				unused.add(t);
 			}
-		}
-
-		if (toleranceFB >= 0) {
-			// If there are no tracks it must have been reset or this is the first frame
-			if (activeTracks) {
-				backwardsTrackValidate();
-			} else {
-				this.prevPyr.update(image);
-			}
-		}
-
-		// If configured to, drop features which are close by each other
-		if (pruneClose != null) {
-			pruneCloseTracks();
 		}
 	}
 

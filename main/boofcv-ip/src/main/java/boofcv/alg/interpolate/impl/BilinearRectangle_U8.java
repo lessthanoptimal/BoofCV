@@ -174,6 +174,10 @@ public class BilinearRectangle_U8 implements InterpolateRectangle<GrayU8> {
 		return this;
 	}
 
+	@Override public InterpolateRectangle<GrayU8> copy() {
+		return new BilinearRectangle_U8();
+	}
+
 	@Override public ImageType<GrayU8> getImageType() {
 		return ImageType.SB_U8;
 	}

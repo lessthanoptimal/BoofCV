@@ -173,6 +173,10 @@ public class BilinearRectangle_F32 implements InterpolateRectangle<GrayF32> {
 		return this;
 	}
 
+	@Override public InterpolateRectangle<GrayF32> copy() {
+		return new BilinearRectangle_F32();
+	}
+
 	@Override public ImageType<GrayF32> getImageType() {
 		return ImageType.SB_F32;
 	}

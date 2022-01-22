@@ -41,7 +41,6 @@ public class NearestNeighborRectangle_F32 implements InterpolateRectangle<GrayF3
 	}
 
 	@Override public void region( float tl_x, float tl_y, GrayF32 dest ) {
-
 		int x = (int)tl_x;
 		int y = (int)tl_y;
 
@@ -58,6 +57,10 @@ public class NearestNeighborRectangle_F32 implements InterpolateRectangle<GrayF3
 
 	@Override public InterpolateRectangle<GrayF32> copyConcurrent() {
 		return this; // no fields modified outside setImage()
+	}
+
+	@Override public InterpolateRectangle<GrayF32> copy() {
+		return new NearestNeighborRectangle_F32();
 	}
 
 	@Override public ImageType<GrayF32> getImageType() {
