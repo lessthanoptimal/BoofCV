@@ -23,14 +23,11 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * @author Peter Abeles
- */
 public class TestQrCodeDecoderBits extends BoofStandardJUnit {
 	@Test public void applyErrorCorrection() {
 		QrCode qr = new QrCodeEncoder().addNumeric("923492348985").fixate();
 
-		QrCodeDecoderBits alg = new QrCodeDecoderBits(EciEncoding.UTF8);
+		var alg = new QrCodeDecoderBits(EciEncoding.UTF8, "raw");
 
 		byte[] original = new byte[qr.rawbits.length];
 		System.arraycopy(qr.rawbits, 0, original, 0, original.length);
@@ -74,7 +71,7 @@ public class TestQrCodeDecoderBits extends BoofStandardJUnit {
 	@Test public void checkPaddingBytes() {
 		QrCode qr = new QrCodeEncoder().addNumeric("923492348985").fixate();
 
-		QrCodeDecoderBits alg = new QrCodeDecoderBits(EciEncoding.UTF8);
+		var alg = new QrCodeDecoderBits(EciEncoding.UTF8, "raw");
 
 		qr.corrected = new byte[50];
 
@@ -101,11 +98,11 @@ public class TestQrCodeDecoderBits extends BoofStandardJUnit {
 	 * Test against example from specification
 	 */
 	@Test public void decodeEci_IsoExample() {
-		PackedBits8 bits = new PackedBits8();
+		var bits = new PackedBits8();
 		// ECI Assignment number
 		bits.append(0b00001001, 8, false);
 
-		QrCodeDecoderBits alg = new QrCodeDecoderBits(EciEncoding.UTF8);
+		var alg = new QrCodeDecoderBits(EciEncoding.UTF8, "raw");
 
 		int newBit = alg.decodeEci(bits, 0);
 		assertEquals("ISO8859_7", alg.encodingEci);

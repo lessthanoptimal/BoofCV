@@ -66,8 +66,8 @@ public class MicroQrCodeDecoderImage<T extends ImageGray<T>> implements VerboseP
 	/**
 	 * @param forceEncoding Force the default encoding to be this. Null for default
 	 */
-	public MicroQrCodeDecoderImage( @Nullable String forceEncoding, Class<T> imageType ) {
-		decoder = new MicroQrCodeDecoderBits(forceEncoding);
+	public MicroQrCodeDecoderImage( @Nullable String forceEncoding, String defaultEncoding, Class<T> imageType ) {
+		decoder = new MicroQrCodeDecoderBits(forceEncoding, defaultEncoding);
 		gridReader = new QrCodeBinaryGridReader<>(imageType);
 		alignmentLocator = new QrCodeAlignmentPatternLocator<>(imageType);
 	}

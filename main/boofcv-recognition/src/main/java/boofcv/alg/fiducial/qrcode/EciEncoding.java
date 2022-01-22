@@ -28,56 +28,6 @@ public class EciEncoding {
 	public static final String ISO8859_1 = "ISO8859_1";
 	public static final String JIS = "JIS";
 
-	/**
-	 * The encoding for byte messages should be ISO8859_1 or JIS, depending on which version of the specification
-	 * you follow. In reality people use whatever they want and expect it to magically work. This attempts to
-	 * figure out if it's ISO8859_1, JIS, or UTF8. UTF-8 is the most common and is used if its ambiguous.
-	 *
-	 * @param message The raw byte message with an unknown encoding. "" indicates raw data that should not be changed.
-	 */
-	public static String guessEncoding( byte[] message ) {
-		// this function is inspired by a similarly named function in ZXing, but was written from scratch
-		// using specifications for each encoding since I didn't understand what they were doing
-
-		boolean isUtf8 = true;
-		boolean isJis = true;
-		boolean isIso = true;
-
-		// NOTE: it seems like a valid JIS message is also a valid ISO-8869-1 message. Might make more sense
-		//       to determine if the message is UTF or some 1-byte format that is user specified.
-
-		for (int i = 0; i < message.length; i++) {
-			int v = message[i] & 0xFF;
-			if (isUtf8)
-				isUtf8 = isValidUTF8(v);
-			if (isJis)
-				isJis = isValidJIS(v);
-			if (isIso)
-				isIso = isValidIso8869_1(v);
-		}
-
-//		System.out.printf("UTF-8=%s ISO=%s JIS=%s\n",isUtf8,isIso,isJis);
-
-		// If there is ambiguity do it based on how common it is and what the specification says
-		if (isUtf8 && EciEncoding.isValidUTF8(message))
-			return UTF8;
-		if (isIso)
-			return ISO8859_1;
-		if (isJis)
-			return JIS;
-
-		// It has no idea. Probably raw data?
-		return "raw";
-	}
-
-	/**
-	 * Checks to see if is a valid UTF-8 character. Taken from wikipedia
-	 */
-	public static boolean isValidUTF8( int v ) {
-		// C0, C1, F5 - FF never appear
-		return (v >= 0 && v <= 0xBF) || (v >= 0xC2 && v <= 0xF4);
-	}
-
 	public static boolean isValidUTF8( byte[] message ) {
 		int index = 0;
 		while (index < message.length) {
@@ -105,20 +55,6 @@ public class EciEncoding {
 				return true;
 		}
 		return false;
-	}
-
-	/**
-	 * Checks to see if is a valid Japanese Industrial Standard (JIS) character. Taken from wikipedia
-	 */
-	public static boolean isValidJIS( int v ) {
-		return (v >= 0x20 && v <= 0x7E) || (v >= 0xA1 && v <= 0xDF);
-	}
-
-	/**
-	 * Checks to see if valid ISO-8859-1 encoding. Taken from wikipedia.
-	 */
-	public static boolean isValidIso8869_1( int v ) {
-		return (v >= 0x20 && v <= 0x7E) || (v >= 0xA0 && v <= 0xFF);
 	}
 
 	/**

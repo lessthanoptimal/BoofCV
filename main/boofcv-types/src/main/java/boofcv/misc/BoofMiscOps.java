@@ -1019,7 +1019,7 @@ public class BoofMiscOps {
 	 * @param message String with raw bytes encoded inside of it.
 	 * @return byte array conversion of the string.
 	 */
-	public static byte[] stringToByteArray( String message ) {
+	public static byte[] stringRawToByteArray( String message ) {
 		byte[] data = new byte[message.length()];
 		for (int i = 0; i < message.length(); i++) {
 			data[i] = (byte)message.charAt(i);

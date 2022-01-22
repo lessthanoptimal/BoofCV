@@ -58,8 +58,8 @@ public class MicroQrCodeDecoderBits implements VerbosePrint {
 	 * @param forceEncoding If null then the default byte encoding is used. If not null then the specified
 	 * encoding is used.
 	 */
-	public MicroQrCodeDecoderBits( @Nullable String forceEncoding ) {
-		this.utils = new QrCodeCodecBitsUtils(forceEncoding);
+	public MicroQrCodeDecoderBits( @Nullable String forceEncoding, String defaultEncoding ) {
+		this.utils = new QrCodeCodecBitsUtils(forceEncoding, defaultEncoding);
 	}
 
 	/**
@@ -110,6 +110,8 @@ public class MicroQrCodeDecoderBits implements VerbosePrint {
 		// Used to indicate when there's no more messages
 		int terminatorBits = qr.terminatorBits();
 
+		// Which encoding it used in BYTE mode
+		String byteEncoding = "";
 		// if there isn't enough bits left to read the mode it must be done
 		int location = 0;
 		while (location <= decodeBits.size) {
@@ -147,7 +149,11 @@ public class MicroQrCodeDecoderBits implements VerbosePrint {
 			switch (mode) {
 				case NUMERIC -> location = decodeNumeric(qr, decodeBits, location);
 				case ALPHANUMERIC -> location = decodeAlphanumeric(qr, decodeBits, location);
-				case BYTE -> location = decodeByte(qr, decodeBits, location);
+				case BYTE -> {
+					location = decodeByte(qr, decodeBits, location);
+					if (byteEncoding.isEmpty())
+						byteEncoding = utils.selectedByteEncoding;
+				}
 				case KANJI -> location = decodeKanji(qr, decodeBits, location);
 				default -> {
 					if (verbose != null) verbose.println("Bad mode. mode=" + mode);
@@ -175,6 +181,7 @@ public class MicroQrCodeDecoderBits implements VerbosePrint {
 		// NOTE: We could check padding for correctness here as an additional sanity check
 		//       I don't think this has ever caught an error with regular QR codes
 
+		qr.byteEncoding = byteEncoding;
 		qr.message = utils.workString.toString();
 		return true;
 	}

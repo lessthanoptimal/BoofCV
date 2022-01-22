@@ -34,11 +34,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * @author Peter Abeles
- */
 public class TestQrCodeDecoderImage extends BoofStandardJUnit {
-
 	@Test void withLensDistortion() {
 		// render a distorted image
 		var helper = new QrCodeDistortedChecks();
@@ -61,7 +57,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 		connect(pps.get(0), pps.get(1), 0, 2);
 
 		// Should fail when run on distorted image
-		var decoder = new QrCodeDecoderImage<>(null, GrayF32.class);
+		var decoder = new QrCodeDecoderImage<>(null, EciEncoding.ISO8859_1, GrayF32.class);
 		decoder.process(pps.toList(), helper.image);
 
 		assertEquals(0, decoder.successes.size());
@@ -90,7 +86,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 		GrayU8 transposedImage = ImageMiscOps.transpose(generator.getGray(), null);
 
 		// It should succeed since the flag is on by default
-		var alg = new QrCodeDecoderImage<>(null, GrayU8.class);
+		var alg = new QrCodeDecoderImage<>(null, EciEncoding.ISO8859_1, GrayU8.class);
 
 		alg.process(pps.toList(), transposedImage);
 		assertEquals(1, alg.successes.size());
@@ -108,7 +104,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 		qr.ppRight = new Polygon2D_F64(2, 0, 3, 0, 3, 1, 2, 1);
 		qr.ppDown = new Polygon2D_F64(0, 2, 1, 2, 1, 3, 0, 3);
 
-		new QrCodeDecoderImage<>(null, GrayU8.class).transposePositionPatterns(qr);
+		new QrCodeDecoderImage<>(null, EciEncoding.ISO8859_1, GrayU8.class).transposePositionPatterns(qr);
 
 		assertEquals(0.0, qr.ppCorner.get(1).distance(0, 1), UtilEjml.TEST_F64);
 		assertEquals(0.0, qr.ppRight.get(0).distance(0, 2), UtilEjml.TEST_F64);
@@ -132,7 +128,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 			generator.render(expected);
 			DogArray<PositionPatternNode> pps = createPositionPatterns(generator);
 
-			var decoder = new QrCodeDecoderImage<>(null, GrayU8.class);
+			var decoder = new QrCodeDecoderImage<>(null, EciEncoding.ISO8859_1, GrayU8.class);
 			decoder.process(pps.toList(), generator.getGray());
 
 			assertEquals(1, decoder.successes.size());
@@ -142,6 +138,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 			assertEquals(expected.error, found.error);
 			assertEquals(expected.mode, found.mode);
 			assertEquals(message, found.message);
+			assertTrue(found.byteEncoding.isEmpty());
 			message += (i%10) + "";
 		}
 	}
@@ -162,7 +159,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 //		ShowImages.showWindow(generator.getGray(),"QR Code", true);
 //		BoofMiscOps.sleep(100000);
 
-			var decoder = new QrCodeDecoderImage<>(null, GrayU8.class);
+			var decoder = new QrCodeDecoderImage<>(null, EciEncoding.ISO8859_1, GrayU8.class);
 			decoder.process(pps.toList(), generator.getGray());
 
 			assertEquals(1, decoder.successes.size());
@@ -172,6 +169,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 			assertEquals(expected.error, found.error);
 			assertEquals(expected.mode, found.mode);
 			assertEquals(message, found.message);
+			assertTrue(found.byteEncoding.isEmpty());
 		}
 	}
 
@@ -188,7 +186,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 //		ShowImages.showWindow(generator.getGray(),"QR Code", true);
 //		BoofMiscOps.sleep(100000);
 
-		var decoder = new QrCodeDecoderImage<>(null, GrayU8.class);
+		var decoder = new QrCodeDecoderImage<>(null, EciEncoding.ISO8859_1, GrayU8.class);
 		decoder.process(pps.toList(), generator.getGray());
 
 		assertEquals(1, decoder.successes.size());
@@ -198,6 +196,8 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 		assertEquals(expected.error, found.error);
 		assertEquals(expected.mode, found.mode);
 		assertEquals("Pp4/", found.message);
+		// Encoding for ISO-8859-1 and UTF-8 is identical in this situation and it will default to UTF-8
+		assertEquals(EciEncoding.UTF8, found.byteEncoding);
 	}
 
 	@Test void message_kanji() {
@@ -213,7 +213,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 //		ShowImages.showWindow(generator.getGray(),"QR Code", true);
 //		BoofMiscOps.sleep(100000);
 
-		var decoder = new QrCodeDecoderImage<>(null, GrayU8.class);
+		var decoder = new QrCodeDecoderImage<>(null, EciEncoding.ISO8859_1, GrayU8.class);
 		decoder.process(pps.toList(), generator.getGray());
 
 		assertEquals(1, decoder.successes.size());
@@ -223,6 +223,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 		assertEquals(expected.error, found.error);
 		assertEquals(expected.mode, found.mode);
 		assertEquals("阿ん鞠ぷへ≦Ｋ", found.message);
+		assertTrue(found.byteEncoding.isEmpty());
 	}
 
 	@Test void message_multiple() {
@@ -238,7 +239,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 //		ShowImages.showWindow(generator.getGray(),"QR Code", true);
 //		BoofMiscOps.sleep(100000);
 
-		var decoder = new QrCodeDecoderImage<>(null, GrayU8.class);
+		var decoder = new QrCodeDecoderImage<>(null, EciEncoding.ISO8859_1, GrayU8.class);
 		decoder.process(pps.toList(), generator.getGray());
 
 		assertEquals(1, decoder.successes.size());
@@ -248,6 +249,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 		assertEquals(expected.error, found.error);
 		assertEquals(QrCode.Mode.MIXED, found.mode);
 		assertEquals("阿ん鞠ぷへ≦Ｋ1235AFefg", found.message);
+		assertEquals(EciEncoding.UTF8, found.byteEncoding);
 	}
 
 	/**
@@ -281,7 +283,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 
 		DogArray<PositionPatternNode> pps = createPositionPatterns(generator);
 
-		var decoder = new QrCodeDecoderImage<>(null, GrayU8.class);
+		var decoder = new QrCodeDecoderImage<>(null, EciEncoding.ISO8859_1, GrayU8.class);
 
 //		ShowImages.showWindow(generator.getGray(),"QR Code");
 //		BoofMiscOps.sleep(100000);
@@ -398,7 +400,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 	 * There was a bug where version 0 QR code was returned
 	 */
 	@Test void extractVersionInfo_version0() {
-		var mock = new QrCodeDecoderImage<>(EciEncoding.UTF8, GrayU8.class) {
+		var mock = new QrCodeDecoderImage<>(EciEncoding.UTF8, EciEncoding.ISO8859_1, GrayU8.class) {
 			@Override int estimateVersionBySize( QrCode qr ) {return 0;}
 
 			@Override int decodeVersion() {return 8;}
@@ -415,7 +417,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 	 */
 	@Test void readFormatRegion0() {
 		var reader = new MockReader();
-		var alg = new QrCodeDecoderImage<>(EciEncoding.UTF8, GrayU8.class);
+		var alg = new QrCodeDecoderImage<>(EciEncoding.UTF8, EciEncoding.ISO8859_1, GrayU8.class);
 		alg.gridReader = reader;
 
 		alg.readFormatRegion0(new QrCode());
@@ -439,7 +441,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 	 */
 	@Test void readFormatRegion1() {
 		var reader = new MockReader();
-		var alg = new QrCodeDecoderImage<>(EciEncoding.UTF8, GrayU8.class);
+		var alg = new QrCodeDecoderImage<>(EciEncoding.UTF8, EciEncoding.ISO8859_1, GrayU8.class);
 		alg.gridReader = reader;
 
 		alg.readFormatRegion1(new QrCode());

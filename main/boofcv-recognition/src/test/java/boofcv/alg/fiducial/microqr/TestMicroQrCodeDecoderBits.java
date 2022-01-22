@@ -31,7 +31,7 @@ public class TestMicroQrCodeDecoderBits extends BoofStandardJUnit {
 	@Test public void applyErrorCorrection() {
 		MicroQrCode qr = new MicroQrCodeEncoder().addNumeric("923492348985").fixate();
 
-		var alg = new MicroQrCodeDecoderBits(EciEncoding.UTF8);
+		var alg = new MicroQrCodeDecoderBits(EciEncoding.UTF8, "");
 
 		byte[] original = new byte[qr.rawbits.length];
 		System.arraycopy(qr.rawbits, 0, original, 0, original.length);
@@ -66,7 +66,7 @@ public class TestMicroQrCodeDecoderBits extends BoofStandardJUnit {
 
 	/** Decode a simple message at different versions */
 	@Test public void decodeAcrossVersions() {
-		var alg = new MicroQrCodeDecoderBits(EciEncoding.UTF8);
+		var alg = new MicroQrCodeDecoderBits(EciEncoding.UTF8, "");
 
 		for (int version = 1; version <= 4; version++) {
 			MicroQrCode expected = new MicroQrCodeEncoder().setVersion(version).

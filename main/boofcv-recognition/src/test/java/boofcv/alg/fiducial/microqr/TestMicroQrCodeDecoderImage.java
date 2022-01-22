@@ -49,7 +49,7 @@ public class TestMicroQrCodeDecoderImage extends BoofStandardJUnit {
 		generator.markerWidth = 100;
 		generator.setRender(engine);
 
-		var alg = new MicroQrCodeDecoderImage<>(null, GrayU8.class);
+		var alg = new MicroQrCodeDecoderImage<>(null, "", GrayU8.class);
 		var patterns = new DogArray<>(PositionPatternNode::new);
 
 //		alg.setVerbose(System.out, null);
@@ -95,7 +95,7 @@ public class TestMicroQrCodeDecoderImage extends BoofStandardJUnit {
 		var patterns = new DogArray<>(PositionPatternNode::new);
 		PositionPatternNode pp = addPositionPattern(qr, patterns);
 
-		var alg = new MicroQrCodeDecoderImage<>(null, GrayU8.class);
+		var alg = new MicroQrCodeDecoderImage<>(null, "", GrayU8.class);
 		for (int i = 0; i < 4; i++) {
 			alg.process(patterns.toList(), image);
 			assertEquals(1, alg.found.size());
@@ -117,7 +117,7 @@ public class TestMicroQrCodeDecoderImage extends BoofStandardJUnit {
 		var patterns = new DogArray<>(PositionPatternNode::new);
 		addPositionPattern(qr, patterns);
 
-		var alg = new MicroQrCodeDecoderImage<>(null, GrayU8.class);
+		var alg = new MicroQrCodeDecoderImage<>(null, "", GrayU8.class);
 		alg.process(patterns.toList(), image);
 
 		assertEquals(1, alg.found.size());
@@ -135,7 +135,7 @@ public class TestMicroQrCodeDecoderImage extends BoofStandardJUnit {
 		var patterns = new DogArray<>(PositionPatternNode::new);
 		addPositionPattern(qr, patterns);
 
-		var alg = new MicroQrCodeDecoderImage<>(null, GrayU8.class);
+		var alg = new MicroQrCodeDecoderImage<>(null, "", GrayU8.class);
 
 		alg.process(patterns.toList(), imageTransposed);
 		assertEquals(1, alg.found.size());
@@ -155,7 +155,7 @@ public class TestMicroQrCodeDecoderImage extends BoofStandardJUnit {
 
 		GrayU8 image = render(qr);
 
-		var alg = new MicroQrCodeDecoderImage<>(null, GrayU8.class);
+		var alg = new MicroQrCodeDecoderImage<>(null, "", GrayU8.class);
 		alg.gridReader.setImage(image);
 		alg.readFormatBitValues(qr);
 

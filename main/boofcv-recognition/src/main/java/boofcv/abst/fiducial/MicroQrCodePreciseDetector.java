@@ -58,11 +58,12 @@ public class MicroQrCodePreciseDetector<T extends ImageGray<T>> implements Micro
 
 	public MicroQrCodePreciseDetector( InputToBinary<T> inputToBinary,
 									   QrCodePositionPatternDetector<T> detectPositionPatterns,
-									   @Nullable String defaultEncoding,
+									   @Nullable String forceEncoding,
+									   String defaultEncoding,
 									   boolean copyBinary, Class<T> imageType ) {
 		this.inputToBinary = inputToBinary;
 		this.detectPositionPatterns = detectPositionPatterns;
-		this.decoder = new MicroQrCodeDecoderImage<>(defaultEncoding, imageType);
+		this.decoder = new MicroQrCodeDecoderImage<>(forceEncoding, defaultEncoding, imageType);
 		this.imageType = imageType;
 		this.contourHelper = new BinaryContourHelper(
 				detectPositionPatterns.getSquareDetector().getDetector().getContourFinder(), copyBinary);

@@ -90,7 +90,7 @@ public class TestQrCodeEncoder extends BoofStandardJUnit {
 
 	@Test void automatic() {
 		var encoder = new QrCodeEncoder();
-		var decoder = new QrCodeDecoderBits(EciEncoding.UTF8); // used to validate the message
+		var decoder = new QrCodeDecoderBits(null, EciEncoding.ISO8859_1); // used to validate the message
 		QrCode qr = encoder.addAutomatic("123ASDdf阿ん鞠ぷへ≦Ｋ").fixate();
 		assertEquals(qr.message, "123ASDdf阿ん鞠ぷへ≦Ｋ");
 
@@ -153,7 +153,7 @@ public class TestQrCodeEncoder extends BoofStandardJUnit {
 		QrCode qr = new QrCodeEncoder().setMask(QrCodeMaskPattern.M011).addBytes(message).fixate();
 
 		qr.message = "";
-		var decoder = new QrCodeDecoderBits(EciEncoding.UTF8);
+		var decoder = new QrCodeDecoderBits(null, EciEncoding.ISO8859_1);
 		assertTrue(decoder.applyErrorCorrection(qr));
 		assertTrue(decoder.decodeMessage(qr));
 
