@@ -94,7 +94,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 	private final QueueCorner excludeList = new QueueCorner(10);
 
 	// number of features tracked so far
-	private long totalFeatures = 0;
+	protected long totalFeatures = 0;
 
 	// Used to prune points close by
 	PruneCloseTracks<PyramidKltFeature> pruneClose;
@@ -261,7 +261,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 		return gradient.getInputType();
 	}
 
-	private void addToTracks( float scaleBottom, QueueCorner found ) {
+	protected void addToTracks( float scaleBottom, QueueCorner found ) {
 		for (int i = 0; i < found.size(); i++) {
 			Point2D_I16 pt = found.get(i);
 

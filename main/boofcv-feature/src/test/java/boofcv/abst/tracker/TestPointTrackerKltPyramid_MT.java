@@ -20,6 +20,7 @@ package boofcv.abst.tracker;
 
 import boofcv.abst.feature.detect.interest.ConfigPointDetector;
 import boofcv.abst.feature.detect.interest.PointDetectorTypes;
+import boofcv.abst.tracker.PointTrackerKltPyramid.PointTrackMod;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.alg.tracker.klt.PyramidKltFeature;
@@ -107,6 +108,10 @@ public class TestPointTrackerKltPyramid_MT extends GenericChecksPointTracker<Gra
 			PyramidKltFeature a = trackerA.active.get(i);
 			PyramidKltFeature b = trackerA.active.get(i);
 
+			PointTrackMod pa = a.getCookie();
+			PointTrackMod pb = b.getCookie();
+
+			assertEquals(pa.featureId, pb.featureId);
 			assertEquals(a.x, b.x, UtilEjml.TEST_F64);
 			assertEquals(a.y, b.y, UtilEjml.TEST_F64);
 			assertEquals(a.desc[0].Gxx, b.desc[0].Gxx, UtilEjml.TEST_F64);

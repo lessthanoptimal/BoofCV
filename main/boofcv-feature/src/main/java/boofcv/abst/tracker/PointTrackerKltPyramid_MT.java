@@ -26,12 +26,15 @@ import boofcv.alg.tracker.klt.KltTrackFault;
 import boofcv.alg.tracker.klt.PyramidKltFeature;
 import boofcv.alg.tracker.klt.PyramidKltTracker;
 import boofcv.concurrency.BoofConcurrency;
+import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.PyramidDiscrete;
+import georegression.struct.point.Point2D_I16;
 import org.ddogleg.struct.DogArray_I32;
 import pabeles.concurrency.GrowArray;
 
-// TODO add backwardsTrackValidation
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Concurrent extension of {@link PointTrackerKltPyramid}
@@ -60,8 +63,63 @@ public class PointTrackerKltPyramid_MT<I extends ImageGray<I>, D extends ImageGr
 		workspace = new GrowArray<>(Helper::new, Helper::reset);
 	}
 
+	@Override protected void addToTracks( float scaleBottom, QueueCorner found ) {
+		// threads will be slower if there aren't enough tracks
+		if (found.size() < minimumTracksConcurrent) {
+			super.addToTracks(scaleBottom, found);
+			return;
+		}
+
+		// pre-declare memory for each track
+		List<PyramidKltFeature> workTracks = new ArrayList<>(found.size);
+		for (int i = 0; i < found.size; i++) {
+			workTracks.add(getUnusedTrack());
+		}
+
+		// do image processing on each new track
+		BoofConcurrency.loopBlocks(0, workTracks.size(), workspace, ( helper, idx0, idx1 ) -> {
+			helper.tracker.setImage(currPyr.basePyramid, currPyr.derivX, currPyr.derivY);
+			for (int detIdx = idx0; detIdx < idx1; detIdx++) {
+				Point2D_I16 pt = found.get(detIdx);
+				PyramidKltFeature t = workTracks.get(detIdx);
+
+				t.x = pt.x*scaleBottom;
+				t.y = pt.y*scaleBottom;
+
+				helper.tracker.setDescription(t);
+
+				// set up point description
+				PointTrackMod p = t.getCookie();
+				p.pixel.setTo(t.x, t.y);
+
+				if (checkValidSpawn(p)) {
+					p.featureId = 1; // mark it as success
+					p.spawnFrameID = frameID;
+					p.lastSeenFrameID = frameID;
+					p.prev.setTo(t.x, t.y);
+				} else {
+					p.featureId = -1; // mark it as failure
+				}
+			}
+		});
+
+		// Add the tracks to the appropriate lists
+		for (int i = 0; i < workTracks.size(); i++) {
+			PyramidKltFeature t = workTracks.get(i);
+			PointTrackMod p = t.getCookie();
+
+			if (p.featureId == 1) {
+				p.featureId = totalFeatures++;
+				active.add(t);
+				spawned.add(t);
+			} else {
+				unused.add(t);
+			}
+		}
+	}
+
 	@Override protected void trackFeatures( I image ) {
-		// threads will be slower if there aren't a enough tracks
+		// threads will be slower if there aren't enough tracks
 		if (active.size() < minimumTracksConcurrent) {
 			super.trackFeatures(image);
 			return;
