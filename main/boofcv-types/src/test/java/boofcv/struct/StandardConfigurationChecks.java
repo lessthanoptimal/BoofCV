@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -75,6 +75,13 @@ public abstract class StandardConfigurationChecks extends BoofStandardJUnit {
 						}
 					}
 					f.set(config, o);
+				} else if (String.class == f.getType()) {
+					// create a random string
+					char[] random = new char[1 + rand.nextInt(10)];
+					for (int i = 0; i < random.length; i++) {
+						random[i] = (char)('a' + rand.nextInt(20));
+					}
+					f.set(config, new String(random));
 				} else if (f.getType().isPrimitive()) {
 					// just add one to all primitive types to make them difference
 					Object o = f.get(config);
@@ -114,7 +121,7 @@ public abstract class StandardConfigurationChecks extends BoofStandardJUnit {
 						throw new RuntimeException("BUG " + f.getType().getSimpleName());
 					}
 					f.set(config, o);
-				} else if( f.getType().isAssignableFrom(List.class)) {
+				} else if (f.getType().isAssignableFrom(List.class)) {
 					// If it's a list, create a "non-default" element for each item in the original
 					List originalList = (List)f.get(config);
 					if (!originalList.isEmpty()) {
@@ -191,6 +198,8 @@ public abstract class StandardConfigurationChecks extends BoofStandardJUnit {
 					for (int i = 0; i < listSrc.size(); i++) {
 						throw new RuntimeException("IMplement!");
 					}
+				} else if (f.getType().isAssignableFrom(String.class)) {
+					assertEquals(f.get(src), f.get(dst), "Field Name: '" + f.getName() + "'");
 				} else
 					assertNotEquals(f.get(src), f.get(dst), "Field Name: '" + f.getName() + "'");
 				// if they are equal that means it copied the reference
