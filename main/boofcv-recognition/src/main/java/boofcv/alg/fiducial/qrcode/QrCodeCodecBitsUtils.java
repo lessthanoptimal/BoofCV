@@ -46,6 +46,9 @@ public class QrCodeCodecBitsUtils implements VerbosePrint {
 	public QrCode.Failure failureCause = QrCode.Failure.NONE;
 	public final StringBuilder workString = new StringBuilder();
 
+	/** The encoding it selected when decoding a BYTE message */
+	public String selectedByteEncoding = "";
+
 	// If null the encoding of byte messages will attempt to be automatically determined, with a default
 	// of UTF-8. Otherwise, this is the encoding used.
 	@Nullable String forceEncoding;
@@ -186,10 +189,10 @@ public class QrCodeCodecBitsUtils implements VerbosePrint {
 
 		// If ECI encoding is not specified use the default encoding. Unfortunately the specification is ignored
 		// by most people here and UTF-8 is used. If an encoding is specified then that is used.
-		String encoding = encodingEci == null ? (forceEncoding != null ? forceEncoding : guessEncoding(rawdata))
+		selectedByteEncoding = encodingEci == null ? (forceEncoding != null ? forceEncoding : guessEncoding(rawdata))
 				: encodingEci;
 		try {
-			if (encoding.isEmpty() || encoding.equalsIgnoreCase("raw")) {
+			if (selectedByteEncoding.equalsIgnoreCase("raw")) {
 				// Handle raw mode where there is no encoding which could change the character's value.
 				// This is what the QR code specifications says you should use, but most ignore it
 				workString.ensureCapacity(workString.length() + rawdata.length);
@@ -197,7 +200,7 @@ public class QrCodeCodecBitsUtils implements VerbosePrint {
 					workString.append((char)(rawdata[i] & 0xFF));
 				}
 			} else {
-				workString.append(new String(rawdata, encoding));
+				workString.append(new String(rawdata, selectedByteEncoding));
 			}
 		} catch (UnsupportedEncodingException ignored) {
 			failureCause = JIS_UNAVAILABLE;

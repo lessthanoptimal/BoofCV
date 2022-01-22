@@ -80,8 +80,15 @@ public class QrCode implements Cloneable {
 	/** Alignment pattern information */
 	public DogArray<Alignment> alignment = new DogArray<>(Alignment::new);
 
-	/** Text encoding mode */
+	/** QR encoding mode */
 	public Mode mode = Mode.UNKNOWN;
+
+	/**
+	 * Which string encoding was used decoding a {@link Mode#BYTE} message. If there is no BYTE encoding then
+	 * this will be an empty string. If there are multiple independent BYTE segments then this will
+	 * be the first one encountered.
+	 */
+	public String byteEncoding = "";
 
 	/** The raw byte data encoded into the QR Code. data + ecc */
 	public byte[] rawbits;
@@ -398,6 +405,7 @@ public class QrCode implements Cloneable {
 		alignment.reset();
 		mode = Mode.UNKNOWN;
 		failureCause = Failure.NONE;
+		byteEncoding = "";
 		rawbits = null;
 		corrected = null;
 		message = null;

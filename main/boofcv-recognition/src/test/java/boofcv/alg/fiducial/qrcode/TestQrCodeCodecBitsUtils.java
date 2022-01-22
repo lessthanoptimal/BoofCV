@@ -72,6 +72,7 @@ public class TestQrCodeCodecBitsUtils extends BoofStandardJUnit {
 
 		alg.decodeByte(packed, 0, 8);
 
+		assertEquals("raw", alg.selectedByteEncoding);
 		String found = alg.workString.toString();
 		assertEquals(data.length, found.length());
 		for (int i = 0; i < data.length; i++) {

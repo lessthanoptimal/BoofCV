@@ -43,6 +43,9 @@ public class EciEncoding {
 		boolean isJis = true;
 		boolean isIso = true;
 
+		// NOTE: it seems like a valid JIS message is also a valid ISO-8869-1 message. Might make more sense
+		//       to determine if the message is UTF or some 1-byte format that is user specified.
+
 		for (int i = 0; i < message.length; i++) {
 			int v = message[i] & 0xFF;
 			if (isUtf8)
@@ -64,7 +67,7 @@ public class EciEncoding {
 			return JIS;
 
 		// It has no idea. Probably raw data?
-		return "";
+		return "raw";
 	}
 
 	/**

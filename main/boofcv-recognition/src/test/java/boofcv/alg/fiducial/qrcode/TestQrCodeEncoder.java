@@ -24,11 +24,7 @@ import org.junit.jupiter.api.Test;
 import static boofcv.alg.fiducial.qrcode.QrCodeCodecBitsUtils.flipBits8;
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * @author Peter Abeles
- */
 public class TestQrCodeEncoder extends BoofStandardJUnit {
-
 	/**
 	 * In the qr code specification an example is given. This compares the computed results
 	 * to that example
@@ -94,13 +90,14 @@ public class TestQrCodeEncoder extends BoofStandardJUnit {
 
 	@Test void automatic() {
 		var encoder = new QrCodeEncoder();
-		QrCodeDecoderBits decoder = new QrCodeDecoderBits(EciEncoding.UTF8); // used to validate the message
+		var decoder = new QrCodeDecoderBits(EciEncoding.UTF8); // used to validate the message
 		QrCode qr = encoder.addAutomatic("123ASDdf阿ん鞠ぷへ≦Ｋ").fixate();
 		assertEquals(qr.message, "123ASDdf阿ん鞠ぷへ≦Ｋ");
 
 		assertTrue(decoder.applyErrorCorrection(qr));
 		assertTrue(decoder.decodeMessage(qr));
 		assertEquals(QrCode.Mode.MIXED, qr.mode);
+		assertEquals("UTF8", qr.byteEncoding);
 
 		encoder.reset();
 		qr = encoder.addAutomatic("123ASDdf").fixate();
@@ -108,6 +105,7 @@ public class TestQrCodeEncoder extends BoofStandardJUnit {
 		assertTrue(decoder.applyErrorCorrection(qr));
 		assertTrue(decoder.decodeMessage(qr));
 		assertEquals(QrCode.Mode.BYTE, qr.mode);
+		assertEquals("UTF8", qr.byteEncoding);
 
 		encoder.reset();
 		qr = encoder.addAutomatic("123ASD").fixate();
@@ -115,6 +113,7 @@ public class TestQrCodeEncoder extends BoofStandardJUnit {
 		assertTrue(decoder.applyErrorCorrection(qr));
 		assertTrue(decoder.decodeMessage(qr));
 		assertEquals(QrCode.Mode.ALPHANUMERIC, qr.mode);
+		assertEquals("", qr.byteEncoding);
 
 		encoder.reset();
 		qr = encoder.addAutomatic("123").fixate();
@@ -122,6 +121,7 @@ public class TestQrCodeEncoder extends BoofStandardJUnit {
 		assertTrue(decoder.applyErrorCorrection(qr));
 		assertTrue(decoder.decodeMessage(qr));
 		assertEquals(QrCode.Mode.NUMERIC, qr.mode);
+		assertEquals("", qr.byteEncoding);
 	}
 
 	@Test void messageTooLong() {
@@ -153,7 +153,7 @@ public class TestQrCodeEncoder extends BoofStandardJUnit {
 		QrCode qr = new QrCodeEncoder().setMask(QrCodeMaskPattern.M011).addBytes(message).fixate();
 
 		qr.message = "";
-		QrCodeDecoderBits decoder = new QrCodeDecoderBits(EciEncoding.UTF8);
+		var decoder = new QrCodeDecoderBits(EciEncoding.UTF8);
 		assertTrue(decoder.applyErrorCorrection(qr));
 		assertTrue(decoder.decodeMessage(qr));
 
@@ -238,7 +238,7 @@ public class TestQrCodeEncoder extends BoofStandardJUnit {
 	 */
 	@Test void detectAdjacentAndPositionPatterns_test0() {
 		int version = 1;
-		QrCodeEncoder.FoundFeatures features = new QrCodeEncoder.FoundFeatures();
+		var features = new QrCodeEncoder.FoundFeatures();
 		int N = QrCode.totalModules(version);
 		QrCodeCodeWordLocations matrix = QrCodeCodeWordLocations.qrcode(version);
 
@@ -260,7 +260,7 @@ public class TestQrCodeEncoder extends BoofStandardJUnit {
 	 */
 	@Test void detectAdjacentAndPositionPatterns_test1() {
 		int version = 1;
-		QrCodeEncoder.FoundFeatures features = new QrCodeEncoder.FoundFeatures();
+		var features = new QrCodeEncoder.FoundFeatures();
 		int N = QrCode.totalModules(version);
 		QrCodeCodeWordLocations matrix = QrCodeCodeWordLocations.qrcode(version);
 
@@ -293,7 +293,7 @@ public class TestQrCodeEncoder extends BoofStandardJUnit {
 	 */
 	@Test void detectAdjacentAndPositionPatterns_test2() {
 		int version = 1;
-		QrCodeEncoder.FoundFeatures features = new QrCodeEncoder.FoundFeatures();
+		var features = new QrCodeEncoder.FoundFeatures();
 		int N = QrCode.totalModules(version);
 		QrCodeCodeWordLocations matrix = QrCodeCodeWordLocations.qrcode(version);
 
