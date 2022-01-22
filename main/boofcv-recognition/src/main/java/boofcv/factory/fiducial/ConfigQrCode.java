@@ -68,7 +68,6 @@ public class ConfigQrCode implements Configuration {
 	public boolean considerTransposed = true;
 
 	{
-
 		// 40% slower but better at detecting fiducials by a few percentage points
 //		ConfigThreshold configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN,15);
 //		configThreshold.scale = 1.00;
@@ -128,6 +127,8 @@ public class ConfigQrCode implements Configuration {
 //			throw new IllegalArgumentException("Must be counter clockwise");
 //		if( polygon.detector.minimumSides != 4 || polygon.detector.maximumSides != 4)
 //			throw new IllegalArgumentException("Must detect 4 sides and only 4 sides");
+		threshold.checkValidity();
+		polygon.checkValidity();
 
 	}
 }

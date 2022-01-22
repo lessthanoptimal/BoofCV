@@ -59,7 +59,7 @@ public class TestQrCodeCodecBitsUtils extends BoofStandardJUnit {
 		checkRawBytes(150, "raw");
 	}
 
-	void checkRawBytes( int length, @Nullable String encoding ) {
+	void checkRawBytes( int length, @Nullable String forceEncoding ) {
 		// encode fewer values so that it could possibly be UTF-8 without the hint
 		byte[] data = new byte[length];
 		for (int i = 0; i < data.length; i++) {
@@ -68,11 +68,14 @@ public class TestQrCodeCodecBitsUtils extends BoofStandardJUnit {
 
 		var packed = new PackedBits8();
 		QrCodeCodecBitsUtils.encodeBytes(data, data.length, 8, packed);
-		var alg = new QrCodeCodecBitsUtils(encoding, "");
+		var alg = new QrCodeCodecBitsUtils(forceEncoding, EciEncoding.ISO8859_1);
 
 		alg.decodeByte(packed, 0, 8);
 
-		assertEquals("raw", alg.selectedByteEncoding);
+		if (forceEncoding != null)
+			assertEquals(forceEncoding, alg.selectedByteEncoding);
+		else
+			assertEquals(EciEncoding.ISO8859_1, alg.selectedByteEncoding);
 		String found = alg.workString.toString();
 		assertEquals(data.length, found.length());
 		for (int i = 0; i < data.length; i++) {
