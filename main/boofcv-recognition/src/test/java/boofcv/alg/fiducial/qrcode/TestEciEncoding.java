@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 
+import static boofcv.alg.fiducial.qrcode.EciEncoding.ISO8859_1;
 import static boofcv.alg.fiducial.qrcode.EciEncoding.UTF8;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -75,6 +76,16 @@ public class TestEciEncoding extends BoofStandardJUnit {
 			else
 				assertFalse(EciEncoding.isValidIso8869_1(i));
 		}
+	}
+
+	@Test void guessEncoding_ISO88591() {
+		byte[] message = "0123456789abcdefgABCDEFG*#$!zZyYxX<¥Àý".getBytes(StandardCharsets.ISO_8859_1);
+		assertSame(ISO8859_1, EciEncoding.guessEncoding(message));
+	}
+
+	@Test void guessEncoding_JIF() {
+		// This is intentionally blank as a reinder that we can't tell a valid JIF apart from ISO-8859-1. It should
+		// probably be removed or an option added to default to one of these two when it's not UTF-8
 	}
 
 	@Test void guessEncoding_Bug_01() {

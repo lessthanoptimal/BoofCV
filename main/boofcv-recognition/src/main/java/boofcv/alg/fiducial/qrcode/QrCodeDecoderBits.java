@@ -126,13 +126,22 @@ public class QrCodeDecoderBits {
 		}
 	}
 
+	/**
+	 * Decodes the message encoded in the corrects bits inside the QR. Results are written to the input QR.
+	 *
+	 * @return true if no error occurred
+	 */
 	public boolean decodeMessage( QrCode qr ) {
+		qr.byteEncoding = "";
 		encodingEci = null;
 		PackedBits8 bits = new PackedBits8();
 		bits.data = qr.corrected;
 		bits.size = qr.corrected.length*8;
 
 		utils.workString.setLength(0);
+
+		// Which decoding was used with BYTE messages
+		String byteEncoding = "";
 
 		// if there isn't enough bits left to read the mode it must be done
 		int location = 0;
@@ -146,7 +155,13 @@ public class QrCodeDecoderBits {
 			switch (mode) {
 				case NUMERIC -> location = decodeNumeric(qr, bits, location);
 				case ALPHANUMERIC -> location = decodeAlphanumeric(qr, bits, location);
-				case BYTE -> location = decodeByte(qr, bits, location);
+				case BYTE -> {
+					location = decodeByte(qr, bits, location);
+					// Only record the encoding of the first BYTE segment encountered
+					if (byteEncoding.isEmpty()) {
+						byteEncoding = utils.selectedByteEncoding;
+					}
+				}
 				case KANJI -> location = decodeKanji(qr, bits, location);
 				case ECI -> location = decodeEci(bits, location);
 				case FNC1_FIRST, FNC1_SECOND -> {
@@ -174,6 +189,7 @@ public class QrCodeDecoderBits {
 			return false;
 		}
 
+		qr.byteEncoding = byteEncoding;
 		qr.message = utils.workString.toString();
 		return true;
 	}
