@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,9 @@ package boofcv.alg.interpolate.impl;
 
 import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageType;
 
-import javax.annotation.processing.Generated;
+import javax.annotation.Generated;
 
 /**
  * <p>
@@ -29,13 +30,11 @@ import javax.annotation.processing.Generated;
  * Image borders are detected and handled appropriately.
  * </p>
  *
- * <p>
- * NOTE: This code was automatically generated using {@link GenerateBilinearRectangle}.
- * </p>
+ * <p>DO NOT MODIFY. Automatically generated code created by GenerateBilinearRectangle</p>
  *
  * @author Peter Abeles
  */
-@Generated("GenerateBilinearRectangle")
+@Generated("boofcv.alg.interpolate.impl.GenerateBilinearRectangle")
 public class BilinearRectangle_F32 implements InterpolateRectangle<GrayF32> {
 
 	private GrayF32 orig;
@@ -43,42 +42,38 @@ public class BilinearRectangle_F32 implements InterpolateRectangle<GrayF32> {
 	private float[] data;
 	private int stride;
 
-	public BilinearRectangle_F32(GrayF32 image) {
+	public BilinearRectangle_F32( GrayF32 image ) {
 		setImage(image);
 	}
 
-	public BilinearRectangle_F32() {
-	}
+	public BilinearRectangle_F32() {}
 
-	@Override
-	public void setImage(GrayF32 image) {
+	@Override public void setImage( GrayF32 image ) {
 		this.orig = image;
 		this.data = orig.data;
 		this.stride = orig.getStride();
 	}
 
-	@Override
-	public GrayF32 getImage() {
+	@Override public GrayF32 getImage() {
 		return orig;
 	}
 
-	@Override
-	public void region(float tl_x, float tl_y, GrayF32 output ) {
-		if( tl_x < 0 || tl_y < 0 || tl_x + output.width > orig.width || tl_y + output.height > orig.height ) {
+	@Override public void region( float tl_x, float tl_y, GrayF32 output ) {
+		if (tl_x < 0 || tl_y < 0 || tl_x + output.width > orig.width || tl_y + output.height > orig.height) {
 			throw new IllegalArgumentException("Region is outside of the image");
 		}
-		int xt = (int) tl_x;
-		int yt = (int) tl_y;
+		int xt = (int)tl_x;
+		int yt = (int)tl_y;
 		float ax = tl_x - xt;
 		float ay = tl_y - yt;
 
 		float bx = 1.0f - ax;
 		float by = 1.0f - ay;
 
-		float a0 = bx * by;
-		float a1 = ax * by;
-		float a2 = ax * ay;
-		float a3 = bx * ay;
+		float a0 = bx*by;
+		float a1 = ax*by;
+		float a2 = ax*ay;
+		float a3 = bx*ay;
 
 		int regWidth = output.width;
 		int regHeight = output.height;
@@ -88,13 +83,13 @@ public class BilinearRectangle_F32 implements InterpolateRectangle<GrayF32> {
 
 		// make sure it is in bounds or if its right on the image border
 		if (xt + regWidth >= orig.width || yt + regHeight >= orig.height) {
-			if( (xt + regWidth > orig.width || yt + regHeight > orig.height) )
+			if ((xt + regWidth > orig.width || yt + regHeight > orig.height))
 				throw new IllegalArgumentException("requested region is out of bounds");
-			if( xt+regWidth == orig.width ) {
+			if (xt + regWidth == orig.width) {
 				regWidth--;
 				borderRight = true;
 			}
-			if( yt+regHeight == orig.height ) {
+			if (yt + regHeight == orig.height) {
 				regHeight--;
 				borderBottom = true;
 			}
@@ -102,7 +97,7 @@ public class BilinearRectangle_F32 implements InterpolateRectangle<GrayF32> {
 
 		// perform the interpolation while reducing the number of times the image needs to be accessed
 		for (int i = 0; i < regHeight; i++) {
-			int index = orig.startIndex + (yt + i) * stride + xt;
+			int index = orig.startIndex + (yt + i)*stride + xt;
 			int indexResults = output.startIndex + i*output.stride;
 
 			float XY = data[index];
@@ -114,28 +109,28 @@ public class BilinearRectangle_F32 implements InterpolateRectangle<GrayF32> {
 				float xY = data[index + 1];
 				float xy = data[index + stride + 1];
 
-				float val = a0 * XY + a1 * xY + a2 * xy + a3 * Xy;
+				float val = a0*XY + a1*xY + a2*xy + a3*Xy;
 
 				results[indexResults++] = val;
 				XY = xY;
 				Xy = xy;
 			}
 		}
-		
+
 		// if touching the image border handle the special case
-		if( borderBottom || borderRight )
+		if (borderBottom || borderRight)
 			handleBorder(output, xt, yt, ax, ay, bx, by, regWidth, regHeight, results, borderRight, borderBottom);
 	}
 
 	private void handleBorder( GrayF32 output,
-							  int xt, int yt,
-							  float ax, float ay, float bx, float by,
-							  int regWidth, int regHeight, float[] results,
-							  boolean borderRight, boolean borderBottom) {
+							   int xt, int yt,
+							   float ax, float ay, float bx, float by,
+							   int regWidth, int regHeight, float[] results,
+							   boolean borderRight, boolean borderBottom ) {
 
-		if( borderRight ) {
-			for( int y = 0; y < regHeight; y++ ) {
-				int index = orig.startIndex + (yt + y) * stride + xt + regWidth;
+		if (borderRight) {
+			for (int y = 0; y < regHeight; y++) {
+				int index = orig.startIndex + (yt + y)*stride + xt + regWidth;
 				int indexResults = output.startIndex + y*output.stride + regWidth;
 
 				float XY = data[index];
@@ -144,19 +139,19 @@ public class BilinearRectangle_F32 implements InterpolateRectangle<GrayF32> {
 				results[indexResults] = by*XY + ay*Xy;
 			}
 
-			if( borderBottom ) {
-				output.set(regWidth,regHeight, orig.get(xt+ regWidth,yt+regHeight));
+			if (borderBottom) {
+				output.set(regWidth, regHeight, orig.get(xt + regWidth, yt + regHeight));
 			} else {
-				float XY = orig.get(xt+ regWidth,yt+regHeight-1);
-				float Xy = orig.get(xt+ regWidth,yt+regHeight);
+				float XY = orig.get(xt + regWidth, yt + regHeight - 1);
+				float Xy = orig.get(xt + regWidth, yt + regHeight);
 
-				output.set(regWidth,regHeight-1, by*XY + ay*Xy);
+				output.set(regWidth, regHeight - 1, by*XY + ay*Xy);
 			}
 		}
-		if( borderBottom ) {
-			for( int x = 0; x < regWidth; x++ ) {
-				int index = orig.startIndex + (yt + regHeight) * stride + xt + x;
-				int indexResults = output.startIndex + regHeight *output.stride + x;
+		if (borderBottom) {
+			for (int x = 0; x < regWidth; x++) {
+				int index = orig.startIndex + (yt + regHeight)*stride + xt + x;
+				int indexResults = output.startIndex + regHeight*output.stride + x;
 
 				float XY = data[index];
 				float Xy = data[index + 1];
@@ -164,12 +159,21 @@ public class BilinearRectangle_F32 implements InterpolateRectangle<GrayF32> {
 				results[indexResults] = bx*XY + ax*Xy;
 			}
 
-			if( !borderRight ) {
-				float XY = orig.get(xt+regWidth-1,yt+ regHeight);
-				float Xy = orig.get(xt+regWidth, regHeight);
+			if (!borderRight) {
+				float XY = orig.get(xt + regWidth - 1, yt + regHeight);
+				float Xy = orig.get(xt + regWidth, regHeight);
 
-				output.set(regWidth-1, regHeight, by*XY + ay*Xy);
+				output.set(regWidth - 1, regHeight, by*XY + ay*Xy);
 			}
 		}
+	}
+
+	@Override public InterpolateRectangle<GrayF32> copyConcurrent() {
+		// only setImage() modifies class fields
+		return this;
+	}
+
+	@Override public ImageType<GrayF32> getImageType() {
+		return ImageType.SB_F32;
 	}
 }
