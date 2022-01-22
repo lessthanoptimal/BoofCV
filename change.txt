@@ -11,10 +11,10 @@ Version : 0.41
   - Updated to Gradle 7
 - Applications
   - Batch scanning of Micro QR Codes
-- QR Code
-  - If it can't determine encoding in byte mode it will use no encoding and leave values as is
+- QR Code and Micro QR Code
+  - Much stricter and more accurate test that looks for UTF-8 strings in BYTE data
+  - Config has defaultEncoding which is the encoding it uses if it decides BYTE isn't UTF-8
   - Added an example demonstrating how raw data can be used ExampleQrCodeRawData
-  - New much stricter test that looks for UTF-8 strings in BYTE data
 - SLAM
   - TODO Monocular
   - TODO Stereo
