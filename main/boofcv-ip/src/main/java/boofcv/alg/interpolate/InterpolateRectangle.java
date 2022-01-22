@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.interpolate;
 
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 
 /**
  * Performs interpolation across a whole rectangular region inside the image. This can be significantly faster than
@@ -28,20 +29,19 @@ import boofcv.struct.image.ImageGray;
  * @author Peter Abeles
  */
 public interface InterpolateRectangle<T extends ImageGray<T>> {
-
 	/**
 	 * Change the image that is being interpolated.
 	 *
 	 * @param image An image.
 	 */
-	public void setImage( T image );
+	void setImage( T image );
 
 	/**
 	 * Returns the image which is being interpolated.
 	 *
 	 * @return A reference to the image being interpolated.
 	 */
-	public T getImage();
+	T getImage();
 
 	/**
 	 * Copies a grid from the source image starting at the specified coordinate
@@ -51,6 +51,11 @@ public interface InterpolateRectangle<T extends ImageGray<T>> {
 	 * @param tl_y upper left corner of the region in the image.
 	 * @param dest Where the interpolated region is to be copied into
 	 */
-	public void region( float tl_x, float tl_y, GrayF32 dest );
-//	public void region(float tl_x, float tl_y, float[] results, int regWidth, int regHeight);
+	void region( float tl_x, float tl_y, GrayF32 dest );
+
+	/** Creates a copy that can be run in parallel with the original */
+	InterpolateRectangle<T> copyConcurrent();
+
+	/** Type of image it can process */
+	ImageType<T> getImageType();
 }
