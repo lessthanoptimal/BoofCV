@@ -18,12 +18,12 @@
 
 package boofcv.examples.fiducial;
 
-import boofcv.alg.drawing.FiducialImageEngine;
 import boofcv.alg.fiducial.microqr.MicroQrCode;
 import boofcv.alg.fiducial.microqr.MicroQrCodeEncoder;
 import boofcv.alg.fiducial.microqr.MicroQrCodeGenerator;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.struct.image.GrayU8;
 
 import java.awt.image.BufferedImage;
 
@@ -43,20 +43,16 @@ public class ExampleRenderMicroQrCode {
 				addAutomatic("Test ん鞠").fixate();
 		// NOTE: The final function you call must be fixate(), that's how it knows it's done
 
-		// FiducialImageEngine is an interface for rending to images. You can also render to PDF and other formats.
-		var render = new FiducialImageEngine();
-		render.configure(/* border */ 10, /* width */ 500);
-
-		// Render the marker after configuring the generator
-		new MicroQrCodeGenerator().setMarkerWidth(500).setRender(render).render(qr);
+		// Render the QR as an image. It's also possible to render as a PDF or your own custom format
+		GrayU8 rendered = MicroQrCodeGenerator.renderImage(/* pixel per module */ 10, /* border modules*/ 1, qr);
 
 		// Convert it to a BufferedImage for display purposes
-		BufferedImage image = ConvertBufferedImage.convertTo(render.getGray(), null);
+		BufferedImage output = ConvertBufferedImage.convertTo(rendered, null);
 
 		// You can also save it to disk by uncommenting the line below
-//		UtilImageIO.saveImage(image, "microqr.png");
+//		UtilImageIO.saveImage(output, "microqr.png");
 
 		// Display the image
-		ShowImages.showWindow(image, "Rendered Micro QR Code", true);
+		ShowImages.showWindow(output, "Rendered Micro QR Code", true);
 	}
 }

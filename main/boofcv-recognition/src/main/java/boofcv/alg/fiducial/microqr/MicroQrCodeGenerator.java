@@ -18,9 +18,11 @@
 
 package boofcv.alg.fiducial.microqr;
 
+import boofcv.alg.drawing.FiducialImageEngine;
 import boofcv.alg.fiducial.qrcode.PackedBits32;
 import boofcv.alg.fiducial.qrcode.QrCodeCodeWordLocations;
 import boofcv.alg.fiducial.qrcode.QrGeneratorBase;
+import boofcv.struct.image.GrayU8;
 import georegression.struct.point.Point2D_I32;
 
 /**
@@ -29,6 +31,16 @@ import georegression.struct.point.Point2D_I32;
  * @author Peter Abeles
  */
 public class MicroQrCodeGenerator extends QrGeneratorBase<MicroQrCodeGenerator> {
+
+	/** Convenience function for rendering images */
+	public static GrayU8 renderImage( int pixelPerModule, int border, MicroQrCode qr ) {
+		int numModules = MicroQrCode.totalModules(qr.version);
+		var render = new FiducialImageEngine();
+		render.configure(pixelPerModule*border, numModules*pixelPerModule);
+		new MicroQrCodeGenerator().setMarkerWidth(numModules*pixelPerModule).setRender(render).render(qr);
+		return render.getGray();
+	}
+
 	public MicroQrCodeGenerator render( MicroQrCode qr ) {
 		numModules = MicroQrCode.totalModules(qr.version);
 		moduleWidth = markerWidth/numModules;

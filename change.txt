@@ -15,13 +15,12 @@ Version : 0.41
   - Much stricter and more accurate test that looks for UTF-8 strings in BYTE data
   - Config has defaultEncoding which is the encoding it uses if it decides BYTE isn't UTF-8
   - Added an example demonstrating how raw data can be used ExampleQrCodeRawData
+  - Added JMH Benchmarks for regression testing
 - SLAM
   - TODO Monocular
   - TODO Stereo
 - Calibration
   - TODO calibration targets Hamming Marker grid and chessboard, e.g. ChArUco and ArUco grids.
-- Testing
-  - TODO make sure Micro QR and QR are in JMH benchmarks
 - Concurrency
   - Added threaded KLT tracker
 - Regression
