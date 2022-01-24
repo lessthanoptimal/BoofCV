@@ -19,6 +19,7 @@
 package boofcv.examples.fiducial;
 
 import boofcv.abst.fiducial.QrCodeDetector;
+import boofcv.alg.fiducial.qrcode.EciEncoding;
 import boofcv.alg.fiducial.qrcode.QrCode;
 import boofcv.alg.fiducial.qrcode.QrCodeEncoder;
 import boofcv.alg.fiducial.qrcode.QrCodeGeneratorImage;
@@ -33,11 +34,11 @@ import java.io.UnsupportedEncodingException;
  * When dealing with binary data embedded in a QR code things do get more complicated. You will need to convert
  * the string message into a byte array. By default, it's assumed that BYTE data is a text string and it will
  * encode it into a string. In general the conversion to a string will not modify the data but it's not defined
- * how illegal characters are encoded. To be safe you can force the encoding to be "raw".
+ * how illegal characters are encoded. To be safe you can force the encoding to be "binary".
  *
  * @author Peter Abeles
  */
-public class ExampleQrCodeRawData {
+public class ExampleQrCodeBinaryData {
 	public static void main( String[] args ) throws UnsupportedEncodingException {
 		// Let's generate some random data. In the real world this could be a zip file or similar
 		byte[] originalData = new byte[500];
@@ -51,9 +52,9 @@ public class ExampleQrCodeRawData {
 
 		// Let's detect and then decode the image
 		var config = new ConfigQrCode();
-		// If you force the encoding to "raw" then you turn off auto encoding you know the bit values will not
+		// If you force the encoding to "binary" then you turn off auto encoding you know the bit values will not
 		// be modified. It's undefined how illegal values are handled in different encodings, but often still work.
-		config.forceEncoding = "raw";
+		config.forceEncoding = EciEncoding.BINARY;
 		QrCodeDetector<GrayU8> detector = FactoryFiducial.qrcode(config, GrayU8.class);
 		detector.process(gray);
 
@@ -62,10 +63,10 @@ public class ExampleQrCodeRawData {
 			if (qr.mode != QrCode.Mode.BYTE)
 				continue;
 
-			// Convert the message from a String to byte data. This only works if the 'raw' encoding is used
+			// Convert the message from a String to byte data. This only works if the 'binary' encoding is used
 			byte[] data;
-			if (qr.byteEncoding.equals("raw")) {
-				data = BoofMiscOps.stringRawToByteArray(qr.message);
+			if (qr.byteEncoding.equals(EciEncoding.BINARY)) {
+				data = BoofMiscOps.castStringToByteArray(qr.message);
 			} else {
 				// If it thought the byte data was UTF-8 you need to decode with UTF-8 because a single character
 				// can be multiple bytes.

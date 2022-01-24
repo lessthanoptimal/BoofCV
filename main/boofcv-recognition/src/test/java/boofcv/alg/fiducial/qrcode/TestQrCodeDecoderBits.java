@@ -27,7 +27,7 @@ public class TestQrCodeDecoderBits extends BoofStandardJUnit {
 	@Test public void applyErrorCorrection() {
 		QrCode qr = new QrCodeEncoder().addNumeric("923492348985").fixate();
 
-		var alg = new QrCodeDecoderBits(EciEncoding.UTF8, "raw");
+		var alg = new QrCodeDecoderBits(EciEncoding.UTF8, EciEncoding.BINARY);
 
 		byte[] original = new byte[qr.rawbits.length];
 		System.arraycopy(qr.rawbits, 0, original, 0, original.length);
@@ -71,7 +71,7 @@ public class TestQrCodeDecoderBits extends BoofStandardJUnit {
 	@Test public void checkPaddingBytes() {
 		QrCode qr = new QrCodeEncoder().addNumeric("923492348985").fixate();
 
-		var alg = new QrCodeDecoderBits(EciEncoding.UTF8, "raw");
+		var alg = new QrCodeDecoderBits(EciEncoding.UTF8, EciEncoding.BINARY);
 
 		qr.corrected = new byte[50];
 
@@ -102,7 +102,7 @@ public class TestQrCodeDecoderBits extends BoofStandardJUnit {
 		// ECI Assignment number
 		bits.append(0b00001001, 8, false);
 
-		var alg = new QrCodeDecoderBits(EciEncoding.UTF8, "raw");
+		var alg = new QrCodeDecoderBits(EciEncoding.UTF8, EciEncoding.BINARY);
 
 		int newBit = alg.decodeEci(bits, 0);
 		assertEquals("ISO8859_7", alg.encodingEci);

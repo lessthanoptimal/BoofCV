@@ -252,7 +252,7 @@ class TestBoofMiscOps extends BoofStandardJUnit {
 			builder.append((char)i);
 		}
 
-		byte[] found = BoofMiscOps.stringRawToByteArray(builder.toString());
+		byte[] found = BoofMiscOps.castStringToByteArray(builder.toString());
 		for (int i = 0; i < N; i++) {
 			assertEquals(i & 0xFF, found[i] & 0xFF);
 		}

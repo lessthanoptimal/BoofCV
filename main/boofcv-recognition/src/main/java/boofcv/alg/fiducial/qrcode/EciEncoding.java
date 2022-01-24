@@ -24,6 +24,10 @@ package boofcv.alg.fiducial.qrcode;
  * @author Peter Abeles
  */
 public class EciEncoding {
+	// BINARY is specific to BoofCV and is used to indicate that there should be no encoding done
+	public static final String BINARY = "binary";
+
+	// Standard QR Code string encodings
 	public static final String UTF8 = "UTF8";
 	public static final String ISO8859_1 = "ISO8859_1";
 	public static final String JIS = "JIS";

@@ -35,6 +35,7 @@ import pabeles.concurrency.GrowArray;
 
 import java.io.*;
 import java.lang.reflect.Method;
+import java.security.MessageDigest;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -45,7 +46,7 @@ import java.util.*;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings("rawtypes")
+@SuppressWarnings({"rawtypes", "ForLoopReplaceableByForEach"})
 public class BoofMiscOps {
 
 	/**
@@ -1019,11 +1020,31 @@ public class BoofMiscOps {
 	 * @param message String with raw bytes encoded inside of it.
 	 * @return byte array conversion of the string.
 	 */
-	public static byte[] stringRawToByteArray( String message ) {
+	public static byte[] castStringToByteArray( String message ) {
 		byte[] data = new byte[message.length()];
 		for (int i = 0; i < message.length(); i++) {
 			data[i] = (byte)message.charAt(i);
 		}
 		return data;
+	}
+
+	/**
+	 * Computes MD5SUM of byte data as a string
+	 */
+	public static String md5sum( byte[] data ) {
+		try {
+			MessageDigest md = MessageDigest.getInstance("MD5");
+			return byteArrayToHex(md.digest(data));
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public static String byteArrayToHex(byte[] array) {
+		var sb = new StringBuilder(array.length * 2);
+		for (int i = 0; i < array.length; i++) {
+			sb.append(String.format("%02X", array[i]));
+		}
+		return sb.toString();
 	}
 }

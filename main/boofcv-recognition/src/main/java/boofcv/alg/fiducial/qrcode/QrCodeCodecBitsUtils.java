@@ -191,7 +191,7 @@ public class QrCodeCodecBitsUtils implements VerbosePrint {
 
 		selectedByteEncoding = selectByteEncoding(rawdata);
 		try {
-			if (selectedByteEncoding.equalsIgnoreCase("raw")) {
+			if (selectedByteEncoding.equalsIgnoreCase(EciEncoding.BINARY)) {
 				// Handle raw mode where there is no encoding which could change the character's value.
 				// This is what the QR code specifications says you should use, but most ignore it
 				workString.ensureCapacity(workString.length() + rawdata.length);
