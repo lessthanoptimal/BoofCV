@@ -44,7 +44,7 @@ public class ConfigMicroQrCode implements Configuration {
 	/**
 	 * If not null, then when decoding BYTE mode data it will always use this encoding. This can be desirable
 	 * if the automatic encoding detection is making a mistake or if you know the data is binary. For binary
-	 * data you should set this to "raw".
+	 * data you should set this to {@link EciEncoding#BINARY}.
 	 */
 	public @Nullable String forceEncoding = null;
 

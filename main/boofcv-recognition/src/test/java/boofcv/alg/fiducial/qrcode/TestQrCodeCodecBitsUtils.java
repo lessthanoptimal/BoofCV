@@ -48,18 +48,18 @@ public class TestQrCodeCodecBitsUtils extends BoofStandardJUnit {
 	}
 
 	/** Tell it to encode a raw byte array and see if it does it correctly. No hints */
-	@Test void rawBytesAutoEncoding() {
-		checkRawBytes(255, null);
+	@Test void binaryAutoEncoding() {
+		checkBinaryBytes(255, null);
 	}
 
 	/** Tell it that it should use raw bytes */
-	@Test void rawBytesHint() {
+	@Test void binaryBytesHint() {
 		// reduce the number of values so that UTF-8 is still an option, and it will modify the byte
 		// values unless you force it into raw mode
-		checkRawBytes(150, "raw");
+		checkBinaryBytes(150, EciEncoding.BINARY);
 	}
 
-	void checkRawBytes( int length, @Nullable String forceEncoding ) {
+	void checkBinaryBytes( int length, @Nullable String forceEncoding ) {
 		// encode fewer values so that it could possibly be UTF-8 without the hint
 		byte[] data = new byte[length];
 		for (int i = 0; i < data.length; i++) {
