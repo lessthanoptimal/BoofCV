@@ -3,8 +3,8 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
-Date    : 2022/
-Version : 0.41
+Date    : 2022/Jan/24
+Version : 0.40.1
 
 - Build
   - Compiles using Java 17. bytecode is still Java 11
@@ -16,19 +16,8 @@ Version : 0.41
   - Config has defaultEncoding which is the encoding it uses if it decides BYTE isn't UTF-8
   - Added an example demonstrating how raw data can be used ExampleQrCodeRawData
   - Added JMH Benchmarks for regression testing
-- SLAM
-  - TODO Monocular
-  - TODO Stereo
-- Calibration
-  - TODO calibration targets Hamming Marker grid and chessboard, e.g. ChArUco and ArUco grids.
 - Concurrency
   - Added threaded KLT tracker
-- Regression
-  - TODO Template matching
-  - TODO Video stabilization
-
-TODO Applications for self calibration mono and stereo
-TODO Monocular VO
 
 ---------------------------------------------
 Date    : 2022/Jan/17
