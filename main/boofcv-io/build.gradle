@@ -5,6 +5,6 @@ dependencies {
 	api project(':main:boofcv-recognition')
 	api project(':main:boofcv-reconstruction')
 
-	api group: 'org.yaml', name: 'snakeyaml', version: smakeyaml_version
+	api group: 'org.yaml', name: 'snakeyaml', version: snakeyaml_version
 	api group: 'commons-io', name: 'commons-io', version: commons_io_version
 }

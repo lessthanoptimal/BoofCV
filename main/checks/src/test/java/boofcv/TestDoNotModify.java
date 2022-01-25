@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,16 +18,6 @@
 
 package boofcv;
 
-import boofcv.io.UtilIO;
-import org.apache.commons.io.IOUtils;
-import org.junit.jupiter.api.Test;
-
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-
-import static org.junit.jupiter.api.Assertions.fail;
-
 /**
  * Unit tests which make sure no one commits code which modifies critical lines in a configuration needed for
  * production.
@@ -35,13 +25,13 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @author Peter Abeles
  */
 public class TestDoNotModify {
-	@Test void buildJava11() throws IOException {
-		String pathBuild = UtilIO.path("build.gradle");
-		String[] lines  = IOUtils.toString(new FileInputStream(pathBuild), StandardCharsets.UTF_8).split("\\R+");
-		for (int i = 0; i < lines.length; i++) {
-			if (lines[i].equals("    ext.build_java11 = true // IntelliJ has issues when this is set to true"))
-				return;
-		}
-		fail("build java 11 line not found");
-	}
+//	@Test void buildJava11() throws IOException {
+//		String pathBuild = UtilIO.path("build.gradle");
+//		String[] lines  = IOUtils.toString(new FileInputStream(pathBuild), StandardCharsets.UTF_8).split("\\R+");
+//		for (int i = 0; i < lines.length; i++) {
+//			if (lines[i].equals("    ext.build_java11 = true // IntelliJ has issues when this is set to true"))
+//				return;
+//		}
+//		fail("build java 11 line not found");
+//	}
 }

@@ -1,11 +1,4 @@
-- SLAM
-  - TODO Monocular
-  - TODO Stereo
-- Calibration
-  - TODO calibration targets Hamming Marker grid and chessboard, e.g. ChArUco and ArUco grids.
-- Regression
-  - TODO Template matching
-  - TODO Video stabilization
+
 
 TODO Applications for self calibration mono and stereo
 TODO Monocular VO

@@ -3,6 +3,19 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
+Date    : 2022/
+Version : 0.41
+
+- SLAM
+  - TODO Monocular
+  - TODO Stereo
+- Calibration
+  - TODO calibration targets Hamming Marker grid and chessboard, e.g. ChArUco and ArUco grids.
+- Regression
+  - TODO Template matching
+  - TODO Video stabilization
+
+---------------------------------------------
 Date    : 2022/Jan/24
 Version : 0.40.1
 
