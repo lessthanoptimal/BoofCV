@@ -27,7 +27,7 @@ project.ext.jabel_version = '0.4.2'
 project.ext.guava_version = '31.0.1-jre'
 project.ext.args4j_version = '2.33'
 project.ext.junit_version = '5.8.2'
-project.ext.errorprone_version = '2.10.0'
+project.ext.errorprone_version = '2.11.0'
 project.ext.nullaway_version = '0.9.5'
 project.ext.auto64to32_version = '3.1.0'
 project.ext.snakeyaml_version = '1.23'
@@ -195,6 +195,7 @@ subprojects {
                 "SameNameButDifferent", // Lombok confuses it
                 "UnescapedEntity",
                 "EmptyBlockTag", // E.g. "@param name" is not defined. This should be cleaned up
+                "AlreadyChecked", // This inspection appears to be broken/too simplistic. False positives galore
         )
         options.errorprone.error("MissingOverride", "MissingCasesInEnumSwitch", "BadInstanceof",
                 "PublicConstructorForAbstractClass", "NarrowingCompoundAssignment", "JdkObsolete", "MissingSummary")
