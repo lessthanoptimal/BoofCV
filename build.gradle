@@ -3,8 +3,8 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
     id "com.peterabeles.gversion" version "1.10" apply false
-    id "net.ltgt.errorprone" version "2.0.1" apply false
-    id "com.diffplug.spotless" version "5.6.1" apply false
+    id "net.ltgt.errorprone" version "2.0.2" apply false
+    id "com.diffplug.spotless" version "6.2.0" apply false
 }
 
 ext.libpath = file('./').absolutePath
