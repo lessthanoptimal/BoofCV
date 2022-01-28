@@ -32,6 +32,8 @@ project.ext.nullaway_version = '0.9.5'
 project.ext.auto64to32_version = '3.1.0'
 project.ext.snakeyaml_version = '1.23'
 project.ext.jmh_version = '1.33'
+project.ext.jetnull_version = '23.0.0'
+project.ext.jsr250_version = '1.0'
 
 // Which native platforms are supported can be specified in the command line.  Otherwise
 // the default is to support all of them
@@ -68,7 +70,7 @@ subprojects {
     // To make ErrorProne and Kotlin plugins happy
     configurations.configureEach {
         resolutionStrategy {
-            force 'org.jetbrains:annotations:20.0.0'
+            force "org.jetbrains:annotations:$project.jetnull_version"
             force "com.google.guava:guava:$project.guava_version"
             force "com.google.errorprone:error_prone_annotations:$project.errorprone_version"
             force 'com.google.code.findbugs:jsr305:3.0.2'
@@ -128,12 +130,12 @@ subprojects {
         api group: 'net.sf.trove4j', name: 'trove4j', version: '3.0.3'
 
         compileOnly "org.projectlombok:lombok:${project.lombok_version}"
-        compileOnly 'org.jetbrains:annotations:20.0.0' // @Nullable
-        compileOnly 'javax.annotation:jsr250-api:1.0'  // @Generated
+        compileOnly "org.jetbrains:annotations:$project.jetnull_version" // @Nullable
+        compileOnly "javax.annotation:jsr250-api:$project.jsr250_version"  // @Generated
 
         noautoCompileOnly "org.projectlombok:lombok:${project.lombok_version}"
-        noautoCompileOnly 'org.jetbrains:annotations:20.0.0' // @Nullable
-        noautoCompileOnly 'javax.annotation:jsr250-api:1.0'  // @Generated
+        noautoCompileOnly "org.jetbrains:annotations:$project.jetnull_version" // @Nullable
+        compileOnly "javax.annotation:jsr250-api:$project.jsr250_version"  // @Generated
 
         testImplementation("org.junit.jupiter:junit-jupiter-api:$junit_version")
         testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junit_version")
