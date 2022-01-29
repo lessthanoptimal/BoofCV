@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,19 +38,23 @@ public abstract class FiducialRenderEngine {
 	 */
 	public abstract void setGray( double value );
 
-	public void square(double x0 , double y0 , double width ) {
-		rectangle(x0,y0,x0+width,y0+width);
+	public void square( double x0, double y0, double width ) {
+		rectangle(x0, y0, x0 + width, y0 + width);
 	}
 
-	public abstract void circle(double cx, double cy , double radius );
+	public abstract void circle( double cx, double cy, double radius );
 
-	public abstract void square(double x0, double y0, double width0, double thickness);
+	public abstract void square( double x0, double y0, double width0, double thickness );
 
-	public abstract void rectangle( double x0 , double y0 , double x1 , double y1 );
+	public abstract void rectangle( double x0, double y0, double x1, double y1 );
 
-	public abstract void draw(GrayU8 image , double x0 , double y0 , double x1 , double y1);
+	public void rectangleWH( double x0, double y0, double width, double height ) {
+		rectangle(x0, y0, x0 + width, y0 + height);
+	}
 
-	public abstract void inputToDocument(double x , double y , Point2D_F64 document );
+	public abstract void draw( GrayU8 image, double x0, double y0, double x1, double y1 );
+
+	public abstract void inputToDocument( double x, double y, Point2D_F64 document );
 
 	// TODO add polyline with line thickness? How to manually do this?
 }
