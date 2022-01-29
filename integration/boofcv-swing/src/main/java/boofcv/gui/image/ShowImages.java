@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -113,8 +113,12 @@ public class ShowImages {
 	 * Show a window for a set amount of time. Blocks until that time has elapsed
 	 */
 	public static void showBlocking( ImageBase<?> img, String title, long milliseconds ) {
+		showBlocking(img, title, milliseconds, false);
+	}
+
+	public static void showBlocking( ImageBase<?> img, String title, long milliseconds, final boolean closeOnExit) {
 		BufferedImage buff = ConvertBufferedImage.convertTo(img, null, true);
-		ImagePanel panel = showWindow(buff, title);
+		ImagePanel panel = showWindow(buff, title, closeOnExit);
 		BoofMiscOps.sleep(milliseconds);
 		// close the window
 		SwingUtilities.invokeLater(() -> {

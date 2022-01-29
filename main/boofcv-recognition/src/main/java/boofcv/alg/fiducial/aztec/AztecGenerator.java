@@ -37,6 +37,7 @@ public class AztecGenerator {
 	// Derived constants
 	protected int lengthInSquares; // length of a side on the marker in units of squares
 	protected double squareWidth; // length of a square in document units
+	protected int orientationSquareCount; // squares in orientation region
 
 	/** Used to render the marker */
 	@Getter protected FiducialRenderEngine render;
@@ -57,14 +58,25 @@ public class AztecGenerator {
 		render.init();
 
 		// Render the orientation and locator patterns
-		int orientationSquares = marker.getLocatorSquareCount() + 4;
+		orientationSquareCount = marker.getLocatorSquareCount() + 4;
 		//noinspection IntegerDivisionInFloatingPointContext
-		double orientationLoc = ((lengthInSquares - orientationSquares)/2)*squareWidth;
-		orientationPattern(orientationLoc, orientationLoc, orientationSquares);
+		double orientationLoc = ((lengthInSquares - orientationSquareCount)/2)*squareWidth;
+		orientationPattern(orientationLoc, orientationLoc, orientationSquareCount);
 		locatorPattern(orientationLoc + 2*squareWidth, orientationLoc + 2*squareWidth,
 				marker.getLocatorRingCount(), marker.locatorRings);
 
-		// TODO Render the reference grid
+		// Render the reference grid
+		if (marker.structure == AztecCode.Structure.FULL && marker.dataLayers > 4) {
+			int offset = lengthInSquares/2;
+			int odd = offset%2;
+			for (int location = 0; location < lengthInSquares/2; location += 16) {
+				referenceGridLine(odd, offset - location, 1, 0, lengthInSquares);
+				referenceGridLine(odd, offset + location, 1, 0, lengthInSquares);
+
+				referenceGridLine(offset - location, odd, 0, 1, lengthInSquares);
+				referenceGridLine(offset + location, odd, 0, 1, lengthInSquares);
+			}
+		}
 
 		// TODO Render the mode message
 
@@ -112,12 +124,31 @@ public class AztecGenerator {
 		render.square(tl_x - sw, tl_y, sw);
 		render.rectangleWH(tl_x - sw, tl_y - sw, 2*sw, sw);
 
-
 		// top-right
 		render.rectangleWH(tl_x + rw, tl_y - sw, sw, 2*sw);
 
 		// bottom-right
 		render.square(tl_x + rw, tl_y + rw - sw, sw);
+	}
+
+	protected void referenceGridLine( int tl_x, int tl_y, int dx, int dy, int count ) {
+		int forbidden0 = (lengthInSquares - orientationSquareCount)/2 - 1;
+		int forbidden1 = forbidden0 + orientationSquareCount + 2;
+
+		for (int i = 0; i < count; i += 2) {
+			int squareX = tl_x + i*dx;
+			int squareY = tl_y + i*dy;
+
+			// Don't draw inside the locator and orientation patterns
+			if (squareX >= forbidden0 && squareX < forbidden1 && squareY >= forbidden0 && squareY < forbidden1)
+				continue;
+
+			double x = squareX*squareWidth;
+			double y = squareY*squareWidth;
+
+
+			render.square(x, y, squareWidth, squareWidth);
+		}
 	}
 
 	public AztecGenerator setMarkerWidth( double width ) {

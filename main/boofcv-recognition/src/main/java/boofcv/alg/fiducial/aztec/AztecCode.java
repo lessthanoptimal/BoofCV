@@ -43,7 +43,11 @@ public class AztecCode {
 
 	/** Number of squares (data bits) wide the marker is */
 	public int getMarkerSquareCount() {
-		return getLocatorSquareCount() + 6 + dataLayers*4;
+		int withoutGrid = getLocatorSquareCount() + 6 + dataLayers*4;
+		if (structure == Structure.COMPACT || dataLayers <= 4)
+			return withoutGrid;
+
+		return withoutGrid + withoutGrid/16;
 	}
 
 	/** Number of rings in the locator pattern */
@@ -74,7 +78,7 @@ public class AztecCode {
 		COMPACT(4),
 		FULL(32);
 
-		Structure(int maxDataLayers) {
+		Structure( int maxDataLayers ) {
 			this.maxDataLayers = maxDataLayers;
 		}
 
