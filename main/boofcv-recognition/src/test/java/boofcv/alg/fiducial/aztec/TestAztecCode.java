@@ -37,6 +37,15 @@ public class TestAztecCode {
 		assertEquals(27, marker.getMarkerSquareCount());
 		marker.structure = AztecCode.Structure.FULL;
 		assertEquals(31, marker.getMarkerSquareCount());
+
+		marker.dataLayers = 5;
+		assertEquals(37, marker.getMarkerSquareCount());
+		marker.dataLayers = 6;
+		assertEquals(41, marker.getMarkerSquareCount());
+		marker.dataLayers = 16;
+		assertEquals(83, marker.getMarkerSquareCount());
+		marker.dataLayers = 32;
+		assertEquals(151, marker.getMarkerSquareCount());
 	}
 
 	@Test void getLocatorRingCount() {

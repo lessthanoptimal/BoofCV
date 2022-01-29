@@ -25,10 +25,10 @@ import org.junit.jupiter.api.Test;
 public class TestAztecGenerator {
 	@Test void foo() {
 		var marker = new AztecCode();
-		marker.dataLayers = 2;
+		marker.dataLayers = 16;
 		marker.structure = AztecCode.Structure.FULL;
 
-		GrayU8 image = AztecGenerator.renderImage(10,1,marker);
-		ShowImages.showBlocking(image, "Aztec Code", 20_000);
+		GrayU8 image = AztecGenerator.renderImage(10, 0, marker);
+		ShowImages.showBlocking(image, "Aztec Code", 120_000, true);
 	}
 }
