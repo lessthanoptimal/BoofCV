@@ -32,7 +32,7 @@ public class AztecCode {
 	/** Number of layers or rings outside the locator pattern that data is encoded on */
 	public int dataLayers = 0;
 
-	/** Which Structure does it have. Determins shape of locator pattern and maximum number of data layers. */
+	/** Which Structure does it have. Determines shape of locator pattern and maximum number of data layers. */
 	public Structure structure = Structure.COMPACT;
 
 	/**
@@ -47,7 +47,9 @@ public class AztecCode {
 		if (structure == Structure.COMPACT || dataLayers <= 4)
 			return withoutGrid;
 
-		return withoutGrid + withoutGrid/16;
+		int radius = 9 + dataLayers*2;
+		int gridRingCount = radius/16;
+		return withoutGrid + 1 + gridRingCount*2 - 1;
 	}
 
 	/** Number of rings in the locator pattern */
