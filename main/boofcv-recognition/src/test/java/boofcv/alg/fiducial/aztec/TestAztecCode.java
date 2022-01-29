@@ -26,26 +26,40 @@ public class TestAztecCode {
 	/** Compare against table in specification */
 	@Test void getSizeSquares() {
 		var marker = new AztecCode();
-		marker.dataLayers = 1;
 		marker.structure = AztecCode.Structure.COMPACT;
-		assertEquals(15, marker.getMarkerSquareCount());
+		checkMarkerSquareCount(1, 15, marker);
 		marker.structure = AztecCode.Structure.FULL;
-		assertEquals(19, marker.getMarkerSquareCount());
+		checkMarkerSquareCount(1, 19, marker);
 
-		marker.dataLayers = 4;
 		marker.structure = AztecCode.Structure.COMPACT;
-		assertEquals(27, marker.getMarkerSquareCount());
+		checkMarkerSquareCount(4, 27, marker);
 		marker.structure = AztecCode.Structure.FULL;
-		assertEquals(31, marker.getMarkerSquareCount());
+		checkMarkerSquareCount(4, 31, marker);
 
-		marker.dataLayers = 5;
-		assertEquals(37, marker.getMarkerSquareCount());
-		marker.dataLayers = 6;
-		assertEquals(41, marker.getMarkerSquareCount());
-		marker.dataLayers = 16;
-		assertEquals(83, marker.getMarkerSquareCount());
-		marker.dataLayers = 32;
-		assertEquals(151, marker.getMarkerSquareCount());
+		checkMarkerSquareCount(5, 37, marker);
+		checkMarkerSquareCount(6, 41, marker);
+		checkMarkerSquareCount(7, 45, marker);
+		checkMarkerSquareCount(8, 49, marker);
+		checkMarkerSquareCount(9, 53, marker);
+		checkMarkerSquareCount(10, 57, marker);
+		checkMarkerSquareCount(11, 61, marker);
+		checkMarkerSquareCount(12, 67, marker);
+		checkMarkerSquareCount(13, 71, marker);
+		checkMarkerSquareCount(14, 75, marker);
+		checkMarkerSquareCount(15, 79, marker);
+		checkMarkerSquareCount(16, 83, marker);
+		checkMarkerSquareCount(17, 87, marker);
+		checkMarkerSquareCount(18, 91, marker);
+		checkMarkerSquareCount(19, 95, marker);
+		checkMarkerSquareCount(20, 101, marker);
+		checkMarkerSquareCount(25, 121, marker);
+		checkMarkerSquareCount(29, 139, marker);
+		checkMarkerSquareCount(32, 151, marker);
+	}
+
+	private void checkMarkerSquareCount( int layers, int expected, AztecCode marker ) {
+		marker.dataLayers = layers;
+		assertEquals(expected, marker.getMarkerSquareCount());
 	}
 
 	@Test void getLocatorRingCount() {

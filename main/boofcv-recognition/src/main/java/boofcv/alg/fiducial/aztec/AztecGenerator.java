@@ -67,14 +67,14 @@ public class AztecGenerator {
 
 		// Render the reference grid
 		if (marker.structure == AztecCode.Structure.FULL && marker.dataLayers > 4) {
-			int offset = lengthInSquares/2;
-			int odd = offset%2;
-			for (int location = 0; location < lengthInSquares/2; location += 16) {
-				referenceGridLine(odd, offset - location, 1, 0, lengthInSquares);
-				referenceGridLine(odd, offset + location, 1, 0, lengthInSquares);
+			int center = lengthInSquares/2;
+			int odd = ((lengthInSquares - orientationSquareCount)/2)%2;
+			for (int location = 0; center + location < lengthInSquares; location += 16) {
+				referenceGridLine(odd, center - location, 1, 0, lengthInSquares);
+				referenceGridLine(odd, center + location, 1, 0, lengthInSquares);
 
-				referenceGridLine(offset - location, odd, 0, 1, lengthInSquares);
-				referenceGridLine(offset + location, odd, 0, 1, lengthInSquares);
+				referenceGridLine(center - location, odd, 0, 1, lengthInSquares);
+				referenceGridLine(center + location, odd, 0, 1, lengthInSquares);
 			}
 		}
 
@@ -145,7 +145,6 @@ public class AztecGenerator {
 
 			double x = squareX*squareWidth;
 			double y = squareY*squareWidth;
-
 
 			render.square(x, y, squareWidth, squareWidth);
 		}
