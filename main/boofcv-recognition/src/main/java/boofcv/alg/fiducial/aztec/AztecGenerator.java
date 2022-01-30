@@ -20,6 +20,7 @@ package boofcv.alg.fiducial.aztec;
 
 import boofcv.alg.drawing.FiducialImageEngine;
 import boofcv.alg.drawing.FiducialRenderEngine;
+import boofcv.alg.fiducial.qrcode.PackedBits8;
 import boofcv.struct.image.GrayU8;
 import georegression.struct.shapes.Polygon2D_F64;
 import lombok.Getter;
@@ -38,9 +39,12 @@ public class AztecGenerator {
 	protected int lengthInSquares; // length of a side on the marker in units of squares
 	protected double squareWidth; // length of a square in document units
 	protected int orientationSquareCount; // squares in orientation region
-
+	protected double orientationLoc; // (x,y) image coordinate of top-left corner of orientation pattern square
 	/** Used to render the marker */
 	@Getter protected FiducialRenderEngine render;
+
+	AztecEncoder encoder = new AztecEncoder();
+	PackedBits8 bits = new PackedBits8();
 
 	/** Convenience function for rendering images */
 	public static GrayU8 renderImage( int pixelPerSquare, int border, AztecCode marker ) {
@@ -60,8 +64,21 @@ public class AztecGenerator {
 		// Render the orientation and locator patterns
 		orientationSquareCount = marker.getLocatorSquareCount() + 4;
 		//noinspection IntegerDivisionInFloatingPointContext
-		double orientationLoc = ((lengthInSquares - orientationSquareCount)/2)*squareWidth;
+		orientationLoc = ((lengthInSquares - orientationSquareCount)/2)*squareWidth;
+
+		renderFixedPatterns(marker);
+		renderModeMessage(marker);
+		// TODO Render data layers
+
+		return this;
+	}
+
+	/**
+	 * Renders symbols which are fixed because they are independent of the encoded data
+	 */
+	private void renderFixedPatterns( AztecCode marker ) {
 		orientationPattern(orientationLoc, orientationLoc, orientationSquareCount);
+
 		locatorPattern(orientationLoc + 2*squareWidth, orientationLoc + 2*squareWidth,
 				marker.getLocatorRingCount(), marker.locatorRings);
 
@@ -77,12 +94,69 @@ public class AztecGenerator {
 				referenceGridLine(center + location, odd, 0, 1, lengthInSquares);
 			}
 		}
+	}
 
-		// TODO Render the mode message
+	/**
+	 * First encodes the mode then renders the mode around the orientation pattern
+	 */
+	private void renderModeMessage( AztecCode marker ) {
+		// Encode the mode into a binary message
+		encoder.encodeModeMessage(marker, bits);
 
-		// TODO Render data layers
+		// short hand variables to cut down on verbosity
+		final double s = squareWidth;
+		// width of orientation pattern
+		final double w = orientationSquareCount*s;
 
-		return this;
+		// data is not rendered inside the reference grid
+		boolean hasGrid = marker.structure == AztecCode.Structure.FULL;
+
+		// Number of bits along each side of the orientation pattern
+		int n = orientationSquareCount - 2 - (hasGrid ? 1 : 0);
+
+		// Render the mode message along each side
+		encodeBitsLine(0, n, orientationLoc + s, orientationLoc - s, 1, 0, hasGrid);
+		encodeBitsLine(n, n, orientationLoc + w, orientationLoc + s, 0, 1, hasGrid);
+		encodeBitsLine(n*2, n, orientationLoc + w - 2*s, orientationLoc + w, -1, 0, hasGrid);
+		encodeBitsLine(n*3, n, orientationLoc - s, orientationLoc + w - 2*s, 0, -1, hasGrid);
+	}
+
+	/**
+	 * Draws binary data long a line. If skipMiddle is true then it will skip over the square
+	 * in the middle of the line. All bits are encoded.
+	 *
+	 * (x0, y0) = initial coordinate in the image
+	 * (dx, dy) = indicate the direction in units of squares
+	 */
+	void encodeBitsLine( int startBit, int count,
+						 double x0, double y0, int dx, int dy,
+						 boolean skipMiddle ) {
+
+		if (skipMiddle) {
+			// Render the first half
+			int middle = count/2;
+			encodeBitsLine(startBit, middle, x0, y0, dx, dy);
+			// start of the second half of the bit
+			int startBit2 = startBit + middle;
+			// render the remainder of the bits, skipping over the middle
+			x0 += dx*(1 + middle)*squareWidth;
+			y0 += dy*(1 + middle)*squareWidth;
+			encodeBitsLine(startBit2, count - middle, x0, y0, dx, dy);
+		} else {
+			encodeBitsLine(startBit, count, x0, y0, dx, dy);
+		}
+	}
+
+	/** Renders bits along the specified line */
+	void encodeBitsLine( int startBit, int count, double x0, double y0, int dx, int dy ) {
+		for (int bit = 0; bit < count; bit++) {
+			// 0 is encoded as white, which is the background color
+			if (bits.get(startBit + bit) == 0)
+				continue;
+
+			// Draw the square
+			render.square(x0 + dx*bit*squareWidth, y0 + dy*bit*squareWidth, squareWidth);
+		}
 	}
 
 	/**
