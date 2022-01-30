@@ -78,7 +78,7 @@ public class MicroQrCodeDecoderBits implements VerbosePrint {
 		qr.corrected = new byte[block.dataCodewords];
 
 		ecc.resize(wordsEcc);
-		rscodes.generator(wordsEcc);
+		rscodes.generatorQR(wordsEcc);
 		message.resize(block.dataCodewords);
 
 		// split the raw bits into data and ECC sections
