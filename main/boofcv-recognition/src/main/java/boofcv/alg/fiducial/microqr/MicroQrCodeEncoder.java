@@ -21,7 +21,7 @@ package boofcv.alg.fiducial.microqr;
 import boofcv.alg.fiducial.qrcode.PackedBits8;
 import boofcv.alg.fiducial.qrcode.QrCode;
 import boofcv.alg.fiducial.qrcode.QrCodeCodecBitsUtils;
-import boofcv.alg.fiducial.qrcode.ReidSolomonCodes;
+import boofcv.alg.fiducial.qrcode.ReedSolomonCodes;
 import boofcv.misc.BoofMiscOps;
 import georegression.struct.point.Point2D_I32;
 import lombok.Getter;
@@ -54,7 +54,7 @@ import static boofcv.alg.fiducial.qrcode.QrCodeCodecBitsUtils.flipBits8;
  */
 public class MicroQrCodeEncoder implements VerbosePrint {
 	// used to compute error correction
-	private final ReidSolomonCodes rscodes = new ReidSolomonCodes(8, 0b100011101);
+	private final ReedSolomonCodes rscodes = new ReedSolomonCodes(8, 0b100011101);
 
 	// output qr code
 	private final MicroQrCode qr = new MicroQrCode();
