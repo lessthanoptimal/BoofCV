@@ -19,7 +19,7 @@
 package boofcv.alg.fiducial.calib.ecocheck;
 
 import boofcv.alg.fiducial.qrcode.PackedBits8;
-import boofcv.alg.fiducial.qrcode.ReidSolomonCodes;
+import boofcv.alg.fiducial.qrcode.ReedSolomonCodes;
 import boofcv.misc.BoofMiscOps;
 import lombok.Getter;
 import lombok.Setter;
@@ -117,7 +117,7 @@ public class ECoCheckCodec {
 	protected final PackedBits8 bits = new PackedBits8();
 
 	// Error correction algorithm. Primitive is taken from QR Code specification
-	private final ReidSolomonCodes rscodes = new ReidSolomonCodes(WORD_BITS, 0b100011101);
+	private final ReedSolomonCodes rscodes = new ReedSolomonCodes(WORD_BITS, 0b100011101);
 
 	/**
 	 * Computes how large of a grid will be needed to encode the coordinates + overhead. Pre-allocates any memory

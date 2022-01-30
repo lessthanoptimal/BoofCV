@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestReidSolomonCodes extends BoofStandardJUnit {
+public class TestReedSolomonCodes extends BoofStandardJUnit {
 
 	int primitive8 = 0b100011101;
 
@@ -36,7 +36,7 @@ public class TestReidSolomonCodes extends BoofStandardJUnit {
 		DogArray_I8 message = randomMessage(50);
 		DogArray_I8 ecc = new DogArray_I8();
 
-		ReidSolomonCodes alg = new ReidSolomonCodes(8, primitive8);
+		ReedSolomonCodes alg = new ReedSolomonCodes(8, primitive8);
 		alg.generatorQR(6);
 		alg.computeECC(message, ecc);
 
@@ -66,7 +66,7 @@ public class TestReidSolomonCodes extends BoofStandardJUnit {
 		message.data = a;
 		message.size = a.length;
 
-		ReidSolomonCodes alg = new ReidSolomonCodes(8, 0x11d);
+		ReedSolomonCodes alg = new ReedSolomonCodes(8, 0x11d);
 		alg.generatorQR(10);
 		alg.computeECC(message, ecc);
 
@@ -80,7 +80,7 @@ public class TestReidSolomonCodes extends BoofStandardJUnit {
 		DogArray_I8 message = randomMessage(50);
 		DogArray_I8 ecc = new DogArray_I8();
 
-		ReidSolomonCodes alg = new ReidSolomonCodes(8, primitive8);
+		ReedSolomonCodes alg = new ReedSolomonCodes(8, primitive8);
 		alg.generatorQR(6);
 		alg.computeECC(message, ecc);
 
@@ -113,7 +113,7 @@ public class TestReidSolomonCodes extends BoofStandardJUnit {
 	}
 
 	@Test void generatorQR() {
-		var alg = new ReidSolomonCodes(8, primitive8);
+		var alg = new ReedSolomonCodes(8, primitive8);
 		alg.generatorQR(5);
 
 		// Evaluate it at the zeros and see if they are zero
@@ -128,7 +128,7 @@ public class TestReidSolomonCodes extends BoofStandardJUnit {
 	}
 
 	@Test void generatorAztec() {
-		var alg = new ReidSolomonCodes(8, primitive8);
+		var alg = new ReedSolomonCodes(8, primitive8);
 		alg.generatorAztec(5);
 
 		// Evaluate it at the zeros and see if they are zero
@@ -144,7 +144,7 @@ public class TestReidSolomonCodes extends BoofStandardJUnit {
 
 	/** Compare to a known solution */
 	@Test void generatorAztecKnown1() {
-		var alg = new ReidSolomonCodes(4, 19);
+		var alg = new ReedSolomonCodes(4, 19);
 		alg.generatorAztec(5);
 
 		// From ISO section 7.2.3
@@ -159,7 +159,7 @@ public class TestReidSolomonCodes extends BoofStandardJUnit {
 
 	/** Compare to a known solution */
 	@Test void generatorAztecKnown0() {
-		var alg = new ReidSolomonCodes(4, 19);
+		var alg = new ReedSolomonCodes(4, 19);
 		alg.generatorAztec(6);
 
 		// From ISO section 7.2.3
@@ -183,7 +183,7 @@ public class TestReidSolomonCodes extends BoofStandardJUnit {
 		int nsyn = 10;
 		DogArray_I8 syndromes = DogArray_I8.zeros(nsyn);
 
-		ReidSolomonCodes alg = new ReidSolomonCodes(8, primitive8);
+		ReedSolomonCodes alg = new ReedSolomonCodes(8, primitive8);
 		alg.generatorQR(nsyn);
 		alg.computeECC(message, ecc);
 
@@ -221,7 +221,7 @@ public class TestReidSolomonCodes extends BoofStandardJUnit {
 			int nsyn = 10;
 			DogArray_I8 syndromes = DogArray_I8.zeros(nsyn);
 
-			ReidSolomonCodes alg = new ReidSolomonCodes(8, primitive8);
+			ReedSolomonCodes alg = new ReedSolomonCodes(8, primitive8);
 			alg.generatorQR(nsyn);
 			alg.computeECC(message, ecc);
 
@@ -259,7 +259,7 @@ public class TestReidSolomonCodes extends BoofStandardJUnit {
 		DogArray_I8 errorLocator = new DogArray_I8();
 		DogArray_I32 locations = new DogArray_I32();
 
-		ReidSolomonCodes alg = new ReidSolomonCodes(8, primitive8);
+		ReedSolomonCodes alg = new ReedSolomonCodes(8, primitive8);
 		alg.generatorQR(nsyn);
 		alg.computeECC(message, ecc);
 
@@ -357,7 +357,7 @@ public class TestReidSolomonCodes extends BoofStandardJUnit {
 									 DogArray_I8 errorLocator,
 									 DogArray_I8 expected ) {
 		DogArray_I8 found = new DogArray_I8();
-		ReidSolomonCodes alg = new ReidSolomonCodes(8, primitive8);
+		ReedSolomonCodes alg = new ReedSolomonCodes(8, primitive8);
 		alg.findErrorEvaluator(syndromes, errorLocator, found);
 
 		assertEquals(found.size, expected.size);
@@ -377,7 +377,7 @@ public class TestReidSolomonCodes extends BoofStandardJUnit {
 		DogArray_I8 errorLocator = new DogArray_I8();
 		int nsyn = 10;
 
-		ReidSolomonCodes alg = new ReidSolomonCodes(8, primitive8);
+		ReedSolomonCodes alg = new ReedSolomonCodes(8, primitive8);
 		alg.generatorQR(nsyn);
 		alg.computeECC(message, ecc);
 
@@ -409,7 +409,7 @@ public class TestReidSolomonCodes extends BoofStandardJUnit {
 		DogArray_I8 ecc = new DogArray_I8();
 		int nsyn = 10; // should be able to recover from 4 errors
 
-		ReidSolomonCodes alg = new ReidSolomonCodes(8, primitive8);
+		ReedSolomonCodes alg = new ReedSolomonCodes(8, primitive8);
 		alg.generatorQR(nsyn);
 
 		for (int i = 0; i < 20000; i++) {

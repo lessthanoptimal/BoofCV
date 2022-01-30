@@ -21,7 +21,7 @@ package boofcv.alg.fiducial.qrcode;
 import boofcv.alg.descriptor.DescriptorDistance;
 
 /**
- * Contains all the formulas for encoding and decoding BCH and Reid-Solomon codes. For a more accessible
+ * Contains all the formulas for encoding and decoding BCH and Reed-Solomon codes. For a more accessible
  * introduction to this material see [1] and [2].
  *
  * <pre>

@@ -33,7 +33,7 @@ import java.util.Arrays;
  *
  * @author Peter Abeles
  */
-public class ReidSolomonCodes {
+public class ReedSolomonCodes {
 
 	GaliosFieldTableOps math;
 
@@ -51,7 +51,7 @@ public class ReidSolomonCodes {
 	DogArray_I8 errorX = new DogArray_I8();
 	DogArray_I8 err_loc_prime_tmp = new DogArray_I8();
 
-	public ReidSolomonCodes( int numBits, int primitive ) {
+	public ReedSolomonCodes( int numBits, int primitive ) {
 		math = new GaliosFieldTableOps(numBits, primitive);
 	}
 
