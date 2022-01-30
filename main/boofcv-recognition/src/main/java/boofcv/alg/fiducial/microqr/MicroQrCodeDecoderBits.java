@@ -21,7 +21,7 @@ package boofcv.alg.fiducial.microqr;
 import boofcv.alg.fiducial.qrcode.PackedBits8;
 import boofcv.alg.fiducial.qrcode.QrCode;
 import boofcv.alg.fiducial.qrcode.QrCodeCodecBitsUtils;
-import boofcv.alg.fiducial.qrcode.ReedSolomonCodes;
+import boofcv.alg.fiducial.qrcode.ReedSolomonCodes_U8;
 import boofcv.misc.BoofMiscOps;
 import lombok.Getter;
 import org.ddogleg.struct.DogArray_I8;
@@ -41,7 +41,7 @@ import static boofcv.alg.fiducial.qrcode.QrCodeCodecBitsUtils.flipBits8;
  */
 public class MicroQrCodeDecoderBits implements VerbosePrint {
 	// used to compute error correction
-	ReedSolomonCodes rscodes = new ReedSolomonCodes(8, 0b100011101);
+	ReedSolomonCodes_U8 rscodes = new ReedSolomonCodes_U8(8, 0b100011101);
 	// storage for the data message
 	DogArray_I8 message = new DogArray_I8();
 	// storage fot the message's ecc

@@ -33,9 +33,8 @@ import java.util.Arrays;
  *
  * @author Peter Abeles
  */
-public class ReedSolomonCodes {
-
-	GaliosFieldTableOps math;
+public class ReedSolomonCodes_U8 {
+	GaliosFieldTableOps_U8 math;
 
 	DogArray_I8 generator = new DogArray_I8();
 
@@ -51,8 +50,8 @@ public class ReedSolomonCodes {
 	DogArray_I8 errorX = new DogArray_I8();
 	DogArray_I8 err_loc_prime_tmp = new DogArray_I8();
 
-	public ReedSolomonCodes( int numBits, int primitive ) {
-		math = new GaliosFieldTableOps(numBits, primitive);
+	public ReedSolomonCodes_U8( int numBits, int primitive ) {
+		math = new GaliosFieldTableOps_U8(numBits, primitive);
 	}
 
 	public void setDegree( int degree ) {

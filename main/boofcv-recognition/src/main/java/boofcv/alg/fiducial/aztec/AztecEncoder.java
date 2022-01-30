@@ -19,7 +19,7 @@
 package boofcv.alg.fiducial.aztec;
 
 import boofcv.alg.fiducial.qrcode.PackedBits8;
-import boofcv.alg.fiducial.qrcode.ReedSolomonCodes;
+import boofcv.alg.fiducial.qrcode.ReedSolomonCodes_U8;
 import org.ddogleg.struct.DogArray_I8;
 
 /**
@@ -29,7 +29,7 @@ import org.ddogleg.struct.DogArray_I8;
  */
 public class AztecEncoder {
 	// Error correction for encoding the message mode
-	ReedSolomonCodes eccMode = new ReedSolomonCodes(4, 19);
+	ReedSolomonCodes_U8 eccMode = new ReedSolomonCodes_U8(4, 19);
 
 	// Storage for input and output when computing ECC bits
 	DogArray_I8 eccInput = new DogArray_I8();
