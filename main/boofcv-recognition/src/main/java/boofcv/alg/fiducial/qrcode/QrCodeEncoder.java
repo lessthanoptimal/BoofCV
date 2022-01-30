@@ -508,7 +508,7 @@ public class QrCodeEncoder {
 		int startEcc = numBlocksA*wordsBlockDataA + numBlocksB*wordsBlockDataB;
 		int totalBlocks = numBlocksA + numBlocksB;
 
-		rscodes.generator(wordsEcc);
+		rscodes.generatorQR(wordsEcc);
 		ecc.resize(wordsEcc);
 		encodeBlocks(stream, wordsBlockDataA, numBlocksA, 0, 0, startEcc, totalBlocks);
 		encodeBlocks(stream, wordsBlockDataB, numBlocksB, wordsBlockDataA*numBlocksA, numBlocksA, startEcc, totalBlocks);

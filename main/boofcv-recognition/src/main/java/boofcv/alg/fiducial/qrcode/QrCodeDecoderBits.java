@@ -81,7 +81,7 @@ public class QrCodeDecoderBits {
 		qr.corrected = new byte[totalDataBytes];
 
 		ecc.resize(wordsEcc);
-		rscodes.generator(wordsEcc);
+		rscodes.generatorQR(wordsEcc);
 
 		totalErrorBits = 0;
 		if (!decodeBlocks(qr, wordsBlockDataA, numBlocksA, 0, 0, totalDataBytes, totalBlocks))

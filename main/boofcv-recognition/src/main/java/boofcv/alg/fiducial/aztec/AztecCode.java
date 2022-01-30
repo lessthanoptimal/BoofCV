@@ -32,8 +32,26 @@ public class AztecCode {
 	/** Number of layers or rings outside the locator pattern that data is encoded on */
 	public int dataLayers = 0;
 
+	/** Number of code words in the marker */
+	public int messageLength = 0;
+
+	/** The raw byte data encoded into the QR Code. data + ecc */
+	public byte[] rawbits;
+
+	/** Raw byte data after error correction has been applied to it. Only contains the data portion */
+	public byte[] corrected;
+
 	/** Which Structure does it have. Determines shape of locator pattern and maximum number of data layers. */
 	public Structure structure = Structure.COMPACT;
+
+	/**
+	 * True if the marker was incorrectly encoded or is being viewed in a mirror because the bits locations are
+	 * transposed.
+	 */
+	public boolean transposed;
+
+	/** Number of bit errors detected when apply error correction to the message */
+	public int totalBitErrors;
 
 	/**
 	 * Locations of extern contours around the squares in a locator pattern. Starts from the innermost ring to

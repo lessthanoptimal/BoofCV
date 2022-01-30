@@ -496,7 +496,7 @@ public class MicroQrCodeEncoder implements VerbosePrint {
 
 		message.resize(dataInfo.dataCodewords);
 
-		rscodes.generator(wordsEcc);
+		rscodes.generatorQR(wordsEcc);
 		ecc.resize(wordsEcc);
 
 		System.arraycopy(stream.data, 0, message.data, 0, stream.arrayLength());

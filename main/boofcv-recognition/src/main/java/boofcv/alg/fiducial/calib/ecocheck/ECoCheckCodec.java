@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -164,7 +164,7 @@ public class ECoCheckCodec {
 		// Compute the number of bytes to encode it all
 		ecc.resize(eccWords);
 		bits.resize(messageBitCount);
-		rscodes.generator(eccWords);
+		rscodes.generatorQR(eccWords);
 
 		// only save bits that are in the word
 		wordMask = BoofMiscOps.generateBitMask(WORD_BITS);

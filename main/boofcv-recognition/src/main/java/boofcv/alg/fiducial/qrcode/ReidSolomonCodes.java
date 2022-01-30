@@ -56,7 +56,7 @@ public class ReidSolomonCodes {
 	}
 
 	public void setDegree( int degree ) {
-		generator(degree);
+		generatorQR(degree);
 	}
 
 	/**
@@ -320,7 +320,7 @@ public class ReidSolomonCodes {
 	 *
 	 * g<sub>4</sub>(x) = (x - α0) (x - α1) (x - α2) (x - α3) = 01 x4 + 0f x3 + 36 x2 + 78 x + 40
 	 */
-	public void generator( int degree ) {
+	public void generatorQR( int degree ) {
 		// initialize to a polynomial = 1
 		initToOne(generator, degree + 1);
 
@@ -329,6 +329,25 @@ public class ReidSolomonCodes {
 		tmp1.data[0] = 1;
 		for (int i = 0; i < degree; i++) {
 			tmp1.data[1] = (byte)math.power(2, i);
+			math.polyMult(generator, tmp1, tmp0);
+			generator.setTo(tmp0);
+		}
+	}
+
+	/**
+	 * Creates the generator function for Aztec codes.
+	 * an = 2**n
+	 * g<sub>5</sub>(x) = (x - α1) ... (x - α5) = x**5 + 11x**4 + 6x**2 + 2x + 1
+	 */
+	public void generatorAztec( int degree ) {
+		// initialize to a polynomial = 1
+		initToOne(generator, degree + 1);
+
+		// (1*x - a[i])
+		tmp1.resize(2);
+		tmp1.data[0] = 1;
+		for (int i = 0; i < degree; i++) {
+			tmp1.data[1] = (byte)math.power(2, i + 1);
 			math.polyMult(generator, tmp1, tmp0);
 			generator.setTo(tmp0);
 		}
