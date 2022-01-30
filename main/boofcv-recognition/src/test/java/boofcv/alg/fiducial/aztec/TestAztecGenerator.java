@@ -25,7 +25,8 @@ import org.junit.jupiter.api.Test;
 public class TestAztecGenerator {
 	@Test void foo() {
 		var marker = new AztecCode();
-		marker.dataLayers = 16;
+		marker.dataLayers = 1;
+		marker.messageLength = 10;
 		marker.structure = AztecCode.Structure.FULL;
 
 		GrayU8 image = AztecGenerator.renderImage(10, 0, marker);
