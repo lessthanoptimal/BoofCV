@@ -83,13 +83,13 @@ public class AztecGenerator {
 	 * Renders symbols which are fixed because they are independent of the encoded data
 	 */
 	private void renderFixedPatterns( AztecCode marker ) {
-//		orientationPattern(orientationLoc, orientationLoc, orientationSquareCount);
+		orientationPattern(orientationLoc, orientationLoc, orientationSquareCount);
 
 		locatorPattern(orientationLoc + 2*squareWidth, orientationLoc + 2*squareWidth,
 				marker.getLocatorRingCount(), marker.locatorRings);
 
 		// Render the reference grid
-		if (marker.structure == AztecCode.Structure.FULL && marker.dataLayers > 4) {
+		if (marker.structure == AztecCode.Structure.FULL) {
 			int center = lengthInSquares/2;
 			int odd = ((lengthInSquares - orientationSquareCount)/2)%2;
 			for (int location = 0; center + location < lengthInSquares; location += 16) {
@@ -154,7 +154,6 @@ public class AztecGenerator {
 	void encodeBitsLine( int startBit, int count,
 						 double x0, double y0, int dx, int dy,
 						 boolean skipMiddle ) {
-
 		if (skipMiddle) {
 			// Render the first half
 			int middle = count/2;
@@ -265,7 +264,7 @@ public class AztecGenerator {
 		int ringRadius = ringWidth/2;
 
 		// is there a reference grid?
-		boolean hasGrid = marker.dataLayers > 4;
+		boolean hasGrid = marker.structure == AztecCode.Structure.FULL;
 
 		// initial coordinates for traversal
 		int row = -ringRadius - 2;

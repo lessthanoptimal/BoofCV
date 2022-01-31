@@ -85,7 +85,19 @@ public class AztecCode {
 
 	/** Returns the maximum number of bits that can be encoded */
 	public int getMaxBitEncoded() {
-		return structure.getMaxBitsForLayers(dataLayers);
+		return structure.getCodewords(dataLayers)*getCodewordBitCount();
+	}
+
+	/** Returns number bits in a code word */
+	public int getCodewordBitCount() {
+		if (dataLayers <= 2)
+			return 6;
+		else if (dataLayers <= 8)
+			return 8;
+		else if (dataLayers <= 22)
+			return 10;
+		else
+			return 12;
 	}
 
 	public void reset() {
@@ -100,24 +112,24 @@ public class AztecCode {
 
 	/** Which symbol structure is used */
 	enum Structure {
-		COMPACT(4, new int[]{102, 240, 408, 608}),
-		FULL(32, new int[]{126, 288, 480, 704, 960, 1248, 1568, 1920, 2300, 2720, 3160, 3640,
-				4160, 4700, 5280, 5880, 6520, 7200, 7900, 8640, 9400, 10200, 11040,
-				11904, 12792, 13728, 14688, 15672, 16704, 17760, 18840, 19968});
+		COMPACT(4, new int[]{17, 40, 51, 76}),
+		FULL(32, new int[]{21, 48, 60, 88, 120, 156, 196, 240, 230, 272,
+				316, 364, 416, 470, 528, 588, 652, 720, 790, 864, 940,
+				1020, 920, 992, 1066, 1144, 1224, 1306, 1392, 1480, 1570, 1664});
 
-		Structure( int maxDataLayers, int[] maxBitsForLayers ) {
+		Structure( int maxDataLayers, int[] codewords ) {
 			this.maxDataLayers = maxDataLayers;
-			this.maxBitsForLayers = maxBitsForLayers;
+			this.codewords = codewords;
 		}
 
 		/** Maximum number of data layers */
 		@Getter int maxDataLayers;
 
-		int[] maxBitsForLayers;
+		int[] codewords;
 
-		/** Returns the maximum number of bits that can be encoded with the specified number of data layers */
-		public int getMaxBitsForLayers( int level ) {
-			return maxBitsForLayers[level - 1];
+		/** Returns number of codewords available at this level */
+		public int getCodewords( int level ) {
+			return codewords[level - 1];
 		}
 	}
 }

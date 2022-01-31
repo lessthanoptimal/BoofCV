@@ -24,10 +24,12 @@ import org.ddogleg.struct.DogArray_I16;
 import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class TestAztecGenerator {
 	@Test void foo() {
 		var marker = new AztecCode();
-		marker.dataLayers = 32;
+		marker.dataLayers = 12;
 		marker.messageLength = 10;
 		marker.structure = AztecCode.Structure.FULL;
 
@@ -50,17 +52,10 @@ public class TestAztecGenerator {
 
 				int expected = marker.getMaxBitEncoded();
 				int found = coordinates.size/2;
-				int adjusted = found;
-				if (dataLayers <= 2)
-					adjusted -= found%6;
-				else if (dataLayers <= 8)
-					adjusted -= found%8;
-				else if (dataLayers <= 22)
-					adjusted -= found%10;
-				else
-					adjusted -= found%12;
-				System.out.println(expected + " " + found + " foo " + adjusted);
-//				assertEquals(expected, found, structure + " " + dataLayers);
+
+				// only full codewords can be encoded
+				found -= found%marker.getCodewordBitCount();
+				assertEquals(expected, found, structure + " " + dataLayers);
 			}
 		}
 	}

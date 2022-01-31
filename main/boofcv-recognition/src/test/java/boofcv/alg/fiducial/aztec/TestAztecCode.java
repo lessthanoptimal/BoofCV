@@ -79,4 +79,9 @@ public class TestAztecCode {
 		marker.structure = AztecCode.Structure.FULL;
 		assertEquals(9, marker.getLocatorSquareCount());
 	}
+
+	@Test void countCodewords() {
+		assertEquals(4, AztecCode.Structure.COMPACT.codewords.length);
+		assertEquals(32, AztecCode.Structure.FULL.codewords.length);
+	}
 }
