@@ -30,10 +30,17 @@ public class TestAztecGenerator {
 	@Test void foo() {
 		var marker = new AztecCode();
 		marker.dataLayers = 12;
-		marker.messageLength = 10;
+		marker.messageWordCount = 10;
 		marker.structure = AztecCode.Structure.FULL;
 
 		GrayU8 image = AztecGenerator.renderImage(5, 0, marker);
+		ShowImages.showBlocking(image, "Aztec Code", 120_000, true);
+	}
+
+	@Test void moo() {
+		var marker = new AztecEncoder().addUpper("C").addLower("ode").addPunctuation("!").fixate();
+
+		GrayU8 image = AztecGenerator.renderImage(10, 0, marker);
 		ShowImages.showBlocking(image, "Aztec Code", 120_000, true);
 	}
 
@@ -50,11 +57,11 @@ public class TestAztecGenerator {
 				marker.dataLayers = dataLayers;
 				AztecGenerator.computeDataBitCoordinates(marker, coordinates, layerStartsAtBit);
 
-				int expected = marker.getMaxBitEncoded();
+				int expected = marker.getCapacityBits();
 				int found = coordinates.size/2;
 
 				// only full codewords can be encoded
-				found -= found%marker.getCodewordBitCount();
+				found -= found%marker.getWordBitCount();
 				assertEquals(expected, found, structure + " " + dataLayers);
 			}
 		}

@@ -54,10 +54,6 @@ public class ReedSolomonCodes_U8 {
 		math = new GaliosFieldTableOps_U8(numBits, primitive);
 	}
 
-	public void setDegree( int degree ) {
-		generatorQR(degree);
-	}
-
 	/**
 	 * Given the input message compute the error correction code for it
 	 *
@@ -65,7 +61,6 @@ public class ReedSolomonCodes_U8 {
 	 * @param output error correction code
 	 */
 	public void computeECC( DogArray_I8 input, DogArray_I8 output ) {
-
 		int N = generator.size - 1;
 		input.extend(input.size + N);
 		Arrays.fill(input.data, input.size - N, input.size, (byte)0);

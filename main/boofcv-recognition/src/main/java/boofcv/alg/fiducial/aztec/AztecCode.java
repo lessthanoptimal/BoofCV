@@ -28,18 +28,20 @@ import org.ddogleg.struct.DogArray;
  * @author Peter Abeles
  */
 public class AztecCode {
-
 	/** Number of layers or rings outside the locator pattern that data is encoded on */
 	public int dataLayers = 0;
 
-	/** Number of code words in the marker */
-	public int messageLength = 0;
+	/** Number of code words used to encode the message. Code words have variable bit count. */
+	public int messageWordCount = 0;
 
 	/** The raw byte data encoded into the QR Code. data + ecc */
 	public byte[] rawbits;
 
 	/** Raw byte data after error correction has been applied to it. Only contains the data portion */
 	public byte[] corrected;
+
+	/** The decoded message */
+	public String message = "";
 
 	/** Which Structure does it have. Determines shape of locator pattern and maximum number of data layers. */
 	public Structure structure = Structure.COMPACT;
@@ -83,13 +85,15 @@ public class AztecCode {
 		return (getLocatorRingCount() - 1)*4 + 1;
 	}
 
-	/** Returns the maximum number of bits that can be encoded */
-	public int getMaxBitEncoded() {
-		return structure.getCodewords(dataLayers)*getCodewordBitCount();
+	/** Returns the maximum number of bits that can be encoded. Data and ECC combined */
+	public int getCapacityBits() {
+		return structure.getCodewords(dataLayers)*getWordBitCount();
 	}
 
 	/** Returns number bits in a code word */
-	public int getCodewordBitCount() {
+	public int getWordBitCount() {
+		if (dataLayers < 1)
+			throw new RuntimeException("Invalid number of layers. layers=" + dataLayers);
 		if (dataLayers <= 2)
 			return 6;
 		else if (dataLayers <= 8)
@@ -103,10 +107,28 @@ public class AztecCode {
 	public void reset() {
 		dataLayers = 0;
 		structure = Structure.COMPACT;
+		message = "";
+		rawbits = null;
+		corrected = null;
+		transposed = false;
+		totalBitErrors = 0;
 		locatorRings.reset();
 	}
 
 	public AztecCode setTo( AztecCode src ) {
+		dataLayers = src.dataLayers;
+		messageWordCount = src.messageWordCount;
+		message = src.message;
+		rawbits = src.rawbits == null ? null : src.rawbits.clone();
+		corrected = src.corrected == null ? null : src.corrected.clone();
+		structure = src.structure;
+		transposed = src.transposed;
+		totalBitErrors = src.totalBitErrors;
+		locatorRings.resize(src.locatorRings.size);
+		for (int i = 0; i < src.locatorRings.size; i++) {
+			locatorRings.get(i).setTo(src.locatorRings.get(i));
+		}
+
 		return this;
 	}
 
@@ -123,13 +145,25 @@ public class AztecCode {
 		}
 
 		/** Maximum number of data layers */
-		@Getter int maxDataLayers;
+		@Getter final int maxDataLayers;
 
-		int[] codewords;
+		// stores number of codewords that can be saved in a marker with this many layers-1.
+		final int[] codewords;
 
 		/** Returns number of codewords available at this level */
 		public int getCodewords( int level ) {
 			return codewords[level - 1];
 		}
+	}
+
+	enum Encodings {
+		UPPER,
+		LOWER,
+		MIXED,
+		PUNCT,
+		DIGIT,
+		FNC1,
+		ECI,
+		BYTE
 	}
 }

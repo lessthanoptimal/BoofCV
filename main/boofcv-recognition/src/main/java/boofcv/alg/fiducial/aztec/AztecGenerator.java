@@ -21,6 +21,7 @@ package boofcv.alg.fiducial.aztec;
 import boofcv.alg.drawing.FiducialImageEngine;
 import boofcv.alg.drawing.FiducialRenderEngine;
 import boofcv.alg.fiducial.qrcode.PackedBits8;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.GrayU8;
 import georegression.struct.shapes.Polygon2D_F64;
 import lombok.Getter;
@@ -49,7 +50,7 @@ public class AztecGenerator {
 	protected DogArray_I16 dataCoordinates = new DogArray_I16();
 	protected DogArray_I32 layerStartsAtBit = new DogArray_I32();
 
-	AztecEncoder encoder = new AztecEncoder();
+	AztecCodecMode codecMode = new AztecCodecMode();
 	PackedBits8 bits = new PackedBits8();
 
 	/** Convenience function for rendering images */
@@ -107,7 +108,7 @@ public class AztecGenerator {
 	 */
 	private void renderModeMessage( AztecCode marker ) {
 		// Encode the mode into a binary message
-		encoder.encodeModeMessage(marker, bits);
+		codecMode.encodeMode(marker, bits);
 
 		// short hand variables to cut down on verbosity
 		final double s = squareWidth;
@@ -132,10 +133,20 @@ public class AztecGenerator {
 		// Get the location of each bit in the image
 		computeDataBitCoordinates(marker, dataCoordinates, layerStartsAtBit);
 
+		PackedBits8 bits = PackedBits8.wrap(marker.rawbits, marker.getCapacityBits());
+
+		// Make sure the number of coordinates and bits are close
+		BoofMiscOps.checkTrue(Math.abs(dataCoordinates.size/2 - bits.size) < marker.getWordBitCount(),
+				"Improperly constructed marker");
+
 		// Draw the bits which have a value of one
-		for (int i = 0; i < dataCoordinates.size; i += 2) {
-			int row = dataCoordinates.data[i];
-			int col = dataCoordinates.data[i + 1];
+		for (int i = 0; i < bits.size; i++) {
+			if (bits.get(i) != 1)
+				continue;
+
+			int j = i*2;
+			int row = dataCoordinates.data[j];
+			int col = dataCoordinates.data[j + 1];
 
 			int x = col + lengthInSquares/2;
 			int y = row + lengthInSquares/2;
