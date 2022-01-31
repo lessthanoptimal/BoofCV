@@ -25,6 +25,8 @@ import boofcv.struct.image.GrayU8;
 import georegression.struct.shapes.Polygon2D_F64;
 import lombok.Getter;
 import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I16;
+import org.ddogleg.struct.DogArray_I32;
 
 /**
  * Generates an image of an Aztec Code marker as specified in ISO/IEC 24778:2008(E)
@@ -42,6 +44,10 @@ public class AztecGenerator {
 	protected double orientationLoc; // (x,y) image coordinate of top-left corner of orientation pattern square
 	/** Used to render the marker */
 	@Getter protected FiducialRenderEngine render;
+
+	/** Location of each bit in marker square coordinates */
+	protected DogArray_I16 dataCoordinates = new DogArray_I16();
+	protected DogArray_I32 layerStartsAtBit = new DogArray_I32();
 
 	AztecEncoder encoder = new AztecEncoder();
 	PackedBits8 bits = new PackedBits8();
@@ -68,7 +74,7 @@ public class AztecGenerator {
 
 		renderFixedPatterns(marker);
 		renderModeMessage(marker);
-		// TODO Render data layers
+		renderDataLayers(marker);
 
 		return this;
 	}
@@ -77,7 +83,7 @@ public class AztecGenerator {
 	 * Renders symbols which are fixed because they are independent of the encoded data
 	 */
 	private void renderFixedPatterns( AztecCode marker ) {
-		orientationPattern(orientationLoc, orientationLoc, orientationSquareCount);
+//		orientationPattern(orientationLoc, orientationLoc, orientationSquareCount);
 
 		locatorPattern(orientationLoc + 2*squareWidth, orientationLoc + 2*squareWidth,
 				marker.getLocatorRingCount(), marker.locatorRings);
@@ -119,6 +125,23 @@ public class AztecGenerator {
 		encodeBitsLine(n, n, orientationLoc + w, orientationLoc + s, 0, 1, hasGrid);
 		encodeBitsLine(n*2, n, orientationLoc + w - 2*s, orientationLoc + w, -1, 0, hasGrid);
 		encodeBitsLine(n*3, n, orientationLoc - s, orientationLoc + w - 2*s, 0, -1, hasGrid);
+	}
+
+	/** Renders the encoded message while skipping over reference grid */
+	private void renderDataLayers( AztecCode marker ) {
+		// Get the location of each bit in the image
+		computeDataBitCoordinates(marker, dataCoordinates, layerStartsAtBit);
+
+		// Draw the bits which have a value of one
+		for (int i = 0; i < dataCoordinates.size; i += 2) {
+			int row = dataCoordinates.data[i];
+			int col = dataCoordinates.data[i + 1];
+
+			int x = col + lengthInSquares/2;
+			int y = row + lengthInSquares/2;
+
+			render.square(x*squareWidth, y*squareWidth, squareWidth);
+		}
 	}
 
 	/**
@@ -222,6 +245,104 @@ public class AztecGenerator {
 
 			render.square(x, y, squareWidth, squareWidth);
 		}
+	}
+
+	/**
+	 * Computes the coordinate of each bit in the marker in units of squares as specified in Figure 5.
+	 * Coordinate system will have (0, 0) be the marker's center. +x right and +y down.
+	 *
+	 * @param coordinates Coordinates are encoded as interleaved (row, col)
+	 * @param layerStart The bit at which each layer starts
+	 */
+	public static void computeDataBitCoordinates( AztecCode marker,
+												  DogArray_I16 coordinates, DogArray_I32 layerStart ) {
+		// clear old data
+		coordinates.reset();
+		layerStart.reset();
+
+		// First layer goes around the orientation pattern + mode bits
+		int ringWidth = marker.getLocatorSquareCount() + 6;
+		int ringRadius = ringWidth/2;
+
+		// is there a reference grid?
+		boolean hasGrid = marker.dataLayers > 4;
+
+		// initial coordinates for traversal
+		int row = -ringRadius - 2;
+		int col = -ringRadius;
+		int maxNum = ringWidth + 2 - (hasGrid ? 1 : 0);
+		int cornerJump = 2; // number of squares it needs to move to get to the next start corner
+
+		// traverse the marker in a spiral pattern starting from the innermost layer outside the static objects
+		for (int layer = 1; layer <= marker.dataLayers; layer++) {
+			layerStart.add(coordinates.size);
+			// Add coordinates one side at a time in this layer
+			int traversed = dataBitCoordinatesLine(row, col, 0, 1, maxNum, hasGrid, coordinates);
+			col += traversed - 1;
+			row += cornerJump;
+			dataBitCoordinatesLine(row, col, 1, 0, maxNum, hasGrid, coordinates);
+			col -= cornerJump;
+			row += traversed - 1;
+			dataBitCoordinatesLine(row, col, 0, -1, maxNum, hasGrid, coordinates);
+			col -= traversed - 1;
+			row -= cornerJump;
+			dataBitCoordinatesLine(row, col, -1, 0, maxNum, hasGrid, coordinates);
+
+			// Move the corner to the next Row
+			row -= traversed + 1;
+			maxNum = maxNum + 4;
+
+			// See if the next layer will encounter a reference grid that needs to be jumped over
+			if (row%16 == 0 || (row + 1)%16 == 0) {
+				row -= 1;
+				cornerJump = 3;
+			} else {
+				cornerJump = 2;
+			}
+		}
+	}
+
+	/**
+	 * Adds "domino" coordinates long the line while taking in account the reference grid
+	 *
+	 * @param row0 initial grid coordinate
+	 * @param drow direction it should scan along
+	 * @param length number of squares along the line it needs to write
+	 * @param hasGrid If the marker has a reference grid
+	 * @return Returns distance it traversed, including skipped squares
+	 */
+	static int dataBitCoordinatesLine( int row0, int col0, int drow, int dcol, int length,
+									   boolean hasGrid,
+									   DogArray_I16 coordinates ) {
+		// See if the other side of the domino will hit a reference grid and needs to jump over it
+		int leg = 1;
+		if (hasGrid && (((row0 + dcol)%16) == 0 || ((col0 - drow)%16) == 0))
+			leg = 2;
+
+		// Add dominoes along the line while skipping over reference grids
+		coordinates.reserve(coordinates.size + 4*length);
+		int locationIndex = coordinates.size;
+		int traversed = 0;
+		int written = 0;
+		while (written < length) {
+			int row = row0 + drow*traversed;
+			int col = col0 + dcol*traversed;
+			traversed++;
+
+			// see if this coordinate is touching a reference grid
+			if (hasGrid && ((row%16) == 0 || (col%16) == 0))
+				continue;
+
+			// "domino" with most significant bit first. Makes sense if you look at figure 5
+			coordinates.data[locationIndex++] = (short)row;
+			coordinates.data[locationIndex++] = (short)col;
+			coordinates.data[locationIndex++] = (short)(row + dcol*leg);
+			coordinates.data[locationIndex++] = (short)(col - drow*leg);
+			coordinates.size += 4;
+
+			written++;
+		}
+		return traversed;
 	}
 
 	public AztecGenerator setMarkerWidth( double width ) {

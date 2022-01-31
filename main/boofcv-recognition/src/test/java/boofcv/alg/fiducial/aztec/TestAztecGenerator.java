@@ -20,16 +20,48 @@ package boofcv.alg.fiducial.aztec;
 
 import boofcv.gui.image.ShowImages;
 import boofcv.struct.image.GrayU8;
+import org.ddogleg.struct.DogArray_I16;
+import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
 
 public class TestAztecGenerator {
 	@Test void foo() {
 		var marker = new AztecCode();
-		marker.dataLayers = 1;
+		marker.dataLayers = 32;
 		marker.messageLength = 10;
 		marker.structure = AztecCode.Structure.FULL;
 
-		GrayU8 image = AztecGenerator.renderImage(10, 0, marker);
+		GrayU8 image = AztecGenerator.renderImage(5, 0, marker);
 		ShowImages.showBlocking(image, "Aztec Code", 120_000, true);
+	}
+
+	/**
+	 * Generate coordinates for all possible markers and see if there are the expected number of bits
+	 */
+	@Test void computeDataBitCoordinates() {
+		var layerStartsAtBit = new DogArray_I32();
+		var marker = new AztecCode();
+		var coordinates = new DogArray_I16();
+		for (var structure : AztecCode.Structure.values()) {
+			marker.structure = structure;
+			for (int dataLayers = 1; dataLayers <= structure.maxDataLayers; dataLayers++) {
+				marker.dataLayers = dataLayers;
+				AztecGenerator.computeDataBitCoordinates(marker, coordinates, layerStartsAtBit);
+
+				int expected = marker.getMaxBitEncoded();
+				int found = coordinates.size/2;
+				int adjusted = found;
+				if (dataLayers <= 2)
+					adjusted -= found%6;
+				else if (dataLayers <= 8)
+					adjusted -= found%8;
+				else if (dataLayers <= 22)
+					adjusted -= found%10;
+				else
+					adjusted -= found%12;
+				System.out.println(expected + " " + found + " foo " + adjusted);
+//				assertEquals(expected, found, structure + " " + dataLayers);
+			}
+		}
 	}
 }
