@@ -87,11 +87,20 @@ public class AztecCode {
 
 	/** Returns the maximum number of bits that can be encoded. Data and ECC combined */
 	public int getCapacityBits() {
-		return structure.getCodewords(dataLayers)*getWordBitCount();
+		return getCapacityWords()*getWordBitCount();
+	}
+
+	/** Returns the maximum number of codewords that can be stored in the marker. */
+	public int getCapacityWords() {
+		return structure.getCodewords(dataLayers);
 	}
 
 	/** Returns number bits in a code word */
 	public int getWordBitCount() {
+		return getWordBitCount(dataLayers);
+	}
+
+	public static int getWordBitCount(int dataLayers) {
 		if (dataLayers < 1)
 			throw new RuntimeException("Invalid number of layers. layers=" + dataLayers);
 		if (dataLayers <= 2)
@@ -154,16 +163,27 @@ public class AztecCode {
 		public int getCodewords( int level ) {
 			return codewords[level - 1];
 		}
+
+		public int getCapacityBits( int level ) {
+			return getCodewords(level)*getWordBitCount(level);
+		}
 	}
 
 	enum Encodings {
-		UPPER,
-		LOWER,
-		MIXED,
-		PUNCT,
-		DIGIT,
-		FNC1,
-		ECI,
-		BYTE
+		UPPER(5),
+		LOWER(5),
+		MIXED(5),
+		PUNCT(5),
+		DIGIT(4),
+		FNC1(5),
+		ECI(8),
+		BYTE(8);
+
+		Encodings(int wordSize) {
+			this.wordSize = wordSize;
+		}
+
+		@Getter
+		final int wordSize;
 	}
 }

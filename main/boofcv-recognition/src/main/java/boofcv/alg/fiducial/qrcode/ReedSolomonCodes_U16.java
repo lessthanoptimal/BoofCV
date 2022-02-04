@@ -54,10 +54,6 @@ public class ReedSolomonCodes_U16 {
 		math = new GaliosFieldTableOps_U16(numBits, primitive);
 	}
 
-	public void setDegree( int degree ) {
-		generatorQR(degree);
-	}
-
 	/**
 	 * Given the input message compute the error correction code for it
 	 *
@@ -65,7 +61,6 @@ public class ReedSolomonCodes_U16 {
 	 * @param output error correction code
 	 */
 	public void computeECC( DogArray_I16 input, DogArray_I16 output ) {
-
 		int N = generator.size - 1;
 		input.extend(input.size + N);
 		Arrays.fill(input.data, input.size - N, input.size, (short)0);
@@ -318,6 +313,8 @@ public class ReedSolomonCodes_U16 {
 	 * of factors of (x-a_n) where a_n is a power of 2.<br>
 	 *
 	 * g<sub>4</sub>(x) = (x - α0) (x - α1) (x - α2) (x - α3) = 01 x4 + 0f x3 + 36 x2 + 78 x + 40
+	 *
+	 * @param degree Number of words in ECC. Larger values mean more error correction
 	 */
 	public void generatorQR( int degree ) {
 		// initialize to a polynomial = 1
@@ -337,6 +334,8 @@ public class ReedSolomonCodes_U16 {
 	 * Creates the generator function for Aztec codes.
 	 * an = 2**n
 	 * g<sub>5</sub>(x) = (x - α1) ... (x - α5) = x**5 + 11x**4 + 6x**2 + 2x + 1
+	 *
+	 * @param degree Number of words in ECC. Larger values mean more error correction
 	 */
 	public void generatorAztec( int degree ) {
 		// initialize to a polynomial = 1

@@ -313,6 +313,8 @@ public class ReedSolomonCodes_U8 {
 	 * of factors of (x-a_n) where a_n is a power of 2.<br>
 	 *
 	 * g<sub>4</sub>(x) = (x - α0) (x - α1) (x - α2) (x - α3) = 01 x4 + 0f x3 + 36 x2 + 78 x + 40
+	 *
+	 * @param degree Number of words in ECC. Larger values mean more error correction
 	 */
 	public void generatorQR( int degree ) {
 		// initialize to a polynomial = 1
@@ -332,6 +334,8 @@ public class ReedSolomonCodes_U8 {
 	 * Creates the generator function for Aztec codes.
 	 * an = 2**n
 	 * g<sub>5</sub>(x) = (x - α1) ... (x - α5) = x**5 + 11x**4 + 6x**2 + 2x + 1
+	 *
+	 * @param degree Number of words in ECC. Larger values mean more error correction
 	 */
 	public void generatorAztec( int degree ) {
 		// initialize to a polynomial = 1

@@ -6,6 +6,9 @@ Date Format: year/month/day
 Date    : 2022/
 Version : 0.41
 
+- Aztec Code
+  - TODO Support B/S
+  - TODO Detect ECI and issue an error
 - SLAM
   - TODO Monocular
   - TODO Stereo
