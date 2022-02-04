@@ -1040,11 +1040,18 @@ public class BoofMiscOps {
 		}
 	}
 
-	public static String byteArrayToHex(byte[] array) {
-		var sb = new StringBuilder(array.length * 2);
+	public static String byteArrayToHex( byte[] array ) {
+		var sb = new StringBuilder(array.length*2);
 		for (int i = 0; i < array.length; i++) {
 			sb.append(String.format("%02X", array[i]));
 		}
 		return sb.toString();
+	}
+
+	/**
+	 * Returns number of bytes that are needed to store the specified number of bits
+	 */
+	public static int bitToByteCount( int numBits ) {
+		return numBits/8 + (numBits%8 == 0 ? 0 : 1);
 	}
 }

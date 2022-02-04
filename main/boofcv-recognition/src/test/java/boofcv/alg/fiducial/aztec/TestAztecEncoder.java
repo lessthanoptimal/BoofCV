@@ -29,18 +29,17 @@ public class TestAztecEncoder {
 	/**
 	 * Compare to example in specification and see if it produces the same results. Page 37
 	 */
-	@Test void example0() {
-		AztecCode marker = new AztecEncoder().addUpper("C").addLower("ode").
-				addDigit(" 2").addUpper("D").addPunctuation("!").fixate();
+	@Test void segmentsToEncodedBits_example0() {
+		AztecEncoder encoder = new AztecEncoder().addUpper("C").addLower("ode").
+				addDigit(" 2").addUpper("D").addPunctuation("!");
 
-		int messageBitCount = marker.messageWordCount*marker.getWordBitCount();
+		// test the bit array and not encoded message since padding will be added later on
+		encoder.segmentsToEncodedBits();
 
 		// Expected encoded bits in order plus any padding to make it fill the last word
-		String expected = "00100 11100 10000 00101 00110 11110 0001 0100 1111 00101 0000 00110 0000";
+		String expected = "00100 11100 10000 00101 00110 11110 0001 0100 1111 00101 0000 00110";
 		expected = expected.replace(" ", ""); // remove human readable spaces
-		var bits = new PackedBits8();
-		bits.data = marker.corrected;
-		bits.size = messageBitCount;
+		PackedBits8 bits = encoder.bits;
 
 		assertEquals(bits.size, expected.length());
 
@@ -48,7 +47,7 @@ public class TestAztecEncoder {
 			char c = expected.charAt(index);
 			assertEquals(bits.get(index) + "", c + "");
 		}
-		assertEquals("Code 2D!", marker.message);
+		assertEquals("Code 2D!", encoder.workMarker.message);
 	}
 
 	/**
@@ -107,7 +106,7 @@ public class TestAztecEncoder {
 		assertEquals(0b0000_0001, encoder.storageDataWords.get(1));
 		assertEquals(0b0110_0001, encoder.storageDataWords.get(2));
 		assertEquals(0b0000_0001, encoder.storageDataWords.get(3));
-		assertEquals(0b0000_0000, encoder.storageDataWords.get(4));
+		assertEquals(0b0011_1111, encoder.storageDataWords.get(4)); // last 6-bits are filled with 1
 	}
 
 	@Test void bitsToWords_ONES() {
@@ -127,7 +126,7 @@ public class TestAztecEncoder {
 		assertEquals(0b1111_1110, encoder.storageDataWords.get(1));
 		assertEquals(0b1110_0001, encoder.storageDataWords.get(2));
 		assertEquals(0b1111_1110, encoder.storageDataWords.get(3));
-		assertEquals(0b0000_0011, encoder.storageDataWords.get(4));
+		assertEquals(0b1111_1111, encoder.storageDataWords.get(4));
 	}
 
 	/**

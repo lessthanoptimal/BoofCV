@@ -21,6 +21,7 @@ package boofcv.alg.fiducial.aztec;
 import boofcv.alg.fiducial.aztec.AztecCode.Encodings;
 import boofcv.alg.fiducial.qrcode.PackedBits8;
 import boofcv.alg.fiducial.qrcode.ReedSolomonCodes_U16;
+import boofcv.misc.BoofMiscOps;
 import org.ddogleg.struct.DogArray_I16;
 import org.ddogleg.struct.DogArray_I8;
 
@@ -129,15 +130,17 @@ public class AztecEncoder {
 		for (int i = 0; i < ascii.length; i++) {
 			int v = ascii[i]%0xFF;
 			if (v == 32) {
-				values.add(0);
+				values.add(1);
 			} else if (v >= 1 && v <= 13) {
 				values.add((byte)(v + 1));
 			} else if (v >= 27 && v <= 31) {
 				values.add((byte)(v - 27 + 15));
 			} else if (v == 64) {
 				values.add(20);
-			} else if (v >= 92 && v <= 96) {
-				values.add((byte)(v - 92 + 21));
+			} else if (v == 92) {
+				values.add(21);
+			} else if (v >= 94 && v <= 96) {
+				values.add((byte)(v - 94 + 22));
 			} else if (v == 124) {
 				values.add(25);
 			} else if (v == 126) {
@@ -161,7 +164,7 @@ public class AztecEncoder {
 			if (i + 1 < message.length()) {
 				char b = message.charAt(i + 1);
 				boolean matched = true;
-				if (a == '\n' && b == '\r') {
+				if (a == '\r' && b == '\n') {
 					values.add(2);
 				} else if (b == ' ') {
 					if (a == '.') {
@@ -242,7 +245,7 @@ public class AztecEncoder {
 	/**
 	 * Encodes all the segments into the {@link #bits},
 	 */
-	private void segmentsToEncodedBits() {
+	void segmentsToEncodedBits() {
 		Encodings currentEncoding = Encodings.UPPER;
 		for (int segIdx = 0; segIdx < segments.size(); segIdx++) {
 			MessageSegment m = segments.get(segIdx);
@@ -272,9 +275,9 @@ public class AztecEncoder {
 	 * Compute the value of error correction words. The number of words depends on the message size and requested
 	 * amount of correction.
 	 */
-	private void computeErrorCorrectionWords() {
+	void computeErrorCorrectionWords() {
 		// it will use all possible code words in the marker for error correction
-		int maxMarkerWords = workMarker.structure.getCodewords(workMarker.dataLayers);
+		int maxMarkerWords = workMarker.getCapacityWords();
 		int actualEccWords = maxMarkerWords - storageDataWords.size;
 		storageEccWords.resize(actualEccWords);
 
@@ -297,66 +300,77 @@ public class AztecEncoder {
 		// Convert the binary data into a format ECC computation can understand
 		int wordBitCount = workMarker.getWordBitCount();
 
-		// compute value of all ones in a word
-		int ones = 0b11_1111;
-		for (int i = 6; i < wordBitCount; i++) {
-			ones |= 1 << i;
-		}
+		// A word which is filled with all ones
+		int ones = (1 << wordBitCount) - 1;
+		int onesMinusOne = ones-1;
 
+		// Write all the data that fills an entire word first
 		storageDataWords.reset();
 		int bitLocation = 0;
-		while (bitLocation < bits.size) {
-			// Make sure it doesn't read past the last bit
-			int readBits = Math.min(bits.size - bitLocation, wordBitCount);
-
+		while (bitLocation + wordBitCount <= bits.size) {
 			// Get the word's value
-			short word = (short)bits.read(bitLocation, readBits, true);
+			short word = (short)bits.read(bitLocation, wordBitCount, true);
 
 			// If a word is all zeros or all ones that's a special case. The
 			// least-significant bit is zero to the opposition value and that bit
 			// is punted to the next word
-			if (word == 0 && readBits == wordBitCount) {
-				storageDataWords.add((short)0b0000_0000_0000_0001);
-				bitLocation += readBits - 1;
+			if (word == 0) {
+				storageDataWords.add(1);
+				bitLocation += wordBitCount - 1;
 			} else if (word == (short)ones) {
-				storageDataWords.add(ones & 0xFFFE);
-				bitLocation += readBits - 1;
+				storageDataWords.add(onesMinusOne);
+				bitLocation += wordBitCount - 1;
 			} else {
 				storageDataWords.add(word);
-				bitLocation += readBits;
+				bitLocation += wordBitCount;
 			}
+
+			// Add the least significant bit again since it will be stripped away when decoded
+			if (word == 1 || word == onesMinusOne) {
+				bitLocation -= 1;
+			}
+		}
+
+		// Last word is a special case
+		if (bits.size > bitLocation) {
+			// Read in the remaining bits
+			int readBits = bits.size - bitLocation;
+			int word = bits.read(bitLocation, readBits, true);
+
+			// shift the data into the upper bits and fill the lower bits with all ones
+			int remainder = wordBitCount - readBits;
+			storageDataWords.add(((word << remainder) | (0xFFFF >> (16 - remainder))));
 		}
 
 		// Record how many words are in the encoded message
 		workMarker.messageWordCount = storageDataWords.size;
+
+		if (workMarker.messageWordCount > workMarker.getCapacityWords())
+			throw new RuntimeException("Encoded message is larger than the capacity. " +
+					"Increase number of layers if manual or report a bug if automatic");
 	}
 
 	/**
 	 * Selects the minim number of layers needed to store the data and error correction information
 	 */
 	void selectNumberOfLayers() {
-		// number of data code words
-		int dataWords = storageDataWords.size;
-
-		// Compute number of error correction words
-		int eccWords = (int)Math.ceil(errorCorrectionLength*dataWords - 3);
-
-		int minimumTotalWords = dataWords + eccWords;
-
-		// If the number of layers has already been selected, make sure it can store all the data
+		// See if the number of layers in the marker has been manually configured
 		if (workMarker.dataLayers > 0) {
-			if (workMarker.structure.getCodewords(workMarker.dataLayers) < minimumTotalWords)
-				throw new RuntimeException("Selected number of layers is insufficient");
 			return;
 		}
+
+		// Estimate the number of bits needed to encode the entire message based on the data and desired level
+		// of error correction
+		int targetBits = (int)(bits.size*(1.0 + errorCorrectionLength));
+
 		// Determine the smallest marker size that can contain this data
 		int maxLayers = workMarker.structure.maxDataLayers;
 
 		// Sanity check to make sure this can be encoded
-		int maxPossibleWords = workMarker.structure.getCodewords(maxLayers - 1);
-		if (minimumTotalWords > maxPossibleWords) {
+		int maxPossibleBits = workMarker.structure.getCapacityBits(maxLayers);
+		if (targetBits > maxPossibleBits) {
 			// See if the problem can be fixed by reducing error correction
-			if (dataWords <= maxPossibleWords) {
+			if (bits.size <= maxPossibleBits) {
 				throw new IllegalArgumentException("Too large with ECC level. Try reducing amount of ECC");
 			} else {
 				throw new IllegalArgumentException("Too large to be encoded inside a single marker");
@@ -365,8 +379,8 @@ public class AztecEncoder {
 
 		// Select the smallest number of layers to store the data
 		for (int layers = 1; layers <= maxLayers; layers++) {
-			int numWords = workMarker.structure.getCodewords(layers);
-			if (numWords >= minimumTotalWords) {
+			int capacityBits = workMarker.structure.getCapacityBits(layers);
+			if (capacityBits >= targetBits) {
 				workMarker.dataLayers = layers;
 				break;
 			}
@@ -380,18 +394,15 @@ public class AztecEncoder {
 		// To make it easier to process we will write the data words into bits, which internally
 		// uses a byte array
 		int wordBitCount = workMarker.getWordBitCount();
-		int bitCount = bits.size;
 		bits.resize(0);
 		for (int wordIdx = 0; wordIdx < storageDataWords.size; wordIdx++) {
-			// the last word will get corrupted if this isn't taken in account
-			int amount = Math.min(bitCount - wordIdx*wordBitCount, wordBitCount);
-			bits.append(storageDataWords.get(wordIdx) & 0xFFFF, amount, false);
+			bits.append(storageDataWords.get(wordIdx) & 0xFFFF, wordBitCount, false);
 		}
 
 		// copy the message into "corrected"
 		bits.size = storageDataWords.size*wordBitCount;
 		// line above is done to make sure the last byte is a full word
-		results.corrected = new byte[bits.size/8 + (bits.size%8 == 0 ? 0 : 1)];
+		results.corrected = new byte[BoofMiscOps.bitToByteCount(bits.size)];
 		System.arraycopy(bits.data, 0, results.corrected, 0, results.corrected.length);
 
 		// Add ecc data to bits
@@ -400,7 +411,7 @@ public class AztecEncoder {
 		}
 
 		// Copy the entire encoded with ECC message into raw bits
-		results.rawbits = new byte[bits.size/8 + (bits.size%8 == 0 ? 0 : 1)];
+		results.rawbits = new byte[BoofMiscOps.bitToByteCount(bits.size)];
 		System.arraycopy(bits.data, 0, results.rawbits, 0, results.rawbits.length);
 
 		return results;
@@ -427,7 +438,14 @@ public class AztecEncoder {
 					case MIXED -> append(29, 5);
 					case DIGIT -> append(30, 5);
 					case BYTE -> append(31, 5);
-					case PUNCT -> { append(0, 5); latched = false; }
+					case PUNCT -> {
+						if (m.data.size == 1) {
+							append(0, 5); latched = false;
+						} else {
+							append(29, 5); // mixed
+							append(30, 5); // punctuation-latched
+						}
+					}
 					default -> throwUnsupported(currentEncoding, m.encoding);
 				}
 			}
@@ -438,7 +456,14 @@ public class AztecEncoder {
 					case MIXED -> append(29, 5);
 					case DIGIT -> append(30, 5);
 					case BYTE -> append(31, 5);
-					case PUNCT -> { append(0, 5); latched = false; }
+					case PUNCT -> {
+						if (m.data.size == 1) {
+							append(0, 5); latched = false;
+						} else {
+							append(29, 5); // mixed
+							append(30, 5); // punctuation-latched
+						}
+					}
 					default -> throwUnsupported(currentEncoding, m.encoding);
 				}
 			}
@@ -485,7 +510,15 @@ public class AztecEncoder {
 							append(14, 4);
 						}
 					}
-					case PUNCT -> { append(0, 4); latched = false; }
+					case PUNCT -> {
+						if (m.data.size == 1) {
+							append(0, 4); latched = false;
+						} else {
+							append(14, 4); // upper
+							append(29, 5); // mixed
+							append(30, 5); // punctuation-latched
+						}
+					}
 					case MIXED -> { append(14, 4); append(29, 5); }
 					case BYTE -> { append(14, 4); append(31, 5); }
 					default -> throwUnsupported(currentEncoding, m.encoding);
