@@ -28,6 +28,9 @@ import lombok.Getter;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I16;
 import org.ddogleg.struct.DogArray_I32;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Objects;
 
 /**
  * Generates an image of an Aztec Code marker as specified in ISO/IEC 24778:2008(E)
@@ -44,7 +47,7 @@ public class AztecGenerator {
 	protected int orientationSquareCount; // squares in orientation region
 	protected double orientationLoc; // (x,y) image coordinate of top-left corner of orientation pattern square
 	/** Used to render the marker */
-	@Getter protected FiducialRenderEngine render;
+	@Nullable @Getter protected FiducialRenderEngine render;
 
 	/** Location of each bit in marker square coordinates */
 	protected DogArray_I16 dataCoordinates = new DogArray_I16();
@@ -66,7 +69,7 @@ public class AztecGenerator {
 		lengthInSquares = marker.getMarkerSquareCount();
 		squareWidth = markerWidth/lengthInSquares;
 
-		render.init();
+		Objects.requireNonNull(render, "You must set 'render' field first.").init();
 
 		// Render the orientation and locator patterns
 		orientationSquareCount = marker.getLocatorSquareCount() + 4;
@@ -140,6 +143,7 @@ public class AztecGenerator {
 				"Improperly constructed marker");
 
 		// Draw the bits which have a value of one
+		FiducialRenderEngine render = Objects.requireNonNull(this.render);
 		for (int i = 0; i < bits.size; i++) {
 			if (bits.get(i) != 1)
 				continue;
@@ -182,6 +186,7 @@ public class AztecGenerator {
 
 	/** Renders bits along the specified line */
 	void encodeBitsLine( int startBit, int count, double x0, double y0, int dx, int dy ) {
+		FiducialRenderEngine render = Objects.requireNonNull(this.render);
 		for (int bit = 0; bit < count; bit++) {
 			// 0 is encoded as white, which is the background color
 			if (bits.get(startBit + bit) == 0)
@@ -197,6 +202,8 @@ public class AztecGenerator {
 	 * the orientation pattern.
 	 */
 	protected void locatorPattern( double tl_x, double tl_y, int ringCount, DogArray<Polygon2D_F64> ringLocations ) {
+		FiducialRenderEngine render = Objects.requireNonNull(this.render);
+
 		ringLocations.resetResize(ringCount);
 		for (int ring = ringCount; ring > 0; ring--) {
 			// number of squares wide the ring is
@@ -220,6 +227,8 @@ public class AztecGenerator {
 	}
 
 	protected void orientationPattern( double tl_x, double tl_y, int moduleCount ) {
+		FiducialRenderEngine render = Objects.requireNonNull(this.render);
+
 		// shorthand
 		final double sw = squareWidth;
 		final double rw = moduleCount*sw;
@@ -239,6 +248,8 @@ public class AztecGenerator {
 	}
 
 	protected void referenceGridLine( int tl_x, int tl_y, int dx, int dy, int count ) {
+		FiducialRenderEngine render = Objects.requireNonNull(this.render);
+
 		int forbidden0 = (lengthInSquares - orientationSquareCount)/2 - 1;
 		int forbidden1 = forbidden0 + orientationSquareCount + 2;
 

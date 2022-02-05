@@ -81,7 +81,7 @@ public class TestAztecCode {
 	}
 
 	@Test void countCodewords() {
-		assertEquals(4, AztecCode.Structure.COMPACT.codewords.length);
-		assertEquals(32, AztecCode.Structure.FULL.codewords.length);
+		assertEquals(4, AztecCode.Structure.COMPACT.getMaxDataLayers());
+		assertEquals(32, AztecCode.Structure.FULL.getMaxDataLayers());
 	}
 }

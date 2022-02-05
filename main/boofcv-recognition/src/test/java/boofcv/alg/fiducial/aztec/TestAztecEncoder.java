@@ -18,7 +18,7 @@
 
 package boofcv.alg.fiducial.aztec;
 
-import boofcv.alg.fiducial.aztec.AztecCode.Encodings;
+import boofcv.alg.fiducial.aztec.AztecCode.Modes;
 import boofcv.alg.fiducial.qrcode.PackedBits8;
 import org.junit.jupiter.api.Test;
 
@@ -61,9 +61,8 @@ public class TestAztecEncoder {
 	/**
 	 * Exhaustively try all encoding transitions and see if it blows up
 	 */
-	@Test void allEncodingTransitions() {
-		var encodings = new Encodings[]{
-				Encodings.UPPER, Encodings.LOWER, Encodings.MIXED, Encodings.PUNCT, Encodings.DIGIT};
+	@Test void allModeTransitions() {
+		var encodings = new Modes[]{Modes.UPPER, Modes.LOWER, Modes.MIXED, Modes.PUNCT, Modes.DIGIT};
 		for (var a : encodings) {
 			for (var b : encodings) {
 				AztecCode marker = addEncoding(b, addEncoding(a, new AztecEncoder())).fixate();
@@ -72,7 +71,7 @@ public class TestAztecEncoder {
 		}
 	}
 
-	AztecEncoder addEncoding( Encodings encoding, AztecEncoder encoder ) {
+	AztecEncoder addEncoding( Modes encoding, AztecEncoder encoder ) {
 		return switch (encoding) {
 			case UPPER -> encoder.addUpper("A");
 			case LOWER -> encoder.addLower("a");

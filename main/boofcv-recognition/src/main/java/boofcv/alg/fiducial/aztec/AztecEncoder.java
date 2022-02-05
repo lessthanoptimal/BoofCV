@@ -18,7 +18,7 @@
 
 package boofcv.alg.fiducial.aztec;
 
-import boofcv.alg.fiducial.aztec.AztecCode.Encodings;
+import boofcv.alg.fiducial.aztec.AztecCode.Modes;
 import boofcv.alg.fiducial.qrcode.PackedBits8;
 import boofcv.alg.fiducial.qrcode.ReedSolomonCodes_U16;
 import boofcv.misc.BoofMiscOps;
@@ -101,7 +101,7 @@ public class AztecEncoder {
 			}
 			values.add((char)(value + 2));
 		}
-		segments.add(new MessageSegment(Encodings.UPPER, values, message));
+		segments.add(new MessageSegment(Modes.UPPER, values, message));
 		return this;
 	}
 
@@ -120,7 +120,7 @@ public class AztecEncoder {
 			}
 			values.add((char)(value + 2));
 		}
-		segments.add(new MessageSegment(Encodings.LOWER, values, message));
+		segments.add(new MessageSegment(Modes.LOWER, values, message));
 		return this;
 	}
 
@@ -152,7 +152,7 @@ public class AztecEncoder {
 			}
 		}
 
-		segments.add(new MessageSegment(Encodings.MIXED, values, message));
+		segments.add(new MessageSegment(Modes.MIXED, values, message));
 		return this;
 	}
 
@@ -206,7 +206,7 @@ public class AztecEncoder {
 				throw new IllegalArgumentException("Invalid ascii " + (int)a);
 			}
 		}
-		segments.add(new MessageSegment(Encodings.PUNCT, values, message));
+		segments.add(new MessageSegment(Modes.PUNCT, values, message));
 		return this;
 	}
 
@@ -224,7 +224,7 @@ public class AztecEncoder {
 				values.add(13);
 			}
 		}
-		segments.add(new MessageSegment(Encodings.DIGIT, values, message));
+		segments.add(new MessageSegment(Modes.DIGIT, values, message));
 		return this;
 	}
 
@@ -246,27 +246,27 @@ public class AztecEncoder {
 	 * Encodes all the segments into the {@link #bits},
 	 */
 	void segmentsToEncodedBits() {
-		Encodings currentEncoding = Encodings.UPPER;
+		Modes currentMode = Modes.UPPER;
 		for (int segIdx = 0; segIdx < segments.size(); segIdx++) {
 			MessageSegment m = segments.get(segIdx);
 			// Switch into the new encoding
-			boolean latched = transitionIntoEncoding(currentEncoding, m);
+			boolean latched = transitionIntoMode(currentMode, m);
 
 			// Write the data
-			switch (m.encoding) {
+			switch (m.encodingMode) {
 				case UPPER -> append(m.data, 5);
 				case LOWER -> append(m.data, 5);
 				case MIXED -> append(m.data, 5);
 				case PUNCT -> append(m.data, 5);
 				case DIGIT -> append(m.data, 4);
-				default -> throw new IllegalArgumentException("Encoding not yet supported: " + m.encoding);
+				default -> throw new IllegalArgumentException("Encoding not yet supported: " + m.encodingMode);
 			}
 
 			workMarker.message += m.message;
 
-			// Update the current encoding
+			// Update the current mode
 			if (latched) {
-				currentEncoding = m.encoding;
+				currentMode = m.encodingMode;
 			}
 		}
 	}
@@ -423,16 +423,16 @@ public class AztecEncoder {
 	}
 
 	/**
-	 * Transitions from one encoding into another.
+	 * Transitions from one mode into another.
 	 *
-	 * @return If it's latched to the new encoding or false if not
+	 * @return If it's latched to the new mode or false if not
 	 */
-	private boolean transitionIntoEncoding( Encodings currentEncoding, MessageSegment m ) {
+	private boolean transitionIntoMode( Modes currentMode, MessageSegment m ) {
 		boolean latched = true;
 		// @formatter:off
-		switch (currentEncoding) {
+		switch (currentMode) {
 			case UPPER -> {
-				switch (m.encoding) {
+				switch (m.encodingMode) {
 					case UPPER -> {}
 					case LOWER -> append(28, 5);
 					case MIXED -> append(29, 5);
@@ -446,11 +446,11 @@ public class AztecEncoder {
 							append(30, 5); // punctuation-latched
 						}
 					}
-					default -> throwUnsupported(currentEncoding, m.encoding);
+					default -> throwUnsupported(currentMode, m.encodingMode);
 				}
 			}
 			case LOWER -> {
-				switch (m.encoding) {
+				switch (m.encodingMode) {
 					case LOWER -> {}
 					case UPPER -> { append(28, 5); latched = false; }
 					case MIXED -> append(29, 5);
@@ -464,11 +464,11 @@ public class AztecEncoder {
 							append(30, 5); // punctuation-latched
 						}
 					}
-					default -> throwUnsupported(currentEncoding, m.encoding);
+					default -> throwUnsupported(currentMode, m.encodingMode);
 				}
 			}
 			case MIXED -> {
-				switch (m.encoding) {
+				switch (m.encodingMode) {
 					case MIXED -> {}
 					case LOWER -> append(28, 5);
 					case UPPER -> append(29, 5);
@@ -482,23 +482,23 @@ public class AztecEncoder {
 					}
 					case DIGIT -> { append(29, 5); append(30, 5); }
 					case BYTE -> append(31, 5);
-					default -> throwUnsupported(currentEncoding, m.encoding);
+					default -> throwUnsupported(currentMode, m.encodingMode);
 				}
 			}
 			// page 37
 			case PUNCT -> {
-				switch (m.encoding) {
+				switch (m.encodingMode) {
 					case PUNCT -> {}
 					case LOWER -> { append(31, 5); append(28, 5); }
 					case UPPER -> append(31, 5);
 					case MIXED -> { append(31, 5); append(29, 5); }
 					case DIGIT -> { append(31, 5); append(30, 5); }
 					case BYTE -> { append(31, 5); append(31, 5); }
-					default -> throwUnsupported(currentEncoding, m.encoding);
+					default -> throwUnsupported(currentMode, m.encodingMode);
 				}
 			}
 			case DIGIT -> {
-				switch (m.encoding) {
+				switch (m.encodingMode) {
 					case DIGIT -> {}
 					case LOWER -> { append(14, 4); append(28, 5); }
 					case UPPER -> {
@@ -521,10 +521,10 @@ public class AztecEncoder {
 					}
 					case MIXED -> { append(14, 4); append(29, 5); }
 					case BYTE -> { append(14, 4); append(31, 5); }
-					default -> throwUnsupported(currentEncoding, m.encoding);
+					default -> throwUnsupported(currentMode, m.encodingMode);
 				}
 			}
-			default -> throw new IllegalArgumentException("Unsupported encoding " + m.encoding);
+			default -> throw new IllegalArgumentException("Unsupported mode " + m.encodingMode);
 		}
 		// @formatter:on
 		return latched;
@@ -553,19 +553,19 @@ public class AztecEncoder {
 	}
 
 	/** Convenience function for throwing an exception for incompatible transitions */
-	private static int throwUnsupported( Encodings src, Encodings dst ) throws UnsupportedOperationException {
+	private static int throwUnsupported( Modes src, Modes dst ) throws UnsupportedOperationException {
 		throw new UnsupportedOperationException("Can't transition from " + src + " to " + dst);
 	}
 
 	public static class MessageSegment {
-		public Encodings encoding;
+		public Modes encodingMode;
 		public DogArray_I8 data;
 		public String message;
 
-		public MessageSegment( Encodings encoding,
+		public MessageSegment( Modes encodingMode,
 							   DogArray_I8 data,
 							   String message ) {
-			this.encoding = encoding;
+			this.encodingMode = encodingMode;
 			this.data = data;
 			this.message = message;
 		}
