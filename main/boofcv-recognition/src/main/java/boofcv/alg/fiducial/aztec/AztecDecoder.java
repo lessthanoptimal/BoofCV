@@ -18,7 +18,7 @@
 
 package boofcv.alg.fiducial.aztec;
 
-import boofcv.alg.fiducial.aztec.AztecCode.Encodings;
+import boofcv.alg.fiducial.aztec.AztecCode.Modes;
 import boofcv.alg.fiducial.qrcode.PackedBits8;
 import boofcv.alg.fiducial.qrcode.ReedSolomonCodes_U16;
 import boofcv.misc.BoofMiscOps;
@@ -47,11 +47,11 @@ public class AztecDecoder implements VerbosePrint {
 	DogArray_I16 storageEccWords = new DogArray_I16();
 
 	//------------------ state of decoder -----------------
-	// What type of characters are encoded
-	Encodings current = Encodings.UPPER;
-	// If not latched (shift mode) then it will switch back to this encoding after 1 character
-	@Nullable Encodings shiftEncoding = null;
-	// if lacked it won't revert to the old encoding
+	// Specifies the encoding mode for the active character set
+	Modes current = Modes.UPPER;
+	// If not latched (shift mode) then it will switch back to this mode after 1 character
+	@Nullable AztecCode.Modes shiftMode = null;
+	// if lacked it won't revert to the old mode
 	boolean latched;
 	// Results of decoded
 	StringBuilder workString = new StringBuilder();
@@ -165,9 +165,9 @@ public class AztecDecoder implements VerbosePrint {
 	boolean bitsToMessage( AztecCode marker, PackedBits8 bits  ) {
 		// Reset the state
 		latched = false;
-		shiftEncoding = null;
+		shiftMode = null;
 		workString.delete(0, workString.length());
-		current = Encodings.UPPER;
+		current = Modes.UPPER;
 
 		int location = 0;
 		while (location + current.wordSize <= bits.size) {
@@ -176,7 +176,7 @@ public class AztecDecoder implements VerbosePrint {
 
 			location += current.wordSize;
 			latched = true;
-			Encodings previous = current;
+			Modes previous = current;
 			boolean success = switch (current) {
 				case UPPER -> handleUpper(value);
 				case LOWER -> handleLower(value);
@@ -184,17 +184,17 @@ public class AztecDecoder implements VerbosePrint {
 				case PUNCT -> handlePunct(value);
 				case DIGIT -> handleDigit(value);
 				default -> {
-					if (verbose != null) verbose.println("Unhandled encoding: " + current);
+					if (verbose != null) verbose.println("Unhandled mode: " + current);
 					yield false;
 				}
 			};
 			if (!success)
 				return false;
 
-			if (shiftEncoding != null) {
-				current = shiftEncoding;
+			if (shiftMode != null) {
+				current = shiftMode;
 			}
-			shiftEncoding = latched ? null : previous;
+			shiftMode = latched ? null : previous;
 		}
 
 		marker.message = workString.toString();
@@ -204,7 +204,7 @@ public class AztecDecoder implements VerbosePrint {
 
 	boolean handleUpper( int value ) {
 		if (value == 0) {
-			current = Encodings.PUNCT;
+			current = Modes.PUNCT;
 			latched = false;
 		} else if (value == 1) {
 			workString.append(' ');
@@ -212,10 +212,10 @@ public class AztecDecoder implements VerbosePrint {
 			workString.append((char)('A' + (value - 2)));
 		} else {
 			switch (value) {
-				case 28 -> current = Encodings.LOWER;
-				case 29 -> current = Encodings.MIXED;
-				case 30 -> current = Encodings.DIGIT;
-				case 31 -> {current = Encodings.BYTE; latched = false;}
+				case 28 -> current = Modes.LOWER;
+				case 29 -> current = Modes.MIXED;
+				case 30 -> current = Modes.DIGIT;
+				case 31 -> {current = Modes.BYTE; latched = false;}
 			}
 		}
 		return true;
@@ -223,7 +223,7 @@ public class AztecDecoder implements VerbosePrint {
 
 	boolean handleLower( int value ) {
 		if (value == 0) {
-			current = Encodings.PUNCT;
+			current = Modes.PUNCT;
 			latched = false;
 		} else if (value == 1) {
 			workString.append(' ');
@@ -231,10 +231,10 @@ public class AztecDecoder implements VerbosePrint {
 			workString.append((char)('a' + (value - 2)));
 		} else {
 			switch (value) {
-				case 28 -> {current = Encodings.UPPER; latched = false;}
-				case 29 -> current = Encodings.MIXED;
-				case 30 -> current = Encodings.DIGIT;
-				case 31 -> {current = Encodings.BYTE; latched = false;}
+				case 28 -> {current = Modes.UPPER; latched = false;}
+				case 29 -> current = Modes.MIXED;
+				case 30 -> current = Modes.DIGIT;
+				case 31 -> {current = Modes.BYTE; latched = false;}
 			}
 		}
 		return true;
@@ -242,7 +242,7 @@ public class AztecDecoder implements VerbosePrint {
 
 	boolean handleMixed( int value ) {
 		if (value == 0) {
-			current = Encodings.PUNCT;
+			current = Modes.PUNCT;
 			latched = false;
 		} else if (value == 1) {
 			workString.append(' ');
@@ -261,10 +261,10 @@ public class AztecDecoder implements VerbosePrint {
 				case 25 -> workString.append('|');
 				case 26 -> workString.append('~');
 				case 27 -> workString.append((char)127);
-				case 28 -> current = Encodings.LOWER;
-				case 29 -> current = Encodings.UPPER;
-				case 30 -> current = Encodings.PUNCT;
-				case 31 -> {current = Encodings.BYTE; latched = false;}
+				case 28 -> current = Modes.LOWER;
+				case 29 -> current = Modes.UPPER;
+				case 30 -> current = Modes.PUNCT;
+				case 31 -> {current = Modes.BYTE; latched = false;}
 			}
 		}
 		return true;
@@ -285,7 +285,7 @@ public class AztecDecoder implements VerbosePrint {
 			case 28 -> workString.append(']');
 			case 29 -> workString.append('{');
 			case 30 -> workString.append('}');
-			case 31 -> current = Encodings.UPPER;
+			case 31 -> current = Modes.UPPER;
 			default -> {
 				if (value <= 20) {
 					workString.append((char)(value - 6 + 33));
@@ -299,7 +299,7 @@ public class AztecDecoder implements VerbosePrint {
 
 	boolean handleDigit( int value ) {
 		if (value == 0) {
-			current = Encodings.PUNCT;
+			current = Modes.PUNCT;
 			latched = false;
 		} else if (value == 1) {
 			workString.append(' ');
@@ -309,8 +309,8 @@ public class AztecDecoder implements VerbosePrint {
 			switch (value) {
 				case 12 -> workString.append(',');
 				case 13 -> workString.append('.');
-				case 14 -> current = Encodings.UPPER;
-				case 15 -> {current = Encodings.UPPER; latched = false;}
+				case 14 -> current = Modes.UPPER;
+				case 15 -> {current = Modes.UPPER; latched = false;}
 			}
 		}
 		return true;

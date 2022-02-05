@@ -27,6 +27,7 @@ import org.ddogleg.struct.DogArray;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class AztecCode {
 	/** Number of layers or rings outside the locator pattern that data is encoded on */
 	public int dataLayers = 0;
@@ -100,7 +101,7 @@ public class AztecCode {
 		return getWordBitCount(dataLayers);
 	}
 
-	public static int getWordBitCount(int dataLayers) {
+	public static int getWordBitCount( int dataLayers ) {
 		if (dataLayers < 1)
 			throw new RuntimeException("Invalid number of layers. layers=" + dataLayers);
 		if (dataLayers <= 2)
@@ -113,6 +114,7 @@ public class AztecCode {
 			return 12;
 	}
 
+	@SuppressWarnings({"NullAway"})
 	public void reset() {
 		dataLayers = 0;
 		structure = Structure.COMPACT;
@@ -124,6 +126,7 @@ public class AztecCode {
 		locatorRings.reset();
 	}
 
+	@SuppressWarnings({"NullAway"})
 	public AztecCode setTo( AztecCode src ) {
 		dataLayers = src.dataLayers;
 		messageWordCount = src.messageWordCount;
@@ -143,13 +146,13 @@ public class AztecCode {
 
 	/** Which symbol structure is used */
 	enum Structure {
-		COMPACT(4, new int[]{17, 40, 51, 76}),
-		FULL(32, new int[]{21, 48, 60, 88, 120, 156, 196, 240, 230, 272,
+		COMPACT(new int[]{17, 40, 51, 76}),
+		FULL(new int[]{21, 48, 60, 88, 120, 156, 196, 240, 230, 272,
 				316, 364, 416, 470, 528, 588, 652, 720, 790, 864, 940,
 				1020, 920, 992, 1066, 1144, 1224, 1306, 1392, 1480, 1570, 1664});
 
-		Structure( int maxDataLayers, int[] codewords ) {
-			this.maxDataLayers = maxDataLayers;
+		Structure( int[] codewords ) {
+			this.maxDataLayers = codewords.length;
 			this.codewords = codewords;
 		}
 
@@ -157,7 +160,7 @@ public class AztecCode {
 		@Getter final int maxDataLayers;
 
 		// stores number of codewords that can be saved in a marker with this many layers-1.
-		final int[] codewords;
+		private final int[] codewords;
 
 		/** Returns number of codewords available at this level */
 		public int getCodewords( int level ) {
@@ -169,7 +172,8 @@ public class AztecCode {
 		}
 	}
 
-	enum Encodings {
+	/** Specifies which encoding is currently active in the data stream. */
+	enum Modes {
 		UPPER(5),
 		LOWER(5),
 		MIXED(5),
@@ -179,11 +183,10 @@ public class AztecCode {
 		ECI(8),
 		BYTE(8);
 
-		Encodings(int wordSize) {
+		Modes( int wordSize ) {
 			this.wordSize = wordSize;
 		}
 
-		@Getter
-		final int wordSize;
+		@Getter final int wordSize;
 	}
 }

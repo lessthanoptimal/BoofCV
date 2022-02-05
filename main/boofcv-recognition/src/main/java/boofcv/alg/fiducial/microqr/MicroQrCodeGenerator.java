@@ -30,6 +30,7 @@ import georegression.struct.point.Point2D_I32;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class MicroQrCodeGenerator extends QrGeneratorBase<MicroQrCodeGenerator> {
 
 	/** Convenience function for rendering images */
