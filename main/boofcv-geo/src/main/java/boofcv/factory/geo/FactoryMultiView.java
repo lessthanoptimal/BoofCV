@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -70,7 +70,6 @@ import org.jetbrains.annotations.Nullable;
  * @author Peter Abeles
  */
 public class FactoryMultiView {
-
 	/**
 	 * Returns bundle adjustment with a sparse implementation for metric reconstruction. In most situations this is
 	 * what you want to use, however dense bundle adjustment is available if the problem is small and degenerate.
@@ -178,9 +177,8 @@ public class FactoryMultiView {
 	 * @return Homography estimator.
 	 * @see HomographyDirectLinearTransform
 	 */
-	public static Estimate1ofEpipolar homographyDLT( boolean normalizeInput ) {
-		HomographyDirectLinearTransform alg = new HomographyDirectLinearTransform(normalizeInput);
-		return new HomographyDLT_to_Epipolar(alg);
+	public static HomographyDLT_to_Epipolar homographyDLT( boolean normalizeInput ) {
+		return new HomographyDLT_to_Epipolar(new HomographyDirectLinearTransform(normalizeInput));
 	}
 
 	/**
@@ -189,9 +187,8 @@ public class FactoryMultiView {
 	 * @return Homography estimator.
 	 * @see HomographyTotalLeastSquares
 	 */
-	public static Estimate1ofEpipolar homographyTLS() {
-		HomographyTotalLeastSquares alg = new HomographyTotalLeastSquares();
-		return new HomographyTLS_to_Epipolar(alg);
+	public static HomographyTLS_to_Epipolar homographyTLS() {
+		return new HomographyTLS_to_Epipolar(new HomographyTotalLeastSquares());
 	}
 
 	/**
@@ -203,8 +200,8 @@ public class FactoryMultiView {
 	 * @see HomographyResidualSampson
 	 * @see HomographyResidualTransfer
 	 */
-	public static RefineEpipolar homographyRefine( double tol, int maxIterations, EpipolarError type ) {
-		ModelObservationResidualN residuals = switch (type) {
+	public static LeastSquaresHomography homographyRefine( double tol, int maxIterations, EpipolarError type ) {
+		ModelObservationResidualN<?, ?> residuals = switch (type) {
 			case SIMPLE -> new HomographyResidualTransfer();
 			case SAMPSON -> new HomographyResidualSampson();
 			default -> throw new IllegalArgumentException("Type not supported: " + type);
@@ -334,14 +331,10 @@ public class FactoryMultiView {
 	 * @see boofcv.alg.geo.f.FundamentalResidualSimple
 	 */
 	public static RefineEpipolar fundamentalRefine( double tol, int maxIterations, EpipolarError type ) {
-		switch (type) {
-			case SAMPSON:
-				return new LeastSquaresFundamental(tol, maxIterations, true);
-			case SIMPLE:
-				return new LeastSquaresFundamental(tol, maxIterations, false);
-		}
-
-		throw new IllegalArgumentException("Type not supported: " + type);
+		return switch (type) {
+			case SAMPSON -> new LeastSquaresFundamental(tol, maxIterations, true);
+			case SIMPLE -> new LeastSquaresFundamental(tol, maxIterations, false);
+		};
 	}
 
 	/**
@@ -355,20 +348,20 @@ public class FactoryMultiView {
 			config = new ConfigTrifocal();
 		}
 
-		switch (config.which) {
-			case LINEAR_7:
-				return new WrapTrifocalLinearPoint7();
+		return switch (config.which) {
+			case LINEAR_7 -> new WrapTrifocalLinearPoint7();
 
-			case ALGEBRAIC_7:
+			case ALGEBRAIC_7 -> {
 				ConfigConverge cc = config.converge;
 				UnconstrainedLeastSquares optimizer = FactoryOptimization.levenbergMarquardt(null, false);
 				TrifocalAlgebraicPoint7 alg = new TrifocalAlgebraicPoint7(optimizer,
 						cc.maxIterations, cc.ftol, cc.gtol);
 
-				return new WrapTrifocalAlgebraicPoint7(alg);
-		}
+				yield new WrapTrifocalAlgebraicPoint7(alg);
+			}
 
-		throw new IllegalArgumentException("Unknown type " + config.which);
+			default -> throw new IllegalArgumentException("Unknown type " + config.which);
+		};
 	}
 
 	/**
@@ -380,12 +373,11 @@ public class FactoryMultiView {
 		if (config == null)
 			config = new ConfigThreeViewRefine();
 
-		switch (config.which) {
-			case GEOMETRIC:
-				RefineThreeViewProjectiveGeometric alg = new RefineThreeViewProjectiveGeometric();
-				alg.getConverge().setTo(config.converge);
-				alg.setScale(config.normalizePixels);
-				return new WrapRefineThreeViewProjectiveGeometric(alg);
+		if (config.which == ConfigThreeViewRefine.Algorithm.GEOMETRIC) {
+			RefineThreeViewProjectiveGeometric alg = new RefineThreeViewProjectiveGeometric();
+			alg.getConverge().setTo(config.converge);
+			alg.setScale(config.normalizePixels);
+			return new WrapRefineThreeViewProjectiveGeometric(alg);
 		}
 
 		throw new IllegalArgumentException("Unknown algorithm " + config.which);
@@ -406,26 +398,18 @@ public class FactoryMultiView {
 
 		MotionTransformPoint<Se3_F64, Point3D_F64> motionFit = FitSpecialEuclideanOps_F64.fitPoints3D();
 
-		switch (which) {
+		return switch (which) {
 			case P3P_GRUNERT -> {
 				P3PGrunert grunert = new P3PGrunert(PolynomialOps.createRootFinder(5, RootFinderType.STURM));
-				return new WrapP3PLineDistance(grunert, motionFit);
+				yield new WrapP3PLineDistance(grunert, motionFit);
 			}
 			case P3P_FINSTERWALDER -> {
 				P3PFinsterwalder finster = new P3PFinsterwalder(PolynomialOps.createRootFinder(4, RootFinderType.STURM));
-				return new WrapP3PLineDistance(finster, motionFit);
+				yield new WrapP3PLineDistance(finster, motionFit);
 			}
-			case EPNP -> {
-				Estimate1ofPnP epnp = pnp_1(which, numIterations, 0);
-				return new Estimate1toNofPnP(epnp);
-			}
-			case IPPE -> {
-				Estimate1ofEpipolar H = FactoryMultiView.homographyTLS();
-				return new Estimate1toNofPnP(new IPPE_to_EstimatePnP(H));
-			}
-		}
-
-		throw new IllegalArgumentException("Type " + which + " not known");
+			case EPNP -> new Estimate1toNofPnP(pnp_1(which, numIterations, 0));
+			case IPPE -> new Estimate1toNofPnP(new IPPE_to_EstimatePnP(FactoryMultiView.homographyTLS()));
+		};
 	}
 
 	/**
@@ -447,7 +431,6 @@ public class FactoryMultiView {
 	 * @return An estimator which returns a single estimate.
 	 */
 	public static Estimate1ofPnP pnp_1( EnumPNP which, int numIterations, int numTest ) {
-
 		if (which == EnumPNP.EPNP) {
 			PnPLepetitEPnP alg = new PnPLepetitEPnP(0.1);
 			alg.setNumIterations(numIterations);
@@ -621,8 +604,8 @@ public class FactoryMultiView {
 			case DLT -> new WrapNViewsTriangulateProjectiveDLT();
 
 			case ALGEBRAIC, GEOMETRIC -> {
-				TriangulateNViewsProjective estimator = new WrapNViewsTriangulateProjectiveDLT();
-				TriangulateRefineProjectiveLS refiner = new TriangulateRefineProjectiveLS(config.converge.gtol, config.converge.maxIterations);
+				var estimator = new WrapNViewsTriangulateProjectiveDLT();
+				var refiner = new TriangulateRefineProjectiveLS(config.converge.gtol, config.converge.maxIterations);
 				yield new TriangulateThenRefineProjective(estimator, refiner);
 			}
 

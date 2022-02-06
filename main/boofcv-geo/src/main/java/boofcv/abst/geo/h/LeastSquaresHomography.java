@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,14 +36,14 @@ import java.util.List;
 public class LeastSquaresHomography implements RefineEpipolar {
 	ResidualsEpipolarMatrixN func;
 
-	UnconstrainedLeastSquares minimizer;
+	UnconstrainedLeastSquares<DMatrixRMaj> minimizer;
 
 	int maxIterations;
 	double convergenceTol;
 
 	public LeastSquaresHomography( double convergenceTol,
 								   int maxIterations,
-								   ModelObservationResidualN residuals ) {
+								   ModelObservationResidualN<?, ?> residuals ) {
 		this.maxIterations = maxIterations;
 		this.convergenceTol = convergenceTol;
 		this.func = new ResidualsEpipolarMatrixN(null, residuals);
