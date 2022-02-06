@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,42 +44,41 @@ public class AssociatedTupleN implements AssociatedTuple {
 		}
 	}
 
-	@Override
-	public double getX( int index ) {
+	@Override public double getX( int index ) {
 		return p[index].x;
 	}
 
-	@Override
-	public double getY( int index ) {
+	@Override public double getY( int index ) {
 		return p[index].y;
 	}
 
-	@Override
-	public Point2D_F64 get( int index ) {
+	@Override public Point2D_F64 get( int index ) {
 		return p[index];
 	}
 
-	@Override
-	public void set( int index, double x, double y ) {
+	@Override public void set( int index, double x, double y ) {
 		p[index].setTo(x, y);
 	}
 
-	@Override
-	public void set( int index, Point2D_F64 src ) {
+	@Override public void set( int index, Point2D_F64 src ) {
 		p[index].setTo(src);
 	}
 
-	@Override
-	public int size() {
+	@Override public int size() {
 		return p.length;
 	}
 
-	@Override
-	public void setTo( AssociatedTuple src ) {
+	@Override public void setTo( AssociatedTuple src ) {
 		BoofMiscOps.checkTrue(src.size() == size());
 
 		for (int i = 0; i < p.length; i++) {
 			p[i].setTo(src.get(i));
+		}
+	}
+
+	@Override public void zero() {
+		for (int i = 0; i < p.length; i++) {
+			p[i].zero();
 		}
 	}
 }

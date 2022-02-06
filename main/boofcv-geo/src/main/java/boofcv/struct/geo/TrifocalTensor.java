@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,6 +53,12 @@ public class TrifocalTensor {
 		T1.setTo(a.T1);
 		T2.setTo(a.T2);
 		T3.setTo(a.T3);
+	}
+
+	public void zero() {
+		T1.zero();
+		T2.zero();
+		T3.zero();
 	}
 
 	/**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,6 +43,11 @@ public abstract class PointIndex<T extends PointIndex<T, P>, P extends GeoTuple<
 	public void setTo( T src ) {
 		this.p.setTo(src.p);
 		this.index = src.index;
+	}
+
+	public void zero() {
+		p.zero();
+		index = 0;
 	}
 
 	public abstract T copy();

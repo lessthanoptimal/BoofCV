@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -75,6 +75,11 @@ public class PairLineNorm {
 	public void setTo( Vector3D_F64 l1, Vector3D_F64 l2 ) {
 		this.l1.setTo(l1);
 		this.l2.setTo(l2);
+	}
+
+	public void zero() {
+		this.l1.zero();
+		this.l2.zero();
 	}
 
 	/**

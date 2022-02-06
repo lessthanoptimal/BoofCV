@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.struct.geo;
 
 import georegression.struct.point.Point3D_F64;
+import lombok.Getter;
 
 /**
  * <p>
@@ -30,9 +31,9 @@ import georegression.struct.point.Point3D_F64;
 public class AssociatedPair3D {
 
 	/** Location of the feature in the first image */
-	public Point3D_F64 p1;
+	@Getter public Point3D_F64 p1;
 	/** Location of the feature in the second image. */
-	public Point3D_F64 p2;
+	@Getter public Point3D_F64 p2;
 
 	public AssociatedPair3D() {
 		p1 = new Point3D_F64();
@@ -84,26 +85,29 @@ public class AssociatedPair3D {
 		return new AssociatedPair3D(p1, p2, false);
 	}
 
-	public void setTo( AssociatedPair3D original ) {
+	public AssociatedPair3D setTo( AssociatedPair3D original ) {
 		this.p1.setTo(original.p1);
 		this.p2.setTo(original.p2);
+		return this;
 	}
 
 	/**
 	 * Assigns this object to be equal to the passed in values.
 	 */
-	public void setTo( Point3D_F64 p1, Point3D_F64 p2 ) {
+	public AssociatedPair3D setTo( Point3D_F64 p1, Point3D_F64 p2 ) {
 		this.p1.setTo(p1);
 		this.p2.setTo(p2);
+		return this;
 	}
 
 	/**
 	 * Assigns this object to be equal to the passed in values.
 	 */
-	public void setTo( double x1, double y1, double z1,
-					   double x2, double y2, double z2 ) {
+	public AssociatedPair3D setTo( double x1, double y1, double z1,
+								   double x2, double y2, double z2 ) {
 		this.p1.setTo(x1, y1, z1);
 		this.p2.setTo(x2, y2, z2);
+		return this;
 	}
 
 	/**
@@ -114,12 +118,10 @@ public class AssociatedPair3D {
 		this.p2 = p2;
 	}
 
-	public Point3D_F64 getP1() {
-		return p1;
-	}
-
-	public Point3D_F64 getP2() {
-		return p2;
+	/** Sets internal points to zero */
+	public void zero() {
+		this.p1.zero();
+		this.p2.zero();
 	}
 
 	public AssociatedPair3D copy() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.struct.geo;
 
 import georegression.struct.point.Point2D_F64;
+import lombok.Getter;
 
 /**
  * <p>
@@ -32,11 +33,11 @@ public class AssociatedPair {
 	/**
 	 * Location of the feature in the first image
 	 */
-	public Point2D_F64 p1;
+	@Getter public Point2D_F64 p1;
 	/**
 	 * Location of the feature in the second image.
 	 */
-	public Point2D_F64 p2;
+	@Getter public Point2D_F64 p2;
 
 	public AssociatedPair() {
 		p1 = new Point2D_F64();
@@ -84,25 +85,46 @@ public class AssociatedPair {
 		}
 	}
 
-	public void setTo( AssociatedPair original ) {
+	public AssociatedPair setTo( AssociatedPair original ) {
 		this.p1.setTo(original.p1);
 		this.p2.setTo(original.p2);
+		return this;
 	}
 
 	/**
 	 * Assigns this object to be equal to the passed in values.
 	 */
-	public void setTo( Point2D_F64 p1, Point2D_F64 p2 ) {
+	public AssociatedPair setTo( Point2D_F64 p1, Point2D_F64 p2 ) {
 		this.p1.setTo(p1);
 		this.p2.setTo(p2);
+		return this;
 	}
 
 	/**
 	 * Assigns this object to be equal to the passed in values.
 	 */
-	public void setTo( double p1_x, double p1_y, double p2_x, double p2_y ) {
+	public AssociatedPair setTo( Point2D_F64 p1, double p2_x, double p2_y ) {
+		this.p1.setTo(p1);
+		this.p2.setTo(p2_x, p2_y);
+		return this;
+	}
+
+	/**
+	 * Assigns this object to be equal to the passed in values.
+	 */
+	public AssociatedPair setTo( double p1_x, double p1_y, Point2D_F64 p2 ) {
+		this.p1.setTo(p1_x, p1_y);
+		this.p2.setTo(p2);
+		return this;
+	}
+
+	/**
+	 * Assigns this object to be equal to the passed in values.
+	 */
+	public AssociatedPair setTo( double p1_x, double p1_y, double p2_x, double p2_y ) {
 		this.p1.setTo(p1_x, p1_y);
 		this.p2.setTo(p2_x, p2_y);
+		return this;
 	}
 
 	/**
@@ -113,16 +135,14 @@ public class AssociatedPair {
 		this.p2 = p2;
 	}
 
-	public Point2D_F64 getP1() {
-		return p1;
-	}
-
-	public Point2D_F64 getP2() {
-		return p2;
+	/** Sets internal points to zero */
+	public void zero() {
+		this.p1.zero();
+		this.p2.zero();
 	}
 
 	public AssociatedPair copy() {
-		return new AssociatedPair(p1, p2, true);
+		return new AssociatedPair().setTo(p1, p2);
 	}
 
 	/**
