@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,8 @@ package boofcv.struct.geo;
 
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Observed point feature location on the image plane and its 3D homogenous position.
@@ -30,11 +32,11 @@ public class Point2D4D {
 	/**
 	 * Observed location of the feature on the image plane
 	 */
-	public Point2D_F64 observation;
+	@Getter @Setter public Point2D_F64 observation;
 	/**
 	 * 3D location of the feature in homogenous world coordinates
 	 */
-	public Point4D_F64 location;
+	@Getter @Setter public Point4D_F64 location;
 
 	public Point2D4D() {
 		observation = new Point2D_F64();
@@ -49,25 +51,10 @@ public class Point2D4D {
 	/**
 	 * Sets 'this' to be identical to 'src'.
 	 */
-	public void setTo( Point2D4D src ) {
+	public Point2D4D setTo( Point2D4D src ) {
 		observation.setTo(src.observation);
 		location.setTo(src.location);
-	}
-
-	public Point2D_F64 getObservation() {
-		return observation;
-	}
-
-	public void setObservation( Point2D_F64 observation ) {
-		this.observation = observation;
-	}
-
-	public Point4D_F64 getLocation() {
-		return location;
-	}
-
-	public void setLocation( Point4D_F64 location ) {
-		this.location = location;
+		return this;
 	}
 
 	public Point2D4D copy() {

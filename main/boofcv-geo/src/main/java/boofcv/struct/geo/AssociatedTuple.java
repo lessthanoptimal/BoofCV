@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,4 +39,6 @@ public interface AssociatedTuple {
 	int size();
 
 	void setTo( AssociatedTuple src );
+
+	void zero();
 }

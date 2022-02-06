@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,6 +41,11 @@ public class ScaleTranslate2D {
 	}
 
 	public ScaleTranslate2D() {}
+
+	public void zero() {
+		scale = 0;
+		transX = transY = 0;
+	}
 
 	public void setTo( ScaleTranslate2D src ) {
 		this.scale = src.scale;

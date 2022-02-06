@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,33 +38,27 @@ public class AssociatedTupleDN implements AssociatedTuple {
 		this(0);
 	}
 
-	@Override
-	public double getX( int index ) {
+	@Override public double getX( int index ) {
 		return p.data[index].x;
 	}
 
-	@Override
-	public double getY( int index ) {
+	@Override public double getY( int index ) {
 		return p.data[index].y;
 	}
 
-	@Override
-	public Point2D_F64 get( int index ) {
+	@Override public Point2D_F64 get( int index ) {
 		return p.data[index];
 	}
 
-	@Override
-	public void set( int index, double x, double y ) {
+	@Override public void set( int index, double x, double y ) {
 		p.data[index].setTo(x, y);
 	}
 
-	@Override
-	public void set( int index, Point2D_F64 src ) {
+	@Override public void set( int index, Point2D_F64 src ) {
 		p.data[index].setTo(src);
 	}
 
-	@Override
-	public int size() {
+	@Override public int size() {
 		return p.size;
 	}
 
@@ -74,12 +68,17 @@ public class AssociatedTupleDN implements AssociatedTuple {
 		p.resize(newSize);
 	}
 
-	@Override
-	public void setTo( AssociatedTuple src ) {
+	@Override public void setTo( AssociatedTuple src ) {
 		p.resize(src.size());
 
 		for (int i = 0; i < p.size; i++) {
 			p.data[i].setTo(src.get(i));
+		}
+	}
+
+	@Override public void zero() {
+		for (int i = 0; i < p.size; i++) {
+			p.data[i].zero();
 		}
 	}
 }

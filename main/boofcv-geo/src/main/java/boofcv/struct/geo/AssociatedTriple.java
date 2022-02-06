@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -55,22 +55,31 @@ public class AssociatedTriple {
 		this.p3 = new Point2D_F64();
 	}
 
-	public void setTo( AssociatedTriple a ) {
+	public AssociatedTriple setTo( AssociatedTriple a ) {
 		p1.setTo(a.p1);
 		p2.setTo(a.p2);
 		p3.setTo(a.p3);
+		return this;
 	}
 
-	public void setTo( Point2D_F64 p1, Point2D_F64 p2, Point2D_F64 p3 ) {
+	public AssociatedTriple setTo( Point2D_F64 p1, Point2D_F64 p2, Point2D_F64 p3 ) {
 		this.p1.setTo(p1);
 		this.p2.setTo(p2);
 		this.p3.setTo(p3);
+		return this;
 	}
 
-	public void setTo( double x1, double y1, double x2, double y2, double x3, double y3 ) {
+	public AssociatedTriple setTo( double x1, double y1, double x2, double y2, double x3, double y3 ) {
 		this.p1.setTo(x1, y1);
 		this.p2.setTo(x2, y2);
 		this.p3.setTo(x3, y3);
+		return this;
+	}
+
+	public void zero() {
+		this.p1.zero();
+		this.p2.zero();
+		this.p3.zero();
 	}
 
 	public AssociatedTriple copy() {
