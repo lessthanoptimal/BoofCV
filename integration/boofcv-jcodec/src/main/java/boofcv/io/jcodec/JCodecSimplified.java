@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -110,7 +110,7 @@ public class JCodecSimplified<T extends ImageBase<T>> implements SimpleImageSequ
 		if (!endOfFile) {
 			try {
 				grabAndCopy(reorder.grow());
-			} catch (IOException e) {
+			} catch (Exception e) {
 				reorder.removeTail();
 				endOfFile = true;
 			}
