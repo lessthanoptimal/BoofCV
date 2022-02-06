@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.jcodec.JCodecSimplified;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
@@ -36,7 +37,7 @@ import java.awt.image.BufferedImage;
  */
 @SuppressWarnings("rawtypes")
 public class ExampleJCodecDisplayFrames {
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 
 		String fileName = UtilIO.pathExample("background/highway_bridge_jitter.mp4");
 		ImageType type = ImageType.pl(3, GrayU8.class);
@@ -44,32 +45,31 @@ public class ExampleJCodecDisplayFrames {
 //		ImageType type = ImageType.pl(3, GrayF32.class);
 //		ImageType type = ImageType.single(GrayF32.class);
 
-		JCodecSimplified sequence = new JCodecSimplified<>(fileName, type);
+		var sequence = new JCodecSimplified<>(fileName, type);
 
 		BufferedImage out;
-		if(sequence.hasNext()) {
+		if (sequence.hasNext()) {
 			ImageBase frame = sequence.next();
-			out = new BufferedImage(frame.width,frame.height,BufferedImage.TYPE_INT_RGB);
-			ConvertBufferedImage.convertTo(frame,out,false);
+			out = new BufferedImage(frame.width, frame.height, BufferedImage.TYPE_INT_RGB);
+			ConvertBufferedImage.convertTo(frame, out, false);
 		} else {
 			throw new RuntimeException("No first frame?!?!");
 		}
 
-		ImagePanel gui = new ImagePanel(out);
-		ShowImages.showWindow(gui,"Video!", true);
+		var gui = new ImagePanel(out);
+		ShowImages.showWindow(gui, "Video!", true);
 
 		long totalNano = 0;
-		while(sequence.hasNext()) {
+		while (sequence.hasNext()) {
 			long before = System.nanoTime();
 			ImageBase frame = sequence.next();
-			totalNano += System.nanoTime()-before;
-			ConvertBufferedImage.convertTo(frame,out,false);
+			totalNano += System.nanoTime() - before;
+			ConvertBufferedImage.convertTo(frame, out, false);
 			gui.repaint();
 
-			try {
-				Thread.sleep(200);
-			} catch (InterruptedException ignore) {}
+			// slow it down to make it easier to see what's going on
+			BoofMiscOps.sleep(20);
 		}
-		System.out.println("Only read FPS = "+(totalNano/1000000.0)/sequence.getFrameNumber());
+		System.out.printf("JCodec FPS %.1f\n", sequence.getFrameNumber()/(totalNano/1.0e9));
 	}
 }

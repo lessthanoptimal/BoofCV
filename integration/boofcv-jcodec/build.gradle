@@ -4,18 +4,10 @@ dependencies {
 	api project(':main:boofcv-io')
 	api project(':integration:boofcv-swing')
 
-	implementation 'org.jcodec:jcodec:0.2.3'
-	implementation 'org.jcodec:jcodec-javase:0.2.3'
+	implementation 'org.jcodec:jcodec:0.2.5'
+	implementation 'org.jcodec:jcodec-javase:0.2.5'
 }
 
 sourceSets {
-	test {
-		java {
-			srcDir 'test'
-			srcDir 'examples'
-		}
-		resources {
-			srcDir 'resources/test'
-		}
-	}
+	test { java { srcDir 'examples' } }
 }
