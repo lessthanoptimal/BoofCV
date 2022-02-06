@@ -18,9 +18,7 @@
 
 package boofcv.alg.fiducial.aztec;
 
-import georegression.struct.shapes.Polygon2D_F64;
 import lombok.Getter;
-import org.ddogleg.struct.DogArray;
 
 /**
  * Information on a detected Aztec Code
@@ -56,11 +54,8 @@ public class AztecCode {
 	/** Number of bit errors detected when apply error correction to the message */
 	public int totalBitErrors;
 
-	/**
-	 * Locations of extern contours around the squares in a locator pattern. Starts from the innermost ring to
-	 * the outermost. 2-rings for "compact" and 3-rings for "full-range"
-	 */
-	public final DogArray<Polygon2D_F64> locatorRings = new DogArray<>(() -> new Polygon2D_F64(4), Polygon2D_F64::zero);
+	/** Locations of extern contours around the squares in a locator pattern. */
+	public final AztecPyramid locator = new AztecPyramid();
 
 	/** Number of squares (data bits) wide the marker is */
 	public int getMarkerSquareCount() {
@@ -123,7 +118,7 @@ public class AztecCode {
 		corrected = null;
 		transposed = false;
 		totalBitErrors = 0;
-		locatorRings.reset();
+		locator.reset();
 	}
 
 	@SuppressWarnings({"NullAway"})
@@ -136,11 +131,7 @@ public class AztecCode {
 		structure = src.structure;
 		transposed = src.transposed;
 		totalBitErrors = src.totalBitErrors;
-		locatorRings.resize(src.locatorRings.size);
-		for (int i = 0; i < src.locatorRings.size; i++) {
-			locatorRings.get(i).setTo(src.locatorRings.get(i));
-		}
-
+		locator.setTo(src.locator);
 		return this;
 	}
 

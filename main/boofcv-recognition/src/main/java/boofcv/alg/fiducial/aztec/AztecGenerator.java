@@ -25,7 +25,6 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.GrayU8;
 import georegression.struct.shapes.Polygon2D_F64;
 import lombok.Getter;
-import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I16;
 import org.ddogleg.struct.DogArray_I32;
 import org.jetbrains.annotations.Nullable;
@@ -90,7 +89,7 @@ public class AztecGenerator {
 		orientationPattern(orientationLoc, orientationLoc, orientationSquareCount);
 
 		locatorPattern(orientationLoc + 2*squareWidth, orientationLoc + 2*squareWidth,
-				marker.getLocatorRingCount(), marker.locatorRings);
+				marker.getLocatorRingCount(), marker.locator);
 
 		// Render the reference grid
 		if (marker.structure == AztecCode.Structure.FULL) {
@@ -201,10 +200,10 @@ public class AztecGenerator {
 	 * Renders the locator pattern given it's top-left corner of the outermost ring. This does NOT include
 	 * the orientation pattern.
 	 */
-	protected void locatorPattern( double tl_x, double tl_y, int ringCount, DogArray<Polygon2D_F64> ringLocations ) {
+	protected void locatorPattern( double tl_x, double tl_y, int ringCount, AztecPyramid locator ) {
 		FiducialRenderEngine render = Objects.requireNonNull(this.render);
 
-		ringLocations.resetResize(ringCount);
+		locator.resize(ringCount);
 		for (int ring = ringCount; ring > 0; ring--) {
 			// number of squares wide the ring is
 			int modules = (ring - 1)*4 + 1;
@@ -215,7 +214,7 @@ public class AztecGenerator {
 			render.square(tl_x, tl_y, width, squareWidth);
 
 			// Save the ring's outer contour
-			Polygon2D_F64 where = ringLocations.get(ring - 1);
+			Polygon2D_F64 where = locator.layers.get(ring - 1).square;
 			where.get(0).setTo(tl_x, tl_y);
 			where.get(1).setTo(tl_x + width, tl_y);
 			where.get(2).setTo(tl_x + width, tl_y + width);
