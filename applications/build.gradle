@@ -14,12 +14,6 @@ dependencies {
 	api group: 'args4j', name: 'args4j', version: '2.33'
 }
 
-idea {
-	module {
-		name = "BoofCV Applications"
-	}
-}
-
 // Create a jar which contains all the applications
 task applicationsJar(type: Jar) {
 	manifest {
