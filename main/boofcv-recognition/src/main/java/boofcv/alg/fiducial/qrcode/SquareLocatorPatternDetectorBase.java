@@ -35,7 +35,6 @@ import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F32;
 import lombok.Getter;
 import lombok.Setter;
-import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
 
@@ -49,7 +48,7 @@ import java.util.Set;
  */
 public abstract class SquareLocatorPatternDetectorBase<T extends ImageGray<T>> implements VerbosePrint {
 	// used to subsample the input image
-	protected InterpolatePixelS<T> interpolate;
+	@Getter protected InterpolatePixelS<T> interpolate;
 
 	/** Used to prune very large contours. This is tuned for QR codes which have two position patterns side by side */
 	@Getter @Setter protected double maxContourFraction = 4.0/3.0;
@@ -57,12 +56,6 @@ public abstract class SquareLocatorPatternDetectorBase<T extends ImageGray<T>> i
 	/** Used to detect black squares */
 	@Getter protected DetectPolygonBinaryGrayRefine<T> squareDetector;
 
-	/**
-	 * Returns a list of all the detected position pattern squares and the other PP that they are connected to.
-	 * If a lens distortion model is provided then coordinates will be in an undistorted image.
-	 */
-	@Getter protected DogArray<PositionPatternNode> positionPatterns = new DogArray<>(
-			PositionPatternNode::new, PositionPatternNode::reset);
 
 	/** runtime profiling */
 	@Getter protected MovingAverage profilingMS = new MovingAverage(0.8);
@@ -100,9 +93,6 @@ public abstract class SquareLocatorPatternDetectorBase<T extends ImageGray<T>> i
 		long time0 = System.nanoTime();
 		findLocatorPatternsFromSquares();
 		long time1 = System.nanoTime();
-
-		if (verbose != null)
-			verbose.printf("squares=%d position_pattern=%d\n", squareDetector.getPolygonInfo().size(), positionPatterns.size);
 
 		profilingMS.update((time1 - time0)*1e-6);
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,7 @@ import georegression.transform.InvertibleTransformSequence;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Provides low level functions that {@link boofcv.alg.distort.DistortImageOps} can call.
+ * Provides low level functions that {@link boofcv.abst.distort.FDistort} can call.
  *
  * @author Peter Abeles
  */
@@ -65,11 +65,11 @@ public class DistortSupport {
 	 * @param y0 Center of rotation in input image coordinates.
 	 * @param x1 Center of rotation in output image coordinates.
 	 * @param y1 Center of rotation in output image coordinates.
-	 * @param angle Angle of rotation.
+	 * @param angle Angle of rotation in radians.
 	 */
 	public static PixelTransformAffine_F32 transformRotate( float x0, float y0, float x1, float y1, float angle ) {
 		Affine2D_F32 affine = rotateCenterAffine(x0, y0, x1, y1, angle);
-		PixelTransformAffine_F32 distort = new PixelTransformAffine_F32();
+		var distort = new PixelTransformAffine_F32();
 		distort.setTo(affine);
 
 		return distort;
@@ -82,20 +82,20 @@ public class DistortSupport {
 	 * @param y0 Center of rotation in input image coordinates.
 	 * @param x1 Center of rotation in output image coordinates.
 	 * @param y1 Center of rotation in output image coordinates.
-	 * @param angle Angle of rotation.
+	 * @param angle Angle of rotation in radians.
 	 */
 	public static Affine2D_F32 rotateCenterAffine( float x0, float y0, float x1, float y1, float angle ) {
 		// make the coordinate system's origin the image center
-		Se2_F32 imageToCenter = new Se2_F32(-x0, -y0, 0);
-		Se2_F32 rotate = new Se2_F32(0, 0, angle);
-		Se2_F32 centerToImage = new Se2_F32(x1, y1, 0);
+		var imageToCenter = new Se2_F32(-x0, -y0, 0);
+		var rotate = new Se2_F32(0, 0, angle);
+		var centerToImage = new Se2_F32(x1, y1, 0);
 
-		InvertibleTransformSequence<Se2_F32> sequence = new InvertibleTransformSequence<>();
+		var sequence = new InvertibleTransformSequence<Se2_F32>();
 		sequence.addTransform(true, imageToCenter);
 		sequence.addTransform(true, rotate);
 		sequence.addTransform(true, centerToImage);
 
-		Se2_F32 total = new Se2_F32();
+		var total = new Se2_F32();
 		sequence.computeTransform(total);
 		Se2_F32 inv = total.invert(null);
 

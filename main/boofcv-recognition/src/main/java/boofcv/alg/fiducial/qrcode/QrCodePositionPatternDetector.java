@@ -28,6 +28,8 @@ import georegression.geometry.UtilPoint2D_F64;
 import georegression.struct.line.LineParametric2D_F64;
 import georegression.struct.line.LineSegment2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
+import lombok.Getter;
+import org.ddogleg.struct.DogArray;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
@@ -43,6 +45,14 @@ import java.util.Set;
  * @author Peter Abeles
  */
 public class QrCodePositionPatternDetector<T extends ImageGray<T>>  extends SquareLocatorPatternDetectorBase<T> {
+
+	/**
+	 * Returns a list of all the detected position pattern squares and the other PP that they are connected to.
+	 * If a lens distortion model is provided then coordinates will be in an undistorted image.
+	 */
+	@Getter protected DogArray<PositionPatternNode> positionPatterns = new DogArray<>(
+			PositionPatternNode::new, PositionPatternNode::reset);
+
 	/**
 	 * Configures the detector
 	 *
@@ -89,6 +99,9 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>>  extends Squa
 
 			SquareGraph.computeNodeInfo(pp);
 		}
+
+		if (verbose != null)
+			verbose.printf("squares=%d position_pattern=%d\n", squareDetector.getPolygonInfo().size(), positionPatterns.size);
 	}
 
 
