@@ -60,7 +60,7 @@ public class AztecPyramid {
 		}
 
 		for (int rotateIdx = 0; rotateIdx < best; rotateIdx++) {
-			UtilPolygons2D_F64.shiftDown(b);
+			UtilPolygons2D_F64.shiftUp(b);
 		}
 	}
 
@@ -73,6 +73,18 @@ public class AztecPyramid {
 
 	public void reset() {
 		layers.reset();
+	}
+
+	public boolean isIdentical( AztecPyramid b ) {
+		if (layers.size != b.layers.size)
+			return false;
+
+		for (int i = 0; i < layers.size; i++) {
+			if (!layers.get(i).isIdentical(b.layers.get(i)))
+				return false;
+		}
+
+		return true;
 	}
 
 	/** Description of a layer in the pyramid */
@@ -93,6 +105,16 @@ public class AztecPyramid {
 		public void reset() {
 			square.zero();
 			threshold = -1;
+		}
+
+		public boolean isIdentical( Layer a ) {
+			if (!square.isIdentical(a.square, 0.0))
+				return false;
+
+			if (!center.isIdentical(a.center, 0.0))
+				return false;
+
+			return threshold == a.threshold;
 		}
 	}
 }
