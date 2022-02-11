@@ -47,7 +47,7 @@ import java.util.Set;
  * @author Peter Abeles
  */
 public abstract class SquareLocatorPatternDetectorBase<T extends ImageGray<T>> implements VerbosePrint {
-	// used to subsample the input image
+	/** used to subsample the input image */
 	@Getter protected InterpolatePixelS<T> interpolate;
 
 	/** Used to prune very large contours. This is tuned for QR codes which have two position patterns side by side */
@@ -55,7 +55,6 @@ public abstract class SquareLocatorPatternDetectorBase<T extends ImageGray<T>> i
 
 	/** Used to detect black squares */
 	@Getter protected DetectPolygonBinaryGrayRefine<T> squareDetector;
-
 
 	/** runtime profiling */
 	@Getter protected MovingAverage profilingMS = new MovingAverage(0.8);

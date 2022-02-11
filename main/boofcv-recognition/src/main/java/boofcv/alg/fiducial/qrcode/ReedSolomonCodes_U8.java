@@ -244,7 +244,7 @@ public class ReedSolomonCodes_U8 {
 			// The commented out code below replicates exactly how the reference code works. This code above
 			// seems to work just as well and passes all the unit tests
 //			int coef_pos = math.max_value-(length_msg_ecc-errorLocations.data[i]-1);
-//			X.data[i] = (byte)math.power_n(2,-coef_pos);
+//			errorX.data[i] = (byte)math.power_n(2,-coef_pos);
 		}
 
 		err_loc_prime_tmp.resize(errorX.size);

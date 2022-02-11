@@ -18,18 +18,14 @@
 
 package boofcv.alg.fiducial.aztec;
 
-import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.alg.fiducial.calib.squares.SquareGraph;
 import boofcv.alg.fiducial.calib.squares.SquareNode;
 import boofcv.alg.fiducial.qrcode.PositionPatternNode;
 import boofcv.alg.fiducial.qrcode.SquareLocatorPatternDetectorBase;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.alg.shapes.polygon.DetectPolygonFromContour;
-import boofcv.factory.geo.FactoryMultiView;
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageGray;
-import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import lombok.Getter;
@@ -37,7 +33,6 @@ import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
 import org.ddogleg.struct.DogArray;
-import org.ejml.data.DMatrixRMaj;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
@@ -61,21 +56,18 @@ public class AztecFinderPatternDetector<T extends ImageGray<T>> extends SquareLo
 	public double distanceTolerance = 0.15;
 
 	// Layers that describe a pyramid
-	private DogArray<Layer> layers = new DogArray<>(Layer::new, Layer::reset);
+	private final DogArray<Layer> layers = new DogArray<>(Layer::new, Layer::reset);
 
 	/** Found candidate pyramids/locator patterns. Recycled every search */
-	private @Getter DogArray<AztecPyramid> found = new DogArray<>(AztecPyramid::new, AztecPyramid::reset);
+	private final @Getter DogArray<AztecPyramid> found = new DogArray<>(AztecPyramid::new, AztecPyramid::reset);
 
 	// used to search for neighbors that which are candidates for connecting
-	private NearestNeighbor<Layer> nn = (NearestNeighbor)FactoryNearestNeighbor.kdtree(new SquareNode.KdTreeSquareNode());
-	private NearestNeighbor.Search<Layer> search = nn.createSearch();
-	private DogArray<NnData<Layer>> searchResults = new DogArray<>(NnData::new);
+	private final NearestNeighbor<Layer> nn = (NearestNeighbor)FactoryNearestNeighbor.kdtree(new SquareNode.KdTreeSquareNode());
+	private final NearestNeighbor.Search<Layer> search = nn.createSearch();
+	private final DogArray<NnData<Layer>> searchResults = new DogArray<>(NnData::new);
 
 	// workspace for homography calculation
-	Estimate1ofEpipolar computeH = FactoryMultiView.homographyTLS();
-	DMatrixRMaj gridToImage = new DMatrixRMaj(3, 3);
-	DogArray<AssociatedPair> pairs = new DogArray<>(AssociatedPair::new, AssociatedPair::zero);
-	Point2D_F64 gridPoint = new Point2D_F64();
+	GridToPixelHelper gridToPixel = new GridToPixelHelper();
 	Point2D_F64 pixel = new Point2D_F64();
 
 	/**
@@ -224,15 +216,8 @@ public class AztecFinderPatternDetector<T extends ImageGray<T>> extends SquareLo
 	 * @return 0.0 to 1.0. 1.0 indicates a perfect fit
 	 */
 	double scoreTemplate( Polygon2D_F64 polygon, float threshold, int squaresWide ) {
-		// Compute a homography from local grid coordinates around the square to image pixels
-		pairs.resetResize(4);
-		pairs.get(0).setTo(0, 0, polygon.get(0));
-		pairs.get(1).setTo(squaresWide, 0, polygon.get(1));
-		pairs.get(2).setTo(squaresWide, squaresWide, polygon.get(2));
-		pairs.get(3).setTo(0, squaresWide, polygon.get(3));
-
-		// Compute a homography to map a grid to pixel coordinate
-		computeH.process(pairs.toList(), gridToImage);
+		// Initialize the conversion
+		gridToPixel.initOriginCorner0(polygon, squaresWide);
 
 		// Number of times an observation matches the template
 		int numMatches = 0;
@@ -240,14 +225,14 @@ public class AztecFinderPatternDetector<T extends ImageGray<T>> extends SquareLo
 		for (int row = 1; row < squaresWide - 1; row++) {
 			// rrow and rcol is distance from the border along their respective axis
 			int rrow = Math.min(row, squaresWide - row - 1);
-			gridPoint.y = row + 0.5; // sample it in the square's center
+			double gridRow = row + 0.5; // sample it in the square's center
 
 			for (int col = 1; col < squaresWide - 1; col++) {
 				int rcol = Math.min(col, squaresWide - col - 1);
-				gridPoint.x = col + 0.5; // sample it in the square's center
+				double gridCol = col + 0.5; // sample it in the square's center
 
 				// find the pixel coordinate for the specified grid coordinate
-				GeometryMath_F64.mult(gridToImage, gridPoint, pixel);
+				gridToPixel.convert(gridCol, gridRow, pixel);
 
 				// Sample the image at this point
 				float pixelValue = interpolate.get((float)pixel.x, (float)pixel.y);

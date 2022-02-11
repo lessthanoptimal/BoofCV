@@ -30,11 +30,12 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class TestReedSolomonCodes_U16 extends BoofStandardJUnit {
 
-	int primitive12 = 0b1000001101001;
-	int primitive8 = 0b100011101;
+	int primitive12 = 0b1_0000_0110_1001;
+	int primitive8 = 0b1_0001_1101;
+	int primitive4 = 0b1_0011;
 
 	@Test void computeECC() {
-		DogArray_I16 message = randomMessage(50);
+		DogArray_I16 message = randomMessage(0xFF, 50);
 		var ecc = new DogArray_I16();
 
 		var alg = new ReedSolomonCodes_U16(12, primitive12);
@@ -78,7 +79,7 @@ public class TestReedSolomonCodes_U16 extends BoofStandardJUnit {
 	}
 
 	@Test void computeSyndromes() {
-		DogArray_I16 message = randomMessage(50);
+		DogArray_I16 message = randomMessage(0xFF, 50);
 		var ecc = new DogArray_I16();
 
 		var alg = new ReedSolomonCodes_U16(12, primitive12);
@@ -105,10 +106,10 @@ public class TestReedSolomonCodes_U16 extends BoofStandardJUnit {
 		assertTrue(notZero > 1);
 	}
 
-	private DogArray_I16 randomMessage( int N ) {
+	private DogArray_I16 randomMessage( int maxValue, int N ) {
 		var message = new DogArray_I16();
 		for (int i = 0; i < N; i++) {
-			message.add(rand.nextInt(256));
+			message.add(rand.nextInt(maxValue + 1));
 		}
 		return message;
 	}
@@ -216,7 +217,7 @@ public class TestReedSolomonCodes_U16 extends BoofStandardJUnit {
 
 		for (int i = 0; i < 30; i++) {
 			int N = 50;
-			DogArray_I16 message = randomMessage(N);
+			DogArray_I16 message = randomMessage(0xFF, N);
 
 			var ecc = new DogArray_I16();
 			int nsyn = 10;
@@ -247,7 +248,7 @@ public class TestReedSolomonCodes_U16 extends BoofStandardJUnit {
 	 * Test positive cases
 	 */
 	@Test void findErrors_BruteForce() {
-		DogArray_I16 message = randomMessage(50);
+		DogArray_I16 message = randomMessage(0xFF, 50);
 		for (int i = 0; i < 200; i++) {
 			findErrors_BruteForce(message, rand.nextInt(5), false);
 		}
@@ -309,7 +310,7 @@ public class TestReedSolomonCodes_U16 extends BoofStandardJUnit {
 	 * Test a case where there are too many errors.
 	 */
 	@Test void findErrors_BruteForce_TooMany() {
-		DogArray_I16 message = randomMessage(50);
+		DogArray_I16 message = randomMessage(0xFF, 50);
 		findErrors_BruteForce(message, 6, true);
 		findErrors_BruteForce(message, 8, true);
 	}
@@ -405,36 +406,47 @@ public class TestReedSolomonCodes_U16 extends BoofStandardJUnit {
 	 * Randomly correct the message and ECC. See if the message is correctly reconstructed.
 	 */
 	@Test void correct_random() {
+		correct_random(4, primitive4);
+//		correct_random(8, primitive8);
+//		correct_random(12, primitive12);
+	}
+
+	void correct_random( int numBits, int primitive ) {
 		var ecc = new DogArray_I16();
 		int nsyn = 10; // should be able to recover from 4 errors
 
-		var alg = new ReedSolomonCodes_U16(12, primitive12);
+		int mask = 0;
+		for (int i = 0; i < numBits; i++) {
+			mask |= 1 << i;
+		}
+		var alg = new ReedSolomonCodes_U16(numBits, primitive);
 		alg.generatorQR(nsyn);
 
+
 		for (int i = 0; i < 20000; i++) {
-			DogArray_I16 message = randomMessage(100);
+			DogArray_I16 message = randomMessage(mask, 100);
 			DogArray_I16 corrupted = message.copy();
 
 			alg.computeECC(message, ecc);
 
 			// apply noise to the message
-			int numErrors = rand.nextInt(6);
+			int numErrors = rand.nextInt(4);
 
 			for (int j = 0; j < numErrors; j++) {
 				int selected = rand.nextInt(message.size);
-				corrupted.data[selected] ^= (short)(0x12 + j); // make sure it changes even if the same number is selected twice
+				corrupted.data[selected] ^= (short)((0x12 + j) & mask); // make sure it changes even if the same number is selected twice
 			}
 
 			// corrupt the ecc code
-			if (numErrors < 5 && rand.nextInt(5) < 1) {
-				ecc.data[rand.nextInt(ecc.size)] ^= (short)0x13;
+			if (numErrors == 0 || rand.nextInt(5) < 1) {
+				ecc.data[rand.nextInt(ecc.size)] ^= (short)(0x13 & mask);
 			}
 
 			alg.correct(corrupted, ecc);
 
-			assertEquals(corrupted.size, message.size);
+			assertEquals(message.size, corrupted.size);
 			for (int j = 0; j < corrupted.size; j++) {
-				assertEquals(corrupted.get(j), message.get(j));
+				assertEquals(message.get(j), corrupted.get(j));
 			}
 		}
 	}

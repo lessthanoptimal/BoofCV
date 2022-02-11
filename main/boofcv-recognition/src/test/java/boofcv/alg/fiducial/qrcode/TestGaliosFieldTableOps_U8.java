@@ -26,14 +26,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestGaliosFieldTableOps_U8 extends BoofStandardJUnit {
-	int primitive8 = 0b100011101;
+	int primitive4 = 0b1_0011;
+	int primitive8 = 0b1_0001_1101;
 
 	@Test void polyScale() {
-		var alg = new GaliosFieldTableOps_U8(8, primitive8);
+		polyScale(4, primitive4);
+		polyScale(8, primitive8);
+	}
+
+	void polyScale( int numBits, int primitive ) {
+		var alg = new GaliosFieldTableOps_U8(numBits, primitive);
+		int mask = alg.max_value;
 
 		DogArray_I8 input = createArbitraryPolynomial();
 
-		int scale = 0x45;
+		int scale = 0x45 & mask;
 
 		var output = new DogArray_I8();
 
@@ -329,7 +336,7 @@ public class TestGaliosFieldTableOps_U8 extends BoofStandardJUnit {
 		checkDivision(alg, inputB, inputA, quotient, remainder);
 	}
 
-	private void checkDivision( GaliosFieldTableOps_U8 alg, DogArray_I8 inputA, DogArray_I8 inputB, 
+	private void checkDivision( GaliosFieldTableOps_U8 alg, DogArray_I8 inputA, DogArray_I8 inputB,
 								DogArray_I8 quotient, DogArray_I8 remainder ) {
 		var tmp = new DogArray_I8();
 		var found = new DogArray_I8();
@@ -371,7 +378,7 @@ public class TestGaliosFieldTableOps_U8 extends BoofStandardJUnit {
 		checkDivision_S(alg, inputB, inputA, quotient, remainder);
 	}
 
-	private void checkDivision_S( GaliosFieldTableOps_U8 alg, DogArray_I8 inputA, DogArray_I8 inputB, 
+	private void checkDivision_S( GaliosFieldTableOps_U8 alg, DogArray_I8 inputA, DogArray_I8 inputB,
 								  DogArray_I8 quotient, DogArray_I8 remainder ) {
 		var tmp = new DogArray_I8();
 		var found = new DogArray_I8();
