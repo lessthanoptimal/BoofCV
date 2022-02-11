@@ -37,10 +37,10 @@ import java.util.Set;
  */
 public class AztecDecoder implements VerbosePrint {
 	// generates ECC for different Galois Fields. Which one is used depends on how large the marker is
-	ReedSolomonCodes_U16 ecc6 = new ReedSolomonCodes_U16(6, 67);
-	ReedSolomonCodes_U16 ecc8 = new ReedSolomonCodes_U16(8, 301);
-	ReedSolomonCodes_U16 ecc10 = new ReedSolomonCodes_U16(10, 1033);
-	ReedSolomonCodes_U16 ecc12 = new ReedSolomonCodes_U16(12, 4201);
+	ReedSolomonCodes_U16 ecc6 = new ReedSolomonCodes_U16(6, 67, 1);
+	ReedSolomonCodes_U16 ecc8 = new ReedSolomonCodes_U16(8, 301, 1);
+	ReedSolomonCodes_U16 ecc10 = new ReedSolomonCodes_U16(10, 1033, 1);
+	ReedSolomonCodes_U16 ecc12 = new ReedSolomonCodes_U16(12, 4201, 1);
 
 	// The data portion of the message converted into a format ECC generation can understand
 	DogArray_I16 storageDataWords = new DogArray_I16();
@@ -110,7 +110,7 @@ public class AztecDecoder implements VerbosePrint {
 		// TODO check for words with all 0 and all 1 and mark word as a known erasure
 
 		// Apply error correction
-		ecc.generatorAztec(marker.getCapacityWords() - storageDataWords.size);
+		ecc.generator(marker.getCapacityWords() - storageDataWords.size);
 		if (!ecc.correct(storageDataWords, storageEccWords)) {
 			if (verbose != null) verbose.println("ECC failed");
 			return false;

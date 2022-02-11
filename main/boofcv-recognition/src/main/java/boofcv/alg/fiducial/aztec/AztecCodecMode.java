@@ -30,7 +30,7 @@ import org.ddogleg.struct.DogArray_I8;
  */
 public class AztecCodecMode {
 	// Error correction for encoding the message mode
-	ReedSolomonCodes_U8 rscodes = new ReedSolomonCodes_U8(4, 19);
+	ReedSolomonCodes_U8 rscodes = new ReedSolomonCodes_U8(4, 19, 1);
 
 	// Storage for input and output when computing ECC bits
 	DogArray_I8 eccInput = new DogArray_I8();
@@ -51,13 +51,13 @@ public class AztecCodecMode {
 				bits.append(marker.dataLayers - 1, 2, false);
 				bits.append(marker.messageWordCount - 1, 6, false);
 				eccInput.resize(2);
-				rscodes.generatorAztec(5);
+				rscodes.generator(5);
 			}
 			case FULL -> {
 				bits.append(marker.dataLayers - 1, 5, false);
 				bits.append(marker.messageWordCount - 1, 11, false);
 				eccInput.resize(4);
-				rscodes.generatorAztec(6);
+				rscodes.generator(6);
 			}
 		}
 
@@ -118,7 +118,7 @@ public class AztecCodecMode {
 				eccOutput.resize(6);
 			}
 		}
-		rscodes.generatorAztec(eccOutput.size);
+		rscodes.generator(eccOutput.size);
 
 		// Convert into 4-bit words for ECC
 		int bitLocation = 0;
