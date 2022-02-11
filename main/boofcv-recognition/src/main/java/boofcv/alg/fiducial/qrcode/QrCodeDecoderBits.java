@@ -34,7 +34,7 @@ import static boofcv.alg.fiducial.qrcode.QrCodeCodecBitsUtils.flipBits8;
 public class QrCodeDecoderBits {
 
 	// used to compute error correction
-	ReedSolomonCodes_U8 rscodes = new ReedSolomonCodes_U8(8, 0b100011101);
+	ReedSolomonCodes_U8 rscodes = new ReedSolomonCodes_U8(8, 0b100011101, 0);
 	// storage for the data message
 	DogArray_I8 message = new DogArray_I8();
 	// storage fot the message's ecc
@@ -81,7 +81,7 @@ public class QrCodeDecoderBits {
 		qr.corrected = new byte[totalDataBytes];
 
 		ecc.resize(wordsEcc);
-		rscodes.generatorQR(wordsEcc);
+		rscodes.generator(wordsEcc);
 
 		totalErrorBits = 0;
 		if (!decodeBlocks(qr, wordsBlockDataA, numBlocksA, 0, 0, totalDataBytes, totalBlocks))

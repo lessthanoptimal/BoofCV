@@ -36,10 +36,10 @@ import java.util.List;
  */
 public class AztecEncoder {
 	// generates ECC for different Galois Fields. Which one is used depends on how large the marker is
-	ReedSolomonCodes_U16 ecc6 = new ReedSolomonCodes_U16(6, 67);
-	ReedSolomonCodes_U16 ecc8 = new ReedSolomonCodes_U16(8, 301);
-	ReedSolomonCodes_U16 ecc10 = new ReedSolomonCodes_U16(10, 1033);
-	ReedSolomonCodes_U16 ecc12 = new ReedSolomonCodes_U16(12, 4201);
+	ReedSolomonCodes_U16 ecc6 = new ReedSolomonCodes_U16(6, 67, 1);
+	ReedSolomonCodes_U16 ecc8 = new ReedSolomonCodes_U16(8, 301, 1);
+	ReedSolomonCodes_U16 ecc10 = new ReedSolomonCodes_U16(10, 1033, 1);
+	ReedSolomonCodes_U16 ecc12 = new ReedSolomonCodes_U16(12, 4201, 1);
 
 	// The data portion of the message converted into a format ECC generation can understand
 	DogArray_I16 storageDataWords = new DogArray_I16();
@@ -418,7 +418,7 @@ public class AztecEncoder {
 	}
 
 	private void computeEcc( ReedSolomonCodes_U16 ecc, int actualEccWords ) {
-		ecc.generatorAztec(actualEccWords);
+		ecc.generator(actualEccWords);
 		ecc.computeECC(storageDataWords, storageEccWords);
 	}
 

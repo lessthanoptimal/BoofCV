@@ -37,20 +37,21 @@ public class TestReedSolomonCodes_U8 extends BoofStandardJUnit {
 		DogArray_I8 message = randomMessage(0xFF, 50);
 		var ecc = new DogArray_I8();
 
-		var alg = new ReedSolomonCodes_U8(8, primitive8);
-		alg.generatorQR(6);
-		alg.computeECC(message, ecc);
+		for (int base = 0; base < 2; base++) {
+			var alg = new ReedSolomonCodes_U8(8, primitive8, base);
+			alg.generator(6);
+			alg.computeECC(message, ecc);
 
-		assertEquals(6, ecc.size);
+			assertEquals(6, ecc.size);
 
-		int numNotZero = 0;
-		for (int i = 0; i < ecc.size; i++) {
-			if (0 != ecc.data[i])
-				numNotZero++;
+			int numNotZero = 0;
+			for (int dataIdx = 0; dataIdx < ecc.size; dataIdx++) {
+				if (0 != ecc.data[dataIdx])
+					numNotZero++;
+			}
+			assertTrue(numNotZero >= 5);
+			// numerical properties are tested by computeSyndromes
 		}
-		assertTrue(numNotZero >= 5);
-
-		// numerical properties are tested by computeSyndromes
 	}
 
 	/**
@@ -67,8 +68,8 @@ public class TestReedSolomonCodes_U8 extends BoofStandardJUnit {
 		message.data = a;
 		message.size = a.length;
 
-		var alg = new ReedSolomonCodes_U8(8, 0x11d);
-		alg.generatorQR(10);
+		var alg = new ReedSolomonCodes_U8(8, 0x11d, 0);
+		alg.generator(10);
 		alg.computeECC(message, ecc);
 
 		assertEquals(10, ecc.size);
@@ -81,28 +82,31 @@ public class TestReedSolomonCodes_U8 extends BoofStandardJUnit {
 		DogArray_I8 message = randomMessage(0xFF, 50);
 		var ecc = new DogArray_I8();
 
-		var alg = new ReedSolomonCodes_U8(8, primitive8);
-		alg.generatorQR(6);
-		alg.computeECC(message, ecc);
+		for (int base = 0; base < 2; base++) {
+			var alg = new ReedSolomonCodes_U8(8, primitive8, base);
+			alg.generator(6);
 
-		DogArray_I8 syndromes = DogArray_I8.zeros(6);
-		alg.computeSyndromes(message, ecc, syndromes);
+			alg.computeECC(message, ecc);
 
-		// no error. All syndromes values should be zero
-		for (int i = 0; i < syndromes.size; i++) {
-			assertEquals(0, syndromes.data[i]);
+			DogArray_I8 syndromes = DogArray_I8.zeros(6);
+			alg.computeSyndromes(message, ecc, syndromes);
+
+			// no error. All syndromes values should be zero
+			for (int i = 0; i < syndromes.size; i++) {
+				assertEquals(0, syndromes.data[i]);
+			}
+
+			// introduce an error
+			message.data[6] += (byte)7;
+			alg.computeSyndromes(message, ecc, syndromes);
+
+			int notZero = 0;
+			for (int i = 0; i < syndromes.size; i++) {
+				if (syndromes.data[i] != 0)
+					notZero++;
+			}
+			assertTrue(notZero > 1);
 		}
-
-		// introduce an error
-		message.data[6] += (byte)7;
-		alg.computeSyndromes(message, ecc, syndromes);
-
-		int notZero = 0;
-		for (int i = 0; i < syndromes.size; i++) {
-			if (syndromes.data[i] != 0)
-				notZero++;
-		}
-		assertTrue(notZero > 1);
 	}
 
 	private DogArray_I8 randomMessage( int maxValue, int N ) {
@@ -113,9 +117,10 @@ public class TestReedSolomonCodes_U8 extends BoofStandardJUnit {
 		return message;
 	}
 
-	@Test void generatorQR() {
-		var alg = new ReedSolomonCodes_U8(8, primitive8);
-		alg.generatorQR(5);
+	/** Generator for QR codes, which is the default */
+	@Test void generatorFamily0() {
+		var alg = new ReedSolomonCodes_U8(8, primitive8, 0);
+		alg.generator(5);
 
 		// Evaluate it at the zeros and see if they are zero
 		for (int i = 0; i < 5; i++) {
@@ -128,9 +133,10 @@ public class TestReedSolomonCodes_U8 extends BoofStandardJUnit {
 		assertTrue(0 != alg.math.polyEval(alg.generator, 5));
 	}
 
-	@Test void generatorAztec() {
-		var alg = new ReedSolomonCodes_U8(8, primitive8);
-		alg.generatorAztec(5);
+	/** Generator for Aztec Codes, which is the default */
+	@Test void generatorBase1() {
+		var alg = new ReedSolomonCodes_U8(8, primitive8, 1);
+		alg.generator(5);
 
 		// Evaluate it at the zeros and see if they are zero
 		for (int i = 0; i < 5; i++) {
@@ -144,9 +150,9 @@ public class TestReedSolomonCodes_U8 extends BoofStandardJUnit {
 	}
 
 	/** Compare to a known solution */
-	@Test void generatorAztecKnown1() {
-		var alg = new ReedSolomonCodes_U8(4, 19);
-		alg.generatorAztec(5);
+	@Test void generatorBase1_Known1() {
+		var alg = new ReedSolomonCodes_U8(4, 19, 1);
+		alg.generator(5);
 
 		// From ISO section 7.2.3
 		assertEquals(6, alg.generator.size);
@@ -159,9 +165,9 @@ public class TestReedSolomonCodes_U8 extends BoofStandardJUnit {
 	}
 
 	/** Compare to a known solution */
-	@Test void generatorAztecKnown0() {
-		var alg = new ReedSolomonCodes_U8(4, 19);
-		alg.generatorAztec(6);
+	@Test void generatorBase1_Known0() {
+		var alg = new ReedSolomonCodes_U8(4, 19, 1);
+		alg.generator(6);
 
 		// From ISO section 7.2.3
 		assertEquals(7, alg.generator.size);
@@ -184,8 +190,8 @@ public class TestReedSolomonCodes_U8 extends BoofStandardJUnit {
 		int nsyn = 10;
 		DogArray_I8 syndromes = DogArray_I8.zeros(nsyn);
 
-		var alg = new ReedSolomonCodes_U8(8, primitive8);
-		alg.generatorQR(nsyn);
+		var alg = new ReedSolomonCodes_U8(8, primitive8, 0);
+		alg.generator(nsyn);
 		alg.computeECC(message, ecc);
 
 		message.data[0] = 0;
@@ -210,35 +216,36 @@ public class TestReedSolomonCodes_U8 extends BoofStandardJUnit {
 	 * error locations
 	 */
 	@Test void findErrorLocatorPolynomialBM_compareToDirect() {
-
 		DogArray_I8 found = new DogArray_I8();
 		DogArray_I8 expected = new DogArray_I8();
 
-		for (int i = 0; i < 30; i++) {
-			int N = 50;
-			DogArray_I8 message = randomMessage(0xFF, N);
+		for (int generatorBase = 0; generatorBase < 2; generatorBase++) {
+			var alg = new ReedSolomonCodes_U8(8, primitive8, generatorBase);
+			for (int trial = 0; trial < 30; trial++) {
+				int N = 50;
+				DogArray_I8 message = randomMessage(0xFF, N);
 
-			var ecc = new DogArray_I8();
-			int nsyn = 10;
-			DogArray_I8 syndromes = DogArray_I8.zeros(nsyn);
+				var ecc = new DogArray_I8();
+				int nsyn = 10;
+				DogArray_I8 syndromes = DogArray_I8.zeros(nsyn);
 
-			var alg = new ReedSolomonCodes_U8(8, primitive8);
-			alg.generatorQR(nsyn);
-			alg.computeECC(message, ecc);
+				alg.generator(nsyn);
+				alg.computeECC(message, ecc);
 
-			int where = rand.nextInt(N);
-			message.data[where] ^= (byte)0x12;
-			alg.computeSyndromes(message, ecc, syndromes);
+				int where = rand.nextInt(N);
+				message.data[where] ^= (byte)0x12;
+				alg.computeSyndromes(message, ecc, syndromes);
 
-			DogArray_I32 whereList = new DogArray_I32(1);
-			whereList.add(where);
+				DogArray_I32 whereList = new DogArray_I32(1);
+				whereList.add(where);
 
-			alg.findErrorLocatorPolynomialBM(syndromes, found);
-			alg.findErrorLocatorPolynomial(N + ecc.size, whereList, expected);
+				alg.findErrorLocatorPolynomialBM(syndromes, found);
+				alg.findErrorLocatorPolynomial(N + ecc.size, whereList, expected);
 
-			assertEquals(found.size, expected.size);
-			for (int j = 0; j < found.size; j++) {
-				assertEquals(found.get(j), expected.get(j));
+				assertEquals(expected.size, found.size);
+				for (int j = 0; j < found.size; j++) {
+					assertEquals(expected.get(j), found.get(j));
+				}
 			}
 		}
 	}
@@ -248,20 +255,25 @@ public class TestReedSolomonCodes_U8 extends BoofStandardJUnit {
 	 */
 	@Test void findErrors_BruteForce() {
 		DogArray_I8 message = randomMessage(0xFF, 50);
-		for (int i = 0; i < 200; i++) {
-			findErrors_BruteForce(message, rand.nextInt(5), false);
+
+		for (int generatorBase = 0; generatorBase < 2; generatorBase++) {
+			var alg = new ReedSolomonCodes_U8(8, primitive8, generatorBase);
+			for (int trial = 0; trial < 200; trial++) {
+				findErrors_BruteForce(alg, message, rand.nextInt(5), false);
+			}
 		}
 	}
 
-	public void findErrors_BruteForce( DogArray_I8 message, int numErrors, boolean expectedFail ) {
+	public void findErrors_BruteForce( ReedSolomonCodes_U8 alg,
+									   DogArray_I8 message, int numErrors, boolean expectedFail ) {
 		var ecc = new DogArray_I8();
 		int nsyn = 10;
 		DogArray_I8 syndromes = DogArray_I8.zeros(nsyn);
 		DogArray_I8 errorLocator = new DogArray_I8();
 		DogArray_I32 locations = new DogArray_I32();
 
-		var alg = new ReedSolomonCodes_U8(8, primitive8);
-		alg.generatorQR(nsyn);
+
+		alg.generator(nsyn);
 		alg.computeECC(message, ecc);
 
 		DogArray_I8 cmessage = message.copy();
@@ -310,8 +322,12 @@ public class TestReedSolomonCodes_U8 extends BoofStandardJUnit {
 	 */
 	@Test void findErrors_BruteForce_TooMany() {
 		DogArray_I8 message = randomMessage(0xFF, 50);
-		findErrors_BruteForce(message, 6, true);
-		findErrors_BruteForce(message, 8, true);
+
+		for (int generatorBase = 0; generatorBase < 2; generatorBase++) {
+			var alg = new ReedSolomonCodes_U8(8, primitive8, generatorBase);
+			findErrors_BruteForce(alg, message, 6, true);
+			findErrors_BruteForce(alg, message, 8, true);
+		}
 	}
 
 	public int[] selectN( int setSize, int maxValue ) {
@@ -356,7 +372,7 @@ public class TestReedSolomonCodes_U8 extends BoofStandardJUnit {
 									 DogArray_I8 errorLocator,
 									 DogArray_I8 expected ) {
 		DogArray_I8 found = new DogArray_I8();
-		var alg = new ReedSolomonCodes_U8(8, primitive8);
+		var alg = new ReedSolomonCodes_U8(8, primitive8, 0);
 		alg.findErrorEvaluator(syndromes, errorLocator, found);
 
 		assertEquals(found.size, expected.size);
@@ -376,8 +392,8 @@ public class TestReedSolomonCodes_U8 extends BoofStandardJUnit {
 		DogArray_I8 errorLocator = new DogArray_I8();
 		int nsyn = 10;
 
-		var alg = new ReedSolomonCodes_U8(8, primitive8);
-		alg.generatorQR(nsyn);
+		var alg = new ReedSolomonCodes_U8(8, primitive8, 0);
+		alg.generator(nsyn);
 		alg.computeECC(message, ecc);
 
 		DogArray_I8 corrupted = message.copy();
@@ -405,11 +421,12 @@ public class TestReedSolomonCodes_U8 extends BoofStandardJUnit {
 	 * Randomly correct the message and ECC. See if the message is correctly reconstructed.
 	 */
 	@Test void correct_random() {
-		correct_random(4, primitive4);
-		correct_random(8, primitive8);
+		correct_random(4, primitive4, 0);
+		correct_random(8, primitive8, 0);
+		correct_random(8, primitive8, 1);
 	}
 
-	void correct_random( int numBits, int primitive ) {
+	void correct_random( int numBits, int primitive, int generatorBase ) {
 		var ecc = new DogArray_I8();
 		int nsyn = 10; // should be able to recover from 4 errors
 
@@ -417,10 +434,10 @@ public class TestReedSolomonCodes_U8 extends BoofStandardJUnit {
 		for (int i = 0; i < numBits; i++) {
 			mask |= 1 << i;
 		}
-		var alg = new ReedSolomonCodes_U8(numBits, primitive);
-		alg.generatorQR(nsyn);
+		var alg = new ReedSolomonCodes_U8(numBits, primitive, generatorBase);
+		alg.generator(nsyn);
 
-		for (int i = 0; i < 20000; i++) {
+		for (int trial = 0; trial < 20_000; trial++) {
 			DogArray_I8 message = randomMessage(mask, 100);
 			DogArray_I8 corrupted = message.copy();
 

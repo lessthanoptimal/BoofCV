@@ -18,6 +18,7 @@
 
 package boofcv.alg.fiducial.qrcode;
 
+import lombok.Getter;
 import org.ddogleg.struct.DogArray_I16;
 import org.ddogleg.struct.DogArray_I32;
 
@@ -50,8 +51,23 @@ public class ReedSolomonCodes_U16 {
 	DogArray_I16 errorX = new DogArray_I16();
 	DogArray_I16 err_loc_prime_tmp = new DogArray_I16();
 
-	public ReedSolomonCodes_U16( int numBits, int primitive ) {
+	/**
+	 * Specifies if the base of the generator polynomial will be 0 or 1:  (x[i] + i + family)* ... *(x[n] + n + family).
+	 *
+	 * For QR this is 0 and for Aztec this is 1.
+	 */
+	@Getter int generatorBase;
+
+	/**
+	 * @param numBits Number of bits in each word
+	 * @param primitive Primitive polynomial
+	 * @param generatorBase Base for generator polynomial. 0 or 1
+	 */
+	public ReedSolomonCodes_U16( int numBits, int primitive, int generatorBase ) {
+		if (generatorBase < 0 || generatorBase > 1)
+			throw new IllegalArgumentException("generatorBase must be 0 or 1");
 		math = new GaliosFieldTableOps_U16(numBits, primitive);
+		this.generatorBase = generatorBase;
 	}
 
 	/**
@@ -99,9 +115,9 @@ public class ReedSolomonCodes_U16 {
 						   DogArray_I16 syndromes ) {
 		syndromes.resize(syndromeLength());
 		for (int i = 0; i < syndromes.size; i++) {
-			int val = math.power(2, i);
-			syndromes.data[i] = (short)math.polyEval(input, val);
-			syndromes.data[i] = (short)math.polyEvalContinue(syndromes.data[i] & 0xFFFF, ecc, val);
+			int val = generatorPower(i);
+			int eval = math.polyEval(input, val);
+			syndromes.data[i] = (short)math.polyEvalContinue(eval, ecc, val);
 		}
 	}
 
@@ -243,8 +259,8 @@ public class ReedSolomonCodes_U16 {
 			errorX.data[i] = (short)math.power(2, coef_pos);
 			// The commented out code below replicates exactly how the reference code works. This code above
 			// seems to work just as well and passes all the unit tests
-//			int coef_pos = math.max_value-(length_msg_ecc-errorLocations.data[i]-1);
-//			X.data[i] = (short)math.power_n(2,-coef_pos);
+//			int coef_pos = math.max_value - (length_msg_ecc - errorLocations.data[i] - 1);
+//			errorX.data[i] = (short)math.power_n(2, -coef_pos);
 		}
 
 		err_loc_prime_tmp.resize(errorX.size);
@@ -273,6 +289,9 @@ public class ReedSolomonCodes_U16 {
 
 			// Compute the magnitude
 			int magnitude = math.divide(y, err_loc_prime);
+			if (generatorBase != 0) {
+				magnitude = math.multiply(magnitude, Xi_inv);
+			}
 
 			// only apply a correction if it's part of the message and not the ECC
 			int loc = errorLocations.get(i);
@@ -312,11 +331,12 @@ public class ReedSolomonCodes_U16 {
 	 * Creates the generator function with the specified polynomial degree. The generator function is composed
 	 * of factors of (x-a_n) where a_n is a power of 2.<br>
 	 *
+	 * if generatorFamily = 0 then:<br>
 	 * g<sub>4</sub>(x) = (x - α0) (x - α1) (x - α2) (x - α3) = 01 x4 + 0f x3 + 36 x2 + 78 x + 40
 	 *
 	 * @param degree Number of words in ECC. Larger values mean more error correction
 	 */
-	public void generatorQR( int degree ) {
+	public void generator( int degree ) {
 		// initialize to a polynomial = 1
 		initToOne(generator, degree + 1);
 
@@ -324,28 +344,7 @@ public class ReedSolomonCodes_U16 {
 		tmp1.resize(2);
 		tmp1.data[0] = 1;
 		for (int i = 0; i < degree; i++) {
-			tmp1.data[1] = (short)math.power(2, i);
-			math.polyMult(generator, tmp1, tmp0);
-			generator.setTo(tmp0);
-		}
-	}
-
-	/**
-	 * Creates the generator function for Aztec codes.
-	 * an = 2**n
-	 * g<sub>5</sub>(x) = (x - α1) ... (x - α5) = x**5 + 11x**4 + 6x**2 + 2x + 1
-	 *
-	 * @param degree Number of words in ECC. Larger values mean more error correction
-	 */
-	public void generatorAztec( int degree ) {
-		// initialize to a polynomial = 1
-		initToOne(generator, degree + 1);
-
-		// (1*x - a[i])
-		tmp1.resize(2);
-		tmp1.data[0] = 1;
-		for (int i = 0; i < degree; i++) {
-			tmp1.data[1] = (short)math.power(2, i + 1);
+			tmp1.data[1] = (short)generatorPower(i);
 			math.polyMult(generator, tmp1, tmp0);
 			generator.setTo(tmp0);
 		}
@@ -356,6 +355,10 @@ public class ReedSolomonCodes_U16 {
 		poly.reserve(length);
 		poly.size = 1;
 		poly.data[0] = 1;
+	}
+
+	int generatorPower( int level ) {
+		return math.power(2, level + generatorBase);
 	}
 
 	private int syndromeLength() {

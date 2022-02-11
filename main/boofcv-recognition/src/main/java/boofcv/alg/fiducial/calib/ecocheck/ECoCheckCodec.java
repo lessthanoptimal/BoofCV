@@ -117,7 +117,7 @@ public class ECoCheckCodec {
 	protected final PackedBits8 bits = new PackedBits8();
 
 	// Error correction algorithm. Primitive is taken from QR Code specification
-	private final ReedSolomonCodes_U8 rscodes = new ReedSolomonCodes_U8(WORD_BITS, 0b100011101);
+	private final ReedSolomonCodes_U8 rscodes = new ReedSolomonCodes_U8(WORD_BITS, 0b100011101, 0);
 
 	/**
 	 * Computes how large of a grid will be needed to encode the coordinates + overhead. Pre-allocates any memory
@@ -164,7 +164,7 @@ public class ECoCheckCodec {
 		// Compute the number of bytes to encode it all
 		ecc.resize(eccWords);
 		bits.resize(messageBitCount);
-		rscodes.generatorQR(eccWords);
+		rscodes.generator(eccWords);
 
 		// only save bits that are in the word
 		wordMask = BoofMiscOps.generateBitMask(WORD_BITS);

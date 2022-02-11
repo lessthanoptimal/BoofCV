@@ -54,7 +54,7 @@ import static boofcv.alg.fiducial.qrcode.QrCodeCodecBitsUtils.flipBits8;
  */
 public class MicroQrCodeEncoder implements VerbosePrint {
 	// used to compute error correction
-	private final ReedSolomonCodes_U8 rscodes = new ReedSolomonCodes_U8(8, 0b100011101);
+	private final ReedSolomonCodes_U8 rscodes = new ReedSolomonCodes_U8(8, 0b100011101, 0);
 
 	// output qr code
 	private final MicroQrCode qr = new MicroQrCode();
@@ -496,7 +496,7 @@ public class MicroQrCodeEncoder implements VerbosePrint {
 
 		message.resize(dataInfo.dataCodewords);
 
-		rscodes.generatorQR(wordsEcc);
+		rscodes.generator(wordsEcc);
 		ecc.resize(wordsEcc);
 
 		System.arraycopy(stream.data, 0, message.data, 0, stream.arrayLength());

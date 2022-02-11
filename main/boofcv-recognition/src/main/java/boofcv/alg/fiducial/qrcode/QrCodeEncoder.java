@@ -44,7 +44,7 @@ import static boofcv.alg.fiducial.qrcode.QrCodeCodecBitsUtils.*;
 public class QrCodeEncoder {
 	// TODO support ECI
 	// used to compute error correction
-	private final ReedSolomonCodes_U8 rscodes = new ReedSolomonCodes_U8(8, 0b100011101);
+	private final ReedSolomonCodes_U8 rscodes = new ReedSolomonCodes_U8(8, 0b100011101, 0);
 
 	// output qr code
 	private final QrCode qr = new QrCode();
@@ -508,7 +508,7 @@ public class QrCodeEncoder {
 		int startEcc = numBlocksA*wordsBlockDataA + numBlocksB*wordsBlockDataB;
 		int totalBlocks = numBlocksA + numBlocksB;
 
-		rscodes.generatorQR(wordsEcc);
+		rscodes.generator(wordsEcc);
 		ecc.resize(wordsEcc);
 		encodeBlocks(stream, wordsBlockDataA, numBlocksA, 0, 0, startEcc, totalBlocks);
 		encodeBlocks(stream, wordsBlockDataB, numBlocksB, wordsBlockDataA*numBlocksA, numBlocksA, startEcc, totalBlocks);
