@@ -53,6 +53,21 @@ public class PackedBits8 implements PackedBits {
 		System.arraycopy(src.data, 0, data, 0, src.arrayLength());
 	}
 
+	/**
+	 * Checks to see if the usable data in 'other' is identical to the usable data in this.
+	 */
+	public boolean isIdentical( PackedBits8 other ) {
+		if (size != other.size)
+			return false;
+
+		int numBytes = size/8 + (size%8 == 0 ? 0 : 1);
+		for (int i = 0; i < numBytes; i++) {
+			if (data[i] != other.data[i])
+				return false;
+		}
+		return true;
+	}
+
 	@Override
 	public int get( int which ) {
 		int index = which/8;

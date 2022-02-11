@@ -22,6 +22,7 @@ import boofcv.alg.fiducial.qrcode.PackedBits8;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestAztecCodecMode {
 	/**
@@ -43,9 +44,75 @@ public class TestAztecCodecMode {
 		expected.append(0b1000110, 7, false);
 		expected.append(0b0011001, 7, false);
 
-		assertEquals(expected.size, found.size);
-		for (int i = 0; i < found.size; i++) {
-			assertEquals(expected.get(i), found.get(i));
+		checkEqualsFirstBits(expected.size, found, expected);
+	}
+
+	/**
+	 * Generate an error free message and see if it modifies anything
+	 */
+	@Test void correctDataBits() {
+		var marker = new AztecCode();
+		var encoder = new AztecCodecMode();
+		var original = new PackedBits8();
+		var copy = new PackedBits8();
+
+		// Go through different structures because the code is slightly different
+		for (var structure : AztecCode.Structure.values()) {
+			System.out.println("\nStructure: "+structure);
+			// Create the error free message
+			marker.structure = structure;
+			marker.dataLayers = 2;
+			marker.messageWordCount = 10;
+			encoder.encodeMode(marker, original);
+
+			// With perfect data there should be no change
+			copy.setTo(original);
+			assertTrue(encoder.correctDataBits(copy, structure));
+
+			// how many data bits
+			int numBits = structure == AztecCode.Structure.COMPACT ? 8 : 16;
+
+			checkEqualsFirstBits(numBits, copy, original);
+
+			System.out.println("Bit error");
+			// Flip a bit and see if it gets corrected
+			copy.setTo(original);
+			copy.set(7, copy.get(7)^1);
+			assertTrue(encoder.correctDataBits(copy, structure));
+			checkEqualsFirstBits(numBits, copy, original);
+		}
+	}
+
+	private void checkEqualsFirstBits( int numBits, PackedBits8 copy, PackedBits8 original ) {
+		assertEquals(numBits, copy.size);
+		for (int bitIdx = 0; bitIdx < copy.size; bitIdx++) {
+			assertEquals(original.get(bitIdx), copy.get(bitIdx));
+		}
+	}
+
+	/**
+	 * Simple test to see if it decodes the original mode correctly.
+	 */
+	@Test void decodeMode() {
+		var marker = new AztecCode();
+		var found = new AztecCode();
+		var alg = new AztecCodecMode();
+		var original = new PackedBits8();
+
+		// Go through different structures because the code is slightly different
+		for (var structure : AztecCode.Structure.values()) {
+			// Create the error free message
+			marker.structure = structure;
+			marker.dataLayers = 2;
+			marker.messageWordCount = 10;
+			alg.encodeMode(marker, original);
+
+			// Decode it and see if it extracted the correct values
+			found.structure = structure;
+			assertTrue(alg.decodeMode(original, found));
+
+			assertEquals(marker.dataLayers, found.dataLayers);
+			assertEquals(marker.messageWordCount, found.messageWordCount);
 		}
 	}
 }
