@@ -36,10 +36,9 @@ public class TestGaliosFieldTableOps_U8 extends BoofStandardJUnit {
 
 	void polyScale( int numBits, int primitive ) {
 		var alg = new GaliosFieldTableOps_U8(numBits, primitive);
+
+		DogArray_I8 input = createArbitraryPolynomial(alg.max_value);
 		int mask = alg.max_value;
-
-		DogArray_I8 input = createArbitraryPolynomial();
-
 		int scale = 0x45 & mask;
 
 		var output = new DogArray_I8();
@@ -57,7 +56,7 @@ public class TestGaliosFieldTableOps_U8 extends BoofStandardJUnit {
 	@Test void polyAdd() {
 		var alg = new GaliosFieldTableOps_U8(8, primitive8);
 
-		DogArray_I8 inputA = createArbitraryPolynomial();
+		DogArray_I8 inputA = createArbitraryPolynomial(alg.max_value);
 
 		// Create an arbitrary polynomial: 0xA0*x^3 + 0x45
 		var inputB = new DogArray_I8(4);
@@ -118,7 +117,7 @@ public class TestGaliosFieldTableOps_U8 extends BoofStandardJUnit {
 	@Test void polyAddScaleB() {
 		var alg = new GaliosFieldTableOps_U8(8, primitive8);
 
-		DogArray_I8 inputA = createArbitraryPolynomial();
+		DogArray_I8 inputA = createArbitraryPolynomial(alg.max_value);
 
 		// Create an arbitrary polynomial: 0xA0*x^3 + 0x45
 		var inputB = new DogArray_I8(4);
@@ -141,7 +140,7 @@ public class TestGaliosFieldTableOps_U8 extends BoofStandardJUnit {
 	@Test void polyMult() {
 		var alg = new GaliosFieldTableOps_U8(8, primitive8);
 
-		DogArray_I8 inputA = createArbitraryPolynomial();
+		DogArray_I8 inputA = createArbitraryPolynomial(alg.max_value);
 
 		var inputB = new DogArray_I8();
 		inputB.resize(2);
@@ -421,12 +420,16 @@ public class TestGaliosFieldTableOps_U8 extends BoofStandardJUnit {
 		}
 	}
 
-	private DogArray_I8 createArbitraryPolynomial() {
+	/**
+	 * @param mask used to prevent it from exceeding the maximum possible value
+	 */
+	private DogArray_I8 createArbitraryPolynomial( int mask ) {
 		// Create an arbitrary polynomial: 0x12*x^2 + 0x54*x + 0xFF
 		var input = new DogArray_I8(3);
-		input.set(0, 0x12);
-		input.set(1, 0x54);
-		input.set(2, 0xFF);
+		input.resize(3);
+		input.set(0, 0x12 & mask);
+		input.set(1, 0x54 & mask);
+		input.set(2, 0xFF & mask);
 		return input;
 	}
 }

@@ -26,12 +26,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestGaliosFieldTableOps_U16 extends BoofStandardJUnit {
-	int primitive12 = 0b1000001101001;
+	int primitive12 = 0b1_0000_0110_1001;
 
 	@Test void polyScale() {
 		var alg = new GaliosFieldTableOps_U16(12, primitive12);
 
-		DogArray_I16 input = createArbitraryPolynomial();
+		DogArray_I16 input = createArbitraryPolynomial(alg.max_value);
 
 		int scale = 0x45;
 
@@ -50,7 +50,7 @@ public class TestGaliosFieldTableOps_U16 extends BoofStandardJUnit {
 	@Test void polyAdd() {
 		var alg = new GaliosFieldTableOps_U16(12, primitive12);
 
-		DogArray_I16 inputA = createArbitraryPolynomial();
+		DogArray_I16 inputA = createArbitraryPolynomial(alg.max_value);
 
 		// Create an arbitrary polynomial: 0xA0*x^3 + 0x45
 		var inputB = new DogArray_I16(4);
@@ -111,7 +111,7 @@ public class TestGaliosFieldTableOps_U16 extends BoofStandardJUnit {
 	@Test void polyAddScaleB() {
 		var alg = new GaliosFieldTableOps_U16(12, primitive12);
 
-		DogArray_I16 inputA = createArbitraryPolynomial();
+		DogArray_I16 inputA = createArbitraryPolynomial(alg.max_value);
 
 		// Create an arbitrary polynomial: 0xA0*x^3 + 0x45
 		var inputB = new DogArray_I16(4);
@@ -134,7 +134,7 @@ public class TestGaliosFieldTableOps_U16 extends BoofStandardJUnit {
 	@Test void polyMult() {
 		var alg = new GaliosFieldTableOps_U16(12, primitive12);
 
-		DogArray_I16 inputA = createArbitraryPolynomial();
+		DogArray_I16 inputA = createArbitraryPolynomial(alg.max_value);
 
 		var inputB = new DogArray_I16();
 		inputB.resize(2);
@@ -329,7 +329,7 @@ public class TestGaliosFieldTableOps_U16 extends BoofStandardJUnit {
 		checkDivision(alg, inputB, inputA, quotient, remainder);
 	}
 
-	private void checkDivision( GaliosFieldTableOps_U16 alg, DogArray_I16 inputA, DogArray_I16 inputB, 
+	private void checkDivision( GaliosFieldTableOps_U16 alg, DogArray_I16 inputA, DogArray_I16 inputB,
 								DogArray_I16 quotient, DogArray_I16 remainder ) {
 		var tmp = new DogArray_I16();
 		var found = new DogArray_I16();
@@ -371,7 +371,7 @@ public class TestGaliosFieldTableOps_U16 extends BoofStandardJUnit {
 		checkDivision_S(alg, inputB, inputA, quotient, remainder);
 	}
 
-	private void checkDivision_S( GaliosFieldTableOps_U16 alg, DogArray_I16 inputA, DogArray_I16 inputB, 
+	private void checkDivision_S( GaliosFieldTableOps_U16 alg, DogArray_I16 inputA, DogArray_I16 inputB,
 								  DogArray_I16 quotient, DogArray_I16 remainder ) {
 		var tmp = new DogArray_I16();
 		var found = new DogArray_I16();
@@ -414,13 +414,16 @@ public class TestGaliosFieldTableOps_U16 extends BoofStandardJUnit {
 		}
 	}
 
-	private DogArray_I16 createArbitraryPolynomial() {
+	/**
+	 * @param mask used to prevent it from exceeding the maximum possible value
+	 */
+	private DogArray_I16 createArbitraryPolynomial( int mask ) {
 		// Create an arbitrary polynomial: 0x121*x^2 + 0x54*x + 0xFFF
 		var input = new DogArray_I16(3);
 		input.resize(3);
-		input.set(0, 0x121);
-		input.set(1, 0x54);
-		input.set(2, 0xFFF);
+		input.set(0, 0x121 & mask);
+		input.set(1, 0x54 & mask);
+		input.set(2, 0xFFF & mask);
 		return input;
 	}
 }
