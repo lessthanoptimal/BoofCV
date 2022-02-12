@@ -20,9 +20,7 @@ package boofcv.alg.fiducial.aztec;
 
 import boofcv.alg.fiducial.aztec.AztecCode.Modes;
 import boofcv.alg.fiducial.qrcode.PackedBits8;
-import boofcv.alg.fiducial.qrcode.ReedSolomonCodes_U16;
 import boofcv.misc.BoofMiscOps;
-import org.ddogleg.struct.DogArray_I16;
 import org.ddogleg.struct.DogArray_I8;
 
 import java.nio.charset.StandardCharsets;
@@ -34,17 +32,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class AztecEncoder {
-	// generates ECC for different Galois Fields. Which one is used depends on how large the marker is
-	ReedSolomonCodes_U16 ecc6 = new ReedSolomonCodes_U16(6, 67, 1);
-	ReedSolomonCodes_U16 ecc8 = new ReedSolomonCodes_U16(8, 301, 1);
-	ReedSolomonCodes_U16 ecc10 = new ReedSolomonCodes_U16(10, 1033, 1);
-	ReedSolomonCodes_U16 ecc12 = new ReedSolomonCodes_U16(12, 4201, 1);
-
-	// The data portion of the message converted into a format ECC generation can understand
-	DogArray_I16 storageDataWords = new DogArray_I16();
-	DogArray_I16 storageEccWords = new DogArray_I16();
-
+public class AztecEncoder extends AztecMessageErrorCorrection {
 	// maker which is going to have the encoding stored on it
 	AztecCode workMarker = new AztecCode();
 
@@ -238,7 +226,7 @@ public class AztecEncoder {
 		segmentsToEncodedBits();
 		selectNumberOfLayers();
 		bitsToWords();
-		computeErrorCorrectionWords();
+		computeEccWords(workMarker.getWordBitCount(), workMarker.getCapacityWords());
 		return copyIntoResults();
 	}
 
@@ -268,26 +256,6 @@ public class AztecEncoder {
 			if (latched) {
 				currentMode = m.encodingMode;
 			}
-		}
-	}
-
-	/**
-	 * Compute the value of error correction words. The number of words depends on the message size and requested
-	 * amount of correction.
-	 */
-	void computeErrorCorrectionWords() {
-		// it will use all possible code words in the marker for error correction
-		int maxMarkerWords = workMarker.getCapacityWords();
-		int actualEccWords = maxMarkerWords - storageDataWords.size;
-		storageEccWords.resize(actualEccWords);
-
-		// Compute ECC with the appropriate coefficients depending on the word size
-		switch (workMarker.getWordBitCount()) {
-			case 6 -> computeEcc(ecc6, actualEccWords);
-			case 8 -> computeEcc(ecc8, actualEccWords);
-			case 10 -> computeEcc(ecc10, actualEccWords);
-			case 12 -> computeEcc(ecc12, actualEccWords);
-			default -> throw new RuntimeException("BUG!");
 		}
 	}
 
@@ -415,11 +383,6 @@ public class AztecEncoder {
 		System.arraycopy(bits.data, 0, results.rawbits, 0, results.rawbits.length);
 
 		return results;
-	}
-
-	private void computeEcc( ReedSolomonCodes_U16 ecc, int actualEccWords ) {
-		ecc.generator(actualEccWords);
-		ecc.computeECC(storageDataWords, storageEccWords);
 	}
 
 	/**
