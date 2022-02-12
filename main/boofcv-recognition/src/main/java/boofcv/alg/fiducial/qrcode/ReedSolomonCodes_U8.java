@@ -99,6 +99,10 @@ public class ReedSolomonCodes_U8 {
 		if (!findErrorLocations_BruteForce(errorLocatorPoly, input.size + ecc.size, errorLocations))
 			return false;
 
+		// see if there are no errors
+//		if (errorLocations.size == 0)
+//			return true;
+
 		correctErrors(input, input.size + ecc.size, syndromes, errorLocatorPoly, errorLocations);
 		return true;
 	}
@@ -113,6 +117,8 @@ public class ReedSolomonCodes_U8 {
 	void computeSyndromes( DogArray_I8 input,
 						   DogArray_I8 ecc,
 						   DogArray_I8 syndromes ) {
+		if (input.size + ecc.size > math.num_values)
+			throw new IllegalArgumentException("Combined size of input and ecc is larger than " + math.num_values);
 		syndromes.resize(syndromeLength());
 		for (int i = 0; i < syndromes.size; i++) {
 			int val = generatorPower(i);

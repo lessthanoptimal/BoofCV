@@ -427,24 +427,26 @@ public class TestReedSolomonCodes_U8 extends BoofStandardJUnit {
 	}
 
 	void correct_random( int numBits, int primitive, int generatorBase ) {
-		var ecc = new DogArray_I8();
-		int nsyn = 10; // should be able to recover from 4 errors
-
-		int mask = 0;
-		for (int i = 0; i < numBits; i++) {
-			mask |= 1 << i;
-		}
 		var alg = new ReedSolomonCodes_U8(numBits, primitive, generatorBase);
+
+		// make sure the message size does not exceed the limits of its Field
+		int maxErrors = 4;
+		int nsyn = maxErrors*2 + 2; // words dedicated to error correction
+		int messageSize = Math.min(100, alg.math.num_values - nsyn - 2);
+
+		var ecc = new DogArray_I8();
+
+		int mask = alg.math.max_value;
 		alg.generator(nsyn);
 
 		for (int trial = 0; trial < 20_000; trial++) {
-			DogArray_I8 message = randomMessage(mask, 100);
+			DogArray_I8 message = randomMessage(mask, messageSize);
 			DogArray_I8 corrupted = message.copy();
 
 			alg.computeECC(message, ecc);
 
 			// apply noise to the message
-			int numErrors = rand.nextInt(4);
+			int numErrors = rand.nextInt(maxErrors);
 
 			for (int j = 0; j < numErrors; j++) {
 				int selected = rand.nextInt(message.size);
@@ -452,7 +454,7 @@ public class TestReedSolomonCodes_U8 extends BoofStandardJUnit {
 			}
 
 			// corrupt the ecc code
-			if (numErrors == 0 || rand.nextInt(5) < 1) {
+			if (numErrors < maxErrors - 1 && rand.nextInt(5) < 1) {
 				ecc.data[rand.nextInt(ecc.size)] ^= (byte)(0x13 & mask);
 			}
 

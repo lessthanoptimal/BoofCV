@@ -28,7 +28,7 @@ import org.ddogleg.struct.DogArray_I8;
  *
  * @author Peter Abeles
  */
-public class AztecCodecMode {
+public class AztecMessageModeCodec {
 	// Error correction for encoding the message mode
 	ReedSolomonCodes_U8 rscodes = new ReedSolomonCodes_U8(4, 19, 1);
 
@@ -66,10 +66,6 @@ public class AztecCodecMode {
 			eccInput.data[word] = (byte)bits.read(word*4, 4, true);
 		}
 		rscodes.computeECC(eccInput, eccOutput);
-
-		eccInput.printHex();
-		eccOutput.printHex();
-		System.out.println();
 
 		// Append resulting check words from ECC to bits data
 		for (int word = 0; word < eccOutput.size; word++) {
@@ -131,13 +127,8 @@ public class AztecCodecMode {
 			eccOutput.data[word] = (byte)bits.read(bitLocation, 4, true);
 		}
 
-		eccInput.printHex();
-		eccOutput.printHex();
-		System.out.println();
 		if (!rscodes.correct(eccInput, eccOutput))
 			return false;
-		eccInput.printHex();
-		System.out.println();
 
 		// Copy results into bits. Just the data and no ECC
 		bits.resize(0);

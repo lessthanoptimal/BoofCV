@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class TestAztecCodecMode {
+public class TestAztecMessageModeCodec {
 	/**
 	 * Known results from ISO Figure G.6. Manually read bits from image
 	 */
@@ -35,7 +35,7 @@ public class TestAztecCodecMode {
 		marker.messageWordCount = 10;
 
 		var found = new PackedBits8();
-		var encoder = new AztecCodecMode();
+		var encoder = new AztecMessageModeCodec();
 		encoder.encodeMode(marker, found);
 
 		var expected = new PackedBits8();
@@ -52,13 +52,12 @@ public class TestAztecCodecMode {
 	 */
 	@Test void correctDataBits() {
 		var marker = new AztecCode();
-		var encoder = new AztecCodecMode();
+		var encoder = new AztecMessageModeCodec();
 		var original = new PackedBits8();
 		var copy = new PackedBits8();
 
 		// Go through different structures because the code is slightly different
 		for (var structure : AztecCode.Structure.values()) {
-			System.out.println("\nStructure: "+structure);
 			// Create the error free message
 			marker.structure = structure;
 			marker.dataLayers = 2;
@@ -74,7 +73,6 @@ public class TestAztecCodecMode {
 
 			checkEqualsFirstBits(numBits, copy, original);
 
-			System.out.println("Bit error");
 			// Flip a bit and see if it gets corrected
 			copy.setTo(original);
 			copy.set(7, copy.get(7)^1);
@@ -96,7 +94,7 @@ public class TestAztecCodecMode {
 	@Test void decodeMode() {
 		var marker = new AztecCode();
 		var found = new AztecCode();
-		var alg = new AztecCodecMode();
+		var alg = new AztecMessageModeCodec();
 		var original = new PackedBits8();
 
 		// Go through different structures because the code is slightly different

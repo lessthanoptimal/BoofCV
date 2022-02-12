@@ -75,7 +75,7 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 	final DogArray<AztecCode> allMarkers = new DogArray<>(AztecCode::new, AztecCode::reset);
 
 	AztecDecoder decoderBits = new AztecDecoder();
-	AztecCodecMode codecMode = new AztecCodecMode();
+	AztecMessageModeCodec codecMode = new AztecMessageModeCodec();
 
 	// value of bits directly read in from the image. This will include fixed structures
 	PackedBits8 imageBits = new PackedBits8();

@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestGaliosFieldTableOps extends BoofStandardJUnit {
 	int primitive2 = 0b111;
+	int primitive4 = 0b10011;
 	int primitive8 = 0b100011101;
 
 	@Test void constructor() {
@@ -130,6 +131,22 @@ public class TestGaliosFieldTableOps extends BoofStandardJUnit {
 			int found = alg.power(valA, b);
 
 			assertEquals(expected, found);
+		}
+	}
+
+	/** Exhaustively two a block of values with 4-bit words */
+	@Test void power4() {
+		var alg = new GaliosFieldTableOps(4, primitive4);
+
+		for (int a = 0; a < 16; a++) {
+			for (int b = 0; b < 16; b++) {
+				int expected = pow(a*b, primitive4, 16);
+
+				int valA = pow(a, primitive4, 16);
+				int found = alg.power(valA, b);
+
+				assertEquals(expected, found);
+			}
 		}
 	}
 
