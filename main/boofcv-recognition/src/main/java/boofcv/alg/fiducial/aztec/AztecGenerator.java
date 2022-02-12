@@ -52,7 +52,7 @@ public class AztecGenerator {
 	protected DogArray_I16 dataCoordinates = new DogArray_I16();
 	protected DogArray_I32 layerStartsAtBit = new DogArray_I32();
 
-	AztecCodecMode codecMode = new AztecCodecMode();
+	AztecMessageModeCodec codecMode = new AztecMessageModeCodec();
 	PackedBits8 bits = new PackedBits8();
 
 	/** Convenience function for rendering images */
