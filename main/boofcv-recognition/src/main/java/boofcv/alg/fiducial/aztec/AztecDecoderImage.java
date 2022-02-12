@@ -38,16 +38,18 @@ import java.util.Set;
  * Given locations of candidate finder patterns and the source image, decode all the markers inside the image and
  * reject false positives.
  *
+ * Note: A fixed feature is a feature on the marker which is not dynamically computed. E.g. the pyramid.
+ *
  * @author Peter Abeles
  */
 public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
-	/** Found and successfully decoded markers in the image */
-	@Getter final List<AztecCode> found = new ArrayList<>();
+	/** Successfully decoded markers in the image */
+	@Getter final List<AztecCode> success = new ArrayList<>();
 
-	/** Markers that it failed to decode */
+	/** Candidate markers which could not be decoded */
 	@Getter final List<AztecCode> failed = new ArrayList<>();
 
-	/** used to subsample the input image */
+	/** Reads interpolated image pixel intensity values */
 	@Getter protected InterpolatePixelS<T> interpolate;
 
 	/**
@@ -87,7 +89,7 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 
 	public void process( List<AztecPyramid> locatorPatterns, T gray ) {
 		allMarkers.reset();
-		found.clear();
+		success.clear();
 		failed.clear();
 
 		for (int i = 0; i < locatorPatterns.size(); i++) {
@@ -102,7 +104,7 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 				continue;
 			}
 
-			found.add(marker);
+			success.add(marker);
 		}
 	}
 
@@ -172,7 +174,10 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 		imageBits.append(readBits, total, true);
 	}
 
-	/** Select best orientation looking at the orientation patterns */
+	/**
+	 * Select best orientation looking at the orientation patterns. Return number
+	 * indicates which side is really the starting point
+	 */
 	int selectOrientation( Structure type ) {
 		int[] modeBitTypes = getModeBitType(type);
 
@@ -180,7 +185,7 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 		int bestOrientation = -1;
 		int bestErrors = Integer.MAX_VALUE;
 		for (int ori = 0; ori < 4; ori++) {
-			int errors = fixedFeatureModeErrors(ori*width, modeBitTypes);
+			int errors = fixedFeatureReadErrors(ori*width, modeBitTypes);
 			if (errors < bestErrors) {
 				bestErrors = errors;
 				bestOrientation = ori;
@@ -190,17 +195,18 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 		return bestOrientation;
 	}
 
+	/** Extracts data from the previously read in mode bits, skipping fixed bits */
 	void extractModeDataBits( int orientation, Structure type ) {
-		int offset = orientation*(type == Structure.COMPACT ? 10 : 15);
 		int[] modeBitTypes = getModeBitType(type);
+		int offset = orientation*modeBitTypes.length/4;
 
 		bits.resize(0);
 		for (int i = 0; i < modeBitTypes.length; i++) {
-			if (modeBitTypes[i] != 2)
+			int index = (i + offset)%modeBitTypes.length;
+			if (modeBitTypes[index] != 2)
 				continue;
 
-			int index = (i + offset)%modeBitTypes.length;
-			bits.append(imageBits.get(index), 1, false);
+			bits.append(imageBits.get(i), 1, false);
 		}
 	}
 
@@ -208,13 +214,14 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 		return type == Structure.COMPACT ? modeBitTypesComp : modeBitTypesFull;
 	}
 
-	/** See how many if the fixed features do not match obsrevations */
-	int fixedFeatureModeErrors( int offset, int[] modeBitTypes ) {
+	/** See how many of the fixed features do not match observations */
+	int fixedFeatureReadErrors( int offset, int[] modeBitTypes ) {
 		BoofMiscOps.checkEq(modeBitTypes.length, imageBits.size);
 
 		int errors = 0;
 		for (int i = 0; i < modeBitTypes.length; i++) {
-			int type = modeBitTypes[i];
+			int index = (i + offset)%modeBitTypes.length;
+			int type = modeBitTypes[index];
 
 			// Data bit. Skip for now
 			if (type == 2) {
@@ -222,8 +229,7 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 			}
 
 			// Fixed Bit
-			int index = (i + offset)%modeBitTypes.length;
-			if (imageBits.get(index) != type)
+			if (imageBits.get(i) != type)
 				errors++;
 		}
 		return errors;
