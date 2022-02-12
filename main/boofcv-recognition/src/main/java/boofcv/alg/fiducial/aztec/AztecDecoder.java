@@ -22,7 +22,6 @@ import boofcv.alg.fiducial.aztec.AztecCode.Modes;
 import boofcv.alg.fiducial.qrcode.PackedBits8;
 import boofcv.alg.fiducial.qrcode.ReedSolomonCodes_U16;
 import boofcv.misc.BoofMiscOps;
-import org.ddogleg.struct.DogArray_I16;
 import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,17 +34,7 @@ import java.util.Set;
  *
  * @author Peter Abeles
  */
-public class AztecDecoder implements VerbosePrint {
-	// generates ECC for different Galois Fields. Which one is used depends on how large the marker is
-	ReedSolomonCodes_U16 ecc6 = new ReedSolomonCodes_U16(6, 67, 1);
-	ReedSolomonCodes_U16 ecc8 = new ReedSolomonCodes_U16(8, 301, 1);
-	ReedSolomonCodes_U16 ecc10 = new ReedSolomonCodes_U16(10, 1033, 1);
-	ReedSolomonCodes_U16 ecc12 = new ReedSolomonCodes_U16(12, 4201, 1);
-
-	// The data portion of the message converted into a format ECC generation can understand
-	DogArray_I16 storageDataWords = new DogArray_I16();
-	DogArray_I16 storageEccWords = new DogArray_I16();
-
+public class AztecDecoder extends AztecMessageErrorCorrection implements VerbosePrint {
 	//------------------ state of decoder -----------------
 	// Specifies the encoding mode for the active character set
 	Modes current = Modes.UPPER;
@@ -70,15 +59,10 @@ public class AztecDecoder implements VerbosePrint {
 		Objects.requireNonNull(marker.rawbits);
 
 		// Apply error correction to the message
-		boolean success = switch (marker.getWordBitCount()) {
-			case 6 -> applyEcc(marker, ecc6);
-			case 8 -> applyEcc(marker, ecc8);
-			case 10 -> applyEcc(marker, ecc10);
-			case 12 -> applyEcc(marker, ecc12);
-			default -> throw new RuntimeException("Unexpected word size");
-		};
-		if (!success)
+		if (!applyErrorCorrection(marker)) {
+			if (verbose != null) verbose.println("ECC failed");
 			return false;
+		}
 
 		// Remove padding from the encoded bits
 		PackedBits8 paddedBits = PackedBits8.wrap(marker.corrected, marker.messageWordCount*marker.getWordBitCount());
