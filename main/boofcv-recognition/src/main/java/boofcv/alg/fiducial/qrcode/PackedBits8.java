@@ -21,7 +21,7 @@ package boofcv.alg.fiducial.qrcode;
 import java.util.Arrays;
 
 /**
- * Stores a set of bits inside of a byte array
+ * Stores a set of bits inside a byte array
  *
  * @author Peter Abeles
  */
@@ -124,6 +124,29 @@ public class PackedBits8 implements PackedBits {
 			return;
 		int tail = bits.read(numWords*8, remaining, true);
 		append(tail, remaining, false);
+	}
+
+	/**
+	 * Adds bits encoded as a binary string, i.e. "100010010011"
+	 */
+	public PackedBits8 append( String text ) {
+		// Add in units of 8-bits since it's more efficient
+		int location;
+		for (location = 0; location + 8 < text.length(); location += 8) {
+			int value = 0;
+			for (int i = 0; i < 8; i++) {
+				if (text.charAt(location + i) == '0')
+					continue;
+				value |= 1 << i;
+			}
+			append(value, 8, true);
+		}
+		// Add the remainder one bit a t a time
+		while (location < text.length()) {
+			int value = text.charAt(location++) == '0' ? 0 : 1;
+			append(value, 1, true);
+		}
+		return this;
 	}
 
 	/**
