@@ -8,7 +8,9 @@ Version : 0.41
 
 - Aztec Code
   - TODO Support B/S
+  - TODO Auto encode message
   - TODO Detect ECI and issue an error
+  - TODO support transposed
 - SLAM
   - TODO Monocular
   - TODO Stereo
