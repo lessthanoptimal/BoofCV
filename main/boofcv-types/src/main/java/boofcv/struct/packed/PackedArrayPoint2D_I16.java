@@ -20,27 +20,27 @@ package boofcv.struct.packed;
 
 import boofcv.misc.BoofLambdas;
 import boofcv.struct.PackedArray;
-import georegression.struct.point.Point2D_F64;
-import org.ddogleg.struct.DogArray_F64;
+import georegression.struct.point.Point2D_I16;
+import org.ddogleg.struct.DogArray_I16;
 
 /**
- * Packed array of {@link Point2D_F64}. Internally the point is stored in an interleaved format.
+ * Packed array of {@link Point2D_I16}. Internally the point is stored in an interleaved format.
  *
  * @author Peter Abeles
  */
-public class PackedArrayPoint2D_F64 implements PackedArray<Point2D_F64> {
+public class PackedArrayPoint2D_I16 implements PackedArray<Point2D_I16> {
 	private static final int DOF = 2;
 
 	// Stores tuple in a single continuous array
-	public final DogArray_F64 array;
+	public final DogArray_I16 array;
 	// tuple that the result is temporarily written to
-	public final Point2D_F64 temp = new Point2D_F64();
+	public final Point2D_I16 temp = new Point2D_I16();
 
 	// Number of tuples stored in the array
 	protected int numElements;
 
-	public PackedArrayPoint2D_F64() {
-		array = new DogArray_F64();
+	public PackedArrayPoint2D_I16() {
+		array = new DogArray_I16();
 		array.resize(0);
 	}
 
@@ -53,30 +53,30 @@ public class PackedArrayPoint2D_F64 implements PackedArray<Point2D_F64> {
 		array.reserve(numTuples*2);
 	}
 
-	public final void append( double x, double y ) {
+	public final void append( int x, int y ) {
 		array.add(x);
 		array.add(y);
 
 		numElements++;
 	}
 
-	@Override public void append( Point2D_F64 element ) {
+	@Override public void append( Point2D_I16 element ) {
 		append(element.x, element.y);
 	}
 
-	@Override public Point2D_F64 getTemp( int index ) {
+	@Override public Point2D_I16 getTemp( int index ) {
 		temp.x = array.data[index*2];
 		temp.y = array.data[index*2 + 1];
 
 		return temp;
 	}
 
-	@Override public void getCopy( int index, Point2D_F64 dst ) {
+	@Override public void getCopy( int index, Point2D_I16 dst ) {
 		dst.x = array.data[index*2];
 		dst.y = array.data[index*2 + 1];
 	}
 
-	@Override public void copy( Point2D_F64 src, Point2D_F64 dst ) {
+	@Override public void copy( Point2D_I16 src, Point2D_I16 dst ) {
 		dst.setTo(src);
 	}
 
@@ -84,11 +84,11 @@ public class PackedArrayPoint2D_F64 implements PackedArray<Point2D_F64> {
 		return numElements;
 	}
 
-	@Override public Class<Point2D_F64> getElementType() {
-		return Point2D_F64.class;
+	@Override public Class<Point2D_I16> getElementType() {
+		return Point2D_I16.class;
 	}
 
-	@Override public void forIdx( int idx0, int idx1, BoofLambdas.ProcessIndex<Point2D_F64> op ) {
+	@Override public void forIdx( int idx0, int idx1, BoofLambdas.ProcessIndex<Point2D_I16> op ) {
 		int pointIndex = idx0;
 		idx0 *= DOF;
 		idx1 *= DOF;

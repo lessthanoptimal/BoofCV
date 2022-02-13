@@ -19,7 +19,7 @@
 package boofcv.struct.packed;
 
 import boofcv.struct.PackedArray;
-import georegression.struct.point.Point2D_I32;
+import georegression.struct.point.Point2D_I16;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -27,24 +27,24 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 /**
  * @author Peter Abeles
  */
-public class TestPackedArrayPoint2D_I32 extends GenericPackedArrayChecks<Point2D_I32> {
+public class TestPackedArrayPoint2D_I16 extends GenericPackedArrayChecks<Point2D_I16> {
 
-	@Override protected PackedArray<Point2D_I32> createAlg() {
-		return new PackedArrayPoint2D_I32();
+	@Override protected PackedArray<Point2D_I16> createAlg() {
+		return new PackedArrayPoint2D_I16();
 	}
 
-	@Override protected Point2D_I32 createRandomPoint() {
-		var point = new Point2D_I32();
-		point.x = rand.nextInt(100) - 50;
-		point.y = rand.nextInt(100) - 50;
+	@Override protected Point2D_I16 createRandomPoint() {
+		var point = new Point2D_I16();
+		point.x = (short)(rand.nextInt(100) - 50);
+		point.y = (short)(rand.nextInt(100) - 50);
 		return point;
 	}
 
-	@Override protected void checkEquals( Point2D_I32 a, Point2D_I32 b ) {
+	@Override protected void checkEquals( Point2D_I16 a, Point2D_I16 b ) {
 		assertEquals(0.0, a.distance(b));
 	}
 
-	@Override protected void checkNotEquals( Point2D_I32 a, Point2D_I32 b ) {
+	@Override protected void checkNotEquals( Point2D_I16 a, Point2D_I16 b ) {
 		assertNotEquals(0.0, a.distance(b));
 	}
 }

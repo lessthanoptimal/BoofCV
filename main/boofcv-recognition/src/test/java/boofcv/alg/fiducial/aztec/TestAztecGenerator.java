@@ -20,8 +20,7 @@ package boofcv.alg.fiducial.aztec;
 
 import boofcv.gui.image.ShowImages;
 import boofcv.struct.image.GrayU8;
-import org.ddogleg.struct.DogArray_I16;
-import org.ddogleg.struct.DogArray_I32;
+import boofcv.struct.packed.PackedArrayPoint2D_I16;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -48,17 +47,16 @@ public class TestAztecGenerator {
 	 * Generate coordinates for all possible markers and see if there are the expected number of bits
 	 */
 	@Test void computeDataBitCoordinates() {
-		var layerStartsAtBit = new DogArray_I32();
 		var marker = new AztecCode();
-		var coordinates = new DogArray_I16();
+		var coordinates = new PackedArrayPoint2D_I16();
 		for (var structure : AztecCode.Structure.values()) {
 			marker.structure = structure;
 			for (int dataLayers = 1; dataLayers <= structure.maxDataLayers; dataLayers++) {
 				marker.dataLayers = dataLayers;
-				AztecGenerator.computeDataBitCoordinates(marker, coordinates, layerStartsAtBit);
+				AztecGenerator.computeDataBitCoordinates(marker, coordinates);
 
 				int expected = marker.getCapacityBits();
-				int found = coordinates.size/2;
+				int found = coordinates.size();
 
 				// only full codewords can be encoded
 				found -= found%marker.getWordBitCount();
