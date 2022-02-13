@@ -209,7 +209,7 @@ public class AztecGenerator {
 
 		// Do not render the innermost ring as it's a single square and ignored when doing image processing
 		locator.layers.reset();
-		for (int ring = ringCount; ring > 1; ring--) {
+		for (int ring = ringCount; ring > 0; ring--) {
 			// number of squares wide the ring is
 			int modules = (ring - 1)*4 + 1;
 			// Number of document units wide the ring is
@@ -228,6 +228,9 @@ public class AztecGenerator {
 			tl_x += 2*squareWidth;
 			tl_y += 2*squareWidth;
 		}
+
+		// Detector doesn't care about the single square layer
+		locator.layers.size -= 1;
 	}
 
 	protected void orientationPattern( double tl_x, double tl_y, int moduleCount ) {

@@ -31,38 +31,27 @@ import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I16;
 import lombok.Getter;
-import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 /**
- * Given locations of candidate finder patterns and the source image, decode all the markers inside the image and
- * reject false positives.
+ * Given location of a candidate finder patterns and the source image, decode the marker.
  *
  * Note: A fixed feature is a feature on the marker which is not dynamically computed. E.g. the pyramid.
  *
  * @author Peter Abeles
  */
 public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
-	/** Successfully decoded markers in the image */
-	@Getter final List<AztecCode> success = new ArrayList<>();
-
-	/** Candidate markers which could not be decoded */
-	@Getter final List<AztecCode> failed = new ArrayList<>();
-
 	/** Reads interpolated image pixel intensity values */
 	@Getter protected InterpolatePixelS<T> interpolate;
 
 	/**
-	 * Should it consider a QR code which has been encoded with a transposed bit pattern?
+	 * Should it consider a marker which has been transposed?
 	 *
-	 * TODO update when config exists
-	 * //	 * @see boofcv.factory.fiducial.ConfigQrCode#considerTransposed
+	 * @see boofcv.factory.fiducial.ConfigAztecCode#considerTransposed
 	 */
 	public boolean considerTransposed = true;
 
@@ -79,8 +68,6 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 			1, 1, 2, 2, 2, 2, 2, 2, 2, 1,
 			0, 0, 2, 2, 2, 2, 2, 2, 2, 0,
 			0, 0, 2, 2, 2, 2, 2, 2, 2, 1};
-
-	final DogArray<AztecCode> allMarkers = new DogArray<>(AztecCode::new, AztecCode::reset);
 
 	AztecDecoder decodeMessage = new AztecDecoder();
 	AztecMessageModeCodec decoderMode = new AztecMessageModeCodec();
@@ -102,26 +89,22 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 				0, 255, InterpolationType.NEAREST_NEIGHBOR, BorderType.EXTENDED, imageType);
 	}
 
-	public void process( List<AztecPyramid> locatorPatterns, T gray ) {
+	/**
+	 * Attempts to decode a marker at the specified location of a previously found locator pattern
+	 *
+	 * @param locatorPattern (Input) Coordinates of locator pattern
+	 * @param gray (Input) Gray scale image of marker
+	 * @param marker (Output) storage for decoded marker
+	 * @return true if the marker could be decoded
+	 */
+	public boolean process( AztecPyramid locatorPattern, T gray, AztecCode marker ) {
+		marker.reset();
 		interpolate.setImage(gray);
-		allMarkers.reset();
-		success.clear();
-		failed.clear();
 
-		for (int i = 0; i < locatorPatterns.size(); i++) {
-			AztecCode marker = allMarkers.grow();
-			if (!decodeMode(locatorPatterns.get(i), marker)) {
-				failed.add(marker);
-				continue;
-			}
+		if (!decodeMode(locatorPattern, marker))
+			return false;
 
-			if (!decodeMessage(marker)) {
-				failed.add(marker);
-				continue;
-			}
-
-			success.add(marker);
-		}
+		return decodeMessage(marker);
 	}
 
 	/**
@@ -140,8 +123,10 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 
 		// Determine the orientation
 		int orientation = selectOrientation(type);
-		if (orientation < 0)
+		if (orientation < 0) {
+			if (verbose != null) verbose.println("failed to find a valid orientation");
 			return false;
+		}
 
 		// Read data bits given known orientation
 		extractModeDataBits(orientation, type);
@@ -155,7 +140,11 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 
 		// Apply error correction and extract the mode
 		code.structure = type;
-		return decoderMode.decodeMode(bits, code);
+		if (!decoderMode.decodeMode(bits, code)) {
+			if (verbose != null) verbose.println("error correction failed when decoding mode");
+			return false;
+		}
+		return true;
 	}
 
 	/**
@@ -268,10 +257,14 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 
 		// Copy raw data into the marker
 		marker.rawbits = new byte[bits.arrayLength()];
-		System.arraycopy(bits.data, 0, marker.rawbits, 0, marker.rawbits.length );
+		System.arraycopy(bits.data, 0, marker.rawbits, 0, marker.rawbits.length);
 
 		// Decode the raw data
-		return decodeMessage.process(marker);
+		if (!decodeMessage.process(marker)) {
+			if (verbose != null) verbose.println("error correction failed when decoding the message");
+			return false;
+		}
+		return true;
 	}
 
 	/** Read gray intensity values from the image and converts into message data bit values */

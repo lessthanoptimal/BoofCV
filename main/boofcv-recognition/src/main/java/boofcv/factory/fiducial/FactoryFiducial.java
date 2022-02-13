@@ -23,6 +23,7 @@ import boofcv.abst.fiducial.calib.*;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.feature.describe.llah.LlahHasher;
 import boofcv.alg.feature.describe.llah.LlahOperations;
+import boofcv.alg.fiducial.aztec.AztecCode;
 import boofcv.alg.fiducial.calib.ecocheck.ECoCheckDetector;
 import boofcv.alg.fiducial.calib.ecocheck.ECoCheckUtils;
 import boofcv.alg.fiducial.dots.UchiyaMarkerImageTracker;
@@ -228,6 +229,28 @@ public class FactoryFiducial {
 		var detector = new QrCodePreciseDetector<>(inputToBinary, detectPositionPatterns,
 				config.forceEncoding, config.defaultEncoding, false, imageType);
 		detector.getGraphPositionPatterns().setMaxVersionQR(config.versionMaximum);
+		detector.getDecoder().considerTransposed = config.considerTransposed;
+		return detector;
+	}
+
+	/**
+	 * Returns an {@link AztecCode Aztec Code} detector
+	 *
+	 * @param config Configuration
+	 * @param imageType type of input image
+	 * @return the detector
+	 */
+	public static <T extends ImageGray<T>>
+	AztecCodePreciseDetector<T> aztec( @Nullable ConfigAztecCode config, Class<T> imageType ) {
+		if (config == null)
+			config = new ConfigAztecCode();
+
+		config.checkValidity();
+
+		InputToBinary<T> inputToBinary = FactoryThresholdBinary.threshold(config.threshold, imageType);
+
+		DetectPolygonBinaryGrayRefine<T> squareDetector = FactoryShapeDetector.polygon(config.polygon, imageType);
+		var detector = new AztecCodePreciseDetector<>(inputToBinary, squareDetector, imageType);
 		detector.getDecoder().considerTransposed = config.considerTransposed;
 		return detector;
 	}

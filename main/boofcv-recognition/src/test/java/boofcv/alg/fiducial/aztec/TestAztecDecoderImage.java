@@ -24,13 +24,9 @@ import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.point.Point2D_F64;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class TestAztecDecoderImage {
-
 	/**
 	 * Sees if it can successfully decode multiple noise free markers
 	 */
@@ -40,17 +36,11 @@ class TestAztecDecoderImage {
 			AztecCode truth = new AztecEncoder().setStructure(structure).addUpper("TEST").fixate();
 			GrayU8 image = AztecGenerator.renderImage(10, 0, truth);
 
-			List<AztecPyramid> pyramids = new ArrayList<>();
-			pyramids.add(truth.locator);
+			AztecCode found = new AztecCode();
 
 			for (int rotation = 0; rotation < 4; rotation++) {
 				// Process the image
-				alg.process(pyramids, image);
-
-				// See if there was the expected number of results
-				assertEquals(0, alg.getFailed().size());
-				assertEquals(1, alg.getSuccess().size());
-				AztecCode found = alg.getSuccess().get(0);
+				assertTrue(alg.process(truth.locator, image, found));
 
 				// See if it was decoded correctly
 				assertEquals(truth.message, found.message);
