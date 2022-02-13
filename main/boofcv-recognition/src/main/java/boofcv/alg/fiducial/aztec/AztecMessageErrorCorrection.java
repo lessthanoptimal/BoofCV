@@ -72,21 +72,33 @@ public abstract class AztecMessageErrorCorrection {
 	 * @return true if successful
 	 */
 	public boolean applyErrorCorrection( AztecCode marker ) {
-		return switch (marker.getWordBitCount()) {
-			case 6 -> applyEcc(marker, ecc6);
-			case 8 -> applyEcc(marker, ecc8);
-			case 10 -> applyEcc(marker, ecc10);
-			case 12 -> applyEcc(marker, ecc12);
-			default -> throw new RuntimeException("Unexpected word size");
-		};
+		extractWordsFromMarker(marker);
+
+		int bitErrors = applyEcc(marker.getCapacityWords(), marker.getWordBitCount());
+
+		if (bitErrors < 0)
+			return false;
+
+		// Save number of detected errors
+		marker.totalBitErrors = bitErrors;
+
+		// Save the corrected data
+		int wordBitCount = marker.getWordBitCount();
+		int messageBits = storageDataWords.size*wordBitCount;
+		marker.corrected = new byte[BoofMiscOps.bitToByteCount(messageBits)];
+		PackedBits8 bits = PackedBits8.wrap(marker.corrected, 0);
+		for (int i = 0; i < storageDataWords.size; i++) {
+			int value = storageDataWords.get(i) & 0xFFFF;
+			bits.append(value, wordBitCount, false);
+		}
+
+		return true;
 	}
 
 	/**
-	 * Applies error correction to data portion of rawbits, then copies the results into marker.corrected.
-	 *
-	 * @return true if nothing went wrong with error correction
+	 * Extract saved message data from the marker and split it into data and ecc words
 	 */
-	boolean applyEcc( AztecCode marker, ReedSolomonCodes_U16 ecc ) {
+	void extractWordsFromMarker( AztecCode marker ) {
 		int wordBitCount = marker.getWordBitCount();
 		PackedBits8 bits = PackedBits8.wrap(marker.rawbits, marker.getCapacityBits());
 
@@ -101,27 +113,37 @@ public abstract class AztecMessageErrorCorrection {
 		for (int i = 0; i < storageEccWords.size; i++, locationBits += wordBitCount) {
 			storageEccWords.data[i] = (short)bits.read(locationBits, wordBitCount, true);
 		}
+	}
 
+	/**
+	 * Applies error correction using the correct encoding.
+	 *
+	 * @return Number of bit errors or -1 if it failed
+	 */
+	int applyEcc( int capacityWords, int wordBitCount ) {
+		return switch (wordBitCount) {
+			case 6 -> applyEcc(capacityWords, ecc6);
+			case 8 -> applyEcc(capacityWords, ecc8);
+			case 10 -> applyEcc(capacityWords, ecc10);
+			case 12 -> applyEcc(capacityWords, ecc12);
+			default -> throw new RuntimeException("Unexpected word size");
+		};
+	}
+
+	/**
+	 * Applies error correction to data portion of rawbits, then copies the results into marker.corrected.
+	 *
+	 * @return Number of bit errors or -1 if it failed
+	 */
+	int applyEcc( int capacityWords, ReedSolomonCodes_U16 ecc ) {
 		// TODO check for words with all 0 and all 1 and mark word as a known erasure
 
 		// Apply error correction
-		ecc.generator(marker.getCapacityWords() - storageDataWords.size);
+		ecc.generator(capacityWords - storageDataWords.size);
 		if (!ecc.correct(storageDataWords, storageEccWords)) {
-			return false;
-		}
-		marker.totalBitErrors = ecc.getTotalErrors();
-
-		// Save the corrected data
-
-		int messageBits = storageDataWords.size*wordBitCount;
-		marker.corrected = new byte[BoofMiscOps.bitToByteCount(messageBits)];
-		bits.size = 0;
-		bits.data = marker.corrected;
-		for (int i = 0; i < storageDataWords.size; i++) {
-			int value = storageDataWords.get(i) & 0xFFFF;
-			bits.append(value, wordBitCount, false);
+			return -1;
 		}
 
-		return true;
+		return ecc.getTotalErrors();
 	}
 }
