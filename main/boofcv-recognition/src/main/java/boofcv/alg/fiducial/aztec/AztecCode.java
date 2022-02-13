@@ -18,6 +18,7 @@
 
 package boofcv.alg.fiducial.aztec;
 
+import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import lombok.Getter;
 
@@ -68,6 +69,9 @@ public class AztecCode {
 	 * Order: top-left = 0. Top-right = 1, Bottom-Right = 2, Bottom-Left = 3.
 	 */
 	public Polygon2D_F64 bounds = new Polygon2D_F64(4);
+
+	/** A homography transform from grid bit coordinates into image pixels. */
+	public Homography2D_F64 Hinv = new Homography2D_F64();
 
 	/** Number of squares (data bits) wide the marker is */
 	public int getMarkerSquareCount() {
@@ -139,6 +143,7 @@ public class AztecCode {
 		totalBitErrors = 0;
 		locator.reset();
 		bounds.zero();
+		Hinv.reset();
 	}
 
 	@SuppressWarnings({"NullAway"})
@@ -154,6 +159,7 @@ public class AztecCode {
 		totalBitErrors = src.totalBitErrors;
 		locator.setTo(src.locator);
 		bounds.setTo(src.bounds);
+		Hinv.setTo(src.Hinv);
 		return this;
 	}
 

@@ -104,15 +104,20 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 		if (!decodeMode(locatorPattern, marker))
 			return false;
 
-		// Estimate the bounds using the previously estimated homography
-		double r = marker.dataLayers + 1 + (marker.locator.getGridWidth() + 2)/2.0;
-		gridToPixel.convert(-r, -r, marker.bounds.get(0));
-		gridToPixel.convert(r, -r, marker.bounds.get(1));
-		gridToPixel.convert(r, r, marker.bounds.get(2));
-		gridToPixel.convert(-r, r, marker.bounds.get(3));
+		try {
+			if (!decodeMessage(marker))
+				return false;
+		} finally {
+			// Estimate the bounds using the previously estimated homography
+			double r = marker.dataLayers + 1 + (marker.locator.getGridWidth() + 2)/2.0;
+			gridToPixel.convert(-r, -r, marker.bounds.get(0));
+			gridToPixel.convert(r, -r, marker.bounds.get(1));
+			gridToPixel.convert(r, r, marker.bounds.get(2));
+			gridToPixel.convert(-r, r, marker.bounds.get(3));
 
-		if (!decodeMessage(marker))
-			return false;
+			// Save the homography
+			marker.Hinv.setTo(gridToPixel.gridToImage);
+		}
 
 		if (verbose != null) verbose.println("success decoding!");
 		return true;
@@ -170,7 +175,7 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 
 		float threshold = (float)layer.threshold;
 
-		// radius in squares. Remenber coordinate system above is defined as the center of innermost square
+		// radius in squares. Remember coordinate system above is defined as the center of innermost square
 		// So we will be sampling at the center of each square because of an implicit 0.5 square offset
 		int radius = modeGridWidth/2;
 

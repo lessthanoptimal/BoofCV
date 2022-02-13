@@ -18,12 +18,12 @@
 
 package boofcv.demonstrations.fiducial;
 
-import boofcv.BoofVerbose;
 import boofcv.abst.fiducial.AztecCodePreciseDetector;
 import boofcv.abst.filter.binary.BinaryContourFinder;
 import boofcv.alg.fiducial.aztec.AztecCode;
+import boofcv.alg.fiducial.aztec.AztecGenerator;
 import boofcv.alg.fiducial.aztec.AztecPyramid;
-import boofcv.alg.fiducial.calib.squares.SquareEdge;
+import boofcv.alg.fiducial.qrcode.PackedBits8;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.demonstrations.shapes.DetectBlackShapeAppBase;
@@ -36,17 +36,20 @@ import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.packed.PackedArrayPoint2D_I16;
+import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.metric.Intersection2D_F64;
-import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point2D_I16;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.DogArray;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.ops.DConvertMatrixStruct;
 
 import javax.swing.*;
 import java.awt.*;
@@ -54,7 +57,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Line2D;
+import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -165,7 +168,7 @@ public class DetectAztecCodeApp<T extends ImageGray<T>>
 			config.considerTransposed = controls.checkTransposed.value;
 
 			detector = FactoryFiducial.aztec(config, imageClass);
-			detector.setVerbose(System.out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));
+//			detector.setVerbose(System.out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));
 //			detector.setProfilerState(true);
 		}
 	}
@@ -279,6 +282,8 @@ public class DetectAztecCodeApp<T extends ImageGray<T>>
 	}
 
 	class VisualizePanel extends ShapeVisualizePanel {
+		Ellipse2D.Double ellipse = new Ellipse2D.Double();
+		PackedArrayPoint2D_I16 points = new PackedArrayPoint2D_I16();
 
 		@Override
 		protected void paintInPanel( AffineTransform tran, Graphics2D g2 ) {
@@ -292,7 +297,7 @@ public class DetectAztecCodeApp<T extends ImageGray<T>>
 					// todo copy after process() to avoid thread issues. or lock
 					BinaryContourFinder contour = detector.getDetectorPyramids().getSquareDetector().getDetector().getContourFinder();
 					List<Contour> contours = BinaryImageOps.convertContours(contour);
-					g2.setStroke(new BasicStroke(1));
+					g2.setStroke(new BasicStroke(2));
 					VisualizeBinaryData.render(contours, null, Color.CYAN, 1.0, scale, g2);
 				}
 
@@ -324,22 +329,6 @@ public class DetectAztecCodeApp<T extends ImageGray<T>>
 					}
 				}
 
-				if (controls.bShowBits) {
-//					synchronized (detected) {
-//						for (int i = 0; i < detected.size(); i++) {
-//							AztecCode qr = detected.get(i);
-//							renderBinaryValues(g2, qr);
-//						}
-//
-//						for (int i = 0; i < failures.size(); i++) {
-//							AztecCode qr = failures.get(i);
-//							if (qr.failureCause.ordinal() < ALIGNMENT.ordinal())
-//								continue;
-//							renderBinaryValues(g2, qr);
-//						}
-//					}
-				}
-
 				if (controls.bShowSquares) {
 					// todo copy after process() to avoid thread issues
 					List<Polygon2D_F64> polygons = detector.getDetectorPyramids().getSquareDetector().getPolygons(null, null);
@@ -355,26 +344,18 @@ public class DetectAztecCodeApp<T extends ImageGray<T>>
 					// todo copy after process() to avoid thread issues
 					DogArray<AztecPyramid> nodes = detector.getDetectorPyramids().getFound();
 
-					g2.setColor(Color.ORANGE);
-					g2.setStroke(new BasicStroke(3));
-					List<SquareEdge> list = new ArrayList<>();
+					g2.setColor(Color.BLACK);
+					g2.setStroke(new BasicStroke(8));
 					for (int i = 0; i < nodes.size(); i++) {
 						Polygon2D_F64 square = nodes.get(i).get(0).square;
 						VisualizeShapes.drawPolygon(square, true, scale, g2);
 					}
 
-					g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-					g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-					g2.setColor(new Color(255, 150, 100));
-					g2.setStroke(new BasicStroke(3));
-					Line2D.Double l = new Line2D.Double();
-					for (int i = 0; i < list.size(); i++) {
-						SquareEdge e = list.get(i);
-						Point2D_F64 a = e.a.center;
-						Point2D_F64 b = e.b.center;
-
-						l.setLine(scale*a.x, scale*a.y, scale*b.x, scale*b.y);
-						g2.draw(l);
+					g2.setColor(Color.ORANGE);
+					g2.setStroke(new BasicStroke(5));
+					for (int i = 0; i < nodes.size(); i++) {
+						Polygon2D_F64 square = nodes.get(i).get(0).square;
+						VisualizeShapes.drawPolygon(square, true, scale, g2);
 					}
 				}
 			}
@@ -383,50 +364,43 @@ public class DetectAztecCodeApp<T extends ImageGray<T>>
 		/**
 		 * Draws the estimated value of each bit onto the image
 		 */
-		private void renderBinaryValues( Graphics2D g2, AztecCode qr ) {
-//			locator.setHomographyInv(qr.Hinv);
-//
-//			List<Point2D_I32> points = AztecCode.LOCATION_BITS[qr.version];
-//
-//			PackedBits8 bits = new PackedBits8();
-//			bits.data = qr.rawbits;
-//			bits.size = qr.rawbits.length*8;
-//
-//			Point2D_F32 p = new Point2D_F32();
-//			g2.setStroke(new BasicStroke(1));
-//			for (int i = 0; i < bits.size; i++) {
-//				Point2D_I32 c = points.get(i);
-//				locator.gridToImage(c.y + 0.5f, c.x + 0.5f, p);
-//				int value = qr.mask.apply(c.y, c.x, bits.get(i));
-//
-//				if (value == 1) {
-//					renderCircleAt(g2, p, Color.BLACK, Color.LIGHT_GRAY);
-//				} else if (value == 0) {
-//					renderCircleAt(g2, p, Color.WHITE, Color.LIGHT_GRAY);
-//				} else {
-//					renderCircleAt(g2, p, Color.RED, Color.LIGHT_GRAY);
-//				}
-//			}
+		private void renderBinaryValues( Graphics2D g2, AztecCode marker ) {
+			Point2D_F64 coordinate = new Point2D_F64();
+			Point2D_F64 pixel = new Point2D_F64();
+			DMatrixRMaj gridToImage = new DMatrixRMaj(3, 3);
 
-//			int N = qr.totalModules();
-//			g2.setColor(Color.BLUE);
-//			locator.gridToImage(0,N-7,p);
-//			renderCircleAt(g2, p);
-//			locator.gridToImage(7,N-7,p);
-//			renderCircleAt(g2, p);
-//			locator.gridToImage(N-7,0,p);
-//			renderCircleAt(g2, p);
-//			locator.gridToImage(N-7,7,p);
-//			renderCircleAt(g2, p);
+			DConvertMatrixStruct.convert(marker.Hinv, gridToImage);
+
+			AztecGenerator.computeDataBitCoordinates(marker, points);
+
+			var bits = new PackedBits8();
+			bits.data = marker.rawbits;
+			bits.size = marker.getCapacityBits();
+
+			g2.setStroke(new BasicStroke(1));
+			for (int i = 0; i < bits.size; i++) {
+				Point2D_I16 c = points.getTemp(i);
+				coordinate.setTo(c.x, c.y);
+				GeometryMath_F64.mult(gridToImage, coordinate, pixel);
+
+				int value = bits.get(i);
+				if (value == 1) {
+					renderCircleAt(g2, pixel, Color.BLACK, Color.LIGHT_GRAY);
+				} else if (value == 0) {
+					renderCircleAt(g2, pixel, Color.WHITE, Color.LIGHT_GRAY);
+				} else {
+					renderCircleAt(g2, pixel, Color.RED, Color.LIGHT_GRAY);
+				}
+			}
 		}
 
-		private void renderCircleAt( Graphics2D g2, Point2D_F32 p, Color center, Color border ) {
-			int x = (int)(scale*p.x + 0.5);
-			int y = (int)(scale*p.y + 0.5);
+		private void renderCircleAt( Graphics2D g2, Point2D_F64 p, Color center, Color border ) {
+			double r = 4;
+			ellipse.setFrame(scale*p.x - r, scale*p.y - r, 2*r, 2*r);
 			g2.setColor(center);
-			g2.fillOval(x - 3, y - 3, 7, 7);
+			g2.fill(ellipse);
 			g2.setColor(border);
-			g2.drawOval(x - 3, y - 3, 7, 7);
+			g2.draw(ellipse);
 		}
 	}
 
