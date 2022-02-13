@@ -20,14 +20,32 @@ package boofcv.alg.fiducial.aztec;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * @author Peter Abeles
- */
 class TestAztecMessageErrorCorrection {
 	/** Construct a message and corrupt a single word. See if it fixes it */
 	@Test void correctSingleWordErrors() {
-		fail("Implement");
+		var alg = new Helper();
+
+		int capacity = 18;
+		for (int i = 0; i < 6; i++) {
+			alg.storageDataWords.add(i + 2);
+		}
+
+		for (int wordBits : new int[]{6, 8, 10, 12}) {
+			// Compute error correction words
+			alg.computeEccWords(wordBits, capacity);
+			assertEquals(18 - alg.storageDataWords.size, alg.storageEccWords.size);
+
+			// correct data with a single bad word
+			alg.storageDataWords.data[2] += 3;
+			assertEquals(1, alg.applyEcc(capacity, wordBits));
+
+			for (int i = 0; i < 6; i++) {
+				assertEquals(i + 2, alg.storageDataWords.get(i));
+			}
+		}
 	}
+
+	private static class Helper extends AztecMessageErrorCorrection {}
 }
