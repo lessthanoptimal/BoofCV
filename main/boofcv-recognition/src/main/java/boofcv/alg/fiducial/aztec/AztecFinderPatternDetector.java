@@ -217,7 +217,7 @@ public class AztecFinderPatternDetector<T extends ImageGray<T>> extends SquareLo
 	 */
 	double scoreTemplate( Polygon2D_F64 polygon, float threshold, int squaresWide ) {
 		// Initialize the conversion
-		gridToPixel.initOriginCorner0(polygon, squaresWide);
+		gridToPixel.initOriginCenter(polygon, squaresWide);
 
 		// Number of times an observation matches the template
 		int numMatches = 0;

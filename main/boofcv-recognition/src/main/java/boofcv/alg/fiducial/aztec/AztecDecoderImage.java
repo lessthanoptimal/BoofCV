@@ -21,8 +21,12 @@ package boofcv.alg.fiducial.aztec;
 import boofcv.alg.fiducial.aztec.AztecCode.Structure;
 import boofcv.alg.fiducial.qrcode.PackedBits8;
 import boofcv.alg.interpolate.InterpolatePixelS;
+import boofcv.alg.interpolate.InterpolationType;
+import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.misc.BoofMiscOps;
+import boofcv.struct.border.BorderType;
 import boofcv.struct.image.ImageGray;
+import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.point.Point2D_F64;
 import lombok.Getter;
 import org.ddogleg.struct.DogArray;
@@ -87,7 +91,13 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 	GridToPixelHelper gridToPixel = new GridToPixelHelper();
 	Point2D_F64 pixel = new Point2D_F64();
 
+	public AztecDecoderImage( Class<T> imageType ) {
+		interpolate = FactoryInterpolation.createPixelS(
+				0, 255, InterpolationType.NEAREST_NEIGHBOR, BorderType.EXTENDED, imageType);
+	}
+
 	public void process( List<AztecPyramid> locatorPatterns, T gray ) {
+		interpolate.setImage(gray);
 		allMarkers.reset();
 		success.clear();
 		failed.clear();
@@ -120,39 +130,48 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 		Structure type = locator.layers.size == 1 ? Structure.COMPACT : Structure.FULL;
 
 		// Read the pixel values once
-		readModeBits(locator);
+		readModeBitsFromImage(locator);
 
 		// Determine the orientation
 		int orientation = selectOrientation(type);
 		if (orientation < 0)
 			return false;
 
-		// TODO correct orientation of pyramid
-
 		// Read data bits given known orientation
 		extractModeDataBits(orientation, type);
+
+		// Rotate the locator pattern so that it's in the canonical position. corner[0] is top left
+		for (int i = 0; i < orientation; i++) {
+			for (int layerIdx = 0; layerIdx < code.locator.layers.size; layerIdx++) {
+				UtilPolygons2D_F64.shiftUp(code.locator.layers.get(layerIdx).square);
+			}
+		}
 
 		// Apply error correction and extract the mode
 		code.structure = type;
 		return codecMode.decodeMode(bits, code);
 	}
 
-	void readModeBits( AztecPyramid locator ) {
+	/**
+	 * Read image pixel intensity values and use polygon threshold to find the bit values around the pyramid.
+	 */
+	void readModeBitsFromImage( AztecPyramid locator ) {
 		AztecPyramid.Layer layer = locator.layers.get(0);
-		int locatorGridWith = locator.layers.size == 2 ? 9 : 5;
-		gridToPixel.initOriginCorner0(layer.square, locatorGridWith);
+		int modeGridWidth = locator.layers.size == 2 ? 15 : 11;
+		gridToPixel.initOriginCenter(layer.square, modeGridWidth - 6);
 
 		float threshold = (float)layer.threshold;
 
-		int modeGridWidth = locatorGridWith + 5;
-		int offset = modeGridWidth/2 - locatorGridWith/2;
+		// radius in squares. Remenber coordinate system above is defined as the center of innermost square
+		// So we will be sampling at the center of each square because of an implicit 0.5 square offset
+		int radius = modeGridWidth/2;
 
 		// read top, right, bottom, left in a circle around the center
 		imageBits.resize(0);
-		readBitsRow(-offset, -offset, 1, 0, modeGridWidth, threshold);
-		readBitsRow(offset, -offset - 1, 0, -1, modeGridWidth - 2, threshold);
-		readBitsRow(offset, offset, -1, 0, modeGridWidth, threshold);
-		readBitsRow(-offset, offset + 1, 0, 1, modeGridWidth - 2, threshold);
+		readBitsRow(-radius, -radius, 1, 0, modeGridWidth - 1, threshold);
+		readBitsRow(radius, -radius, 0, 1, modeGridWidth - 1, threshold);
+		readBitsRow(radius, radius, -1, 0, modeGridWidth - 1, threshold);
+		readBitsRow(-radius, radius, 0, -1, modeGridWidth - 1, threshold);
 	}
 
 	/**
@@ -163,9 +182,8 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 		// first write to a single integer for a small speed boost
 		int readBits = 0;
 		for (int i = 0; i < total; i++) {
-			// read from the center of a square
-			double x = x0 + i*dx + 0.5;
-			double y = y0 + i*dy + 0.5;
+			double x = x0 + i*dx;
+			double y = y0 + i*dy;
 			gridToPixel.convert(x, y, pixel);
 			float value = interpolate.get((float)pixel.x, (float)pixel.y);
 			if (value < threshold)
@@ -202,15 +220,15 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 
 		bits.resize(0);
 		for (int i = 0; i < modeBitTypes.length; i++) {
-			int index = (i + offset)%modeBitTypes.length;
-			if (modeBitTypes[index] != 2)
+			if (modeBitTypes[i] != 2)
 				continue;
 
-			bits.append(imageBits.get(i), 1, false);
+			int index = (i + offset)%modeBitTypes.length;
+			bits.append(imageBits.get(index), 1, false);
 		}
 	}
 
-	private static int[] getModeBitType( Structure type ) {
+	static int[] getModeBitType( Structure type ) {
 		return type == Structure.COMPACT ? modeBitTypesComp : modeBitTypesFull;
 	}
 
@@ -220,16 +238,15 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 
 		int errors = 0;
 		for (int i = 0; i < modeBitTypes.length; i++) {
-			int index = (i + offset)%modeBitTypes.length;
-			int type = modeBitTypes[index];
+			int type = modeBitTypes[i];
 
 			// Data bit. Skip for now
-			if (type == 2) {
+			if (type == 2)
 				continue;
-			}
 
-			// Fixed Bit
-			if (imageBits.get(i) != type)
+			// Fixed Bit. See if it has the expected value
+			int index = (i + offset)%modeBitTypes.length;
+			if (imageBits.get(index) != type)
 				errors++;
 		}
 		return errors;

@@ -61,6 +61,12 @@ public class AztecGenerator {
 		var render = new FiducialImageEngine();
 		render.configure(pixelPerSquare*border, numSquares*pixelPerSquare);
 		new AztecGenerator().setMarkerWidth(numSquares*pixelPerSquare).setRender(render).render(marker);
+
+		// Set the threshold to be 1/2 way between what the image defines as black and white
+		for( AztecPyramid.Layer layer : marker.locator.layers.toList()) {
+			layer.threshold = (render.getWhite() + render.getBlack())/2.0;
+		}
+
 		return render.getGray();
 	}
 
@@ -203,8 +209,9 @@ public class AztecGenerator {
 	protected void locatorPattern( double tl_x, double tl_y, int ringCount, AztecPyramid locator ) {
 		FiducialRenderEngine render = Objects.requireNonNull(this.render);
 
-		locator.resize(ringCount);
-		for (int ring = ringCount; ring > 0; ring--) {
+		// Do not render the innermost ring as it's a single square and ignored when doing image processing
+		locator.layers.reset();
+		for (int ring = ringCount; ring > 1; ring--) {
 			// number of squares wide the ring is
 			int modules = (ring - 1)*4 + 1;
 			// Number of document units wide the ring is
@@ -214,7 +221,7 @@ public class AztecGenerator {
 			render.square(tl_x, tl_y, width, squareWidth);
 
 			// Save the ring's outer contour
-			Polygon2D_F64 where = locator.layers.get(ring - 1).square;
+			Polygon2D_F64 where = locator.layers.grow().square;
 			where.get(0).setTo(tl_x, tl_y);
 			where.get(1).setTo(tl_x + width, tl_y);
 			where.get(2).setTo(tl_x + width, tl_y + width);
