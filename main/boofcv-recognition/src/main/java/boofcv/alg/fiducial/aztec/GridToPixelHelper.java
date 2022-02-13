@@ -44,18 +44,22 @@ public class GridToPixelHelper {
 	protected Point2D_F64 gridPoint = new Point2D_F64();
 
 	/**
-	 * Defines a grid coordinate system with the origin at corner[0] in the polygon
+	 * Origin is defined as the dead center of the center square in the locator pattern. Thus the inner more
+	 * square black square is from (-0.5, -0.5) to (0.5, 0.5)
 	 *
 	 * @param polygon Polygon which defines the square grid in image pixels
 	 * @param squaresWide Number of squares wide the grid coordinate is inside the square
 	 */
-	public void initOriginCorner0( Polygon2D_F64 polygon, int squaresWide ) {
+	public void initOriginCenter( Polygon2D_F64 polygon, int squaresWide ) {
+		// radius
+		double r = squaresWide/2.0;
+
 		// Compute a homography from local grid coordinates around the square to image pixels
 		pairs.resetResize(4);
-		pairs.get(0).setTo(0, 0, polygon.get(0));
-		pairs.get(1).setTo(squaresWide, 0, polygon.get(1));
-		pairs.get(2).setTo(squaresWide, squaresWide, polygon.get(2));
-		pairs.get(3).setTo(0, squaresWide, polygon.get(3));
+		pairs.get(0).setTo(-r, -r, polygon.get(0));
+		pairs.get(1).setTo(r, -r, polygon.get(1));
+		pairs.get(2).setTo(r, r, polygon.get(2));
+		pairs.get(3).setTo(-r, r, polygon.get(3));
 
 		// Compute a homography to map a grid to pixel coordinate
 		computeH.process(pairs.toList(), gridToImage);
