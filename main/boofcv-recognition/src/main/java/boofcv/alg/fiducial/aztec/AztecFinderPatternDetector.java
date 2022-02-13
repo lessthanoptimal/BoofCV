@@ -216,36 +216,38 @@ public class AztecFinderPatternDetector<T extends ImageGray<T>> extends SquareLo
 	 * @return 0.0 to 1.0. 1.0 indicates a perfect fit
 	 */
 	double scoreTemplate( Polygon2D_F64 polygon, float threshold, int squaresWide ) {
-		// Initialize the conversion
+		// Initialize the coordinate system. Note an artifact of how defining the coordinate
+		// system in the center of a square is that integer values will be at the center in the image
 		gridToPixel.initOriginCenter(polygon, squaresWide);
+
+		// Start sampling inside the next white ring inside the outer black ring
+		int radius = (squaresWide - 2)/2;
 
 		// Number of times an observation matches the template
 		int numMatches = 0;
 
-		for (int row = 1; row < squaresWide - 1; row++) {
+		for (int row = -radius; row <= radius; row++) {
 			// rrow and rcol is distance from the border along their respective axis
-			int rrow = Math.min(row, squaresWide - row - 1);
-			double gridRow = row + 0.5; // sample it in the square's center
+			int rrow = Math.abs(row);
 
-			for (int col = 1; col < squaresWide - 1; col++) {
-				int rcol = Math.min(col, squaresWide - col - 1);
-				double gridCol = col + 0.5; // sample it in the square's center
+			for (int col = -radius; col <= radius; col++) {
+				int rcol = Math.abs(col);
 
 				// find the pixel coordinate for the specified grid coordinate
-				gridToPixel.convert(gridCol, gridRow, pixel);
+				gridToPixel.convert(col, row, pixel);
 
 				// Sample the image at this point
 				float pixelValue = interpolate.get((float)pixel.x, (float)pixel.y);
 
 				// distance from the edge determines if we expect a white or black region
-				int r = Math.min(rrow, rcol);
+				int r = Math.max(rrow, rcol);
 				if (pixelValue > threshold == (r%2 == 1))
 					numMatches++;
 			}
 		}
 
 		// total number of times the template was tested
-		int numSamples = (squaresWide - 2)*(squaresWide - 2);
+		int numSamples = (radius*2 + 1)*(radius*2 + 1);
 		double fitFraction = numMatches/(double)numSamples;
 
 		if (verbose != null) verbose.printf("poly_sore: p[0]=(%.1f %.1f) template: score=%.2f squares=%d pixels=%.1f\n",

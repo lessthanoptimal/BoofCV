@@ -80,7 +80,7 @@ public abstract class SquareLocatorPatternDetectorBase<T extends ImageGray<T>> i
 	 * Detects position patterns inside the image and forms a graph.
 	 *
 	 * @param gray Gray scale input image
-	 * @param binary Thresholed version of gray image.
+	 * @param binary Binary version of gray image.
 	 */
 	public void process( T gray, GrayU8 binary ) {
 		configureContourDetector(gray);

@@ -41,7 +41,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * A QR-Code detector which is designed to find the location of corners in the finder pattern precisely.
+ * A Micro QR-Code detector which is designed to find the location of corners in the finder pattern precisely.
  */
 public class MicroQrCodePreciseDetector<T extends ImageGray<T>> implements MicroQrCodeDetector<T>, VerbosePrint {
 	@Getter QrCodePositionPatternDetector<T> detectPositionPatterns;
