@@ -18,6 +18,7 @@
 
 package boofcv.alg.fiducial.aztec;
 
+import georegression.struct.shapes.Polygon2D_F64;
 import lombok.Getter;
 
 /**
@@ -45,6 +46,9 @@ public class AztecCode {
 	/** Which Structure does it have. Determines shape of locator pattern and maximum number of data layers. */
 	public Structure structure = Structure.COMPACT;
 
+	/** At what stage did decoding fail at */
+	public Failure failure = Failure.NONE;
+
 	/**
 	 * True if the marker was incorrectly encoded or is being viewed in a mirror because the bits locations are
 	 * transposed.
@@ -56,6 +60,14 @@ public class AztecCode {
 
 	/** Locations of extern contours around the squares in a locator pattern. */
 	public final AztecPyramid locator = new AztecPyramid();
+
+	/**
+	 * Approximate bounding box of the marker. Note that the corners are not directly measured but have to be
+	 * inferred from other fixed structures.
+	 *
+	 * Order: top-left = 0. Top-right = 1, Bottom-Right = 2, Bottom-Left = 3.
+	 */
+	public Polygon2D_F64 bounds = new Polygon2D_F64(4);
 
 	/** Number of squares (data bits) wide the marker is */
 	public int getMarkerSquareCount() {
@@ -109,6 +121,12 @@ public class AztecCode {
 			return 12;
 	}
 
+	/** Returns ratio of words used for error correction over words used to store data */
+	public double getCorrectionLevel() {
+		int wordsErrorCorrection = getCapacityWords() - messageWordCount;
+		return wordsErrorCorrection/(double)messageWordCount;
+	}
+
 	@SuppressWarnings({"NullAway"})
 	public void reset() {
 		dataLayers = 0;
@@ -116,9 +134,11 @@ public class AztecCode {
 		message = "";
 		rawbits = null;
 		corrected = null;
+		failure = Failure.NONE;
 		transposed = false;
 		totalBitErrors = 0;
 		locator.reset();
+		bounds.zero();
 	}
 
 	@SuppressWarnings({"NullAway"})
@@ -128,11 +148,17 @@ public class AztecCode {
 		message = src.message;
 		rawbits = src.rawbits == null ? null : src.rawbits.clone();
 		corrected = src.corrected == null ? null : src.corrected.clone();
+		failure = src.failure;
 		structure = src.structure;
 		transposed = src.transposed;
 		totalBitErrors = src.totalBitErrors;
 		locator.setTo(src.locator);
+		bounds.setTo(src.bounds);
 		return this;
+	}
+
+	public AztecCode copy() {
+		return new AztecCode().setTo(this);
 	}
 
 	/** Which symbol structure is used */
@@ -164,7 +190,7 @@ public class AztecCode {
 	}
 
 	/** Specifies which encoding is currently active in the data stream. */
-	enum Modes {
+	public enum Modes {
 		UPPER(5),
 		LOWER(5),
 		MIXED(5),
@@ -179,5 +205,14 @@ public class AztecCode {
 		}
 
 		@Getter final int wordSize;
+	}
+
+	/** At what stage did it fail at? */
+	public enum Failure {
+		NONE,
+		ORIENTATION,
+		MODE_ECC,
+		MESSAGE_ECC,
+		MESSAGE_PARSE
 	}
 }

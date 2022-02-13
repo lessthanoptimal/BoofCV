@@ -69,6 +69,10 @@ public class AztecPyramid {
 		}
 	}
 
+	public int getGridWidth() {
+		return layers.size == 1 ? 11 : 15;
+	}
+
 	public void setTo( AztecPyramid src ) {
 		this.layers.resetResize(src.layers.size);
 		for (int i = 0; i < src.layers.size; i++) {

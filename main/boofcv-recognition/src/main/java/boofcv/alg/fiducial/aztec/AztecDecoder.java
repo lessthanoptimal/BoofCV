@@ -22,6 +22,7 @@ import boofcv.alg.fiducial.aztec.AztecCode.Modes;
 import boofcv.alg.fiducial.qrcode.PackedBits8;
 import boofcv.alg.fiducial.qrcode.ReedSolomonCodes_U16;
 import boofcv.misc.BoofMiscOps;
+import lombok.Getter;
 import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
 
@@ -47,6 +48,9 @@ public class AztecDecoder extends AztecMessageErrorCorrection implements Verbose
 
 	@Nullable PrintStream verbose = null;
 
+	/** True if it failed when doing error correction */
+	@Getter boolean failedECC;
+
 	/**
 	 * Extracts the message from this marker.
 	 *
@@ -59,7 +63,9 @@ public class AztecDecoder extends AztecMessageErrorCorrection implements Verbose
 		Objects.requireNonNull(marker.rawbits);
 
 		// Apply error correction to the message
+		failedECC = false;
 		if (!applyErrorCorrection(marker)) {
+			failedECC = true;
 			if (verbose != null) verbose.println("ECC failed");
 			return false;
 		}

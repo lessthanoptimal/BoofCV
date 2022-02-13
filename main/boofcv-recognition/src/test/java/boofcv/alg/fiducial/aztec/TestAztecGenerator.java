@@ -18,31 +18,12 @@
 
 package boofcv.alg.fiducial.aztec;
 
-import boofcv.gui.image.ShowImages;
-import boofcv.struct.image.GrayU8;
 import boofcv.struct.packed.PackedArrayPoint2D_I16;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestAztecGenerator {
-	@Test void foo() {
-		var marker = new AztecCode();
-		marker.dataLayers = 12;
-		marker.messageWordCount = 10;
-		marker.structure = AztecCode.Structure.FULL;
-
-		GrayU8 image = AztecGenerator.renderImage(5, 0, marker);
-		ShowImages.showBlocking(image, "Aztec Code", 120_000, true);
-	}
-
-	@Test void moo() {
-		var marker = new AztecEncoder().addUpper("C").addLower("ode").addPunctuation("!").fixate();
-
-		GrayU8 image = AztecGenerator.renderImage(10, 0, marker);
-		ShowImages.showBlocking(image, "Aztec Code", 120_000, true);
-	}
-
 	/**
 	 * Generate coordinates for all possible markers and see if there are the expected number of bits
 	 */

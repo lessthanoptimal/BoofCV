@@ -104,18 +104,29 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 		if (!decodeMode(locatorPattern, marker))
 			return false;
 
-		return decodeMessage(marker);
+		// Estimate the bounds using the previously estimated homography
+		double r = marker.dataLayers + 1 + (marker.locator.getGridWidth() + 2)/2.0;
+		gridToPixel.convert(-r, -r, marker.bounds.get(0));
+		gridToPixel.convert(r, -r, marker.bounds.get(1));
+		gridToPixel.convert(r, r, marker.bounds.get(2));
+		gridToPixel.convert(-r, r, marker.bounds.get(3));
+
+		if (!decodeMessage(marker))
+			return false;
+
+		if (verbose != null) verbose.println("success decoding!");
+		return true;
 	}
 
 	/**
 	 * Reads the image and decodes the marker's mode
 	 *
 	 * @param locator Locator pattern
-	 * @param code Storage for decoded marker
+	 * @param marker Storage for decoded marker
 	 * @return true if successful or false if it failed
 	 */
-	protected boolean decodeMode( AztecPyramid locator, AztecCode code ) {
-		code.locator.setTo(locator);
+	protected boolean decodeMode( AztecPyramid locator, AztecCode marker ) {
+		marker.locator.setTo(locator);
 		Structure type = locator.layers.size == 1 ? Structure.COMPACT : Structure.FULL;
 
 		// Read the pixel values once
@@ -124,6 +135,7 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 		// Determine the orientation
 		int orientation = selectOrientation(type);
 		if (orientation < 0) {
+			marker.failure = AztecCode.Failure.ORIENTATION;
 			if (verbose != null) verbose.println("failed to find a valid orientation");
 			return false;
 		}
@@ -133,14 +145,15 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 
 		// Rotate the locator pattern so that it's in the canonical position. corner[0] is top left
 		for (int i = 0; i < orientation; i++) {
-			for (int layerIdx = 0; layerIdx < code.locator.layers.size; layerIdx++) {
-				UtilPolygons2D_F64.shiftUp(code.locator.layers.get(layerIdx).square);
+			for (int layerIdx = 0; layerIdx < marker.locator.layers.size; layerIdx++) {
+				UtilPolygons2D_F64.shiftUp(marker.locator.layers.get(layerIdx).square);
 			}
 		}
 
 		// Apply error correction and extract the mode
-		code.structure = type;
-		if (!decoderMode.decodeMode(bits, code)) {
+		marker.structure = type;
+		if (!decoderMode.decodeMode(bits, marker)) {
+			marker.failure = AztecCode.Failure.MODE_ECC;
 			if (verbose != null) verbose.println("error correction failed when decoding mode");
 			return false;
 		}
@@ -261,7 +274,11 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 
 		// Decode the raw data
 		if (!decodeMessage.process(marker)) {
-			if (verbose != null) verbose.println("error correction failed when decoding the message");
+			if (decodeMessage.failedECC)
+				marker.failure = AztecCode.Failure.MESSAGE_ECC;
+			else
+				marker.failure = AztecCode.Failure.MESSAGE_PARSE;
+			if (verbose != null) verbose.println("Could not decode the message");
 			return false;
 		}
 		return true;
@@ -270,7 +287,7 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 	/** Read gray intensity values from the image and converts into message data bit values */
 	void readMessageDataFromImage( AztecCode marker ) {
 		// Use locator pattern to determine the threshold and coordinate system
-		int modeGridWidth = marker.locator.layers.size == 2 ? 15 : 11;
+		int modeGridWidth = marker.locator.getGridWidth();
 		AztecPyramid.Layer locator = marker.locator.layers.get(0);
 		gridToPixel.initOriginCenter(locator.square, modeGridWidth - 6);
 		float threshold = (float)locator.threshold;
@@ -303,5 +320,6 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
 		this.verbose = BoofMiscOps.addPrefix(this, out);
+		BoofMiscOps.verboseChildren(out, configuration, decodeMessage);
 	}
 }
