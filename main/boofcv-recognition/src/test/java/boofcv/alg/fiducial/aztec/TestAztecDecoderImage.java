@@ -24,9 +24,45 @@ import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.point.Point2D_F64;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class TestAztecDecoderImage {
+
+	/**
+	 * Sees if it can successfully decode multiple noise free markers
+	 */
+	@Test void process() {
+		var alg = new AztecDecoderImage<>(GrayU8.class);
+		for (var structure : AztecCode.Structure.values()) {
+			AztecCode truth = new AztecEncoder().setStructure(structure).addUpper("TEST").fixate();
+			GrayU8 image = AztecGenerator.renderImage(10, 0, truth);
+
+			List<AztecPyramid> pyramids = new ArrayList<>();
+			pyramids.add(truth.locator);
+
+			for (int rotation = 0; rotation < 4; rotation++) {
+				// Process the image
+				alg.process(pyramids, image);
+
+				// See if there was the expected number of results
+				assertEquals(0, alg.getFailed().size());
+				assertEquals(1, alg.getSuccess().size());
+				AztecCode found = alg.getSuccess().get(0);
+
+				// See if it was decoded correctly
+				assertEquals(truth.message, found.message);
+				assertEquals(0, found.totalBitErrors);
+				assertFalse(found.transposed);
+
+				// Rotate the locator pattern so that initially it will be wrong
+				truth.locator.layers.forEach(l -> UtilPolygons2D_F64.shiftUp(l.square));
+			}
+		}
+	}
+
 	/**
 	 * Render an image and test the results. Rotate the image to make sure orientation is correctly estimated
 	 */

@@ -38,6 +38,11 @@ public class AztecPyramid {
 		layers.resetResize(numLayers);
 	}
 
+	/** Returns a layer in the pyramid */
+	public Layer get( int index ) {
+		return layers.get(index);
+	}
+
 	/**
 	 * Rotates the inner ring so that its corners indexes match up with the corners in the outer ring.
 	 */

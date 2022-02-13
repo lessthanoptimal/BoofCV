@@ -26,8 +26,10 @@ import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.packed.PackedArrayPoint2D_I16;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point2D_I16;
 import lombok.Getter;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.VerbosePrint;
@@ -80,8 +82,12 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 
 	final DogArray<AztecCode> allMarkers = new DogArray<>(AztecCode::new, AztecCode::reset);
 
-	AztecDecoder decoderBits = new AztecDecoder();
-	AztecMessageModeCodec codecMode = new AztecMessageModeCodec();
+	AztecDecoder decodeMessage = new AztecDecoder();
+	AztecMessageModeCodec decoderMode = new AztecMessageModeCodec();
+
+	// Location of each bit in grid coordinates
+	PackedArrayPoint2D_I16 coordinates = new PackedArrayPoint2D_I16();
+	Point2D_I16 coordinate = new Point2D_I16();
 
 	// value of bits directly read in from the image. This will include fixed structures
 	PackedBits8 imageBits = new PackedBits8();
@@ -149,7 +155,7 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 
 		// Apply error correction and extract the mode
 		code.structure = type;
-		return codecMode.decodeMode(bits, code);
+		return decoderMode.decodeMode(bits, code);
 	}
 
 	/**
@@ -252,8 +258,54 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 		return errors;
 	}
 
-	protected boolean decodeMessage( AztecCode code ) {
-		return true;
+	/** Reads the message data from the image then decodes it. Results are stored in Marker */
+	protected boolean decodeMessage( AztecCode marker ) {
+		// Look up location of bit locations in grid coordinates
+		AztecGenerator.computeDataBitCoordinates(marker, coordinates);
+
+		// Read the value of each bit
+		readMessageDataFromImage(marker);
+
+		// Copy raw data into the marker
+		marker.rawbits = new byte[bits.arrayLength()];
+		System.arraycopy(bits.data, 0, marker.rawbits, 0, marker.rawbits.length );
+
+		// Decode the raw data
+		return decodeMessage.process(marker);
+	}
+
+	/** Read gray intensity values from the image and converts into message data bit values */
+	void readMessageDataFromImage( AztecCode marker ) {
+		// Use locator pattern to determine the threshold and coordinate system
+		int modeGridWidth = marker.locator.layers.size == 2 ? 15 : 11;
+		AztecPyramid.Layer locator = marker.locator.layers.get(0);
+		gridToPixel.initOriginCenter(locator.square, modeGridWidth - 6);
+		float threshold = (float)locator.threshold;
+
+		// Read image bits in chunks of 8 for write effiency
+		bits.resize(0);
+		int bitIdx;
+		for (bitIdx = 0; bitIdx + 8 < coordinates.size(); bitIdx += 8) {
+			// Read values of each bit in the image.
+			int data = 0;
+			for (int i = 0; i < 8; i++) {
+				coordinates.getCopy(bitIdx + i, coordinate);
+				gridToPixel.convert(coordinate.x, coordinate.y, pixel);
+
+				float value = interpolate.get((float)pixel.x, (float)pixel.y);
+				if (value < threshold)
+					data |= 1 << i;
+			}
+			bits.append(data, 8, true);
+		}
+		// handle the remainder
+		while (bitIdx < coordinates.size()) {
+			coordinates.getCopy(bitIdx++, coordinate);
+			gridToPixel.convert(coordinate.x, coordinate.y, pixel);
+
+			float value = interpolate.get((float)pixel.x, (float)pixel.y);
+			bits.append(value < threshold ? 1 : 0, 1, true);
+		}
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
