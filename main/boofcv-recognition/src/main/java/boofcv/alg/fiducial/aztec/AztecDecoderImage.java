@@ -109,7 +109,7 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 				continue;
 			}
 
-			if (!decodeData(marker)) {
+			if (!decodeMessage(marker)) {
 				failed.add(marker);
 				continue;
 			}
@@ -252,7 +252,7 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 		return errors;
 	}
 
-	protected boolean decodeData( AztecCode code ) {
+	protected boolean decodeMessage( AztecCode code ) {
 		return true;
 	}
 

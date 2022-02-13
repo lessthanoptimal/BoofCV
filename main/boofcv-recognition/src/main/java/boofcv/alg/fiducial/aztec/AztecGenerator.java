@@ -23,10 +23,10 @@ import boofcv.alg.drawing.FiducialRenderEngine;
 import boofcv.alg.fiducial.qrcode.PackedBits8;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.packed.PackedArrayPoint2D_I16;
+import georegression.struct.point.Point2D_I16;
 import georegression.struct.shapes.Polygon2D_F64;
 import lombok.Getter;
-import org.ddogleg.struct.DogArray_I16;
-import org.ddogleg.struct.DogArray_I32;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -49,8 +49,8 @@ public class AztecGenerator {
 	@Nullable @Getter protected FiducialRenderEngine render;
 
 	/** Location of each bit in marker square coordinates */
-	protected DogArray_I16 dataCoordinates = new DogArray_I16();
-	protected DogArray_I32 layerStartsAtBit = new DogArray_I32();
+	protected PackedArrayPoint2D_I16 messageBitLocation = new PackedArrayPoint2D_I16();
+	protected Point2D_I16 coordinate = new Point2D_I16();
 
 	AztecMessageModeCodec codecMode = new AztecMessageModeCodec();
 	PackedBits8 bits = new PackedBits8();
@@ -63,7 +63,7 @@ public class AztecGenerator {
 		new AztecGenerator().setMarkerWidth(numSquares*pixelPerSquare).setRender(render).render(marker);
 
 		// Set the threshold to be 1/2 way between what the image defines as black and white
-		for( AztecPyramid.Layer layer : marker.locator.layers.toList()) {
+		for (AztecPyramid.Layer layer : marker.locator.layers.toList()) {
 			layer.threshold = (render.getWhite() + render.getBlack())/2.0;
 		}
 
@@ -139,12 +139,12 @@ public class AztecGenerator {
 	/** Renders the encoded message while skipping over reference grid */
 	private void renderDataLayers( AztecCode marker ) {
 		// Get the location of each bit in the image
-		computeDataBitCoordinates(marker, dataCoordinates, layerStartsAtBit);
+		computeDataBitCoordinates(marker, messageBitLocation);
 
 		PackedBits8 bits = PackedBits8.wrap(marker.rawbits, marker.getCapacityBits());
 
 		// Make sure the number of coordinates and bits are close
-		BoofMiscOps.checkTrue(Math.abs(dataCoordinates.size/2 - bits.size) < marker.getWordBitCount(),
+		BoofMiscOps.checkTrue(Math.abs(messageBitLocation.size() - bits.size) < marker.getWordBitCount(),
 				"Improperly constructed marker");
 
 		// Draw the bits which have a value of one
@@ -153,12 +153,10 @@ public class AztecGenerator {
 			if (bits.get(i) != 1)
 				continue;
 
-			int j = i*2;
-			int row = dataCoordinates.data[j];
-			int col = dataCoordinates.data[j + 1];
+			messageBitLocation.getCopy(i, coordinate);
 
-			int x = col + lengthInSquares/2;
-			int y = row + lengthInSquares/2;
+			int x = coordinate.x + lengthInSquares/2;
+			int y = coordinate.y + lengthInSquares/2;
 
 			render.square(x*squareWidth, y*squareWidth, squareWidth);
 		}
@@ -279,13 +277,11 @@ public class AztecGenerator {
 	 * Coordinate system will have (0, 0) be the marker's center. +x right and +y down.
 	 *
 	 * @param coordinates Coordinates are encoded as interleaved (row, col)
-	 * @param layerStart The bit at which each layer starts
 	 */
 	public static void computeDataBitCoordinates( AztecCode marker,
-												  DogArray_I16 coordinates, DogArray_I32 layerStart ) {
+												  PackedArrayPoint2D_I16 coordinates ) {
 		// clear old data
 		coordinates.reset();
-		layerStart.reset();
 
 		// First layer goes around the orientation pattern + mode bits
 		int ringWidth = marker.getLocatorSquareCount() + 6;
@@ -302,7 +298,6 @@ public class AztecGenerator {
 
 		// traverse the marker in a spiral pattern starting from the innermost layer outside the static objects
 		for (int layer = 1; layer <= marker.dataLayers; layer++) {
-			layerStart.add(coordinates.size);
 			// Add coordinates one side at a time in this layer
 			int traversed = dataBitCoordinatesLine(row, col, 0, 1, maxNum, hasGrid, coordinates);
 			col += traversed - 1;
@@ -340,15 +335,14 @@ public class AztecGenerator {
 	 */
 	static int dataBitCoordinatesLine( int row0, int col0, int drow, int dcol, int length,
 									   boolean hasGrid,
-									   DogArray_I16 coordinates ) {
+									   PackedArrayPoint2D_I16 coordinates ) {
 		// See if the other side of the domino will hit a reference grid and needs to jump over it
 		int leg = 1;
 		if (hasGrid && (((row0 + dcol)%16) == 0 || ((col0 - drow)%16) == 0))
 			leg = 2;
 
 		// Add dominoes along the line while skipping over reference grids
-		coordinates.reserve(coordinates.size + 4*length);
-		int locationIndex = coordinates.size;
+		coordinates.reserve(coordinates.size() + 2*length);
 		int traversed = 0;
 		int written = 0;
 		while (written < length) {
@@ -361,11 +355,8 @@ public class AztecGenerator {
 				continue;
 
 			// "domino" with most significant bit first. Makes sense if you look at figure 5
-			coordinates.data[locationIndex++] = (short)row;
-			coordinates.data[locationIndex++] = (short)col;
-			coordinates.data[locationIndex++] = (short)(row + dcol*leg);
-			coordinates.data[locationIndex++] = (short)(col - drow*leg);
-			coordinates.size += 4;
+			coordinates.append(col, row);
+			coordinates.append(col - drow*leg, row + dcol*leg);
 
 			written++;
 		}
