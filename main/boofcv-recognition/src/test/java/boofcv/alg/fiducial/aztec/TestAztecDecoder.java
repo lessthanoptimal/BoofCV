@@ -18,12 +18,13 @@
 
 package boofcv.alg.fiducial.aztec;
 
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class TestAztecDecoder {
+public class TestAztecDecoder extends BoofStandardJUnit {
 	@Test void test0() {
 		AztecCode marker = new AztecEncoder().
 				addLower("moo").addUpper("A").addPunctuation("!").addDigit("312").fixate();

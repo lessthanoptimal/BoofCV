@@ -18,13 +18,14 @@
 
 package boofcv.alg.fiducial.aztec;
 
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class TestAztecPyramid {
+class TestAztecPyramid extends BoofStandardJUnit {
 	@Test void alignCorners() {
 		var pyramid = new AztecPyramid();
 		// sanity check for when there's nothing to align

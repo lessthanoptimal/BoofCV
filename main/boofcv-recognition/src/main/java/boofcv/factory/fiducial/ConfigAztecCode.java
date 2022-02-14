@@ -93,6 +93,7 @@ public class ConfigAztecCode implements Configuration {
 		this.threshold.setTo(src.threshold);
 		this.polygon.setTo(src.polygon);
 		this.considerTransposed = src.considerTransposed;
+		this.maxOrientationError = src.maxOrientationError;
 		return this;
 	}
 
@@ -100,5 +101,7 @@ public class ConfigAztecCode implements Configuration {
 	public void checkValidity() {
 		threshold.checkValidity();
 		polygon.checkValidity();
+		if (maxOrientationError < 0)
+			throw new IllegalArgumentException("maxOrientationError must be >= 0");
 	}
 }
