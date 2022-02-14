@@ -128,6 +128,34 @@ public class TestAztecEncoder {
 		assertEquals(0b1111_1111, encoder.storageDataWords.get(4));
 	}
 
+	/** Example taken from G.3 page 38 */
+	@Test void bitsToWords_Example0() {
+		String input = "00100 11100 10000 00101 00110 11110 0001 0100 1111 00101 0000 00110";
+		String[] expectedWords = "001001 110010 000001 101001 101111 000010 100111 100101 000001 011011".split(" ");
+
+		var encoder = new AztecEncoder();
+		encoder.bits.append(input.replace(" ", ""));
+		encoder.workMarker.dataLayers = 1;
+		encoder.workMarker.structure = AztecCode.Structure.COMPACT;
+		encoder.bitsToWords();
+
+		// to make it easier to check add ECC words onto the data words array
+		encoder.storageDataWords.addAll(encoder.storageEccWords);
+
+		// Compare against expected taken from the ISO
+		assertEquals(encoder.storageDataWords.size, expectedWords.length);
+
+		for (int index = 0; index < expectedWords.length; index++) {
+			int expected = 0;
+			String word = expectedWords[index];
+			for (int i = 0; i < 6; i++) {
+				if (word.charAt(i) == '1')
+					expected |= 1 << (6 - i - 1);
+			}
+			assertEquals(expected, encoder.storageDataWords.get(index) & 0xFFFF);
+		}
+	}
+
 	/**
 	 * Number of bits will not be divisible by 8. Make sure that situation is handled correctly.
 	 */

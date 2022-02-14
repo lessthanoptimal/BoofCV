@@ -20,7 +20,6 @@ package boofcv.alg.fiducial.aztec;
 
 import boofcv.alg.fiducial.aztec.AztecCode.Modes;
 import boofcv.alg.fiducial.qrcode.PackedBits8;
-import boofcv.alg.fiducial.qrcode.ReedSolomonCodes_U16;
 import boofcv.misc.BoofMiscOps;
 import lombok.Getter;
 import org.ddogleg.struct.VerbosePrint;
@@ -74,54 +73,6 @@ public class AztecDecoder extends AztecMessageErrorCorrection implements Verbose
 		PackedBits8 paddedBits = PackedBits8.wrap(marker.corrected, marker.messageWordCount*marker.getWordBitCount());
 		PackedBits8 bits = removeExtraBits(marker.getWordBitCount(), paddedBits);
 		return bitsToMessage(marker, bits);
-	}
-
-	/**
-	 * Applies error correction to data portion of rawbits, then copies the results into marker.corrected.
-	 *
-	 * @return true if nothing went wrong with error correction
-	 */
-	boolean applyEcc( AztecCode marker, ReedSolomonCodes_U16 ecc ) {
-		int wordBitCount = marker.getWordBitCount();
-		PackedBits8 bits = PackedBits8.wrap(marker.rawbits, marker.getCapacityBits());
-
-		// convert the rawbits into a format ECC can understand
-		storageDataWords.resize(marker.messageWordCount);
-		storageEccWords.resize(marker.getCapacityWords() - marker.messageWordCount);
-
-		int locationBits = 0;
-		for (int i = 0; i < storageDataWords.size; i++, locationBits += wordBitCount) {
-			storageDataWords.data[i] = (short)bits.read(locationBits, wordBitCount, true);
-		}
-		for (int i = 0; i < storageEccWords.size; i++, locationBits += wordBitCount) {
-			storageEccWords.data[i] = (short)bits.read(locationBits, wordBitCount, true);
-		}
-
-		// TODO check for words with all 0 and all 1 and mark word as a known erasure
-
-		// Apply error correction
-		ecc.generator(marker.getCapacityWords() - storageDataWords.size);
-		if (!ecc.correct(storageDataWords, storageEccWords)) {
-			if (verbose != null) verbose.println("ECC failed");
-			return false;
-		}
-		marker.totalBitErrors = ecc.getTotalErrors();
-
-		// Save the corrected data
-
-		int messageBits = storageDataWords.size*wordBitCount;
-		marker.corrected = new byte[BoofMiscOps.bitToByteCount(messageBits)];
-		bits.size = 0;
-		bits.data = marker.corrected;
-		for (int i = 0; i < storageDataWords.size; i++) {
-			int value = storageDataWords.get(i) & 0xFFFF;
-
-			// TODO handle special case words for all zeros and ones
-
-			bits.append(value, wordBitCount, false);
-		}
-
-		return true;
 	}
 
 	/**

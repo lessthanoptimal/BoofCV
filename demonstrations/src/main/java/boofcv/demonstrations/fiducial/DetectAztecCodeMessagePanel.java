@@ -81,13 +81,15 @@ public class DetectAztecCodeMessagePanel extends StandardAlgConfigPanel
 		this.detected.clear();
 		for (int i = 0; i < detected.size(); i++) {
 			AztecCode marker = detected.get(i);
-			model.addElement(String.format("l%02d %.5s %.10s", marker.dataLayers, marker.structure, marker.message));
+			String shortName = marker.structure.toString().substring(0, 4);
+			model.addElement(String.format("%4s L=%02d %.10s", shortName, marker.dataLayers, marker.message));
 			this.detected.add(marker.copy());
 		}
 		this.failures.clear();
 		for (int i = 0; i < failures.size(); i++) {
 			AztecCode marker = failures.get(i);
-			model.addElement(String.format("l%02d Cause: %s", marker.dataLayers, marker.failure));
+			String shortName = marker.structure.toString().substring(0, 4);
+			model.addElement(String.format("%4s L=%02d %s", shortName, marker.dataLayers, marker.failure));
 			this.failures.add(marker.copy());
 		}
 		listDetected.invalidate();
@@ -127,11 +129,11 @@ public class DetectAztecCodeMessagePanel extends StandardAlgConfigPanel
 		double errorLevel = marker.getCorrectionLevel();
 
 		if (failure) {
-			textArea.setText(String.format("%5s Layers %2d   ECC %.1f\n\nCause: %s",
-					marker.structure, marker.dataLayers, errorLevel, marker.failure));
+			textArea.setText(String.format("%5s Layers %2d  ECC %.1f\nMessage Words %d\nCause: %s",
+					marker.structure, marker.dataLayers, errorLevel, marker.messageWordCount, marker.failure));
 		} else {
-			textArea.setText(String.format("%5s Layers %2d   ECC %.1f\nBit Errors %d\n\n'%s'",
-					marker.structure, marker.dataLayers, errorLevel, marker.totalBitErrors, marker.message));
+			textArea.setText(String.format("%5s Layers %2d  ECC %.1f\nMessage Words %d\nBit Errors %d\n\n'%s'",
+					marker.structure, marker.dataLayers, errorLevel, marker.messageWordCount, marker.totalBitErrors, marker.message));
 		}
 	}
 
