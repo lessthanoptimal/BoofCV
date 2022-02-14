@@ -126,13 +126,13 @@ public class DetectAztecCodeMessagePanel extends StandardAlgConfigPanel
 	}
 
 	private void setMarkerMessageText( AztecCode marker, boolean failure ) {
-		double errorLevel = marker.getCorrectionLevel();
+		double errorLevel = marker.dataLayers >= 1 ? marker.getCorrectionLevel() : Double.NaN;
 
 		if (failure) {
 			textArea.setText(String.format("%5s Layers %2d  ECC %.1f\nMessage Words %d\nCause: %s",
 					marker.structure, marker.dataLayers, errorLevel, marker.messageWordCount, marker.failure));
 		} else {
-			textArea.setText(String.format("%5s Layers %2d  ECC %.1f\nMessage Words %d\nBit Errors %d\n\n'%s'",
+			textArea.setText(String.format("%5s Layers %2d  ECC %.1f\nMessage Words %d\nBit Errors %d\n\n%s",
 					marker.structure, marker.dataLayers, errorLevel, marker.messageWordCount, marker.totalBitErrors, marker.message));
 		}
 	}

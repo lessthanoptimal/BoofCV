@@ -220,6 +220,9 @@ public class DetectAztecCodeApp<T extends ImageGray<T>>
 			}
 			this.failures.reset();
 			for (AztecCode d : detector.getFailures()) {
+				// If it fails this early it's probably a real false positive. Let's just ignore it
+				if (d.failure.ordinal() <= AztecCode.Failure.MODE_ECC.ordinal())
+					continue;
 				this.failures.grow().setTo(d);
 			}
 //			System.out.println("Failed "+failures.size());
@@ -228,7 +231,6 @@ public class DetectAztecCodeApp<T extends ImageGray<T>>
 //			}
 		}
 		controlPanel.polygonPanel.thresholdPanel.updateHistogram((T)input);
-
 
 		SwingUtilities.invokeLater(() -> {
 			controls.setProcessingTimeS(timeInSeconds);
@@ -254,21 +256,20 @@ public class DetectAztecCodeApp<T extends ImageGray<T>>
 		final Point2D_F64 center = new Point2D_F64();
 
 		synchronized (detected) {
-			AztecCode qr;
+			AztecCode marker;
 			if (failure) {
 				if (index >= failures.size)
 					return;
-				qr = failures.get(index);
+				marker = failures.get(index);
 			} else {
 				if (index >= detected.size)
 					return;
-				qr = detected.get(index);
+				marker = detected.get(index);
 			}
-			UtilPolygons2D_F64.vertexAverage(qr.bounds, center);
-
+			UtilPolygons2D_F64.vertexAverage(marker.bounds, center);
 
 			for (int i = 0; i < 4; i++) {
-				width = Math.max(width, qr.bounds.getSideLength(i));
+				width = Math.max(width, marker.bounds.getSideLength(i));
 			}
 		}
 
@@ -365,6 +366,9 @@ public class DetectAztecCodeApp<T extends ImageGray<T>>
 		 * Draws the estimated value of each bit onto the image
 		 */
 		private void renderBinaryValues( Graphics2D g2, AztecCode marker ) {
+			// Don't draw if it didn't get far enough along
+			if (marker.dataLayers <= 0 || marker.rawbits == null)
+				return;
 			Point2D_F64 coordinate = new Point2D_F64();
 			Point2D_F64 pixel = new Point2D_F64();
 			DMatrixRMaj gridToImage = new DMatrixRMaj(3, 3);
@@ -378,8 +382,11 @@ public class DetectAztecCodeApp<T extends ImageGray<T>>
 			bits.size = marker.getCapacityBits();
 
 			g2.setStroke(new BasicStroke(1));
+
+			// bits are encoded in reverse order
+			int pointIndex = bits.size - 1;
 			for (int i = 0; i < bits.size; i++) {
-				Point2D_I16 c = points.getTemp(i);
+				Point2D_I16 c = points.getTemp(pointIndex--);
 				coordinate.setTo(c.x, c.y);
 				GeometryMath_F64.mult(gridToImage, coordinate, pixel);
 
