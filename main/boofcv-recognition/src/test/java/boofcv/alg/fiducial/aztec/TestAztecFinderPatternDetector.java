@@ -27,6 +27,7 @@ import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.gui.image.ShowImages;
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.DogArray;
 import org.junit.jupiter.api.Test;
@@ -36,10 +37,7 @@ import static boofcv.alg.fiducial.aztec.AztecCode.Structure.FULL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * @author Peter Abeles
- */
-class TestAztecFinderPatternDetector {
+class TestAztecFinderPatternDetector extends BoofStandardJUnit {
 	/** Easy test to see if it can detect a single well defined target */
 	@Test void detectSingle() {
 		detectSingle(COMPACT);

@@ -11,6 +11,7 @@ Version : 0.41
   - TODO Auto encode message
   - TODO Detect ECI and issue an error
   - TODO support transposed
+  - TODO JMH
 - SLAM
   - TODO Monocular
   - TODO Stereo

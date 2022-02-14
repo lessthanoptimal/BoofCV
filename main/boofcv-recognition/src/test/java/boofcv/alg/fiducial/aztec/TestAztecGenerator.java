@@ -19,11 +19,12 @@
 package boofcv.alg.fiducial.aztec;
 
 import boofcv.struct.packed.PackedArrayPoint2D_I16;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TestAztecGenerator {
+public class TestAztecGenerator extends BoofStandardJUnit {
 	/**
 	 * Generate coordinates for all possible markers and see if there are the expected number of bits
 	 */

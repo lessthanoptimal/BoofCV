@@ -19,12 +19,13 @@
 package boofcv.alg.fiducial.aztec;
 
 import boofcv.alg.fiducial.qrcode.PackedBits8;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class TestAztecMessageModeCodec {
+public class TestAztecMessageModeCodec extends BoofStandardJUnit {
 	/**
 	 * Known results from ISO Figure G.6. Manually read bits from image
 	 */

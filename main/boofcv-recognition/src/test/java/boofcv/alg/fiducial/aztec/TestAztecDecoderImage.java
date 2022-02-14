@@ -20,13 +20,14 @@ package boofcv.alg.fiducial.aztec;
 
 import boofcv.alg.fiducial.qrcode.PackedBits8;
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.point.Point2D_F64;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class TestAztecDecoderImage {
+class TestAztecDecoderImage extends BoofStandardJUnit {
 	/**
 	 * Sees if it can successfully decode multiple noise free markers
 	 */

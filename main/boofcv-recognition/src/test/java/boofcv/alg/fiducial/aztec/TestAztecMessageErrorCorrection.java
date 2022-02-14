@@ -18,11 +18,12 @@
 
 package boofcv.alg.fiducial.aztec;
 
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class TestAztecMessageErrorCorrection {
+class TestAztecMessageErrorCorrection extends BoofStandardJUnit {
 	/** Construct a message and corrupt a single word. See if it fixes it */
 	@Test void correctSingleWordErrors() {
 		var alg = new Helper();

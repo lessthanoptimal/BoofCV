@@ -20,12 +20,13 @@ package boofcv.alg.fiducial.aztec;
 
 import boofcv.alg.fiducial.aztec.AztecCode.Modes;
 import boofcv.alg.fiducial.qrcode.PackedBits8;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-public class TestAztecEncoder {
+public class TestAztecEncoder extends BoofStandardJUnit {
 	/**
 	 * Compare to example in specification and see if it produces the same results. Page 37
 	 */

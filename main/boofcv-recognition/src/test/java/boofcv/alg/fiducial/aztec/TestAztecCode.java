@@ -18,11 +18,12 @@
 
 package boofcv.alg.fiducial.aztec;
 
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TestAztecCode {
+public class TestAztecCode extends BoofStandardJUnit {
 	/** Compare against table in specification */
 	@Test void getSizeSquares() {
 		var marker = new AztecCode();
