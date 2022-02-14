@@ -49,7 +49,7 @@ public class AztecGenerator {
 	@Nullable @Getter protected FiducialRenderEngine render;
 
 	/** Location of each bit in marker square coordinates */
-	protected PackedArrayPoint2D_I16 messageBitLocation = new PackedArrayPoint2D_I16();
+	protected PackedArrayPoint2D_I16 messageCoordiantes = new PackedArrayPoint2D_I16();
 	protected Point2D_I16 coordinate = new Point2D_I16();
 
 	AztecMessageModeCodec codecMode = new AztecMessageModeCodec();
@@ -139,21 +139,23 @@ public class AztecGenerator {
 	/** Renders the encoded message while skipping over reference grid */
 	private void renderDataLayers( AztecCode marker ) {
 		// Get the location of each bit in the image
-		computeDataBitCoordinates(marker, messageBitLocation);
+		computeDataBitCoordinates(marker, messageCoordiantes);
 
 		PackedBits8 bits = PackedBits8.wrap(marker.rawbits, marker.getCapacityBits());
 
 		// Make sure the number of coordinates and bits are close
-		BoofMiscOps.checkTrue(Math.abs(messageBitLocation.size() - bits.size) < marker.getWordBitCount(),
+		BoofMiscOps.checkTrue(Math.abs(messageCoordiantes.size() - bits.size) < marker.getWordBitCount(),
 				"Improperly constructed marker");
 
 		// Draw the bits which have a value of one
 		FiducialRenderEngine render = Objects.requireNonNull(this.render);
+		int coordinateIndex = bits.size - 1;
 		for (int i = 0; i < bits.size; i++) {
 			if (bits.get(i) != 1)
 				continue;
 
-			messageBitLocation.getCopy(i, coordinate);
+			// Render the bits in reverse order. I have no idea why it's what the ISO says to do...
+			messageCoordiantes.getCopy(coordinateIndex - i, coordinate);
 
 			int x = coordinate.x + lengthInSquares/2;
 			int y = coordinate.y + lengthInSquares/2;
@@ -358,8 +360,8 @@ public class AztecGenerator {
 				continue;
 
 			// "domino" with most significant bit first. Makes sense if you look at figure 5
-			coordinates.append(col, row);
 			coordinates.append(col - drow*leg, row + dcol*leg);
+			coordinates.append(col, row);
 
 			written++;
 		}

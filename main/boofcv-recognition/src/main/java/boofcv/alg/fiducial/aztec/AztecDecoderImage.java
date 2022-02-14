@@ -297,14 +297,14 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 		gridToPixel.initOriginCenter(locator.square, modeGridWidth - 6);
 		float threshold = (float)locator.threshold;
 
-		// Read image bits in chunks of 8 for write effiency
+		// Read image bits in chunks of 8 for write efficiency
 		bits.resize(0);
 		int bitIdx;
-		for (bitIdx = 0; bitIdx + 8 < coordinates.size(); bitIdx += 8) {
+		for (bitIdx = marker.getCapacityBits() - 1; bitIdx >= 8; bitIdx -= 8) {
 			// Read values of each bit in the image.
 			int data = 0;
 			for (int i = 0; i < 8; i++) {
-				coordinates.getCopy(bitIdx + i, coordinate);
+				coordinates.getCopy(bitIdx - i, coordinate);
 				gridToPixel.convert(coordinate.x, coordinate.y, pixel);
 
 				float value = interpolate.get((float)pixel.x, (float)pixel.y);
@@ -313,9 +313,10 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 			}
 			bits.append(data, 8, true);
 		}
+
 		// handle the remainder
-		while (bitIdx < coordinates.size()) {
-			coordinates.getCopy(bitIdx++, coordinate);
+		while (bitIdx >= 0) {
+			coordinates.getCopy(bitIdx--, coordinate);
 			gridToPixel.convert(coordinate.x, coordinate.y, pixel);
 
 			float value = interpolate.get((float)pixel.x, (float)pixel.y);

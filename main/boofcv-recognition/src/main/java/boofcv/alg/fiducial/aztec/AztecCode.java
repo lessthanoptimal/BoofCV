@@ -168,7 +168,7 @@ public class AztecCode {
 	}
 
 	/** Which symbol structure is used */
-	enum Structure {
+	public enum Structure {
 		COMPACT(new int[]{17, 40, 51, 76}),
 		FULL(new int[]{21, 48, 60, 88, 120, 156, 196, 240, 230, 272,
 				316, 364, 416, 470, 528, 588, 652, 720, 790, 864, 940,
