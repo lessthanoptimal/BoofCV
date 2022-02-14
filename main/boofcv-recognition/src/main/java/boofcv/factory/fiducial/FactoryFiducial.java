@@ -252,6 +252,7 @@ public class FactoryFiducial {
 		DetectPolygonBinaryGrayRefine<T> squareDetector = FactoryShapeDetector.polygon(config.polygon, imageType);
 		var detector = new AztecCodePreciseDetector<>(inputToBinary, squareDetector, imageType);
 		detector.getDecoder().considerTransposed = config.considerTransposed;
+		detector.getDecoder().maxOrientationError = config.maxOrientationError;
 		return detector;
 	}
 

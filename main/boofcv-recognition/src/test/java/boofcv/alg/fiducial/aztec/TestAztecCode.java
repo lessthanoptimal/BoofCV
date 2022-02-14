@@ -59,7 +59,7 @@ public class TestAztecCode {
 
 	private void checkMarkerSquareCount( int layers, int expected, AztecCode marker ) {
 		marker.dataLayers = layers;
-		assertEquals(expected, marker.getMarkerSquareCount());
+		assertEquals(expected, marker.getMarkerWidthSquares());
 	}
 
 	@Test void getLocatorRingCount() {
@@ -75,9 +75,9 @@ public class TestAztecCode {
 		var marker = new AztecCode();
 		marker.dataLayers = 10; // distraction. Shouldn't change results
 		marker.structure = AztecCode.Structure.COMPACT;
-		assertEquals(5, marker.getLocatorSquareCount());
+		assertEquals(5, marker.getLocatorWidthSquares());
 		marker.structure = AztecCode.Structure.FULL;
-		assertEquals(9, marker.getLocatorSquareCount());
+		assertEquals(9, marker.getLocatorWidthSquares());
 	}
 
 	@Test void countCodewords() {

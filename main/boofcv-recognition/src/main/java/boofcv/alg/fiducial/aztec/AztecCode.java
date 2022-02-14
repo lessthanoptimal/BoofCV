@@ -74,8 +74,8 @@ public class AztecCode {
 	public Homography2D_F64 Hinv = new Homography2D_F64();
 
 	/** Number of squares (data bits) wide the marker is */
-	public int getMarkerSquareCount() {
-		int withoutGrid = getLocatorSquareCount() + 6 + dataLayers*4;
+	public int getMarkerWidthSquares() {
+		int withoutGrid = getLocatorWidthSquares() + 6 + dataLayers*4;
 		if (structure == Structure.COMPACT || dataLayers <= 4)
 			return withoutGrid;
 
@@ -93,7 +93,7 @@ public class AztecCode {
 	}
 
 	/** Number of squares in locator pattern */
-	public int getLocatorSquareCount() {
+	public int getLocatorWidthSquares() {
 		return (getLocatorRingCount() - 1)*4 + 1;
 	}
 

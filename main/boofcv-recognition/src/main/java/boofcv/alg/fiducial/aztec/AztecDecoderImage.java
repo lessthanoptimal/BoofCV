@@ -48,6 +48,9 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 	/** Reads interpolated image pixel intensity values */
 	@Getter protected InterpolatePixelS<T> interpolate;
 
+	/** Maximum number of static bits that can be incorrect for orientation to be accepted */
+	public int maxOrientationError = 4;
+
 	/**
 	 * Should it consider a marker which has been transposed?
 	 *
@@ -109,7 +112,7 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 				return false;
 		} finally {
 			// Estimate the bounds using the previously estimated homography
-			double r = marker.dataLayers + 1 + (marker.locator.getGridWidth() + 2)/2.0;
+			double r = marker.getMarkerWidthSquares()/2.0;
 			gridToPixel.convert(-r, -r, marker.bounds.get(0));
 			gridToPixel.convert(r, -r, marker.bounds.get(1));
 			gridToPixel.convert(r, r, marker.bounds.get(2));
@@ -214,7 +217,7 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 
 		int width = modeBitTypes.length/4;
 		int bestOrientation = -1;
-		int bestErrors = Integer.MAX_VALUE;
+		int bestErrors = maxOrientationError;
 		for (int ori = 0; ori < 4; ori++) {
 			int errors = fixedFeatureReadErrors(ori*width, modeBitTypes);
 			if (errors < bestErrors) {

@@ -57,7 +57,7 @@ public class AztecGenerator {
 
 	/** Convenience function for rendering images */
 	public static GrayU8 renderImage( int pixelPerSquare, int border, AztecCode marker ) {
-		int numSquares = marker.getMarkerSquareCount();
+		int numSquares = marker.getMarkerWidthSquares();
 		var render = new FiducialImageEngine();
 		render.configure(pixelPerSquare*border, numSquares*pixelPerSquare);
 		new AztecGenerator().setMarkerWidth(numSquares*pixelPerSquare).setRender(render).render(marker);
@@ -71,13 +71,13 @@ public class AztecGenerator {
 	}
 
 	public AztecGenerator render( AztecCode marker ) {
-		lengthInSquares = marker.getMarkerSquareCount();
+		lengthInSquares = marker.getMarkerWidthSquares();
 		squareWidth = markerWidth/lengthInSquares;
 
 		Objects.requireNonNull(render, "You must set 'render' field first.").init();
 
 		// Render the orientation and locator patterns
-		orientationSquareCount = marker.getLocatorSquareCount() + 4;
+		orientationSquareCount = marker.getLocatorWidthSquares() + 4;
 		//noinspection IntegerDivisionInFloatingPointContext
 		orientationLoc = ((lengthInSquares - orientationSquareCount)/2)*squareWidth;
 
@@ -289,7 +289,7 @@ public class AztecGenerator {
 		coordinates.reset();
 
 		// First layer goes around the orientation pattern + mode bits
-		int ringWidth = marker.getLocatorSquareCount() + 6;
+		int ringWidth = marker.getLocatorWidthSquares() + 6;
 		int ringRadius = ringWidth/2;
 
 		// is there a reference grid?

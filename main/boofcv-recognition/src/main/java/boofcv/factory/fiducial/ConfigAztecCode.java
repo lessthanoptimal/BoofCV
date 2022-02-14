@@ -45,6 +45,12 @@ public class ConfigAztecCode implements Configuration {
 	 */
 	public boolean considerTransposed = true;
 
+	/**
+	 * Maximum number of incorrect readings in orientation pattern that are accepted. max 12 for compact.
+	 * 16 for full-range. Full-range includes reference grid.
+	 */
+	public int maxOrientationError = 4;
+
 	{
 		// fast but does a bad job detecting fiducials that are up close
 		ConfigThresholdLocalOtsu configThreshold = ConfigThreshold.local(ThresholdType.BLOCK_OTSU, 40);
