@@ -378,4 +378,3 @@ public class AztecGenerator {
 		return this;
 	}
 }
-
