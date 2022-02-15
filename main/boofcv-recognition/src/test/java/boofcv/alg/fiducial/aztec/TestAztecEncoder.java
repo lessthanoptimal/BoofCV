@@ -63,7 +63,7 @@ public class TestAztecEncoder extends BoofStandardJUnit {
 	 * Exhaustively try all encoding transitions and see if it blows up
 	 */
 	@Test void allModeTransitions() {
-		var encodings = new Modes[]{Modes.UPPER, Modes.LOWER, Modes.MIXED, Modes.PUNCT, Modes.DIGIT};
+		var encodings = new Modes[]{Modes.UPPER, Modes.LOWER, Modes.MIXED, Modes.PUNCT, Modes.DIGIT, Modes.BYTE};
 		for (var a : encodings) {
 			for (var b : encodings) {
 				AztecCode marker = addEncoding(b, addEncoding(a, new AztecEncoder())).fixate();
@@ -79,6 +79,7 @@ public class TestAztecEncoder extends BoofStandardJUnit {
 			case MIXED -> encoder.addMixed("^");
 			case PUNCT -> encoder.addPunctuation("!");
 			case DIGIT -> encoder.addDigit("1");
+			case BYTE -> encoder.addBytes(new byte[]{1}, 0, 1);
 			default -> throw new RuntimeException();
 		};
 	}

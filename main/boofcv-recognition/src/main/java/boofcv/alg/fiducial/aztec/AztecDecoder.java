@@ -112,30 +112,48 @@ public class AztecDecoder extends AztecMessageErrorCorrection implements Verbose
 
 		int location = 0;
 		while (location + current.wordSize <= bits.size) {
-			int value = bits.read(location, current.wordSize, true);
-			if (verbose != null) verbose.println("current=" + current + " latched=" + latched + " value=" + value);
-
-			location += current.wordSize;
-			latched = true;
-			Modes previous = current;
-			boolean success = switch (current) {
-				case UPPER -> handleUpper(value);
-				case LOWER -> handleLower(value);
-				case MIXED -> handleMixed(value);
-				case PUNCT -> handlePunct(value);
-				case DIGIT -> handleDigit(value);
-				default -> {
-					if (verbose != null) verbose.println("Unhandled mode: " + current);
-					yield false;
+			if (current == Modes.BYTE) {
+				// Reading raw bytes is a special case
+				int length = bits.read(location, 5, true);
+				location += 5;
+				if (length == 0) {
+					length = bits.read(location, 11, true) + 31;
+					location += 11;
 				}
-			};
-			if (!success)
-				return false;
-
-			if (shiftMode != null) {
+				if (verbose != null) verbose.println("current=" + current + " length=" + length);
+				for (int i = 0; i < length; i++) {
+					workString.append((char)bits.read(location, 8, true));
+					location += 8;
+				}
+				// it always returns to the previous mode it was in before entering byte mode
 				current = shiftMode;
+				shiftMode = null;
+			} else {
+				int value = bits.read(location, current.wordSize, true);
+				if (verbose != null) verbose.println("current=" + current + " latched=" + latched + " value=" + value);
+
+				location += current.wordSize;
+				latched = true;
+				Modes previous = current;
+				boolean success = switch (current) {
+					case UPPER -> handleUpper(value);
+					case LOWER -> handleLower(value);
+					case MIXED -> handleMixed(value);
+					case PUNCT -> handlePunct(value);
+					case DIGIT -> handleDigit(value);
+					default -> {
+						if (verbose != null) verbose.println("Unhandled mode: " + current);
+						yield false;
+					}
+				};
+				if (!success)
+					return false;
+
+				if (shiftMode != null) {
+					current = shiftMode;
+				}
+				shiftMode = latched ? null : previous;
 			}
-			shiftMode = latched ? null : previous;
 		}
 
 		marker.message = workString.toString();
@@ -254,6 +272,11 @@ public class AztecDecoder extends AztecMessageErrorCorrection implements Verbose
 				case 15 -> {current = Modes.UPPER; latched = false;}
 			}
 		}
+		return true;
+	}
+
+	boolean handleByte( int value ) {
+		workString.append((char)value);
 		return true;
 	}
 

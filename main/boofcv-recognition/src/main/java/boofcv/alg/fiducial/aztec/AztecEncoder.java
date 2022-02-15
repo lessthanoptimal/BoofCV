@@ -216,6 +216,14 @@ public class AztecEncoder extends AztecMessageErrorCorrection {
 		return this;
 	}
 
+	public AztecEncoder addBytes( byte[] data, int offset, int length ) {
+		var values = new DogArray_I8(length);
+		values.size = length;
+		System.arraycopy(data, offset, values.data, 0, length);
+		segments.add(new MessageSegment(Modes.BYTE, values, new String(data, offset, length)));
+		return this;
+	}
+
 	/**
 	 * Encodes into binary data all the segments, computes ECC, and constructs the final marker. Anything
 	 * which is not explicitly specified will have a reasonable value auto selected.
@@ -247,6 +255,7 @@ public class AztecEncoder extends AztecMessageErrorCorrection {
 				case MIXED -> append(m.data, 5);
 				case PUNCT -> append(m.data, 5);
 				case DIGIT -> append(m.data, 4);
+				case BYTE -> appendByteArray(m.data);
 				default -> throw new IllegalArgumentException("Encoding not yet supported: " + m.encodingMode);
 			}
 
@@ -270,7 +279,7 @@ public class AztecEncoder extends AztecMessageErrorCorrection {
 
 		// A word which is filled with all ones
 		int ones = (1 << wordBitCount) - 1;
-		int onesMinusOne = ones-1;
+		int onesMinusOne = ones - 1;
 
 		// Write all the data that fills an entire word first
 		storageDataWords.reset();
@@ -400,7 +409,7 @@ public class AztecEncoder extends AztecMessageErrorCorrection {
 					case LOWER -> append(28, 5);
 					case MIXED -> append(29, 5);
 					case DIGIT -> append(30, 5);
-					case BYTE -> append(31, 5);
+					case BYTE -> {append(31, 5); latched = false;}
 					case PUNCT -> {
 						if (m.data.size == 1) {
 							append(0, 5); latched = false;
@@ -418,7 +427,7 @@ public class AztecEncoder extends AztecMessageErrorCorrection {
 					case UPPER -> { append(28, 5); latched = false; }
 					case MIXED -> append(29, 5);
 					case DIGIT -> append(30, 5);
-					case BYTE -> append(31, 5);
+					case BYTE -> {append(31, 5); latched = false;}
 					case PUNCT -> {
 						if (m.data.size == 1) {
 							append(0, 5); latched = false;
@@ -444,7 +453,7 @@ public class AztecEncoder extends AztecMessageErrorCorrection {
 						}
 					}
 					case DIGIT -> { append(29, 5); append(30, 5); }
-					case BYTE -> append(31, 5);
+					case BYTE -> {append(31, 5); latched = false;}
 					default -> throwUnsupported(currentMode, m.encodingMode);
 				}
 			}
@@ -456,7 +465,7 @@ public class AztecEncoder extends AztecMessageErrorCorrection {
 					case UPPER -> append(31, 5);
 					case MIXED -> { append(31, 5); append(29, 5); }
 					case DIGIT -> { append(31, 5); append(30, 5); }
-					case BYTE -> { append(31, 5); append(31, 5); }
+					case BYTE -> { append(31, 5); append(31, 5); latched = false;}
 					default -> throwUnsupported(currentMode, m.encodingMode);
 				}
 			}
@@ -483,11 +492,11 @@ public class AztecEncoder extends AztecMessageErrorCorrection {
 						}
 					}
 					case MIXED -> { append(14, 4); append(29, 5); }
-					case BYTE -> { append(14, 4); append(31, 5); }
+					case BYTE -> { append(14, 4); append(31, 5); latched = false;}
 					default -> throwUnsupported(currentMode, m.encodingMode);
 				}
 			}
-			default -> throw new IllegalArgumentException("Unsupported mode " + m.encodingMode);
+			default -> throw new IllegalArgumentException("Unsupported. current="+currentMode+" encoding=" + m.encodingMode);
 		}
 		// @formatter:on
 		return latched;
@@ -513,6 +522,24 @@ public class AztecEncoder extends AztecMessageErrorCorrection {
 		for (int i = 0; i < message.size; i++) {
 			bits.append(message.data[i] & 0xFF, wordBits, false);
 		}
+	}
+
+	/**
+	 * Adds a byte array. This is a special case as it first specifies the length.
+	 */
+	private void appendByteArray( DogArray_I8 message ) {
+		// If a smaller array encoding its length in the next 5-bits
+		if (message.size < 32)
+			bits.append(message.size, 5, false);
+		else if (message.size < 0b0111_1111_1111 + 31) {
+			// it's a longer array, so signal that with a 0 here
+			bits.append(0, 5, false);
+			// Then specify the actual length, minus 31
+			bits.append(message.size - 31, 11, false);
+		} else {
+			throw new IllegalArgumentException("Message is too long to be encoded: " + message.size);
+		}
+		bits.append(message.data, message.size*8, false);
 	}
 
 	/** Convenience function for throwing an exception for incompatible transitions */
