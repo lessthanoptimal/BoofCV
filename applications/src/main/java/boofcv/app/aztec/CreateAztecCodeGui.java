@@ -16,13 +16,11 @@
  * limitations under the License.
  */
 
-package boofcv.app.micrqr;
+package boofcv.app.aztec;
 
-import boofcv.alg.drawing.FiducialImageEngine;
-import boofcv.alg.fiducial.microqr.MicroQrCode;
-import boofcv.alg.fiducial.microqr.MicroQrCodeEncoder;
-import boofcv.alg.fiducial.microqr.MicroQrCodeGenerator;
-import boofcv.app.CreateMicroQrDocument;
+import boofcv.alg.fiducial.aztec.AztecEncoder;
+import boofcv.alg.fiducial.aztec.AztecGenerator;
+import boofcv.app.CreateAztecCodeDocument;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ScaleOptions;
@@ -42,17 +40,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 /**
- * GUI for creating Micro QR codes
+ * GUI for creating Aztec Codes
  *
  * @author Peter Abeles
  */
-public class CreateMicroQrGui extends JPanel implements CreateMicroQrControlPanel.Listener {
-	CreateMicroQrControlPanel controls = new CreateMicroQrControlPanel(this);
+public class CreateAztecCodeGui extends JPanel implements CreateAztecCodeControlPanel.Listener {
+	CreateAztecCodeControlPanel controls = new CreateAztecCodeControlPanel(this);
 	ImagePanel imagePanel = new ImagePanel();
 
 	JFrame frame;
 
-	public CreateMicroQrGui() {
+	public CreateAztecCodeGui() {
 		setLayout(new BorderLayout());
 
 		imagePanel.setCentering(true);
@@ -63,7 +61,7 @@ public class CreateMicroQrGui extends JPanel implements CreateMicroQrControlPane
 		add(BorderLayout.CENTER, imagePanel);
 
 		setPreferredSize(new Dimension(700, 500));
-		frame = ShowImages.setupWindow(this, "Micro QR Code Document Creator", true);
+		frame = ShowImages.setupWindow(this, "Aztec Code Document Creator", true);
 		createMenuBar();
 
 		renderPreview();
@@ -135,7 +133,7 @@ public class CreateMicroQrGui extends JPanel implements CreateMicroQrControlPane
 			f = new File(""); // dummy to make the code below happy and less complex
 		} else {
 			f = FileSystemView.getFileSystemView().getHomeDirectory();
-			f = new File(f, "microqr." + controls.format);
+			f = new File(f, "aztec." + controls.format);
 
 			f = BoofSwingUtil.fileChooser(null, this, false, f.getPath(), null);
 			if (f == null) {
@@ -148,7 +146,7 @@ public class CreateMicroQrGui extends JPanel implements CreateMicroQrControlPane
 			}
 		}
 
-		var generator = new CreateMicroQrDocument();
+		var generator = new CreateAztecCodeDocument();
 
 		// Make sure the file has the correct extension
 		String outputFile = f.getAbsolutePath();
@@ -159,10 +157,9 @@ public class CreateMicroQrGui extends JPanel implements CreateMicroQrControlPane
 		}
 
 		generator.fileName = outputFile;
-		generator.error = controls.error;
-		generator.mask = controls.mask;
-		generator.encoding = controls.mode;
-		generator.version = controls.version;
+		generator.errorFraction = controls.errorFraction;
+		generator.numLayers = controls.numLayers;
+		generator.structure = controls.structure;
 		generator.paperSize = controls.paperSize;
 		generator.gridFill = controls.fillGrid;
 		generator.drawGrid = controls.drawGrid;
@@ -183,55 +180,33 @@ public class CreateMicroQrGui extends JPanel implements CreateMicroQrControlPane
 	}
 
 	private void renderPreview() {
-		var encoder = new MicroQrCodeEncoder();
+		AztecEncoder encoder = new AztecEncoder().setStructure(controls.structure);
 
-		if (controls.error != null) {
-			encoder.setError(controls.error);
+		if (controls.errorFraction >= 0) {
+			encoder.setEcc(controls.errorFraction);
 		}
-		if (controls.mask != null) {
-			encoder.setMask(controls.mask);
-		}
-		if (controls.version > 0) {
-			encoder.setVersion(controls.version);
+		if (controls.numLayers > 0) {
+			encoder.setLayers(controls.numLayers);
 		}
 
-		if (controls.mode != null) {
-			switch (controls.mode) {
-				case NUMERIC -> encoder.addNumeric(controls.message);
-				case ALPHANUMERIC -> encoder.addAlphanumeric(controls.message);
-				case BYTE -> encoder.addBytes(controls.message);
-				case KANJI -> encoder.addKanji(controls.message);
-				default -> encoder.addAutomatic(controls.message);
-			}
-		} else {
-			encoder.addAutomatic(controls.message);
-		}
-
-		boolean failed = false;
-		var render = new FiducialImageEngine();
+		encoder.addUpper(controls.message);
+		GrayU8 preview = null;
 		try {
-			MicroQrCode qr = encoder.fixate();
-			render.configure(20, qr.getNumberOfModules()*10);
-			var generator = new MicroQrCodeGenerator();
-			generator.setRender(render);
-			generator.markerWidth = qr.getNumberOfModules()*10;
-			generator.render(qr);
+			preview = AztecGenerator.renderImage(10, 1, encoder.fixate());
 		} catch (RuntimeException e) {
-			failed = true;
 			System.err.println("Render Failed! " + e.getClass().getSimpleName() + " " + e.getMessage());
 //			e.printStackTrace();
 		}
 
-		if (failed) {
+		if (preview == null) {
 			BufferedImage output = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
 			Graphics2D g2 = output.createGraphics();
 			g2.setColor(Color.RED);
 			g2.fillRect(0, 0, output.getWidth(), output.getHeight());
 			imagePanel.setImageRepaint(output);
 		} else {
-			GrayU8 gray = render.getGray();
-			BufferedImage output = new BufferedImage(gray.width, gray.height, BufferedImage.TYPE_INT_RGB);
-			ConvertBufferedImage.convertTo(gray, output);
+			BufferedImage output = new BufferedImage(preview.width, preview.height, BufferedImage.TYPE_INT_RGB);
+			ConvertBufferedImage.convertTo(preview, output);
 			imagePanel.setImageRepaint(output);
 		}
 	}

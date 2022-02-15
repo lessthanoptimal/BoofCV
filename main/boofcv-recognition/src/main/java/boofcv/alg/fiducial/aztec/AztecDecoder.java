@@ -136,7 +136,7 @@ public class AztecDecoder extends AztecMessageErrorCorrection implements Verbose
 					location += 8;
 				}
 				// it always returns to the previous mode it was in before entering byte mode
-				current = shiftMode;
+				current = Objects.requireNonNull(shiftMode);
 				shiftMode = null;
 			} else {
 				int value = bits.read(location, current.wordSize, true);

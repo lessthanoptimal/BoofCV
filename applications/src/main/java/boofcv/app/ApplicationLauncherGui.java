@@ -18,6 +18,7 @@
 
 package boofcv.app;
 
+import boofcv.app.aztec.CreateAztecCodeGui;
 import boofcv.app.micrqr.CreateMicroQrGui;
 import boofcv.app.qrcode.CreateQrCodeGui;
 import boofcv.demonstrations.calibration.CalibrateMonocularPlanarApp;
@@ -58,6 +59,7 @@ public class ApplicationLauncherGui extends JPanel {
 		logo.setPreferredSize(new Dimension(500, 250));
 
 		JButton bCreateQR = createButton("QR Code", CreateQrCodeGui::new);
+		JButton bCreateAztec = createButton("Aztec Code", CreateAztecCodeGui::new);
 		JButton bCreateMicroQR = createButton("Micro QR", CreateMicroQrGui::new);
 		JButton bCreateDots = createButton("Random Dot", CreateFiducialRandomDotGui::new);
 		JButton bCreateCalib = createButton("Calibration", CreateCalibrationTargetGui::new);
@@ -99,7 +101,7 @@ public class ApplicationLauncherGui extends JPanel {
 		layout.putConstraint(SpringLayout.NORTH, logo, 0, SpringLayout.NORTH, this);
 
 		JComponent panelLeft = buttonPanel("Create / Print",
-				bCreateMicroQR, bCreateQR, bCreateDots, bCreateCalib, bCreateFidBin, bCreateFidImage, bCreateFidHamming);
+				bCreateQR, bCreateAztec, bCreateMicroQR, bCreateDots, bCreateCalib, bCreateFidBin, bCreateFidImage, bCreateFidHamming);
 		JComponent panelRight = buttonPanel("Tools",
 				bUtilAssisted, bUtilCalib, bUtilStereoCalib, bUtilScanQrCode, bUtilScanMicroQr, bUtilDown, bUtilUndist, bUtilViewCloud);
 
