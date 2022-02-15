@@ -276,7 +276,7 @@ public class AztecGenerator {
 			double x = squareX*squareWidth;
 			double y = squareY*squareWidth;
 
-			render.square(x, y, squareWidth, squareWidth);
+			render.square(x, y, squareWidth);
 		}
 	}
 
