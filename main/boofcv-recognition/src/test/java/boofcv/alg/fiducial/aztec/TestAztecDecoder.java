@@ -75,6 +75,44 @@ public class TestAztecDecoder extends BoofStandardJUnit {
 		assertEquals(0, marker.totalBitErrors);
 	}
 
+	/** Test encoding byte data with a length <= 31 */
+	@Test void byteSmall() {
+		AztecCode marker = new AztecEncoder().
+				addUpper("A").addBytes(new byte[]{1, 100, (byte)200}, 0, 3).addLower("a").fixate();
+
+		// clear the old data
+		clearMarker(marker);
+
+		assertTrue(new AztecDecoder().process(marker));
+
+		assertEquals('A', marker.message.charAt(0));
+		assertEquals(1, (int)marker.message.charAt(1));
+		assertEquals(100, (int)marker.message.charAt(2));
+		assertEquals(200, (int)marker.message.charAt(3));
+		assertEquals('a', marker.message.charAt(4));
+	}
+
+	/** Test encoding byte data with a length > 31, plus test their being an offset */
+	@Test void byteLarge() {
+		byte[] data = new byte[100];
+		for (int i = 0; i < data.length; i++) {
+			data[i] = (byte)(100 + i);
+		}
+		AztecCode marker = new AztecEncoder().
+				addUpper("A").addBytes(data, 1, 99).addLower("a").fixate();
+
+		// clear the old data
+		clearMarker(marker);
+
+		assertTrue(new AztecDecoder().process(marker));
+
+		assertEquals('A', marker.message.charAt(0));
+		for (int i = 1; i < 100; i++) {
+			assertEquals(100 + i, (int)marker.message.charAt(i));
+		}
+		assertEquals('a', marker.message.charAt(100));
+	}
+
 	/**
 	 * A longer message which will not have a word size of 6
 	 */

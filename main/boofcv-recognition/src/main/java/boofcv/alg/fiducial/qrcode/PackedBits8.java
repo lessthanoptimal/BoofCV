@@ -85,6 +85,26 @@ public class PackedBits8 implements PackedBits {
 	}
 
 	/**
+	 * Appends data in the array. Fractions of a byte are allowed
+	 */
+	public void append( byte[] data, int numberOfBits, boolean swapOrder ) {
+		// pre-declare required memory. TODO remove this hack in the future
+		int oldSize = size;
+		growArray(numberOfBits, true);
+		size = oldSize;
+
+		// Copy over data one byte at a time
+		int numBytes = numberOfBits/8;
+		for (int i = 0; i < numBytes; i++) {
+			append(data[i] & 0xFF, 8, swapOrder);
+		}
+		int remaining = numberOfBits - numBytes*8;
+		if (remaining == 0)
+			return;
+		append(data[numBytes], remaining, swapOrder);
+	}
+
+	/**
 	 * Appends bits on to the end of the stack.
 	 *
 	 * @param bits Storage for bits. Relevant bits start at the front.
