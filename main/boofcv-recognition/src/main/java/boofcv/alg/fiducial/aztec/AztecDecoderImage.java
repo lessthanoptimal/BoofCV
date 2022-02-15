@@ -122,6 +122,12 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 			marker.Hinv.setTo(gridToPixel.gridToImage);
 		}
 
+		// if the bounding polygon isn't convex it's probably noise, even if ECC passed
+		if (!UtilPolygons2D_F64.isConvex(marker.bounds)) {
+			marker.failure = AztecCode.Failure.IMPROBABLE;
+			return false;
+		}
+
 		if (verbose != null) verbose.println("success decoding!");
 		return true;
 	}

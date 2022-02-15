@@ -215,10 +215,17 @@ public class AztecCode {
 
 	/** At what stage did it fail at? */
 	public enum Failure {
+		/** No failure */
 		NONE,
+		/** Reconstruction resulted in a very odd shape and this is most likely noise */
+		IMPROBABLE,
+		/** Orientation could not be determined */
 		ORIENTATION,
+		/** Error correction failed when decoding the mode */
 		MODE_ECC,
+		/** Error correction failed when decoding the message */
 		MESSAGE_ECC,
+		/** Could not parse the message */
 		MESSAGE_PARSE
 	}
 }

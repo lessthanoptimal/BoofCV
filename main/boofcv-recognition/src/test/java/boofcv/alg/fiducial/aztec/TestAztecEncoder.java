@@ -127,7 +127,7 @@ public class TestAztecEncoder extends BoofStandardJUnit {
 		assertEquals(0b1111_1110, encoder.storageDataWords.get(1));
 		assertEquals(0b1110_0001, encoder.storageDataWords.get(2));
 		assertEquals(0b1111_1110, encoder.storageDataWords.get(3));
-		assertEquals(0b1111_1111, encoder.storageDataWords.get(4));
+		assertEquals(0b1111_1110, encoder.storageDataWords.get(4));
 	}
 
 	/** Example taken from G.3 page 38 */
