@@ -220,7 +220,8 @@ public class AztecEncoder extends AztecMessageErrorCorrection {
 		var values = new DogArray_I8(length);
 		values.size = length;
 		System.arraycopy(data, offset, values.data, 0, length);
-		segments.add(new MessageSegment(Modes.BYTE, values, new String(data, offset, length)));
+		segments.add(new MessageSegment(Modes.BYTE, values,
+				new String(data, offset, length, StandardCharsets.ISO_8859_1)));
 		return this;
 	}
 

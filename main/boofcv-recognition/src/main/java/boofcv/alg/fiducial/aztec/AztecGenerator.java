@@ -213,12 +213,15 @@ public class AztecGenerator {
 		locator.layers.reset();
 		for (int ring = ringCount; ring > 0; ring--) {
 			// number of squares wide the ring is
-			int modules = (ring - 1)*4 + 1;
+			int squares = (ring - 1)*4 + 1;
 			// Number of document units wide the ring is
-			double width = squareWidth*modules;
+			double width = squareWidth*squares;
 
 			// Draw the ring
-			render.square(tl_x, tl_y, width, squareWidth);
+			if (squares > 1)
+				render.square(tl_x, tl_y, width, squareWidth);
+			else
+				render.square(tl_x, tl_y, width);
 
 			// Save the ring's outer contour
 			Polygon2D_F64 where = locator.layers.grow().square;

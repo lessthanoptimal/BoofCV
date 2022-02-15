@@ -43,6 +43,7 @@ public class Help {
 			BatchScanMicroQrCodes.class,
 			CreateCalibrationTarget.class,
 			CreateQrCodeDocument.class,
+			CreateAztecCodeDocument.class,
 			CreateMicroQrDocument.class,
 			DownSelectVideoFramesFor3DApp.class,
 			SceneReconstruction.class,
