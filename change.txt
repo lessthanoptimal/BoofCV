@@ -12,9 +12,7 @@ Version : 0.41
 - ConvertBufferedImage
   - TODO https://github.com/lessthanoptimal/BoofCV/issues/284
 - Aztec Code
-  - TODO Support B/S
   - TODO Auto encode message
-  - TODO Detect ECI and issue an error
   - TODO support transposed
   - TODO JMH
 - SLAM

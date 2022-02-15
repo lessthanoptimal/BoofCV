@@ -71,31 +71,41 @@ public class AztecDecoder extends AztecMessageErrorCorrection implements Verbose
 
 		// Remove padding from the encoded bits
 		PackedBits8 paddedBits = PackedBits8.wrap(marker.corrected, marker.messageWordCount*marker.getWordBitCount());
-		PackedBits8 bits = removeExtraBits(marker.getWordBitCount(), paddedBits);
+		var bits = new PackedBits8();
+		if (!removeExtraBits(marker.getWordBitCount(), marker.messageWordCount, paddedBits, bits))
+			return false;
+
 		return bitsToMessage(marker, bits);
 	}
 
 	/**
 	 * Removes extra bits in raw stream caused by padding being added to avoid a word that's all zero or ones.
 	 */
-	static PackedBits8 removeExtraBits( int wordBitCount, PackedBits8 bitsExtras ) {
+	boolean removeExtraBits( int wordBitCount, int messageWordCount, PackedBits8 bitsExtras, PackedBits8 bits ) {
 		// sanity check to make sure only whole words are inside the input bit array
 		BoofMiscOps.checkTrue(bitsExtras.size%wordBitCount == 0);
 
 		int numWords = bitsExtras.size/wordBitCount;
 
+		// a word with all ones
+		int ones = (1 << wordBitCount) - 1;
+
 		// Remove extra 0 and 1 added to data stream
 		int onesMinusOne = (1 << wordBitCount) - 2;
-		var bits = new PackedBits8();
 		for (int i = 0; i < numWords; i++) {
 			int value = bitsExtras.read(i*wordBitCount, wordBitCount, true);
 			if (value == 1 || value == onesMinusOne) {
 				bits.append(value >> 1, wordBitCount - 1, false);
+			} else if (i < messageWordCount && (value == 0 || value == ones)) {
+				if (verbose != null) verbose.println("invalid message word. All zeros or ones");
+				// These are illegal values in the raw message. In all likelihood the message is very small
+				// and filled with all zeros
+				return false;
 			} else {
 				bits.append(value, wordBitCount, false);
 			}
 		}
-		return bits;
+		return true;
 	}
 
 	/**
@@ -103,7 +113,7 @@ public class AztecDecoder extends AztecMessageErrorCorrection implements Verbose
 	 *
 	 * @return true if successful
 	 */
-	boolean bitsToMessage( AztecCode marker, PackedBits8 bits  ) {
+	boolean bitsToMessage( AztecCode marker, PackedBits8 bits ) {
 		// Reset the state
 		latched = false;
 		shiftMode = null;
@@ -174,7 +184,10 @@ public class AztecDecoder extends AztecMessageErrorCorrection implements Verbose
 				case 28 -> current = Modes.LOWER;
 				case 29 -> current = Modes.MIXED;
 				case 30 -> current = Modes.DIGIT;
-				case 31 -> {current = Modes.BYTE; latched = false;}
+				case 31 -> {
+					current = Modes.BYTE;
+					latched = false;
+				}
 			}
 		}
 		return true;
@@ -190,10 +203,16 @@ public class AztecDecoder extends AztecMessageErrorCorrection implements Verbose
 			workString.append((char)('a' + (value - 2)));
 		} else {
 			switch (value) {
-				case 28 -> {current = Modes.UPPER; latched = false;}
+				case 28 -> {
+					current = Modes.UPPER;
+					latched = false;
+				}
 				case 29 -> current = Modes.MIXED;
 				case 30 -> current = Modes.DIGIT;
-				case 31 -> {current = Modes.BYTE; latched = false;}
+				case 31 -> {
+					current = Modes.BYTE;
+					latched = false;
+				}
 			}
 		}
 		return true;
@@ -223,7 +242,10 @@ public class AztecDecoder extends AztecMessageErrorCorrection implements Verbose
 				case 28 -> current = Modes.LOWER;
 				case 29 -> current = Modes.UPPER;
 				case 30 -> current = Modes.PUNCT;
-				case 31 -> {current = Modes.BYTE; latched = false;}
+				case 31 -> {
+					current = Modes.BYTE;
+					latched = false;
+				}
 			}
 		}
 		return true;
@@ -269,7 +291,10 @@ public class AztecDecoder extends AztecMessageErrorCorrection implements Verbose
 				case 12 -> workString.append(',');
 				case 13 -> workString.append('.');
 				case 14 -> current = Modes.UPPER;
-				case 15 -> {current = Modes.UPPER; latched = false;}
+				case 15 -> {
+					current = Modes.UPPER;
+					latched = false;
+				}
 			}
 		}
 		return true;

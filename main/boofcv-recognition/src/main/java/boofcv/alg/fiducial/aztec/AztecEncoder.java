@@ -316,7 +316,14 @@ public class AztecEncoder extends AztecMessageErrorCorrection {
 
 			// shift the data into the upper bits and fill the lower bits with all ones
 			int remainder = wordBitCount - readBits;
-			storageDataWords.add(((word << remainder) | (0xFFFF >> (16 - remainder))));
+
+			// pad it with 1's
+			word = (word << remainder) | (0xFFFF >> (16 - remainder));
+			// make sure it's not all 1's
+			if (word == ones) {
+				word = onesMinusOne;
+			}
+			storageDataWords.add(word);
 		}
 
 		// Record how many words are in the encoded message
