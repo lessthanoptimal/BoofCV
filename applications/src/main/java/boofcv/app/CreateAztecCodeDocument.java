@@ -212,8 +212,7 @@ public class CreateAztecCodeDocument {
 			if (numLayers > 0)
 				encoder.setLayers(numLayers);
 
-			// TODO change to automatic
-			encoder.addUpper(message);
+			encoder.addAutomatic(message);
 
 			try {
 				AztecCode marker = encoder.fixate();

@@ -189,10 +189,10 @@ public class CreateAztecCodeGui extends JPanel implements CreateAztecCodeControl
 			encoder.setLayers(controls.numLayers);
 		}
 
-		encoder.addUpper(controls.message);
+		encoder.addAutomatic(controls.message);
 		GrayU8 preview = null;
 		try {
-			preview = AztecGenerator.renderImage(10, 1, encoder.fixate());
+			preview = AztecGenerator.renderImage(10, 0, encoder.fixate());
 		} catch (RuntimeException e) {
 			System.err.println("Render Failed! " + e.getClass().getSimpleName() + " " + e.getMessage());
 //			e.printStackTrace();

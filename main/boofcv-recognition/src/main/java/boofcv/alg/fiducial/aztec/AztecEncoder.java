@@ -18,7 +18,7 @@
 
 package boofcv.alg.fiducial.aztec;
 
-import boofcv.alg.fiducial.aztec.AztecCode.Modes;
+import boofcv.alg.fiducial.aztec.AztecCode.Mode;
 import boofcv.alg.fiducial.qrcode.PackedBits8;
 import boofcv.misc.BoofMiscOps;
 import org.ddogleg.struct.DogArray_I8;
@@ -38,6 +38,9 @@ public class AztecEncoder extends AztecMessageErrorCorrection {
 
 	// Workspace for encoding each segment
 	PackedBits8 bits = new PackedBits8();
+
+	// Used for automatically selecting encoding mechanism
+	AztecEncoderAutomatic automatic = new AztecEncoderAutomatic();
 
 	/**
 	 * Amount of error correction is determined by this number. ecc_words = errorCorrectionLength*code_words - 3.
@@ -89,7 +92,7 @@ public class AztecEncoder extends AztecMessageErrorCorrection {
 			}
 			values.add((char)(value + 2));
 		}
-		segments.add(new MessageSegment(Modes.UPPER, values, message));
+		segments.add(new MessageSegment(Mode.UPPER, values, message));
 		return this;
 	}
 
@@ -108,7 +111,7 @@ public class AztecEncoder extends AztecMessageErrorCorrection {
 			}
 			values.add((char)(value + 2));
 		}
-		segments.add(new MessageSegment(Modes.LOWER, values, message));
+		segments.add(new MessageSegment(Mode.LOWER, values, message));
 		return this;
 	}
 
@@ -140,7 +143,7 @@ public class AztecEncoder extends AztecMessageErrorCorrection {
 			}
 		}
 
-		segments.add(new MessageSegment(Modes.MIXED, values, message));
+		segments.add(new MessageSegment(Mode.MIXED, values, message));
 		return this;
 	}
 
@@ -194,7 +197,7 @@ public class AztecEncoder extends AztecMessageErrorCorrection {
 				throw new IllegalArgumentException("Invalid ascii " + (int)a);
 			}
 		}
-		segments.add(new MessageSegment(Modes.PUNCT, values, message));
+		segments.add(new MessageSegment(Mode.PUNCT, values, message));
 		return this;
 	}
 
@@ -212,7 +215,7 @@ public class AztecEncoder extends AztecMessageErrorCorrection {
 				values.add(13);
 			}
 		}
-		segments.add(new MessageSegment(Modes.DIGIT, values, message));
+		segments.add(new MessageSegment(Mode.DIGIT, values, message));
 		return this;
 	}
 
@@ -220,8 +223,17 @@ public class AztecEncoder extends AztecMessageErrorCorrection {
 		var values = new DogArray_I8(length);
 		values.size = length;
 		System.arraycopy(data, offset, values.data, 0, length);
-		segments.add(new MessageSegment(Modes.BYTE, values,
+		segments.add(new MessageSegment(Mode.BYTE, values,
 				new String(data, offset, length, StandardCharsets.ISO_8859_1)));
+		return this;
+	}
+
+	/**
+	 * Automatically select which encoding mode it should encode this message. This will select the most efficient
+	 * encoding possible.
+	 */
+	public AztecEncoder addAutomatic( String message ) {
+		automatic.process(message, this);
 		return this;
 	}
 
@@ -243,7 +255,7 @@ public class AztecEncoder extends AztecMessageErrorCorrection {
 	 * Encodes all the segments into the {@link #bits},
 	 */
 	void segmentsToEncodedBits() {
-		Modes currentMode = Modes.UPPER;
+		Mode currentMode = Mode.UPPER;
 		for (int segIdx = 0; segIdx < segments.size(); segIdx++) {
 			MessageSegment m = segments.get(segIdx);
 			// Switch into the new encoding
@@ -407,7 +419,7 @@ public class AztecEncoder extends AztecMessageErrorCorrection {
 	 *
 	 * @return If it's latched to the new mode or false if not
 	 */
-	private boolean transitionIntoMode( Modes currentMode, MessageSegment m ) {
+	private boolean transitionIntoMode( Mode currentMode, MessageSegment m ) {
 		boolean latched = true;
 		// @formatter:off
 		switch (currentMode) {
@@ -551,18 +563,19 @@ public class AztecEncoder extends AztecMessageErrorCorrection {
 	}
 
 	/** Convenience function for throwing an exception for incompatible transitions */
-	private static int throwUnsupported( Modes src, Modes dst ) throws UnsupportedOperationException {
+	private static int throwUnsupported( Mode src, Mode dst ) throws UnsupportedOperationException {
 		throw new UnsupportedOperationException("Can't transition from " + src + " to " + dst);
 	}
 
+	/**
+	 * Contains the data for a sequence of characters that are all encoded in the same mode
+	 */
 	public static class MessageSegment {
-		public Modes encodingMode;
+		public Mode encodingMode;
 		public DogArray_I8 data;
 		public String message;
 
-		public MessageSegment( Modes encodingMode,
-							   DogArray_I8 data,
-							   String message ) {
+		public MessageSegment( Mode encodingMode, DogArray_I8 data, String message ) {
 			this.encodingMode = encodingMode;
 			this.data = data;
 			this.message = message;

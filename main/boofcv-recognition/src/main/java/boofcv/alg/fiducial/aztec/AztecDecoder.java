@@ -18,7 +18,7 @@
 
 package boofcv.alg.fiducial.aztec;
 
-import boofcv.alg.fiducial.aztec.AztecCode.Modes;
+import boofcv.alg.fiducial.aztec.AztecCode.Mode;
 import boofcv.alg.fiducial.qrcode.PackedBits8;
 import boofcv.misc.BoofMiscOps;
 import lombok.Getter;
@@ -37,9 +37,9 @@ import java.util.Set;
 public class AztecDecoder extends AztecMessageErrorCorrection implements VerbosePrint {
 	//------------------ state of decoder -----------------
 	// Specifies the encoding mode for the active character set
-	Modes current = Modes.UPPER;
+	Mode current = Mode.UPPER;
 	// If not latched (shift mode) then it will switch back to this mode after 1 character
-	@Nullable AztecCode.Modes shiftMode = null;
+	@Nullable AztecCode.Mode shiftMode = null;
 	// if lacked it won't revert to the old mode
 	boolean latched;
 	// Results of decoded
@@ -118,11 +118,11 @@ public class AztecDecoder extends AztecMessageErrorCorrection implements Verbose
 		latched = false;
 		shiftMode = null;
 		workString.delete(0, workString.length());
-		current = Modes.UPPER;
+		current = Mode.UPPER;
 
 		int location = 0;
 		while (location + current.wordSize <= bits.size) {
-			if (current == Modes.BYTE) {
+			if (current == Mode.BYTE) {
 				// Reading raw bytes is a special case
 				int length = bits.read(location, 5, true);
 				location += 5;
@@ -144,7 +144,7 @@ public class AztecDecoder extends AztecMessageErrorCorrection implements Verbose
 
 				location += current.wordSize;
 				latched = true;
-				Modes previous = current;
+				Mode previous = current;
 				boolean success = switch (current) {
 					case UPPER -> handleUpper(value);
 					case LOWER -> handleLower(value);
@@ -173,7 +173,7 @@ public class AztecDecoder extends AztecMessageErrorCorrection implements Verbose
 
 	boolean handleUpper( int value ) {
 		if (value == 0) {
-			current = Modes.PUNCT;
+			current = Mode.PUNCT;
 			latched = false;
 		} else if (value == 1) {
 			workString.append(' ');
@@ -181,11 +181,11 @@ public class AztecDecoder extends AztecMessageErrorCorrection implements Verbose
 			workString.append((char)('A' + (value - 2)));
 		} else {
 			switch (value) {
-				case 28 -> current = Modes.LOWER;
-				case 29 -> current = Modes.MIXED;
-				case 30 -> current = Modes.DIGIT;
+				case 28 -> current = Mode.LOWER;
+				case 29 -> current = Mode.MIXED;
+				case 30 -> current = Mode.DIGIT;
 				case 31 -> {
-					current = Modes.BYTE;
+					current = Mode.BYTE;
 					latched = false;
 				}
 			}
@@ -195,7 +195,7 @@ public class AztecDecoder extends AztecMessageErrorCorrection implements Verbose
 
 	boolean handleLower( int value ) {
 		if (value == 0) {
-			current = Modes.PUNCT;
+			current = Mode.PUNCT;
 			latched = false;
 		} else if (value == 1) {
 			workString.append(' ');
@@ -204,13 +204,13 @@ public class AztecDecoder extends AztecMessageErrorCorrection implements Verbose
 		} else {
 			switch (value) {
 				case 28 -> {
-					current = Modes.UPPER;
+					current = Mode.UPPER;
 					latched = false;
 				}
-				case 29 -> current = Modes.MIXED;
-				case 30 -> current = Modes.DIGIT;
+				case 29 -> current = Mode.MIXED;
+				case 30 -> current = Mode.DIGIT;
 				case 31 -> {
-					current = Modes.BYTE;
+					current = Mode.BYTE;
 					latched = false;
 				}
 			}
@@ -220,7 +220,7 @@ public class AztecDecoder extends AztecMessageErrorCorrection implements Verbose
 
 	boolean handleMixed( int value ) {
 		if (value == 0) {
-			current = Modes.PUNCT;
+			current = Mode.PUNCT;
 			latched = false;
 		} else if (value == 1) {
 			workString.append(' ');
@@ -239,11 +239,11 @@ public class AztecDecoder extends AztecMessageErrorCorrection implements Verbose
 				case 25 -> workString.append('|');
 				case 26 -> workString.append('~');
 				case 27 -> workString.append((char)127);
-				case 28 -> current = Modes.LOWER;
-				case 29 -> current = Modes.UPPER;
-				case 30 -> current = Modes.PUNCT;
+				case 28 -> current = Mode.LOWER;
+				case 29 -> current = Mode.UPPER;
+				case 30 -> current = Mode.PUNCT;
 				case 31 -> {
-					current = Modes.BYTE;
+					current = Mode.BYTE;
 					latched = false;
 				}
 			}
@@ -266,7 +266,7 @@ public class AztecDecoder extends AztecMessageErrorCorrection implements Verbose
 			case 28 -> workString.append(']');
 			case 29 -> workString.append('{');
 			case 30 -> workString.append('}');
-			case 31 -> current = Modes.UPPER;
+			case 31 -> current = Mode.UPPER;
 			default -> {
 				if (value <= 20) {
 					workString.append((char)(value - 6 + 33));
@@ -280,7 +280,7 @@ public class AztecDecoder extends AztecMessageErrorCorrection implements Verbose
 
 	boolean handleDigit( int value ) {
 		if (value == 0) {
-			current = Modes.PUNCT;
+			current = Mode.PUNCT;
 			latched = false;
 		} else if (value == 1) {
 			workString.append(' ');
@@ -290,9 +290,9 @@ public class AztecDecoder extends AztecMessageErrorCorrection implements Verbose
 			switch (value) {
 				case 12 -> workString.append(',');
 				case 13 -> workString.append('.');
-				case 14 -> current = Modes.UPPER;
+				case 14 -> current = Mode.UPPER;
 				case 15 -> {
-					current = Modes.UPPER;
+					current = Mode.UPPER;
 					latched = false;
 				}
 			}

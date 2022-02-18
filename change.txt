@@ -11,8 +11,7 @@ Version : 0.41
   - Added ability to specify maximum contour in places it was missing
 - ConvertBufferedImage
   - TODO https://github.com/lessthanoptimal/BoofCV/issues/284
-- Aztec Code
-  - TODO Auto encode message
+- Added Aztec Code encoder and decoder
   - TODO support transposed
   - TODO JMH
 - SLAM
