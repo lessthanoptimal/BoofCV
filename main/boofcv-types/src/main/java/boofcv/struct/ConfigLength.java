@@ -29,12 +29,11 @@ import lombok.Setter;
 @Getter @Setter
 public class ConfigLength implements Configuration {
 	/**
-	 * If in fixed mode this is the length or it's the minimum length of a relative length is being specified
+	 * If in fixed mode this is the length, or it's the minimum length of a relative length is being specified
 	 */
 	public double length = -1;
 	/**
-	 * If &ge; 0 the length is relative to the total size and the 'fixed' number is treated
-	 * as a minium size.
+	 * If &ge; 0 the length is relative to the total size and the 'fixed' number is treated as a minimum size.
 	 */
 	public double fraction = -1;
 
