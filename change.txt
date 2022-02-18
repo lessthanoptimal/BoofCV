@@ -6,6 +6,11 @@ Date Format: year/month/day
 Date    : 2022/
 Version : 0.41
 
+- Contour Tracing
+  - Can specify max and minimum contours using fractional size, i.e. ConfigLength instead of int
+  - Added ability to specify maximum contour in places it was missing
+- ConvertBufferedImage
+  - TODO https://github.com/lessthanoptimal/BoofCV/issues/284
 - Aztec Code
   - TODO Support B/S
   - TODO Auto encode message
