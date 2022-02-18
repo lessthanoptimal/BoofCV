@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoGrid.Grid;
 import boofcv.alg.shapes.ellipse.BinaryEllipseDetector;
 import boofcv.alg.shapes.ellipse.BinaryEllipseDetectorPixel;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.curve.EllipseRotated_F64;
 
@@ -47,9 +48,8 @@ import georegression.struct.curve.EllipseRotated_F64;
  * </center>
  * Example of a 24 by 28 grid; row, column.
  *
- * @see KeyPointsCircleHexagonalGrid
- *
  * @author Peter Abeles
+ * @see KeyPointsCircleHexagonalGrid
  */
 public class DetectCircleHexagonalGrid<T extends ImageGray<T>> extends DetectCircleGrid<T> {
 
@@ -62,69 +62,69 @@ public class DetectCircleHexagonalGrid<T extends ImageGray<T>> extends DetectCir
 	 * @param ellipseDetector Detects ellipses inside the image
 	 * @param clustering Finds clusters of ellipses
 	 */
-	public DetectCircleHexagonalGrid(int numRows, int numCols,
-									 InputToBinary<T> inputToBinary,
-									 BinaryEllipseDetector<T> ellipseDetector,
-									 EllipsesIntoClusters clustering) {
-		super(numRows,numCols,inputToBinary,ellipseDetector, clustering,
+	public DetectCircleHexagonalGrid( int numRows, int numCols,
+									  InputToBinary<T> inputToBinary,
+									  BinaryEllipseDetector<T> ellipseDetector,
+									  EllipsesIntoClusters clustering ) {
+		super(numRows, numCols, inputToBinary, ellipseDetector, clustering,
 				new EllipseClustersIntoHexagonalGrid());
 	}
 
 	@Override
-	protected void configureContourDetector(T gray) {
+	protected void configureContourDetector( T gray ) {
 		// overestimate for multiple reasons. Doesn't take in account space and distance between touching circles
 		// isn't correct
-		int diameter = Math.max(gray.width,gray.height)/Math.max(numCols,numRows);
+		int diameter = Math.max(gray.width, gray.height)/Math.max(numCols, numRows);
 
 		BinaryEllipseDetectorPixel binaryDetector = ellipseDetector.getEllipseDetector();
-		binaryDetector.setMaximumContour((int)(Math.PI*diameter*3)+1);
+		binaryDetector.setMaximumContour(ConfigLength.fixed((Math.PI*diameter*3) + 1));
 		binaryDetector.setInternalContour(false);
 	}
 
 	@Override
-	public int totalEllipses( int numRows , int numCols ) {
-		return numRows/2*(numCols/2) + (numRows+1)/2*((numCols+1)/2);
+	public int totalEllipses( int numRows, int numCols ) {
+		return numRows/2*(numCols/2) + (numRows + 1)/2*((numCols + 1)/2);
 	}
 
 	/**
 	 * Puts the grid into a canonical orientation
 	 */
 	@Override
-	protected void putGridIntoCanonical(Grid g ) {
+	protected void putGridIntoCanonical( Grid g ) {
 		// first put it into a plausible solution
-		if( g.columns != numCols ) {
+		if (g.columns != numCols) {
 			rotateGridCCW(g);
 		}
 
-		if( g.get(0,0) == null ) {
+		if (g.get(0, 0) == null) {
 			reverse(g);
 		}
 
 		// select the best corner for canonical
-		if( g.columns%2 == 1 && g.rows%2 == 1) {
+		if (g.columns%2 == 1 && g.rows%2 == 1) {
 			// first make sure orientation constraint is maintained
-			if( isClockWise(g)) {
+			if (isClockWise(g)) {
 				flipHorizontal(g);
 			}
 
 			int numRotationsCCW = closestCorner4(g);
-			if( g.columns == g.rows ) {
+			if (g.columns == g.rows) {
 				for (int i = 0; i < numRotationsCCW; i++) {
 					rotateGridCCW(g);
 				}
-			} else if( numRotationsCCW == 2 ){
+			} else if (numRotationsCCW == 2) {
 				// only two valid solutions. rotate only if the other valid solution is better
 				rotateGridCCW(g);
 				rotateGridCCW(g);
 			}
-		} else if( g.columns%2 == 1 ) {
+		} else if (g.columns%2 == 1) {
 			// only two solutions. Go with the one which maintains orientation constraint
-			if( isClockWise(g)) {
+			if (isClockWise(g)) {
 				flipHorizontal(g);
 			}
-		} else if( g.rows%2 == 1 ) {
+		} else if (g.rows%2 == 1) {
 			// only two solutions. Go with the one which maintains orientation constraint
-			if( isClockWise(g)) {
+			if (isClockWise(g)) {
 				flipVertical(g);
 			}
 		}
@@ -134,9 +134,9 @@ public class DetectCircleHexagonalGrid<T extends ImageGray<T>> extends DetectCir
 	 * Uses the cross product to determine if the grid is in clockwise order
 	 */
 	private static boolean isClockWise( Grid g ) {
-		EllipseRotated_F64 v00 = g.get(0,0);
-		EllipseRotated_F64 v02 = g.columns<3?g.get(1,1):g.get(0,2);
-		EllipseRotated_F64 v20 = g.rows<3?g.get(1,1):g.get(2,0);
+		EllipseRotated_F64 v00 = g.get(0, 0);
+		EllipseRotated_F64 v02 = g.columns < 3 ? g.get(1, 1) : g.get(0, 2);
+		EllipseRotated_F64 v20 = g.rows < 3 ? g.get(1, 1) : g.get(2, 0);
 
 		double a_x = v02.center.x - v00.center.x;
 		double a_y = v02.center.y - v00.center.y;
@@ -144,6 +144,6 @@ public class DetectCircleHexagonalGrid<T extends ImageGray<T>> extends DetectCir
 		double b_x = v20.center.x - v00.center.x;
 		double b_y = v20.center.y - v00.center.y;
 
-		return a_x * b_y - a_y * b_x < 0;
+		return a_x*b_y - a_y*b_x < 0;
 	}
 }

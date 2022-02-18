@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -65,7 +65,12 @@ public class ConfigUchiyaMarker implements Configuration {
 	/**
 	 * Minimum number of pixels in the contour to consider
 	 */
-	public int contourMinimumLength = 5;
+	public ConfigLength contourMinimumLength = ConfigLength.fixed(5);
+
+	/**
+	 * Maximum number of pixels in the contour to consider. Used to filter out weird excessively large shapes
+	 */
+	public ConfigLength contourMaximumLength = ConfigLength.relative(0.25, 10);
 
 	/**
 	 * Detector: maximum distance from the ellipse in pixels
@@ -107,7 +112,8 @@ public class ConfigUchiyaMarker implements Configuration {
 		this.llah.setTo(src.llah);
 		this.ransac.setTo(src.ransac);
 		this.contourRule = src.contourRule;
-		this.contourMinimumLength = src.contourMinimumLength;
+		this.contourMinimumLength.setTo(src.contourMinimumLength);
+		this.contourMaximumLength.setTo(src.contourMaximumLength);
 		this.maxDistanceFromEllipse = src.maxDistanceFromEllipse;
 		this.minimumMinorAxis = src.minimumMinorAxis;
 		this.maxMajorToMinorRatio = src.maxMajorToMinorRatio;
@@ -118,6 +124,8 @@ public class ConfigUchiyaMarker implements Configuration {
 	@Override
 	public void checkValidity() {
 		llah.checkValidity();
+		contourMinimumLength.checkValidity();
+		contourMaximumLength.checkValidity();
 		if (markerWidth <= 0)
 			throw new IllegalArgumentException("Marker's width must set!");
 		if (markerHeight <= 0)

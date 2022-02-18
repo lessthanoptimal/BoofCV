@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,9 +19,11 @@
 package boofcv.abst.filter.binary;
 
 import boofcv.alg.filter.binary.ContourPacked;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.ConnectRule;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.DogArray;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +50,7 @@ public interface BinaryContourInterface {
 	 * @param contourID ID of the contour you wish to load
 	 * @param storage Storage for the contour points. Must be set to declare new elements.
 	 */
-	void loadContour(int contourID, DogArray<Point2D_I32> storage);
+	void loadContour( int contourID, DogArray<Point2D_I32> storage );
 
 	/**
 	 * Overwrites the coordinates of the saved contour. Useful when points have
@@ -57,25 +59,46 @@ public interface BinaryContourInterface {
 	 * @param contourID ID of the contour you wish to load
 	 * @param storage Storage for the contour points. Must be set to declare new elements.
 	 */
-	void writeContour(int contourID, List<Point2D_I32> storage);
+	void writeContour( int contourID, List<Point2D_I32> storage );
 
 	/**
 	 * Used to toggle on and off the saving of inner contours.
+	 *
 	 * @param enabled true to enable or false to disable
 	 */
-	void setSaveInnerContour(boolean enabled);
+	void setSaveInnerContour( boolean enabled );
 
 	boolean isSaveInternalContours();
 
-	void setMinContour(int length);
+	/**
+	 * Specifies the minimum contour as either an absolute value in pixels or a value relative to the
+	 * sqrt(width*height). Threshold &le; 0 will be treated as infinite.
+	 */
+	void setMinContour( ConfigLength length );
 
-	int getMinContour();
+	/**
+	 * Returns the minimum contour
+	 *
+	 * @param length Optional storage for the contour's length
+	 * @return The contour's length
+	 */
+	ConfigLength getMinContour( @Nullable ConfigLength length );
 
-	void setMaxContour(int length);
+	/**
+	 * Specifies the maximum contour as either an absolute value in pixels or a value relative to the
+	 * sqrt(width*height). Threshold &le; 0 will be treated as infinite.
+	 */
+	void setMaxContour( ConfigLength length );
 
-	int getMaxContour();
+	/**
+	 * Returns the maximum contour. Threshold %le; 0 will be treated as infinite.
+	 *
+	 * @param length Optional storage for the contour's length
+	 * @return The contour's length
+	 */
+	ConfigLength getMaxContour( @Nullable ConfigLength length );
 
-	void setConnectRule(ConnectRule rule);
+	void setConnectRule( ConnectRule rule );
 
 	ConnectRule getConnectRule();
 
@@ -85,9 +108,9 @@ public interface BinaryContourInterface {
 	 *
 	 * @return New copy of contour
 	 */
-	static List<Point2D_I32> copyContour(BinaryContourInterface finder , int contourID) {
+	static List<Point2D_I32> copyContour( BinaryContourInterface finder, int contourID ) {
 		DogArray<Point2D_I32> storage = new DogArray<>(Point2D_I32::new);
-		finder.loadContour(contourID,storage);
+		finder.loadContour(contourID, storage);
 		List<Point2D_I32> list = new ArrayList<>(storage.size);
 		for (int i = 0; i < storage.size; i++) {
 			list.add(storage.get(i));
@@ -107,13 +130,13 @@ public interface BinaryContourInterface {
 		 *
 		 * You probably want to also adjust the coordinates using a value of (1,1)
 		 */
-		void setCreatePaddedCopy(boolean hasPadding );
+		void setCreatePaddedCopy( boolean hasPadding );
 
 		boolean isCreatePaddedCopy();
 
 		/**
 		 * Adjustment applied to pixel coordinate of contour points. Only used if a padded copy is NOT done.
 		 */
-		void setCoordinateAdjustment(int x, int y);
+		void setCoordinateAdjustment( int x, int y );
 	}
 }

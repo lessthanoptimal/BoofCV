@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,6 +34,7 @@ import boofcv.factory.fiducial.ConfigUchiyaMarker;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.binary.VisualizeBinaryData;
+import boofcv.gui.controls.JConfigLength;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.fiducial.VisualizeFiducial;
@@ -322,7 +323,8 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 		final JSpinner spinMinEdge = spinner(config.checkEdge.minimumEdgeIntensity, 0.0, 1000.0, 1.0);
 		// Contour Controls
 		final JComboBox<String> comboConnectRule = combo(config.contourRule.ordinal(), (Object[])ConnectRule.values());
-		final JSpinner spinMinContour = spinner(config.contourMinimumLength, 4, 999, 1);
+		final JConfigLength spinMinContour = configLength(config.contourMinimumLength, 4, 999);
+		final JConfigLength spinMaxContour = configLength(config.contourMaximumLength, -1, 999);
 		final JSpinner spinMinAxis = spinner(config.minimumMinorAxis, 0.0, 999.0, 1.0);
 		final JSpinner spinMaxAxisRatio = spinner(config.maxMajorToMinorRatio, 1.0, 1000.0, 1.0);
 
@@ -344,10 +346,11 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 			addLabeled(spinMinEdge, "Min Edge Intensity");
 			addLabeled(comboConnectRule, "Connect Rule");
 			addLabeled(spinMinContour, "Min Contour");
+			addLabeled(spinMaxContour, "Max Contour");
 			addLabeled(spinMinAxis, "Min Axis");
 			addLabeled(spinMaxAxisRatio, "Max Axis Ratio");
 			add(thresholdPanel);
-			setPreferredSize(new Dimension(200, 300));
+			setPreferredSize(new Dimension(250, 300));
 		}
 
 		@Override
@@ -381,7 +384,10 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 				config.contourRule = ConnectRule.values()[comboConnectRule.getSelectedIndex()];
 				control = true;
 			} else if (source == spinMinContour) {
-				config.contourMinimumLength = ((Number)spinMinContour.getValue()).intValue();
+				config.contourMinimumLength.setTo(spinMinContour.getValue());
+				control = true;
+			} else if (source == spinMaxContour) {
+				config.contourMaximumLength.setTo(spinMaxContour.getValue());
 				control = true;
 			} else if (source == spinMinAxis) {
 				config.minimumMinorAxis = ((Number)spinMinAxis.getValue()).doubleValue();

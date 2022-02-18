@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,39 +36,31 @@ import java.util.Random;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * @author Peter Abeles
- */
-class TestBinaryContourFinderLinearExternal extends GenericBinaryContourFinder
-{
+class TestBinaryContourFinderLinearExternal extends GenericBinaryContourFinder {
 	Random rand = BoofTesting.createRandom(0);
 
 	public TestBinaryContourFinderLinearExternal() {
 		super.supportsInternalContour = false;
 	}
 
-	@Override
-	protected BinaryContourFinder create() {
-		return new BinaryContourFinderLinearExternal();
-	}
+	@Override protected BinaryContourFinder create() {return new BinaryContourFinderLinearExternal();}
 
-	@Test
-	void compareToChang2004() {
-		var binary = new GrayU8(200,190);
-		var labeled = new GrayS32(200,190);
-		GImageMiscOps.fillUniform(binary,rand,0,1);
+	@Test void compareToChang2004() {
+		var binary = new GrayU8(200, 190);
+		var labeled = new GrayS32(200, 190);
+		GImageMiscOps.fillUniform(binary, rand, 0, 1);
 
-		for( var rule : ConnectRule.values() ) {
+		for (var rule : ConnectRule.values()) {
 			var chang = new LinearContourLabelChang2004(rule);
 			var alg = new BinaryContourFinderLinearExternal();
 
 			// configure contour tracing so that it should produce identical results
 			alg.setConnectRule(rule);
 			alg.setCreatePaddedCopy(true);
-			alg.setCoordinateAdjustment(1,1);
+			alg.setCoordinateAdjustment(1, 1);
 			chang.setSaveInternalContours(false);
 
-			chang.process(binary.clone(),labeled);
+			chang.process(binary.clone(), labeled);
 			alg.process(binary);
 
 			DogArray<ContourPacked> expected = chang.getContours();
@@ -78,19 +70,18 @@ class TestBinaryContourFinderLinearExternal extends GenericBinaryContourFinder
 
 			DogArray<Point2D_I32> contourExpected = new DogArray<>(Point2D_I32::new);
 			DogArray<Point2D_I32> contourFound = new DogArray<>(Point2D_I32::new);
-			for (int i = 0; i < expected.size; i++ ) {
-				chang.getPackedPoints().getSet(expected.get(i).externalIndex,contourExpected);
+			for (int i = 0; i < expected.size; i++) {
+				chang.getPackedPoints().getSet(expected.get(i).externalIndex, contourExpected);
 				boolean matched = false;
 				for (int j = 0; j < found.size(); j++) {
-					alg.loadContour(found.get(i).id,contourFound);
-					if(ContourOps.isEquivalent(contourExpected.toList(),contourFound.toList())) {
+					alg.loadContour(found.get(i).id, contourFound);
+					if (ContourOps.isEquivalent(contourExpected.toList(), contourFound.toList())) {
 						matched = true;
 						break;
 					}
 				}
 				assertTrue(matched);
 			}
-
 		}
 	}
 }

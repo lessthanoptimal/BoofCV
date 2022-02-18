@@ -26,6 +26,7 @@ import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.misc.BoofMiscOps;
 import boofcv.misc.MovingAverage;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.distort.Point2Transform2_F32;
@@ -127,7 +128,7 @@ public abstract class SquareLocatorPatternDetectorBase<T extends ImageGray<T>> i
 
 	/**
 	 * Configures the contour detector based on the image size. Setting a maximum contour and turning off recording
-	 * of inner contours and improve speed and reduce the memory foot print significantly.
+	 * of inner contours and improve speed and reduce the memory footprint significantly.
 	 */
 	protected void configureContourDetector( T gray ) {
 		// determine the maximum possible size of a position pattern
@@ -135,7 +136,7 @@ public abstract class SquareLocatorPatternDetectorBase<T extends ImageGray<T>> i
 		// 4 side in a square
 		int maxContourSize = (int)(Math.min(gray.width, gray.height)*maxContourFraction);
 		BinaryContourFinder contourFinder = squareDetector.getDetector().getContourFinder();
-		contourFinder.setMaxContour(maxContourSize);
+		contourFinder.setMaxContour(ConfigLength.fixed(maxContourSize));
 		contourFinder.setSaveInnerContour(false);
 	}
 

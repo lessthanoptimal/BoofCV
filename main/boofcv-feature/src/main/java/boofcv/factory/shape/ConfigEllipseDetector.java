@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.factory.shape;
 
+import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
 import boofcv.struct.ConnectRule;
 
@@ -35,12 +36,12 @@ public class ConfigEllipseDetector implements Configuration {
 	/**
 	 * Detector: minimum number of pixels in the contour
 	 */
-	public int minimumContour = 10;
+	public ConfigLength minimumContour = ConfigLength.fixed(10);
 
 	/**
-	 * Detector: maximum number of pixels in the contour. 0 == no limit
+	 * Detector: maximum number of pixels in the contour.
 	 */
-	public int maximumContour = 0;
+	public ConfigLength maximumContour = ConfigLength.fixed(-1);
 
 	/**
 	 * Pixel connectivity rule for blob/contour finder.
@@ -100,8 +101,8 @@ public class ConfigEllipseDetector implements Configuration {
 
 	public ConfigEllipseDetector setTo( ConfigEllipseDetector src ) {
 		this.maxDistanceFromEllipse = src.maxDistanceFromEllipse;
-		this.minimumContour = src.minimumContour;
-		this.maximumContour = src.maximumContour;
+		this.minimumContour.setTo(src.minimumContour);
+		this.maximumContour.setTo(src.maximumContour);
 		this.contourRule = src.contourRule;
 		this.minimumMinorAxis = src.minimumMinorAxis;
 		this.processInternal = src.processInternal;
@@ -115,5 +116,8 @@ public class ConfigEllipseDetector implements Configuration {
 		return this;
 	}
 
-	@Override public void checkValidity() {}
+	@Override public void checkValidity() {
+		minimumContour.checkValidity();
+		maximumContour.checkValidity();
+	}
 }

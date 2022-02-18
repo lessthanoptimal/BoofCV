@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,8 +39,7 @@ import java.awt.event.ActionListener;
  * @author Peter Abeles
  */
 public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
-		implements ActionListener, ChangeListener, JConfigLength.Listener
-{
+		implements ActionListener, ChangeListener, JConfigLength.Listener {
 	ShapeGuiListener owner;
 	JSpinner spinnerContourConnect;
 
@@ -50,6 +49,7 @@ public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
 	public ThresholdControlPanel thresholdPanel;
 
 	JConfigLength spinnerMinContourSize;
+	JConfigLength spinnerMaxContourSize;
 	JSpinner spinnerMinEdgeD; // threshold for detect
 	JSpinner spinnerMinEdgeR; // threshold for refine
 	JCheckBox setBorder;
@@ -70,13 +70,13 @@ public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
 
 	public ConfigPolygonDetector config;
 
-	public DetectBlackPolygonControlPanel(ShapeGuiListener owner) {
-		this(owner,new ConfigPolygonDetector(3,6),null);
+	public DetectBlackPolygonControlPanel( ShapeGuiListener owner ) {
+		this(owner, new ConfigPolygonDetector(3, 6), null);
 	}
 
-	public DetectBlackPolygonControlPanel(ShapeGuiListener owner,
-										  ConfigPolygonDetector configPolygon,
-										  @Nullable ConfigThreshold configThreshold ) {
+	public DetectBlackPolygonControlPanel( ShapeGuiListener owner,
+										   ConfigPolygonDetector configPolygon,
+										   @Nullable ConfigThreshold configThreshold ) {
 		setBorder(BorderFactory.createEmptyBorder());
 		this.owner = owner;
 		this.config = configPolygon;
@@ -86,15 +86,16 @@ public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
 
 		thresholdPanel = configThreshold == null ?
 				new ThresholdControlPanel(owner) :
-				new ThresholdControlPanel(owner,configThreshold);
+				new ThresholdControlPanel(owner, configThreshold);
 		thresholdPanel.setBorder(BorderFactory.createEmptyBorder());
 
-		spinnerMinContourSize = configLength(configPolygon.detector.minimumContour,5,99999);
+		spinnerMinContourSize = configLength(configPolygon.detector.minimumContour, -1, 99999);
+		spinnerMaxContourSize = configLength(configPolygon.detector.maximumContour, -1, 99999);
 
-		spinnerMinEdgeD = spinner(configPolygon.detector.minimumEdgeIntensity, 0.0,255.0,1.0);
-		spinnerMinEdgeR = spinner(configPolygon.minimumRefineEdgeIntensity, 0.0,255.0,1.0);
+		spinnerMinEdgeD = spinner(configPolygon.detector.minimumEdgeIntensity, 0.0, 255.0, 1.0);
+		spinnerMinEdgeR = spinner(configPolygon.minimumRefineEdgeIntensity, 0.0, 255.0, 1.0);
 
-		polylinePanel = new PolylineControlPanel(owner,configPolygon.detector.contourToPoly);
+		polylinePanel = new PolylineControlPanel(owner, configPolygon.detector.contourToPoly);
 		polylinePanel.disableLoopingCheckBox(); // looping must always be true
 
 		setBorder = new JCheckBox("Image Border");
@@ -103,15 +104,15 @@ public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
 
 		setConcurrent = checkbox("Concurrent", BoofConcurrency.USE_CONCURRENT);
 
-		setRefineContour = checkbox("Refine Contour",configPolygon.refineContour);
-		setRefineGray = checkbox("Refine Gray",configPolygon.refineGray != null);
-		setRemoveBias = checkbox("Remove Bias",configPolygon.adjustForThresholdBias);
+		setRefineContour = checkbox("Refine Contour", configPolygon.refineContour);
+		setRefineGray = checkbox("Refine Gray", configPolygon.refineGray != null);
+		setRemoveBias = checkbox("Remove Bias", configPolygon.adjustForThresholdBias);
 		spinnerLineSamples = spinner(refineGray.lineSamples, 5, 100, 1);
 		spinnerCornerOffset = spinner(refineGray.cornerOffset, 0, 10, 1);
 		spinnerSampleRadius = spinner(refineGray.sampleRadius, 1, 10, 1);
 		spinnerRefineMaxIterations = spinner(refineGray.maxIterations, 1, 200, 1);
-		spinnerConvergeTol = spinner(refineGray.convergeTolPixels, 0.0, 2.0, 0.005,1,3);
-		spinnerMaxCornerChange = spinner(refineGray.maxCornerChangePixel, 0.0, 50.0, 1.0,1,3);
+		spinnerConvergeTol = spinner(refineGray.convergeTolPixels, 0.0, 2.0, 0.005, 1, 3);
+		spinnerMaxCornerChange = spinner(refineGray.maxCornerChangePixel, 0.0, 50.0, 1.0, 1, 3);
 
 		StandardAlgConfigPanel refinePanel = new StandardAlgConfigPanel();
 		refinePanel.setBorder(BorderFactory.createEmptyBorder());
@@ -130,8 +131,9 @@ public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
 		tabbedPane.addTab("Polyline", polylinePanel);
 		tabbedPane.addTab("Refine", refinePanel);
 
-		addLabeled(spinnerContourConnect,"Contour Connect: ");
-		addLabeled(spinnerMinContourSize, "Min Contour Size: ");
+		addLabeled(spinnerContourConnect, "Contour Connect: ", "Binary connectivity rule");
+		addLabeled(spinnerMinContourSize, "Min Contour Size: ", "Minimum pixels in contour");
+		addLabeled(spinnerMaxContourSize, "Max Contour Size: ", "Maximum pixels in contour");
 		addLabeled(spinnerMinEdgeD, "Edge Intensity D: ");
 		addLabeled(spinnerMinEdgeR, "Edge Intensity R: ");
 
@@ -152,62 +154,61 @@ public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		if( e.getSource() == setBorder ) {
+	public void actionPerformed( ActionEvent e ) {
+		if (e.getSource() == setBorder) {
 			config.detector.canTouchBorder = setBorder.isSelected();
 			owner.configUpdate();
-		} else if( e.getSource() == setConcurrent ) {
+		} else if (e.getSource() == setConcurrent) {
 			BoofConcurrency.USE_CONCURRENT = setConcurrent.isSelected();
 			owner.configUpdate();
-		} else if( e.getSource() == setRefineContour ) {
+		} else if (e.getSource() == setRefineContour) {
 			config.refineContour = setRefineContour.isSelected();
 			owner.configUpdate();
-		} else if( e.getSource() == setRefineGray ) {
+		} else if (e.getSource() == setRefineGray) {
 			bRefineGray = setRefineGray.isSelected();
 			owner.configUpdate();
-		} else if( e.getSource() == setRemoveBias ) {
+		} else if (e.getSource() == setRemoveBias) {
 			config.adjustForThresholdBias = setRemoveBias.isSelected();
 			owner.configUpdate();
 		}
 	}
 
 	@Override
-	public void stateChanged(ChangeEvent e) {
-		if( e.getSource() == spinnerMinEdgeD) {
-			config.detector.minimumEdgeIntensity = ((Number) spinnerMinEdgeD.getValue()).doubleValue();
-		} else if( e.getSource() == spinnerMinEdgeR) {
-			config.minimumRefineEdgeIntensity = ((Number) spinnerMinEdgeR.getValue()).doubleValue();
+	public void stateChanged( ChangeEvent e ) {
+		if (e.getSource() == spinnerMinEdgeD) {
+			config.detector.minimumEdgeIntensity = ((Number)spinnerMinEdgeD.getValue()).doubleValue();
+		} else if (e.getSource() == spinnerMinEdgeR) {
+			config.minimumRefineEdgeIntensity = ((Number)spinnerMinEdgeR.getValue()).doubleValue();
 		} else if (e.getSource() == spinnerLineSamples) {
-			refineGray.lineSamples = ((Number) spinnerLineSamples.getValue()).intValue();
+			refineGray.lineSamples = ((Number)spinnerLineSamples.getValue()).intValue();
 		} else if (e.getSource() == spinnerCornerOffset) {
-			refineGray.cornerOffset = ((Number) spinnerCornerOffset.getValue()).intValue();
+			refineGray.cornerOffset = ((Number)spinnerCornerOffset.getValue()).intValue();
 		} else if (e.getSource() == spinnerSampleRadius) {
-			refineGray.sampleRadius = ((Number) spinnerSampleRadius.getValue()).intValue();
+			refineGray.sampleRadius = ((Number)spinnerSampleRadius.getValue()).intValue();
 		} else if (e.getSource() == spinnerRefineMaxIterations) {
-			refineGray.maxIterations = ((Number) spinnerRefineMaxIterations.getValue()).intValue();
+			refineGray.maxIterations = ((Number)spinnerRefineMaxIterations.getValue()).intValue();
 		} else if (e.getSource() == spinnerConvergeTol) {
-			refineGray.convergeTolPixels = ((Number) spinnerConvergeTol.getValue()).doubleValue();
+			refineGray.convergeTolPixels = ((Number)spinnerConvergeTol.getValue()).doubleValue();
 		} else if (e.getSource() == spinnerMaxCornerChange) {
-			refineGray.maxCornerChangePixel = ((Number) spinnerMaxCornerChange.getValue()).doubleValue();
-		} else if( e.getSource() == spinnerContourConnect ) {
+			refineGray.maxCornerChangePixel = ((Number)spinnerMaxCornerChange.getValue()).doubleValue();
+		} else if (e.getSource() == spinnerContourConnect) {
 			config.detector.contourRule = (ConnectRule)spinnerContourConnect.getValue();
 		}
 		owner.configUpdate();
 	}
-
 
 	public ThresholdControlPanel getThresholdPanel() {
 		return thresholdPanel;
 	}
 
 	public ConfigPolygonDetector getConfigPolygon() {
-		if( polylinePanel.whichAlgorithm == 0 ) {
+		if (polylinePanel.whichAlgorithm == 0) {
 			config.detector.contourToPoly = polylinePanel.getConfigSplitMerge();
 		} else {
 			config.detector.contourToPoly = polylinePanel.getConfigSplitMergeOld();
 		}
 
-		if( bRefineGray ) {
+		if (bRefineGray) {
 			config.refineGray = refineGray;
 		} else {
 			config.refineGray = null;
@@ -216,10 +217,11 @@ public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
 	}
 
 	@Override
-	public void changeConfigLength(JConfigLength source, double fraction, double length) {
-		if( source == spinnerMinContourSize ) {
-			config.detector.minimumContour.fraction = fraction;
-			config.detector.minimumContour.length = length;
+	public void changeConfigLength( JConfigLength source, double fraction, double length ) {
+		if (source == spinnerMinContourSize) {
+			config.detector.minimumContour.setTo(source.getValue());
+		} else if (source == spinnerMaxContourSize) {
+			config.detector.maximumContour.setTo(source.getValue());
 		}
 		owner.configUpdate();
 	}

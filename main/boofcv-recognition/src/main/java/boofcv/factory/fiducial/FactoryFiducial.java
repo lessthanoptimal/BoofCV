@@ -335,6 +335,7 @@ public class FactoryFiducial {
 		ellipseDetector.setMinimumMinorAxis(config.minimumMinorAxis);
 		ellipseDetector.setMaxMajorToMinorRatio(config.maxMajorToMinorRatio);
 		ellipseDetector.setMinimumContour(config.contourMinimumLength);
+		ellipseDetector.setMaximumContour(config.contourMaximumLength);
 
 		EdgeIntensityEllipse<T> check = new EdgeIntensityEllipse<>(
 				config.checkEdge.checkRadialDistance,

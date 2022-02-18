@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -66,9 +66,15 @@ public class ConfigPolygonFromContour implements Configuration {
 
 	/**
 	 * Specifies the minimum allowed contour length. Relative lengths will be relative with to the image's
-	 * width and height.
+	 * sqrt(width*height).
 	 */
 	public ConfigLength minimumContour = ConfigLength.relative(0.05, 4);
+
+	/**
+	 * Specifies the maximum allowed contour length. Relative lengths will be relative with to the image's
+	 * sqrt(width*height).
+	 */
+	public ConfigLength maximumContour = ConfigLength.fixed(-1);
 
 	/**
 	 * Will the found polygons be in clockwise order?
@@ -99,6 +105,7 @@ public class ConfigPolygonFromContour implements Configuration {
 		this.minimumEdgeIntensity = src.minimumEdgeIntensity;
 		this.tangentEdgeIntensity = src.tangentEdgeIntensity;
 		this.minimumContour.setTo(src.minimumContour);
+		this.maximumContour.setTo(src.maximumContour);
 		this.clockwise = src.clockwise;
 		return this;
 	}
@@ -106,6 +113,7 @@ public class ConfigPolygonFromContour implements Configuration {
 	@Override
 	public void checkValidity() {
 		minimumContour.checkValidity();
+		maximumContour.checkValidity();
 	}
 
 	@Override
@@ -115,6 +123,7 @@ public class ConfigPolygonFromContour implements Configuration {
 				", minimumEdgeIntensity=" + minimumEdgeIntensity +
 				", tangentEdgeIntensity=" + tangentEdgeIntensity +
 				", minimumContour=" + minimumContour +
+				", maximumContour=" + maximumContour +
 				", clockwise=" + clockwise +
 				'}';
 	}

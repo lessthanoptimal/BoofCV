@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,7 @@ import boofcv.abst.filter.binary.BinaryLabelContourFinder;
 import boofcv.alg.filter.binary.ContourOps;
 import boofcv.alg.filter.binary.ContourPacked;
 import boofcv.factory.filter.binary.FactoryBinaryContourFinder;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.GrayS32;
@@ -77,9 +78,9 @@ public class BinaryEllipseDetectorPixel {
 	private @Getter @Setter double maxDistanceFromEllipse = 3.0;
 
 	// minimum number of pixels in the contour
-	private @Getter @Setter int minimumContour = 20;
-	// maximum number of pixels in the contour. 0 == no limit
-	private @Getter @Setter int maximumContour = 0;
+	private @Getter @Setter ConfigLength minimumContour = ConfigLength.fixed(20);
+	// maximum number of pixels in the contour.
+	private @Getter @Setter ConfigLength maximumContour = ConfigLength.fixed(-1);
 
 	// minimum number of pixels along the minor axis
 	private @Getter @Setter double minimumMinorAxis = 1.5;
@@ -145,8 +146,8 @@ public class BinaryEllipseDetectorPixel {
 
 		final BinaryContourInterface selectedFinder = getContourFinder();
 
-		selectedFinder.setMaxContour(maximumContour == 0 ? Integer.MAX_VALUE : maximumContour);
 		selectedFinder.setMinContour(minimumContour);
+		selectedFinder.setMaxContour(maximumContour);
 
 		if (isInternalContour()) {
 			Objects.requireNonNull(contourFinder).process(binary, labeled);

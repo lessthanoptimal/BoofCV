@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,11 +21,13 @@ package boofcv.abst.filter.binary;
 import boofcv.alg.filter.binary.ContourPacked;
 import boofcv.alg.filter.binary.LinearExternalContours;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.PackedSetsPoint2D_I32;
 import boofcv.struct.image.GrayU8;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.DogArray;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -34,14 +36,13 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class BinaryContourFinderLinearExternal implements BinaryContourFinder, BinaryContourInterface.Padded
-{
+public class BinaryContourFinderLinearExternal implements BinaryContourFinder, BinaryContourInterface.Padded {
 	LinearExternalContours alg;
 
 	boolean copyForPadding = true;
-	int adjustX,adjustY;
+	int adjustX, adjustY;
 
-	GrayU8 work = new GrayU8(1,1);
+	GrayU8 work = new GrayU8(1, 1);
 
 	DogArray<ContourPacked> contours = new DogArray<>(ContourPacked::new);
 
@@ -50,21 +51,20 @@ public class BinaryContourFinderLinearExternal implements BinaryContourFinder, B
 	}
 
 	@Override
-	public void process(GrayU8 binary) {
-
-		if(copyForPadding) {
+	public void process( GrayU8 binary ) {
+		if (copyForPadding) {
 			work.reshape(binary.width + 2, binary.height + 2);
 			ImageMiscOps.copy(0, 0, 1, 1, binary.width, binary.height, binary, work);
-			alg.process(work,1,1);
+			alg.process(work, 1, 1);
 		} else {
-			alg.process(binary,adjustX,adjustY);
+			alg.process(binary, adjustX, adjustY);
 		}
 
 		// create the contours list
 		contours.reset();
 		PackedSetsPoint2D_I32 points = alg.getExternalContours();
 
-		for( int i = 0; i < points.size(); i++ ) {
+		for (int i = 0; i < points.size(); i++) {
 			ContourPacked p = contours.grow();
 			p.externalIndex = i;
 			p.id = i;
@@ -77,17 +77,17 @@ public class BinaryContourFinderLinearExternal implements BinaryContourFinder, B
 	}
 
 	@Override
-	public void loadContour(int contourID, DogArray<Point2D_I32> storage) {
-		alg.getExternalContours().getSet(contourID,storage);
+	public void loadContour( int contourID, DogArray<Point2D_I32> storage ) {
+		alg.getExternalContours().getSet(contourID, storage);
 	}
 
 	@Override
-	public void writeContour(int contourID, List<Point2D_I32> storage) {
-		alg.getExternalContours().writeOverSet(contourID,storage);
+	public void writeContour( int contourID, List<Point2D_I32> storage ) {
+		alg.getExternalContours().writeOverSet(contourID, storage);
 	}
 
 	@Override
-	public void setSaveInnerContour(boolean enabled) {
+	public void setSaveInnerContour( boolean enabled ) {
 	}
 
 	@Override
@@ -96,27 +96,33 @@ public class BinaryContourFinderLinearExternal implements BinaryContourFinder, B
 	}
 
 	@Override
-	public void setMinContour(int length) {
+	public void setMinContour( ConfigLength length ) {
 		alg.setMinContourLength(length);
 	}
 
 	@Override
-	public int getMinContour() {
-		return alg.getMinContourLength();
+	public ConfigLength getMinContour( @Nullable ConfigLength length ) {
+		if (length == null)
+			length = new ConfigLength();
+		length.setTo(alg.getMinContourLength());
+		return length;
 	}
 
 	@Override
-	public void setMaxContour(int length) {
+	public void setMaxContour( ConfigLength length ) {
 		alg.setMaxContourLength(length);
 	}
 
 	@Override
-	public int getMaxContour() {
-		return alg.getMaxContourLength();
+	public ConfigLength getMaxContour( @Nullable ConfigLength length ) {
+		if (length == null)
+			length = new ConfigLength();
+		length.setTo(alg.getMaxContourLength());
+		return length;
 	}
 
 	@Override
-	public void setConnectRule(ConnectRule rule) {
+	public void setConnectRule( ConnectRule rule ) {
 		alg.setConnectRule(rule);
 	}
 
@@ -126,7 +132,7 @@ public class BinaryContourFinderLinearExternal implements BinaryContourFinder, B
 	}
 
 	@Override
-	public void setCreatePaddedCopy(boolean padded) {
+	public void setCreatePaddedCopy( boolean padded ) {
 		this.copyForPadding = padded;
 	}
 
@@ -136,7 +142,7 @@ public class BinaryContourFinderLinearExternal implements BinaryContourFinder, B
 	}
 
 	@Override
-	public void setCoordinateAdjustment(int x, int y) {
+	public void setCoordinateAdjustment( int x, int y ) {
 		this.adjustX = x;
 		this.adjustY = y;
 	}

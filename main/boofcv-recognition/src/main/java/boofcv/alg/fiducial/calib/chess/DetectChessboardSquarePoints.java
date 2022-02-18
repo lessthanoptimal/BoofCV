@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -166,7 +166,7 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>> {
 		// also take in account shapes touching the edge will be concave
 		int maxContourSize = Math.max(gray.width, gray.height)/Math.max(numCols, numRows);
 		BinaryContourFinder contourFinder = detectorSquare.getDetector().getContourFinder();
-		contourFinder.setMaxContour(maxContourSize*4*2); // fisheye distortion can let one square go larger
+		contourFinder.setMaxContour(ConfigLength.fixed(maxContourSize*4*2)); // fisheye distortion can let one square go larger
 		contourFinder.setSaveInnerContour(false);
 	}
 

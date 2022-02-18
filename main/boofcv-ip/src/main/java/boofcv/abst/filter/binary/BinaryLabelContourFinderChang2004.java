@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,11 +20,13 @@ package boofcv.abst.filter.binary;
 
 import boofcv.alg.filter.binary.ContourPacked;
 import boofcv.alg.filter.binary.LinearContourLabelChang2004;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.DogArray;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -39,8 +41,8 @@ public class BinaryLabelContourFinderChang2004 implements BinaryLabelContourFind
 	LinearContourLabelChang2004 finder = new LinearContourLabelChang2004(ConnectRule.FOUR);
 
 	@Override
-	public void process(GrayU8 binary, GrayS32 labeled) {
-		finder.process(binary,labeled);
+	public void process( GrayU8 binary, GrayS32 labeled ) {
+		finder.process(binary, labeled);
 	}
 
 	@Override
@@ -49,17 +51,17 @@ public class BinaryLabelContourFinderChang2004 implements BinaryLabelContourFind
 	}
 
 	@Override
-	public void loadContour(int contourID, DogArray<Point2D_I32> storage) {
-		finder.getPackedPoints().getSet(contourID,storage);
+	public void loadContour( int contourID, DogArray<Point2D_I32> storage ) {
+		finder.getPackedPoints().getSet(contourID, storage);
 	}
 
 	@Override
-	public void writeContour(int contourID, List<Point2D_I32> list) {
-		finder.getPackedPoints().writeOverSet(contourID,list);
+	public void writeContour( int contourID, List<Point2D_I32> list ) {
+		finder.getPackedPoints().writeOverSet(contourID, list);
 	}
 
 	@Override
-	public void setSaveInnerContour(boolean enabled) {
+	public void setSaveInnerContour( boolean enabled ) {
 		finder.setSaveInternalContours(enabled);
 	}
 
@@ -69,27 +71,33 @@ public class BinaryLabelContourFinderChang2004 implements BinaryLabelContourFind
 	}
 
 	@Override
-	public void setMinContour(int length) {
-		finder.setMinContourSize(length);
+	public void setMinContour( ConfigLength length ) {
+		finder.setMinContourLength(length);
 	}
 
 	@Override
-	public int getMinContour() {
-		return finder.getMinContourSize();
+	public ConfigLength getMinContour( @Nullable ConfigLength length ) {
+		if (length == null)
+			length = new ConfigLength();
+		length.setTo(finder.getMinContourLength());
+		return length;
 	}
 
 	@Override
-	public void setMaxContour(int length) {
-		finder.setMaxContourSize(length);
+	public void setMaxContour( ConfigLength length ) {
+		finder.setMaxContourLength(length);
 	}
 
 	@Override
-	public int getMaxContour() {
-		return finder.getMaxContourSize();
+	public ConfigLength getMaxContour( @Nullable ConfigLength length ) {
+		if (length == null)
+			length = new ConfigLength();
+		length.setTo(finder.getMaxContourLength());
+		return length;
 	}
 
 	@Override
-	public void setConnectRule(ConnectRule rule) {
+	public void setConnectRule( ConnectRule rule ) {
 		finder.setConnectRule(rule);
 	}
 

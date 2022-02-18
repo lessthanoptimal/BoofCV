@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.filter.binary;
 
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.PackedSetsPoint2D_I32;
 import boofcv.struct.image.GrayU8;
@@ -57,9 +58,13 @@ import lombok.Setter;
  */
 public class LinearExternalContours {
 	// Maximum number of pixels in an external contour. If the contour is longer than this it will be discarded
-	@Getter @Setter private int maxContourLength = Integer.MAX_VALUE;
+	@Getter @Setter private ConfigLength maxContourLength = ConfigLength.fixed(-1);
 	// External contours less than this will be discarded
-	@Getter @Setter private int minContourLength = 0;
+	@Getter @Setter private ConfigLength minContourLength = ConfigLength.fixed(0);
+
+	// Specifies the actual contour length constraints in image pixels
+	private int minContourLengthPixels;
+	private int maxContourLengthPixels;
 
 	// adjusts coordinate from binary to output
 	private int adjustX, adjustY;
@@ -80,6 +85,8 @@ public class LinearExternalContours {
 	 */
 	public void process( GrayU8 binary, int adjustX, int adjustY ) {
 		// Initialize data structures
+		minContourLengthPixels = minContourLength.computeNegMaxI(Math.sqrt(binary.width*binary.height));
+		maxContourLengthPixels = maxContourLength.computeNegMaxI(Math.sqrt(binary.width*binary.height));
 		this.adjustX = adjustX;
 		this.adjustY = adjustY;
 		storagePoints.reset();
@@ -107,7 +114,7 @@ public class LinearExternalContours {
 				if (binaryData[indexBinary] == 1) {
 					if (tracer.trace(x, y, true)) {
 						int N = storagePoints.sizeOfTail();
-						if (N < minContourLength || N >= maxContourLength)
+						if (N < minContourLengthPixels || N >= maxContourLengthPixels)
 							storagePoints.removeTail();
 					} else {
 						// it was really an internal contour
@@ -158,8 +165,7 @@ public class LinearExternalContours {
 
 	@SuppressWarnings("Duplicates")
 	class Tracer extends ContourTracerBase {
-
-		public int maxContourLength = Integer.MAX_VALUE;
+		public int maxContourLengthPixels = Integer.MAX_VALUE;
 
 		public Tracer( ConnectRule rule ) {
 			super(rule);
@@ -185,9 +191,9 @@ public class LinearExternalContours {
 			}
 
 			if (external) {
-				this.maxContourLength = LinearExternalContours.this.maxContourLength;
+				this.maxContourLengthPixels = LinearExternalContours.this.maxContourLengthPixels;
 			} else {
-				this.maxContourLength = -1;
+				this.maxContourLengthPixels = -1;
 			}
 
 			// start a contour here
@@ -207,7 +213,7 @@ public class LinearExternalContours {
 			storagePoints.addPointToTail(x - adjustX, y - adjustY);
 			binary.data[indexBinary] = -2;
 
-			// find the next one pixel. handle case where its an isolated point
+			// find the next one pixel. handle case where it's an isolated point
 			if (!searchNotZero()) {
 				return true;
 			}
@@ -229,7 +235,7 @@ public class LinearExternalContours {
 						return external;
 					}
 				}
-				if (storagePoints.sizeOfTail() <= maxContourLength)
+				if (storagePoints.sizeOfTail() <= maxContourLengthPixels)
 					storagePoints.addPointToTail(x - adjustX, y - adjustY);
 
 				moveToNext();

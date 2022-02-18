@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.abst.filter.binary.BinaryContourFinder;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.fiducial.calib.squares.*;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
@@ -165,14 +166,14 @@ public class DetectSquareGridFiducial<T extends ImageGray<T>> {
 
 	/**
 	 * Configures the contour detector based on the image size. Setting a maximum contour and turning off recording
-	 * of inner contours and improve speed and reduce the memory foot print significantly.
+	 * of inner contours and improve speed and reduce the memory footprint significantly.
 	 */
 	private void configureContourDetector( T gray ) {
 		// determine the maximum possible size of a square when viewed head on
 		// this doesn't take in account the spacing between squares and will be an over estimate
 		int maxContourSize = Math.max(gray.width, gray.height)/Math.max(numCols, numRows);
 		BinaryContourFinder contourFinder = detectorSquare.getDetector().getContourFinder();
-		contourFinder.setMaxContour(maxContourSize*4*2);
+		contourFinder.setMaxContour(ConfigLength.fixed(maxContourSize*4*2));
 		contourFinder.setSaveInnerContour(false);
 	}
 
@@ -191,10 +192,10 @@ public class DetectSquareGridFiducial<T extends ImageGray<T>> {
 			for (int col = 0; col < grid.columns; col++) {
 				Polygon2D_F64 square = grid.get(row, col).square;
 
-				row0.add(new PointIndex2D_F64(square.get(0),0));
-				row0.add(new PointIndex2D_F64(square.get(1),0));
-				row1.add(new PointIndex2D_F64(square.get(3),0));
-				row1.add(new PointIndex2D_F64(square.get(2),0));
+				row0.add(new PointIndex2D_F64(square.get(0), 0));
+				row0.add(new PointIndex2D_F64(square.get(1), 0));
+				row1.add(new PointIndex2D_F64(square.get(3), 0));
+				row1.add(new PointIndex2D_F64(square.get(2), 0));
 			}
 			calibrationPoints.addAll(row0);
 			calibrationPoints.addAll(row1);

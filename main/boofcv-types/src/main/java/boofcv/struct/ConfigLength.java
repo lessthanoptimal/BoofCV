@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -70,7 +70,6 @@ public class ConfigLength implements Configuration {
 	 * @return The length
 	 */
 	public double compute( double totalLength ) {
-
 		double size;
 		if (fraction >= 0) {
 			size = fraction*totalLength;
@@ -92,12 +91,22 @@ public class ConfigLength implements Configuration {
 		return fraction < 0;
 	}
 
+	/** Computes an integer threshold. If threshold value is &lt; 0 then an exception is thrown. */
 	public int computeI( double totalLength ) {
 		double size = compute(totalLength);
 		if (size >= 0)
 			return (int)Math.round(size);
 		else
-			return -1;
+			throw new IllegalArgumentException("Threshold was set to a negative value: " + size);
+	}
+
+	/** Computes an integer threshold. If threshold value is &lt; 0 will return {@link Integer#MAX_VALUE} */
+	public int computeNegMaxI( double totalLength ) {
+		double size = compute(totalLength);
+		if (size >= 0)
+			return (int)Math.round(size);
+		else
+			return Integer.MAX_VALUE;
 	}
 
 	/** Returns the length as a rounded integer. */
@@ -105,12 +114,17 @@ public class ConfigLength implements Configuration {
 		return (int)Math.round(length);
 	}
 
+	public boolean isIdentical( ConfigLength a ) {
+		return length == a.length && fraction == a.fraction;
+	}
+
 	@Override public void checkValidity() {
-		if (length < 0 && fraction < 0)
-			throw new IllegalArgumentException("length and/or fraction must be >= 0");
+//      -1 now means max possible value
+//		if (length < 0 && fraction < 0)
+//			throw new IllegalArgumentException("length and/or fraction must be >= 0");
 		if (isRelative())
 			if (fraction < 0 || fraction > 1.0)
-				throw new IllegalArgumentException("Fractional value must be from 0.0maxFeatures to 1.0, inclusive");
+				throw new IllegalArgumentException("Fractional value must be from 0.0 to 1.0, inclusive");
 	}
 
 	public ConfigLength setTo( ConfigLength src ) {

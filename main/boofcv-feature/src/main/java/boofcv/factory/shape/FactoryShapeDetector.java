@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -110,9 +110,10 @@ public class FactoryShapeDetector {
 
 		BinaryContourFinder contour = FactoryBinaryContourFinder.linearExternal();
 		contour.setConnectRule(config.contourRule);
+		contour.setMinContour(config.minimumContour);
+		contour.setMaxContour(config.maximumContour);
 
 		return new DetectPolygonFromContour<>(contourToPolygon,
-				config.minimumContour,
 				config.clockwise, config.canTouchBorder,
 				config.minimumEdgeIntensity, config.tangentEdgeIntensity, contour, imageType);
 	}

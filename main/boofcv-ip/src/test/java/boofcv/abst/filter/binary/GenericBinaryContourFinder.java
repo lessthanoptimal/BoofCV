@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.abst.filter.binary;
 
 import boofcv.alg.misc.ImageStatistics;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.image.GrayU8;
 import org.junit.jupiter.api.Test;
@@ -48,7 +49,7 @@ public abstract class GenericBinaryContourFinder extends GenericBinaryContourInt
 
 		BinaryContourFinder alg = create();
 
-		alg.setMinContour(1000);
+		alg.setMinContour(ConfigLength.fixed(1000));
 		alg.process(input);
 		assertEquals(0, alg.getContours().size());
 	}
@@ -58,7 +59,7 @@ public abstract class GenericBinaryContourFinder extends GenericBinaryContourInt
 
 		BinaryContourFinder alg = create();
 
-		alg.setMaxContour(1);
+		alg.setMaxContour(ConfigLength.fixed(1));
 		alg.process(input);
 
 		assertEquals(0, alg.getContours().size());

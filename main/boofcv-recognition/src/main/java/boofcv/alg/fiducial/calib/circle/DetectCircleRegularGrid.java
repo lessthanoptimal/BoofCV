@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoGrid.Grid;
 import boofcv.alg.shapes.ellipse.BinaryEllipseDetector;
 import boofcv.alg.shapes.ellipse.BinaryEllipseDetectorPixel;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.curve.EllipseRotated_F64;
 
@@ -56,26 +57,26 @@ public class DetectCircleRegularGrid<T extends ImageGray<T>> extends DetectCircl
 	 * @param ellipseDetector Detects ellipses inside the image
 	 * @param clustering Finds clusters of ellipses
 	 */
-	public DetectCircleRegularGrid(int numRows, int numCols,
-								   InputToBinary<T> inputToBinary,
-								   BinaryEllipseDetector<T> ellipseDetector,
-								   EllipsesIntoClusters clustering) {
-		super(numRows,numCols,inputToBinary,ellipseDetector,clustering,
+	public DetectCircleRegularGrid( int numRows, int numCols,
+									InputToBinary<T> inputToBinary,
+									BinaryEllipseDetector<T> ellipseDetector,
+									EllipsesIntoClusters clustering ) {
+		super(numRows, numCols, inputToBinary, ellipseDetector, clustering,
 				new EllipseClustersIntoRegularGrid());
 	}
 
 	@Override
-	protected void configureContourDetector(T gray) {
+	protected void configureContourDetector( T gray ) {
 		// overestimate the max diameter by not taking in account space between the circles
-		int diameter = Math.max(gray.width,gray.height)/Math.max(numCols,numRows);
+		int diameter = Math.max(gray.width, gray.height)/Math.max(numCols, numRows);
 
 		BinaryEllipseDetectorPixel contourFinder = ellipseDetector.getEllipseDetector();
-		contourFinder.setMaximumContour(((int)(Math.PI*diameter))*2);
+		contourFinder.setMaximumContour(ConfigLength.fixed((Math.PI*diameter)*2));
 		contourFinder.setInternalContour(false);
 	}
 
 	@Override
-	public int totalEllipses( int numRows , int numCols ) {
+	public int totalEllipses( int numRows, int numCols ) {
 		return numRows*numCols;
 	}
 
@@ -83,26 +84,26 @@ public class DetectCircleRegularGrid<T extends ImageGray<T>> extends DetectCircl
 	 * Puts the grid into a canonical orientation
 	 */
 	@Override
-	protected void putGridIntoCanonical(Grid g ) {
+	protected void putGridIntoCanonical( Grid g ) {
 		// first put it into a plausible solution
-		if( g.columns != numCols ) {
+		if (g.columns != numCols) {
 			rotateGridCCW(g);
 		}
 
-		if( isClockWise(g)) {
+		if (isClockWise(g)) {
 			flipHorizontal(g);
 		}
 
 		// pick the solutin which puts (0,0) coordinate the closest to the top left corner to resolve ambiguity
-		if( g.columns == g.rows ) {
-			closestCorner[0] = g.get(0,0).center.normSq();
-			closestCorner[1] = g.get(numRows-1,0).center.normSq();
-			closestCorner[2] = g.get(numRows-1,numCols-1).center.normSq();
-			closestCorner[3] = g.get(0,numCols-1).center.normSq();
+		if (g.columns == g.rows) {
+			closestCorner[0] = g.get(0, 0).center.normSq();
+			closestCorner[1] = g.get(numRows - 1, 0).center.normSq();
+			closestCorner[2] = g.get(numRows - 1, numCols - 1).center.normSq();
+			closestCorner[3] = g.get(0, numCols - 1).center.normSq();
 
 			int best = 0;
 			for (int i = 0; i < 4; i++) {
-				if( closestCorner[i] < closestCorner[best]) {
+				if (closestCorner[i] < closestCorner[best]) {
 					best = i;
 				}
 			}
@@ -111,10 +112,10 @@ public class DetectCircleRegularGrid<T extends ImageGray<T>> extends DetectCircl
 				rotateGridCCW(g);
 			}
 		} else {
-			double d00 = g.get(0,0).center.normSq();
-			double d11 = g.get(numRows-1,numCols-1).center.normSq();
+			double d00 = g.get(0, 0).center.normSq();
+			double d11 = g.get(numRows - 1, numCols - 1).center.normSq();
 
-			if( d11 < d00 ) {
+			if (d11 < d00) {
 				rotateGridCCW(g);
 				rotateGridCCW(g);
 			}
@@ -125,9 +126,9 @@ public class DetectCircleRegularGrid<T extends ImageGray<T>> extends DetectCircl
 	 * Uses the cross product to determine if the grid is in clockwise order
 	 */
 	private static boolean isClockWise( Grid g ) {
-		EllipseRotated_F64 v00 = g.get(0,0);
-		EllipseRotated_F64 v02 = g.get(0,1);
-		EllipseRotated_F64 v20 = g.get(1,0);
+		EllipseRotated_F64 v00 = g.get(0, 0);
+		EllipseRotated_F64 v02 = g.get(0, 1);
+		EllipseRotated_F64 v20 = g.get(1, 0);
 
 		double a_x = v02.center.x - v00.center.x;
 		double a_y = v02.center.y - v00.center.y;
@@ -135,6 +136,6 @@ public class DetectCircleRegularGrid<T extends ImageGray<T>> extends DetectCircl
 		double b_x = v20.center.x - v00.center.x;
 		double b_y = v20.center.y - v00.center.y;
 
-		return a_x * b_y - a_y * b_x < 0;
+		return a_x*b_y - a_y*b_x < 0;
 	}
 }

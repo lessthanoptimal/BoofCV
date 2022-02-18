@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,6 +36,7 @@ import boofcv.factory.geo.EpipolarError;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.misc.BoofMiscOps;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.distort.*;
 import boofcv.struct.geo.AssociatedPair;
@@ -358,7 +359,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> implement
 		// determine the maximum possible size of a square based on image size
 		int maxContourSize = Math.min(gray.width, gray.height)*4;
 		BinaryContourFinder contourFinder = squareDetector.getDetector().getContourFinder();
-		contourFinder.setMaxContour(maxContourSize);
+		contourFinder.setMaxContour(ConfigLength.fixed(maxContourSize)); // TODO this should not be hardcoded
 		contourFinder.setSaveInnerContour(false);
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.filter.binary;
 
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.PackedSetsPoint2D_I32;
 import boofcv.struct.image.GrayS32;
@@ -59,13 +60,16 @@ import org.ddogleg.struct.DogArray;
  * @author Peter Abeles
  */
 public class LinearContourLabelChang2004 {
-
-	// The maximum number of elements in a contour that will be recorded
-	private @Getter @Setter int minContourSize = 0;
-	// The maximum number of elements in a contour that will be recorded
-	private @Getter @Setter int maxContourSize = Integer.MAX_VALUE;
+	// Maximum number of pixels in an external contour. If the contour is longer than this it will be discarded
+	@Getter @Setter private ConfigLength maxContourLength = ConfigLength.fixed(-1);
+	// External contours less than this will be discarded
+	@Getter @Setter private ConfigLength minContourLength = ConfigLength.fixed(0);
 	// If false it will not save internal contours as they are found
 	private @Getter @Setter boolean saveInternalContours = true;
+
+	// Specifies the actual contour length constraints in image pixels
+	private int minContourLengthPixels;
+	private int maxContourLengthPixels;
 
 	// traces edge pixels
 	private ContourTracer tracer;
@@ -98,6 +102,8 @@ public class LinearContourLabelChang2004 {
 	public void process( GrayU8 binary, GrayS32 labeled ) {
 		// initialize data structures
 		labeled.reshape(binary.width, binary.height);
+		minContourLengthPixels = minContourLength.computeNegMaxI(Math.sqrt(binary.width*binary.height));
+		maxContourLengthPixels = maxContourLength.computeNegMaxI(Math.sqrt(binary.width*binary.height));
 
 		// ensure that the image border pixels are filled with zero by enlarging the image
 		if (border.width != binary.width + 2 || border.height != binary.height + 2) {
@@ -175,7 +181,7 @@ public class LinearContourLabelChang2004 {
 		ContourPacked c = contours.grow();
 		c.reset();
 		c.id = contours.size();
-		tracer.setMaxContourSize(maxContourSize);
+		tracer.setMaxContourSize(maxContourLengthPixels);
 		// save the set index for this contour and declare memory for it
 		c.externalIndex = packedPoints.size();
 		packedPoints.grow();
@@ -183,7 +189,7 @@ public class LinearContourLabelChang2004 {
 		tracer.trace(contours.size(), x, y, true);
 
 		// Keep track that this was a contour, but free up all the points used in defining it
-		if (packedPoints.sizeOfTail() >= maxContourSize || packedPoints.sizeOfTail() < minContourSize) {
+		if (packedPoints.sizeOfTail() >= maxContourLengthPixels || packedPoints.sizeOfTail() < minContourLengthPixels) {
 			packedPoints.removeTail();
 			packedPoints.grow();
 		}
@@ -201,11 +207,11 @@ public class LinearContourLabelChang2004 {
 		ContourPacked c = contours.get(label - 1);
 		c.internalIndexes.add(packedPoints.size());
 		packedPoints.grow();
-		tracer.setMaxContourSize(saveInternalContours ? maxContourSize : 0);
+		tracer.setMaxContourSize(saveInternalContours ? maxContourLengthPixels : 0);
 		tracer.trace(label, x, y, false);
 
 		// See if the inner contour exceeded the maximum  or minimum size. If so free its points
-		if (packedPoints.sizeOfTail() >= maxContourSize || packedPoints.sizeOfTail() < minContourSize) {
+		if (packedPoints.sizeOfTail() >= maxContourLengthPixels || packedPoints.sizeOfTail() < minContourLengthPixels) {
 			packedPoints.removeTail();
 			packedPoints.grow();
 		}

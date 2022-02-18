@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -80,9 +80,6 @@ public class UchiyaMarkerImageTracker<T extends ImageGray<T>> {
 	 * @param input Gray scale image
 	 */
 	public void detect( T input ) {
-		// Filter out huge objects since they are very unlikely to be valid dots
-		ellipseDetector.setMaximumContour(Math.min(input.width, input.height)/4);
-
 		// Find the ellipses inside a binary image
 		final long nano0 = System.nanoTime();
 		inputToBinary.process(input, binary);
@@ -105,7 +102,7 @@ public class UchiyaMarkerImageTracker<T extends ImageGray<T>> {
 				continue;
 			}
 			// NOTE: These centers will not be the geometric centers. The geometric center could be found using
-			//       tangent points and this would make it more accurate. Not sure it's worth the effort...
+			//       tangent points and this would make it more accurate. Not sure if it's worth the effort...
 			foundDots.add(f.ellipse.center);
 		}
 		final long nano3 = System.nanoTime();

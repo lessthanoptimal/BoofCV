@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -130,8 +130,7 @@ public class UchiyaMarkerTracker implements VerbosePrint {
 	/**
 	 * Configures the tracker
 	 */
-	public UchiyaMarkerTracker( LlahOperations llahOps,
-								Ransac<Homography2D_F64, AssociatedPair> ransac ) {
+	public UchiyaMarkerTracker( LlahOperations llahOps, Ransac<Homography2D_F64, AssociatedPair> ransac ) {
 		this.llahOps = llahOps;
 		this.ransac = ransac;
 

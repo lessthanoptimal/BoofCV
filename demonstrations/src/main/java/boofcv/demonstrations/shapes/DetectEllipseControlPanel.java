@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,11 +19,10 @@
 package boofcv.demonstrations.shapes;
 
 import boofcv.factory.shape.ConfigEllipseDetector;
+import boofcv.gui.controls.JConfigLength;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import static boofcv.gui.BoofSwingUtil.MAX_ZOOM;
@@ -34,75 +33,47 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
  *
  * @author Peter Abeles
  */
-public class DetectEllipseControlPanel extends DetectBlackShapePanel
-	implements ActionListener, ChangeListener
-{
+public class DetectEllipseControlPanel extends DetectBlackShapePanel implements ActionListener, ChangeListener {
+	ConfigEllipseDetector config = new ConfigEllipseDetector();
 	DetectBlackEllipseApp owner;
 
 	// selects which image to view
-	JComboBox imageView;
-
-	JCheckBox showEllipses;
-	JCheckBox showContour;
+	JComboBox imageView = combo(0, "Input", "Binary", "Black");
 
 	boolean bShowShapes = true;
 	boolean bShowContour = false;
 
+	JCheckBox showEllipses = checkbox("Ellipses", bShowShapes);
+	JCheckBox showContour= checkbox("Contour", bShowContour);
+
 	ThresholdControlPanel threshold;
 
-	JSpinner spinnerMaxContourSize;
-	JSpinner spinnerMinContourSize;
-	JSpinner spinnerMinMinorAxisSize;
+	JConfigLength spinnerMinContourSize = configLength(config.minimumContour, -1, 50000);
+	JConfigLength spinnerMaxContourSize = configLength(config.maximumContour, -1, 50000);
+	JSpinner spinnerMinMinorAxisSize = spinner(config.minimumMinorAxis, 0, 1000.0, 1.0);
 
-	JSpinner spinnerConvergeTol;
-	JSpinner spinnerMaxIterations;
-	JSpinner spinnerNumSample;
-	JSpinner spinnerRadiusSample;
+	JSpinner spinnerConvergeTol = spinner(config.convergenceTol, 0.0, 1.0, 0.001);
+	JSpinner spinnerMaxIterations = spinner(config.maxIterations, 0, 200, 2);
+	JSpinner spinnerNumSample = spinner(config.numSampleContour, 1, 200, 2);
+	JSpinner spinnerRadiusSample = spinner(config.refineRadialSamples, 1, 5, 1);
 
-	JSpinner spinnerMinEdge;
+	JSpinner spinnerMinEdge = spinner(config.minimumEdgeIntensity, 0.0, 255.0, 1.0);
 
-	ConfigEllipseDetector config = new ConfigEllipseDetector();
-
-	public DetectEllipseControlPanel(DetectBlackEllipseApp owner) {
+	public DetectEllipseControlPanel( DetectBlackEllipseApp owner ) {
 		this.owner = owner;
-
-		imageView = new JComboBox();
-		imageView.addItem("Input");
-		imageView.addItem("Binary");
-		imageView.addItem("Black");
-		imageView.addActionListener(this);
-		imageView.setMaximumSize(imageView.getPreferredSize());
-
-		selectZoom = new JSpinner(new SpinnerNumberModel(1,MIN_ZOOM,MAX_ZOOM,1));
-		selectZoom.addChangeListener(this);
-		selectZoom.setMaximumSize(selectZoom.getPreferredSize());
-
-		showEllipses = new JCheckBox("Ellipses");
-		showEllipses.setSelected(bShowShapes);
-		showEllipses.addActionListener(this);
-		showContour = new JCheckBox("Contour");
-		showContour.addActionListener(this);
-		showContour.setSelected(bShowContour);
 
 		threshold = new ThresholdControlPanel(owner);
 
+		selectZoom = new JSpinner(new SpinnerNumberModel(1, MIN_ZOOM, MAX_ZOOM, 1));
+		selectZoom.addChangeListener(this);
+		selectZoom.setMaximumSize(selectZoom.getPreferredSize());
 
-		spinnerMinContourSize = spinner(config.minimumContour,0,50000,20);
-		spinnerMaxContourSize = spinner(config.maximumContour,0,50000,20);
-		spinnerMinMinorAxisSize = spinner(config.minimumMinorAxis,0,1000.0,1.0);
-
-		spinnerMinEdge = spinner(config.minimumEdgeIntensity,0.0,255.0,1.0);
-
-		spinnerConvergeTol = spinner(config.convergenceTol,0.0,1.0,0.001);
 		configureSpinnerFloat(spinnerConvergeTol, 1, 3);
-		spinnerMaxIterations = spinner(config.maxIterations,0,200,2);
-		spinnerNumSample = spinner(config.numSampleContour,1,200,2);
-		spinnerRadiusSample = spinner(config.refineRadialSamples, 1, 5, 1);
 
-		addLabeled(processingTimeLabel,"Time (ms)");
-		addLabeled(imageSizeLabel,"Size");
+		addLabeled(processingTimeLabel, "Time (ms)");
+		addLabeled(imageSizeLabel, "Size");
 		addLabeled(imageView, "View: ");
-		addLabeled(selectZoom,"Zoom");
+		addLabeled(selectZoom, "Zoom");
 		addAlignLeft(showEllipses);
 		addAlignLeft(showContour);
 		add(threshold);
@@ -119,48 +90,43 @@ public class DetectEllipseControlPanel extends DetectBlackShapePanel
 		addVerticalGlue();
 	}
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		if( e.getSource() == imageView ) {
+	@Override public void controlChanged( final Object source ) {
+		if (source == imageView) {
 			selectedView = imageView.getSelectedIndex();
 			owner.viewUpdated();
-		} else if( e.getSource() == showEllipses) {
+		} else if (source == showEllipses) {
 			bShowShapes = showEllipses.isSelected();
 			owner.viewUpdated();
-		} else if( e.getSource() == showContour ) {
+		} else if (source == showContour) {
 			bShowContour = showContour.isSelected();
 			owner.viewUpdated();
-		}
-	}
-
-	@Override
-	public void stateChanged(ChangeEvent e) {
-
-		if( e.getSource() == spinnerMinEdge) {
-			config.minimumEdgeIntensity = ((Number) spinnerMinEdge.getValue()).doubleValue();
-		} else if( e.getSource() == selectZoom ) {
-			zoom = ((Number) selectZoom.getValue()).doubleValue();
-			owner.viewUpdated();
-			return;
-		} else if( e.getSource() == spinnerMinContourSize) {
-			config.minimumContour = ((Number) spinnerMinContourSize.getValue()).intValue();
-		} else if( e.getSource() == spinnerMaxContourSize) {
-			config.maximumContour = ((Number) spinnerMaxContourSize.getValue()).intValue();
-		} else if( e.getSource() == spinnerMinMinorAxisSize) {
-			config.minimumMinorAxis = ((Number) spinnerMinMinorAxisSize.getValue()).doubleValue();
-		} else if( e.getSource() == spinnerConvergeTol) {
-			config.convergenceTol = ((Number) spinnerConvergeTol.getValue()).doubleValue();
-		} else if( e.getSource() == spinnerMaxIterations) {
-			config.maxIterations = ((Number) spinnerMaxIterations.getValue()).intValue();
-		} else if( e.getSource() == spinnerNumSample) {
-			config.numSampleContour = ((Number) spinnerNumSample.getValue()).intValue();
-		} else if( e.getSource() == spinnerRadiusSample) {
-			config.refineRadialSamples = ((Number) spinnerRadiusSample.getValue()).intValue();
 		} else {
-			throw new RuntimeException("Unknown source! BuG");
-		}
+			if (source == spinnerMinEdge) {
+				config.minimumEdgeIntensity = ((Number)spinnerMinEdge.getValue()).doubleValue();
+			} else if (source == selectZoom) {
+				zoom = ((Number)selectZoom.getValue()).doubleValue();
+				owner.viewUpdated();
+				return;
+			} else if (source == spinnerMinContourSize) {
+				config.minimumContour.setTo(spinnerMinContourSize.getValue());
+			} else if (source == spinnerMaxContourSize) {
+				config.maximumContour.setTo(spinnerMaxContourSize.getValue());
+			} else if (source == spinnerMinMinorAxisSize) {
+				config.minimumMinorAxis = ((Number)spinnerMinMinorAxisSize.getValue()).doubleValue();
+			} else if (source == spinnerConvergeTol) {
+				config.convergenceTol = ((Number)spinnerConvergeTol.getValue()).doubleValue();
+			} else if (source == spinnerMaxIterations) {
+				config.maxIterations = ((Number)spinnerMaxIterations.getValue()).intValue();
+			} else if (source == spinnerNumSample) {
+				config.numSampleContour = ((Number)spinnerNumSample.getValue()).intValue();
+			} else if (source == spinnerRadiusSample) {
+				config.refineRadialSamples = ((Number)spinnerRadiusSample.getValue()).intValue();
+			} else {
+				throw new RuntimeException("Unknown source! BuG");
+			}
 
-		owner.configUpdate();
+			owner.configUpdate();
+		}
 	}
 
 	public ThresholdControlPanel getThreshold() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,6 @@ import boofcv.abst.shapes.polyline.PointsToPolyline;
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.binary.ContourPacked;
 import boofcv.misc.MovingAverage;
-import boofcv.struct.ConfigLength;
 import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
@@ -78,10 +77,7 @@ import java.util.Set;
  */
 @SuppressWarnings({"NullAway.Init"})
 public class DetectPolygonFromContour<T extends ImageGray<T>> implements VerbosePrint {
-
-	// minimum size of a shape's contour as a fraction of the image width
-	private ConfigLength minimumContourConfig;
-	private int minimumContour;
+	private int minimumContourPixels;
 	private double minimumArea; // computed from minimumContour
 
 	@Getter private BinaryContourFinder contourFinder;
@@ -147,22 +143,18 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> implements Verbose
 	 * Configures the detector.
 	 *
 	 * @param contourToPolyline Fits a crude polygon to the shape's binary contour
-	 * @param minimumContour Minimum allowed length of a contour. Copy stored internally. Try 50 pixels.
 	 * @param outputClockwiseUpY If true then the order of the output polygons will be in clockwise order
 	 * @param touchBorder if true then shapes which touch the image border are allowed
 	 * @param contourEdgeThreshold Polygons with an edge intensity less than this are discarded.
 	 * @param inputType Type of input image it's processing
 	 */
 	public DetectPolygonFromContour( PointsToPolyline contourToPolyline,
-									 ConfigLength minimumContour,
 									 boolean outputClockwiseUpY,
 									 boolean touchBorder,
 									 double contourEdgeThreshold,
 									 double tangentEdgeIntensity,
 									 BinaryContourFinder contourFinder,
 									 Class<T> inputType ) {
-
-		this.minimumContourConfig = minimumContour.copy(); // local copy so that external can be modified
 		this.contourToPolyline = contourToPolyline;
 		this.outputClockwiseUpY = outputClockwiseUpY;
 		this.canTouchBorder = touchBorder;
@@ -277,15 +269,13 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> implements Verbose
 	 * @param height Height of the input image
 	 */
 	private void configure( int width, int height ) {
-
 		this.imageWidth = width;
 		this.imageHeight = height;
 
 		// adjust size based parameters based on image size
-		this.minimumContour = minimumContourConfig.computeI(Math.min(width, height));
-		this.minimumContour = Math.max(4, minimumContour); // This is needed to avoid processing zero or other impossible
-		this.minimumArea = Math.pow(this.minimumContour/4.0, 2);
-		contourFinder.setMinContour(minimumContour);
+		this.minimumContourPixels = contourFinder.getMinContour(null).computeNegMaxI(Math.sqrt(width*height));
+		this.minimumContourPixels = Math.max(4, minimumContourPixels); // This is needed to avoid processing zero or other impossible
+		this.minimumArea = Math.pow(this.minimumContourPixels/4.0, 2);
 
 		if (helper != null)
 			helper.setImageShape(width, height);
@@ -296,7 +286,6 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> implements Verbose
 	 * below for the requirements. Those that remain are considered to be target candidates.
 	 */
 	private void findCandidateShapes() {
-
 		// find blobs where all 4 edges are lines
 		List<ContourPacked> blobs = contourFinder.getContours();
 		for (int i = 0; i < blobs.size(); i++) {
@@ -304,138 +293,136 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> implements Verbose
 
 			contourTmp.reset();
 			contourFinder.loadContour(c.externalIndex, contourTmp);
-			if (contourTmp.size() >= minimumContour) {
-				float edgeInside = -1, edgeOutside = -1;
+			if (contourTmp.size < minimumContourPixels)
+				continue;
+			float edgeInside = -1, edgeOutside = -1;
 
-//				System.out.println("----- candidate "+contourTmp.size()+"  "+contourTmp.get(0));
-
-				// ignore shapes which touch the image border
-				boolean touchesBorder = touchesBorder(contourTmp.toList());
-				if (!canTouchBorder && touchesBorder) {
-					if (verbose != null) verbose.println("rejected polygon, touched border");
-					continue;
-				}
-
-				if (helper != null)
-					if (!helper.filterContour(contourTmp.toList(), touchesBorder, true))
-						continue;
-
-				// filter out contours which are noise
-				if (contourEdgeIntensity != null) {
-					contourEdgeIntensity.process(contourTmp.toList(), true);
-					edgeInside = contourEdgeIntensity.getEdgeInsideAverage();
-					edgeOutside = contourEdgeIntensity.getEdgeOutsideAverage();
-
-					// take the ABS because CCW/CW isn't known yet
-					if (Math.abs(edgeOutside - edgeInside) < contourEdgeThreshold) {
-						if (verbose != null) verbose.println("rejected polygon. contour edge intensity");
-						continue;
-					}
-				}
-
-				// remove lens distortion
-				List<Point2D_I32> undistorted;
-				if (distToUndist != null) {
-					undistorted = this.undistorted.toList();
-					removeDistortionFromContour(contourTmp.toList(), this.undistorted);
-					if (helper != null)
-						if (!helper.filterContour(this.undistorted.toList(), touchesBorder, false))
-							continue;
-				} else {
-					undistorted = contourTmp.toList();
-				}
-
-				if (helper != null) {
-					helper.configureBeforePolyline(contourToPolyline, touchesBorder);
-				}
-
-				// Find the initial approximate fit of a polygon to the contour
-				if (!contourToPolyline.process(undistorted, splits)) {
-					if (verbose != null)
-						verbose.println("rejected polygon initial fit failed. contour size = " + contourTmp.size());
-					continue;
-				}
-
-				// determine the polygon's orientation
-				polygonPixel.clear();
-				for (int j = 0; j < splits.size; j++) {
-					polygonPixel.add(undistorted.get(splits.get(j)));
-				}
-
-				// Note the CCW here uses a standard geometric coordinate system with +y up, not +y down
-				boolean isCCW = UtilPolygons2D_I32.isCCW(polygonPixel);
-
-				// Now that the orientation is known it can check to see if it's actually trying to fit to a
-				// white blob instead of a black blob
-				if (contourEdgeIntensity != null) {
-					// before it assumed it was CCW
-					if (!isCCW) {
-						float tmp = edgeInside;
-						edgeInside = edgeOutside;
-						edgeOutside = tmp;
-					}
-
-					if (edgeInside > edgeOutside) {
-						if (verbose != null) verbose.println("White blob. Rejected");
-						continue;
-					}
-				}
-
-				// see if it should be flipped so that the polygon has the correct orientation
-				if (outputClockwiseUpY == isCCW) {
-					flip(splits.data, splits.size);
-				}
-
-				// convert the format of the initial crude polygon
-				polygonWork.vertexes.resize(splits.size());
-				polygonDistorted.vertexes.resize(splits.size());
-				for (int j = 0; j < splits.size(); j++) {
-					Point2D_I32 p = undistorted.get(splits.get(j));
-					Point2D_I32 q = contourTmp.get(splits.get(j));
-					polygonWork.get(j).setTo(p.x, p.y);
-					polygonDistorted.get(j).setTo(q.x, q.y);
-				}
-
-				if (touchesBorder) {
-					determineCornersOnBorder(polygonDistorted, borderCorners);
-				} else {
-					borderCorners.resize(0);
-				}
-
-				if (helper != null) {
-					if (!helper.filterPixelPolygon(polygonWork, polygonDistorted, borderCorners, touchesBorder)) {
-						if (verbose != null) verbose.println("rejected by helper.filterPixelPolygon()");
-						continue;
-					}
-				}
-
-				// make sure it's big enough
-				double area = Area2D_F64.polygonSimple(polygonWork);
-
-				if (area < minimumArea) {
-					if (verbose != null) verbose.println("Rejected area");
-					continue;
-				}
-
-				// Get the storage for a new polygon. This is recycled and has already been cleaned up
-				Info info = foundInfo.grow();
-
-				if (distToUndist != null) {
-					// changed the save points in the packed contour list with undistorted coordinates
-					contourFinder.writeContour(c.externalIndex, undistorted);
-				}
-
-				// save results
-				info.splits.setTo(splits);
-				info.contourTouchesBorder = touchesBorder;
-				info.external = true;
-				info.edgeInside = edgeInside;
-				info.edgeOutside = edgeOutside;
-				info.contour = c;
-				info.polygon.setTo(polygonWork);
-				info.polygonDistorted.setTo(polygonDistorted);
-				info.borderCorners.setTo(borderCorners);
+			// ignore shapes which touch the image border
+			boolean touchesBorder = touchesBorder(contourTmp.toList());
+			if (!canTouchBorder && touchesBorder) {
+				if (verbose != null) verbose.println("rejected polygon, touched border");
+				continue;
 			}
+
+			if (helper != null)
+				if (!helper.filterContour(contourTmp.toList(), touchesBorder, true))
+					continue;
+
+			// filter out contours which are noise
+			if (contourEdgeIntensity != null) {
+				contourEdgeIntensity.process(contourTmp.toList(), true);
+				edgeInside = contourEdgeIntensity.getEdgeInsideAverage();
+				edgeOutside = contourEdgeIntensity.getEdgeOutsideAverage();
+
+				// take the ABS because CCW/CW isn't known yet
+				if (Math.abs(edgeOutside - edgeInside) < contourEdgeThreshold) {
+					if (verbose != null) verbose.println("rejected polygon. contour edge intensity");
+					continue;
+				}
+			}
+
+			// remove lens distortion
+			List<Point2D_I32> undistorted;
+			if (distToUndist != null) {
+				undistorted = this.undistorted.toList();
+				removeDistortionFromContour(contourTmp.toList(), this.undistorted);
+				if (helper != null)
+					if (!helper.filterContour(this.undistorted.toList(), touchesBorder, false))
+						continue;
+			} else {
+				undistorted = contourTmp.toList();
+			}
+
+			if (helper != null) {
+				helper.configureBeforePolyline(contourToPolyline, touchesBorder);
+			}
+
+			// Find the initial approximate fit of a polygon to the contour
+			if (!contourToPolyline.process(undistorted, splits)) {
+				if (verbose != null)
+					verbose.println("rejected polygon initial fit failed. contour size = " + contourTmp.size());
+				continue;
+			}
+
+			// determine the polygon's orientation
+			polygonPixel.clear();
+			for (int j = 0; j < splits.size; j++) {
+				polygonPixel.add(undistorted.get(splits.get(j)));
+			}
+
+			// Note the CCW here uses a standard geometric coordinate system with +y up, not +y down
+			boolean isCCW = UtilPolygons2D_I32.isCCW(polygonPixel);
+
+			// Now that the orientation is known it can check to see if it's actually trying to fit to a
+			// white blob instead of a black blob
+			if (contourEdgeIntensity != null) {
+				// before it assumed it was CCW
+				if (!isCCW) {
+					float tmp = edgeInside;
+					edgeInside = edgeOutside;
+					edgeOutside = tmp;
+				}
+
+				if (edgeInside > edgeOutside) {
+					if (verbose != null) verbose.println("White blob. Rejected");
+					continue;
+				}
+			}
+
+			// see if it should be flipped so that the polygon has the correct orientation
+			if (outputClockwiseUpY == isCCW) {
+				flip(splits.data, splits.size);
+			}
+
+			// convert the format of the initial crude polygon
+			polygonWork.vertexes.resize(splits.size());
+			polygonDistorted.vertexes.resize(splits.size());
+			for (int j = 0; j < splits.size(); j++) {
+				Point2D_I32 p = undistorted.get(splits.get(j));
+				Point2D_I32 q = contourTmp.get(splits.get(j));
+				polygonWork.get(j).setTo(p.x, p.y);
+				polygonDistorted.get(j).setTo(q.x, q.y);
+			}
+
+			if (touchesBorder) {
+				determineCornersOnBorder(polygonDistorted, borderCorners);
+			} else {
+				borderCorners.resize(0);
+			}
+
+			if (helper != null) {
+				if (!helper.filterPixelPolygon(polygonWork, polygonDistorted, borderCorners, touchesBorder)) {
+					if (verbose != null) verbose.println("rejected by helper.filterPixelPolygon()");
+					continue;
+				}
+			}
+
+			// make sure it's big enough
+			double area = Area2D_F64.polygonSimple(polygonWork);
+
+			if (area < minimumArea) {
+				if (verbose != null) verbose.println("Rejected area");
+				continue;
+			}
+
+			// Get the storage for a new polygon. This is recycled and has already been cleaned up
+			Info info = foundInfo.grow();
+
+			if (distToUndist != null) {
+				// changed the save points in the packed contour list with undistorted coordinates
+				contourFinder.writeContour(c.externalIndex, undistorted);
+			}
+
+			// save results
+			info.splits.setTo(splits);
+			info.contourTouchesBorder = touchesBorder;
+			info.external = true;
+			info.edgeInside = edgeInside;
+			info.edgeOutside = edgeOutside;
+			info.contour = c;
+			info.polygon.setTo(polygonWork);
+			info.polygonDistorted.setTo(polygonDistorted);
+			info.borderCorners.setTo(borderCorners);
 		}
 	}
 
