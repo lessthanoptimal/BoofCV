@@ -18,7 +18,7 @@
 
 package boofcv.alg.fiducial.aztec;
 
-import boofcv.alg.fiducial.aztec.AztecCode.Modes;
+import boofcv.alg.fiducial.aztec.AztecCode.Mode;
 import boofcv.alg.fiducial.qrcode.PackedBits8;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
@@ -51,6 +51,20 @@ public class TestAztecEncoder extends BoofStandardJUnit {
 		assertEquals("Code 2D!", encoder.workMarker.message);
 	}
 
+	@Test void automatic_example0() {
+		String expected = "001001 110010 000001 101001 101111 000010 100111 100101 000001 011011";
+		expected = expected.replace(" ", ""); // remove human readable spaces
+
+		AztecCode code = new AztecEncoder().addAutomatic("Code 2D!").fixate();
+		var bits = PackedBits8.wrap(code.rawbits, expected.length());
+
+		for (int index = 0; index < expected.length(); index++) {
+			char c = expected.charAt(index);
+			assertEquals(bits.get(index) + "", c + "");
+		}
+		assertEquals("Code 2D!", code.message);
+	}
+
 	/**
 	 * Make sure it respects the user decision when manually specifies the number of layers
 	 */
@@ -63,7 +77,7 @@ public class TestAztecEncoder extends BoofStandardJUnit {
 	 * Exhaustively try all encoding transitions and see if it blows up
 	 */
 	@Test void allModeTransitions() {
-		var encodings = new Modes[]{Modes.UPPER, Modes.LOWER, Modes.MIXED, Modes.PUNCT, Modes.DIGIT, Modes.BYTE};
+		var encodings = new Mode[]{Mode.UPPER, Mode.LOWER, Mode.MIXED, Mode.PUNCT, Mode.DIGIT, Mode.BYTE};
 		for (var a : encodings) {
 			for (var b : encodings) {
 				AztecCode marker = addEncoding(b, addEncoding(a, new AztecEncoder())).fixate();
@@ -72,7 +86,7 @@ public class TestAztecEncoder extends BoofStandardJUnit {
 		}
 	}
 
-	AztecEncoder addEncoding( Modes encoding, AztecEncoder encoder ) {
+	AztecEncoder addEncoding( Mode encoding, AztecEncoder encoder ) {
 		return switch (encoding) {
 			case UPPER -> encoder.addUpper("A");
 			case LOWER -> encoder.addLower("a");

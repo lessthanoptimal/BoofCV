@@ -40,7 +40,7 @@ public class ExampleRenderAztecCode {
 		// Create a marker to render. Almost everything about how the marker is constructed can be manually specified
 		// or you can let it automatically select everything using the message
 		AztecCode marker = new AztecEncoder().setStructure(AztecCode.Structure.COMPACT).
-				addUpper("C").addLower("ode").addDigit(" 2").addUpper("D").addPunctuation("!").fixate();
+				addAutomatic("Code  2D!").fixate();
 		// NOTE: The final function you call must be fixate(), that's how it knows it's done
 
 		// Render the QR as an image. It's also possible to render as a PDF or your own custom format

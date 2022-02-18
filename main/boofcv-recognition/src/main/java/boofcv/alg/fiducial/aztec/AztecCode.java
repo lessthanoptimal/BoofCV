@@ -196,17 +196,17 @@ public class AztecCode {
 	}
 
 	/** Specifies which encoding is currently active in the data stream. */
-	public enum Modes {
+	public enum Mode {
 		UPPER(5),
 		LOWER(5),
 		MIXED(5),
 		PUNCT(5),
 		DIGIT(4),
+		BYTE(8),
 		FNC1(5),
-		ECI(8),
-		BYTE(8);
+		ECI(8);
 
-		Modes( int wordSize ) {
+		Mode( int wordSize ) {
 			this.wordSize = wordSize;
 		}
 
