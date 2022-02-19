@@ -20,6 +20,7 @@ package boofcv.alg.fiducial.aztec;
 
 import boofcv.alg.fiducial.aztec.AztecCode.Structure;
 import boofcv.alg.fiducial.qrcode.PackedBits8;
+import boofcv.alg.fiducial.qrcode.QrCodeDecoderImage;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.InterpolationType;
 import boofcv.factory.interpolate.FactoryInterpolation;
@@ -147,11 +148,18 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 		readModeBitsFromImage(locator);
 
 		// Determine the orientation
-		int orientation = selectOrientation(type);
+		int orientation = selectOrientationAndTranspose(type);
 		if (orientation < 0) {
 			marker.failure = AztecCode.Failure.ORIENTATION;
 			if (verbose != null) verbose.println("failed to find a valid orientation");
 			return false;
+		}
+
+		// See if it needs to handle a transposed marker
+		marker.transposed = orientation >= 4;
+		if (marker.transposed) {
+			orientation -= 4;
+			transposeModeBitArray(imageBits, bits);
 		}
 
 		// Read data bits given known orientation
@@ -160,7 +168,11 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 		// Rotate the locator pattern so that it's in the canonical position. corner[0] is top left
 		for (int i = 0; i < orientation; i++) {
 			for (int layerIdx = 0; layerIdx < marker.locator.layers.size; layerIdx++) {
-				UtilPolygons2D_F64.shiftUp(marker.locator.layers.get(layerIdx).square);
+				if (marker.transposed) {
+					UtilPolygons2D_F64.shiftDown(marker.locator.layers.get(layerIdx).square);
+				} else {
+					UtilPolygons2D_F64.shiftUp(marker.locator.layers.get(layerIdx).square);
+				}
 			}
 		}
 
@@ -172,6 +184,19 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 			return false;
 		}
 		return true;
+	}
+
+	/** Adjust the index of a mode bit when the target is transposed in the image */
+	static int transposeModeBitIndex( int index, int size ) {
+		return (size - index)%size;
+	}
+
+	/** transposes the array used to store mode bits */
+	static void transposeModeBitArray( PackedBits8 bits, PackedBits8 work ) {
+		work.setTo(bits);
+		for (int i = 0; i < bits.size; i++) {
+			bits.set(transposeModeBitIndex(i, bits.size), work.get(i));
+		}
 	}
 
 	/**
@@ -216,23 +241,29 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 
 	/**
 	 * Select best orientation looking at the orientation patterns. Return number
-	 * indicates which side is really the starting point
+	 * indicates which side is really the starting point. If transposed then +4.
 	 */
-	int selectOrientation( Structure type ) {
+	int selectOrientationAndTranspose( Structure type ) {
 		int[] modeBitTypes = getModeBitType(type);
 
 		int width = modeBitTypes.length/4;
 		int bestOrientation = -1;
+		boolean bestTranspose = false;
 		int bestErrors = maxOrientationError;
-		for (int ori = 0; ori < 4; ori++) {
-			int errors = fixedFeatureReadErrors(ori*width, modeBitTypes);
-			if (errors < bestErrors) {
-				bestErrors = errors;
-				bestOrientation = ori;
+
+		for (int tran = 0; tran < 2; tran++) { // transposed loop
+			boolean transposed = tran == 1;
+			for (int ori = 0; ori < 4; ori++) { // orientation loop
+				int errors = fixedFeatureReadErrors(transposed, ori*width, modeBitTypes);
+				if (errors < bestErrors) {
+					bestErrors = errors;
+					bestOrientation = ori;
+					bestTranspose = transposed;
+				}
 			}
 		}
 
-		return bestOrientation;
+		return bestOrientation + (bestTranspose ? 4 : 0);
 	}
 
 	/** Extracts data from the previously read in mode bits, skipping fixed bits */
@@ -255,7 +286,7 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 	}
 
 	/** See how many of the fixed features do not match observations */
-	int fixedFeatureReadErrors( int offset, int[] modeBitTypes ) {
+	int fixedFeatureReadErrors( boolean transposed, int offset, int[] modeBitTypes ) {
 		BoofMiscOps.checkEq(modeBitTypes.length, imageBits.size);
 
 		int errors = 0;
@@ -268,7 +299,8 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 
 			// Fixed Bit. See if it has the expected value
 			int index = (i + offset)%modeBitTypes.length;
-			if (imageBits.get(index) != type)
+			int adjustedIndex = transposed ? transposeModeBitIndex(index, imageBits.size) : index;
+			if (imageBits.get(adjustedIndex) != type)
 				errors++;
 		}
 		return errors;
@@ -292,7 +324,7 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 				marker.failure = AztecCode.Failure.MESSAGE_ECC;
 			else
 				marker.failure = AztecCode.Failure.MESSAGE_PARSE;
-			if (verbose != null) verbose.println("Could not decode the message");
+			if (verbose != null) verbose.println("Could not decode the message. ecc=" + decodeMessage.failedECC);
 			return false;
 		}
 		return true;
@@ -303,7 +335,16 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 		// Use locator pattern to determine the threshold and coordinate system
 		int modeGridWidth = marker.locator.getGridWidth();
 		AztecPyramid.Layer locator = marker.locator.layers.get(0);
+
+		// Transpose the square so that the coordinate system is transposed
+		if (marker.transposed) QrCodeDecoderImage.transposeCorners(locator.square);
+
+		// Initialize the coordinate system transform
 		gridToPixel.initOriginCenter(locator.square, modeGridWidth - 6);
+
+		//  Undo transpose so that the corner order is consistent. This is important for polygon operations.
+		if (marker.transposed) QrCodeDecoderImage.transposeCorners(locator.square);
+
 		float threshold = (float)locator.threshold;
 
 		// Read image bits in chunks of 8 for write efficiency

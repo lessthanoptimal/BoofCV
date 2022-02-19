@@ -12,7 +12,6 @@ Version : 0.41
 - ConvertBufferedImage
   - TODO https://github.com/lessthanoptimal/BoofCV/issues/284
 - Added Aztec Code encoder and decoder
-  - TODO support transposed
   - TODO JMH
 - SLAM
   - TODO Monocular
