@@ -183,6 +183,13 @@ public class AztecDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
 			if (verbose != null) verbose.println("error correction failed when decoding mode");
 			return false;
 		}
+
+		// Sanity check the mode
+		if (marker.messageWordCount > marker.getCapacityWords()) {
+			if (verbose != null) verbose.println("number of message words exceeds marker capacity");
+			return false;
+		}
+
 		return true;
 	}
 

@@ -210,26 +210,24 @@ public class DetectAztecCodeApp<T extends ImageGray<T>>
 			detector.process((T)input);
 			long after = System.nanoTime();
 			timeInSeconds = (after - before)*1e-9;
+
+			synchronized (detected) {
+				this.detected.reset();
+				for (AztecCode d : detector.getDetections()) {
+					this.detected.grow().setTo(d);
+				}
+				this.failures.reset();
+				for (AztecCode d : detector.getFailures()) {
+					// If it fails this early it's probably a real false positive. Let's just ignore it
+					if (d.failure.ordinal() <= AztecCode.Failure.MODE_ECC.ordinal())
+						continue;
+					this.failures.grow().setTo(d);
+				}
+			}
 		}
 
 		// create a local copy so that gui and processing thread's dont conflict
-		synchronized (detected) {
-			this.detected.reset();
-			for (AztecCode d : detector.getDetections()) {
-				this.detected.grow().setTo(d);
-			}
-			this.failures.reset();
-			for (AztecCode d : detector.getFailures()) {
-				// If it fails this early it's probably a real false positive. Let's just ignore it
-				if (d.failure.ordinal() <= AztecCode.Failure.MODE_ECC.ordinal())
-					continue;
-				this.failures.grow().setTo(d);
-			}
-//			System.out.println("Failed "+failures.size());
-//			for( AztecCode qr : failures.toList() ) {
-//				System.out.println("  cause "+qr.failureCause);
-//			}
-		}
+
 		controlPanel.polygonPanel.thresholdPanel.updateHistogram((T)input);
 
 		SwingUtilities.invokeLater(() -> {
