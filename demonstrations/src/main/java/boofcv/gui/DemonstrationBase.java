@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -493,7 +493,7 @@ public abstract class DemonstrationBase extends JPanel {
 			e.printStackTrace();
 			return;
 		}
-		File current = new File(UtilIO.ensureUrlNotNull(path).getFile());
+		File current = new File(UtilIO.ensureUrlNotNull(path).getFile().replace("%20"," "));
 		File parent = current.getParentFile();
 		if (parent == null)
 			return;
