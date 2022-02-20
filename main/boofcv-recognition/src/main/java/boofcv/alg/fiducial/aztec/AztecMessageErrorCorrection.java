@@ -99,6 +99,9 @@ public abstract class AztecMessageErrorCorrection {
 	 * Extract saved message data from the marker and split it into data and ecc words
 	 */
 	void extractWordsFromMarker( AztecCode marker ) {
+		BoofMiscOps.checkTrue(marker.messageWordCount > 0);
+		BoofMiscOps.checkTrue(marker.getCapacityWords() >= marker.messageWordCount);
+
 		int wordBitCount = marker.getWordBitCount();
 		PackedBits8 bits = PackedBits8.wrap(marker.rawbits, marker.getCapacityBits());
 

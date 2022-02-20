@@ -132,8 +132,9 @@ public class DetectAztecCodeMessagePanel extends StandardAlgConfigPanel
 			textArea.setText(String.format("%5s Layers %2d  ECC %.1f\nMessage Words %d\nCause: %s",
 					marker.structure, marker.dataLayers, errorLevel, marker.messageWordCount, marker.failure));
 		} else {
-			textArea.setText(String.format("%5s Layers %2d  ECC %.1f\nMessage Words %d\nBit Errors %d\n\n%s",
-					marker.structure, marker.dataLayers, errorLevel, marker.messageWordCount, marker.totalBitErrors, marker.message));
+			textArea.setText(String.format("%5s Layers %2d  ECC %.1f\ntransposed=%s\nMessage Words %d\nBit Errors %d\n\n%s",
+					marker.structure, marker.dataLayers, errorLevel, marker.transposed + "",
+					marker.messageWordCount, marker.totalBitErrors, marker.message));
 		}
 	}
 
