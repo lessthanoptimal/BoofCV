@@ -29,8 +29,8 @@ import boofcv.struct.image.GrayU8;
 import java.awt.image.BufferedImage;
 
 /**
- * A simple API is provided for creating your own Aztec Code marker. Used extensively in BoofCV for testing purposes.
- * It's also easy to extending the rendering tools to support other file formats.
+ * An easy-to-use API is provided for creating your own Aztec Code marker. You can render it as an image or PDF
+ * document.
  *
  * @author Peter Abeles
  * @see MicroQrCodeGenerator
@@ -38,12 +38,11 @@ import java.awt.image.BufferedImage;
 public class ExampleRenderAztecCode {
 	public static void main( String[] args ) {
 		// Create a marker to render. Almost everything about how the marker is constructed can be manually specified
-		// or you can let it automatically select everything using the message
-		AztecCode marker = new AztecEncoder().setStructure(AztecCode.Structure.COMPACT).
-				addAutomatic("Code  2D!").fixate();
+		// or you can let it automatically select everything
+		AztecCode marker = new AztecEncoder().addAutomatic("Code 2D!").fixate();
 		// NOTE: The final function you call must be fixate(), that's how it knows it's done
 
-		// Render the QR as an image. It's also possible to render as a PDF or your own custom format
+		// Render the marker as an image. It's also possible to render as a PDF or your own custom format
 		GrayU8 rendered = AztecGenerator.renderImage(/* pixel per square */ 10, /* border squares */ 1, marker);
 
 		// Convert it to a BufferedImage for display purposes
@@ -52,7 +51,7 @@ public class ExampleRenderAztecCode {
 		// You can also save it to disk by uncommenting the line below
 //		UtilImageIO.saveImage(output, "aztec.png");
 
-		// Display the image
+		// Display the rendered marker
 		ShowImages.showWindow(output, "Rendered Aztec Code", true);
 	}
 }

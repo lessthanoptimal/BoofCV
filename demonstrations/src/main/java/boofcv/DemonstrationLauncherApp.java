@@ -154,6 +154,7 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 				DetectECoCheckApp.class,
 				DetectQrCodeApp.class,
 				DetectMicroQrApp.class,
+				DetectAztecCodeApp.class,
 				DetectUchiyaMarkerApp.class,
 				VisualizeSquareBinaryFiducial.class,
 				VisualizeSquareFiducial.class);
