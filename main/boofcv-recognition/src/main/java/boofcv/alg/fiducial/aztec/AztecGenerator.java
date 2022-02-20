@@ -102,11 +102,11 @@ public class AztecGenerator {
 			int center = lengthInSquares/2;
 			int odd = ((lengthInSquares - orientationSquareCount)/2)%2;
 			for (int location = 0; center + location < lengthInSquares; location += 16) {
-				referenceGridLine(odd, center - location, 1, 0, lengthInSquares);
-				referenceGridLine(odd, center + location, 1, 0, lengthInSquares);
+				referenceGridLine(odd, center - location, 1, 0, lengthInSquares - odd);
+				referenceGridLine(odd, center + location, 1, 0, lengthInSquares - odd);
 
-				referenceGridLine(center - location, odd, 0, 1, lengthInSquares);
-				referenceGridLine(center + location, odd, 0, 1, lengthInSquares);
+				referenceGridLine(center - location, odd, 0, 1, lengthInSquares - odd);
+				referenceGridLine(center + location, odd, 0, 1, lengthInSquares - odd);
 			}
 		}
 	}
