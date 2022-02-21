@@ -226,13 +226,12 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> implements Verbose
 						+ (gray.width + padding) + "x" + (gray.height + padding));
 			}
 		} else {
-			InputSanityCheck.checkSameShape(binary, gray);
+			InputSanityCheck.checkSameShape(gray, binary);
 		}
 		if (imageWidth != gray.width || imageHeight != gray.height)
 			configure(gray.width, gray.height);
 
-		// reset storage for output. Call reset individually here to ensure that all references
-		// are nulled from last time
+		// reset storage for output. Call reset individually here to ensure that all references are nulled from last time
 		for (int i = 0; i < foundInfo.size; i++) {
 			foundInfo.get(i).reset();
 		}

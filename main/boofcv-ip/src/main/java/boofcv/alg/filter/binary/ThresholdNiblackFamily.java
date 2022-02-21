@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -123,13 +123,14 @@ public class ThresholdNiblackFamily implements InputToBinary<GrayF32> {
 	 */
 	@Override
 	public void process( GrayF32 input, GrayU8 output ) {
-		inputPow2.reshape(input.width, input.height);
-		inputMean.reshape(input.width, input.height);
-		inputMeanPow2.reshape(input.width, input.height);
-		inputPow2Mean.reshape(input.width, input.height);
-		stdev.reshape(input.width, input.height);
-		tmp.reshape(input.width, input.height);
-		inputPow2.reshape(input.width, input.height);
+		output.reshape(input);
+		inputPow2.reshape(input);
+		inputMean.reshape(input);
+		inputMeanPow2.reshape(input);
+		inputPow2Mean.reshape(input);
+		stdev.reshape(input);
+		tmp.reshape(input);
+		inputPow2.reshape(input);
 
 		int radius = width.computeI(Math.min(input.width, input.height))/2;
 

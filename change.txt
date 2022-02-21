@@ -12,6 +12,8 @@ Version : 0.41
 - ConvertBufferedImage
   - TODO https://github.com/lessthanoptimal/BoofCV/issues/284
 - Added Aztec Code encoder and decoder
+- Various
+  - Fixed crash in Niblack Family when output image was not resized to match input image
 - SLAM
   - TODO Monocular
   - TODO Stereo

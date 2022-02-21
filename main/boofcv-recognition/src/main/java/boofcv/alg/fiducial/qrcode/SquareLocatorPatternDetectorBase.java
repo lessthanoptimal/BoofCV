@@ -19,6 +19,7 @@
 package boofcv.alg.fiducial.qrcode;
 
 import boofcv.abst.filter.binary.BinaryContourFinder;
+import boofcv.alg.InputSanityCheck;
 import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.interpolate.InterpolatePixelDistortS;
 import boofcv.alg.interpolate.InterpolatePixelS;
@@ -84,6 +85,7 @@ public abstract class SquareLocatorPatternDetectorBase<T extends ImageGray<T>> i
 	 * @param binary Binary version of gray image.
 	 */
 	public void process( T gray, GrayU8 binary ) {
+		InputSanityCheck.checkSameShape(gray, binary);
 		configureContourDetector(gray);
 		interpolate.setImage(gray);
 

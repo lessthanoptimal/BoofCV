@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,10 +51,11 @@ public class InputToBinarySwitch<T extends ImageGray<T>> implements InputToBinar
 
 	@Override
 	public void process( T input, GrayU8 output ) {
+		output.reshape(input);
 		if (this.work == null)
 			alg.process(input, output);
 		else {
-			this.work.reshape(input.width, input.height);
+			this.work.reshape(input);
 			GConvertImage.convert(input, this.work);
 			alg.process(this.work, output);
 		}

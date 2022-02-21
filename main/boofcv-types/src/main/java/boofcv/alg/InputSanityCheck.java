@@ -120,29 +120,25 @@ public class InputSanityCheck {
 	 */
 	public static void checkReshapeB( ImageMultiBand<?> imgA, ImageMultiBand<?> imgB ) {
 		if (imgA == imgB)
-			throw new IllegalArgumentException("Image's can't be the same instance");
+			throw new IllegalArgumentException("Images can't be the same instance");
 		imgB.reshapeTo(imgA);
 	}
 
 	public static void checkSameShape( ImageBase<?> imgA, ImageBase<?> imgB ) {
-		if (imgA.width != imgB.width)
-			throw new IllegalArgumentException("Image widths do not match. " + imgA.width + " " + imgB.width);
-		if (imgA.height != imgB.height)
-			throw new IllegalArgumentException("Image heights do not match. " + imgA.height + " " + imgB.height);
+		if (imgA.width != imgB.width || imgA.height != imgB.height)
+			throw new IllegalArgumentException("Image shapes do not match. " + imgA.width + "x" + imgA.height + " vs " + imgB.width + "x" + imgB.height);
 	}
 
 	public static void checkSameShapeB( ImageMultiBand<?> imgA, ImageMultiBand<?> imgB ) {
-		if (imgA.width != imgB.width)
-			throw new IllegalArgumentException("Image widths do not match. " + imgA.width + " " + imgB.width);
-		if (imgA.height != imgB.height)
-			throw new IllegalArgumentException("Image heights do not match. " + imgA.height + " " + imgB.height);
+		if (imgA.width != imgB.width || imgA.height != imgB.height)
+			throw new IllegalArgumentException("Image shapes do not match. " + imgA.width + "x" + imgA.height + " vs " + imgB.width + "x" + imgB.height);
 		if (imgA.getNumBands() != imgB.getNumBands())
 			throw new IllegalArgumentException("Number of bands do not match " + imgA.getNumBands() + " " + imgB.getNumBands());
 	}
 
 	public static void checkSameShape( ImagePyramid<?> imgA, ImagePyramid<?> imgB ) {
 		if (imgA.getNumLayers() != imgB.getNumLayers())
-			throw new IllegalArgumentException("Number of layers do not match");
+			throw new IllegalArgumentException("Number of layers do not match. " + imgA.getNumLayers() + " " + imgB.getNumLayers());
 		int N = imgA.getNumLayers();
 		for (int i = 0; i < N; i++) {
 			if (imgA.getScale(i) != imgB.getScale(i))

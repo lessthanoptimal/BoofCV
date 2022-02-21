@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,6 +27,8 @@ import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /**
  * @author Peter Abeles
  */
@@ -41,7 +43,7 @@ public class TestThresholdNiblackFamily extends BoofStandardJUnit {
 		simple(ThresholdNiblackFamily.Variant.WOLF_JOLION);
 	}
 
-	void simple(ThresholdNiblackFamily.Variant variant) {
+	void simple( ThresholdNiblackFamily.Variant variant ) {
 		int width = 11;
 		GrayU8 expected = new GrayU8(30, 35);
 
@@ -72,6 +74,17 @@ public class TestThresholdNiblackFamily extends BoofStandardJUnit {
 		BinaryImageOps.invert(expected, expected);
 
 		BoofTesting.assertEqualsInner(expected, found, 0, radius, radius, false);
+	}
+
+	@Test void reshapeOutput() {
+		GrayF32 input = new GrayF32(30, 35);
+		GrayU8 output = new GrayU8(1, 1);
+
+		ConfigLength regionWidth = ConfigLength.fixed(10);
+		var alg = new ThresholdNiblackFamily(regionWidth, 0.5f, true, ThresholdNiblackFamily.Variant.SAUVOLA);
+		alg.process(input, output);
+		assertEquals(30, output.width);
+		assertEquals(35, output.height);
 	}
 
 	@Test void bruteForce() {
