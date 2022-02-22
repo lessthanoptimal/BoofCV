@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,9 +40,10 @@ public class BOverrideBlurImageOps extends BOverrideClass {
 	public static @Nullable Gaussian gaussian;
 
 	public interface Mean<T extends ImageBase<T>> {
-		void processMeanWeighted( T input, T output, int radiusX, int radiusY, T storage );
+		void processMeanWeighted( T input, T output, int radiusX, int radiusY, @Nullable T storage );
 
-		void processMeanBorder( T input, T output, int radiusX, int radiusY, @Nullable ImageBorder<T> border, T storage );
+		void processMeanBorder( T input, T output, int radiusX, int radiusY, @Nullable ImageBorder<T> border,
+								@Nullable T storage );
 	}
 
 	public interface Median<T extends ImageBase<T>> {
@@ -50,14 +51,15 @@ public class BOverrideBlurImageOps extends BOverrideClass {
 	}
 
 	public interface Gaussian<T extends ImageBase<T>> {
-		void processGaussian( T input, T output, double sigmaX, int radiusX, double sigmaY, int radiusY, T storage );
+		void processGaussian( T input, T output, double sigmaX, int radiusX, double sigmaY, int radiusY,
+							  @Nullable T storage );
 	}
 
 	/**
 	 * Weighted average mean
 	 */
 	public static <T extends ImageBase<T>>
-	boolean invokeNativeMeanWeighted( T input, T output, int radiusX, int radiusY, T storage ) {
+	boolean invokeNativeMeanWeighted( T input, T output, int radiusX, int radiusY, @Nullable T storage ) {
 		boolean processed = false;
 		if (BOverrideBlurImageOps.mean != null) {
 			try {
@@ -72,7 +74,8 @@ public class BOverrideBlurImageOps extends BOverrideClass {
 	 * Extended border mean
 	 */
 	public static <T extends ImageBase<T>>
-	boolean invokeNativeMeanBorder( T input, T output, int radiusX, int radiusY, @Nullable ImageBorder<T> border, T storage ) {
+	boolean invokeNativeMeanBorder( T input, T output, int radiusX, int radiusY,
+									@Nullable ImageBorder<T> border, @Nullable T storage ) {
 		boolean processed = false;
 		if (BOverrideBlurImageOps.mean != null) {
 			try {
@@ -98,7 +101,8 @@ public class BOverrideBlurImageOps extends BOverrideClass {
 
 	// TODO replace with native normalized?
 	public static <T extends ImageBase<T>>
-	boolean invokeNativeGaussian( T input, T output, double sigmaX, int radiusX, double sigmaY, int radiusY, T storage ) {
+	boolean invokeNativeGaussian( T input, T output, double sigmaX, int radiusX, double sigmaY, int radiusY,
+								  @Nullable T storage ) {
 		boolean processed = false;
 		if (BOverrideBlurImageOps.gaussian != null) {
 			try {
