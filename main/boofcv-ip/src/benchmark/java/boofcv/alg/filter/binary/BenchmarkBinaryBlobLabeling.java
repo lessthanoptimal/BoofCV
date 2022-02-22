@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,6 @@
 package boofcv.alg.filter.binary;
 
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
@@ -28,6 +27,7 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.openjdk.jmh.runner.options.TimeValue;
 
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -44,10 +44,6 @@ import java.util.concurrent.TimeUnit;
 @State(Scope.Benchmark)
 @Fork(value=1)
 public class BenchmarkBinaryBlobLabeling {
-
-	@Param({"true","false"})
-	public boolean concurrent;
-
 	//	@Param({"100", "500", "1000", "5000", "10000"})
 	@Param({"1000"})
 	public int size;
@@ -58,11 +54,12 @@ public class BenchmarkBinaryBlobLabeling {
 
 	LinearContourLabelChang2004 chang4 = new LinearContourLabelChang2004(ConnectRule.FOUR);
 	LinearContourLabelChang2004 chang8 = new LinearContourLabelChang2004(ConnectRule.EIGHT);
+	LinearExternalContours external4 = new LinearExternalContours(ConnectRule.FOUR);
+	LinearExternalContours external8 = new LinearExternalContours(ConnectRule.EIGHT);
 
 	@Setup
 	public void setup() {
-		BoofConcurrency.USE_CONCURRENT = concurrent;
-		Random rand = new Random(234);
+		var rand = new Random(234);
 
 		original.reshape(size, size);
 		input.reshape(size, size);
@@ -80,10 +77,14 @@ public class BenchmarkBinaryBlobLabeling {
 
 	@Benchmark public void Chang2004_4() { input.setTo(original); chang4.process(input, output); }
 	@Benchmark public void Chang2004_8() { input.setTo(original); chang8.process(input, output); }
+	@Benchmark public void External_4() { input.setTo(original); external4.process(input, 0, 0); }
+	@Benchmark public void External_8() { input.setTo(original); external8.process(input, 0, 0); }
 
 	public static void main(String[] args) throws RunnerException {
 		Options opt = new OptionsBuilder()
 				.include(BenchmarkBinaryBlobLabeling.class.getSimpleName())
+				.warmupTime(TimeValue.seconds(1))
+				.measurementTime(TimeValue.seconds(1))
 				.build();
 
 		new Runner(opt).run();
