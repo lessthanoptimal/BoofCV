@@ -68,7 +68,7 @@ public class ConfigPolygonFromContour implements Configuration {
 	 * Specifies the minimum allowed contour length. Relative lengths will be relative with to the image's
 	 * sqrt(width*height).
 	 */
-	public ConfigLength minimumContour = ConfigLength.relative(0.05, 4);
+	public ConfigLength minimumContour = ConfigLength.relative(0.044, 4);
 
 	/**
 	 * Specifies the maximum allowed contour length. Relative lengths will be relative with to the image's
