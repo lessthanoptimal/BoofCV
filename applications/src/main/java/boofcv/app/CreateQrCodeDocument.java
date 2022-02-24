@@ -236,7 +236,7 @@ public class CreateQrCodeDocument {
 				Objects.requireNonNull(unit);
 				CreateQrCodeDocumentPDF renderer = new CreateQrCodeDocumentPDF(fileName, paperSize, unit);
 				renderer.markerWidth = markerWidth;
-				renderer.spaceBetween = gridFill || markers.isEmpty() ? spaceBetween : 0.0f;
+				renderer.spaceBetween = gridFill || markers.size() > 1 ? spaceBetween : 0.0f;
 				renderer.gridFill = gridFill;
 				renderer.drawGrid = drawGrid;
 				renderer.showInfo = !hideInfo;

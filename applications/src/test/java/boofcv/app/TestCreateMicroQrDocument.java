@@ -104,7 +104,21 @@ public class TestCreateMicroQrDocument extends CommonFiducialPdfChecks {
 
 		assertEquals(4, found.size());
 
-		checkFound(found, "1234567", "second");
+		checkFound(detector.getDetections(), "1234567", "second");
+	}
+
+	/** Single marker with no border should be created */
+	@Test void noAddedBorder() throws IOException {
+		createDocument("-t 1234567 -p 10.5:10.5 -w 10 -o target.pdf");
+		BufferedImage image = loadPDF();
+
+		GrayF32 gray = ConvertBufferedImage.convertFrom(image, GrayF32.class, true);
+
+		MicroQrCodeDetector<GrayF32> detector = FactoryFiducial.microqr(null, GrayF32.class);
+
+		detector.process(gray);
+
+		checkFound(detector.getDetections(), "1234567");
 	}
 
 	private void checkFound( List<MicroQrCode> found, String... messages ) {

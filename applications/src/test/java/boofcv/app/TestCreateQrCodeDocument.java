@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,8 +54,7 @@ public class TestCreateQrCodeDocument extends CommonFiducialPdfChecks {
 		createDocument("-t http://boofcv.org -p LETTER -w 5 -o target.pdf");
 		BufferedImage image = loadPDF();
 
-		GrayF32 gray = new GrayF32(image.getWidth(), image.getHeight());
-		ConvertBufferedImage.convertFrom(image, gray);
+		GrayF32 gray = ConvertBufferedImage.convertFrom(image, GrayF32.class, true);
 
 //		ShowImages.showWindow(image,"Rendered", true);
 //		BoofMiscOps.sleep(10000);
@@ -73,8 +72,7 @@ public class TestCreateQrCodeDocument extends CommonFiducialPdfChecks {
 		createDocument("-t http://boofcv.org -t second -p LETTER -w 5 -o target.pdf");
 		BufferedImage image = loadPDF();
 
-		GrayF32 gray = new GrayF32(image.getWidth(), image.getHeight());
-		ConvertBufferedImage.convertFrom(image, gray);
+		GrayF32 gray = ConvertBufferedImage.convertFrom(image, GrayF32.class, true);
 
 //		ShowImages.showWindow(image,"Rendered", true);
 //		BoofMiscOps.sleep(10000);
@@ -93,8 +91,7 @@ public class TestCreateQrCodeDocument extends CommonFiducialPdfChecks {
 		createDocument("-t http://boofcv.org -t second -p 14cm:14cm --GridFill -w 5 -o target.pdf");
 		BufferedImage image = loadPDF();
 
-		GrayF32 gray = new GrayF32(image.getWidth(), image.getHeight());
-		ConvertBufferedImage.convertFrom(image, gray);
+		GrayF32 gray = ConvertBufferedImage.convertFrom(image, GrayF32.class, true);
 
 //		ShowImages.showWindow(image,"Rendered", true);
 //		BoofMiscOps.sleep(10000);
@@ -107,6 +104,20 @@ public class TestCreateQrCodeDocument extends CommonFiducialPdfChecks {
 		assertEquals(4, found.size());
 
 		checkFound(found, "http://boofcv.org", "second");
+	}
+
+	/** Single marker with no border should be created */
+	@Test void noAddedBorder() throws IOException {
+		createDocument("-t http://boofcv.org -p 10.5:10.5 -w 10 -o target.pdf");
+		BufferedImage image = loadPDF();
+
+		GrayF32 gray = ConvertBufferedImage.convertFrom(image, GrayF32.class, true);
+
+		QrCodeDetector<GrayF32> detector = FactoryFiducial.qrcode(null, GrayF32.class);
+
+		detector.process(gray);
+
+		checkFound(detector.getDetections(), "http://boofcv.org");
 	}
 
 	private void checkFound( List<QrCode> found, String... messages ) {

@@ -236,7 +236,7 @@ public class CreateAztecCodeDocument {
 				Objects.requireNonNull(unit);
 				var renderer = new CreateAztecCodeDocumentPDF(fileName, paperSize, unit);
 				renderer.markerWidth = markerWidth > 0 ? markerWidth : squareWidth*markers.get(0).getMarkerWidthSquares();
-				renderer.spaceBetween = gridFill || markers.isEmpty() ? spaceBetween : 0.0f;
+				renderer.spaceBetween = gridFill || markers.size() > 1 ? spaceBetween : 0.0f;
 				renderer.gridFill = gridFill;
 				renderer.drawGrid = drawGrid;
 				renderer.showInfo = !hideInfo;

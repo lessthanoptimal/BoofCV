@@ -102,6 +102,19 @@ public class TestCreateAztecCodeDocument extends CommonFiducialPdfChecks {
 		checkFound(found, "http://boofcv.org", "second");
 	}
 
+	/** Single marker with no border should be created */
+	@Test void noAddedBorder() throws IOException {
+		createDocument("-t 1234567 -p 10.5:10.5 -w 10 -o target.pdf");
+
+		GrayF32 gray = ConvertBufferedImage.convertFrom(loadPDF(), GrayF32.class, true);
+
+		AztecCodeDetector<GrayF32> detector = FactoryFiducial.aztec(null, GrayF32.class);
+
+		detector.process(gray);
+
+		checkFound(detector.getDetections(), "1234567");
+	}
+
 	private void checkFound( List<AztecCode> found, String... messages ) {
 		boolean[] matches = new boolean[messages.length];
 		int total = 0;
