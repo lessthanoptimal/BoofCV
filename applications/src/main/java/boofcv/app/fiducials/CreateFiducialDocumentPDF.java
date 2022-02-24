@@ -96,11 +96,14 @@ public abstract class CreateFiducialDocumentPDF {
 	}
 
 	public void render() throws IOException {
-		if (markerWidth <= 0 || spaceBetween <= 0)
-			throw new RuntimeException("Must specify the marker's dimensions. Width and spacing");
+		if (markerWidth <= 0)
+			throw new RuntimeException("Must specify the marker's dimensions.");
+		if ((totalMarkers > 1 || gridFill) && spaceBetween <= 0)
+			throw new RuntimeException("Must specify a positive space between if a grid is rendered");
 
 		float markerHeight = this.markerHeight > 0 ? this.markerHeight : this.markerWidth;
 
+		// Compute how much space each marker required. If it's a grid then space is needed between the markers
 		float sizeBoxX = (markerWidth + spaceBetween)*UNIT_TO_POINTS;
 		float sizeBoxY = (markerHeight + spaceBetween)*UNIT_TO_POINTS;
 

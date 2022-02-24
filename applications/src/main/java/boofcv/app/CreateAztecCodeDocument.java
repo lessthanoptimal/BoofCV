@@ -84,9 +84,6 @@ public class CreateAztecCodeDocument {
 			"Valid extensions are pdf, png, jpg, gif, bmp")
 	public String fileName = "microqr";
 
-	@Option(name = "--DisablePrintInfo", usage = "Disable printing information about the calibration target")
-	public boolean disablePrintInfo = false;
-
 	@Option(name = "--GridFill", usage = "Flag to turn on filling the entire document with a grid of qr codes")
 	public boolean gridFill = false;
 
@@ -171,8 +168,8 @@ public class CreateAztecCodeDocument {
 			if (paperSize == null) {
 				String[] words = _paperSize.split(":");
 				if (words.length != 2) failExit("Expected two value+unit separated by a :");
-				LengthUnit w = new LengthUnit(words[0]);
-				LengthUnit h = new LengthUnit(words[1]);
+				var w = new LengthUnit(words[0], unit);
+				var h = new LengthUnit(words[1], unit);
 				if (w.unit != h.unit) failExit("Same units must be specified for width and height");
 				paperSize = new PaperSize(w.length, h.length, w.getUnit());
 			}
@@ -193,7 +190,7 @@ public class CreateAztecCodeDocument {
 			Objects.requireNonNull(unit);
 			System.out.println("   Document     : PDF");
 			System.out.println("   paper        : " + paperSize);
-			System.out.println("   info         : " + !disablePrintInfo);
+			System.out.println("   info         : " + !hideInfo);
 			System.out.println("   units        : " + unit);
 			System.out.println("   marker width : " + markerWidth + " (" + unit.abbreviation + ")");
 		} else {
@@ -239,7 +236,7 @@ public class CreateAztecCodeDocument {
 				Objects.requireNonNull(unit);
 				var renderer = new CreateAztecCodeDocumentPDF(fileName, paperSize, unit);
 				renderer.markerWidth = markerWidth > 0 ? markerWidth : squareWidth*markers.get(0).getMarkerWidthSquares();
-				renderer.spaceBetween = spaceBetween;
+				renderer.spaceBetween = gridFill || markers.isEmpty() ? spaceBetween : 0.0f;
 				renderer.gridFill = gridFill;
 				renderer.drawGrid = drawGrid;
 				renderer.showInfo = !hideInfo;

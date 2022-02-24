@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,11 @@ public class LengthUnit {
 	public Unit unit;
 
 	public LengthUnit( String string ) {
-		unit = Unit.UNKNOWN;
+		this(string, Unit.UNKNOWN);
+	}
+
+	public LengthUnit( String string, Unit defaultUnit ) {
+		unit = defaultUnit;
 		for (Unit u : Unit.values()) { // lint:forbidden ignore_line
 			if (string.endsWith(u.abbreviation)) {
 				unit = u;
