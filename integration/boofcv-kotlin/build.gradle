@@ -1,19 +1,19 @@
 plugins {
-	id 'org.jetbrains.kotlin.jvm' version '1.4.0'
+	id 'org.jetbrains.kotlin.jvm' version '1.6.10'
 }
 
 configurations.all {
 	resolutionStrategy {
-		force 'org.jetbrains:annotations:20.0.0'
-		force 'org.jetbrains.kotlin:kotlin-stdlib:1.4.0'
-		force 'org.jetbrains.kotlin:kotlin-stdlib-common:1.4.0'
+		force "org.jetbrains:annotations:$project.jetnull_version"
+		force "org.jetbrains.kotlin:kotlin-stdlib:1.6.10"
+		force "org.jetbrains.kotlin:kotlin-stdlib-common:1.6.10"
 	}
 }
 
 configurations {
 	[annotationProcessor, testAnnotationProcessor].each {
-		it.resolutionStrategy.force 'com.google.code.findbugs:jsr305:3.0.2'
-		it.resolutionStrategy.force "com.google.errorprone:error_prone_annotations:2.4.0"
+		it.resolutionStrategy.force "com.google.code.findbugs:jsr305:$project.jsr305_version"
+		it.resolutionStrategy.force "com.google.errorprone:error_prone_annotations:$project.errorprone_version"
 		it.resolutionStrategy.force "com.google.guava:guava:$project.guava_version"
 		it.resolutionStrategy.force "org.checkerframework:checker-qual:2.10.0"
 	}

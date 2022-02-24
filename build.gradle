@@ -32,6 +32,7 @@ project.ext.snakeyaml_version = '1.23'
 project.ext.jmh_version = '1.33'
 project.ext.jetnull_version = '23.0.0'
 project.ext.jsr250_version = '1.0'
+project.ext.jsr305_version = '3.0.2'
 
 // Which native platforms are supported can be specified in the command line.  Otherwise
 // the default is to support all of them
@@ -71,7 +72,7 @@ subprojects {
             force "org.jetbrains:annotations:$project.jetnull_version"
             force "com.google.guava:guava:$project.guava_version"
             force "com.google.errorprone:error_prone_annotations:$project.errorprone_version"
-            force 'com.google.code.findbugs:jsr305:3.0.2'
+            force "com.google.code.findbugs:jsr305:$project.jsr305_version"
             force 'org.checkerframework:checker-qual:2.10.0'
         }
     }
