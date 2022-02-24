@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,6 +44,7 @@ import georegression.struct.se.Se3_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.Rectangle2D_I32;
 import georegression.transform.se.SePointOps_F64;
+import lombok.Getter;
 import org.ddogleg.struct.DogArray;
 import org.ejml.UtilEjml;
 
@@ -333,22 +334,22 @@ public class SimulatePlanarWorld {
 
 	@SuppressWarnings({"NullAway.Init"})
 	public class SurfaceRect {
-		Se3_F64 rectToWorld;
-		Se3_F64 rectToCamera = new Se3_F64();
-		// surface normal in world frame
-		Vector3D_F64 normal = new Vector3D_F64();
+		@Getter Se3_F64 rectToWorld;
+		@Getter Se3_F64 rectToCamera = new Se3_F64();
+		/** surface normal in world frame */
+		@Getter Vector3D_F64 normal = new Vector3D_F64();
 		public final GrayF32 texture = new GrayF32(1, 1);
 		public double width3D;
 		public double height3D;
 
-		// 3D point of corners in camera frame
-		DogArray<Point3D_F64> rect3D = new DogArray<>(Point3D_F64::new);
-		// 2D point of corners in surface frame
-		Polygon2D_F64 rect2D = new Polygon2D_F64();
-		// bounding box of visible region in pixels
-		Rectangle2D_I32 pixelRect = new Rectangle2D_I32();
-		// true if its visible
-		public boolean visible;
+		/** 3D point of corners in camera frame */
+		@Getter final DogArray<Point3D_F64> rect3D = new DogArray<>(Point3D_F64::new);
+		/** 2D point of corners in surface frame */
+		@Getter final Polygon2D_F64 rect2D = new Polygon2D_F64();
+		/** bounding box of visible region in pixels */
+		@Getter final Rectangle2D_I32 pixelRect = new Rectangle2D_I32();
+		/** true if its visible */
+		@Getter public boolean visible;
 
 		/**
 		 * Computes the location of the surface's rectangle in the camera reference frame
@@ -409,6 +410,19 @@ public class SimulatePlanarWorld {
 			pixelRect.y1 += 2;
 
 //			System.out.println("PixelRect "+pixelRect);
+		}
+
+		/** Returns bounding polygon of the rendered region */
+		public Polygon2D_F64 computeImageBoundingRect() {
+			var rect = new Polygon2D_F64(4);
+
+			UtilShape3D_F64.polygon2Dto3D(rect2D, rectToCamera, rect3D);
+			for (int i = 0; i < rect.size(); i++) {
+				Point3D_F64 p = rect3D.get(i);
+				sphereToPixel.compute(p.x, p.y, p.z, rect.get(i));
+			}
+
+			return rect;
 		}
 	}
 
