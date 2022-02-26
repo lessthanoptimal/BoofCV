@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -55,11 +55,11 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel {
 	public ConfigHammingChessboard configHammingChess = ConfigHammingChessboard.create(HammingDictionary.ARUCO_MIP_25h7, 8, 6, 1.0);
 	public ConfigHammingGrid configHammingGrid = ConfigHammingGrid.create(HammingDictionary.ARUCO_MIP_25h7, 7, 5, 1.0, 0.2);
 
-	public CalibrationTargetPanel( Listener listener ) {
+	public CalibrationTargetPanel( Listener listener, boolean onlyDetectable ) {
 		setBorder(BorderFactory.createEmptyBorder());
 
 		this.listener = listener;
-		comboType = new JComboBox<>(supportedPatterns());
+		comboType = new JComboBox<>(onlyDetectable ? supportedPatterns() : CalibrationPatterns.values());
 		comboType.addActionListener(this);
 		comboType.setMaximumSize(comboType.getPreferredSize());
 
@@ -90,6 +90,8 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel {
 			case CIRCLE_GRID -> configCircle.setTo(target.grid);
 			case CIRCLE_HEXAGONAL -> configCircleHex.setTo(target.grid);
 			case ECOCHECK -> configECoCheck.setTo(target.ecocheck);
+			case HAMMING_CHESSBOARD -> configHammingChess.setTo(target.hammingChess);
+			case HAMMING_GRID -> configHammingGrid.setTo(target.hammingGrid);
 			default -> throw new RuntimeException("Target type not yet supported");
 		}
 
@@ -105,6 +107,8 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel {
 			case CIRCLE_GRID -> ret.grid.setTo(configCircle);
 			case CIRCLE_HEXAGONAL -> ret.grid.setTo(configCircleHex);
 			case ECOCHECK -> ret.ecocheck.setTo(configECoCheck);
+			case HAMMING_CHESSBOARD -> ret.hammingChess.setTo(configHammingChess);
+			case HAMMING_GRID -> ret.hammingGrid.setTo(configHammingGrid);
 			default -> throw new RuntimeException("Target type not yet supported");
 		}
 		return ret;

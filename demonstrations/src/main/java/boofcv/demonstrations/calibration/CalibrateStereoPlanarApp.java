@@ -881,7 +881,7 @@ public class CalibrateStereoPlanarApp extends JPanel {
 		JComboBox<String> comboRect = combo(rectType.ordinal(), (Object[])RectifyFillType.values());
 
 		@Getter ControlPanelPinhole pinhole = new ControlPanelPinhole(() -> settingsChanged(false, true));
-		@Getter CalibrationTargetPanel targetPanel = new CalibrationTargetPanel(( a, b ) -> handleUpdatedTarget());
+		@Getter CalibrationTargetPanel targetPanel = new CalibrationTargetPanel(( a, b ) -> handleUpdatedTarget(), true);
 		// Displays a preview of the calibration target
 		ImagePanel targetPreviewPanel = new ImagePanel();
 		// Displays calibration information

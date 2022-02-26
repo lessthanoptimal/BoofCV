@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -94,7 +94,7 @@ public class AssistedCalibrationGui extends JPanel {
 	public class TargetConfigurePanel extends StandardAlgConfigPanel {
 		protected JLabel imageSizeLabel = new JLabel();
 		protected JLabel processingTimeLabel = new JLabel();
-		public CalibrationTargetPanel configPanel = new CalibrationTargetPanel(( a, b ) -> handleUpdatedTarget());
+		public CalibrationTargetPanel configPanel = new CalibrationTargetPanel(( a, b ) -> handleUpdatedTarget(), true);
 		public ImagePanel targetPreviewPanel = new ImagePanel();
 
 		public TargetConfigurePanel() {

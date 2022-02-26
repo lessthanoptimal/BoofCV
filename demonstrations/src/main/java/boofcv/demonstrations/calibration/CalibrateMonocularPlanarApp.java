@@ -782,7 +782,7 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 		JSpinnerNumber selectErrorScale = spinnerWrap(10.0, 0.1, 1000.0, 2.0);
 
 		@Getter CalibrationModelPanel modelPanel = new CalibrationModelPanel();
-		@Getter CalibrationTargetPanel targetPanel = new CalibrationTargetPanel(( a, b ) -> handleUpdatedTarget());
+		@Getter CalibrationTargetPanel targetPanel = new CalibrationTargetPanel(( a, b ) -> handleUpdatedTarget(), true);
 		// Displays a preview of the calibration target
 		ImagePanel targetPreviewPanel = new ImagePanel();
 		// Displays calibration information
