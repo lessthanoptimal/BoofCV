@@ -22,6 +22,7 @@ import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.calibration.UtilCalibrationGui;
 import boofcv.gui.controls.CalibrationTargetPanel;
+import boofcv.gui.controls.JCheckBoxValue;
 import boofcv.gui.image.ImagePanel;
 import lombok.Getter;
 
@@ -94,6 +95,7 @@ public class AssistedCalibrationGui extends JPanel {
 	public class TargetConfigurePanel extends StandardAlgConfigPanel {
 		protected JLabel imageSizeLabel = new JLabel();
 		protected JLabel processingTimeLabel = new JLabel();
+		public final JCheckBoxValue flipHorizontal = checkboxWrap("Flip Horizontal", false);
 		public CalibrationTargetPanel configPanel = new CalibrationTargetPanel(( a, b ) -> handleUpdatedTarget(), true);
 		public ImagePanel targetPreviewPanel = new ImagePanel();
 
@@ -102,9 +104,12 @@ public class AssistedCalibrationGui extends JPanel {
 
 			addLabeled(imageSizeLabel, "Resolution");
 			addLabeled(processingTimeLabel, "Process Time (ms)");
+			add(flipHorizontal.check);
 			add(configPanel);
 			add(targetPreviewPanel);
 		}
+
+		@Override public void controlChanged( Object source ) {}
 
 		public void setImageSize( final int width, final int height ) {
 			BoofSwingUtil.invokeNowOrLater(() -> imageSizeLabel.setText(width + " x " + height));

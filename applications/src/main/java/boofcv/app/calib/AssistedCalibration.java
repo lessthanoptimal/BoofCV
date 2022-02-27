@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,6 +33,7 @@ import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.DogArray;
 
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -227,7 +228,7 @@ public class AssistedCalibration {
 			actions.update(success, found);
 		}
 		long time1 = System.nanoTime();
-		double elapsedSeconds = (time1-time0)*1e-9;
+		double elapsedSeconds = (time1 - time0)*1e-9;
 		gui.targetPanel.setProcessingTimeS(elapsedSeconds);
 
 		if (gui.getInfoPanel().forceSaveImage) {
@@ -243,7 +244,22 @@ public class AssistedCalibration {
 			case FILL_SCREEN -> handleFillScreen(success);
 		}
 
-		gui.setImage(image);
+		// See if the user requested the image be flipped horizontally
+		if (gui.targetPanel.flipHorizontal.value) {
+			// this transform will flip the image
+			AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
+			tx.translate(-image.getWidth(), 0);
+
+			// create the image then draw a flipped version of input image
+			var flipped = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
+			Graphics2D g2 = flipped.createGraphics();
+			g2.setTransform(tx);
+			g2.drawImage(image, 0, 0, null);
+			gui.setImage(flipped);
+		} else {
+			gui.setImage(image);
+		}
+
 		gui.repaint();
 	}
 
@@ -326,7 +342,7 @@ public class AssistedCalibration {
 	}
 
 	boolean pictureTaken = false;
-	DogArray<Polygon2D_F64> regions = new DogArray<>(()->new Polygon2D_F64(4));
+	DogArray<Polygon2D_F64> regions = new DogArray<>(() -> new Polygon2D_F64(4));
 
 	private void handleClearDots( boolean detected ) {
 		String message = "Clear the dots!";
