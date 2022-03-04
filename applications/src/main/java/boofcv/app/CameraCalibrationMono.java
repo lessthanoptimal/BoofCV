@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,24 +60,24 @@ import static boofcv.app.calib.AssistedCalibration.OUTPUT_DIRECTORY;
 @SuppressWarnings({"NullAway.Init"})
 public class CameraCalibrationMono extends BaseStandardInputApp {
 
-	protected String inputPattern;
-	protected String outputFilePath = "intrinsic.yaml";
-	protected boolean zeroSkew = true;
-	protected int numRadial = 2;
-	protected boolean tangential = false;
-	protected CameraModelType modeType = CameraModelType.BROWN;
-	protected FormatType formatType = FormatType.BOOFCV;
+	public String inputPattern;
+	public String outputFilePath = "intrinsic.yaml";
+	public boolean zeroSkew = true;
+	public int numRadial = 2;
+	public boolean tangential = false;
+	public CameraModelType modeType = CameraModelType.BROWN;
+	public FormatType formatType = FormatType.BOOFCV;
 
-	protected ConfigCalibrationTarget configTarget = new ConfigCalibrationTarget();
+	public final ConfigCalibrationTarget configTarget = new ConfigCalibrationTarget();
 
 	// parameters for Kannala-Brandt
-	protected int kbNumSymmetric = 5;
-	protected int kbNumAsymmetric = 0;
+	public int kbNumSymmetric = 5;
+	public int kbNumAsymmetric = 0;
 
-	protected boolean GUI = false;
-	protected boolean saveLandmarks = false;
-	protected boolean justDetect = false;
-	protected boolean verbose = false;
+	public boolean GUI = false;
+	public boolean saveLandmarks = false;
+	public boolean justDetect = false;
+	public boolean verbose = false;
 
 	public void printHelp() {
 		System.out.println("./application <Input Options> <Calibration Parameters> <Fiducial Type> <Fiducial Specific Options> ");
@@ -427,7 +427,7 @@ public class CameraCalibrationMono extends BaseStandardInputApp {
 	}
 
 	// TODO break this function up into its own class so that it isn't one massive function?
-	protected void handleDirectory() {
+	public void handleDirectory() {
 		File outputDirectory = null;
 		PrintStream summaryDetection = null;
 
