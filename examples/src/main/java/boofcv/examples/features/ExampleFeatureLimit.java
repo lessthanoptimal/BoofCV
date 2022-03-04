@@ -19,12 +19,15 @@
 package boofcv.examples.features;
 
 import boofcv.abst.feature.detect.extract.ConfigExtract;
-import boofcv.abst.feature.detect.extract.NonMaxSuppression;
+import boofcv.abst.feature.detect.extract.NonMaxLimiter;
+import boofcv.abst.feature.detect.extract.NonMaxLimiter.LocalExtreme;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.alg.filter.derivative.DerivativeType;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPoint;
+import boofcv.factory.feature.detect.selector.ConfigSelectLimit;
+import boofcv.factory.feature.detect.selector.SelectLimitTypes;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ShowImages;
@@ -32,43 +35,47 @@ import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.QueueCorner;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.image.GrayF32;
-import georegression.struct.point.Point2D_I16;
+import org.ddogleg.struct.FastAccess;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
- * Non-maximum suppression is used to identify local maximums and/or minimums in an image feature intensity map. This
- * is a common step in feature detection. BoofCV includes an implementation of non-maximum suppression which is much
- * faster than the naive algorithm that is often used because of its ease of implementation. The following code
- * demonstrates how tuning parameters affects the final output.
+ * Visualization of feature Select Limit. After non-maximum suppression, select limit decides which detected
+ * features should be used when the requested number of features is exceeded by the number of detected features.
+ * Typically, you either want the most intense features or you want to ensure that features are selected
+ * throughout the image.
  *
  * @author Peter Abeles
  */
-public class ExampleNonMaximumSupression {
+public class ExampleFeatureLimit {
+	// Radius for non-maximum suppression
+	public static final int NON_MAX_RADIUS = 5;
 
-	public static BufferedImage renderNonMax( GrayF32 intensity, int radius, float threshold ) {
-		// Create and configure the feature detector
-		NonMaxSuppression nonmax = FactoryFeatureExtractor.nonmax(new ConfigExtract(radius, threshold));
+	// Maximum number of features it will return
+	public static final int MAX_FEATURES = 200;
 
-		// We will only search for the maximums. Other variants will look for minimums or will exclude previous
-		// candidate detections from being detected twice
-		var maximums = new QueueCorner();
-		nonmax.process(intensity, null, null, null, maximums);
+	public static BufferedImage renderLimit( GrayF32 intensity, SelectLimitTypes type ) {
+		// Configure how it will select features inside the intensity image
+		var limit = new ConfigSelectLimit(type, 0xBEEF);
+		NonMaxLimiter nonmax = FactoryFeatureExtractor.nonmaxLimiter(new ConfigExtract(NON_MAX_RADIUS, 0), limit, MAX_FEATURES);
+
+		// Detect the features
+		nonmax.process(intensity);
+		FastAccess<LocalExtreme> features = nonmax.getFeatures();
 
 		// Visualize the intensity image
 		var output = new BufferedImage(intensity.width, intensity.height, BufferedImage.TYPE_INT_RGB);
 		VisualizeImageData.colorizeSign(intensity, output, -1);
 
-		// render each maximum with a circle
+		// render each selected maximum with a circle
 		Graphics2D g2 = output.createGraphics();
 		g2.setColor(Color.blue);
-		for (int i = 0; i < maximums.size(); i++) {
-			Point2D_I16 c = maximums.get(i);
-			VisualizeFeatures.drawCircle(g2, c.x, c.y, radius);
+		for (int i = 0; i < features.size(); i++) {
+			LocalExtreme c = features.get(i);
+			VisualizeFeatures.drawCircle(g2, c.location.x, c.location.y, NON_MAX_RADIUS);
 		}
 		return output;
 	}
@@ -91,17 +98,14 @@ public class ExampleNonMaximumSupression {
 		featureIntensity.process(input, derivX, derivY, null, null, null);
 		GrayF32 intensity = featureIntensity.getIntensity();
 
-		ListDisplayPanel panel = new ListDisplayPanel();
+		var panel = new ListDisplayPanel();
 		panel.addImage(buffered, "Input Image");
-		// hack to just show intensity - no features can be detected
-		panel.addImage(renderNonMax(intensity, 10, Float.MAX_VALUE), "Intensity Image");
 
 		// Detect maximums with different settings and visualize the results
-		panel.addImage(renderNonMax(intensity, 3, -Float.MAX_VALUE), "Radius 3");
-		panel.addImage(renderNonMax(intensity, 3, 30000), "Radius 3  threshold");
-		panel.addImage(renderNonMax(intensity, 20, -Float.MAX_VALUE), "Radius 10");
-		panel.addImage(renderNonMax(intensity, 20, 30000), "Radius 10 threshold");
+		for (var type : SelectLimitTypes.values()) {
+			panel.addImage(renderLimit(intensity, type), type.name());
+		}
 
-		ShowImages.showWindow(panel, "Non-Maximum Suppression", true);
+		ShowImages.showWindow(panel, "Non-Max with Limiter", true);
 	}
 }
