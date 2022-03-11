@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,9 +26,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * @author Peter Abeles
- */
 public class TestLookUpImageFilesByPath extends BoofStandardJUnit {
 	@Test void loadShape() {
 		var alg = new DummyLookupFileByPath();
@@ -50,7 +47,7 @@ public class TestLookUpImageFilesByPath extends BoofStandardJUnit {
 
 	private static class DummyLookupFileByPath extends LookUpImageFilesByPath {
 		public DummyLookupFileByPath() {
-			super((path,out)-> out.reshape(10,15));
+			super(( path, out ) -> out.reshape(10, 15));
 		}
 	}
 }

@@ -31,18 +31,15 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests select functions in ConvertRaster.
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class TestConvertRaster extends CompareIdenticalFunctions {
-
-	Random rand = new Random(234);
-
 	int imgWidth = 10;
 	int imgHeight = 20;
 
@@ -53,16 +50,16 @@ public class TestConvertRaster extends CompareIdenticalFunctions {
 	}
 
 	@Override
-	protected Object[][] createInputParam(Method candidate, Method validation) {
+	protected Object[][] createInputParam( Method candidate, Method validation ) {
 		Class[] types = candidate.getParameterTypes();
 		Object[] params = new Object[types.length];
 
 		for (int i = 0; i < types.length; i++) {
 			Class c = types[i];
 
-			if( c.isAssignableFrom(ImageBase.class)) {
-				params[i] = GeneralizedImageOps.createImage(c,imgWidth,imgHeight,3);
-				GImageMiscOps.fillUniform((ImageBase)params[i],rand,0,200);
+			if (c.isAssignableFrom(ImageBase.class)) {
+				params[i] = GeneralizedImageOps.createImage(c, imgWidth, imgHeight, 3);
+				GImageMiscOps.fillUniform((ImageBase)params[i], rand, 0, 200);
 			}
 		}
 
@@ -75,8 +72,7 @@ public class TestConvertRaster extends CompareIdenticalFunctions {
 	 * <p/>
 	 * Java Bug ID: 5051418
 	 */
-	@Test
-	void checkGrayBug_To() {
+	@Test void checkGrayBug_To() {
 		BufferedImage img = new BufferedImage(5, 5, BufferedImage.TYPE_BYTE_GRAY);
 
 		img.getRaster().getDataBuffer().setElem(0, 101);
@@ -90,18 +86,18 @@ public class TestConvertRaster extends CompareIdenticalFunctions {
 
 		// test several image types
 		GrayU8 out = new GrayU8(5, 5);
-		ConvertRaster.bufferedToGray((DataBufferByte)img.getRaster().getDataBuffer(),img.getRaster(), out);
+		ConvertRaster.bufferedToGray((DataBufferByte)img.getRaster().getDataBuffer(), img.getRaster(), out);
 		assertEquals(101, out.get(0, 0));
 
 		GrayF32 outF = new GrayF32(5, 5);
-		ConvertRaster.bufferedToGray((DataBufferByte)img.getRaster().getDataBuffer(),img.getRaster(), outF);
+		ConvertRaster.bufferedToGray((DataBufferByte)img.getRaster().getDataBuffer(), img.getRaster(), outF);
 		assertEquals(101, outF.get(0, 0), 1e-4);
 	}
 
-	private void testBufferedTo(Method m) {
-		Class paramTypes[] = m.getParameterTypes();
+	private void testBufferedTo( Method m ) {
+		Class[] paramTypes = m.getParameterTypes();
 
-		BufferedImage input[];
+		BufferedImage[] input;
 
 		input = createBufferedTestImages(paramTypes[0]);
 
@@ -113,7 +109,7 @@ public class TestConvertRaster extends CompareIdenticalFunctions {
 			ImageBase output = createImage(m, imageType, input[i]);
 			BoofTesting.checkSubImage(this, "performBufferedTo", true, m, input[i], output);
 
-			if( canSubImage ) {
+			if (canSubImage) {
 				// subimage input
 				BufferedImage subimage = input[i].getSubimage(1, 2, imgWidth - 1, imgHeight - 2);
 				output = createImage(m, imageType, subimage);
@@ -122,7 +118,7 @@ public class TestConvertRaster extends CompareIdenticalFunctions {
 		}
 	}
 
-	private ImageBase createImage(Method m, Class imageType, BufferedImage inputBuff) {
+	private ImageBase createImage( Method m, Class imageType, BufferedImage inputBuff ) {
 
 		int numBands = inputBuff.getRaster().getNumBands();
 
@@ -130,7 +126,7 @@ public class TestConvertRaster extends CompareIdenticalFunctions {
 		if (ImageGray.class.isAssignableFrom(imageType)) {
 			output = GeneralizedImageOps.createSingleBand(imageType, inputBuff.getWidth(), inputBuff.getHeight());
 		} else if (ImageInterleaved.class.isAssignableFrom(imageType)) {
-			if( m.getName().contains("Gray")) {
+			if (m.getName().contains("Gray")) {
 				output = GeneralizedImageOps.createInterleaved(imageType, inputBuff.getWidth(), inputBuff.getHeight(), 1);
 			} else {
 				output = GeneralizedImageOps.createInterleaved(imageType, inputBuff.getWidth(), inputBuff.getHeight(), numBands);
@@ -153,7 +149,7 @@ public class TestConvertRaster extends CompareIdenticalFunctions {
 	/**
 	 * Creates a set of test BufferedImages with the appropriate rasters and number of bytes/channels.
 	 */
-	private BufferedImage[] createBufferedTestImages(Class<?> paramType) {
+	private BufferedImage[] createBufferedTestImages( Class<?> paramType ) {
 		BufferedImage[] input;
 		if (paramType == DataBufferByte.class) {
 			// the code is handled different when a different number of channels is used
@@ -166,7 +162,7 @@ public class TestConvertRaster extends CompareIdenticalFunctions {
 					createBufferedByType(imgWidth, imgHeight, BufferedImage.TYPE_INT_ARGB, rand),
 					createBufferedByType(imgWidth, imgHeight, BufferedImage.TYPE_INT_BGR, rand),
 					createBufferedByType(imgWidth, imgHeight, BufferedImage.TYPE_INT_RGB, rand)};
-		} else if( paramType == DataBufferUShort.class ) {
+		} else if (paramType == DataBufferUShort.class) {
 			input = new BufferedImage[]{createShortBuff(imgWidth, imgHeight, rand)};
 		} else if (paramType == BufferedImage.class) {
 			// just pick an arbitrary image type here
@@ -177,14 +173,14 @@ public class TestConvertRaster extends CompareIdenticalFunctions {
 		return input;
 	}
 
-	public void performBufferedTo(Method m, BufferedImage input, ImageBase output) {
+	public void performBufferedTo( Method m, BufferedImage input, ImageBase output ) {
 		try {
 			if (DataBuffer.class.isAssignableFrom(m.getParameterTypes()[0])) {
-				m.invoke(null, input.getRaster().getDataBuffer(),input.getRaster(), output);
+				m.invoke(null, input.getRaster().getDataBuffer(), input.getRaster(), output);
 
 				// read directly from raster if the raster is an input
-				if( ImageMultiBand.class.isAssignableFrom(output.getClass()) )
-					BufferedImageChecks.checkEquals(input.getRaster(),(ImageMultiBand)output,1);
+				if (ImageMultiBand.class.isAssignableFrom(output.getClass()))
+					BufferedImageChecks.checkEquals(input.getRaster(), (ImageMultiBand)output, 1);
 				else
 					BufferedImageChecks.checkEquals(input, output, false, 1f);
 			} else {
@@ -196,11 +192,10 @@ public class TestConvertRaster extends CompareIdenticalFunctions {
 		}
 	}
 
-	private void testImageTo(Method m) {
+	private void testImageTo( Method m ) {
+		Class[] paramTypes = m.getParameterTypes();
 
-		Class paramTypes[] = m.getParameterTypes();
-
-		BufferedImage output[] = createBufferedTestImages(paramTypes[1]);
+		BufferedImage[] output = createBufferedTestImages(paramTypes[1]);
 
 		for (int i = 0; i < output.length; i++) {
 			ImageBase input = createImage(m, paramTypes[0], output[i]);
@@ -210,36 +205,34 @@ public class TestConvertRaster extends CompareIdenticalFunctions {
 		}
 	}
 
-	public void performImageTo(Method m, ImageBase input, BufferedImage output) {
+	public void performImageTo( Method m, ImageBase input, BufferedImage output ) {
 		try {
 			if (DataBuffer.class.isAssignableFrom(m.getParameterTypes()[1])) {
 				m.invoke(null, input, output.getRaster().getDataBuffer(), output.getRaster());
 
 				// read directly from raster if the raster is an input
 				if (Planar.class.isAssignableFrom(input.getClass()))
-					BufferedImageChecks.checkEquals(output.getRaster(), (Planar) input, 1);
+					BufferedImageChecks.checkEquals(output.getRaster(), (Planar)input, 1);
 				else
 					BufferedImageChecks.checkEquals(output, input, false, 1f);
 			} else if (Raster.class.isAssignableFrom(m.getParameterTypes()[1])) {
 				m.invoke(null, input, output.getRaster());
 
 				// read directly from raster if the raster is an input
-				if( Planar.class.isAssignableFrom(input.getClass()) )
-					BufferedImageChecks.checkEquals(output.getRaster(),(Planar)input,1);
+				if (Planar.class.isAssignableFrom(input.getClass()))
+					BufferedImageChecks.checkEquals(output.getRaster(), (Planar)input, 1);
 				else
-					BufferedImageChecks.checkEquals(output, input,false,  1f);
+					BufferedImageChecks.checkEquals(output, input, false, 1f);
 			} else {
 				m.invoke(null, input, output);
 				BufferedImageChecks.checkEquals(output, input, false, 1f);
 			}
-
 		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-
-	public static BufferedImage createByteBuff(int width, int height, int numBands, Random rand) {
+	public static BufferedImage createByteBuff( int width, int height, int numBands, Random rand ) {
 		BufferedImage ret;
 
 		if (numBands == 1) {
@@ -257,7 +250,7 @@ public class TestConvertRaster extends CompareIdenticalFunctions {
 		return ret;
 	}
 
-	public static BufferedImage createBufferedByType(int width, int height, int type, Random rand) {
+	public static BufferedImage createBufferedByType( int width, int height, int type, Random rand ) {
 		BufferedImage ret = new BufferedImage(width, height, type);
 
 		randomize(ret, rand);
@@ -265,50 +258,50 @@ public class TestConvertRaster extends CompareIdenticalFunctions {
 		return ret;
 	}
 
-	public static BufferedImage createByteIndexed(int width, int height, Random rand) {
-		BufferedImage ret = new BufferedImage(width,height,BufferedImage.TYPE_BYTE_INDEXED);
+	public static BufferedImage createByteIndexed( int width, int height, Random rand ) {
+		BufferedImage ret = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_INDEXED);
 
 		randomize(ret, rand);
 
 		return ret;
 	}
 
-	public static BufferedImage createByteBinary(int width, int height, Random rand) {
-		BufferedImage ret = new BufferedImage(width,height,BufferedImage.TYPE_BYTE_BINARY);
+	public static BufferedImage createByteBinary( int width, int height, Random rand ) {
+		BufferedImage ret = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_BINARY);
 
 		randomize(ret, rand);
 
 		return ret;
 	}
 
-	public static BufferedImage createIntBuff(int width, int height, Random rand) {
+	public static BufferedImage createIntBuff( int width, int height, Random rand ) {
 		BufferedImage ret = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		randomize(ret, rand);
 		return ret;
 	}
 
-	public static BufferedImage createIntBuffRGBA(int width, int height, Random rand, boolean alphaFirst) {
+	public static BufferedImage createIntBuffRGBA( int width, int height, Random rand, boolean alphaFirst ) {
 		BufferedImage ret = new BufferedImage(width, height,
 				alphaFirst ? BufferedImage.TYPE_INT_ARGB_PRE : BufferedImage.TYPE_INT_ARGB);
 		randomize(ret, rand);
 		return ret;
 	}
 
-	public static BufferedImage createShortBuff(int width, int height, Random rand) {
+	public static BufferedImage createShortBuff( int width, int height, Random rand ) {
 		BufferedImage ret = new BufferedImage(width, height, BufferedImage.TYPE_USHORT_GRAY);
 		randomize(ret, rand);
 		return ret;
 	}
 
-	public static void randomize(BufferedImage img, Random rand) {
+	public static void randomize( BufferedImage img, Random rand ) {
 		WritableRaster raster = img.getRaster();
 		DataBuffer buffer = raster.getDataBuffer();
-		if( buffer.getDataType() == DataBuffer.TYPE_BYTE ) {
+		if (buffer.getDataType() == DataBuffer.TYPE_BYTE) {
 			byte[] data = ((DataBufferByte)buffer).getData();
 			for (int i = 0; i < data.length; i++) {
 				data[i] = (byte)rand.nextInt();
 			}
-			img.setRGB(0,0,img.getRGB(0,0));
+			img.setRGB(0, 0, img.getRGB(0, 0));
 		} else {
 			for (int i = 0; i < img.getWidth(); i++) {
 				for (int j = 0; j < img.getHeight(); j++) {
@@ -317,7 +310,6 @@ public class TestConvertRaster extends CompareIdenticalFunctions {
 			}
 		}
 	}
-
 
 	@Test void orderBandsIntoRGB() {
 		Planar<GrayU8> input = new Planar<>(GrayU8.class, 10, 10, 3);
@@ -329,22 +321,22 @@ public class TestConvertRaster extends CompareIdenticalFunctions {
 		// test no swap first
 		BufferedImage orig = new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB);
 		ConvertRaster.orderBandsIntoRGB(input, orig);
-		assertTrue(band0 == input.getBand(0));
-		assertTrue(band1 == input.getBand(1));
-		assertTrue(band2 == input.getBand(2));
+		assertSame(band0, input.getBand(0));
+		assertSame(band1, input.getBand(1));
+		assertSame(band2, input.getBand(2));
 
 		// check swaps now
 		orig = new BufferedImage(10, 10, BufferedImage.TYPE_3BYTE_BGR);
 		ConvertRaster.orderBandsIntoRGB(input, orig);
-		assertTrue(band2 == input.getBand(0));
-		assertTrue(band1 == input.getBand(1));
-		assertTrue(band0 == input.getBand(2));
+		assertSame(band2, input.getBand(0));
+		assertSame(band1, input.getBand(1));
+		assertSame(band0, input.getBand(2));
 
 		orig = new BufferedImage(10, 10, BufferedImage.TYPE_INT_BGR);
 		ConvertRaster.orderBandsIntoRGB(input, orig);
-		assertTrue(band0 == input.getBand(0));
-		assertTrue(band1 == input.getBand(1));
-		assertTrue(band2 == input.getBand(2));
+		assertSame(band0, input.getBand(0));
+		assertSame(band1, input.getBand(1));
+		assertSame(band2, input.getBand(2));
 
 		// 4-band images
 		input = new Planar<>(GrayU8.class, 10, 10, 4);
@@ -356,10 +348,10 @@ public class TestConvertRaster extends CompareIdenticalFunctions {
 
 		orig = new BufferedImage(10, 10, BufferedImage.TYPE_4BYTE_ABGR);
 		ConvertRaster.orderBandsIntoRGB(input, orig);
-		assertTrue(band3 == input.getBand(0));
-		assertTrue(band2 == input.getBand(1));
-		assertTrue(band1 == input.getBand(2));
-		assertTrue(band0 == input.getBand(3));
+		assertSame(band3, input.getBand(0));
+		assertSame(band2, input.getBand(1));
+		assertSame(band1, input.getBand(2));
+		assertSame(band0, input.getBand(3));
 
 		band0 = input.getBand(0);
 		band1 = input.getBand(1);
@@ -367,9 +359,9 @@ public class TestConvertRaster extends CompareIdenticalFunctions {
 		band3 = input.getBand(3);
 		orig = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
 		ConvertRaster.orderBandsIntoRGB(input, orig);
-		assertTrue(band1 == input.getBand(0));
-		assertTrue(band2 == input.getBand(1));
-		assertTrue(band3 == input.getBand(2));
-		assertTrue(band0 == input.getBand(3));
+		assertSame(band1, input.getBand(0));
+		assertSame(band2, input.getBand(1));
+		assertSame(band3, input.getBand(2));
+		assertSame(band0, input.getBand(3));
 	}
 }

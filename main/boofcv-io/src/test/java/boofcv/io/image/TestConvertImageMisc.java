@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,18 +27,14 @@ import boofcv.struct.image.GrayU16;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
-/**
- * @author Peter Abeles
- */
 class TestConvertImageMisc extends BoofStandardJUnit {
-	int width = 30,height=40;
+	int width = 30, height = 40;
 
-	@Test
-	void convert_F32_U16() {
-		GrayF32 src = new GrayF32(width,height);
-		GrayU16 dst = new GrayU16(width,height);
-		GrayF32 found = new GrayF32(width,height);
-		ImageMiscOps.fillUniform(src,rand,0,255);
+	@Test void convert_F32_U16() {
+		GrayF32 src = new GrayF32(width, height);
+		GrayU16 dst = new GrayU16(width, height);
+		GrayF32 found = new GrayF32(width, height);
+		ImageMiscOps.fillUniform(src, rand, 0, 255);
 
 		// Make sure the flag is handled correctly
 		BoofConcurrency.USE_CONCURRENT = false;
@@ -47,11 +43,11 @@ class TestConvertImageMisc extends BoofStandardJUnit {
 		convert_F32_U16(src, dst, found);
 	}
 
-	private void convert_F32_U16(GrayF32 src, GrayU16 dst, GrayF32 found) {
+	private void convert_F32_U16( GrayF32 src, GrayU16 dst, GrayF32 found ) {
 		int fractionBits = 8;
-		ImplConvertImageMisc.convert_F32_U16(src,fractionBits,dst);
-		ImplConvertImageMisc.convert_U16_F32(dst,fractionBits,found);
-		float resolution = 1.0f/(1<<fractionBits);
-		BoofTesting.assertEquals(src,found,resolution);
+		ImplConvertImageMisc.convert_F32_U16(src, fractionBits, dst);
+		ImplConvertImageMisc.convert_U16_F32(dst, fractionBits, found);
+		float resolution = 1.0f/(1 << fractionBits);
+		BoofTesting.assertEquals(src, found, resolution);
 	}
 }

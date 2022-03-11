@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,7 @@ class TestLookUpImageListByIndex extends BoofStandardJUnit {
 
 	public TestLookUpImageListByIndex() {
 		for (int i = 0; i < 4; i++) {
-			images.add(new GrayU8(10+i,5));
+			images.add(new GrayU8(10 + i, 5));
 		}
 	}
 
@@ -42,17 +42,17 @@ class TestLookUpImageListByIndex extends BoofStandardJUnit {
 		var alg = new LookUpImageListByIndex<>(images);
 		var found = new ImageDimension();
 		for (int i = 0; i < 4; i++) {
-			alg.loadShape(""+i,found);
-			assertEquals(10+i,found.width);
-			assertEquals(5,found.height);
+			alg.loadShape("" + i, found);
+			assertEquals(10 + i, found.width);
+			assertEquals(5, found.height);
 		}
 	}
 
 	@Test void loadImage() {
-		var found = new GrayF32(0,0);
+		var found = new GrayF32(0, 0);
 		var alg = new LookUpImageListByIndex<>(images);
-		alg.loadImage("1",found);
-		assertEquals(11,found.width);
-		assertEquals(5,found.height);
+		alg.loadImage("1", found);
+		assertEquals(11, found.width);
+		assertEquals(5, found.height);
 	}
 }

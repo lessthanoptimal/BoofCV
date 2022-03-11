@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,14 +35,14 @@ class TestConvertLabeledImageFormats extends BoofStandardJUnit {
 		List<PolygonRegion> regions = new ArrayList<>();
 		var r = new PolygonRegion();
 		regions.add(r);
-		r.polygon.vertexes.grow().setTo(5,5);
-		r.polygon.vertexes.grow().setTo(15,5);
-		r.polygon.vertexes.grow().setTo(15,20);
-		r.polygon.vertexes.grow().setTo(5,20);
+		r.polygon.vertexes.grow().setTo(5, 5);
+		r.polygon.vertexes.grow().setTo(15, 5);
+		r.polygon.vertexes.grow().setTo(15, 20);
+		r.polygon.vertexes.grow().setTo(5, 20);
 		r.regionID = 3;
 
-		var expected = new GrayS32(30,35);
-		GImageMiscOps.fillRectangle(expected,3,5,5,10,15);
+		var expected = new GrayS32(30, 35);
+		GImageMiscOps.fillRectangle(expected, 3, 5, 5, 10, 15);
 
 		GrayS32 found = ConvertLabeledImageFormats.convert(regions, expected.width, expected.height, null);
 
