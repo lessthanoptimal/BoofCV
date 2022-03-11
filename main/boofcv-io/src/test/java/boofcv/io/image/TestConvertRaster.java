@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -283,6 +283,13 @@ public class TestConvertRaster extends CompareIdenticalFunctions {
 
 	public static BufferedImage createIntBuff(int width, int height, Random rand) {
 		BufferedImage ret = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+		randomize(ret, rand);
+		return ret;
+	}
+
+	public static BufferedImage createIntBuffRGBA(int width, int height, Random rand, boolean alphaFirst) {
+		BufferedImage ret = new BufferedImage(width, height,
+				alphaFirst ? BufferedImage.TYPE_INT_ARGB_PRE : BufferedImage.TYPE_INT_ARGB);
 		randomize(ret, rand);
 		return ret;
 	}

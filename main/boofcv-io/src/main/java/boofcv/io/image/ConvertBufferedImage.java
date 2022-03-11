@@ -469,8 +469,7 @@ public class ConvertBufferedImage {
 
 		DataBuffer srcBuff = src.getRaster().getDataBuffer();
 		if (type == GrayU8.class) {
-			if (srcBuff.getDataType() == DataBuffer.TYPE_BYTE &&
-					isKnownByteFormat(src)) {
+			if (srcBuff.getDataType() == DataBuffer.TYPE_BYTE && isKnownByteFormat(src)) {
 				if (src.getType() == BufferedImage.TYPE_BYTE_GRAY) {
 					for (int i = 0; i < dst.getNumBands(); i++) {
 						ConvertRaster.bufferedToGray((DataBufferByte)srcBuff, raster, ((Planar<GrayU8>)dst).getBand(i));
@@ -484,8 +483,7 @@ public class ConvertBufferedImage {
 				ConvertRaster.bufferedToPlanar_U8(src, (Planar<GrayU8>)dst);
 			}
 		} else if (type == GrayF32.class) {
-			if (srcBuff.getDataType() == DataBuffer.TYPE_BYTE &&
-					isKnownByteFormat(src)) {
+			if (srcBuff.getDataType() == DataBuffer.TYPE_BYTE && isKnownByteFormat(src)) {
 				if (src.getType() == BufferedImage.TYPE_BYTE_GRAY) {
 					for (int i = 0; i < dst.getNumBands(); i++)
 						ConvertRaster.bufferedToGray((DataBufferByte)srcBuff, raster, ((Planar<GrayF32>)dst).getBand(i));
@@ -825,8 +823,15 @@ public class ConvertBufferedImage {
 			else if (src instanceof GrayI)
 				// no good equivalent. I'm giving it the biggest pixel for the range
 				dst = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_USHORT_GRAY);
-			else
+			else if (src instanceof ImageMultiBand<?>) {
+				var mv = (ImageMultiBand)src;
+				if (mv.getNumBands() == 4)
+					dst = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_INT_ARGB);
+				else
+					dst = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_INT_RGB);
+			} else {
 				dst = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_INT_RGB);
+			}
 		}
 		return dst;
 	}

@@ -305,8 +305,7 @@ public class ConvertRaster {
 		if (swap) {
 			if (image.getNumBands() == 3) {
 				int bufferedImageType = input.getType();
-				if (bufferedImageType == BufferedImage.TYPE_3BYTE_BGR ||
-						bufferedImageType == BufferedImage.TYPE_INT_BGR) {
+				if (bufferedImageType == BufferedImage.TYPE_3BYTE_BGR || bufferedImageType == BufferedImage.TYPE_INT_BGR) {
 					T tmp = image.getBand(0);
 					image.bands[0] = image.getBand(2);
 					image.bands[2] = tmp;
@@ -315,12 +314,12 @@ public class ConvertRaster {
 				T[] temp = (T[])Array.newInstance(image.getBandType(), 4);
 
 				int bufferedImageType = input.getType();
-				if (bufferedImageType == BufferedImage.TYPE_INT_ARGB) {
+				if (bufferedImageType == BufferedImage.TYPE_INT_ARGB || bufferedImageType == BufferedImage.TYPE_INT_ARGB_PRE) {
 					temp[0] = image.getBand(1);
 					temp[1] = image.getBand(2);
 					temp[2] = image.getBand(3);
 					temp[3] = image.getBand(0);
-				} else if (bufferedImageType == BufferedImage.TYPE_4BYTE_ABGR) {
+				} else if (bufferedImageType == BufferedImage.TYPE_4BYTE_ABGR || bufferedImageType == BufferedImage.TYPE_4BYTE_ABGR_PRE) {
 					temp[0] = image.getBand(3);
 					temp[1] = image.getBand(2);
 					temp[2] = image.getBand(1);
@@ -355,12 +354,14 @@ public class ConvertRaster {
 				T[] temp = (T[])Array.newInstance(image.getBandType(), 4);
 
 				int bufferedImageType = input.getType();
-				if (bufferedImageType == BufferedImage.TYPE_INT_ARGB) {
+				if (bufferedImageType == BufferedImage.TYPE_INT_ARGB ||
+						bufferedImageType == BufferedImage.TYPE_INT_ARGB_PRE) {
 					temp[0] = image.getBand(3);
 					temp[1] = image.getBand(0);
 					temp[2] = image.getBand(1);
 					temp[3] = image.getBand(2);
-				} else if (bufferedImageType == BufferedImage.TYPE_4BYTE_ABGR) {
+				} else if (bufferedImageType == BufferedImage.TYPE_4BYTE_ABGR ||
+						bufferedImageType == BufferedImage.TYPE_4BYTE_ABGR_PRE) {
 					temp[0] = image.getBand(3);
 					temp[1] = image.getBand(2);
 					temp[2] = image.getBand(1);
@@ -425,7 +426,9 @@ public class ConvertRaster {
 		return bufferedImageType == BufferedImage.TYPE_3BYTE_BGR ||
 				bufferedImageType == BufferedImage.TYPE_INT_BGR ||
 				bufferedImageType == BufferedImage.TYPE_INT_ARGB ||
-				bufferedImageType == BufferedImage.TYPE_4BYTE_ABGR;
+				bufferedImageType == BufferedImage.TYPE_4BYTE_ABGR ||
+				bufferedImageType == BufferedImage.TYPE_INT_ARGB_PRE ||
+				bufferedImageType == BufferedImage.TYPE_4BYTE_ABGR_PRE;
 	}
 
 	public static void interleavedToBuffered( InterleavedU8 src, BufferedImage dst ) {

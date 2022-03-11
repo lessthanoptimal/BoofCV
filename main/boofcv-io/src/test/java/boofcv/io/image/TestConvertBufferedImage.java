@@ -30,6 +30,7 @@ import org.junit.jupiter.api.Test;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -74,8 +75,14 @@ public class TestConvertBufferedImage extends BoofStandardJUnit {
 		found = ConvertBufferedImage.checkInputs(new GrayF64(10,10),null);
 		assertEquals(found.getType(), BufferedImage.TYPE_BYTE_GRAY);
 
-		found = ConvertBufferedImage.checkInputs(new Planar(GrayU8.class,3,10,10),null);
+		found = ConvertBufferedImage.checkInputs(new Planar(GrayU8.class,3,10,3),null);
 		assertEquals(found.getType(), BufferedImage.TYPE_INT_RGB);
+
+		found = ConvertBufferedImage.checkInputs(new Planar(GrayU8.class,3,10,2),null);
+		assertEquals(found.getType(), BufferedImage.TYPE_INT_RGB);
+
+		found = ConvertBufferedImage.checkInputs(new Planar(GrayU8.class,3,10,4),null);
+		assertEquals(found.getType(), BufferedImage.TYPE_INT_ARGB);
 	}
 
  	@Test
@@ -210,24 +217,30 @@ public class TestConvertBufferedImage extends BoofStandardJUnit {
 	 */
  	@Test
 	void convertFrom_PL_orderRgb() {
-		Class []bandTypes = new Class[]{GrayU8.class,GrayF32.class};
+		// Premultiplied unit tests are commented out since the RGB values will not match the data values
+		Class []bandTypes = new Class[]{GrayU8.class, GrayF32.class};
 		for( Class b : bandTypes ) {
+			System.out.println("band="+b);
 			convertFrom_PL_orderRgb(BufferedImage.TYPE_3BYTE_BGR, b, true);
 			convertFrom_PL_orderRgb(BufferedImage.TYPE_4BYTE_ABGR, b, true);
+//			convertFrom_PL_orderRgb(BufferedImage.TYPE_4BYTE_ABGR_PRE, b, true);
 			convertFrom_PL_orderRgb(BufferedImage.TYPE_INT_ARGB, b, true);
+//			convertFrom_PL_orderRgb(BufferedImage.TYPE_INT_ARGB_PRE, b, true);
 			convertFrom_PL_orderRgb(BufferedImage.TYPE_INT_RGB, b, true);
 			convertFrom_PL_orderRgb(BufferedImage.TYPE_INT_BGR, b, true);
-
+//
 			convertFrom_PL_orderRgb(BufferedImage.TYPE_3BYTE_BGR, b, false);
 			convertFrom_PL_orderRgb(BufferedImage.TYPE_4BYTE_ABGR, b, false);
+//			convertFrom_PL_orderRgb(BufferedImage.TYPE_4BYTE_ABGR_PRE, b, false);
 			convertFrom_PL_orderRgb(BufferedImage.TYPE_INT_ARGB, b, false);
+//			convertFrom_PL_orderRgb(BufferedImage.TYPE_INT_ARGB_PRE, b, false);
 			convertFrom_PL_orderRgb(BufferedImage.TYPE_INT_RGB, b, false);
 			convertFrom_PL_orderRgb(BufferedImage.TYPE_INT_BGR, b, false);
 		}
 	}
 
 	public void convertFrom_PL_orderRgb(int buffType, Class bandType, boolean reorder) {
-		BufferedImage input = TestConvertRaster.createBufferedByType(imgWidth, imgHeight, buffType, rand);
+		BufferedImage input = TestConvertRaster.createBufferedByType(imgWidth, imgHeight, buffType, new Random(1));
 
 		int numBands = input.getRaster().getNumBands();
 
@@ -241,17 +254,22 @@ public class TestConvertBufferedImage extends BoofStandardJUnit {
 
  	@Test
 	void convertFrom_interlaced_orderRgb() {
+		 // Premultiplied unit tests are commented out since the RGB values will not match the data values
 		Class []bandTypes = new Class[]{InterleavedU8.class,InterleavedF32.class};
 		for( Class b : bandTypes ) {
 			convertFrom_interlaced_orderRgb(BufferedImage.TYPE_3BYTE_BGR, b, true);
 			convertFrom_interlaced_orderRgb(BufferedImage.TYPE_4BYTE_ABGR, b, true);
+//			convertFrom_interlaced_orderRgb(BufferedImage.TYPE_4BYTE_ABGR_PRE, b, true);
 			convertFrom_interlaced_orderRgb(BufferedImage.TYPE_INT_ARGB, b, true);
+//			convertFrom_interlaced_orderRgb(BufferedImage.TYPE_INT_ARGB_PRE, b, true);
 			convertFrom_interlaced_orderRgb(BufferedImage.TYPE_INT_RGB, b, true);
 			convertFrom_interlaced_orderRgb(BufferedImage.TYPE_INT_BGR, b, true);
 
 			convertFrom_interlaced_orderRgb(BufferedImage.TYPE_3BYTE_BGR, b, false);
 			convertFrom_interlaced_orderRgb(BufferedImage.TYPE_4BYTE_ABGR, b, false);
+//			convertFrom_interlaced_orderRgb(BufferedImage.TYPE_4BYTE_ABGR_PRE, b, false);
 			convertFrom_interlaced_orderRgb(BufferedImage.TYPE_INT_ARGB, b, false);
+//			convertFrom_interlaced_orderRgb(BufferedImage.TYPE_INT_ARGB_PRE, b, false);
 			convertFrom_interlaced_orderRgb(BufferedImage.TYPE_INT_RGB, b, false);
 			convertFrom_interlaced_orderRgb(BufferedImage.TYPE_INT_BGR, b, false);
 		}
@@ -337,8 +355,7 @@ public class TestConvertBufferedImage extends BoofStandardJUnit {
 	void convertFromPlanar() {
 		BufferedImage origImg;
 
-		for( int i = 0; i < 6; i++ ) {
-
+		for( int i = 0; i < 7; i++ ) {
 			if( i == 0 )
 				origImg = TestConvertRaster.createByteBuff(imgWidth, imgHeight, 1, rand);
 			else if( i == 1 )
@@ -349,8 +366,10 @@ public class TestConvertBufferedImage extends BoofStandardJUnit {
 				origImg = TestConvertRaster.createByteIndexed(imgWidth, imgHeight, rand );
 			else if( i == 4 )
 				origImg = TestConvertRaster.createByteBinary(imgWidth, imgHeight, rand );
+			else if( i == 5 )
+				origImg = TestConvertRaster.createIntBuff(imgWidth, imgHeight, rand );
 			else
-				origImg = TestConvertRaster.createIntBuff(imgWidth, imgHeight, rand);
+				origImg = TestConvertRaster.createIntBuffRGBA(imgWidth, imgHeight, rand, false);
 
 			int limit = ConvertBufferedImage.isSubImageLegal() ? 2 : 1;
 			for( int j = 0; j < limit; j++ ) {
@@ -478,17 +497,22 @@ public class TestConvertBufferedImage extends BoofStandardJUnit {
 	 */
  	@Test
 	void convertTo_PL_orderRgb() {
+		// Premultiplied unit tests are commented out since the RGB values will not match the data values
 		Class []bandTypes = new Class[]{GrayU8.class,GrayF32.class};
 		for( Class b : bandTypes ) {
 			convertTo_PL_orderRgb(BufferedImage.TYPE_3BYTE_BGR, b, true);
 			convertTo_PL_orderRgb(BufferedImage.TYPE_4BYTE_ABGR, b, true);
+//			convertTo_PL_orderRgb(BufferedImage.TYPE_4BYTE_ABGR_PRE, b, true);
 			convertTo_PL_orderRgb(BufferedImage.TYPE_INT_ARGB, b, true);
+//			convertTo_PL_orderRgb(BufferedImage.TYPE_INT_ARGB_PRE, b, true);
 			convertTo_PL_orderRgb(BufferedImage.TYPE_INT_RGB, b, true);
 			convertTo_PL_orderRgb(BufferedImage.TYPE_INT_BGR, b, true);
 
 			convertTo_PL_orderRgb(BufferedImage.TYPE_3BYTE_BGR, b, false);
 			convertTo_PL_orderRgb(BufferedImage.TYPE_4BYTE_ABGR, b, false);
+//			convertTo_PL_orderRgb(BufferedImage.TYPE_4BYTE_ABGR_PRE, b, false);
 			convertTo_PL_orderRgb(BufferedImage.TYPE_INT_ARGB, b, false);
+//			convertTo_PL_orderRgb(BufferedImage.TYPE_INT_ARGB_PRE, b, false);
 			convertTo_PL_orderRgb(BufferedImage.TYPE_INT_RGB, b, false);
 			convertTo_PL_orderRgb(BufferedImage.TYPE_INT_BGR, b, false);
 		}
@@ -501,7 +525,7 @@ public class TestConvertBufferedImage extends BoofStandardJUnit {
 
 		Planar input = new Planar(bandType,imgWidth,imgHeight,numBands);
 
-		double pixel[] = new double[numBands];
+		double[] pixel = new double[numBands];
 		for (int i = 0; i < numBands; i++) {
 			pixel[i] = (i+1)*10;
 		}
@@ -514,17 +538,22 @@ public class TestConvertBufferedImage extends BoofStandardJUnit {
 
  	@Test
 	void convertTo_interleaved_orderRgb() {
+		// Premultiplied unit tests are commented out since the RGB values will not match the data values
 		Class []bandTypes = new Class[]{InterleavedI8.class,InterleavedF32.class};
 		for( Class b : bandTypes ) {
 			convertTo_interleaved_orderRgb(BufferedImage.TYPE_3BYTE_BGR, b, true);
 			convertTo_interleaved_orderRgb(BufferedImage.TYPE_4BYTE_ABGR, b, true);
+//			convertTo_interleaved_orderRgb(BufferedImage.TYPE_4BYTE_ABGR_PRE, b, true);
 			convertTo_interleaved_orderRgb(BufferedImage.TYPE_INT_ARGB, b, true);
+//			convertTo_interleaved_orderRgb(BufferedImage.TYPE_INT_ARGB_PRE, b, true);
 			convertTo_interleaved_orderRgb(BufferedImage.TYPE_INT_RGB, b, true);
 			convertTo_interleaved_orderRgb(BufferedImage.TYPE_INT_BGR, b, true);
 
 			convertTo_interleaved_orderRgb(BufferedImage.TYPE_3BYTE_BGR, b, false);
 			convertTo_interleaved_orderRgb(BufferedImage.TYPE_4BYTE_ABGR, b, false);
+//			convertTo_interleaved_orderRgb(BufferedImage.TYPE_4BYTE_ABGR_PRE, b, false);
 			convertTo_interleaved_orderRgb(BufferedImage.TYPE_INT_ARGB, b, false);
+//			convertTo_interleaved_orderRgb(BufferedImage.TYPE_INT_ARGB_PRE, b, false);
 			convertTo_interleaved_orderRgb(BufferedImage.TYPE_INT_RGB, b, false);
 			convertTo_interleaved_orderRgb(BufferedImage.TYPE_INT_BGR, b, false);
 		}
@@ -537,7 +566,7 @@ public class TestConvertBufferedImage extends BoofStandardJUnit {
 
 		ImageInterleaved input = GeneralizedImageOps.createInterleaved(bandType, imgWidth, imgHeight, numBands);
 
-		double pixel[] = new double[numBands];
+		double[] pixel = new double[numBands];
 		for (int i = 0; i < numBands; i++) {
 			pixel[i] = (i+1)*10;
 		}
