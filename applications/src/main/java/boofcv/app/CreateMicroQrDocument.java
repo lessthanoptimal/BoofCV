@@ -45,7 +45,7 @@ import java.util.Objects;
  * @author Peter Abeles
  */
 @SuppressWarnings({"NullAway.Init"})
-public class CreateMicroQrDocument {
+public class CreateMicroQrDocument extends BaseMarkerDocument {
 
 	@Option(name = "-t", aliases = {"--Text", "--Message"},
 			usage = "Specifies the message(s) to encode. For each message at least one QR Code will be added to the paper(s)")
@@ -68,49 +68,8 @@ public class CreateMicroQrDocument {
 	protected String _encoding = "AUTO";
 	public @Nullable QrCode.Mode encoding;
 
-	@Option(name = "-u", aliases = {"--Units"}, usage = "Name of document units. default: cm")
-	protected String _unit = Unit.CENTIMETER.abbreviation;
-	public Unit unit = Unit.UNKNOWN;
-
-	@Option(name = "-p", aliases = {"--PaperSize"}, usage = "Size of paper used. See below for predefined document sizes. "
-			+ "You can manually specify any size using the following notation. W:H  where W is the width and H is the height. "
-			+ "Values of W and H is specified with <number><unit abbreviation>, e.g. 6cm or 6, the unit is optional. If no unit"
-			+ " are specified the default document units are used.")
-	protected String _paperSize = PaperSize.LETTER.name;
-	public PaperSize paperSize;
-
-	@Option(name = "-w", aliases = {"--MarkerWidth"}, usage = "Width of the Micro QR Code. In document units.")
-	public float markerWidth = -1;
-
-	@Option(name = "-mw", aliases = {"--ModuleWidth"}, usage = "Specify size of QR Code by its module/cells. In document units.")
-	public float moduleWidth = -1;
-
-	@Option(name = "-s", aliases = {"--Space"}, usage = "Spacing between the fiducials. In document units.")
-	public float spaceBetween = 2;
-
-	@Option(name = "-o", aliases = {"--OutputName"}, usage = "Name of output file. Extension determines file type. E.g. qrcode.pdf. " +
-			"Valid extensions are pdf, png, jpg, gif, bmp")
-	public String fileName = "microqr";
-
-	@Option(name = "--GridFill", usage = "Flag to turn on filling the entire document with a grid of qr codes")
-	public boolean gridFill = false;
-
-	@Option(name = "--DrawGrid", usage = "Draws a line showing the grid")
-	public boolean drawGrid = false;
-
-	@Option(name = "--HideInfo", usage = "Flag that's used to turn off the printing of extra information")
-	public boolean hideInfo = false;
-
-	@Option(name = "--GUI", usage = "Ignore all other command line arguments and switch to GUI mode")
-	public boolean guiMode = false;
-
 	@Option(name = "--SaveCorners", usage = "Save location of marker corners in the document to corners.txt")
 	boolean saveCorners = false;
-
-	// if true it will send a document to the printer instead of saving it
-	public boolean sendToPrinter = false;
-	// specifies the file type
-	public String fileType;
 
 	private static void printHelpExit( CmdLineParser parser ) {
 		parser.getProperties().withUsageWidth(120);
