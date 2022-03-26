@@ -23,8 +23,8 @@ import boofcv.abst.fiducial.calib.ConfigECoCheckMarkers;
 import boofcv.abst.geo.calibration.CalibrateMonoPlanar;
 import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
 import boofcv.alg.fiducial.calib.ConfigCalibrationTarget;
-import boofcv.app.calib.AssistedCalibration;
-import boofcv.app.calib.AssistedCalibrationGui;
+import boofcv.app.calib.AssistedCalibrationMono;
+import boofcv.app.calib.AssistedCalibrationMonoGui;
 import boofcv.demonstrations.calibration.CalibrateMonocularPlanarApp;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.gui.controls.CalibrationModelPanel;
@@ -49,8 +49,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static boofcv.app.calib.AssistedCalibration.IMAGE_DIRECTORY;
-import static boofcv.app.calib.AssistedCalibration.OUTPUT_DIRECTORY;
+import static boofcv.app.calib.AssistedCalibrationMono.IMAGE_DIRECTORY;
+import static boofcv.app.calib.AssistedCalibrationMono.OUTPUT_DIRECTORY;
 
 /**
  * Application for easily calibrating a webcam using a live stream
@@ -630,7 +630,7 @@ public class CameraCalibrationMono extends BaseStandardInputApp {
 			}
 		}));
 
-		var gui = new AssistedCalibrationGui(webcam.getViewSize());
+		var gui = new AssistedCalibrationMonoGui(webcam.getViewSize());
 		JFrame frame = ShowImages.showWindow(gui, "Webcam Calibration", true);
 
 		GrayF32 gray = new GrayF32(webcam.getViewSize().width, webcam.getViewSize().height);
@@ -641,7 +641,7 @@ public class CameraCalibrationMono extends BaseStandardInputApp {
 						"  Desired: " + desiredWidth + " " + desiredHeight);
 		}
 
-		var assisted = new AssistedCalibration(gui, OUTPUT_DIRECTORY, IMAGE_DIRECTORY);
+		var assisted = new AssistedCalibrationMono(gui, OUTPUT_DIRECTORY, IMAGE_DIRECTORY);
 
 		// If the user specified a target type use that as the default
 		if (configTarget.type != null)

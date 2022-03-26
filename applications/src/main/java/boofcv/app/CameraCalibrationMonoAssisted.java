@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import javax.swing.*;
  *
  * @author Peter Abeles
  */
-public class CameraCalibrationAssisted {
+public class CameraCalibrationMonoAssisted {
 	public static void main( @Nullable String[] args ) {
 		SwingUtilities.invokeLater(() -> {
 			// Let the user select which camera and at what resolution

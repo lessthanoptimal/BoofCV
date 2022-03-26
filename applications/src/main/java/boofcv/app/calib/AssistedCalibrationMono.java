@@ -75,7 +75,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 @SuppressWarnings({"NullAway.Init"})
-public class AssistedCalibration {
+public class AssistedCalibrationMono {
 
 	public static final String OUTPUT_DIRECTORY = "calibration_data";
 	public static final String IMAGE_DIRECTORY = "images";
@@ -115,7 +115,7 @@ public class AssistedCalibration {
 	Ellipse2D.Double ellipse = new Ellipse2D.Double();
 
 	DetectUserActions actions = new DetectUserActions();
-	public AssistedCalibrationGui gui;
+	public AssistedCalibrationMonoGui gui;
 
 	// used to compute the geometric quality of collected fiducials
 	ComputeGeometryScore quality;
@@ -143,7 +143,7 @@ public class AssistedCalibration {
 	 * @param outputDirectory Root directory for where all output will be stored
 	 * @param imageDirectory Where images will be stored. Relative to outputDirectory
 	 */
-	public AssistedCalibration( AssistedCalibrationGui gui, String outputDirectory, String imageDirectory ) {
+	public AssistedCalibrationMono( AssistedCalibrationMonoGui gui, String outputDirectory, String imageDirectory ) {
 		File outputDir = new File(outputDirectory);
 		if (outputDir.exists()) {
 			System.out.println("Deleting output directory " + outputDirectory);
