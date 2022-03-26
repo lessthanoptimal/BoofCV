@@ -67,7 +67,7 @@ public class ApplicationLauncherGui extends JPanel {
 		JButton bCreateFidImage = createButton("Square Image", CreateFiducialSquareImageGui::new);
 		JButton bCreateFidHamming = createButton("Square Hamming", CreateFiducialSquareHammingGui::new);
 
-		JButton bUtilAssisted = createButton("Assisted Calibration", () -> CameraCalibrationAssisted.main(null));
+		JButton bUtilAssisted = createButton("Assisted Calibration", () -> CameraCalibrationMonoAssisted.main(null));
 		JButton bUtilCalib = createButton("Mono Calibration", () -> CalibrateMonocularPlanarApp.main(null));
 		JButton bUtilStereoCalib = createButton("Stereo Calibration", () -> CalibrateStereoPlanarApp.main(null));
 		JButton bUtilScanQrCode = createButton("Batch QR Code", BatchScanQrCodesGui::new);

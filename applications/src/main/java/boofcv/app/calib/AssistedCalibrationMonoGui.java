@@ -36,7 +36,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class AssistedCalibrationGui extends JPanel {
+public class AssistedCalibrationMonoGui extends JPanel {
 	JLabel messageLabel;
 	ImagePanel imagePanel;
 
@@ -47,11 +47,11 @@ public class AssistedCalibrationGui extends JPanel {
 
 	Runnable handleTargetChanged = () -> {};
 
-	public AssistedCalibrationGui( Dimension dimension ) {
+	public AssistedCalibrationMonoGui( Dimension dimension ) {
 		this(dimension.width, Math.max(600, dimension.height));
 	}
 
-	public AssistedCalibrationGui( int imageWidth, int imageHeight ) {
+	public AssistedCalibrationMonoGui( int imageWidth, int imageHeight ) {
 		super(new BorderLayout());
 
 		messageLabel = new JLabel();
