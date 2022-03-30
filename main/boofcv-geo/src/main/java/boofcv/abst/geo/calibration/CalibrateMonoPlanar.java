@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,8 @@ package boofcv.abst.geo.calibration;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.geo.calibration.CalibrationPlanarGridZhang99;
+import boofcv.alg.geo.calibration.ScoreCalibrationBorderFill;
+import boofcv.alg.geo.calibration.ScoreCalibrationInnerFill;
 import boofcv.alg.geo.calibration.cameras.Zhang99Camera;
 import boofcv.alg.geo.calibration.cameras.Zhang99CameraBrown;
 import boofcv.alg.geo.calibration.cameras.Zhang99CameraKannalaBrandt;
@@ -191,7 +193,33 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 	}
 
 	public void printStatistics( PrintStream out ) {
+		var quality = new CalibrationQuality();
+		computeQuality(foundIntrinsic, observations, quality);
+		out.printf("quality.fill_border   %.2f\n", quality.borderFill);
+		out.printf("quality.fill_inner    %.2f\n", quality.innerFill);
+		out.println();
 		printErrors(errors, out);
+	}
+
+	/**
+	 * Computes quality metrics to quantify how good of a job the person calibrating did
+	 */
+	public static void computeQuality( CameraModel intrinsic,
+									   List<CalibrationObservation> observations,
+									   CalibrationQuality quality ) {
+		var border = new ScoreCalibrationBorderFill();
+		var inner = new ScoreCalibrationInnerFill();
+
+		border.initialize(intrinsic.width, intrinsic.height);
+		inner.initialize(intrinsic.width, intrinsic.height);
+
+		for (int i = 0; i < observations.size(); i++) {
+			border.add(observations.get(i));
+			inner.add(observations.get(i));
+		}
+
+		quality.borderFill = border.getScore();
+		quality.innerFill = inner.getScore();
 	}
 
 	/**

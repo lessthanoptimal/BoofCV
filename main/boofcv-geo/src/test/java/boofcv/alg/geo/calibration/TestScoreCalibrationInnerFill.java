@@ -16,9 +16,8 @@
  * limitations under the License.
  */
 
-package boofcv.abst.geo.calibration;
+package boofcv.alg.geo.calibration;
 
-import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
@@ -65,7 +64,7 @@ public class TestScoreCalibrationInnerFill extends BoofStandardJUnit {
 
 		// Add 3 points. 1 is in the same cell as before. other 2 are in the same cell as each other
 		obs.reset();
-		obs.add(0, 51, 52);
+		obs.add(0, 5, 52);
 		obs.add(2, 82, 52);
 		obs.add(3, 82, 51);
 		alg.add(obs);

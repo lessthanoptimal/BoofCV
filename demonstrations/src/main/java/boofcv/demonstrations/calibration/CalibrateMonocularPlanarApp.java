@@ -19,6 +19,7 @@
 package boofcv.demonstrations.calibration;
 
 import boofcv.abst.geo.calibration.CalibrateMonoPlanar;
+import boofcv.abst.geo.calibration.CalibrationQuality;
 import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
 import boofcv.abst.geo.calibration.ImageResults;
 import boofcv.alg.distort.LensDistortionWideFOV;
@@ -536,6 +537,9 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 
 			// Save results for visualization
 			results.safe(() -> {
+				CalibrateMonoPlanar.computeQuality(detectorSet.calibrator.getIntrinsic(),
+						results.allUsedObservations, results.quality);
+
 				results.imageResults.clear();
 				List<ImageResults> listResults = detectorSet.calibrator.getErrors();
 				for (int i = 0; i < listResults.size(); i++) {
@@ -594,7 +598,11 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 				maxError = Math.max(maxError, r.maxError);
 			}
 			averageError /= results.usedImages.size();
-			String text = String.format("Reprojection Errors (px):\n\nmean=%.3f max=%.3f\n\n", averageError, maxError);
+			String text = "";
+			text += String.format("quality.fill_border  %5.1f%%\n", 100*results.quality.borderFill);
+			text += String.format("quality.fill_inner   %5.1f%%\n", 100*results.quality.innerFill);
+			text += "\n";
+			text += String.format("Reprojection Errors (px):\n\nmean=%.3f max=%.3f\n\n", averageError, maxError);
 			text += String.format("%-10s | %8s\n", "image", "max (px)");
 			for (int i = 0; i < results.usedImages.size(); i++) {
 				String image = results.imagePaths.get(results.usedImages.get(i));
@@ -894,6 +902,8 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 		protected final DogArray_I32 usedImages = new DogArray_I32();
 		// Copy of original observation before any edits
 		protected final DogArray<CalibrationObservation> originalObservations = new DogArray<>(CalibrationObservation::new);
+		// Quality of observations and results
+		protected final CalibrationQuality quality = new CalibrationQuality();
 
 		public CalibrationObservation getObservation( String key ) {
 			return Objects.requireNonNull(imageObservations.get(key));
@@ -911,6 +921,7 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 				usedImages.reset();
 				allUsedObservations.clear();
 				originalObservations.reset();
+				quality.reset();
 			});
 		}
 	}
