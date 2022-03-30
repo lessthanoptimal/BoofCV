@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -66,7 +66,7 @@ public class TestRadialDistortionEstimateLinear extends BoofStandardJUnit {
 
 			CalibrationObservation set = new CalibrationObservation();
 			for (int i = 0; i < pixels.size(); i++) {
-				set.add(pixels.get(i),i);
+				set.add(i, pixels.get(i));
 			}
 
 			observations.add( set );

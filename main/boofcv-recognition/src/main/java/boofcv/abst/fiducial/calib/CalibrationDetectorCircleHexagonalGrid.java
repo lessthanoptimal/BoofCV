@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -109,7 +109,7 @@ public class CalibrationDetectorCircleHexagonalGrid implements DetectSingleFiduc
 		DogArray<PointIndex2D_F64> foundPixels = keypoint.getKeyPoints();
 
 		for (int i = 0; i < foundPixels.size; i++) {
-			results.add(foundPixels.get(i).p, i);
+			results.add(i, foundPixels.get(i).p);
 		}
 		return true;
 	}

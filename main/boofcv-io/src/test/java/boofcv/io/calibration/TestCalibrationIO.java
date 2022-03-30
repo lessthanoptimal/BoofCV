@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,9 +39,9 @@ public class TestCalibrationIO extends BoofStandardJUnit {
 		var original = new CalibrationObservation();
 		original.width = 99;
 		original.height = 123;
-		original.add(1, 2, -23);
-		original.add(5, 10.5, -23);
-		original.add(3.11, -20.1, -23);
+		original.add(-23, 1, 2);
+		original.add(-23, 5, 10.5);
+		original.add(-23, 3.11, -20.1);
 
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		CalibrationIO.saveLandmarksCsv("File", "ASDASD", original, stream);

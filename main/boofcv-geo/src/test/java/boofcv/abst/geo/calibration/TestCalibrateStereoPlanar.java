@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -135,7 +135,7 @@ public class TestCalibrateStereoPlanar extends BoofStandardJUnit {
 			if( pixel.x < 0 || pixel.x >= intrinsic.width-1 || pixel.y < 0 || pixel.y >= intrinsic.height-1 )
 				throw new RuntimeException("Adjust test setup, bad observation");
 
-			set.add(pixel,i);
+			set.add(i, pixel);
 		}
 
 		return set;

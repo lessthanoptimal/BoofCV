@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -82,7 +82,7 @@ public class TestMultiToSingleFiducialCalibration extends BoofStandardJUnit {
 		@Override public CalibrationObservation getDetectedPoints( int detectionID ) {
 			var det = new CalibrationObservation();
 			for (int i = 0; i < 3; i++) {
-				det.add(1.0, 2.0, i+2);
+				det.add(i+2, 1.0, 2.0);
 			}
 			return det;
 		}
