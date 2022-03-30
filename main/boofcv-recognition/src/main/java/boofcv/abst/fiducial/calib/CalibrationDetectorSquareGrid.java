@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -73,7 +73,7 @@ public class CalibrationDetectorSquareGrid implements DetectSingleFiducialCalibr
 		if (detector.process(input)) {
 			List<PointIndex2D_F64> found = detector.getCalibrationPoints();
 			for (int i = 0; i < found.size(); i++) {
-				detected.add(found.get(i).p, i);
+				detected.add(i, found.get(i).p);
 			}
 			return true;
 		} else {

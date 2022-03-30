@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -91,7 +91,7 @@ public class GenericCalibrationGrid extends BoofStandardJUnit {
 
 			Point3D_F64 t = SePointOps_F64.transform(motion,p3,null);
 
-			ret.add( new Point2D_F64(t.x/t.z,t.y/t.z), i);
+			ret.add(i, new Point2D_F64(t.x/t.z,t.y/t.z));
 		}
 
 		return ret;

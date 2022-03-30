@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -568,7 +568,7 @@ public class CalibrationIO {
 				int which = Integer.parseInt(words[0]);
 				double x = Double.parseDouble(words[1]);
 				double y = Double.parseDouble(words[2]);
-				ret.add(x, y, which);
+				ret.add(which, x, y);
 			}
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);

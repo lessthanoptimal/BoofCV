@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -70,14 +70,14 @@ public class CalibrationObservation {
 	/**
 	 * Adds a new observation. A copy is made.
 	 *
-	 * @param observation The observation. A copy is internally created.
 	 * @param which Index of the observed feature
+	 * @param observation The observation. A copy is internally created.
 	 */
-	public void add( Point2D_F64 observation, int which ) {
+	public void add( int which, Point2D_F64 observation ) {
 		points.add(new PointIndex2D_F64(observation.x, observation.y, which));
 	}
 
-	public void add( double x, double y, int which ) {
+	public void add( int which, double x, double y ) {
 		points.add(new PointIndex2D_F64(x, y, which));
 	}
 
