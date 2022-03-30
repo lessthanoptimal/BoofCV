@@ -18,9 +18,7 @@
 
 package boofcv.demonstrations.calibration;
 
-import boofcv.abst.geo.calibration.CalibrateStereoPlanar;
-import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
-import boofcv.abst.geo.calibration.ImageResults;
+import boofcv.abst.geo.calibration.*;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyFillType;
 import boofcv.alg.geo.RectifyImageOps;
@@ -480,6 +478,10 @@ public class CalibrateStereoPlanarApp extends JPanel {
 			results.right.errors.put(imageName, algorithms.calibrator.getCalibRight().getErrors().get(usedIdx));
 			usedIdx += 1;
 		}
+		CalibrateMonoPlanar.computeQuality(algorithms.calibrator.getCalibLeft().getIntrinsic(),
+				algorithms.calibrator.getCalibLeft().getObservations(), results.left.quality);
+		CalibrateMonoPlanar.computeQuality(algorithms.calibrator.getCalibRight().getIntrinsic(),
+				algorithms.calibrator.getCalibRight().getObservations(), results.right.quality);
 		results.unlock();
 		algorithms.unlock();
 	}
@@ -498,8 +500,7 @@ public class CalibrateStereoPlanarApp extends JPanel {
 					continue;
 				CalibrationObservation left = results.left.observations.get(imageName);
 				CalibrationObservation right = results.right.observations.get(imageName);
-				if (left == null || right == null)
-					throw new RuntimeException("Egads");
+				BoofMiscOps.checkTrue(left != null && right != null);
 				algorithms.calibrator.addPair(left, right);
 			}
 		} finally {
@@ -625,7 +626,13 @@ public class CalibrateStereoPlanarApp extends JPanel {
 				maxError = Math.max(maxError, r.maxError);
 			}
 			averageError /= errors.size();
-			String text = String.format("Reprojection Errors (px):\n\nmean=%.3f max=%.3f\n\n", averageError, maxError);
+			String text = "";
+			text += String.format("quality.fill_border %3.0f%% %3.0f%%\n", 100*results.left.quality.borderFill,
+					100*results.left.quality.innerFill);
+			text += String.format("quality.fill_inner  %3.0f%% %3.0f%%\n", 100*results.right.quality.borderFill,
+					100*results.right.quality.innerFill);
+			text += "\n";
+			text += String.format("Reprojection Errors (px):\n\nmean=%.3f max=%.3f\n\n", averageError, maxError);
 			text += String.format("%-10s | %8s\n", "image", "max (px)");
 			for (int imageIdx = 0, i = 0; imageIdx < results.names.size(); imageIdx++) {
 				if (!results.used.get(imageIdx))
@@ -881,7 +888,8 @@ public class CalibrateStereoPlanarApp extends JPanel {
 		JComboBox<String> comboRect = combo(rectType.ordinal(), (Object[])RectifyFillType.values());
 
 		@Getter ControlPanelPinhole pinhole = new ControlPanelPinhole(() -> settingsChanged(false, true));
-		@Getter CalibrationTargetPanel targetPanel = new CalibrationTargetPanel(( a, b ) -> handleUpdatedTarget(), true);
+		@Getter
+		CalibrationTargetPanel targetPanel = new CalibrationTargetPanel(( a, b ) -> handleUpdatedTarget(), true);
 		// Displays a preview of the calibration target
 		ImagePanel targetPreviewPanel = new ImagePanel();
 		// Displays calibration information
@@ -1010,12 +1018,14 @@ public class CalibrateStereoPlanarApp extends JPanel {
 		protected final Map<String, CalibrationObservation> observations = new HashMap<>();
 		// Copy of original observation before any edits
 		protected final DogArray<CalibrationObservation> original = new DogArray<>(CalibrationObservation::new);
+		// Quality of observations and results
+		protected final CalibrationQuality quality = new CalibrationQuality();
 
-		public ImageResults getError(String key) {
+		public ImageResults getError( String key ) {
 			return Objects.requireNonNull(errors.get(key));
 		}
 
-		public CalibrationObservation getObservation(String key) {
+		public CalibrationObservation getObservation( String key ) {
 			return Objects.requireNonNull(observations.get(key));
 		}
 
@@ -1029,6 +1039,7 @@ public class CalibrateStereoPlanarApp extends JPanel {
 			errors.clear();
 			observations.clear();
 			original.reset();
+			quality.reset();
 		}
 	}
 

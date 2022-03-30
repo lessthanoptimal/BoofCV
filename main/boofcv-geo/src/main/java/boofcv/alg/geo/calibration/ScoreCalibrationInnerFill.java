@@ -16,9 +16,8 @@
  * limitations under the License.
  */
 
-package boofcv.abst.geo.calibration;
+package boofcv.alg.geo.calibration;
 
-import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.ImageGrid;
 import georegression.struct.point.Point2D_F64;

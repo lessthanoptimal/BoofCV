@@ -16,9 +16,8 @@
  * limitations under the License.
  */
 
-package boofcv.abst.geo.calibration;
+package boofcv.alg.geo.calibration;
 
-import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.testing.BoofStandardJUnit;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
@@ -30,19 +29,17 @@ public class TestScoreCalibrationBorderFill extends BoofStandardJUnit {
 		var alg = new ScoreCalibrationBorderFill();
 		alg.innerSamples = 7;
 		alg.borderSpace.setFixed(5.0);
-		alg.touchTol.setFixed(7.0);
 		alg.initialize(160, 120);
 
 		assertEquals(4 + 4*7, alg.targets.size);
 		assertEquals(5.0, alg.actualBorderTol);
-		assertEquals(7.0, alg.actualTouchTol);
+		assertEquals(140/14.0, alg.actualTouchTol);
 	}
 
 	@Test void add_NoHits() {
 		var alg = new ScoreCalibrationBorderFill();
 		alg.innerSamples = 3;
 		alg.borderSpace.setFixed(5.0);
-		alg.touchTol.setFixed(7.0);
 		alg.initialize(160, 120);
 
 		var obs = new CalibrationObservation();
@@ -55,7 +52,8 @@ public class TestScoreCalibrationBorderFill extends BoofStandardJUnit {
 		assertEquals(0.0, alg.score);
 
 		// This will be on an edge but not near one of the points
-		obs.reset();
+		alg.actualTouchTol = 2;
+		obs.points.clear();
 		obs.add(0, 15, 7);
 		alg.add(obs);
 		assertEquals(0.0, alg.score, UtilEjml.TEST_F64);
@@ -65,7 +63,6 @@ public class TestScoreCalibrationBorderFill extends BoofStandardJUnit {
 		var alg = new ScoreCalibrationBorderFill();
 		alg.innerSamples = 3;
 		alg.borderSpace.setFixed(5.0);
-		alg.touchTol.setFixed(7.0);
 		alg.initialize(160, 120);
 		double N = alg.targets.size;
 
@@ -101,18 +98,20 @@ public class TestScoreCalibrationBorderFill extends BoofStandardJUnit {
 		// some are well inside others are right on the threshold
 		assertTrue(alg.isNearBorder(0, 0, w, h));
 		assertTrue(alg.isNearBorder(2*b, 2*b, w, h));
-		assertTrue(alg.isNearBorder(w - 1, h - 1, w, h));
-		assertTrue(alg.isNearBorder(w - 1 - 2*b, h - 1 - 2*b, w, h));
-		assertTrue(alg.isNearBorder(w - 1, 0, w, h));
-		assertTrue(alg.isNearBorder(w - 1 - 2*b, 2*b, w, h));
-		assertTrue(alg.isNearBorder(0, h - 1, w, h));
-		assertTrue(alg.isNearBorder(2*b, h - 1 - 2*b, w, h));
+		assertTrue(alg.isNearBorder(w, h, w, h));
+		assertTrue(alg.isNearBorder(w - 2*b, h - 2*b, w, h));
+		assertTrue(alg.isNearBorder(w, 0, w, h));
+		assertTrue(alg.isNearBorder(w - 2*b, 2*b, w, h));
+		assertTrue(alg.isNearBorder(0, h, w, h));
+		assertTrue(alg.isNearBorder(2*b, h - 2*b, w, h));
+		assertTrue(alg.isNearBorder(w/2.0, b, w, h));
+		assertTrue(alg.isNearBorder(b, h/2.0, w, h));
 
 		// negative
 		double delta = 1e-6; // very small number to throw it over the threshold
-		assertFalse(alg.isNearBorder(2*b + delta, 2*b, w, h));
-		assertFalse(alg.isNearBorder(2*b, 2*b + delta, w, h));
-		assertFalse(alg.isNearBorder(2*b + delta, h - 1 - 2*b, w, h));
-		assertFalse(alg.isNearBorder(2*b, h - 1 - 2*b - delta, w, h));
+		assertFalse(alg.isNearBorder(2*b + delta, 2*b + delta, w, h));
+		assertFalse(alg.isNearBorder(2*b + delta, h - 2*b - delta, w, h));
+		assertFalse(alg.isNearBorder(w/2.0, 2*b + delta, w, h));
+		assertFalse(alg.isNearBorder(2*b + delta, h/2.0, w, h));
 	}
 }
