@@ -544,8 +544,8 @@ public class QrCodeDecoderImage<T extends ImageGray<T>> {
 
 		double versionY = ((grid.y + 7) - 17)/4;
 
-		// see if they are in agreement
-		if (Math.abs(versionX - versionY)/Math.max(versionX, versionY) > 0.4)
+		// see if they are in agreement. Use a crude tolerance
+		if (Math.abs(versionX - versionY) > 2)
 			return -1;
 
 		return (int)((versionX + versionY)/2.0 + 0.5);
