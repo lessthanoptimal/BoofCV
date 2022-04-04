@@ -18,6 +18,8 @@ Version : 0.41
 - ConvertBufferedImage
   - RGBA with pre-multiplied alpha will have channels swapped correctly
 - Added Aztec Code encoder and decoder
+- QR Code
+  - Fixed issue where it was rejecting version 1 QR codes at a highly skewed angle
 - Various
   - Fixed crash in Niblack Family when output image was not resized to match input image
 - SLAM
