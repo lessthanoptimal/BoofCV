@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -184,8 +184,8 @@ public class CreateCalibrationTarget {
 		if (paperSize == null) {
 			String[] words = _paperSize.split(":");
 			if (words.length != 2) failExit("Expected two value+unit separated by a :");
-			var w = new LengthUnit(words[0]);
-			var h = new LengthUnit(words[1]);
+			var w = new LengthUnit(words[0], unit);
+			var h = new LengthUnit(words[1], unit);
 			if (w.unit != h.unit) failExit("Same units must be specified for width and height");
 			paperSize = new PaperSize(w.length, h.length, w.getUnit());
 		}
@@ -268,7 +268,7 @@ public class CreateCalibrationTarget {
 
 		if (type == CalibrationPatterns.ECOCHECK) {
 			CreateECoCheckDocumentPDF doc = ecoCheckToPdf(fileName + suffix,
-					paperSize, unit, rows, columns, shapeWidth, numMarkers, chessBitsError, ecocheckChecksum);
+					paperSize, unit, !disablePrintInfo, rows, columns, shapeWidth, numMarkers, chessBitsError, ecocheckChecksum);
 			doc.showInfo = !disablePrintInfo;
 			if (sendToPrinter) {
 				doc.sendToPrinter();
@@ -286,8 +286,7 @@ public class CreateCalibrationTarget {
 			return;
 		} else if (type == CalibrationPatterns.HAMMING_CHESSBOARD) {
 			CreateHammingChessboardDocumentPDF doc = hammingChessToPdf(fileName + suffix,
-					paperSize, unit, rows, columns, chessboardOdd, shapeWidth, markerScale, encodingName, encodingOffset);
-			doc.showInfo = !disablePrintInfo;
+					paperSize, unit, !disablePrintInfo, rows, columns, chessboardOdd, shapeWidth, markerScale, encodingName, encodingOffset);
 			if (sendToPrinter) {
 				doc.sendToPrinter();
 			} else {
@@ -306,8 +305,7 @@ public class CreateCalibrationTarget {
 			return;
 		} else if (type == CalibrationPatterns.HAMMING_GRID) {
 			CreateHammingGridDocumentPDF doc = hammingGridToPdf(fileName + suffix,
-					paperSize, unit, rows, columns, shapeWidth, shapeSpace, encodingName, encodingOffset);
-			doc.showInfo = !disablePrintInfo;
+					paperSize, unit, !disablePrintInfo, rows, columns, shapeWidth, shapeSpace, encodingName, encodingOffset);
 			if (sendToPrinter) {
 				doc.sendToPrinter();
 			} else {
@@ -361,6 +359,7 @@ public class CreateCalibrationTarget {
 	}
 
 	public static CreateECoCheckDocumentPDF ecoCheckToPdf( String outputFile, PaperSize paper, Unit units,
+														   boolean showInfo,
 														   int rows, int columns, float squareWidth,
 														   int numMarkers, int errorLevel, int checksum ) throws IOException {
 		ConfigECoCheckMarkers config = ConfigECoCheckMarkers.singleShape(rows, columns, numMarkers, squareWidth);
@@ -376,11 +375,13 @@ public class CreateCalibrationTarget {
 		doc.markerHeight = (rows - 1)*squareWidth;
 		doc.spaceBetween = squareWidth/2.0f;
 		doc.squareWidth = squareWidth;
+		doc.showInfo = showInfo;
 		doc.render(utils);
 		return doc;
 	}
 
 	public static CreateHammingChessboardDocumentPDF hammingChessToPdf( String outputFile, PaperSize paper, Unit units,
+																		boolean showInfo,
 																		int rows, int columns, boolean chessboardEven,
 																		float squareWidth, float markerScale,
 																		String encoding, int markerOffset ) throws IOException {
@@ -396,11 +397,13 @@ public class CreateCalibrationTarget {
 		doc.markerHeight = rows*squareWidth;
 		doc.spaceBetween = squareWidth/2.0f;
 		doc.squareWidth = squareWidth;
+		doc.showInfo = showInfo;
 		doc.render(config);
 		return doc;
 	}
 
 	public static CreateHammingGridDocumentPDF hammingGridToPdf( String outputFile, PaperSize paper, Unit units,
+																 boolean showInfo,
 																 int rows, int columns,
 																 float squareWidth, float spaceToSquare,
 																 String encoding, int markerOffset ) throws IOException {
@@ -415,6 +418,7 @@ public class CreateCalibrationTarget {
 		doc.markerHeight = (float)config.getMarkerHeight();
 		doc.spaceBetween = squareWidth/2.0f;
 		doc.squareWidth = squareWidth;
+		doc.showInfo = showInfo;
 		doc.render(config);
 		return doc;
 	}
