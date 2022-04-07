@@ -534,7 +534,9 @@ public class CalibrateStereoPlanarApp extends JPanel {
 		final DMatrixRMaj rect2 = rectify.getUndistToRectPixels2();
 		final DMatrixRMaj rectK = rectify.getCalibrationMatrix();
 
-		RectifyImageOps.adjustView(configurePanel.rectType, param.getLeft(), rect1, rect2, rectK, null);
+		// 0 = input image
+		RectifyFillType type = RectifyFillType.values()[Math.max(0, configurePanel.selectedRectify - 1)];
+		RectifyImageOps.adjustView(type, param.getLeft(), rect1, rect2, rectK, null);
 
 		SwingUtilities.invokeLater(() -> stereoPanel.setRectification(param.getLeft(), rect1, param.getRight(), rect2));
 	}
@@ -668,7 +670,7 @@ public class CalibrateStereoPlanarApp extends JPanel {
 		BoofSwingUtil.checkGuiThread();
 		stereoPanel.setShowPoints(configurePanel.checkPoints.value);
 		stereoPanel.setShowErrors(configurePanel.checkErrors.value);
-		stereoPanel.setRectify(configurePanel.checkRectified.value);
+		stereoPanel.setRectify(configurePanel.selectedRectify != 0);
 		stereoPanel.setShowAll(configurePanel.checkAll.value);
 		stereoPanel.setShowNumbers(configurePanel.checkNumbers.value);
 		stereoPanel.setShowOrder(configurePanel.checkOrder.value);
@@ -873,19 +875,18 @@ public class CalibrateStereoPlanarApp extends JPanel {
 	public class ConfigureInfoPanel extends StandardAlgConfigPanel {
 		protected JSpinnerNumber zoom = spinnerWrap(1.0, MIN_ZOOM, MAX_ZOOM, 1.0);
 		protected JLabel imageSizeLabel = new JLabel();
-		protected RectifyFillType rectType = RectifyFillType.FULL_VIEW_LEFT;
+		protected int selectedRectify = 0; // Which image view should be displayed
 
 		JButton bCompute = button("Compute", false);
 
 		JCheckBoxValue checkPoints = checkboxWrap("Points", true).tt("Show calibration landmarks");
 		JCheckBoxValue checkResidual = checkboxWrap("Residual", false).tt("Line showing residual exactly");
 		JCheckBoxValue checkErrors = checkboxWrap("Errors", false).tt("Exaggerated residual errors");
-		JCheckBoxValue checkRectified = checkboxWrap("Rectify", false).tt("Visualize rectified images");
 		JCheckBoxValue checkAll = checkboxWrap("All", false).tt("Show location of all landmarks in all images");
 		JCheckBoxValue checkNumbers = checkboxWrap("Numbers", false).tt("Draw feature numbers");
 		JCheckBoxValue checkOrder = checkboxWrap("Order", true).tt("Visualize landmark order");
 		JSpinnerNumber selectErrorScale = spinnerWrap(10.0, 0.1, 1000.0, 2.0);
-		JComboBox<String> comboRect = combo(rectType.ordinal(), (Object[])RectifyFillType.values());
+		JComboBox<String> comboRect = combo(selectedRectify, "Input", "Default", "ALL_INSIDE", "FULL_VIEW");
 
 		@Getter ControlPanelPinhole pinhole = new ControlPanelPinhole(() -> settingsChanged(false, true));
 		@Getter
@@ -916,7 +917,8 @@ public class CalibrateStereoPlanarApp extends JPanel {
 
 			addLabeled(imageSizeLabel, "Image Size", "Size of image being viewed");
 			addLabeled(zoom.spinner, "Zoom", "Zoom of image being viewed");
-			addLabeled(comboRect, "Rectify");
+			addLabeled(comboRect, "Rectify",
+					"If the image should be rectified and if so how it will compute the rectification");
 			addAlignCenter(bCompute, "Press to compute calibration with current settings.");
 			add(createVisualFlagPanel());
 			addLabeled(selectErrorScale.spinner, "Error Scale", "Increases the error visualization");
@@ -943,7 +945,6 @@ public class CalibrateStereoPlanarApp extends JPanel {
 
 			panel.add(checkPoints.check);
 			panel.add(checkErrors.check);
-			panel.add(checkRectified.check);
 			panel.add(checkResidual.check);
 			panel.add(checkAll.check);
 			panel.add(checkNumbers.check);
@@ -976,8 +977,9 @@ public class CalibrateStereoPlanarApp extends JPanel {
 			} else if (source == zoom.spinner) {
 				stereoPanel.setScale(zoom.vdouble());
 			} else if (source == comboRect) {
-				rectType = RectifyFillType.values()[comboRect.getSelectedIndex()];
+				selectedRectify = comboRect.getSelectedIndex();
 				handleRectificationChange();
+				updateVisualizationSettings();
 			} else {
 				updateVisualizationSettings();
 			}
