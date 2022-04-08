@@ -61,6 +61,7 @@ import java.io.File;
 import java.util.List;
 import java.util.*;
 
+import static boofcv.abst.geo.calibration.CalibrateStereoPlanar.computeQualityText;
 import static boofcv.demonstrations.calibration.CalibrateMonocularPlanarApp.saveCalibrationTarget;
 import static boofcv.demonstrations.calibration.CalibrateMonocularPlanarApp.saveIntrinsics;
 import static boofcv.gui.BoofSwingUtil.MAX_ZOOM;
@@ -246,8 +247,8 @@ public class CalibrateStereoPlanarApp extends JPanel {
 	protected void saveLandmarks( ViewResults view, boolean left, File destination ) {
 		results.safe(() -> {
 			String detectorName = algorithms.select(() -> algorithms.detector.getClass().getSimpleName());
-			for (int imageIdx = 0; imageIdx < results.names.size(); imageIdx++) {
-				String imageName = results.names.get(imageIdx);
+			for (int imageIdx = 0; imageIdx < results.namesLeft.size(); imageIdx++) {
+				String imageName = results.namesLeft.get(imageIdx);
 				if (!results.used.get(imageIdx))
 					continue;
 				String fileName = left ? imageName : results.namesRight.get(imageIdx);
@@ -470,10 +471,10 @@ public class CalibrateStereoPlanarApp extends JPanel {
 	private void saveErrorsInResults() {
 		results.lock();
 		algorithms.lock();
-		for (int imageIdx = 0, usedIdx = 0; imageIdx < results.names.size(); imageIdx++) {
+		for (int imageIdx = 0, usedIdx = 0; imageIdx < results.namesLeft.size(); imageIdx++) {
 			if (!results.used.get(imageIdx))
 				continue;
-			String imageName = results.names.get(imageIdx);
+			String imageName = results.namesLeft.get(imageIdx);
 			results.left.errors.put(imageName, algorithms.calibrator.getCalibLeft().getErrors().get(usedIdx));
 			results.right.errors.put(imageName, algorithms.calibrator.getCalibRight().getErrors().get(usedIdx));
 			usedIdx += 1;
@@ -494,13 +495,12 @@ public class CalibrateStereoPlanarApp extends JPanel {
 		results.lock();
 		try {
 			algorithms.calibrator.reset();
-			for (int imageIdx = 0; imageIdx < results.names.size(); imageIdx++) {
-				String imageName = results.names.get(imageIdx);
+			for (int imageIdx = 0; imageIdx < results.namesLeft.size(); imageIdx++) {
+				String imageName = results.namesLeft.get(imageIdx);
 				if (!results.used.get(imageIdx))
 					continue;
-				CalibrationObservation left = results.left.observations.get(imageName);
-				CalibrationObservation right = results.right.observations.get(imageName);
-				BoofMiscOps.checkTrue(left != null && right != null);
+				CalibrationObservation left = Objects.requireNonNull(results.left.observations.get(imageName));
+				CalibrationObservation right = Objects.requireNonNull(results.right.observations.get(imageName));
 				algorithms.calibrator.addPair(left, right);
 			}
 		} finally {
@@ -592,7 +592,7 @@ public class CalibrateStereoPlanarApp extends JPanel {
 			boolean _used = used;
 			results.safe(() -> {
 				results.used.add(_used);
-				results.names.add(imageName);
+				results.namesLeft.add(imageName);
 				results.namesRight.add(imageRight);
 			});
 
@@ -616,41 +616,14 @@ public class CalibrateStereoPlanarApp extends JPanel {
 		results.lock();
 
 		try {
-			double averageError = 0.0;
-			double maxError = 0.0;
 			List<ImageResults> errors = algorithms.calibrator.computeErrors();
 			if (errors.isEmpty())
 				return;
 
-			for (int i = 0; i < errors.size(); i++) {
-				ImageResults r = errors.get(i);
-				averageError += r.meanError;
-				maxError = Math.max(maxError, r.maxError);
-			}
-			averageError /= errors.size();
-			String text = "";
-			text += String.format("quality.fill_border %3.0f%% %3.0f%%\n", 100*results.left.quality.borderFill,
-					100*results.left.quality.innerFill);
-			text += String.format("quality.fill_inner  %3.0f%% %3.0f%%\n", 100*results.right.quality.borderFill,
-					100*results.right.quality.innerFill);
-			text += "\n";
-			text += String.format("Reprojection Errors (px):\n\nmean=%.3f max=%.3f\n\n", averageError, maxError);
-			text += String.format("%-10s | %8s\n", "image", "max (px)");
-			for (int imageIdx = 0, i = 0; imageIdx < results.names.size(); imageIdx++) {
-				if (!results.used.get(imageIdx))
-					continue;
-				String imageName = results.names.get(imageIdx);
-				ImageResults r = errors.get(i);
-				text += String.format("%-12s %8.3f\n", imageName, r.maxError);
-				// print right image now
-				r = errors.get(i + 1);
-				text += String.format("%-12s %8.3f\n", "", r.maxError);
-				i += 2;
-			}
-
-			String _text = text;
+			String text = computeQualityText(results.namesLeft, results.used, errors,
+					results.left.quality, results.right.quality);
 			SwingUtilities.invokeLater(() -> {
-				configurePanel.textAreaStats.setText(_text);
+				configurePanel.textAreaStats.setText(text);
 				configurePanel.textAreaStats.setCaretPosition(0); // show the top where summary stats are
 			});
 		} finally {
@@ -708,7 +681,7 @@ public class CalibrateStereoPlanarApp extends JPanel {
 		BoofSwingUtil.checkGuiThread();
 
 		results.safe(() -> {
-			String imageName = results.names.get(inputIndex);
+			String imageName = results.namesLeft.get(inputIndex);
 
 			{
 				List<CalibrationObservation> all = algorithms.select(() ->
@@ -794,7 +767,7 @@ public class CalibrateStereoPlanarApp extends JPanel {
 			if (!imageListPanel.imageSuccess.get(selected))
 				return;
 
-			String imageName = results.select(() -> results.names.get(selected));
+			String imageName = results.select(() -> results.namesLeft.get(selected));
 
 			if (soft) {
 				// if a soft rule is applied then only remove if there are not enough observations in left and right
@@ -832,8 +805,8 @@ public class CalibrateStereoPlanarApp extends JPanel {
 		// Rebuild list of used images and copy over original observations into the active observations
 		results.safe(() -> {
 			results.used.reset();
-			for (int i = 0; i < results.names.size(); i++) {
-				String imageName = results.names.get(i);
+			for (int i = 0; i < results.namesLeft.size(); i++) {
+				String imageName = results.namesLeft.get(i);
 				CalibrationObservation ol = results.left.getObservation(imageName);
 				CalibrationObservation or = results.right.getObservation(imageName);
 				ol.setTo(results.left.original.get(i));
@@ -846,7 +819,7 @@ public class CalibrateStereoPlanarApp extends JPanel {
 		// Visually show the changes
 		BoofSwingUtil.invokeNowOrLater(() -> {
 			results.safe(() -> {
-				for (int i = 0; i < results.names.size(); i++) {
+				for (int i = 0; i < results.namesLeft.size(); i++) {
 					imageListPanel.imageSuccess.set(i, results.used.get(i));
 				}
 			});
@@ -995,7 +968,7 @@ public class CalibrateStereoPlanarApp extends JPanel {
 
 	private static class ResultsLocked extends VariableLockSet {
 		// List of all image names. Left view, but this is these are the names used to identify the pairs
-		protected final List<String> names = new ArrayList<>();
+		protected final List<String> namesLeft = new ArrayList<>();
 		// Names of right images
 		protected final List<String> namesRight = new ArrayList<>();
 		// List of images in use
@@ -1009,7 +982,7 @@ public class CalibrateStereoPlanarApp extends JPanel {
 				used.reset();
 				left.reset();
 				right.reset();
-				names.clear();
+				namesLeft.clear();
 			});
 		}
 	}
