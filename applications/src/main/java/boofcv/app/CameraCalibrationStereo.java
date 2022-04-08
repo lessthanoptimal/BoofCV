@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,6 +45,9 @@ import org.kohsuke.args4j.Option;
 import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -246,10 +249,11 @@ public class CameraCalibrationStereo {
 			System.err.println("No input images found");
 			System.exit(1);
 		}
+		Objects.requireNonNull(inputDir);
 
 		// If not specified use input directory as output directory
 		if (outputPath.isEmpty()) {
-			outputPath = new File(Objects.requireNonNull(inputDir), "stereo.yaml").getPath();
+			outputPath = new File(inputDir, "stereo.yaml").getPath();
 		}
 
 		// Detect markers in images and pass to calibrator
@@ -263,8 +267,11 @@ public class CameraCalibrationStereo {
 			BoofMiscOps.checkTrue(landmarksPath.mkdirs());
 		}
 
+		List<String> leftNames = new ArrayList<>();
 		for (int frame = 0; frame < stereoImages.size(); frame++) {
 			stereoImages.setSelected(frame);
+			leftNames.add(stereoImages.getLeftName());
+
 			BufferedImage buffLeft = stereoImages.loadLeft();
 			BufferedImage buffRight = stereoImages.loadRight();
 
@@ -292,10 +299,18 @@ public class CameraCalibrationStereo {
 
 		// Compute calibration and save results
 		StereoParameters stereo = calibrator.process();
-		if (verbose)
-			calibrator.printStatistics();
-
 		CalibrationIO.save(stereo, outputPath);
+
+		// Save metrics which indicate if the calibration is good
+		String metricText = calibrator.computeQualityText(leftNames);
+		if (verbose)
+			System.out.println(metricText);
+
+		try (var out = new PrintWriter(new File(inputDir, "quality.txt"))) {
+			out.println(metricText);
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	private int determineSplitX( List<String> listImages ) {

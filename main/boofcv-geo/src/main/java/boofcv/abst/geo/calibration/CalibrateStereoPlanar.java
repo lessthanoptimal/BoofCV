@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,6 +35,7 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import lombok.Getter;
+import org.ddogleg.struct.DogArray_B;
 import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
 
@@ -270,19 +271,59 @@ public class CalibrateStereoPlanar implements VerbosePrint {
 				parameters.left.width, parameters.left.height, parameters.right);
 	}
 
-	public void printStatistics() {
+	/**
+	 * Prints statistics based on image residuals
+	 */
+	public String computeQualityText( List<String> namesLeft ) {
+		var qualityLeft = new CalibrationQuality();
+		var qualityRight = new CalibrationQuality();
+
+		CalibrateMonoPlanar.computeQuality(getCalibLeft().getIntrinsic(),
+				getCalibLeft().getObservations(), qualityLeft);
+		CalibrateMonoPlanar.computeQuality(getCalibRight().getIntrinsic(),
+				getCalibRight().getObservations(), qualityRight);
+
 		List<ImageResults> errors = computeErrors();
 
-		double totalError = 0;
+		return computeQualityText(namesLeft, null, errors, qualityLeft, qualityRight);
+	}
+
+	/** Creates human-readable text with metrics that indicate calibration quality */
+	public static String computeQualityText( List<String> namesLeft,
+											 @Nullable DogArray_B used,
+											 List<ImageResults> errors,
+											 CalibrationQuality qualityLeft,
+											 CalibrationQuality qualityRight ) {
+		double averageError = 0.0;
+		double maxError = 0.0;
 		for (int i = 0; i < errors.size(); i++) {
 			ImageResults r = errors.get(i);
-			totalError += r.meanError;
-
-			String side = (i%2 == 0) ? "left" : "right";
-			System.out.printf("%5s %3d Euclidean ( mean = %7.1e max = %7.1e ) bias ( X = %8.1e Y %8.1e )\n",
-					side, i/2, r.meanError, r.maxError, r.biasX, r.biasY);
+			averageError += r.meanError;
+			maxError = Math.max(maxError, r.maxError);
 		}
-		System.out.println("Average Mean Error = " + (totalError/errors.size()));
+		averageError /= errors.size();
+		String text = "";
+		text += "Metrics             left right \n";
+		text += String.format("quality.fill_border %3.0f%% %3.0f%%\n", 100*qualityLeft.borderFill,
+				100*qualityLeft.innerFill);
+		text += String.format("quality.fill_inner  %3.0f%% %3.0f%%\n", 100*qualityRight.borderFill,
+				100*qualityRight.innerFill);
+		text += "\n";
+		text += String.format("Reprojection Errors (px):\nmean=%.3f max=%.3f\n\n", averageError, maxError);
+		text += String.format("%-10s | %8s\n", "image", "max (px)");
+		for (int imageIdx = 0, i = 0; imageIdx < namesLeft.size(); imageIdx++) {
+			if (used != null && !used.get(imageIdx))
+				continue;
+			String imageName = namesLeft.get(imageIdx);
+			ImageResults r = errors.get(i);
+			text += String.format("%-12s %8.3f\n", imageName, r.maxError);
+			// print right image now
+			r = errors.get(i + 1);
+			text += String.format("%-12s %8.3f\n", "", r.maxError);
+			i += 2;
+		}
+
+		return text;
 	}
 
 	public List<ImageResults> computeErrors() {

@@ -33,6 +33,7 @@ import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.GrayF32;
 
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -119,6 +120,7 @@ public class ExampleCalibrateStereo {
 		Collections.sort(left);
 		Collections.sort(right);
 
+		List<String> usedImages = new ArrayList<>();
 		for (int i = 0; i < left.size(); i++) {
 			BufferedImage l = UtilImageIO.loadImageNotNull(left.get(i));
 			BufferedImage r = UtilImageIO.loadImageNotNull(right.get(i));
@@ -139,13 +141,14 @@ public class ExampleCalibrateStereo {
 			calibRight = detector.getDetectedPoints();
 
 			calibratorAlg.addPair(calibLeft, calibRight);
+			usedImages.add(left.get(i));
 		}
 
 		// Process and compute calibration parameters
 		StereoParameters stereoCalib = calibratorAlg.process();
 
 		// print out information on its accuracy and errors
-		calibratorAlg.printStatistics();
+		calibratorAlg.computeQualityText(usedImages);
 
 		// save results to a file and print out
 		CalibrationIO.save(stereoCalib, "stereo.yaml");
