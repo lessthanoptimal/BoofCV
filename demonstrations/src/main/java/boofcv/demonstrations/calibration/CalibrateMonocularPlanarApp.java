@@ -547,8 +547,6 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 					results.imageResults.put(image, listResults.get(i));
 				}
 			});
-
-			detectorSet.calibrator.printStatistics(System.out);
 		} catch (RuntimeException e) {
 			e.printStackTrace();
 			SwingUtilities.invokeLater(() -> BoofSwingUtil.warningDialog(this, e));
@@ -589,30 +587,21 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 	/** Format statistics on results and add to a text panel */
 	private void showStatsToUser() {
 		results.safe(() -> {
-			double averageError = 0.0;
-			double maxError = 0.0;
+			// Create a list of used image names and their results
+			List<ImageResults> listResults = new ArrayList<>();
+			List<String> names = new ArrayList<>();
+
 			for (int i = 0; i < results.usedImages.size(); i++) {
 				String image = results.imagePaths.get(results.usedImages.get(i));
-				ImageResults r = results.getResults(image);
-				averageError += r.meanError;
-				maxError = Math.max(maxError, r.maxError);
-			}
-			averageError /= results.usedImages.size();
-			String text = "";
-			text += String.format("quality.fill_border  %5.1f%%\n", 100*results.quality.borderFill);
-			text += String.format("quality.fill_inner   %5.1f%%\n", 100*results.quality.innerFill);
-			text += "\n";
-			text += String.format("Reprojection Errors (px):\n\nmean=%.3f max=%.3f\n\n", averageError, maxError);
-			text += String.format("%-10s | %8s\n", "image", "max (px)");
-			for (int i = 0; i < results.usedImages.size(); i++) {
-				String image = results.imagePaths.get(results.usedImages.get(i));
-				ImageResults r = results.getResults(image);
-				text += String.format("%-12s %8.3f\n", new File(image).getName(), r.maxError);
+				listResults.add(results.getResults(image));
+				names.add(image);
 			}
 
-			String _text = text;
+			// Create formatted list of metrics
+			String text = CalibrateMonoPlanar.computeQualityText(listResults, names, results.quality);
+
 			SwingUtilities.invokeLater(() -> {
-				configurePanel.textAreaStats.setText(_text);
+				configurePanel.textAreaStats.setText(text);
 				configurePanel.textAreaStats.setCaretPosition(0); // show the top where summary stats are
 			});
 		});
