@@ -486,6 +486,7 @@ public class CameraCalibrationMono extends BaseStandardInputApp {
 
 		final List<File> imagesSuccess = new ArrayList<>();
 		final List<File> imagesFailed = new ArrayList<>();
+		final List<String> usedNames = new ArrayList<>();
 
 		for (String path : imagePath) {
 			File f = new File(path);
@@ -501,6 +502,7 @@ public class CameraCalibrationMono extends BaseStandardInputApp {
 			GrayF32 image = ConvertBufferedImage.convertFrom(buffered, (GrayF32)null);
 
 			if (detector.process(image)) {
+				usedNames.add(f.getName());
 				imagesSuccess.add(f);
 				if (summaryDetection != null)
 					summaryDetection.println(f.getPath() + ",true");
@@ -541,19 +543,19 @@ public class CameraCalibrationMono extends BaseStandardInputApp {
 		try {
 			final CameraModel intrinsic = calibrationAlg.process();
 
+			String metricText = calibrationAlg.computeQualityText(usedNames);
+
 			// Save calibration statistics to disk
 			if (outputDirectory != null) {
-				try {
-					PrintStream out = new PrintStream(new File(outputDirectory, "stats.txt"));
-					calibrationAlg.printStatistics(out);
-					out.close();
-				} catch (IOException e) {
-					throw new UncheckedIOException(e);
+				try (var out = new PrintWriter(new File(outputDirectory, "quality.txt"))) {
+					out.println(metricText);
+				} catch (FileNotFoundException e) {
+					throw new RuntimeException(e);
 				}
 			}
 
 			if (verbose) {
-				calibrationAlg.printStatistics(System.out);
+				System.out.println(metricText);
 				System.out.println();
 				System.out.println("--- " + modeType + " Parameters ---");
 				System.out.println();

@@ -30,6 +30,7 @@ import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.GrayF32;
 
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -86,11 +87,13 @@ public class ExampleCalibrateMonocular {
 				/*numRadialParam*/ 2,
 				/*includeTangential*/ false);
 
+		var usedImages = new ArrayList<String>();
 		for (String n : images) {
 			BufferedImage input = UtilImageIO.loadImageNotNull(n);
 			GrayF32 image = ConvertBufferedImage.convertFrom(input, (GrayF32)null);
 			if (detector.process(image)) {
 				calibrationAlg.addImage(detector.getDetectedPoints().copy());
+				usedImages.add(n);
 			} else {
 				System.err.println("Failed to detect target in " + n);
 			}
@@ -101,7 +104,7 @@ public class ExampleCalibrateMonocular {
 		// save results to a file and print out
 		CalibrationIO.save(intrinsic, "intrinsic.yaml");
 
-		calibrationAlg.printStatistics(System.out);
+		System.out.println(calibrationAlg.computeQualityText(usedImages));
 		System.out.println();
 		System.out.println("--- Intrinsic Parameters ---");
 		System.out.println();

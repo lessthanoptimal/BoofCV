@@ -27,12 +27,14 @@ import boofcv.alg.geo.calibration.cameras.Zhang99Camera;
 import boofcv.alg.geo.calibration.cameras.Zhang99CameraBrown;
 import boofcv.alg.geo.calibration.cameras.Zhang99CameraKannalaBrandt;
 import boofcv.alg.geo.calibration.cameras.Zhang99CameraUniversalOmni;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraModel;
 import georegression.struct.point.Point2D_F64;
 import lombok.Getter;
 import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -192,13 +194,38 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 		return (T)foundIntrinsic;
 	}
 
-	public void printStatistics( PrintStream out ) {
+	public String computeQualityText( List<String> imageNames ) {
 		var quality = new CalibrationQuality();
 		computeQuality(foundIntrinsic, observations, quality);
-		out.printf("quality.fill_border   %.2f\n", quality.borderFill);
-		out.printf("quality.fill_inner    %.2f\n", quality.innerFill);
-		out.println();
-		printErrors(errors, out);
+		return computeQualityText(errors, imageNames, quality);
+	}
+
+	/** Creates human-readable text with metrics that indicate calibration quality */
+	public static String computeQualityText( List<ImageResults> errors,
+											 List<String> imageNames,
+											 CalibrationQuality quality ) {
+		BoofMiscOps.checkEq(errors.size(), imageNames.size());
+
+		double averageError = 0.0;
+		double maxError = 0.0;
+		for (int i = 0; i < imageNames.size(); i++) {
+			ImageResults r = errors.get(i);
+			averageError += r.meanError;
+			maxError = Math.max(maxError, r.maxError);
+		}
+		averageError /= imageNames.size();
+		String text = "";
+		text += String.format("quality.fill_border  %5.1f%%\n", 100*quality.borderFill);
+		text += String.format("quality.fill_inner   %5.1f%%\n", 100*quality.innerFill);
+		text += "\n";
+		text += String.format("Reprojection Errors (px):\nmean=%.3f max=%.3f\n\n", averageError, maxError);
+		text += String.format("%-10s | %8s\n", "image", "max (px)");
+		for (int i = 0; i < imageNames.size(); i++) {
+			String image = imageNames.get(i);
+			ImageResults r = errors.get(i);
+			text += String.format("%-12s %8.3f\n", new File(image).getName(), r.maxError);
+		}
+		return text;
 	}
 
 	/**
