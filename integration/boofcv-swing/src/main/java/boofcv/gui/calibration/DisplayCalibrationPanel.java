@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -243,7 +243,7 @@ public abstract class DisplayCalibrationPanel extends ImageZoomPanel {
 				PointIndex2D_F64 p = set.get(i);
 				pixelTransform.compute((float)p.p.x, (float)p.p.y, adj);
 
-				double r = errorScale*results.pointError[i];
+				double r = errorScale*scale*results.pointError[i];
 				if (r < 1)
 					continue;
 
@@ -256,7 +256,7 @@ public abstract class DisplayCalibrationPanel extends ImageZoomPanel {
 				PointIndex2D_F64 p = set.get(i);
 				pixelTransform.compute((float)p.p.x, (float)p.p.y, adj);
 
-				double r = errorScale*results.pointError[i];
+				double r = errorScale*scale*results.pointError[i];
 				if (r < 1)
 					continue;
 
