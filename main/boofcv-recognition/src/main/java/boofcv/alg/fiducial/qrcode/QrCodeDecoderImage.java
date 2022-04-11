@@ -544,11 +544,23 @@ public class QrCodeDecoderImage<T extends ImageGray<T>> {
 
 		double versionY = ((grid.y + 7) - 17)/4;
 
-		// see if they are in agreement. Use a crude tolerance
-		if (Math.abs(versionX - versionY) > 2)
+		// Sanity check the estimated version
+		int averageVersion = (int)((versionX + versionY)/2.0 + 0.5);
+		double versionError = Math.abs(versionX - versionY);
+
+		// If the two are very close, always accept
+		if (versionError <= 2.0)
+			return averageVersion;
+
+		// If it thinks the version is low, there will be no encoding to read
+		if (averageVersion < QrCode.VERSION_ENCODED_AT)
 			return -1;
 
-		return (int)((versionX + versionY)/2.0 + 0.5);
+		// If they are drastically not in agreement, probably not a QR code
+		if (versionError/averageVersion > 0.4)
+			return -1;
+
+		return averageVersion;
 	}
 
 	/**
