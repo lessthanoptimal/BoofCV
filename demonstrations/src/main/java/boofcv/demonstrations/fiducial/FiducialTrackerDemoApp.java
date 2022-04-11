@@ -78,7 +78,7 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>> extends Demonstratio
 	private static final String CALIB_CIRCLE_HEXAGONAL_GRID = "Circle Hexagonal Grid";
 	private static final String CALIB_CIRCLE_REGULAR_GRID = "Circle Regular Grid";
 
-	private static final Font font = new Font("Serif", Font.BOLD, 14);
+	private static final Font font = new Font("Serif", Font.BOLD, 16);
 
 	private Class<I> imageClass;
 
@@ -270,6 +270,9 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>> extends Demonstratio
 
 			Graphics2D g2 = BoofSwingUtil.antialiasing(g);
 
+			// Make the lines thicker so it's easier to see in higher resolution images
+			int thickness = (int)Math.max(5, getWidth()*0.01);
+
 			synchronized (fiducialInfo) {
 				for (int i = 0; i < fiducialInfo.size(); i++) {
 					FiducialInfo info = fiducialInfo.get(i);
@@ -279,7 +282,7 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>> extends Demonstratio
 
 
 					if (controls.showBoundary) {
-						g2.setStroke(new BasicStroke(11));
+						g2.setStroke(new BasicStroke(thickness*2 + 1));
 						g2.setColor(Color.BLUE);
 						VisualizeShapes.drawPolygon(info.polygon, true, scale, g2);
 					}
@@ -288,14 +291,14 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>> extends Demonstratio
 						double x = info.center.x*scale + offsetX;
 						double y = info.center.y*scale + offsetY;
 
-						VisualizeFeatures.drawPoint(g2, x, y, 10, Color.MAGENTA, true);
+						VisualizeFeatures.drawPoint(g2, x, y, 2*thickness, Color.MAGENTA, true);
 					}
 
 					if (controls.show3D) {
 						double width = detector.getWidth(i);
 
 						VisualizeFiducial.drawLabelCenter(info.fidToCam, intrinsic, info.message, g2, scale);
-						VisualizeFiducial.drawCube(info.fidToCam, intrinsic, width, 0.5, 5, g2, scale);
+						VisualizeFiducial.drawCube(info.fidToCam, intrinsic, width, 0.5, thickness, g2, scale);
 					}
 
 					if (controls.showStability)
@@ -308,32 +311,37 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>> extends Demonstratio
 		 * Computes and visualizes the stability
 		 */
 		private void handleStability( Graphics2D g2, FiducialInfo info ) {
+			BufferedImage image = getImage();
+			if (info.totalObserved <= 20 || image == null)
+				return;
+
+
 			int height = getHeight();
 
 			g2.setFont(font);
 
-			if (info.totalObserved > 20) {
+			double fractionLocation = info.stability.location/stabilityMax.location;
+			double fractionOrientation = info.stability.orientation/stabilityMax.orientation;
 
-				double fractionLocation = info.stability.location/stabilityMax.location;
-				double fractionOrientation = info.stability.orientation/stabilityMax.orientation;
+			// make bar width and bar space dynamic based on resolution
+			int bw = (int)Math.max(10, getWidth()*0.05 + 0.5);
+			int bs = Math.max(2, bw/3);
+			int maxHeight = (int)(height*0.15 + 0.5);
 
-				int maxHeight = (int)(height*0.15);
+			int x = info.grid*(bw + 2*bs)*2;
+			int y = 10 + maxHeight;
 
-				int x = info.grid*60;
-				int y = 10 + maxHeight;
+			g2.setColor(Color.BLUE);
+			int h = (int)(fractionLocation*maxHeight);
+			g2.fillRect(x, y - h, bw, h);
 
-				g2.setColor(Color.BLUE);
-				int h = (int)(fractionLocation*maxHeight);
-				g2.fillRect(x, y - h, 20, h);
+			g2.setColor(Color.CYAN);
+			x += bw + bs;
+			h = (int)(fractionOrientation*maxHeight);
+			g2.fillRect(x, y - h, bw, h);
 
-				g2.setColor(Color.CYAN);
-				x += 25;
-				h = (int)(fractionOrientation*maxHeight);
-				g2.fillRect(x, y - h, 20, h);
-
-				g2.setColor(Color.RED);
-				g2.drawString(info.message, x - 20, y + 20);
-			}
+			g2.setColor(Color.RED);
+			g2.drawString(info.message, x - 20, y + 20);
 		}
 	}
 
