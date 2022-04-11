@@ -28,6 +28,7 @@ import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.image.UtilImageIO;
 import boofcv.io.webcamcapture.OpenWebcamDialog;
 import boofcv.io.wrapper.DefaultMediaManager;
+import boofcv.io.wrapper.images.LoadFileImageSequence2;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
@@ -493,7 +494,7 @@ public abstract class DemonstrationBase extends JPanel {
 			e.printStackTrace();
 			return;
 		}
-		File current = new File(UtilIO.ensureUrlNotNull(path).getFile().replace("%20"," "));
+		File current = new File(UtilIO.ensureUrlNotNull(path).getFile().replace("%20", " "));
 		File parent = current.getParentFile();
 		if (parent == null)
 			return;
@@ -630,7 +631,17 @@ public abstract class DemonstrationBase extends JPanel {
 		for (int which = 0; which < filePaths.length; which++) {
 			CacheSequenceStream cache = inputStreams.get(which);
 
-			SimpleImageSequence sequence = media.openVideo(filePaths[which], cache.getImageType());
+			@Nullable SimpleImageSequence sequence = null;
+
+			if (new File(filePaths[which]).isDirectory()) {
+				// If it's a directly, try loading an image sequence
+				List<String> images = UtilIO.listSmartImages(filePaths[which], true);
+				if (images.isEmpty())
+					sequence = new LoadFileImageSequence2(images, cache.getImageType());
+			} else {
+				// Otherwise, assume it's a video file
+				sequence = media.openVideo(filePaths[which], cache.getImageType());
+			}
 			if (sequence == null) {
 				failed = true;
 				System.out.println("Can't find file. " + filePaths[which]);
