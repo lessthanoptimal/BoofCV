@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -199,7 +199,8 @@ public class LoadFileImageSequence2<T extends ImageBase<T>> implements SimpleIma
 	public void reset() {
 		index = 0;
 		forwards = true;
-		image = null;
+		image.reshape(1, 1);
+		work.reshape(1, 1);
 		imageGUI = null;
 	}
 
