@@ -33,6 +33,7 @@ import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.calibration.UtilCalibrationGui;
 import boofcv.gui.controls.JCheckBoxValue;
 import boofcv.gui.controls.JSpinnerNumber;
+import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
@@ -223,6 +224,9 @@ public class DetectECoCheckApp extends DemonstrationBase {
 				}
 			}
 
+			// Colorize corner intensity for visualization
+			VisualizeImageData.colorizeSign(detector.getDetector().detector.getIntensityRaw(), visualized, -1);
+
 			System.out.println("found.size=" + found.size);
 			for (int i = 0; i < found.size; i++) {
 				ECoCheckFound c = found.get(i);
@@ -330,7 +334,7 @@ public class DetectECoCheckApp extends DemonstrationBase {
 		JSlider sliderTranslucent = new JSlider(JSlider.HORIZONTAL, 0, 100, 0);
 		JCheckBoxValue showChessboards = checkboxWrap("Chessboard", true).tt("Display found chessboards");
 		JCheckBoxValue showNumbers = checkboxWrap("Numbers", false).tt("Show feature numbers");
-		JCheckBoxValue showCorners = checkboxWrap("Corners", false).tt( "Show x-corner locations");
+		JCheckBoxValue showCorners = checkboxWrap("Corners", false).tt("Show x-corner locations");
 		JCheckBoxValue showAnonymous = checkboxWrap("Anonymous", false).tt("Show unknown chessboards");
 		JCheckBoxValue showClusters = checkboxWrap("Grids", false).tt("Chessboard grids");
 		JCheckBoxValue showPerpendicular = checkboxWrap("Perpendicular", false).tt("Chessboard edge intensity");
@@ -341,8 +345,9 @@ public class DetectECoCheckApp extends DemonstrationBase {
 			textArea.setLineWrap(true);
 
 			selectZoom = spinner(1.0, MIN_ZOOM, MAX_ZOOM, 1.0);
+			sliderTranslucent.addChangeListener(this);
 
-			JTabbedPane tabbedPane = new JTabbedPane();
+			var tabbedPane = new JTabbedPane();
 			tabbedPane.addTab("Controls", controlPanel);
 			tabbedPane.addTab("Info", textArea);
 
