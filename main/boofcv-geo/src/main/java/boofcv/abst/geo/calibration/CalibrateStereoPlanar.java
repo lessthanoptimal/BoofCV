@@ -280,9 +280,9 @@ public class CalibrateStereoPlanar implements VerbosePrint {
 		var qualityLeft = new CalibrationQuality();
 		var qualityRight = new CalibrationQuality();
 
-		CalibrateMonoPlanar.computeQuality(getCalibLeft().getIntrinsic(), fillScorer,
+		CalibrateMonoPlanar.computeQuality(getCalibLeft().getIntrinsic(), fillScorer, layout,
 				getCalibLeft().getObservations(), qualityLeft);
-		CalibrateMonoPlanar.computeQuality(getCalibRight().getIntrinsic(), fillScorer,
+		CalibrateMonoPlanar.computeQuality(getCalibRight().getIntrinsic(), fillScorer, layout,
 				getCalibRight().getObservations(), qualityRight);
 
 		List<ImageResults> errors = computeErrors();
@@ -307,9 +307,11 @@ public class CalibrateStereoPlanar implements VerbosePrint {
 		String text = "";
 		text += "Metrics             left right \n";
 		text += String.format("quality.fill_border %3.0f%% %3.0f%%\n", 100*qualityLeft.borderFill,
-				100*qualityLeft.innerFill);
-		text += String.format("quality.fill_inner  %3.0f%% %3.0f%%\n", 100*qualityRight.borderFill,
+				100*qualityRight.borderFill);
+		text += String.format("quality.fill_inner  %3.0f%% %3.0f%%\n", 100*qualityLeft.innerFill,
 				100*qualityRight.innerFill);
+		text += String.format("quality.geometric   %3.0f%% %3.0f%%\n", 100*qualityLeft.geometric,
+				100*qualityRight.geometric);
 		text += "\n";
 		text += String.format("Reprojection Errors (px):\nmean=%.3f max=%.3f\n\n", averageError, maxError);
 		text += String.format("%-10s | %8s\n", "image", "max (px)");

@@ -481,10 +481,10 @@ public class CalibrateStereoPlanarApp extends JPanel {
 			usedIdx += 1;
 		}
 		CalibrateMonoPlanar.computeQuality(algorithms.calibrator.getCalibLeft().getIntrinsic(),
-				results.left.fillScorer,
+				results.left.fillScorer, algorithms.detector.getLayout(),
 				algorithms.calibrator.getCalibLeft().getObservations(), results.left.quality);
 		CalibrateMonoPlanar.computeQuality(algorithms.calibrator.getCalibRight().getIntrinsic(),
-				results.right.fillScorer,
+				results.right.fillScorer, algorithms.detector.getLayout(),
 				algorithms.calibrator.getCalibRight().getObservations(), results.right.quality);
 		results.left.fillScorer.updateUnoccupied();
 		results.right.fillScorer.updateUnoccupied();

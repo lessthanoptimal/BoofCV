@@ -540,8 +540,8 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 
 			// Save results for visualization
 			results.safe(() -> {
-				CalibrateMonoPlanar.computeQuality(detectorSet.calibrator.getIntrinsic(),
-						results.fillScorer, results.allUsedObservations, results.quality);
+				CalibrateMonoPlanar.computeQuality(detectorSet.calibrator.getIntrinsic(), results.fillScorer,
+						detectorSet.detector.getLayout(), results.allUsedObservations, results.quality);
 				// Compute the bounds of regions which do not have points for visualization
 				results.fillScorer.updateUnoccupied();
 

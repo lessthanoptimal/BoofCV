@@ -95,7 +95,7 @@ public class ScoreCalibrationFill {
 	/**
 	 * See if any observed calibration points hit a target. if so remove the target.
 	 */
-	public void add( CalibrationObservation obs ) {
+	public void addObservation( CalibrationObservation obs ) {
 		BoofMiscOps.checkTrue(obs.width == imageWidth && obs.height == imageHeight,
 				"Image width and height must match expected");
 

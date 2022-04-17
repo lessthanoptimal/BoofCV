@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,12 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.app.calib;
+package boofcv.alg.geo.calibration;
 
-import boofcv.alg.geo.calibration.CalibrationObservation;
-import boofcv.alg.geo.calibration.Zhang99CalibrationMatrixFromHomographies;
-import boofcv.alg.geo.calibration.Zhang99ComputeTargetHomography;
 import georegression.struct.point.Point2D_F64;
+import lombok.Getter;
 import org.ejml.data.DMatrixRMaj;
 
 import java.util.ArrayList;
@@ -34,43 +32,52 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class ComputeGeometryScore {
+public class ScoreCalibrationGeometricDiversity {
 
 	Zhang99ComputeTargetHomography computeHomography;
 	Zhang99CalibrationMatrixFromHomographies computeCalib;
 
 	List<DMatrixRMaj> homographies = new ArrayList<>();
 
-	double score = 0;
+	/**
+	 * A number from 0 to 1.0 for how close to having the correct geometry it is. 1.0 = done
+	 */
+	@Getter double score = 0;
 
-	public ComputeGeometryScore( boolean assumeZeroSkew, List<Point2D_F64> worldPoints ) {
+	public ScoreCalibrationGeometricDiversity( boolean assumeZeroSkew, List<Point2D_F64> worldPoints ) {
 		computeCalib = new Zhang99CalibrationMatrixFromHomographies(assumeZeroSkew);
 		computeHomography = new Zhang99ComputeTargetHomography(worldPoints);
 	}
 
+	/**
+	 * Adds information from the provided set of observations
+	 */
 	public void addObservations( CalibrationObservation observations ) {
-		computeHomography.computeHomography(observations);
+		if (observations.size() <= 4)
+			return;
+		if (!computeHomography.computeHomography(observations)) {
+			System.err.println("Failed to compute homography");
+			return;
+		}
 		homographies.add(computeHomography.getHomography().copy());
+	}
 
+	/**
+	 * Computes the score from all the found homographies
+	 */
+	public void computeScore() {
 		try {
 			computeCalib.process(homographies);
 
 			double[] values = computeCalib.getSolverNull().getSingularValues();
 			Arrays.sort(values, 0, 3);
 
-			System.out.println("raw singularity score = " + (values[1]/values[2]));
+//			System.out.println("raw singularity score = " + (values[1]/values[2]));
 
-			// 0.2 was a threshold that was emperically determined
+			// 0.2 was a threshold that was empirically determined
 			score = Math.min(1.0, (values[1]/values[2])/0.2);
 		} catch (RuntimeException e) {
 			score = 0;
 		}
-	}
-
-	/**
-	 * A number from 0 to 1.0 for how close to having the correct geometry it is. 1.0 = done
-	 */
-	public double getScore() {
-		return score;
 	}
 }

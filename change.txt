@@ -28,6 +28,8 @@ Version : 0.41
   - TODO Monocular
   - TODO Stereo
 - Calibration
+  - Mono and Stereo apps now generate calibration quality metrics for coverage and geometry
+  - Mono and Stereo GUIs have option to show border and inner coverage
   - TODO calibration targets Hamming Marker grid and chessboard, e.g. ChArUco and ArUco grids.
 - Regression
   - TODO Template matching
