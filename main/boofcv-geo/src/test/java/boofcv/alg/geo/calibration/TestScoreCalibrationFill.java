@@ -24,22 +24,29 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestScoreCalibrationBorderFill extends BoofStandardJUnit {
+public class TestScoreCalibrationFill extends BoofStandardJUnit {
 	@Test void initialize() {
-		var alg = new ScoreCalibrationBorderFill();
-		alg.innerSamples = 7;
-		alg.borderSpace.setFixed(5.0);
+		var alg = new ScoreCalibrationFill();
+		alg.scoreInner = -1;
+		alg.scoreBorder = -1;
+		alg.regionsBorder = 5;
+		alg.regionsInner = 7;
+		alg.borderExtent.setFixed(5.0);
 		alg.initialize(160, 120);
 
-		assertEquals(4 + 4*7, alg.targets.size);
-		assertEquals(5.0, alg.actualBorderTol);
-		assertEquals(140/14.0, alg.actualTouchTol);
+		assertEquals(0.0, alg.scoreBorder);
+		assertEquals(0.0, alg.scoreInner);
+		assertEquals(5.0, alg.actualBorderPx);
+		assertEquals(160, alg.imageWidth);
+		assertEquals(120, alg.imageHeight);
+		assertEquals(7*4, alg.occupiedBorder.size);
+		assertEquals(25, alg.occupiedInner.size);
 	}
 
-	@Test void add_NoHits() {
-		var alg = new ScoreCalibrationBorderFill();
-		alg.innerSamples = 3;
-		alg.borderSpace.setFixed(5.0);
+	@Test void addInner() {
+		var alg = new ScoreCalibrationFill();
+		alg.regionsInner = 3;
+		alg.borderExtent.setFixed(5.0);
 		alg.initialize(160, 120);
 
 		var obs = new CalibrationObservation();
@@ -49,22 +56,22 @@ public class TestScoreCalibrationBorderFill extends BoofStandardJUnit {
 		// This will be in the middle and not on an edge
 		obs.add(0, 50, 56);
 		alg.add(obs);
-		assertEquals(0.0, alg.score);
+		assertEquals(0.0, alg.scoreBorder, UtilEjml.TEST_F64);
+		assertEquals(0.0, alg.scoreInner, UtilEjml.TEST_F64);
 
 		// This will be on an edge but not near one of the points
-		alg.actualTouchTol = 2;
 		obs.points.clear();
 		obs.add(0, 15, 7);
 		alg.add(obs);
-		assertEquals(0.0, alg.score, UtilEjml.TEST_F64);
+		assertEquals(0.0, alg.scoreBorder, UtilEjml.TEST_F64);
+		assertEquals(0.0, alg.scoreInner, UtilEjml.TEST_F64);
 	}
 
-	@Test void add_MultipleHits() {
-		var alg = new ScoreCalibrationBorderFill();
-		alg.innerSamples = 3;
-		alg.borderSpace.setFixed(5.0);
+	@Test void addBorder() {
+		var alg = new ScoreCalibrationFill();
+		alg.borderExtent.setFixed(5.0);
 		alg.initialize(160, 120);
-		double N = alg.targets.size;
+		double N = alg.occupiedBorder.size;
 
 		var obs = new CalibrationObservation();
 		obs.width = 160;
@@ -73,25 +80,25 @@ public class TestScoreCalibrationBorderFill extends BoofStandardJUnit {
 		// Exactly on a point
 		obs.add(0, 7, 7);
 		alg.add(obs);
-		assertEquals(1.0/N, alg.score, UtilEjml.TEST_F64);
+		assertEquals(1.0/N, alg.scoreBorder, UtilEjml.TEST_F64);
 
 		// there should be no change this time
 		alg.add(obs);
-		assertEquals(1.0/N, alg.score, UtilEjml.TEST_F64);
+		assertEquals(1.0/N, alg.scoreBorder, UtilEjml.TEST_F64);
 
 		// hit another corner
 		obs.points.clear();
 		obs.add(0, 155, 5);
 		alg.add(obs);
-		assertEquals(2.0/N, alg.score, UtilEjml.TEST_F64);
+		assertEquals(2.0/N, alg.scoreBorder, UtilEjml.TEST_F64);
 	}
 
 	@Test void isNearBorder() {
 		int w = 160;
 		int h = 120;
 		double b = 5.0; // border
-		var alg = new ScoreCalibrationBorderFill();
-		alg.borderSpace.setFixed(b);
+		var alg = new ScoreCalibrationFill();
+		alg.borderExtent.setFixed(b);
 		alg.initialize(w, h);
 
 		// test positive cases
@@ -113,5 +120,25 @@ public class TestScoreCalibrationBorderFill extends BoofStandardJUnit {
 		assertFalse(alg.isNearBorder(2*b + delta, h - 2*b - delta, w, h));
 		assertFalse(alg.isNearBorder(w/2.0, 2*b + delta, w, h));
 		assertFalse(alg.isNearBorder(2*b + delta, h/2.0, w, h));
+	}
+
+	@Test void findUnoccupiedTop() {
+		fail("Implement");
+	}
+
+	@Test void findUnoccupiedRight() {
+		fail("Implement");
+	}
+
+	@Test void findUnoccupiedBottom() {
+		fail("Implement");
+	}
+
+	@Test void findUnoccupiedLeft() {
+		fail("Implement");
+	}
+
+	@Test void findUnoccupiedInner() {
+		fail("Implement");
 	}
 }
