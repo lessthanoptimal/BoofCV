@@ -61,19 +61,19 @@ public class TestScoreCalibrationFill extends BoofStandardJUnit {
 
 		// This will be in the middle and not on an edge
 		obs.add(0, 50, 56);
-		alg.add(obs);
+		alg.addObservation(obs);
 		assertEquals(0.0, alg.scoreBorder, UtilEjml.TEST_F64);
 		assertEquals(1.0/25.0, alg.scoreInner, UtilEjml.TEST_F64);
 
 		// Add it again, there should be no change
-		alg.add(obs);
+		alg.addObservation(obs);
 		assertEquals(0.0, alg.scoreBorder, UtilEjml.TEST_F64);
 		assertEquals(1.0/25.0, alg.scoreInner, UtilEjml.TEST_F64);
 
 		// Another inner point
 		obs.points.clear();
 		obs.add(0, 15, 7);
-		alg.add(obs);
+		alg.addObservation(obs);
 		assertEquals(0.0, alg.scoreBorder, UtilEjml.TEST_F64);
 		assertEquals(2.0/25.0, alg.scoreInner, UtilEjml.TEST_F64);
 	}
@@ -90,19 +90,19 @@ public class TestScoreCalibrationFill extends BoofStandardJUnit {
 
 		// Inside a border region
 		obs.add(0, 3, 3);
-		alg.add(obs);
+		alg.addObservation(obs);
 		assertEquals(1.0/N, alg.scoreBorder, UtilEjml.TEST_F64);
 		assertEquals(0.0, alg.scoreInner, UtilEjml.TEST_F64);
 
 		// there should be no change this time
-		alg.add(obs);
+		alg.addObservation(obs);
 		assertEquals(1.0/N, alg.scoreBorder, UtilEjml.TEST_F64);
 		assertEquals(0.0, alg.scoreInner, UtilEjml.TEST_F64);
 
 		// Along the border, at the border to test <=
 		obs.points.clear();
 		obs.add(0, 155, 5);
-		alg.add(obs);
+		alg.addObservation(obs);
 		assertEquals(2.0/N, alg.scoreBorder, UtilEjml.TEST_F64);
 		assertEquals(0.0, alg.scoreInner, UtilEjml.TEST_F64);
 	}
@@ -156,7 +156,7 @@ public class TestScoreCalibrationFill extends BoofStandardJUnit {
 		});
 
 		// Add and verify the score is 100%
-		alg.add(obs);
+		alg.addObservation(obs);
 		assertEquals(1.0, alg.scoreBorder);
 		assertEquals(1.0, alg.scoreInner);
 

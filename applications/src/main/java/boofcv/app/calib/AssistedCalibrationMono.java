@@ -22,6 +22,7 @@ import boofcv.abst.fiducial.calib.*;
 import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
 import boofcv.abst.geo.calibration.MultiToSingleFiducialCalibration;
 import boofcv.alg.geo.calibration.CalibrationObservation;
+import boofcv.alg.geo.calibration.ScoreCalibrationGeometricDiversity;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.io.UtilIO;
 import boofcv.io.image.UtilImageIO;
@@ -118,7 +119,7 @@ public class AssistedCalibrationMono {
 	public AssistedCalibrationMonoGui gui;
 
 	// used to compute the geometric quality of collected fiducials
-	ComputeGeometryScore quality;
+	ScoreCalibrationGeometricDiversity quality;
 
 	// state that the algorithm is in
 	State state = State.DETERMINE_SIZE;
@@ -173,7 +174,7 @@ public class AssistedCalibrationMono {
 		synchronized (detectorLock) {
 			detector = gui.targetPanel.configPanel.createSingleTargetDetector();
 			totalLandmarks = detector.getLayout().size();
-			quality = new ComputeGeometryScore(true, detector.getLayout());
+			quality = new ScoreCalibrationGeometricDiversity(true, detector.getLayout());
 
 			if (detector instanceof CalibrationDetectorChessboardX) {
 				view = new CalibrationView.Chessboard();
@@ -523,6 +524,7 @@ public class AssistedCalibrationMono {
 			p.get(i).setTo(sidesCollision.get(i));
 		}
 		quality.addObservations(detector.getDetectedPoints());
+		quality.computeScore();
 		gui.getInfoPanel().updateGeometry(quality.getScore());
 
 		// once the user has sufficient geometric variation enable save

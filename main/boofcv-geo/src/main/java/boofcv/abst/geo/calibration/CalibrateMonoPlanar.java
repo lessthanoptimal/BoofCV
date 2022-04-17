@@ -22,6 +22,7 @@ import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.geo.calibration.CalibrationPlanarGridZhang99;
 import boofcv.alg.geo.calibration.ScoreCalibrationFill;
+import boofcv.alg.geo.calibration.ScoreCalibrationGeometricDiversity;
 import boofcv.alg.geo.calibration.cameras.Zhang99Camera;
 import boofcv.alg.geo.calibration.cameras.Zhang99CameraBrown;
 import boofcv.alg.geo.calibration.cameras.Zhang99CameraKannalaBrandt;
@@ -196,7 +197,7 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 	public String computeQualityText( List<String> imageNames ) {
 		var fillScore = new ScoreCalibrationFill();
 		var quality = new CalibrationQuality();
-		computeQuality(foundIntrinsic, fillScore, observations, quality);
+		computeQuality(foundIntrinsic, fillScore, layout, observations, quality);
 		return computeQualityText(errors, imageNames, quality);
 	}
 
@@ -217,6 +218,7 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 		String text = "";
 		text += String.format("quality.fill_border  %5.1f%%\n", 100*quality.borderFill);
 		text += String.format("quality.fill_inner   %5.1f%%\n", 100*quality.innerFill);
+		text += String.format("quality.geometric    %5.1f%%\n", 100*quality.geometric);
 		text += "\n";
 		text += String.format("Reprojection Errors (px):\nmean=%.3f max=%.3f\n\n", averageError, maxError);
 		text += String.format("%-10s | %8s\n", "image", "max (px)");
@@ -230,19 +232,30 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 
 	/**
 	 * Computes quality metrics to quantify how good of a job the person calibrating did
+	 *
+	 * @param intrinsic Estimated camera model from calibration
+	 * @param fillScorer Used to compute image fill score
+	 * @param worldPoints Known location of points in world coordinates
+	 * @param observations Observed calibration points
+	 * @param quality (Output) Metrics used to evaluate how good the calibration is
 	 */
 	public static void computeQuality( CameraModel intrinsic,
 									   ScoreCalibrationFill fillScorer,
+									   List<Point2D_F64> worldPoints,
 									   List<CalibrationObservation> observations,
-									   CalibrationQuality quality) {
+									   CalibrationQuality quality ) {
 		fillScorer.initialize(intrinsic.width, intrinsic.height);
+		var geoScorer = new ScoreCalibrationGeometricDiversity(true, worldPoints);
 
 		for (int i = 0; i < observations.size(); i++) {
-			fillScorer.add(observations.get(i));
+			fillScorer.addObservation(observations.get(i));
+			geoScorer.addObservations(observations.get(i));
 		}
+		geoScorer.computeScore();
 
 		quality.borderFill = fillScorer.getScoreBorder();
 		quality.innerFill = fillScorer.getScoreInner();
+		quality.geometric = geoScorer.getScore();
 	}
 
 	/**

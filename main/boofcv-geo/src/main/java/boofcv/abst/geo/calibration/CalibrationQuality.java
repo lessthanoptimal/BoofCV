@@ -31,8 +31,12 @@ public class CalibrationQuality {
 	/** How well the inner image has been observed. 0 to 1. 1 = best */
 	public double innerFill;
 
+	/** Indicates how much geometric diversity there is. Higher the better */
+	public double geometric;
+
 	public void reset() {
 		borderFill = 0;
 		innerFill = 0;
+		geometric = 0;
 	}
 }
