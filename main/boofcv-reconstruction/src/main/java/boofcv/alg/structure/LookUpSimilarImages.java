@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -66,10 +66,10 @@ public interface LookUpSimilarImages {
 	 * recent call to {@link #findSimilar}. The src will be the target in 'findSimilar' and the dst
 	 * will be the requested similar image.
 	 *
-	 * @param similarD ID of a similar image to the target when calling {@link #findSimilar}.
+	 * @param similarID ID of a similar image to the target when calling {@link #findSimilar}.
 	 * @param pairs Storage for associated features. Cleared upon each call
 	 * @return true if views are similar and have known associations. False if not and results should be ignored
 	 * @throws IllegalArgumentException If the one of the views is not known
 	 */
-	boolean lookupAssociated( String similarD, DogArray<AssociatedIndex> pairs );
+	boolean lookupAssociated( String similarID, DogArray<AssociatedIndex> pairs );
 }

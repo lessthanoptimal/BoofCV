@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -124,10 +124,10 @@ public class SimilarImagesData implements LookUpSimilarImages {
 		features.copyAll(similarInfo.features.toList(), ( src, dst ) -> dst.setTo(src));
 	}
 
-	@Override public boolean lookupAssociated( String similarD, DogArray<AssociatedIndex> pairs ) {
+	@Override public boolean lookupAssociated( String similarID, DogArray<AssociatedIndex> pairs ) {
 		Objects.requireNonNull(targetInfo, "Must call findSimilar first");
 
-		Info similarInfo = Objects.requireNonNull(imageMap.get(similarD));
+		Info similarInfo = Objects.requireNonNull(imageMap.get(similarID));
 		boolean swapped = targetInfo.index > similarInfo.index;
 
 		if (swapped) {
@@ -139,7 +139,7 @@ public class SimilarImagesData implements LookUpSimilarImages {
 				pairs.get(i).setTo(/* src= */b.dst, /* dst= */b.src);
 			}
 		} else {
-			Relationship related = Objects.requireNonNull(targetInfo.findRelated(similarD));
+			Relationship related = Objects.requireNonNull(targetInfo.findRelated(similarID));
 			pairs.resetResize(related.pairs.size);
 			for (int i = 0; i < pairs.size; i++) {
 				pairs.get(i).setTo(related.pairs.get(i));

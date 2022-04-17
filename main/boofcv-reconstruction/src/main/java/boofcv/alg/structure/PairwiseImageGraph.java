@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -133,6 +133,10 @@ public class PairwiseImageGraph {
 		}
 	}
 
+	/**
+	 * Relationship between two views. Which features they have in common and value of the 3D information
+	 * that can be derived from the two views.
+	 */
 	@SuppressWarnings("NullAway.Init")
 	public static class Motion {
 		/** if this camera motion is known up to a metric transform. otherwise it will be projective */
