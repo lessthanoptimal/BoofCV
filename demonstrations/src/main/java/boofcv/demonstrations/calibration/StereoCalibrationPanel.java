@@ -77,9 +77,9 @@ public class StereoCalibrationPanel extends JPanel {
 
 	public void clearVisuals() {
 		panelLeft.clearCalibration();
-		panelLeft.clearResults();
+		panelLeft.clearViewResults();
 		panelRight.clearCalibration();
-		panelRight.clearResults();
+		panelRight.clearViewResults();
 	}
 
 	public void setRectification( CameraPinholeBrown leftParam, DMatrixRMaj leftRect,

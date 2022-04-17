@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -105,9 +105,7 @@ public class DisplayPinholeCalibrationPanel extends DisplayCalibrationPanel {
 	}
 
 	@Override protected void paintInPanel( AffineTransform tran, Graphics2D g2 ) {
-		if (observation != null && observation.size() > selectedImage) {
-			drawFeatures(g2, scale);
-		}
+		drawFeatures(g2, scale);
 
 		if (lineY > -1) {
 			g2.setColor(Color.RED);
