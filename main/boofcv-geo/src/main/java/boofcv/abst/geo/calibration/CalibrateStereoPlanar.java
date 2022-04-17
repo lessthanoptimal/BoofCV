@@ -26,6 +26,7 @@ import boofcv.alg.geo.bundle.BundleAdjustmentOps;
 import boofcv.alg.geo.bundle.CodecSceneStructureMetric;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeBrown;
 import boofcv.alg.geo.calibration.CalibrationObservation;
+import boofcv.alg.geo.calibration.ScoreCalibrationFill;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.geo.PointIndex2D_F64;
@@ -275,12 +276,13 @@ public class CalibrateStereoPlanar implements VerbosePrint {
 	 * Prints statistics based on image residuals
 	 */
 	public String computeQualityText( List<String> namesLeft ) {
+		var fillScorer = new ScoreCalibrationFill();
 		var qualityLeft = new CalibrationQuality();
 		var qualityRight = new CalibrationQuality();
 
-		CalibrateMonoPlanar.computeQuality(getCalibLeft().getIntrinsic(),
+		CalibrateMonoPlanar.computeQuality(getCalibLeft().getIntrinsic(), fillScorer,
 				getCalibLeft().getObservations(), qualityLeft);
-		CalibrateMonoPlanar.computeQuality(getCalibRight().getIntrinsic(),
+		CalibrateMonoPlanar.computeQuality(getCalibRight().getIntrinsic(), fillScorer,
 				getCalibRight().getObservations(), qualityRight);
 
 		List<ImageResults> errors = computeErrors();

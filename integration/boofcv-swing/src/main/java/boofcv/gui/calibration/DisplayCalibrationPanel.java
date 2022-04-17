@@ -20,6 +20,7 @@ package boofcv.gui.calibration;
 
 import boofcv.abst.geo.calibration.ImageResults;
 import boofcv.alg.geo.calibration.CalibrationObservation;
+import boofcv.alg.geo.calibration.ScoreCalibrationFill.RegionInfo;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ImageZoomPanel;
@@ -29,6 +30,7 @@ import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import lombok.Getter;
+import org.ddogleg.struct.DogArray;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -37,6 +39,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
+import java.awt.geom.Rectangle2D;
 import java.util.List;
 
 import static boofcv.gui.calibration.UtilCalibrationGui.drawNumbers;
@@ -60,6 +63,7 @@ public abstract class DisplayCalibrationPanel extends ImageZoomPanel {
 	public boolean showNumbers = true;
 	public boolean showOrder = true;
 	public boolean showResiduals = false;
+	public boolean showImageUnoccupied = false;
 	public double errorScale;
 
 	// Which observation in the current image has the user selected
@@ -74,11 +78,15 @@ public abstract class DisplayCalibrationPanel extends ImageZoomPanel {
 	// Used to transform point coordinate system
 	protected Point2Transform2_F32 pixelTransform = new DoNothing2Transform2_F32();
 
+	// Specified which regions in the image have been filled in
+	public final DogArray<RegionInfo> unoccupied = new DogArray<>(RegionInfo::new, RegionInfo::reset);
+
 	// workspace
 	protected Point2D_F32 adj = new Point2D_F32();
 	protected Point2D_F32 adj2 = new Point2D_F32();
 	protected Ellipse2D.Double ellipse = new Ellipse2D.Double();
 	protected Line2D.Double line = new Line2D.Double();
+	protected Rectangle2D.Double rect = new Rectangle2D.Double();
 
 	// Called after setScale has been called
 	public SetScale setScale = ( s ) -> {};
@@ -137,6 +145,13 @@ public abstract class DisplayCalibrationPanel extends ImageZoomPanel {
 		this.selectedObservation = -1;
 	}
 
+	public void setUnoccupied( List<RegionInfo> unoccupied ) {
+		this.unoccupied.resetResize(unoccupied.size());
+		for (int i = 0; i < unoccupied.size(); i++) {
+			this.unoccupied.get(i).setTo(unoccupied.get(i));
+		}
+	}
+
 	public void clearResults() {
 		BoofSwingUtil.checkGuiThread();
 
@@ -144,6 +159,7 @@ public abstract class DisplayCalibrationPanel extends ImageZoomPanel {
 		results = null;
 		allObservations = null;
 		selectedObservation = -1;
+		unoccupied.reset();
 	}
 
 	public void setDisplay( boolean showPoints, boolean showErrors,
@@ -186,6 +202,9 @@ public abstract class DisplayCalibrationPanel extends ImageZoomPanel {
 		BoofSwingUtil.antialiasing(g2);
 
 		final CalibrationObservation set = observation;
+
+		if (showImageUnoccupied)
+			drawImageUnoccupied(g2, scale);
 
 		if (showOrder) {
 			renderOrder(g2, pixelTransform, scale, set.points);
@@ -269,6 +288,33 @@ public abstract class DisplayCalibrationPanel extends ImageZoomPanel {
 			PointIndex2D_F64 p = set.get(selectedObservation);
 			pixelTransform.compute((float)p.p.x, (float)p.p.y, adj);
 			VisualizeFeatures.drawPoint(g2, adj.x*scale, adj.y*scale, 10.0, Color.GREEN, true, ellipse);
+		}
+	}
+
+	protected void drawImageUnoccupied( Graphics2D g2, double scale ) {
+		if (unoccupied.isEmpty())
+			return;
+
+		// Make it translucent so you can see inside
+		var colorBorder = new Color(255, 0, 0, 100);
+		var colorInner = new Color(255, 200, 0, 100);
+
+		for (int i = 0; i < unoccupied.size; i++) {
+			// Convert region into a format Swing understands and compensate for the image being scaled
+			RegionInfo r = unoccupied.get(i);
+			rect.x = scale*r.region.x0;
+			rect.y = scale*r.region.y0;
+			rect.width = scale*r.region.getWidth();
+			rect.height = scale*r.region.getHeight();
+
+			// Fill with a solid color and draw a black outline so you can see individual regions
+			if (r.inner)
+				g2.setColor(colorInner);
+			else
+				g2.setColor(colorBorder);
+			g2.fill(rect);
+			g2.setColor(Color.BLACK);
+			g2.draw(rect);
 		}
 	}
 

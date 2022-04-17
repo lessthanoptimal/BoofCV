@@ -76,11 +76,11 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 	// how the points are laid out
 	protected List<Point2D_F64> layout;
 
-	// computes calibration parameters
-	protected CalibrationPlanarGridZhang99 zhang99;
+	/** computes calibration parameters */
+	@Getter protected CalibrationPlanarGridZhang99 zhang99;
 
 	// computed parameters
-	protected SceneStructureMetric structure;
+	@Getter protected SceneStructureMetric structure;
 	protected CameraModel foundIntrinsic;
 
 	// Information on calibration targets and results
@@ -194,8 +194,9 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 	}
 
 	public String computeQualityText( List<String> imageNames ) {
+		var fillScore = new ScoreCalibrationFill();
 		var quality = new CalibrationQuality();
-		computeQuality(foundIntrinsic, observations, quality);
+		computeQuality(foundIntrinsic, fillScore, observations, quality);
 		return computeQualityText(errors, imageNames, quality);
 	}
 
@@ -231,18 +232,17 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 	 * Computes quality metrics to quantify how good of a job the person calibrating did
 	 */
 	public static void computeQuality( CameraModel intrinsic,
+									   ScoreCalibrationFill fillScorer,
 									   List<CalibrationObservation> observations,
-									   CalibrationQuality quality ) {
-		var fill = new ScoreCalibrationFill();
-
-		fill.initialize(intrinsic.width, intrinsic.height);
+									   CalibrationQuality quality) {
+		fillScorer.initialize(intrinsic.width, intrinsic.height);
 
 		for (int i = 0; i < observations.size(); i++) {
-			fill.add(observations.get(i));
+			fillScorer.add(observations.get(i));
 		}
 
-		quality.borderFill = fill.getScoreBorder();
-		quality.innerFill = fill.getScoreInner();
+		quality.borderFill = fillScorer.getScoreBorder();
+		quality.innerFill = fillScorer.getScoreInner();
 	}
 
 	/**
@@ -263,16 +263,8 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 		this.zhang99.setRobust(robust);
 	}
 
-	public SceneStructureMetric getStructure() {
-		return structure;
-	}
-
 	public <T extends CameraModel> T getIntrinsic() {
 		return (T)foundIntrinsic;
-	}
-
-	public CalibrationPlanarGridZhang99 getZhang99() {
-		return zhang99;
 	}
 
 	@Override

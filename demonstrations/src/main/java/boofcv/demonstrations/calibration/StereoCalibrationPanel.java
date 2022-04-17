@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -111,6 +111,11 @@ public class StereoCalibrationPanel extends JPanel {
 	public void setShowAll( boolean state ) {
 		panelLeft.showAll = state;
 		panelRight.showAll = state;
+	}
+
+	public void setShowUnoccupied( boolean state ) {
+		panelLeft.showImageUnoccupied = state;
+		panelRight.showImageUnoccupied = state;
 	}
 
 	public void setShowNumbers( boolean state ) {
