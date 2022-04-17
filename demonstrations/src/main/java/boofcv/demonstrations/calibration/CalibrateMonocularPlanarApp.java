@@ -25,6 +25,7 @@ import boofcv.abst.geo.calibration.ImageResults;
 import boofcv.alg.distort.LensDistortionWideFOV;
 import boofcv.alg.fiducial.calib.ConfigCalibrationTarget;
 import boofcv.alg.geo.calibration.CalibrationObservation;
+import boofcv.alg.geo.calibration.ScoreCalibrationFill;
 import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.StandardAlgConfigPanel;
@@ -369,7 +370,8 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 			ConfigCalibrationTarget config = UtilIO.loadConfig(fileTarget);
 			BoofSwingUtil.invokeNowOrLater(() -> panel.setConfigurationTo(config));
 			return true;
-		} catch (RuntimeException ignore) {}
+		} catch (RuntimeException ignore) {
+		}
 		return false;
 	}
 
@@ -410,6 +412,7 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 		if (imageObservations == null || imageResults == null)
 			return;
 		getCalibrationPanel().setResults(imageObservations, imageResults, results.allUsedObservations);
+		getCalibrationPanel().setUnoccupied(results.fillScorer.getUnoccupiedRegions().toList());
 		getCalibrationPanel().repaint();
 	}
 
@@ -538,7 +541,9 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 			// Save results for visualization
 			results.safe(() -> {
 				CalibrateMonoPlanar.computeQuality(detectorSet.calibrator.getIntrinsic(),
-						results.allUsedObservations, results.quality);
+						results.fillScorer, results.allUsedObservations, results.quality);
+				// Compute the bounds of regions which do not have points for visualization
+				results.fillScorer.updateUnoccupied();
 
 				results.imageResults.clear();
 				List<ImageResults> listResults = detectorSet.calibrator.getErrors();
@@ -724,7 +729,6 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 		});
 	}
 
-
 	protected @Nullable ImageResults getResultsForSelected() {
 		BoofSwingUtil.checkGuiThread();
 
@@ -744,6 +748,7 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 		panel.setDisplay(configurePanel.checkPoints.value, configurePanel.checkErrors.value,
 				configurePanel.checkUndistorted.value, configurePanel.checkAll.value,
 				configurePanel.checkNumbers.value, configurePanel.checkOrder.value, configurePanel.selectErrorScale.vdouble());
+		panel.showImageUnoccupied = configurePanel.checkUnoccupied.value;
 		panel.showResiduals = configurePanel.checkResidual.value;
 		panel.repaint();
 	}
@@ -776,10 +781,12 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 		JCheckBoxValue checkAll = checkboxWrap("All", false).tt("Show location of all landmarks in all images");
 		JCheckBoxValue checkNumbers = checkboxWrap("Numbers", false).tt("Draw feature numbers");
 		JCheckBoxValue checkOrder = checkboxWrap("Order", true).tt("Visualize landmark order");
+		JCheckBoxValue checkUnoccupied = checkboxWrap("Fill", false).tt("Regions without observations");
 		JSpinnerNumber selectErrorScale = spinnerWrap(10.0, 0.1, 1000.0, 2.0);
 
 		@Getter CalibrationModelPanel modelPanel = new CalibrationModelPanel();
-		@Getter CalibrationTargetPanel targetPanel = new CalibrationTargetPanel(( a, b ) -> handleUpdatedTarget(), true);
+		@Getter CalibrationTargetPanel targetPanel = new CalibrationTargetPanel(
+				( a, b ) -> handleUpdatedTarget(), true);
 		// Displays a preview of the calibration target
 		ImagePanel targetPreviewPanel = new ImagePanel();
 		// Displays calibration information
@@ -837,6 +844,7 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 			panel.add(checkUndistorted.check);
 			panel.add(checkResidual.check);
 			panel.add(checkAll.check);
+			panel.add(checkUnoccupied.check);
 			panel.add(checkNumbers.check);
 			panel.add(checkOrder.check);
 
@@ -893,6 +901,7 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 		protected final DogArray<CalibrationObservation> originalObservations = new DogArray<>(CalibrationObservation::new);
 		// Quality of observations and results
 		protected final CalibrationQuality quality = new CalibrationQuality();
+		protected final ScoreCalibrationFill fillScorer = new ScoreCalibrationFill();
 
 		public CalibrationObservation getObservation( String key ) {
 			return Objects.requireNonNull(imageObservations.get(key));

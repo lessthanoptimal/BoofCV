@@ -31,13 +31,16 @@ import org.ddogleg.struct.DogArray_B;
  * Computes a score for amount of coverage across the image, with independent scores for the border region and inner
  * image. All the regions which are not filled can be computed also. Score is simply fraction of specified region filled.
  * A region is filled if a single point occupies it.
+ *
+ * Size of regions along the border and inner image can be specified different. Regions will have a rectangular shape
+ * as the scale factor is determined by the image's aspect ratio.
  */
 public class ScoreCalibrationFill {
 	/**
 	 * How close to the edge a point needs is to be considered along the image border. If relative, then it's
 	 * relative to the average side length
 	 */
-	@Getter public final ConfigLength borderExtent = ConfigLength.relative(0.02, 5);
+	@Getter public final ConfigLength borderExtent = ConfigLength.relative(0.04, 5);
 
 	/** Number of regions the border along each side will be broken up into */
 	@Getter @Setter public int regionsBorder = 15;
@@ -61,10 +64,13 @@ public class ScoreCalibrationFill {
 	public int actualBorderPx;
 
 	/** Storage for unoccupied regions. Must be updated by calling {@link #updateUnoccupied} */
-	public final DogArray<RegionInfo> unoccupiedRegions = new DogArray<>(RegionInfo::new, RegionInfo::reset);
+	public final @Getter DogArray<RegionInfo> unoccupiedRegions = new DogArray<>(RegionInfo::new, RegionInfo::reset);
 
 	/** Shape of expected image */
 	protected int imageWidth, imageHeight;
+
+	/** image shape minus the border */
+	protected int innerWidth, innerHeight;
 
 	/**
 	 * Resets and initializes for an image of the specified shape
@@ -81,34 +87,39 @@ public class ScoreCalibrationFill {
 		// Mark all regions as not occupied
 		occupiedBorder.resetResize(regionsBorder*4, false);
 		occupiedInner.resetResize(regionsInner*regionsInner, false);
+
+		innerWidth = imageWidth - actualBorderPx*2;
+		innerHeight = imageHeight - actualBorderPx*2;
 	}
 
 	/**
 	 * See if any observed calibration points hit a target. if so remove the target.
 	 */
 	public void add( CalibrationObservation obs ) {
-		BoofMiscOps.checkTrue(obs.width > 0 && obs.height > 0, "Must specify width and height");
+		BoofMiscOps.checkTrue(obs.width == imageWidth && obs.height == imageHeight,
+				"Image width and height must match expected");
 
 		for (int obsIdx = 0; obsIdx < obs.size(); obsIdx++) {
 			Point2D_F64 o = obs.get(obsIdx).p;
 
-			if (isNearBorder(o.x, o.y, obs.width, obs.height)) {
+			if (isNearBorder(o.x, o.y, imageWidth, imageHeight)) {
 				int index;
 				if (o.y <= actualBorderPx) {
-					index = (int)(regionsBorder*o.x/obs.width);
-				} else if (o.x >= obs.width - actualBorderPx) {
-					index = (int)(regionsBorder*o.y/obs.height) + regionsBorder;
-				} else if (o.y >= obs.height - actualBorderPx) {
-					index = (int)(regionsBorder*o.x/obs.width) + regionsBorder*2;
+					index = (int)(regionsBorder*o.x/imageWidth);
+				} else if (o.y >= imageHeight - actualBorderPx) {
+					index = (int)(regionsBorder*o.x/imageWidth) + regionsBorder*2;
 				} else {
-					index = (int)(regionsBorder*o.y/obs.height) + regionsBorder*3;
+					// Have the regions start below the top border so that they don't overlap
+					double adjY = o.y - actualBorderPx;
+					index = (int)(regionsBorder*adjY/innerHeight);
+					if (o.x >= imageWidth - actualBorderPx) {
+						index += regionsBorder;
+					} else {
+						index += regionsBorder*3;
+					}
 				}
 				occupiedBorder.set(index, true);
 			} else {
-				// Subtract border from image to find shape of inner region
-				int innerWidth = obs.width - actualBorderPx*2;
-				int innerHeight = obs.height - actualBorderPx*2;
-
 				// Compute grid coordinate inside inner region
 				int row = (int)(regionsInner*(o.y - actualBorderPx)/innerHeight);
 				int col = (int)(regionsInner*(o.x - actualBorderPx)/innerWidth);
@@ -132,18 +143,31 @@ public class ScoreCalibrationFill {
 		findUnoccupiedInner();
 	}
 
-	private void findUnoccupiedLeft() {
-		for (int i = 3*regionsBorder; i < 4*regionsBorder; i++) {
+	private void findUnoccupiedTop() {
+		for (int i = 0; i < regionsBorder; i++) {
 			if (occupiedBorder.get(i))
 				continue;
-			RegionInfo r = unoccupiedRegions.get(i);
+			RegionInfo r = unoccupiedRegions.grow();
+			r.inner = false;
+			r.region.x0 = i*imageWidth/regionsBorder;
+			r.region.x1 = (i + 1)*imageWidth/regionsBorder;
+			r.region.y0 = 0;
+			r.region.y1 = actualBorderPx;
+		}
+	}
+
+	private void findUnoccupiedRight() {
+		for (int i = regionsBorder; i < 2*regionsBorder; i++) {
+			if (occupiedBorder.get(i))
+				continue;
+			RegionInfo r = unoccupiedRegions.grow();
 			r.inner = false;
 
 			int loc = i - regionsBorder;
-			r.region.x0 = 0;
-			r.region.x1 = actualBorderPx;
-			r.region.y0 = loc*imageHeight/regionsBorder;
-			r.region.y1 = (loc + 1)*imageHeight/regionsBorder;
+			r.region.x0 = imageWidth - actualBorderPx;
+			r.region.x1 = imageWidth;
+			r.region.y0 = actualBorderPx + loc*innerHeight/regionsBorder;
+			r.region.y1 = actualBorderPx + (loc + 1)*innerHeight/regionsBorder;
 		}
 	}
 
@@ -151,7 +175,7 @@ public class ScoreCalibrationFill {
 		for (int i = 2*regionsBorder; i < 3*regionsBorder; i++) {
 			if (occupiedBorder.get(i))
 				continue;
-			RegionInfo r = unoccupiedRegions.get(i);
+			RegionInfo r = unoccupiedRegions.grow();
 			r.inner = false;
 
 			int loc = i - 2*regionsBorder;
@@ -162,37 +186,22 @@ public class ScoreCalibrationFill {
 		}
 	}
 
-	private void findUnoccupiedRight() {
-		for (int i = regionsBorder; i < 2*regionsBorder; i++) {
+	private void findUnoccupiedLeft() {
+		for (int i = 3*regionsBorder; i < 4*regionsBorder; i++) {
 			if (occupiedBorder.get(i))
 				continue;
-			RegionInfo r = unoccupiedRegions.get(i);
+			RegionInfo r = unoccupiedRegions.grow();
 			r.inner = false;
 
-			int loc = i - regionsBorder;
-			r.region.x0 = imageWidth - actualBorderPx;
-			r.region.x1 = imageWidth;
-			r.region.y0 = loc*imageHeight/regionsBorder;
-			r.region.y1 = (loc + 1)*imageHeight/regionsBorder;
-		}
-	}
-
-	private void findUnoccupiedTop() {
-		for (int i = 0; i < regionsBorder; i++) {
-			if (occupiedBorder.get(i))
-				continue;
-			RegionInfo r = unoccupiedRegions.get(i);
-			r.inner = false;
-			r.region.x0 = i*imageWidth/regionsBorder;
-			r.region.x1 = (i + 1)*imageWidth/regionsBorder;
-			r.region.y0 = 0;
-			r.region.y1 = actualBorderPx;
+			int loc = i - regionsBorder*3;
+			r.region.x0 = 0;
+			r.region.x1 = actualBorderPx;
+			r.region.y0 = actualBorderPx + loc*innerHeight/regionsBorder;
+			r.region.y1 = actualBorderPx + (loc + 1)*innerHeight/regionsBorder;
 		}
 	}
 
 	private void findUnoccupiedInner() {
-		int innerWidth = imageWidth - actualBorderPx*2;
-		int innerHeight = imageHeight - actualBorderPx*2;
 		for (int i = 0; i < occupiedInner.size; i++) {
 			if (occupiedInner.get(i))
 				continue;
@@ -200,7 +209,7 @@ public class ScoreCalibrationFill {
 			int row = i/regionsInner;
 			int col = i%regionsInner;
 
-			RegionInfo r = unoccupiedRegions.get(i);
+			RegionInfo r = unoccupiedRegions.grow();
 			r.inner = true;
 			r.region.x0 = actualBorderPx + col*innerWidth/regionsInner;
 			r.region.x1 = actualBorderPx + (col + 1)*innerWidth/regionsInner;
@@ -224,13 +233,19 @@ public class ScoreCalibrationFill {
 	/** Specifies where a region is and if it's an inner region or border region. */
 	public static class RegionInfo {
 		/** true if it's an inner region or false if it's a border region */
-		boolean inner;
+		public boolean inner;
 		/** Bounding box of region in pixels */
 		public Rectangle2D_I32 region = new Rectangle2D_I32();
 
 		public void reset() {
 			inner = false;
 			region.zero();
+		}
+
+		public RegionInfo setTo( RegionInfo src ) {
+			this.inner = src.inner;
+			this.region.setTo(src.region);
+			return this;
 		}
 	}
 }

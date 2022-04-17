@@ -23,6 +23,7 @@ import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyFillType;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.calibration.CalibrationObservation;
+import boofcv.alg.geo.calibration.ScoreCalibrationFill;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.StandardAlgConfigPanel;
@@ -480,9 +481,13 @@ public class CalibrateStereoPlanarApp extends JPanel {
 			usedIdx += 1;
 		}
 		CalibrateMonoPlanar.computeQuality(algorithms.calibrator.getCalibLeft().getIntrinsic(),
+				results.left.fillScorer,
 				algorithms.calibrator.getCalibLeft().getObservations(), results.left.quality);
 		CalibrateMonoPlanar.computeQuality(algorithms.calibrator.getCalibRight().getIntrinsic(),
+				results.right.fillScorer,
 				algorithms.calibrator.getCalibRight().getObservations(), results.right.quality);
+		results.left.fillScorer.updateUnoccupied();
+		results.right.fillScorer.updateUnoccupied();
 		results.unlock();
 		algorithms.unlock();
 	}
@@ -649,6 +654,7 @@ public class CalibrateStereoPlanarApp extends JPanel {
 		stereoPanel.setShowOrder(configurePanel.checkOrder.value);
 		stereoPanel.setErrorScale(configurePanel.selectErrorScale.value.doubleValue());
 		stereoPanel.setShowResiduals(configurePanel.checkResidual.value);
+		stereoPanel.setShowUnoccupied(configurePanel.checkUnoccupied.value);
 		stereoPanel.repaint();
 	}
 
@@ -689,6 +695,7 @@ public class CalibrateStereoPlanarApp extends JPanel {
 				CalibrationObservation o = results.left.getObservation(imageName);
 				ImageResults errors = results.left.errors.get(imageName);
 				stereoPanel.panelLeft.setResults(o, errors, all);
+				stereoPanel.panelLeft.setUnoccupied(results.left.fillScorer.getUnoccupiedRegions().toList());
 			}
 
 			{
@@ -697,6 +704,7 @@ public class CalibrateStereoPlanarApp extends JPanel {
 				CalibrationObservation o = results.right.getObservation(imageName);
 				ImageResults errors = results.right.errors.get(imageName);
 				stereoPanel.panelRight.setResults(o, errors, all);
+				stereoPanel.panelRight.setUnoccupied(results.right.fillScorer.getUnoccupiedRegions().toList());
 			}
 		});
 
@@ -856,6 +864,7 @@ public class CalibrateStereoPlanarApp extends JPanel {
 		JCheckBoxValue checkResidual = checkboxWrap("Residual", false).tt("Line showing residual exactly");
 		JCheckBoxValue checkErrors = checkboxWrap("Errors", false).tt("Exaggerated residual errors");
 		JCheckBoxValue checkAll = checkboxWrap("All", false).tt("Show location of all landmarks in all images");
+		JCheckBoxValue checkUnoccupied = checkboxWrap("Fill", false).tt("Regions without observations");
 		JCheckBoxValue checkNumbers = checkboxWrap("Numbers", false).tt("Draw feature numbers");
 		JCheckBoxValue checkOrder = checkboxWrap("Order", true).tt("Visualize landmark order");
 		JSpinnerNumber selectErrorScale = spinnerWrap(10.0, 0.1, 1000.0, 2.0);
@@ -920,6 +929,7 @@ public class CalibrateStereoPlanarApp extends JPanel {
 			panel.add(checkErrors.check);
 			panel.add(checkResidual.check);
 			panel.add(checkAll.check);
+			panel.add(checkUnoccupied.check);
 			panel.add(checkNumbers.check);
 			panel.add(checkOrder.check);
 
@@ -995,6 +1005,8 @@ public class CalibrateStereoPlanarApp extends JPanel {
 		protected final DogArray<CalibrationObservation> original = new DogArray<>(CalibrationObservation::new);
 		// Quality of observations and results
 		protected final CalibrationQuality quality = new CalibrationQuality();
+		// Computes fill score and used to visualize unfilled regions
+		protected final ScoreCalibrationFill fillScorer = new ScoreCalibrationFill();
 
 		public ImageResults getError( String key ) {
 			return Objects.requireNonNull(errors.get(key));
