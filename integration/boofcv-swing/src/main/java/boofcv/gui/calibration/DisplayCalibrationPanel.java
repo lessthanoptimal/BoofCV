@@ -146,19 +146,27 @@ public abstract class DisplayCalibrationPanel extends ImageZoomPanel {
 	}
 
 	public void setUnoccupied( List<RegionInfo> unoccupied ) {
+		BoofSwingUtil.checkGuiThread();
+
 		this.unoccupied.resetResize(unoccupied.size());
 		for (int i = 0; i < unoccupied.size(); i++) {
 			this.unoccupied.get(i).setTo(unoccupied.get(i));
 		}
 	}
 
-	public void clearResults() {
+	/** Clears visualization image that is specific to a single view */
+	public void clearViewResults() {
 		BoofSwingUtil.checkGuiThread();
 
 		observation = null;
 		results = null;
-		allObservations = null;
 		selectedObservation = -1;
+	}
+
+	/** Clears all calibration information for all views */
+	public void clearAllResults() {
+		clearViewResults();
+		allObservations = null;
 		unoccupied.reset();
 	}
 
@@ -196,15 +204,26 @@ public abstract class DisplayCalibrationPanel extends ImageZoomPanel {
 	 * Visualizes calibration information, such as feature location and order.
 	 */
 	protected void drawFeatures( Graphics2D g2, double scale ) {
-		if (observation == null || allObservations == null)
-			return;
-
 		BoofSwingUtil.antialiasing(g2);
-
-		final CalibrationObservation set = observation;
 
 		if (showImageUnoccupied)
 			drawImageUnoccupied(g2, scale);
+
+		if (showAll && allObservations != null) {
+			for (CalibrationObservation l : allObservations) {
+				for (PointIndex2D_F64 p : l.points) {
+					pixelTransform.compute((float)p.p.x, (float)p.p.y, adj);
+					VisualizeFeatures.drawPoint(g2, adj.x*scale, adj.y*scale, 3, Color.BLUE, Color.WHITE, ellipse);
+				}
+			}
+		}
+
+		// Everything else relies on observations so abort if it's null
+		final CalibrationObservation set = observation;
+		if (set == null) {
+			return;
+		}
+
 
 		if (showOrder) {
 			renderOrder(g2, pixelTransform, scale, set.points);
@@ -239,15 +258,6 @@ public abstract class DisplayCalibrationPanel extends ImageZoomPanel {
 			for (PointIndex2D_F64 p : set.points) {
 				pixelTransform.compute((float)p.p.x, (float)p.p.y, adj);
 				VisualizeFeatures.drawCross(g2, adj.x*scale, adj.y*scale, 5);
-			}
-		}
-
-		if (showAll) {
-			for (CalibrationObservation l : allObservations) {
-				for (PointIndex2D_F64 p : l.points) {
-					pixelTransform.compute((float)p.p.x, (float)p.p.y, adj);
-					VisualizeFeatures.drawPoint(g2, adj.x*scale, adj.y*scale, 3, Color.BLUE, Color.WHITE, ellipse);
-				}
 			}
 		}
 

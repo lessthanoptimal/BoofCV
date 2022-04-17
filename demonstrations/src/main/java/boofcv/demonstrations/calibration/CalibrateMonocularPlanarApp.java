@@ -90,8 +90,6 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 
 	boolean calibratorChanged = true;
 	boolean targetChanged = true;
-	// if true the landmarks have been modified and it should not display results
-	boolean resultsInvalid;
 
 	//----------------------- GUI owned objects
 	protected @Getter ConfigureInfoPanel configurePanel = new ConfigureInfoPanel();
@@ -320,10 +318,9 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 			}
 		});
 
-
+		results.invalid = true;
 		targetChanged = false;
 		calibratorChanged = false;
-		resultsInvalid = true;
 	}
 
 	/**
@@ -409,11 +406,15 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 
 		CalibrationObservation imageObservations = getObservationsForSelected();
 		ImageResults imageResults = getResultsForSelected();
-		if (imageObservations == null || imageResults == null)
-			return;
-		getCalibrationPanel().setResults(imageObservations, imageResults, results.allUsedObservations);
-		getCalibrationPanel().setUnoccupied(results.fillScorer.getUnoccupiedRegions().toList());
-		getCalibrationPanel().repaint();
+		try {
+			if (imageObservations == null || imageResults == null) {
+				getCalibrationPanel().clearViewResults();
+				return;
+			}
+			getCalibrationPanel().setResults(imageObservations, imageResults, results.allUsedObservations);
+		} finally {
+			getCalibrationPanel().repaint();
+		}
 	}
 
 	/**
@@ -453,7 +454,7 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 		SwingUtilities.invokeLater(() -> {
 			imageListPanel.clearImages();
 			getCalibrationPanel().clearCalibration();
-			getCalibrationPanel().clearResults();
+			getCalibrationPanel().clearAllResults();
 		});
 
 		// Let the user configure verbose output to stdout
@@ -536,7 +537,6 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 			// Calibrate
 			detectorSet.calibrator.process();
 			detectorSet.calibrationSuccess = true;
-			resultsInvalid = false;
 
 			// Save results for visualization
 			results.safe(() -> {
@@ -551,6 +551,8 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 					String image = results.imagePaths.get(results.usedImages.get(i));
 					results.imageResults.put(image, listResults.get(i));
 				}
+
+				results.invalid = false;
 			});
 		} catch (RuntimeException e) {
 			e.printStackTrace();
@@ -591,6 +593,11 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 
 	/** Format statistics on results and add to a text panel */
 	private void showStatsToUser() {
+		// Need to ensure results are locked while inside GUI when copying occupied regions
+		// that's why this isn't in the same code block below
+		SwingUtilities.invokeLater(() -> results.safe(() -> getCalibrationPanel().setUnoccupied(
+				results.fillScorer.getUnoccupiedRegions().toList())));
+
 		results.safe(() -> {
 			// Create a list of used image names and their results
 			List<ImageResults> listResults = new ArrayList<>();
@@ -629,9 +636,8 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 		if (observation == null)
 			return;
 
-		resultsInvalid = true;
-
 		results.safe(() -> {
+			results.invalid = true;
 			if (whichPoint >= observation.points.size())
 				return;
 			observation.points.remove(whichPoint);
@@ -660,12 +666,12 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 			if (!imageListPanel.imageSuccess.get(selected))
 				return;
 
-			resultsInvalid = true;
-
 			// Mark it as not used in the UI
 			imageListPanel.imageSuccess.set(selected, false);
 
 			results.safe(() -> {
+				results.invalid = true;
+
 				// Remove all points from this image, which will remove it from the active list
 				String image = results.imagePaths.get(selected);
 				results.getObservation(image).points.clear();
@@ -677,7 +683,7 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 			});
 
 			// Visually show the changes
-			getCalibrationPanel().results = null;
+			getCalibrationPanel().clearViewResults();
 			configurePanel.bCompute.setEnabled(true);
 			getCalibrationPanel().repaint();
 		});
@@ -685,8 +691,9 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 
 	/** Adds all images and points back in */
 	protected void undoAllRemove() {
-		resultsInvalid = true;
 		results.safe(() -> {
+			results.invalid = true;
+
 			// we will re-generate the used image list
 			results.usedImages.reset();
 			for (int i = 0; i < results.originalObservations.size; i++) {
@@ -732,14 +739,14 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 	protected @Nullable ImageResults getResultsForSelected() {
 		BoofSwingUtil.checkGuiThread();
 
-		if (resultsInvalid)
+		if (results.invalid)
 			return null;
 
 		int selected = imageListPanel.selectedImage;
 		return results.selectNull(() -> {
 			if (selected < 0 || selected >= results.imagePaths.size())
 				return null;
-			return results.getResults(results.imagePaths.get(selected));
+			return results.getResultsNull(results.imagePaths.get(selected));
 		});
 	}
 
@@ -888,6 +895,9 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 	}
 
 	private static class ResultsLocked extends VariableLockSet {
+		// if true the results have been modified. NOTE: don't need to lock this to read it
+		boolean invalid;
+
 		// Path to all input images
 		protected final List<String> imagePaths = new ArrayList<>();
 		// List of found observations and results
@@ -911,7 +921,12 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 			return Objects.requireNonNull(imageResults.get(key));
 		}
 
+		public @Nullable ImageResults getResultsNull( String key ) {
+			return imageResults.get(key);
+		}
+
 		public void reset() {
+			invalid = true;
 			safe(() -> {
 				imagePaths.clear();
 				imageObservations.clear();
