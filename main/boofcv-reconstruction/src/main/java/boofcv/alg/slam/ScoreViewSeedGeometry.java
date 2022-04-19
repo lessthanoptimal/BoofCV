@@ -21,9 +21,13 @@ package boofcv.alg.slam;
 import boofcv.alg.structure.LookUpSimilarImages;
 import boofcv.alg.structure.PairwiseImageGraph;
 import boofcv.struct.distort.Point2Transform3_F64;
+import boofcv.struct.feature.AssociatedIndex;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
+import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,6 +37,8 @@ import java.util.Map;
 /**
  * Scores how good each view would be as a seed to initialize the coordinate system. View pairs it known extrinsics
  * are given preference over pairs which are unknown.
+ *
+ * @author Peter Abeles
  */
 public class ScoreViewSeedGeometry {
 
@@ -51,6 +57,16 @@ public class ScoreViewSeedGeometry {
 	List<String> foundSimilar = new ArrayList<>();
 
 	PairwiseImageGraph pairwise = new PairwiseImageGraph();
+
+	// Which features in the two views are paired with each other
+	DogArray<AssociatedIndex> pairs = new DogArray<>(AssociatedIndex::new);
+	// Which of the pairs are inside the inlier set
+	DogArray_I32 inliersIdx = new DogArray_I32();
+
+	// Scores relationship between views when extrinsics is known
+	EpipolarCalibratedScore3D scoreKnown;
+	// Scores relationship between views when extrinsics is not known
+	EpipolarCalibratedScore3D scoreNotKnown;
 
 	public void process( LookUpSimilarImages similarImages ) {
 		pairwise.reset();
@@ -93,44 +109,45 @@ public class ScoreViewSeedGeometry {
 		}
 	}
 
-	protected void scoreConnectedViews( String viewTarget, LookUpSimilarImages similarImages ) {
-		PairwiseImageGraph.View ptarget = pairwise.createNode(viewTarget);
-		ViewObservations target = viewToInfo.get(viewTarget);
+	protected void scoreConnectedViews( String viewA, LookUpSimilarImages similarImages ) {
+		PairwiseImageGraph.View pa = pairwise.createNode(viewA);
+		ViewObservations obsA = viewToInfo.get(viewA);
 
 		// To avoid considering the same pair twice, filter out views with a higher index
-		similarImages.findSimilar(viewTarget, ( v ) -> target.index > viewToInfo.get(v).index, foundSimilar);
+		similarImages.findSimilar(viewA, ( v ) -> obsA.index > viewToInfo.get(v).index, foundSimilar);
+
+		Se3_F64 workExtrinsics = new Se3_F64();
 
 		for (int i = 0; i < foundSimilar.size(); i++) {
-			String similarID = foundSimilar.get(i);
+			String viewB = foundSimilar.get(i);
+			ViewObservations obsB = viewToInfo.get(viewB);
 
-			PairwiseImageGraph.View psimilar = pairwise.createNode(similarID);
-			PairwiseImageGraph.Motion motion = pairwise.connect(ptarget, psimilar);
+			PairwiseImageGraph.View pb = pairwise.createNode(viewB);
+			PairwiseImageGraph.Motion motion = pairwise.connect(pa, pb);
+
+			// List of common observations
+			similarImages.lookupAssociated(viewB, pairs);
 
 			// Compute the score differently depending on if the extrinsic relationship is known
-			if (checkSynchronized.isSynchronized(viewTarget, similarID)) {
-				evaluateKnownExtrinsics(motion);
+			EpipolarCalibratedScore3D scorer;
+			@Nullable Se3_F64 b_to_a = null;
+			if (checkSynchronized.isSynchronized(viewA, viewB)) {
+				b_to_a = sensors.computeSrcToDst(viewB, viewA, workExtrinsics);
+				scorer = scoreKnown;
 			} else {
-				evaluateUnknownRelationship(motion);
+				scorer = scoreNotKnown;
 			}
+
+			// Compute then save the score
+			scorer.process(obsA.pointing.toList(), obsB.pointing.toList(), pairs.toList(), b_to_a, inliersIdx);
+			motion.score3D = scoreKnown.getScore();
+			motion.is3D = scorer.is3D();
 		}
-	}
-
-	protected void evaluateKnownExtrinsics( PairwiseImageGraph.Motion motion ) {
-		// TODO find common features
-		// TODO triangulate, keep points in front of camera AND look at reprojection error
-		// TODO keep inliers
-		// TODO compute score based on delta if translation is set to zero
-	}
-
-	protected void evaluateUnknownRelationship( PairwiseImageGraph.Motion motion ) {
-		// TODO find common features
-		// TODO solve for pose and 3D points
-		// TODO keep inliers
-		// TODO compute score based on delta if translation is set to zero
 	}
 
 	public static class ViewObservations {
 		int index;
+		// pixel observation converted to a pointing vector in 3D
 		DogArray<Point3D_F64> pointing = new DogArray<>(Point3D_F64::new, Point3D_F64::zero);
 
 		public void reset() {

@@ -20,6 +20,7 @@ package boofcv.alg.slam;
 
 import boofcv.alg.distort.LensDistortionWideFOV;
 import georegression.struct.se.Se3_F64;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -37,6 +38,14 @@ public class MultiCameraSystem {
 		var cam = new Camera(name, cameraToSensor, intrinsics);
 		cameras.add(cam);
 		nameToCameras.put(name, cam);
+	}
+
+	/** Computes the extrinsics relationship between the two views from src to dst */
+	public Se3_F64 computeSrcToDst( String src, String dst, @Nullable Se3_F64 src_to_dst ) {
+		if (src_to_dst == null)
+			src_to_dst = new Se3_F64();
+
+		return src_to_dst;
 	}
 
 	public Camera lookupCamera( String cameraID ) {
