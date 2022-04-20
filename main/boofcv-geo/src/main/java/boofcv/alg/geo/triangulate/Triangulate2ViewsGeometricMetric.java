@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -94,6 +94,35 @@ public class Triangulate2ViewsGeometricMetric {
 		GeometryMath_F64.multTran(a_to_b.getR(), b, rayB.slope);
 
 		rayA.slope.setTo(a.x, a.y, 1);
+
+		ClosestPoint3D_F64.closestPoint(rayA, rayB, foundInA);
+	}
+
+	/**
+	 * <p>
+	 * Triangulates two observations that are 3D pointing vectors and saves the results ad a 3D point in
+	 * homogenous coordinates.
+	 * </p>
+	 *
+	 * @param a Observation from camera view 'a' as a 3D pointing vector. Not modified.
+	 * @param b Observation from camera view 'b' as a 3D pointing vector. Not modified.
+	 * @param a_to_b Transformation from camera view 'a' to 'b'  Not modified.
+	 * @param foundInA (Output) Found 3D position of the point in reference frame 'a'. Homogenous coordinates. Modified.
+	 */
+	public void triangulate( Point3D_F64 a, Point3D_F64 b, Se3_F64 a_to_b, Point4D_F64 foundInA ) {
+		// b_to_a = R'*(X_b-T)=X_a
+		// rayB should start at origin of B so X_b = 0
+		// Thus, rayB.p = -R'*T
+
+		// set camera B's principle point
+		Vector3D_F64 t = a_to_b.getT();
+		rayB.p.setTo(-t.x, -t.y, -t.z);
+
+		// rotate observation in B into camera A's view
+		GeometryMath_F64.multTran(a_to_b.getR(), rayB.p, rayB.p);
+		GeometryMath_F64.multTran(a_to_b.getR(), b, rayB.slope);
+
+		rayA.slope.setTo(a.x, a.y, a.z);
 
 		ClosestPoint3D_F64.closestPoint(rayA, rayB, foundInA);
 	}

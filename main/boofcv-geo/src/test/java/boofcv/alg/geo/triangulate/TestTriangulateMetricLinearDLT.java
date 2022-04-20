@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,13 @@
 
 package boofcv.alg.geo.triangulate;
 
+import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -35,9 +39,8 @@ public class TestTriangulateMetricLinearDLT extends CommonTriangulationChecks {
 	@Test void triangulate_N() {
 		createScene();
 
-		TriangulateMetricLinearDLT alg = new TriangulateMetricLinearDLT();
-
-		Point4D_F64 found = new Point4D_F64();
+		var alg = new TriangulateMetricLinearDLT();
+		var found = new Point4D_F64();
 
 		alg.triangulate(obsNorm, motionWorldToCamera, found);
 
@@ -52,11 +55,47 @@ public class TestTriangulateMetricLinearDLT extends CommonTriangulationChecks {
 	@Test void triangulate_two() {
 		createScene();
 
-		TriangulateMetricLinearDLT alg = new TriangulateMetricLinearDLT();
-
-		Point4D_F64 found = new Point4D_F64();
+		var alg = new TriangulateMetricLinearDLT();
+		var found = new Point4D_F64();
 
 		alg.triangulate(obsNorm.get(0), obsNorm.get(1), motionWorldToCamera.get(1), found);
+
+		assertEquals(worldPoint.x, found.x/found.w, UtilEjml.TEST_F64);
+		assertEquals(worldPoint.y, found.y/found.w, UtilEjml.TEST_F64);
+		assertEquals(worldPoint.z, found.z/found.w, UtilEjml.TEST_F64);
+	}
+
+	/**
+	 * Create 3 perfect pointing vector observations and solve for the position
+	 */
+	@Test void triangulate_N_pointing() {
+		createScene();
+
+		var alg = new TriangulateMetricLinearDLT();
+		var found = new Point4D_F64();
+
+		var list = new ArrayList<Point3D_F64>();
+		for (Point2D_F64 n : obsNorm) {
+			list.add(normTo3D(n));
+		}
+
+		alg.triangulateP(list, motionWorldToCamera, found);
+
+		assertEquals(worldPoint.x, found.x/found.w, UtilEjml.TEST_F64);
+		assertEquals(worldPoint.y, found.y/found.w, UtilEjml.TEST_F64);
+		assertEquals(worldPoint.z, found.z/found.w, UtilEjml.TEST_F64);
+	}
+
+	/**
+	 * Create 2 perfect observations and solve for the position
+	 */
+	@Test void triangulate_two_pointing() {
+		createScene();
+
+		var alg = new TriangulateMetricLinearDLT();
+		var found = new Point4D_F64();
+
+		alg.triangulateP(normTo3D(obsNorm.get(0)), normTo3D(obsNorm.get(1)), motionWorldToCamera.get(1), found);
 
 		assertEquals(worldPoint.x, found.x/found.w, UtilEjml.TEST_F64);
 		assertEquals(worldPoint.y, found.y/found.w, UtilEjml.TEST_F64);

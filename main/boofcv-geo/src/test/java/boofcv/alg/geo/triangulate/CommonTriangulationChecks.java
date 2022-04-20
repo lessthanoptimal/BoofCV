@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,10 +47,15 @@ public class CommonTriangulationChecks extends BoofStandardJUnit {
 	protected Point4D_F64 worldPointH;
 	protected List<Point2D_F64> obsPixels;
 	protected List<Point2D_F64> obsNorm;
+	protected List<Point3D_F64> obsPointing;
 	protected List<Se3_F64> motionWorldToCamera;
 	protected List<DMatrixRMaj> essential;
 	protected List<DMatrixRMaj> fundamental;
 	protected List<DMatrixRMaj> cameraMatrices;
+
+	public static Point3D_F64 normTo3D( Point2D_F64 a ) {
+		return new Point3D_F64(a.x, a.y, 1);
+	}
 
 	public void createScene() {
 		createScene(new Point3D_F64(0.1, -0.2, 4));
@@ -66,6 +71,7 @@ public class CommonTriangulationChecks extends BoofStandardJUnit {
 		PerspectiveOps.homogenousTo3dPositiveZ(point, Double.MAX_VALUE, 1e-16, worldPoint);
 		motionWorldToCamera = new ArrayList<>();
 		obsNorm = new ArrayList<>();
+		obsPointing = new ArrayList<>();
 		obsPixels = new ArrayList<>();
 		essential = new ArrayList<>();
 		fundamental = new ArrayList<>();
@@ -89,6 +95,7 @@ public class CommonTriangulationChecks extends BoofStandardJUnit {
 			Point2D_F64 pixel = PerspectiveOps.renderPixel(world_to_view, intrinsic, worldPointH, null);
 
 			obsNorm.add(norm);
+			obsPointing.add(normTo3D(norm));
 			obsPixels.add(pixel);
 			motionWorldToCamera.add(world_to_view);
 			essential.add(E);

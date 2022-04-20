@@ -18,28 +18,19 @@
 
 package boofcv.abst.geo.triangulate;
 
-import boofcv.abst.geo.Triangulate2ViewsMetric;
-import boofcv.abst.geo.TriangulateNViewsMetricH;
-import boofcv.alg.geo.GeometricResult;
-import boofcv.alg.geo.triangulate.TriangulateMetricLinearDLT;
-import georegression.struct.point.Point2D_F64;
+import boofcv.abst.geo.GeneralCheckNPointingTriangulateMetricH;
+import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
-import lombok.Getter;
+import org.ejml.data.DMatrixRMaj;
 
 import java.util.List;
 
-/**
- * Wrapper around {@link TriangulateMetricLinearDLT} for {@link Triangulate2ViewsMetric}.
- *
- * @author Peter Abeles
- */
-public class WrapNViewsTriangulateMetricHgDLT implements TriangulateNViewsMetricH {
+class TestWrapNPointingTriangulateMetricHgDLT extends GeneralCheckNPointingTriangulateMetricH {
+	WrapNPointingTriangulateMetricHgDLT alg = new WrapNPointingTriangulateMetricHgDLT();
 
-	final @Getter TriangulateMetricLinearDLT algorithm = new TriangulateMetricLinearDLT();
-
-	@Override
-	public boolean triangulate( List<Point2D_F64> observations, List<Se3_F64> listWorldToView, Point4D_F64 location ) {
-		return GeometricResult.SUCCESS == algorithm.triangulate(observations, listWorldToView, location);
+	@Override public boolean triangulate( List<Point3D_F64> obsPts, List<Se3_F64> motion,
+								List<DMatrixRMaj> essential, Point4D_F64 found ) {
+		return alg.triangulate(obsPts, motion, found);
 	}
 }
