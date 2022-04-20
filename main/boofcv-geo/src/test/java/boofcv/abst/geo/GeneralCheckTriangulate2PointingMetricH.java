@@ -48,18 +48,8 @@ public abstract class GeneralCheckTriangulate2PointingMetricH extends BoofStanda
 		worldToB.getT().setTo(2, 0.1, -0.5);
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0, 0.05, 0, worldToB.getR());
 
-		Point3D_F64 pointA = SePointOps_F64.transform(worldToA, world, null);
-		var viewA = new Point3D_F64();
-		viewA.x = pointA.x/pointA.z;
-		viewA.y = pointA.y/pointA.z;
-		viewA.z = 1;
-
-		Point3D_F64 pointB = SePointOps_F64.transform(worldToB, world, null);
-		var viewB = new Point3D_F64();
-		viewB.x = pointB.x/pointB.z;
-		viewB.y = pointB.y/pointB.z;
-		viewB.z = 1;
-
+		Point3D_F64 viewA = SePointOps_F64.transform(worldToA, world, null);
+		Point3D_F64 viewB = SePointOps_F64.transform(worldToB, world, null);
 
 		Triangulate2PointingMetricH alg = createAlg();
 		var found = new Point4D_F64();
