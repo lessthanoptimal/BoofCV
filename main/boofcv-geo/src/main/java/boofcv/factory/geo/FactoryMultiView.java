@@ -576,7 +576,7 @@ public class FactoryMultiView {
 	}
 
 	/**
-	 * Triangulate N views using the Discrete Linear Transform (DLT) with a calibrated camera in homogenous coordinates
+	 * Triangulate a homogenous point from N metric views given observations in normalized image coordinates.
 	 *
 	 * @return N-view triangulation algorithm
 	 * @see TriangulateMetricLinearDLT
@@ -599,7 +599,7 @@ public class FactoryMultiView {
 	}
 
 	/**
-	 * Triangulate N views using the Discrete Linear Transform (DLT) with an uncalibrated camera
+	 * Triangulate a homogenous point from N projective views given observations in pixel coordinates.
 	 *
 	 * @return N-view triangulation algorithm
 	 * @see TriangulateProjectiveLinearDLT
@@ -616,6 +616,47 @@ public class FactoryMultiView {
 				var refiner = new TriangulateRefineProjectiveLS(config.converge.gtol, config.converge.maxIterations);
 				yield new TriangulateThenRefineProjective(estimator, refiner);
 			}
+
+			default -> throw new IllegalArgumentException("Unknown or unsupported type " + config.type);
+		};
+	}
+
+	/**
+	 * Triangulate a point in homogeneous coordinates using two pointing vector observations.
+	 *
+	 * @return Two view triangulation algorithm
+	 * @see TriangulateMetricLinearDLT
+	 * @see Triangulate2ViewsGeometricMetric
+	 */
+	public static Triangulate2PointingMetricH triangulate2PointingMetricH( @Nullable ConfigTriangulation config ) {
+		if (config == null)
+			config = new ConfigTriangulation();
+
+		return switch (config.type) {
+			case DLT -> new Wrap2PointingTriangulateMetricDLTH();
+			case GEOMETRIC -> new Wrap2PointingTriangulateGeometricH();
+			default -> throw new IllegalArgumentException("Unknown or unsupported type " + config.type);
+		};
+	}
+
+	/**
+	 * Triangulate a point in homogenous coordinates from N views given observations as pointing vectors.
+	 *
+	 * @return N-view triangulation algorithm
+	 * @see TriangulateMetricLinearDLT
+	 */
+	public static TriangulateNPointingMetricH triangulateNPointingMetricH( @Nullable ConfigTriangulation config ) {
+		if (config == null)
+			config = new ConfigTriangulation();
+
+		return switch (config.type) {
+			case DLT -> new WrapNPointingTriangulateMetricHgDLT();
+
+//			case GEOMETRIC -> {
+//				var estimator = new WrapNPointingTriangulateMetricHgDLT();
+//				var refiner = new TriangulateRefineMetricHgLS(config.converge.gtol, config.converge.maxIterations);
+//				yield new TriangulateThenRefineMetricH(estimator, refiner);
+//			}
 
 			default -> throw new IllegalArgumentException("Unknown or unsupported type " + config.type);
 		};

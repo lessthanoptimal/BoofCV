@@ -16,30 +16,28 @@
  * limitations under the License.
  */
 
-package boofcv.abst.geo.triangulate;
+package boofcv.abst.geo;
 
-import boofcv.abst.geo.Triangulate2ViewsMetric;
-import boofcv.abst.geo.TriangulateNViewsMetricH;
-import boofcv.alg.geo.GeometricResult;
-import boofcv.alg.geo.triangulate.TriangulateMetricLinearDLT;
-import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
-import lombok.Getter;
 
 import java.util.List;
 
 /**
- * Wrapper around {@link TriangulateMetricLinearDLT} for {@link Triangulate2ViewsMetric}.
+ * Triangulate the location of a point from N views a calibrated camera and known poses.
  *
  * @author Peter Abeles
  */
-public class WrapNViewsTriangulateMetricHgDLT implements TriangulateNViewsMetricH {
+public interface TriangulateNPointingMetricH {
 
-	final @Getter TriangulateMetricLinearDLT algorithm = new TriangulateMetricLinearDLT();
-
-	@Override
-	public boolean triangulate( List<Point2D_F64> observations, List<Se3_F64> listWorldToView, Point4D_F64 location ) {
-		return GeometricResult.SUCCESS == algorithm.triangulate(observations, listWorldToView, location);
-	}
+	/**
+	 * Triangulates the point's location.
+	 *
+	 * @param observations Observations of the 3D point as 3d pointing vectors from different camera views.
+	 * @param listWorldToView Transform from world to each of the different camera views
+	 * @param location Computed location of feature in world coordinates.
+	 * @return true if successful, false otherwise.
+	 */
+	boolean triangulate( List<Point3D_F64> observations, List<Se3_F64> listWorldToView, Point4D_F64 location );
 }

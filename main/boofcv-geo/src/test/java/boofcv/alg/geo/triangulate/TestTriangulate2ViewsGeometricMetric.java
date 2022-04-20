@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,9 @@
 
 package boofcv.alg.geo.triangulate;
 
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Point4D_F64;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -34,15 +36,51 @@ public class TestTriangulate2ViewsGeometricMetric extends CommonTriangulationChe
 	@Test void triangulate_two() {
 		createScene();
 
-		Triangulate2ViewsGeometricMetric alg = new Triangulate2ViewsGeometricMetric();
+		var alg = new Triangulate2ViewsGeometricMetric();
 
-		Point3D_F64 found = new Point3D_F64();
+		var found = new Point3D_F64();
 		for (int i = 1; i < N; i++) {
 			alg.triangulate(obsNorm.get(0), obsNorm.get(i), motionWorldToCamera.get(i), found);
 
 			assertEquals(worldPoint.x, found.x, 1e-8);
 			assertEquals(worldPoint.y, found.y, 1e-8);
 			assertEquals(worldPoint.z, found.z, 1e-8);
+		}
+	}
+
+	@Test void triangulate_two_homogenous() {
+		createScene();
+
+		var alg = new Triangulate2ViewsGeometricMetric();
+
+		var found = new Point4D_F64();
+		for (int i = 1; i < N; i++) {
+			alg.triangulate(obsNorm.get(0), obsNorm.get(i), motionWorldToCamera.get(i), found);
+
+			assertEquals(worldPoint.x, found.x/found.w, 1e-8);
+			assertEquals(worldPoint.y, found.y/found.w, 1e-8);
+			assertEquals(worldPoint.z, found.z/found.w, 1e-8);
+		}
+	}
+
+	/**
+	 * Create 2 perfect observations and solve for the position
+	 */
+	@Test void triangulate_two_pointing() {
+		createScene();
+
+		var alg = new Triangulate2ViewsGeometricMetric();
+
+		var found = new Point4D_F64();
+		for (int i = 1; i < N; i++) {
+			Point2D_F64 na = obsNorm.get(0);
+			Point2D_F64 nb = obsNorm.get(i);
+
+			alg.triangulate(new Point3D_F64(na.x, na.y, 1), new Point3D_F64(nb.x, nb.y, 1), motionWorldToCamera.get(i), found);
+
+			assertEquals(worldPoint.x, found.x/found.w, 1e-8);
+			assertEquals(worldPoint.y, found.y/found.w, 1e-8);
+			assertEquals(worldPoint.z, found.z/found.w, 1e-8);
 		}
 	}
 }
