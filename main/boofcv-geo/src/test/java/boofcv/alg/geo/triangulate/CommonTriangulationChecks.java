@@ -29,6 +29,7 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.DMatrixRMaj;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,8 +54,11 @@ public class CommonTriangulationChecks extends BoofStandardJUnit {
 	protected List<DMatrixRMaj> fundamental;
 	protected List<DMatrixRMaj> cameraMatrices;
 
-	public static Point3D_F64 normTo3D( Point2D_F64 a ) {
-		return new Point3D_F64(a.x, a.y, 1);
+	public static Point3D_F64 normTo3D( @Nullable Point2D_F64 a ) {
+		if (a == null)
+			return null;
+		double scale = 0.6;
+		return new Point3D_F64(a.x*scale, a.y*scale, scale);
 	}
 
 	public void createScene() {
