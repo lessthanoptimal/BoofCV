@@ -18,7 +18,9 @@
 
 package boofcv.alg.slam;
 
+import boofcv.struct.distort.Point3Transform2_F64;
 import boofcv.struct.feature.AssociatedIndex;
+import boofcv.struct.image.ImageDimension;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.DogArray_I32;
@@ -36,14 +38,20 @@ public interface EpipolarCalibratedScore3D extends VerbosePrint {
 	/**
 	 * Estimates the amount of 3D information contained between the two observations
 	 *
+	 * @param imageShapeA (Input) Camera A: Image size
+ 	 * @param iamgeShapeB (Input) Camera B: Image size
+	 * @param pointToPixelA (Input) Camera A: Projector from pointing to image pixel
+	 * @param pointToPixelB (Input) Camera B: Projector from pointing to image pixel
 	 * @param obsA (Input) Camera A: Pointing vector of feature observations
 	 * @param obsB (Input) Camera B: Pointing vector of feature observations. Matches obsA
 	 * @param pairs (Input) Which features have been paired up in the two views.
+	 * @param a_to_b (Input) If not null, then it specifies the extrinsic relationship between the views
 	 * @param inliersIdx (Output) Which features inside of pairs are in the inlier sets
 	 */
-	void process( List<Point3D_F64> obsA, List<Point3D_F64> obsB, List<AssociatedIndex> pairs,
-				  @Nullable Se3_F64 b_to_a,
-				  DogArray_I32 inliersIdx );
+	void process( ImageDimension imageShapeA, ImageDimension iamgeShapeB,
+				  Point3Transform2_F64 pointToPixelA, Point3Transform2_F64 pointToPixelB,
+				  List<Point3D_F64> obsA, List<Point3D_F64> obsB,
+				  List<AssociatedIndex> pairs, @Nullable Se3_F64 a_to_b, DogArray_I32 inliersIdx );
 
 	/**
 	 * Returns a score for how much 3D information there is. 0 = no 3D information. 1 = very strong 3D information.

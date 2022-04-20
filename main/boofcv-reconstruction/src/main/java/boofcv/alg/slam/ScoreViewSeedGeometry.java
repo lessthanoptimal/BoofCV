@@ -139,7 +139,7 @@ public class ScoreViewSeedGeometry {
 			}
 
 			// Compute then save the score
-			scorer.process(obsA.pointing.toList(), obsB.pointing.toList(), pairs.toList(), b_to_a, inliersIdx);
+//			scorer.process(obsA.pointing.toList(), obsB.pointing.toList(), pairs.toList(), b_to_a, inliersIdx);
 			motion.score3D = scoreKnown.getScore();
 			motion.is3D = scorer.is3D();
 		}
