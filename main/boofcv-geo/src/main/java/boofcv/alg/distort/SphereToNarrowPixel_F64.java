@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,8 +37,13 @@ public class SphereToNarrowPixel_F64 implements Point3Transform2_F64 {
 
 	@Override
 	public void compute( double x, double y, double z, Point2D_F64 out ) {
-		// ignore the whole z <= 0 issue with it being behind the camera. No way to tell it that it failed
-		projToPixel.compute(x/z, y/z, out);
+		// Handle the singularity. There is no good way to handle this.
+		if (z == 0.0) {
+			projToPixel.compute(x, y, out);
+		} else {
+			// ignore the whole z < 0 issue with it being behind the camera. No way to tell it that it failed
+			projToPixel.compute(x/z, y/z, out);
+		}
 	}
 
 	@Override
