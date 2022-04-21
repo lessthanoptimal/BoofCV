@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,24 +25,34 @@ import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
-/**
- * @author Peter Abeles
- */
 public class TestSphereToNarrowPixel_F64 extends BoofStandardJUnit {
 	@Test void basic() {
+		var alg = new SphereToNarrowPixel_F64(new Dummy());
 
-		SphereToNarrowPixel_F64 alg = new SphereToNarrowPixel_F64(new Dummy());
-
-		Point2D_F64 found = new Point2D_F64();
+		var found = new Point2D_F64();
 		alg.compute(1,2,3, found);
 
 		assertEquals(1.0/3.0,found.x, UtilEjml.TEST_F64);
 		assertEquals(2.0/3.0,found.y, UtilEjml.TEST_F64);
 	}
 
-	private static class Dummy implements Point2Transform2_F64 {
+	/** Special case where z=0. This is a singularity.  */
+	@Test void zeroZ() {
+		var alg = new SphereToNarrowPixel_F64(new Dummy());
 
+		var found = new Point2D_F64();
+		alg.compute(1,2,0, found);
+
+		assertFalse(Double.isNaN(found.x));
+		assertFalse(Double.isNaN(found.y));
+
+		assertEquals(1.0,found.x, UtilEjml.TEST_F64);
+		assertEquals(2.0,found.y, UtilEjml.TEST_F64);
+	}
+
+	private static class Dummy implements Point2Transform2_F64 {
 		@Override
 		public void compute(double x, double y, Point2D_F64 out) {
 			out.setTo(x,y);
