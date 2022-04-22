@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.geo.pose;
 
 import boofcv.alg.geo.DistanceFromModelMultiView;
-import boofcv.alg.geo.NormalizedToPixelError;
+import boofcv.alg.geo.NormalizedToPinholePixelError;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.Point2D3D;
 import georegression.struct.point.Point2D_F64;
@@ -51,9 +51,9 @@ public class PnPDistanceReprojectionSq implements DistanceFromModelMultiView<Se3
 	private final Point3D_F64 X = new Point3D_F64();
 
 	// computes the error in units of pixels
-	private NormalizedToPixelError pixelError = new NormalizedToPixelError(1, 1, 0);
+	private NormalizedToPinholePixelError pixelError = new NormalizedToPinholePixelError(1, 1, 0);
 
-	public PnPDistanceReprojectionSq( NormalizedToPixelError pixelError ) {
+	public PnPDistanceReprojectionSq( NormalizedToPinholePixelError pixelError ) {
 		this.pixelError = pixelError;
 	}
 

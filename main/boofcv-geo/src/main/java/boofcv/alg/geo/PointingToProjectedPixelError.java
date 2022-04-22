@@ -18,7 +18,11 @@
 
 package boofcv.alg.geo;
 
+import boofcv.struct.distort.Point3Transform2_F64;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Simple function for converting error in pointing vector coordinates to pixels using
@@ -26,48 +30,28 @@ import georegression.struct.point.Point3D_F64;
  *
  * @author Peter Abeles
  */
-public class PointingToPixelError {
-	private double fx; // focal length x
-	private double fy; // focal length y
-	private double skew; // pixel skew
+@SuppressWarnings({"NullAway.Init"})
+public class PointingToProjectedPixelError {
+	@Getter @Setter Point3Transform2_F64 camera;
 
-	public PointingToPixelError( double fx, double fy, double skew ) {
-		setTo(fx, fy, skew);
+	// Storage for projected pixels in both views
+	Point2D_F64 pixelA = new Point2D_F64();
+	Point2D_F64 pixelB = new Point2D_F64();
+
+	public PointingToProjectedPixelError( Point3Transform2_F64 camera ) {
+		this.camera = camera;
 	}
 
-	public PointingToPixelError() {}
-
-	/**
-	 * Specify camera intrinsic parameters
-	 *
-	 * @param fx focal length x
-	 * @param fy focal length y
-	 * @param skew camera skew
-	 */
-	public void setTo( double fx, double fy, double skew ) {
-		this.fx = fx;
-		this.fy = fy;
-		this.skew = skew;
-	}
+	public PointingToProjectedPixelError() {}
 
 	public double errorSq( Point3D_F64 a, Point3D_F64 b ) {
 		return errorSq(a.x, a.y, a.z, b.x, b.y, b.z);
 	}
 
 	public double errorSq( double a_x, double a_y, double a_z, double b_x, double b_y, double b_z ) {
-		// There's a singularity if z == 0. No good way to handle that so we treat that as if it's 1
-		if (a_z != 0.0) {
-			a_x /= a_z;
-			a_y /= a_z;
-		}
-		if (b_z != 0.0) {
-			b_x /= b_z;
-			b_y /= b_z;
-		}
-		double dy = (b_y - a_y);
-		double dx = (b_x - a_x)*fx + dy*skew;
-		dy *= fy;
+		camera.compute(a_x, a_y, a_z, pixelA);
+		camera.compute(b_x, b_y, b_z, pixelB);
 
-		return dx*dx + dy*dy;
+		return pixelA.distance2(pixelB);
 	}
 }

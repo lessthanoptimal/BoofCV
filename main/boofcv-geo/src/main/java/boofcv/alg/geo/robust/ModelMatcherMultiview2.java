@@ -18,23 +18,23 @@
 
 package boofcv.alg.geo.robust;
 
-import boofcv.struct.calib.CameraPinhole;
+import boofcv.struct.distort.Point3Transform2_F64;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 
 /**
- * {@link ModelMatcher} for multiview problems. Intrinsic camera parameters can be set for each view individually
+ * {@link ModelMatcher} for multiview problems. A lens distortion model is provided that goes from observations
+ * to pixels.
  *
  * @author Peter Abeles
  */
-public interface ModelMatcherMultiview<Model, Point> extends ModelMatcher<Model, Point> {
-
+public interface ModelMatcherMultiview2<Model, Point> extends ModelMatcher<Model, Point> {
 	/**
-	 * Specify intrinsic parameters for a particular view
+	 * Specifies the camera model for a view
 	 *
 	 * @param view which view this belongs to
-	 * @param intrinsic intrinsic parameters that it should be set to
+	 * @param intrinsic Camera model that goes from a pointing vector observation to pixel coordinate
 	 */
-	void setIntrinsic( int view, CameraPinhole intrinsic );
+	void setDistortion( int view, Point3Transform2_F64 intrinsic );
 
 	/**
 	 * Returns the new of views which need to be set
