@@ -18,9 +18,7 @@
 
 package boofcv.factory.geo;
 
-import boofcv.abst.geo.Estimate1ofEpipolar;
-import boofcv.abst.geo.Estimate1ofPnP;
-import boofcv.abst.geo.Triangulate2ViewsMetricH;
+import boofcv.abst.geo.*;
 import boofcv.abst.geo.fitting.DistanceFromModelResidual;
 import boofcv.abst.geo.fitting.GenerateEpipolarMatrix;
 import boofcv.abst.geo.fitting.ModelManagerEpipolarMatrix;
@@ -33,10 +31,7 @@ import boofcv.alg.geo.selfcalib.MetricCameraTriple;
 import boofcv.alg.geo.selfcalib.ModelManagerMetricCameraTriple;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.calib.ElevateViewInfo;
-import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.geo.AssociatedTriple;
-import boofcv.struct.geo.Point2D3D;
-import boofcv.struct.geo.TrifocalTensor;
+import boofcv.struct.geo.*;
 import georegression.fitting.homography.ModelManagerHomography2D_F64;
 import georegression.fitting.se.ModelManagerSe3_F64;
 import georegression.struct.homography.Homography2D_F64;
@@ -234,6 +229,50 @@ public class FactoryMultiViewRobust {
 				manager, generateEpipolarMotion, distanceSe3);
 	}
 
+	/**
+	 * Robust solution for estimating the stereo baseline {@link Se3_F64} using epipolar geometry from two views with
+	 * {@link RansacCalibrated}. Input observations are in pointing vectors.
+	 *
+	 * <p>See code for all the details.</p>
+	 *
+	 * @param configEssential Essential matrix estimation parameters.
+	 * @param configRansac Parameters for RANSAC. Can't be null.
+	 * @return Robust Se3_F64 estimator
+	 */
+	public static ModelMatcherMultiview<Se3_F64, AssociatedPair3D>
+	baselinePointingRansac( @Nullable ConfigEssential configEssential, ConfigRansac configRansac ) {
+		if (configEssential == null)
+			configEssential = new ConfigEssential();
+		configEssential.checkValidity();
+		configRansac.checkValidity();
+
+		if (configEssential.errorModel != ConfigEssential.ErrorModel.GEOMETRIC) {
+			throw new RuntimeException("Error model has to be Euclidean");
+		}
+
+		Estimate1ofEpipolarPointing epipolar = FactoryMultiView.
+				essentialPointing_1(configEssential.which, configEssential.numResolve);
+
+		Triangulate2PointingMetricH triangulate = FactoryMultiView.triangulate2PointingMetricH(
+				new ConfigTriangulation(ConfigTriangulation.Type.GEOMETRIC));
+		var manager = new ModelManagerSe3_F64();
+		var generateEpipolarMotion = new Se3FromEssentialPointingGenerator(epipolar, triangulate);
+
+		var distanceSe3 = new DistanceSe3SymmetricSqPointing(triangulate);
+
+		double ransacTOL = configRansac.inlierThreshold*configRansac.inlierThreshold*2.0;
+
+		return new RansacCalibrated<>(configRansac.randSeed, configRansac.iterations, ransacTOL,
+				manager, generateEpipolarMotion, distanceSe3);
+	}
+
+	/**
+	 * Estimates the essential matrix given associated image features in normalized image coordinates using RANSAC.
+	 *
+	 * @param configEssential (Optional) Configuration for computing essential matrix
+	 * @param configRansac Configuration for RANSAC
+	 * @return Robust essential matrix estimator
+	 */
 	public static ModelMatcherMultiview<DMatrixRMaj, AssociatedPair>
 	essentialRansac( @Nullable ConfigEssential configEssential, ConfigRansac configRansac ) {
 		if (configEssential == null)

@@ -18,29 +18,29 @@
 
 package boofcv.abst.geo.f;
 
-import boofcv.abst.geo.EstimateNofEpipolar;
+import boofcv.abst.geo.EstimateNofEpipolarPointing;
 import boofcv.alg.geo.f.EssentialNister5;
-import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.geo.AssociatedPair3D;
 import org.ddogleg.struct.DogArray;
 import org.ejml.data.DMatrixRMaj;
 
 import java.util.List;
 
 /**
- * Wrapper around either {@link boofcv.alg.geo.f.EssentialNister5} for {@link boofcv.abst.geo.EstimateNofEpipolar}.
+ * Wrapper around either {@link EssentialNister5} for {@link EstimateNofEpipolarPointing}.
  *
  * @author Peter Abeles
  */
-public class WrapEssentialNister5 implements EstimateNofEpipolar {
+public class WrapEssentialNister5Pointing implements EstimateNofEpipolarPointing {
 	EssentialNister5 alg;
 
-	public WrapEssentialNister5() {
+	public WrapEssentialNister5Pointing() {
 		alg = new EssentialNister5();
 	}
 
 	@Override
-	public boolean process( List<AssociatedPair> points, DogArray<DMatrixRMaj> estimatedModels ) {
-		if (!alg.processNormalized(points, estimatedModels))
+	public boolean process( List<AssociatedPair3D> points, DogArray<DMatrixRMaj> estimatedModels ) {
+		if (!alg.processPointing(points, estimatedModels))
 			return false;
 
 		return true;

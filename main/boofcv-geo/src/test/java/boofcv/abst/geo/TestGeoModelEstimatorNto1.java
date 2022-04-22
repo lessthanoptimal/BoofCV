@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -101,7 +101,7 @@ public class TestGeoModelEstimatorNto1 extends BoofStandardJUnit {
 
 
 		DogArray<DMatrixRMaj> solutions = new QueueMatrix(3, 3);
-		assertTrue(nister.process(obs,solutions));
+		assertTrue(nister.processNormalized(obs,solutions));
 
 		return solutions.get(0);
 	}

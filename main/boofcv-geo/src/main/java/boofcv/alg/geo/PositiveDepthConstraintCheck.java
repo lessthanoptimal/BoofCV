@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -59,8 +59,8 @@ public class PositiveDepthConstraintCheck {
 	/**
 	 * Checks to see if a single point meets the constraint.
 	 *
-	 * @param viewA View of the 3D point from the first camera. Calibrated coordinates.
-	 * @param viewB View of the 3D point from the second camera. Calibrated coordinates.
+	 * @param viewA View of the 3D point from the first camera. Normalized image coordinates.
+	 * @param viewB View of the 3D point from the second camera. Normalized image coordinates.
 	 * @param fromAtoB Transform from the B to A camera frame.
 	 * @return If the triangulated point appears in front of both cameras.
 	 */

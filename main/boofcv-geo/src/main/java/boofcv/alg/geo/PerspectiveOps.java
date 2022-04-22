@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -524,7 +524,7 @@ public class PerspectiveOps {
 	 * @param pixel (Output) storage for the rendered pixel
 	 * @return 2D Render point on image plane or null if it's behind the camera
 	 */
-	public static @Nullable Point2D_F64 renderPixel( Se3_F64 worldToCamera, DMatrixRMaj K, Point3D_F64 X,
+	public static @Nullable Point2D_F64 renderPixel( Se3_F64 worldToCamera, @Nullable DMatrixRMaj K, Point3D_F64 X,
 													 @Nullable Point2D_F64 pixel ) {
 		return ImplPerspectiveOps_F64.renderPixel(worldToCamera, K, X, pixel);
 	}
@@ -542,6 +542,17 @@ public class PerspectiveOps {
 	public static @Nullable Point2D_F64 renderPixel( Se3_F64 worldToCamera, Point3D_F64 X,
 													 @Nullable Point2D_F64 pixel ) {
 		return ImplPerspectiveOps_F64.renderPixel(worldToCamera, 1, 0, 0, 1, 0, X, pixel);
+	}
+
+	/**
+	 * Renders an observations as a pointing vector.
+	 *
+	 * @param X 3D Point in world reference frame.
+	 * @param pixel (Output) storage for the rendered pixel
+	 * @return Rendering observations as a pointing vector
+	 */
+	public static Point3D_F64 renderPointing( Se3_F64 worldToCamera, Point3D_F64 X, @Nullable Point3D_F64 pixel ) {
+		return ImplPerspectiveOps_F64.renderPointing(worldToCamera, 1, 0, 0, 1, 0, X, pixel);
 	}
 
 	/**

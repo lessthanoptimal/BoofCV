@@ -18,30 +18,28 @@
 
 package boofcv.abst.geo.f;
 
-import boofcv.abst.geo.Estimate1ofEpipolar;
+import boofcv.abst.geo.Estimate1ofEpipolarPointing;
 import boofcv.abst.geo.GeoModelEstimatorNto1;
-import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.geo.AssociatedPair3D;
 import boofcv.struct.geo.GeoModelEstimatorN;
 import boofcv.struct.geo.QueueMatrix;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
 import org.ejml.data.DMatrixRMaj;
 
 /**
- * Implementation of {@link GeoModelEstimatorNto1} for epipolar matrices given observations in 2D, i.e. pixels
- * or normalized image coordinates.
+ * Implementation of {@link GeoModelEstimatorNto1} for epipolar matrices given observations as pointing vectors.
  *
  * @author Peter Abeles
  */
-public class EstimateNto1ofEpipolar extends GeoModelEstimatorNto1<DMatrixRMaj, AssociatedPair>
-		implements Estimate1ofEpipolar {
-	public EstimateNto1ofEpipolar( GeoModelEstimatorN<DMatrixRMaj, AssociatedPair> alg,
-								   DistanceFromModel<DMatrixRMaj, AssociatedPair> distance,
-								   int numTest ) {
+public class EstimateNto1ofEpipolarPointing extends GeoModelEstimatorNto1<DMatrixRMaj, AssociatedPair3D>
+		implements Estimate1ofEpipolarPointing {
+	public EstimateNto1ofEpipolarPointing( GeoModelEstimatorN<DMatrixRMaj, AssociatedPair3D> alg,
+										   DistanceFromModel<DMatrixRMaj, AssociatedPair3D> distance,
+										   int numTest ) {
 		super(alg, distance, new QueueMatrix(3, 3), numTest);
 	}
 
-	@Override
-	protected void copy( DMatrixRMaj src, DMatrixRMaj dst ) {
+	@Override protected void copy( DMatrixRMaj src, DMatrixRMaj dst ) {
 		dst.setTo(src);
 	}
 }

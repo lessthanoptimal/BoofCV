@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -159,7 +159,7 @@ public class ImplPerspectiveOps_F64 {
 		if (norm == null)
 			norm = new Point2D_F64();
 
-		PinholePtoN_F64 alg = new PinholePtoN_F64();
+		var alg = new PinholePtoN_F64();
 		alg.setK(K.get(0, 0), K.get(1, 1), K.get(0, 1), K.get(0, 2), K.get(1, 2));
 
 		alg.compute(pixel.x, pixel.y, norm);
@@ -183,7 +183,8 @@ public class ImplPerspectiveOps_F64 {
 		return norm;
 	}
 
-	public static @Nullable Point2D_F64 renderPixel( Se3_F64 worldToCamera, DMatrixRMaj K, Point3D_F64 X,
+	public static @Nullable Point2D_F64 renderPixel( Se3_F64 worldToCamera,
+													 @Nullable DMatrixRMaj K, Point3D_F64 X,
 													 @Nullable Point2D_F64 pixel ) {
 		DMatrixRMaj R = worldToCamera.R;
 		Vector3D_F64 T = worldToCamera.T;
@@ -212,8 +213,7 @@ public class ImplPerspectiveOps_F64 {
 	public static @Nullable Point2D_F64 renderPixel( Se3_F64 worldToCamera,
 													 double fx, double skew, double cx, double fy, double cy,
 													 Point3D_F64 X, @Nullable Point2D_F64 pixel ) {
-
-		Point3D_F64 X_cam = new Point3D_F64();
+		var X_cam = new Point3D_F64();
 
 		SePointOps_F64.transform(worldToCamera, X, X_cam);
 
@@ -229,6 +229,29 @@ public class ImplPerspectiveOps_F64 {
 
 		pixel.x = fx*xx + skew*yy + cx;
 		pixel.y = fy*yy + cy;
+
+		return pixel;
+	}
+
+	public static Point3D_F64 renderPointing( Se3_F64 worldToCamera,
+											  double fx, double skew, double cx, double fy, double cy,
+											  Point3D_F64 X, @Nullable Point3D_F64 pixel ) {
+		var X_cam = new Point3D_F64();
+
+		SePointOps_F64.transform(worldToCamera, X, X_cam);
+
+		if (pixel == null)
+			pixel = new Point3D_F64();
+
+		// Make sure the norm of the point is 1 to avoid numerical issues
+		double n = X_cam.norm();
+		double xx = X_cam.x/n;
+		double yy = X_cam.y/n;
+		double zz = X_cam.z/n;
+
+		pixel.x = fx*xx + skew*yy + cx*zz;
+		pixel.y = fy*yy + cy*zz;
+		pixel.z = zz;
 
 		return pixel;
 	}
