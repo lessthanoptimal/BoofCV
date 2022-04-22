@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -79,7 +79,7 @@ public class ConfigECoCheckMarkers implements Configuration {
 
 	/**
 	 * Parses the standard compact name string and converts it into a configuration. Note that error correction
-	 * 'e' and checksum 'c' are optional.
+	 * 'e' and checksum 'c' are optional. See {@link #compactName} for a summary of this string format.
 	 */
 	public static ConfigECoCheckMarkers parse( String description, double squareSize ) {
 		// 9x7n1e3c6
@@ -153,10 +153,13 @@ public class ConfigECoCheckMarkers implements Configuration {
 	}
 
 	/**
-	 * String which compactly describes markers with duplicate shapes.
+	 * <p>String which compactly describes markers with duplicate shapes.</p>
 	 *
-	 * Example: 9x7n1e3c6 means 9x7 pattern, 1 possible marker, with error correction level of 3, checksum with 6 bits.
-	 * Example: 9x7n1 is the same, but ecc and checksum have default values.
+	 * <ul>
+	 *     <li>Example: 9x7n1e3c6 means 9x7 pattern, 1 possible marker, with error correction level of 3,
+	 *     checksum with 6 bits.</li>
+	 * 	 <li>Example: 9x7n1 is the same, but ecc and checksum have default values.</li>
+	 * </ul>
 	 */
 	public String compactName() {
 		BoofMiscOps.checkEq(1, markerShapes.size(), "Only one unique shape allowed");
