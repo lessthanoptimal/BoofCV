@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.alg.geo.GeoTestingOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.geo.AssociatedPair3D;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
@@ -48,6 +49,7 @@ public abstract class EpipolarTestSimulation extends BoofStandardJUnit {
 	protected Se3_F64 a_to_b;
 	protected List<Point3D_F64> pointsInA;
 	protected List<AssociatedPair> pairs;
+	protected List<AssociatedPair3D> pairsPointing;
 	protected List<Point2D_F64> currentObs;
 
 	public void init( int N , boolean isFundamental ) {
@@ -59,15 +61,21 @@ public abstract class EpipolarTestSimulation extends BoofStandardJUnit {
 
 		// transform points into second camera's reference frame
 		pairs = new ArrayList<>();
+		pairsPointing = new ArrayList<>();
 		currentObs = new ArrayList<>();
 
 		for(Point3D_F64 p1 : pointsInA) {
 			Point3D_F64 p2 = SePointOps_F64.transform(a_to_b, p1, null);
 
-			AssociatedPair pair = new AssociatedPair();
+			var pair = new AssociatedPair();
 			pair.p1.setTo(p1.x/p1.z,p1.y/p1.z);
 			pair.p2.setTo(p2.x/p2.z,p2.y/p2.z);
 			pairs.add(pair);
+
+			var pair3D = new AssociatedPair3D();
+			pair3D.p1.setTo(p1);
+			pair3D.p2.setTo(p2);
+			pairsPointing.add(pair3D);
 
 			if( isFundamental ) {
 				GeometryMath_F64.mult(K, pair.p1, pair.p1);
@@ -87,6 +95,21 @@ public abstract class EpipolarTestSimulation extends BoofStandardJUnit {
 
 		while( ret.size() < N ) {
 			AssociatedPair p = pairs.get(rand.nextInt(pairs.size()));
+			if( !ret.contains(p) )
+				ret.add(p);
+		}
+
+		return ret;
+	}
+
+	/**
+	 * Random observations as pointing vectors
+	 */
+	public List<AssociatedPair3D> randomPairsPointing( int N ) {
+		List<AssociatedPair3D> ret = new ArrayList<>();
+
+		while( ret.size() < N ) {
+			AssociatedPair3D p = pairsPointing.get(rand.nextInt(pairs.size()));
 			if( !ret.contains(p) )
 				ret.add(p);
 		}

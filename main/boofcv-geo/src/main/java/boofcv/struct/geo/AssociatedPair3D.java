@@ -110,6 +110,12 @@ public class AssociatedPair3D {
 		return this;
 	}
 
+	/** Rescale the points so that their norm is 1 */
+	public void normalizePoints() {
+		this.p1.divideIP(this.p1.norm());
+		this.p2.divideIP(this.p2.norm());
+	}
+
 	/**
 	 * Changes the references to the passed in objects.
 	 */

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,9 @@
 package boofcv.alg.geo.f;
 
 import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.geo.AssociatedPair3D;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point3D_F64;
 import org.ddogleg.solver.Polynomial;
 import org.ddogleg.solver.PolynomialRoots;
 import org.ddogleg.solver.impl.FindRealRootsSturm;
@@ -60,7 +62,6 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class EssentialNister5 {
-
 	// Linear system describing p'*E*q = 0
 	private final DMatrixRMaj Q = new DMatrixRMaj(5, 9);
 	// contains the span of A
@@ -95,13 +96,13 @@ public class EssentialNister5 {
 	private final Polynomial poly = new Polynomial(11);
 
 	/**
-	 * Computes the essential matrix from point correspondences.
+	 * Computes the essential matrix from point correspondences in normalized image coordinates.
 	 *
 	 * @param points Input: List of points correspondences in normalized image coordinates
 	 * @param solutions Output: Storage for the found solutions. .
 	 * @return true for success or false if a fault has been detected
 	 */
-	public boolean process( List<AssociatedPair> points, DogArray<DMatrixRMaj> solutions ) {
+	public boolean processNormalized( List<AssociatedPair> points, DogArray<DMatrixRMaj> solutions ) {
 		if (points.size() != 5)
 			throw new IllegalArgumentException("Exactly 5 points are required, not " + points.size());
 		solutions.reset();
@@ -109,6 +110,28 @@ public class EssentialNister5 {
 		// Computes the 4-vector span which contains E. See equations 7-9
 		computeSpan(points);
 
+		return solveForSolutions(solutions);
+	}
+
+	/**
+	 * Computes the essential matrix from point correspondences represented by pointing vectors
+	 *
+	 * @param points Input: List of points correspondences as 3D pointing vectors
+	 * @param solutions Output: Storage for the found solutions. .
+	 * @return true for success or false if a fault has been detected
+	 */
+	public boolean processPointing( List<AssociatedPair3D> points, DogArray<DMatrixRMaj> solutions ) {
+		if (points.size() != 5)
+			throw new IllegalArgumentException("Exactly 5 points are required, not " + points.size());
+		solutions.reset();
+
+		// Computes the 4-vector span which contains E. See equations 7-9
+		computeSpan3(points);
+
+		return solveForSolutions(solutions);
+	}
+
+	private boolean solveForSolutions( DogArray<DMatrixRMaj> solutions ) {
 		// Construct a linear system based on the 10 constraint equations. See equations 5,6, and 10 .
 		helper.setNullSpace(X, Y, Z, W);
 		helper.setupA1(A1);
@@ -147,8 +170,7 @@ public class EssentialNister5 {
 	}
 
 	/**
-	 * From the epipolar constraint p2^T*E*p1 = 0 construct a linear system
-	 * and find its null space.
+	 * From the epipolar constraint p2^T*E*p1 = 0 construct a linear system and find its null space.
 	 */
 	private void computeSpan( List<AssociatedPair> points ) {
 
@@ -173,6 +195,48 @@ public class EssentialNister5 {
 			Q.data[index++] =      b.x;
 			Q.data[index++] =      b.y;
 			Q.data[index++] =  1;
+			// @formatter:on
+		}
+
+		if (!solverNull.process(Q, 4, nullspace))
+			throw new RuntimeException("Nullspace solver should never fail, probably bad input");
+
+		// extract the span of solutions for E from the null space
+		for (int i = 0; i < 9; i++) {
+			X[i] = nullspace.unsafe_get(i, 0);
+			Y[i] = nullspace.unsafe_get(i, 1);
+			Z[i] = nullspace.unsafe_get(i, 2);
+			W[i] = nullspace.unsafe_get(i, 3);
+		}
+	}
+
+	/**
+	 * From the epipolar constraint p2^T*E*p1 = 0 construct a linear system and find its null space.
+	 * Observations as pointing vectors.
+	 */
+	private void computeSpan3( List<AssociatedPair3D> points ) {
+
+		Q.reshape(points.size(), 9);
+		int index = 0;
+
+		for (int i = 0; i < points.size(); i++) {
+			AssociatedPair3D p = points.get(i);
+
+			Point3D_F64 a = p.p2;
+			Point3D_F64 b = p.p1;
+
+			// The points are assumed to be in homogeneous coordinates. This means z = 1
+
+			// @formatter:off
+			Q.data[index++] =  a.x*b.x;
+			Q.data[index++] =  a.x*b.y;
+			Q.data[index++] =  a.x*b.z;
+			Q.data[index++] =  a.y*b.x;
+			Q.data[index++] =  a.y*b.y;
+			Q.data[index++] =  a.y*b.z;
+			Q.data[index++] =  a.z*b.x;
+			Q.data[index++] =  a.z*b.y;
+			Q.data[index++] =  a.z*b.z;
 			// @formatter:on
 		}
 

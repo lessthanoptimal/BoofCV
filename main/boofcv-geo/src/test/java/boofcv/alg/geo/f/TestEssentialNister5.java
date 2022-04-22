@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.geo.f;
 
 import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.geo.AssociatedPair3D;
 import org.ddogleg.struct.DogArray;
 import org.ejml.data.DMatrixRMaj;
 import org.junit.jupiter.api.Test;
@@ -36,9 +37,13 @@ public class TestEssentialNister5 extends EpipolarTestSimulation {
 		createCommonChecks().checkEpipolarMatrix(5, false);
 	}
 
+	@Test void perfectEssentialPointing() {
+		createCommonChecksPointing().checkEpipolarMatrix(5);
+	}
+
 	private CommonFundamentalChecks createCommonChecks() {
 		return new CommonFundamentalChecks() {
-			EssentialNister5 alg = new EssentialNister5();
+			final EssentialNister5 alg = new EssentialNister5();
 
 			{
 				// use a more relaxed tolerance
@@ -48,9 +53,26 @@ public class TestEssentialNister5 extends EpipolarTestSimulation {
 				zeroTol = 0.0001;
 			}
 
-			@Override
-			public void computeFundamental(List<AssociatedPair> pairs , DogArray<DMatrixRMaj> solutions ) {
-				assertTrue(alg.process(pairs,solutions));
+			@Override public void computeFundamental( List<AssociatedPair> pairs, DogArray<DMatrixRMaj> solutions ) {
+				assertTrue(alg.processNormalized(pairs, solutions));
+			}
+		};
+	}
+
+	private CommonEssentialPointingChecks createCommonChecksPointing() {
+		return new CommonEssentialPointingChecks() {
+			final EssentialNister5 alg = new EssentialNister5();
+
+			{
+				// use a more relaxed tolerance
+				// in practice the bad hypotheses seem to get thrown out. The robustness benchmark
+				// also provides a better idea of what's going on and seems to be similar to what
+				// papers show
+				zeroTol = 0.0001;
+			}
+
+			@Override public void computeEssential( List<AssociatedPair3D> pairs, DogArray<DMatrixRMaj> solutions ) {
+				assertTrue(alg.processPointing(pairs, solutions));
 			}
 		};
 	}
