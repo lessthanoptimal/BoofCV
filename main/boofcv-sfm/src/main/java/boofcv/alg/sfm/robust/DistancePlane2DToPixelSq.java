@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.sfm.robust;
 
-import boofcv.alg.geo.NormalizedToPixelError;
+import boofcv.alg.geo.NormalizedToPinholePixelError;
 import boofcv.alg.sfm.overhead.CameraPlaneProjection;
 import boofcv.struct.sfm.PlanePtPixel;
 import georegression.struct.point.Point2D_F64;
@@ -51,10 +51,10 @@ public class DistancePlane2DToPixelSq implements DistanceFromModel<Se2_F64, Plan
 	private CameraPlaneProjection planeProjection = new CameraPlaneProjection();
 
 	// given observations in normalized image coordinates, compute the error in pixels
-	private NormalizedToPixelError errorCamera = new NormalizedToPixelError();
+	private NormalizedToPinholePixelError errorCamera = new NormalizedToPinholePixelError();
 
 	public DistancePlane2DToPixelSq( CameraPlaneProjection planeProjection,
-									 NormalizedToPixelError errorCamera ) {
+									 NormalizedToPinholePixelError errorCamera ) {
 		this.planeProjection = planeProjection;
 		this.errorCamera = errorCamera;
 	}

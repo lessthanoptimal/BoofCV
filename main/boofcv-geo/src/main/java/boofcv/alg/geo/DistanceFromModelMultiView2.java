@@ -16,28 +16,19 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.robust;
+package boofcv.alg.geo;
 
-import boofcv.struct.calib.CameraPinhole;
-import org.ddogleg.fitting.modelset.ModelMatcher;
+import boofcv.struct.distort.Point3Transform2_F64;
+import org.ddogleg.fitting.modelset.DistanceFromModel;
 
 /**
- * {@link ModelMatcher} for multiview problems. Intrinsic camera parameters can be set for each view individually
+ * Computes the observation errors in pixels when the input is in point vector coordinates.
  *
  * @author Peter Abeles
  */
-public interface ModelMatcherMultiview<Model, Point> extends ModelMatcher<Model, Point> {
+public interface DistanceFromModelMultiView2<Model, Point> extends DistanceFromModel<Model, Point> {
 
-	/**
-	 * Specify intrinsic parameters for a particular view
-	 *
-	 * @param view which view this belongs to
-	 * @param intrinsic intrinsic parameters that it should be set to
-	 */
-	void setIntrinsic( int view, CameraPinhole intrinsic );
+	void setDistortion( int view, Point3Transform2_F64 intrinsic );
 
-	/**
-	 * Returns the new of views which need to be set
-	 */
 	int getNumberOfViews();
 }

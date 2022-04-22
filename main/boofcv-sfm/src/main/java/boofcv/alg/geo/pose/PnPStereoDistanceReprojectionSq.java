@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.geo.pose;
 
 import boofcv.alg.geo.DistanceFromModelMultiView;
-import boofcv.alg.geo.NormalizedToPixelError;
+import boofcv.alg.geo.NormalizedToPinholePixelError;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.sfm.Stereo2D3D;
@@ -54,11 +54,11 @@ public class PnPStereoDistanceReprojectionSq implements DistanceFromModelMultiVi
 	// transform from left to right camera. Assumed to be known.
 	private Se3_F64 leftToRight = new Se3_F64();
 	// computes the error in units of pixels. Assumed to be known
-	private NormalizedToPixelError leftPixelError = new NormalizedToPixelError();
-	private NormalizedToPixelError rightPixelError = new NormalizedToPixelError();
+	private NormalizedToPinholePixelError leftPixelError = new NormalizedToPinholePixelError();
+	private NormalizedToPinholePixelError rightPixelError = new NormalizedToPinholePixelError();
 
-	public PnPStereoDistanceReprojectionSq( NormalizedToPixelError leftPixelError,
-											NormalizedToPixelError rightPixelError,
+	public PnPStereoDistanceReprojectionSq( NormalizedToPinholePixelError leftPixelError,
+											NormalizedToPinholePixelError rightPixelError,
 											Se3_F64 leftToRight ) {
 		this.leftPixelError = leftPixelError;
 		this.rightPixelError = rightPixelError;

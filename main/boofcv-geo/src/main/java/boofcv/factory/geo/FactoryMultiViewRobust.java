@@ -200,7 +200,7 @@ public class FactoryMultiViewRobust {
 	 * @param configRansac Parameters for RANSAC. Can't be null.
 	 * @return Robust Se3_F64 estimator
 	 */
-	public static ModelMatcherMultiview<Se3_F64, AssociatedPair>
+	public static RansacCalibrated<Se3_F64, AssociatedPair>
 	baselineRansac( @Nullable ConfigEssential configEssential, ConfigRansac configRansac ) {
 		if (configEssential == null)
 			configEssential = new ConfigEssential();
@@ -231,7 +231,7 @@ public class FactoryMultiViewRobust {
 
 	/**
 	 * Robust solution for estimating the stereo baseline {@link Se3_F64} using epipolar geometry from two views with
-	 * {@link RansacCalibrated}. Input observations are in pointing vectors.
+	 * {@link RansacCalibrated2}. Input observations are in pointing vector coordinates.
 	 *
 	 * <p>See code for all the details.</p>
 	 *
@@ -239,7 +239,7 @@ public class FactoryMultiViewRobust {
 	 * @param configRansac Parameters for RANSAC. Can't be null.
 	 * @return Robust Se3_F64 estimator
 	 */
-	public static ModelMatcherMultiview<Se3_F64, AssociatedPair3D>
+	public static RansacCalibrated2<Se3_F64, AssociatedPair3D>
 	baselinePointingRansac( @Nullable ConfigEssential configEssential, ConfigRansac configRansac ) {
 		if (configEssential == null)
 			configEssential = new ConfigEssential();
@@ -262,7 +262,7 @@ public class FactoryMultiViewRobust {
 
 		double ransacTOL = configRansac.inlierThreshold*configRansac.inlierThreshold*2.0;
 
-		return new RansacCalibrated<>(configRansac.randSeed, configRansac.iterations, ransacTOL,
+		return new RansacCalibrated2<>(configRansac.randSeed, configRansac.iterations, ransacTOL,
 				manager, generateEpipolarMotion, distanceSe3);
 	}
 

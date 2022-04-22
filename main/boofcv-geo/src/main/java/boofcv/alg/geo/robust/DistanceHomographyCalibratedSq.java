@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.geo.robust;
 
 import boofcv.alg.geo.DistanceFromModelMultiView;
-import boofcv.alg.geo.NormalizedToPixelError;
+import boofcv.alg.geo.NormalizedToPinholePixelError;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.homography.Homography2D_F64;
@@ -40,7 +40,7 @@ import java.util.List;
 public class DistanceHomographyCalibratedSq implements DistanceFromModelMultiView<Homography2D_F64, AssociatedPair> {
 	Homography2D_F64 model;
 	private Point2D_F64 expected = new Point2D_F64();
-	private NormalizedToPixelError errorCam2 = new NormalizedToPixelError();
+	private NormalizedToPinholePixelError errorCam2 = new NormalizedToPinholePixelError();
 
 	@Override
 	public void setModel( Homography2D_F64 model ) {

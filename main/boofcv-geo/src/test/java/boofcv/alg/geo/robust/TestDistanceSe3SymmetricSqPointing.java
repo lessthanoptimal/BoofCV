@@ -19,10 +19,13 @@
 package boofcv.alg.geo.robust;
 
 import boofcv.abst.geo.Triangulate2PointingMetricH;
+import boofcv.alg.distort.SphereToNarrowPixel_F64;
 import boofcv.alg.geo.PerspectiveOps;
+import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.factory.geo.ConfigTriangulation;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.calib.CameraPinhole;
+import boofcv.struct.distort.Point3Transform2_F64;
 import boofcv.struct.geo.AssociatedPair3D;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.GeometryMath_F64;
@@ -48,9 +51,11 @@ public class TestDistanceSe3SymmetricSqPointing extends BoofStandardJUnit {
 	DistanceSe3SymmetricSqPointing alg;
 
 	public TestDistanceSe3SymmetricSqPointing() {
+		var intrinsics = new CameraPinhole(1, 1, 0, 0, 0, 0, 0);
+		Point3Transform2_F64 distortion = new SphereToNarrowPixel_F64(LensDistortionFactory.narrow(intrinsics).distort_F64(false, true));
 		alg = new DistanceSe3SymmetricSqPointing(triangulate);
-		alg.setIntrinsic(0, new CameraPinhole(1, 1, 0, 0, 0, 0, 0));
-		alg.setIntrinsic(1, new CameraPinhole(1, 1, 0, 0, 0, 0, 0));
+		alg.setDistortion(0, distortion);
+		alg.setDistortion(1, distortion);
 	}
 
 	/**
@@ -243,9 +248,14 @@ public class TestDistanceSe3SymmetricSqPointing extends BoofStandardJUnit {
 		GeometryMath_F64.mult(K1_inv, obsP.p1, obsP.p1);
 		GeometryMath_F64.mult(K2_inv, obsP.p2, obsP.p2);
 
+		Point3Transform2_F64 distortion1 = new SphereToNarrowPixel_F64(LensDistortionFactory.narrow(
+				PerspectiveOps.matrixToPinhole(K1, 0, 0, null)).distort_F64(false, true));
+		Point3Transform2_F64 distortion2 = new SphereToNarrowPixel_F64(LensDistortionFactory.narrow(
+				PerspectiveOps.matrixToPinhole(K2, 0, 0, null)).distort_F64(false, true));
+
 		var alg = new DistanceSe3SymmetricSqPointing(triangulate);
-		alg.setIntrinsic(0, PerspectiveOps.matrixToPinhole(K1, 0, 0, null));
-		alg.setIntrinsic(1, PerspectiveOps.matrixToPinhole(K2, 0, 0, null));
+		alg.setDistortion(0, distortion1);
+		alg.setDistortion(1, distortion2);
 		alg.setModel(keyToCurr);
 		assertEquals(error, alg.distance(obsP), 1e-8);
 	}

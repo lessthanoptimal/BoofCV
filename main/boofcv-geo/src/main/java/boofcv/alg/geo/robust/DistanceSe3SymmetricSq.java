@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.geo.robust;
 
 import boofcv.abst.geo.Triangulate2ViewsMetricH;
 import boofcv.alg.geo.DistanceFromModelMultiView;
-import boofcv.alg.geo.NormalizedToPixelError;
+import boofcv.alg.geo.NormalizedToPinholePixelError;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.AssociatedPair;
@@ -71,8 +71,8 @@ public class DistanceSe3SymmetricSq implements DistanceFromModelMultiView<Se3_F6
 	private Point4D_F64 p = new Point4D_F64();
 
 	// Used to compute error in pixels
-	private NormalizedToPixelError errorCam1 = new NormalizedToPixelError();
-	private NormalizedToPixelError errorCam2 = new NormalizedToPixelError();
+	private NormalizedToPinholePixelError errorCam1 = new NormalizedToPinholePixelError();
+	private NormalizedToPinholePixelError errorCam2 = new NormalizedToPinholePixelError();
 
 	/**
 	 * Configure distance calculation.
