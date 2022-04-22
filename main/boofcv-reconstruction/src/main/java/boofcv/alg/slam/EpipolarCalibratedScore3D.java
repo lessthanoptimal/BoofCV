@@ -39,7 +39,7 @@ public interface EpipolarCalibratedScore3D extends VerbosePrint {
 	 * Estimates the amount of 3D information contained between the two observations
 	 *
 	 * @param imageShapeA (Input) Camera A: Image size
- 	 * @param iamgeShapeB (Input) Camera B: Image size
+ 	 * @param imageShapeB (Input) Camera B: Image size
 	 * @param pointToPixelA (Input) Camera A: Projector from pointing to image pixel
 	 * @param pointToPixelB (Input) Camera B: Projector from pointing to image pixel
 	 * @param obsA (Input) Camera A: Pointing vector of feature observations
@@ -48,7 +48,7 @@ public interface EpipolarCalibratedScore3D extends VerbosePrint {
 	 * @param a_to_b (Input) If not null, then it specifies the extrinsic relationship between the views
 	 * @param inliersIdx (Output) Which features inside of pairs are in the inlier sets
 	 */
-	void process( ImageDimension imageShapeA, ImageDimension iamgeShapeB,
+	void process( ImageDimension imageShapeA, ImageDimension imageShapeB,
 				  Point3Transform2_F64 pointToPixelA, Point3Transform2_F64 pointToPixelB,
 				  List<Point3D_F64> obsA, List<Point3D_F64> obsB,
 				  List<AssociatedIndex> pairs, @Nullable Se3_F64 a_to_b, DogArray_I32 inliersIdx );

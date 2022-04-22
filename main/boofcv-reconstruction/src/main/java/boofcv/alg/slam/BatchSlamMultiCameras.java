@@ -28,11 +28,26 @@ import boofcv.alg.structure.LookUpSimilarImages;
  * @author Peter Abeles
  */
 public class BatchSlamMultiCameras {
-	public void initialize( MultiCameraSystem sensor ) {
 
+	GeneratePairwiseGraphFromMultiCameraSystem generatePairwise;
+
+	public void process( MultiCameraSystem sensors, LookUpSimilarImages similarImages ) {
+		// Learn how much geometric information is available between views
+		generatePairwise.process(sensors, similarImages);
+
+		// TODO score views to act as a seed
+
+		// TODO select view with the best seed score
+
+		// TODO pick a seed, grow the reconstruction graph until there are no more views it can add
+
+		// TODO pick another view as a seed until all have been added to a graph
 	}
 
-	public void process( LookUpSimilarImages similarImages ) {
+	/**
+	 * Score each view as a potential seed.
+	 */
+	void scoreViewsAsSeeds() {
 
 	}
 }

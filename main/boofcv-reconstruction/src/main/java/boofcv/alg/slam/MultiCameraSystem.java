@@ -19,6 +19,7 @@
 package boofcv.alg.slam;
 
 import boofcv.alg.distort.LensDistortionWideFOV;
+import boofcv.struct.image.ImageDimension;
 import georegression.struct.se.Se3_F64;
 import org.jetbrains.annotations.Nullable;
 
@@ -56,11 +57,16 @@ public class MultiCameraSystem {
 		public final String name;
 		public final LensDistortionWideFOV intrinsics;
 		public final Se3_F64 cameraToSensor = new Se3_F64();
+		public final ImageDimension shape = new ImageDimension();
 
 		public Camera( String name, Se3_F64 cameraToSensor, LensDistortionWideFOV intrinsics ) {
 			this.name = name;
 			this.cameraToSensor.setTo(cameraToSensor);
 			this.intrinsics = intrinsics;
+		}
+
+		public int getSideLength() {
+			return (shape.width + shape.height)/2;
 		}
 	}
 }

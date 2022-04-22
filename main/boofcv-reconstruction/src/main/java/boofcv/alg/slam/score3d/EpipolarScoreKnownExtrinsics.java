@@ -32,6 +32,7 @@ import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import lombok.Getter;
+import lombok.Setter;
 import org.ddogleg.struct.DogArray_I32;
 import org.jetbrains.annotations.Nullable;
 
@@ -53,7 +54,7 @@ public class EpipolarScoreKnownExtrinsics implements EpipolarCalibratedScore3D {
 	@Getter public ConfigLength maxReprojectionError = ConfigLength.relative(0.006, 2);
 
 	/** Larger values reduces influence of residual error */
-	@Getter public double dampeneddResidualError = 50;
+	@Getter @Setter public double dampenedResidualError = 50;
 
 	// Triangulates location of points
 	Triangulate2PointingMetricH triangulator = FactoryMultiView.triangulate2PointingMetricH(null);
@@ -81,7 +82,7 @@ public class EpipolarScoreKnownExtrinsics implements EpipolarCalibratedScore3D {
 	PrintStream verbose;
 
 	@Override
-	public void process( ImageDimension imageShapeA, ImageDimension iamgeShapeB,
+	public void process( ImageDimension imageShapeA, ImageDimension imageShapeB,
 						 Point3Transform2_F64 pointToPixelA, Point3Transform2_F64 pointToPixelB,
 						 List<Point3D_F64> obsA, List<Point3D_F64> obsB,
 						 List<AssociatedIndex> pairs, @Nullable Se3_F64 a_to_b, DogArray_I32 inliersIdx ) {
@@ -93,7 +94,7 @@ public class EpipolarScoreKnownExtrinsics implements EpipolarCalibratedScore3D {
 		// Find the inlier set by looking at reprojection error in each view. Tolerance is computed for each
 		// view since the image size could be different
 		errorTolA = maxReprojectionError.compute((imageShapeA.width + imageShapeA.height)/2.0);
-		errorTolB = maxReprojectionError.compute((iamgeShapeB.width + iamgeShapeB.height)/2.0);
+		errorTolB = maxReprojectionError.compute((imageShapeB.width + imageShapeB.height)/2.0);
 
 		// Use squared error since it's faster to compute
 		errorTolA *= errorTolA;
@@ -109,7 +110,7 @@ public class EpipolarScoreKnownExtrinsics implements EpipolarCalibratedScore3D {
 		// after translation has been removed. Adjust so that a value close to zero is bad
 		score3D = inliersIdx.size/(2.0 + countNoTranslation);
 		// Prefer smaller residual error and larger error with no translation
-		score3D *= (dampeneddResidualError + residualErrorNoTranslation)/(dampeneddResidualError + residualError);
+		score3D *= (dampenedResidualError + residualErrorNoTranslation)/(dampenedResidualError + residualError);
 		is3D = inliersIdx.size > (countNoTranslation + 1)*2;
 	}
 

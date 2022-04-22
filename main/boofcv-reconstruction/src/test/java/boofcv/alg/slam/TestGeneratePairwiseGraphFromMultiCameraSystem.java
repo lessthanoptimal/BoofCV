@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
-class TestScoreViewSeedGeometry {
+class TestGeneratePairwiseGraphFromMultiCameraSystem {
 	@Test void implement() {
 		fail("Implement");
 	}
