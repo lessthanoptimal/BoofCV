@@ -547,7 +547,7 @@ public class CameraCalibrationMono extends BaseStandardInputApp {
 
 			// Save calibration statistics to disk
 			if (outputDirectory != null) {
-				try (var out = new PrintWriter(new File(outputDirectory, "quality.txt"))) {
+				try (var out = new PrintWriter(new File(outputDirectory, "calibration_metrics.txt"))) {
 					out.println(metricText);
 				} catch (FileNotFoundException e) {
 					throw new RuntimeException(e);

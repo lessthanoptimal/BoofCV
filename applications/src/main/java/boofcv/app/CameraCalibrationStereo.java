@@ -92,6 +92,9 @@ public class CameraCalibrationStereo {
 	@Option(name = "--SaveLandmarks", usage = "Save detected landmarks")
 	protected boolean saveLandmarks = false;
 
+	@Option(name = "--SaveMetrics", usage = "Save calibration quality metrics to a file")
+	protected boolean saveMetrics = false;
+
 	@Option(name = "--Verbose", usage = "Verbose printing to stdout")
 	protected boolean verbose = false;
 
@@ -259,7 +262,8 @@ public class CameraCalibrationStereo {
 		// Detect markers in images and pass to calibrator
 		if (verbose) System.out.println("total pairs: " + stereoImages.size());
 		GrayF32 image = new GrayF32(1, 1);
-		File landmarksPath = new File(new File(outputPath).getParentFile(), "landmarks");
+		File outputDir = new File(outputPath).getParentFile();
+		File landmarksPath = new File(outputDir, "landmarks");
 		String detectorName = detector.getClass().getSimpleName();
 
 		if (saveLandmarks && !landmarksPath.exists()) {
@@ -306,10 +310,12 @@ public class CameraCalibrationStereo {
 		if (verbose)
 			System.out.println(metricText);
 
-		try (var out = new PrintWriter(new File(inputDir, "quality.txt"))) {
-			out.println(metricText);
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
+		if (saveMetrics) {
+			try (var out = new PrintWriter(new File(outputDir, "calibration_metrics.txt"))) {
+				out.println(metricText);
+			} catch (FileNotFoundException e) {
+				throw new RuntimeException(e);
+			}
 		}
 	}
 
