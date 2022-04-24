@@ -83,7 +83,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 
 	SceneMergingOperations mergeOps = new SceneMergingOperations();
 
-	/** Which scenes are include which views */
+	/** Keeps track of which views are in which scenes */
 	PairwiseViewScenes scenesInEachView = new PairwiseViewScenes();
 
 	public MetricFromUncalibratedPairwiseGraph( PairwiseGraphUtils utils ) {
@@ -116,7 +116,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 	public boolean process( LookUpSimilarImages dbSimilar, LookUpCameraInfo dbCams, PairwiseImageGraph pairwise ) {
 		scenes.reset();
 
-		// Declare storage for book keeping at each view
+		// Declare storage for bookkeeping at each view
 		scenesInEachView.initialize(pairwise);
 
 		// Score nodes for their ability to be seeds

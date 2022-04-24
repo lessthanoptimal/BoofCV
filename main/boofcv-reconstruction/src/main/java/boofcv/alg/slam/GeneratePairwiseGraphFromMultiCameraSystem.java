@@ -257,12 +257,4 @@ public class GeneratePairwiseGraphFromMultiCameraSystem {
 			pointing.reset();
 		}
 	}
-
-	/**
-	 * Checks to see if the two views were captured at the same moment in time.
-	 */
-	@FunctionalInterface
-	public interface CheckSynchronized {
-		boolean isSynchronized( String viewA, String viewB );
-	}
 }
