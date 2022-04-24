@@ -24,8 +24,10 @@ import boofcv.abst.filter.binary.BinaryContourFinder;
 import boofcv.alg.fiducial.calib.squares.SquareEdge;
 import boofcv.alg.fiducial.calib.squares.SquareNode;
 import boofcv.alg.fiducial.microqr.MicroQrCode;
+import boofcv.alg.fiducial.qrcode.PackedBits8;
 import boofcv.alg.fiducial.qrcode.PositionPatternNode;
 import boofcv.alg.fiducial.qrcode.QrCode;
+import boofcv.alg.fiducial.qrcode.QrCodeBinaryGridToPixel;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.demonstrations.shapes.DetectBlackShapeAppBase;
@@ -45,7 +47,9 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.metric.Intersection2D_F64;
+import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.DogArray;
 
@@ -55,6 +59,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -206,7 +211,8 @@ public class DetectMicroQrApp<T extends ImageGray<T>>
 
 		// TODO Copy all data that's visualized outside so that GUI doesn't lock
 		synchronized (this) {
-//			detector.setVerbose(System.out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));
+			detector.setVerbose(controlPanel.checkVerbose.value ? System.out : null,
+					BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));
 			long before = System.nanoTime();
 			detector.process((T)input);
 			long after = System.nanoTime();
@@ -285,9 +291,12 @@ public class DetectMicroQrApp<T extends ImageGray<T>>
 	}
 
 	class VisualizePanel extends ShapeVisualizePanel {
-		@Override
-		protected void paintInPanel( AffineTransform tran, Graphics2D g2 ) {
+		QrCodeBinaryGridToPixel locator = new QrCodeBinaryGridToPixel();
+		Point2D_F32 pixel = new Point2D_F32();
+		BasicStroke binaryDotsStroke = new BasicStroke(2);
+		Ellipse2D.Double ellipse = new Ellipse2D.Double();
 
+		@Override protected void paintInPanel( AffineTransform tran, Graphics2D g2 ) {
 			var controls = (DetectMicroQrControlPanel)DetectMicroQrApp.this.controls;
 			BoofSwingUtil.antialiasing(g2);
 
@@ -331,21 +340,21 @@ public class DetectMicroQrApp<T extends ImageGray<T>>
 					}
 				}
 
-//				if (controls.bShowBits) {
-//					synchronized (detected) {
-//						for (int i = 0; i < detected.size(); i++) {
-//							MicroQrCode qr = detected.get(i);
-//							renderBinaryValues(g2, qr);
-//						}
-//
-//						for (int i = 0; i < failures.size(); i++) {
-//							QrCode qr = failures.get(i);
-//							if (qr.failureCause.ordinal() < ALIGNMENT.ordinal())
-//								continue;
-//							renderBinaryValues(g2, qr);
-//						}
-//					}
-//				}
+				if (controls.bShowBits) {
+					synchronized (detected) {
+						for (int i = 0; i < detected.size(); i++) {
+							MicroQrCode qr = detected.get(i);
+							renderBinaryValues(g2, qr);
+						}
+
+						for (int i = 0; i < failures.size(); i++) {
+							MicroQrCode qr = failures.get(i);
+							if (qr.failureCause.ordinal() < ALIGNMENT.ordinal())
+								continue;
+							renderBinaryValues(g2, qr);
+						}
+					}
+				}
 
 				if (controls.bShowSquares) {
 					// todo copy after process() to avoid thread issues
@@ -393,10 +402,47 @@ public class DetectMicroQrApp<T extends ImageGray<T>>
 				}
 			}
 		}
+
+		private void renderBinaryValues( Graphics2D g2, MicroQrCode qr ) {
+			locator.setHomographyInv(qr.Hinv);
+
+			List<Point2D_I32> points = MicroQrCode.LOCATION_BITS[qr.version];
+
+			int numDataBits = qr.getMaxDataBits();
+
+			var bits = new PackedBits8();
+			bits.data = qr.rawbits;
+			bits.size = points.size();
+
+			g2.setStroke(binaryDotsStroke);
+			for (int i = 0; i < points.size(); i++) {
+				// end of data bits is sometimes filled with zeros
+				int bitIndex = i < numDataBits ? i : i + numDataBits%8;
+				Point2D_I32 c = points.get(i);
+				locator.gridToImage(c.y + 0.5f, c.x + 0.5f, pixel);
+				int value = qr.mask.apply(c.y, c.x, bits.get(bitIndex));
+
+				if (value == 1) {
+					renderCircleAt(g2, pixel, Color.BLACK, Color.LIGHT_GRAY);
+				} else if (value == 0) {
+					renderCircleAt(g2, pixel, Color.WHITE, Color.LIGHT_GRAY);
+				} else {
+					renderCircleAt(g2, pixel, Color.RED, Color.LIGHT_GRAY);
+				}
+			}
+		}
+
+		private void renderCircleAt( Graphics2D g2, Point2D_F32 p, Color center, Color border ) {
+			double r = 4;
+			ellipse.setFrame(scale*p.x - r, scale*p.y - r, r*2, r*2);
+			g2.setColor(center);
+			g2.fill(ellipse);
+			g2.setColor(border);
+			g2.draw(ellipse);
+		}
 	}
 
-	@Override
-	public void viewUpdated() {
+	@Override public void viewUpdated() {
 		BufferedImage active;
 		if (controls.selectedView == 0) {
 			active = original;
