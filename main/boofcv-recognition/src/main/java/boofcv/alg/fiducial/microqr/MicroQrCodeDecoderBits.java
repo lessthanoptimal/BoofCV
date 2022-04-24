@@ -110,6 +110,9 @@ public class MicroQrCodeDecoderBits implements VerbosePrint {
 		// Used to indicate when there's no more messages
 		int terminatorBits = qr.terminatorBits();
 
+		// How many bits are used to encode the mode
+		int modeLength = MicroQrCode.modeIndicatorBitCount(qr.version);
+
 		// Which encoding it used in BYTE mode
 		String byteEncoding = "";
 		// if there isn't enough bits left to read the mode it must be done
@@ -123,7 +126,6 @@ public class MicroQrCodeDecoderBits implements VerbosePrint {
 				break;
 			}
 
-			int modeLength = MicroQrCode.modeIndicatorBitCount(qr.version);
 			if (location + modeLength > decodeBits.size) {
 				if (verbose != null) verbose.println("reading mode overflowed");
 				qr.failureCause = QrCode.Failure.MESSAGE_OVERFLOW;
@@ -132,14 +134,18 @@ public class MicroQrCodeDecoderBits implements VerbosePrint {
 			QrCode.Mode mode;
 			if (modeLength >= 0) {
 				int modeBits = decodeBits.read(location, modeLength, true);
-				location += modeLength;
 				mode = MicroQrCode.valueToMode(modeBits);
 
 				// See if something went really wrong
 				if (mode == QrCode.Mode.UNKNOWN) {
-					if (verbose != null) verbose.println("mode=UNKNOWN Bad encoding?");
+					if (verbose != null)
+						verbose.println("mode=UNKNOWN Bad encoding? modeValue=" + modeBits +
+								" location=" + (location - modeLength) + "/" + decodeBits.size);
+					// NOTE: One online encoder causes unknown mode since it either tries to put it into ECI mode
+					//       or added an invalid padding to terminate.
 					return false;
 				}
+				location += modeLength;
 			} else {
 				mode = QrCode.Mode.NUMERIC;
 			}

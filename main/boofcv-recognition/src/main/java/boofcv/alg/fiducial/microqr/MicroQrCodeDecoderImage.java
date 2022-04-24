@@ -107,6 +107,11 @@ public class MicroQrCodeDecoderImage<T extends ImageGray<T>> implements VerboseP
 						qr.bitsTransposed = transposed == 1;
 						success = true;
 						break escape;
+					} else if (qr.failureCause.ordinal() > QrCode.Failure.ERROR_CORRECTION.ordinal()) {
+						// If ECC was successful and it still failed, that means there's a bug in this decoder
+						// or the decoder is non-compliant / buggy
+						success = false;
+						break escape;
 					}
 
 					// Try another orientation
