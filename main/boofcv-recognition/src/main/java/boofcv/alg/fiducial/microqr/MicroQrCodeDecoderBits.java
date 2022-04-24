@@ -146,20 +146,27 @@ public class MicroQrCodeDecoderBits implements VerbosePrint {
 			qr.mode = updateModeLogic(qr.mode, mode);
 			if (verbose != null) verbose.println("_ mode=" + mode);
 
-			switch (mode) {
-				case NUMERIC -> location = decodeNumeric(qr, decodeBits, location);
-				case ALPHANUMERIC -> location = decodeAlphanumeric(qr, decodeBits, location);
-				case BYTE -> {
-					location = decodeByte(qr, decodeBits, location);
-					if (byteEncoding.isEmpty())
-						byteEncoding = utils.selectedByteEncoding;
+			try {
+				switch (mode) {
+					case NUMERIC -> location = decodeNumeric(qr, decodeBits, location);
+					case ALPHANUMERIC -> location = decodeAlphanumeric(qr, decodeBits, location);
+					case BYTE -> {
+						location = decodeByte(qr, decodeBits, location);
+						if (byteEncoding.isEmpty())
+							byteEncoding = utils.selectedByteEncoding;
+					}
+					case KANJI -> location = decodeKanji(qr, decodeBits, location);
+					default -> {
+						if (verbose != null) verbose.println("Bad mode. mode=" + mode);
+						qr.failureCause = QrCode.Failure.UNKNOWN_MODE;
+						return false;
+					}
 				}
-				case KANJI -> location = decodeKanji(qr, decodeBits, location);
-				default -> {
-					if (verbose != null) verbose.println("Bad mode. mode=" + mode);
-					qr.failureCause = QrCode.Failure.UNKNOWN_MODE;
-					return false;
-				}
+			} catch (RuntimeException e) {
+				if (verbose != null)
+					verbose.println("Exception decoding: type=" + e.getClass().getSimpleName() +
+							" message='" + e.getMessage() + "'");
+				qr.failureCause = QrCode.Failure.DECODING_MESSAGE;
 			}
 
 			if (verbose != null)
