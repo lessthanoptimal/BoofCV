@@ -62,6 +62,7 @@ public class DetectMicroQrControlPanel extends DetectBlackShapePanel implements 
 	JCheckBox showPositionPattern = checkbox("Pos. Pattern", bShowPositionPattern);
 	JCheckBox showContour = checkbox("Contour", bShowContour);
 	JCheckBoxValue checkTransposed = checkboxWrap("Transposed", config.considerTransposed).tt("Consider markers with bits transposed");
+	JCheckBoxValue checkVerbose = checkboxWrap("Verbose", false).tt("Verbose print to stdout");
 
 	DetectBlackPolygonControlPanel polygonPanel;
 
@@ -109,6 +110,7 @@ public class DetectMicroQrControlPanel extends DetectBlackShapePanel implements 
 		addLabeled(selectZoom, "Zoom");
 		add(togglePanel);
 		addAlignLeft(checkTransposed.check);
+		addAlignLeft(checkVerbose.check);
 		add(tabbedPanel);
 		addVerticalGlue();
 		setPreferredSize(new Dimension(250, 200));
