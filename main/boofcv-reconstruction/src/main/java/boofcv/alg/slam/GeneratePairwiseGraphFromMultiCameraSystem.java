@@ -61,7 +61,7 @@ public class GeneratePairwiseGraphFromMultiCameraSystem {
 
 	// Describes the multi-camera system being used
 	MultiCameraSystem sensors;
-	Map<String, String> viewToCamera = new HashMap<>();
+	ViewToCamera viewToCamera;
 
 	// Storage for pointing vector of each observation
 	Map<String, ViewObservations> viewToInfo = new HashMap<>();
@@ -90,10 +90,12 @@ public class GeneratePairwiseGraphFromMultiCameraSystem {
 	final DogArray<AssociatedPair3D> associations = new DogArray<>(AssociatedPair3D::new);
 
 	public GeneratePairwiseGraphFromMultiCameraSystem( MultiCameraSystem sensors,
+													   ViewToCamera viewToCamera,
 													   RansacCalibrated2<Se3_F64, AssociatedPair3D> robustExtrinsic,
 													   EpipolarCalibratedScore3D scorer,
-													   CheckSynchronized checkSynchronized) {
+													   CheckSynchronized checkSynchronized ) {
 		this.sensors = sensors;
+		this.viewToCamera = viewToCamera;
 		this.robustExtrinsic = robustExtrinsic;
 		this.scorer = scorer;
 		this.checkSynchronized = checkSynchronized;
@@ -120,12 +122,12 @@ public class GeneratePairwiseGraphFromMultiCameraSystem {
 	/**
 	 * Loads pixels observations for a view then computing pointing vectors for each observation and saves the result
 	 */
-	protected void computePointingVectors( String viewId, LookUpSimilarImages similarImages) {
+	protected void computePointingVectors( String viewId, LookUpSimilarImages similarImages ) {
 		// Load pixel coordinates of observations
 		similarImages.lookupPixelFeats(viewId, pixels);
 
 		// Load conversion to pointing vector
-		String cameraId = viewToCamera.get(viewId);
+		String cameraId = viewToCamera.lookup(viewId);
 		Point2Transform3_F64 pixelToPointing = sensors.lookupCamera(cameraId).intrinsics.undistortPtoS_F64();
 
 		// Transform points to pointing
@@ -147,10 +149,10 @@ public class GeneratePairwiseGraphFromMultiCameraSystem {
 	 * @param viewA The target view who's connections are going to be examined.
 	 * @param similarImages Used to look which views have a relationship with the target view.
 	 */
-	protected void scoreConnectedViews( String viewA, LookUpSimilarImages similarImages) {
+	protected void scoreConnectedViews( String viewA, LookUpSimilarImages similarImages ) {
 		PairwiseImageGraph.View pa = pairwise.createNode(viewA);
 		ViewObservations obsA = viewToInfo.get(viewA);
-		MultiCameraSystem.Camera cameraA = sensors.lookupCamera(viewToCamera.get(viewA));
+		MultiCameraSystem.Camera cameraA = sensors.lookupCamera(viewToCamera.lookup(viewA));
 		Point3Transform2_F64 pointingToPixelA = cameraA.intrinsics.distortStoP_F64();
 
 		// To avoid considering the same pair twice, filter out views with a higher index
@@ -163,7 +165,7 @@ public class GeneratePairwiseGraphFromMultiCameraSystem {
 		for (int i = 0; i < foundSimilar.size(); i++) {
 			String viewB = foundSimilar.get(i);
 			ViewObservations obsB = viewToInfo.get(viewB);
-			MultiCameraSystem.Camera cameraB = sensors.lookupCamera(viewToCamera.get(viewB));
+			MultiCameraSystem.Camera cameraB = sensors.lookupCamera(viewToCamera.lookup(viewB));
 			Point3Transform2_F64 pointingToPixelB = cameraB.intrinsics.distortStoP_F64();
 
 			// Which image features have been paired together
@@ -196,7 +198,7 @@ public class GeneratePairwiseGraphFromMultiCameraSystem {
 	protected boolean estimateBaseline( String viewA, String viewB,
 										MultiCameraSystem.Camera cameraA, MultiCameraSystem.Camera cameraB,
 										Point3Transform2_F64 pointingToPixelA, Point3Transform2_F64 pointingToPixelB,
-										Se3_F64 b_to_a) {
+										Se3_F64 b_to_a ) {
 		// Compute RANSAC inlier tolerance relative to image size
 		double errorTolA = maxReprojectionError.compute(cameraA.getSideLength());
 		double errorTolB = maxReprojectionError.compute(cameraB.getSideLength());

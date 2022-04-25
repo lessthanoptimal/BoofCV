@@ -54,6 +54,7 @@ public class MultiCameraSystem {
 	}
 
 	public static class Camera {
+		public int index;
 		public final String name;
 		public final LensDistortionWideFOV intrinsics;
 		public final Se3_F64 cameraToSensor = new Se3_F64();

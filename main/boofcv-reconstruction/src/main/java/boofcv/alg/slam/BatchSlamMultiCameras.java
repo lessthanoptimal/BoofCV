@@ -20,12 +20,18 @@ package boofcv.alg.slam;
 
 import boofcv.alg.structure.LookUpSimilarImages;
 import boofcv.alg.structure.PairwiseImageGraph;
+import boofcv.alg.structure.SceneWorkingGraph;
+import boofcv.misc.BoofMiscOps;
 import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_B;
 import org.ddogleg.struct.FastAccess;
+import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Batch Simultaneous Location and Mapping (SLAM) system which assumed a known multi camera system is viewing the world.
@@ -34,7 +40,12 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class BatchSlamMultiCameras {
+public class BatchSlamMultiCameras implements VerbosePrint {
+
+	// Handling known baseline in multi-camera systems
+	// - TLDR for now ignore this constraint
+	// - TODO How to handle that the baseline between cameras in multi-camera system is assumed to be known?
+	// - TODO if the location of one view is known then the location of all views from camera system is known
 
 	int countConsideredConnections = 3;
 
@@ -44,6 +55,17 @@ public class BatchSlamMultiCameras {
 	GeneratePairwiseGraphFromMultiCameraSystem generatePairwise;
 
 	DogArray<SeedInfo> seeds = new DogArray<>(SeedInfo::new, SeedInfo::reset);
+	DogArray_B viewUsed = new DogArray_B();
+
+	DogArray<SceneWorkingGraph> scenes = new DogArray<>(SceneWorkingGraph::new, SceneWorkingGraph::reset);
+
+	MultiCameraSystem sensors;
+	ViewToCamera viewToCamera;
+
+	// If a scene as a known scale, which means the seed has a pair of views with a known extrinsic relationship
+	boolean activeSceneKnownScale;
+
+	PrintStream verbose;
 
 	public void process( MultiCameraSystem sensors, LookUpSimilarImages similarImages ) {
 		// Learn how much geometric information is available between views
@@ -52,14 +74,33 @@ public class BatchSlamMultiCameras {
 		// Decide which views are preferred as seeds
 		scoreViewsAsSeeds();
 
+		// All views can be used as a seed or added to a scene
+		viewUsed.resetResize(seeds.size, true);
+
 		// Select seeds and perform reconstructions
+		PairwiseImageGraph pairwise = generatePairwise.getPairwise();
 		while (true) {
-			// TODO select view with the best seed score
+			SeedInfo seed = selectSeedForScene(pairwise);
+			if (seed == null)
+				return;
 
-			// TODO pick a seed, grow the reconstruction graph until there are no more views it can add
+			if (!initializeNewScene(pairwise, seed)) {
+				// TODO abort if it fails X times in a row
+				continue;
+			}
+
+			SceneWorkingGraph scene = scenes.getTail();
+
+			while (scene.open.size > 0) {
+				// TODO select the view with the most geometric information and overlap to views in the scene to add
+				selectViewToExpandInto(pairwise, scene);
+
+				// TODO add the view
+
+			}
+
+			// TODO refine the scene
 		}
-
-		// TODO Batch refine all scenes
 	}
 
 	/**
@@ -137,6 +178,92 @@ public class BatchSlamMultiCameras {
 		}
 	}
 
+	public @Nullable SeedInfo selectSeedForScene( PairwiseImageGraph pairwise ) {
+		for (int seedIdx = 0; seedIdx < seeds.size; seedIdx++) {
+			// See if this view can be used
+			SeedInfo candidate = seeds.get(seedIdx);
+			if (viewUsed.get(candidate.viewIndex))
+				continue;
+
+			// Remove views which can't be seeds
+			for (int removeIdx = seedIdx; removeIdx >= 0; removeIdx--) {
+				seeds.removeSwap(removeIdx);
+			}
+
+			return candidate;
+		}
+		return null;
+	}
+
+	public boolean initializeNewScene( PairwiseImageGraph pairwise, SeedInfo seed ) {
+		SceneWorkingGraph scene = scenes.grow();
+
+		// Create a camera for every camera in the multi camera system
+		for (int i = 0; i < sensors.cameras.size(); i++) {
+			scene.addCamera(i);
+		}
+
+		activeSceneKnownScale = !seed.knownScale;
+
+		PairwiseImageGraph.View pseed = pairwise.nodes.get(seed.viewIndex);
+
+		if (activeSceneKnownScale) {
+			SceneWorkingGraph.Camera camSeed = lookupCamera(scene, pseed);
+			SceneWorkingGraph.View wseed = scene.addView(pseed, camSeed);
+			SceneWorkingGraph.InlierInfo inliers = wseed.inliers.grow();
+
+			for (int i = 0; i < seed.neighbors.size(); i++) {
+				PairwiseImageGraph.Motion m = seed.neighbors.get(i);
+				PairwiseImageGraph.View dst = m.other(pseed);
+				if (!isExtrinsicsKnown(pseed, dst)) {
+					continue;
+				}
+
+				// Don't add a view which has already been used again
+				if (viewUsed.get(dst.index))
+					continue;
+
+				SceneWorkingGraph.Camera camDst = lookupCamera(scene, dst);
+				SceneWorkingGraph.View wdst = scene.addView(dst, camDst);
+
+				inliers.views.add(pseed);
+				inliers.views.add(dst);
+				// TODO add list of observations from each view
+
+				// Mark these two views as being used
+				viewUsed.set(pseed.index, true);
+				viewUsed.set(dst.index, true);
+				break;
+			}
+
+			// See if it failed to find a valid view. Probably a bug
+			if (scene.listViews.size() == 1)
+				return false;
+
+			// Add all neighbors which are connected to the seed to the open list
+			for (int i = 0; i < seed.neighbors.size(); i++) {
+				PairwiseImageGraph.Motion m = seed.neighbors.get(i);
+				PairwiseImageGraph.View dst = m.other(pseed);
+
+				if (viewUsed.get(dst.index))
+					continue;
+
+				scene.open.add(dst);
+			}
+			return true;
+		} else {
+			throw new RuntimeException("Handle situation where there is no known scale");
+		}
+	}
+
+	public SceneWorkingGraph.View selectViewToExpandInto( PairwiseImageGraph pairwise, SceneWorkingGraph scene ) {
+		return null;
+	}
+
+	private SceneWorkingGraph.Camera lookupCamera( SceneWorkingGraph scene, PairwiseImageGraph.View pview ) {
+		return scene.cameras.get(sensors.lookupCamera(viewToCamera.lookup(pview.id)).index);
+	}
+
 	public void addNeighbor( SeedInfo info, PairwiseImageGraph.View target, PairwiseImageGraph.Motion m, double score ) {
 		info.knownScale |= isExtrinsicsKnown(target, m.other(target));
 		info.score += score;
@@ -146,6 +273,10 @@ public class BatchSlamMultiCameras {
 	/** Returns true if the two views have a known baseline / extrinsics between them */
 	public boolean isExtrinsicsKnown( PairwiseImageGraph.View va, PairwiseImageGraph.View vb ) {
 		return checkSynchronized.isSynchronized(va.id, vb.id);
+	}
+
+	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> options ) {
+		this.verbose = BoofMiscOps.addPrefix(this, out);
 	}
 
 	public static class SeedInfo implements Comparable<SeedInfo> {
