@@ -31,6 +31,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -47,6 +48,8 @@ public class BatchSlamMultiCameras implements VerbosePrint {
 	// - TODO How to handle that the baseline between cameras in multi-camera system is assumed to be known?
 	// - TODO if the location of one view is known then the location of all views from camera system is known
 
+	// TODO force it to use simplified camera model for now?
+
 	int countConsideredConnections = 3;
 
 	// Checks to see if two views where captured at the same time by the multi-camera system
@@ -58,6 +61,8 @@ public class BatchSlamMultiCameras implements VerbosePrint {
 	DogArray_B viewUsed = new DogArray_B();
 
 	DogArray<SceneWorkingGraph> scenes = new DogArray<>(SceneWorkingGraph::new, SceneWorkingGraph::reset);
+
+	private final List<PairwiseImageGraph.View> valid = new ArrayList<>();
 
 	MultiCameraSystem sensors;
 	ViewToCamera viewToCamera;
@@ -92,14 +97,23 @@ public class BatchSlamMultiCameras implements VerbosePrint {
 			SceneWorkingGraph scene = scenes.getTail();
 
 			while (scene.open.size > 0) {
-				// TODO select the view with the most geometric information and overlap to views in the scene to add
-				selectViewToExpandInto(pairwise, scene);
+				// Select the view with the most informative connections to known views in the scene
+				PairwiseImageGraph.View target = selectViewToExpandInto(scene);
 
-				// TODO add the view
+				// Couldn't find a valid view to add
+				if (target == null)
+					break;
+
+				// Try adding this view to the scene
+				if (!expandIntoView(scene, target)) {
+					continue;
+				}
+
+				// TODO sometimes refine the entire scene
 
 			}
 
-			// TODO refine the scene
+			// TODO refine the entire scene
 		}
 	}
 
@@ -256,8 +270,68 @@ public class BatchSlamMultiCameras implements VerbosePrint {
 		}
 	}
 
-	public SceneWorkingGraph.View selectViewToExpandInto( PairwiseImageGraph pairwise, SceneWorkingGraph scene ) {
-		return null;
+	protected @Nullable PairwiseImageGraph.View selectViewToExpandInto( SceneWorkingGraph scene ) {
+		int bestIdx = -1;
+		double bestScore = 0.0;
+		int bestValidCount = 0;
+
+		for (int openIdx = 0; openIdx < scene.open.size; openIdx++) {
+			final PairwiseImageGraph.View pview = scene.open.get(openIdx);
+
+			// See which views in the scene pview can connect to
+			valid.clear();
+			for (int connIdx = 0; connIdx < pview.connections.size; connIdx++) {
+				PairwiseImageGraph.Motion m = pview.connections.get(connIdx);
+				PairwiseImageGraph.View dst = m.other(pview);
+				if (!m.is3D || !scene.isKnown(dst))
+					continue;
+				valid.add(dst);
+			}
+
+			double bestLocalScore = 0.0;
+			for (int idx0 = 0; idx0 < valid.size(); idx0++) {
+				PairwiseImageGraph.View viewB = valid.get(idx0);
+				PairwiseImageGraph.Motion m0 = Objects.requireNonNull(pview.findMotion(viewB));
+
+				for (int idx1 = idx0 + 1; idx1 < valid.size(); idx1++) {
+					PairwiseImageGraph.View viewC = valid.get(idx1);
+					PairwiseImageGraph.Motion m2 = viewB.findMotion(viewC);
+
+					if (m2 == null || !m2.is3D)
+						continue;
+
+					PairwiseImageGraph.Motion m1 = Objects.requireNonNull(pview.findMotion(viewC));
+
+					double s = BoofMiscOps.min(m0.score3D, m1.score3D, m2.score3D);
+
+					bestLocalScore = Math.max(s, bestLocalScore);
+				}
+			}
+
+			// strongly prefer 3 or more. Technically the above test won't check for this but in the future it will
+			// so this test serves as a reminder
+			if (Math.min(3, valid.size()) >= bestValidCount && bestLocalScore > bestScore) {
+				bestValidCount = Math.min(3, valid.size());
+				bestScore = bestLocalScore;
+				bestIdx = openIdx;
+			}
+		}
+
+		if (bestIdx < 0)
+			return null;
+
+		return scene.open.removeSwap(bestIdx);
+	}
+
+	protected boolean expandIntoView( SceneWorkingGraph scene, PairwiseImageGraph.View ptarget ) {
+		// TODO find all views in the scene which are connected to the target
+
+		// TODO see if the extrinsics are known, if so use those
+
+		// TODO if extrinsics are not known, estimate them
+
+
+		return true;
 	}
 
 	private SceneWorkingGraph.Camera lookupCamera( SceneWorkingGraph scene, PairwiseImageGraph.View pview ) {
