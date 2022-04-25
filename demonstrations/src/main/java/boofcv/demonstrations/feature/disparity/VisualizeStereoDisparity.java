@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -67,6 +67,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -192,6 +193,7 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 
 	@Override
 	protected void openFileMenuBar() {
+		// TODO let user select split some how do you don't need to modify code to handle that image format
 		String[] files = BoofSwingUtil.openImageSetChooser(window, OpenImageSetDialog.Mode.EXACTLY, 2);
 		if (files == null)
 			return;
@@ -209,24 +211,77 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 
 	@Override
 	public void processFiles( String[] files ) {
-		if (files.length == 3) {
-			origCalib = CalibrationIO.load(media.openFileNotNull(files[0]));
-			origLeft = media.openImageNotNull(files[1]);
-			origRight = media.openImageNotNull(files[2]);
-		} else if (files.length == 2) {
-			origLeft = media.openImageNotNull(files[0]);
-			origRight = media.openImageNotNull(files[1]);
 
+		StereoParameters calib = null;
+		BufferedImage left = null;
+		BufferedImage right = null;
+
+		try {
+			calib = CalibrationIO.load(media.openFileNotNull(files[0]));
+			left = media.openImageNotNull(files[1]);
+			if (files.length > 2)
+				right = media.openImageNotNull(files[2]);
+		} catch (RuntimeException ignore) {
+		}
+
+		if (calib == null) {
+			try {
+				File file = new File(files[0]);
+				calib = CalibrationIO.load(media.openFileNotNull(new File(file.getParent(), "stereo.yaml").getPath()));
+			} catch (RuntimeException ignore) {
+			}
+		}
+
+		if (left == null) {
+			left = media.openImageNotNull(files[0]);
+			if (files.length > 1)
+				right = media.openImageNotNull(files[1]);
+		}
+
+		if (right == null) {
+			System.out.println("Split stereo image");
+			// Assume it's a split image
+			BufferedImage tmp = new BufferedImage(left.getWidth()/2, left.getHeight(), left.getType());
+			right = new BufferedImage(left.getWidth() - tmp.getWidth(), left.getHeight(), left.getType());
+			right.createGraphics().drawImage(left, 0, 0, right.getWidth(), right.getHeight(),
+					tmp.getWidth(), 0, left.getWidth(), left.getHeight(), null);
+			tmp.createGraphics().drawImage(left, 0, 0, tmp.getWidth(), tmp.getHeight(), 0, 0, tmp.getWidth(), tmp.getHeight(), null);
+			left = tmp;
+		}
+
+		if (calib == null) {
+			System.out.println("No calibration found. Guessing");
 			// Guess something "reasonable"
 			// baseline of 1 and distortion free cameras with a 90 HFOV
-			origCalib = new StereoParameters();
-			origCalib.right_to_left = new Se3_F64();
-			origCalib.right_to_left.T.x = 1;
-			origCalib.left = PerspectiveOps.createIntrinsic(origLeft.getWidth(), origLeft.getHeight(), 90, null);
-			origCalib.right = PerspectiveOps.createIntrinsic(origRight.getWidth(), origRight.getHeight(), 90, null);
-		} else {
-			throw new IllegalArgumentException("Unexpected number of files. " + files.length);
+			calib = new StereoParameters();
+			calib.right_to_left = new Se3_F64();
+			calib.right_to_left.T.x = 1;
+			calib.left = PerspectiveOps.createIntrinsic(origLeft.getWidth(), origLeft.getHeight(), 90, null);
+			calib.right = PerspectiveOps.createIntrinsic(origRight.getWidth(), origRight.getHeight(), 90, null);
 		}
+
+		origCalib = calib;
+		origLeft = left;
+		origRight = right;
+
+//		if (files.length == 3) {
+//			origCalib = CalibrationIO.load(media.openFileNotNull(files[0]));
+//			origLeft = media.openImageNotNull(files[1]);
+//			origRight = media.openImageNotNull(files[2]);
+//		} else if (files.length == 2) {
+//			origLeft = media.openImageNotNull(files[0]);
+//			origRight = media.openImageNotNull(files[1]);
+//
+//			// Guess something "reasonable"
+//			// baseline of 1 and distortion free cameras with a 90 HFOV
+//			origCalib = new StereoParameters();
+//			origCalib.right_to_left = new Se3_F64();
+//			origCalib.right_to_left.T.x = 1;
+//			origCalib.left = PerspectiveOps.createIntrinsic(origLeft.getWidth(), origLeft.getHeight(), 90, null);
+//			origCalib.right = PerspectiveOps.createIntrinsic(origRight.getWidth(), origRight.getHeight(), 90, null);
+//		} else {
+//			throw new IllegalArgumentException("Unexpected number of files. " + files.length);
+//		}
 		if (activeAlg == null)
 			createAlgConcurrent();
 		changeInputScale();
