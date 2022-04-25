@@ -23,7 +23,6 @@ import boofcv.alg.fiducial.aztec.AztecEncoder;
 import boofcv.app.aztec.CreateAztecCodeDocumentImage;
 import boofcv.app.aztec.CreateAztecCodeDocumentPDF;
 import boofcv.app.micrqr.CreateMicroQrGui;
-import boofcv.generate.LengthUnit;
 import boofcv.generate.Unit;
 import boofcv.gui.BoofSwingUtil;
 import org.apache.commons.io.FilenameUtils;
@@ -90,11 +89,6 @@ public class CreateAztecCodeDocument extends BaseMarkerDocument {
 		System.exit(1);
 	}
 
-	private static void failExit( String message ) {
-		System.err.println(message);
-		System.exit(1);
-	}
-
 	public void finishParsing() {
 		if (errorFraction != -1 && errorFraction < 0) {
 			failExit("Error must be -1 or >= 0");
@@ -119,20 +113,7 @@ public class CreateAztecCodeDocument extends BaseMarkerDocument {
 				throw new RuntimeException("Must specify squareWidth or markerWidth");
 			}
 
-			unit = unit == Unit.UNKNOWN ? Unit.lookup(_unit) : unit;
-			if (unit == Unit.UNKNOWN) {
-				failExit("Must specify a valid unit or use default");
-			}
-			PaperSize paperSize = PaperSize.lookup(_paperSize);
-			if (paperSize == null) {
-				String[] words = _paperSize.split(":");
-				if (words.length != 2) failExit("Expected two value+unit separated by a :");
-				var w = new LengthUnit(words[0], unit);
-				var h = new LengthUnit(words[1], unit);
-				if (w.unit != h.unit) failExit("Same units must be specified for width and height");
-				paperSize = new PaperSize(w.length, h.length, w.getUnit());
-			}
-			this.paperSize = paperSize;
+			parsePaperSze();
 		}
 	}
 

@@ -25,7 +25,6 @@ import boofcv.alg.fiducial.qrcode.QrCode;
 import boofcv.app.micrqr.CreateMicroQrDocumentImage;
 import boofcv.app.micrqr.CreateMicroQrDocumentPDF;
 import boofcv.app.micrqr.CreateMicroQrGui;
-import boofcv.generate.LengthUnit;
 import boofcv.generate.Unit;
 import boofcv.gui.BoofSwingUtil;
 import org.apache.commons.io.FilenameUtils;
@@ -98,13 +97,7 @@ public class CreateMicroQrDocument extends BaseMarkerDocument {
 		System.exit(1);
 	}
 
-	private static void failExit( String message ) {
-		System.err.println(message);
-		System.exit(1);
-	}
-
 	public void finishParsing() {
-
 		mask = _mask == null ? null : MicroQrCodeMaskPattern.lookupMask(_mask);
 		if (_error.isEmpty()) {
 			error = null;
@@ -127,20 +120,7 @@ public class CreateMicroQrDocument extends BaseMarkerDocument {
 				markerWidth = moduleWidth*QrCode.totalModules(version);
 			}
 
-			unit = unit == Unit.UNKNOWN ? Unit.lookup(_unit) : unit;
-			if (unit == Unit.UNKNOWN) {
-				failExit("Must specify a valid unit or use default");
-			}
-			PaperSize paperSize = PaperSize.lookup(_paperSize);
-			if (paperSize == null) {
-				String[] words = _paperSize.split(":");
-				if (words.length != 2) failExit("Expected two value+unit separated by a :");
-				var w = new LengthUnit(words[0], unit);
-				var h = new LengthUnit(words[1], unit);
-				if (w.unit != h.unit) failExit("Same units must be specified for width and height");
-				paperSize = new PaperSize(w.length, h.length, w.getUnit());
-			}
-			this.paperSize = paperSize;
+			parsePaperSze();
 		}
 	}
 

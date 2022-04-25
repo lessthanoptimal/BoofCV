@@ -18,6 +18,7 @@
 
 package boofcv.app;
 
+import boofcv.generate.LengthUnit;
 import boofcv.generate.Unit;
 import org.kohsuke.args4j.Option;
 
@@ -68,4 +69,27 @@ public abstract class BaseMarkerDocument {
 	public boolean sendToPrinter = false;
 	// specifies the file type
 	public String fileType;
+
+	protected void parsePaperSze() {
+		unit = unit == Unit.UNKNOWN ? Unit.lookup(_unit) : unit;
+		if (unit == Unit.UNKNOWN) {
+			failExit("Must specify a valid unit or use default");
+		}
+		PaperSize paperSize = PaperSize.lookup(_paperSize);
+		if (paperSize == null) {
+			String[] words = _paperSize.split(":");
+			if (words.length == 1) failExit("Paper Size: Unknown document name '" + words[0] + "'");
+			if (words.length != 2) failExit("Paper Size: Expected two value+unit separated by :");
+			var w = new LengthUnit(words[0], unit);
+			var h = new LengthUnit(words[1], unit);
+			if (w.unit != h.unit) failExit("Same units must be specified for width and height");
+			paperSize = new PaperSize(w.length, h.length, w.getUnit());
+		}
+		this.paperSize = paperSize;
+	}
+
+	protected void failExit( String message ) {
+		System.err.println(message);
+		System.exit(1);
+	}
 }
