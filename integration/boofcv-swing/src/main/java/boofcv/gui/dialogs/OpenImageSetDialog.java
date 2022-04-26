@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -148,15 +148,9 @@ public class OpenImageSetDialog extends JPanel {
 
 	public void handleSelectedUpdate( int count ) {
 		switch (modeSelect) {
-			case EXACTLY: {
-				bOK.setEnabled(count == requiredSelect);
-			}
-			break;
-
-			case MINIMUM: {
-				bOK.setEnabled(count >= requiredSelect);
-			}
-			break;
+			case EXACTLY -> bOK.setEnabled(count == requiredSelect);
+			case MINIMUM -> bOK.setEnabled(count >= requiredSelect);
+			case AT_MOST -> bOK.setEnabled(count >= 1 && count <= requiredSelect);
 		}
 	}
 
@@ -232,7 +226,7 @@ public class OpenImageSetDialog extends JPanel {
 		public void addPath( File path ) {
 			BoofSwingUtil.invokeNowOrLater(() -> {
 				// ignore if it has reached its limit already
-				if (modeSelect == Mode.EXACTLY && paths.size() == requiredSelect)
+				if ((modeSelect == Mode.EXACTLY || modeSelect == Mode.AT_MOST) && paths.size() == requiredSelect)
 					return;
 
 				// make sure it doesn't add the same image twice
@@ -362,7 +356,8 @@ public class OpenImageSetDialog extends JPanel {
 
 	public enum Mode {
 		MINIMUM,
-		EXACTLY
+		EXACTLY,
+		AT_MOST
 	}
 
 	public static @Nullable String[] showDialog( File directory, Mode mode, int numberOfImages,
@@ -370,12 +365,13 @@ public class OpenImageSetDialog extends JPanel {
 		String title = switch (mode) {
 			case EXACTLY -> "Select exactly " + numberOfImages + " images";
 			case MINIMUM -> "Select at least " + numberOfImages + " images";
+			case AT_MOST -> "Select at most " + numberOfImages + " images";
 		};
 
-		JDialog dialog = new JDialog(owner, title, Dialog.ModalityType.APPLICATION_MODAL);
-		DefaultListener listener = new DefaultListener(dialog);
-		OpenImageSetDialog panel = new OpenImageSetDialog(dialog, listener, directory);
-		panel.modeSelect = Mode.EXACTLY;
+		var dialog = new JDialog(owner, title, Dialog.ModalityType.APPLICATION_MODAL);
+		var listener = new DefaultListener(dialog);
+		var panel = new OpenImageSetDialog(dialog, listener, directory);
+		panel.modeSelect = mode;
 		panel.requiredSelect = numberOfImages;
 
 		dialog.addWindowListener(new WindowAdapter() {
@@ -399,7 +395,7 @@ public class OpenImageSetDialog extends JPanel {
 	}
 
 	public static void main( String[] args ) {
-		String selected[] = showDialog(new File(""), Mode.EXACTLY, 3, null);
+		String[] selected = showDialog(new File(""), Mode.EXACTLY, 3, null);
 
 		if (selected == null)
 			System.out.println("Canceled");

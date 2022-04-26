@@ -194,7 +194,7 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 	@Override
 	protected void openFileMenuBar() {
 		// TODO let user select split some how do you don't need to modify code to handle that image format
-		String[] files = BoofSwingUtil.openImageSetChooser(window, OpenImageSetDialog.Mode.EXACTLY, 2);
+		String[] files = BoofSwingUtil.openImageSetChooser(window, OpenImageSetDialog.Mode.AT_MOST, 2);
 		if (files == null)
 			return;
 		BoofSwingUtil.invokeNowOrLater(() -> openImageSet(false, files));
