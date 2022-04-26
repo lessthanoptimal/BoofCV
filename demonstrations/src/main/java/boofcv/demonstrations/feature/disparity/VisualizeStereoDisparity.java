@@ -221,6 +221,7 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 			left = media.openImageNotNull(files[1]);
 			if (files.length > 2)
 				right = media.openImageNotNull(files[2]);
+//			System.out.println("Loaded specified calibration '"+files[0]+"'");
 		} catch (RuntimeException ignore) {
 		}
 
@@ -228,6 +229,7 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 			try {
 				File file = new File(files[0]);
 				calib = CalibrationIO.load(media.openFileNotNull(new File(file.getParent(), "stereo.yaml").getPath()));
+				System.out.println("Loaded calibration under default name 'stereo.yaml'");
 			} catch (RuntimeException ignore) {
 			}
 		}
@@ -239,7 +241,7 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 		}
 
 		if (right == null) {
-			System.out.println("Split stereo image");
+			System.out.println("Splitting stereo image");
 			// Assume it's a split image
 			BufferedImage tmp = new BufferedImage(left.getWidth()/2, left.getHeight(), left.getType());
 			right = new BufferedImage(left.getWidth() - tmp.getWidth(), left.getHeight(), left.getType());
