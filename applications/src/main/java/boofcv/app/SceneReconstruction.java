@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,7 @@ import boofcv.alg.cloud.PointCloudReader;
 import boofcv.alg.cloud.PointCloudUtils_F64;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.alg.misc.PixelMath;
+import boofcv.alg.mvs.ColorizeMultiViewStereoResults;
 import boofcv.alg.mvs.DisparityParameters;
 import boofcv.alg.mvs.MultiViewStereoFromKnownSceneStructure;
 import boofcv.alg.similar.ConfigSimilarImagesSceneRecognition;
@@ -34,6 +35,7 @@ import boofcv.alg.structure.*;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.core.image.ConvertImage;
 import boofcv.core.image.GConvertImage;
+import boofcv.core.image.LookUpColorRgbFormats;
 import boofcv.factory.disparity.ConfigDisparity;
 import boofcv.factory.disparity.ConfigDisparitySGM;
 import boofcv.factory.scene.FactorySceneRecognition;
@@ -48,6 +50,7 @@ import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.MirrorStream;
 import boofcv.io.UtilIO;
 import boofcv.io.geo.MultiViewIO;
+import boofcv.io.image.LookUpImageFilesByIndex;
 import boofcv.io.image.UtilImageIO;
 import boofcv.io.points.PointCloudIO;
 import boofcv.io.wrapper.images.LoadFileImageSequence2;
@@ -61,6 +64,7 @@ import boofcv.visualize.VisualizeData;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Point4D_F64;
 import georegression.struct.so.Rodrigues_F64;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import org.ddogleg.DDoglegConcurrency;
@@ -78,6 +82,8 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import static boofcv.misc.BoofMiscOps.checkTrue;
 
 /**
  * Command line application for doing a 3D reconstruction
@@ -115,11 +121,11 @@ public class SceneReconstruction {
 	@Option(name = "--MaxPixels", usage = "Maximum number of images in an image before its down sampled. E.g. 800*600=480000")
 	int maxPixels = 800*600;
 
-	@Option(name = "--MinDisparity", usage = "Minimum disparity. Points less than this are filtered. Can be used to remove noisy distant points.")
-	double minDisparity = 0.0;
+	@Option(name = "--DisparityMin", usage = "Minimum disparity. Points less than this are filtered. Can be used to remove noisy distant points.")
+	double disparityMin = 0.0;
 
-	@Option(name = "--MaxDisparity", usage = "Used to override maximum disparity. Can't exceed 255.")
-	int maxDisparity = 0;
+	@Option(name = "--DisparityRange", usage = "Number of disparity values considered. Can't exceed 255.")
+	int disparityRange = 0;
 
 	@Option(name = "--Ordered", usage = "Images are assumed to be in sequential order and a feature tracker can be used")
 	boolean ordered = false;
@@ -177,6 +183,9 @@ public class SceneReconstruction {
 	// How big the view will be
 	ImageDimension windowSize = new ImageDimension();
 
+	// All the input images
+	List<String> imagePaths;
+
 	PrintStream out;
 
 	public void process() {
@@ -197,15 +206,15 @@ public class SceneReconstruction {
 			loadSparseScene = true;
 		}
 
-		List<String> paths = UtilIO.listSmartImages(inputPattern, true);
+		imagePaths = UtilIO.listSmartImages(inputPattern, true);
 
-		if (paths.isEmpty()) {
+		if (imagePaths.isEmpty()) {
 			System.err.println("No inputs found. Bad path or pattern? " + inputPattern);
 			System.exit(-1);
 		}
 
-		if (maxDisparity > 255)
-			throw new RuntimeException("Max Disparity can't be larger than 255. maxDisparity=" + maxDisparity);
+		if (disparityRange > 255)
+			throw new RuntimeException("Disparity range can't be larger than 255. disparityRange=" + disparityRange);
 
 		// See if the user overrode the number of threads
 		if (numThreads > 0) {
@@ -218,8 +227,8 @@ public class SceneReconstruction {
 		// Create the output directory if it doesn't exist
 		UtilIO.mkdirs(new File(outputPath), deleteOutput);
 
-		System.out.println("Total images: " + paths.size());
-		saveIndexToImageTable(paths);
+		System.out.println("Total images: " + imagePaths.size());
+		saveIndexToImageTable(imagePaths);
 
 		// See if the user
 		if (configPath.isEmpty()) {
@@ -240,7 +249,7 @@ public class SceneReconstruction {
 				out = fileOut;
 			}
 
-			images = new LoadFileImageSequence2<>(paths, ImageType.PL_U8);
+			images = new LoadFileImageSequence2<>(imagePaths, ImageType.PL_U8);
 			images.setTargetPixels(maxPixels);
 			listDimensions.clear();
 
@@ -274,10 +283,10 @@ public class SceneReconstruction {
 				// Number of digits needed to contain all the scenes
 				int numDigits = BoofMiscOps.numDigits(listScenes.size());
 				for (int sceneIndex = 0; sceneIndex < listScenes.size(); sceneIndex++) {
-					reconstructScene(paths, listScenes.get(sceneIndex), new File(outputPath, String.format("scene%0" + numDigits + "d", sceneIndex)));
+					reconstructScene(imagePaths, listScenes.get(sceneIndex), new File(outputPath, String.format("scene%0" + numDigits + "d", sceneIndex)));
 				}
 			} else {
-				reconstructScene(paths, listScenes.get(0), new File(outputPath, "scene"));
+				reconstructScene(imagePaths, listScenes.get(0), new File(outputPath, "scene"));
 			}
 
 			// Print total processing time
@@ -348,6 +357,7 @@ public class SceneReconstruction {
 		printSparseSummary(working);
 
 		computeDense(paths, working, sceneDirectory);
+		saveSparseCloudToDisk(sceneDirectory);
 		saveCloudToDisk(sceneDirectory);
 		if (showCloud)
 			visualizeInPointCloud(sparseToDense.getCloud(), sparseToDense.getColorRgb(), scene, sceneDirectory.getName());
@@ -358,7 +368,7 @@ public class SceneReconstruction {
 		ConfigDisparitySGM configSgm = configSparseToDense.disparity.approachSGM;
 		configSgm.validateRtoL = 0;
 		configSgm.texture = 0.75;
-		configSgm.disparityRange = maxDisparity <= 0 ? 250: maxDisparity;
+		configSgm.disparityRange = disparityRange <= 0 ? 250: disparityRange;
 		configSgm.paths = ConfigDisparitySGM.Paths.P4;
 		configSgm.configBlockMatch.radiusX = 3;
 		configSgm.configBlockMatch.radiusY = 3;
@@ -411,7 +421,7 @@ public class SceneReconstruction {
 	}
 
 	/**
-	 * If it can, it will load the configuration and return a new instsance. Otherwise it will return the passed in
+	 * If it can, it will load the configuration and return a new instance. Otherwise, it will return the passed in
 	 * instance and print an error message
 	 */
 	private <T extends Configuration> T loadConfiguration( File file, T config ) {
@@ -570,8 +580,8 @@ public class SceneReconstruction {
 
 			@Override
 			public void handleFusedDisparity( String name, GrayF32 disparity, GrayU8 mask, DisparityParameters parameters ) {
-				if (minDisparity > 0) {
-					PixelMath.operator1(disparity, ( v ) -> v >= minDisparity ? v : parameters.disparityRange, disparity);
+				if (disparityMin > 0) {
+					PixelMath.operator1(disparity, ( v ) -> v >= disparityMin ? v : parameters.disparityRange, disparity);
 				}
 
 				if (saveFusedDisparity) {
@@ -612,6 +622,43 @@ public class SceneReconstruction {
 				return true;
 			}
 		};
+	}
+
+	private void saveSparseCloudToDisk( File outputDirectory ) {
+		checkTrue(scene.isHomogenous());
+		List<Point3D_F64> cloudXyz = new ArrayList<>();
+		Point4D_F64 world = new Point4D_F64();
+
+		// NOTE: By default the colors found below are not used. Look before to see why and how to turn them on.
+		//
+		// Colorize the cloud by reprojecting the images. The math is straight forward but there's a lot of book
+		// keeping that needs to be done due to the scene data structure. A class is provided to make this process easy
+		var imageLookup = new LookUpImageFilesByIndex(imagePaths);
+		var colorize = new ColorizeMultiViewStereoResults<>(new LookUpColorRgbFormats.PL_U8(), imageLookup);
+
+		DogArray_I32 colorsRgb = new DogArray_I32();
+		colorsRgb.resize(scene.points.size);
+		colorize.processScenePoints(scene,
+				( viewIdx ) -> viewIdx + "", // String encodes the image's index
+				( pointIdx, r, g, b ) -> colorsRgb.set(pointIdx, (r << 16) | (g << 8) | b)); // Assign the RGB color
+
+		// Convert the structure into regular 3D points from homogenous
+		for (int i = 0; i < scene.points.size; i++) {
+			scene.points.get(i).get(world);
+			// If the point is at infinity it's not clear what to do. It would be best to skip it then the color
+			// array would be out of sync. Let's just throw it far far away then.
+			if (world.w == 0.0)
+				cloudXyz.add(new Point3D_F64(0, 0, Double.MAX_VALUE));
+			else
+				cloudXyz.add(new Point3D_F64(world.x/world.w, world.y/world.w, world.z/world.w));
+		}
+
+		// Save everything
+		try (FileOutputStream out = new FileOutputStream(new File(outputDirectory, "sparse_cloud.ply"))) {
+			PointCloudIO.save3D(PointCloudIO.Format.PLY, PointCloudReader.wrapF64(cloudXyz, colorsRgb.data), true, out);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void saveCloudToDisk( File outputDirectory ) {
