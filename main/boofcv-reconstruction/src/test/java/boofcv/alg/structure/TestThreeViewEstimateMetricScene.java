@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.structure;
 
+import boofcv.abst.geo.bundle.SceneStructureCommon;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
@@ -52,8 +53,7 @@ public class TestThreeViewEstimateMetricScene extends BoofStandardJUnit {
 
 	List<AssociatedTriple> views = new ArrayList<>();
 
-	@BeforeEach
-	void before() {
+	@BeforeEach void before() {
 		features = UtilPoint3D_F64.random(new Point3D_F64(0, 0, 2), -1, 1, 100, rand);
 		for (int i = 0; i < features.size(); i++) {
 			Point3D_F64 X = features.get(i);
@@ -66,43 +66,44 @@ public class TestThreeViewEstimateMetricScene extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	void perfectData() {
+	@Test void perfectData() {
+		var alg = new ThreeViewEstimateMetricScene();
 
-		ThreeViewEstimateMetricScene alg = new ThreeViewEstimateMetricScene();
+		for (boolean singleCamera : new boolean[]{false, true}) {
+			alg.singleCamera = singleCamera;
+			assertTrue(alg.process(views, 900, 900));
 
-		assertTrue(alg.process(views, 900, 900));
+			// See if the reconstructed seen matches the original to within a high level of precision
+			SceneStructureMetric structure = alg.getStructure();
+			for (SceneStructureCommon.Camera cam : structure.getCameras().toList()) {
+				BundlePinholeSimplified c = cam.getModel();
+				assertEquals(intrinsic.fx, c.f, 1e-4);
+				assertEquals(0, c.k1, 1e-5);
+				assertEquals(0, c.k2, 1e-5);
+			}
 
-		// See if the reconstructed seen matches the original to within a high level of precision
-		SceneStructureMetric structure = alg.getStructure();
-		for (int i = 0; i < 3; i++) {
-			BundlePinholeSimplified c = structure.getCameras().get(i).getModel();
-			assertEquals(intrinsic.fx, c.f, 1e-4);
-			assertEquals(0, c.k1, 1e-5);
-			assertEquals(0, c.k2, 1e-5);
-		}
+			Se3_F64 found1 = structure.getParentToView(1);
+			Se3_F64 found2 = structure.getParentToView(2);
 
-		Se3_F64 found1 = structure.getParentToView(1);
-		Se3_F64 found2 = structure.getParentToView(2);
+			view0_to_view1.T.normalize();
+			found1.T.normalize();
+			assertEquals(0, found1.T.distance(view0_to_view1.T), 1e-4);
+			view0_to_view2.T.normalize();
+			found2.T.normalize();
+			assertEquals(0, found2.T.distance(view0_to_view2.T), 1e-4);
 
-		view0_to_view1.T.normalize();
-		found1.T.normalize();
-		assertEquals(0, found1.T.distance(view0_to_view1.T), 1e-4);
-		view0_to_view2.T.normalize();
-		found2.T.normalize();
-		assertEquals(0, found2.T.distance(view0_to_view2.T), 1e-4);
+			double[] found_xyz = ConvertRotation3D_F64.matrixToEuler(found1.R, EulerType.XYZ, null);
+			double[] expec_xyz = ConvertRotation3D_F64.matrixToEuler(view0_to_view1.R, EulerType.XYZ, null);
 
-		double[] found_xyz = ConvertRotation3D_F64.matrixToEuler(found1.R, EulerType.XYZ, null);
-		double[] expec_xyz = ConvertRotation3D_F64.matrixToEuler(view0_to_view1.R, EulerType.XYZ, null);
+			for (int i = 0; i < 3; i++) {
+				assertEquals(expec_xyz[i], found_xyz[i], 1e-4);
+			}
+			found_xyz = ConvertRotation3D_F64.matrixToEuler(found2.R, EulerType.XYZ, null);
+			expec_xyz = ConvertRotation3D_F64.matrixToEuler(view0_to_view2.R, EulerType.XYZ, null);
 
-		for (int i = 0; i < 3; i++) {
-			assertEquals(expec_xyz[i], found_xyz[i], 1e-4);
-		}
-		found_xyz = ConvertRotation3D_F64.matrixToEuler(found2.R, EulerType.XYZ, null);
-		expec_xyz = ConvertRotation3D_F64.matrixToEuler(view0_to_view2.R, EulerType.XYZ, null);
-
-		for (int i = 0; i < 3; i++) {
-			assertEquals(expec_xyz[i], found_xyz[i], 1e-4);
+			for (int i = 0; i < 3; i++) {
+				assertEquals(expec_xyz[i], found_xyz[i], 1e-4);
+			}
 		}
 	}
 }
