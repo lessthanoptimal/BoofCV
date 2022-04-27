@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,9 +31,8 @@ import boofcv.struct.image.ImageGray;
  * @author Peter Abeles
  */
 @SuppressWarnings({"NullAway.Init"})
-public abstract class SelectDisparityBasicWta<Array , Disparity extends ImageGray>
-		implements DisparitySelect<Array,Disparity>
-{
+public abstract class SelectDisparityBasicWta<Array, Disparity extends ImageGray>
+		implements DisparitySelect<Array, Disparity> {
 	// Output disparity image
 	protected Disparity imageDisparity;
 	// The minimum and maximum disparity it will search
@@ -48,14 +47,14 @@ public abstract class SelectDisparityBasicWta<Array , Disparity extends ImageGra
 	protected int imageWidth;
 
 	@Override
-	public void configure(Disparity imageDisparity, int disparityMin , int disparityMax , int radiusX ) {
+	public void configure( Disparity imageDisparity, int disparityMin, int disparityMax, int radiusX ) {
 		this.imageDisparity = imageDisparity;
 		this.disparityMin = disparityMin;
 		this.disparityMax = disparityMax;
 		this.radiusX = radiusX;
 
-		disparityRange = disparityMax-disparityMin+1;
-		regionWidth = radiusX*2+1;
+		disparityRange = disparityMax - disparityMin + 1;
+		regionWidth = radiusX*2 + 1;
 		imageWidth = imageDisparity.width;
 	}
 
@@ -63,7 +62,7 @@ public abstract class SelectDisparityBasicWta<Array , Disparity extends ImageGra
 	 * Returns the maximum allowed disparity for a particular column in left to right direction,
 	 * as limited by the image border.
 	 */
-	protected int disparityMaxAtColumnL2R( int col) {
-		return Math.min(col,disparityMax);
+	protected int disparityMaxAtColumnL2R( int col ) {
+		return Math.min(col, disparityMax);
 	}
 }

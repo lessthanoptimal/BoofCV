@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -70,7 +70,7 @@ public class SelectErrorSubpixel {
 
 		@Override
 		protected void setDisparityInvalid( int index ) {
-			imageDisparity.data[index] = (byte)invalidDisparity;
+			imageDisparity.data[index] = invalidDisparity;
 		}
 
 		@Override
@@ -109,7 +109,7 @@ public class SelectErrorSubpixel {
 
 		@Override
 		protected void setDisparityInvalid( int index ) {
-			imageDisparity.data[index] = (byte)invalidDisparity;
+			imageDisparity.data[index] = invalidDisparity;
 		}
 
 		@Override
