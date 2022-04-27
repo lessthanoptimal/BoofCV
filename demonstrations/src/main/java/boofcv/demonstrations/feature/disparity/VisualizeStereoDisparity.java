@@ -319,6 +319,7 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 			disparityMin = activeAlg.getDisparityMin();
 			disparityRange = activeAlg.getDisparityRange();
 			smoother.process(rectLeft, disparityImage, disparityRange);
+
 			long time1 = System.nanoTime();
 			elapsedTime = time1 - time0;
 		} catch (RuntimeException e) {
@@ -347,21 +348,13 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 			throw new RuntimeException("Must be in UI thread");
 
 		if (control.selectedView < 3) {
-			BufferedImage img;
+			BufferedImage img = switch (control.selectedView) {
+				case 0 -> disparityOut;
+				case 1 -> colorLeft;
+				case 2 -> colorRight;
+				default -> throw new RuntimeException("Unknown option");
+			};
 
-			switch (control.selectedView) {
-				case 0:
-					img = disparityOut;
-					break;
-				case 1:
-					img = colorLeft;
-					break;
-				case 2:
-					img = colorRight;
-					break;
-				default:
-					throw new RuntimeException("Unknown option");
-			}
 			if (img == null)
 				return;
 
