@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,22 +60,30 @@ public abstract class ChecksSelectDisparityWithChecksWta<ArrayData, D extends Im
 	}
 
 	/**
+	 * Makes sure everything works correctly when larger disparity values are computed and there's an offset.
+	 * Created after a bug was found due to type casting.
+	 */
+	@Test void largestDisparityWithOffset() {
+		rightToLeftValidation(4, 200);
+	}
+
+	/**
 	 * Similar to simpleTest but takes in account the effects of right to left validation
 	 */
 	@Test
 	void testRightToLeftValidation() {
-		rightToLeftValidation(0);
-		rightToLeftValidation(2);
+		rightToLeftValidation(0, 10);
+		rightToLeftValidation(4, 10);
 	}
 
-	private void rightToLeftValidation( int minDisparity ) {
-		init(minDisparity, 10);
+	private void rightToLeftValidation( int minDisparity, int maxDisparity ) {
+		init(minDisparity, maxDisparity);
 
 		int y = 3;
 		int r = 2;
 
 		SelectDisparityWithChecksWta<ArrayData, D> alg = createSelector(1, -1);
-		alg.configure(disparity, minDisparity, maxDisparity, r);
+		alg.configure(disparity, minDisparity, this.maxDisparity, r);
 
 		int[] scores = new int[w*rangeDisparity];
 
@@ -103,7 +111,7 @@ public abstract class ChecksSelectDisparityWithChecksWta<ArrayData, D extends Im
 
 		// sanity check, I now set the tolerance to zero
 		alg = createSelector(0, -1);
-		alg.configure(disparity, minDisparity, maxDisparity, 2);
+		alg.configure(disparity, minDisparity, this.maxDisparity, 2);
 		alg.process(y, copyToCorrectType(scores));
 		assertEquals(reject, getDisparity(4 + minDisparity, y), 1e-8);
 	}

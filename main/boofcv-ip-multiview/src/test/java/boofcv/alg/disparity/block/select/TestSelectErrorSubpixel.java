@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Peter Abeles
  */
 public class TestSelectErrorSubpixel extends BoofStandardJUnit {
-
 	@Nested
 	public class F32_F32 extends ChecksSelectDisparityWithChecksWtaError<float[], GrayF32> {
 		public F32_F32() {
@@ -46,10 +45,9 @@ public class TestSelectErrorSubpixel extends BoofStandardJUnit {
 		 */
 		@Test
 		public void addSubpixelBias() {
+			var img = new GrayF32(w, h);
 
-			GrayF32 img = new GrayF32(w, h);
-
-			SelectErrorSubpixel.F32_F32 alg = new SelectErrorSubpixel.F32_F32(-1, -1, -1);
+			var alg = new SelectErrorSubpixel.F32_F32(-1, -1, -1);
 
 			alg.configure(img, 0, 20, 2);
 			alg.setLocalDisparityMax(20);
@@ -87,9 +85,9 @@ public class TestSelectErrorSubpixel extends BoofStandardJUnit {
 		@Test
 		public void addSubpixelBias() {
 
-			GrayF32 img = new GrayF32(w, h);
+			var img = new GrayF32(w, h);
 
-			SelectErrorSubpixel.S32_F32 alg = new SelectErrorSubpixel.S32_F32(-1, -1, -1);
+			var alg = new SelectErrorSubpixel.S32_F32(-1, -1, -1);
 
 			alg.configure(img, 0, 20, 2);
 			alg.setLocalDisparityMax(20);

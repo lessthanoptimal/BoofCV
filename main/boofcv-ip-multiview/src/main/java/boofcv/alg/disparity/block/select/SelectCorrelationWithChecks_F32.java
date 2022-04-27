@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -69,7 +69,7 @@ public abstract class SelectCorrelationWithChecks_F32<DI extends ImageGray<DI>>
 
 		// Mark all pixels as invalid which can't be estimate due to disparityMin
 		for (int col = 0; col < disparityMin; col++) {
-			setDisparity(indexDisparity++, disparityRange);
+			setDisparity(indexDisparity++, invalidDisparity);
 		}
 
 		// Select the best disparity from all the rest
