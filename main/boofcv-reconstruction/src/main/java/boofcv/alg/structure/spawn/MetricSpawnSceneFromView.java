@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -256,6 +256,8 @@ public class MetricSpawnSceneFromView implements VerbosePrint {
 				camera = scene.addCamera(cameraDbIdx);
 				utils.dbCams.lookupCalibration(cameraDbIdx, camera.prior);
 				BundleAdjustmentOps.convert(results.intrinsics.get(i), camera.intrinsic);
+				// TODO is there a way to tell the metric esclation that each view is or is not it's own camera?
+				//      Right now each view will always have independent cameras and only one of N hypotheses is used
 			}
 
 			// Save the extrinsics for this view

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,6 +29,7 @@ import boofcv.factory.transform.census.CensusVariants;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.controls.ControlPanelDdaComboTabs;
 import boofcv.gui.controls.ControlPanelDisparityDense;
+import boofcv.gui.controls.JCheckBoxValue;
 import boofcv.struct.image.GrayU8;
 
 import javax.swing.*;
@@ -62,6 +63,7 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 	JCheckBox cFocalAuto = checkbox("Auto Focal", autoFocal,
 			"Automatic initial guess for focal length or user specified");
 	JSpinner sFocal = spinner(focal, 100, 3000, 50);
+	JCheckBoxValue cSingleCamera = checkboxWrap("Single Camera", true);
 	JButton bCompute = button("Compute", true);
 
 	JTextArea textInfo = new JTextArea();
@@ -149,6 +151,7 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 				"Prunes this percent of the worse matches after computing the solution once.");
 		panel.addAlignLeft(cFocalAuto);
 		panel.addLabeled(sFocal, "Focal", "User specified value for focal length in pixels.");
+		panel.addAlignLeft(cSingleCamera.check, "Assume all images are from a single fixed focus camera");
 		return panel;
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -210,8 +210,8 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 		}
 
 		// Workspace for selecting which scene and view to expand into
-		Expansion best = new Expansion();
-		Expansion candidate = new Expansion();
+		var best = new Expansion();
+		var candidate = new Expansion();
 
 		// Loop until it can't expand any more
 		while (true) {
