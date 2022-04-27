@@ -108,6 +108,7 @@ public class DemoThreeViewStereoApp<TD extends TupleDesc<TD>> extends Demonstrat
 	AssociateThreeByPairs<TD> associateThree;
 	DogArray<AssociatedTriple> associated = new DogArray<>(AssociatedTriple::new);
 
+	// Performs self calibration from 3 views
 	ThreeViewEstimateMetricScene structureEstimator = new ThreeViewEstimateMetricScene();
 
 	DogArray<Point2D_F64>[] locations = new DogArray[3];
@@ -568,6 +569,7 @@ public class DemoThreeViewStereoApp<TD extends TupleDesc<TD>> extends Demonstrat
 		}
 
 		if (!skipStructure) {
+			structureEstimator.singleCamera = controls.cSingleCamera.value;
 			structureEstimator.configRansac.inlierThreshold = controls.inliers;
 			structureEstimator.pruneFraction = (100 - controls.prune)/100.0;
 			if (controls.autoFocal) {
@@ -593,13 +595,13 @@ public class DemoThreeViewStereoApp<TD extends TupleDesc<TD>> extends Demonstrat
 				int numPoints = structureEstimator.structure.points.size;
 				controls.addText(String.format("Inliers %d\n", n));
 				controls.addText("Initial Intrinsic\n");
-				for (int i = 0; i < 3; i++) {
+				for (int i = 0; i < structureEstimator.listPinhole.size(); i++) {
 					CameraPinhole c = structureEstimator.listPinhole.get(i);
 					controls.addText(String.format("  fx=%6.1f fy=%6.1f sk=%.2f\n", c.fx, c.fy, c.skew));
 				}
 
 				controls.addText("SBA Intrinsic\n");
-				for (int i = 0; i < 3; i++) {
+				for (int i = 0; i < structureEstimator.structure.cameras.size; i++) {
 					BundlePinholeSimplified c = structureEstimator.structure.getCameraModel(i);
 					controls.addText(String.format("  f=%.1f k1=%.2f k2=%.2f\n", c.f, c.k1, c.k2));
 				}
@@ -628,11 +630,13 @@ public class DemoThreeViewStereoApp<TD extends TupleDesc<TD>> extends Demonstrat
 		if (!skipRectify) {
 			System.out.println("Computing rectification: views " + view0 + " " + view1);
 			SceneStructureMetric structure = structureEstimator.getStructure();
+			SceneStructureMetric.View viewObj0 = structure.views.get(view0);
+			SceneStructureMetric.View viewObj1 = structure.views.get(view1);
 
-			BundleAdjustmentOps.convert((BundleAdjustmentCamera)structure.getCameraModel(view0),
+			BundleAdjustmentOps.convert((BundleAdjustmentCamera)structure.getCameraModel(viewObj0.camera),
 					dimensions[view0].width, dimensions[view0].height, intrinsic01);
 
-			BundleAdjustmentOps.convert((BundleAdjustmentCamera)structure.getCameraModel(view1),
+			BundleAdjustmentOps.convert((BundleAdjustmentCamera)structure.getCameraModel(viewObj1.camera),
 					dimensions[view1].width, dimensions[view1].height, intrinsic02);
 
 			Se3_F64 w_to_0 = structure.getParentToView(view0);

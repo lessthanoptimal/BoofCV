@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -95,6 +95,9 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 	public ConfigLevenbergMarquardt configLM = new ConfigLevenbergMarquardt();
 	public ConfigBundleAdjustment configSBA = new ConfigBundleAdjustment();
 	public ConfigConverge convergeSBA = new ConfigConverge(1e-6, 1e-6, 100);
+
+	/** It can assume that all views are generated from a single camera */
+	public boolean singleCamera = true;
 
 	// estimating the trifocal tensor and storing which observations are in the inlier set
 	public Ransac<TrifocalTensor, AssociatedTriple> ransac;
@@ -229,7 +232,7 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 			return;
 		if (verbose != null) verbose.println("Pruning Outliers");
 
-		PruneStructureFromSceneMetric pruner = new PruneStructureFromSceneMetric(structure, observations);
+		var pruner = new PruneStructureFromSceneMetric(structure, observations);
 		pruner.pruneObservationsByErrorRank(pruneFraction);
 		pruner.pruneViews(10);
 		pruner.pruneUnusedMotions();
@@ -278,10 +281,13 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 		if (verbose != null) verbose.println("First Pass: SBA score " + bestScore);
 		List<Se3_F64> bestPose = new ArrayList<>();
 		List<BundlePinholeSimplified> bestCameras = new ArrayList<>();
-		for (int i = 0; i < structure.views.size; i++) {
+		for (int i = 0; i < structure.cameras.size; i++) {
 			BundlePinholeSimplified c = Objects.requireNonNull(structure.cameras.data[i].getModel());
-			bestPose.add(structure.getParentToView(i).copy());
 			bestCameras.add(c.copy());
+		}
+
+		for (int i = 0; i < structure.views.size; i++) {
+			bestPose.add(structure.getParentToView(i).copy());
 		}
 
 		for (int i = 0; i < structure.cameras.size; i++) {
@@ -315,6 +321,8 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 			for (int i = 0; i < structure.cameras.size; i++) {
 				BundlePinholeSimplified c = Objects.requireNonNull(structure.cameras.data[i].getModel());
 				c.setTo(bestCameras.get(i));
+			}
+			for (int i = 0; i < structure.views.size; i++) {
 				structure.getParentToView(i).setTo(bestPose.get(i));
 			}
 			triangulatePoints(structure, observations);
@@ -352,7 +360,7 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 	private void setupMetricBundleAdjustment( List<AssociatedTriple> inliers ) {
 		// Construct bundle adjustment data structure
 		structure = new SceneStructureMetric(false);
-		structure.initialize(3, 3, inliers.size());
+		structure.initialize(listPinhole.size(), 3, inliers.size());
 		observations = new SceneObservations();
 		observations.initialize(3);
 
@@ -363,7 +371,10 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 			bp.f = cp.fx;
 
 			structure.setCamera(i, false, bp);
-			structure.setView(i, i, i == 0, listWorldToView.get(i));
+		}
+
+		for (int i = 0; i < 3; i++) {
+			structure.setView(i, singleCamera ? 0 : i, i == 0, listWorldToView.get(i));
 		}
 
 		for (int i = 0; i < inliers.size(); i++) {
@@ -411,7 +422,7 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 			List<DMatrixRMaj> cameras = new ArrayList<>();
 			cameras.add(P2);
 			cameras.add(P3);
-			DogArray<AssociatedTuple> observations = new DogArray<>(() -> new AssociatedTupleN(3));
+			var observations = new DogArray<AssociatedTuple>(() -> new AssociatedTupleN(3));
 			MultiViewOps.convertTr(ransac.getMatchSet(), observations);
 
 			var results = new MetricCameras();
@@ -419,7 +430,12 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 
 			if (success) {
 				successfulSelfCalibration = true;
-				listPinhole.addAll(results.intrinsics.toList());
+				if (singleCamera) {
+					averageIntrinsicParameters(results);
+				} else {
+					listPinhole.addAll(results.intrinsics.toList());
+				}
+
 				listWorldToView.get(0).reset();
 				listWorldToView.get(1).setTo(results.motion_1_to_k.get(0));
 				listWorldToView.get(2).setTo(results.motion_1_to_k.get(1));
@@ -447,7 +463,7 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 			// Use the found calibration homography to find motion estimates
 			DMatrixRMaj H = estimateH.getCalibrationHomography();
 			listPinhole.clear();
-			for (int i = 0; i < 3; i++) {
+			for (int i = 0; i < (singleCamera ? 1 : 3); i++) {
 				listPinhole.add(PerspectiveOps.matrixToPinhole(K, width, height, null));
 			}
 			listWorldToView.get(0).reset();
@@ -457,7 +473,7 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 
 		if (verbose != null) {
 			verbose.println("Initial Intrinsic Estimate:");
-			for (int i = 0; i < 3; i++) {
+			for (int i = 0; i < listPinhole.size(); i++) {
 				CameraPinhole r = listPinhole.get(i);
 				verbose.printf("  fx = %6.1f, fy = %6.1f, skew = %6.3f\n", r.fx, r.fy, r.skew);
 			}
@@ -481,6 +497,25 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Assume that there's only really one camera being used and take all the indepdent estimates and average them
+	 */
+	private void averageIntrinsicParameters( MetricCameras results ) {
+		listPinhole.add(results.intrinsics.get(0));
+		CameraPinhole ave = listPinhole.get(0);
+		for (int i = 1; i < results.intrinsics.size; i++) {
+			CameraPinhole a = results.intrinsics.get(i);
+			ave.fx += a.fx;
+			ave.fy += a.fy;
+			ave.cx += a.cx;
+			ave.cy += a.cy;
+		}
+		ave.fx /=  results.intrinsics.size;
+		ave.fy /=  results.intrinsics.size;
+		ave.cx /=  results.intrinsics.size;
+		ave.cy /=  results.intrinsics.size;
 	}
 
 	/**
