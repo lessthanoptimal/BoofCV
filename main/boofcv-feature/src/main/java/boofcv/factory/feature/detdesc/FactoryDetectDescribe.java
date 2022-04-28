@@ -98,7 +98,9 @@ public class FactoryDetectDescribe {
 		}
 		DescribePointRadiusAngle descriptor = switch (config.typeDescribe) {
 			case SURF_FAST -> FactoryDescribePointRadiusAngle.surfFast(config.describeSurfFast, imageType);
+			case SURF_COLOR_FAST -> FactoryDescribePointRadiusAngle.surfColorFast(config.describeSurfFast, ImageType.pl(3, imageType));
 			case SURF_STABLE -> FactoryDescribePointRadiusAngle.surfStable(config.describeSurfStability, imageType);
+			case SURF_COLOR_STABLE -> FactoryDescribePointRadiusAngle.surfColorStable(config.describeSurfStability, ImageType.pl(3, imageType));
 			case SIFT -> FactoryDescribePointRadiusAngle.sift(config.scaleSpaceSift, config.describeSift, imageType);
 			case BRIEF -> FactoryDescribePointRadiusAngle.brief(config.describeBrief, imageType);
 			case TEMPLATE -> FactoryDescribePointRadiusAngle.template(config.describeTemplate, imageType);

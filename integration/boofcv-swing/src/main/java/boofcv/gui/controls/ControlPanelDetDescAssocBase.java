@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -130,18 +130,18 @@ public abstract class ControlPanelDetDescAssocBase extends StandardAlgConfigPane
 			case FAST_HESSIAN -> controlDetectFastHessian;
 			case SIFT -> controlDetectSift;
 			case POINT -> controlDetectPoint;
-			default -> throw new IllegalArgumentException("Unknown"); // to future proof it if more is added
+			default -> throw new IllegalArgumentException("Unknown");
 		};
 	}
 
 	public JPanel getDescriptorPanel() {
 		return switch (configDetDesc.typeDescribe) {
-			case SURF_FAST -> controlDescSurfFast;
-			case SURF_STABLE -> controlDescSurfStable;
+			case SURF_FAST, SURF_COLOR_FAST -> controlDescSurfFast;
+			case SURF_STABLE, SURF_COLOR_STABLE -> controlDescSurfStable;
 			case SIFT -> controlDescSift;
 			case BRIEF -> controlDescBrief;
 			case TEMPLATE -> controlDescTemplate;
-			default -> throw new IllegalArgumentException("Unknown"); // to future proof it if more is added
+			default -> throw new IllegalArgumentException("Unknown: " + configDetDesc.typeDescribe);
 		};
 	}
 
