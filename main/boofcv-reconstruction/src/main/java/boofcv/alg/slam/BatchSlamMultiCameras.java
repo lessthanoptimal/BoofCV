@@ -323,6 +323,12 @@ public class BatchSlamMultiCameras implements VerbosePrint {
 		return scene.open.removeSwap(bestIdx);
 	}
 
+	/**
+	 *
+	 * @param scene The known scene
+	 * @param ptarget The view which is to be added to the scene
+	 * @return true if successful and the scene was modified. If false the scene was not modified
+	 */
 	protected boolean expandIntoView( SceneWorkingGraph scene, PairwiseImageGraph.View ptarget ) {
 		// TODO find all views in the scene which are connected to the target
 
