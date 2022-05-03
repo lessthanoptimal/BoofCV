@@ -29,6 +29,8 @@ Version : 0.41
 - Various
   - Fixed crash in Niblack Family when output image was not resized to match input image
 - Stereo Disparity: Fixed bug where invalid values got cast to a byte when image was float, causing artifacts.
+- Three-View Estimate Scene Metric
+  - Does self calibration entirely inside of RANSAC
 - SLAM
   - TODO Monocular
   - TODO Stereo
