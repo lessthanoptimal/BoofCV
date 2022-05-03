@@ -340,12 +340,14 @@ public class DemoThreeViewStereoApp<TD extends TupleDesc<TD>> extends Demonstrat
 		if (controls.scaleChanged || controls.featuresChanged) {
 			reprocessInput();
 		} else {
+			System.out.println("assocChange="+controls.assocChanged+" stereoChanged="+controls.stereoChanged);
+
 			exceptionOccurred = false;
 			boolean skipAssociate = false;
 			boolean skipSparseStructure = false;
 			if (!controls.assocChanged) {
 				skipAssociate = true;
-				if (controls.stereoChanged) {
+				if (!controls.stereoChanged) {
 					skipSparseStructure = true;
 				}
 			}
@@ -356,6 +358,8 @@ public class DemoThreeViewStereoApp<TD extends TupleDesc<TD>> extends Demonstrat
 
 			boolean _assoc = skipAssociate;
 			boolean _struct = skipSparseStructure;
+
+			System.out.println("skipAssociate="+skipAssociate+" skipSparseStructure="+skipSparseStructure);
 
 			new Thread(() -> safeProcessImages(_assoc, _struct)).start();
 		}
@@ -581,7 +585,8 @@ public class DemoThreeViewStereoApp<TD extends TupleDesc<TD>> extends Demonstrat
 			//structureEstimator.setVerbose(System.out,0);
 			System.out.println("Computing 3D structure. triplets " + associated.size);
 			if (!structureEstimator.process(associated.toList(), width, height)) {
-				SwingUtilities.invokeLater(() -> controls.addText("SBA Failed!\n"));
+				SwingUtilities.invokeLater(() -> controls.addText("Estimate structure Failed!\n"));
+				controls.scaleChanged = true;
 				return;
 			}
 
@@ -736,7 +741,7 @@ public class DemoThreeViewStereoApp<TD extends TupleDesc<TD>> extends Demonstrat
 			case 0 -> new int[]{0, 1};
 			case 1 -> new int[]{0, 2};
 			case 2 -> new int[]{1, 2};
-			default -> throw new RuntimeException("BUG!");
+			default -> throw new RuntimeException("BUG! " + best);
 		};
 	}
 

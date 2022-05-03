@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,5 +43,23 @@ public class MetricCameraTriple {
 		view1.setTo(src.view1);
 		view2.setTo(src.view2);
 		view3.setTo(src.view3);
+	}
+
+	public CameraPinhole getIntrinsics( int viewIdx ) {
+		return switch (viewIdx) {
+			case 0 -> view1;
+			case 1 -> view2;
+			case 2 -> view3;
+			default -> throw new IllegalArgumentException("Invalid index " + viewIdx);
+		};
+	}
+
+	public Se3_F64 getTransform( int viewIdx ) {
+		return switch (viewIdx) {
+			case 0 -> new Se3_F64();
+			case 1 -> view_1_to_2;
+			case 2 -> view_1_to_3;
+			default -> throw new IllegalArgumentException("Invalid index " + viewIdx);
+		};
 	}
 }

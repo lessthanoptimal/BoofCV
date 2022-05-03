@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,8 @@ public class RansacProjective<Model, Point> extends Ransac<Model, Point>
 	public RansacProjective( long randSeed,
 							 ModelManager<Model> modelManager,
 							 ModelGeneratorViews<Model, Point, ElevateViewInfo> modelGenerator,
-							 DistanceFromModelViews<Model, Point, ElevateViewInfo> modelDistance, int maxIterations, double thresholdFit ) {
+							 DistanceFromModelViews<Model, Point, ElevateViewInfo> modelDistance,
+							 int maxIterations, double thresholdFit ) {
 		super(randSeed, maxIterations, thresholdFit, modelManager, modelDistance.getPointType());
 		setModel(() -> modelGenerator, () -> modelDistance);
 		this.modelDistance = modelDistance;
