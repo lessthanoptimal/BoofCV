@@ -49,7 +49,7 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 
 	int view = 0;
 	int maxImageSize = 800;
-	double inliers = 1.0;
+	double inliers = 4.0;
 	int prune = 30; // percentage of features it will prune at the very end
 	boolean autoFocal = true;
 	int focal = 500;
@@ -58,7 +58,7 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 
 	// TODO select features, e.g. sift, surf, ShiTomasi, BRIEF
 	JSpinner sMaxSize = spinner(maxImageSize, 50, 1200, 50);
-	JSpinner sInliers = spinner(inliers, 0.1, 10.0, 0.1);
+	JSpinner sInliers = spinner(inliers, 0.1, 100.0, 0.5);
 	JSpinner sPrune = spinner(prune, 0, 100, 5);
 	JCheckBox cFocalAuto = checkbox("Auto Focal", autoFocal,
 			"Automatic initial guess for focal length or user specified");
@@ -203,6 +203,8 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 		} else if (source == bCompute) {
 			owner.handleComputePressed();
 			compute = false;
+		} else if (source == cSingleCamera.check) {
+			stereoChanged = true;
 		}
 		if (compute)
 			bCompute.setEnabled(true);

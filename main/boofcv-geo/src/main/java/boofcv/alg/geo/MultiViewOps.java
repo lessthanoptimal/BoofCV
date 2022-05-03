@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -1708,7 +1708,7 @@ public class MultiViewOps {
 				BundlePinholeBrown cam = (BundlePinholeBrown)baseModel;
 				p2n.setK(cam.fx, cam.fy, cam.skew, cam.cx, cam.cy).setDistortion(cam.radial, cam.t1, cam.t2);
 			} else {
-				throw new RuntimeException("Unknown camera model!");
+				throw new RuntimeException("Unknown camera model! " + baseModel.getClass().getSimpleName());
 			}
 			list_p_to_n.add(p2n);
 		}
