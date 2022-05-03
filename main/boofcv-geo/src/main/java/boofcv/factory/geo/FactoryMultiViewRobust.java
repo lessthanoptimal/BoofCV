@@ -460,6 +460,22 @@ public class FactoryMultiViewRobust {
 		return new RansacProjective<>(configRansac.randSeed, manager, generator, distance, configRansac.iterations, ransacTol);
 	}
 
+	public static LeastMedianOfSquaresProjective<MetricCameraTriple, AssociatedTriple>
+	metricThreeViewLmeds( @Nullable ConfigPixelsToMetric configSelfcalib,
+						   ConfigLMedS configLMedS ) {
+		configLMedS.checkValidity();
+
+		// lint:forbidden ignore_below 1
+		var generator = FactoryMultiView.selfCalibThree(configSelfcalib);
+		var manager = new ModelManagerMetricCameraTriple();
+		var distance = new DistanceFromModelIntoViews<MetricCameraTriple, AssociatedTriple, ElevateViewInfo>
+				(new DistanceMetricTripleReprojection23(), 3);
+
+		return new LeastMedianOfSquaresProjective<>(configLMedS.randSeed, configLMedS.totalCycles, Double.MAX_VALUE,
+				configLMedS.errorFraction, manager, generator, distance);
+	}
+
+
 	public static <Model, Point> LeastMedianOfSquares<Model, Point>
 	createLMEDS( ConfigLMedS configLMedS, ModelManager<Model> manager, Class<Point> pointType ) {
 		LeastMedianOfSquares<Model, Point> alg = BoofConcurrency.isUseConcurrent() ?

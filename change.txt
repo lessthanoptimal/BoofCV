@@ -29,8 +29,9 @@ Version : 0.41
 - Various
   - Fixed crash in Niblack Family when output image was not resized to match input image
 - Stereo Disparity: Fixed bug where invalid values got cast to a byte when image was float, causing artifacts.
-- Three-View Estimate Scene Metric
-  - Does self calibration entirely inside of RANSAC
+- Photogrammetry
+ - Three-View Reconstruction: Does self calibration entirely inside of RANSAC
+ - TODO Use this three-view code in PairwiseGraphUtils and remove projective part
 - SLAM
   - TODO Monocular
   - TODO Stereo
