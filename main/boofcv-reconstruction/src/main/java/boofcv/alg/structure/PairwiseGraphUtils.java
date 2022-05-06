@@ -80,8 +80,6 @@ public class PairwiseGraphUtils {
 	protected final @Getter SceneStructureProjective structurePr = new SceneStructureProjective(true);
 	protected final @Getter SceneObservations observations = new SceneObservations();
 
-	/** Used to convert observations from 3-views into a metric scene */
-	protected final @Getter ThreeViewEstimateMetricScene pixelToMetric3 = new ThreeViewEstimateMetricScene();
 	protected @Getter ModelMatcher<TrifocalTensor, AssociatedTriple> ransac;
 	protected @Getter TriangulateNViewsProjective triangulator;
 	protected @Getter PoseFromPairLinear6 poseEstimator = new PoseFromPairLinear6();
@@ -293,26 +291,6 @@ public class PairwiseGraphUtils {
 		inlierIdx.resize(inliersThreeView.size);
 		for (int i = 0; i < inliersThreeView.size; i++) {
 			inlierIdx.data[i] = ransac.getInputIndex(i);
-		}
-		return true;
-	}
-
-	/**
-	 * Robustly estimates metric views with extrinsics known up to a scale factor
-	 */
-	public boolean estimateMetricCamerasRobustly() {
-		// TODO specific which cameras are known to be thesame
-		// TODO specify shape of each camera individually
-		pixelToMetric3.initialize(priorCamA.width, priorCamA.height);
-		if (!pixelToMetric3.process(matchesTriple.toList()))
-			return false;
-
-		inliersThreeView.reset();
-		inliersThreeView.addAll(pixelToMetric3.ransac.getMatchSet());
-		inlierIdx.reset();
-		inlierIdx.resize(inliersThreeView.size);
-		for (int i = 0; i < inliersThreeView.size; i++) {
-			inlierIdx.data[i] = pixelToMetric3.ransac.getInputIndex(i);
 		}
 		return true;
 	}

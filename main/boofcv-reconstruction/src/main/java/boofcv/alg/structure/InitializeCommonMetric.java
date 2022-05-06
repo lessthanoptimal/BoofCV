@@ -19,7 +19,6 @@
 package boofcv.alg.structure;
 
 import boofcv.abst.geo.bundle.SceneObservations;
-import boofcv.abst.geo.bundle.SceneStructureProjective;
 import boofcv.alg.geo.MetricCameras;
 import boofcv.alg.structure.PairwiseImageGraph.Motion;
 import boofcv.alg.structure.PairwiseImageGraph.View;
@@ -51,10 +50,9 @@ import static boofcv.misc.BoofMiscOps.checkTrue;
  * </ol>
  *
  * TODO handle 2-view case
- * TODO use information for when there's a single camera
- *
- * The output is contained in SBA structure. See {@link #getStructure()} and
- * {@link #getPairwiseGraphViewByStructureIndex(int)}
+ * TODO specify camera shape individually. One camera is used for all views right now
+ * TODO Need to provide some way to external adjust RANSAC parameters here
+ * TODO Handle planar scenes.
  *
  * @author Peter Abeles
  */
@@ -62,6 +60,9 @@ import static boofcv.misc.BoofMiscOps.checkTrue;
 public class InitializeCommonMetric implements VerbosePrint {
 	/** Common algorithms for reconstructing the projective scene */
 	public @Getter @Setter PairwiseGraphUtils utils;
+
+	/** Used to convert observations from 3-views into a metric scene */
+	protected final @Getter ThreeViewEstimateMetricScene pixelToMetric3 = new ThreeViewEstimateMetricScene();
 
 	/**
 	 * List of feature indexes for each view that are part of the inlier set. The seed view is at index 0. The other
@@ -158,9 +159,8 @@ public class InitializeCommonMetric implements VerbosePrint {
 
 		// Estimate the initial projective cameras using trifocal tensor
 		utils.createTripleFromCommon(verbose);
-		utils.pixelToMetric3.singleCamera = false; // TODO make this configured centrally better some how
 		// TODO move out camera estimation from pairwise utils?
-		if (!utils.estimateMetricCamerasRobustly()) {
+		if (!estimateMetricCamerasRobustly()) {
 			if (verbose != null) verbose.println("FAILED: Create metric views from initial triplet");
 			return false;
 		}
@@ -179,13 +179,43 @@ public class InitializeCommonMetric implements VerbosePrint {
 		viewsByStructureIndex.forIdx(( i, o ) -> BoofMiscOps.checkTrue(o != null));
 
 		// Save results
-		for (int viewIdx = 0; viewIdx < 3; viewIdx++) {
-			results.intrinsics.grow().setTo(utils.pixelToMetric3.listPinhole.get(viewIdx));
-			// First view is implicit
-			if (viewIdx != 0)
-				results.motion_1_to_k.grow().setTo(utils.pixelToMetric3.listWorldToView.get(viewIdx));
+		for (int camIdx = 0; camIdx < pixelToMetric3.listPinhole.size; camIdx++) {
+			results.intrinsics.grow().setTo(pixelToMetric3.listPinhole.get(camIdx));
 		}
 
+		for (int viewIdx = 1; viewIdx < pixelToMetric3.listWorldToView.size; viewIdx++) {
+			results.motion_1_to_k.grow().setTo(pixelToMetric3.listWorldToView.get(viewIdx));
+		}
+
+		return true;
+	}
+
+	/** True if a single camera generated all views */
+	private boolean isSingleCamera() {
+		int camA = utils.dbCams.viewToCamera(utils.seed.id);
+		int camB = utils.dbCams.viewToCamera(utils.viewB.id);
+		int camC = utils.dbCams.viewToCamera(utils.viewC.id);
+
+		return camA == camB && camA == camC;
+	}
+
+	/**
+	 * Robustly estimates metric views with extrinsics known up to a scale factor
+	 */
+	public boolean estimateMetricCamerasRobustly() {
+		// TODO specify shape of each camera individually
+		pixelToMetric3.singleCamera = isSingleCamera();
+		pixelToMetric3.initialize(utils.priorCamA.width, utils.priorCamA.height);
+		if (!pixelToMetric3.process(utils.matchesTriple.toList()))
+			return false;
+
+		utils.inliersThreeView.reset();
+		utils.inliersThreeView.addAll(pixelToMetric3.ransac.getMatchSet());
+		utils.inlierIdx.reset();
+		utils.inlierIdx.resize(utils.inliersThreeView.size);
+		for (int i = 0; i < utils.inliersThreeView.size; i++) {
+			utils.inlierIdx.data[i] = pixelToMetric3.ransac.getInputIndex(i);
+		}
 		return true;
 	}
 
@@ -196,7 +226,7 @@ public class InitializeCommonMetric implements VerbosePrint {
 	 * Only points that are in the inlier set are part of the scene's structure.
 	 */
 	void createStructureLookUpTables( View viewA ) {
-		final Ransac<?, ?> ransac = utils.pixelToMetric3.ransac;
+		final Ransac<?, ?> ransac = pixelToMetric3.ransac;
 
 		final int numInliers = ransac.getMatchSet().size();
 		seedToStructure.resize(viewA.totalObservations);
@@ -300,13 +330,6 @@ public class InitializeCommonMetric implements VerbosePrint {
 	}
 
 	/**
-	 * Returns the estimated scene structure
-	 */
-	public SceneStructureProjective getStructure() {
-		return utils.structurePr;
-	}
-
-	/**
 	 * Returns the {@link View} given the index of the view in structure
 	 */
 	public View getPairwiseGraphViewByStructureIndex( int index ) {
@@ -316,5 +339,6 @@ public class InitializeCommonMetric implements VerbosePrint {
 	@Override
 	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
 		this.verbose = BoofMiscOps.addPrefix(this, out);
+		BoofMiscOps.verboseChildren(out, configuration, pixelToMetric3);
 	}
 }
