@@ -18,23 +18,15 @@
 
 package boofcv.alg.structure.spawn;
 
-import boofcv.abst.geo.selfcalib.ProjectiveToMetricCameras;
 import boofcv.alg.geo.MetricCameras;
 import boofcv.alg.geo.bundle.BundleAdjustmentOps;
 import boofcv.alg.structure.*;
-import boofcv.factory.geo.ConfigSelfCalibDualQuadratic;
-import boofcv.factory.geo.FactoryMultiView;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinholeBrown;
-import boofcv.struct.calib.ElevateViewInfo;
-import boofcv.struct.geo.AssociatedTupleDN;
 import lombok.Getter;
-import lombok.Setter;
-import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.VerbosePrint;
-import org.ejml.data.DMatrixRMaj;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
@@ -58,13 +50,9 @@ import static boofcv.misc.BoofMiscOps.checkEq;
 public class MetricSpawnSceneFromView implements VerbosePrint {
 
 	/** Computes the initial scene from the seed and some of it's neighbors */
-	private final @Getter ProjectiveInitializeAllCommon initProjective;
+	private final @Getter InitializeCommonMetric initialize;
 
 	private final @Getter RefineMetricWorkingGraph refineWorking;
-
-	/** Used elevate the projective scene into a metric scene */
-	private @Getter @Setter ProjectiveToMetricCameras projectiveToMetric =
-			FactoryMultiView.projectiveToMetric((ConfigSelfCalibDualQuadratic)null);
 
 	/** If less than this number of features fail the physical constraint test, attempt to recover by removing them */
 	public double fractionBadFeaturesRecover = 0.05;
@@ -79,9 +67,6 @@ public class MetricSpawnSceneFromView implements VerbosePrint {
 
 	//------------ Internal Work Space
 	List<String> viewIds = new ArrayList<>();
-	DogArray<ElevateViewInfo> viewInfos = new DogArray<>(ElevateViewInfo::new);
-	DogArray<DMatrixRMaj> cameraMatrices = new DogArray<>(() -> new DMatrixRMaj(3, 4));
-	DogArray<AssociatedTupleDN> observations = new DogArray<>(AssociatedTupleDN::new);
 	MetricCameras elevationResults = new MetricCameras();
 
 	List<CameraPinholeBrown> listPriorCameras = new ArrayList<>();
@@ -89,8 +74,8 @@ public class MetricSpawnSceneFromView implements VerbosePrint {
 
 	public MetricSpawnSceneFromView( RefineMetricWorkingGraph refineWorking, PairwiseGraphUtils utils ) {
 		this.refineWorking = refineWorking;
-		this.initProjective = new ProjectiveInitializeAllCommon();
-		this.initProjective.utils = utils;
+		this.initialize = new InitializeCommonMetric();
+		this.initialize.utils = utils;
 		this.utils = utils;
 	}
 
@@ -113,26 +98,20 @@ public class MetricSpawnSceneFromView implements VerbosePrint {
 							PairwiseImageGraph.View seed,
 							DogArray_I32 motions ) {
 		scene.reset();
-		var commonPairwise = new DogArray_I32();
-
-		// Find the common features
-		utils.findAllConnectedSeed(seed, motions, commonPairwise);
-		if (commonPairwise.size < 6) { // if less than the minimum it will fail
-			if (verbose != null) verbose.println("FAILED: Too few common features. seed.id='" + seed.id + "'");
-			return false;
-		}
 
 		// initialize projective scene using common tracks
-		if (!initProjective.projectiveSceneN(dbSimilar, dbCams, seed, commonPairwise, motions)) {
+		if (!initialize.metricScene(dbSimilar, dbCams, seed, motions, elevationResults)) {
 			if (verbose != null) verbose.println("FAILED: Initialize projective scene");
 			return false;
 		}
 
-		// Elevate initial seed to metric
-		if (!projectiveSeedToMetric(pairwise)) {
-			if (verbose != null) verbose.println("FAILED: Projective to metric. seed.id='" + seed.id + "'");
-			return false;
+		// List of views by ID which compose this new scene
+		viewIds.clear();
+		for (int i = 0; i < initialize.getViewsByStructureIndex().size; i++) {
+			viewIds.add(initialize.getViewsByStructureIndex().get(i).id);
 		}
+
+		saveMetricSeed(pairwise, viewIds, initialize.getInlierIndexes(), elevationResults, scene);
 
 		return refineAndRemoveBadFeatures(dbSimilar, seed);
 	}
@@ -211,25 +190,6 @@ public class MetricSpawnSceneFromView implements VerbosePrint {
 	}
 
 	/**
-	 * Elevate the initial projective scene into a metric scene.
-	 */
-	private boolean projectiveSeedToMetric( PairwiseImageGraph pairwise ) {
-		// Get results in a format that 'projectiveToMetric' understands
-		initProjective.lookupInfoForMetricElevation(viewIds, viewInfos, cameraMatrices, observations);
-
-		// Pass the projective scene and elevate into a metric scene
-		if (!projectiveToMetric.process(viewInfos.toList(), cameraMatrices.toList(),
-				(List)observations.toList(), elevationResults)) {
-			if (verbose != null) verbose.println("_ views=" + BoofMiscOps.toStringLine(viewIds));
-			return false;
-		}
-
-		saveMetricSeed(pairwise, viewIds, initProjective.getInlierIndexes(), elevationResults, scene);
-
-		return true;
-	}
-
-	/**
 	 * Saves the elevated metric results to the scene. Each view is given a copy of the inlier that has been
 	 * adjusted so that it is view zero.
 	 *
@@ -239,7 +199,8 @@ public class MetricSpawnSceneFromView implements VerbosePrint {
 						 FastAccess<DogArray_I32> viewInlierIndexes,
 						 MetricCameras results,
 						 SceneWorkingGraph scene ) {
-		checkEq(viewIds.size(), results.motion_1_to_k.size + 1, "Implicit view[0] no included");
+		// +1 to include implicit view[0]
+		checkEq(viewIds.size(), results.motion_1_to_k.size + 1, "view count and motion count do not match");
 		checkEq(viewIds.size(), viewInlierIndexes.size());
 
 		// Save the number of views in the seed
@@ -286,10 +247,6 @@ public class MetricSpawnSceneFromView implements VerbosePrint {
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
 		this.verbose = BoofMiscOps.addPrefix(this, out);
-		BoofMiscOps.verboseChildren(verbose, configuration, initProjective, checks);
-
-		if (projectiveToMetric instanceof VerbosePrint) {
-			BoofMiscOps.verboseChildren(verbose, configuration, (VerbosePrint)projectiveToMetric);
-		}
+		BoofMiscOps.verboseChildren(verbose, configuration, initialize, checks);
 	}
 }

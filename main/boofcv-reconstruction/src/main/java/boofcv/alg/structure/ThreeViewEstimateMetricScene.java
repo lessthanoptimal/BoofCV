@@ -22,6 +22,7 @@ import boofcv.abst.geo.bundle.BundleAdjustment;
 import boofcv.abst.geo.bundle.PruneStructureFromSceneMetric;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
+import boofcv.alg.geo.bundle.BundleAdjustmentOps;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.alg.geo.robust.RansacProjective;
 import boofcv.alg.geo.selfcalib.MetricCameraTriple;
@@ -29,20 +30,19 @@ import boofcv.factory.geo.*;
 import boofcv.misc.BoofMiscOps;
 import boofcv.misc.ConfigConverge;
 import boofcv.struct.calib.CameraPinhole;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.calib.ElevateViewInfo;
 import boofcv.struct.geo.AssociatedTriple;
 import georegression.geometry.ConvertRotation3D_F64;
-import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.so.Rodrigues_F64;
 import lombok.Getter;
 import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
+import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.VerbosePrint;
-import org.ejml.dense.row.CommonOps_DDRM;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -90,8 +90,17 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 	public ConfigBundleAdjustment configSBA = new ConfigBundleAdjustment();
 	public ConfigConverge convergeSBA = new ConfigConverge(1e-6, 1e-6, 100);
 
+	/** Optimize points in homogenous coordinates */
+	public boolean homogenous = true;
+
 	/** It can assume that all views are generated from a single camera */
 	public boolean singleCamera = true;
+
+	/** If a positive number the focal length will be assumed to be that */
+	public double manualFocalLength = -1;
+
+	/** How many features it will keep when pruning */
+	public double pruneFraction = 0.7;
 
 	// estimating the trifocal tensor and storing which observations are in the inlier set
 	public RansacProjective<MetricCameraTriple, AssociatedTriple> ransac;
@@ -100,27 +109,21 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 	// how much and where it should print to
 	private @Nullable PrintStream verbose;
 
-	// storage for pinhole cameras
-	public final List<CameraPinhole> listPinhole = new ArrayList<>();
+	/** Found intrinsics for each camera */
+	public final DogArray<CameraPinholeBrown> listPinhole = new DogArray<>(CameraPinholeBrown::new, CameraPinholeBrown::reset);
+
+	/** Found extrinsics for each view. view 0 is always identity */
+	public final DogArray<Se3_F64> listWorldToView = new DogArray<>(Se3_F64::new, Se3_F64::reset);
 
 	// Refines the structure
 	public BundleAdjustment<SceneStructureMetric> bundleAdjustment;
 
 	// Bundle adjustment data structure and tuning parameters
-	public @Getter SceneStructureMetric structure;
-	public SceneObservations observations;
+	private @Getter SceneStructureMetric structure;
+	private @Getter SceneObservations observations;
 
-	// If a positive number the focal length will be assumed to be that
-	public double manualFocalLength = -1;
-
-	// How many features it will keep when pruning
-	public double pruneFraction = 0.7;
-
-	// shape of input images.
-//	private int width, height; // TODO Get size for each image individually
-
-	// metric location of each camera. The first view is always identity
-//	protected List<Se3_F64> listWorldToView = new ArrayList<>();
+	// Image width and height
+	protected int width, height;
 
 	/**
 	 * Sets configurations to their default value
@@ -135,35 +138,12 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 	}
 
 	/**
-	 * Determines the metric scene. The principle point is assumed to be zero in the passed in pixel coordinates.
-	 * Typically this is done by subtracting the image center from each pixel coordinate for each view.
+	 * Initializes data structures and fixates configurations
 	 *
-	 * @param associated List of associated features from 3 views. pixels
 	 * @param width width of all images
 	 * @param height height of all images
-	 * @return true if successful or false if it failed
 	 */
-	public boolean process( List<AssociatedTriple> associated, int width, int height ) {
-		init(width, height);
-
-		// Fit a trifocal tensor to the input observations
-		if (!robustSelfCalibration(associated))
-			return false;
-
-		// Run bundle adjustment while make sure a valid solution is found
-		setupMetricBundleAdjustment(inliers);
-
-		bundleAdjustment = FactoryMultiView.bundleSparseMetric(configSBA);
-		findBestValidSolution(bundleAdjustment);
-
-		// Prune outliers and run bundle adjustment one last time
-		pruneOutliers(bundleAdjustment);
-
-		return true;
-	}
-
-	@SuppressWarnings("NullAway")
-	private void init( int width, int height ) {
+	public void initialize( int width, int height ) {
 		// TODO let it specify image shape for each view independently
 		ransac = FactoryMultiViewRobust.metricThreeViewRansac(configSelfCalib, configRansac);
 
@@ -172,8 +152,35 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 			int camId = singleCamera ? 0 : idx;
 			ransac.setView(idx, new ElevateViewInfo(width, height, camId));
 		}
-		structure = null;
-		observations = null;
+
+		structure = new SceneStructureMetric(homogenous);
+		observations = new SceneObservations();
+		bundleAdjustment = FactoryMultiView.bundleSparseMetric(configSBA);
+		bundleAdjustment.configure(convergeSBA.ftol, convergeSBA.gtol, convergeSBA.maxIterations);
+	}
+
+	/**
+	 * Determines the metric scene. The principle point is assumed to be zero in the passed in pixel coordinates.
+	 * Typically this is done by subtracting the image center from each pixel coordinate for each view.
+	 *
+	 * @param associated List of associated features from 3 views. pixels
+	 * @return true if successful or false if it failed
+	 */
+	public boolean process( List<AssociatedTriple> associated ) {
+		Objects.requireNonNull(structure, "Did you call initialize?");
+
+		// Fit a trifocal tensor to the input observations
+		if (!robustSelfCalibration(associated))
+			return false;
+
+		// Run bundle adjustment while make sure a valid solution is found
+		setupMetricBundleAdjustment(inliers);
+
+		bundleAdjustment.setParameters(structure, observations);
+		bundleAdjustment.optimize(structure);
+
+		// Prune outliers and run bundle adjustment one last time
+		return pruneOutliers(bundleAdjustment);
 	}
 
 	/**
@@ -196,125 +203,23 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 
 		if (verbose != null) verbose.println("Remaining after RANSAC " + inliers.size() + " / " + associated.size());
 
+		// Save intrinsics
 		if (singleCamera) {
 			averageIntrinsicParameters(ransac.getModelParameters());
 		} else {
-			listPinhole.clear();
+			listPinhole.resetResize(3);
 			for (int i = 0; i < 3; i++) {
-				listPinhole.add(ransac.getModelParameters().getIntrinsics(i));
+				listPinhole.get(i).setTo(ransac.getModelParameters().getIntrinsics(i));
 			}
 		}
+
+		// Save extrinsics
+		listWorldToView.resetResize(3);
+		for (int i = 0; i < 3; i++) {
+			ransac.getModelParameters().getView1ToIdx(i, listWorldToView.get(i));
+		}
+
 		return true;
-	}
-
-	/**
-	 * Prunes the features with the largest reprojection error
-	 */
-	private void pruneOutliers( BundleAdjustment<SceneStructureMetric> bundleAdjustment ) {
-		// see if it's configured to not prune
-		if (pruneFraction == 1.0)
-			return;
-		if (verbose != null) verbose.println("Pruning Outliers");
-
-		var pruner = new PruneStructureFromSceneMetric(structure, observations);
-		pruner.pruneObservationsByErrorRank(pruneFraction);
-		pruner.pruneViews(10);
-		pruner.pruneUnusedMotions();
-		pruner.prunePoints(1);
-		bundleAdjustment.setParameters(structure, observations);
-		double before = bundleAdjustment.getFitScore();
-		bundleAdjustment.optimize(structure);
-		if (verbose != null) verbose.println("   before " + before + " after " + bundleAdjustment.getFitScore());
-
-		if (verbose != null) {
-			verbose.println("\nCamera");
-			for (int i = 0; i < structure.cameras.size; i++) {
-				verbose.println("  " + Objects.requireNonNull(structure.cameras.data[i].getModel()).toString());
-			}
-			verbose.println("\nworldToView");
-			for (int i = 0; i < structure.views.size; i++) {
-				if (verbose != null) {
-					Se3_F64 se = structure.getParentToView(i);
-					Rodrigues_F64 rod = ConvertRotation3D_F64.matrixToRodrigues(se.R, null);
-					verbose.println("  T=" + se.T + "  R=" + rod);
-				}
-			}
-		}
-	}
-
-	/**
-	 * Tries a bunch of stuff to ensure that it can find the best solution which is physically possible
-	 */
-	private void findBestValidSolution( BundleAdjustment<SceneStructureMetric> bundleAdjustment ) {
-		// Specifies convergence criteria
-		bundleAdjustment.configure(convergeSBA.ftol, convergeSBA.gtol, convergeSBA.maxIterations);
-
-		bundleAdjustment.setParameters(structure, observations);
-		bundleAdjustment.optimize(structure);
-
-		// ensure that the points are in front of the camera and are a valid solution
-		if (checkBehindCamera(structure)) {
-			if (verbose != null)
-				verbose.println("  #1 Points Behind. Flipping view");
-			flipAround(structure, observations);
-			bundleAdjustment.setParameters(structure, observations);
-			bundleAdjustment.optimize(structure);
-		}
-
-		double bestScore = bundleAdjustment.getFitScore();
-		if (verbose != null) verbose.println("First Pass: SBA score " + bestScore);
-		List<Se3_F64> bestPose = new ArrayList<>();
-		List<BundlePinholeSimplified> bestCameras = new ArrayList<>();
-		for (int i = 0; i < structure.cameras.size; i++) {
-			BundlePinholeSimplified c = Objects.requireNonNull(structure.cameras.data[i].getModel());
-			bestCameras.add(c.copy());
-		}
-
-		for (int i = 0; i < structure.views.size; i++) {
-			bestPose.add(structure.getParentToView(i).copy());
-		}
-
-		for (int i = 0; i < structure.cameras.size; i++) {
-			BundlePinholeSimplified c = Objects.requireNonNull(structure.cameras.data[i].getModel());
-			c.f = listPinhole.get(i).fx;
-			c.k1 = c.k2 = 0;
-		}
-		// flip rotation assuming that it was done wrong
-		for (int i = 1; i < structure.views.size; i++) {
-			CommonOps_DDRM.transpose(structure.getParentToView(i).R);
-		}
-		triangulatePoints(structure, observations);
-
-		bundleAdjustment.setParameters(structure, observations);
-		bundleAdjustment.optimize(structure);
-
-		if (checkBehindCamera(structure)) {
-			if (verbose != null)
-				verbose.println("  #2 Points Behind. Flipping view");
-			flipAround(structure, observations);
-			bundleAdjustment.setParameters(structure, observations);
-			bundleAdjustment.optimize(structure);
-		}
-
-		// revert to old settings
-		if (verbose != null)
-			verbose.println(" First Pass / Transpose(R) = " + bestScore + " / " + bundleAdjustment.getFitScore());
-		if (bundleAdjustment.getFitScore() > bestScore) {
-			if (verbose != null)
-				verbose.println("  recomputing old structure");
-			for (int i = 0; i < structure.cameras.size; i++) {
-				BundlePinholeSimplified c = Objects.requireNonNull(structure.cameras.data[i].getModel());
-				c.setTo(bestCameras.get(i));
-			}
-			for (int i = 0; i < structure.views.size; i++) {
-				structure.getParentToView(i).setTo(bestPose.get(i));
-			}
-			triangulatePoints(structure, observations);
-			bundleAdjustment.setParameters(structure, observations);
-			bundleAdjustment.optimize(structure);
-			if (verbose != null)
-				verbose.println("  score after reverting = " + bundleAdjustment.getFitScore() + "  original " + bestScore);
-		}
 	}
 
 	/**
@@ -329,7 +234,7 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 
 		for (int i = 0; i < listPinhole.size(); i++) {
 			CameraPinhole cp = listPinhole.get(i);
-			BundlePinholeSimplified bp = new BundlePinholeSimplified();
+			var bp = new BundlePinholeSimplified();
 
 			bp.f = cp.fx;
 
@@ -338,7 +243,7 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 
 		MetricCameraTriple found = ransac.getModelParameters();
 		for (int i = 0; i < 3; i++) {
-			structure.setView(i, singleCamera ? 0 : i, i == 0, found.getTransform(i));
+			structure.setView(i, singleCamera ? 0 : i, i == 0, found.getView1ToIdx(i));
 		}
 
 		for (int i = 0; i < inliers.size(); i++) {
@@ -357,11 +262,57 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 	}
 
 	/**
+	 * Prunes the features with the largest reprojection error
+	 */
+	private boolean pruneOutliers( BundleAdjustment<SceneStructureMetric> bundleAdjustment ) {
+		// see if it's configured to not prune
+		if (pruneFraction == 1.0)
+			return true;
+		if (verbose != null) verbose.println("Pruning Outliers");
+
+		var pruner = new PruneStructureFromSceneMetric(structure, observations);
+		pruner.pruneObservationsByErrorRank(pruneFraction);
+		pruner.pruneViews(10);
+		pruner.pruneUnusedMotions();
+		pruner.prunePoints(1);
+		bundleAdjustment.setParameters(structure, observations);
+		double before = bundleAdjustment.getFitScore();
+		if (!bundleAdjustment.optimize(structure))
+			return false;
+
+		// Save results
+		listPinhole.resetResize(structure.cameras.size);
+		for (int i = 0; i < structure.cameras.size; i++) {
+			BundleAdjustmentOps.convert(structure.cameras.get(i).model, width, height, listPinhole.get(i));
+		}
+		listWorldToView.resetResize(structure.views.size);
+		for (int i = 0; i < structure.views.size; i++) {
+			listWorldToView.get(i).setTo(structure.getParentToView(i));
+		}
+
+		// Print debugging info if requested
+		if (verbose != null) {
+			verbose.println("   before " + before + " after " + bundleAdjustment.getFitScore());
+			verbose.println("\nCamera");
+			for (int i = 0; i < structure.cameras.size; i++) {
+				verbose.println("  " + Objects.requireNonNull(structure.cameras.data[i].getModel()));
+			}
+			verbose.println("\nworldToView");
+			for (int i = 0; i < structure.views.size; i++) {
+				Se3_F64 se = structure.getParentToView(i);
+				Rodrigues_F64 rod = ConvertRotation3D_F64.matrixToRodrigues(se.R, null);
+				verbose.println("  T=" + se.T + "  R=" + rod);
+			}
+		}
+		return true;
+	}
+
+	/**
 	 * Assume that there's only really one camera being used and take all the indepdent estimates and average them
 	 */
 	private void averageIntrinsicParameters( MetricCameraTriple results ) {
-		listPinhole.clear();
-		listPinhole.add(results.getIntrinsics(0));
+		listPinhole.reset();
+		listPinhole.grow().setTo(results.getIntrinsics(0));
 
 		CameraPinhole ave = listPinhole.get(0);
 		for (int i = 1; i < 3; i++) {
@@ -375,39 +326,6 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 		ave.fy /= 3;
 		ave.cx /= 3;
 		ave.cy /= 3;
-	}
-
-	/**
-	 * Checks to see if a solution was converged to where the points are behind the camera. This is
-	 * physically impossible
-	 */
-	private boolean checkBehindCamera( SceneStructureMetric structure ) {
-		int totalBehind = 0;
-		Point3D_F64 X = new Point3D_F64();
-		for (int i = 0; i < structure.points.size; i++) {
-			structure.points.data[i].get(X);
-			if (X.z < 0)
-				totalBehind++;
-		}
-
-		if (verbose != null) {
-			verbose.println("points behind " + totalBehind + " / " + structure.points.size);
-		}
-
-		return totalBehind > structure.points.size/2;
-	}
-
-	/**
-	 * Flip the camera pose around. This seems to help it converge to a valid solution if it got it backwards
-	 * even if it's not technically something which can be inverted this way
-	 */
-	private static void flipAround( SceneStructureMetric structure, SceneObservations observations ) {
-		// The first view will be identity
-		for (int i = 1; i < structure.views.size; i++) {
-			Se3_F64 w2v = structure.getParentToView(i);
-			w2v.setTo(w2v.invert(null));
-		}
-		triangulatePoints(structure, observations);
 	}
 
 	@Override

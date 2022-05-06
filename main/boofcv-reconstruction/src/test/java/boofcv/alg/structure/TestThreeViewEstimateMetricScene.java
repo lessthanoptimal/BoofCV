@@ -41,9 +41,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * @author Peter Abeles
- */
 public class TestThreeViewEstimateMetricScene extends BoofStandardJUnit {
 	CameraPinhole intrinsic = new CameraPinhole(400, 400, 0, 0, 0, 900, 900);
 
@@ -71,7 +68,8 @@ public class TestThreeViewEstimateMetricScene extends BoofStandardJUnit {
 
 		for (boolean singleCamera : new boolean[]{false, true}) {
 			alg.singleCamera = singleCamera;
-			assertTrue(alg.process(views, 900, 900));
+			alg.initialize(900, 900);
+			assertTrue(alg.process(views));
 
 			// See if the reconstructed seen matches the original to within a high level of precision
 			SceneStructureMetric structure = alg.getStructure();

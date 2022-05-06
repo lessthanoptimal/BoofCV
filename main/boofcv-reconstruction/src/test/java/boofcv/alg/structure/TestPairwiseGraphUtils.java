@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -265,15 +265,15 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 
 		alg.initializeSbaSceneThreeView(true);
 
-		assertEquals(1, alg.structure.points.size);
+		assertEquals(1, alg.structurePr.points.size);
 
 		// triangulate is tested elsewhere for accuracy
 		assertTrue(alg.called);
 
 		// See if the results were copied
-		assertTrue(MatrixFeatures_DDRM.isIdentical(alg.P1, alg.structure.views.get(0).worldToView, 1e-8));
-		assertTrue(MatrixFeatures_DDRM.isIdentical(alg.P2, alg.structure.views.get(1).worldToView, 1e-8));
-		assertTrue(MatrixFeatures_DDRM.isIdentical(alg.P3, alg.structure.views.get(2).worldToView, 1e-8));
+		assertTrue(MatrixFeatures_DDRM.isIdentical(alg.P1, alg.structurePr.views.get(0).worldToView, 1e-8));
+		assertTrue(MatrixFeatures_DDRM.isIdentical(alg.P2, alg.structurePr.views.get(1).worldToView, 1e-8));
+		assertTrue(MatrixFeatures_DDRM.isIdentical(alg.P3, alg.structurePr.views.get(2).worldToView, 1e-8));
 	}
 
 	@Test void estimateProjectiveCamerasRobustly() {
@@ -329,7 +329,7 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 			alg.inliersThreeView.add(t);
 		}
 
-		alg.structure.initialize(3, alg.inliersThreeView.size());
+		alg.structurePr.initialize(3, alg.inliersThreeView.size());
 		alg.triangulateFeatures();
 
 		// start with 3D triangulation
@@ -345,7 +345,7 @@ class TestPairwiseGraphUtils extends BoofStandardJUnit {
 		Point4D_F64 X = new Point4D_F64();
 		Point2D_F64 expected = new Point2D_F64();
 		for (int i = 0; i < alg.inliersThreeView.size(); i++) {
-			alg.structure.getPoints().get(i).get(X);
+			alg.structurePr.getPoints().get(i).get(X);
 
 			PerspectiveOps.renderPixel(alg.P1, X, expected);
 			assertEquals(0.0, expected.distance(alg.inliersThreeView.get(i).p1), UtilEjml.TEST_F64);

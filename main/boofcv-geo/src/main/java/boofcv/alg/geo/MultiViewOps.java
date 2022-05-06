@@ -1713,13 +1713,13 @@ public class MultiViewOps {
 			list_p_to_n.add(p2n);
 		}
 
-		DogArray<Point2D_F64> normObs = new DogArray<>(Point2D_F64::new);
+		var normObs = new DogArray<>(Point2D_F64::new);
 		normObs.resize(3);
 
 		final boolean homogenous = structure.isHomogenous();
-		Point4D_F64 X = new Point4D_F64();
+		var X = new Point4D_F64();
 
-		List<Se3_F64> worldToViews = new ArrayList<>();
+		var worldToViews = new ArrayList<Se3_F64>();
 		for (int i = 0; i < structure.points.size; i++) {
 			normObs.reset();
 			worldToViews.clear();
