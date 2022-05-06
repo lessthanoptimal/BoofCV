@@ -77,9 +77,11 @@ public class PairwiseGraphUtils {
 	public boolean configScaleSBA = false;
 
 	/** The estimated scene structure. This the final estimated scene state */
-	protected final @Getter SceneStructureProjective structure = new SceneStructureProjective(true);
+	protected final @Getter SceneStructureProjective structurePr = new SceneStructureProjective(true);
 	protected final @Getter SceneObservations observations = new SceneObservations();
 
+	/** Used to convert observations from 3-views into a metric scene */
+	protected final @Getter ThreeViewEstimateMetricScene pixelToMetric3 = new ThreeViewEstimateMetricScene();
 	protected @Getter ModelMatcher<TrifocalTensor, AssociatedTriple> ransac;
 	protected @Getter TriangulateNViewsProjective triangulator;
 	protected @Getter PoseFromPairLinear6 poseEstimator = new PoseFromPairLinear6();
@@ -296,6 +298,26 @@ public class PairwiseGraphUtils {
 	}
 
 	/**
+	 * Robustly estimates metric views with extrinsics known up to a scale factor
+	 */
+	public boolean estimateMetricCamerasRobustly() {
+		// TODO specific which cameras are known to be thesame
+		// TODO specify shape of each camera individually
+		pixelToMetric3.initialize(priorCamA.width, priorCamA.height);
+		if (!pixelToMetric3.process(matchesTriple.toList()))
+			return false;
+
+		inliersThreeView.reset();
+		inliersThreeView.addAll(pixelToMetric3.ransac.getMatchSet());
+		inlierIdx.reset();
+		inlierIdx.resize(inliersThreeView.size);
+		for (int i = 0; i < inliersThreeView.size; i++) {
+			inlierIdx.data[i] = pixelToMetric3.ransac.getInputIndex(i);
+		}
+		return true;
+	}
+
+	/**
 	 * Saves which features were used as inliers.
 	 *
 	 * @param inlierIdx Which features in 'commonIdx' are inliers and should be added to the set
@@ -353,7 +375,7 @@ public class PairwiseGraphUtils {
 	 */
 	public void initializeSbaSceneThreeView( boolean fixedSeed ) {
 		// Initialize the 3D scene structure, stored in a format understood by bundle adjustment
-		structure.initialize(3, inliersThreeView.size());
+		structurePr.initialize(3, inliersThreeView.size());
 
 		// specify the found projective camera matrices
 		dbCams.lookupCalibration(dbCams.viewToCamera(seed.id), priorCamA);
@@ -361,9 +383,9 @@ public class PairwiseGraphUtils {
 		dbCams.lookupCalibration(dbCams.viewToCamera(viewC.id), priorCamC);
 
 		// The first view is assumed to be the coordinate system's origin and is identity by definition
-		structure.setView(0, fixedSeed, P1, priorCamA.width, priorCamA.height);
-		structure.setView(1, !fixedSeed, P2, priorCamB.width, priorCamB.height);
-		structure.setView(2, !fixedSeed, P3, priorCamC.width, priorCamC.height);
+		structurePr.setView(0, fixedSeed, P1, priorCamA.width, priorCamA.height);
+		structurePr.setView(1, !fixedSeed, P2, priorCamB.width, priorCamB.height);
+		structurePr.setView(2, !fixedSeed, P3, priorCamC.width, priorCamC.height);
 
 		// triangulate homogenous coordinates for each point in the inlier set
 		triangulateFeatures();
@@ -373,8 +395,8 @@ public class PairwiseGraphUtils {
 	 * Triangulates the location of each features in homogenous space and save to bundle adjustment scene
 	 */
 	protected void triangulateFeatures() {
-		checkTrue(structure.views.size > 0, "Must initialize the structure first");
-		checkTrue(structure.points.size == inliersThreeView.size(),
+		checkTrue(structurePr.views.size > 0, "Must initialize the structure first");
+		checkTrue(structurePr.points.size == inliersThreeView.size(),
 				"Number of inliers must match the number of points in the scene");
 
 		// TODO Normalize camera matrices for better numerics?
@@ -400,7 +422,7 @@ public class PairwiseGraphUtils {
 			// triangulation can fail if all 3 views have the same pixel value. This has been observed in
 			// simulated 3D scenes
 			if (triangulator.triangulate(triangObs, cameraMatrices, X)) {
-				structure.points.data[i].set(X.x, X.y, X.z, X.w);
+				structurePr.points.data[i].set(X.x, X.y, X.z, X.w);
 			} else {
 				throw new RuntimeException("Failed to triangulate a point in the inlier set?! Handle if this is common");
 			}
@@ -435,18 +457,18 @@ public class PairwiseGraphUtils {
 			return true;
 
 		if (configScaleSBA) {
-			scaler.applyScale(structure, observations);
+			scaler.applyScale(structurePr, observations);
 		}
 
-		sba.setParameters(structure, observations);
+		sba.setParameters(structurePr, observations);
 		sba.configure(configConvergeSBA.ftol, configConvergeSBA.gtol, configConvergeSBA.maxIterations);
 
-		if (!sba.optimize(structure)) {
+		if (!sba.optimize(structurePr)) {
 			return false;
 		}
 
 		if (configScaleSBA) {
-			scaler.undoScale(structure, observations);
+			scaler.undoScale(structurePr, observations);
 		}
 		return true;
 	}

@@ -54,11 +54,20 @@ public class MetricCameraTriple {
 		};
 	}
 
-	public Se3_F64 getTransform( int viewIdx ) {
+	public Se3_F64 getView1ToIdx( int viewIdx ) {
 		return switch (viewIdx) {
 			case 0 -> new Se3_F64();
 			case 1 -> view_1_to_2;
 			case 2 -> view_1_to_3;
+			default -> throw new IllegalArgumentException("Invalid index " + viewIdx);
+		};
+	}
+
+	public void getView1ToIdx( int viewIdx, Se3_F64 output ) {
+		switch (viewIdx) {
+			case 0 -> output.reset();
+			case 1 -> output.setTo(view_1_to_2);
+			case 2 -> output.setTo(view_1_to_3);
 			default -> throw new IllegalArgumentException("Invalid index " + viewIdx);
 		};
 	}

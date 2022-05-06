@@ -627,7 +627,8 @@ public class DemoThreeViewStereoApp<TD extends TupleDesc<TD>> extends Demonstrat
 
 			//structureEstimator.setVerbose(System.out,0);
 			System.out.println("Computing 3D structure. triplets " + associated.size);
-			if (!structureEstimator.process(associated.toList(), width, height)) {
+			structureEstimator.initialize(width, height);
+			if (!structureEstimator.process(associated.toList())) {
 				SwingUtilities.invokeLater(() -> controls.addText("Estimate structure Failed!\n"));
 				controls.scaleChanged = true;
 				return;
@@ -639,8 +640,8 @@ public class DemoThreeViewStereoApp<TD extends TupleDesc<TD>> extends Demonstrat
 					controls.setViews(2);
 				int n = structureEstimator.ransac.getMatchSet().size();
 				double score = structureEstimator.bundleAdjustment.getFitScore();
-				int numObs = structureEstimator.observations.getObservationCount();
-				int numPoints = structureEstimator.structure.points.size;
+				int numObs = structureEstimator.getObservations().getObservationCount();
+				int numPoints = structureEstimator.getStructure().points.size;
 				controls.addText(String.format("Inliers %d\n", n));
 				controls.addText("Initial Intrinsic\n");
 				for (int i = 0; i < structureEstimator.listPinhole.size(); i++) {
@@ -649,8 +650,8 @@ public class DemoThreeViewStereoApp<TD extends TupleDesc<TD>> extends Demonstrat
 				}
 
 				controls.addText("SBA Intrinsic\n");
-				for (int i = 0; i < structureEstimator.structure.cameras.size; i++) {
-					BundlePinholeSimplified c = structureEstimator.structure.getCameraModel(i);
+				for (int i = 0; i < structureEstimator.getStructure().cameras.size; i++) {
+					BundlePinholeSimplified c = structureEstimator.getStructure().getCameraModel(i);
 					controls.addText(String.format("  f=%.1f k1=%.2f k2=%.2f\n", c.f, c.k1, c.k2));
 				}
 				controls.addText(String.format("SBA Obs %4d Pts %d\n", numObs, numPoints));
@@ -661,7 +662,7 @@ public class DemoThreeViewStereoApp<TD extends TupleDesc<TD>> extends Demonstrat
 		}
 
 		// Pick the two best views to compute stereo from
-		int[] selected = selectBestPair(structureEstimator.structure);
+		int[] selected = selectBestPair(structureEstimator.getStructure());
 
 		if (!computeStereoCloud(selected[0], selected[1], skipStructure, _automaticChangeViews))
 			return;

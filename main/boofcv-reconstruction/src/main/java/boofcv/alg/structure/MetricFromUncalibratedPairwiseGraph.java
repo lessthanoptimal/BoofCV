@@ -40,7 +40,7 @@ import java.util.Set;
  * <ol>
  * <li>Input: {@link PairwiseImageGraph} and {@link LookUpSimilarImages image information}</li>
  * <li>Selected a set of views to estimate a projective scene based on having good geometry.
- * {@link ProjectiveInitializeAllCommon}</li>
+ * {@link InitializeAllCommonProjective}</li>
  * <li>Metric elevation from initial seed views</li>
  * <li>Grow metric scene one at a time using previously found metric views.
  * {@link MetricExpandByOneView}</li>
@@ -213,7 +213,7 @@ public class MetricFromUncalibratedPairwiseGraph extends ReconstructionFromPairw
 		var best = new Expansion();
 		var candidate = new Expansion();
 
-		// Loop until it can't expand any more
+		// Loop until it can't expand anymore
 		while (true) {
 			if (verbose != null) verbose.println("Selecting next scene/view to expand.");
 

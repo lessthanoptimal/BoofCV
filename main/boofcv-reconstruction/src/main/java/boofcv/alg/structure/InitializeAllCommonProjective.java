@@ -70,7 +70,7 @@ import static boofcv.misc.BoofMiscOps.checkTrue;
  * @author Peter Abeles
  */
 @SuppressWarnings({"NullAway.Init"})
-public class ProjectiveInitializeAllCommon implements VerbosePrint {
+public class InitializeAllCommonProjective implements VerbosePrint {
 
 	/** Common algorithms for reconstructing the projective scene */
 	public @Getter @Setter PairwiseGraphUtils utils;
@@ -101,16 +101,11 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 	 */
 	protected final DogArray_I32 seedToStructure = new DogArray_I32();
 
-	// Used to reassign camera IDs
-	TIntIntMap dbToCamera = new TIntIntHashMap() {{
-		no_entry_value = -1;
-	}};
-
-	public ProjectiveInitializeAllCommon( ConfigProjectiveReconstruction configProjective ) {
+	public InitializeAllCommonProjective( ConfigProjectiveReconstruction configProjective ) {
 		utils = new PairwiseGraphUtils(configProjective);
 	}
 
-	public ProjectiveInitializeAllCommon() {
+	public InitializeAllCommonProjective() {
 		this(new ConfigProjectiveReconstruction());
 	}
 
@@ -177,7 +172,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 		// Estimate the initial projective cameras using trifocal tensor
 		utils.createTripleFromCommon(verbose);
 		if (!utils.estimateProjectiveCamerasRobustly()) {
-			if (verbose != null) verbose.println("FAILED: Created projective from initial triplet");
+			if (verbose != null) verbose.println("FAILED: Create projective from initial triplet");
 			return false;
 		}
 
@@ -219,14 +214,14 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 	 */
 	private void initializeStructureForAllViews( LookUpCameraInfo db, int numberOfFeatures, View seed, DogArray_I32 seedConnIdx ) {
 		utils.observations.initialize(1 + seedConnIdx.size);
-		utils.structure.initialize(1 + seedConnIdx.size, numberOfFeatures);
-		viewsByStructureIndex.resize(utils.structure.views.size, null);
+		utils.structurePr.initialize(1 + seedConnIdx.size, numberOfFeatures);
+		viewsByStructureIndex.resize(utils.structurePr.views.size, null);
 
 		utils.triangulateFeatures();
 
 		// Added the seed view
 		db.lookupViewShape(seed.id, shape);
-		utils.structure.setView(0, true, utils.P1, shape.width, shape.height);
+		utils.structurePr.setView(0, true, utils.P1, shape.width, shape.height);
 
 		// Add the two views connected to it. Note that the index of these views is based on their index
 		// in the seedConnIdx list
@@ -238,7 +233,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 			Motion motion = seed.connections.get(selectedTriple[i]);
 			View view = motion.other(seed);
 			db.lookupViewShape(view.id, shape);
-			utils.structure.setView(
+			utils.structurePr.setView(
 					i == 0 ? indexSbaViewB : indexSbaViewC, false,
 					i == 0 ? utils.P2 : utils.P3, shape.width, shape.height);
 		}
@@ -348,8 +343,8 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 
 		// Look up the 3D coordinates of features from the scene's structure previously computed
 		points3D.reset(); // points in 3D
-		for (int i = 0; i < utils.structure.points.size; i++) {
-			utils.structure.points.data[i].get(points3D.grow());
+		for (int i = 0; i < utils.structurePr.points.size; i++) {
+			utils.structurePr.points.data[i].get(points3D.grow());
 		}
 
 		// contains associated pairs of pixel observations
@@ -386,7 +381,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 			int indexSbaView = motionIdx + 1;
 			// image information and found camera matrix
 			dbCams.lookupViewShape(edge.other(seed).id, shape);
-			utils.structure.setView(indexSbaView, false, cameraMatrix, shape.width, shape.height);
+			utils.structurePr.setView(indexSbaView, false, cameraMatrix, shape.width, shape.height);
 			// observation of features
 			SceneObservations.View sbaObsView = utils.observations.getView(indexSbaView);
 			checkTrue(sbaObsView.size() == 0, "Must be reset to initial state first");
@@ -496,7 +491,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 											  DogArray<DMatrixRMaj> cameraMatrices,
 											  DogArray<AssociatedTupleDN> observations ) {
 		// Initialize all data structures to the correct size
-		final int numViews = utils.structure.views.size;
+		final int numViews = utils.structurePr.views.size;
 		viewIds.clear();
 		views.resize(numViews);
 		cameraMatrices.resize(numViews - 1);
@@ -509,7 +504,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 
 		// Copy results from bundle adjustment data structures
 		for (int viewIdx = 0; viewIdx < numViews; viewIdx++) {
-			SceneStructureProjective.View pview = utils.structure.views.get(viewIdx);
+			SceneStructureProjective.View pview = utils.structurePr.views.get(viewIdx);
 			if (viewIdx != 0)
 				cameraMatrices.get(viewIdx - 1).setTo(pview.worldToView);
 			else
@@ -543,7 +538,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 	 * Returns the estimated scene structure
 	 */
 	public SceneStructureProjective getStructure() {
-		return utils.structure;
+		return utils.structurePr;
 	}
 
 	/**
