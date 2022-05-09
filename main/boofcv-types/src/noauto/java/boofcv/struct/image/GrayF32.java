@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -162,7 +162,7 @@ public class GrayF32 extends GrayF<GrayF32> {
 		this.data = data;
 	}
 
-	@FunctionalInterface interface EachPixel {
+	@FunctionalInterface public interface EachPixel {
 		void process( int x, int y, float value );
 	}
 }
