@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,6 @@ import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ImageZoomPanel;
-import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
@@ -35,6 +34,7 @@ import boofcv.struct.distort.PointToPixelTransform_F32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.image.Planar;
 import georegression.struct.point.Point2D_F32;
 import org.jetbrains.annotations.Nullable;
 
@@ -78,7 +78,7 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 	final List<Point2D_F32> pointsDistorted = new ArrayList<>();
 
 	public DeformImageKeyPointsApp( List<?> exampleInputs, ImageType<T> imageType ) {
-		super(exampleInputs, imageType);
+		super(true, false, exampleInputs, imageType);
 
 		undistorted = imageType.createImage(1, 1);
 
@@ -361,19 +361,20 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 	}
 
 	public static void main( String[] args ) {
-		ImageType type = ImageType.pl(3, GrayU8.class);
+		ImageType<Planar<GrayU8>> type = ImageType.pl(3, GrayU8.class);
 
-		List<PathLabel> inputs = new ArrayList<>();
+		var inputs = new ArrayList<PathLabel>();
 		inputs.add(new PathLabel("Man MLS", UtilIO.pathExample("standard/man_mls.jpg")));
 		inputs.add(new PathLabel("Mona Lisa", UtilIO.pathExample("standard/mona_lisa.jpg")));
 		inputs.add(new PathLabel("Drawing Face", UtilIO.pathExample("drawings/drawing_face.png")));
 
-		DeformImageKeyPointsApp app = new DeformImageKeyPointsApp(inputs, type);
+		SwingUtilities.invokeLater(()-> {
+			var app = new DeformImageKeyPointsApp<>(inputs, type);
 
-		app.openFile(new File(inputs.get(0).getPath()));
+			app.openFile(new File(inputs.get(0).getPath()));
 
-		app.waitUntilInputSizeIsKnown();
-
-		ShowImages.showWindow(app, "Deform Image Key Points", true);
+			app.display("Deform Image Key Points");
+			app.waitUntilInputSizeIsKnown();
+		});
 	}
 }

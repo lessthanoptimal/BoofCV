@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,6 +33,7 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.io.File;
@@ -119,7 +120,6 @@ public class DetectBlackEllipseApp<T extends ImageGray<T>> extends DetectBlackSh
 	}
 
 	public static void main( String[] args ) {
-
 		List<String> examples = new ArrayList<>();
 		examples.add(UtilIO.pathExample("fiducial/circle_hexagonal/image00.jpg"));
 		examples.add(UtilIO.pathExample("shapes/polygons01.jpg"));
@@ -128,10 +128,12 @@ public class DetectBlackEllipseApp<T extends ImageGray<T>> extends DetectBlackSh
 		examples.add(UtilIO.pathExample("fiducial/circle_hexagonal/image01.jpg"));
 		examples.add(UtilIO.pathExample("fiducial/circle_hexagonal/movie.mp4"));
 
-		DetectBlackEllipseApp app = new DetectBlackEllipseApp(examples, GrayF32.class);
+		SwingUtilities.invokeLater(()->{
+			var app = new DetectBlackEllipseApp(examples, GrayF32.class);
 
-		app.openFile(new File(examples.get(0)));
+			app.openFile(new File(examples.get(0)));
 
-		app.display("Detect Black Ellipses");
+			app.display("Detect Black Ellipses");
+		});
 	}
 }
