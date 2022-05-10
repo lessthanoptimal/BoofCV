@@ -21,6 +21,7 @@ package boofcv.app;
 import boofcv.abst.fiducial.calib.CalibrationPatterns;
 import boofcv.abst.fiducial.calib.ConfigECoCheckMarkers;
 import boofcv.alg.fiducial.calib.ecocheck.ECoCheckUtils;
+import boofcv.app.CreateCalibrationTargetGenerator.Destination;
 import boofcv.app.calib.CreateECoCheckDocumentPDF;
 import boofcv.app.calib.CreateHammingChessboardDocumentPDF;
 import boofcv.app.calib.CreateHammingGridDocumentPDF;
@@ -324,7 +325,7 @@ public class CreateCalibrationTarget {
 		}
 
 		var generator = new CreateCalibrationTargetGenerator(fileName + suffix, paperSize, rows, columns, unit);
-		generator.sendToPrinter = sendToPrinter;
+		generator.destination = sendToPrinter ? Destination.PRINTER : Destination.FILE;
 		generator.setShowInfo(!disablePrintInfo);
 
 		switch (type) {

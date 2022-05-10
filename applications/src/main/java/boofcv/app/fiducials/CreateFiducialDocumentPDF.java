@@ -35,6 +35,7 @@ import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.List;
 
@@ -277,6 +278,11 @@ public abstract class CreateFiducialDocumentPDF {
 
 	public void saveToDisk() throws IOException {
 		document.save(documentName);
+		document.close();
+	}
+
+	public void saveToStream( OutputStream output ) throws IOException {
+		document.save(output);
 		document.close();
 	}
 }

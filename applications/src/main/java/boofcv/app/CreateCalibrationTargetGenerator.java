@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,12 +27,15 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.printing.PDFPageable;
 import org.apache.pdfbox.util.Matrix;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.UncheckedIOException;
+import java.util.Objects;
 
 import static georegression.metric.UtilAngle.radian;
 
@@ -48,7 +51,6 @@ public class CreateCalibrationTargetGenerator {
 	PDPage page;
 	PDPageContentStream pcs;
 
-	public boolean sendToPrinter = false;
 
 	PaperSize paper;
 	int rows, cols;
@@ -59,7 +61,13 @@ public class CreateCalibrationTargetGenerator {
 	float patternWidth;
 	float patternHeight;
 
-	String documentName;
+	// Where it should send the PDF
+	public Destination destination = Destination.FILE;
+
+	// Where it will save the document if destination is FILE
+	@Nullable public String documentName;
+	// Stream it will write the document to if destination is STREAM
+	@Nullable public OutputStream outputStream;
 
 	public float UNIT_TO_POINTS;
 	public static final float CM_TO_POINTS = 72.0f/2.54f;
@@ -183,7 +191,6 @@ public class CreateCalibrationTargetGenerator {
 	}
 
 	private void printHeader( String documentTitle ) throws IOException {
-
 		PDDocumentInformation info = document.getDocumentInformation();
 		info.setCreator("BoofCV");
 		info.setTitle(documentTitle);
@@ -213,14 +220,20 @@ public class CreateCalibrationTargetGenerator {
 		pcs.close();
 
 		try {
-			if (sendToPrinter) {
-				PrinterJob job = PrinterJob.getPrinterJob();
-				job.setPageable(new PDFPageable(document));
-				if (job.printDialog()) {
-					job.print();
+			switch (destination) {
+				case PRINTER -> {
+					PrinterJob job = PrinterJob.getPrinterJob();
+					job.setPageable(new PDFPageable(document));
+					if (job.printDialog()) {
+						job.print();
+					}
 				}
-			} else {
-				document.save(documentName);
+
+				case FILE -> document.save(Objects.requireNonNull(documentName,
+						"Must specify destination file"));
+
+				case STREAM -> document.save(Objects.requireNonNull(outputStream,
+						"Must specify output stream"));
 			}
 		} catch (PrinterException e) {
 			throw new IOException(e);
@@ -231,5 +244,12 @@ public class CreateCalibrationTargetGenerator {
 
 	public void setShowInfo( boolean showInfo ) {
 		this.showInfo = showInfo;
+	}
+
+	/** Where it will send the PDF */
+	public enum Destination {
+		PRINTER,
+		FILE,
+		STREAM
 	}
 }
