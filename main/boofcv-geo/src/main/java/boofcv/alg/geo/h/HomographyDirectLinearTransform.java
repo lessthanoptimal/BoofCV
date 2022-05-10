@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,8 @@ import boofcv.struct.geo.AssociatedPairConic;
 import georegression.geometry.UtilCurves_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
+import lombok.Getter;
+import lombok.Setter;
 import org.ejml.data.DMatrix3x3;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.fixed.CommonOps_DDF3;
@@ -71,7 +73,7 @@ public class HomographyDirectLinearTransform {
 
 	// contains the set of equations that are solved
 	protected DMatrixRMaj A = new DMatrixRMaj(1, 9);
-	protected SolveNullSpace<DMatrixRMaj> solverNullspace = new SolveNullSpaceSvd_DDRM();
+	@Getter protected SolveNullSpace<DMatrixRMaj> solverNullspace = new SolveNullSpaceSvd_DDRM();
 
 	// Used to normalize input points
 	protected NormalizationPoint2D N1 = new NormalizationPoint2D();
@@ -80,13 +82,13 @@ public class HomographyDirectLinearTransform {
 	// pick a reasonable scale and sign
 	private AdjustHomographyMatrix adjust = new AdjustHomographyMatrix();
 
-	// normalize image coordinates to avoid numerical errors?
-	boolean normalize;
+	/** normalize image coordinates to avoid numerical errors? */
+	@Getter @Setter boolean normalize;
 	// if it's actually normalizing points
 	private boolean shouldNormalize;
 
-	// should it go through all combination of conics or a linear set
-	private boolean exhaustiveConics = false;
+	/** should it go through all combination of conics or a linear set */
+	@Getter @Setter private boolean exhaustiveConics = false;
 
 	// workspace variables for conics
 	private final DMatrix3x3 C1 = new DMatrix3x3();
@@ -364,21 +366,5 @@ public class HomographyDirectLinearTransform {
 			}
 		}
 		return rowA + 9;
-	}
-
-	public SolveNullSpace<DMatrixRMaj> getSolverNullspace() {
-		return solverNullspace;
-	}
-
-	public boolean isNormalize() {
-		return normalize;
-	}
-
-	public boolean isExhaustiveConics() {
-		return exhaustiveConics;
-	}
-
-	public void setExhaustiveConics( boolean exhaustiveConics ) {
-		this.exhaustiveConics = exhaustiveConics;
 	}
 }
