@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ import georegression.struct.point.Point2D_F64;
 public class PinholeNtoP_F64 implements Point2Transform2_F64 {
 
 	// camera calibration matrix
-	private double fx, fy, skew, cx, cy;
+	public double fx, fy, skew, cx, cy;
 
 	public PinholeNtoP_F64( PinholeNtoP_F64 original ) {
 		this.fx = original.fx;

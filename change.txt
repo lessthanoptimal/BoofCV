@@ -38,6 +38,7 @@ Version : 0.41
 - Calibration
   - Mono and Stereo apps now generate calibration quality metrics for coverage and geometry
   - Mono and Stereo GUIs have option to show border and inner coverage
+  - Added Division camera model
   - TODO calibration targets Hamming Marker grid and chessboard, e.g. ChArUco and ArUco grids.
 - Regression
   - TODO Template matching
