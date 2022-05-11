@@ -42,6 +42,7 @@ import java.util.Set;
  * on the 6-point algorithm in [2] that solves 2 quadratic equations and 6 linear equations. See
  * Tech Report [3] for the final form of equations used in code below.</p>
  *
+ * Undistortion model:
  * <p>f(x,y) = [x, y, 1 + &lambda;(x**2 + y**2)]<sup>T</sup></p>
  * where &lambda; is the radial distortion parameter from one of the cameras.
  *
@@ -134,26 +135,7 @@ public class HomographyRadial6Pts implements VerbosePrint {
 	 * @return true if no errors detected
 	 */
 	boolean linearCrossConstraint( List<AssociatedPair> points ) {
-		A.reshape(points.size(), 8);
-
-		// NOTE: p2 = x' and p1 = x in paper
-		for (int row = 0; row < points.size(); row++) {
-			AssociatedPair p = points.get(row);
-			int index = row*A.numCols;
-
-			// x**2 + y**2
-			double r = p.p1.normSq();
-
-			// Matrix is stored in a row-major format. This is filling in a row
-			A.data[index++] = -p.p2.y*p.p1.x;
-			A.data[index++] = -p.p2.y*p.p1.y;
-			A.data[index++] = -p.p2.y;
-			A.data[index++] = p.p2.x*p.p1.x;
-			A.data[index++] = p.p2.x*p.p1.y;
-			A.data[index++] = p.p2.x;
-			A.data[index++] = -p.p2.y*r;
-			A.data[index] = p.p2.x*r;
-		}
+		constructCrossConstraints(points);
 
 		// Find the null space
 		if (!svd.decompose(A))
@@ -177,8 +159,35 @@ public class HomographyRadial6Pts implements VerbosePrint {
 	}
 
 	/**
+	 * Creates a matrix that represents linear constraints. Columns are for variables
+	 * [h11, h12, h13, h21, h22, h23, lambda*h13, lambda*h23]
+	 */
+	void constructCrossConstraints( List<AssociatedPair> points ) {
+		A.reshape(points.size(), 8);
+
+		// NOTE: p2 = x' and p1 = x in paper
+		for (int row = 0; row < points.size(); row++) {
+			AssociatedPair p = points.get(row);
+			int index = row*A.numCols;
+
+			// x**2 + y**2
+			double r1 = p.p1.normSq();
+
+			// Matrix is stored in a row-major format. This is filling in a row
+			A.data[index++] = -p.p2.y*p.p1.x;
+			A.data[index++] = -p.p2.y*p.p1.y;
+			A.data[index++] = -p.p2.y;
+			A.data[index++] = p.p2.x*p.p1.x;
+			A.data[index++] = p.p2.x*p.p1.y;
+			A.data[index++] = p.p2.x;
+			A.data[index++] = -p.p2.y*r1;
+			A.data[index] = p.p2.x*r1;
+		}
+	}
+
+	/**
 	 * The solution vector v1 = gamma*n1 + n2, where (n1, n2) are the previously found null space.
-	 * There is a known relaionship between elements in n1 and n2 which is then exploited to create a
+	 * There is a known relationship between elements in n1 and n2 which is then exploited to create a
 	 * quadratic equation to solve for the unknown radial distortion.
 	 *
 	 * @return true if no errors detected
@@ -194,7 +203,7 @@ public class HomographyRadial6Pts implements VerbosePrint {
 		double n27 = null2.data[6];
 		double n28 = null2.data[7];
 
-		// Coeffients in quadratic equation: a*x**2 + b*x + c = 0
+		// Coefficients in quadratic equation: a*x**2 + b*x + c = 0
 		double a = n16*n17 - n13*n18;
 		double b = n16*n27 + n17*n26 - n13*n28 - n18*n23;
 		double c = n26*n27 - n23*n28;
@@ -215,7 +224,7 @@ public class HomographyRadial6Pts implements VerbosePrint {
 	}
 
 	/**
-	 * Create a linear system for the 4 remaining unknowns by feeding the knowns into the second line of
+	 * Create a linear system for the 4 remaining unknowns by feeding the known parameters into the second line of
 	 * matrix equation (4), see paper.
 	 *
 	 * @param points Observed points
@@ -266,8 +275,8 @@ public class HomographyRadial6Pts implements VerbosePrint {
 		solution.H.data[4] = hypo.gamma*null1.data[4] + null2.data[4]; // h22
 		solution.H.data[5] = hypo.gamma*null1.data[5] + null2.data[5]; // h23
 		solution.H.data[6] = X.data[0]; // h31
-		solution.H.data[7] = X.data[0]; // h32
-		solution.H.data[8] = X.data[0]; // h33
+		solution.H.data[7] = X.data[1]; // h32
+		solution.H.data[8] = X.data[2]; // h33
 
 		return true;
 	}
