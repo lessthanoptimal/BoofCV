@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ public class PinholePtoN_F64 implements Point2Transform2_F64 {
 
 	// inverse of camera calibration matrix
 	// These are the upper triangular elements in a 3x3 matrix
-	private double a11, a12, a13, a22, a23;
+	public double a11, a12, a13, a22, a23;
 
 	public PinholePtoN_F64( PinholePtoN_F64 original ) {
 		this.a11 = original.a11;

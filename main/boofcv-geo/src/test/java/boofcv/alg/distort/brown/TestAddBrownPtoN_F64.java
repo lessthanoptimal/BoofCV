@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestAddRadialPtoN_F64 extends BoofStandardJUnit {
+public class TestAddBrownPtoN_F64 extends BoofStandardJUnit {
 	/**
 	 * Manually compute the distorted coordinate for a point and see if it matches
 	 */

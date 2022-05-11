@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.distort.Point2Transform2_F64;
 
 /**
- * Radial-Tangential lens distortion model point transforms.
+ * {@link CameraPinholeBrown Brown} lens distortion model point transforms.
  *
  * @author Peter Abeles
  */

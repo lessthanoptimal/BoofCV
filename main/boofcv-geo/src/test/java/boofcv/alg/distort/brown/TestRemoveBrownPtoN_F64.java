@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestRemoveRadialPtoN_F64 extends BoofStandardJUnit {
+public class TestRemoveBrownPtoN_F64 extends BoofStandardJUnit {
 
 	@Test void checkAgainstAdd() {
 		checkAgainstAdd(0,0);
