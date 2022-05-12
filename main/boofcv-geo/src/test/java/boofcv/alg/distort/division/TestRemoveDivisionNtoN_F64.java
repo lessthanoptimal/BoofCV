@@ -24,10 +24,8 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class TestAddDivisionPtoP_F64 {
+class TestRemoveDivisionNtoN_F64 {
 	@Test void compareManual() {
-		double cx = 10;
-		double cy = 14;
 		double radial = 0.00002;
 
 		double x_dist = 40;
@@ -38,8 +36,8 @@ class TestAddDivisionPtoP_F64 {
 		double y_undist = y_dist/(1.0 + radial*r);
 
 		var found = new Point2D_F64();
-		new AddDivisionPtoP_F64().setRadial(radial).setIntrinsics(cx, cy).compute(x_undist + cx, y_undist + cy, found);
+		new RemoveDivisionNtoN_F64().setRadial(radial).compute(x_dist, y_dist, found);
 
-		assertEquals(0.0, found.distance(x_dist + cx, y_dist + cy), UtilEjml.TEST_F64);
+		assertEquals(0.0, found.distance(x_undist, y_undist), UtilEjml.TEST_F64);
 	}
 }

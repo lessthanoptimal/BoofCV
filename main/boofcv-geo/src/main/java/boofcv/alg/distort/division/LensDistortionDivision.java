@@ -19,8 +19,6 @@
 package boofcv.alg.distort.division;
 
 import boofcv.alg.distort.LensDistortionNarrowFOV;
-import boofcv.alg.distort.Transform2PixelThenNorm_F32;
-import boofcv.alg.distort.Transform2PixelThenNorm_F64;
 import boofcv.alg.distort.pinhole.PinholeNtoP_F32;
 import boofcv.alg.distort.pinhole.PinholeNtoP_F64;
 import boofcv.alg.distort.pinhole.PinholePtoN_F32;
@@ -46,80 +44,84 @@ public class LensDistortionDivision implements LensDistortionNarrowFOV {
 
 	@Override
 	public Point2Transform2_F64 distort_F64( boolean pixelIn, boolean pixelOut ) {
-		Point2Transform2_F64 p_to_p = new AddDivisionPtoP_F64().setRadial(p.radial).setIntrinsics(p.cx, p.cy);
+		Point2Transform2_F64 n_to_n = new AddDivisionNtoN_F64().setRadial(p.radial);
 		if (pixelIn) {
+			Point2Transform2_F64 p_to_n = new PinholePtoN_F64().setK(p.fx, p.fy, p.skew, p.cx, p.cy);
 			if (pixelOut) {
-				return p_to_p;
+				PinholeNtoP_F64 n_to_p = new PinholeNtoP_F64().setK(p.fx, p.fy, p.skew, p.cx, p.cy);
+				return new SequencePoint2Transform2_F64(p_to_n, n_to_n, n_to_p);
 			} else {
-				return new Transform2PixelThenNorm_F64(p_to_p).set(p.fx, p.fy, p.skew, p.cx, p.cy);
+				return new SequencePoint2Transform2_F64(p_to_n, n_to_n);
 			}
 		} else {
-			Point2Transform2_F64 n_to_p = new PinholeNtoP_F64().setK(p.fx, p.fy, p.skew, p.cx, p.cy);
 			if (pixelOut) {
-				return new SequencePoint2Transform2_F64(n_to_p, p_to_p);
+				PinholeNtoP_F64 n_to_p = new PinholeNtoP_F64().setK(p.fx, p.fy, p.skew, p.cx, p.cy);
+				return new SequencePoint2Transform2_F64(n_to_n, n_to_p);
 			} else {
-				Point2Transform2_F64 p_to_n = new PinholePtoN_F64().setK(p.fx, p.fy, p.skew, p.cx, p.cy);
-				return new SequencePoint2Transform2_F64(n_to_p, p_to_p, p_to_n);
+				return n_to_n;
 			}
 		}
 	}
 
 	@Override
 	public Point2Transform2_F64 undistort_F64( boolean pixelIn, boolean pixelOut ) {
-		Point2Transform2_F64 p_to_p = new RemoveDivisionPtoP_F64().setRadial(p.radial).setIntrinsics(p.cx, p.cy);
+		Point2Transform2_F64 n_to_n = new RemoveDivisionNtoN_F64().setRadial(p.radial);
 		if (pixelIn) {
+			Point2Transform2_F64 p_to_n = new PinholePtoN_F64().setK(p.fx, p.fy, p.skew, p.cx, p.cy);
 			if (pixelOut) {
-				return p_to_p;
+				PinholeNtoP_F64 n_to_p = new PinholeNtoP_F64().setK(p.fx, p.fy, p.skew, p.cx, p.cy);
+				return new SequencePoint2Transform2_F64(p_to_n, n_to_n, n_to_p);
 			} else {
-				return new Transform2PixelThenNorm_F64(p_to_p).set(p.fx, p.fy, p.skew, p.cx, p.cy);
+				return new SequencePoint2Transform2_F64(p_to_n, n_to_n);
 			}
 		} else {
-			Point2Transform2_F64 n_to_p = new PinholeNtoP_F64().setK(p.fx, p.fy, p.skew, p.cx, p.cy);
 			if (pixelOut) {
-				return new SequencePoint2Transform2_F64(n_to_p, p_to_p);
+				PinholeNtoP_F64 n_to_p = new PinholeNtoP_F64().setK(p.fx, p.fy, p.skew, p.cx, p.cy);
+				return new SequencePoint2Transform2_F64(n_to_n, n_to_p);
 			} else {
-				Point2Transform2_F64 p_to_n = new PinholePtoN_F64().setK(p.fx, p.fy, p.skew, p.cx, p.cy);
-				return new SequencePoint2Transform2_F64(n_to_p, p_to_p, p_to_n);
+				return n_to_n;
 			}
 		}
 	}
 
 	@Override
 	public Point2Transform2_F32 distort_F32( boolean pixelIn, boolean pixelOut ) {
-		Point2Transform2_F32 p_to_p = new AddDivisionPtoP_F32().setRadial((float)p.radial);
+		Point2Transform2_F32 n_to_n = new AddDivisionNtoN_F32().setRadial((float)p.radial);
 		if (pixelIn) {
+			Point2Transform2_F32 p_to_n = new PinholePtoN_F32().setK(p.fx, p.fy, p.skew, p.cx, p.cy);
 			if (pixelOut) {
-				return p_to_p;
+				PinholeNtoP_F32 n_to_p = new PinholeNtoP_F32().setK(p.fx, p.fy, p.skew, p.cx, p.cy);
+				return new SequencePoint2Transform2_F32(p_to_n, n_to_n, n_to_p);
 			} else {
-				return new Transform2PixelThenNorm_F32(p_to_p).set(p.fx, p.fy, p.skew, p.cx, p.cy);
+				return new SequencePoint2Transform2_F32(p_to_n, n_to_n);
 			}
 		} else {
-			Point2Transform2_F32 n_to_p = new PinholeNtoP_F32().setK(p.fx, p.fy, p.skew, p.cx, p.cy);
 			if (pixelOut) {
-				return new SequencePoint2Transform2_F32(n_to_p, p_to_p);
+				PinholeNtoP_F32 n_to_p = new PinholeNtoP_F32().setK(p.fx, p.fy, p.skew, p.cx, p.cy);
+				return new SequencePoint2Transform2_F32(n_to_n, n_to_p);
 			} else {
-				Point2Transform2_F32 p_to_n = new PinholePtoN_F32().setK(p.fx, p.fy, p.skew, p.cx, p.cy);
-				return new SequencePoint2Transform2_F32(n_to_p, p_to_p, p_to_n);
+				return n_to_n;
 			}
 		}
 	}
 
 	@Override
 	public Point2Transform2_F32 undistort_F32( boolean pixelIn, boolean pixelOut ) {
-		Point2Transform2_F32 p_to_p = new RemoveDivisionPtoP_F32().setRadial((float)p.radial);
+		Point2Transform2_F32 n_to_n = new RemoveDivisionNtoN_F32().setRadial((float)p.radial);
 		if (pixelIn) {
+			Point2Transform2_F32 p_to_n = new PinholePtoN_F32().setK(p.fx, p.fy, p.skew, p.cx, p.cy);
 			if (pixelOut) {
-				return p_to_p;
+				PinholeNtoP_F32 n_to_p = new PinholeNtoP_F32().setK(p.fx, p.fy, p.skew, p.cx, p.cy);
+				return new SequencePoint2Transform2_F32(p_to_n, n_to_n, n_to_p);
 			} else {
-				return new Transform2PixelThenNorm_F32(p_to_p).set(p.fx, p.fy, p.skew, p.cx, p.cy);
+				return new SequencePoint2Transform2_F32(p_to_n, n_to_n);
 			}
 		} else {
-			Point2Transform2_F32 n_to_p = new PinholeNtoP_F32().setK(p.fx, p.fy, p.skew, p.cx, p.cy);
 			if (pixelOut) {
-				return new SequencePoint2Transform2_F32(n_to_p, p_to_p);
+				PinholeNtoP_F32 n_to_p = new PinholeNtoP_F32().setK(p.fx, p.fy, p.skew, p.cx, p.cy);
+				return new SequencePoint2Transform2_F32(n_to_n, n_to_p);
 			} else {
-				Point2Transform2_F32 p_to_n = new PinholePtoN_F32().setK(p.fx, p.fy, p.skew, p.cx, p.cy);
-				return new SequencePoint2Transform2_F32(n_to_p, p_to_p, p_to_n);
+				return n_to_n;
 			}
 		}
 	}
