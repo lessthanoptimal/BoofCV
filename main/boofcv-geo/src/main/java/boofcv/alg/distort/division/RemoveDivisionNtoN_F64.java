@@ -22,28 +22,18 @@ import boofcv.struct.distort.Point2Transform2_F64;
 import georegression.struct.point.Point2D_F64;
 
 /**
- * Converts the observed distorted pixel image coordinates into undistorted pixel image coordinates.
+ * Converts the observed distorted normalized image coordinates into undistorted normalized image coordinates.
  *
  * @author Peter Abeles
  */
 @SuppressWarnings({"NullAway.Init"})
-public class RemoveDivisionPtoP_F64 implements Point2Transform2_F64 {
-
-	// camera principle point
-	double cx, cy;
-
+public class RemoveDivisionNtoN_F64 implements Point2Transform2_F64 {
 	// lens distortion
 	public double radial;
 
-	public RemoveDivisionPtoP_F64() {}
+	public RemoveDivisionNtoN_F64() {}
 
-	public RemoveDivisionPtoP_F64 setIntrinsics( double cx, double cy ) {
-		this.cx = cx;
-		this.cy = cy;
-		return this;
-	}
-
-	public RemoveDivisionPtoP_F64 setRadial( double radial ) {
+	public RemoveDivisionNtoN_F64 setRadial( double radial ) {
 		this.radial = radial;
 		return this;
 	}
@@ -57,19 +47,15 @@ public class RemoveDivisionPtoP_F64 implements Point2Transform2_F64 {
 	 */
 	@Override
 	public void compute( double x, double y, Point2D_F64 out ) {
-		// must shift points so that they are in the image center first
-		double xx = x - cx;
-		double yy = y - cy;
+		double r2 = x*x + y*y;
 
-		double r2 = xx*xx + yy*yy;
-
-		out.x = cx + xx/(1.0 + radial*r2);
-		out.y = cy + yy/(1.0 + radial*r2);
+		out.x = x/(1.0 + radial*r2);
+		out.y = y/(1.0 + radial*r2);
 	}
 
 	@Override
-	public RemoveDivisionPtoP_F64 copyConcurrent() {
-		var ret = new RemoveDivisionPtoP_F64();
+	public RemoveDivisionNtoN_F64 copyConcurrent() {
+		var ret = new RemoveDivisionNtoN_F64();
 		ret.radial = radial;
 		return ret;
 	}

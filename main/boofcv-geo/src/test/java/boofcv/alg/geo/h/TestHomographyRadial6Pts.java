@@ -202,8 +202,8 @@ class TestHomographyRadial6Pts extends BoofStandardJUnit {
 		H_truth = MultiViewOps.createHomography(R, T, 1.0, new Vector3D_F64(0.1, 0.001, -0.8), K);
 
 		// Applies lens distortion to pixels
-		Point2Transform2_F64 distorter1 = new LensDistortionDivision(new CameraDivision().fsetRadial(radial1)).distort_F64(true, true);
-		Point2Transform2_F64 distorter2 = new LensDistortionDivision(new CameraDivision().fsetRadial(radial2)).distort_F64(true, true);
+		Point2Transform2_F64 distorter1 = new LensDistortionDivision(new CameraDivision().fsetRadial(radial1)).distort_F64(false, false);
+		Point2Transform2_F64 distorter2 = new LensDistortionDivision(new CameraDivision().fsetRadial(radial2)).distort_F64(false, false);
 
 		distorted.resetResize(numPoints);
 		undistorted.resetResize(numPoints);

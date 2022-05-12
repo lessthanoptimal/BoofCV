@@ -22,15 +22,12 @@ import boofcv.struct.distort.Point2Transform2_F64;
 import georegression.struct.point.Point2D_F64;
 
 /**
- * Converts the undistorted pixel coordinate into distorted pixel coordinates.
+ * Converts the undistorted normalized coordinate into normalized pixel coordinates.
  *
  * @author Peter Abeles
  */
 @SuppressWarnings({"NullAway.Init"})
-public class AddDivisionPtoP_F64 implements Point2Transform2_F64 {
-
-	// camera principle point
-	double cx, cy;
+public class AddDivisionNtoN_F64 implements Point2Transform2_F64 {
 
 	// lens distortion
 	public double radial;
@@ -40,15 +37,9 @@ public class AddDivisionPtoP_F64 implements Point2Transform2_F64 {
 	/** Maximum number of iterations */
 	public int maxIterations = 500;
 
-	public AddDivisionPtoP_F64() {}
+	public AddDivisionNtoN_F64() {}
 
-	public AddDivisionPtoP_F64 setIntrinsics( double cx, double cy ) {
-		this.cx = cx;
-		this.cy = cy;
-		return this;
-	}
-
-	public AddDivisionPtoP_F64 setRadial( double radial ) {
+	public AddDivisionNtoN_F64 setRadial( double radial ) {
 		this.radial = radial;
 		return this;
 	}
@@ -61,20 +52,17 @@ public class AddDivisionPtoP_F64 implements Point2Transform2_F64 {
 	 * @param out Distorted normalized image coordinate.
 	 */
 	@Override
-	public void compute( final double x, final double y, Point2D_F64 out ) {
-		double xx = x - cx;
-		double yy = y - cy;
-
-		double origX = xx;
-		double origY = yy;
+	public void compute( double x, double y, Point2D_F64 out ) {
+		double origX = x;
+		double origY = y;
 
 		double prevR2 = 0;
 
 		for (int iter = 0; iter < maxIterations; iter++) {
-			double r2 = xx*xx + yy*yy;
+			double r2 = x*x + y*y;
 
-			xx = origX*(1.0 + radial*r2);
-			yy = origY*(1.0 + radial*r2);
+			x = origX*(1.0 + radial*r2);
+			y = origY*(1.0 + radial*r2);
 
 			if (Math.abs(r2 - prevR2) <= tol) {
 				break;
@@ -82,12 +70,12 @@ public class AddDivisionPtoP_F64 implements Point2Transform2_F64 {
 				prevR2 = r2;
 			}
 		}
-		out.setTo(xx + cx, yy + cy);
+		out.setTo(x, y);
 	}
 
 	@Override
-	public AddDivisionPtoP_F64 copyConcurrent() {
-		var ret = new AddDivisionPtoP_F64();
+	public AddDivisionNtoN_F64 copyConcurrent() {
+		var ret = new AddDivisionNtoN_F64();
 		ret.radial = radial;
 		return ret;
 	}
