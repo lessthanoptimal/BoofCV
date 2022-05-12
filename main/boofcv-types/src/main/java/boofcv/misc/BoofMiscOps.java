@@ -245,6 +245,52 @@ public class BoofMiscOps {
 		return true;
 	}
 
+	/**
+	 * Carefully constructed quadratic equation solver that attempts to maximize numerical stability and
+	 * gracefully handle zeros in coefficients.
+	 *
+	 * <p>a*x*x + b*c + c = 0. Solve for x.</p>
+	 *
+	 * @param solutions (Output) storage for up to two solutions.
+	 * @return Number of valid solutions found
+	 */
+	public static int quadraticSolver( double a, double b, double c, double[] solutions ) {
+		if (a == 0.0) {
+			if (b == 0.0)
+				return 0;
+			solutions[0] = -c/b;
+			return 1;
+		} else if (c == 0.0) {
+			solutions[0] = -b/a;
+			solutions[1] = 0.0;
+			return 2;
+		} else {
+			double inner = b*b - 4*a*c;
+
+			// Imaginary numbers are invalid
+//			if (inner < -UtilEjml.TEST_F64)
+//				return 0;
+
+			// Assume it's really zero and the negative number is rounding error
+			if (inner <= 0.0) {
+				solutions[0] = -b/(2*a);
+				return 1;
+			}
+
+			double d = Math.sqrt(inner);
+
+			// If 4*a*c is much smaller than b*b then there's the potential for catastrophic cancellation
+			if (Math.abs(4*a*c) < b*b*0.001) {
+				solutions[0] = (-b - Math.signum(b)*d)/(2.0*a);
+				solutions[1] = c/(a*solutions[0]);
+			} else {
+				solutions[0] = (-b + d)/(2.0*a);
+				solutions[1] = (-b - d)/(2.0*a);
+			}
+			return 2;
+		}
+	}
+
 	private static class CompareStringNames implements Comparator<String> {
 
 		@Override

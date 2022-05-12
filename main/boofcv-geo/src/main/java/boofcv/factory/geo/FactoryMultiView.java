@@ -33,10 +33,7 @@ import boofcv.abst.geo.trifocal.WrapTrifocalLinearPoint7;
 import boofcv.alg.geo.ModelObservationResidualN;
 import boofcv.alg.geo.bundle.*;
 import boofcv.alg.geo.f.DistanceEpipolarConstraint;
-import boofcv.alg.geo.h.HomographyDirectLinearTransform;
-import boofcv.alg.geo.h.HomographyResidualSampson;
-import boofcv.alg.geo.h.HomographyResidualTransfer;
-import boofcv.alg.geo.h.HomographyTotalLeastSquares;
+import boofcv.alg.geo.h.*;
 import boofcv.alg.geo.pose.*;
 import boofcv.alg.geo.robust.ModelGeneratorViews;
 import boofcv.alg.geo.selfcalib.*;
@@ -189,6 +186,17 @@ public class FactoryMultiView {
 	 */
 	public static HomographyTLS_to_Epipolar homographyTLS() {
 		return new HomographyTLS_to_Epipolar(new HomographyTotalLeastSquares());
+	}
+
+	/**
+	 * Estimator that will find the homography and radial distortion terms. Models lens with
+	 * {@link boofcv.struct.calib.CameraDivision} and requires at least 6 points.
+	 *
+	 * @return Homography + radial distortion estimator.
+	 * @see HomographyRadial6Pts
+	 */
+	public static HomographyRadial6Pts homographyWithRadial() {
+		return new HomographyRadial6Pts();
 	}
 
 	/**
