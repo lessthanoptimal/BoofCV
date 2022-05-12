@@ -21,6 +21,7 @@ package boofcv.alg.geo.h;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.geo.AssociatedPair;
 import lombok.Getter;
+import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.VerbosePrint;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
@@ -59,6 +60,7 @@ import java.util.Set;
  * @author Peter Abeles
  */
 public class HomographyRadial6Pts implements VerbosePrint {
+	// TODO handle case of more than 6 points. Null space changes
 
 	/** Higher the value the more well-formed observations are for this model. */
 	@Getter double crossSingularRatio;
@@ -75,13 +77,12 @@ public class HomographyRadial6Pts implements VerbosePrint {
 
 	// Linear Solvers
 	SingularValueDecomposition_F64<DMatrixRMaj> svd =
-			DecompositionFactory_DDRM.svd(6, 8, false, true, true);
+			DecompositionFactory_DDRM.svd(6, 8, false, true, false);
 
 	LinearSolver<DMatrixRMaj, DMatrixRMaj> solver = LinearSolverFactory_DDRM.linear(6);
 
 	// Storage for two hypotheses from quadratic formula
-	Hypothesis hypothesis1 = new Hypothesis();
-	Hypothesis hypothesis2 = new Hypothesis();
+	DogArray<Hypothesis> hypotheses = new DogArray<>(Hypothesis::new);
 
 	@Nullable PrintStream verbose;
 
@@ -94,35 +95,32 @@ public class HomographyRadial6Pts implements VerbosePrint {
 	 * </p>
 	 *
 	 * @param points A set of observed image points that are generated from a planar object. Minimum of 4 pairs required.
-	 * @param foundA Output: Where first solution is written to
-	 * @param foundB Output: Where second solution is written to
+	 * @param found Output: Storage for all the solutions. There can be 1 or 2 solutions.
 	 * @return True if successful. False if it failed.
 	 */
-	public boolean process( List<AssociatedPair> points, Results foundA, Results foundB ) {
+	public boolean process( List<AssociatedPair> points, DogArray<Results> found ) {
 		if (points.size() < 6)
 			throw new IllegalArgumentException("A minimum of 6 points is required");
+		found.reset();
 
 		if (!linearCrossConstraint(points)) {
 			if (verbose != null) verbose.println("Failed at linear cross constraint");
 			return false;
 		}
 
-		if (!solveQuadraticRelationship(hypothesis1, hypothesis2)) {
+		if (!solveQuadraticRelationship()) {
 			if (verbose != null) verbose.println("Failed at quadratic relationship");
 			return false;
 		}
 
-		if (!solveForRemaining(points, hypothesis1, foundA)) {
-			if (verbose != null) verbose.println("Failed at linear solver for 4 remaining parameters. A");
-			return false;
+		for (int i = 0; i < hypotheses.size; i++) {
+			if (!solveForRemaining(points, hypotheses.get(i), found.grow())) {
+				if (verbose != null) verbose.println("Failed at linear solver for 4 remaining parameters. A");
+				found.removeTail();
+			}
 		}
 
-		if (!solveForRemaining(points, hypothesis2, foundB)) {
-			if (verbose != null) verbose.println("Failed at linear solver for 4 remaining parameters. B");
-			return false;
-		}
-
-		return true;
+		return !found.isEmpty();
 	}
 
 	/**
@@ -141,19 +139,19 @@ public class HomographyRadial6Pts implements VerbosePrint {
 		if (!svd.decompose(A))
 			return false;
 
-		DMatrixRMaj V_t = svd.getV(null, true);
+		DMatrixRMaj V_t = svd.getV(null, false);
 		DMatrixRMaj W = svd.getW(null);
 
 		// Singular values are in an arbitrary order initially
-		SingularOps_DDRM.descendingOrder(null, false, W, V_t, true);
+		SingularOps_DDRM.descendingOrder(null, false, W, V_t, false);
 
 		// If there is a well-defined null space then sv[4] >>> sv[5]
 		// EPS in denominator to avoid divide by zero
-		crossSingularRatio = W.unsafe_get(4, 4)/(UtilEjml.EPS + W.unsafe_get(5, 5));
+		crossSingularRatio = W.unsafe_get(5, 5)/(UtilEjml.EPS + (W.numRows > 6 ? W.unsafe_get(6, 6) : 0.0));
 
 		// Space the null space
-		CommonOps_DDRM.extract(V_t, 5, 6, 0, 8, null1);
-		CommonOps_DDRM.extract(V_t, 6, 7, 0, 8, null2);
+		CommonOps_DDRM.extract(V_t, 0, 8, 6, 7, null1);
+		CommonOps_DDRM.extract(V_t, 0, 8, 7, 8, null2);
 
 		return true;
 	}
@@ -192,7 +190,9 @@ public class HomographyRadial6Pts implements VerbosePrint {
 	 *
 	 * @return true if no errors detected
 	 */
-	boolean solveQuadraticRelationship( Hypothesis hypo1, Hypothesis hypo2 ) {
+	boolean solveQuadraticRelationship() {
+		hypotheses.reset();
+
 		// Note the conversion from 0 indexed to 1 indexed, so that variables match what's in the paper
 		double n13 = null1.data[2];
 		double n16 = null1.data[5];
@@ -207,18 +207,24 @@ public class HomographyRadial6Pts implements VerbosePrint {
 		double a = n16*n17 - n13*n18;
 		double b = n16*n27 + n17*n26 - n13*n28 - n18*n23;
 		double c = n26*n27 - n23*n28;
+		double d = b*b - 4.0*a*c;
 
-		if (a == 0.0)
+		if (a == 0.0 || d < -UtilEjml.EPS)
 			return false;
 
-		// Solve for gamma now
-		double inner = Math.sqrt(b*b - 4.0*a*c);
-		hypo1.gamma = (-b + inner)/(2.0*a);
-		hypo2.gamma = (-b - inner)/(2.0*a);
+		// If it's almost exactly zero then there is just one solution
+		if (d <= UtilEjml.EPS) {
+			hypotheses.grow().gamma = -b /(2.0*a);
+		} else {
+			double inner = Math.sqrt(d);
+			hypotheses.grow().gamma = (-b + inner)/(2.0*a);
+			hypotheses.grow().gamma = (-b - inner)/(2.0*a);
+		}
 
-		// You now have two solutions for lambda and gamma
-		hypo1.lambda = solveForLambdaGivenGamma(n13, n23, n17, n27, n16, n26, n18, n28, hypo1.gamma);
-		hypo2.lambda = solveForLambdaGivenGamma(n13, n23, n17, n27, n16, n26, n18, n28, hypo2.gamma);
+		for (int i = 0; i < hypotheses.size; i++) {
+			Hypothesis hypo = hypotheses.get(i);
+			hypo.lambda = solveForLambdaGivenGamma(n13, n23, n17, n27, n16, n26, n18, n28, hypo.gamma);
+		}
 
 		return true;
 	}
@@ -246,8 +252,8 @@ public class HomographyRadial6Pts implements VerbosePrint {
 			int index = row*A.numCols;
 
 			double r1 = p.p1.normSq();
-			double r2 = p.p2.normSq();
 			double w1 = 1.0 + hypo.lambda*r1;
+			double r2 = p.p2.normSq();
 
 			A.data[index++] = p.p2.x*p.p1.x; // H[31]
 			A.data[index++] = p.p2.x*p.p1.y; // H[32]
@@ -287,7 +293,9 @@ public class HomographyRadial6Pts implements VerbosePrint {
 
 	/** Storage for internal parameters that define a hypothesis. See paper. */
 	static class Hypothesis {
+		// how to combine the two null spaces to get the homography H
 		public double gamma;
+		// radial distortion parameter
 		public double lambda;
 	}
 
