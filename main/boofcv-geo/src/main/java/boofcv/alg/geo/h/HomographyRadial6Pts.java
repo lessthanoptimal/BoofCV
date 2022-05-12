@@ -166,7 +166,9 @@ public class HomographyRadial6Pts implements VerbosePrint {
 
 		var undistorted = new AssociatedPair();
 		var found = new Point2D_F64();
-		for (AssociatedPair a : points) {
+		for (int i = 0; i < points.size(); i++) {
+			AssociatedPair a = points.get(i);
+
 			// Remove lens distortion
 			undistorted.setTo(a);
 			undistorted.p1.scale(1.0/(1.0 + result.radial1*a.p1.normSq()));
