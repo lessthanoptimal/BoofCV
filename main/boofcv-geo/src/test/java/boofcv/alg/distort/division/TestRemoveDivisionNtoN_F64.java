@@ -18,13 +18,14 @@
 
 package boofcv.alg.distort.division;
 
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class TestRemoveDivisionNtoN_F64 {
+class TestRemoveDivisionNtoN_F64 extends BoofStandardJUnit {
 	@Test void compareManual() {
 		double radial = 0.00002;
 
