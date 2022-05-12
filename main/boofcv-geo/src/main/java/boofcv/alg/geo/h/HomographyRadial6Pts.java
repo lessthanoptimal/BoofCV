@@ -20,7 +20,10 @@ package boofcv.alg.geo.h;
 
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.geo.AssociatedPair;
+import georegression.geometry.GeometryMath_F64;
+import georegression.struct.point.Point2D_F64;
 import lombok.Getter;
+import lombok.Setter;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.VerbosePrint;
 import org.ejml.UtilEjml;
@@ -49,6 +52,7 @@ import java.util.Set;
  *
  * <p>NOTE: This assumes that the center of distortion is the center of the image. I.e. image center = (0,0)</p>
  * <p>NOTE: This will work on homographies induced from planes or pure rotations</p>
+ * <p>NOTE: Modified from original description to handle > 6 points</p>
  *
  * <ol>
  *     <li>Fitzgibbon, Andrew W. "Simultaneous linear estimation of multiple view geometry and lens distortion."
@@ -60,7 +64,7 @@ import java.util.Set;
  * @author Peter Abeles
  */
 public class HomographyRadial6Pts implements VerbosePrint {
-	// TODO handle case of more than 6 points. Null space changes
+	// TODO redo division model to operate on normalized coordinates then update this code
 
 	/** Higher the value the more well-formed observations are for this model. */
 	@Getter double crossSingularRatio;
@@ -75,14 +79,31 @@ public class HomographyRadial6Pts implements VerbosePrint {
 	DMatrixRMaj null1 = new DMatrixRMaj(8, 1);
 	DMatrixRMaj null2 = new DMatrixRMaj(8, 1);
 
-	// Linear Solvers
-	SingularValueDecomposition_F64<DMatrixRMaj> svd =
+	// Storage for SVD
+	DMatrixRMaj V = new DMatrixRMaj(1, 1);
+	DMatrixRMaj W = new DMatrixRMaj(1, 1);
+
+	/** Solves for null space */
+	@Setter SingularValueDecomposition_F64<DMatrixRMaj> svd =
 			DecompositionFactory_DDRM.svd(6, 8, false, true, false);
 
-	LinearSolver<DMatrixRMaj, DMatrixRMaj> solver = LinearSolverFactory_DDRM.linear(6);
+	/** Linear solver used to find last 4 parameters */
+	@Setter LinearSolver<DMatrixRMaj, DMatrixRMaj> solver = LinearSolverFactory_DDRM.qr(6, 6);
+//	LinearSolver<DMatrixRMaj, DMatrixRMaj> solver = LinearSolverFactory_DDRM.qrp(true, false);
+//	LinearSolver<DMatrixRMaj, DMatrixRMaj> solver = LinearSolverFactory_DDRM.pseudoInverse(true);
 
 	// Storage for two hypotheses from quadratic formula
 	DogArray<Hypothesis> hypotheses = new DogArray<>(Hypothesis::new);
+
+	// True if exactly the minimum number of points that it can handle was passed in. This determines the
+	// size of the null space
+	boolean minimalPoints;
+
+	// solutions to quadratic equation
+	private final double[] quadraticSolutions = new double[2];
+
+	// The found solutions
+	@Getter final DogArray<Result> found = new DogArray<>(Result::new);
 
 	@Nullable PrintStream verbose;
 
@@ -94,11 +115,13 @@ public class HomographyRadial6Pts implements VerbosePrint {
 	 * x<sub>2</sub> = H*x<sub>1</sub>
 	 * </p>
 	 *
-	 * @param points A set of observed image points that are generated from a planar object. Minimum of 4 pairs required.
-	 * @param found Output: Storage for all the solutions. There can be 1 or 2 solutions.
+	 * To get the output call {@link #getFound()}. One way to evaluate multiple solutions to see which one is
+	 * best is to call {@link #computeResidualError(List, Result)}.
+	 *
+	 * @param points A set of observed image points that are generated from a planar object. Minimum of 6 pairs required.
 	 * @return True if successful. False if it failed.
 	 */
-	public boolean process( List<AssociatedPair> points, DogArray<Results> found ) {
+	public boolean process( List<AssociatedPair> points ) {
 		if (points.size() < 6)
 			throw new IllegalArgumentException("A minimum of 6 points is required");
 		found.reset();
@@ -108,9 +131,15 @@ public class HomographyRadial6Pts implements VerbosePrint {
 			return false;
 		}
 
-		if (!solveQuadraticRelationship()) {
-			if (verbose != null) verbose.println("Failed at quadratic relationship");
-			return false;
+		if (minimalPoints) {
+			// null space has a span of 2
+			if (!solveQuadraticRelationship()) {
+				if (verbose != null) verbose.println("Failed at quadratic relationship");
+				return false;
+			}
+		} else {
+			// only one vector defines the null space and is easier
+			easyNullSpace();
 		}
 
 		for (int i = 0; i < hypotheses.size; i++) {
@@ -121,6 +150,35 @@ public class HomographyRadial6Pts implements VerbosePrint {
 		}
 
 		return !found.isEmpty();
+	}
+
+	/**
+	 * Used to evaluate how good a hypothesis is by removing radial distortion from points then applying the found
+	 * homography. The difference between the observed undistorted point and the predicted point in view 2 is
+	 * the computed and summed across all points.
+	 *
+	 * @param points Observed point pairs
+	 * @param result Hypothesis
+	 * @return sqrt(sum residual error squared)/N
+	 */
+	public static double computeResidualError( List<AssociatedPair> points, Result result ) {
+		double error = 0.0;
+
+		var undistorted = new AssociatedPair();
+		var found = new Point2D_F64();
+		for (AssociatedPair a : points) {
+			// Remove lens distortion
+			undistorted.setTo(a);
+			undistorted.p1.scale(1.0/(1.0 + result.radial1*a.p1.normSq()));
+			undistorted.p2.scale(1.0/(1.0 + result.radial2*a.p2.normSq()));
+
+			// predict where undistorted point in other view will appear
+			GeometryMath_F64.mult(result.H, undistorted.p1, found);
+
+			// Compute the error
+			error += found.distance2(undistorted.p2);
+		}
+		return Math.sqrt(error)/points.size();
 	}
 
 	/**
@@ -139,19 +197,25 @@ public class HomographyRadial6Pts implements VerbosePrint {
 		if (!svd.decompose(A))
 			return false;
 
-		DMatrixRMaj V_t = svd.getV(null, false);
-		DMatrixRMaj W = svd.getW(null);
+		svd.getV(V, false);
+		svd.getW(W);
 
 		// Singular values are in an arbitrary order initially
-		SingularOps_DDRM.descendingOrder(null, false, W, V_t, false);
+		SingularOps_DDRM.descendingOrder(null, false, W, V, false);
 
-		// If there is a well-defined null space then sv[4] >>> sv[5]
+		// Number of expected non-singular values
+		minimalPoints = points.size() == 6;
+		int fsv = minimalPoints ? 6 : 7;
+		// If there is a well-defined null space then sv[rank] >>> sv[rank+1]
 		// EPS in denominator to avoid divide by zero
-		crossSingularRatio = W.unsafe_get(5, 5)/(UtilEjml.EPS + (W.numRows > 6 ? W.unsafe_get(6, 6) : 0.0));
+		double sv1 = W.unsafe_get(fsv - 1, fsv - 1);
+		double sv2 = W.numRows > fsv ? W.unsafe_get(fsv, fsv) : 0.0;
+		crossSingularRatio = sv1/(UtilEjml.EPS + sv2);
 
-		// Space the null space
-		CommonOps_DDRM.extract(V_t, 0, 8, 6, 7, null1);
-		CommonOps_DDRM.extract(V_t, 0, 8, 7, 8, null2);
+		// Copy the null space. If rank is 6 then null space has a span of 2
+		if (minimalPoints)
+			CommonOps_DDRM.extract(V, 0, 8, 6, 7, null1);
+		CommonOps_DDRM.extract(V, 0, 8, 7, 8, null2);
 
 		return true;
 	}
@@ -207,18 +271,13 @@ public class HomographyRadial6Pts implements VerbosePrint {
 		double a = n16*n17 - n13*n18;
 		double b = n16*n27 + n17*n26 - n13*n28 - n18*n23;
 		double c = n26*n27 - n23*n28;
-		double d = b*b - 4.0*a*c;
 
-		if (a == 0.0 || d < -UtilEjml.EPS)
+		int numSolutions = BoofMiscOps.quadraticSolver(a, b, c, quadraticSolutions);
+		if (numSolutions == 0)
 			return false;
 
-		// If it's almost exactly zero then there is just one solution
-		if (d <= UtilEjml.EPS) {
-			hypotheses.grow().gamma = -b /(2.0*a);
-		} else {
-			double inner = Math.sqrt(d);
-			hypotheses.grow().gamma = (-b + inner)/(2.0*a);
-			hypotheses.grow().gamma = (-b - inner)/(2.0*a);
+		for (int i = 0; i < numSolutions; i++) {
+			hypotheses.grow().gamma = quadraticSolutions[i];
 		}
 
 		for (int i = 0; i < hypotheses.size; i++) {
@@ -230,6 +289,21 @@ public class HomographyRadial6Pts implements VerbosePrint {
 	}
 
 	/**
+	 * Only one vector defines the entire null space. Making determination of lambda easy. We set gamma to zero
+	 * so that null1 will be ignored later on
+	 */
+	void easyNullSpace() {
+		hypotheses.reset();
+		Hypothesis hypo = hypotheses.grow();
+		hypo.gamma = 0.0;
+
+		// Compute it two different ways and average them
+		double a = null2.data[6]/null2.data[2];
+		double b = null2.data[7]/null2.data[5];
+		hypo.lambda = (a + b)/2.0;
+	}
+
+	/**
 	 * Create a linear system for the 4 remaining unknowns by feeding the known parameters into the second line of
 	 * matrix equation (4), see paper.
 	 *
@@ -237,9 +311,9 @@ public class HomographyRadial6Pts implements VerbosePrint {
 	 * @param hypo Hypothesis being considered
 	 * @param solution Resulting solution
 	 */
-	boolean solveForRemaining( List<AssociatedPair> points, Hypothesis hypo, Results solution ) {
+	boolean solveForRemaining( List<AssociatedPair> points, Hypothesis hypo, Result solution ) {
 		A.reshape(points.size(), 4);
-		Y.reshape(points.size(),1);
+		Y.reshape(points.size(), 1);
 
 		// Compute values of H which are now known from the previously computed null space
 		double h11 = hypo.gamma*null1.data[0] + null2.data[0];
@@ -249,12 +323,12 @@ public class HomographyRadial6Pts implements VerbosePrint {
 		// NOTE: p2 = x' and p1 = x in paper
 		for (int row = 0; row < points.size(); row++) {
 			AssociatedPair p = points.get(row);
-			int index = row*A.numCols;
 
 			double r1 = p.p1.normSq();
 			double w1 = 1.0 + hypo.lambda*r1;
 			double r2 = p.p2.normSq();
 
+			int index = row*A.numCols;
 			A.data[index++] = p.p2.x*p.p1.x; // H[31]
 			A.data[index++] = p.p2.x*p.p1.y; // H[32]
 			A.data[index++] = p.p2.x*w1;     // H[33]
@@ -270,8 +344,8 @@ public class HomographyRadial6Pts implements VerbosePrint {
 		solver.solve(Y, X);
 
 		// Save radial distortion parameter
-		solution.l1 = hypo.lambda;
-		solution.l2 = X.data[3];
+		solution.radial1 = hypo.lambda;
+		solution.radial2 = X.data[3];
 
 		// Save H directory to the array.
 		solution.H.data[0] = h11;
@@ -309,10 +383,13 @@ public class HomographyRadial6Pts implements VerbosePrint {
 		return (solA + solB)/2.0;
 	}
 
-	public static class Results {
+	/**
+	 * Estimated homography matrix and radial distortion terms
+	 */
+	public static class Result {
 		/** Homography between the two views */
 		public final DMatrixRMaj H = new DMatrixRMaj(3, 3);
 		/** Radial distortion in view-1 and view-2, respectively */
-		public double l1, l2;
+		public double radial1, radial2;
 	}
 }
