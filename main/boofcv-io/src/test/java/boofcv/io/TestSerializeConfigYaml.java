@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -176,13 +176,38 @@ class TestSerializeConfigYaml extends BoofStandardJUnit {
 		assertTrue(serialization.serialize(orig, orig).isEmpty());
 
 		// Now try serializing using the default values as a reference
-		ByteArrayOutputStream stream = new ByteArrayOutputStream();
+		var stream = new ByteArrayOutputStream();
 		serialization.serialize(orig, new ConfigBoof(), new OutputStreamWriter(stream, UTF_8));
 		Reader reader = new InputStreamReader(new ByteArrayInputStream(stream.toByteArray()), UTF_8);
 		ConfigBoof found = serialization.deserialize(reader);
 
 		// See if the serialization/deserialization worked
 		checkIdentical(orig, found);
+	}
+
+	/** See if it handles primitive arrays correctly */
+	@Test void encode_decode_primitive_arrays() {
+		var config = new ConfigArrays();
+		config.bools[0] = true;
+		config.bytes[0] = 1;
+		config.shorts[0] = 1;
+		config.ints[0] = 1;
+		config.longs[0] = 1;
+		config.floats[0] = 1;
+		config.doubles[0] = 1;
+
+		var stream = new ByteArrayOutputStream();
+		serialization.serialize(config, null, new OutputStreamWriter(stream, UTF_8));
+
+		Reader reader = new InputStreamReader(new ByteArrayInputStream(stream.toByteArray()), UTF_8);
+		ConfigArrays found = serialization.deserialize(reader);
+		assertTrue(found.bools[0]);
+		assertEquals(1, found.bytes[0]);
+		assertEquals(1, found.shorts[0]);
+		assertEquals(1, found.ints[0]);
+		assertEquals(1, found.longs[0]);
+		assertEquals(1, found.floats[0]);
+		assertEquals(1, found.doubles[0]);
 	}
 
 	// Create a chain of configurations, both native BoofCV and External, that will exercise the system
@@ -254,6 +279,18 @@ class TestSerializeConfigYaml extends BoofStandardJUnit {
 			enums.clear();
 			enums.addAll(src.enums);
 		}
+
+		@Override public void checkValidity() {}
+	}
+
+	public static class ConfigArrays implements Configuration {
+		public boolean[] bools = new boolean[2];
+		public byte[] bytes = new byte[2];
+		public short[] shorts = new short[2];
+		public int[] ints = new int[2];
+		public long[] longs = new long[2];
+		public float[] floats = new float[2];
+		public double[] doubles = new double[2];
 
 		@Override public void checkValidity() {}
 	}

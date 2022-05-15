@@ -200,7 +200,7 @@ public class SerializeFieldsYamlBase {
 					c.getMethod("setTo", c).invoke(f.get(parent), child);
 				}
 			} catch (NoSuchFieldException | IllegalAccessException | NoSuchMethodException |
-					InstantiationException | InvocationTargetException e) {
+					 InstantiationException | InvocationTargetException e) {
 				errorHandler.handle(ErrorType.REFLECTION,
 						String.format("%s class='%s' key='%s'", e.getClass().getSimpleName(), type.getSimpleName(), key), null);
 			}
@@ -233,28 +233,53 @@ public class SerializeFieldsYamlBase {
 	private void deserializePrimitiveArray( Object parent, Map<String, Object> state, String key, Field f, Class ftype )
 			throws IllegalAccessException {
 		Object value = state.get(key);
-		if (ftype == boolean[].class)
-			f.set(parent, ((boolean[])value).clone());
-		else if (ftype == byte[].class)
+		if (ftype == boolean[].class) {
+			List<Boolean> list = (List<Boolean>)value;
+			boolean[] array = new boolean[list.size()];
+			for (int i = 0; i < array.length; i++) {
+				array[i] = list.get(i);
+			}
+			f.set(parent, array);
+		} else if (ftype == byte[].class) {
 			f.set(parent, ((byte[])value).clone());
-		else if (ftype == char[].class)
+		} else if (ftype == char[].class) {
 			f.set(parent, ((char[])value).clone());
-		else if (ftype == short[].class)
-			f.set(parent, ((short[])value).clone());
-		else if (ftype == int[].class) {
+		} else if (ftype == short[].class) {
+			List<Number> list = (List<Number>)value;
+			short[] array = new short[list.size()];
+			for (int i = 0; i < array.length; i++) {
+				array[i] = list.get(i).shortValue();
+			}
+			f.set(parent, array);
+		} else if (ftype == int[].class) {
 			List<Integer> list = (List<Integer>)value;
 			int[] array = new int[list.size()];
 			for (int i = 0; i < array.length; i++) {
 				array[i] = list.get(i);
 			}
 			f.set(parent, array);
-		} else if (ftype == long[].class)
-			f.set(parent, ((long[])value).clone());
-		else if (ftype == float[].class)
-			f.set(parent, ((float[])value).clone());
-		else if (ftype == double[].class)
-			f.set(parent, ((double[])value).clone());
-		else
+		} else if (ftype == long[].class) {
+			List<Number> list = (List<Number>)value;
+			long[] array = new long[list.size()];
+			for (int i = 0; i < array.length; i++) {
+				array[i] = list.get(i).longValue();
+			}
+			f.set(parent, array);
+		} else if (ftype == float[].class) {
+			List<Number> list = (List<Number>)value;
+			float[] array = new float[list.size()];
+			for (int i = 0; i < array.length; i++) {
+				array[i] = list.get(i).floatValue();
+			}
+			f.set(parent, array);
+		} else if (ftype == double[].class) {
+			List<Number> list = (List<Number>)value;
+			double[] array = new double[list.size()];
+			for (int i = 0; i < array.length; i++) {
+				array[i] = list.get(i).doubleValue();
+			}
+			f.set(parent, array);
+		} else
 			errorHandler.handle(ErrorType.UNEXPECTED_TYPE, "Unknown primitive array " + ftype, null);
 	}
 
