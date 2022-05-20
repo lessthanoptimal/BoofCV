@@ -833,6 +833,13 @@ public class DemoThreeViewStereoApp<TD extends TupleDesc<TD>> extends Demonstrat
 		return disparity;
 	}
 
+	public void updateCloudVisuals(boolean repaint) {
+		double d = leftToRight.getT().norm();
+		controls.controlCloud.configure(guiPointCloud, d*10, d/2.0);
+		if (repaint)
+			repaint();
+	}
+
 	/**
 	 * Show results as a point cloud
 	 */
@@ -850,6 +857,7 @@ public class DemoThreeViewStereoApp<TD extends TupleDesc<TD>> extends Demonstrat
 
 		CameraPinhole rectifiedPinhole = PerspectiveOps.matrixToPinhole(rectifiedK, disparity.width, disparity.height, null);
 
+		updateCloudVisuals(false);
 		PointCloudViewer pcv = guiPointCloud;
 		pcv.setCameraHFov(PerspectiveOps.computeHFov(rectifiedPinhole));
 		if (_automaticChangeViews) // snape back to home position

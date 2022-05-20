@@ -29,6 +29,7 @@ import boofcv.factory.transform.census.CensusVariants;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.controls.ControlPanelDdaComboTabs;
 import boofcv.gui.controls.ControlPanelDisparityDense;
+import boofcv.gui.controls.ControlPanelPointCloud;
 import boofcv.gui.controls.JCheckBoxValue;
 import boofcv.struct.image.GrayU8;
 
@@ -57,7 +58,7 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 	JComboBox<String> imageView = combo(view, "Image 1", "Matches", "Inliers", "Rectified", "Disparity", "3D");
 
 	// TODO select features, e.g. sift, surf, ShiTomasi, BRIEF
-	JSpinner sMaxSize = spinner(maxImageSize, 50, 1200, 50);
+	JSpinner sMaxSize = spinner(maxImageSize, 50, 2000, 50);
 	JSpinner sInliers = spinner(inliers, 0.1, 100.0, 0.5);
 	JSpinner sPrune = spinner(prune, 0, 100, 5);
 	JCheckBox cFocalAuto = checkbox("Auto Focal", autoFocal,
@@ -70,6 +71,7 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 
 	ControlPanelDdaComboTabs controlsDetDescAssoc = new ControlPanelCustomDDA();
 	ControlPanelDisparityDense controlDisparity;
+	ControlPanelPointCloud controlCloud = new ControlPanelPointCloud();
 
 	DemoThreeViewStereoApp owner;
 
@@ -89,10 +91,13 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 			sFocal.setEnabled(false);
 		}
 
-		JTabbedPane tabs = new JTabbedPane();
+		controlCloud.setCallbackModified(() -> owner.updateCloudVisuals(true));
+
+		var tabs = new JTabbedPane();
 		tabs.addTab("Calib", createSelfCalibPanel());
 		tabs.addTab("Feats", controlsDetDescAssoc);
 		tabs.addTab("Stereo", controlDisparity);
+		tabs.addTab("Cloud", controlCloud);
 		tabs.setMaximumSize(tabs.getPreferredSize());
 
 		addLabeled(imageView, "View");
