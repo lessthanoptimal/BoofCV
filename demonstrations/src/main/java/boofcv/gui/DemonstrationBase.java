@@ -636,7 +636,7 @@ public abstract class DemonstrationBase extends JPanel {
 			if (new File(filePaths[which]).isDirectory()) {
 				// If it's a directly, try loading an image sequence
 				List<String> images = UtilIO.listSmartImages(filePaths[which], true);
-				if (images.isEmpty())
+				if (!images.isEmpty())
 					sequence = new LoadFileImageSequence2(images, cache.getImageType());
 			} else {
 				// Otherwise, assume it's a video file
