@@ -295,7 +295,7 @@ public class SceneWorkingGraph {
 		public PairwiseImageGraph.View pview;
 
 		/** Which feature each observation belongs to. If < 0 then it's unknown */
-		public final DogArray_I32 featureIDs = new DogArray_I32();
+		public final DogArray_I32 landmarkIDs = new DogArray_I32();
 
 		/**
 		 * Specifies which observations were used to compute the projective transform for this view
@@ -350,7 +350,7 @@ public class SceneWorkingGraph {
 			index = -1;
 			pview = null;
 			cameraIdx = -1;
-			featureIDs.reset();
+			landmarkIDs.reset();
 			projective.zero();
 			inliers.reset();
 			world_to_view.reset();

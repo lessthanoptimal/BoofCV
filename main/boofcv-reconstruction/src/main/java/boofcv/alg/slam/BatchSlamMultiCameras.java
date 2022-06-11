@@ -26,6 +26,7 @@ import boofcv.factory.geo.FactoryMultiView;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.distort.Point2Transform3_F64;
 import boofcv.struct.feature.AssociatedIndex;
+import boofcv.struct.geo.Point2D3D;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
@@ -116,7 +117,7 @@ public class BatchSlamMultiCameras implements VerbosePrint {
 					break;
 
 				// Try adding this view to the scene
-				if (!expandIntoView(scene, target)) {
+				if (!expandIntoView(scene, target, similarImages)) {
 					continue;
 				}
 
@@ -240,7 +241,7 @@ public class BatchSlamMultiCameras implements VerbosePrint {
 			SceneWorkingGraph.Camera camSeed = lookupCamera(scene, pseed);
 			SceneWorkingGraph.View wseed = scene.addView(pseed, camSeed);
 			SceneWorkingGraph.InlierInfo inliers = wseed.inliers.grow();
-			wseed.featureIDs.resetResize(pseed.totalObservations, -1);
+			wseed.landmarkIDs.resetResize(pseed.totalObservations, -1);
 
 
 			for (int i = 0; i < seed.neighbors.size(); i++) {
@@ -256,12 +257,12 @@ public class BatchSlamMultiCameras implements VerbosePrint {
 
 				SceneWorkingGraph.Camera camDst = lookupCamera(scene, dst);
 				SceneWorkingGraph.View wdst = scene.addView(dst, camDst);
-				wdst.featureIDs.resetResize(dst.totalObservations, -1);
+				wdst.landmarkIDs.resetResize(dst.totalObservations, -1);
 
 				similarImages.lookupPixelFeats(dst.id, pixelsB);
 				Point2Transform3_F64 pixelToPointingB = sensors.lookupCamera(dst.id).intrinsics.undistortPtoS_F64();
 
-				// Look up known extrinsics
+				// Look up known extrinsics between the stereo pair
 				sensors.computeSrcToDst(pseed.id, dst.id, viewA_to_viewB);
 
 				// Triangulate common observations from inliers
@@ -287,9 +288,12 @@ public class BatchSlamMultiCameras implements VerbosePrint {
 						continue;
 					}
 
+					// TODO discard triangulations with too large reprojection error
+					// TODO discard triangulations pointing 180 degrees behind an observation
+
 					// note which features these line up with
-					wseed.featureIDs.set(a.src, landmarkID);
-					wdst.featureIDs.set(a.dst, landmarkID);
+					wseed.landmarkIDs.set(a.src, landmarkID);
+					wdst.landmarkIDs.set(a.dst, landmarkID);
 				}
 
 				// Add remaining unknown observations to landmark list, both views
@@ -326,10 +330,10 @@ public class BatchSlamMultiCameras implements VerbosePrint {
 	}
 
 	private void addUnknownLandmarks( SceneWorkingGraph scene, SceneWorkingGraph.View wseed ) {
-		for (int obsIdx = 0; obsIdx < wseed.featureIDs.size; obsIdx++) {
-			if (wseed.featureIDs.get(obsIdx) >= 0)
+		for (int obsIdx = 0; obsIdx < wseed.landmarkIDs.size; obsIdx++) {
+			if (wseed.landmarkIDs.get(obsIdx) >= 0)
 				continue;
-			wseed.featureIDs.set(obsIdx, scene.listLandmarks.size);
+			wseed.landmarkIDs.set(obsIdx, scene.listLandmarks.size);
 			scene.listLandmarks.grow();
 		}
 	}
@@ -392,30 +396,69 @@ public class BatchSlamMultiCameras implements VerbosePrint {
 	 * @param ptarget The view which is to be added to the scene
 	 * @return true if successful and the scene was modified. If false the scene was not modified
 	 */
-	protected boolean expandIntoView( SceneWorkingGraph scene, PairwiseImageGraph.View ptarget ) {
-		List<String> knownViews = new ArrayList<>();
-
-		// Find all known views in the scene which are connected to the target
-		for (int midx = 0; midx < ptarget.connections.size; midx++) {
-			PairwiseImageGraph.Motion m = ptarget.connections.get(midx);
-			if (scene.isKnown(m.other(ptarget))) {
-				knownViews.add(m.other(ptarget).id);
-			}
-		}
-
-		// For each observation, this contains a list of feature IDs neighboring views thing it belongs to
-		DogArray<DogArray_I32> listVotes = new DogArray<>(DogArray_I32::new, DogArray_I32::reset);
-
-		// Accumulate votes for each observation
-		listVotes.resetResize(ptarget.totalObservations);
+	protected boolean expandIntoView( SceneWorkingGraph scene, PairwiseImageGraph.View ptarget, LookUpSimilarImages similarImages ) {
+		// Select the known neighbor with the most common connections to the target
+		PairwiseImageGraph.Motion bestMotion = null;
 		for (int midx = 0; midx < ptarget.connections.size; midx++) {
 			PairwiseImageGraph.Motion m = ptarget.connections.get(midx);
 			if (!scene.isKnown(m.other(ptarget))) {
 				continue;
 			}
-			PairwiseImageGraph.View ov = m.other(ptarget);
-			SceneWorkingGraph.View sv = scene.lookupView(ov.id);
+			if (bestMotion == null || bestMotion.inliers.size < m.inliers.size)
+				bestMotion = m;
+		}
 
+		if (bestMotion == null)
+			return false;
+
+		// Look up information on the other view. Now referred to as view 'b'
+		PairwiseImageGraph.View pb = bestMotion.other(ptarget);
+		SceneWorkingGraph.View sb = scene.lookupView(pb.id);
+
+		// Look up pointing observations in each view
+		similarImages.lookupPixelFeats(ptarget.id, pixelsA);
+		similarImages.lookupPixelFeats(pb.id, pixelsB);
+
+		// Create inputs for PNP
+		DogArray<Point2D3D> inputPnP = new DogArray<>(Point2D3D::new, Point2D3D::zero);
+		DogArray_I32 inputIDs = new DogArray_I32();
+
+		inputPnP.reset();
+		inputIDs.reset();
+
+		Point2Transform3_F64 pixelToPointingA = sensors.lookupCamera(ptarget.id).intrinsics.undistortPtoS_F64();
+		Point2Transform3_F64 pixelToPointingB = sensors.lookupCamera(pb.id).intrinsics.undistortPtoS_F64();
+
+
+		for (int inlierIdx = 0; inlierIdx < bestMotion.inliers.size; inlierIdx++) {
+			AssociatedIndex a = bestMotion.inliers.get(inlierIdx);
+
+			int landmarkID = sb.landmarkIDs.get(bestMotion.src == pb ? a.src : a.dst);
+			if (landmarkID < 0)
+				continue;
+
+			// get pointing vector of observation
+			Point2D_F64 pixelA = pixelsA.get(bestMotion.src == ptarget ? a.src : a.dst);
+			Point2D_F64 pixelB = pixelsB.get(bestMotion.src == ptarget ? a.dst : a.src);
+			pixelToPointingA.compute(pixelA.x, pixelA.y, pointA);
+			pixelToPointingB.compute(pixelB.x, pixelB.y, pointB);
+
+			// PNP requires normalized image coordinates. It can't handle z=0 pointing vectors
+			if (pointA.z == 0.0 || pointB.z == 0.0)
+				continue;
+
+			// Convert location to local coordinate system of 'sv'
+			Point4D_F64 loc4 = scene.listLandmarks.get(landmarkID);
+
+			// Discard if point is at infinity. PNP can't handle this scenario
+			if (loc4.w == 0.0)
+				continue;
+
+			inputIDs.add(landmarkID);
+
+			// TODO shift point into local coordinate system of dst
+
+			// TODO convert from homogenous into 3D point and add to input list for PNP
 		}
 		// TODO Robust PNP to find pose of new view
 
