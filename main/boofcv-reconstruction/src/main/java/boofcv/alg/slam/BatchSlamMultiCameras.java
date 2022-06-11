@@ -18,14 +18,19 @@
 
 package boofcv.alg.slam;
 
+import boofcv.abst.geo.Triangulate2PointingMetricH;
 import boofcv.alg.structure.LookUpSimilarImages;
 import boofcv.alg.structure.PairwiseImageGraph;
 import boofcv.alg.structure.SceneWorkingGraph;
+import boofcv.factory.geo.FactoryMultiView;
 import boofcv.misc.BoofMiscOps;
-import org.ddogleg.struct.DogArray;
-import org.ddogleg.struct.DogArray_B;
-import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.VerbosePrint;
+import boofcv.struct.distort.Point2Transform3_F64;
+import boofcv.struct.feature.AssociatedIndex;
+import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Point4D_F64;
+import georegression.struct.se.Se3_F64;
+import org.ddogleg.struct.*;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
@@ -52,15 +57,21 @@ public class BatchSlamMultiCameras implements VerbosePrint {
 
 	int countConsideredConnections = 3;
 
-	// Checks to see if two views where captured at the same time by the multi-camera system
-	CheckSynchronized checkSynchronized;
-
 	GeneratePairwiseGraphFromMultiCameraSystem generatePairwise;
 
 	DogArray<SeedInfo> seeds = new DogArray<>(SeedInfo::new, SeedInfo::reset);
 	DogArray_B viewUsed = new DogArray_B();
 
 	DogArray<SceneWorkingGraph> scenes = new DogArray<>(SceneWorkingGraph::new, SceneWorkingGraph::reset);
+
+	Triangulate2PointingMetricH triangulator2 = FactoryMultiView.triangulate2PointingMetricH(null);
+	Se3_F64 viewA_to_viewB = new Se3_F64();
+	DogArray<Point2D_F64> pixelsA = new DogArray<>(Point2D_F64::new, Point2D_F64::zero);
+	DogArray<Point2D_F64> pixelsB = new DogArray<>(Point2D_F64::new, Point2D_F64::zero);
+
+	// Observations converting into pointing vectors
+	Point3D_F64 pointA = new Point3D_F64();
+	Point3D_F64 pointB = new Point3D_F64();
 
 	private final List<PairwiseImageGraph.View> valid = new ArrayList<>();
 
@@ -89,7 +100,7 @@ public class BatchSlamMultiCameras implements VerbosePrint {
 			if (seed == null)
 				return;
 
-			if (!initializeNewScene(pairwise, seed)) {
+			if (!initializeNewScene(pairwise, seed, similarImages)) {
 				// TODO abort if it fails X times in a row
 				continue;
 			}
@@ -209,7 +220,7 @@ public class BatchSlamMultiCameras implements VerbosePrint {
 		return null;
 	}
 
-	public boolean initializeNewScene( PairwiseImageGraph pairwise, SeedInfo seed ) {
+	public boolean initializeNewScene( PairwiseImageGraph pairwise, SeedInfo seed, LookUpSimilarImages similarImages ) {
 		SceneWorkingGraph scene = scenes.grow();
 
 		// Create a camera for every camera in the multi camera system
@@ -221,15 +232,21 @@ public class BatchSlamMultiCameras implements VerbosePrint {
 
 		PairwiseImageGraph.View pseed = pairwise.nodes.get(seed.viewIndex);
 
+		similarImages.lookupPixelFeats(pseed.id, pixelsA);
+
+		Point2Transform3_F64 pixelToPointingA = sensors.lookupCamera(pseed.id).intrinsics.undistortPtoS_F64();
+
 		if (activeSceneKnownScale) {
 			SceneWorkingGraph.Camera camSeed = lookupCamera(scene, pseed);
 			SceneWorkingGraph.View wseed = scene.addView(pseed, camSeed);
 			SceneWorkingGraph.InlierInfo inliers = wseed.inliers.grow();
+			wseed.featureIDs.resetResize(pseed.totalObservations, -1);
+
 
 			for (int i = 0; i < seed.neighbors.size(); i++) {
 				PairwiseImageGraph.Motion m = seed.neighbors.get(i);
 				PairwiseImageGraph.View dst = m.other(pseed);
-				if (!isExtrinsicsKnown(pseed, dst)) {
+				if (!sensors.isStereo(pseed.id, dst.id)) {
 					continue;
 				}
 
@@ -239,10 +256,48 @@ public class BatchSlamMultiCameras implements VerbosePrint {
 
 				SceneWorkingGraph.Camera camDst = lookupCamera(scene, dst);
 				SceneWorkingGraph.View wdst = scene.addView(dst, camDst);
+				wdst.featureIDs.resetResize(dst.totalObservations, -1);
+
+				similarImages.lookupPixelFeats(dst.id, pixelsB);
+				Point2Transform3_F64 pixelToPointingB = sensors.lookupCamera(dst.id).intrinsics.undistortPtoS_F64();
+
+				// Look up known extrinsics
+				sensors.computeSrcToDst(pseed.id, dst.id, viewA_to_viewB);
+
+				// Triangulate common observations from inliers
+				for (int inlierIdx = 0; inlierIdx < m.inliers.size; inlierIdx++) {
+					// identifier for the landmark and storage for estimated location
+					int landmarkID = scene.listLandmarks.size;
+					Point4D_F64 location = scene.listLandmarks.grow();
+
+					// Look up which image features have been paired for this landmark
+					AssociatedIndex a = m.inliers.get(inlierIdx);
+
+					// Get pixel observations
+					Point2D_F64 pixelA = pixelsA.get(a.src);
+					Point2D_F64 pixelB = pixelsB.get(a.dst);
+
+					// Convert to pointing vectors
+					pixelToPointingA.compute(pixelA.x, pixelA.y, pointA);
+					pixelToPointingB.compute(pixelB.x, pixelB.y, pointB);
+
+					// Estimate 3D location in homogeneous coordinates
+					if (!triangulator2.triangulate(pointA, pointB, viewA_to_viewB, location)) {
+						scene.listLandmarks.removeTail();
+						continue;
+					}
+
+					// note which features these line up with
+					wseed.featureIDs.set(a.src, landmarkID);
+					wdst.featureIDs.set(a.dst, landmarkID);
+				}
+
+				// Add remaining unknown observations to landmark list, both views
+				addUnknownLandmarks(scene, wseed);
+				addUnknownLandmarks(scene, wdst);
 
 				inliers.views.add(pseed);
 				inliers.views.add(dst);
-				// TODO add list of observations from each view
 
 				// Mark these two views as being used
 				viewUsed.set(pseed.index, true);
@@ -267,6 +322,15 @@ public class BatchSlamMultiCameras implements VerbosePrint {
 			return true;
 		} else {
 			throw new RuntimeException("Handle situation where there is no known scale");
+		}
+	}
+
+	private void addUnknownLandmarks( SceneWorkingGraph scene, SceneWorkingGraph.View wseed ) {
+		for (int obsIdx = 0; obsIdx < wseed.featureIDs.size; obsIdx++) {
+			if (wseed.featureIDs.get(obsIdx) >= 0)
+				continue;
+			wseed.featureIDs.set(obsIdx, scene.listLandmarks.size);
+			scene.listLandmarks.grow();
 		}
 	}
 
@@ -324,18 +388,43 @@ public class BatchSlamMultiCameras implements VerbosePrint {
 	}
 
 	/**
-	 *
 	 * @param scene The known scene
 	 * @param ptarget The view which is to be added to the scene
 	 * @return true if successful and the scene was modified. If false the scene was not modified
 	 */
 	protected boolean expandIntoView( SceneWorkingGraph scene, PairwiseImageGraph.View ptarget ) {
-		// TODO find all views in the scene which are connected to the target
+		List<String> knownViews = new ArrayList<>();
 
-		// TODO see if the extrinsics are known, if so use those
+		// Find all known views in the scene which are connected to the target
+		for (int midx = 0; midx < ptarget.connections.size; midx++) {
+			PairwiseImageGraph.Motion m = ptarget.connections.get(midx);
+			if (scene.isKnown(m.other(ptarget))) {
+				knownViews.add(m.other(ptarget).id);
+			}
+		}
 
-		// TODO if extrinsics are not known, estimate them
+		// For each observation, this contains a list of feature IDs neighboring views thing it belongs to
+		DogArray<DogArray_I32> listVotes = new DogArray<>(DogArray_I32::new, DogArray_I32::reset);
 
+		// Accumulate votes for each observation
+		listVotes.resetResize(ptarget.totalObservations);
+		for (int midx = 0; midx < ptarget.connections.size; midx++) {
+			PairwiseImageGraph.Motion m = ptarget.connections.get(midx);
+			if (!scene.isKnown(m.other(ptarget))) {
+				continue;
+			}
+			PairwiseImageGraph.View ov = m.other(ptarget);
+			SceneWorkingGraph.View sv = scene.lookupView(ov.id);
+
+		}
+		// TODO Robust PNP to find pose of new view
+
+		// TODO Triangulate features which don't have a known location
+
+		// TODO assign a unique ID to all observations that don't have a feature ID
+
+		// NOTE: Future might want to triangulate from local views too and compare solutions. This is done to prevent
+		//       earlier mistakes from screwing up things now
 
 		return true;
 	}
@@ -345,14 +434,9 @@ public class BatchSlamMultiCameras implements VerbosePrint {
 	}
 
 	public void addNeighbor( SeedInfo info, PairwiseImageGraph.View target, PairwiseImageGraph.Motion m, double score ) {
-		info.knownScale |= isExtrinsicsKnown(target, m.other(target));
+		info.knownScale |= sensors.isStereo(target.id, m.other(target).id);
 		info.score += score;
 		info.neighbors.add(m);
-	}
-
-	/** Returns true if the two views have a known baseline / extrinsics between them */
-	public boolean isExtrinsicsKnown( PairwiseImageGraph.View va, PairwiseImageGraph.View vb ) {
-		return checkSynchronized.isSynchronized(va.id, vb.id);
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> options ) {

@@ -21,6 +21,7 @@ package boofcv.alg.structure;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.struct.calib.CameraPinholeBrown;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.TObjectIntMap;
@@ -48,6 +49,9 @@ public class SceneWorkingGraph {
 	public final TIntObjectMap<Camera> cameras = new TIntObjectHashMap<>();
 	/** List of scene cameras */
 	public final DogArray<Camera> listCameras = new DogArray<>(Camera::new, Camera::reset);
+
+	/** List of landmarks in world frame. If x=NaN then location is unknown */
+	public final DogArray<Point4D_F64> listLandmarks = new DogArray<>(Point4D_F64::new, (p)->p.x = Double.NaN);
 
 	/** List of all views in the scene graph. Look up based on the image/view's id */
 	public final Map<String, View> views = new HashMap<>();
@@ -290,6 +294,9 @@ public class SceneWorkingGraph {
 		/** Reference to the {@link PairwiseImageGraph.View} that this view was generated from */
 		public PairwiseImageGraph.View pview;
 
+		/** Which feature each observation belongs to. If < 0 then it's unknown */
+		public final DogArray_I32 featureIDs = new DogArray_I32();
+
 		/**
 		 * Specifies which observations were used to compute the projective transform for this view
 		 * If empty that means one set of inliers are used for multiple views and only one view needed
@@ -343,6 +350,7 @@ public class SceneWorkingGraph {
 			index = -1;
 			pview = null;
 			cameraIdx = -1;
+			featureIDs.reset();
 			projective.zero();
 			inliers.reset();
 			world_to_view.reset();

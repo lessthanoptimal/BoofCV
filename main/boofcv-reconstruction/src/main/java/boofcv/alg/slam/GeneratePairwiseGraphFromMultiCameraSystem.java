@@ -57,7 +57,7 @@ public class GeneratePairwiseGraphFromMultiCameraSystem {
 	@Getter @Setter public int numberOfIterations = 500;
 
 	// Checks to see if two views where captured at the same time by the multi-camera system
-	final CheckSynchronized checkSynchronized;
+	final LookUpStereoPair checkSynchronized;
 
 	// Describes the multi-camera system being used
 	MultiCameraSystem sensors;
@@ -93,7 +93,7 @@ public class GeneratePairwiseGraphFromMultiCameraSystem {
 													   ViewToCamera viewToCamera,
 													   RansacCalibrated2<Se3_F64, AssociatedPair3D> robustExtrinsic,
 													   EpipolarCalibratedScore3D scorer,
-													   CheckSynchronized checkSynchronized ) {
+													   LookUpStereoPair checkSynchronized ) {
 		this.sensors = sensors;
 		this.viewToCamera = viewToCamera;
 		this.robustExtrinsic = robustExtrinsic;
@@ -172,7 +172,7 @@ public class GeneratePairwiseGraphFromMultiCameraSystem {
 			similarImages.lookupAssociated(viewB, pairs);
 
 			// If cameras are synchronized then the extrinsics is known
-			if (checkSynchronized.isSynchronized(viewA, viewB)) {
+			if (checkSynchronized.isStereo(viewA, viewB)) {
 				sensors.computeSrcToDst(viewB, viewA, b_to_a);
 			} else {
 				// Estimate the extrinsics robustly

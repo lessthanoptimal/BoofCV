@@ -41,6 +41,10 @@ public class MultiCameraSystem {
 		nameToCameras.put(name, cam);
 	}
 
+	public boolean isStereo(String src, String dst) {
+		return true;
+	}
+
 	/** Computes the extrinsics relationship between the two views from src to dst */
 	public Se3_F64 computeSrcToDst( String src, String dst, @Nullable Se3_F64 src_to_dst ) {
 		if (src_to_dst == null)
@@ -56,7 +60,9 @@ public class MultiCameraSystem {
 	public static class Camera {
 		public int index;
 		public final String name;
+		// intrinsic model to go from pixel to pointing and vis versa
 		public final LensDistortionWideFOV intrinsics;
+		// Location of camera in local sensor coordinate system, e.g. stereo
 		public final Se3_F64 cameraToSensor = new Se3_F64();
 		public final ImageDimension shape = new ImageDimension();
 

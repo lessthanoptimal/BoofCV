@@ -19,11 +19,16 @@
 package boofcv.alg.slam;
 
 /**
- * Expands into a new view where some views have a known extrinsic relationship. If there's a 3D relationship
- * between a view in the scene with a known extrinsics than that is used. If there isn't then the 3D relationship
- * is estimated and added using known intrinsics of each view.
- *
- * @author Peter Abeles
+ * Checks to see if the two views are a stereo pair with a known extrinsics and synchronized shutters.
  */
-public class MetricKnownExtrinsicsExpandByOneView {
+@FunctionalInterface
+public interface LookUpStereoPair {
+	/**
+	 * Used to determine of two views make a stereo pair and retrieve their extrinsic relationship
+	 *
+	 * @param viewA ID of view A
+	 * @param viewB ID of view B
+	 * @return true if the views are a stereo pair, synchronized, and have a known extrinsic relationship
+	 */
+	boolean isStereo( String viewA, String viewB );
 }
