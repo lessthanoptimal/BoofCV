@@ -41,6 +41,8 @@ import boofcv.factory.geo.FactoryMultiView;
 import boofcv.misc.BoofLambdas;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinhole;
+import boofcv.struct.distort.Point2Transform3_F64;
+import boofcv.struct.distort.Point3Transform2_F64;
 import boofcv.struct.geo.*;
 import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.UtilLine2D_F64;
@@ -2082,5 +2084,64 @@ public class MultiViewOps {
 		CommonOps_DDRM.mult(KR, K1_inv, H21);
 
 		return H21;
+	}
+
+	/**
+	 * Approximates a pinhole camera given a function to transform a point from a pixel to a pointing direction.
+	 * The approximation is created by sampling projections starting at the principle point along the longest axis.
+	 * When it becomes unstable or hits the maxFov it then decides this is the image boundary. If the region
+	 * that's a reasonable approximation for a pinhole camera is smaller than the actual image then
+	 * the resulting pinhole will not have the same width and height as the original.
+	 *
+	 * @param maxFov maximum allowed field-of-view in radians.
+	 * @param width original camera width
+	 * @param height original camera height
+	 * @param pinhole (Output) The approximated pinhole camera. See above for why width and height might be changed.
+	 */
+	public static CameraPinhole approximatePinhole( Point3Transform2_F64 pointingToPixel,
+													Point2Transform3_F64 pixelToPointing, double maxFov,
+													int width, int height, CameraPinhole pinhole ) {
+		if (pinhole == null)
+			pinhole = new CameraPinhole();
+		Point2D_F64 pixel = new Point2D_F64();
+
+		// Find the principle point
+		pointingToPixel.compute(0, 0, 1.0, pixel);
+		pinhole.cx = pixel.x;
+		pinhole.cy = pixel.y;
+
+		// Starting from the principle point, move until it hits the image border or maximum fov
+		// use the wider axis in the image to find the FOV
+		Point3D_F64 pointing = new Point3D_F64();
+		int length = Math.max(width, height);
+		double goodFov = 0.0;
+		int N = 30;
+		int i;
+		for (i = 0; i < N; i++) {
+			int r = (i + 1)*length/(2*N);
+			double x = pinhole.cx + (width > height ? r : 0);
+			double y = pinhole.cy + (height > width ? r : 0);
+			pixelToPointing.compute(x, y, pointing);
+			double axisValue = width > height ? pointing.x : pointing.y;
+			double fov = 2*Math.atan(axisValue/pointing.z);
+
+			// If the FOV got smaller than it hit an unstable region and pinhole is clearly not a good approximation
+			if (fov < goodFov || fov > maxFov)
+				break;
+			goodFov = fov;
+		}
+
+		// minor issue here is that it assumes the principle point is the image center. Regions of poor approximation
+		// could still be included
+		double imageLength = Math.min(N,(i+1))*length/(double)N;
+		double focalLength = (imageLength/2)*Math.tan(goodFov/2.0);
+
+		pinhole.fx = focalLength;
+		pinhole.fy = focalLength;
+		pinhole.skew = 0;
+		pinhole.width = (int)Math.min(imageLength, width);
+		pinhole.height = (int)Math.min(imageLength, height);
+
+		return pinhole;
 	}
 }

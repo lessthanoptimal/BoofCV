@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -1475,6 +1475,10 @@ class TestMultiViewOps extends BoofStandardJUnit {
 		GeometryMath_F64.mult(H21,pixel1, found);
 
 		assertEquals(0.0, found.distance(pixel2), 1e-6);
+	}
+
+	@Test void approximatePinhole() {
+		fail("Implement");
 	}
 
 	private class BundleSceneHelper {
