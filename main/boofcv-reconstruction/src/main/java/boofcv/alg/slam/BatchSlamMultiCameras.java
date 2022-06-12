@@ -18,17 +18,13 @@
 
 package boofcv.alg.slam;
 
-import boofcv.abst.geo.Triangulate2PointingMetricH;
 import boofcv.alg.structure.LookUpSimilarImages;
 import boofcv.alg.structure.PairwiseImageGraph;
 import boofcv.alg.structure.SceneWorkingGraph;
-import boofcv.factory.geo.FactoryMultiView;
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.distort.Point2Transform3_F64;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.geo.Point2D3D;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.*;
@@ -58,6 +54,8 @@ public class BatchSlamMultiCameras implements VerbosePrint {
 
 	int countConsideredConnections = 3;
 
+	MultiCameraSlamUtils slamUtils = new MultiCameraSlamUtils();
+
 	GeneratePairwiseGraphFromMultiCameraSystem generatePairwise;
 
 	DogArray<SeedInfo> seeds = new DogArray<>(SeedInfo::new, SeedInfo::reset);
@@ -65,14 +63,9 @@ public class BatchSlamMultiCameras implements VerbosePrint {
 
 	DogArray<SceneWorkingGraph> scenes = new DogArray<>(SceneWorkingGraph::new, SceneWorkingGraph::reset);
 
-	Triangulate2PointingMetricH triangulator2 = FactoryMultiView.triangulate2PointingMetricH(null);
 	Se3_F64 viewA_to_viewB = new Se3_F64();
 	DogArray<Point2D_F64> pixelsA = new DogArray<>(Point2D_F64::new, Point2D_F64::zero);
 	DogArray<Point2D_F64> pixelsB = new DogArray<>(Point2D_F64::new, Point2D_F64::zero);
-
-	// Observations converting into pointing vectors
-	Point3D_F64 pointA = new Point3D_F64();
-	Point3D_F64 pointB = new Point3D_F64();
 
 	private final List<PairwiseImageGraph.View> valid = new ArrayList<>();
 
@@ -85,6 +78,9 @@ public class BatchSlamMultiCameras implements VerbosePrint {
 	PrintStream verbose;
 
 	public void process( MultiCameraSystem sensors, LookUpSimilarImages similarImages ) {
+		// Print verbose from utils as if it was from this class, to keep indentations down
+		slamUtils.verbose = this.verbose;
+
 		// Learn how much geometric information is available between views
 		generatePairwise.process(sensors, similarImages);
 
@@ -235,14 +231,13 @@ public class BatchSlamMultiCameras implements VerbosePrint {
 
 		similarImages.lookupPixelFeats(pseed.id, pixelsA);
 
-		Point2Transform3_F64 pixelToPointingA = sensors.lookupCamera(pseed.id).intrinsics.undistortPtoS_F64();
+		setCameraA(sensors.lookupCamera(pseed.id));
 
 		if (activeSceneKnownScale) {
 			SceneWorkingGraph.Camera camSeed = lookupCamera(scene, pseed);
 			SceneWorkingGraph.View wseed = scene.addView(pseed, camSeed);
 			SceneWorkingGraph.InlierInfo inliers = wseed.inliers.grow();
 			wseed.landmarkIDs.resetResize(pseed.totalObservations, -1);
-
 
 			for (int i = 0; i < seed.neighbors.size(); i++) {
 				PairwiseImageGraph.Motion m = seed.neighbors.get(i);
@@ -260,7 +255,7 @@ public class BatchSlamMultiCameras implements VerbosePrint {
 				wdst.landmarkIDs.resetResize(dst.totalObservations, -1);
 
 				similarImages.lookupPixelFeats(dst.id, pixelsB);
-				Point2Transform3_F64 pixelToPointingB = sensors.lookupCamera(dst.id).intrinsics.undistortPtoS_F64();
+				setCameraB(sensors.lookupCamera(dst.id));
 
 				// Look up known extrinsics between the stereo pair
 				sensors.computeSrcToDst(pseed.id, dst.id, viewA_to_viewB);
@@ -279,17 +274,21 @@ public class BatchSlamMultiCameras implements VerbosePrint {
 					Point2D_F64 pixelB = pixelsB.get(a.dst);
 
 					// Convert to pointing vectors
-					pixelToPointingA.compute(pixelA.x, pixelA.y, pointA);
-					pixelToPointingB.compute(pixelB.x, pixelB.y, pointB);
-
-					// Estimate 3D location in homogeneous coordinates
-					if (!triangulator2.triangulate(pointA, pointB, viewA_to_viewB, location)) {
+					if (!slamUtils.triangulate(pixelA, pixelB, viewA_to_viewB, location)) {
 						scene.listLandmarks.removeTail();
 						continue;
 					}
 
-					// TODO discard triangulations with too large reprojection error
-					// TODO discard triangulations pointing 180 degrees behind an observation
+					// Sanity checks
+					if (!slamUtils.checkObservationAngle(viewA_to_viewB, location)) {
+						scene.listLandmarks.removeTail();
+						continue;
+					}
+
+					if (!slamUtils.checkReprojection(pixelA, pixelB, viewA_to_viewB, location)) {
+						scene.listLandmarks.removeTail();
+						continue;
+					}
 
 					// note which features these line up with
 					wseed.landmarkIDs.set(a.src, landmarkID);
@@ -426,9 +425,8 @@ public class BatchSlamMultiCameras implements VerbosePrint {
 		inputPnP.reset();
 		inputIDs.reset();
 
-		Point2Transform3_F64 pixelToPointingA = sensors.lookupCamera(ptarget.id).intrinsics.undistortPtoS_F64();
-		Point2Transform3_F64 pixelToPointingB = sensors.lookupCamera(pb.id).intrinsics.undistortPtoS_F64();
-
+		setCameraA(sensors.lookupCamera(ptarget.id));
+		setCameraB(sensors.lookupCamera(pb.id));
 
 		for (int inlierIdx = 0; inlierIdx < bestMotion.inliers.size; inlierIdx++) {
 			AssociatedIndex a = bestMotion.inliers.get(inlierIdx);
@@ -440,11 +438,11 @@ public class BatchSlamMultiCameras implements VerbosePrint {
 			// get pointing vector of observation
 			Point2D_F64 pixelA = pixelsA.get(bestMotion.src == ptarget ? a.src : a.dst);
 			Point2D_F64 pixelB = pixelsB.get(bestMotion.src == ptarget ? a.dst : a.src);
-			pixelToPointingA.compute(pixelA.x, pixelA.y, pointA);
-			pixelToPointingB.compute(pixelB.x, pixelB.y, pointB);
+			slamUtils.pixelToPointingA.compute(pixelA.x, pixelA.y, slamUtils.pointA);
+			slamUtils.pixelToPointingB.compute(pixelB.x, pixelB.y, slamUtils.pointB);
 
 			// PNP requires normalized image coordinates. It can't handle z=0 pointing vectors
-			if (pointA.z == 0.0 || pointB.z == 0.0)
+			if (slamUtils.pointA.z == 0.0 || slamUtils.pointB.z == 0.0)
 				continue;
 
 			// Convert location to local coordinate system of 'sv'
@@ -470,6 +468,14 @@ public class BatchSlamMultiCameras implements VerbosePrint {
 		//       earlier mistakes from screwing up things now
 
 		return true;
+	}
+
+	private void setCameraA(MultiCameraSystem.Camera camera) {
+		slamUtils.setCameraA(camera.intrinsics, camera.shape);
+	}
+
+	private void setCameraB(MultiCameraSystem.Camera camera) {
+		slamUtils.setCameraB(camera.intrinsics, camera.shape);
 	}
 
 	private SceneWorkingGraph.Camera lookupCamera( SceneWorkingGraph scene, PairwiseImageGraph.View pview ) {
