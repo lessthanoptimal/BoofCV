@@ -116,7 +116,7 @@ public class MultiCameraSlamUtils {
 	 * @param pixelA (Input) Pixel observation of landmark in view A
 	 * @param pixelB (Input) Pixel observation of landmark in view B
 	 * @param viewA_to_viewB (Input) Known extronsic relationship. Transform from view-a to view-b
-	 * @param locationA (Output) Found location of landmark in 3D space as homogenous coordinate
+	 * @param locationA (Output) Found location of landmark in view A reference frame as a 3D homogenous coordinate
 	 * @return true is triangulation did not fail
 	 */
 	public boolean triangulate( Point2D_F64 pixelA, Point2D_F64 pixelB, Se3_F64 viewA_to_viewB, Point4D_F64 locationA ) {

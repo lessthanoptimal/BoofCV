@@ -45,13 +45,13 @@ import static boofcv.misc.BoofMiscOps.checkTrue;
  */
 public class SceneWorkingGraph {
 
-	/** Camera database ID to scene Camera*/
+	/** Camera database ID to scene Camera */
 	public final TIntObjectMap<Camera> cameras = new TIntObjectHashMap<>();
 	/** List of scene cameras */
 	public final DogArray<Camera> listCameras = new DogArray<>(Camera::new, Camera::reset);
 
 	/** List of landmarks in world frame. If x=NaN then location is unknown */
-	public final DogArray<Point4D_F64> listLandmarks = new DogArray<>(Point4D_F64::new, (p)->p.x = Double.NaN);
+	public final DogArray<Point4D_F64> listLandmarks = new DogArray<>(Point4D_F64::new, ( p ) -> p.x = Double.NaN);
 
 	/** List of all views in the scene graph. Look up based on the image/view's id */
 	public final Map<String, View> views = new HashMap<>();
@@ -119,6 +119,15 @@ public class SceneWorkingGraph {
 
 	public boolean isKnown( PairwiseImageGraph.View pview ) {
 		return views.containsKey(pview.id);
+	}
+
+	/**
+	 * Checks to see if the landmark has been assigned a location
+	 *
+	 * @return true if it has a known location
+	 */
+	public boolean isLandmarkKnown( int landmarkID ) {
+		return !Double.isNaN(listLandmarks.get(landmarkID).x);
 	}
 
 	public Camera addCamera( int indexDB ) {
@@ -212,10 +221,10 @@ public class SceneWorkingGraph {
 		 */
 		public double scoreGeometric;
 
-		public boolean isEmpty() { return observations.size == 0; }
+		public boolean isEmpty() {return observations.size == 0;}
 
 		/** Returns total number of features are included in this inlier set */
-		public int getInlierCount() { return observations.get(0).size; }
+		public int getInlierCount() {return observations.get(0).size;}
 
 		public void setTo( InlierInfo src ) {
 			this.reset();

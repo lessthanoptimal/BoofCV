@@ -35,14 +35,14 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ddogleg.struct.*;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_B;
+import org.ddogleg.struct.FastAccess;
+import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Batch Simultaneous Location and Mapping (SLAM) system which assumed a known multi camera system is viewing the world.
@@ -70,6 +70,13 @@ public class BatchSlamMultiCameras implements VerbosePrint {
 
 	DogArray<SeedInfo> seeds = new DogArray<>(SeedInfo::new, SeedInfo::reset);
 	DogArray_B viewUsed = new DogArray_B();
+
+	DogArray<Point2D3D> inputPnP = new DogArray<>(Point2D3D::new, Point2D3D::zero);
+	CameraPinhole pinholeA = new CameraPinhole();
+	CameraPinhole pinholeB = new CameraPinhole();
+
+	// triangulated point in view-A reference frame
+	Point4D_F64 locationA = new Point4D_F64();
 
 	DogArray<SceneWorkingGraph> scenes = new DogArray<>(SceneWorkingGraph::new, SceneWorkingGraph::reset);
 
@@ -135,11 +142,8 @@ public class BatchSlamMultiCameras implements VerbosePrint {
 					continue;
 				}
 
-				// TODO sometimes refine the entire scene
-
+				// TODO refine the entire scene
 			}
-
-			// TODO refine the entire scene
 		}
 	}
 
@@ -431,13 +435,13 @@ public class BatchSlamMultiCameras implements VerbosePrint {
 		if (!estimateViewPose(scene, bestMotion, ptarget, similarImages))
 			return false;
 
-		assignLandmarksToObservations();
+		assignLandmarksToObservations(ptarget, scene, pixelsA.toList(), similarImages);
 
 		return true;
 	}
 
-	boolean estimateViewPose(SceneWorkingGraph scene, PairwiseImageGraph.Motion bestMotion,
-							 PairwiseImageGraph.View ptarget, LookUpSimilarImages similarImages) {
+	boolean estimateViewPose( SceneWorkingGraph scene, PairwiseImageGraph.Motion bestMotion,
+							  PairwiseImageGraph.View ptarget, LookUpSimilarImages similarImages ) {
 		// Look up information on the other view. Now referred to as view 'b'
 		PairwiseImageGraph.View pknown = bestMotion.other(ptarget);
 		SceneWorkingGraph.View sknown = scene.lookupView(pknown.id);
@@ -447,11 +451,7 @@ public class BatchSlamMultiCameras implements VerbosePrint {
 		similarImages.lookupPixelFeats(pknown.id, pixelsB);
 
 		// Create inputs for PNP
-		DogArray<Point2D3D> inputPnP = new DogArray<>(Point2D3D::new, Point2D3D::zero);
-		DogArray_I32 inputIDs = new DogArray_I32();
-
 		inputPnP.reset();
-		inputIDs.reset();
 
 		MultiCameraSystem.Camera cameraA = sensors.lookupCamera(ptarget.id);
 		MultiCameraSystem.Camera cameraB = sensors.lookupCamera(pknown.id);
@@ -481,8 +481,6 @@ public class BatchSlamMultiCameras implements VerbosePrint {
 			if (loc4.w == 0.0)
 				continue;
 
-			inputIDs.add(landmarkID);
-
 			// Put landmark location in view-B reference frame
 			// This is an attempt to prevent issues when the world gets very large
 			SePointOps_F64.transform(sknown.world_to_view, loc4, slamUtils.locationB);
@@ -499,8 +497,6 @@ public class BatchSlamMultiCameras implements VerbosePrint {
 		// Configure intrinsics for PnP.
 		// NOTE: This really should be generalized for pointing observations and homogenous points.
 		// NOTE: Also having a threshold relative for each image size...
-		var pinholeA = new CameraPinhole();
-		var pinholeB = new CameraPinhole();
 
 		MultiViewOps.approximatePinhole(slamUtils.pointingToPixelA, slamUtils.pixelToPointingA, Math.PI*0.9,
 				slamUtils.shapeA.width, slamUtils.shapeA.height, pinholeA);
@@ -514,16 +510,95 @@ public class BatchSlamMultiCameras implements VerbosePrint {
 		if (!robustPnP.process(inputPnP.toList()))
 			return false;
 
+		// Save the now known location
+		Se3_F64 viewB_to_viewA = robustPnP.getModelParameters();
+
+		SceneWorkingGraph.View starget = scene.addView(ptarget, lookupCamera(scene, ptarget));
+		sknown.world_to_view.concat(viewB_to_viewA, starget.world_to_view);
+
 		return true;
 	}
 
-	void assignLandmarksToObservations() {
-		// TODO now that the pose of this camera is known, go through connected views and assign landmark ID's
-		//      if triangulation is within tolerance. Do that until all possible assignments have been made
-		// TODO if a landmark is triangulated and does not already have a known location set it to what's triangulated
-		// TODO create new feature IDs for remaining unknown
-	}
+	/**
+	 * Assigns landmarks to observations using associated features from connected views. An assignment
+	 * is only made if reprojection error and observations angles are within tolerance. If an observation has
+	 * landmark assigned to it, a new landmark without a location is created and assigned.
+	 */
+	void assignLandmarksToObservations( PairwiseImageGraph.View ptarget,
+										SceneWorkingGraph scene,
+										List<Point2D_F64> pixelsA,
+										LookUpSimilarImages similarImages ) {
+		// Sort connections from the most inliers to the least. If a connection has a lot of inliers it's
+		// probably a more accurate match
+		List<PairwiseImageGraph.Motion> sortedMotions = new ArrayList<>();
+		sortedMotions.addAll(ptarget.connections.toList());
+		Collections.sort(sortedMotions, ( a, b ) -> Integer.compare(b.inliers.size, a.inliers.size));
 
+		SceneWorkingGraph.View starget = scene.lookupView(ptarget.id);
+
+		// Go through all motions and mark observations with corresponding landmarks
+		for (int midx = 0; midx < sortedMotions.size(); midx++) {
+			PairwiseImageGraph.Motion motion = sortedMotions.get(midx);
+			PairwiseImageGraph.View pb = motion.other(ptarget);
+			SceneWorkingGraph.View sb = scene.lookupView(pb.id);
+
+			// viewA_to_world * world_to_viewB = viewA_to_viewB
+			starget.world_to_view.invertConcat(sb.world_to_view, viewA_to_viewB);
+
+			similarImages.lookupPixelFeats(pb.id, pixelsB);
+
+			for (int aidx = 0; aidx < motion.inliers.size; aidx++) {
+				AssociatedIndex a = motion.inliers.get(aidx);
+
+				// index of features in viewA and viewB
+				int indexA = motion.src == ptarget ? a.src : a.dst;
+				int indexB = motion.src == pb ? a.src : a.dst;
+
+				// If this feature has already been assigned a landmark, skip
+				int landmarkID = starget.landmarkIDs.get(indexA);
+				if (landmarkID >= 0)
+					continue;
+
+				Point2D_F64 pixelA = pixelsA.get(indexA);
+				Point2D_F64 pixelB = pixelsB.get(indexB);
+
+				// Look up the landmark ID in view B
+				landmarkID = sb.landmarkIDs.get(indexB);
+
+				if (!scene.isLandmarkKnown(landmarkID)) {
+					// Triangulate location of landmark
+					if (!slamUtils.triangulate(pixelA, pixelB, viewA_to_viewB, locationA))
+						continue;
+				} else {
+					// convert landmark from global to view A reference frame
+					SePointOps_F64.transform(starget.world_to_view, scene.listLandmarks.get(landmarkID), locationA);
+				}
+
+				// Sanity check
+				if (!slamUtils.checkReprojection(pixelA, pixelB, viewA_to_viewB, locationA))
+					continue;
+				if (!slamUtils.checkObservationAngle(viewA_to_viewB, locationA))
+					continue;
+
+				// Accept this solutions
+				starget.landmarkIDs.set(indexA, landmarkID);
+
+				// If there was no location estimate for the landmark already, save the current location
+				if (!scene.isLandmarkKnown(landmarkID)) {
+					starget.world_to_view.transformReverse(locationA, scene.listLandmarks.get(landmarkID));
+				}
+			}
+		}
+
+		// Create new landmarkIDs for any features which have not been assigned a landmarkID yet
+		for (int oidx = 0; oidx < pixelsA.size(); oidx++) {
+			if (starget.landmarkIDs.get(oidx) >= 0)
+				continue;
+
+			starget.landmarkIDs.set(oidx, scene.listLandmarks.size);
+			scene.listLandmarks.grow();
+		}
+	}
 
 	private void setCameraA( MultiCameraSystem.Camera camera ) {
 		slamUtils.setCameraA(camera.intrinsics, camera.shape);
