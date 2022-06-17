@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -311,7 +311,7 @@ public abstract class DetectCircleGrid<T extends ImageGray<T>> {
 	}
 
 	public void setVerbose( boolean verbose ) {
-		this.ellipseDetector.setVerbose(verbose);
+		this.ellipseDetector.setVerbose(System.out, null);
 		this.grider.setVerbose(verbose);
 		this.verbose = verbose;
 	}

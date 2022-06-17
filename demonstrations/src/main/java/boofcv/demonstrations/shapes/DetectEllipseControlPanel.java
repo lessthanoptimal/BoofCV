@@ -50,6 +50,7 @@ public class DetectEllipseControlPanel extends DetectBlackShapePanel implements 
 
 	JConfigLength spinnerMinContourSize = configLength(config.minimumContour, -1, 50000);
 	JConfigLength spinnerMaxContourSize = configLength(config.maximumContour, -1, 50000);
+	JSpinner spinnerMaxError = spinner(config.maxDistanceFromEllipse, 0, 1000.0, 1.0);
 	JSpinner spinnerMinMinorAxisSize = spinner(config.minimumMinorAxis, 0, 1000.0, 1.0);
 
 	JSpinner spinnerConvergeTol = spinner(config.convergenceTol, 0.0, 1.0, 0.001);
@@ -80,6 +81,7 @@ public class DetectEllipseControlPanel extends DetectBlackShapePanel implements 
 		addCenterLabel("Contour");
 		addLabeled(spinnerMinContourSize, "Min Contour Size: ");
 		addLabeled(spinnerMaxContourSize, "Max Contour Size: ");
+		addLabeled(spinnerMaxError, "Max Error: ");
 		addLabeled(spinnerMinMinorAxisSize, "Min Minor Axis: ");
 		addLabeled(spinnerMinEdge, "Edge Intensity: ");
 		addCenterLabel("Refinement");
@@ -111,6 +113,8 @@ public class DetectEllipseControlPanel extends DetectBlackShapePanel implements 
 				config.minimumContour.setTo(spinnerMinContourSize.getValue());
 			} else if (source == spinnerMaxContourSize) {
 				config.maximumContour.setTo(spinnerMaxContourSize.getValue());
+			} else if (source == spinnerMaxError) {
+				config.maxDistanceFromEllipse = ((Number)spinnerMaxError.getValue()).doubleValue();
 			} else if (source == spinnerMinMinorAxisSize) {
 				config.minimumMinorAxis = ((Number)spinnerMinMinorAxisSize.getValue()).doubleValue();
 			} else if (source == spinnerConvergeTol) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.shapes.ellipse;
 
 import boofcv.alg.filter.binary.ContourPacked;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
@@ -26,10 +27,13 @@ import georegression.struct.curve.EllipseRotated_F64;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Detects ellipses inside gray scale images. The first step is to detect them in a binary image and then
@@ -39,7 +43,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class BinaryEllipseDetector<T extends ImageGray<T>> {
+public class BinaryEllipseDetector<T extends ImageGray<T>> implements VerbosePrint {
 
 	BinaryEllipseDetectorPixel ellipseDetector;
 	@Nullable SnapToEllipseEdge<T> ellipseRefiner;
@@ -50,7 +54,7 @@ public class BinaryEllipseDetector<T extends ImageGray<T>> {
 
 	Class<T> inputType;
 
-	boolean verbose = false;
+	@Nullable PrintStream verbose;
 
 	// toggled the refinement step. If false an ellise can still be refined after the fact
 	boolean autoRefine = true;
@@ -112,7 +116,7 @@ public class BinaryEllipseDetector<T extends ImageGray<T>> {
 		for (BinaryEllipseDetectorPixel.Found f : found) {
 
 			if (!intensityCheck.process(f.ellipse)) {
-				if (verbose) System.out.println("Rejecting ellipse. Initial fit didn't have intense enough edge");
+				if (verbose != null) verbose.println("Rejecting ellipse. Initial fit didn't have intense enough edge");
 				continue;
 			}
 
@@ -121,13 +125,11 @@ public class BinaryEllipseDetector<T extends ImageGray<T>> {
 
 			if (ellipseRefiner != null) {
 				if (!ellipseRefiner.process(f.ellipse, r.ellipse)) {
-					if (verbose)
-						System.out.println("Rejecting ellipse. Refined fit didn't have an intense enough edge");
+					if (verbose != null) verbose.println("Rejecting ellipse. Refined fit didn't have an intense enough edge");
 					results.removeTail();
 					continue;
 				} else if (!intensityCheck.process(f.ellipse)) {
-					if (verbose)
-						System.out.println("Rejecting ellipse. Refined fit didn't have an intense enough edge");
+					if (verbose != null) verbose.println("Rejecting ellipse. Refined fit didn't have an intense enough edge");
 					continue;
 				}
 			} else {
@@ -156,14 +158,6 @@ public class BinaryEllipseDetector<T extends ImageGray<T>> {
 
 	public BinaryEllipseDetectorPixel getEllipseDetector() {
 		return ellipseDetector;
-	}
-
-	public boolean isVerbose() {
-		return verbose;
-	}
-
-	public void setVerbose( boolean verbose ) {
-		this.verbose = verbose;
 	}
 
 	public boolean isAutoRefine() {
@@ -200,6 +194,11 @@ public class BinaryEllipseDetector<T extends ImageGray<T>> {
 			storage.add(results.get(i).ellipse);
 		}
 		return storage;
+	}
+
+	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> config ) {
+		this.verbose = BoofMiscOps.addPrefix(this, out);
+		BoofMiscOps.verboseChildren(out, config, ellipseDetector);
 	}
 
 	@SuppressWarnings({"NullAway.Init"})

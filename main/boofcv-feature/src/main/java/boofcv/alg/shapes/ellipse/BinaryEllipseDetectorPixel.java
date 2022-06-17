@@ -24,6 +24,7 @@ import boofcv.abst.filter.binary.BinaryLabelContourFinder;
 import boofcv.alg.filter.binary.ContourOps;
 import boofcv.alg.filter.binary.ContourPacked;
 import boofcv.factory.filter.binary.FactoryBinaryContourFinder;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.distort.PixelTransform;
@@ -40,11 +41,13 @@ import georegression.struct.point.Point2D_I32;
 import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * <p>Detects ellipses inside a binary image by finding their contour and fitting an ellipse to the contour. Fitting
@@ -73,7 +76,7 @@ import java.util.Objects;
  * @author Peter Abeles
  */
 @SuppressWarnings({"NullAway.Init"})
-public class BinaryEllipseDetectorPixel {
+public class BinaryEllipseDetectorPixel implements VerbosePrint {
 	// maximum distance from the ellipse in pixels
 	private @Getter @Setter double maxDistanceFromEllipse = 3.0;
 
@@ -334,12 +337,12 @@ public class BinaryEllipseDetectorPixel {
 		}
 	}
 
-	public void setVerbose( PrintStream verbose ) {
-		this.verbose = verbose;
-	}
-
 	public List<Found> getFound() {
 		return found.toList();
+	}
+
+	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
+		this.verbose = BoofMiscOps.addPrefix(this, out);
 	}
 
 	@SuppressWarnings({"NullAway.Init"})

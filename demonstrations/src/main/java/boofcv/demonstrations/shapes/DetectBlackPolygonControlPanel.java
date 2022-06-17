@@ -134,8 +134,8 @@ public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
 		addLabeled(spinnerContourConnect, "Contour Connect: ", "Binary connectivity rule");
 		addLabeled(spinnerMinContourSize, "Min Contour Size: ", "Minimum pixels in contour");
 		addLabeled(spinnerMaxContourSize, "Max Contour Size: ", "Maximum pixels in contour");
-		addLabeled(spinnerMinEdgeD, "Edge Intensity D: ");
-		addLabeled(spinnerMinEdgeR, "Edge Intensity R: ");
+		addLabeled(spinnerMinEdgeD, "Edge Intensity D: ", "Minimum Intensity Detect");
+		addLabeled(spinnerMinEdgeR, "Edge Intensity R: ", "Minimum Intensity Regine");
 
 		addAlignLeft(setBorder);
 		addAlignLeft(setConcurrent);
