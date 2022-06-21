@@ -225,6 +225,7 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel {
 	private class EcoCheckPanel extends StandardAlgConfigPanel implements ChangeListener {
 		JSpinner sRows, sCols, sWidth, sMarkers;
 		JComboBox<String> comboErrorLevel, comboChecksum;
+		JLabel textShorthand = new JLabel("XXXXXXXXXXXX");
 
 		public EcoCheckPanel() {
 			setBorder(BorderFactory.createEmptyBorder());
@@ -238,12 +239,17 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel {
 			comboErrorLevel = combo(configECoCheck.errorCorrectionLevel, "0", "1", "2", "3", "4", "5", "6", "7", "8", "9");
 			comboChecksum = combo(configECoCheck.checksumBits, "0", "1", "2", "3", "4", "5", "6", "7", "8");
 
+			textShorthand.setMaximumSize(textShorthand.getPreferredSize());
+			textShorthand.setText(configECoCheck.compactName());
+
+			addLabeled(textShorthand, "Shorthand", "Shorthand that describes this target");
 			addLabeled(sRows, "Rows", "Number of square rows");
 			addLabeled(sCols, "Cols", "Number of square columns");
 			addLabeled(sWidth, "Square Width", "How wide each square is");
 			addLabeled(sMarkers, "Count", "Number of unique markers");
 			addLabeled(comboErrorLevel, "Error Level", "Amount of error correction. 0 = none. 10 = max.");
 			addLabeled(comboChecksum, "Checksum", "Bits for checksum. 0 = none. 8 = max.");
+
 		}
 
 		@Override
@@ -263,6 +269,7 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel {
 			} else if (source == comboChecksum) {
 				configECoCheck.checksumBits = comboChecksum.getSelectedIndex();
 			}
+			textShorthand.setText(configECoCheck.compactName());
 			updateParameters();
 		}
 	}
