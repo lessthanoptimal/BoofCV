@@ -18,7 +18,6 @@
 
 package boofcv.demonstrations.shapes;
 
-import boofcv.BoofVerbose;
 import boofcv.abst.filter.binary.BinaryContourInterface;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
@@ -30,7 +29,6 @@ import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.io.UtilIO;
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
@@ -65,7 +63,7 @@ public class DetectBlackEllipseApp<T extends ImageGray<T>> extends DetectBlackSh
 		DetectEllipseControlPanel controls = (DetectEllipseControlPanel)DetectBlackEllipseApp.this.controls;
 		synchronized (this) {
 			detector = FactoryShapeDetector.ellipse(controls.getConfigEllipse(), imageClass);
-			detector.setVerbose(System.out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));
+//			detector.setVerbose(System.out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));
 		}
 		imageThresholdUpdated();
 	}
