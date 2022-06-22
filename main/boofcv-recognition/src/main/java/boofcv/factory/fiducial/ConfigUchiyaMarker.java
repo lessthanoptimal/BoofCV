@@ -78,9 +78,9 @@ public class ConfigUchiyaMarker implements Configuration {
 	public double maxDistanceFromEllipse = 3.0;
 
 	/**
-	 * Minimum number of pixels in the minor axis
+	 * Minimum number of pixels in the minor axis. Relative to (w+h)/2
 	 */
-	public double minimumMinorAxis = 0.5;
+	public final ConfigLength minimumMinorAxis = ConfigLength.fixed(0.5);
 
 	/**
 	 * The maximum ratio between the major to minor ratio
@@ -115,7 +115,7 @@ public class ConfigUchiyaMarker implements Configuration {
 		this.contourMinimumLength.setTo(src.contourMinimumLength);
 		this.contourMaximumLength.setTo(src.contourMaximumLength);
 		this.maxDistanceFromEllipse = src.maxDistanceFromEllipse;
-		this.minimumMinorAxis = src.minimumMinorAxis;
+		this.minimumMinorAxis.setTo(src.minimumMinorAxis);
 		this.maxMajorToMinorRatio = src.maxMajorToMinorRatio;
 		this.checkEdge.setTo(src.checkEdge);
 		return this;

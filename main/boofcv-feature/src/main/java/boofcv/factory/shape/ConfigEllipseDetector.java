@@ -18,6 +18,7 @@
 
 package boofcv.factory.shape;
 
+import boofcv.abst.filter.binary.BinaryContourInterface;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
 import boofcv.struct.ConnectRule;
@@ -34,12 +35,16 @@ public class ConfigEllipseDetector implements Configuration {
 	public double maxDistanceFromEllipse = 3.0;
 
 	/**
-	 * Detector: minimum number of pixels in the contour
+	 * Detector: minimum number of pixels in the contour.
+	 *
+	 * @see BinaryContourInterface#setMinContour(ConfigLength)
 	 */
 	public ConfigLength minimumContour = ConfigLength.fixed(10);
 
 	/**
 	 * Detector: maximum number of pixels in the contour.
+	 *
+	 * @see BinaryContourInterface#setMaxContour(ConfigLength)
 	 */
 	public ConfigLength maximumContour = ConfigLength.fixed(-1);
 
@@ -49,9 +54,9 @@ public class ConfigEllipseDetector implements Configuration {
 	public ConnectRule contourRule = ConnectRule.FOUR;
 
 	/**
-	 * Minimum number of pixels in the minor axis
+	 * Minimum number of pixels in the minor axis. Relative to (w+h)/2
 	 */
-	public double minimumMinorAxis = 1.5;
+	public final ConfigLength minimumMinorAxis = ConfigLength.fixed(1.5);
 
 	/**
 	 * Detector: If true it will consider internal contours and not just external
@@ -59,7 +64,7 @@ public class ConfigEllipseDetector implements Configuration {
 	public boolean processInternal = false;
 
 	/**
-	 * Refinement: maximum number of refinement iterations it will performance. Set to zero to disable
+	 * Refinement: maximum number of refinement iterations. Set to zero to disable
 	 */
 	public int maxIterations = 5;
 
@@ -104,7 +109,7 @@ public class ConfigEllipseDetector implements Configuration {
 		this.minimumContour.setTo(src.minimumContour);
 		this.maximumContour.setTo(src.maximumContour);
 		this.contourRule = src.contourRule;
-		this.minimumMinorAxis = src.minimumMinorAxis;
+		this.minimumMinorAxis.setTo(src.minimumMinorAxis);
 		this.processInternal = src.processInternal;
 		this.maxIterations = src.maxIterations;
 		this.convergenceTol = src.convergenceTol;

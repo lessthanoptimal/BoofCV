@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -82,7 +82,8 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 	}
 
 	public JConfigLength configLength( ConfigLength initial, double min, double max ) {
-		JConfigLength control = new JConfigLength(this, true);
+		boolean integerMode = ((int)initial.length) == initial.length;
+		JConfigLength control = new JConfigLength(this, integerMode);
 		control.setValue(initial);
 		control.setLengthBounds(min, max);
 		control.setMaximumSize(control.getPreferredSize());
@@ -90,9 +91,10 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 	}
 
 	public JConfigLength configLength( ConfigLength initial, double min, double max, BoofLambdas.ProcessCall listener ) {
+		boolean integerMode = ((int)initial.length) == initial.length;
 		JConfigLength.Listener cl = ( source, fraction, length ) -> listener.process();
 
-		JConfigLength control = new JConfigLength(cl, true);
+		JConfigLength control = new JConfigLength(cl, integerMode);
 		control.setValue(initial);
 		control.setLengthBounds(min, max);
 		control.setMaximumSize(control.getPreferredSize());

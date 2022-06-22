@@ -325,7 +325,7 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 		final JComboBox<String> comboConnectRule = combo(config.contourRule.ordinal(), (Object[])ConnectRule.values());
 		final JConfigLength spinMinContour = configLength(config.contourMinimumLength, 4, 999);
 		final JConfigLength spinMaxContour = configLength(config.contourMaximumLength, -1, 999);
-		final JSpinner spinMinAxis = spinner(config.minimumMinorAxis, 0.0, 999.0, 1.0);
+		final JConfigLength spinMinAxis = configLength(config.minimumMinorAxis, 0.0, 999.0);
 		final JSpinner spinMaxAxisRatio = spinner(config.maxMajorToMinorRatio, 1.0, 1000.0, 1.0);
 
 		public ControlPanel() {
@@ -390,7 +390,7 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 				config.contourMaximumLength.setTo(spinMaxContour.getValue());
 				control = true;
 			} else if (source == spinMinAxis) {
-				config.minimumMinorAxis = ((Number)spinMinAxis.getValue()).doubleValue();
+				config.minimumMinorAxis.setTo(spinMinAxis.getValue());
 				control = true;
 			} else if (source == spinMaxAxisRatio) {
 				config.maxMajorToMinorRatio = ((Number)spinMaxAxisRatio.getValue()).doubleValue();

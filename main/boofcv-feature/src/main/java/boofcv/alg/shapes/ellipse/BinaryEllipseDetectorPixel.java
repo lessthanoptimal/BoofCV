@@ -77,21 +77,22 @@ import java.util.Set;
  */
 @SuppressWarnings({"NullAway.Init"})
 public class BinaryEllipseDetectorPixel implements VerbosePrint {
-	// maximum distance from the ellipse in pixels
+	/** maximum distance from the ellipse in pixels */
 	private @Getter @Setter double maxDistanceFromEllipse = 3.0;
 
-	// minimum number of pixels in the contour
+	/** minimum number of pixels in the contour */
 	private @Getter @Setter ConfigLength minimumContour = ConfigLength.fixed(20);
-	// maximum number of pixels in the contour.
+	/** maximum number of pixels in the contour. */
 	private @Getter @Setter ConfigLength maximumContour = ConfigLength.fixed(-1);
 
-	// minimum number of pixels along the minor axis
-	private @Getter @Setter double minimumMinorAxis = 1.5;
+	/** minimum number of pixels along the minor axis. Relative to (w+h)/2  */
+	private @Getter @Setter ConfigLength minimumMinorAxis = ConfigLength.fixed(1.5);
+	private double minimumMinorAxisPixels = 0;
 
-	// Can be used to filter out shapes which are very skinny
+	/** Can be used to filter out shapes which are very skinny */
 	private @Getter @Setter double maxMajorToMinorRatio = Double.MAX_VALUE;
 
-	// connect rule used with contour finding
+	/** connect rule used with contour finding */
 	private final @Getter ConnectRule connectRule;
 	// allow it to switch between two algorithms
 	private @Nullable BinaryLabelContourFinder contourFinder;
@@ -145,6 +146,7 @@ public class BinaryEllipseDetectorPixel implements VerbosePrint {
 	 * @param binary binary image
 	 */
 	public void process( GrayU8 binary ) {
+		minimumMinorAxisPixels = minimumMinorAxis.compute((binary.width + binary.height)/2.0);
 		found.reset();
 
 		final BinaryContourInterface selectedFinder = getContourFinder();
@@ -204,7 +206,7 @@ public class BinaryEllipseDetectorPixel implements VerbosePrint {
 
 		boolean accepted = true;
 
-		if (f.ellipse.b <= minimumMinorAxis) {
+		if (f.ellipse.b <= minimumMinorAxisPixels) {
 			if (verbose != null)
 				verbose.println("Rejecting: Minor axis too small. size = " + f.ellipse.b);
 			accepted = false;

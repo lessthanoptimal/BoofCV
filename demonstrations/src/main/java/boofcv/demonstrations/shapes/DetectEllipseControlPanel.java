@@ -44,14 +44,14 @@ public class DetectEllipseControlPanel extends DetectBlackShapePanel implements 
 	boolean bShowContour = false;
 
 	JCheckBox showEllipses = checkbox("Ellipses", bShowShapes);
-	JCheckBox showContour= checkbox("Contour", bShowContour);
+	JCheckBox showContour = checkbox("Contour", bShowContour);
 
 	ThresholdControlPanel threshold;
 
 	JConfigLength spinnerMinContourSize = configLength(config.minimumContour, -1, 50000);
 	JConfigLength spinnerMaxContourSize = configLength(config.maximumContour, -1, 50000);
 	JSpinner spinnerMaxError = spinner(config.maxDistanceFromEllipse, 0, 1000.0, 1.0);
-	JSpinner spinnerMinMinorAxisSize = spinner(config.minimumMinorAxis, 0, 1000.0, 1.0);
+	JConfigLength spinnerMinMinorAxisSize = configLength(config.minimumMinorAxis, 0, 1000.0);
 
 	JSpinner spinnerConvergeTol = spinner(config.convergenceTol, 0.0, 1.0, 0.001);
 	JSpinner spinnerMaxIterations = spinner(config.maxIterations, 0, 200, 2);
@@ -116,7 +116,7 @@ public class DetectEllipseControlPanel extends DetectBlackShapePanel implements 
 			} else if (source == spinnerMaxError) {
 				config.maxDistanceFromEllipse = ((Number)spinnerMaxError.getValue()).doubleValue();
 			} else if (source == spinnerMinMinorAxisSize) {
-				config.minimumMinorAxis = ((Number)spinnerMinMinorAxisSize.getValue()).doubleValue();
+				config.minimumMinorAxis.setTo(spinnerMinMinorAxisSize.getValue());
 			} else if (source == spinnerConvergeTol) {
 				config.convergenceTol = ((Number)spinnerConvergeTol.getValue()).doubleValue();
 			} else if (source == spinnerMaxIterations) {
