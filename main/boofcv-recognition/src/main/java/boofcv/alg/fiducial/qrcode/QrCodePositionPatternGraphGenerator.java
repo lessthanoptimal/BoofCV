@@ -20,6 +20,7 @@ package boofcv.alg.fiducial.qrcode;
 
 import boofcv.alg.fiducial.calib.squares.SquareGraph;
 import boofcv.alg.fiducial.calib.squares.SquareNode;
+import boofcv.misc.BoofMiscOps;
 import georegression.struct.line.LineSegment2D_F64;
 import georegression.struct.point.Point2D_F64;
 import lombok.Getter;
@@ -58,6 +59,8 @@ public class QrCodePositionPatternGraphGenerator implements VerbosePrint {
 	protected LineSegment2D_F64 connectLine = new LineSegment2D_F64();
 	protected Point2D_F64 intersection = new Point2D_F64();
 
+	protected @Nullable PrintStream verbose;
+
 	public QrCodePositionPatternGraphGenerator() {}
 
 	public QrCodePositionPatternGraphGenerator( int maxVersionQR ) {
@@ -88,6 +91,9 @@ public class QrCodePositionPatternGraphGenerator implements VerbosePrint {
 
 			// Connect all the finder patterns which are near by each other together in a graph
 			search.findNearest(f, searchRadius, Integer.MAX_VALUE, searchResults);
+
+			if (verbose != null)
+				verbose.printf("PP: (%.1f %.1f) width=%.1f neighbors=%d\n", f.center.x, f.center.y, f.largestSide, searchResults.size - 1);
 
 			if (searchResults.size > 1) {
 				for (int j = 0; j < searchResults.size; j++) {
@@ -129,6 +135,9 @@ public class QrCodePositionPatternGraphGenerator implements VerbosePrint {
 		if (Math.abs(sideLoc0 - 0.5) > 0.35 || Math.abs(sideLoc1 - 0.5) > 0.35)
 			return;
 
+		// distance measure for how far away from the center it is. 0 is best
+		double sideCenterDistance = (Math.abs(sideLoc0 - 0.5) + Math.abs(sideLoc1 - 0.5))/2.0;
+
 		// see if connecting sides are of similar size
 		if (Math.abs(side0 - side1)/Math.max(side0, side1) > 0.25) {
 			return;
@@ -149,11 +158,19 @@ public class QrCodePositionPatternGraphGenerator implements VerbosePrint {
 			return;
 
 		double angle = graph.acuteAngle(node0, intersection0, node1, intersection1);
-		double score = lineA.getLength()*(1.0 + angle/0.1);
+		double score = lineA.getLength()*(1.0 + angle + sideCenterDistance/2);
+		// this score function is a little brittle.
 
-		graph.checkConnect(node0, intersection0, node1, intersection1, score);
+//		System.out.println("  length: "+lineA.getLength()+" angle="+angle);
+
+		boolean changed = graph.checkConnect(node0, intersection0, node1, intersection1, score);
+
+		if (verbose != null) {
+			verbose.printf("_ (%.1f %.1f) score=%.2f change=%s\n", node1.center.x, node1.center.y, score, changed);
+		}
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
+		verbose = BoofMiscOps.addPrefix(this, out);
 	}
 }

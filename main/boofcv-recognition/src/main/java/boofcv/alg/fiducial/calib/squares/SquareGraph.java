@@ -106,8 +106,10 @@ public class SquareGraph {
 	 * Checks to see if the two nodes can be connected. If one of the nodes is already connected to
 	 * another it then checks to see if the proposed connection is more desirable. If it is the old
 	 * connection is removed and a new one created. Otherwise nothing happens.
+	 *
+	 * @return true if a connection is made
 	 */
-	public void checkConnect( SquareNode a, int indexA, SquareNode b, int indexB, double distance ) {
+	public boolean checkConnect( SquareNode a, int indexA, SquareNode b, int indexB, double distance ) {
 		if (a.edges[indexA] != null && a.edges[indexA].distance > distance) {
 			detachEdge(a.edges[indexA]);
 		}
@@ -118,7 +120,9 @@ public class SquareGraph {
 
 		if (a.edges[indexA] == null && b.edges[indexB] == null) {
 			connect(a, indexA, b, indexB, distance);
+			return true;
 		}
+		return false;
 	}
 
 	/**
