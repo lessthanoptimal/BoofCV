@@ -24,6 +24,7 @@ Version : 0.41
 - Added Aztec Code encoder and decoder
 - QR Code
   - Fixed issue where it was rejecting version 1 QR codes at a highly skewed angle
+  - Fixed issue where it failed to detect all QR when there was a cluster of several high version
 - Micro QR Code
   - Doesn't keep on trying to decode a marker if it fails after the ECC check
 - Various
