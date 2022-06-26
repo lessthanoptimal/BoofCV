@@ -53,7 +53,7 @@ public class BundlePinholeBrown implements BundleAdjustmentCamera {
 		if (src.radial != null)
 			setRadial(src.radial);
 		else
-			radial = null;
+			radial = new double[0];
 		setTangential(src.t1, src.t2);
 		return this;
 	}
