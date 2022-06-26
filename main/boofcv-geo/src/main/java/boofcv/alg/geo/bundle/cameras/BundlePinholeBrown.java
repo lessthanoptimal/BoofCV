@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,6 +47,16 @@ public class BundlePinholeBrown implements BundleAdjustmentCamera {
 	}
 
 	public BundlePinholeBrown() {}
+
+	public BundlePinholeBrown setTo( CameraPinholeBrown src ) {
+		setK(src.fx, src.fy, src.skew, src.cx, src.cy);
+		if (src.radial != null)
+			setRadial(src.radial);
+		else
+			radial = null;
+		setTangential(src.t1, src.t2);
+		return this;
+	}
 
 	public BundlePinholeBrown setK( double fx, double fy, double skew, double cx, double cy ) {
 		this.fx = fx;

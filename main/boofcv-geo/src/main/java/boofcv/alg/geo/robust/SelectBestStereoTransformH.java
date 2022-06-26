@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,7 @@ import boofcv.factory.geo.ConfigTriangulation;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.se.Se3_F64;
+import lombok.Getter;
 
 import java.util.List;
 
@@ -38,6 +39,9 @@ public class SelectBestStereoTransformH {
 
 	// used to select best hypothesis
 	PositiveDepthConstraintCheckH depthCheck;
+
+	/** Number of features which pass the sanity checks */
+	@Getter int totalPassing;
 
 	/**
 	 * Specifies how the essential matrix is computed
@@ -80,9 +84,7 @@ public class SelectBestStereoTransformH {
 			}
 		}
 
-		if (bestModel == null)
-			throw new RuntimeException("BUG");
-
+		totalPassing = bestCount;
 		model.setTo(bestModel);
 	}
 }

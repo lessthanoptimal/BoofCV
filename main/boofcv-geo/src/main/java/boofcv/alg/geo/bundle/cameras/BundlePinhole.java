@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.geo.bundle.cameras;
 
 import boofcv.abst.geo.bundle.BundleAdjustmentCamera;
+import boofcv.struct.calib.CameraPinhole;
 import georegression.struct.point.Point2D_F64;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,6 +39,11 @@ public class BundlePinhole implements BundleAdjustmentCamera {
 	}
 
 	public BundlePinhole() {}
+
+	public BundlePinhole setTo( CameraPinhole src ) {
+		setK(src.fx, src.fy, src.skew, src.cx, src.cy);
+		return this;
+	}
 
 	public BundlePinhole setK( double fx, double fy, double skew, double cx, double cy ) {
 		this.fx = fx;
