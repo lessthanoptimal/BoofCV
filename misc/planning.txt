@@ -51,6 +51,8 @@ TODO Geometry Wish List
    - P3P equivalent for multiple cameras with known relationships
    - Given a trifocal tensor from normalize image coordinates, go straight to SE3
    - Is it possible to compute trifocal from fewer observations when normalized image coordinates
+   - Trifocal -> camera matrices seems to not yield stable camera calibration estimates
+     give it observations as normalized coordinates and K isn't identity
 
 TODO Tech Reports
    - new chessboard detector
