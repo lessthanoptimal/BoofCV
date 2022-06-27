@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -176,6 +176,8 @@ public class AverageDownSampleOps {
 			}
 		} else if (Planar.class.isAssignableFrom(input.getClass())) {
 			down((Planar)input, (Planar)output);
+		} else {
+			throw new IllegalArgumentException("Image type not supported yet");
 		}
 	}
 

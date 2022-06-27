@@ -400,6 +400,7 @@ public class FactoryMultiViewRobust {
 
 		configTrifocal.checkValidity();
 		configError.checkValidity();
+		configRansac.checkValidity();
 
 		// needed for lambdas
 		final ConfigTrifocal _configTrifocal = configTrifocal;
