@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -87,14 +87,14 @@ public class DecomposeEssential {
 	 *
 	 * @param E essential matrix
 	 */
-	public void decompose( DMatrixRMaj E ) {
+	public boolean decompose( DMatrixRMaj E ) {
 		if (svd.inputModified()) {
 			E_copy.setTo(E);
 			E = E_copy;
 		}
 
 		if (!svd.decompose(E))
-			throw new RuntimeException("Svd some how failed");
+			return false;
 
 		U = svd.getU(U, false);
 		V = svd.getV(V, false);
@@ -105,6 +105,7 @@ public class DecomposeEssential {
 		translationLength = Math.abs(S.get(0, 0) + S.get(1, 1))/2;
 
 		decompose(U, V);
+		return true;
 	}
 
 	/**
