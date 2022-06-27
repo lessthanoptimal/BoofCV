@@ -49,6 +49,8 @@ TODO Chessboard X-Corner
 TODO Geometry Wish List
    - Triangulation refine which minimizes pixel error
    - P3P equivalent for multiple cameras with known relationships
+   - Given a trifocal tensor from normalize image coordinates, go straight to SE3
+   - Is it possible to compute trifocal from fewer observations when normalized image coordinates
 
 TODO Tech Reports
    - new chessboard detector
