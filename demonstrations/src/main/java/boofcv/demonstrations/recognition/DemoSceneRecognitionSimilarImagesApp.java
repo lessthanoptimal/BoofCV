@@ -226,15 +226,16 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 			BufferedImage preview = new BufferedImage(
 					(int)(buffered.getWidth()*scale), (int)(buffered.getHeight()*scale), BufferedImage.TYPE_INT_RGB);
 			preview.createGraphics().drawImage(buffered, AffineTransform.getScaleInstance(scale, scale), null);
-			synchronized (imageLock) {
-				imagePreviews.put(path, preview);
-				imageShapes.grow().setTo(buffered.getWidth(), buffered.getHeight());
-			}
 			SwingUtilities.invokeLater(() -> viewControlPanel.addImageToPath(path));
 
 			// Convert to gray for image processing
 			ConvertBufferedImage.convertFrom(buffered, gray, true);
-			dbSimilar.addImage(path, transform.process(gray));
+			Gray scaled = transform.process(gray);
+			synchronized (imageLock) {
+				imagePreviews.put(path, preview);
+				imageShapes.grow().setTo(scaled.getWidth(), scaled.getHeight());
+			}
+			dbSimilar.addImage(path, scaled);
 		}
 		long time1 = System.currentTimeMillis();
 		System.out.println((time1 - time0) + " (ms)");
