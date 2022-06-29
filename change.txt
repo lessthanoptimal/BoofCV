@@ -29,6 +29,7 @@ Version : 0.41
   - Doesn't keep on trying to decode a marker if it fails after the ECC check
 - Various
   - Fixed crash in Niblack Family when output image was not resized to match input image
+  - Image.setTo() now returns 'this' to enable chaining.
 - Stereo Disparity: Fixed bug where invalid values got cast to a byte when image was float, causing artifacts.
 - RansacCalibrated now support concurrency
 - Photogrammetry

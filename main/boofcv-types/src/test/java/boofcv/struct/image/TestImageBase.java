@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -100,7 +100,7 @@ class TestImageBase extends BoofStandardJUnit {
 		public void reshape( int width, int height ) {}
 
 		@Override
-		public void setTo( ImageBase orig ) {}
+		public ImageBase setTo( ImageBase orig ) {return this;}
 
 		@Override
 		public ImageBase createNew( int imgWidth, int imgHeight ) {

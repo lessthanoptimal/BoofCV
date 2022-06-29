@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -142,7 +142,7 @@ public abstract class ImageInterleaved<T extends ImageInterleaved<T>> extends Im
 	 */
 	@SuppressWarnings({"SuspiciousSystemArraycopy"})
 	@Override
-	public void setTo( T orig ) {
+	public T setTo( T orig ) {
 		if (orig.width != width || orig.height != height || orig.numBands != numBands)
 			reshape(orig.width, orig.height, orig.numBands);
 
@@ -157,6 +157,7 @@ public abstract class ImageInterleaved<T extends ImageInterleaved<T>> extends Im
 				indexDst += stride;
 			}
 		}
+		return (T)this;
 	}
 
 	@Override

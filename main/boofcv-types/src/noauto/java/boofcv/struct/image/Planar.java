@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import java.lang.reflect.Array;
  * each one is an independent memory and are of type {@link ImageGray}. Planar images fully supports all
  * functions inside of {@link ImageBase}. Each internal image has the same width, height, startIndex, and stride.
  * </p>
- * 
+ *
  * <p>
  * For example, in a RGB image there would be three bands one for each color,
  * and each color would be stored in its own gray scale image. To access the image for a particular
@@ -45,20 +45,20 @@ import java.lang.reflect.Array;
  * image.getBand(2).set(x,y,blue);
  * </pre>
  * </p>
- * 
+ *
  * <p>
  * May image processing operations can be run independently on each color band. This is useful since many
  * operations have been written for {@link ImageGray}, but not Planar yet.
  * <pre>
  * for( int i = 0; i < image.numBands(); i++ ) {
  *     SomeGrayImageFilter.process( image.getBand(0) );
- * }    
+ * }
  * </pre>
  * </p>
  *
  * @author Peter Abeles
  */
-public class Planar<T extends ImageGray<T>> extends ImageMultiBand<Planar<T>>{
+public class Planar<T extends ImageGray<T>> extends ImageMultiBand<Planar<T>> {
 
 	/**
 	 * Type of image in each band
@@ -78,35 +78,34 @@ public class Planar<T extends ImageGray<T>> extends ImageMultiBand<Planar<T>>{
 	 * @param height Height of the image.
 	 * @param numBands Total number of bands.
 	 */
-	public Planar(Class<T> type, int width, int height, int numBands) {
+	public Planar( Class<T> type, int width, int height, int numBands ) {
 		this.type = type;
 		this.stride = width;
 		this.width = width;
 		this.height = height;
-		this.bands = (T[]) Array.newInstance(type, numBands);
+		this.bands = (T[])Array.newInstance(type, numBands);
 
 		for (int i = 0; i < numBands; i++) {
 			bands[i] = ImageGray.create(type, width, height);
 		}
-		this.imageType = ImageType.pl(numBands,type);
+		this.imageType = ImageType.pl(numBands, type);
 	}
-	
+
 	/**
 	 * Declares internal arrays for storing each band, but not the images in each band.
 	 *
-	 * @param type The type of image which each band is stored as. 
+	 * @param type The type of image which each band is stored as.
 	 * @param numBands Number of bands in the image.
 	 */
-	public Planar(Class<T> type, int numBands) {
+	public Planar( Class<T> type, int numBands ) {
 		this.type = type;
-		this.bands = (T[]) Array.newInstance(type, numBands);
-		this.imageType = ImageType.pl(numBands,type);
+		this.bands = (T[])Array.newInstance(type, numBands);
+		this.imageType = ImageType.pl(numBands, type);
 	}
-
 
 	/**
 	 * Type of image each band is stored as.
-	 * 
+	 *
 	 * @return The type of ImageGray which each band is stored as.
 	 */
 	public Class<T> getBandType() {
@@ -115,7 +114,7 @@ public class Planar<T extends ImageGray<T>> extends ImageMultiBand<Planar<T>>{
 
 	/**
 	 * Returns the number of bands or colors stored in this image.
-	 * 
+	 *
 	 * @return Number of bands in the image.
 	 */
 	@Override
@@ -125,13 +124,13 @@ public class Planar<T extends ImageGray<T>> extends ImageMultiBand<Planar<T>>{
 
 	/**
 	 * Returns a band in the multi-band image.
-	 * 
+	 *
 	 * @param band Which band should be returned.
 	 * @return Image band
 	 */
-	public T getBand(int band) {
+	public T getBand( int band ) {
 		if (band >= bands.length || band < 0)
-			throw new IllegalArgumentException("The specified band is out of range. "+band+" / "+bands.length);
+			throw new IllegalArgumentException("The specified band is out of range. " + band + " / " + bands.length);
 
 		return bands[band];
 	}
@@ -141,7 +140,6 @@ public class Planar<T extends ImageGray<T>> extends ImageMultiBand<Planar<T>>{
 	 * that stores each pixel's value, but will only pertain to an axis-aligned rectangular segment
 	 * of the original.
 	 *
-	 *
 	 * @param x0 x-coordinate of top-left corner of the sub-image.
 	 * @param y0 y-coordinate of top-left corner of the sub-image.
 	 * @param x1 x-coordinate of bottom-right corner of the sub-image.
@@ -150,7 +148,7 @@ public class Planar<T extends ImageGray<T>> extends ImageMultiBand<Planar<T>>{
 	 * @return A sub-image of this image.
 	 */
 	@Override
-	public Planar<T> subimage(int x0, int y0, int x1, int y1, @Nullable Planar<T> output) {
+	public Planar<T> subimage( int x0, int y0, int x1, int y1, @Nullable Planar<T> output ) {
 		if (x0 < 0 || y0 < 0)
 			throw new IllegalArgumentException("x0 or y0 is less than zero");
 		if (x1 < x0 || y1 < y0)
@@ -160,7 +158,7 @@ public class Planar<T extends ImageGray<T>> extends ImageMultiBand<Planar<T>>{
 
 		if (output != null) {
 			output.type = type;
-			output.bands = (T[]) Array.newInstance(type, bands.length);
+			output.bands = (T[])Array.newInstance(type, bands.length);
 		} else {
 			output = new Planar<>(type, bands.length);
 		}
@@ -168,13 +166,13 @@ public class Planar<T extends ImageGray<T>> extends ImageMultiBand<Planar<T>>{
 		output.stride = Math.max(width, stride);
 		output.width = x1 - x0;
 		output.height = y1 - y0;
-		output.startIndex = startIndex + y0 * stride + x0;
+		output.startIndex = startIndex + y0*stride + x0;
 		output.subImage = true;
 
-		for( int i = 0; i < bands.length; i++ ) {
-			output.bands[i] = (T)bands[i].subimage(x0,y0,x1,y1);
+		for (int i = 0; i < bands.length; i++) {
+			output.bands[i] = (T)bands[i].subimage(x0, y0, x1, y1);
 		}
-		
+
 		return output;
 	}
 
@@ -185,20 +183,21 @@ public class Planar<T extends ImageGray<T>> extends ImageMultiBand<Planar<T>>{
 	 * @param orig The original image whose value is to be copied into this one
 	 */
 	@Override
-	public void setTo( Planar<T> orig) {
+	public Planar<T> setTo( Planar<T> orig ) {
 		if (orig.width != width || orig.height != height)
-			reshape(orig.width,orig.height);
-		if( orig.getBandType() != getBandType() )
+			reshape(orig.width, orig.height);
+		if (orig.getBandType() != getBandType())
 			throw new IllegalArgumentException("The band type must be the same");
 
 		int N = orig.getNumBands();
-		if( N != getNumBands() ) {
+		if (N != getNumBands()) {
 			setNumberOfBands(orig.getNumBands());
 		}
 
-		for( int i = 0; i < N; i++ ) {
+		for (int i = 0; i < N; i++) {
 			bands[i].setTo(orig.getBand(i));
 		}
+		return this;
 	}
 
 	/**
@@ -209,15 +208,15 @@ public class Planar<T extends ImageGray<T>> extends ImageMultiBand<Planar<T>>{
 	 * @param height The new height.
 	 */
 	@Override
-	public void reshape(int width, int height) {
-		if( this.width == width && this.height == height )
+	public void reshape( int width, int height ) {
+		if (this.width == width && this.height == height)
 			return;
 
-		if( isSubimage() )
+		if (isSubimage())
 			throw new IllegalArgumentException("Can't reshape subimage");
 
-		for( int i = 0; i < bands.length; i++ ) {
-			bands[i].reshape(width,height);
+		for (int i = 0; i < bands.length; i++) {
+			bands[i].reshape(width, height);
 		}
 
 		this.startIndex = 0;
@@ -227,13 +226,13 @@ public class Planar<T extends ImageGray<T>> extends ImageMultiBand<Planar<T>>{
 	}
 
 	@Override
-	public void reshape(int width, int height, int numberOfBands) {
-		if( getNumBands() != numberOfBands ) {
-			if( isSubimage() )
+	public void reshape( int width, int height, int numberOfBands ) {
+		if (getNumBands() != numberOfBands) {
+			if (isSubimage())
 				throw new RuntimeException("Can't reshape subimage");
 
-			T[] bands = (T[]) Array.newInstance(type, numberOfBands);
-			int N = Math.min(numberOfBands, this.bands.length );
+			T[] bands = (T[])Array.newInstance(type, numberOfBands);
+			int N = Math.min(numberOfBands, this.bands.length);
 			for (int i = 0; i < N; i++) {
 				bands[i] = this.bands[i];
 				bands[i].reshape(width, height);
@@ -260,17 +259,17 @@ public class Planar<T extends ImageGray<T>> extends ImageMultiBand<Planar<T>>{
 	 * @return new image
 	 */
 	@Override
-	public Planar<T> createNew(int imgWidth, int imgHeight) {
+	public Planar<T> createNew( int imgWidth, int imgHeight ) {
 		return new Planar<>(type, imgWidth, imgHeight, bands.length);
 	}
 
 	@Override
-	public void copyRow(int row, int col0, int col1, int offset, Object array) {
+	public void copyRow( int row, int col0, int col1, int offset, Object array ) {
 		throw new IllegalArgumentException("Not supported for planar images");
 	}
 
 	@Override
-	public void copyCol(int col, int row0, int row1, int offset, Object array) {
+	public void copyCol( int col, int row0, int row1, int offset, Object array ) {
 		throw new IllegalArgumentException("Not supported for planar images");
 	}
 
@@ -280,7 +279,7 @@ public class Planar<T extends ImageGray<T>> extends ImageMultiBand<Planar<T>>{
 	 * @param which List of bands which will comprise the new image
 	 * @return New image
 	 */
-	public Planar<T> partialSpectrum(int ...which ) {
+	public Planar<T> partialSpectrum( int... which ) {
 		Planar<T> out = new Planar<>(getBandType(), which.length);
 
 		out.setWidth(width);
@@ -288,7 +287,7 @@ public class Planar<T extends ImageGray<T>> extends ImageMultiBand<Planar<T>>{
 		out.setStride(stride);
 
 		for (int i = 0; i < which.length; i++) {
-			out.setBand(i,getBand(which[i]));
+			out.setBand(i, getBand(which[i]));
 		}
 
 		return out;
@@ -296,10 +295,11 @@ public class Planar<T extends ImageGray<T>> extends ImageMultiBand<Planar<T>>{
 
 	/**
 	 * Changes the bands order
+	 *
 	 * @param order The new band order
 	 */
-	public void reorderBands( int ...order ) {
-		T[] bands = (T[]) Array.newInstance(type, order.length);
+	public void reorderBands( int... order ) {
+		T[] bands = (T[])Array.newInstance(type, order.length);
 
 		for (int i = 0; i < order.length; i++) {
 			bands[i] = this.bands[order[i]];
@@ -310,15 +310,16 @@ public class Planar<T extends ImageGray<T>> extends ImageMultiBand<Planar<T>>{
 	/**
 	 * Changes the number of bands in the image. A new array is declared and individual bands are recycled
 	 * if possible
+	 *
 	 * @param numberOfBands New number of bands in the image.
 	 */
 	@Override
 	public void setNumberOfBands( int numberOfBands ) {
-		if( numberOfBands == this.bands.length )
+		if (numberOfBands == this.bands.length)
 			return;
 
-		T[] bands = (T[]) Array.newInstance(type, numberOfBands);
-		int N = Math.min(numberOfBands, this.bands.length );
+		T[] bands = (T[])Array.newInstance(type, numberOfBands);
+		int N = Math.min(numberOfBands, this.bands.length);
 		for (int i = 0; i < N; i++) {
 			bands[i] = this.bands[i];
 		}
@@ -337,12 +338,12 @@ public class Planar<T extends ImageGray<T>> extends ImageMultiBand<Planar<T>>{
 	 * @param y row
 	 * @return 32 bit integer
 	 */
-	public int get32u8( int x , int y ) {
-		int i = startIndex + y*stride+x;
-		return ((((GrayU8)bands[0]).data[i]&0xFF) << 24) |
-				((((GrayU8)bands[1]).data[i]&0xFF) << 16) |
-				((((GrayU8)bands[2]).data[i]&0xFF) << 8) |
-				(((GrayU8)bands[3]).data[i]&0xFF);
+	public int get32u8( int x, int y ) {
+		int i = startIndex + y*stride + x;
+		return ((((GrayU8)bands[0]).data[i] & 0xFF) << 24) |
+				((((GrayU8)bands[1]).data[i] & 0xFF) << 16) |
+				((((GrayU8)bands[2]).data[i] & 0xFF) << 8) |
+				(((GrayU8)bands[3]).data[i] & 0xFF);
 	}
 
 	/**
@@ -352,30 +353,30 @@ public class Planar<T extends ImageGray<T>> extends ImageMultiBand<Planar<T>>{
 	 * @param y row
 	 * @return 32 bit integer
 	 */
-	public int get24u8( int x , int y ) {
-		int i = startIndex + y*stride+x;
-		return ((((GrayU8)bands[0]).data[i]&0xFF) << 16) |
-				((((GrayU8)bands[1]).data[i]&0xFF) << 8) |
-				(((GrayU8)bands[2]).data[i]&0xFF);
+	public int get24u8( int x, int y ) {
+		int i = startIndex + y*stride + x;
+		return ((((GrayU8)bands[0]).data[i] & 0xFF) << 16) |
+				((((GrayU8)bands[1]).data[i] & 0xFF) << 8) |
+				(((GrayU8)bands[2]).data[i] & 0xFF);
 	}
 
-	public void set24u8( int x , int y , int value ) {
-		int i = startIndex + y*stride+x;
-		((GrayU8)bands[0]).data[i] = (byte)(value>>>16);
-		((GrayU8)bands[1]).data[i] = (byte)(value>>>8);
-		((GrayU8)bands[2]).data[i]   = (byte)value;
+	public void set24u8( int x, int y, int value ) {
+		int i = startIndex + y*stride + x;
+		((GrayU8)bands[0]).data[i] = (byte)(value >>> 16);
+		((GrayU8)bands[1]).data[i] = (byte)(value >>> 8);
+		((GrayU8)bands[2]).data[i] = (byte)value;
 	}
 
-	public void set32u8( int x , int y , int value ) {
-		int i = startIndex + y*stride+x;
-		((GrayU8)bands[0]).data[i] = (byte)(value>>>24);
-		((GrayU8)bands[1]).data[i] = (byte)(value>>>16);
-		((GrayU8)bands[2]).data[i] = (byte)(value>>>8);
-		((GrayU8)bands[3]).data[i]   = (byte)value;
+	public void set32u8( int x, int y, int value ) {
+		int i = startIndex + y*stride + x;
+		((GrayU8)bands[0]).data[i] = (byte)(value >>> 24);
+		((GrayU8)bands[1]).data[i] = (byte)(value >>> 16);
+		((GrayU8)bands[2]).data[i] = (byte)(value >>> 8);
+		((GrayU8)bands[3]).data[i] = (byte)value;
 	}
 
-	public void setBandType(Class<T> type) {
-		if( this.type != null && this.type != type )
+	public void setBandType( Class<T> type ) {
+		if (this.type != null && this.type != type)
 			throw new RuntimeException("Once the band type has been set you can't change it");
 		this.type = type;
 	}
@@ -384,11 +385,11 @@ public class Planar<T extends ImageGray<T>> extends ImageMultiBand<Planar<T>>{
 		return bands;
 	}
 
-	public void setBands(T[] bands) {
+	public void setBands( T[] bands ) {
 		this.bands = bands;
 	}
 
-	public void setBand( int which , T image ) {
+	public void setBand( int which, T image ) {
 		this.bands[which] = image;
 	}
 }

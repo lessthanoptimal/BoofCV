@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -172,7 +172,7 @@ public abstract class ImageGray<T extends ImageGray<T>> extends ImageBase<T> {
 	 */
 	@SuppressWarnings({"SuspiciousSystemArraycopy"})
 	@Override
-	public void setTo( T orig ) {
+	public T setTo( T orig ) {
 		if (width != orig.width || height != orig.height)
 			reshape(orig.width, orig.height);
 
@@ -187,6 +187,7 @@ public abstract class ImageGray<T extends ImageGray<T>> extends ImageBase<T> {
 				indexDst += stride;
 			}
 		}
+		return (T)this;
 	}
 
 	/**

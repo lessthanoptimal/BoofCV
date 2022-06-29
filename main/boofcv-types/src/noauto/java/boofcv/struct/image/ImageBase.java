@@ -108,8 +108,9 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 	 * attributes of the images must be the same.
 	 *
 	 * @param orig Image for which 'this' is to be a copy of.
+	 * @return Instance of 'this' to allow chaining.
 	 */
-	public abstract void setTo( T orig );
+	public abstract T setTo( T orig );
 
 	/**
 	 * If this matrix is a sub-image or not.
