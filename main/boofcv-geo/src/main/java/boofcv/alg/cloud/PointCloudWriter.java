@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -62,6 +62,13 @@ public interface PointCloudWriter {
 			cloudXyz.add((float)y);
 			cloudXyz.add((float)z);
 			cloudRgb.add(rgb);
+		}
+
+		public void getPoint( int index, Point3D_F64 p ) {
+			int i = index*3;
+			p.x = cloudXyz.data[i];
+			p.y = cloudXyz.data[i + 1];
+			p.z = cloudXyz.data[i + 2];
 		}
 	}
 
