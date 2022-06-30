@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -71,6 +71,13 @@ public class FactoryStereoDisparity {
 			case SGM -> sgm(config.approachSGM, imageType, dispType);
 			default -> throw new IllegalArgumentException("Unknown approach "+config.approach);
 		};
+	}
+
+	public static <T extends ImageGray<T>, DI extends ImageGray<DI>> StereoDisparity<T, DI>
+	generic( ConfigDisparity config, Class<T> imageType) {
+		// Determine the require disparity image type from the configuration
+		Class<DI> dispType = (Class)(config.isSubpixel() ? GrayF32.class : GrayU8.class);
+		return generic(config, imageType, dispType);
 	}
 
 	public static <T extends ImageGray<T>, DI extends ImageGray<DI>> StereoDisparity<T, DI>

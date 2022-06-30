@@ -19,7 +19,8 @@
 package boofcv.demonstrations.sfm.multiview;
 
 import boofcv.abst.disparity.ConfigSpeckleFilter;
-import boofcv.factory.disparity.ConfigDisparityBMBest5;
+import boofcv.factory.disparity.ConfigDisparity;
+import boofcv.factory.disparity.ConfigDisparityBM;
 import boofcv.factory.disparity.ConfigDisparitySGM;
 import boofcv.factory.disparity.DisparityError;
 import boofcv.factory.feature.associate.ConfigAssociate;
@@ -133,17 +134,20 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 	}
 
 	private void addDisparityControls() {
-		ConfigDisparityBMBest5 configBM = new ConfigDisparityBMBest5();
-		ConfigDisparitySGM configSGM = new ConfigDisparitySGM();
-		ConfigSpeckleFilter configSpeckle = new ConfigSpeckleFilter();
+		var configDisparity = new ConfigDisparity();
+		configDisparity.approach = ConfigDisparity.Approach.BLOCK_MATCH_5;
 
+		ConfigDisparityBM configBM = configDisparity.approachBM;
+		ConfigDisparitySGM configSGM = configDisparity.approachSGM;
 		configBM.disparityMin = configSGM.disparityMin = 0;
 		configBM.disparityRange = configSGM.disparityRange = 200;
 		configBM.regionRadiusX = configBM.regionRadiusY = 4;
 		configBM.errorType = DisparityError.CENSUS;
 		configBM.configCensus.variant = CensusVariants.BLOCK_7_7;
 
-		controlDisparity = new ControlPanelDisparityDense(configBM, configSGM, configSpeckle, GrayU8.class);
+		var configSpeckle = new ConfigSpeckleFilter();
+
+		controlDisparity = new ControlPanelDisparityDense(configDisparity, configSpeckle, GrayU8.class);
 		controlDisparity.setListener(this::handleStereoChanged);
 	}
 

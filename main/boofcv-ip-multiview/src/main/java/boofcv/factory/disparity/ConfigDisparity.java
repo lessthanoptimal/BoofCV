@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,6 +49,14 @@ public class ConfigDisparity implements Configuration {
 		this.approachBM5.setTo(src.approachBM5);
 		this.approachSGM.setTo(src.approachSGM);
 		return this;
+	}
+
+	public boolean isSubpixel() {
+		return switch (approach) {
+			case BLOCK_MATCH -> approachBM.subpixel;
+			case BLOCK_MATCH_5 -> approachBM5.subpixel;
+			case SGM -> approachSGM.subpixel;
+		};
 	}
 
 	/**

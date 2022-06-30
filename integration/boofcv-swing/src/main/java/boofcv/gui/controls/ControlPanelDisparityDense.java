@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,10 +43,9 @@ public class ControlPanelDisparityDense extends StandardAlgConfigPanel {
 	private final static String[] ERRORS_BLOCK = new String[]{"SAD", "Census", "NCC"};
 	private final static String[] ERRORS_SGM = new String[]{"Absolute Diff", "Census", "HMI"};
 
-	// which algorithm to run
-	int selectedMethod = 0;
-	public final ConfigDisparityBMBest5 configBM;
-	public final ConfigDisparitySGM configSGM;
+	// Disparity configuration. NOT publicly accessible because BM and BM5 are mirrored. use accessor
+	private final ConfigDisparity configDisparity;
+	// Configuration for speckle filtering
 	public final ConfigSpeckleFilter configSpeckle;
 
 	JComboBox<String> comboMethod, comboError;
@@ -71,21 +70,19 @@ public class ControlPanelDisparityDense extends StandardAlgConfigPanel {
 	Listener listener;
 	Class imageType;
 
-	public ControlPanelDisparityDense( ConfigDisparityBMBest5 configBM,
-									   ConfigDisparitySGM configSGM,
+	public ControlPanelDisparityDense( ConfigDisparity configDisparity,
 									   ConfigSpeckleFilter configSpeckle,
 									   Class imageType ) {
 		setBorder(BorderFactory.createEmptyBorder());
-		this.configBM = configBM;
-		this.configSGM = configSGM;
+		this.configDisparity = configDisparity;
 		this.configSpeckle = configSpeckle;
 		this.imageType = imageType;
 
-		comboMethod = combo(e -> handleMethod(), selectedMethod, "BlockMatch-5", "BlockMatch", "SGM");
+		comboMethod = combo(e -> handleMethod(), configDisparity.approach.ordinal(), "BlockMatch", "BlockMatch-5", "SGM");
 		if (isBlockSelected())
-			comboError = combo(e -> handleErrorSelected(false), configBM.errorType.ordinal(), (Object[])ERRORS_BLOCK);
+			comboError = combo(e -> handleErrorSelected(false), configDisparity.approachBM.errorType.ordinal(), (Object[])ERRORS_BLOCK);
 		else
-			comboError = combo(e -> handleErrorSelected(false), configSGM.errorType.ordinal(), (Object[])ERRORS_SGM);
+			comboError = combo(e -> handleErrorSelected(false), configDisparity.approachSGM.errorType.ordinal(), (Object[])ERRORS_SGM);
 		controlBM = new ControlsBlockMatching();
 		controlSGM = new ControlsSemiGlobal();
 		controlSad = new ControlsSAD();
@@ -111,16 +108,13 @@ public class ControlPanelDisparityDense extends StandardAlgConfigPanel {
 
 	public static ControlPanelDisparityDense createRange( int disparityMin, int disparityRange,
 														  Class imageType ) {
-		ConfigDisparityBMBest5 configBM = new ConfigDisparityBMBest5();
-		ConfigDisparitySGM configSGM = new ConfigDisparitySGM();
-		ConfigSpeckleFilter configSpeckle = new ConfigSpeckleFilter();
+		var c = new ConfigDisparity();
+		c.approachBM.disparityMin = disparityMin;
+		c.approachBM.disparityRange = disparityRange;
+		c.approachSGM.disparityMin = disparityMin;
+		c.approachSGM.disparityRange = disparityRange;
 
-		configBM.disparityMin = disparityMin;
-		configBM.disparityRange = disparityRange;
-		configSGM.disparityMin = disparityMin;
-		configSGM.disparityRange = disparityRange;
-
-		return new ControlPanelDisparityDense(configBM, configSGM, configSpeckle, imageType);
+		return new ControlPanelDisparityDense(c, new ConfigSpeckleFilter(), imageType);
 	}
 
 	public void broadcastChange() {
@@ -139,61 +133,50 @@ public class ControlPanelDisparityDense extends StandardAlgConfigPanel {
 		}
 	}
 
+	/**
+	 * Accessor function to copy over the disparity configuration. This is needed because BM and BM5 are mirrored
+	 */
+	public void getDisparityConfig( ConfigDisparity dst ) {
+		configDisparity.approachBM5.setTo(configDisparity.approachBM);
+		dst.setTo(configDisparity);
+	}
+
 	@SuppressWarnings("unchecked")
 	public StereoDisparity createAlgorithm() {
 //		BoofSwingUtil.checkGuiThread(); // TODO lock instead to make this safe?
 
-		boolean block = isBlockSelected();
-
-		if (block) {
-			Class dispType = configBM.subpixel ? GrayF32.class : GrayU8.class;
-			if (selectedMethod == 0)
-				return FactoryStereoDisparity.blockMatchBest5(configBM, imageType, dispType);
-			else if (selectedMethod == 1)
-				return FactoryStereoDisparity.blockMatch(configBM, imageType, dispType);
-			else
-				throw new RuntimeException("BUG");
-		} else {
-			Class dispType = configSGM.subpixel ? GrayF32.class : GrayU8.class;
-			return FactoryStereoDisparity.sgm(configSGM, imageType, dispType);
-		}
+		configDisparity.approachBM5.setTo(configDisparity.approachBM);
+		return FactoryStereoDisparity.generic(configDisparity, imageType);
 	}
 
 	public DisparitySmoother createSmoother() {
-		boolean block = isBlockSelected();
-
-		Class dispType;
-		if (block) {
-			dispType = configBM.subpixel ? GrayF32.class : GrayU8.class;
-		} else {
-			dispType = configSGM.subpixel ? GrayF32.class : GrayU8.class;
-		}
-
+		configDisparity.approachBM5.setTo(configDisparity.approachBM);
+		Class dispType = configDisparity.isSubpixel() ? GrayF32.class : GrayU8.class;
 		return FactoryStereoDisparity.removeSpeckle(configSpeckle, dispType);
 	}
 
 	public int getDisparityMin() {
 		if (isBlockSelected())
-			return configBM.disparityMin;
+			return configDisparity.approachBM.disparityMin;
 		else
-			return configSGM.disparityMin;
+			return configDisparity.approachSGM.disparityMin;
 	}
 
 	public int getDisparityRange() {
 		if (isBlockSelected())
-			return configBM.disparityRange;
+			return configDisparity.approachBM.disparityRange;
 		else
-			return configSGM.disparityRange;
+			return configDisparity.approachSGM.disparityRange;
 	}
 
 	/**
 	 * The user changed which method is being used
 	 */
 	private void handleMethod() {
-		if (selectedMethod == comboMethod.getSelectedIndex())
+		if (configDisparity.approach.ordinal() == comboMethod.getSelectedIndex())
 			return;
 		boolean previousBlock = isBlockSelected();
-		selectedMethod = comboMethod.getSelectedIndex();
+		configDisparity.approach = ConfigDisparity.Approach.values()[comboMethod.getSelectedIndex()];
 		boolean block = isBlockSelected();
 
 		// All the code above can cause multiple calls to broadcastChange() as listeners are triggered
@@ -204,10 +187,10 @@ public class ControlPanelDisparityDense extends StandardAlgConfigPanel {
 			int activeTab = tabbedPane.getSelectedIndex(); // don't switch out of the current tab
 			if (block) {
 				comboError.setModel(new DefaultComboBoxModel<>(ERRORS_BLOCK));
-				comboError.setSelectedIndex(configBM.errorType.ordinal());
+				comboError.setSelectedIndex(configDisparity.approachBM.errorType.ordinal());
 			} else {
 				comboError.setModel(new DefaultComboBoxModel<>(ERRORS_SGM));
-				comboError.setSelectedIndex(configSGM.errorType.ordinal());
+				comboError.setSelectedIndex(configDisparity.approachSGM.errorType.ordinal());
 			}
 			Component c = getModelControl(block);
 			if (!block)
@@ -236,12 +219,12 @@ public class ControlPanelDisparityDense extends StandardAlgConfigPanel {
 	}
 
 	private boolean isBlockSelected() {
-		return selectedMethod < 2;
+		return configDisparity.approach != ConfigDisparity.Approach.SGM;
 	}
 
 	private void handleErrorSelected( boolean force ) {
 		boolean block = isBlockSelected();
-		int previousIdx = block ? configBM.errorType.ordinal() : configSGM.errorType.ordinal();
+		int previousIdx = block ? configDisparity.approachBM.errorType.ordinal() : configDisparity.approachSGM.errorType.ordinal();
 		if (!force && previousIdx == comboError.getSelectedIndex())
 			return;
 		int selectedIdx = comboError.getSelectedIndex();
@@ -255,13 +238,13 @@ public class ControlPanelDisparityDense extends StandardAlgConfigPanel {
 //		System.out.println("error for block="+block+" idx="+selectedIdx);
 
 		if (block) {
-			configBM.errorType = DisparityError.values()[selectedIdx];
-			controlCensus.update(configBM.configCensus);
-			controlNCC.update(configBM.configNCC);
+			configDisparity.approachBM.errorType = DisparityError.values()[selectedIdx];
+			controlCensus.update(configDisparity.approachBM.configCensus);
+			controlNCC.update(configDisparity.approachBM.configNCC);
 		} else {
-			configSGM.errorType = DisparitySgmError.values()[selectedIdx];
-			controlCensus.update(configSGM.configCensus);
-			controlHMI.update(configSGM.configHMI);
+			configDisparity.approachSGM.errorType = DisparitySgmError.values()[selectedIdx];
+			controlCensus.update(configDisparity.approachSGM.configCensus);
+			controlHMI.update(configDisparity.approachSGM.configHMI);
 		}
 		Component c = getErrorControl(selectedIdx);
 		tabbedPane.removeTabAt(1);
@@ -296,14 +279,14 @@ public class ControlPanelDisparityDense extends StandardAlgConfigPanel {
 	}
 
 	public class ControlsBlockMatching extends StandardAlgConfigPanel {
-		JSpinner spinnerDisparityMin = spinner(configBM.disparityMin, 0, 1000, 5);
-		JSpinner spinnerDisparityRange = spinner(configBM.disparityRange, 1, 254, 5);
-		JSpinner radiusXSpinner = spinner(configBM.regionRadiusX, 0, 50, 1);
-		JSpinner radiusYSpinner = spinner(configBM.regionRadiusY, 0, 50, 1);
-		JSpinner spinnerError = spinner(configBM.maxPerPixelError, -1, 80, 5);
-		JSpinner spinnerReverse = spinner(configBM.validateRtoL, -1, 50, 1);
-		JSpinner spinnerTexture = spinner(configBM.texture, 0.0, 1.0, 0.05, 1, 3);
-		JCheckBox subpixelToggle = checkbox("Subpixel", configBM.subpixel, "Subpixel Disparity Estimate");
+		JSpinner spinnerDisparityMin = spinner(configDisparity.approachBM.disparityMin, 0, 1000, 5);
+		JSpinner spinnerDisparityRange = spinner(configDisparity.approachBM.disparityRange, 1, 254, 5);
+		JSpinner radiusXSpinner = spinner(configDisparity.approachBM.regionRadiusX, 0, 50, 1);
+		JSpinner radiusYSpinner = spinner(configDisparity.approachBM.regionRadiusY, 0, 50, 1);
+		JSpinner spinnerError = spinner(configDisparity.approachBM.maxPerPixelError, -1, 80, 5);
+		JSpinner spinnerReverse = spinner(configDisparity.approachBM.validateRtoL, -1, 50, 1);
+		JSpinner spinnerTexture = spinner(configDisparity.approachBM.texture, 0.0, 1.0, 0.05, 1, 3);
+		JCheckBox subpixelToggle = checkbox("Subpixel", configDisparity.approachBM.subpixel, "Subpixel Disparity Estimate");
 
 		ControlsBlockMatching() {
 			setBorder(BorderFactory.createEmptyBorder());
@@ -319,22 +302,24 @@ public class ControlPanelDisparityDense extends StandardAlgConfigPanel {
 
 		@Override
 		public void controlChanged( final Object source ) {
+			ConfigDisparityBM c = configDisparity.approachBM;
+
 			if (source == spinnerReverse) {
-				configBM.validateRtoL = ((Number)spinnerReverse.getValue()).intValue();
+				c.validateRtoL = ((Number)spinnerReverse.getValue()).intValue();
 			} else if (source == spinnerDisparityMin) {
-				configBM.disparityMin = ((Number)spinnerDisparityMin.getValue()).intValue();
+				c.disparityMin = ((Number)spinnerDisparityMin.getValue()).intValue();
 			} else if (source == spinnerDisparityRange) {
-				configBM.disparityRange = ((Number)spinnerDisparityRange.getValue()).intValue();
+				c.disparityRange = ((Number)spinnerDisparityRange.getValue()).intValue();
 			} else if (source == spinnerError) {
-				configBM.maxPerPixelError = ((Number)spinnerError.getValue()).intValue();
+				c.maxPerPixelError = ((Number)spinnerError.getValue()).intValue();
 			} else if (source == radiusXSpinner) {
-				configBM.regionRadiusX = ((Number)radiusXSpinner.getValue()).intValue();
+				c.regionRadiusX = ((Number)radiusXSpinner.getValue()).intValue();
 			} else if (source == radiusYSpinner) {
-				configBM.regionRadiusY = ((Number)radiusYSpinner.getValue()).intValue();
+				c.regionRadiusY = ((Number)radiusYSpinner.getValue()).intValue();
 			} else if (source == spinnerTexture) {
-				configBM.texture = ((Number)spinnerTexture.getValue()).doubleValue();
+				c.texture = ((Number)spinnerTexture.getValue()).doubleValue();
 			} else if (source == subpixelToggle) {
-				configBM.subpixel = subpixelToggle.isSelected();
+				c.subpixel = subpixelToggle.isSelected();
 			} else {
 				throw new RuntimeException("Unknown");
 			}
@@ -343,21 +328,21 @@ public class ControlPanelDisparityDense extends StandardAlgConfigPanel {
 	}
 
 	public class ControlsSemiGlobal extends StandardAlgConfigPanel {
-		JComboBox<String> comboPaths = combo(configSGM.paths.ordinal(), "1", "2", "4", "8", "16");
+		JComboBox<String> comboPaths = combo(configDisparity.approachSGM.paths.ordinal(), "1", "2", "4", "8", "16");
 
-		JSpinner spinnerPenaltySmall = spinner(configSGM.penaltySmallChange, 0, SgmDisparityCost.MAX_COST, 10);
-		JSpinner spinnerPenaltyLarge = spinner(configSGM.penaltyLargeChange, 1, SgmDisparityCost.MAX_COST, 10);
+		JSpinner spinnerPenaltySmall = spinner(configDisparity.approachSGM.penaltySmallChange, 0, SgmDisparityCost.MAX_COST, 10);
+		JSpinner spinnerPenaltyLarge = spinner(configDisparity.approachSGM.penaltyLargeChange, 1, SgmDisparityCost.MAX_COST, 10);
 
-		JSpinner spinnerDisparityMin = spinner(configSGM.disparityMin, 0, 1000, 5);
-		JSpinner spinnerDisparityRange = spinner(configSGM.disparityRange, 1, 254, 5);
-		JSpinner spinnerError = spinner(configSGM.maxError, -1, Short.MAX_VALUE, 200);
-		JSpinner spinnerReverse = spinner(configSGM.validateRtoL, -1, 50, 1);
-		JSpinner spinnerTexture = spinner(configSGM.texture, 0.0, 1.0, 0.05, 1, 3);
-		JCheckBox subpixelToggle = checkbox("Subpixel", configSGM.subpixel);
-		JCheckBox useBlocks = checkbox("Use Blocks", configSGM.useBlocks);
-		JComboBox<String> comboBlockApproach = combo(configSGM.configBlockMatch.approach.ordinal(), (Object[])BlockMatchingApproach.values());
-		JSpinner radiusXSpinner = spinner(configSGM.configBlockMatch.radiusX, 0, 50, 1); // TODO move to error
-		JSpinner radiusYSpinner = spinner(configSGM.configBlockMatch.radiusY, 0, 50, 1);
+		JSpinner spinnerDisparityMin = spinner(configDisparity.approachSGM.disparityMin, 0, 1000, 5);
+		JSpinner spinnerDisparityRange = spinner(configDisparity.approachSGM.disparityRange, 1, 254, 5);
+		JSpinner spinnerError = spinner(configDisparity.approachSGM.maxError, -1, Short.MAX_VALUE, 200);
+		JSpinner spinnerReverse = spinner(configDisparity.approachSGM.validateRtoL, -1, 50, 1);
+		JSpinner spinnerTexture = spinner(configDisparity.approachSGM.texture, 0.0, 1.0, 0.05, 1, 3);
+		JCheckBox subpixelToggle = checkbox("Subpixel", configDisparity.approachSGM.subpixel);
+		JCheckBox useBlocks = checkbox("Use Blocks", configDisparity.approachSGM.useBlocks);
+		JComboBox<String> comboBlockApproach = combo(configDisparity.approachSGM.configBlockMatch.approach.ordinal(), (Object[])BlockMatchingApproach.values());
+		JSpinner radiusXSpinner = spinner(configDisparity.approachSGM.configBlockMatch.radiusX, 0, 50, 1); // TODO move to error
+		JSpinner radiusYSpinner = spinner(configDisparity.approachSGM.configBlockMatch.radiusY, 0, 50, 1);
 
 		ControlsSemiGlobal() {
 			setBorder(BorderFactory.createEmptyBorder());
@@ -379,33 +364,35 @@ public class ControlPanelDisparityDense extends StandardAlgConfigPanel {
 
 		@Override
 		public void controlChanged( final Object source ) {
+			ConfigDisparitySGM c = configDisparity.approachSGM;
+
 			if (source == spinnerReverse) {
-				configSGM.validateRtoL = ((Number)spinnerReverse.getValue()).intValue();
+				c.validateRtoL = ((Number)spinnerReverse.getValue()).intValue();
 			} else if (source == spinnerDisparityMin) {
-				configSGM.disparityMin = ((Number)spinnerDisparityMin.getValue()).intValue();
+				c.disparityMin = ((Number)spinnerDisparityMin.getValue()).intValue();
 			} else if (source == spinnerDisparityRange) {
-				configSGM.disparityRange = ((Number)spinnerDisparityRange.getValue()).intValue();
+				c.disparityRange = ((Number)spinnerDisparityRange.getValue()).intValue();
 			} else if (source == spinnerError) {
-				configSGM.maxError = ((Number)spinnerError.getValue()).intValue();
+				c.maxError = ((Number)spinnerError.getValue()).intValue();
 			} else if (source == spinnerTexture) {
-				configSGM.texture = ((Number)spinnerTexture.getValue()).doubleValue();
+				c.texture = ((Number)spinnerTexture.getValue()).doubleValue();
 			} else if (source == spinnerPenaltySmall) {
-				configSGM.penaltySmallChange = ((Number)spinnerPenaltySmall.getValue()).intValue();
+				c.penaltySmallChange = ((Number)spinnerPenaltySmall.getValue()).intValue();
 			} else if (source == spinnerPenaltyLarge) {
-				configSGM.penaltyLargeChange = ((Number)spinnerPenaltyLarge.getValue()).intValue();
+				c.penaltyLargeChange = ((Number)spinnerPenaltyLarge.getValue()).intValue();
 			} else if (source == radiusXSpinner) {
-				configSGM.configBlockMatch.radiusX = ((Number)radiusXSpinner.getValue()).intValue();
+				c.configBlockMatch.radiusX = ((Number)radiusXSpinner.getValue()).intValue();
 			} else if (source == radiusYSpinner) {
-				configSGM.configBlockMatch.radiusY = ((Number)radiusYSpinner.getValue()).intValue();
+				c.configBlockMatch.radiusY = ((Number)radiusYSpinner.getValue()).intValue();
 			} else if (source == comboPaths) {
-				configSGM.paths = ConfigDisparitySGM.Paths.values()[comboPaths.getSelectedIndex()];
+				c.paths = ConfigDisparitySGM.Paths.values()[comboPaths.getSelectedIndex()];
 			} else if (source == subpixelToggle) {
-				configSGM.subpixel = subpixelToggle.isSelected();
+				c.subpixel = subpixelToggle.isSelected();
 			} else if (source == useBlocks) {
-				configSGM.useBlocks = useBlocks.isSelected();
+				c.useBlocks = useBlocks.isSelected();
 				updateControlsEnabled();
 			} else if (source == comboBlockApproach) {
-				configSGM.configBlockMatch.approach = BlockMatchingApproach.values()[comboBlockApproach.getSelectedIndex()];
+				c.configBlockMatch.approach = BlockMatchingApproach.values()[comboBlockApproach.getSelectedIndex()];
 			} else {
 				throw new RuntimeException("Unknown");
 			}
@@ -413,7 +400,7 @@ public class ControlPanelDisparityDense extends StandardAlgConfigPanel {
 		}
 
 		void updateControlsEnabled() {
-			final boolean e = configSGM.useBlocks;
+			final boolean e = configDisparity.approachSGM.useBlocks;
 			comboBlockApproach.setEnabled(e);
 			radiusXSpinner.setEnabled(e);
 			radiusYSpinner.setEnabled(e);
