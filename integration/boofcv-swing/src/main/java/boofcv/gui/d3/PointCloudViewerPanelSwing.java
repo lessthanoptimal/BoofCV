@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -99,6 +99,9 @@ public class PointCloudViewerPanelSwing extends JPanel
 	private int dotRadius = 2; // radius of square dot
 	int backgroundColor = 0; // RGB 32-bit format
 
+	// pass in coordinates in world frame when selecting their color
+	boolean colorizeUsingWorldFrame = true;
+
 	// previous mouse location
 	int prevX;
 	int prevY;
@@ -147,6 +150,7 @@ public class PointCloudViewerPanelSwing extends JPanel
 
 		addFocusListener(new FocusListener() {
 			@Nullable ScheduledFuture<?> future;
+
 			@Override
 			public void focusGained( FocusEvent e ) {
 				KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(keyboard);
@@ -339,8 +343,10 @@ public class PointCloudViewerPanelSwing extends JPanel
 			int rgb;
 			if (colorizer == null) {
 				rgb = cloudColor.get(idx);
-			} else {
+			} else if (colorizeUsingWorldFrame) {
 				rgb = colorizer.color(idx, worldPt.x, worldPt.y, worldPt.z);
+			} else {
+				rgb = colorizer.color(idx, cameraPt.x, cameraPt.y, cameraPt.z);
 			}
 
 			if (fog) {
