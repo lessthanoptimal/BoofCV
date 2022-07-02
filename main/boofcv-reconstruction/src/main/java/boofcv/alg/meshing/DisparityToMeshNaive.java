@@ -26,6 +26,7 @@ import boofcv.alg.shapes.polyline.splitmerge.PolylineSplitMerge;
 import boofcv.factory.filter.binary.FactoryBinaryContourFinder;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
+import georegression.geometry.UtilPolygons2D_F64;
 import georegression.geometry.polygon.ThreeIndexes;
 import georegression.geometry.polygon.TriangulateSimpleRemoveEars_F64;
 import georegression.struct.point.Point2D_F64;
@@ -87,14 +88,23 @@ public class DisparityToMeshNaive {
 
 		fitPolygon.setCornerScorePenalty(cornerPenalty);
 		fitPolygon.setMinimumSideLength(minSideLength);
+		fitPolygon.getMaxSideError().setFixed(Double.MAX_VALUE);
+		fitPolygon.setMaxSides(1000);
 		fitPolygon.setConvex(false);
 		fitPolygon.setLoops(true);
 
-		for (int idxContour = 0; idxContour < contours.size(); idxContour++) {
+		// TODO how to make a polygon simple?
+
+		System.out.println("blobs.size=" + contours.size());
+		for (int idxContour = 0; idxContour < 3; idxContour++) {
 			ContourPacked cp = contours.get(idxContour);
 			blobFinder.loadContour(cp.id, pixels);
+			System.out.println("contour idx=" + idxContour + " pixels.size=" + pixels.size);
+
+
 			if (!fitPolygon.process(pixels.toList())) {
-				throw new RuntimeException("Reconfigure! Failed to fit polygon");
+				System.out.println("  Failed to fit polygon to contour!");
+				continue;
 			}
 
 			PolylineSplitMerge.CandidatePolyline found = Objects.requireNonNull(fitPolygon.getBestPolyline());
@@ -105,6 +115,7 @@ public class DisparityToMeshNaive {
 				polygon.get(i).setTo(c.x, c.y);
 			}
 
+			System.out.println("  finding triangles. poly.size=" + polygon.size()+" simple="+ UtilPolygons2D_F64.isSimple(polygon, null, 0.1).type);
 			triangulator.process(polygon, triangles);
 
 			// TODO split these triangles up even more by sampling at regular intervals and injecting triangles

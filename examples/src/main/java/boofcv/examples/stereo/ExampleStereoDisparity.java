@@ -113,7 +113,7 @@ public class ExampleStereoDisparity {
 		config.regionRadiusX = config.regionRadiusY = regionSize;
 		config.maxPerPixelError = 35;
 		config.validateRtoL = 1;
-		config.texture = 0.2;
+		config.texture = 0.05;
 		StereoDisparity<GrayU8, GrayF32> disparityAlg =
 				FactoryStereoDisparity.blockMatchBest5(config, GrayU8.class, GrayF32.class);
 

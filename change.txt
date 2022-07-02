@@ -40,6 +40,10 @@ Version : 0.41
 - SLAM
   - TODO Monocular
   - TODO Stereo
+- 3D Mesh
+  - Added related example code
+  - TODO Support for saving to PLY
+  - Added algorithms for converting stereo disparity into a 3D mesh
 - Calibration
   - Mono and Stereo apps now generate calibration quality metrics for coverage and geometry
   - Mono and Stereo GUIs have option to show border and inner coverage
