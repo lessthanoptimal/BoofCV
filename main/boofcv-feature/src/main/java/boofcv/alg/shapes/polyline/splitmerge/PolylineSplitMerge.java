@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,8 @@ import georegression.metric.Distance2D_F64;
 import georegression.struct.line.LineParametric2D_F64;
 import georegression.struct.line.LineSegment2D_F64;
 import georegression.struct.point.Point2D_I32;
+import lombok.Getter;
+import lombok.Setter;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_F64;
 import org.ddogleg.struct.DogArray_I32;
@@ -69,39 +71,43 @@ import java.util.Objects;
  */
 public class PolylineSplitMerge {
 
-	// Does the polyline form a loop or are the end points disconnected
-	private boolean loops = true;
+	/** Does the polyline form a loop or are the end points disconnected */
+	@Getter @Setter private boolean loops = true;
 
-	// Can it assume the shape is convex? If so it can reject shapes earlier
-	private boolean convex = false;
+	/** Can it assume the shape is convex? If so it can reject shapes earlier */
+	@Getter @Setter private boolean convex = false;
 
-	// maximum number of sides it will consider
-	private int maxSides = Integer.MAX_VALUE;
-	// minimum number of sides that will be considered for the best polyline
-	private int minSides = 3;
+	/** maximum number of sides it will consider */
+	@Getter @Setter private int maxSides = Integer.MAX_VALUE;
+	/** minimum number of sides that will be considered for the best polyline */
+	@Getter @Setter private int minSides = 3;
 
-	// The minimum length of a side
-	private int minimumSideLength = 10;
+	/** The minimum length of a side */
+	@Getter private int minimumSideLength = 10;
 
-	// how many corners past the max it will fit a polygon to
-	private ConfigLength extraConsider = ConfigLength.relative(1.0, 0);
+	/** how many corners past the max it will fit a polygon to */
+	@Getter private final ConfigLength extraConsider = ConfigLength.relative(1.0, 0);
 
-	// When selecting the best model how much is a split penalized
-	private double cornerScorePenalty = 0.25;
+	/** When selecting the best model how much is a split penalized */
+	@Getter @Setter private double cornerScorePenalty = 0.25;
 
-	// If the score of a side is less than this it is considered a perfect fit and won't be split any more
-	private double thresholdSideSplitScore = 0;
+	/** If the score of a side is less than this it is considered a perfect fit and won't be split anymore */
+	@Getter @Setter private double thresholdSideSplitScore = 0;
 
-	// maximum number of points along a side it will sample when computing a score
-	// used to limit computational cost of large contours
-	int maxNumberOfSideSamples = 50;
+	/**
+	 * maximum number of points along a side it will sample when computing a score
+	 * used to limit computational cost of large contours
+	 */
+	@Getter @Setter int maxNumberOfSideSamples = 50;
 
-	// If the contour between two corners is longer than this multiple of the distance
-	// between the two corners then it will be rejected as not convex
-	double convexTest = 2.5;
+	/**
+	 * If the contour between two corners is longer than this multiple of the distance
+	 * between the two corners then it will be rejected as not convex
+	 */
+	@Getter @Setter double convexTest = 2.5;
 
-	// maximum error along any side
-	ConfigLength maxSideError = ConfigLength.relative(0.1, 3);
+	/** maximum error along any side */
+	@Getter final ConfigLength maxSideError = ConfigLength.relative(0.1, 3);
 
 	// work space for side score calculation
 	private final LineSegment2D_F64 line = new LineSegment2D_F64();
@@ -110,7 +116,7 @@ public class PolylineSplitMerge {
 	DogLinkedList<Corner> list = new DogLinkedList<>();
 	DogArray<Corner> corners = new DogArray<>(Corner::new);
 
-	private SplitSelector splitter = new MaximumLineDistance();
+	@Setter private SplitSelector splitter = new MaximumLineDistance();
 	private final SplitResults resultsA = new SplitResults();
 	private final SplitResults resultsB = new SplitResults();
 
@@ -836,14 +842,6 @@ public class PolylineSplitMerge {
 		return bestPolyline;
 	}
 
-	public void setLoops( boolean loops ) {
-		this.loops = loops;
-	}
-
-	public boolean isLoops() {
-		return loops;
-	}
-
 	/**
 	 * Storage for results from selecting where to split a line
 	 */
@@ -893,89 +891,17 @@ public class PolylineSplitMerge {
 		public double value;
 	}
 
-	public boolean isConvex() {
-		return convex;
-	}
-
-	public void setConvex( boolean convex ) {
-		this.convex = convex;
-	}
-
-	public int getMaxSides() {
-		return maxSides;
-	}
-
-	public void setMaxSides( int maxSides ) {
-		this.maxSides = maxSides;
-	}
-
-	public int getMinimumSideLength() {
-		return minimumSideLength;
-	}
-
 	public void setMinimumSideLength( int minimumSideLength ) {
 		if (minimumSideLength <= 0)
 			throw new IllegalArgumentException("Minimum length must be at least 1");
 		this.minimumSideLength = minimumSideLength;
 	}
 
-	public double getCornerScorePenalty() {
-		return cornerScorePenalty;
+	public void setExtraConsider( ConfigLength extra ) {
+		this.extraConsider.setTo(extra);
 	}
 
-	public void setCornerScorePenalty( double cornerScorePenalty ) {
-		this.cornerScorePenalty = cornerScorePenalty;
-	}
-
-	public double getThresholdSideSplitScore() {
-		return thresholdSideSplitScore;
-	}
-
-	public void setThresholdSideSplitScore( double thresholdSideSplitScore ) {
-		this.thresholdSideSplitScore = thresholdSideSplitScore;
-	}
-
-	public int getMaxNumberOfSideSamples() {
-		return maxNumberOfSideSamples;
-	}
-
-	public void setMaxNumberOfSideSamples( int maxNumberOfSideSamples ) {
-		this.maxNumberOfSideSamples = maxNumberOfSideSamples;
-	}
-
-	public void setSplitter( SplitSelector splitter ) {
-		this.splitter = splitter;
-	}
-
-	public int getMinSides() {
-		return minSides;
-	}
-
-	public void setMinSides( int minSides ) {
-		this.minSides = minSides;
-	}
-
-	public ConfigLength getExtraConsider() {
-		return extraConsider;
-	}
-
-	public void setExtraConsider( ConfigLength extraConsider ) {
-		this.extraConsider = extraConsider;
-	}
-
-	public double getConvexTest() {
-		return convexTest;
-	}
-
-	public void setConvexTest( double convexTest ) {
-		this.convexTest = convexTest;
-	}
-
-	public ConfigLength getMaxSideError() {
-		return maxSideError;
-	}
-
-	public void setMaxSideError( ConfigLength maxSideError ) {
-		this.maxSideError = maxSideError;
+	public void setMaxSideError( ConfigLength config ) {
+		this.maxSideError.setTo(config);
 	}
 }

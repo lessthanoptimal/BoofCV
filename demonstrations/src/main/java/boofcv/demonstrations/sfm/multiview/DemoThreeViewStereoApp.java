@@ -58,7 +58,6 @@ import boofcv.struct.border.BorderType;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.calib.StereoParameters;
-import boofcv.struct.distort.DoNothing2Transform2_F64;
 import boofcv.struct.feature.AssociatedTripleIndex;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.geo.AssociatedTriple;
@@ -852,7 +851,7 @@ public class DemoThreeViewStereoApp<TD extends TupleDesc<TD>> extends Demonstrat
 		int disparityMin = controls.controlDisparity.getDisparityMin();
 		int disparityRange = controls.controlDisparity.getDisparityRange();
 
-		d2c.configure(baseline, rectifiedK, rectifiedR, new DoNothing2Transform2_F64(), disparityMin, disparityRange);
+		d2c.configure(baseline, rectifiedK, rectifiedR, null, disparityMin, disparityRange);
 		d2c.process(disparity, UtilDisparitySwing.wrap(left), cloud);
 
 		CameraPinhole rectifiedPinhole = PerspectiveOps.matrixToPinhole(rectifiedK, disparity.width, disparity.height, null);

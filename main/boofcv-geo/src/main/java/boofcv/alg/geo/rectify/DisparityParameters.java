@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,10 +16,12 @@
  * limitations under the License.
  */
 
-package boofcv.alg.mvs;
+package boofcv.alg.geo.rectify;
 
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinhole;
+import georegression.geometry.GeometryMath_F64;
+import georegression.struct.point.Point3D_F64;
 import lombok.Data;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
@@ -52,6 +54,37 @@ public class DisparityParameters {
 		this.disparityRange = disparityRange;
 		this.baseline = baseline;
 		this.pinhole.setTo(pinhole);
+	}
+
+	/**
+	 * Give a pixel coordinate and raw disparity value, compute its 3D location. If the point is at infinity
+	 * or the disparity value is illegal, then false is returned.
+	 *
+	 * @param pixelX Pixel coordinate x-axis
+	 * @param pixelY Pixel coordinate y-axis
+	 * @param value Raw disparity value. DO NOT ADD MIN.
+	 * @param location (Output) Computed 3D coordinate
+	 * @return true if successful
+	 */
+	public boolean pixelTo3D( double pixelX, double pixelY, double value, Point3D_F64 location ) {
+		if (value >= disparityRange)
+			return false;
+
+		value += disparityMin;
+
+		// The point lies at infinity.
+		if (value == 0)
+			return false;
+
+		// Note that this will be in the rectified left camera's reference frame.
+		// An additional rotation is needed to put it into the original left camera frame.
+		location.z = baseline*pinhole.fx/value;
+		location.x = location.z*(pixelX - pinhole.cx)/pinhole.fx;
+		location.y = location.z*(pixelY - pinhole.cy)/pinhole.fy;
+
+		// Bring it back into left camera frame
+		GeometryMath_F64.multTran(rotateToRectified, location, location);
+		return true;
 	}
 
 	/** Resets fields to their initial values */

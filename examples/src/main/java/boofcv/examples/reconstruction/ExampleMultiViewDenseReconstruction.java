@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.BoofVerbose;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.cloud.PointCloudReader;
 import boofcv.alg.cloud.PointCloudUtils_F64;
-import boofcv.alg.mvs.DisparityParameters;
+import boofcv.alg.geo.rectify.DisparityParameters;
 import boofcv.alg.mvs.MultiViewStereoFromKnownSceneStructure;
 import boofcv.alg.structure.SparseSceneToDenseCloud;
 import boofcv.factory.disparity.ConfigDisparity;
