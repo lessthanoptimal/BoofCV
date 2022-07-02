@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,11 +22,13 @@ import boofcv.alg.cloud.AccessColorIndex;
 import boofcv.alg.cloud.AccessPointIndex;
 import boofcv.alg.cloud.PointCloudReader;
 import boofcv.alg.cloud.PointCloudWriter;
+import boofcv.alg.meshing.VertexMesh;
 import boofcv.io.points.impl.PlyCodec;
 import boofcv.struct.Point3dRgbI_F64;
 import georegression.struct.point.Point3D_F32;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -48,7 +50,14 @@ public class PointCloudIO {
 	public static void save3D( Format format, PointCloudReader cloud, boolean saveRGB, OutputStream outputStream )
 			throws IOException {
 		switch (format) {
-			case PLY -> PlyCodec.saveBinary(cloud, ByteOrder.BIG_ENDIAN, saveRGB, false, outputStream);
+			case PLY -> PlyCodec.saveCloudBinary(cloud, ByteOrder.BIG_ENDIAN, saveRGB, false, outputStream);
+		}
+	}
+
+	public static void save3D( Format format, VertexMesh mesh, @Nullable DogArray_I32 colorRGB, OutputStream outputStream )
+			throws IOException {
+		switch (format) {
+			case PLY -> PlyCodec.saveMeshBinary(mesh, colorRGB, ByteOrder.BIG_ENDIAN, false, outputStream);
 		}
 	}
 

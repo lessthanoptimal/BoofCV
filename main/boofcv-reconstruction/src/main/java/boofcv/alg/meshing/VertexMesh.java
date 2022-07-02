@@ -22,13 +22,13 @@ import boofcv.struct.packed.PackedBigArrayPoint3D_F64;
 import org.ddogleg.struct.DogArray_I32;
 
 /**
- * Specifies a 3D mesh
+ * Specifies a 3D mesh. BigArray types are used since a 3D mesh can have a very large number of points in it.
  *
  * @author Peter Abeles
  */
 public class VertexMesh {
 	/** 3D location of each vertex */
-	public final PackedBigArrayPoint3D_F64 vertexes = new PackedBigArrayPoint3D_F64();
+	public final PackedBigArrayPoint3D_F64 vertexes = new PackedBigArrayPoint3D_F64(10);
 
 	/** Which indexes correspond to each vertex */
 	public final DogArray_I32 triangles = new DogArray_I32();

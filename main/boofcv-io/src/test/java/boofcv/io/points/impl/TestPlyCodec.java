@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,13 +34,21 @@ import java.util.List;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Peter Abeles
  */
 class TestPlyCodec extends BoofStandardJUnit {
-	@Test
-	void encode_decode_3D_ascii() throws IOException {
+	@Test void encode_decode_mesh_ascii() throws IOException {
+		fail("Implement");
+	}
+
+	@Test void encode_decode_mesh_binary() throws IOException {
+		fail("Implement");
+	}
+	
+	@Test void encode_decode_3D_ascii() throws IOException {
 		List<Point3D_F64> expected = new ArrayList<>();
 		for (int i = 0; i < 10; i++) {
 			expected.add(new Point3D_F64(i*123.45, i - 1.01, i + 2.34));
@@ -49,7 +57,7 @@ class TestPlyCodec extends BoofStandardJUnit {
 		DogArray<Point3D_F64> found = new DogArray<>(Point3D_F64::new);
 
 		Writer output = new StringWriter();
-		PlyCodec.saveAscii(PointCloudReader.wrapF64(expected), false, output);
+		PlyCodec.saveCloudAscii(PointCloudReader.wrapF64(expected), false, output);
 		InputStream input = new ByteArrayInputStream(output.toString().getBytes(UTF_8));
 		PlyCodec.read(input, PointCloudWriter.wrapF64(found));
 
@@ -59,8 +67,7 @@ class TestPlyCodec extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	void encode_decode_3DRGB_ascii() throws IOException {
+	@Test void encode_decode_3DRGB_ascii() throws IOException {
 		List<Point3dRgbI_F64> expected = new ArrayList<>();
 		for (int i = 0; i < 10; i++) {
 			int r = (10*i) & 0xFF;
@@ -75,7 +82,7 @@ class TestPlyCodec extends BoofStandardJUnit {
 		DogArray<Point3dRgbI_F64> found = new DogArray<>(Point3dRgbI_F64::new);
 
 		Writer output = new StringWriter();
-		PlyCodec.saveAscii(PointCloudReader.wrapF64RGB(expected), true, output);
+		PlyCodec.saveCloudAscii(PointCloudReader.wrapF64RGB(expected), true, output);
 		InputStream input = new ByteArrayInputStream(output.toString().getBytes(UTF_8));
 		PlyCodec.read(input, PointCloudWriter.wrapF64RGB(found));
 
@@ -85,8 +92,7 @@ class TestPlyCodec extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	void encode_decode_3D_binary() throws IOException {
+	@Test void encode_decode_3D_binary() throws IOException {
 		List<Point3D_F64> expected = new ArrayList<>();
 		for (int i = 0; i < 10; i++) {
 			expected.add(new Point3D_F64(i*123.45, i - 1.01, i + 2.34));
@@ -96,7 +102,7 @@ class TestPlyCodec extends BoofStandardJUnit {
 			DogArray<Point3D_F64> found = new DogArray<>(Point3D_F64::new);
 
 			ByteArrayOutputStream output = new ByteArrayOutputStream();
-			PlyCodec.saveBinary(PointCloudReader.wrapF64(expected), ByteOrder.BIG_ENDIAN, false, asFloat, output);
+			PlyCodec.saveCloudBinary(PointCloudReader.wrapF64(expected), ByteOrder.BIG_ENDIAN, false, asFloat, output);
 			ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
 			PlyCodec.read(input, PointCloudWriter.wrapF64(found));
 
@@ -108,8 +114,7 @@ class TestPlyCodec extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	void encode_decode_3DRGB_binary() throws IOException {
+	@Test void encode_decode_3DRGB_binary() throws IOException {
 		List<Point3dRgbI_F64> expected = new ArrayList<>();
 		for (int i = 0; i < 10; i++) {
 			int r = (10*i) & 0xFF;
@@ -125,7 +130,7 @@ class TestPlyCodec extends BoofStandardJUnit {
 			DogArray<Point3dRgbI_F64> found = new DogArray<>(Point3dRgbI_F64::new);
 
 			ByteArrayOutputStream output = new ByteArrayOutputStream();
-			PlyCodec.saveBinary(PointCloudReader.wrapF64RGB(expected), ByteOrder.BIG_ENDIAN, false, asFloat, output);
+			PlyCodec.saveCloudBinary(PointCloudReader.wrapF64RGB(expected), ByteOrder.BIG_ENDIAN, false, asFloat, output);
 			ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
 			PlyCodec.read(input, PointCloudWriter.wrapF64RGB(found));
 

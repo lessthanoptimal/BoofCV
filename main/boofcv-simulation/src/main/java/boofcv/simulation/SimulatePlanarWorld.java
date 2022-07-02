@@ -60,7 +60,7 @@ import java.util.List;
 public class SimulatePlanarWorld {
 
 	GrayF32 output = new GrayF32(1, 1);
-	GrayF32 depthMap = new GrayF32(1, 1);
+	@Getter GrayF32 depthMap = new GrayF32(1, 1);
 
 	List<SurfaceRect> scene = new ArrayList<>();
 

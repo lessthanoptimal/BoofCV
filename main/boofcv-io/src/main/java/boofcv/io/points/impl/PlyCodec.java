@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,12 @@ package boofcv.io.points.impl;
 
 import boofcv.alg.cloud.PointCloudReader;
 import boofcv.alg.cloud.PointCloudWriter;
+import boofcv.alg.meshing.VertexMesh;
 import boofcv.io.UtilIO;
+import boofcv.misc.BoofMiscOps;
 import georegression.struct.point.Point3D_F64;
+import org.ddogleg.struct.DogArray_I32;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,7 +42,50 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class PlyCodec {
-	public static void saveAscii( PointCloudReader cloud, boolean saveRgb, Writer outputWriter ) throws IOException {
+	public static void saveMeshAscii( VertexMesh mesh, @Nullable DogArray_I32 colorRGB, Writer outputWriter ) throws IOException {
+		outputWriter.write("ply\n");
+		outputWriter.write("format ascii 1.0\n");
+		outputWriter.write("comment Created using BoofCV!\n");
+		outputWriter.write("element face " + (mesh.triangles.size()/3) + "\n" +
+				"property list uchar int vertex_indices\n");
+		outputWriter.write("element vertex " + mesh.vertexes.size() + "\n" +
+				"property float x\n" +
+				"property float y\n" +
+				"property float z\n");
+		if (colorRGB != null) {
+			BoofMiscOps.checkEq(colorRGB.size, mesh.vertexes.size(), "Colors and vertexes must match");
+
+			outputWriter.write("""
+					property uchar red
+					property uchar green
+					property uchar blue
+					""");
+		}
+		outputWriter.write("end_header\n");
+
+		Point3D_F64 p = new Point3D_F64();
+		for (int i = 0; i < mesh.vertexes.size(); i++) {
+			mesh.vertexes.getCopy(i, p);
+			if (colorRGB != null) {
+				int rgb = colorRGB.get(i);
+				int r = (rgb >> 16) & 0xFF;
+				int g = (rgb >> 8) & 0xFF;
+				int b = rgb & 0xFF;
+				outputWriter.write(String.format("%f %f %f %d %d %d\n", p.x, p.y, p.z, r, g, b));
+			} else {
+				outputWriter.write(String.format("%f %f %f\n", p.x, p.y, p.z));
+			}
+		}
+		for (int i = 0; i < mesh.triangles.size(); i += 3) {
+			int idx0 = mesh.triangles.get(i);
+			int idx1 = mesh.triangles.get(i + 1);
+			int idx2 = mesh.triangles.get(i + 2);
+			outputWriter.write(String.format("3 %d %d %d\n", idx0, idx1, idx2));
+		}
+		outputWriter.flush();
+	}
+
+	public static void saveCloudAscii( PointCloudReader cloud, boolean saveRgb, Writer outputWriter ) throws IOException {
 		outputWriter.write("ply\n");
 		outputWriter.write("format ascii 1.0\n");
 		outputWriter.write("comment Created using BoofCV!\n");
@@ -49,8 +96,8 @@ public class PlyCodec {
 		if (saveRgb) {
 			outputWriter.write(
 					"property uchar red\n" +
-						"property uchar green\n" +
-						"property uchar blue\n");
+							"property uchar green\n" +
+							"property uchar blue\n");
 		}
 		outputWriter.write("end_header\n");
 
@@ -79,8 +126,8 @@ public class PlyCodec {
 	 * @param saveAsFloat if true it will save it as a 4-byte float and if false as an 8-byte double
 	 * @param outputWriter Stream it will write to
 	 */
-	public static void saveBinary( PointCloudReader cloud, ByteOrder order, boolean saveRgb, boolean saveAsFloat,
-								   OutputStream outputWriter ) throws IOException {
+	public static void saveCloudBinary( PointCloudReader cloud, ByteOrder order, boolean saveRgb, boolean saveAsFloat,
+										OutputStream outputWriter ) throws IOException {
 		String format = "UTF-8";
 		String dataType = saveAsFloat ? "float" : "double";
 		int dataLength = saveAsFloat ? 4 : 8;
@@ -90,13 +137,13 @@ public class PlyCodec {
 		outputWriter.write(("element vertex " + cloud.size() + "\n").getBytes(format));
 		outputWriter.write((
 				"property " + dataType + " x\n" +
-				"property " + dataType + " y\n" +
-				"property " + dataType + " z\n").getBytes(format));
+						"property " + dataType + " y\n" +
+						"property " + dataType + " z\n").getBytes(format));
 		if (saveRgb) {
 			outputWriter.write(
 					("property uchar red\n" +
-					 "property uchar green\n" +
-					 "property uchar blue\n").getBytes(format));
+							"property uchar green\n" +
+							"property uchar blue\n").getBytes(format));
 		}
 		outputWriter.write("end_header\n".getBytes(format));
 
@@ -125,6 +172,77 @@ public class PlyCodec {
 				bytes.put(end + 1, (byte)g);
 				bytes.put(end + 2, (byte)b);
 			}
+			outputWriter.write(bytes.array());
+		}
+		outputWriter.flush();
+	}
+
+	/**
+	 * Saves data in binary format
+	 *
+	 * @param mesh (Input) Point cloud data
+	 * @param colorRGB (Input) color of each vertex
+	 * @param saveAsFloat if true it will save it as a 4-byte float and if false as an 8-byte double
+	 * @param outputWriter Stream it will write to
+	 */
+	public static void saveMeshBinary( VertexMesh mesh, @Nullable DogArray_I32 colorRGB,
+									   ByteOrder order, boolean saveAsFloat, OutputStream outputWriter ) throws IOException {
+		String format = "UTF-8";
+		String dataType = saveAsFloat ? "float" : "double";
+		int dataLength = saveAsFloat ? 4 : 8;
+		outputWriter.write("ply\n".getBytes(format));
+		outputWriter.write("format binary_big_endian 1.0\n".getBytes(format));
+		outputWriter.write("comment Created using BoofCV!\n".getBytes(format));
+		outputWriter.write(("element vertex " + mesh.vertexes.size() + "\n").getBytes(format));
+		outputWriter.write((
+				"property " + dataType + " x\n" +
+						"property " + dataType + " y\n" +
+						"property " + dataType + " z\n").getBytes(format));
+		if (colorRGB != null) {
+			BoofMiscOps.checkEq(colorRGB.size, mesh.vertexes.size(), "Colors and vertexes must match");
+			outputWriter.write(
+					("property uchar red\n" +
+							"property uchar green\n" +
+							"property uchar blue\n").getBytes(format));
+		}
+		outputWriter.write(("element face " + (mesh.triangles.size()/3) + "\n" +
+				"property list uchar int vertex_indices\n").getBytes(format));
+		outputWriter.write("end_header\n".getBytes(format));
+
+		int end = dataLength*3;
+		var bytes = ByteBuffer.allocate(dataLength*3 + (colorRGB != null ? 3 : 0));
+		bytes.order(order);
+		var p = new Point3D_F64();
+		for (int i = 0; i < mesh.vertexes.size(); i++) {
+			mesh.vertexes.getCopy(i, p);
+			if (saveAsFloat) {
+				bytes.putFloat(0, (float)p.x);
+				bytes.putFloat(4, (float)p.y);
+				bytes.putFloat(8, (float)p.z);
+			} else {
+				bytes.putDouble(0, p.x);
+				bytes.putDouble(8, p.y);
+				bytes.putDouble(16, p.z);
+			}
+
+			if (colorRGB != null) {
+				int rgb = colorRGB.get(i);
+				int r = (rgb >> 16) & 0xFF;
+				int g = (rgb >> 8) & 0xFF;
+				int b = rgb & 0xFF;
+				bytes.put(end, (byte)r);
+				bytes.put(end + 1, (byte)g);
+				bytes.put(end + 2, (byte)b);
+			}
+			outputWriter.write(bytes.array());
+		}
+		bytes = ByteBuffer.allocate(1 + 4*3);
+		for (int i = 0; i < mesh.triangles.size(); i += 3) {
+			bytes.position(0);
+			bytes.put((byte)3);
+			bytes.putInt(mesh.triangles.get(i));
+			bytes.putInt(mesh.triangles.get(i + 1));
+			bytes.putInt(mesh.triangles.get(i + 2));
 			outputWriter.write(bytes.array());
 		}
 		outputWriter.flush();
@@ -164,7 +282,7 @@ public class PlyCodec {
 			String[] words = line.split("\\s+");
 			if (words.length == 1)
 				throw new IOException("Expected more than one word");
-			if( line.startsWith("format")) {
+			if (line.startsWith("format")) {
 				format = switch (words[1]) {
 					case "ascii" -> Format.ASCII;
 					case "binary_little_endian" -> Format.BINARY_LITTLE;
@@ -192,9 +310,18 @@ public class PlyCodec {
 					case "x" -> v = VarType.X;
 					case "y" -> v = VarType.Y;
 					case "z" -> v = VarType.Z;
-					case "red" -> { v = VarType.R; rgb = true; }
-					case "green" -> { v = VarType.G; rgb = true; }
-					case "blue" -> { v = VarType.B; rgb = true; }
+					case "red" -> {
+						v = VarType.R;
+						rgb = true;
+					}
+					case "green" -> {
+						v = VarType.G;
+						rgb = true;
+					}
+					case "blue" -> {
+						v = VarType.B;
+						rgb = true;
+					}
 					default -> v = VarType.UNKNOWN;
 				}
 				dataWords.add(new DataWord(v, d));
@@ -242,14 +369,27 @@ public class PlyCodec {
 					case UINT, INT, USHORT, SHORT, UCHAR, CHAR -> I32 = Integer.parseInt(word);
 					default -> throw new RuntimeException("Unsupported");
 				}
-				switch( d.var ) {
-					case X: x = F64; break;
-					case Y: y = F64; break;
-					case Z: z = F64; break;
-					case R: r = I32; break;
-					case G: g = I32; break;
-					case B: b = I32; break;
-					default: break;
+				switch (d.var) {
+					case X:
+						x = F64;
+						break;
+					case Y:
+						y = F64;
+						break;
+					case Z:
+						z = F64;
+						break;
+					case R:
+						r = I32;
+						break;
+					case G:
+						g = I32;
+						break;
+					case B:
+						b = I32;
+						break;
+					default:
+						break;
 				}
 			}
 			if (rgb) {
@@ -302,14 +442,27 @@ public class PlyCodec {
 					default -> throw new RuntimeException("Unsupported");
 				}
 				location += d.data.size;
-				switch( d.var ) {
-					case X: x = F64; break;
-					case Y: y = F64; break;
-					case Z: z = F64; break;
-					case R: r = I32; break;
-					case G: g = I32; break;
-					case B: b = I32; break;
-					default: break;
+				switch (d.var) {
+					case X:
+						x = F64;
+						break;
+					case Y:
+						y = F64;
+						break;
+					case Z:
+						z = F64;
+						break;
+					case R:
+						r = I32;
+						break;
+					case G:
+						g = I32;
+						break;
+					case B:
+						b = I32;
+						break;
+					default:
+						break;
 				}
 			}
 
