@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,6 +64,19 @@ public class PackedBigArrayPoint3D_F64 implements PackedArray<Point3D_F64> {
 	 */
 	public PackedBigArrayPoint3D_F64( int reservedPoints, int blockSize, BigDogGrowth growth ) {
 		dog = new BigDogArray_F64(reservedPoints*DOF, blockSize*DOF, growth);
+	}
+
+	/**
+	 * Makes this array have a value identical to 'src'
+	 *
+	 * @param src original array being copies
+	 * @return Reference to 'this'
+	 */
+	public PackedBigArrayPoint3D_F64 setTo( PackedBigArrayPoint3D_F64 src ) {
+		reset();
+		reserve(src.size);
+		src.forIdx(0, src.size, ( idx, p ) -> append(p.x, p.y, p.z));
+		return this;
 	}
 
 	@Override public void reset() {

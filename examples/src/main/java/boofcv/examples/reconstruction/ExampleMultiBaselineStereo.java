@@ -21,7 +21,7 @@ package boofcv.examples.reconstruction;
 import boofcv.alg.distort.brown.LensDistortionBrown;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.bundle.BundleAdjustmentOps;
-import boofcv.alg.mvs.DisparityParameters;
+import boofcv.alg.geo.rectify.DisparityParameters;
 import boofcv.alg.mvs.MultiBaselineStereoIndependent;
 import boofcv.alg.mvs.MultiViewStereoOps;
 import boofcv.alg.structure.SceneWorkingGraph;

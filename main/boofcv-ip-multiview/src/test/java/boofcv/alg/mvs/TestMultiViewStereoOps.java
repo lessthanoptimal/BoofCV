@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.distort.pinhole.LensDistortionPinhole;
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.WorldToCameraToPixel;
+import boofcv.alg.geo.rectify.DisparityParameters;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.misc.ImageStatistics;

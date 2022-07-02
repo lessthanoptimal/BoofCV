@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,7 @@ import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyDistortImageOps;
+import boofcv.alg.geo.rectify.DisparityParameters;
 import boofcv.misc.BoofLambdas;
 import boofcv.misc.BoofMiscOps;
 import boofcv.misc.LookUpImages;

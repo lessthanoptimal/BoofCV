@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,7 +47,6 @@ import boofcv.io.image.UtilImageIO;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeBrown;
-import boofcv.struct.distort.DoNothing2Transform2_F64;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.*;
@@ -297,7 +296,7 @@ public class ExampleStereoTwoViewsOneCamera {
 		PointCloudWriter.CloudArraysF32 cloud = new PointCloudWriter.CloudArraysF32();
 
 		double baseline = motion.getT().norm();
-		d2c.configure(baseline, rectifiedK, rectifiedR, new DoNothing2Transform2_F64(), disparityMin, disparityRange);
+		d2c.configure(baseline, rectifiedK, rectifiedR, null, disparityMin, disparityRange);
 		d2c.process(disparity, UtilDisparitySwing.wrap(left), cloud);
 
 		CameraPinhole rectifiedPinhole = PerspectiveOps.matrixToPinhole(rectifiedK, disparity.width, disparity.height, null);

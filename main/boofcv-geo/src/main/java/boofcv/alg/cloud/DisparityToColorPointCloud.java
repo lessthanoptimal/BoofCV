@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,9 @@
 
 package boofcv.alg.cloud;
 
+import boofcv.alg.geo.PerspectiveOps;
+import boofcv.alg.geo.rectify.DisparityParameters;
+import boofcv.struct.distort.DoNothing2Transform2_F64;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
@@ -29,6 +32,7 @@ import georegression.struct.shapes.Rectangle2D_I32;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.FMatrixRMaj;
 import org.ejml.ops.ConvertMatrixData;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>
@@ -79,14 +83,16 @@ public class DisparityToColorPointCloud {
 	 *
 	 * @param baseline Stereo baseline (world units)
 	 * @param K Intrinsic camera calibration matrix of rectified camera
-	 * @param rectifiedToColor Transform from rectified pixels to the color image pixels.
+	 * @param rectifiedToColor Transform from rectified pixels to the color image pixels. If null then no transform.
 	 * @param disparityMin Minimum disparity that's computed (pixels)
 	 * @param disparityRange Number of possible disparity values (pixels)
 	 */
 	public void configure( double baseline,
 						   DMatrixRMaj K, DMatrixRMaj rectifiedR,
-						   Point2Transform2_F64 rectifiedToColor,
+						   @Nullable Point2Transform2_F64 rectifiedToColor,
 						   int disparityMin, int disparityRange ) {
+		if (rectifiedToColor == null)
+			rectifiedToColor = new DoNothing2Transform2_F64();
 		this.K = K;
 		ConvertMatrixData.convert(rectifiedR, this.rectifiedR);
 		this.rectifiedToColor = rectifiedToColor;
@@ -102,6 +108,21 @@ public class DisparityToColorPointCloud {
 	}
 
 	/**
+	 * Convenience function which allows you to use {@link DisparityParameters} and calls
+	 * {@link #configure(double, DMatrixRMaj, DMatrixRMaj, Point2Transform2_F64, int, int)}.
+	 */
+	public void configure( DisparityParameters param, @Nullable Point2Transform2_F64 rectifiedToColor ) {
+		if (rectifiedToColor == null)
+			rectifiedToColor = new DoNothing2Transform2_F64();
+		this.configure(param.baseline,
+				PerspectiveOps.pinholeToMatrix(param.pinhole, K),
+				param.rotateToRectified,
+				rectifiedToColor,
+				param.disparityMin,
+				param.disparityRange);
+	}
+
+	/**
 	 * Given the disparity image compute the 3D location of valid points and save pixel colors
 	 * at that point
 	 *
@@ -109,7 +130,6 @@ public class DisparityToColorPointCloud {
 	 * @param color Color image of left camera
 	 */
 	public void process( ImageGray<?> disparity, ColorImage color, PointCloudWriter output ) {
-
 		if (disparity instanceof GrayU8)
 			process((GrayU8)disparity, color, output);
 		else if (disparity instanceof GrayF32)
@@ -126,7 +146,6 @@ public class DisparityToColorPointCloud {
 	 * @param output (Output) destination for the colorized point cloud
 	 */
 	private void process( GrayU8 disparity, ColorImage color, PointCloudWriter output ) {
-
 		final int x0 = Math.max(roi.x0, 0);
 		final int y0 = Math.max(roi.y0, 0);
 		final int x1 = Math.min(roi.x1, disparity.width);

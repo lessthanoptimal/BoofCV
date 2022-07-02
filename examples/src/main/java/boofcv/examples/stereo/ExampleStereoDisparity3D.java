@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,8 @@
 package boofcv.examples.stereo;
 
 import boofcv.alg.geo.PerspectiveOps;
+import boofcv.alg.geo.rectify.DisparityParameters;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
-import boofcv.alg.mvs.DisparityParameters;
 import boofcv.alg.mvs.MultiViewStereoOps;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.mvs;
 
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.distort.pinhole.PixelTransformPinholeNorm_F64;
+import boofcv.alg.geo.rectify.DisparityParameters;
 import boofcv.alg.mvs.impl.ImplMultiViewStereoOps;
 import boofcv.misc.BoofLambdas;
 import boofcv.struct.distort.PixelTransform;
