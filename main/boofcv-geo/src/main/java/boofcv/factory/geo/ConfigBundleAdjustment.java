@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.factory.geo;
 
+import boofcv.struct.Configuration;
 import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
 
 /**
@@ -25,7 +26,7 @@ import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
  *
  * @author Peter Abeles
  */
-public class ConfigBundleAdjustment {
+public class ConfigBundleAdjustment implements Configuration {
 
 	/**
 	 * Used to specify which optimization routine to use and how to configure it.
@@ -34,6 +35,10 @@ public class ConfigBundleAdjustment {
 	 * @see org.ddogleg.optimization.trustregion.ConfigTrustRegion
 	 */
 	public Object configOptimizer = new ConfigLevenbergMarquardt();
+
+	@Override public void checkValidity() {
+
+	}
 
 	public ConfigBundleAdjustment setTo( ConfigBundleAdjustment src ) {
 		// it should copy / overwrite but that isn't possible/easy. So this is the compromise

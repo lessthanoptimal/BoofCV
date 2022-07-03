@@ -56,14 +56,20 @@ public class CameraDivision extends CameraPinhole implements Serializable {
 		return (T)new CameraDivision();
 	}
 
-	@Override public void setTo( CameraPinhole param ) {
+	public CameraDivision setTo( CameraDivision param ) {
+		this.radial = param.radial;
+		super.setTo(param);
+		return this;
+	}
+
+	@Override public CameraPinhole setTo( CameraPinhole param ) {
 		if (param instanceof CameraDivision) {
-			CameraDivision p = (CameraDivision)param;
-			radial = p.radial;
+			this.setTo((CameraDivision)param);
 		} else {
 			this.radial = 0;
+			super.setTo(param);
 		}
-		super.setTo(param);
+		return this;
 	}
 
 	public boolean isDistorted() {
