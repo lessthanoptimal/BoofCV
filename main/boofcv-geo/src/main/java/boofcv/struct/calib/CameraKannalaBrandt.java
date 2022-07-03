@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -192,7 +192,7 @@ public class CameraKannalaBrandt extends CameraPinhole {
 	 *
 	 * @param src (input) Camera model
 	 */
-	public void setTo( CameraKannalaBrandt src ) {
+	public CameraKannalaBrandt setTo( CameraKannalaBrandt src ) {
 		super.setTo(src);
 
 		this.symmetric = BoofMiscOps.copySmart(src.symmetric, this.symmetric);
@@ -200,6 +200,7 @@ public class CameraKannalaBrandt extends CameraPinhole {
 		this.radialTrig = BoofMiscOps.copySmart(src.radialTrig, this.radialTrig);
 		this.tangent = BoofMiscOps.copySmart(src.tangent, this.tangent);
 		this.tangentTrig = BoofMiscOps.copySmart(src.tangentTrig, this.tangentTrig);
+		return this;
 	}
 
 	/**

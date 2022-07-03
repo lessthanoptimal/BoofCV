@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,15 +18,11 @@
 
 package boofcv.struct.calib;
 
-import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * @author Peter Abeles
- */
-public class TestCameraPinholeBrown extends BoofStandardJUnit {
+public class TestCameraPinholeBrown extends CommonCameraChecks {
 
 	@Test void set_radial() {
 		CameraPinholeBrown p = new CameraPinholeBrown(200,210,1,320,240,640,380);
@@ -50,7 +46,7 @@ public class TestCameraPinholeBrown extends BoofStandardJUnit {
 
 		equalsP(p,f);
 
-		assertTrue(f.radial == null);
+		assertNull(f.radial);
 		assertEquals(0, f.t1, 1e-8);
 		assertEquals(0, f.t2, 1e-8);
 	}
@@ -70,7 +66,7 @@ public class TestCameraPinholeBrown extends BoofStandardJUnit {
 		assertEquals(expected.t2, found.t2, 1e-8);
 
 		if( expected.radial == null ) {
-			assertTrue(found.radial==null);
+			assertNull(found.radial);
 		} else {
 			assertArrayEquals(expected.radial, found.radial, 1e-8);
 		}
@@ -79,9 +75,9 @@ public class TestCameraPinholeBrown extends BoofStandardJUnit {
 	@Test void fsetRadial() {
 		CameraPinholeBrown p = new CameraPinholeBrown(200,210,1,320,240,640,380);
 
-		assertTrue(p == p.fsetRadial(1.1,2.2,3.3));
+		assertSame(p, p.fsetRadial(1.1, 2.2, 3.3));
 
-		assertTrue(p.radial.length==3);
+		assertEquals(3, p.radial.length);
 		assertEquals(1.1,p.radial[0],1e-8);
 		assertEquals(2.2,p.radial[1],1e-8);
 		assertEquals(3.3,p.radial[2],1e-8);
@@ -100,7 +96,7 @@ public class TestCameraPinholeBrown extends BoofStandardJUnit {
 	@Test void fsetTangental() {
 		CameraPinholeBrown p = new CameraPinholeBrown(200,210,1,320,240,640,380);
 
-		assertTrue(p == p.fsetTangental(1.1, 2.2));
+		assertSame(p, p.fsetTangental(1.1, 2.2));
 
 		assertEquals(1.1,p.t1,1e-8);
 		assertEquals(2.2,p.t2, 1e-8);
@@ -112,7 +108,7 @@ public class TestCameraPinholeBrown extends BoofStandardJUnit {
 		assertEquals(240,p.cy,1e-8);
 		assertEquals(640,p.width,1e-8);
 		assertEquals(380,p.height,1e-8);
-		assertTrue(p.radial==null);
+		assertNull(p.radial);
 	}
 
 	@Test void isDistorted() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -105,25 +105,32 @@ public class CameraPinholeBrown extends CameraPinhole implements Serializable {
 		return this;
 	}
 
+	public CameraPinholeBrown setTo( CameraPinholeBrown param ) {
+		CameraPinholeBrown p = (CameraPinholeBrown)param;
+
+		p.fsetRadial(p.radial);
+		if (p.radial != null)
+			radial = p.radial.clone();
+		else
+			radial = null;
+
+		this.t1 = p.t1;
+		this.t2 = p.t2;
+		super.setTo(param);
+		return this;
+	}
+
 	@Override
-	public void setTo( CameraPinhole param ) {
+	public CameraPinhole setTo( CameraPinhole param ) {
 		if (param instanceof CameraPinholeBrown) {
-			CameraPinholeBrown p = (CameraPinholeBrown)param;
-
-			p.fsetRadial(p.radial);
-			if (p.radial != null)
-				radial = p.radial.clone();
-			else
-				radial = null;
-
-			this.t1 = p.t1;
-			this.t2 = p.t2;
+			setTo((CameraPinholeBrown)param);
 		} else {
 			this.radial = null;
 			this.t1 = 0;
 			this.t2 = 0;
+			super.setTo(param);
 		}
-		super.setTo(param);
+		return this;
 	}
 
 	/**

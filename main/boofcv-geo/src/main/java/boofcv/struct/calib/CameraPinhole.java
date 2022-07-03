@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -111,7 +111,7 @@ public class CameraPinhole extends CameraModel {
 		return this;
 	}
 
-	public void setTo( CameraPinhole param ) {
+	public CameraPinhole setTo( CameraPinhole param ) {
 		this.fx = param.fx;
 		this.fy = param.fy;
 		this.skew = param.skew;
@@ -119,6 +119,7 @@ public class CameraPinhole extends CameraModel {
 		this.cy = param.cy;
 		this.width = param.width;
 		this.height = param.height;
+		return this;
 	}
 
 	/**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,7 +53,7 @@ public class ConfigDescribePoint implements Configuration {
 	public ConfigDescribePoint setTo( ConfigDescribePoint src ) {
 		this.radius = src.radius;
 		this.descriptors.setTo(src.descriptors);
-		this.orientation.setTo(orientation);
+		this.orientation.setTo(src.orientation);
 		this.convert.setTo(src.convert);
 		return this;
 	}

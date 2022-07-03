@@ -23,30 +23,14 @@ import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.EulerType;
 import georegression.struct.point.Point3D_F64;
-import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TestDisparityParameters extends BoofStandardJUnit {
-	@Test void setTo() {
-		var src = new DisparityParameters();
-		src.pinhole.fsetK(1,2,3,4,5,6,9);
-		src.rotateToRectified.set(0,0,2);
-		src.baseline = 10;
-		src.disparityRange = 102;
-		src.disparityMin = 8;
 
-		var dst = new DisparityParameters();
-		dst.setTo(src);
-
-		assertTrue(src.pinhole.isEquals(dst.pinhole, 1e-8));
-		assertTrue(MatrixFeatures_DDRM.isEquals(src.rotateToRectified, dst.rotateToRectified));
-		assertEquals(src.baseline, dst.baseline);
-		assertEquals(src.disparityRange, dst.disparityRange);
-		assertEquals(src.disparityMin, dst.disparityMin);
-	}
+	@Test void setTo() {checkSetTo(lookUpClassFromTestName(), true);}
 
 	@Test void pixelTo3D() {
 		var param = new DisparityParameters();

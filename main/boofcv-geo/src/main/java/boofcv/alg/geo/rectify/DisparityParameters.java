@@ -101,12 +101,13 @@ public class DisparityParameters {
 	 *
 	 * @param src Set of disparity parameters.
 	 */
-	public void setTo( DisparityParameters src ) {
+	public DisparityParameters setTo( DisparityParameters src ) {
 		this.disparityMin = src.disparityMin;
 		this.disparityRange = src.disparityRange;
 		this.baseline = src.baseline;
 		this.pinhole.setTo(src.pinhole);
 		this.rotateToRectified.setTo(src.rotateToRectified);
+		return this;
 	}
 
 	/** Checks if specified parameters are valid */

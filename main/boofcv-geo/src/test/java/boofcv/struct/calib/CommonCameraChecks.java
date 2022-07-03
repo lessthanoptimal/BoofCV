@@ -18,24 +18,9 @@
 
 package boofcv.struct.calib;
 
-import org.ejml.UtilEjml;
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-
-class TestCameraKannalaBrandt extends CommonCameraChecks {
-	@Test void fsetSymmetric() {
-		CameraKannalaBrandt cam = new CameraKannalaBrandt().fsetSymmetric(0.1, 0.2);
-		assertArrayEquals(new double[]{0.1, 0.2}, cam.symmetric, UtilEjml.TEST_F64);
-	}
-
-	@Test void fsetDistRadial() {
-		CameraKannalaBrandt cam = new CameraKannalaBrandt().fsetRadial(0.1, 0.2);
-		assertArrayEquals(new double[]{0.1, 0.2}, cam.radial, UtilEjml.TEST_F64);
-	}
-
-	@Test void fsetDistTangent() {
-		CameraKannalaBrandt cam = new CameraKannalaBrandt().fsetTangent(0.1, 0.2);
-		assertArrayEquals(new double[]{0.1, 0.2}, cam.tangent, UtilEjml.TEST_F64);
-	}
+public abstract class CommonCameraChecks extends BoofStandardJUnit {
+	@Test void setTo() {checkSetTo(lookUpClassFromTestName(), true);}
 }
