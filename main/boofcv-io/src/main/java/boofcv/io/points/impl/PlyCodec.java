@@ -22,7 +22,6 @@ import boofcv.alg.cloud.PointCloudReader;
 import boofcv.alg.cloud.PointCloudWriter;
 import boofcv.alg.meshing.VertexMesh;
 import boofcv.io.UtilIO;
-import boofcv.misc.BoofMiscOps;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.DogArray_I32;
 import org.jetbrains.annotations.Nullable;
@@ -37,84 +36,66 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * For reading PLY point files
+ * For reading PLY point files.
  *
  * @author Peter Abeles
  */
 public class PlyCodec {
+	public static void saveAscii( PlyWriter data, Writer outputWriter ) throws IOException {
+		writeAsciiHeader(data.getVertexCount(), data.getTriangleCount(), data.isColor(), outputWriter);
+
+		boolean color = data.isColor();
+
+		Point3D_F64 p = new Point3D_F64();
+		for (int i = 0; i < data.getVertexCount(); i++) {
+			data.getVertex(i, p);
+			if (color) {
+				int rgb = data.getColor(i);
+				int r = (rgb >> 16) & 0xFF;
+				int g = (rgb >> 8) & 0xFF;
+				int b = rgb & 0xFF;
+				outputWriter.write(String.format("%f %f %f %d %d %d\n", p.x, p.y, p.z, r, g, b));
+			} else {
+				outputWriter.write(String.format("%f %f %f\n", p.x, p.y, p.z));
+			}
+		}
+		int[] indexes = new int[3];
+		for (int i = 0; i < data.getTriangleCount(); i++) {
+			data.getTriangle(i, indexes);
+			outputWriter.write(String.format("3 %d %d %d\n", indexes[0], indexes[1], indexes[2]));
+		}
+		outputWriter.flush();
+	}
+
 	public static void saveMeshAscii( VertexMesh mesh, @Nullable DogArray_I32 colorRGB, Writer outputWriter ) throws IOException {
+		saveAscii(wrapMeshForWriting(mesh, colorRGB), outputWriter);
+	}
+
+	public static void saveCloudAscii( PointCloudReader cloud, boolean saveRgb, Writer outputWriter ) throws IOException {
+		saveAscii(wrapCloudForWriting(cloud, saveRgb), outputWriter);
+	}
+
+	private static void writeAsciiHeader( int vertexCount, int triangleCount, boolean hasColor, Writer outputWriter )
+			throws IOException {
 		outputWriter.write("ply\n");
 		outputWriter.write("format ascii 1.0\n");
 		outputWriter.write("comment Created using BoofCV!\n");
-		outputWriter.write("element face " + (mesh.triangles.size()/3) + "\n" +
-				"property list uchar int vertex_indices\n");
-		outputWriter.write("element vertex " + mesh.vertexes.size() + "\n" +
+		outputWriter.write("element vertex " + vertexCount + "\n" +
 				"property float x\n" +
 				"property float y\n" +
 				"property float z\n");
-		if (colorRGB != null) {
-			BoofMiscOps.checkEq(colorRGB.size, mesh.vertexes.size(), "Colors and vertexes must match");
-
+		if (hasColor) {
 			outputWriter.write("""
 					property uchar red
 					property uchar green
 					property uchar blue
 					""");
 		}
-		outputWriter.write("end_header\n");
-
-		Point3D_F64 p = new Point3D_F64();
-		for (int i = 0; i < mesh.vertexes.size(); i++) {
-			mesh.vertexes.getCopy(i, p);
-			if (colorRGB != null) {
-				int rgb = colorRGB.get(i);
-				int r = (rgb >> 16) & 0xFF;
-				int g = (rgb >> 8) & 0xFF;
-				int b = rgb & 0xFF;
-				outputWriter.write(String.format("%f %f %f %d %d %d\n", p.x, p.y, p.z, r, g, b));
-			} else {
-				outputWriter.write(String.format("%f %f %f\n", p.x, p.y, p.z));
-			}
-		}
-		for (int i = 0; i < mesh.triangles.size(); i += 3) {
-			int idx0 = mesh.triangles.get(i);
-			int idx1 = mesh.triangles.get(i + 1);
-			int idx2 = mesh.triangles.get(i + 2);
-			outputWriter.write(String.format("3 %d %d %d\n", idx0, idx1, idx2));
-		}
-		outputWriter.flush();
-	}
-
-	public static void saveCloudAscii( PointCloudReader cloud, boolean saveRgb, Writer outputWriter ) throws IOException {
-		outputWriter.write("ply\n");
-		outputWriter.write("format ascii 1.0\n");
-		outputWriter.write("comment Created using BoofCV!\n");
-		outputWriter.write("element vertex " + cloud.size() + "\n" +
-				"property float x\n" +
-				"property float y\n" +
-				"property float z\n");
-		if (saveRgb) {
-			outputWriter.write(
-					"property uchar red\n" +
-							"property uchar green\n" +
-							"property uchar blue\n");
+		if (triangleCount > 0) {
+			outputWriter.write("element face " + triangleCount + "\n" +
+					"property list uchar int vertex_indices\n");
 		}
 		outputWriter.write("end_header\n");
-
-		Point3D_F64 p = new Point3D_F64();
-		for (int i = 0; i < cloud.size(); i++) {
-			cloud.get(i, p);
-			if (saveRgb) {
-				int rgb = cloud.getRGB(i);
-				int r = (rgb >> 16) & 0xFF;
-				int g = (rgb >> 8) & 0xFF;
-				int b = rgb & 0xFF;
-				outputWriter.write(String.format("%f %f %f %d %d %d\n", p.x, p.y, p.z, r, g, b));
-			} else {
-				outputWriter.write(String.format("%f %f %f\n", p.x, p.y, p.z));
-			}
-		}
-		outputWriter.flush();
 	}
 
 	/**
@@ -128,53 +109,7 @@ public class PlyCodec {
 	 */
 	public static void saveCloudBinary( PointCloudReader cloud, ByteOrder order, boolean saveRgb, boolean saveAsFloat,
 										OutputStream outputWriter ) throws IOException {
-		String format = "UTF-8";
-		String dataType = saveAsFloat ? "float" : "double";
-		int dataLength = saveAsFloat ? 4 : 8;
-		outputWriter.write("ply\n".getBytes(format));
-		outputWriter.write("format binary_big_endian 1.0\n".getBytes(format));
-		outputWriter.write("comment Created using BoofCV!\n".getBytes(format));
-		outputWriter.write(("element vertex " + cloud.size() + "\n").getBytes(format));
-		outputWriter.write((
-				"property " + dataType + " x\n" +
-						"property " + dataType + " y\n" +
-						"property " + dataType + " z\n").getBytes(format));
-		if (saveRgb) {
-			outputWriter.write(
-					("property uchar red\n" +
-							"property uchar green\n" +
-							"property uchar blue\n").getBytes(format));
-		}
-		outputWriter.write("end_header\n".getBytes(format));
-
-		int end = dataLength*3;
-		var bytes = ByteBuffer.allocate(dataLength*3 + (saveRgb ? 3 : 0));
-		bytes.order(order);
-		Point3D_F64 p = new Point3D_F64();
-		for (int i = 0; i < cloud.size(); i++) {
-			cloud.get(i, p);
-			if (saveAsFloat) {
-				bytes.putFloat(0, (float)p.x);
-				bytes.putFloat(4, (float)p.y);
-				bytes.putFloat(8, (float)p.z);
-			} else {
-				bytes.putDouble(0, p.x);
-				bytes.putDouble(8, p.y);
-				bytes.putDouble(16, p.z);
-			}
-
-			if (saveRgb) {
-				int rgb = cloud.getRGB(i);
-				int r = (rgb >> 16) & 0xFF;
-				int g = (rgb >> 8) & 0xFF;
-				int b = rgb & 0xFF;
-				bytes.put(end, (byte)r);
-				bytes.put(end + 1, (byte)g);
-				bytes.put(end + 2, (byte)b);
-			}
-			outputWriter.write(bytes.array());
-		}
-		outputWriter.flush();
+		saveBinary(wrapCloudForWriting(cloud, saveRgb), order, saveAsFloat, outputWriter);
 	}
 
 	/**
@@ -186,35 +121,25 @@ public class PlyCodec {
 	 * @param outputWriter Stream it will write to
 	 */
 	public static void saveMeshBinary( VertexMesh mesh, @Nullable DogArray_I32 colorRGB,
-									   ByteOrder order, boolean saveAsFloat, OutputStream outputWriter ) throws IOException {
+									   ByteOrder order, boolean saveAsFloat, OutputStream outputWriter )
+			throws IOException {
+		saveBinary(wrapMeshForWriting(mesh, colorRGB), order, saveAsFloat, outputWriter);
+	}
+
+	public static void saveBinary( PlyWriter data, ByteOrder order, boolean saveAsFloat, OutputStream outputWriter )
+			throws IOException {
 		String format = "UTF-8";
-		String dataType = saveAsFloat ? "float" : "double";
 		int dataLength = saveAsFloat ? 4 : 8;
-		outputWriter.write("ply\n".getBytes(format));
-		outputWriter.write("format binary_big_endian 1.0\n".getBytes(format));
-		outputWriter.write("comment Created using BoofCV!\n".getBytes(format));
-		outputWriter.write(("element vertex " + mesh.vertexes.size() + "\n").getBytes(format));
-		outputWriter.write((
-				"property " + dataType + " x\n" +
-						"property " + dataType + " y\n" +
-						"property " + dataType + " z\n").getBytes(format));
-		if (colorRGB != null) {
-			BoofMiscOps.checkEq(colorRGB.size, mesh.vertexes.size(), "Colors and vertexes must match");
-			outputWriter.write(
-					("property uchar red\n" +
-							"property uchar green\n" +
-							"property uchar blue\n").getBytes(format));
-		}
-		outputWriter.write(("element face " + (mesh.triangles.size()/3) + "\n" +
-				"property list uchar int vertex_indices\n").getBytes(format));
-		outputWriter.write("end_header\n".getBytes(format));
+		writeBinaryHeader(data.getVertexCount(), data.getTriangleCount(), data.isColor(), saveAsFloat, format, outputWriter);
+
+		boolean color = data.isColor();
 
 		int end = dataLength*3;
-		var bytes = ByteBuffer.allocate(dataLength*3 + (colorRGB != null ? 3 : 0));
+		var bytes = ByteBuffer.allocate(dataLength*3 + (color ? 3 : 0));
 		bytes.order(order);
 		var p = new Point3D_F64();
-		for (int i = 0; i < mesh.vertexes.size(); i++) {
-			mesh.vertexes.getCopy(i, p);
+		for (int i = 0; i < data.getVertexCount(); i++) {
+			data.getVertex(i, p);
 			if (saveAsFloat) {
 				bytes.putFloat(0, (float)p.x);
 				bytes.putFloat(4, (float)p.y);
@@ -225,8 +150,8 @@ public class PlyCodec {
 				bytes.putDouble(16, p.z);
 			}
 
-			if (colorRGB != null) {
-				int rgb = colorRGB.get(i);
+			if (color) {
+				int rgb = data.getColor(i);
 				int r = (rgb >> 16) & 0xFF;
 				int g = (rgb >> 8) & 0xFF;
 				int b = rgb & 0xFF;
@@ -236,16 +161,44 @@ public class PlyCodec {
 			}
 			outputWriter.write(bytes.array());
 		}
-		bytes = ByteBuffer.allocate(1 + 4*3);
-		for (int i = 0; i < mesh.triangles.size(); i += 3) {
+
+		bytes = ByteBuffer.allocate(1 + 3*4);
+		int[] indexes = new int[3];
+		for (int i = 0; i < data.getTriangleCount(); i++) {
+			data.getTriangle(i, indexes);
 			bytes.position(0);
 			bytes.put((byte)3);
-			bytes.putInt(mesh.triangles.get(i));
-			bytes.putInt(mesh.triangles.get(i + 1));
-			bytes.putInt(mesh.triangles.get(i + 2));
+			bytes.putInt(indexes[0]);
+			bytes.putInt(indexes[1]);
+			bytes.putInt(indexes[2]);
 			outputWriter.write(bytes.array());
 		}
 		outputWriter.flush();
+	}
+
+	private static void writeBinaryHeader( int vertexCount, int triangleCount, boolean hasColor,
+										   boolean saveAsFloat, String format, OutputStream outputWriter )
+			throws IOException {
+		String dataType = saveAsFloat ? "float" : "double";
+		outputWriter.write("ply\n".getBytes(format));
+		outputWriter.write("format binary_big_endian 1.0\n".getBytes(format));
+		outputWriter.write("comment Created using BoofCV!\n".getBytes(format));
+		outputWriter.write(("element vertex " + vertexCount + "\n").getBytes(format));
+		outputWriter.write((
+				"property " + dataType + " x\n" +
+						"property " + dataType + " y\n" +
+						"property " + dataType + " z\n").getBytes(format));
+		if (hasColor) {
+			outputWriter.write(
+					("property uchar red\n" +
+							"property uchar green\n" +
+							"property uchar blue\n").getBytes(format));
+		}
+		if (triangleCount > 0) {
+			outputWriter.write(("element face " + triangleCount + "\n" +
+					"property list uchar int vertex_indices\n").getBytes(format));
+		}
+		outputWriter.write("end_header\n".getBytes(format));
 	}
 
 	private static String readNextPly( InputStream reader, boolean failIfNull, StringBuilder buffer ) throws IOException {
@@ -262,20 +215,15 @@ public class PlyCodec {
 		return line;
 	}
 
-	public static void read( InputStream input, PointCloudWriter output ) throws IOException {
-		StringBuilder buffer = new StringBuilder();
+	private static void readHeader( InputStream input, Header header ) throws IOException {
+		var buffer = new StringBuilder();
 
 		String line = UtilIO.readLine(input, buffer);
 		if (line.length() == 0) throw new IOException("Missing first line");
 		if (line.compareToIgnoreCase("ply") != 0) throw new IOException("Expected PLY at start of file");
 
-		var dataWords = new ArrayList<DataWord>();
-
-		int vertexCount = -1;
-
-		Format format = null;
-		boolean rgb = false;
 		line = readNextPly(input, true, buffer);
+		boolean previousVertex = false;
 		while (line.length() != 0) {
 			if (line.equals("end_header"))
 				break;
@@ -283,17 +231,22 @@ public class PlyCodec {
 			if (words.length == 1)
 				throw new IOException("Expected more than one word");
 			if (line.startsWith("format")) {
-				format = switch (words[1]) {
+				header.format = switch (words[1]) {
 					case "ascii" -> Format.ASCII;
 					case "binary_little_endian" -> Format.BINARY_LITTLE;
 					case "binary_big_endian" -> Format.BINARY_BIG;
 					default -> throw new IOException("Unknown format " + words[1]);
 				};
 			} else if (line.startsWith("element")) {
+				previousVertex = false;
 				if (words[1].equals("vertex")) {
-					vertexCount = Integer.parseInt(words[2]);
+					previousVertex = true;
+					header.vertexCount = Integer.parseInt(words[2]);
 				}
-			} else if (words[0].equals("property")) {
+				if (words[1].equals("face")) {
+					header.triangleCount = Integer.parseInt(words[2]);
+				}
+			} else if (words[0].equals("property") && previousVertex) {
 				DataType d = switch (words[1].toLowerCase()) {
 					case "float" -> DataType.FLOAT;
 					case "double" -> DataType.DOUBLE;
@@ -312,47 +265,95 @@ public class PlyCodec {
 					case "z" -> v = VarType.Z;
 					case "red" -> {
 						v = VarType.R;
-						rgb = true;
+						header.rgb = true;
 					}
 					case "green" -> {
 						v = VarType.G;
-						rgb = true;
+						header.rgb = true;
 					}
 					case "blue" -> {
 						v = VarType.B;
-						rgb = true;
+						header.rgb = true;
 					}
 					default -> v = VarType.UNKNOWN;
 				}
-				dataWords.add(new DataWord(v, d));
+				header.dataWords.add(new DataWord(v, d));
 			} else {
 				throw new IOException("Unknown header element");
 			}
 			line = readNextPly(input, true, buffer);
 		}
-		if (vertexCount == -1)
+	}
+
+	public static void readCloud( InputStream input, PointCloudWriter output ) throws IOException {
+		read(input, new PlyReader() {
+			@Override public void initialize( int vertexes, int triangles, boolean color ) {
+				output.initialize(vertexes, color);
+			}
+
+			@Override public void addVertex( double x, double y, double z, int rgb ) {
+				output.add(x, y, z, rgb);
+			}
+
+			@Override public void addTriangle( int idx0, int idx1, int idx2 ) {}
+		});
+	}
+
+	public static void readMesh( InputStream input, VertexMesh mesh, DogArray_I32 colorRGB ) throws IOException {
+		read(input, new PlyReader() {
+			@Override public void initialize( int vertexes, int triangles, boolean color ) {
+				colorRGB.reset();
+				mesh.vertexes.reset();
+				mesh.triangles.reset();
+				mesh.vertexes.reserve(vertexes);
+				mesh.triangles.reserve(triangles*3);
+			}
+
+			@Override public void addVertex( double x, double y, double z, int rgb ) {
+				mesh.vertexes.append(x, y, z);
+				colorRGB.add(rgb);
+			}
+
+			@Override public void addTriangle( int idx0, int idx1, int idx2 ) {
+				mesh.triangles.add(idx0);
+				mesh.triangles.add(idx1);
+				mesh.triangles.add(idx2);
+			}
+		});
+	}
+
+	public static void read( InputStream input, PlyReader output ) throws IOException {
+		Header header = new Header();
+		readHeader(input, header);
+
+		if (header.vertexCount == -1)
 			throw new IOException("File is missing vertex count");
-		if (format == null)
+		if (header.format == null)
 			throw new IOException("Format is never specified");
 
-		output.initialize(vertexCount, rgb);
+		output.initialize(header.vertexCount, header.triangleCount, header.rgb);
 
-		switch (format) {
-			case ASCII -> readAscii(output, input, dataWords, buffer, vertexCount, rgb);
-			case BINARY_LITTLE -> readBinary(output, input, dataWords, ByteOrder.LITTLE_ENDIAN, vertexCount, rgb);
-			case BINARY_BIG -> readBinary(output, input, dataWords, ByteOrder.BIG_ENDIAN, vertexCount, rgb);
+		switch (header.format) {
+			case ASCII -> readAscii(output, input, header.dataWords, header.vertexCount,
+					header.rgb, header.triangleCount);
+			case BINARY_LITTLE -> readCloudBinary(output, input, header.dataWords,
+					ByteOrder.LITTLE_ENDIAN, header.vertexCount, header.rgb, header.triangleCount);
+			case BINARY_BIG -> readCloudBinary(output, input, header.dataWords,
+					ByteOrder.BIG_ENDIAN, header.vertexCount, header.rgb, header.triangleCount);
 			default -> throw new RuntimeException("BUG!");
 		}
 	}
 
-	private static void readAscii( PointCloudWriter output, InputStream reader, List<DataWord> dataWords,
-								   StringBuilder buffer, int vertexCount, boolean rgb ) throws IOException {
+	private static void readAscii( PlyReader output, InputStream reader, List<DataWord> dataWords,
+								   int vertexCount, boolean rgb, int triangleCount ) throws IOException {
+		var buffer = new StringBuilder();
+
 		// storage for read in values
 		int I32 = -1;
 		double F64 = -1;
 
 		// values that are writen to that we care about
-		int r = -1, g = -1, b = -1;
+		int r = 0, g = 0, b = 0;
 		double x = -1, y = -1, z = -1;
 
 		for (int i = 0; i < vertexCount; i++) {
@@ -370,39 +371,33 @@ public class PlyCodec {
 					default -> throw new RuntimeException("Unsupported");
 				}
 				switch (d.var) {
-					case X:
-						x = F64;
-						break;
-					case Y:
-						y = F64;
-						break;
-					case Z:
-						z = F64;
-						break;
-					case R:
-						r = I32;
-						break;
-					case G:
-						g = I32;
-						break;
-					case B:
-						b = I32;
-						break;
-					default:
-						break;
+					case X -> x = F64;
+					case Y -> y = F64;
+					case Z -> z = F64;
+					case R -> r = I32;
+					case G -> g = I32;
+					case B -> b = I32;
+					default -> {}
 				}
 			}
-			if (rgb) {
-				output.add(x, y, z, r << 16 | g << 8 | b);
-			} else {
-				output.add(x, y, z, 0x0);
-			}
+			output.addVertex(x, y, z, r << 16 | g << 8 | b);
+		}
+
+		for (int i = 0; i < triangleCount; i++) {
+			String line = readNextPly(reader, true, buffer);
+			String[] words = line.split("\\s+");
+			int n = Integer.parseInt(words[0]);
+			if (n != 3)
+				throw new RuntimeException("Expected 3 indexes for triangles not " + n);
+			output.addTriangle(Integer.parseInt(words[1]),
+					Integer.parseInt(words[2]),
+					Integer.parseInt(words[3]));
 		}
 	}
 
-	private static void readBinary( PointCloudWriter output, InputStream reader, List<DataWord> dataWords,
-									ByteOrder order,
-									int vertexCount, boolean rgb ) throws IOException {
+	private static void readCloudBinary( PlyReader output, InputStream reader, List<DataWord> dataWords,
+										 ByteOrder order,
+										 int vertexCount, boolean rgb, int triangleCount ) throws IOException {
 
 		int totalBytes = 0;
 		for (int i = 0; i < dataWords.size(); i++) {
@@ -443,35 +438,80 @@ public class PlyCodec {
 				}
 				location += d.data.size;
 				switch (d.var) {
-					case X:
-						x = F64;
-						break;
-					case Y:
-						y = F64;
-						break;
-					case Z:
-						z = F64;
-						break;
-					case R:
-						r = I32;
-						break;
-					case G:
-						g = I32;
-						break;
-					case B:
-						b = I32;
-						break;
-					default:
-						break;
+					case X -> x = F64;
+					case Y -> y = F64;
+					case Z -> z = F64;
+					case R -> r = I32;
+					case G -> g = I32;
+					case B -> b = I32;
+					default -> {}
 				}
 			}
 
-			if (rgb) {
-				output.add(x, y, z, r << 16 | g << 8 | b);
-			} else {
-				output.add(x, y, z, 0x0);
-			}
+			output.addVertex(x, y, z, r << 16 | g << 8 | b);
 		}
+
+		final byte[] lineTriangle = new byte[1 + 4*3];
+		for (int i = 0; i < triangleCount; i++) {
+			int found = reader.read(line);
+			if (line.length != found)
+				throw new IOException("Read unexpected number of bytes. " + found + " vs " + line.length);
+
+			int count = bb.get(0);
+			if (count != 3)
+				throw new RuntimeException("Expected 3 values for a triangle not " + count);
+			int idx0 = bb.getInt(1);
+			int idx1 = bb.getInt(5);
+			int idx2 = bb.getInt(9);
+
+			output.addTriangle(idx0, idx1, idx2);
+		}
+	}
+
+	private static PlyWriter wrapMeshForWriting( VertexMesh mesh, @Nullable DogArray_I32 colorRGB ) {
+		return new PlyWriter() {
+			@Override public int getVertexCount() {return mesh.vertexes.size();}
+
+			@Override public int getTriangleCount() {return mesh.triangles.size/3;}
+
+			@Override public boolean isColor() {return colorRGB != null;}
+
+			@Override public void getVertex( int which, Point3D_F64 vertex ) {mesh.vertexes.getCopy(which, vertex);}
+
+			@SuppressWarnings("NullAway")
+			@Override public int getColor( int which ) {return colorRGB.get(which);}
+
+			@Override public void getTriangle( int which, int[] indexes ) {
+				int i = which*3;
+				indexes[0] = mesh.triangles.get(i++);
+				indexes[1] = mesh.triangles.get(i++);
+				indexes[2] = mesh.triangles.get(i);
+			}
+		};
+	}
+
+	private static PlyWriter wrapCloudForWriting( PointCloudReader cloud, boolean saveRgb ) {
+		return new PlyWriter() {
+			@Override public int getVertexCount() {return cloud.size();}
+
+			@Override public int getTriangleCount() {return 0;}
+
+			@Override public boolean isColor() {return saveRgb;}
+
+			@Override public void getVertex( int which, Point3D_F64 vertex ) {cloud.get(which, vertex);}
+
+			@Override public int getColor( int which ) {return cloud.getRGB(which);}
+
+			@Override public void getTriangle( int which, int[] indexes ) {}
+		};
+	}
+
+	private static class Header {
+		List<DataWord> dataWords = new ArrayList<>();
+		int vertexCount = -1;
+		int triangleCount = -1;
+		boolean rgb = false;
+		Format format = Format.ASCII;
 	}
 
 	private static class DataWord {

@@ -34,20 +34,8 @@ import java.util.List;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 
-/**
- * @author Peter Abeles
- */
 class TestPlyCodec extends BoofStandardJUnit {
-	@Test void encode_decode_mesh_ascii() throws IOException {
-		fail("Implement");
-	}
-
-	@Test void encode_decode_mesh_binary() throws IOException {
-		fail("Implement");
-	}
-	
 	@Test void encode_decode_3D_ascii() throws IOException {
 		List<Point3D_F64> expected = new ArrayList<>();
 		for (int i = 0; i < 10; i++) {
@@ -59,7 +47,7 @@ class TestPlyCodec extends BoofStandardJUnit {
 		Writer output = new StringWriter();
 		PlyCodec.saveCloudAscii(PointCloudReader.wrapF64(expected), false, output);
 		InputStream input = new ByteArrayInputStream(output.toString().getBytes(UTF_8));
-		PlyCodec.read(input, PointCloudWriter.wrapF64(found));
+		PlyCodec.readCloud(input, PointCloudWriter.wrapF64(found));
 
 		assertEquals(expected.size(), found.size);
 		for (int i = 0; i < found.size; i++) {
@@ -84,7 +72,7 @@ class TestPlyCodec extends BoofStandardJUnit {
 		Writer output = new StringWriter();
 		PlyCodec.saveCloudAscii(PointCloudReader.wrapF64RGB(expected), true, output);
 		InputStream input = new ByteArrayInputStream(output.toString().getBytes(UTF_8));
-		PlyCodec.read(input, PointCloudWriter.wrapF64RGB(found));
+		PlyCodec.readCloud(input, PointCloudWriter.wrapF64RGB(found));
 
 		assertEquals(expected.size(), found.size);
 		for (int i = 0; i < found.size; i++) {
@@ -104,7 +92,7 @@ class TestPlyCodec extends BoofStandardJUnit {
 			ByteArrayOutputStream output = new ByteArrayOutputStream();
 			PlyCodec.saveCloudBinary(PointCloudReader.wrapF64(expected), ByteOrder.BIG_ENDIAN, false, asFloat, output);
 			ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
-			PlyCodec.read(input, PointCloudWriter.wrapF64(found));
+			PlyCodec.readCloud(input, PointCloudWriter.wrapF64(found));
 
 			assertEquals(expected.size(), found.size);
 			double tol = asFloat ? UtilEjml.TEST_F32 : UtilEjml.TEST_F64;
@@ -132,7 +120,7 @@ class TestPlyCodec extends BoofStandardJUnit {
 			ByteArrayOutputStream output = new ByteArrayOutputStream();
 			PlyCodec.saveCloudBinary(PointCloudReader.wrapF64RGB(expected), ByteOrder.BIG_ENDIAN, false, asFloat, output);
 			ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
-			PlyCodec.read(input, PointCloudWriter.wrapF64RGB(found));
+			PlyCodec.readCloud(input, PointCloudWriter.wrapF64RGB(found));
 
 			assertEquals(expected.size(), found.size);
 			double tol = asFloat ? UtilEjml.TEST_F32 : UtilEjml.TEST_F64;
