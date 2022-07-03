@@ -42,7 +42,7 @@ import java.util.List;
  */
 public class PlyCodec {
 	public static void saveAscii( PlyWriter data, Writer outputWriter ) throws IOException {
-		writeAsciiHeader(data.getVertexCount(), data.getTriangleCount(), data.isColor(), outputWriter);
+		writeAsciiHeader(data.getVertexCount(), data.getPolygonCount(), data.isColor(), outputWriter);
 
 		boolean color = data.isColor();
 
@@ -59,10 +59,14 @@ public class PlyCodec {
 				outputWriter.write(String.format("%f %f %f\n", p.x, p.y, p.z));
 			}
 		}
-		int[] indexes = new int[3];
-		for (int i = 0; i < data.getTriangleCount(); i++) {
-			data.getTriangle(i, indexes);
-			outputWriter.write(String.format("3 %d %d %d\n", indexes[0], indexes[1], indexes[2]));
+		int[] indexes = new int[100];
+		for (int i = 0; i < data.getPolygonCount(); i++) {
+			int size = data.getIndexes(i, indexes);
+			outputWriter.write(size);
+			for (int idxidx = 0; idxidx < size; idxidx++) {
+				outputWriter.write(" " + indexes[idxidx]);
+			}
+			outputWriter.write('\n');
 		}
 		outputWriter.flush();
 	}
@@ -130,7 +134,7 @@ public class PlyCodec {
 			throws IOException {
 		String format = "UTF-8";
 		int dataLength = saveAsFloat ? 4 : 8;
-		writeBinaryHeader(data.getVertexCount(), data.getTriangleCount(), data.isColor(), saveAsFloat, format, outputWriter);
+		writeBinaryHeader(data.getVertexCount(), data.getPolygonCount(), data.isColor(), saveAsFloat, format, outputWriter);
 
 		boolean color = data.isColor();
 
@@ -162,16 +166,16 @@ public class PlyCodec {
 			outputWriter.write(bytes.array());
 		}
 
-		bytes = ByteBuffer.allocate(1 + 3*4);
-		int[] indexes = new int[3];
-		for (int i = 0; i < data.getTriangleCount(); i++) {
-			data.getTriangle(i, indexes);
+		int[] indexes = new int[100];
+		bytes = ByteBuffer.allocate(1 + indexes.length*4);
+		for (int i = 0; i < data.getPolygonCount(); i++) {
+			int size = data.getIndexes(i, indexes);
 			bytes.position(0);
-			bytes.put((byte)3);
-			bytes.putInt(indexes[0]);
-			bytes.putInt(indexes[1]);
-			bytes.putInt(indexes[2]);
-			outputWriter.write(bytes.array());
+			bytes.put((byte)size);
+			for (int idx = 0; idx < indexes.length; idx++) {
+				bytes.putInt(indexes[idx]);
+			}
+			outputWriter.write(bytes.array(), 0, 1 + 4*size);
 		}
 		outputWriter.flush();
 	}
@@ -295,7 +299,7 @@ public class PlyCodec {
 				output.add(x, y, z, rgb);
 			}
 
-			@Override public void addTriangle( int idx0, int idx1, int idx2 ) {}
+			@Override public void addPolygon( int[] indexes, int offset, int length ) {}
 		});
 	}
 
@@ -304,9 +308,9 @@ public class PlyCodec {
 			@Override public void initialize( int vertexes, int triangles, boolean color ) {
 				colorRGB.reset();
 				mesh.vertexes.reset();
-				mesh.triangles.reset();
+				mesh.indexes.reset();
 				mesh.vertexes.reserve(vertexes);
-				mesh.triangles.reserve(triangles*3);
+				mesh.indexes.reserve(triangles*3);
 			}
 
 			@Override public void addVertex( double x, double y, double z, int rgb ) {
@@ -314,10 +318,9 @@ public class PlyCodec {
 				colorRGB.add(rgb);
 			}
 
-			@Override public void addTriangle( int idx0, int idx1, int idx2 ) {
-				mesh.triangles.add(idx0);
-				mesh.triangles.add(idx1);
-				mesh.triangles.add(idx2);
+			@Override public void addPolygon( int[] indexes, int offset, int length ) {
+				mesh.offsets.add(length);
+				mesh.indexes.addAll(indexes, offset, offset + length);
 			}
 		});
 	}
@@ -377,21 +380,26 @@ public class PlyCodec {
 					case R -> r = I32;
 					case G -> g = I32;
 					case B -> b = I32;
-					default -> {}
+					default -> {
+					}
 				}
 			}
 			output.addVertex(x, y, z, r << 16 | g << 8 | b);
 		}
 
+		int[] indexes = new int[100];
 		for (int i = 0; i < triangleCount; i++) {
 			String line = readNextPly(reader, true, buffer);
 			String[] words = line.split("\\s+");
 			int n = Integer.parseInt(words[0]);
-			if (n != 3)
-				throw new RuntimeException("Expected 3 indexes for triangles not " + n);
-			output.addTriangle(Integer.parseInt(words[1]),
-					Integer.parseInt(words[2]),
-					Integer.parseInt(words[3]));
+			if (words.length != n + 1) {
+				throw new RuntimeException("Unexpected number of words.");
+			}
+			for (int wordIdx = 1; wordIdx <= n; wordIdx++) {
+				indexes[wordIdx - 1] = Integer.parseInt(words[i]);
+			}
+
+			output.addPolygon(indexes, 0, n);
 		}
 	}
 
@@ -444,27 +452,27 @@ public class PlyCodec {
 					case R -> r = I32;
 					case G -> g = I32;
 					case B -> b = I32;
-					default -> {}
+					default -> {
+					}
 				}
 			}
 
 			output.addVertex(x, y, z, r << 16 | g << 8 | b);
 		}
 
-		final byte[] lineTriangle = new byte[1 + 4*3];
+		int[] indexes = new int[100];
 		for (int i = 0; i < triangleCount; i++) {
 			int found = reader.read(line);
 			if (line.length != found)
 				throw new IOException("Read unexpected number of bytes. " + found + " vs " + line.length);
 
 			int count = bb.get(0);
-			if (count != 3)
-				throw new RuntimeException("Expected 3 values for a triangle not " + count);
-			int idx0 = bb.getInt(1);
-			int idx1 = bb.getInt(5);
-			int idx2 = bb.getInt(9);
 
-			output.addTriangle(idx0, idx1, idx2);
+			for (int wordIndex = 0; wordIndex < count; wordIndex++) {
+				indexes[wordIndex] = bb.getInt(1 + wordIndex*4);
+			}
+
+			output.addPolygon(indexes, 0, count);
 		}
 	}
 
@@ -472,7 +480,7 @@ public class PlyCodec {
 		return new PlyWriter() {
 			@Override public int getVertexCount() {return mesh.vertexes.size();}
 
-			@Override public int getTriangleCount() {return mesh.triangles.size/3;}
+			@Override public int getPolygonCount() {return mesh.offsets.size - 1;}
 
 			@Override public boolean isColor() {return colorRGB != null;}
 
@@ -481,11 +489,15 @@ public class PlyCodec {
 			@SuppressWarnings("NullAway")
 			@Override public int getColor( int which ) {return colorRGB.get(which);}
 
-			@Override public void getTriangle( int which, int[] indexes ) {
-				int i = which*3;
-				indexes[0] = mesh.triangles.get(i++);
-				indexes[1] = mesh.triangles.get(i++);
-				indexes[2] = mesh.triangles.get(i);
+			@Override public int getIndexes( int which, int[] indexes ) {
+				int idx0 = mesh.offsets.get(which);
+				int idx1 = mesh.offsets.get(which + 1);
+
+				for (int i = idx0; i < idx1; i++) {
+					indexes[i - idx0] = mesh.indexes.get(i);
+				}
+
+				return idx1 - idx0;
 			}
 		};
 	}
@@ -494,7 +506,7 @@ public class PlyCodec {
 		return new PlyWriter() {
 			@Override public int getVertexCount() {return cloud.size();}
 
-			@Override public int getTriangleCount() {return 0;}
+			@Override public int getPolygonCount() {return 0;}
 
 			@Override public boolean isColor() {return saveRgb;}
 
@@ -502,7 +514,7 @@ public class PlyCodec {
 
 			@Override public int getColor( int which ) {return cloud.getRGB(which);}
 
-			@Override public void getTriangle( int which, int[] indexes ) {}
+			@Override public int getIndexes( int which, int[] indexes ) {return 0;}
 		};
 	}
 

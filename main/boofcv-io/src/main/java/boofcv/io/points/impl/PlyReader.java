@@ -28,5 +28,5 @@ public interface PlyReader {
 
 	void addVertex( double x, double y, double z, int rgb );
 
-	void addTriangle( int idx0, int idx1, int idx2 );
+	void addPolygon( int[] indexes, int offset, int length );
 }
