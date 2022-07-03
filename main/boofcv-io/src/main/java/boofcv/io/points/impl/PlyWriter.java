@@ -28,13 +28,20 @@ import georegression.struct.point.Point3D_F64;
 public interface PlyWriter {
 	int getVertexCount();
 
-	int getTriangleCount();
+	int getPolygonCount();
 
+	/** True if a vertex has color information or not */
 	boolean isColor();
 
 	void getVertex( int which, Point3D_F64 vertex );
 
+	/**
+	 * Color of a vertex
+	 */
 	int getColor( int which );
 
-	void getTriangle( int which, int[] indexes );
+	/**
+	 * Get the indexes of each vertex in the polygon. Returns the number of vertexes.
+	 */
+	int getIndexes( int which, int[] indexes );
 }

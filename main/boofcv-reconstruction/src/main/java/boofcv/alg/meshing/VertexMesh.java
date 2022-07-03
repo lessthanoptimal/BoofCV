@@ -30,17 +30,23 @@ public class VertexMesh {
 	/** 3D location of each vertex */
 	public final PackedBigArrayPoint3D_F64 vertexes = new PackedBigArrayPoint3D_F64(10);
 
-	/** Which indexes correspond to each vertex */
-	public final DogArray_I32 triangles = new DogArray_I32();
+	/** Which indexes correspond to each vertex in a shape*/
+	public final DogArray_I32 indexes = new DogArray_I32();
+
+	/** Start index of each shape + the last index */
+	public final DogArray_I32 offsets = new DogArray_I32();
 
 	public VertexMesh setTo( VertexMesh src ) {
 		this.vertexes.setTo(src.vertexes);
-		this.triangles.setTo(src.triangles);
+		this.indexes.setTo(src.indexes);
+		this.offsets.setTo(src.offsets);
 		return this;
 	}
 
 	public void reset() {
 		vertexes.reset();
-		triangles.reset();
+		indexes.reset();
+		offsets.reset();
+		offsets.add(0);
 	}
 }

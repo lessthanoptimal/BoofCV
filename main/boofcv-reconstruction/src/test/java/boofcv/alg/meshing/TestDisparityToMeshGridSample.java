@@ -25,13 +25,11 @@ import boofcv.struct.image.GrayF32;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.se.SpecialEuclideanOps_F64;
-import org.ddogleg.struct.DogArray;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class TestDisparityToMeshNaive extends BoofStandardJUnit {
+class TestDisparityToMeshGridSample extends BoofStandardJUnit {
 	/**
 	 * Very basic test that checks to see if it can detect the object inside and now blow up
 	 */
@@ -55,13 +53,13 @@ class TestDisparityToMeshNaive extends BoofStandardJUnit {
 		GrayF32 disparity = depth.createSameShape();
 		depthToDisparityImage(pinhole, param, depth, disparity);
 
-		var alg = new DisparityToMeshNaive();
+		var alg = new DisparityToMeshGridSample();
 		alg.process(param, disparity);
-		DogArray<VertexMesh> found = alg.getMeshes();
+		VertexMesh found = alg.getMesh();
 
-		assertEquals(1, found.size);
-		VertexMesh mesh = found.get(0);
-		assertTrue(mesh.vertexes.size() >= 4);
+		assertTrue(found.vertexes.size() >= 4);
+		assertTrue(found.indexes.size() >= 4);
+		assertTrue(found.offsets.size() >= 1);
 	}
 
 	private void depthToDisparityImage( CameraPinhole pinhole, DisparityParameters param, GrayF32 depth, GrayF32 disparity ) {
