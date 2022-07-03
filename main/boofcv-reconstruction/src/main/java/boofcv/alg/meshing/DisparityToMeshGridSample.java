@@ -99,17 +99,17 @@ public class DisparityToMeshGridSample {
 
 				// Create two triangles
 				int idx = mesh.vertexes.size();
-				mesh.vertexes.append(p3);
-				mesh.vertexes.append(p2);
-				mesh.vertexes.append(p1);
 				mesh.vertexes.append(p0);
+				mesh.vertexes.append(p1);
+				mesh.vertexes.append(p2);
+				mesh.vertexes.append(p3);
 
-				mesh.triangles.add(idx);
+				mesh.triangles.add(idx + 2);
 				mesh.triangles.add(idx + 1);
+				mesh.triangles.add(idx);
+				mesh.triangles.add(idx + 3);
 				mesh.triangles.add(idx + 2);
 				mesh.triangles.add(idx);
-				mesh.triangles.add(idx + 2);
-				mesh.triangles.add(idx + 3);
 			}
 		}
 	}

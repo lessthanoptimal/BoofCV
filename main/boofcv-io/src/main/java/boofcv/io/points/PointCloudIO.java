@@ -125,7 +125,7 @@ public class PointCloudIO {
 	 */
 	public static void load( Format format, InputStream input, PointCloudWriter output ) throws IOException {
 		switch (format) {
-			case PLY -> PlyCodec.read(input, output);
+			case PLY -> PlyCodec.readCloud(input, output);
 		}
 	}
 
