@@ -164,6 +164,9 @@ public class PointCloudViewerPanelSwing extends JPanel
 
 			@Override
 			public void focusLost( FocusEvent e ) {
+				// clear these buttons to avoid annoying situation where they are locked
+				shiftPressed = false;
+				controlPressed = false;
 				KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(keyboard);
 				Objects.requireNonNull(pressedTask).shutdown();
 				pressedTask = null;
@@ -506,7 +509,6 @@ public class PointCloudViewerPanelSwing extends JPanel
 	private final Set<Integer> pressed = new HashSet<>();
 
 	private class Keyboard implements KeyEventDispatcher {
-
 		@Override
 		public boolean dispatchKeyEvent( KeyEvent e ) {
 			lockPressed.lock();
