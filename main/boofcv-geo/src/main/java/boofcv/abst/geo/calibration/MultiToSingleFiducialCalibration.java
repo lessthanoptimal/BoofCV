@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -67,7 +67,7 @@ public class MultiToSingleFiducialCalibration implements DetectSingleFiducialCal
 
 	@Override public CalibrationObservation getDetectedPoints() {
 		if (detectedID == -1)
-			return new CalibrationObservation(width, height);
+			return new CalibrationObservation();
 
 		return multi.getDetectedPoints(detectedID);
 	}

@@ -31,6 +31,7 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageDimension;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -110,8 +111,8 @@ public class ExampleCalibrateStereo {
 	 */
 	public void process() {
 		// Declare and setup the calibration algorithm
-		var calibratorAlg = new CalibrateStereoPlanar(detector.getLayout());
-		calibratorAlg.configure(/*zero skew*/true, /* radial */4, /* tangential */false);
+		var calibrator = new CalibrateStereoPlanar(detector.getLayout());
+		calibrator.configure(/*zero skew*/true, /* radial */4, /* tangential */false);
 
 		// Uncomment to print more information to stdout
 //		calibratorAlg.setVerbose(System.out,null);
@@ -128,6 +129,12 @@ public class ExampleCalibrateStereo {
 			GrayF32 imageLeft = ConvertBufferedImage.convertFrom(l, (GrayF32)null);
 			GrayF32 imageRight = ConvertBufferedImage.convertFrom(r, (GrayF32)null);
 
+			if (i == 0) {
+				// Initialize the system once we know the image size
+				calibrator.initialize(new ImageDimension(imageLeft.width, imageLeft.height),
+						new ImageDimension(imageRight.width, imageRight.height));
+			}
+
 			CalibrationObservation calibLeft, calibRight;
 			if (!detector.process(imageLeft)) {
 				System.out.println("Failed to detect target in " + left.get(i));
@@ -140,15 +147,15 @@ public class ExampleCalibrateStereo {
 			}
 			calibRight = detector.getDetectedPoints();
 
-			calibratorAlg.addPair(calibLeft, calibRight);
+			calibrator.addPair(calibLeft, calibRight);
 			usedImages.add(left.get(i));
 		}
 
 		// Process and compute calibration parameters
-		StereoParameters stereoCalib = calibratorAlg.process();
+		StereoParameters stereoCalib = calibrator.process();
 
 		// print out information on its accuracy and errors
-		calibratorAlg.computeQualityText(usedImages);
+		calibrator.computeQualityText(usedImages);
 
 		// save results to a file and print out
 		CalibrationIO.save(stereoCalib, "stereo.yaml");

@@ -65,8 +65,8 @@ public class TestCalibrateMonoPlanar extends BoofStandardJUnit {
 	 * estimate the camera parameters.
 	 */
 	@Test void fullBasic() {
-
-		CalibrateMonoPlanar alg = new CalibrateMonoPlanar(layout);
+		var alg = new CalibrateMonoPlanar();
+		alg.initialize(intrinsic.width, intrinsic.height, layout);
 //		alg.setVerbose(System.out,0);
 		alg.configurePinhole(true,2,true);
 
@@ -96,7 +96,7 @@ public class TestCalibrateMonoPlanar extends BoofStandardJUnit {
 
 	private CalibrationObservation createFakeObservations( int which ) {
 		Se3_F64 t2c = targetToCamera.get(which);
-		CalibrationObservation set = new CalibrationObservation(intrinsic.width,intrinsic.height);
+		var set = new CalibrationObservation();
 
 		for( int i = 0; i < layout.size(); i++ ) {
 			Point2D_F64 p2 = layout.get(i);

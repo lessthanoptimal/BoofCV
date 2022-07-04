@@ -38,6 +38,7 @@ import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageDimension;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
@@ -216,12 +217,10 @@ public class CameraCalibrationStereo {
 	void process() {
 		// Create detector and calibrator from configurations
 		DetectSingleFiducialCalibration detector = FactoryFiducialCalibration.genericSingle(configTarget);
-		CalibrateStereoPlanar calibrator = new CalibrateStereoPlanar(detector.getLayout());
+		var calibrator = new CalibrateStereoPlanar(detector.getLayout());
 		if (verboseDebug) {
 			calibrator.setVerbose(System.out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));
 		}
-
-		calibrator.configure(zeroSkew, numRadial, tangential);
 
 		// Load paths to images
 		String inputDir = null;
@@ -271,6 +270,9 @@ public class CameraCalibrationStereo {
 			BoofMiscOps.checkTrue(landmarksPath.mkdirs());
 		}
 
+		// Number of landmarks required. Update with a real value later on
+		int minLandmarks = Integer.MAX_VALUE;
+
 		List<String> leftNames = new ArrayList<>();
 		for (int frame = 0; frame < stereoImages.size(); frame++) {
 			stereoImages.setSelected(frame);
@@ -279,20 +281,28 @@ public class CameraCalibrationStereo {
 			BufferedImage buffLeft = stereoImages.loadLeft();
 			BufferedImage buffRight = stereoImages.loadRight();
 
+			if (frame == 0) {
+				// Initialize now that we know the image size
+				calibrator.initialize(new ImageDimension(buffLeft.getWidth(), buffLeft.getHeight()),
+						new ImageDimension(buffRight.getWidth(), buffRight.getHeight()));
+				calibrator.configure(zeroSkew, numRadial, tangential);
+				minLandmarks = calibrator.getCalibLeft().getZhang99().getMinimumObservedPoints();
+			}
+
 			CalibrationObservation calibLeft = detectLandmarks(detector, image, buffLeft);
 			CalibrationObservation calibRight = detectLandmarks(detector, image, buffRight);
 
 			// One image in the pair needs to be usable
-
-			if (calibLeft.size() > 4 || calibRight.size() > 4)
+			if (calibLeft.size() >= minLandmarks || calibRight.size() >= minLandmarks) {
 				calibrator.addPair(calibLeft, calibRight);
 
-			// Save landmarks to disk if configured to do so
-			if (saveLandmarks) {
-				String leftName = stereoImages.getLeftName();
-				String rightName = stereoImages.getRightName();
-				CalibrationIO.saveLandmarksCsv(leftName, detectorName, calibLeft, new File(landmarksPath, leftName + ".csv"));
-				CalibrationIO.saveLandmarksCsv(rightName, detectorName, calibLeft, new File(landmarksPath, rightName + ".csv"));
+				// Save landmarks to disk if configured to do so
+				if (saveLandmarks) {
+					String leftName = stereoImages.getLeftName();
+					String rightName = stereoImages.getRightName();
+					CalibrationIO.saveLandmarksCsv(leftName, detectorName, calibLeft, new File(landmarksPath, leftName + ".csv"));
+					CalibrationIO.saveLandmarksCsv(rightName, detectorName, calibLeft, new File(landmarksPath, rightName + ".csv"));
+				}
 			}
 
 			if (verbose && frame%30 == 29)

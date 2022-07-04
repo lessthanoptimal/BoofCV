@@ -69,7 +69,7 @@ public class CalibrationDetectorSquareGrid implements DetectSingleFiducialCalibr
 
 	@Override
 	public boolean process( GrayF32 input ) {
-		detected = new CalibrationObservation(input.width, input.height);
+		detected = new CalibrationObservation();
 		if (detector.process(input)) {
 			List<PointIndex2D_F64> found = detector.getCalibrationPoints();
 			for (int i = 0; i < found.size(); i++) {

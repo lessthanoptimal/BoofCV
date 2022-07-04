@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -336,6 +336,13 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 	@Override
 	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
 		this.verbose = BoofMiscOps.addPrefix(this, out);
+	}
+
+	/**
+	 * Minimum number of calibration points in a single target that must be observed for it to process the image
+	 */
+	public int getMinimumObservedPoints() {
+		return Zhang99ComputeTargetHomography.MINIMUM_POINTS;
 	}
 
 	public interface Listener {

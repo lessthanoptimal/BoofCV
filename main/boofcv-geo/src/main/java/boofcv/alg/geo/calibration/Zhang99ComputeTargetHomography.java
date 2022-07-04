@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,7 @@ import org.ejml.data.DMatrixRMaj;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * <p>
@@ -42,6 +43,8 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class Zhang99ComputeTargetHomography {
+	/** Minimum number of points requires to process an image */
+	public static int MINIMUM_POINTS = 4;
 
 	private final Estimate1ofEpipolar computeHomography = FactoryMultiView.homographyDLT(true);
 	private final DMatrixRMaj found = new DMatrixRMaj(3, 3);
@@ -51,7 +54,7 @@ public class Zhang99ComputeTargetHomography {
 	List<Point2D_F64> worldPoints;
 
 	public Zhang99ComputeTargetHomography( List<Point2D_F64> worldPoints ) {
-		this.worldPoints = worldPoints;
+		this.worldPoints = Objects.requireNonNull(worldPoints);
 	}
 
 	/**
@@ -63,7 +66,7 @@ public class Zhang99ComputeTargetHomography {
 	 * @return True if it computed a Homography and false if it failed to compute a homography matrix.
 	 */
 	public boolean computeHomography( CalibrationObservation observedPoints ) {
-		if (observedPoints.size() < 4)
+		if (observedPoints.size() < MINIMUM_POINTS)
 			throw new IllegalArgumentException("At least 4 points needed in each set of observations. " +
 					" Filter these first please");
 

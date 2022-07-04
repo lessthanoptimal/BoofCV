@@ -73,8 +73,8 @@ public class TestCalibrateStereoPlanar extends BoofStandardJUnit {
 	 * estimate the camera parameters.
 	 */
 	@Test void fullBasic() {
-
-		CalibrateStereoPlanar alg = new CalibrateStereoPlanar(layout);
+		var alg = new CalibrateStereoPlanar(layout);
+		alg.initialize(intrinsic.getDimension(null), intrinsic.getDimension(null));
 		alg.configure(true, 2, true);
 
 		for (int i = 0; i < targetToLeft.size(); i++) {
@@ -120,7 +120,7 @@ public class TestCalibrateStereoPlanar extends BoofStandardJUnit {
 			t2l.concat(leftToRight,t2c);
 		}
 
-		CalibrationObservation set = new CalibrationObservation(intrinsic.width,intrinsic.height);
+		var set = new CalibrationObservation();
 
 		for( int i = 0; i < layout.size(); i++ ) {
 			Point2D_F64 p2 = layout.get(i);

@@ -79,10 +79,10 @@ public class ExampleCalibrateMonocular {
 		images = UtilIO.listByPrefix(UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess"), "left", null);
 
 		// Declare and setup the calibration algorithm
-		CalibrateMonoPlanar calibrationAlg = new CalibrateMonoPlanar(detector.getLayout());
+		var calibrator = new CalibrateMonoPlanar();
 
 		// tell it type type of target and which intrinsic parameters to estimate
-		calibrationAlg.configurePinhole(
+		calibrator.configurePinhole(
 				/*assumeZeroSkew*/ true,
 				/*numRadialParam*/ 2,
 				/*includeTangential*/ false);
@@ -92,19 +92,23 @@ public class ExampleCalibrateMonocular {
 			BufferedImage input = UtilImageIO.loadImageNotNull(n);
 			GrayF32 image = ConvertBufferedImage.convertFrom(input, (GrayF32)null);
 			if (detector.process(image)) {
-				calibrationAlg.addImage(detector.getDetectedPoints().copy());
+				// Need to tell it the image shape and the layout once
+				if (usedImages.isEmpty())
+					calibrator.initialize(image.getWidth(), image.getHeight(), detector.getLayout());
+
+				calibrator.addImage(detector.getDetectedPoints().copy());
 				usedImages.add(n);
 			} else {
 				System.err.println("Failed to detect target in " + n);
 			}
 		}
 		// process and compute intrinsic parameters
-		CameraPinholeBrown intrinsic = calibrationAlg.process();
+		CameraPinholeBrown intrinsic = calibrator.process();
 
 		// save results to a file and print out
 		CalibrationIO.save(intrinsic, "intrinsic.yaml");
 
-		System.out.println(calibrationAlg.computeQualityText(usedImages));
+		System.out.println(calibrator.computeQualityText(usedImages));
 		System.out.println();
 		System.out.println("--- Intrinsic Parameters ---");
 		System.out.println();

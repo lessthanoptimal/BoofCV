@@ -72,7 +72,7 @@ public class CalibrationDetectorChessboardX implements DetectSingleFiducialCalib
 		DogArray<GridInfo> found = detectorX.getFoundChessboard();
 
 		if (found.size >= 1) {
-			detected = new CalibrationObservation(input.width, input.height);
+			detected = new CalibrationObservation();
 			GridInfo info = found.get(0);
 
 			for (int i = 0; i < info.nodes.size(); i++) {
@@ -89,7 +89,7 @@ public class CalibrationDetectorChessboardX implements DetectSingleFiducialCalib
 
 			return true;
 		} else {
-			detected = new CalibrationObservation(input.width, input.height);
+			detected = new CalibrationObservation();
 			return false;
 		}
 	}

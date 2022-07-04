@@ -21,7 +21,6 @@ package boofcv.alg.geo.calibration;
 import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.struct.point.Point2D_F64;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,28 +34,16 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class CalibrationObservation {
-
-	/**
-	 * Shape of the image in which observations were created from. Use to configure intrinsics and sanity checks
-	 */
-	@Getter @Setter public int width, height;
-
 	/**
 	 * List of pixel observations and the index of the control point
 	 */
 	@Getter public List<PointIndex2D_F64> points = new ArrayList<>();
 
-	public CalibrationObservation( int width, int height ) {
-		this.width = width;
-		this.height = height;
-	}
 
 	public CalibrationObservation() {}
 
 	public void setTo( CalibrationObservation obs ) {
 		reset();
-		this.width = obs.width;
-		this.height = obs.height;
 		for (int i = 0; i < obs.size(); i++) {
 			PointIndex2D_F64 p = obs.points.get(i);
 			points.add(p.copy());
@@ -83,8 +70,6 @@ public class CalibrationObservation {
 
 	public void reset() {
 		points.clear();
-		this.width = 0;
-		this.height = 0;
 	}
 
 	/**

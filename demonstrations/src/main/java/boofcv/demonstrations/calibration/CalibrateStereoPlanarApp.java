@@ -46,6 +46,7 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.misc.VariableLockSet;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageDimension;
 import georegression.struct.se.Se3_F64;
 import lombok.Getter;
 import org.apache.commons.io.FilenameUtils;
@@ -499,7 +500,7 @@ public class CalibrateStereoPlanarApp extends JPanel {
 		algorithms.lock();
 		results.lock();
 		try {
-			algorithms.calibrator.reset();
+			algorithms.calibrator.initialize(algorithms.shapeLeft, algorithms.shapeRight);
 			for (int imageIdx = 0; imageIdx < results.namesLeft.size(); imageIdx++) {
 				String imageName = results.namesLeft.get(imageIdx);
 				if (!results.used.get(imageIdx))
@@ -561,6 +562,8 @@ public class CalibrateStereoPlanarApp extends JPanel {
 		results.reset();
 
 		GrayF32 image = new GrayF32(1, 1);
+		var shapeLeft = new ImageDimension(-1, -1);
+		var shapeRight = new ImageDimension(-1, -1);
 		for (int imageIdx = 0; imageIdx < numStereoPairs; imageIdx++) {
 			CalibrationObservation calibLeft, calibRight;
 			BufferedImage buffLeft, buffRight;
@@ -575,12 +578,26 @@ public class CalibrateStereoPlanarApp extends JPanel {
 				imageRight = inputImages.getRightName();
 				// we use the left image to identify the stereo pair
 			}
+
+			// Check the shape to make sure it's consistent
+			if (shapeLeft.width == -1) {
+				shapeLeft.setTo(buffLeft.getWidth(), buffLeft.getHeight());
+				shapeRight.setTo(buffRight.getWidth(), buffRight.getHeight());
+			} else if (!shapeLeft.isIdentical(buffLeft.getWidth(), buffLeft.getHeight())) {
+				System.err.println("Unexpected shape in left image");
+				continue;
+			} else if (!shapeRight.isIdentical(buffRight.getWidth(), buffRight.getHeight())) {
+				System.err.println("Unexpected shape in right image");
+				continue;
+			}
+
 			// Detect calibration landmarks
 			ConvertBufferedImage.convertFrom(buffLeft, image);
 			calibLeft = algorithms.select(() -> {
 				algorithms.detector.process(image);
 				return algorithms.detector.getDetectedPoints();
 			});
+
 			// Order matters for visualization later on
 			Collections.sort(calibLeft.points, Comparator.comparingInt(a -> a.index));
 			// see if at least one view was able to use this target
@@ -611,6 +628,12 @@ public class CalibrateStereoPlanarApp extends JPanel {
 				imageListPanel.addImage(imageName, _used);
 			});
 		}
+
+		// Save shape of input images for future use
+		algorithms.safe(() -> {
+			algorithms.shapeLeft.setTo(shapeLeft);
+			algorithms.shapeRight.setTo(shapeRight);
+		});
 	}
 
 	/** Format statistics on results and add to a text panel */
@@ -974,6 +997,8 @@ public class CalibrateStereoPlanarApp extends JPanel {
 		protected CalibrateStereoPlanar calibrator;
 		protected boolean calibrationSuccess;
 		protected StereoParameters parameters;
+		protected ImageDimension shapeLeft = new ImageDimension();
+		protected ImageDimension shapeRight = new ImageDimension();
 	}
 
 	private static class ResultsLocked extends VariableLockSet {
