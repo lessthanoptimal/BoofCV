@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -80,10 +80,8 @@ public class CalibrationDetectorMultiECoCheck implements DetectMultiFiducialCali
 
 	@Override public CalibrationObservation getDetectedPoints( int detectionID ) {
 		FastAccess<PointIndex2D_F64> original = detector.getFound().get(detectionID).corners;
-		var found = new CalibrationObservation();
-		found.width = dimension.width;
-		found.height = dimension.height;
 
+		var found = new CalibrationObservation();
 		for (int i = 0; i < original.size; i++) {
 			found.points.add(original.get(i).copy());
 		}

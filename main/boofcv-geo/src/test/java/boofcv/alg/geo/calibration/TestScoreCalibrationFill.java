@@ -56,8 +56,6 @@ public class TestScoreCalibrationFill extends BoofStandardJUnit {
 		alg.initialize(imageWidth, imageHeight);
 
 		var obs = new CalibrationObservation();
-		obs.width = imageWidth;
-		obs.height = imageHeight;
 
 		// This will be in the middle and not on an edge
 		obs.add(0, 50, 56);
@@ -85,8 +83,6 @@ public class TestScoreCalibrationFill extends BoofStandardJUnit {
 		double N = alg.occupiedBorder.size;
 
 		var obs = new CalibrationObservation();
-		obs.width = imageWidth;
-		obs.height = imageHeight;
 
 		// Inside a border region
 		obs.add(0, 3, 3);
@@ -146,8 +142,6 @@ public class TestScoreCalibrationFill extends BoofStandardJUnit {
 
 		// Create an observation with a point in the center of each unoccupied region
 		var obs = new CalibrationObservation();
-		obs.width = imageWidth;
-		obs.height = imageHeight;
 		alg.updateUnoccupied();
 		alg.getUnoccupiedRegions().forIdx(( idx, r ) -> {
 			int x = (r.region.x0 + r.region.x1)/2;

@@ -23,6 +23,7 @@ import boofcv.abst.fiducial.calib.ConfigECoCheckMarkers;
 import boofcv.abst.geo.calibration.CalibrateMonoPlanar;
 import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
 import boofcv.alg.fiducial.calib.ConfigCalibrationTarget;
+import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.app.calib.AssistedCalibrationMono;
 import boofcv.app.calib.AssistedCalibrationMonoGui;
 import boofcv.demonstrations.calibration.CalibrateMonocularPlanarApp;
@@ -449,7 +450,7 @@ public class CameraCalibrationMono extends BaseStandardInputApp {
 		}
 
 		final DetectSingleFiducialCalibration detector = FactoryFiducialCalibration.genericSingle(configTarget);
-		final CalibrateMonoPlanar calibrationAlg = new CalibrateMonoPlanar(detector.getLayout());
+		final var calibrationAlg = new CalibrateMonoPlanar();
 
 		switch (modeType) {
 			case BROWN -> calibrationAlg.configurePinhole(zeroSkew, numRadial, tangential);
@@ -488,6 +489,7 @@ public class CameraCalibrationMono extends BaseStandardInputApp {
 		final List<File> imagesFailed = new ArrayList<>();
 		final List<String> usedNames = new ArrayList<>();
 
+		boolean firstImage = true;
 		for (String path : imagePath) {
 			File f = new File(path);
 			if (f.isDirectory() || f.isHidden())
@@ -502,6 +504,25 @@ public class CameraCalibrationMono extends BaseStandardInputApp {
 			GrayF32 image = ConvertBufferedImage.convertFrom(buffered, (GrayF32)null);
 
 			if (detector.process(image)) {
+				CalibrationObservation obs = detector.getDetectedPoints();
+				if (obs.size() < calibrationAlg.getZhang99().getMinimumObservedPoints()) {
+					if (verbose)
+						System.out.println("  Too few detected points to process. count=" + obs.size());
+					continue;
+				}
+
+				// need to pass in the layout and image size
+				if (firstImage) {
+					calibrationAlg.initialize(image.width, image.height, detector.getLayout());
+					firstImage = false;
+				}
+
+				if (!calibrationAlg.isExpectedShape(image.width, image.height)) {
+					if (verbose)
+						System.out.println("  Unexpected image shape!");
+					continue;
+				}
+
 				usedNames.add(f.getName());
 				imagesSuccess.add(f);
 				if (summaryDetection != null)
@@ -512,7 +533,8 @@ public class CameraCalibrationMono extends BaseStandardInputApp {
 							detector.getDetectedPoints(),
 							new File(outputDirectory, FilenameUtils.getBaseName(f.getName()) + ".csv"));
 				}
-				calibrationAlg.addImage(detector.getDetectedPoints());
+
+				calibrationAlg.addImage(obs);
 				if (verbose)
 					System.out.println("  Detection successful " + f.getPath());
 			} else {

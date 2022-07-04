@@ -95,7 +95,7 @@ public class CalibrationDetectorCircleHexagonalGrid implements DetectSingleFiduc
 
 	@Override
 	public boolean process( GrayF32 input ) {
-		results = new CalibrationObservation(input.width, input.height);
+		results = new CalibrationObservation();
 		detector.process(input);
 
 		List<Grid> grids = detector.getGrids();

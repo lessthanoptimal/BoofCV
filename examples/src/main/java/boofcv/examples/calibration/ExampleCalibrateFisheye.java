@@ -58,11 +58,11 @@ public class ExampleCalibrateFisheye {
 		List<String> images = UtilIO.listAll(UtilIO.pathExample("calibration/fisheye/chessboard"));
 
 		// Declare and setup the calibration algorithm
-		var calibrationAlg = new CalibrateMonoPlanar(detector.getLayout());
+		var calibrator = new CalibrateMonoPlanar();
 
 		// Specify the camera model to use. Here are a few examples.
 		//
-		calibrationAlg.configureUniversalOmni( /*zeroSkew*/ true, /*radial*/ 2, /*tangential*/ false);
+		calibrator.configureUniversalOmni( /*zeroSkew*/ true, /*radial*/ 2, /*tangential*/ false);
 		// it's also possible to fix the mirror offset parameter
 		// 0 = pinhole camera. 1 = fisheye
 //		calibrationAlg.configureUniversalOmni( /*zeroSkew*/ true, /*radial*/ 2, /*tangential*/ false, /*offset*/ 1.0);
@@ -76,19 +76,22 @@ public class ExampleCalibrateFisheye {
 				continue;
 			GrayF32 image = ConvertBufferedImage.convertFrom(input, (GrayF32)null);
 			if (detector.process(image)) {
-				calibrationAlg.addImage(detector.getDetectedPoints().copy());
+				// Need to tell it the image shape and the layout once
+				if (usedImages.isEmpty())
+					calibrator.initialize(image.getWidth(), image.getHeight(), detector.getLayout());
+				calibrator.addImage(detector.getDetectedPoints().copy());
 				usedImages.add(n);
 			} else {
 				System.err.println("Failed to detect target in " + n);
 			}
 		}
 		// process and compute intrinsic parameters
-		CameraModel intrinsic = calibrationAlg.process();
+		CameraModel intrinsic = calibrator.process();
 
 		// save results to a file and print out
 		CalibrationIO.save(intrinsic, "fisheye.yaml");
 
-		System.out.println(calibrationAlg.computeQualityText(usedImages));
+		System.out.println(calibrator.computeQualityText(usedImages));
 		System.out.println();
 		System.out.println("--- Intrinsic Parameters ---");
 		System.out.println();

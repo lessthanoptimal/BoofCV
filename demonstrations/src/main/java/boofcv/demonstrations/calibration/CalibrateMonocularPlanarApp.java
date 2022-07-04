@@ -53,6 +53,7 @@ import boofcv.struct.calib.CameraModelType;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageDimension;
 import lombok.Getter;
 import org.apache.commons.io.FilenameUtils;
 import org.ddogleg.struct.DogArray;
@@ -109,6 +110,8 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 
 	protected DetectorLocked detectorSet = new DetectorLocked();
 	protected ResultsLocked results = new ResultsLocked();
+	// shape of images it's processing
+	protected ImageDimension shape = new ImageDimension(-1, -1);
 
 	{
 		BoofSwingUtil.initializeSwing();
@@ -294,7 +297,7 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 		detectorSet.safe(() -> {
 			if (targetChanged)
 				detectorSet.detector = configurePanel.targetPanel.createSingleTargetDetector();
-			detectorSet.calibrator = new CalibrateMonoPlanar(detectorSet.detector.getLayout());
+			detectorSet.calibrator = new CalibrateMonoPlanar();
 			configurePanel.modelPanel.configureCalibrator(detectorSet.calibrator);
 		});
 
@@ -461,7 +464,8 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 		detectorSet.safe(() -> BoofSwingUtil.setVerboseWithDemoSettings(detectorSet.calibrator));
 
 		// Load and detect calibration targets
-		GrayF32 gray = new GrayF32(1, 1);
+		var gray = new GrayF32(1, 1);
+		shape.setTo(-1, -1);
 		for (String path : foundImages) {
 			BufferedImage buffered = UtilImageIO.loadImage(path);
 			if (buffered == null) {
@@ -471,6 +475,16 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 
 			// Convert to gray and detect the marker inside it
 			ConvertBufferedImage.convertFrom(buffered, gray);
+
+			if (shape.width == -1) {
+				shape.setTo(gray.width, gray.height);
+			} else {
+				if (!shape.isIdentical(gray.width, gray.height)) {
+					System.err.printf("Unexpected image shape. (%d %d) vs (%d %d)\n", gray.width, gray.height,
+							shape.width, shape.height);
+					continue;
+				}
+			}
 
 			detectorSet.lock();
 			boolean detected;
@@ -526,7 +540,8 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 		// by default assume the calibration will be unsuccessful
 		detectorSet.calibrationSuccess = false;
 		try {
-			detectorSet.calibrator.reset();
+			detectorSet.calibrator.initialize(shape.width, shape.height, detectorSet.detector.getLayout());
+
 			results.safe(() -> {
 				for (int usedIdx = 0; usedIdx < results.usedImages.size(); usedIdx++) {
 					String image = results.imagePaths.get(results.usedImages.get(usedIdx));

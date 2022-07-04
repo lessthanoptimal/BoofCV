@@ -37,8 +37,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class TestCalibrationIO extends BoofStandardJUnit {
 	@Test void landmarksCSV() {
 		var original = new CalibrationObservation();
-		original.width = 99;
-		original.height = 123;
 		original.add(-23, 1, 2);
 		original.add(-23, 5, 10.5);
 		original.add(-23, 3.11, -20.1);
@@ -48,8 +46,7 @@ public class TestCalibrationIO extends BoofStandardJUnit {
 
 		CalibrationObservation found = CalibrationIO.loadLandmarksCsv(new ByteArrayInputStream(stream.toByteArray()));
 
-		assertEquals(original.width, found.width);
-		assertEquals(original.height, found.height);
+
 		assertEquals(original.points.size(), found.points.size());
 		for (int i = 0; i < original.points.size(); i++) {
 			PointIndex2D_F64 o = original.get(i);

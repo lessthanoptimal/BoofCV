@@ -18,7 +18,6 @@
 
 package boofcv.alg.geo.calibration;
 
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ConfigLength;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Rectangle2D_I32;
@@ -96,9 +95,6 @@ public class ScoreCalibrationFill {
 	 * See if any observed calibration points hit a target. if so remove the target.
 	 */
 	public void addObservation( CalibrationObservation obs ) {
-		BoofMiscOps.checkTrue(obs.width == imageWidth && obs.height == imageHeight,
-				"Image width and height must match expected");
-
 		for (int obsIdx = 0; obsIdx < obs.size(); obsIdx++) {
 			Point2D_F64 o = obs.get(obsIdx).p;
 

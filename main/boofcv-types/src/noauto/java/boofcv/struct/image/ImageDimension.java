@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,6 +49,10 @@ public class ImageDimension {
 
 	public boolean isIdentical( ImageDimension a ) {
 		return width == a.width && height == a.height;
+	}
+
+	public boolean isIdentical( int width, int height ) {
+		return width == this.width && height == this.height;
 	}
 
 	@Override

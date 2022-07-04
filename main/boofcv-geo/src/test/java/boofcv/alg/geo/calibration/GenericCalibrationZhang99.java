@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -202,7 +202,7 @@ public abstract class GenericCalibrationZhang99<CM extends CameraModel> extends 
 
 			Se3_F64 worldToView = SpecialEuclideanOps_F64.eulerXyz(x, y, z, rotX, rotY, rotZ, null);
 
-			var obs = new CalibrationObservation(camera.width, camera.height);
+			var obs = new CalibrationObservation();
 			ret.worldToViews.add(worldToView);
 			ret.observations.add(obs);
 

@@ -30,6 +30,7 @@ import boofcv.alg.geo.calibration.ScoreCalibrationFill;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.geo.PointIndex2D_F64;
+import boofcv.struct.image.ImageDimension;
 import georegression.fitting.se.FitSpecialEuclideanOps_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -73,8 +74,8 @@ public class CalibrateStereoPlanar implements VerbosePrint {
 	List<Se3_F64> viewRight = new ArrayList<>();
 
 	// calibrates the left and right camera image
-	@Getter CalibrateMonoPlanar calibLeft;
-	@Getter CalibrateMonoPlanar calibRight;
+	@Getter CalibrateMonoPlanar calibLeft = new CalibrateMonoPlanar();
+	@Getter CalibrateMonoPlanar calibRight = new CalibrateMonoPlanar();
 
 	List<Point2D_F64> layout;
 
@@ -88,19 +89,20 @@ public class CalibrateStereoPlanar implements VerbosePrint {
 	 * @param layout How calibration points are laid out on the target
 	 */
 	public CalibrateStereoPlanar( List<Point2D_F64> layout ) {
-		calibLeft = new CalibrateMonoPlanar(layout);
-		calibRight = new CalibrateMonoPlanar(layout);
 		this.layout = layout;
 	}
 
 	/**
 	 * Puts the class into its initial state.
+	 *
+	 * @param left Shape of images from left camera
+	 * @param right Shape of images from left camera
 	 */
-	public void reset() {
+	public void initialize( ImageDimension left, ImageDimension right ) {
 		viewLeft.clear();
 		viewRight.clear();
-		calibLeft.reset();
-		calibRight.reset();
+		calibLeft.initialize(left.width, left.height, layout);
+		calibRight.initialize(right.width, right.height, layout);
 	}
 
 	/**
@@ -123,7 +125,8 @@ public class CalibrateStereoPlanar implements VerbosePrint {
 	 * @param left Image of left target.
 	 * @param right Image of right target.
 	 */
-	public void addPair( CalibrationObservation left, CalibrationObservation right ) {
+	public void addPair( CalibrationObservation left,
+						 CalibrationObservation right ) {
 		calibLeft.addImage(left);
 		calibRight.addImage(right);
 	}
@@ -134,7 +137,6 @@ public class CalibrateStereoPlanar implements VerbosePrint {
 	 * @return Stereo calibration parameters
 	 */
 	public StereoParameters process() {
-
 		// calibrate left and right cameras
 		if (verbose != null) verbose.println("Mono Left");
 		CameraPinholeBrown leftParam = calibrateMono(calibLeft, viewLeft);

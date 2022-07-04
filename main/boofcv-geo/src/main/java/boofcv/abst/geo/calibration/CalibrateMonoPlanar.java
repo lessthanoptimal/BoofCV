@@ -38,6 +38,7 @@ import java.io.File;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -52,7 +53,7 @@ import java.util.Set;
  * in the following order:
  * <ol>
  * <li>{@link #configure}</li>
- * <li>{@link #reset}</li>
+ * <li>{@link #initialize}</li>
  * <li>{@link #addImage}</li>
  * <li>{@link #process}</li>
  * <li>{@link #getIntrinsic}</li>
@@ -94,7 +95,17 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 	private int imageWidth;
 	private int imageHeight;
 
-	public CalibrateMonoPlanar( List<Point2D_F64> layout ) {
+	/**
+	 * Resets internal data structures. Must call before adding images
+	 *
+	 * @param width Image width
+	 * @param height Image height
+	 */
+	public void initialize( int width, int height, List<Point2D_F64> layout ) {
+		observations = new ArrayList<>();
+		errors = new ArrayList<>();
+		imageWidth = width;
+		imageHeight = height;
 		this.layout = layout;
 	}
 
@@ -102,6 +113,8 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 	 * Specifies the calibration model.
 	 */
 	public void configure( boolean assumeZeroSkew, Zhang99Camera camera ) {
+		Objects.requireNonNull(layout, "layout is null. Did you call initialize()?");
+
 		zhang99 = new CalibrationPlanarGridZhang99(layout, camera);
 		zhang99.setZeroSkew(assumeZeroSkew);
 	}
@@ -109,6 +122,8 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 	public void configurePinhole( boolean assumeZeroSkew,
 								  int numRadialParam,
 								  boolean includeTangential ) {
+		Objects.requireNonNull(layout, "layout is null. Did you call initialize()?");
+
 		var camera = new Zhang99CameraBrown(layout, assumeZeroSkew, includeTangential, numRadialParam);
 		zhang99 = new CalibrationPlanarGridZhang99(layout, camera);
 		zhang99.setZeroSkew(assumeZeroSkew);
@@ -117,6 +132,8 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 	public void configureUniversalOmni( boolean assumeZeroSkew,
 										int numRadialParam,
 										boolean includeTangential ) {
+		Objects.requireNonNull(layout, "layout is null. Did you call initialize()?");
+
 		zhang99 = new CalibrationPlanarGridZhang99(layout,
 				new Zhang99CameraUniversalOmni(layout, assumeZeroSkew, includeTangential, numRadialParam));
 		zhang99.setZeroSkew(assumeZeroSkew);
@@ -125,6 +142,8 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 	public void configureKannalaBrandt( boolean assumeZeroSkew,
 										int numSymmetric,
 										int numAsymmetric ) {
+		Objects.requireNonNull(layout, "layout is null. Did you call initialize()?");
+
 		zhang99 = new CalibrationPlanarGridZhang99(layout,
 				new Zhang99CameraKannalaBrandt(assumeZeroSkew, numSymmetric, numAsymmetric));
 		zhang99.setZeroSkew(assumeZeroSkew);
@@ -134,18 +153,16 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 										int numRadialParam,
 										boolean includeTangential,
 										double mirrorOffset ) {
+		Objects.requireNonNull(layout, "layout is null. Did you call initialize()?");
+
 		zhang99 = new CalibrationPlanarGridZhang99(layout,
 				new Zhang99CameraUniversalOmni(layout, assumeZeroSkew, includeTangential, numRadialParam, mirrorOffset));
 		zhang99.setZeroSkew(assumeZeroSkew);
 	}
 
-	/**
-	 * Resets internal data structures. Must call before adding images
-	 */
-	public void reset() {
-		observations = new ArrayList<>();
-		errors = new ArrayList<>();
-		imageHeight = imageWidth = 0;
+	/** Convience function which returns true if the provided shape matches the expected image shape */
+	public boolean isExpectedShape( int width, int height ) {
+		return width == imageWidth && height == imageHeight;
 	}
 
 	/**
@@ -154,13 +171,6 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 	 * @param observation Detected calibration points
 	 */
 	public void addImage( CalibrationObservation observation ) {
-		if (imageWidth == 0) {
-			this.imageWidth = observation.getWidth();
-			this.imageHeight = observation.getHeight();
-		} else if (observation.getWidth() != this.imageWidth || observation.getHeight() != this.imageHeight) {
-			throw new IllegalArgumentException("Image shape miss match. Are these all from the same camera? " +
-					imageWidth + "x" + imageHeight + " vs " + observation.getWidth() + "x" + observation.getHeight());
-		}
 		observations.add(observation);
 	}
 
@@ -176,6 +186,8 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 	 * estimate calibration parameters. Error statistics are also computed.
 	 */
 	public <T extends CameraModel> T process() {
+		if (imageWidth == 0)
+			throw new RuntimeException("Must call initialize() first");
 		if (zhang99 == null)
 			throw new IllegalArgumentException("Please call configure first.");
 		zhang99.setVerbose(verbose, null);

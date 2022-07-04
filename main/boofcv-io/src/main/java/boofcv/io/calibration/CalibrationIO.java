@@ -527,7 +527,6 @@ public class CalibrationIO {
 
 		out.println("# Landmarks detected on a calibration target");
 		out.println("# " + inputFile);
-		out.println("# Image Shape: " + landmarks.getWidth() + " x " + landmarks.getHeight());
 		out.println("# " + detector);
 		out.println("# BoofCV Version: " + BoofVersion.VERSION);
 		out.println("# BoofCV GITSHA: " + BoofVersion.GIT_SHA);
@@ -552,13 +551,8 @@ public class CalibrationIO {
 		try {
 			while (true) {
 				String line = UtilIO.readLine(input, buffer);
-				if (line.isEmpty())
+				if (line.isEmpty()) {
 					break;
-				if (line.startsWith("# Image Shape:")) {
-					String[] words = line.split(" ");
-					ret.width = Integer.parseInt(words[3]);
-					ret.height = Integer.parseInt(words[5]);
-					continue;
 				} else if (line.startsWith("#")) {
 					continue;
 				}
