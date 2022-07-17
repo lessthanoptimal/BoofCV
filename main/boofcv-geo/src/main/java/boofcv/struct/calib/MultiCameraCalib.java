@@ -40,19 +40,25 @@ public class MultiCameraCalib implements Serializable {
 	/**
 	 * Intrinsic camera parameters and model for each camera.
 	 */
-	@Getter final List<CameraModel> intrinsics = new ArrayList<>();
+	@Getter public final List<CameraModel> intrinsics = new ArrayList<>();
 
 	/**
-	 * Extrinsics for each camera from camera to the world frame. World frame is typically camera[0] but not always
+	 * Extrinsics for each camera. Camera to the common sensor frame. Typically the common sensor frame is
+	 * defined as camera[0], but not always.
 	 */
-	@Getter final List<Se3_F64> extrinsicsCamToWorld = new ArrayList<>();
+	@Getter public final List<Se3_F64> listCameraToSensor = new ArrayList<>();
+
+	public void reset() {
+		intrinsics.clear();
+		listCameraToSensor.clear();
+	}
 
 	public <Cam extends CameraModel>Cam getIntrinsics( int index ) {
 		return (Cam)intrinsics.get(index);
 	}
 
-	public Se3_F64 getExtrinsics( int index ) {
-		return extrinsicsCamToWorld.get(index);
+	public Se3_F64 getCameraToSensor( int index ) {
+		return listCameraToSensor.get(index);
 	}
 
 	/**
@@ -66,13 +72,17 @@ public class MultiCameraCalib implements Serializable {
 	 * Returns the transform from cam0 to cam1 reference frame
 	 * @param cam0 Index of camera 0
 	 * @param cam1 Index of camera 1
-	 * @param cam0_to_cam1 (Output) Transform from cam0 to cam 1. Can be null.
+	 * @param cam0_to_cam1 (Output) Storage for transform from cam[0] to cam[1]. Can be null.
 	 * @return The transform.
 	 */
 	public Se3_F64 computeExtrinsics( int cam0, int cam1, @Nullable Se3_F64 cam0_to_cam1 ) {
 		if (cam0_to_cam1 == null)
 			cam0_to_cam1 = new Se3_F64();
 
+		Se3_F64 camera0_to_sensor = listCameraToSensor.get(cam0);
+		Se3_F64 camera1_to_sensor = listCameraToSensor.get(cam1);
+
+		camera0_to_sensor.concat(camera1_to_sensor.invert(null), cam0_to_cam1);
 
 		return cam0_to_cam1;
 	}

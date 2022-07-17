@@ -16,20 +16,38 @@
  * limitations under the License.
  */
 
-package boofcv.struct.calib;
+package boofcv.abst.geo.calibration;
 
-import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
-
-class TestMultiCameraCalib extends BoofStandardJUnit {
-	@Test void getBaseline() {
+public class TestCalibrateMultiPlanar {
+	@Test void perfect() {
 		fail("Implement");
 	}
 
-	@Test void computeExtrinsics() {
+	@Test void noisy() {
+		fail("Implement");
+	}
+
+	@Test void monocularCalibration() {
+		fail("Implement");
+	}
+
+	@Test void estimateExtrinsics() {
+		fail("Implement");
+	}
+
+	@Test void setupSbaScene() {
+		fail("Implement");
+	}
+
+	@Test void sbaToOutput() {
+		fail("Implement");
+	}
+
+	@Test void extrinsicFromKnownCamera() {
 		fail("Implement");
 	}
 }

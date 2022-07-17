@@ -30,6 +30,7 @@ import boofcv.alg.geo.calibration.cameras.Zhang99CameraUniversalOmni;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraModel;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.se.Se3_F64;
 import lombok.Getter;
 import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
@@ -205,6 +206,14 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 
 		return (T)foundIntrinsic;
 	}
+
+	/**
+	 * Returns estimated transform from calibration target to camera view
+	 */
+	public Se3_F64 getTargetToView( int viewIdx ) {
+		return structure.getParentToView(viewIdx);
+	}
+
 
 	public String computeQualityText( List<String> imageNames ) {
 		var fillScore = new ScoreCalibrationFill();

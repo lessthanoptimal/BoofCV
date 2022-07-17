@@ -34,6 +34,9 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class CalibrationObservation {
+	/** Which target was observed */
+	public int target;
+
 	/**
 	 * List of pixel observations and the index of the control point
 	 */
@@ -44,6 +47,7 @@ public class CalibrationObservation {
 
 	public void setTo( CalibrationObservation obs ) {
 		reset();
+		this.target = obs.target;
 		for (int i = 0; i < obs.size(); i++) {
 			PointIndex2D_F64 p = obs.points.get(i);
 			points.add(p.copy());
@@ -69,6 +73,7 @@ public class CalibrationObservation {
 	}
 
 	public void reset() {
+		this.target = 0;
 		points.clear();
 	}
 
