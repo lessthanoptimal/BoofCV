@@ -18,100 +18,468 @@
 
 package boofcv.abst.geo.calibration;
 
+import boofcv.abst.geo.bundle.MetricBundleAdjustmentUtils;
+import boofcv.abst.geo.bundle.SceneObservations;
+import boofcv.abst.geo.bundle.SceneStructureMetric;
+import boofcv.alg.geo.bundle.BundleAdjustmentOps;
+import boofcv.alg.geo.bundle.cameras.BundlePinholeBrown;
 import boofcv.alg.geo.calibration.CalibrationObservation;
-import boofcv.alg.geo.calibration.ObservedCalTargets;
+import boofcv.alg.geo.calibration.CalibrationObservationSet;
+import boofcv.alg.geo.calibration.SynchronizedCalObs;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.calib.MultiCameraCalib;
 import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.se.Se3_F64;
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
 import lombok.Getter;
 import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
+import org.ddogleg.struct.FastArray;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
- * Multi camera calibration using planar targets
+ * <p>Multi camera calibration using multiple planar targets. It's assumed that all cameras are rigidly attach and
+ * that the calibration targets are static. Camera[0] is always the sensor reference frame. The world
+ * reference frame is defined as calibration target[0]. </p>
+ *
+ * Usage:
+ * <ol>
+ *     <li>Call initialize()</li>
+ *     <li>Specify shape of all cameras {@link #setCameraProperties}</li>
+ *     <li>Specify target layouts using {@link #setTargetLayout}</li>
+ *     <li></li>
+ *     <li></li>
+ * </ol>
+ *
+ * Algorithm overview:
+ * <ol>
+ *     <li>Calibrate each camera independently using monocular approach</li>
+ *     <li>Estimate extrinsic relationship between cameras using common observed targets</li>
+ *     <li>Estimate extrinsic relationship between sensor and world for each frame</li>
+ *     <li>Run bundle adjustment to improve results</li>
+ * </ol>
+ * Internally it assumes that the targets are stationary and the camera system is moving. It will work just fine
+ * if the opposite is true as these are mathematically identical.
+ *
+ * TODO add support for multiple targets. Current version has been simplified for one target.
  *
  * @author Peter Abeles
  */
 public class CalibrateMultiPlanar {
-
+	/** Used to calibrate each camera independently */
 	@Getter final CalibrateMonoPlanar calibratorMono = new CalibrateMonoPlanar();
 
-	final DogArray<Camera> cameras = new DogArray<>(Camera::new);
-	final List<List<Point2D_F64>> layouts = new ArrayList<>();
+	/** Makes bundle adjustment easier */
+	@Getter MetricBundleAdjustmentUtils bundleUtils = new MetricBundleAdjustmentUtils();
 
-	MultiCameraCalib results = new MultiCameraCalib();
+	/** Storage for found calibration parameters */
+	@Getter MultiCameraCalib results = new MultiCameraCalib();
 
-	public CalibrateMultiPlanar() {
+	// Specifies locations of landmarks are calibration taregets
+	final FastArray<List<Point2D_F64>> layouts = new FastArray<>((Class)(ArrayList.class));
 
-	}
+	// Monocular calibration results
+	final DogArray<CameraPriors> cameras = new DogArray<>(CameraPriors::new);
 
+	// Observations from the camera system taken at a single time step
+	final List<SynchronizedCalObs> frameObs = new ArrayList<>();
+
+	/** Must call this function first. Specifies the number of cameras and calibration targets */
 	public void initialize( int numCameras, int numTargets ) {
+		if (numTargets != 1)
+			throw new RuntimeException("Currently only supports one target");
+
+		layouts.resize(numTargets);
 		cameras.resetResize(numCameras);
+		for (int i = 0; i < cameras.size; i++) {
+			cameras.get(i).index = i;
+		}
+
+		frameObs.clear();
 	}
 
-	public void setCameraProperties( int which, int width , int height ) {
+	/** Specifies the shape o images from a specific camera */
+	public void setCameraProperties( int which, int width, int height ) {
 		cameras.get(which).width = width;
 		cameras.get(which).height = height;
 	}
 
+	/** Specifies location of calibration points for a target. */
 	public void setTargetLayout( int which, List<Point2D_F64> layout ) {
-
+		layouts.set(which, layout);
 	}
 
 	/**
-	 * Adds an observation. Order does not matter.
+	 * Adds an observation. Order does not matter. All cameras are assumed to have synchronized shutters
+	 * and observed the world at the exact same time.
 	 *
 	 * @param observations Observed calibration targets in a single fram.
 	 */
-	public void addObservation( ObservedCalTargets observations ) {
-
+	public void addObservation( SynchronizedCalObs observations ) {
+		frameObs.add(observations);
 	}
 
-	public void process() {
+	/**
+	 * Processes the inputs and estimates the camera system's intrinsic and extrinsic calibration. If true is
+	 * returned, then {@link #getResults()} will return the found calibration.
+	 *
+	 * @return true if successful or false if it failed
+	 */
+	public boolean process() {
+		results.reset();
+		for (int i = 0; i < cameras.size; i++) {
+			results.listCameraToSensor.add(new Se3_F64());
+		}
 		int targetID = 0;
 
+		List<FrameState> frames = new ArrayList<>();
+		for (int i = 0; i < frameObs.size(); i++) {
+			frames.add(new FrameState());
+		}
+
 		// Do monocular calibration first
-		for (int cameraIdx = 0; (cameraIdx < cameras.size); cameraIdx++) {
-			Camera c = cameras.get(cameraIdx);
+		monocularCalibration(targetID, frames);
+
+		// Find extrinsic relationship between all the cameras
+		estimateExtrinsics(frames);
+
+		setupSbaScene(targetID, frames);
+
+		if (!bundleUtils.process())
+			return false;
+
+		sbaToOutput();
+
+		return true;
+	}
+
+	/**
+	 * Find the sensor to world transform for every frame
+	 */
+	private void estimateSensorRelativeToWorld( List<FrameState> frames ) {
+		for (int frameIdx = 0; frameIdx < frames.size(); frameIdx++) {
+			FrameState f = frames.get(frameIdx);
+
+			// If true then a transform was found for this frame
+			boolean found = false;
+
+			// Go through all cameras
+			frameEscape:
+			for (int camIdx = 0; camIdx < cameras.size; camIdx++) {
+				FrameCamera fc = f.cameras.get(camIdx);
+				if (fc == null)
+					continue;
+
+				// see if this camera has an observation that can be used
+				for (int obsIdx = 0; obsIdx < fc.observations.size(); obsIdx++) {
+
+					// NOTE: This code assumes there is only one target and that target is the world frame
+					TargetExtrinsics te = fc.observations.get(obsIdx);
+					Se3_F64 cameraToTarget = te.targetToCamera.invert(null);
+					results.getCameraToSensor(camIdx).invertConcat(cameraToTarget, f.sensorToWorld);
+
+					found = true;
+					break frameEscape;
+				}
+			}
+
+			if (!found)
+				throw new RuntimeException("This frame should be removed");
+		}
+	}
+
+	/**
+	 * Calibrate each camera independently. Save extrinsic relationship between targets and each camera
+	 * in all the views
+	 *
+	 * @param targetID Which target is going to be used to calibrate the cameras
+	 * @param frames All the time step frames
+	 */
+	private void monocularCalibration( int targetID, List<FrameState> frames ) {
+		// Store the index of each frame that had observations from a camera and the specified target
+		var usedFrames = new DogArray_I32();
+
+		// Go through all cameras
+		for (int cameraIdx = 0; cameraIdx < cameras.size; cameraIdx++) {
+			usedFrames.reset();
+			CameraPriors c = cameras.get(cameraIdx);
 
 			// Tell it information about the camera and target
 			calibratorMono.initialize(c.width, c.height, layouts.get(targetID));
 
-			// Pass in all the observations
-			List<List<PointIndex2D_F64>> listObs = lookupObservations(cameraIdx, targetID);
-			for (int obsIdx = 0; obsIdx < listObs.size(); obsIdx++) {
-				var monoObs = new CalibrationObservation();
-				monoObs.points = listObs.get(obsIdx);
-				calibratorMono.addImage(monoObs);
+			// Go through all the data frames
+			for (int frameIdx = 0; frameIdx < frameObs.size(); frameIdx++) {
+				SynchronizedCalObs synch = frameObs.get(frameIdx);
+
+				// See if this frame has observatiosn from the target camera
+				for (int camIdx = 0; camIdx < synch.cameras.size; camIdx++) {
+					CalibrationObservationSet os = synch.cameras.get(cameraIdx);
+					if (os.cameraID != c.index)
+						continue;
+
+					// Add the observations, record which frame it came from, escape the loop
+					var monoObs = new CalibrationObservation();
+					monoObs.points.addAll(os.targets.get(0).points); // NOTE: assumes only one target
+					calibratorMono.addImage(monoObs);
+
+					usedFrames.add(frameIdx);
+					break;
+				}
 			}
 
 			// Compute and save results
 			results.getIntrinsics().add(calibratorMono.process());
+
+			// Save the extrinsic relationship between the camera in each frame and the targets it observed
+			for (int usedIdx = 0; usedIdx < usedFrames.size(); usedIdx++) {
+				int frameID = usedFrames.get(usedIdx);
+				CalibrationObservationSet obs = frameObs.get(frameID).findCamera(c.index);
+				Objects.requireNonNull(obs, "BUG!");
+
+				FrameState frame = frames.get(frameID);
+				FrameCamera cam = frame.cameras.get(cameraIdx);
+				if (cam == null) {
+					cam = new FrameCamera();
+					frame.cameras.put(cameraIdx, cam);
+				}
+
+				var target = new TargetExtrinsics();
+				target.targetID = targetID;
+				target.targetToCamera.setTo(calibratorMono.getTargetToView(usedIdx));
+				cam.observations.add(target);
+			}
 		}
-
-		// TODO estimate initial extrinsics
-
-		// TODO refine extrinsics
-	}
-
-	private List<List<PointIndex2D_F64>> lookupObservations( int camera, int target) {
-		return null;
-	}
-
-	public static class Camera {
-		/** Shape of camera images */
-		int width, height;
-
-		/** All observations from this camera */
-		List<ObservedCalTargets> observations = new ArrayList<>();
 	}
 
 	/**
-	 * Calibration quality metrics
+	 * Given the known mono camera calibrations, determine the relationship of each camera view to sensor
+	 * reference frame by finding cases where common cameras observed the same target.
 	 */
-	public static class Metrics {
+	private void estimateExtrinsics( List<FrameState> frames ) {
+		// Known contains cameras where the extrinsics is known
+		// Unknown contains cameras with unknown extronsics
+		List<CameraPriors> known = new ArrayList<>();
+		List<CameraPriors> unknown = new ArrayList<>();
+		for (int i = 1; i < cameras.size; i++) {
+			unknown.add(cameras.get(i));
+		}
 
+		// This effectively sets camera[0] as the origin of the sensor frame
+		known.add(cameras.get(0));
+
+		// Iterate untol it's solved or doesn't change and failed
+		while (unknown.size() > 0) {
+			boolean change = false;
+			for (int unknownIdx = unknown.size() - 1; unknownIdx >= 0; unknownIdx--) {
+				CameraPriors unknownCam = unknown.get(unknownIdx);
+
+				// Go through each frame and see it can determine all the views
+				solved:
+				for (int frameIdx = 0; frameIdx < frames.size(); frameIdx++) {
+					FrameState frame = frames.get(frameIdx);
+
+					for (int knownIdx = 0; knownIdx < known.size(); knownIdx++) {
+						CameraPriors knownCam = known.get(knownIdx);
+
+						// Find relationship between camera and sensor frame
+						Se3_F64 camI_to_sensor = extrinsicFromKnownCamera(frame, knownCam.index, unknownCam.index);
+						if (camI_to_sensor == null) {
+							continue;
+						}
+						// Save the results
+						results.listCameraToSensor.get(unknownCam.index).setTo(camI_to_sensor);
+
+						// Let it know there has been a change
+						change = true;
+
+						// Update bookkeeping
+						unknown.remove(unknownIdx);
+						known.add(unknownCam);
+
+						// No longer need to go through all the frames
+						break solved;
+					}
+				}
+			}
+
+			// If there is no change, that means there are no common observatiosn and nothing more can be done
+			if (!change) {
+				break;
+			}
+		}
+
+		if (!unknown.isEmpty())
+			throw new RuntimeException("Not all cameras have known extrinsics");
+	}
+
+	/**
+	 * Given the initial estimates already found, create a scene graph that can be optimized by SBA
+	 */
+	private void setupSbaScene( int targetID, List<FrameState> frames ) {
+		// Find relationship of sensor reference frame to world reference frame
+		estimateSensorRelativeToWorld(frames);
+
+		// Refine everything with bundle adjustment
+		final SceneStructureMetric structure = bundleUtils.getStructure();
+		final SceneObservations observations = bundleUtils.getObservations();
+		final List<Point2D_F64> layout = layouts.get(targetID);
+
+		// There will be a view for every camera in every frame, even if a camera did not observe anything in
+		// that frame as it makes the structure much easier to manage
+		int totalViews = frames.size()*cameras.size;
+		int totalMotions = cameras.size;
+
+		structure.initialize(cameras.size, totalViews, totalMotions, layout.size(), 1);
+
+		// Configure the cameras
+		for (int i = 0; i < cameras.size; i++) {
+			structure.setCamera(i, false, (CameraPinholeBrown)results.getIntrinsics().get(i));
+		}
+
+		// Specify the relationships of each camera to the sensor frame, a.k.a. camera[0]
+		for (int camIdx = 0; camIdx < cameras.size; camIdx++) {
+			structure.addMotion(camIdx == 0, results.getCameraToSensor(camIdx));
+		}
+
+		// Specific the views
+		int viewIdx = 0;
+		for (int frameIdx = 0; frameIdx < frames.size(); frameIdx++) {
+			// view index of camera zero in this frame
+			int cameraZeroIdx = viewIdx;
+			// view for camera[0] will be relative to world coordinate system
+			Se3_F64 worldToSensor = frames.get(frameIdx).sensorToWorld.invert(null);
+			structure.setView(viewIdx++, 0, false, worldToSensor);
+
+			// All the other views are relative to the camera[0] view in this frame
+			for (int camIdx = 1; camIdx < cameras.size; camIdx++) {
+				structure.setView(viewIdx++, camIdx, camIdx, cameraZeroIdx);
+			}
+		}
+
+		// NOTE: Only one target is currently allowed and it's the world of the world frame
+		structure.setRigid(0, true, new Se3_F64(), layout.size());
+		SceneStructureMetric.Rigid rigid = structure.rigids.data[0];
+		for (int i = 0; i < layout.size(); i++) {
+			rigid.setPoint(i, layout.get(i).x, layout.get(i).y, 0);
+		}
+
+		// Add observations to bundle adjustment
+		observations.initialize(totalViews, true);
+		for (int frameIdx = 0; frameIdx < frameObs.size(); frameIdx++) {
+			SynchronizedCalObs f = frameObs.get(frameIdx);
+
+			for (int camIdx = 0; camIdx < f.cameras.size; camIdx++) {
+				CalibrationObservationSet c = f.cameras.get(camIdx);
+
+				// Remember, one view for every camera in every frame
+				int sbaViewIndex = frameIdx*cameras.size + c.cameraID;
+				SceneObservations.View sbaView = observations.getViewRigid(sbaViewIndex);
+
+				for (int obsIdx = 0; obsIdx < c.targets.size; obsIdx++) {
+					CalibrationObservation o = c.targets.get(obsIdx);
+					for (int featIdx = 0; featIdx < o.size(); featIdx++) {
+						PointIndex2D_F64 p = o.get(featIdx);
+						sbaView.add(p.index, (float)p.p.x, (float)p.p.y);
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Copies over camera intrinsics and extrinsics in sensor frame to output data structure
+	 */
+	private void sbaToOutput() {
+		final SceneStructureMetric structure = bundleUtils.getStructure();
+
+		for (int camIdx = 0; camIdx < cameras.size; camIdx++) {
+			CameraPriors c = cameras.get(camIdx);
+			BundlePinholeBrown bb = structure.getCameraModel(camIdx);
+			BundleAdjustmentOps.convert(bb, c.width, c.height, (CameraPinholeBrown)results.intrinsics.get(camIdx));
+			results.listCameraToSensor.get(camIdx).setTo(structure.motions.get(camIdx).motion);
+		}
+	}
+
+	/**
+	 * Computes the SE3 from the unknown camera to world using the known SE3 in the known view.
+	 * If there are no common observations then it returns false.
+	 *
+	 * @param frame Frame that it's examining
+	 * @param idx0 Index of known camera
+	 * @param idx1 Index of unknown camera
+	 * @return camera1 to sensor transform or null if it failed
+	 */
+	@Nullable Se3_F64 extrinsicFromKnownCamera( FrameState frame, int idx0, int idx1 ) {
+		FrameCamera state0 = frame.cameras.get(idx0);
+		FrameCamera state1 = frame.cameras.get(idx1);
+
+		if (state0 == null || state1 == null)
+			return null;
+
+		for (int obsIdx0 = 0; obsIdx0 < state0.observations.size(); obsIdx0++) {
+			TargetExtrinsics tgt0 = state0.observations.get(obsIdx0);
+
+			for (int obsIdx1 = 0; obsIdx1 < state1.observations.size(); obsIdx1++) {
+				TargetExtrinsics tgt1 = state1.observations.get(obsIdx1);
+
+				if (tgt0.targetID != tgt1.targetID)
+					continue;
+
+				// Find the transform from world to camera using the relative transform of the common target
+				// to each of the cameras;
+				Se3_F64 cam0_to_cam1 = new Se3_F64();
+
+				tgt0.targetToCamera.invertConcat(tgt1.targetToCamera, cam0_to_cam1);
+
+				Se3_F64 cam0_to_sensor = results.getCameraToSensor(idx0);
+
+				return cam0_to_cam1.invertConcat(cam0_to_sensor, null);
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Prior information provided about the camera by the user
+	 */
+	public static class CameraPriors {
+		/** Index of the camera */
+		int index;
+
+		/** Shape of camera images */
+		int width, height;
+	}
+
+	/**
+	 * Workspace for information related to a single frame. A frame is the set of all observations from each camera
+	 * at a single instance of time.
+	 */
+	public static class FrameState {
+		TIntObjectMap<FrameCamera> cameras = new TIntObjectHashMap<>();
+		Se3_F64 sensorToWorld = new Se3_F64();
+	}
+
+	/**
+	 * List of all observation from a camera in a frame. A camera can observe multiple targets at once.
+	 */
+	public static class FrameCamera {
+		List<TargetExtrinsics> observations = new ArrayList<>();
+	}
+
+	/**
+	 * Specifies which target was observed and what the inferred transform was..
+	 */
+	public static class TargetExtrinsics {
+		// Which target this is an observation of
+		int targetID;
+		// Extrinsic relationship between target and camera at this instance
+		Se3_F64 targetToCamera = new Se3_F64();
 	}
 }

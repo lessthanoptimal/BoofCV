@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -125,7 +125,7 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	}
 
 	/**
-	 * Returns SE3 relationship to the specified view from it's parent.
+	 * Returns SE3 relationship to the specified view from its parent.
 	 *
 	 * @param view The target view
 	 * @return SE3 transform from parent to view.
@@ -134,6 +134,12 @@ public class SceneStructureMetric extends SceneStructureCommon {
 		return motions.get(view.parent_to_view).motion;
 	}
 
+	/**
+	 * Returns SE3 relationship to the specified view from its parent.
+	 *
+	 * @param viewIdx Index of target view
+	 * @return SE3 transform from parent to view.
+	 */
 	public Se3_F64 getParentToView( int viewIdx ) {
 		View v = views.get(viewIdx);
 		return motions.get(v.parent_to_view).motion;

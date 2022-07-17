@@ -18,26 +18,22 @@
 
 package boofcv.alg.geo.calibration;
 
-import boofcv.struct.geo.PointIndex2D_F64;
 import org.ddogleg.struct.DogArray;
+import org.jetbrains.annotations.Nullable;
 
 /**
- * Set of observed calibration targets in a single frame from a multi camera calibration system.
+ * Set of observed calibration targets in a single frame from a single camera
  *
  * @author Peter Abeles
  */
-public class ObservedCalTargets {
-	/** When it was observed. All observations with the same frame will be assuemed to be simultaneous */
-	public int frame;
-
+public class CalibrationObservationSet {
 	/** Which camera did the observation */
 	public int cameraID;
 
 	/** All observed calibration target landmarks in this frame */
-	public final DogArray<Observation> targets = new DogArray<>(Observation::new, Observation::reset);
+	public final DogArray<CalibrationObservation> targets = new DogArray<>(CalibrationObservation::new, CalibrationObservation::reset);
 
-	public ObservedCalTargets setTo( ObservedCalTargets src ) {
-		this.frame = src.frame;
+	public CalibrationObservationSet setTo( CalibrationObservationSet src ) {
 		this.cameraID = src.cameraID;
 		this.targets.reset();
 		for (int i = 0; i < src.targets.size; i++) {
@@ -47,32 +43,19 @@ public class ObservedCalTargets {
 	}
 
 	public void reset() {
-		frame = -1;
 		cameraID = -1;
 		targets.reset();
 	}
 
 	/**
-	 * Specifies observation for a single target
+	 * Exhaustively searches for a target with the specified ID. Returns null if no match is found.
 	 */
-	public static class Observation {
-		/** Which target was observed */
-		public int target;
-		/** Landmarks that were observed in pixel coordinates */
-		public final DogArray<PointIndex2D_F64> landmarks = new DogArray<>(PointIndex2D_F64::new);
-
-		public Observation setTo( Observation src ) {
-			this.target = src.target;
-			landmarks.reset();
-			for (int i = 0; i < src.landmarks.size; i++) {
-				landmarks.grow().setTo(src.landmarks.get(i));
+	public @Nullable CalibrationObservation findTarget( int targetID ) {
+		for (int i = 0; i < targets.size; i++) {
+			if (targets.get(i).target == targetID) {
+				return targets.get(i);
 			}
-			return this;
 		}
-
-		public void reset() {
-			target = -1;
-			landmarks.reset();
-		}
+		return null;
 	}
 }
