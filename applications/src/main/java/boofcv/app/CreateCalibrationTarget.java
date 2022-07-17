@@ -87,7 +87,7 @@ public class CreateCalibrationTarget {
 	@Option(name = "-e", aliases = {"--Encoding"}, usage = "Encoding for hamming markers")
 	String encodingName = HammingDictionary.ARUCO_MIP_25h7.name();
 
-	@Option(name = "--EncodingOffset", usage = "Start encoding markers at this index")
+	@Option(name = "--EncodingOffset", usage = "Start encoding markers at this index. With ECoCheck user --NumMarkers instead.")
 	int encodingOffset = 0;
 
 	@Option(name = "--MarkerScale", usage = "Scale of marker relative to square for hamming chessboard")
@@ -225,6 +225,8 @@ public class CreateCalibrationTarget {
 					failExit("Must specify at least one marker");
 				if (rows < 4 || columns < 3)
 					failExit("Grid is too small");
+				if (encodingOffset != 0)
+					failExit("ECoCheck doesn't need an offset for multiple markers. use --NumMarkers instead");
 			}
 
 			case HAMMING_CHESSBOARD -> {
@@ -232,6 +234,8 @@ public class CreateCalibrationTarget {
 					failExit("Don't specify center distance for chessboard targets");
 				if (shapeSpace > 0)
 					failExit("Don't specify center distance for chessboard targets");
+				if (numMarkers != 1)
+					failExit("Use encoding offset to create multiple markers, not NumMarkers");
 			}
 
 			case HAMMING_GRID -> {
@@ -239,6 +243,8 @@ public class CreateCalibrationTarget {
 					failExit("Don't specify center distance for square type targets, use shape space instead");
 				if (shapeSpace <= 0)
 					shapeSpace = (float)new ConfigHammingGrid(new ConfigHammingMarker()).spaceToSquare;
+				if (numMarkers != 1)
+					failExit("Use encoding offset to create multiple markers, not NumMarkers");
 			}
 
 			case CIRCLE_HEXAGONAL -> {
