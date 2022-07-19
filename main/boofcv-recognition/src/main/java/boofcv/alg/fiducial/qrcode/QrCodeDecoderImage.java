@@ -98,7 +98,11 @@ public class QrCodeDecoderImage<T extends ImageGray<T>> {
 
 					// Decode the entire marker now
 					if (decode(gray, qr)) {
-						successes.add(qr);
+						if (qr.failureCause == QrCode.Failure.NONE) {
+							successes.add(qr);
+						} else {
+							failures.add(qr);
+						}
 					} else {
 						// Consider the possibility that the QR code was encoded incorrectly with transposed bits
 						boolean success = false;
@@ -109,7 +113,11 @@ public class QrCodeDecoderImage<T extends ImageGray<T>> {
 
 						if (success) {
 							qr.bitsTransposed = true;
-							successes.add(qr);
+							if (qr.failureCause == QrCode.Failure.NONE) {
+								successes.add(qr);
+							} else {
+								failures.add(qr);
+							}
 						} else {
 							failures.add(qr);
 						}
@@ -202,6 +210,14 @@ public class QrCodeDecoderImage<T extends ImageGray<T>> {
 		qr.bounds.get(3).setTo(qr.ppDown.get(3));
 	}
 
+	/**
+	 * Decodes the marker and saves result.
+	 *
+	 * @param gray Input image
+	 * @param qr Where the decoded marker is writen to
+	 * @return Returns true if it could at least decode the message up to error correction.
+	 * Parsing could false after that
+	 */
 	private boolean decode( T gray, QrCode qr ) {
 		if (!extractFormatInfo(qr)) {
 			qr.failureCause = QrCode.Failure.FORMAT;
@@ -221,7 +237,7 @@ public class QrCodeDecoderImage<T extends ImageGray<T>> {
 		boolean success = false;
 		gridReader.setMarker(qr);
 		gridReader.getTransformGrid().addAllFeatures(qr);
-		// by default it removes outside corners. This works most of the time
+		// by default, it removes outside corners. This works most of the time
 		for (int i = 0; i < 6; i++) {
 			if (i > 0) {
 				boolean removed = gridReader.getTransformGrid().removeFeatureWithLargestError();
@@ -248,13 +264,12 @@ public class QrCodeDecoderImage<T extends ImageGray<T>> {
 		}
 
 		if (success) {
-			// if it can error the errors that means it has all the bits correct
-			// that's why decode is outside of the loop above
-			if (!decoder.decodeMessage(qr)) {
-				// error enum is set internally so that it can be more specific
-//				System.out.println("failed trial "+i+" "+qr.failureCause);
-				success = false;
-			}
+			// Could have failed previously, then successfully decoded it
+			qr.failureCause = QrCode.Failure.NONE;
+
+			// Parses the message. Return value is ignored since the parse error is encoded
+			// in the message and we want to return true if it could apply error correciton
+			decoder.decodeMessage(qr);
 		}
 
 
