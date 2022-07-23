@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.*;
 import android.hardware.camera2.*;
+import android.hardware.camera2.params.OutputConfiguration;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
@@ -324,9 +325,9 @@ public abstract class SimpleCamera2Activity extends Activity {
 	}
 
 	/**
-	 * By default this will select the backfacing camera. override to change the camera it selects.
+	 * By default this will select the back facing camera. override to change the camera it selects.
 	 */
-	protected boolean selectCamera( String id, CameraCharacteristics characteristics ) {
+	protected boolean selectCamera( CameraID camera, CameraCharacteristics characteristics ) {
 		if (verbose)
 			Log.i(TAG, "selectCamera() default function");
 		Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
@@ -349,7 +350,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 	@SuppressWarnings("MissingPermission")
 	protected void openCamera( int widthTexture, int heightTexture ) {
 		if (verbose)
-			Log.i(TAG, "openCamera( texture: " + widthTexture + "x" + heightTexture + ") activity=" + getClass().getSimpleName());
+			Log.i(TAG, "openCamera( texture: " + widthTexture + "x" + heightTexture + " ) activity=" + getClass().getSimpleName());
 
 		if (Looper.getMainLooper().getThread() != Thread.currentThread()) {
 			throw new RuntimeException("Attempted to openCamera() when not in the main looper thread!");
@@ -408,10 +409,12 @@ public abstract class SimpleCamera2Activity extends Activity {
 			this.firstFrame = true;
 			this.failuresToDecodeImage = 0;
 
-			String[] cameras = manager.getCameraIdList();
-			for (String cameraId : cameras) {
-				CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
-				if (!selectCamera(cameraId, characteristics))
+			// Create a list of all cameras, including cameras inside a multi camera system
+			List<CameraID> allCameras = getAllCameras(manager);
+
+			for (CameraID camera : allCameras) {
+				CameraCharacteristics characteristics = manager.getCameraCharacteristics(camera.id);
+				if (!selectCamera(camera, characteristics))
 					continue;
 
 				StreamConfigurationMap map = characteristics.
@@ -425,14 +428,14 @@ public abstract class SimpleCamera2Activity extends Activity {
 				if (which < 0 || which >= sizes.length)
 					continue;
 				open.mCameraSize = sizes[which];
-				open.cameraId = cameraId;
+				open.cameraId = camera;
 				open.mSensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
 
 				this.cameraToDisplayDensity = displayDensityAdjusted();
 
 				Objects.requireNonNull(open.mCameraSize);
 				if (verbose)
-					Log.i(TAG, "selected cameraId=" + cameraId + " orientation=" + open.mSensorOrientation +
+					Log.i(TAG, "selected cameraId=" + camera.id + " orientation=" + open.mSensorOrientation +
 							" res=" + open.mCameraSize.getWidth() + "x" + open.mCameraSize.getHeight());
 
 				open.mCameraCharacterstics = characteristics;
@@ -447,7 +450,9 @@ public abstract class SimpleCamera2Activity extends Activity {
 				// grinding the UI to a halt
 				open.mPreviewReader.setOnImageAvailableListener(onAvailableListener, mBackgroundHandler);
 				configureTransform(widthTexture, heightTexture);
-				manager.openCamera(cameraId, mStateCallback, null);
+				if (verbose)
+					Log.i(TAG, "before manager.openCamera()");
+				manager.openCamera(camera.getOpenID(), mStateCallback, null);
 				releaseLock = false;
 				return;
 			}
@@ -476,6 +481,33 @@ public abstract class SimpleCamera2Activity extends Activity {
 			if (releaseLock)
 				open.mLock.unlock();
 		}
+	}
+
+	/**
+	 * Finds all cameras, including physical cameras that are part of a logical camera.
+	 */
+	public static List<CameraID> getAllCameras( CameraManager manager ) throws CameraAccessException {
+		List<CameraID> allCameras = new ArrayList<>();
+		for (String id : manager.getCameraIdList()) {
+			allCameras.add(new CameraID(id));
+			CameraCharacteristics characteristics = manager.getCameraCharacteristics(id);
+
+			// getPhysicalCameraIds() does not exist in older android devices
+			if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.P)
+				continue;
+
+			int[] capabilities = characteristics.get(CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES);
+			for (int i = 0; i < capabilities.length; i++) {
+				if (capabilities[i] != CameraMetadata.REQUEST_AVAILABLE_CAPABILITIES_LOGICAL_MULTI_CAMERA) {
+					continue;
+				}
+				for (String physicalID : characteristics.getPhysicalCameraIds()) {
+					allCameras.add(new CameraID(physicalID, id));
+				}
+				break;
+			}
+		}
+		return allCameras;
 	}
 
 	/**
@@ -537,7 +569,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 				// grinding the UI to a halt
 				open.mPreviewReader.setOnImageAvailableListener(onAvailableListener, mBackgroundHandler);
 				configureTransform(viewWidth, viewHeight);
-				manager.openCamera(open.cameraId, mStateCallback, null);
+				manager.openCamera(open.cameraId.getOpenID(), mStateCallback, null);
 				releaseLock = false;
 			} catch (IllegalArgumentException e) {
 				Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
@@ -653,8 +685,22 @@ public abstract class SimpleCamera2Activity extends Activity {
 		@Nullable CameraDevice cameraDevice = open.mCameraDevice;
 		if (cameraDevice == null)
 			return;
+
+		CameraID cameraID = open.cameraId;
+
+		// Configure it to open all the services, and if a physical camera is selected, open that
+		List<OutputConfiguration> configurations = new ArrayList<>();
+		for (int i = 0; i < open.surfaces.size(); i++) {
+			var config = new OutputConfiguration(open.surfaces.get(i));
+			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+				if (!cameraID.isLogical())
+					config.setPhysicalCameraId(cameraID.id);
+			}
+			configurations.add(config);
+		}
+
 		configureCamera(cameraDevice, open.mCameraCharacterstics, open.mPreviewRequestBuilder);
-		cameraDevice.createCaptureSession(open.surfaces,
+		cameraDevice.createCaptureSessionByOutputConfigurations(configurations,
 				new CameraCaptureSession.StateCallback() {
 
 					@Override
@@ -1101,7 +1147,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 		@Nullable CameraDevice mCameraDevice;
 		List<Surface> surfaces;
 		@Nullable Size mCameraSize; // size of camera preview
-		String cameraId; // the camera that was selected to view
+		CameraID cameraId; // the camera that was selected to view
 		int mSensorOrientation; // sensor's orientation
 		// describes physical properties of the camera
 		CameraCharacteristics mCameraCharacterstics;
