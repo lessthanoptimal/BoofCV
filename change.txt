@@ -13,6 +13,8 @@ Version : 0.41
   - Fixed units in manually specified document size
   - Create Calibration: Fixed units in manually specified paper size
   - Create Calibration: Fixed disable info flag
+- Android
+  - Properly handles multi camera systems by finding physical cameras inside a logical camera
 - Demonstrations
   - Better Micro QR Code visualizations
 - Contour Tracing
