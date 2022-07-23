@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,14 +51,14 @@ public class GConvertImage {
 	 * @param input Input image which is being converted. Not modified.
 	 * @param output (Optional) The output image. If null a new image is created. Modified.
 	 */
-	public static void convert( ImageBase input , ImageBase output ) {
+	public static void convert( ImageBase input, ImageBase output ) {
 
 		ImageType typeIn = input.getImageType();
 		ImageType typeOut = output.getImageType();
 
-		if( input instanceof ImageGray) {
+		if (input instanceof ImageGray) {
 			ImageGray sb = (ImageGray)input;
-			if( output instanceof ImageGray) {
+			if (output instanceof ImageGray) {
 				if (input.getClass() == output.getClass()) {
 					output.setTo(input);
 				} else {
@@ -66,52 +66,55 @@ public class GConvertImage {
 						Method m = ConvertImage.class.getMethod("convert", input.getClass(), output.getClass());
 						m.invoke(null, input, output);
 					} catch (Exception e) {
-						throw new IllegalArgumentException("Unknown conversion. "+
-								input.getClass().getSimpleName()+" to "+output.getClass().getSimpleName());
+						throw new IllegalArgumentException("Unknown conversion. " +
+								input.getClass().getSimpleName() + " to " + output.getClass().getSimpleName());
 					}
 				}
-			} else if( output instanceof Planar) {
+			} else if (output instanceof Planar) {
 				Planar ms = (Planar)output;
 				for (int i = 0; i < ms.getNumBands(); i++) {
-					convert(input,ms.getBand(i));
+					convert(input, ms.getBand(i));
 				}
-			} else if( output instanceof ImageInterleaved ) {
+			} else if (output instanceof ImageInterleaved) {
 				ImageInterleaved il = (ImageInterleaved)output;
 				for (int i = 0; i < il.getNumBands(); i++) {
 					GImageMiscOps.insertBand(sb, i, il);
 				}
+			} else {
+				throw new IllegalArgumentException("Unknown conversion. " +
+						input.getClass().getSimpleName() + " to " + output.getClass().getSimpleName());
 			}
-		} else if( input instanceof ImageInterleaved && output instanceof ImageInterleaved )  {
-			if( input.getClass() == output.getClass() ) {
+		} else if (input instanceof ImageInterleaved && output instanceof ImageInterleaved) {
+			if (input.getClass() == output.getClass()) {
 				output.setTo(input);
 			} else {
 				try {
 					Method m = ConvertImage.class.getMethod("convert", input.getClass(), output.getClass());
 					m.invoke(null, input, output);
 				} catch (Exception e) {
-					throw new IllegalArgumentException("Unknown conversion. "+
-							input.getClass().getSimpleName()+" to "+output.getClass().getSimpleName());
+					throw new IllegalArgumentException("Unknown conversion. " +
+							input.getClass().getSimpleName() + " to " + output.getClass().getSimpleName());
 				}
 			}
-		} else if( input instanceof Planar && output instanceof ImageGray)  {
+		} else if (input instanceof Planar && output instanceof ImageGray) {
 			Planar mi = (Planar)input;
 			ImageGray so = (ImageGray)output;
 
-			if( mi.getImageType().getDataType() != so.getDataType() ) {
+			if (mi.getImageType().getDataType() != so.getDataType()) {
 				int w = output.width;
 				int h = output.height;
-				ImageGray tmp = GeneralizedImageOps.createSingleBand(mi.getImageType().getDataType(),w,h);
-				average(mi,tmp);
-				convert(tmp,so);
+				ImageGray tmp = GeneralizedImageOps.createSingleBand(mi.getImageType().getDataType(), w, h);
+				average(mi, tmp);
+				convert(tmp, so);
 			} else {
-				average(mi,so);
+				average(mi, so);
 			}
-		} else if( input instanceof Planar && output instanceof ImageInterleaved )  {
+		} else if (input instanceof Planar && output instanceof ImageInterleaved) {
 			String functionName;
-			if( typeIn.getDataType() == typeOut.getDataType()) {
+			if (typeIn.getDataType() == typeOut.getDataType()) {
 				functionName = "convert";
 			} else {
-				functionName = "convert"+typeIn.getDataType()+typeOut.getDataType();
+				functionName = "convert" + typeIn.getDataType() + typeOut.getDataType();
 			}
 			try {
 				Method m = ConvertImage.class.getMethod(functionName, input.getClass(), output.getClass());
@@ -120,9 +123,9 @@ public class GConvertImage {
 				throw new IllegalArgumentException("Unknown conversion. " +
 						input.getClass().getSimpleName() + " to " + output.getClass().getSimpleName());
 			}
-		} else if( input instanceof Planar && output instanceof Planar) {
-			Planar mi = (Planar) input;
-			Planar mo = (Planar) output;
+		} else if (input instanceof Planar && output instanceof Planar) {
+			Planar mi = (Planar)input;
+			Planar mo = (Planar)output;
 
 			if (mi.getBandType() == mo.getBandType()) {
 				mo.setTo(mi);
@@ -131,37 +134,37 @@ public class GConvertImage {
 					convert(mi.getBand(i), mo.getBand(i));
 				}
 			}
-		} else if( input instanceof ImageInterleaved && output instanceof Planar)  {
+		} else if (input instanceof ImageInterleaved && output instanceof Planar) {
 			String functionName;
-			if( typeIn.getDataType() == typeOut.getDataType()) {
+			if (typeIn.getDataType() == typeOut.getDataType()) {
 				functionName = "convert";
 			} else {
-				functionName = "convert"+typeIn.getDataType()+typeOut.getDataType();
+				functionName = "convert" + typeIn.getDataType() + typeOut.getDataType();
 			}
 			try {
 				Method m = ConvertImage.class.getMethod(functionName, input.getClass(), output.getClass());
 				m.invoke(null, input, output);
 			} catch (Exception e) {
-				throw new IllegalArgumentException("Unknown conversion. "+
-						input.getClass().getSimpleName()+" to "+output.getClass().getSimpleName());
+				throw new IllegalArgumentException("Unknown conversion. " +
+						input.getClass().getSimpleName() + " to " + output.getClass().getSimpleName());
 			}
-		} else if( input instanceof ImageInterleaved && output instanceof ImageGray)  {
+		} else if (input instanceof ImageInterleaved && output instanceof ImageGray) {
 			ImageInterleaved mb = (ImageInterleaved)input;
 			ImageGray so = (ImageGray)output;
 
-			if( mb.getImageType().getDataType() != so.getDataType() ) {
+			if (mb.getImageType().getDataType() != so.getDataType()) {
 				int w = output.width;
 				int h = output.height;
-				ImageGray tmp = GeneralizedImageOps.createSingleBand(mb.getImageType().getDataType(),w,h);
-				average(mb,tmp);
-				convert(tmp,so);
+				ImageGray tmp = GeneralizedImageOps.createSingleBand(mb.getImageType().getDataType(), w, h);
+				average(mb, tmp);
+				convert(tmp, so);
 			} else {
-				average(mb,so);
+				average(mb, so);
 			}
 		} else {
 			String nameInput = input.getClass().getSimpleName();
 			String nameOutput = output.getClass().getSimpleName();
-			throw new IllegalArgumentException("Don't know how to convert between input types. "+nameInput+" "+nameOutput);
+			throw new IllegalArgumentException("Don't know how to convert between input types. " + nameInput + " " + nameOutput);
 		}
 	}
 
@@ -173,11 +176,11 @@ public class GConvertImage {
 	 * @param output (Optional) The single band output image. If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static <T extends ImageGray<T>>T average( ImageMultiBand input , T output ) {
-		if( input instanceof Planar ) {
-			return (T)average((Planar)input,output);
-		} else if( input instanceof ImageInterleaved ) {
-			return (T)average((ImageInterleaved)input,output);
+	public static <T extends ImageGray<T>> T average( ImageMultiBand input, T output ) {
+		if (input instanceof Planar) {
+			return (T)average((Planar)input, output);
+		} else if (input instanceof ImageInterleaved) {
+			return (T)average((ImageInterleaved)input, output);
 		} else {
 			throw new RuntimeException("Unknown multiband image");
 		}
@@ -191,26 +194,26 @@ public class GConvertImage {
 	 * @param output (Optional) The single band output image. If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static <T extends ImageGray<T>>T average(Planar<T> input , T output ) {
+	public static <T extends ImageGray<T>> T average( Planar<T> input, T output ) {
 		Class type = input.getBandType();
-		if( type == GrayU8.class ) {
-			return (T)ConvertImage.average((Planar<GrayU8>)input,(GrayU8)output);
-		} else if( type == GrayS8.class ) {
-			return (T)ConvertImage.average((Planar<GrayS8>)input,(GrayS8)output);
-		} else if( type == GrayU16.class ) {
-			return (T)ConvertImage.average((Planar<GrayU16>)input,(GrayU16)output);
-		} else if( type == GrayS16.class ) {
-			return (T)ConvertImage.average((Planar<GrayS16>)input,(GrayS16)output);
-		} else if( type == GrayS32.class ) {
-			return (T)ConvertImage.average((Planar<GrayS32>)input,(GrayS32)output);
-		} else if( type == GrayS64.class ) {
-			return (T)ConvertImage.average((Planar<GrayS64>)input,(GrayS64)output);
-		} else if( type == GrayF32.class ) {
-			return (T)ConvertImage.average((Planar<GrayF32>)input,(GrayF32)output);
-		} else if( type == GrayF64.class ) {
-			return (T)ConvertImage.average((Planar<GrayF64>)input,(GrayF64)output);
+		if (type == GrayU8.class) {
+			return (T)ConvertImage.average((Planar<GrayU8>)input, (GrayU8)output);
+		} else if (type == GrayS8.class) {
+			return (T)ConvertImage.average((Planar<GrayS8>)input, (GrayS8)output);
+		} else if (type == GrayU16.class) {
+			return (T)ConvertImage.average((Planar<GrayU16>)input, (GrayU16)output);
+		} else if (type == GrayS16.class) {
+			return (T)ConvertImage.average((Planar<GrayS16>)input, (GrayS16)output);
+		} else if (type == GrayS32.class) {
+			return (T)ConvertImage.average((Planar<GrayS32>)input, (GrayS32)output);
+		} else if (type == GrayS64.class) {
+			return (T)ConvertImage.average((Planar<GrayS64>)input, (GrayS64)output);
+		} else if (type == GrayF32.class) {
+			return (T)ConvertImage.average((Planar<GrayF32>)input, (GrayF32)output);
+		} else if (type == GrayF64.class) {
+			return (T)ConvertImage.average((Planar<GrayF64>)input, (GrayF64)output);
 		} else {
-			throw new IllegalArgumentException("Unknown image type: "+type.getSimpleName());
+			throw new IllegalArgumentException("Unknown image type: " + type.getSimpleName());
 		}
 	}
 
@@ -222,24 +225,24 @@ public class GConvertImage {
 	 * @param output (Optional) The single band output image. If null a new image is created. Modified.
 	 * @return Converted image.
 	 */
-	public static <T extends ImageGray<T>>T average(ImageInterleaved input , T output ) {
+	public static <T extends ImageGray<T>> T average( ImageInterleaved input, T output ) {
 		ImageDataType type = input.getImageType().getDataType();
-		if( type == ImageDataType.U8) {
-			return (T)ConvertImage.average((InterleavedU8)input,(GrayU8)output);
-		} else if( type == ImageDataType.S8) {
-			return (T)ConvertImage.average((InterleavedS8)input,(GrayS8)output);
-		} else if( type == ImageDataType.U16 ) {
-			return (T)ConvertImage.average((InterleavedU16)input,(GrayU16)output);
-		} else if( type == ImageDataType.S16 ) {
-			return (T)ConvertImage.average((InterleavedS16)input,(GrayS16)output);
-		} else if( type == ImageDataType.S32 ) {
-			return (T)ConvertImage.average((InterleavedS32)input,(GrayS32)output);
-		} else if( type == ImageDataType.S64 ) {
-			return (T)ConvertImage.average((InterleavedS64)input,(GrayS64)output);
-		} else if( type == ImageDataType.F32 ) {
-			return (T)ConvertImage.average((InterleavedF32)input,(GrayF32)output);
-		} else if( type == ImageDataType.F64 ) {
-			return (T)ConvertImage.average((InterleavedF64)input,(GrayF64)output);
+		if (type == ImageDataType.U8) {
+			return (T)ConvertImage.average((InterleavedU8)input, (GrayU8)output);
+		} else if (type == ImageDataType.S8) {
+			return (T)ConvertImage.average((InterleavedS8)input, (GrayS8)output);
+		} else if (type == ImageDataType.U16) {
+			return (T)ConvertImage.average((InterleavedU16)input, (GrayU16)output);
+		} else if (type == ImageDataType.S16) {
+			return (T)ConvertImage.average((InterleavedS16)input, (GrayS16)output);
+		} else if (type == ImageDataType.S32) {
+			return (T)ConvertImage.average((InterleavedS32)input, (GrayS32)output);
+		} else if (type == ImageDataType.S64) {
+			return (T)ConvertImage.average((InterleavedS64)input, (GrayS64)output);
+		} else if (type == ImageDataType.F32) {
+			return (T)ConvertImage.average((InterleavedF32)input, (GrayF32)output);
+		} else if (type == ImageDataType.F64) {
+			return (T)ConvertImage.average((InterleavedF64)input, (GrayF64)output);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: " + type);
 		}
@@ -247,6 +250,7 @@ public class GConvertImage {
 
 	/**
 	 * Converts pixel values in the input image into an integer values from 0 to numValues.
+	 *
 	 * @param input Input image
 	 * @param min minimum input pixel value, inclusive
 	 * @param max maximum input pixel value, inclusive
@@ -254,33 +258,32 @@ public class GConvertImage {
 	 * @param output (Optional) Storage for the output image. Can be null.
 	 * @return The converted output image.
 	 */
-	public static GrayU8 convert(ImageGray input , double min , double max , int numValues , GrayU8 output )
-	{
+	public static GrayU8 convert( ImageGray input, double min, double max, int numValues, GrayU8 output ) {
 		// see if it can use the faster straight forward convert
-		if( min == 0 && max == 255 && numValues == 256 ) {
-			if( output == null )
-				output = new GrayU8(input.width,input.height);
-			convert(input,output);
+		if (min == 0 && max == 255 && numValues == 256) {
+			if (output == null)
+				output = new GrayU8(input.width, input.height);
+			convert(input, output);
 			return output;
 		}
 
 		ImageDataType type = input.getImageType().getDataType();
-		if( type == ImageDataType.U8) {
-			return ConvertImage.convert((GrayU8)input,(int)min,(int)max,numValues,output);
-		} else if( type == ImageDataType.S8) {
-			return ConvertImage.convert((GrayS8)input,(int)min,(int)max,numValues,output);
-		} else if( type == ImageDataType.U16 ) {
-			return ConvertImage.convert((GrayU16)input,(int)min,(int)max,numValues,output);
-		} else if( type == ImageDataType.S16 ) {
-			return ConvertImage.convert((GrayS16)input,(int)min,(int)max,numValues,output);
-		} else if( type == ImageDataType.S32 ) {
-			return ConvertImage.convert((GrayS32)input,(int)min,(int)max,numValues,output);
-		} else if( type == ImageDataType.S64 ) {
-			return ConvertImage.convert((GrayS64)input,(long)min,(long)max,numValues,output);
-		} else if( type == ImageDataType.F32 ) {
-			return ConvertImage.convert((GrayF32)input,(float)min,(float)max,numValues,output);
-		} else if( type == ImageDataType.F64 ) {
-			return ConvertImage.convert((GrayF64)input,min,max,numValues,output);
+		if (type == ImageDataType.U8) {
+			return ConvertImage.convert((GrayU8)input, (int)min, (int)max, numValues, output);
+		} else if (type == ImageDataType.S8) {
+			return ConvertImage.convert((GrayS8)input, (int)min, (int)max, numValues, output);
+		} else if (type == ImageDataType.U16) {
+			return ConvertImage.convert((GrayU16)input, (int)min, (int)max, numValues, output);
+		} else if (type == ImageDataType.S16) {
+			return ConvertImage.convert((GrayS16)input, (int)min, (int)max, numValues, output);
+		} else if (type == ImageDataType.S32) {
+			return ConvertImage.convert((GrayS32)input, (int)min, (int)max, numValues, output);
+		} else if (type == ImageDataType.S64) {
+			return ConvertImage.convert((GrayS64)input, (long)min, (long)max, numValues, output);
+		} else if (type == ImageDataType.F32) {
+			return ConvertImage.convert((GrayF32)input, (float)min, (float)max, numValues, output);
+		} else if (type == ImageDataType.F64) {
+			return ConvertImage.convert((GrayF64)input, min, max, numValues, output);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: " + type);
 		}
@@ -295,14 +298,13 @@ public class GConvertImage {
 	 * @param typeDst The type of output image.
 	 * @return Converted image.
 	 */
-	public static <T extends ImageGray<T>> T convert(ImageGray<?> src , T dst , Class<T> typeDst  )
-	{
+	public static <T extends ImageGray<T>> T convert( ImageGray<?> src, T dst, Class<T> typeDst ) {
 		if (dst == null) {
-			dst =(T) GeneralizedImageOps.createSingleBand(typeDst, src.width, src.height);
+			dst = (T)GeneralizedImageOps.createSingleBand(typeDst, src.width, src.height);
 		} else {
 			InputSanityCheck.checkSameShape(src, dst);
 		}
-		convert(src,dst);
+		convert(src, dst);
 
 		return dst;
 	}
