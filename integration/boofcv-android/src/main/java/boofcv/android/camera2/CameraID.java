@@ -48,4 +48,10 @@ public class CameraID {
 	public String getOpenID() {
 		return logical != null ? logical : id;
 	}
+
+	@Override public String toString() {
+		if (logical == null)
+			return id;
+		return logical + ":" + id;
+	}
 }
