@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,6 +31,7 @@ import android.util.Log;
 import android.util.Size;
 import android.view.*;
 import boofcv.alg.color.ColorFormat;
+import boofcv.android.BoofAndroidUtils;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.ConvertCameraImage;
 import boofcv.misc.MovingAverage;
@@ -262,52 +263,10 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 		if (verbose)
 			Log.i(TAG, "camera rotation = " + sensorOrientation + " display rotation = " + rotation);
 
-		videoToDisplayMatrix(cameraWidth, cameraHeight, sensorOrientation,
+		BoofAndroidUtils.videoToDisplayMatrix(cameraWidth, cameraHeight, sensorOrientation,
 				viewWidth, viewHeight, rotation*90, stretchToFill, imageToView);
 		if (!imageToView.invert(viewToImage)) {
 			throw new RuntimeException("WTF can't invert the matrix?");
-		}
-	}
-
-	protected static void videoToDisplayMatrix( int cameraWidth, int cameraHeight, int cameraRotation,
-												int displayWidth, int displayHeight, int displayRotation,
-												boolean stretchToFill, Matrix imageToView ) {
-		// Compute transform from bitmap to view coordinates
-		int rotatedWidth = cameraWidth;
-		int rotatedHeight = cameraHeight;
-
-		int offsetX = 0, offsetY = 0;
-
-		boolean needToRotateView = (0 == displayRotation || 180 == displayRotation) !=
-				(cameraRotation == 0 || cameraRotation == 180);
-
-		if (needToRotateView) {
-			rotatedWidth = cameraHeight;
-			rotatedHeight = cameraWidth;
-			offsetX = (rotatedWidth - rotatedHeight)/2;
-			offsetY = (rotatedHeight - rotatedWidth)/2;
-		}
-
-		imageToView.reset();
-		float scale = Math.min(
-				(float)displayWidth/rotatedWidth,
-				(float)displayHeight/rotatedHeight);
-		if (scale == 0) {
-			Log.e(TAG, "displayView has zero width and height");
-			return;
-		}
-
-		imageToView.postRotate(-displayRotation + cameraRotation, cameraWidth/2, cameraHeight/2);
-		imageToView.postTranslate(offsetX, offsetY);
-		imageToView.postScale(scale, scale);
-		if (stretchToFill) {
-			imageToView.postScale(
-					displayWidth/(rotatedWidth*scale),
-					displayHeight/(rotatedHeight*scale));
-		} else {
-			imageToView.postTranslate(
-					(displayWidth - rotatedWidth*scale)/2,
-					(displayHeight - rotatedHeight*scale)/2);
 		}
 	}
 

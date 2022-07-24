@@ -42,6 +42,7 @@ import android.view.TextureView;
 import android.view.View;
 import android.widget.Toast;
 import boofcv.alg.geo.PerspectiveOps;
+import boofcv.android.BoofAndroidUtils;
 import boofcv.struct.calib.CameraPinhole;
 
 import java.util.ArrayList;
@@ -268,33 +269,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 	 * @return index of the resolution
 	 */
 	protected int selectResolution( int widthTexture, int heightTexture, Size[] resolutions ) {
-		int bestIndex = -1;
-		double bestAspect = Double.MAX_VALUE;
-		double bestArea = 0;
-
-		double textureAspect = widthTexture > 0 ? widthTexture/(double)heightTexture : 0;
-
-		for (int i = 0; i < resolutions.length; i++) {
-			Size s = resolutions[i];
-			int width = s.getWidth();
-			int height = s.getHeight();
-
-			double aspectScore = widthTexture > 0 ? Math.abs(width - height*textureAspect)/width : 1;
-
-			if (aspectScore < bestAspect) {
-				bestIndex = i;
-				bestAspect = aspectScore;
-				bestArea = width*height;
-			} else if (Math.abs(aspectScore - bestArea) <= 1e-8) {
-				bestIndex = i;
-				double area = width*height;
-				if (area > bestArea) {
-					bestArea = area;
-				}
-			}
-		}
-
-		return bestIndex;
+		return BoofAndroidUtils.selectAspectRatio(widthTexture, heightTexture, resolutions);
 	}
 
 	/**
@@ -410,7 +385,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 			this.failuresToDecodeImage = 0;
 
 			// Create a list of all cameras, including cameras inside a multi camera system
-			List<CameraID> allCameras = getAllCameras(manager);
+			List<CameraID> allCameras = BoofAndroidUtils.getAllCameras(manager);
 
 			for (CameraID camera : allCameras) {
 				CameraCharacteristics characteristics = manager.getCameraCharacteristics(camera.id);
@@ -481,33 +456,6 @@ public abstract class SimpleCamera2Activity extends Activity {
 			if (releaseLock)
 				open.mLock.unlock();
 		}
-	}
-
-	/**
-	 * Finds all cameras, including physical cameras that are part of a logical camera.
-	 */
-	public static List<CameraID> getAllCameras( CameraManager manager ) throws CameraAccessException {
-		List<CameraID> allCameras = new ArrayList<>();
-		for (String id : manager.getCameraIdList()) {
-			allCameras.add(new CameraID(id));
-			CameraCharacteristics characteristics = manager.getCameraCharacteristics(id);
-
-			// getPhysicalCameraIds() does not exist in older android devices
-			if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.P)
-				continue;
-
-			int[] capabilities = characteristics.get(CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES);
-			for (int i = 0; i < capabilities.length; i++) {
-				if (capabilities[i] != CameraMetadata.REQUEST_AVAILABLE_CAPABILITIES_LOGICAL_MULTI_CAMERA) {
-					continue;
-				}
-				for (String physicalID : characteristics.getPhysicalCameraIds()) {
-					allCameras.add(new CameraID(physicalID, id));
-				}
-				break;
-			}
-		}
-		return allCameras;
 	}
 
 	/**
