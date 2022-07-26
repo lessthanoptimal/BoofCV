@@ -82,7 +82,7 @@ public class ScoreCalibrationFill {
 		scoreInner = 0.0;
 
 		// offset from image border that target points should be
-		actualBorderPx = borderExtent.computeI((int)((width + height)/2));
+		actualBorderPx = BoofMiscOps.thresholdByImageSizeI(borderExtent, width, height);
 
 		// Mark all regions as not occupied
 		occupiedBorder.resetResize(regionsBorder*4, false);

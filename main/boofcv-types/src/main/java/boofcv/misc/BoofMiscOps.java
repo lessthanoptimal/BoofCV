@@ -20,6 +20,7 @@ package boofcv.misc;
 
 import boofcv.BoofVerbose;
 import boofcv.errors.BoofCheckFailure;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.*;
@@ -1099,5 +1100,21 @@ public class BoofMiscOps {
 	 */
 	public static int bitToByteCount( int numBits ) {
 		return numBits/8 + (numBits%8 == 0 ? 0 : 1);
+	}
+
+	/**
+	 * Standard formula for computing a relative threshold based on the image size. Computed as the average
+	 * of the width and height. This it will scale linearly with the perimeter and not the area.
+	 */
+	public static double thresholdByImageSize( ConfigLength config, int width, int height ) {
+		return config.compute((width + height)/2.0);
+	}
+
+	/**
+	 * Standard formula for computing a relative threshold based on the image size. Computed as the average
+	 * of the width and height. This it will scale linearly with the perimeter and not the area.
+	 */
+	public static int thresholdByImageSizeI( ConfigLength config, int width, int height ) {
+		return config.computeI((width + height)/2.0);
 	}
 }

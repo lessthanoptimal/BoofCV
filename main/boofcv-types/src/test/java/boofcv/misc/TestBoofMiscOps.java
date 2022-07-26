@@ -18,10 +18,12 @@
 
 package boofcv.misc;
 
+import boofcv.struct.ConfigLength;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofStandardJUnit;
+import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -256,5 +258,19 @@ class TestBoofMiscOps extends BoofStandardJUnit {
 		for (int i = 0; i < N; i++) {
 			assertEquals(i & 0xFF, found[i] & 0xFF);
 		}
+	}
+
+	@Test void thresholdByImageSize() {
+		var config = new ConfigLength(100, 0.6);
+		assertEquals(100, BoofMiscOps.thresholdByImageSize(config, 50, 60), UtilEjml.TEST_F64);
+		assertEquals(250*0.6, BoofMiscOps.thresholdByImageSize(config, 200, 300), UtilEjml.TEST_F64);
+		assertEquals(250*0.6, BoofMiscOps.thresholdByImageSize(config, 300, 200), UtilEjml.TEST_F64);
+	}
+
+	@Test void thresholdByImageSizeI() {
+		var config = new ConfigLength(100, 0.6);
+		assertEquals(100, BoofMiscOps.thresholdByImageSizeI(config, 50, 60));
+		assertEquals((int)(250*0.6), BoofMiscOps.thresholdByImageSizeI(config, 200, 300));
+		assertEquals((int)(250*0.6), BoofMiscOps.thresholdByImageSizeI(config, 300, 200));
 	}
 }
