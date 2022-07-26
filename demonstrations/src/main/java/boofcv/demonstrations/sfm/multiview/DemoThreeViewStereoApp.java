@@ -35,7 +35,10 @@ import boofcv.alg.geo.RectifyDistortImageOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.bundle.BundleAdjustmentOps;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
+import boofcv.alg.geo.rectify.DisparityParameters;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
+import boofcv.alg.meshing.DisparityToMeshGridSample;
+import boofcv.alg.meshing.VertexMesh;
 import boofcv.alg.structure.ThreeViewEstimateMetricScene;
 import boofcv.core.image.ConvertImage;
 import boofcv.factory.feature.associate.FactoryAssociation;
@@ -53,6 +56,7 @@ import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
+import boofcv.io.points.PointCloudIO;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.calib.CameraPinhole;
@@ -76,6 +80,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -191,22 +198,11 @@ public class DemoThreeViewStereoApp<TD extends TupleDesc<TD>> extends Demonstrat
 	@Override
 	protected void customAddToFileMenu( JMenu menuFile ) {
 		menuFile.addSeparator();
-
-		JMenuItem itemSaveCalibration = new JMenuItem("Save Calibration");
-		itemSaveCalibration.addActionListener(e -> saveCalibration());
-		menuFile.add(itemSaveCalibration);
-
-		JMenuItem itemSaveRectified = new JMenuItem("Save Rectified");
-		itemSaveRectified.addActionListener(e -> saveRectified());
-		menuFile.add(itemSaveRectified);
-
-		JMenuItem itemSaveDisparity = new JMenuItem("Save Disparity");
-		itemSaveDisparity.addActionListener(e -> saveDisparity());
-		menuFile.add(itemSaveDisparity);
-
-		JMenuItem itemSaveCloud = new JMenuItem("Save Point Cloud");
-		itemSaveCloud.addActionListener(e -> savePointCloud());
-		menuFile.add(itemSaveCloud);
+		menuFile.add(BoofSwingUtil.createMenuItem("Save Calibration", this::saveCalibration));
+		menuFile.add(BoofSwingUtil.createMenuItem("Save Rectified", this::saveRectified));
+		menuFile.add(BoofSwingUtil.createMenuItem("Save Disparity", this::saveDisparity));
+		menuFile.add(BoofSwingUtil.createMenuItem("Save Point Cloud", this::savePointCloud));
+		menuFile.add(BoofSwingUtil.createMenuItem("Save Mesh", this::saveSurfaceMesh));
 	}
 
 	private void saveCalibration() {
@@ -227,7 +223,7 @@ public class DemoThreeViewStereoApp<TD extends TupleDesc<TD>> extends Demonstrat
 
 		f = BoofSwingUtil.ensureSuffix(f, ".yaml");
 
-		StereoParameters stereo = new StereoParameters();
+		var stereo = new StereoParameters();
 		stereo.left = intrinsic01;
 		stereo.right = intrinsic02;
 		stereo.right_to_left = leftToRight.invert(null);
@@ -266,6 +262,54 @@ public class DemoThreeViewStereoApp<TD extends TupleDesc<TD>> extends Demonstrat
 
 	private void savePointCloud() {
 		BoofSwingUtil.savePointCloudDialog(this, BoofSwingUtil.KEY_PREVIOUS_DIRECTORY, guiPointCloud);
+	}
+
+	private void saveSurfaceMesh() {
+		// Select where it should be saved
+		String currentPath = BoofSwingUtil.getDefaultPath(this, BoofSwingUtil.KEY_PREVIOUS_DIRECTORY);
+		var fileChooser = new JFileChooser();
+		fileChooser.setDialogTitle("Save Mesh");
+		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		fileChooser.setSelectedFile(new File(currentPath, "mesh.ply"));
+		if (fileChooser.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) {
+			return;
+		}
+
+		// Use an external thread to save it to avoid blocking the UI
+		new Thread("Save Mesh") {
+			@Override public void run() {
+				// Put disparity parameters into a format that the meshing algorithm can understand
+				var parameters = new DisparityParameters();
+				parameters.disparityMin = controls.controlDisparity.getDisparityMin();
+				parameters.disparityRange = controls.controlDisparity.getDisparityRange();
+				PerspectiveOps.matrixToPinhole(rectifiedK, disparity.width, disparity.height, parameters.pinhole);
+				parameters.baseline = leftToRight.T.norm()/10;
+				parameters.rotateToRectified.setTo(rectifiedR);
+
+				// Convert the disparity image into a polygon mesh
+				var alg = new DisparityToMeshGridSample();
+				alg.maxDisparityJump = 2;
+				alg.samplePeriod.setFixed(2);
+				alg.process(parameters, (GrayF32)disparity);
+				VertexMesh mesh = alg.getMesh();
+
+				// Specify the color of each vertex
+				var colors = new DogArray_I32(mesh.vertexes.size());
+				DogArray<Point2D_F64> pixels = alg.getVertexPixels();
+				for (int i = 0; i < pixels.size; i++) {
+					Point2D_F64 p = pixels.get(i);
+					int rgb = rectColor1.get24u8((int)p.x, (int)p.y);
+					colors.add(rgb);
+				}
+
+				// Save results. Display using a 3rd party application
+				try (OutputStream out = new FileOutputStream(fileChooser.getSelectedFile())) {
+					PointCloudIO.save3D(PointCloudIO.Format.PLY, mesh, colors, out);
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+			}
+		}.start();
 	}
 
 	@Override
@@ -629,6 +673,7 @@ public class DemoThreeViewStereoApp<TD extends TupleDesc<TD>> extends Demonstrat
 		System.out.println("Success!");
 	}
 
+	GrayF32 foo = new GrayF32();
 	private boolean computeStereoCloud( int view0, int view1, boolean skipRectify,
 										boolean _automaticChangeViews ) {
 		if (!skipRectify) {
@@ -845,8 +890,8 @@ public class DemoThreeViewStereoApp<TD extends TupleDesc<TD>> extends Demonstrat
 	public void showPointCloud( ImageGray disparity, BufferedImage left,
 								Se3_F64 motion, DMatrixRMaj rectifiedK, DMatrixRMaj rectifiedR,
 								boolean _automaticChangeViews ) {
-		DisparityToColorPointCloud d2c = new DisparityToColorPointCloud();
-		PointCloudWriter.CloudArraysF32 cloud = new PointCloudWriter.CloudArraysF32();
+		var d2c = new DisparityToColorPointCloud();
+		var cloud = new PointCloudWriter.CloudArraysF32();
 		double baseline = motion.getT().norm();
 		int disparityMin = controls.controlDisparity.getDisparityMin();
 		int disparityRange = controls.controlDisparity.getDisparityRange();
