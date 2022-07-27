@@ -673,7 +673,6 @@ public class DemoThreeViewStereoApp<TD extends TupleDesc<TD>> extends Demonstrat
 		System.out.println("Success!");
 	}
 
-	GrayF32 foo = new GrayF32();
 	private boolean computeStereoCloud( int view0, int view1, boolean skipRectify,
 										boolean _automaticChangeViews ) {
 		if (!skipRectify) {
@@ -759,7 +758,7 @@ public class DemoThreeViewStereoApp<TD extends TupleDesc<TD>> extends Demonstrat
 	 * Select two views which are the closest to an idea stereo pair. Little rotation and little translation along
 	 * z-axis
 	 */
-	private int[] selectBestPair( SceneStructureMetric structure ) {
+	public static int[] selectBestPair( SceneStructureMetric structure ) {
 		Se3_F64 w_to_0 = structure.getParentToView(0);
 		Se3_F64 w_to_1 = structure.getParentToView(1);
 		Se3_F64 w_to_2 = structure.getParentToView(2);
@@ -792,7 +791,7 @@ public class DemoThreeViewStereoApp<TD extends TupleDesc<TD>> extends Demonstrat
 	/**
 	 * Give lower scores to transforms with no rotation and translations along x or y axis.
 	 */
-	private double score( Se3_F64 se ) {
+	private static double score( Se3_F64 se ) {
 //		Rodrigues_F64 rod = new Rodrigues_F64();
 //		ConvertRotation3D_F64.matrixToRodrigues(se.R,rod);
 
@@ -808,7 +807,7 @@ public class DemoThreeViewStereoApp<TD extends TupleDesc<TD>> extends Demonstrat
 		return 1.0/r; // ignoring rotation seems to work better <shrug>
 	}
 
-	public <C extends ImageBase<C>>
+	public static <C extends ImageBase<C>>
 	void rectifyImages( C distorted1,
 						C distorted2,
 						Se3_F64 leftToRight,
