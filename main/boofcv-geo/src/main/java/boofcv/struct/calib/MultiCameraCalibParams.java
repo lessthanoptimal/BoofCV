@@ -33,7 +33,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class MultiCameraCalib implements Serializable {
+public class MultiCameraCalibParams implements Serializable {
 	// serialization version
 	public static final long serialVersionUID = 1L;
 
