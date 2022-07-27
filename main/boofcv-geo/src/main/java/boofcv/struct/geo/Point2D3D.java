@@ -39,8 +39,8 @@ public class Point2D3D {
 	public @Getter @Setter Point3D_F64 location;
 
 	public Point2D3D() {
-		observation = new Point2D_F64();
-		location = new Point3D_F64();
+		this.observation = new Point2D_F64();
+		this.location = new Point3D_F64();
 	}
 
 	public Point2D3D( Point2D_F64 observation, Point3D_F64 location ) {
@@ -52,20 +52,26 @@ public class Point2D3D {
 	 * Sets 'this' to be identical to 'src'.
 	 */
 	public Point2D3D setTo( Point2D3D src ) {
-		observation.setTo(src.observation);
-		location.setTo(src.location);
+		this.observation.setTo(src.observation);
+		this.location.setTo(src.location);
+		return this;
+	}
+
+	public Point2D3D setTo( Point2D_F64 observation, Point3D_F64 location ) {
+		this.observation.setTo(observation);
+		this.location.setTo(location);
 		return this;
 	}
 
 	public Point2D3D setTo( double x2, double y2, double x3, double y3, double z3 ) {
-		observation.setTo(x2, y2);
-		location.setTo(x3, y3, z3);
+		this.observation.setTo(x2, y2);
+		this.location.setTo(x3, y3, z3);
 		return this;
 	}
 
 	public void zero() {
-		observation.zero();
-		location.zero();
+		this.observation.zero();
+		this.location.zero();
 	}
 
 	public Point2D3D copy() {
