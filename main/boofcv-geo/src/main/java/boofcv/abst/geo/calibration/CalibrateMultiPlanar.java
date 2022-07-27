@@ -27,7 +27,7 @@ import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.geo.calibration.CalibrationObservationSet;
 import boofcv.alg.geo.calibration.SynchronizedCalObs;
 import boofcv.struct.calib.CameraPinholeBrown;
-import boofcv.struct.calib.MultiCameraCalib;
+import boofcv.struct.calib.MultiCameraCalibParams;
 import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
@@ -79,9 +79,9 @@ public class CalibrateMultiPlanar {
 	@Getter MetricBundleAdjustmentUtils bundleUtils = new MetricBundleAdjustmentUtils();
 
 	/** Storage for found calibration parameters */
-	@Getter MultiCameraCalib results = new MultiCameraCalib();
+	@Getter MultiCameraCalibParams results = new MultiCameraCalibParams();
 
-	// Specifies locations of landmarks are calibration taregets
+	// Specifies locations of landmarks are calibration targets
 	final FastArray<List<Point2D_F64>> layouts = new FastArray<>((Class)(ArrayList.class));
 
 	// Monocular calibration results
@@ -95,10 +95,12 @@ public class CalibrateMultiPlanar {
 		if (numTargets != 1)
 			throw new RuntimeException("Currently only supports one target");
 
+		results.reset();
 		layouts.resize(numTargets);
 		cameras.resetResize(numCameras);
 		for (int i = 0; i < cameras.size; i++) {
 			cameras.get(i).index = i;
+			results.listCameraToSensor.add(new Se3_F64());
 		}
 
 		frameObs.clear();
@@ -132,13 +134,10 @@ public class CalibrateMultiPlanar {
 	 * @return true if successful or false if it failed
 	 */
 	public boolean process() {
-		results.reset();
-		for (int i = 0; i < cameras.size; i++) {
-			results.listCameraToSensor.add(new Se3_F64());
-		}
+		// Assume there's only one target for now. This should be changed in the future
 		int targetID = 0;
 
-		List<FrameState> frames = new ArrayList<>();
+		var frames = new ArrayList<FrameState>();
 		for (int i = 0; i < frameObs.size(); i++) {
 			frames.add(new FrameState());
 		}
@@ -147,7 +146,10 @@ public class CalibrateMultiPlanar {
 		monocularCalibration(targetID, frames);
 
 		// Find extrinsic relationship between all the cameras
-		estimateExtrinsics(frames);
+		estimateCameraToSensor(frames);
+
+		// Find relationship of sensor reference frame to world reference frame
+		estimateSensorToWorldInAllFrames(frames);
 
 		setupSbaScene(targetID, frames);
 
@@ -160,48 +162,13 @@ public class CalibrateMultiPlanar {
 	}
 
 	/**
-	 * Find the sensor to world transform for every frame
-	 */
-	private void estimateSensorRelativeToWorld( List<FrameState> frames ) {
-		for (int frameIdx = 0; frameIdx < frames.size(); frameIdx++) {
-			FrameState f = frames.get(frameIdx);
-
-			// If true then a transform was found for this frame
-			boolean found = false;
-
-			// Go through all cameras
-			frameEscape:
-			for (int camIdx = 0; camIdx < cameras.size; camIdx++) {
-				FrameCamera fc = f.cameras.get(camIdx);
-				if (fc == null)
-					continue;
-
-				// see if this camera has an observation that can be used
-				for (int obsIdx = 0; obsIdx < fc.observations.size(); obsIdx++) {
-
-					// NOTE: This code assumes there is only one target and that target is the world frame
-					TargetExtrinsics te = fc.observations.get(obsIdx);
-					Se3_F64 cameraToTarget = te.targetToCamera.invert(null);
-					results.getCameraToSensor(camIdx).invertConcat(cameraToTarget, f.sensorToWorld);
-
-					found = true;
-					break frameEscape;
-				}
-			}
-
-			if (!found)
-				throw new RuntimeException("This frame should be removed");
-		}
-	}
-
-	/**
 	 * Calibrate each camera independently. Save extrinsic relationship between targets and each camera
 	 * in all the views
 	 *
 	 * @param targetID Which target is going to be used to calibrate the cameras
 	 * @param frames All the time step frames
 	 */
-	private void monocularCalibration( int targetID, List<FrameState> frames ) {
+	void monocularCalibration( int targetID, List<FrameState> frames ) {
 		// Store the index of each frame that had observations from a camera and the specified target
 		var usedFrames = new DogArray_I32();
 
@@ -258,13 +225,15 @@ public class CalibrateMultiPlanar {
 	}
 
 	/**
-	 * Given the known mono camera calibrations, determine the relationship of each camera view to sensor
-	 * reference frame by finding cases where common cameras observed the same target.
+	 * Given known target to cameras from mono calibration, determine the camera to sensor
+	 * reference frame by finding cases where common cameras observed the same target. This is done by
+	 * iteratively going through the list of cameras with unknown relationships to the sensor frame and seeing
+	 * if they share an observation with a known camera.
 	 */
-	private void estimateExtrinsics( List<FrameState> frames ) {
+	void estimateCameraToSensor( List<FrameState> frames ) {
 		// Known contains cameras where the extrinsics is known
-		// Unknown contains cameras with unknown extronsics
 		List<CameraPriors> known = new ArrayList<>();
+		// Unknown contains cameras with unknown extrinsics
 		List<CameraPriors> unknown = new ArrayList<>();
 		for (int i = 1; i < cameras.size; i++) {
 			unknown.add(cameras.get(i));
@@ -319,12 +288,45 @@ public class CalibrateMultiPlanar {
 	}
 
 	/**
+	 * Find the sensor to world transform for every frame. For each frame, it selects an arbitrary target
+	 * observation and uses the known camera to sensor and target to world transform, to find sensor to world.
+	 */
+	void estimateSensorToWorldInAllFrames( List<FrameState> frames ) {
+		for (int frameIdx = 0; frameIdx < frames.size(); frameIdx++) {
+			FrameState f = frames.get(frameIdx);
+
+			// If true then a transform was found for this frame
+			boolean found = false;
+
+			// Go through all cameras
+			frameEscape:
+			for (int camIdx = 0; camIdx < cameras.size; camIdx++) {
+				FrameCamera fc = f.cameras.get(camIdx);
+				if (fc == null)
+					continue;
+
+				// see if this camera has an observation that can be used
+				for (int obsIdx = 0; obsIdx < fc.observations.size(); obsIdx++) {
+
+					// NOTE: This code assumes there is only one target and that target is the world frame
+					TargetExtrinsics te = fc.observations.get(obsIdx);
+					Se3_F64 cameraToTarget = te.targetToCamera.invert(null);
+					results.getCameraToSensor(camIdx).invertConcat(cameraToTarget, f.sensorToWorld);
+
+					found = true;
+					break frameEscape;
+				}
+			}
+
+			if (!found)
+				throw new RuntimeException("This frame should be removed");
+		}
+	}
+
+	/**
 	 * Given the initial estimates already found, create a scene graph that can be optimized by SBA
 	 */
-	private void setupSbaScene( int targetID, List<FrameState> frames ) {
-		// Find relationship of sensor reference frame to world reference frame
-		estimateSensorRelativeToWorld(frames);
-
+	void setupSbaScene( int targetID, List<FrameState> frames ) {
 		// Refine everything with bundle adjustment
 		final SceneStructureMetric structure = bundleUtils.getStructure();
 		final SceneObservations observations = bundleUtils.getObservations();
@@ -395,7 +397,7 @@ public class CalibrateMultiPlanar {
 	/**
 	 * Copies over camera intrinsics and extrinsics in sensor frame to output data structure
 	 */
-	private void sbaToOutput() {
+	void sbaToOutput() {
 		final SceneStructureMetric structure = bundleUtils.getStructure();
 
 		for (int camIdx = 0; camIdx < cameras.size; camIdx++) {
@@ -407,17 +409,17 @@ public class CalibrateMultiPlanar {
 	}
 
 	/**
-	 * Computes the SE3 from the unknown camera to world using the known SE3 in the known view.
-	 * If there are no common observations then it returns false.
+	 * Computes the SE3 for the unknown view using a view with a known SE3. This is done by finding a
+	 * target that they both are observing.
 	 *
 	 * @param frame Frame that it's examining
-	 * @param idx0 Index of known camera
-	 * @param idx1 Index of unknown camera
-	 * @return camera1 to sensor transform or null if it failed
+	 * @param camId0 ID of known camera
+	 * @param camId1 ID of unknown camera
+	 * @return Transform from cam1 to sensor frame
 	 */
-	@Nullable Se3_F64 extrinsicFromKnownCamera( FrameState frame, int idx0, int idx1 ) {
-		FrameCamera state0 = frame.cameras.get(idx0);
-		FrameCamera state1 = frame.cameras.get(idx1);
+	@Nullable Se3_F64 extrinsicFromKnownCamera( FrameState frame, int camId0, int camId1 ) {
+		FrameCamera state0 = frame.cameras.get(camId0);
+		FrameCamera state1 = frame.cameras.get(camId1);
 
 		if (state0 == null || state1 == null)
 			return null;
@@ -425,22 +427,19 @@ public class CalibrateMultiPlanar {
 		for (int obsIdx0 = 0; obsIdx0 < state0.observations.size(); obsIdx0++) {
 			TargetExtrinsics tgt0 = state0.observations.get(obsIdx0);
 
-			for (int obsIdx1 = 0; obsIdx1 < state1.observations.size(); obsIdx1++) {
-				TargetExtrinsics tgt1 = state1.observations.get(obsIdx1);
+			TargetExtrinsics tgt1 = state1.findTarget(tgt0.targetID);
+			if (tgt1 == null)
+				continue;
 
-				if (tgt0.targetID != tgt1.targetID)
-					continue;
+			// Find the transform from world to camera using the relative transform of the common target
+			// to each of the cameras;
+			Se3_F64 cam0_to_cam1 = new Se3_F64();
 
-				// Find the transform from world to camera using the relative transform of the common target
-				// to each of the cameras;
-				Se3_F64 cam0_to_cam1 = new Se3_F64();
+			tgt0.targetToCamera.invertConcat(tgt1.targetToCamera, cam0_to_cam1);
 
-				tgt0.targetToCamera.invertConcat(tgt1.targetToCamera, cam0_to_cam1);
+			Se3_F64 cam0_to_sensor = results.getCameraToSensor(camId0);
 
-				Se3_F64 cam0_to_sensor = results.getCameraToSensor(idx0);
-
-				return cam0_to_cam1.invertConcat(cam0_to_sensor, null);
-			}
+			return cam0_to_cam1.invertConcat(cam0_to_sensor, null);
 		}
 
 		return null;
@@ -462,7 +461,10 @@ public class CalibrateMultiPlanar {
 	 * at a single instance of time.
 	 */
 	public static class FrameState {
+		/** Mapping from camera index to camera */
 		TIntObjectMap<FrameCamera> cameras = new TIntObjectHashMap<>();
+
+		/** Transform from the sensor coordinate system at this time step to the world frame */
 		Se3_F64 sensorToWorld = new Se3_F64();
 	}
 
@@ -471,6 +473,15 @@ public class CalibrateMultiPlanar {
 	 */
 	public static class FrameCamera {
 		List<TargetExtrinsics> observations = new ArrayList<>();
+
+		/** Returns the observations which matches the specified targetID or null if there is no match */
+		public @Nullable TargetExtrinsics findTarget( int targetID ) {
+			for (int i = 0; i < observations.size(); i++) {
+				if (observations.get(i).targetID == targetID)
+					return observations.get(i);
+			}
+			return null;
+		}
 	}
 
 	/**
@@ -481,5 +492,11 @@ public class CalibrateMultiPlanar {
 		int targetID;
 		// Extrinsic relationship between target and camera at this instance
 		Se3_F64 targetToCamera = new Se3_F64();
+
+		public TargetExtrinsics( int targetID ) {
+			this.targetID = targetID;
+		}
+
+		public TargetExtrinsics() {}
 	}
 }

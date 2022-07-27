@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo.calibration;
 
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ConfigLength;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Rectangle2D_I32;
