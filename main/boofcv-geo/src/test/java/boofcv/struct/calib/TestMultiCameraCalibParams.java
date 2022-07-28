@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class TestMultiCameraCalib extends BoofStandardJUnit {
+class TestMultiCameraCalibParams extends BoofStandardJUnit {
 	@Test void getBaseline() {
 		var alg = new MultiCameraCalibParams();
 		alg.listCameraToSensor.add(SpecialEuclideanOps_F64.eulerXyz(1, 0, 0, 0, 0, 0, null));
