@@ -35,13 +35,12 @@ import java.util.List;
  */
 public class CalibrationObservation {
 	/** Which target was observed */
-	public int target;
+	@Getter public int target;
 
 	/**
 	 * List of pixel observations and the index of the control point
 	 */
 	@Getter public List<PointIndex2D_F64> points = new ArrayList<>();
-
 
 	public CalibrationObservation() {}
 
