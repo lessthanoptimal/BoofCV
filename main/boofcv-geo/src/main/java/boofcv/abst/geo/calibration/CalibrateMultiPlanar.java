@@ -405,7 +405,7 @@ public class CalibrateMultiPlanar {
 			CameraPriors c = cameras.get(camIdx);
 			BundlePinholeBrown bb = structure.getCameraModel(camIdx);
 			BundleAdjustmentOps.convert(bb, c.width, c.height, (CameraPinholeBrown)results.intrinsics.get(camIdx));
-			results.listCameraToSensor.get(camIdx).setTo(structure.motions.get(camIdx).motion);
+			structure.motions.get(camIdx).motion.invert(results.listCameraToSensor.get(camIdx));
 		}
 	}
 

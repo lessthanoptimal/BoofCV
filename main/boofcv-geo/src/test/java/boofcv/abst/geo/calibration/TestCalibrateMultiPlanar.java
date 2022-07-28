@@ -49,37 +49,87 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TestCalibrateMultiPlanar extends BoofStandardJUnit {
 	CameraPinholeBrown intrinsicA = new CameraPinholeBrown(200,210,0,320,240,640,480).
-			fsetRadial(0.01, -0.02).fsetTangental(0.03,0.03);
+			fsetRadial(0.01, -0.02);
 	CameraPinholeBrown intrinsicB = new CameraPinholeBrown(400,405,0,320,240,800,600);
 
-	List<Point2D_F64> layout = CalibrationDetectorSquareGrid.createLayout(6, 5, 30, 30);
+	List<Point2D_F64> layout = CalibrationDetectorSquareGrid.createLayout(6, 5, .02, .02);
 
+	/**
+	 * Test everything together given perfect input
+	 */
 	@Test void perfect() {
-		fail("Implement");
+		var expected = new MultiCameraCalibParams();
+		var alg = new CalibrateMultiPlanar();
+
+		createScenarioAndConfigure(alg, expected);
+
+		assertTrue(alg.process());
+
+		assertEquals(expected.intrinsics.size(), alg.results.intrinsics.size());
+		for (int i = 0; i < expected.intrinsics.size(); i++) {
+			CameraPinholeBrown e = expected.getIntrinsics(i);
+			CameraPinholeBrown f = alg.results.getIntrinsics(i);
+
+			// Check just some parameters. When it fails it tends to be very wrong
+			assertEquals(e.fx, f.fx, 1e-2);
+			assertEquals(e.fy, f.fy, 1e-2);
+			assertEquals(e.width, f.width);
+			assertEquals(e.height, f.height);
+		}
+
+		for (int i = 0; i < expected.listCameraToSensor.size(); i++) {
+			Se3_F64 e = expected.getCameraToSensor(i);
+			Se3_F64 f = alg.results.getCameraToSensor(i);
+			assertTrue(SpecialEuclideanOps_F64.isIdentical(e, f, 0.01, 0.02));
+		}
 	}
 
-	@Test void noisy() {
-		fail("Implement");
-	}
-
+	/**
+	 * Test monocular calibration only
+	 */
 	@Test void monocularCalibration() {
 		var expected = new MultiCameraCalibParams();
+		var alg = new CalibrateMultiPlanar();
+
+		createScenarioAndConfigure(alg, expected);
+
+		var frames = new ArrayList<FrameState>();
+		for (int i = 0; i < alg.frameObs.size(); i++) {
+			frames.add(new FrameState());
+		}
+		alg.monocularCalibration(0, frames);
+
+		assertEquals(expected.intrinsics.size(), alg.results.intrinsics.size());
+		for (int i = 0; i < expected.intrinsics.size(); i++) {
+			CameraPinholeBrown e = expected.getIntrinsics(i);
+			CameraPinholeBrown f = alg.results.getIntrinsics(i);
+
+			// Check just some parameters. When it fails it tends to be very wrong
+			assertEquals(e.fx, f.fx, 1e-2);
+			assertEquals(e.fy, f.fy, 1e-2);
+			assertEquals(e.width, f.width);
+			assertEquals(e.height, f.height);
+		}
+	}
+
+	void createScenarioAndConfigure( CalibrateMultiPlanar alg, MultiCameraCalibParams expected) {
 		expected.intrinsics.add(intrinsicA);
 		expected.intrinsics.add(intrinsicB);
 		expected.intrinsics.add(intrinsicB);
-		expected.listCameraToSensor.add(eulerXyz(0,0,0,0,0,0,null));
-		expected.listCameraToSensor.add(eulerXyz(0,0.25,0,0,0,0,null));
-		expected.listCameraToSensor.add(eulerXyz(0.2,0.0,0,0,0,0,null));
+		expected.listCameraToSensor.add(eulerXyz(0, 0, 0, 0, 0, 0, null));
+		expected.listCameraToSensor.add(eulerXyz(0, 0.15, 0, 0.02, 0, 0, null));
+		expected.listCameraToSensor.add(eulerXyz(0.1, 0.0, 0, 0, -0.05, 0, null));
 
 		List<Se3_F64> listSensorToWorld = new ArrayList<>();
-		listSensorToWorld.add(eulerXyz(0,0,-2,0,0,0,null));
-		listSensorToWorld.add(eulerXyz(-0.3,0,-2,0.05,0,0,null));
-		listSensorToWorld.add(eulerXyz(0,0.1,-2,0,0,0.04,null));
-		listSensorToWorld.add(eulerXyz(0.2,0,-1.8,0,0.04,0,null));
-		listSensorToWorld.add(eulerXyz(0,0,-2,-0.05,-0.01,0,null));
+		listSensorToWorld.add(eulerXyz(0, 0, -2, 0, 0, 0, null));
+		listSensorToWorld.add(eulerXyz(-0.3, 0, -2, 0.05, 0, 0, null));
+		listSensorToWorld.add(eulerXyz(0, 0.1, -2, 0, 0, 0.04, null));
+		listSensorToWorld.add(eulerXyz(0, 0.5, -2, 0, 0.2, 0.04, null));
+		listSensorToWorld.add(eulerXyz(0, 0.55, -1.5, 0, -0.2, 0.04, null));
+		listSensorToWorld.add(eulerXyz(0.2, 0, -1.8, 0, 0.04, 0, null));
+		listSensorToWorld.add(eulerXyz(-0.6, 0, -2, -0.05, -0.01, 0, null));
+		listSensorToWorld.add(eulerXyz(0.6, 0, -2, 0.15, -0.1, 0, null));
 
-
-		var alg = new CalibrateMultiPlanar();
 		alg.getCalibratorMono().configurePinhole(true, 2, true);
 		alg.initialize(expected.intrinsics.size(), 1);
 		for (int i = 0; i < expected.intrinsics.size(); i++) {
@@ -91,14 +141,6 @@ public class TestCalibrateMultiPlanar extends BoofStandardJUnit {
 		for (Se3_F64 sensorToWorld : listSensorToWorld) {
 			alg.addObservation(createObs(sensorToWorld, expected));
 		}
-
-		var frames = new ArrayList<FrameState>();
-		for (int i = 0; i < listSensorToWorld.size(); i++) {
-			frames.add(new FrameState());
-		}
-		alg.monocularCalibration(0, frames);
-
-		assertEquals(expected.intrinsics.size(), alg.results.intrinsics.size());
 	}
 
 	SynchronizedCalObs createObs(Se3_F64 sensorToWorld, MultiCameraCalibParams params) {
@@ -118,17 +160,30 @@ public class TestCalibrateMultiPlanar extends BoofStandardJUnit {
 			set.cameraID = i;
 			CalibrationObservation tgtObs = set.targets.grow();
 
+			int behind = 0;
 			for (int landmarkID = 0; landmarkID < layout.size(); landmarkID++) {
 				tgtX.x = layout.get(landmarkID).x;
 				tgtX.y = layout.get(landmarkID).y;
 
 				worldToCamera.transform(tgtX, camX);
 
+				// Skip behind camera
+				if (camX.z < 0) {
+					behind++;
+					continue;
+				}
+
 				var landmarkObs = new PointIndex2D_F64();
 				normToPixel.compute(camX.x/camX.z, camX.y/camX.z, landmarkObs.p);
 				landmarkObs.index = landmarkID;
 				tgtObs.points.add(landmarkObs);
+
+				if (!intrinsic.isInside(landmarkObs.p.x, landmarkObs.p.y))
+					throw new RuntimeException("Not inside image");
 			}
+
+			if (behind >= layout.size()/2)
+				throw new RuntimeException("Too many behind camera");
 		}
 		return syncObs;
 	}
