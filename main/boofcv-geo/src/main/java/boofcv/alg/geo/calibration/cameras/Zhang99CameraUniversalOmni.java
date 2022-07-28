@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,9 +45,8 @@ public class Zhang99CameraUniversalOmni implements Zhang99Camera {
 	/**
 	 * Constructor where mirror offset is assumed to be known
 	 */
-	public Zhang99CameraUniversalOmni( List<Point2D_F64> layout,
-									   boolean assumeZeroSkew, boolean includeTangential, int numRadial, double mirror ) {
-		this(layout, assumeZeroSkew, includeTangential, numRadial);
+	public Zhang99CameraUniversalOmni( boolean assumeZeroSkew, boolean includeTangential, int numRadial, double mirror ) {
+		this(assumeZeroSkew, includeTangential, numRadial);
 		this.fixedMirror = true;
 		this.mirror = mirror;
 	}
@@ -55,12 +54,15 @@ public class Zhang99CameraUniversalOmni implements Zhang99Camera {
 	/**
 	 * Constructor where mirror offset is assumed to be unknown
 	 */
-	public Zhang99CameraUniversalOmni( List<Point2D_F64> layout,
-									   boolean assumeZeroSkew, boolean includeTangential, int numRadial ) {
+	public Zhang99CameraUniversalOmni( boolean assumeZeroSkew, boolean includeTangential, int numRadial ) {
 		this.assumeZeroSkew = assumeZeroSkew;
 		this.includeTangential = includeTangential;
 		this.fixedMirror = false;
-		computeRadial = new RadialDistortionEstimateLinear(layout, numRadial);
+		computeRadial = new RadialDistortionEstimateLinear(numRadial);
+	}
+
+	@Override public void setLayout( List<Point2D_F64> layout ) {
+		computeRadial.setWorldPoints(layout);
 	}
 
 	@Override public BundleAdjustmentCamera initializeCamera(

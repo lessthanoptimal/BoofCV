@@ -18,21 +18,42 @@
 
 package boofcv.abst.geo.calibration;
 
+import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
 import boofcv.abst.geo.calibration.CalibrateMultiPlanar.FrameCamera;
 import boofcv.abst.geo.calibration.CalibrateMultiPlanar.FrameState;
 import boofcv.abst.geo.calibration.CalibrateMultiPlanar.TargetExtrinsics;
+import boofcv.alg.geo.calibration.CalibrationObservation;
+import boofcv.alg.geo.calibration.CalibrationObservationSet;
+import boofcv.alg.geo.calibration.SynchronizedCalObs;
+import boofcv.factory.distort.LensDistortionFactory;
+import boofcv.struct.calib.CameraModel;
+import boofcv.struct.calib.CameraPinholeBrown;
+import boofcv.struct.calib.MultiCameraCalibParams;
+import boofcv.struct.distort.Point2Transform2_F64;
+import boofcv.struct.geo.PointIndex2D_F64;
+import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.EulerType;
+import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.se.SpecialEuclideanOps_F64;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
+import static georegression.struct.se.SpecialEuclideanOps_F64.eulerXyz;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestCalibrateMultiPlanar {
+public class TestCalibrateMultiPlanar extends BoofStandardJUnit {
+	CameraPinholeBrown intrinsicA = new CameraPinholeBrown(200,210,0,320,240,640,480).
+			fsetRadial(0.01, -0.02).fsetTangental(0.03,0.03);
+	CameraPinholeBrown intrinsicB = new CameraPinholeBrown(400,405,0,320,240,800,600);
+
+	List<Point2D_F64> layout = CalibrationDetectorSquareGrid.createLayout(6, 5, 30, 30);
+
 	@Test void perfect() {
 		fail("Implement");
 	}
@@ -42,7 +63,74 @@ public class TestCalibrateMultiPlanar {
 	}
 
 	@Test void monocularCalibration() {
-		fail("Implement");
+		var expected = new MultiCameraCalibParams();
+		expected.intrinsics.add(intrinsicA);
+		expected.intrinsics.add(intrinsicB);
+		expected.intrinsics.add(intrinsicB);
+		expected.listCameraToSensor.add(eulerXyz(0,0,0,0,0,0,null));
+		expected.listCameraToSensor.add(eulerXyz(0,0.25,0,0,0,0,null));
+		expected.listCameraToSensor.add(eulerXyz(0.2,0.0,0,0,0,0,null));
+
+		List<Se3_F64> listSensorToWorld = new ArrayList<>();
+		listSensorToWorld.add(eulerXyz(0,0,-2,0,0,0,null));
+		listSensorToWorld.add(eulerXyz(-0.3,0,-2,0.05,0,0,null));
+		listSensorToWorld.add(eulerXyz(0,0.1,-2,0,0,0.04,null));
+		listSensorToWorld.add(eulerXyz(0.2,0,-1.8,0,0.04,0,null));
+		listSensorToWorld.add(eulerXyz(0,0,-2,-0.05,-0.01,0,null));
+
+
+		var alg = new CalibrateMultiPlanar();
+		alg.getCalibratorMono().configurePinhole(true, 2, true);
+		alg.initialize(expected.intrinsics.size(), 1);
+		for (int i = 0; i < expected.intrinsics.size(); i++) {
+			CameraModel cam = expected.intrinsics.get(i);
+			alg.setCameraProperties(i, cam.width, cam.height);
+		}
+		alg.setTargetLayout(0, layout);
+
+		for (Se3_F64 sensorToWorld : listSensorToWorld) {
+			alg.addObservation(createObs(sensorToWorld, expected));
+		}
+
+		var frames = new ArrayList<FrameState>();
+		for (int i = 0; i < listSensorToWorld.size(); i++) {
+			frames.add(new FrameState());
+		}
+		alg.monocularCalibration(0, frames);
+
+		assertEquals(expected.intrinsics.size(), alg.results.intrinsics.size());
+	}
+
+	SynchronizedCalObs createObs(Se3_F64 sensorToWorld, MultiCameraCalibParams params) {
+		var syncObs = new SynchronizedCalObs();
+
+		var tgtX = new Point3D_F64();
+		var camX = new Point3D_F64();
+
+		for (int i = 0; i < params.intrinsics.size(); i++) {
+			Se3_F64 cameraToSensor = params.getCameraToSensor(i);
+			CameraPinholeBrown intrinsic = params.getIntrinsics(i);
+			Point2Transform2_F64 normToPixel = LensDistortionFactory.narrow(intrinsic).distort_F64(false, true);
+
+			Se3_F64 worldToCamera = cameraToSensor.concat(sensorToWorld, null).invert(null);
+
+			CalibrationObservationSet set = syncObs.cameras.grow();
+			set.cameraID = i;
+			CalibrationObservation tgtObs = set.targets.grow();
+
+			for (int landmarkID = 0; landmarkID < layout.size(); landmarkID++) {
+				tgtX.x = layout.get(landmarkID).x;
+				tgtX.y = layout.get(landmarkID).y;
+
+				worldToCamera.transform(tgtX, camX);
+
+				var landmarkObs = new PointIndex2D_F64();
+				normToPixel.compute(camX.x/camX.z, camX.y/camX.z, landmarkObs.p);
+				landmarkObs.index = landmarkID;
+				tgtObs.points.add(landmarkObs);
+			}
+		}
+		return syncObs;
 	}
 
 	/**
@@ -55,12 +143,12 @@ public class TestCalibrateMultiPlanar {
 		// Define the ground truth for camera to sensor
 		var expectedC2S = new ArrayList<Se3_F64>();
 		for (int i = 0; i < numCameras; i++) {
-			expectedC2S.add(SpecialEuclideanOps_F64.eulerXyz(i, 0, 0, 0, 0, 0, null));
+			expectedC2S.add(eulerXyz(i, 0, 0, 0, 0, 0, null));
 		}
 
 		var frames = new ArrayList<FrameState>();
 		for (int frameIdx = 0; frameIdx < numFrames; frameIdx++) {
-			Se3_F64 tgt_to_sensor = SpecialEuclideanOps_F64.eulerXyz(20 + frameIdx, 0, 0, 0, 0, 0, null);
+			Se3_F64 tgt_to_sensor = eulerXyz(20 + frameIdx, 0, 0, 0, 0, 0, null);
 
 			frames.add(new FrameState());
 			FrameState f = frames.get(frameIdx);

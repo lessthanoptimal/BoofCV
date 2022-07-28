@@ -46,7 +46,8 @@ public class ScoreCalibrationGeometricDiversity {
 
 	public ScoreCalibrationGeometricDiversity( boolean assumeZeroSkew, List<Point2D_F64> worldPoints ) {
 		computeCalib = new Zhang99CalibrationMatrixFromHomographies(assumeZeroSkew);
-		computeHomography = new Zhang99ComputeTargetHomography(worldPoints);
+		computeHomography = new Zhang99ComputeTargetHomography();
+		computeHomography.setWorldPoints(worldPoints);
 	}
 
 	/**

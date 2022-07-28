@@ -39,7 +39,6 @@ import java.io.File;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -114,38 +113,30 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 	 * Specifies the calibration model.
 	 */
 	public void configure( boolean assumeZeroSkew, Zhang99Camera camera ) {
-		Objects.requireNonNull(layout, "layout is null. Did you call initialize()?");
-
-		zhang99 = new CalibrationPlanarGridZhang99(layout, camera);
+		zhang99 = new CalibrationPlanarGridZhang99(camera);
 		zhang99.setZeroSkew(assumeZeroSkew);
 	}
 
 	public void configurePinhole( boolean assumeZeroSkew,
 								  int numRadialParam,
 								  boolean includeTangential ) {
-		Objects.requireNonNull(layout, "layout is null. Did you call initialize()?");
-
-		var camera = new Zhang99CameraBrown(layout, assumeZeroSkew, includeTangential, numRadialParam);
-		zhang99 = new CalibrationPlanarGridZhang99(layout, camera);
+		var camera = new Zhang99CameraBrown(assumeZeroSkew, includeTangential, numRadialParam);
+		zhang99 = new CalibrationPlanarGridZhang99(camera);
 		zhang99.setZeroSkew(assumeZeroSkew);
 	}
 
 	public void configureUniversalOmni( boolean assumeZeroSkew,
 										int numRadialParam,
 										boolean includeTangential ) {
-		Objects.requireNonNull(layout, "layout is null. Did you call initialize()?");
-
-		zhang99 = new CalibrationPlanarGridZhang99(layout,
-				new Zhang99CameraUniversalOmni(layout, assumeZeroSkew, includeTangential, numRadialParam));
+		zhang99 = new CalibrationPlanarGridZhang99(
+				new Zhang99CameraUniversalOmni(assumeZeroSkew, includeTangential, numRadialParam));
 		zhang99.setZeroSkew(assumeZeroSkew);
 	}
 
 	public void configureKannalaBrandt( boolean assumeZeroSkew,
 										int numSymmetric,
 										int numAsymmetric ) {
-		Objects.requireNonNull(layout, "layout is null. Did you call initialize()?");
-
-		zhang99 = new CalibrationPlanarGridZhang99(layout,
+		zhang99 = new CalibrationPlanarGridZhang99(
 				new Zhang99CameraKannalaBrandt(assumeZeroSkew, numSymmetric, numAsymmetric));
 		zhang99.setZeroSkew(assumeZeroSkew);
 	}
@@ -154,10 +145,8 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 										int numRadialParam,
 										boolean includeTangential,
 										double mirrorOffset ) {
-		Objects.requireNonNull(layout, "layout is null. Did you call initialize()?");
-
-		zhang99 = new CalibrationPlanarGridZhang99(layout,
-				new Zhang99CameraUniversalOmni(layout, assumeZeroSkew, includeTangential, numRadialParam, mirrorOffset));
+		zhang99 = new CalibrationPlanarGridZhang99(
+				new Zhang99CameraUniversalOmni(assumeZeroSkew, includeTangential, numRadialParam, mirrorOffset));
 		zhang99.setZeroSkew(assumeZeroSkew);
 	}
 
@@ -191,6 +180,7 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 			throw new RuntimeException("Must call initialize() first");
 		if (zhang99 == null)
 			throw new IllegalArgumentException("Please call configure first.");
+		zhang99.setLayout(layout);
 		zhang99.setVerbose(verbose, null);
 		if (!zhang99.process(observations)) {
 			throw new RuntimeException("Zhang99 algorithm failed!");

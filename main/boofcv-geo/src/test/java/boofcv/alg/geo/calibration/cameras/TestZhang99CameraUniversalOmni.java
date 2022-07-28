@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,11 +31,8 @@ import java.util.Random;
 import static org.ejml.UtilEjml.EPS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * @author Peter Abeles
- */
-public class TestZhang99CameraUniversalOmni
-		extends GenericCalibrationZhang99<CameraUniversalOmni> {
+
+public class TestZhang99CameraUniversalOmni extends GenericCalibrationZhang99<CameraUniversalOmni> {
 
 	@Override
 	public List<CameraConfig> createCamera( Random rand ) {
@@ -119,8 +116,8 @@ public class TestZhang99CameraUniversalOmni
 	@Override
 	public Zhang99Camera createGenerator( CameraConfig config, List<Point2D_F64> layout ) {
 		OmniConfig c = (OmniConfig)config;
-		Zhang99CameraUniversalOmni a = new Zhang99CameraUniversalOmni(
-				layout, c.assumeZeroSkew, c.includeTangential, c.numRadial);
+		var a = new Zhang99CameraUniversalOmni(c.assumeZeroSkew, c.includeTangential, c.numRadial);
+		a.setLayout(layout);
 		a.fixedMirror = c.fixedMirror;
 		return a;
 	}

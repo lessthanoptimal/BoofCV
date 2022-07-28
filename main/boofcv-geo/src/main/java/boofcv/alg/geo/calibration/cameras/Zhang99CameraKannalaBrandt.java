@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,7 @@ import boofcv.alg.geo.bundle.cameras.BundleKannalaBrandt;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.struct.calib.CameraKannalaBrandt;
 import boofcv.struct.calib.CameraModel;
+import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DMatrixRMaj;
 
 import java.util.List;
@@ -43,6 +44,8 @@ public class Zhang99CameraKannalaBrandt implements Zhang99Camera {
 		this.numSymmetric = numSymmetric;
 		this.numAsymmetric = numAsymmetric;
 	}
+
+	@Override public void setLayout( List<Point2D_F64> layout ) {}
 
 	@Override
 	public BundleAdjustmentCamera initializeCamera( DMatrixRMaj K,

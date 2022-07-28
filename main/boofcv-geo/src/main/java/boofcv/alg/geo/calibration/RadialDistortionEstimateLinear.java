@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,11 +20,13 @@ package boofcv.alg.geo.calibration;
 
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
+import lombok.Setter;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.factory.LinearSolverFactory_DDRM;
 import org.ejml.interfaces.linsol.LinearSolverDense;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * <p>
@@ -58,6 +60,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class RadialDistortionEstimateLinear {
 	// matrices in the linear equations
 	private final DMatrixRMaj A = new DMatrixRMaj(1, 1);
@@ -69,18 +72,18 @@ public class RadialDistortionEstimateLinear {
 	// linear solver
 	private final LinearSolverDense<DMatrixRMaj> solver = LinearSolverFactory_DDRM.leastSquares(0, 0);
 
-	// location of grid coordinates in the world frame.
-	// the z-axis is assumed to be zero
-	private final List<Point2D_F64> worldPoints;
+	/**
+	 * location of grid coordinates in the world frame.
+	 * the z-axis is assumed to be zero
+	 */
+	private @Setter List<Point2D_F64> worldPoints;
 
 	/**
 	 * Creates a estimator for the specified number of distortion parameters.
 	 *
-	 * @param layout Description of calibration grid
 	 * @param numParam Number of radial distortion parameters. Two is a good number.
 	 */
-	public RadialDistortionEstimateLinear( List<Point2D_F64> layout, int numParam ) {
-		worldPoints = layout;
+	public RadialDistortionEstimateLinear( int numParam ) {
 		X = new DMatrixRMaj(numParam, 1);
 	}
 
@@ -93,6 +96,7 @@ public class RadialDistortionEstimateLinear {
 	public void process( DMatrixRMaj cameraCalibration,
 						 List<DMatrixRMaj> homographies,
 						 List<CalibrationObservation> observations ) {
+		Objects.requireNonNull(worldPoints, "Must specify world points first");
 		init(observations);
 
 		setupA_and_B(cameraCalibration, homographies, observations);

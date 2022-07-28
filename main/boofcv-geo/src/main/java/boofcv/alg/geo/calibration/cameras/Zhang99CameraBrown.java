@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,11 +40,14 @@ public class Zhang99CameraBrown implements Zhang99Camera {
 
 	private final RadialDistortionEstimateLinear computeRadial;
 
-	public Zhang99CameraBrown( List<Point2D_F64> layout,
-							   boolean assumeZeroSkew, boolean includeTangential, int numRadial ) {
+	public Zhang99CameraBrown( boolean assumeZeroSkew, boolean includeTangential, int numRadial ) {
 		this.assumeZeroSkew = assumeZeroSkew;
 		this.includeTangential = includeTangential;
-		computeRadial = new RadialDistortionEstimateLinear(layout, numRadial);
+		computeRadial = new RadialDistortionEstimateLinear( numRadial);
+	}
+
+	@Override public void setLayout( List<Point2D_F64> layout ) {
+		computeRadial.setWorldPoints(layout);
 	}
 
 	@Override public BundleAdjustmentCamera initializeCamera(
