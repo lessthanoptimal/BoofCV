@@ -22,6 +22,7 @@ import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.point.Point2D_F64;
+import lombok.Setter;
 import org.ejml.data.DMatrixRMaj;
 
 import java.util.ArrayList;
@@ -42,6 +43,7 @@ import java.util.Objects;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class Zhang99ComputeTargetHomography {
 	/** Minimum number of points requires to process an image */
 	public static int MINIMUM_POINTS = 4;
@@ -49,13 +51,11 @@ public class Zhang99ComputeTargetHomography {
 	private final Estimate1ofEpipolar computeHomography = FactoryMultiView.homographyDLT(true);
 	private final DMatrixRMaj found = new DMatrixRMaj(3, 3);
 
-	// location of calibration points in the target frame's in world units.
-	// the z-axis is assumed to be zero
-	List<Point2D_F64> worldPoints;
-
-	public Zhang99ComputeTargetHomography( List<Point2D_F64> worldPoints ) {
-		this.worldPoints = Objects.requireNonNull(worldPoints);
-	}
+	/**
+	 * location of calibration points in the target frame's in world units.
+	 * he z-axis is assumed to be zero
+	 */
+	@Setter List<Point2D_F64> worldPoints;
 
 	/**
 	 * Computes the homography from a list of detected grid points in the image. The
@@ -66,6 +66,7 @@ public class Zhang99ComputeTargetHomography {
 	 * @return True if it computed a Homography and false if it failed to compute a homography matrix.
 	 */
 	public boolean computeHomography( CalibrationObservation observedPoints ) {
+		Objects.requireNonNull(worldPoints, "Must specify worldPoints first");
 		if (observedPoints.size() < MINIMUM_POINTS)
 			throw new IllegalArgumentException("At least 4 points needed in each set of observations. " +
 					" Filter these first please");

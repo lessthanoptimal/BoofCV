@@ -81,7 +81,8 @@ public class TestRadialDistortionEstimateLinear extends BoofStandardJUnit {
 			}
 		}
 
-		RadialDistortionEstimateLinear alg = new RadialDistortionEstimateLinear(layout,distort.length);
+		var alg = new RadialDistortionEstimateLinear(distort.length);
+		alg.setWorldPoints(layout);
 
 		alg.process(K,homographies,observations);
 

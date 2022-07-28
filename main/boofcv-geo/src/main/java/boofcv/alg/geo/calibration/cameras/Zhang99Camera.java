@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.alg.geo.calibration.cameras;
 import boofcv.abst.geo.bundle.BundleAdjustmentCamera;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.struct.calib.CameraModel;
+import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DMatrixRMaj;
 
 import java.util.List;
@@ -31,6 +32,11 @@ import java.util.List;
  * @author Peter Abeles
  */
 public interface Zhang99Camera {
+	/**
+	 * Specifies layout of calibration target
+	 */
+	void setLayout( List<Point2D_F64> layout );
+
 	/**
 	 * Provide an initial estimate for the camera parameters given 1) estimated pinhole camera parameters,
 	 * set of found homographies, and observed calibration targets.

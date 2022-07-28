@@ -50,11 +50,12 @@ import java.util.Objects;
  *
  * Usage:
  * <ol>
- *     <li>Call initialize()</li>
+ *     <li>Specify camera model via {@link #getCalibratorMono} and configure* functions</li>
+ *     <li>Call {@link #initialize}</li>
  *     <li>Specify shape of all cameras {@link #setCameraProperties}</li>
  *     <li>Specify target layouts using {@link #setTargetLayout}</li>
- *     <li></li>
- *     <li></li>
+ *     <li>Call {@link #process} perform calibration. Check results to see if it succeeded</li>
+ *     <li>Get found calibration with {@link #getResults()}</li>
  * </ol>
  *
  * Algorithm overview:
@@ -184,7 +185,7 @@ public class CalibrateMultiPlanar {
 			for (int frameIdx = 0; frameIdx < frameObs.size(); frameIdx++) {
 				SynchronizedCalObs synch = frameObs.get(frameIdx);
 
-				// See if this frame has observatiosn from the target camera
+				// See if this frame has observations from the target camera
 				for (int camIdx = 0; camIdx < synch.cameras.size; camIdx++) {
 					CalibrationObservationSet os = synch.cameras.get(cameraIdx);
 					if (os.cameraID != c.index)

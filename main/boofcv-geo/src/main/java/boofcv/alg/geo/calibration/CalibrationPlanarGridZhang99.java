@@ -43,6 +43,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -103,8 +104,8 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 	/** provides information on calibration status as it's being computed */
 	@Getter @Setter private Listener listener;
 
-	// where calibration points are layout on the target.
-	private final List<Point2D_F64> layout;
+	/** where calibration points are layout on the target. */
+	private @Setter List<Point2D_F64> layout;
 
 	/** Use a robust non-linear solver. This can run significantly slower */
 	@Getter @Setter private boolean robust = false;
@@ -113,13 +114,10 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 
 	/**
 	 * Configures calibration process.
-	 *
-	 * @param layout Layout of calibration points on the target
 	 */
-	public CalibrationPlanarGridZhang99( List<Point2D_F64> layout, Zhang99Camera cameraGenerator ) {
+	public CalibrationPlanarGridZhang99( Zhang99Camera cameraGenerator ) {
 		this.cameraGenerator = cameraGenerator;
-		this.layout = layout;
-		computeHomography = new Zhang99ComputeTargetHomography(layout);
+		computeHomography = new Zhang99ComputeTargetHomography();
 		computeK = new Zhang99CalibrationMatrixFromHomographies();
 	}
 
@@ -131,6 +129,7 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 	 * @return true if successful and false if it failed
 	 */
 	public boolean process( List<CalibrationObservation> observations ) {
+		Objects.requireNonNull(layout, "Must specify the layout first");
 		computeK.setAssumeZeroSkew(zeroSkew);
 
 		// compute initial parameter estimates using linear algebra
@@ -153,6 +152,7 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 		List<DMatrixRMaj> homographies = new ArrayList<>();
 		List<Se3_F64> motions = new ArrayList<>();
 
+		computeHomography.setWorldPoints(layout);
 		for (int i = 0; i < observations.size(); i++) {
 			CalibrationObservation obs = observations.get(i);
 
@@ -230,6 +230,7 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 		observations.initialize(motions.size(), true);
 
 		// A single camera is assumed, that's what is being calibrated!
+		cameraGenerator.setLayout(layout);
 		structure.setCamera(0, false, cameraGenerator.initializeCamera(K, homographies, calibrationObservations));
 		// A single rigid planar target is being viewed. It is assumed to be centered at the origin
 		structure.setRigid(0, true, new Se3_F64(), layout.size());

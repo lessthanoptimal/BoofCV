@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -63,7 +63,8 @@ public class TestZhang99ComputeTargetHomography extends BoofStandardJUnit {
 		}
 
 		// compute the homography
-		Zhang99ComputeTargetHomography alg = new Zhang99ComputeTargetHomography(layout);
+		var alg = new Zhang99ComputeTargetHomography();
+		alg.setWorldPoints(layout);
 
 		assertTrue(alg.computeHomography(observations));
 
