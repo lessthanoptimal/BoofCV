@@ -27,7 +27,7 @@ Version : 0.41
 - QR Code
   - Fixed issue where it was rejecting version 1 QR codes at a highly skewed angle
   - Fixed issue where it failed to detect all QR when there was a cluster of several high version
-  - If it error correction passes it will stop processing the QR. Easier to diagnose issues.
+  - If error correction passes it will stop processing the QR. Easier to diagnose issues.
 - Micro QR Code
   - Doesn't keep on trying to decode a marker if it fails after the ECC check
 - Various
@@ -45,7 +45,7 @@ Version : 0.41
   - TODO Stereo
 - 3D Mesh
   - Added related example code
-  - TODO Support for saving to PLY
+  - Added support for saving mesh + color points to PLY
   - Added algorithms for converting stereo disparity into a 3D mesh
 - Calibration
   - Mono and Stereo apps now generate calibration quality metrics for coverage and geometry
