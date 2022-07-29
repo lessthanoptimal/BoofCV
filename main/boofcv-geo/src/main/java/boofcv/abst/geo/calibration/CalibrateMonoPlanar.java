@@ -204,7 +204,6 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 		return structure.getParentToView(viewIdx);
 	}
 
-
 	public String computeQualityText( List<String> imageNames ) {
 		var fillScore = new ScoreCalibrationFill();
 		var quality = new CalibrationQuality();
