@@ -39,6 +39,7 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageDimension;
+import org.apache.pdfbox.util.Charsets;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
@@ -46,8 +47,9 @@ import org.kohsuke.args4j.Option;
 import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -321,10 +323,10 @@ public class CameraCalibrationStereo {
 			System.out.println(metricText);
 
 		if (saveMetrics) {
-			try (var out = new PrintWriter(new File(outputDir, "calibration_metrics.txt"))) {
+			try (var out = new PrintWriter(new File(outputDir, "calibration_metrics.txt"), Charsets.UTF_8)) {
 				out.println(metricText);
-			} catch (FileNotFoundException e) {
-				throw new RuntimeException(e);
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
 			}
 		}
 	}
