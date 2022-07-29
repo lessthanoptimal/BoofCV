@@ -21,20 +21,25 @@ package boofcv.abst.geo.calibration;
 import boofcv.abst.geo.bundle.MetricBundleAdjustmentUtils;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
+import boofcv.alg.geo.WorldToCameraToPixel;
 import boofcv.alg.geo.bundle.BundleAdjustmentOps;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeBrown;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.geo.calibration.CalibrationObservationSet;
+import boofcv.alg.geo.calibration.ScoreCalibrationFill;
 import boofcv.alg.geo.calibration.SynchronizedCalObs;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.calib.MultiCameraCalibParams;
 import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import lombok.Getter;
+import org.ddogleg.stats.StatisticsDogArray;
 import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_F64;
 import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastArray;
 import org.jetbrains.annotations.Nullable;
@@ -42,6 +47,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import static boofcv.abst.geo.calibration.CalibrateMonoPlanar.computeQuality;
 
 /**
  * <p> Multi camera calibration using multiple planar targets. It's assumed that all cameras are rigidly attach and
@@ -83,6 +90,9 @@ public class CalibrateMultiPlanar {
 	/** Storage for found calibration parameters */
 	@Getter MultiCameraCalibParams results = new MultiCameraCalibParams();
 
+	/** Calibration quality statistics */
+	@Getter DogArray<CameraStatistics> statistics = new DogArray<>(CameraStatistics::new, CameraStatistics::reset);
+
 	// Specifies locations of landmarks are calibration targets
 	final FastArray<List<Point2D_F64>> layouts = new FastArray<>((Class)(ArrayList.class));
 
@@ -97,6 +107,7 @@ public class CalibrateMultiPlanar {
 		if (numTargets != 1)
 			throw new RuntimeException("Currently only supports one target");
 
+		statistics.resetResize(numCameras);
 		results.reset();
 		layouts.resize(numTargets);
 		cameras.resetResize(numCameras);
@@ -159,7 +170,7 @@ public class CalibrateMultiPlanar {
 			return false;
 
 		sbaToOutput();
-
+		computeReprojectionErrors();
 		return true;
 	}
 
@@ -171,6 +182,9 @@ public class CalibrateMultiPlanar {
 	 * @param frames All the time step frames
 	 */
 	void monocularCalibration( int targetID, List<FrameState> frames ) {
+		// used to compute calibration quality metrics
+		var fillScore = new ScoreCalibrationFill();
+
 		// Store the index of each frame that had observations from a camera and the specified target
 		var usedFrames = new DogArray_I32();
 
@@ -204,6 +218,10 @@ public class CalibrateMultiPlanar {
 
 			// Compute and save results
 			results.getIntrinsics().add(calibratorMono.process());
+
+			// Compute quality of image coverage
+			computeQuality(calibratorMono.foundIntrinsic, fillScore, layouts.get(0),
+					calibratorMono.observations, statistics.get(cameraIdx).quality);
 
 			// Save the extrinsic relationship between the camera in each frame and the targets it observed
 			for (int usedIdx = 0; usedIdx < usedFrames.size(); usedIdx++) {
@@ -411,6 +429,84 @@ public class CalibrateMultiPlanar {
 	}
 
 	/**
+	 * Computes reprojection errors. This is good indicator for how well the camera model fits the data.
+	 */
+	void computeReprojectionErrors() {
+		final SceneStructureMetric structure = bundleUtils.getStructure();
+
+		List<Point2D_F64> layout = layouts.get(0);
+
+		var w2p = new WorldToCameraToPixel();
+		var worldPt = new Point3D_F64();
+		var predictedPixel = new Point2D_F64();
+		var errors = new DogArray_F64();
+
+		for (int camIdx = 0; camIdx < cameras.size; camIdx++) {
+			CameraPinholeBrown intrinsics = (CameraPinholeBrown)results.intrinsics.get(camIdx);
+
+			Se3_F64 cameraToSensor = results.getCameraToSensor(camIdx);
+
+			// Summary statistics
+			double overallMean = 0.0;
+			double overallMax = 0.0;
+			int totalFrames = 0;
+
+			// Compute reprojection statistics across all frames with this camera
+			for (int frameIdx = 0; frameIdx < frameObs.size(); frameIdx++) {
+				// Every image will have stats to make to make it easier to process later
+				var imageStats = new ImageResults(errors.size);
+				statistics.get(camIdx).residuals.add(imageStats);
+
+				CalibrationObservationSet camSet = frameObs.get(frameIdx).findCamera(camIdx);
+				if (camSet == null)
+					continue;
+				CalibrationObservation camObs = camSet.findTarget(0);
+				if (camObs == null)
+					continue;
+
+				totalFrames++;
+				Se3_F64 worldToSensor = structure.motions.get(cameras.size + frameIdx).motion;
+				Se3_F64 worldToCamera = worldToSensor.concat(cameraToSensor.invert(null), null);
+				w2p.configure(intrinsics, worldToCamera);
+
+				// Compute reprojection error from landmark observations on the fiducial
+				errors.reset();
+				double sumX = 0.0;
+				double sumY = 0.0;
+				for (int obsIdx = 0; obsIdx < camObs.points.size(); obsIdx++) {
+					PointIndex2D_F64 o = camObs.points.get(obsIdx);
+					Point2D_F64 landmarkX = layout.get(o.index);
+
+					worldPt.x = landmarkX.x;
+					worldPt.y = landmarkX.y;
+
+					w2p.transform(worldPt, predictedPixel);
+					double dx = predictedPixel.x - o.p.x;
+					double dy = predictedPixel.y - o.p.y;
+					errors.add(Math.sqrt(dx*dx + dy*dy));
+					sumX += dx;
+					sumY += dy;
+				}
+
+				// Reprojection error based statistics
+				errors.sort();
+				imageStats.maxError = errors.getFraction(1.0);
+				imageStats.meanError = StatisticsDogArray.mean(errors);
+				imageStats.biasX += sumX/camObs.points.size();
+				imageStats.biasY += sumY/camObs.points.size();
+
+				overallMean += imageStats.meanError;
+				overallMax = Math.max(overallMax, imageStats.maxError);
+			}
+
+			// Save summary statis across all frames
+			CameraStatistics stats = statistics.get(camIdx);
+			stats.overallMax = overallMax;
+			stats.overallMean = overallMean/totalFrames;
+		}
+	}
+
+	/**
 	 * Computes the SE3 for the unknown view using a view with a known SE3. This is done by finding a
 	 * target that they both are observing.
 	 *
@@ -448,6 +544,38 @@ public class CalibrateMultiPlanar {
 	}
 
 	/**
+	 * Summarizes calibration quality and residual errors in a human readable text string
+	 */
+	public String computeQualityText() {
+		var builder = new StringBuilder();
+		builder.append("Calibration Quality Metrics:\n");
+		for (int camId = 0; camId < statistics.size; camId++) {
+			CameraStatistics cam = statistics.get(camId);
+			builder.append(String.format("  camera[%d] fill_border=%5.1f fill_inner=%5.1f geometric=%5.1f\n",
+					camId, cam.quality.borderFill, cam.quality.innerFill, cam.quality.geometric));
+		}
+		builder.append('\n');
+		builder.append("Summary Residual Metrics:\n");
+		for (int camId = 0; camId < statistics.size; camId++) {
+			CameraStatistics cam = statistics.get(camId);
+			builder.append(String.format("  camera[%3d] mean=%6.2f max=%6.2f\n", camId, cam.overallMean, cam.overallMax));
+		}
+		builder.append('\n');
+		for (int camId = 0; camId < statistics.size; camId++) {
+			builder.append("Residual Errors: Camera ").append(camId).append("\n");
+			CameraStatistics cam = statistics.get(camId);
+
+			for (int frameIdx = 0; frameIdx < cam.residuals.size(); frameIdx++) {
+				ImageResults img = cam.residuals.get(frameIdx);
+				builder.append(String.format("  img[%4d] mean=%6.2f max=%6.2f\n", frameIdx, img.meanError, img.maxError));
+			}
+			builder.append('\n');
+		}
+
+		return builder.toString();
+	}
+
+	/**
 	 * Prior information provided about the camera by the user
 	 */
 	public static class CameraPriors {
@@ -456,6 +584,28 @@ public class CalibrateMultiPlanar {
 
 		/** Shape of camera images */
 		int width, height;
+	}
+
+	/**
+	 * Calibration quality statistics
+	 */
+	public static class CameraStatistics {
+		/** Summary of overall quality if input data for monocular calibration */
+		public CalibrationQuality quality = new CalibrationQuality();
+
+		/** Summary statistics for residual errors in each image */
+		public List<ImageResults> residuals = new ArrayList<>();
+
+		// overall statistics across all images
+		public double overallMean = 0.0;
+		public double overallMax = 0.0;
+
+		public void reset() {
+			quality.reset();
+			residuals.clear();
+			this.overallMax = 0.0;
+			this.overallMean = 0.0;
+		}
 	}
 
 	/**
@@ -474,7 +624,7 @@ public class CalibrateMultiPlanar {
 	 * List of all observation from a camera in a frame. A camera can observe multiple targets at once.
 	 */
 	public static class FrameCamera {
-		List<TargetExtrinsics> observations = new ArrayList<>();
+		public List<TargetExtrinsics> observations = new ArrayList<>();
 
 		/** Returns the observations which matches the specified targetID or null if there is no match */
 		public @Nullable TargetExtrinsics findTarget( int targetID ) {

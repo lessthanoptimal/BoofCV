@@ -81,7 +81,12 @@ public class ExampleCalibrateMulti {
 		}
 
 		System.out.println("Performing calibration");
+
+		// Print out optimization results. Can help you see if something has gone wrong
+		calibrator.getBundleUtils().sba.setVerbose(System.out, null);
 		BoofMiscOps.checkTrue(calibrator.process(), "Calibration Failed!");
+
+		System.out.println(calibrator.computeQualityText());
 
 		MultiCameraCalibParams params = calibrator.getResults();
 		CalibrationIO.save(params, "multi_camera.yaml");
