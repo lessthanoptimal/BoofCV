@@ -24,6 +24,7 @@ import boofcv.abst.geo.calibration.CalibrateMultiPlanar;
 import boofcv.alg.geo.calibration.SynchronizedCalObs;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.io.UtilIO;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.MultiCameraCalibParams;
@@ -83,11 +84,10 @@ public class ExampleCalibrateMulti {
 		BoofMiscOps.checkTrue(calibrator.process(), "Calibration Failed!");
 
 		MultiCameraCalibParams params = calibrator.getResults();
+		CalibrationIO.save(params, "multi_camera.yaml");
 		System.out.println(params);
-		System.out.println("Done!");
 
 		// TODO print summary of accuracy
-		// TODO save calibration to disk
 	}
 
 	private static void addCameraObservations( int cameraID, GrayF32 image,

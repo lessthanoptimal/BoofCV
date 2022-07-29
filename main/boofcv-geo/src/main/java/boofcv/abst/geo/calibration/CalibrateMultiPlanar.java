@@ -44,7 +44,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * <p>Multi camera calibration using multiple planar targets. It's assumed that all cameras are rigidly attach and
+ * <p> Multi camera calibration using multiple planar targets. It's assumed that all cameras are rigidly attach and
  * that the calibration targets are static. Camera[0] is always the sensor reference frame. The world
  * reference frame is defined as calibration target[0]. </p>
  *
@@ -65,8 +65,9 @@ import java.util.Objects;
  *     <li>Estimate extrinsic relationship between sensor and world for each frame</li>
  *     <li>Run bundle adjustment to improve results</li>
  * </ol>
- * Internally it assumes that the targets are stationary and the camera system is moving. It will work just fine
- * if the opposite is true as these are mathematically identical.
+ *
+ * <p> Internally it assumes that the targets are stationary and the camera system is moving. It will work just fine
+ * if the opposite is true as these are mathematically identical. </p>
  *
  * TODO add support for multiple targets. Current version has been simplified for one target.
  *
@@ -101,7 +102,7 @@ public class CalibrateMultiPlanar {
 		cameras.resetResize(numCameras);
 		for (int i = 0; i < cameras.size; i++) {
 			cameras.get(i).index = i;
-			results.listCameraToSensor.add(new Se3_F64());
+			results.camerasToSensor.add(new Se3_F64());
 		}
 
 		frameObs.clear();
@@ -263,7 +264,7 @@ public class CalibrateMultiPlanar {
 							continue;
 						}
 						// Save the results
-						results.listCameraToSensor.get(unknownCam.index).setTo(camI_to_sensor);
+						results.camerasToSensor.get(unknownCam.index).setTo(camI_to_sensor);
 
 						// Let it know there has been a change
 						change = true;
@@ -405,7 +406,7 @@ public class CalibrateMultiPlanar {
 			CameraPriors c = cameras.get(camIdx);
 			BundlePinholeBrown bb = structure.getCameraModel(camIdx);
 			BundleAdjustmentOps.convert(bb, c.width, c.height, (CameraPinholeBrown)results.intrinsics.get(camIdx));
-			structure.motions.get(camIdx).motion.invert(results.listCameraToSensor.get(camIdx));
+			structure.motions.get(camIdx).motion.invert(results.camerasToSensor.get(camIdx));
 		}
 	}
 

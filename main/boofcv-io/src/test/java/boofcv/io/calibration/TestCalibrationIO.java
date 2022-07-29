@@ -21,8 +21,10 @@ package boofcv.io.calibration;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.struct.calib.CameraKannalaBrandt;
 import boofcv.struct.calib.CameraPinholeBrown;
+import boofcv.struct.calib.MultiCameraCalibParams;
 import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.testing.BoofStandardJUnit;
+import georegression.struct.se.SpecialEuclideanOps_F64;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
@@ -31,9 +33,6 @@ import java.net.URL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * @author Peter Abeles
- */
 public class TestCalibrationIO extends BoofStandardJUnit {
 	@Test void landmarksCSV() {
 		var original = new CalibrationObservation();
@@ -41,11 +40,10 @@ public class TestCalibrationIO extends BoofStandardJUnit {
 		original.add(-23, 5, 10.5);
 		original.add(-23, 3.11, -20.1);
 
-		ByteArrayOutputStream stream = new ByteArrayOutputStream();
+		var stream = new ByteArrayOutputStream();
 		CalibrationIO.saveLandmarksCsv("File", "ASDASD", original, stream);
 
 		CalibrationObservation found = CalibrationIO.loadLandmarksCsv(new ByteArrayInputStream(stream.toByteArray()));
-
 
 		assertEquals(original.points.size(), found.points.size());
 		for (int i = 0; i < original.points.size(); i++) {
@@ -62,7 +60,7 @@ public class TestCalibrationIO extends BoofStandardJUnit {
 	 * Read an actual OpenCV generated file
 	 */
 	@Test void saveOpenCV() {
-		CameraPinholeBrown model = new CameraPinholeBrown();
+		var model = new CameraPinholeBrown();
 
 		model.fsetK(1, 2, 3, 4, 0.65, 100, 7);
 		model.fsetRadial(.1, .2, .3);
@@ -129,10 +127,26 @@ public class TestCalibrationIO extends BoofStandardJUnit {
 	}
 
 	void save_load_KannalaBrandt( CameraKannalaBrandt model ) {
-		ByteArrayOutputStream stream = new ByteArrayOutputStream();
+		var stream = new ByteArrayOutputStream();
 		CalibrationIO.save(model, new OutputStreamWriter(stream));
 
 		CameraKannalaBrandt found = CalibrationIO.load(new StringReader(stream.toString()));
 		assertTrue(model.isIdentical(found));
+	}
+
+	@Test void save_load_MultiCameraCalibParams() {
+		// try simplified case with only symmetric distortion
+		var original = new MultiCameraCalibParams();
+		// Two different camera types
+		original.intrinsics.add(new CameraKannalaBrandt().fsetK(500, 550, 0.1, 600, 650).fsetRadial(0.1));
+		original.intrinsics.add(new CameraPinholeBrown().fsetRadial(0.2).fsetK(400, 550, 0.1, 600, 650));
+		original.camerasToSensor.add(SpecialEuclideanOps_F64.axisXyz(1, 2, 3, 4, 5, 2, null));
+		original.camerasToSensor.add(SpecialEuclideanOps_F64.axisXyz(3, 0, 1, 4, 5, 2, null));
+
+		var stream = new ByteArrayOutputStream();
+		CalibrationIO.save(original, new OutputStreamWriter(stream));
+
+		MultiCameraCalibParams found = CalibrationIO.load(new StringReader(stream.toString()));
+		assertTrue(original.isIdentical_WARNING(found));
 	}
 }
