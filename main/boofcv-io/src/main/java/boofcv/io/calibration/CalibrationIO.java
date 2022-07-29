@@ -55,6 +55,7 @@ public class CalibrationIO {
 	public static String MODEL_OMNIDIRECTIONAL_UNIVERSAL = "omnidirectional_universal";
 	public static String MODEL_KANNALA_BRANDT = "kannala_brandt";
 	public static String MODEL_STEREO = "stereo_camera";
+	public static String MODEL_MULT_CAMERA = "mult_camera";
 	public static String MODEL_RIGID_BODY = "rigid_body";
 	public static String MODEL_VISUAL_DEPTH = "visual_depth";
 	public static String MODEL_MONO_PLANE = "monocular_plane";
@@ -148,6 +149,44 @@ public class CalibrationIO {
 	}
 
 	public static void save( StereoParameters parameters, String outputPath ) {
+		try (var stream = new FileOutputStream(outputPath)) {
+			save(parameters, new OutputStreamWriter(stream, UTF_8));
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	/**
+	 * Saves {@link MultiCameraCalibParams} to disk
+	 *
+	 * @param parameters Camera system parameters
+	 * @param outputWriter Stream to save to
+	 */
+	public static void save( MultiCameraCalibParams parameters, Writer outputWriter ) {
+		List<Object> intrinsics = new ArrayList<>();
+		for (int i = 0; i < parameters.intrinsics.size(); i++) {
+			intrinsics.add(putModel(parameters.intrinsics.get(i), null));
+		}
+
+		List<Object> extrinsics = new ArrayList<>();
+		for (int i = 0; i < parameters.camerasToSensor.size(); i++) {
+			extrinsics.add(putSe3(parameters.camerasToSensor.get(i)));
+		}
+
+		Map<String, Object> map = new HashMap<>();
+		map.put("model", MODEL_MULT_CAMERA);
+		map.put(VERSION, 0);
+		map.put("intrinsics", intrinsics);
+		map.put("camerasToSensor", extrinsics);
+
+		PrintWriter out = new PrintWriter(outputWriter);
+		out.println("# Intrinsic and extrinsic parameters for a multi camera system");
+		Yaml yaml = createYmlObject();
+		yaml.dump(map, out);
+		out.flush();
+	}
+
+	public static void save( MultiCameraCalibParams parameters, String outputPath ) {
 		try (var stream = new FileOutputStream(outputPath)) {
 			save(parameters, new OutputStreamWriter(stream, UTF_8));
 		} catch (IOException e) {
@@ -332,10 +371,21 @@ public class CalibrationIO {
 			parameters.fsetTangentTrig(loadCoefficients(data, "tangent_trig"));
 			return (T)parameters;
 		} else if (model.equals(MODEL_STEREO)) {
-			StereoParameters parameters = new StereoParameters();
+			var parameters = new StereoParameters();
 			parameters.left = load((Map<String, Object>)getOrThrow(data, "left"));
 			parameters.right = load((Map<String, Object>)getOrThrow(data, "right"));
 			parameters.right_to_left = loadSe3(getOrThrow(data, "rightToLeft"), null);
+			return (T)parameters;
+		} else if (model.equals(MODEL_MULT_CAMERA)) {
+			var parameters = new MultiCameraCalibParams();
+			List<Object> listIntrinsics = getOrThrow(data, "intrinsics");
+			for (var o : listIntrinsics) {
+				parameters.intrinsics.add(load((Map<String, Object>)o));
+			}
+			List<Object> listExtrinsics = getOrThrow(data, "camerasToSensor");
+			for (var o : listExtrinsics) {
+				parameters.camerasToSensor.add(loadSe3((Map<String, Object>)o, null));
+			}
 			return (T)parameters;
 		} else if (model.equals(MODEL_VISUAL_DEPTH)) {
 			VisualDepthParameters parameters = new VisualDepthParameters();
@@ -353,6 +403,23 @@ public class CalibrationIO {
 		} else {
 			throw new RuntimeException("Unknown camera model: " + model);
 		}
+	}
+
+	public static Map<String, Object> putModel( CameraModel parameters, Map<String, Object> map ) {
+		if (map == null)
+			map = new HashMap<>();
+
+		if (parameters instanceof CameraPinholeBrown) {
+			putModelBrown((CameraPinholeBrown)parameters, map);
+		} else if (parameters instanceof CameraUniversalOmni) {
+			putModelUniversalOmni((CameraUniversalOmni)parameters, map);
+		} else if (parameters instanceof CameraKannalaBrandt) {
+			putKannalaBrandt((CameraKannalaBrandt)parameters, map);
+		} else {
+			putModelPinhole((CameraPinhole)parameters, map);
+		}
+
+		return map;
 	}
 
 	public static Map<String, Object> putModelPinhole( CameraPinhole parameters, Map<String, Object> map ) {

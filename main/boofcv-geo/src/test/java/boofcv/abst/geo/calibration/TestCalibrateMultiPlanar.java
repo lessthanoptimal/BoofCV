@@ -77,7 +77,7 @@ public class TestCalibrateMultiPlanar extends BoofStandardJUnit {
 			assertEquals(e.height, f.height);
 		}
 
-		for (int i = 0; i < expected.listCameraToSensor.size(); i++) {
+		for (int i = 0; i < expected.camerasToSensor.size(); i++) {
 			Se3_F64 e = expected.getCameraToSensor(i);
 			Se3_F64 f = alg.results.getCameraToSensor(i);
 			assertTrue(SpecialEuclideanOps_F64.isIdentical(e, f, 0.01, 0.02));
@@ -116,9 +116,9 @@ public class TestCalibrateMultiPlanar extends BoofStandardJUnit {
 		expected.intrinsics.add(intrinsicA);
 		expected.intrinsics.add(intrinsicB);
 		expected.intrinsics.add(intrinsicB);
-		expected.listCameraToSensor.add(eulerXyz(0, 0, 0, 0, 0, 0, null));
-		expected.listCameraToSensor.add(eulerXyz(0, 0.15, 0, 0.02, 0, 0, null));
-		expected.listCameraToSensor.add(eulerXyz(0.1, 0.0, 0, 0, -0.05, 0, null));
+		expected.camerasToSensor.add(eulerXyz(0, 0, 0, 0, 0, 0, null));
+		expected.camerasToSensor.add(eulerXyz(0, 0.15, 0, 0.02, 0, 0, null));
+		expected.camerasToSensor.add(eulerXyz(0.1, 0.0, 0, 0, -0.05, 0, null));
 
 		List<Se3_F64> listSensorToWorld = new ArrayList<>();
 		listSensorToWorld.add(eulerXyz(0, 0, -2, 0, 0, 0, null));
@@ -220,8 +220,8 @@ public class TestCalibrateMultiPlanar extends BoofStandardJUnit {
 		alg.initialize(numCameras, 1);
 		alg.estimateCameraToSensor(frames);
 
-		for (int camID = 0; camID < alg.results.listCameraToSensor.size(); camID++) {
-			Se3_F64 found = alg.results.listCameraToSensor.get(camID);
+		for (int camID = 0; camID < alg.results.camerasToSensor.size(); camID++) {
+			Se3_F64 found = alg.results.camerasToSensor.get(camID);
 			Se3_F64 expected = expectedC2S.get(camID);
 
 			assertTrue(SpecialEuclideanOps_F64.isIdentical(found, expected, 1e-8, 1e-4));
@@ -257,8 +257,8 @@ public class TestCalibrateMultiPlanar extends BoofStandardJUnit {
 		}
 
 		for (int camID = 0; camID < numCameras; camID++) {
-			alg.results.listCameraToSensor.add(new Se3_F64());
-			alg.results.listCameraToSensor.get(camID).T.setTo(100 + camID, 0, 0);
+			alg.results.camerasToSensor.add(new Se3_F64());
+			alg.results.camerasToSensor.get(camID).T.setTo(100 + camID, 0, 0);
 		}
 
 		alg.estimateSensorToWorldInAllFrames(frames);
@@ -326,9 +326,9 @@ public class TestCalibrateMultiPlanar extends BoofStandardJUnit {
 
 		var alg = new CalibrateMultiPlanar();
 		for (int i = 0; i < 5; i++) {
-			alg.results.listCameraToSensor.add(new Se3_F64());
+			alg.results.camerasToSensor.add(new Se3_F64());
 		}
-		alg.results.listCameraToSensor.get(2).T.setTo(101, 0, 0);
+		alg.results.camerasToSensor.get(2).T.setTo(101, 0, 0);
 
 		Se3_F64 cam3_to_world = alg.extrinsicFromKnownCamera(frame, 2, 3);
 		Objects.requireNonNull(cam3_to_world);
