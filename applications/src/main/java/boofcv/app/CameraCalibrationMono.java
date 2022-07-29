@@ -42,6 +42,7 @@ import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.GrayF32;
 import com.github.sarxos.webcam.Webcam;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.pdfbox.util.Charsets;
 
 import javax.swing.*;
 import java.awt.image.BufferedImage;
@@ -569,10 +570,10 @@ public class CameraCalibrationMono extends BaseStandardInputApp {
 
 			// Save calibration statistics to disk
 			if (outputDirectory != null) {
-				try (var out = new PrintWriter(new File(outputDirectory, "calibration_metrics.txt"))) {
+				try (var out = new PrintWriter(new File(outputDirectory, "calibration_metrics.txt"), Charsets.UTF_8)) {
 					out.println(metricText);
-				} catch (FileNotFoundException e) {
-					throw new RuntimeException(e);
+				} catch (IOException e) {
+					throw new UncheckedIOException(e);
 				}
 			}
 

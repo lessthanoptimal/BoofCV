@@ -39,10 +39,6 @@ Version : 0.41
 - Photogrammetry
  - Three-View Reconstruction: Does self calibration entirely inside of RANSAC
  - Added ResolveThreeViewScaleAmbiguity
- - TODO Use this three-view code in PairwiseGraphUtils and remove projective part
-- SLAM
-  - TODO Monocular
-  - TODO Stereo
 - 3D Mesh
   - Added related example code
   - Added support for saving mesh + color points to PLY
@@ -52,11 +48,8 @@ Version : 0.41
   - Mono and Stereo GUIs have option to show border and inner coverage
   - Added Division camera model
   - Added multi camera calibration
-  - TODO add images, regression
-  - TODO calibration targets Hamming Marker grid and chessboard, e.g. ChArUco and ArUco grids.
 - Regression
   - TODO Template matching
-  - TODO Video stabilization
 
 ---------------------------------------------
 Date    : 2022/Jan/24

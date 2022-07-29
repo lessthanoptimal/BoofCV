@@ -91,8 +91,6 @@ public class ExampleCalibrateMulti {
 		MultiCameraCalibParams params = calibrator.getResults();
 		CalibrationIO.save(params, "multi_camera.yaml");
 		System.out.println(params.toStringFormat());
-
-		// TODO print summary of accuracy
 	}
 
 	private static void addCameraObservations( int cameraID, GrayF32 image,

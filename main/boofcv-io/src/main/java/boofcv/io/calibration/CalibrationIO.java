@@ -405,7 +405,8 @@ public class CalibrationIO {
 		}
 	}
 
-	public static Map<String, Object> putModel( CameraModel parameters, Map<String, Object> map ) {
+	public static Map<String, Object> putModel( CameraModel parameters,
+												@Nullable Map<String, Object> map ) {
 		if (map == null)
 			map = new HashMap<>();
 
@@ -422,7 +423,8 @@ public class CalibrationIO {
 		return map;
 	}
 
-	public static Map<String, Object> putModelPinhole( CameraPinhole parameters, Map<String, Object> map ) {
+	public static Map<String, Object> putModelPinhole( CameraPinhole parameters,
+													   @Nullable Map<String, Object> map ) {
 		if (map == null)
 			map = new HashMap<>();
 
