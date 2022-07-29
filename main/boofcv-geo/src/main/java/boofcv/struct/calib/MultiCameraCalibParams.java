@@ -18,6 +18,8 @@
 
 package boofcv.struct.calib;
 
+import georegression.geometry.ConvertRotation3D_F64;
+import georegression.struct.EulerType;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.se.SpecialEuclideanOps_F64;
 import lombok.Getter;
@@ -117,5 +119,36 @@ public class MultiCameraCalibParams implements Serializable {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Formatted to be easier to read
+	 */
+	public String toStringFormat() {
+		var builder = new StringBuilder();
+		builder.append(getClass().getSimpleName()).append(" {\n");
+		builder.append("  intrinsics {\n");
+		for (int i = 0; i < intrinsics.size(); i++) {
+			CameraModel model = intrinsics.get(i);
+			builder.append("    [").append(i).append("] ").append(model).append("\n");
+		}
+		builder.append("  }\n");
+		builder.append("  camerasToSensor {\n");
+		for (int i = 0; i < camerasToSensor.size(); i++) {
+			Se3_F64 extrinsic = camerasToSensor.get(i);
+			double[] euler = ConvertRotation3D_F64.matrixToEuler(extrinsic.getR(), EulerType.XYZ, (double[])null);
+			builder.append(String.format("    [%d] SE3{ T={%.2e, %.2e, %.2e} euler_xyz={%.5f, %.5f, %.5f} }\n",
+					i, extrinsic.T.x, extrinsic.T.y, extrinsic.T.z, euler[0], euler[1], euler[2]));
+		}
+		builder.append("  }\n}\n");
+		return builder.toString();
+	}
+
+	/**
+	 * Print summary on a single line
+	 */
+	@Override public String toString() {
+		String human = toStringFormat();
+		return human.replace("\n", "").replace("  ", " ");
 	}
 }
