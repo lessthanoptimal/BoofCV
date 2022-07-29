@@ -59,9 +59,9 @@ public class ExampleCalibrateMulti {
 		//       the future.
 		calibrator.initialize(/*num cameras*/3, /*num targets*/1);
 		calibrator.setTargetLayout(0, detector.getLayout(0));
-		calibrator.setCameraProperties(0, 2248, 2048);
-		calibrator.setCameraProperties(1, 2248, 2048);
-		calibrator.setCameraProperties(2, 2248, 2048);
+		calibrator.setCameraProperties(0, 1224, 1024);
+		calibrator.setCameraProperties(1, 1224, 1024);
+		calibrator.setCameraProperties(2, 1224, 1024);
 
 		for (int imageIdx = 0; imageIdx < left.size(); imageIdx++) {
 			System.out.print("image set " + imageIdx + ", landmark count:");

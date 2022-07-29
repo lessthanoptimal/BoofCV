@@ -52,7 +52,7 @@ Version : 0.41
   - Mono and Stereo GUIs have option to show border and inner coverage
   - Added Division camera model
   - Added multi camera calibration
-  - TODO multi IO, stats, add images, regression
+  - TODO multi stats, add images, regression
   - TODO calibration targets Hamming Marker grid and chessboard, e.g. ChArUco and ArUco grids.
 - Regression
   - TODO Template matching
