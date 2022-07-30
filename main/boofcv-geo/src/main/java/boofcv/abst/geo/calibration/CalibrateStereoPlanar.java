@@ -161,7 +161,7 @@ public class CalibrateStereoPlanar implements VerbosePrint {
 		SceneStructureMetric structure = calib.getStructure();
 
 		for (int i = 0; i < structure.motions.size; i++) {
-			location.add(structure.motions.data[i].motion);
+			location.add(structure.motions.data[i].parent_to_view);
 		}
 
 		return intrinsic;
@@ -236,7 +236,7 @@ public class CalibrateStereoPlanar implements VerbosePrint {
 		// initialize the views. Right views will be relative to left and will share the same baseline
 		int left_to_right_idx = structure.addMotion(false, left_to_right);
 		for (int viewIndex = 0; viewIndex < numViews; viewIndex++) {
-			int world_to_left_idx = structure.addMotion(false, structureLeft.motions.get(viewIndex).motion);
+			int world_to_left_idx = structure.addMotion(false, structureLeft.motions.get(viewIndex).parent_to_view);
 			structure.setView(viewIndex*2, 0, world_to_left_idx, -1);
 			structure.setView(viewIndex*2 + 1, 1, left_to_right_idx, viewIndex*2);
 		}
@@ -267,7 +267,7 @@ public class CalibrateStereoPlanar implements VerbosePrint {
 			return;
 
 		// save the output
-		structure.motions.get(left_to_right_idx).motion.invert(parameters.right_to_left);
+		structure.motions.get(left_to_right_idx).parent_to_view.invert(parameters.right_to_left);
 		BundleAdjustmentOps.convert(((BundlePinholeBrown)structure.cameras.get(0).model),
 				parameters.left.width, parameters.left.height, parameters.left);
 		BundleAdjustmentOps.convert(((BundlePinholeBrown)structure.cameras.get(1).model),

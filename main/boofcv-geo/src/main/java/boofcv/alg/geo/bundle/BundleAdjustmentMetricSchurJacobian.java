@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -341,11 +341,11 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 				jacSO3.setParameters(input, paramIndex);
 				paramIndex += jacSO3.getParameterLength();
 
-				motion.motion.T.x = input[paramIndex];
-				motion.motion.T.y = input[paramIndex + 1];
-				motion.motion.T.z = input[paramIndex + 2];
+				motion.parent_to_view.T.x = input[paramIndex];
+				motion.parent_to_view.T.y = input[paramIndex + 1];
+				motion.parent_to_view.T.z = input[paramIndex + 2];
 
-				motion.motion.getR().setTo(jacSO3.getRotationMatrix());
+				motion.parent_to_view.getR().setTo(jacSO3.getRotationMatrix());
 
 				// save the Jacobian if we need to
 				DMatrixRMaj[] savedJac = mapSO3Jac.get(view.parent_to_view);
@@ -500,7 +500,7 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 				view = view.parent;
 				if (view == null)
 					break;
-				CommonOps_DDRM.mult(accumulatedR, motion.motion.R, tmp3x3);
+				CommonOps_DDRM.mult(accumulatedR, motion.parent_to_view.R, tmp3x3);
 				accumulatedR.setTo(tmp3x3);
 				continue;
 			}
@@ -552,7 +552,7 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 				break;
 
 			// accumulatedR = R[i,j]*R[j-1]
-			CommonOps_DDRM.mult(accumulatedR, motion.motion.R, tmp3x3);
+			CommonOps_DDRM.mult(accumulatedR, motion.parent_to_view.R, tmp3x3);
 			accumulatedR.setTo(tmp3x3);
 		}
 	}
@@ -565,7 +565,7 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 		if (view.parent != null) {
 			world_to_view = mapWorldToView.get(view);
 		} else {
-			world_to_view = structure.motions.get(view.parent_to_view).motion;
+			world_to_view = structure.motions.get(view.parent_to_view).parent_to_view;
 		}
 		return Objects.requireNonNull(world_to_view);
 	}

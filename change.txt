@@ -51,6 +51,8 @@ Version : 0.41
 - Regression
   - TODO Template matching
 
+- TODO why does CalibrateMultiPlanar start with a large error?
+
 ---------------------------------------------
 Date    : 2022/Jan/24
 Version : 0.40.1

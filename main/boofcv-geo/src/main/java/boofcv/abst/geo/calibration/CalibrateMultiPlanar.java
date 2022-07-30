@@ -85,7 +85,7 @@ public class CalibrateMultiPlanar {
 	@Getter final CalibrateMonoPlanar calibratorMono = new CalibrateMonoPlanar();
 
 	/** Makes bundle adjustment easier */
-	@Getter MetricBundleAdjustmentUtils bundleUtils = new MetricBundleAdjustmentUtils();
+	@Getter MetricBundleAdjustmentUtils bundleUtils = new MetricBundleAdjustmentUtils(null, false);
 
 	/** Storage for found calibration parameters */
 	@Getter MultiCameraCalibParams results = new MultiCameraCalibParams();
@@ -366,7 +366,7 @@ public class CalibrateMultiPlanar {
 
 		// Specify the relationships of each camera to the sensor frame, a.k.a. camera[0]
 		for (int camIdx = 0; camIdx < cameras.size; camIdx++) {
-			structure.addMotion(camIdx == 0, results.getCameraToSensor(camIdx));
+			structure.addMotion(camIdx == 0, results.getCameraToSensor(camIdx).invert(null));
 		}
 
 		// Specific the views
@@ -424,7 +424,7 @@ public class CalibrateMultiPlanar {
 			CameraPriors c = cameras.get(camIdx);
 			BundlePinholeBrown bb = structure.getCameraModel(camIdx);
 			BundleAdjustmentOps.convert(bb, c.width, c.height, (CameraPinholeBrown)results.intrinsics.get(camIdx));
-			structure.motions.get(camIdx).motion.invert(results.camerasToSensor.get(camIdx));
+			structure.motions.get(camIdx).parent_to_view.invert(results.camerasToSensor.get(camIdx));
 		}
 	}
 
@@ -465,7 +465,7 @@ public class CalibrateMultiPlanar {
 					continue;
 
 				totalFrames++;
-				Se3_F64 worldToSensor = structure.motions.get(cameras.size + frameIdx).motion;
+				Se3_F64 worldToSensor = structure.motions.get(cameras.size + frameIdx).parent_to_view;
 				Se3_F64 worldToCamera = worldToSensor.concat(cameraToSensor.invert(null), null);
 				w2p.configure(intrinsics, worldToCamera);
 
@@ -641,9 +641,9 @@ public class CalibrateMultiPlanar {
 	 */
 	public static class TargetExtrinsics {
 		// Which target this is an observation of
-		int targetID;
+		public int targetID;
 		// Extrinsic relationship between target and camera at this instance
-		Se3_F64 targetToCamera = new Se3_F64();
+		public Se3_F64 targetToCamera = new Se3_F64();
 
 		public TargetExtrinsics( int targetID ) {
 			this.targetID = targetID;

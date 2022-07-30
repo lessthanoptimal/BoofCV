@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -396,7 +396,7 @@ public class TestMultiViewStereoFromKnownSceneStructure extends BoofStandardJUni
 			pinhole.height = height;
 
 			sim.setCamera(pinhole);
-			sim.setWorldToCamera(scene.motions.get(indexSba).motion);
+			sim.setWorldToCamera(scene.motions.get(indexSba).parent_to_view);
 			GConvertImage.convert(sim.render(), output);
 			return true;
 		}

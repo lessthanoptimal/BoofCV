@@ -38,6 +38,7 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.se.SpecialEuclideanOps_F64;
 import org.ejml.UtilEjml;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -48,9 +49,9 @@ import static georegression.struct.se.SpecialEuclideanOps_F64.eulerXyz;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestCalibrateMultiPlanar extends BoofStandardJUnit {
-	CameraPinholeBrown intrinsicA = new CameraPinholeBrown(200,210,0,320,240,640,480).
+	CameraPinholeBrown intrinsicA = new CameraPinholeBrown(200, 210, 0, 320, 240, 640, 480).
 			fsetRadial(0.01, -0.02);
-	CameraPinholeBrown intrinsicB = new CameraPinholeBrown(400,405,0,320,240,800,600);
+	CameraPinholeBrown intrinsicB = new CameraPinholeBrown(400, 405, 0, 320, 240, 800, 600);
 
 	List<Point2D_F64> layout = CalibrationDetectorSquareGrid.createLayout(6, 5, .02, .02);
 
@@ -112,7 +113,7 @@ public class TestCalibrateMultiPlanar extends BoofStandardJUnit {
 		}
 	}
 
-	void createScenarioAndConfigure( CalibrateMultiPlanar alg, MultiCameraCalibParams expected) {
+	void createScenarioAndConfigure( CalibrateMultiPlanar alg, MultiCameraCalibParams expected ) {
 		expected.intrinsics.add(intrinsicA);
 		expected.intrinsics.add(intrinsicB);
 		expected.intrinsics.add(intrinsicB);
@@ -120,15 +121,7 @@ public class TestCalibrateMultiPlanar extends BoofStandardJUnit {
 		expected.camerasToSensor.add(eulerXyz(0, 0.15, 0, 0.02, 0, 0, null));
 		expected.camerasToSensor.add(eulerXyz(0.1, 0.0, 0, 0, -0.05, 0, null));
 
-		List<Se3_F64> listSensorToWorld = new ArrayList<>();
-		listSensorToWorld.add(eulerXyz(0, 0, -2, 0, 0, 0, null));
-		listSensorToWorld.add(eulerXyz(-0.3, 0, -2, 0.05, 0, 0, null));
-		listSensorToWorld.add(eulerXyz(0, 0.1, -2, 0, 0, 0.04, null));
-		listSensorToWorld.add(eulerXyz(0, 0.5, -2, 0, 0.2, 0.04, null));
-		listSensorToWorld.add(eulerXyz(0, 0.55, -1.5, 0, -0.2, 0.04, null));
-		listSensorToWorld.add(eulerXyz(0.2, 0, -1.8, 0, 0.04, 0, null));
-		listSensorToWorld.add(eulerXyz(-0.6, 0, -2, -0.05, -0.01, 0, null));
-		listSensorToWorld.add(eulerXyz(0.6, 0, -2, 0.15, -0.1, 0, null));
+		List<Se3_F64> listSensorToWorld = createCameraLocations();
 
 		alg.getCalibratorMono().configurePinhole(true, 2, true);
 		alg.initialize(expected.intrinsics.size(), 1);
@@ -143,7 +136,20 @@ public class TestCalibrateMultiPlanar extends BoofStandardJUnit {
 		}
 	}
 
-	SynchronizedCalObs createObs(Se3_F64 sensorToWorld, MultiCameraCalibParams params) {
+	@NotNull private static List<Se3_F64> createCameraLocations() {
+		List<Se3_F64> listSensorToWorld = new ArrayList<>();
+		listSensorToWorld.add(eulerXyz(0, 0, -2, 0, 0, 0, null));
+		listSensorToWorld.add(eulerXyz(-0.3, 0, -2, 0.05, 0, 0, null));
+		listSensorToWorld.add(eulerXyz(0, 0.1, -2, 0, 0, 0.04, null));
+		listSensorToWorld.add(eulerXyz(0, 0.5, -2, 0, 0.2, 0.04, null));
+		listSensorToWorld.add(eulerXyz(0, 0.55, -1.5, 0, -0.2, 0.04, null));
+		listSensorToWorld.add(eulerXyz(0.2, 0, -1.8, 0, 0.04, 0, null));
+		listSensorToWorld.add(eulerXyz(-0.6, 0, -2, -0.05, -0.01, 0, null));
+		listSensorToWorld.add(eulerXyz(0.6, 0, -2, 0.15, -0.1, 0, null));
+		return listSensorToWorld;
+	}
+
+	SynchronizedCalObs createObs( Se3_F64 sensorToWorld, MultiCameraCalibParams params ) {
 		var syncObs = new SynchronizedCalObs();
 
 		var tgtX = new Point3D_F64();
@@ -333,5 +339,44 @@ public class TestCalibrateMultiPlanar extends BoofStandardJUnit {
 		Se3_F64 cam3_to_world = alg.extrinsicFromKnownCamera(frame, 2, 3);
 		Objects.requireNonNull(cam3_to_world);
 		assertEquals(0.0, cam3_to_world.T.distance(102, 0, 0), UtilEjml.TEST_F64);
+	}
+
+	/**
+	 * Make sure the reprojection error is zero after SBA has been set up. ALl observations are perfect
+	 */
+	@Test void setupSbaScene() {
+		var expected = new MultiCameraCalibParams();
+		var alg = new CalibrateMultiPlanar();
+
+		createScenarioAndConfigure(alg, expected);
+
+		List<Se3_F64> listSensorToWorld = createCameraLocations();
+
+		// Configure it with ground truth
+		var frames = new ArrayList<FrameState>();
+		for (int frameIdx = 0; frameIdx < listSensorToWorld.size(); frameIdx++) {
+			var s = new FrameState();
+			frames.add(s);
+			s.sensorToWorld.setTo(listSensorToWorld.get(frameIdx));
+			for (int camIdx = 0; camIdx < expected.camerasToSensor.size(); camIdx++) {
+				var te = new TargetExtrinsics();
+				te.targetID = 0;
+				s.sensorToWorld.invert(te.targetToCamera);
+
+				var fc = new FrameCamera();
+				fc.observations.add(te);
+				s.cameras.put(camIdx, fc);
+			}
+		}
+
+		alg.results = expected;
+
+		// Set it up for SBA
+		alg.setupSbaScene(0, frames);
+		alg.bundleUtils.sba.setParameters(alg.bundleUtils.structure, alg.bundleUtils.observations);
+
+		// See if the initial error is zero
+		double error = Math.sqrt(alg.bundleUtils.sba.getFitScore()/alg.bundleUtils.observations.getObservationCount());
+		assertEquals(0.0, error, 1e-5);
 	}
 }

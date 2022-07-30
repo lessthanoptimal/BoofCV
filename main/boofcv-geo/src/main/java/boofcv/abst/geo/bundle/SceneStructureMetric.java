@@ -131,7 +131,7 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	 * @return SE3 transform from parent to view.
 	 */
 	public Se3_F64 getParentToView( View view ) {
-		return motions.get(view.parent_to_view).motion;
+		return motions.get(view.parent_to_view).parent_to_view;
 	}
 
 	/**
@@ -142,7 +142,7 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	 */
 	public Se3_F64 getParentToView( int viewIdx ) {
 		View v = views.get(viewIdx);
-		return motions.get(v.parent_to_view).motion;
+		return motions.get(v.parent_to_view).parent_to_view;
 	}
 
 	/**
@@ -233,14 +233,14 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	 * Specifies a new motion.
 	 *
 	 * @param known If the parameters are known and not optimized or unknown and optimized
-	 * @param motion The value of the motion
+	 * @param parentToView Specifies motion from parent to view reference frames
 	 * @return Index or ID for the created motion
 	 */
-	public int addMotion( boolean known, Se3_F64 motion ) {
+	public int addMotion( boolean known, Se3_F64 parentToView ) {
 		int index = motions.size;
 		Motion m = motions.grow();
 		m.known = known;
-		m.motion.setTo(motion);
+		m.parent_to_view.setTo(parentToView);
 		return index;
 	}
 
@@ -477,20 +477,20 @@ public class SceneStructureMetric extends SceneStructureCommon {
 		/** If the parameters are assumed to be known and should not be optimised. */
 		public boolean known;
 		/** Transform from parent view into this view */
-		public final Se3_F64 motion = new Se3_F64();
+		public final Se3_F64 parent_to_view = new Se3_F64();
 
 		public void reset() {
 			known = true;
-			motion.reset();
+			parent_to_view.reset();
 		}
 
 		public boolean isIdentical( Motion m, double tol ) {
 			if (known != m.known)
 				return false;
-			if (motion.T.distance(m.motion.T) > tol)
+			if (parent_to_view.T.distance(m.parent_to_view.T) > tol)
 				return false;
 			for (int i = 0; i < 9; i++) {
-				if (Math.abs(motion.R.data[i] - m.motion.R.data[i]) > tol)
+				if (Math.abs(parent_to_view.R.data[i] - m.parent_to_view.R.data[i]) > tol)
 					return false;
 			}
 			return true;

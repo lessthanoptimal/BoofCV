@@ -70,7 +70,7 @@ public class BoofStandardJUnit {
 	}
 
 	/**
-	 * Creates an instance of the class where all fields are assigned a random value
+	 * Creates an instance of the class where all fields are assigned a random valuen
 	 */
 	public static Object createNotDefault( Class<?> type, Random rand ) {
 		try {

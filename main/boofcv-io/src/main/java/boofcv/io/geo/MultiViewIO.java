@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -275,7 +275,7 @@ public class MultiViewIO {
 	private static Map<String, Object> encodeSceneMotion( SceneStructureMetric.Motion m ) {
 		Map<String, Object> encoded = new HashMap<>();
 		encoded.put("known", m.known);
-		encoded.put("motion", putSE3(m.motion));
+		encoded.put("motion", putSE3(m.parent_to_view));
 		return encoded;
 	}
 
@@ -412,7 +412,7 @@ public class MultiViewIO {
 				SceneStructureMetric.Motion m = scene.motions.grow();
 				Map<String, Object> yamlMotion = yamlMotions.get(i);
 				m.known = getOrThrow(yamlMotion, "known");
-				loadSE3(getOrThrow(yamlMotion, "motion"), m.motion);
+				loadSE3(getOrThrow(yamlMotion, "motion"), m.parent_to_view);
 			}
 
 			for (int i = 0; i < yamlRigids.size(); i++) {

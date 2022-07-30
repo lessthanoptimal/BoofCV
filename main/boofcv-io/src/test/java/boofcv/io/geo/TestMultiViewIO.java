@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -333,7 +333,7 @@ class TestMultiViewIO extends BoofStandardJUnit {
 		for (int i = 0; i < numMotions; i++) {
 			SceneStructureMetric.Motion m = ret.motions.grow();
 			SpecialEuclideanOps_F64.eulerXyz(rand.nextGaussian(), rand.nextGaussian(), rand.nextGaussian(),
-					rand.nextGaussian(), rand.nextGaussian(), rand.nextGaussian(), m.motion);
+					rand.nextGaussian(), rand.nextGaussian(), rand.nextGaussian(), m.parent_to_view);
 			m.known = rand.nextBoolean();
 		}
 

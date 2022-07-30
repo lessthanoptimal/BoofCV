@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -82,12 +82,12 @@ public class CodecSceneStructureMetric implements BundleAdjustmentSchur.Codec<Sc
 			if (motion.known)
 				continue;
 			rotation.setParameters(input, index);
-			motion.motion.R.setTo(rotation.getRotationMatrix());
+			motion.parent_to_view.R.setTo(rotation.getRotationMatrix());
 			index += rotation.getParameterLength();
 
-			motion.motion.T.x = input[index++];
-			motion.motion.T.y = input[index++];
-			motion.motion.T.z = input[index++];
+			motion.parent_to_view.T.x = input[index++];
+			motion.parent_to_view.T.y = input[index++];
+			motion.parent_to_view.T.z = input[index++];
 		}
 
 		for (int i = 0; i < structure.cameras.size; i++) {
@@ -130,12 +130,12 @@ public class CodecSceneStructureMetric implements BundleAdjustmentSchur.Codec<Sc
 			// Decode the rigid body transform from world to view
 			if (motion.known)
 				continue;
-			rotation.getParameters(motion.motion.R, output, index);
+			rotation.getParameters(motion.parent_to_view.R, output, index);
 			index += rotation.getParameterLength();
 
-			output[index++] = motion.motion.T.x;
-			output[index++] = motion.motion.T.y;
-			output[index++] = motion.motion.T.z;
+			output[index++] = motion.parent_to_view.T.x;
+			output[index++] = motion.parent_to_view.T.y;
+			output[index++] = motion.parent_to_view.T.z;
 		}
 
 		for (int i = 0; i < structure.cameras.size; i++) {

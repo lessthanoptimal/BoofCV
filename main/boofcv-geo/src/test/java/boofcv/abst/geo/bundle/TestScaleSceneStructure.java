@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -78,7 +78,7 @@ class TestScaleSceneStructure extends BoofStandardJUnit {
 
 			// Make sure it was changed
 			for (int i = 0; i < expected.motions.size; i++) {
-				assertNotEquals(expected.motions.data[i].motion.T.distance(found.motions.data[i].motion.T), UtilEjml.TEST_F64);
+				assertNotEquals(expected.motions.data[i].parent_to_view.T.distance(found.motions.data[i].parent_to_view.T), UtilEjml.TEST_F64);
 			}
 
 			// Must still have perfect observations if scaling was correctly applied. Otherwise solution will be changed when optimizing

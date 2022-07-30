@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -83,11 +83,11 @@ class TestCodecSceneStructureMetric extends BoofStandardJUnit {
 			SceneStructureMetric.Motion o = original.motions.data[i];
 			SceneStructureMetric.Motion f = found.motions.data[i];
 
-			assertTrue(MatrixFeatures_DDRM.isIdentical(o.motion.R,
-					f.motion.R, UtilEjml.TEST_F64));
-			assertEquals(o.motion.T.x, f.motion.T.x, UtilEjml.TEST_F64);
-			assertEquals(o.motion.T.y, f.motion.T.y, UtilEjml.TEST_F64);
-			assertEquals(o.motion.T.z, f.motion.T.z, UtilEjml.TEST_F64);
+			assertTrue(MatrixFeatures_DDRM.isIdentical(o.parent_to_view.R,
+					f.parent_to_view.R, UtilEjml.TEST_F64));
+			assertEquals(o.parent_to_view.T.x, f.parent_to_view.T.x, UtilEjml.TEST_F64);
+			assertEquals(o.parent_to_view.T.y, f.parent_to_view.T.y, UtilEjml.TEST_F64);
+			assertEquals(o.parent_to_view.T.z, f.parent_to_view.T.z, UtilEjml.TEST_F64);
 		}
 
 		for (int i = 0; i < original.rigids.size; i++) {

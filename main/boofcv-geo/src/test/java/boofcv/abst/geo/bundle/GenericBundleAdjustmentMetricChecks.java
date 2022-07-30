@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -227,10 +227,10 @@ import static org.junit.jupiter.api.Assertions.fail;
 		}
 
 		for (int i = 0; i < a.motions.size; i++) {
-			double error = a.motions.data[i].motion.T.distance(b.motions.data[i].motion.T);
+			double error = a.motions.data[i].parent_to_view.T.distance(b.motions.data[i].parent_to_view.T);
 			assertTrue( error < tolDistance );
-			assertTrue(MatrixFeatures_DDRM.isIdentical(a.motions.data[i].motion.R,
-					b.motions.data[i].motion.R,tolRotation));
+			assertTrue(MatrixFeatures_DDRM.isIdentical(a.motions.data[i].parent_to_view.R,
+					b.motions.data[i].parent_to_view.R,tolRotation));
 		}
 
 	}

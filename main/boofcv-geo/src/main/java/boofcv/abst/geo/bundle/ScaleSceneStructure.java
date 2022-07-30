@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -290,7 +290,7 @@ public class ScaleSceneStructure {
 			SceneStructureMetric.Motion motion = structure.motions.data[i];
 
 			// X_w = R'*(X_c - T) let X_c = 0 then X_w = -R'*T is center of camera in world
-			GeometryMath_F64.multTran(motion.motion.R, motion.motion.T, c);
+			GeometryMath_F64.multTran(motion.parent_to_view.R, motion.parent_to_view.T, c);
 
 			// Apply transform
 			c.x = -c.x/scale + medianPoint.x;
@@ -298,8 +298,8 @@ public class ScaleSceneStructure {
 			c.z = -c.z/scale + medianPoint.z;
 
 			// -R*T
-			GeometryMath_F64.mult(motion.motion.R, c, motion.motion.T);
-			motion.motion.T.scale(-1);
+			GeometryMath_F64.mult(motion.parent_to_view.R, c, motion.parent_to_view.T);
+			motion.parent_to_view.T.scale(-1);
 		}
 	}
 
@@ -364,7 +364,7 @@ public class ScaleSceneStructure {
 			SceneStructureMetric.Motion motion = structure.motions.data[i];
 
 			// X_w = R'*(X_c - T) let X_c = 0 then X_w = -R'*T is center of camera in world
-			GeometryMath_F64.multTran(motion.motion.R, motion.motion.T, c);
+			GeometryMath_F64.multTran(motion.parent_to_view.R, motion.parent_to_view.T, c);
 
 			// Apply transform
 			c.x = -scale*(c.x + medianPoint.x);
@@ -372,8 +372,8 @@ public class ScaleSceneStructure {
 			c.z = -scale*(c.z + medianPoint.z);
 
 			// -R*T
-			GeometryMath_F64.mult(motion.motion.R, c, motion.motion.T);
-			motion.motion.T.scale(-1);
+			GeometryMath_F64.mult(motion.parent_to_view.R, c, motion.parent_to_view.T);
+			motion.parent_to_view.T.scale(-1);
 		}
 	}
 

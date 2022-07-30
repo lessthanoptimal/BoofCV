@@ -123,7 +123,7 @@ public class TestMultiBaselineStereoIndependent extends BoofStandardJUnit {
 		for (int i = 0; i < listIntrinsic.size(); i++) {
 			sbaIndexToViewID.put(i, i + "");
 			sim.setCamera(listIntrinsic.get(i));
-			sim.setWorldToCamera(scene.motions.get(i).motion);
+			sim.setWorldToCamera(scene.motions.get(i).parent_to_view);
 			images.add(sim.render().clone());
 
 			if (visualize)

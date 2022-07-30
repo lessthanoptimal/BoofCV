@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -89,7 +89,7 @@ class TestSparseSceneToDenseCloud extends BoofStandardJUnit {
 			viewIdx_to_imageID.put(i, "" + (i + 1));
 			scene.setView(i, i, true, new Se3_F64());
 			scene.setCamera(i, true, new CameraPinhole(200, 200, 0, 150, 150, 300, 300));
-			scene.motions.get(i).motion.T.x = -i;
+			scene.motions.get(i).parent_to_view.T.x = -i;
 		}
 
 		// Create a set of points that are visible and overlapping with other neighboring views
