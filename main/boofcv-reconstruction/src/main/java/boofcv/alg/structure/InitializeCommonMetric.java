@@ -123,6 +123,10 @@ public class InitializeCommonMetric implements VerbosePrint {
 				verbose.println("2-views, a.k.a. stereo, is a special case and requires different" +
 						" logic and isn't yet supported");
 			return false;
+		} else if (seedConnIdx.size >= 3) {
+			if (verbose != null)
+				verbose.println("Can only handle the 3-view case for right now");
+			return false;
 		}
 
 		// initialize data structures

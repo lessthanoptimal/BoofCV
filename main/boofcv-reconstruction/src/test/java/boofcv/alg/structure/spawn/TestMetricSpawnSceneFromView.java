@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,11 +32,8 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * @author Peter Abeles
- */
-class TestMetricSpawnSceneFromView extends BoofStandardJUnit {
 
+class TestMetricSpawnSceneFromView extends BoofStandardJUnit {
 	/**
 	 * Simple scenario that tests everything all together
 	 */
@@ -48,7 +45,7 @@ class TestMetricSpawnSceneFromView extends BoofStandardJUnit {
 
 		PairwiseImageGraph pairwise = dbSimilar.createPairwise();
 		PairwiseImageGraph.View seed = pairwise.nodes.get(2);
-		DogArray_I32 motions = DogArray_I32.array(0, 1, 2, 3);
+		DogArray_I32 motions = DogArray_I32.array(0, 1);
 
 		// Create the new scene
 		var alg = new MetricSpawnSceneFromView(
@@ -59,7 +56,7 @@ class TestMetricSpawnSceneFromView extends BoofStandardJUnit {
 		// DO some very basic tests
 		SceneWorkingGraph found = alg.getScene();
 		assertEquals(1, found.listCameras.size());
-		assertEquals(5, found.listViews.size());
+		assertEquals(3, found.listViews.size());
 	}
 
 	@Test void saveMetricSeed() {

@@ -18,11 +18,12 @@
 
 package boofcv.alg.structure;
 
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
-class TestInitializeCommonMetric {
+class TestInitializeCommonMetric extends BoofStandardJUnit {
 	@Test void implement() {
 		fail("Implement");
 	}
