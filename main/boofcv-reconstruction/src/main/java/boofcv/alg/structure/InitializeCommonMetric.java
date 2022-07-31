@@ -203,8 +203,7 @@ public class InitializeCommonMetric implements VerbosePrint {
 	 * Robustly estimates metric views with extrinsics known up to a scale factor
 	 */
 	public boolean estimateMetricCamerasRobustly() {
-		// TODO specify shape of each camera individually
-		pixelToMetric3.singleCamera = isSingleCamera();
+		pixelToMetric3.viewToCamera = isSingleCamera() ? new int[]{0, 0, 0} : new int[]{0, 1, 2};
 		pixelToMetric3.initialize(utils.priorCamA.width, utils.priorCamA.height);
 		if (!pixelToMetric3.process(utils.matchesTriple.toList()))
 			return false;

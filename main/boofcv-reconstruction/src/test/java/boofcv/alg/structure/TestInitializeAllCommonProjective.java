@@ -70,7 +70,7 @@ class TestInitializeAllCommonProjective extends BoofStandardJUnit {
 		// NOTES: Using regular pixels maxed out at 12
 		//        With zero centering maxed out at 14
 
-		var alg = new InitializeAllCommonProjective();
+		var alg = new InitializeCommonProjective();
 //		alg.utils.sba.setVerbose(System.out,null);
 
 		for (int seedIdx = 0; seedIdx < 3; seedIdx++) {
@@ -100,7 +100,7 @@ class TestInitializeAllCommonProjective extends BoofStandardJUnit {
 	 * Perfect scene with 3 to 5 connections
 	 */
 	@Test void perfect_connections_3_to_5() {
-		var alg = new InitializeAllCommonProjective();
+		var alg = new InitializeCommonProjective();
 
 		for (int numConnections = 3; numConnections <= 6; numConnections++) {
 			// do a few trials since things are randomized to shake out more bugs potentially
@@ -172,7 +172,7 @@ class TestInitializeAllCommonProjective extends BoofStandardJUnit {
 		var dbSimilar = new MockLookupSimilarImages(4, 0xDEADBEEF);
 		var dbCams = new MockLookUpCameraInfo(dbSimilar.intrinsic);
 
-		var alg = new InitializeAllCommonProjective();
+		var alg = new InitializeCommonProjective();
 
 		// These observations are no longer perfect, just a little bit of error
 		dbSimilar.viewObs.get(0).get(20).x += 0.1;
@@ -187,7 +187,7 @@ class TestInitializeAllCommonProjective extends BoofStandardJUnit {
 	@Test void configurations_sba() {
 		var dbSimilar = new MockLookupSimilarImages(5, 0xDEADBEEF);
 		var dbCams = new MockLookUpCameraInfo(dbSimilar.intrinsic);
-		var alg = new InitializeAllCommonProjective();
+		var alg = new InitializeCommonProjective();
 
 		checkConfiguration(alg, dbSimilar, dbCams, true, true, false, 1e-4);
 		checkConfiguration(alg, dbSimilar, dbCams, true, true, true, 1e-4);
@@ -197,7 +197,7 @@ class TestInitializeAllCommonProjective extends BoofStandardJUnit {
 		checkConfiguration(alg, dbSimilar, dbCams, false, false, false, 1e-4);
 	}
 
-	private void checkConfiguration( InitializeAllCommonProjective alg,
+	private void checkConfiguration( InitializeCommonProjective alg,
 									 MockLookupSimilarImages dbSimilar, MockLookUpCameraInfo dbCams,
 									 boolean threeViews,
 									 boolean sba, boolean scale, double reprojectionTol ) {
@@ -226,7 +226,7 @@ class TestInitializeAllCommonProjective extends BoofStandardJUnit {
 	/**
 	 * Check reconstruction by seeing if it's consistent with the input observations
 	 */
-	private void checkReconstruction( InitializeAllCommonProjective alg,
+	private void checkReconstruction( InitializeCommonProjective alg,
 									  MockLookupSimilarImages db,
 									  DogArray_I32 seedConnIdx,
 									  int numFeatures,
@@ -276,7 +276,7 @@ class TestInitializeAllCommonProjective extends BoofStandardJUnit {
 	/**
 	 * Check reconstruction by seeing if it's consistent with the input observations
 	 */
-	private void checkReconstruction( InitializeAllCommonProjective alg,
+	private void checkReconstruction( InitializeCommonProjective alg,
 									  MockLookupSimilarImagesRealistic db,
 									  DogArray_I32 seedConnIdx,
 									  double reprojectionTol ) {
@@ -325,7 +325,7 @@ class TestInitializeAllCommonProjective extends BoofStandardJUnit {
 	/**
 	 * Check camera matrices directly by computing a matrix which allows direct comparision of the two sets
 	 */
-	private void checkCameraMatrices( InitializeAllCommonProjective alg,
+	private void checkCameraMatrices( InitializeCommonProjective alg,
 									  MockLookupSimilarImagesRealistic db ) {
 		List<DMatrixRMaj> listA = new ArrayList<>();
 		List<DMatrixRMaj> listB = new ArrayList<>();
@@ -383,7 +383,7 @@ class TestInitializeAllCommonProjective extends BoofStandardJUnit {
 		}
 
 		// Select the results
-		var alg = new InitializeAllCommonProjective();
+		var alg = new InitializeCommonProjective();
 
 		DogArray_I32 edgeIdxs = DogArray_I32.array(0, 2, 3, 4, 5); // skip one to see if it uses this list
 		int[] selected = new int[2];
@@ -398,7 +398,7 @@ class TestInitializeAllCommonProjective extends BoofStandardJUnit {
 	 * Give it a set of three views which are not mutually connected in a complete circle
 	 */
 	@Test void scoreTripleView_NotCircle() {
-		var alg = new InitializeAllCommonProjective();
+		var alg = new InitializeCommonProjective();
 
 		View seedA = new View();
 		View viewB = new View();
@@ -426,7 +426,7 @@ class TestInitializeAllCommonProjective extends BoofStandardJUnit {
 	 * See if it scores a set of three views higher if they have stronger 3D information
 	 */
 	@Test void scoreTripleView_Prefer3D() {
-		var alg = new InitializeAllCommonProjective();
+		var alg = new InitializeCommonProjective();
 
 		View seedA = new View();
 		View viewB = new View();
@@ -467,7 +467,7 @@ class TestInitializeAllCommonProjective extends BoofStandardJUnit {
 		int offset = 5;
 
 		var db = new MockLookupSimilarImages(4, 0xDEADBEEF);
-		var alg = new InitializeAllCommonProjective();
+		var alg = new InitializeCommonProjective();
 		alg.utils.ransac = new MockRansac(offset, db.feats3D.size() - offset);
 		alg.utils.dbSimilar = db;
 		alg.utils.P1.setTo(db.listCameraMatrices.get(0));
@@ -502,7 +502,7 @@ class TestInitializeAllCommonProjective extends BoofStandardJUnit {
 		PairwiseImageGraph graph = dbSimilar.graph;
 		View seed = graph.nodes.get(0);
 		DogArray_I32 motionIndexes = DogArray_I32.array(0, 2, 3); // which edges in the first view should be considered
-		var alg = new InitializeAllCommonProjective();
+		var alg = new InitializeCommonProjective();
 		alg.utils.dbSimilar = dbSimilar;
 		alg.utils.dbCams = dbCams;
 		alg.utils.seed = seed;
@@ -547,7 +547,7 @@ class TestInitializeAllCommonProjective extends BoofStandardJUnit {
 		int numViews = 4;
 		var dbSimilar = new MockLookupSimilarImages(numViews, 0xDEADBEEF);
 		var dbCams = new MockLookUpCameraInfo(800, 800);
-		var alg = new InitializeAllCommonProjective();
+		var alg = new InitializeCommonProjective();
 		alg.utils.dbSimilar = dbSimilar;
 		alg.utils.dbCams = dbCams;
 
