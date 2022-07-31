@@ -70,7 +70,7 @@ import static boofcv.misc.BoofMiscOps.checkTrue;
  * @author Peter Abeles
  */
 @SuppressWarnings({"NullAway.Init"})
-public class InitializeAllCommonProjective implements VerbosePrint {
+public class InitializeCommonProjective implements VerbosePrint {
 
 	/** Common algorithms for reconstructing the projective scene */
 	public @Getter @Setter PairwiseGraphUtils utils;
@@ -101,11 +101,11 @@ public class InitializeAllCommonProjective implements VerbosePrint {
 	 */
 	protected final DogArray_I32 seedToStructure = new DogArray_I32();
 
-	public InitializeAllCommonProjective( ConfigProjectiveReconstruction configProjective ) {
+	public InitializeCommonProjective( ConfigProjectiveReconstruction configProjective ) {
 		utils = new PairwiseGraphUtils(configProjective);
 	}
 
-	public InitializeAllCommonProjective() {
+	public InitializeCommonProjective() {
 		this(new ConfigProjectiveReconstruction());
 	}
 

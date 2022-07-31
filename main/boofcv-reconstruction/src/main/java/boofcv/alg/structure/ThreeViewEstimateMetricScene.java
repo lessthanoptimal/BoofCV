@@ -50,9 +50,9 @@ import java.util.Set;
 import static boofcv.alg.geo.MultiViewOps.triangulatePoints;
 
 /**
- * Estimates the metric scene's structure given a set of sparse features associations from three views. This is
+ * <p>Estimates the metric scene's structure given a set of sparse features associations from three views. This is
  * intended to give the best possible solution from the sparse set of matching features. Its internal
- * methods are updated as better strategies are found.
+ * methods are updated as better strategies are found.</p>
  *
  * Assumptions:
  * <ul>
@@ -61,8 +61,8 @@ import static boofcv.alg.geo.MultiViewOps.triangulatePoints;
  *     <li>fx = fy approximately</li>
  * </ul>
  *
- * The zero principle point is enforced prior to calling {@link #process} by subtracting the image center from
- * each pixel observations.
+ * <p>The zero principle point is enforced prior to calling {@link #process} by subtracting the image center from
+ * each pixel observations.</p>
  *
  * Steps:
  * <ol>
@@ -79,9 +79,8 @@ import static boofcv.alg.geo.MultiViewOps.triangulatePoints;
  */
 @SuppressWarnings("NullAway.Init")
 public class ThreeViewEstimateMetricScene implements VerbosePrint {
-	// TODO modify so that you can tell it if each view has the same intrinsics or not
-	// TODO consider changing from RANSAC to LSMED. It provides better performance when the error tolerance is
-	//      unreasonably high. This could indicate that features are not matching perfectly but close.
+	// NOTE: Consider changing from RANSAC to LSMED. It provides better performance when the error tolerance is
+	//       unreasonably high. This could indicate that features are not matching perfectly but close.
 
 	// Make all configurations public for ease of manipulation
 	public ConfigPixelsToMetric configSelfCalib = new ConfigPixelsToMetric();
@@ -93,8 +92,8 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 	/** Optimize points in homogenous coordinates */
 	public boolean homogenous = true;
 
-	/** It can assume that all views are generated from a single camera */
-	public boolean singleCamera = true;
+	/** Use to specify if multiple views share a camera. Values from 0 to 2, inclusive. */
+	public int[] viewToCamera = new int[]{0, 0, 0};
 
 	/** If a positive number the focal length will be assumed to be that */
 	public double manualFocalLength = -1;
@@ -147,9 +146,11 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 		// TODO let it specify image shape for each view independently
 		ransac = FactoryMultiViewRobust.metricThreeViewRansac(configSelfCalib, configRansac);
 
-		// Let it know some information about the cameras
+		// Let it know some information about the cameras. More than one view can share the same camera
 		for (int idx = 0; idx < 3; idx++) {
-			int camId = singleCamera ? 0 : idx;
+			int camId = viewToCamera[idx];
+			BoofMiscOps.checkTrue(camId <= idx, "camID must be <= array index");
+			BoofMiscOps.checkTrue(camId >= 0 && camId < 3, "Camera must be from 0 to 2");
 			ransac.setView(idx, new ElevateViewInfo(width, height, camId));
 		}
 
@@ -160,8 +161,8 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 	}
 
 	/**
-	 * Determines the metric scene. The principle point is assumed to be zero in the passed in pixel coordinates.
-	 * Typically this is done by subtracting the image center from each pixel coordinate for each view.
+	 * Determines the metric scene. Pixel coordinates are assumed to already have been adjusted for the principle
+	 * point being zero, e.g. minus (cx, cy).
 	 *
 	 * @param associated List of associated features from 3 views. pixels
 	 * @return true if successful or false if it failed
@@ -204,14 +205,7 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 		if (verbose != null) verbose.println("Remaining after RANSAC " + inliers.size() + " / " + associated.size());
 
 		// Save intrinsics
-		if (singleCamera) {
-			averageIntrinsicParameters(ransac.getModelParameters());
-		} else {
-			listPinhole.resetResize(3);
-			for (int i = 0; i < 3; i++) {
-				listPinhole.get(i).setTo(ransac.getModelParameters().getIntrinsics(i));
-			}
-		}
+		averageIntrinsicParameters(ransac.getModelParameters());
 
 		// Save extrinsics
 		listWorldToView.resetResize(3);
@@ -243,7 +237,7 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 
 		MetricCameraTriple found = ransac.getModelParameters();
 		for (int i = 0; i < 3; i++) {
-			structure.setView(i, singleCamera ? 0 : i, i == 0, found.getView1ToIdx(i));
+			structure.setView(i, viewToCamera[i], i == 0, found.getView1ToIdx(i));
 		}
 
 		for (int i = 0; i < inliers.size(); i++) {
@@ -308,24 +302,37 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 	}
 
 	/**
-	 * Assume that there's only really one camera being used and take all the indepdent estimates and average them
+	 * <p>Average intrinsics from all views with the same camera ID.</p>
 	 */
 	private void averageIntrinsicParameters( MetricCameraTriple results ) {
-		listPinhole.reset();
-		listPinhole.grow().setTo(results.getIntrinsics(0));
+		// NOTE: Instead of an average maybe picking the one which lowers residual error the most? With average if there's
+		// one bonkers answer it will produce garbage results.
 
-		CameraPinhole ave = listPinhole.get(0);
-		for (int i = 1; i < 3; i++) {
-			CameraPinhole a = results.getIntrinsics(i);
-			ave.fx += a.fx;
-			ave.fy += a.fy;
-			ave.cx += a.cx;
-			ave.cy += a.cy;
+		listPinhole.reset();
+
+		int total = 0;
+		for (int target = 0; target < 3 && total < 3; target++) {
+			listPinhole.grow().setTo(results.getIntrinsics(target));
+			CameraPinhole ave = listPinhole.getTail();
+
+			int count = 0;
+			for (int i = 0; i < viewToCamera.length; i++) {
+				if (viewToCamera[i] != target)
+					continue;
+				CameraPinhole a = results.getIntrinsics(i);
+				ave.fx += a.fx;
+				ave.fy += a.fy;
+				ave.cx += a.cx;
+				ave.cy += a.cy;
+				count++;
+			}
+
+			ave.fx /= count;
+			ave.fy /= count;
+			ave.cx /= count;
+			ave.cy /= count;
+			total += count;
 		}
-		ave.fx /= 3;
-		ave.fy /= 3;
-		ave.cx /= 3;
-		ave.cy /= 3;
 	}
 
 	@Override

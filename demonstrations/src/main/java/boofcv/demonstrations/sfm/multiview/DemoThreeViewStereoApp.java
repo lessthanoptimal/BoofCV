@@ -616,7 +616,7 @@ public class DemoThreeViewStereoApp<TD extends TupleDesc<TD>> extends Demonstrat
 		}
 
 		if (!skipStructure) {
-			structureEstimator.singleCamera = controls.cSingleCamera.value;
+			structureEstimator.viewToCamera = controls.cSingleCamera.value ? new int[]{0, 0, 0} : new int[]{0, 1, 2};
 			structureEstimator.configRansac.inlierThreshold = controls.inliers;
 			structureEstimator.pruneFraction = (100 - controls.prune)/100.0;
 			if (controls.autoFocal) {

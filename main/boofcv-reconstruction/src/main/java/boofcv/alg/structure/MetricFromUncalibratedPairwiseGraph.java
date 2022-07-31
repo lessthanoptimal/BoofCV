@@ -39,15 +39,13 @@ import java.util.Set;
  *
  * <ol>
  * <li>Input: {@link PairwiseImageGraph} and {@link LookUpSimilarImages image information}</li>
- * <li>Selected a set of views to estimate a projective scene based on having good geometry.
- * {@link InitializeAllCommonProjective}</li>
- * <li>Metric elevation from initial seed views</li>
+ * <li>Selected an initial set of views and perform {@link MetricSpawnSceneFromView metric reconstruction}.</li>
  * <li>Grow metric scene one at a time using previously found metric views.
  * {@link MetricExpandByOneView}</li>
  * <li>Stop when all views have been considered</li>
  * </ol>
  *
- * Output is contained in {@link SceneWorkingGraph} and accessible from TODO update. 3D point features
+ * Output is contained in {@link SceneWorkingGraph} and accessible from ???. 3D point features
  * are not part of the output directly. Observations used are saved and can be used to triangulate the 3D features.
  * It's advisable to perform bundle adjustment and outlier rejection and the scene as a whole.
  *

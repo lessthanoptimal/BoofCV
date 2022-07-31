@@ -67,7 +67,7 @@ public class TestThreeViewEstimateMetricScene extends BoofStandardJUnit {
 		var alg = new ThreeViewEstimateMetricScene();
 
 		for (boolean singleCamera : new boolean[]{false, true}) {
-			alg.singleCamera = singleCamera;
+			alg.viewToCamera = singleCamera ? new int[]{0, 0, 0} : new int[]{0, 1, 2};
 			alg.initialize(900, 900);
 			assertTrue(alg.process(views));
 
