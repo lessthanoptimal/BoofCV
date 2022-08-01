@@ -21,6 +21,7 @@ package boofcv.io.geo;
 import boofcv.BoofVersion;
 import boofcv.abst.geo.bundle.SceneStructureCommon;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
+import boofcv.alg.geo.bundle.cameras.BundlePinholeBrown;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.alg.similar.SimilarImagesData;
 import boofcv.alg.structure.LookUpSimilarImages;
@@ -340,8 +341,11 @@ public class MultiViewIO {
 		if (c.model instanceof BundlePinholeSimplified) {
 			model = putPinholeSimplified((BundlePinholeSimplified)c.model);
 			model.put("type", "PinholeSimplified");
+		} else if (c.model instanceof BundlePinholeBrown) {
+			model = putPinholeBrown((BundlePinholeBrown)c.model);
+			model.put("type", "PinholeBrown");
 		} else {
-			throw new RuntimeException("BundleAdjustmentCamera type not yet supported. " + c.getClass().getSimpleName());
+			throw new RuntimeException("Camera type not yet supported. type='" + c.model.getClass().getSimpleName() + "'");
 		}
 		encoded.put("model", model);
 		return encoded;
@@ -357,7 +361,8 @@ public class MultiViewIO {
 		String type = getOrThrow(model, "type");
 		c.model = switch (type) {
 			case "PinholeSimplified" -> loadPinholeSimplified(model, null);
-			default -> throw new RuntimeException("Unknown camera. " + type);
+			case "PinholeBrown" -> loadPinholeBrown(model, null);
+			default -> throw new RuntimeException("Unknown camera. type='" + type + "'");
 		};
 
 		return c;
@@ -792,14 +797,43 @@ public class MultiViewIO {
 		return dimension;
 	}
 
-	public static Map<String, Object> putPinholeSimplified( BundlePinholeSimplified intrinsic ) {
+	public static Map<String, Object> putPinholeBrown( BundlePinholeBrown intrinsic ) {
 		Map<String, Object> map = new HashMap<>();
 
-		map.put("f", intrinsic.f);
-		map.put("k1", intrinsic.k1);
-		map.put("k2", intrinsic.k2);
+		map.put("fx", intrinsic.fx);
+		map.put("fy", intrinsic.fy);
+		map.put("skew", intrinsic.skew);
+		map.put("cx", intrinsic.cx);
+		map.put("cy", intrinsic.cy);
+		map.put("t1", intrinsic.t1);
+		map.put("t2", intrinsic.t2);
+		map.put("radial", intrinsic.radial);
 
 		return map;
+	}
+
+	public static BundlePinholeBrown loadPinholeBrown( Map<String, Object> map,
+													   @Nullable BundlePinholeBrown intrinsic ) {
+		if (intrinsic == null)
+			intrinsic = new BundlePinholeBrown();
+
+		intrinsic.fx = (double)map.get("fx");
+		intrinsic.fy = (double)map.get("fy");
+		intrinsic.skew = (double)map.getOrDefault("skew", 0.0);
+		intrinsic.cx = (double)map.get("cx");
+		intrinsic.cy = (double)map.get("cy");
+
+		intrinsic.t1 = (double)map.getOrDefault("t1", 0.0);
+		intrinsic.t2 = (double)map.getOrDefault("t2", 0.0);
+
+		List<Double> radialList = (List<Double>)map.get("radial");
+		if (radialList == null)
+			intrinsic.radial = new double[0];
+		else {
+			intrinsic.radial = radialList.stream().mapToDouble(i -> i).toArray();
+		}
+
+		return intrinsic;
 	}
 
 	public static BundlePinholeSimplified loadPinholeSimplified( Map<String, Object> map,
@@ -812,6 +846,16 @@ public class MultiViewIO {
 		intrinsic.k2 = (double)map.get("k2");
 
 		return intrinsic;
+	}
+
+	public static Map<String, Object> putPinholeSimplified( BundlePinholeSimplified intrinsic ) {
+		Map<String, Object> map = new HashMap<>();
+
+		map.put("f", intrinsic.f);
+		map.put("k1", intrinsic.k1);
+		map.put("k2", intrinsic.k2);
+
+		return map;
 	}
 
 	public static Map<String, Object> putSE3( Se3_F64 m ) {

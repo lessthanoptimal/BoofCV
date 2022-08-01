@@ -58,6 +58,31 @@ public class BundlePinholeBrown implements BundleAdjustmentCamera {
 		return this;
 	}
 
+	public boolean isIdentical( BundlePinholeBrown c, double tol ) {
+		if (radial.length != c.radial.length)
+			return false;
+
+		if (Math.abs(fx - c.fx) > tol)
+			return false;
+		if (Math.abs(fy - c.fy) > tol)
+			return false;
+		if (Math.abs(cx - c.cx) > tol)
+			return false;
+		if (Math.abs(cy - c.cy) > tol)
+			return false;
+		if (Math.abs(skew - c.skew) > tol)
+			return false;
+		if (Math.abs(t1 - c.t1) > tol)
+			return false;
+		if (Math.abs(t2 - c.t2) > tol)
+			return false;
+		for (int i = 0; i < radial.length; i++) {
+			if (radial[i] != c.radial[i])
+				return false;
+		}
+		return true;
+	}
+
 	public BundlePinholeBrown setK( double fx, double fy, double skew, double cx, double cy ) {
 		this.fx = fx;
 		this.fy = fy;

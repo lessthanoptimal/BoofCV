@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -191,8 +191,12 @@ public abstract class SceneStructureCommon implements SceneStructure {
 
 			try {
 				if (model instanceof BundlePinholeSimplified) {
-					BundlePinholeSimplified a = (BundlePinholeSimplified)model;
-					BundlePinholeSimplified b = (BundlePinholeSimplified)m.model;
+					var a = (BundlePinholeSimplified)model;
+					var b = (BundlePinholeSimplified)m.model;
+					return a.isIdentical(b, tol);
+				} else if (model instanceof BundlePinholeBrown) {
+					var a = (BundlePinholeBrown)model;
+					var b = (BundlePinholeBrown)m.model;
 					return a.isIdentical(b, tol);
 				} else {
 					throw new RuntimeException("Add support for " + model.getClass().getSimpleName());

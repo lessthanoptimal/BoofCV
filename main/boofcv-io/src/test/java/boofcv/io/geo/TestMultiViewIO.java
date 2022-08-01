@@ -20,6 +20,7 @@ package boofcv.io.geo;
 
 import boofcv.abst.geo.bundle.SceneStructureCommon;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
+import boofcv.alg.geo.bundle.cameras.BundlePinholeBrown;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.alg.similar.SimilarImagesData;
 import boofcv.alg.structure.LookUpSimilarImages;
@@ -66,9 +67,9 @@ class TestMultiViewIO extends BoofStandardJUnit {
 
 		var matches12 = new ArrayList<AssociatedIndex>();
 		for (int i = 0; i < 8; i++) {
-			matches12.add( new AssociatedIndex(rand.nextInt(), rand.nextInt()));
+			matches12.add(new AssociatedIndex(rand.nextInt(), rand.nextInt()));
 		}
-		expected.setRelationship("2","1", matches12);
+		expected.setRelationship("2", "1", matches12);
 
 		var output = new ByteArrayOutputStream();
 		MultiViewIO.save(expected, new OutputStreamWriter(output, UTF_8));
@@ -87,8 +88,6 @@ class TestMultiViewIO extends BoofStandardJUnit {
 
 			found.lookupPixelFeats(id, features);
 			assertEquals(4 + i, features.size);
-
-
 		}
 
 		for (String id : expected.listImages) {
@@ -373,6 +372,32 @@ class TestMultiViewIO extends BoofStandardJUnit {
 		}
 
 		return ret;
+	}
+
+	/**
+	 * Test encoding and decoding of different camera types
+	 */
+	@Test void save_load_SceneStructureMetric_Cameras() {
+		var brown = new BundlePinholeBrown();
+		brown.fx = rand.nextGaussian();
+		brown.fy = rand.nextGaussian();
+		brown.cx = rand.nextGaussian();
+		brown.cy = rand.nextGaussian();
+		brown.skew = rand.nextGaussian();
+		brown.t1 = rand.nextGaussian();
+		brown.t2 = rand.nextGaussian();
+		brown.radial = new double[]{1, 2, 3};
+
+		var expected = new SceneStructureMetric(true);
+		expected.initialize(1, 0, 0);
+		expected.cameras.get(0).model = brown;
+
+		var output = new ByteArrayOutputStream();
+		MultiViewIO.save(expected, new OutputStreamWriter(output, UTF_8));
+
+		var input = new ByteArrayInputStream(output.toByteArray());
+		SceneStructureMetric found = MultiViewIO.load(new InputStreamReader(input, UTF_8), (SceneStructureMetric)null);
+		assertTrue(expected.isIdentical(found, UtilEjml.TEST_F64));
 	}
 
 	private void randomizePoint( SceneStructureCommon.Point p ) {
