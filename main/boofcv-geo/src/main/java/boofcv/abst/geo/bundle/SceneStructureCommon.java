@@ -190,13 +190,11 @@ public abstract class SceneStructureCommon implements SceneStructure {
 				return false;
 
 			try {
-				if (model instanceof BundlePinholeSimplified) {
-					var a = (BundlePinholeSimplified)model;
-					var b = (BundlePinholeSimplified)m.model;
+				if (model instanceof BundlePinholeSimplified a) {
+					BundlePinholeSimplified b = (BundlePinholeSimplified)m.model;
 					return a.isIdentical(b, tol);
-				} else if (model instanceof BundlePinholeBrown) {
-					var a = (BundlePinholeBrown)model;
-					var b = (BundlePinholeBrown)m.model;
+				} else if (model instanceof BundlePinholeBrown a) {
+					BundlePinholeBrown b = (BundlePinholeBrown)m.model;
 					return a.isIdentical(b, tol);
 				} else {
 					throw new RuntimeException("Add support for " + model.getClass().getSimpleName());
