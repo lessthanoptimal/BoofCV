@@ -178,6 +178,32 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	}
 
 	/**
+	 * Computes and returns the transform from view1 to view2
+	 *
+	 * @param view1 First view
+	 * @param view2 Second view
+	 * @return SE3 transform from view1 to view2.
+	 */
+	public Se3_F64 getViewToView( View view1, View view2 ) {
+		var world_to_view1 = new Se3_F64();
+		var world_to_view2 = new Se3_F64();
+		var tmp = new Se3_F64();
+
+		getWorldToView(view1, world_to_view1, tmp);
+		getWorldToView(view2, world_to_view2, tmp);
+
+		world_to_view1.invertConcat(world_to_view2, tmp);
+		return tmp;
+	}
+
+	/**
+	 * Computes and returns the transform from view1 to view2. See {@link #getViewToView(View, View)}.
+	 */
+	public Se3_F64 getViewToView( int view1, int view2 ) {
+		return getViewToView(views.get(view1), views.get(view2));
+	}
+
+	/**
 	 * Returns true if the scene contains rigid objects
 	 */
 	public boolean hasRigid() {

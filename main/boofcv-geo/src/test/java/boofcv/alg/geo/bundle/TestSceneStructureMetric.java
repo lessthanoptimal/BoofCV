@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -111,6 +111,23 @@ public class TestSceneStructureMetric extends BoofStandardJUnit {
 		}
 	}
 
+	@Test void getViewToView() {
+		var scene = new SceneStructureMetric(false);
+
+		scene.initialize(1, 4, 4);
+
+		// Create a chained scene
+		for (int i = 0; i < scene.views.size; i++) {
+			scene.setView(i, -1, true, SpecialEuclideanOps_F64.eulerXyz(i + 1, 0, 0, 0, 0, 0, null), i - 1);
+		}
+
+		Se3_F64 view2_to_view3 = scene.getViewToView(2, 3);
+		Se3_F64 view3_to_view2 = scene.getViewToView(3, 2);
+
+		assertEquals(view2_to_view3.T.x, -view3_to_view2.T.x, UtilEjml.TEST_F64);
+		assertEquals(-4.0, view3_to_view2.T.x, UtilEjml.TEST_F64);
+	}
+
 	@Test void projectToPixel_3D() {
 		var scene = new SceneStructureMetric(false);
 		var intrinsic = new CameraPinhole(100, 100, 0, 0, 0, 300, 300);
@@ -126,7 +143,7 @@ public class TestSceneStructureMetric extends BoofStandardJUnit {
 		assertTrue(scene.projectToPixel(0, 0, new Se3_F64(), new Se3_F64(), new Point3D_F64(), pixel));
 
 		var expected = new Point2D_F64();
-		PerspectiveOps.renderPixel(world_to_view,intrinsic,new Point3D_F64(0.1, -0.5, 1.1), expected);
+		PerspectiveOps.renderPixel(world_to_view, intrinsic, new Point3D_F64(0.1, -0.5, 1.1), expected);
 
 		assertEquals(expected.x, pixel.x, UtilEjml.TEST_F64);
 		assertEquals(expected.y, pixel.y, UtilEjml.TEST_F64);
