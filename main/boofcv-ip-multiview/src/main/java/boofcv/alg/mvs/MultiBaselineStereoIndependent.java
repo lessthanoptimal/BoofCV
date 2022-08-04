@@ -105,8 +105,8 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 
 	// Storage for stereo disparity results
 	final StereoResults results = new StereoResults();
-	// Fuses multiple disparity images together provided they have the same "left" view
-	MultiBaselineDisparityMedian performFusion = new MultiBaselineDisparityMedian();
+	/** Fuses multiple disparity images together provided they have the same "left" view */
+	@Getter MultiBaselineDisparityMedian performFusion = new MultiBaselineDisparityMedian();
 
 	// Storage for the original images in the stereo pair
 	Image image1, image2;

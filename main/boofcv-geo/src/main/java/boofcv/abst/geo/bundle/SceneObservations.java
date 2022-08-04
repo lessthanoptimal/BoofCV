@@ -205,6 +205,14 @@ public class SceneObservations {
 			point.resetResize(numPoints, -1);
 			observations.resetResize(numPoints*2, -1);
 		}
+
+		public boolean isIdentical( View other) {
+			if (!point.isEquals(other.point))
+				return false;
+			if (!observations.isEquals(other.observations))
+				return false;
+			return true;
+		}
 	}
 
 	/**
@@ -223,5 +231,27 @@ public class SceneObservations {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Returns true of the two observations contain the same values
+	 */
+	public boolean isIdentical( SceneObservations other ) {
+		if (views.size != other.views.size)
+			return false;
+
+		if (viewsRigid.size != other.viewsRigid.size)
+			return false;
+
+		for (int i = 0; i < views.size; i++) {
+			if (!views.get(i).isIdentical(other.views.get(i)))
+				return false;
+		}
+		for (int i = 0; i < viewsRigid.size; i++) {
+			if (!viewsRigid.get(i).isIdentical(other.viewsRigid.get(i)))
+				return false;
+		}
+
+		return true;
 	}
 }

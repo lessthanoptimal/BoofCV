@@ -19,6 +19,7 @@
 package boofcv.io.geo;
 
 import boofcv.BoofVersion;
+import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureCommon;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeBrown;
@@ -263,6 +264,36 @@ public class MultiViewIO {
 		out.close();
 	}
 
+	/**
+	 * Saves a {@link SceneObservations} into the {@link Writer}.
+	 *
+	 * @param scene (Input) Scene observations
+	 * @param outputWriter (Output) where the scene is writen to
+	 */
+	public static void save( SceneObservations scene, Writer outputWriter ) {
+		var out = new PrintWriter(outputWriter);
+
+		Yaml yaml = createYmlObject();
+
+		out.println("# " + scene.getClass().getSimpleName() + " in YAML format. BoofCV " + BoofVersion.VERSION);
+
+		List<Map<String, Object>> views = new ArrayList<>();
+		List<Map<String, Object>> viewsRigid = new ArrayList<>();
+
+		scene.views.forEach(v -> views.add(encodeObservationView(v)));
+		scene.viewsRigid.forEach(v -> viewsRigid.add(encodeObservationView(v)));
+
+		Map<String, Object> data = new HashMap<>();
+		data.put("views", views);
+		data.put("views_rigid", viewsRigid);
+		data.put("data_type", "SceneObservations");
+		data.put("version", 0);
+
+		yaml.dump(data, out);
+
+		out.close();
+	}
+
 	private static Map<String, Object> encodeSceneView( SceneStructureMetric scene,
 														SceneStructureMetric.View v ) {
 		Map<String, Object> encoded = new HashMap<>();
@@ -298,6 +329,13 @@ public class MultiViewIO {
 		Map<String, Object> encoded = new HashMap<>();
 		encoded.put("coordinate", p.coordinate);
 		encoded.put("views", p.views.toArray());
+		return encoded;
+	}
+
+	private static Map<String, Object> encodeObservationView( SceneObservations.View v ) {
+		Map<String, Object> encoded = new HashMap<>();
+		encoded.put("point", v.point.toArray());
+		encoded.put("observations", v.observations.toArray());
 		return encoded;
 	}
 
@@ -445,6 +483,64 @@ public class MultiViewIO {
 		}
 
 		return scene;
+	}
+
+	public static SceneObservations load( String path, @Nullable SceneObservations graph ) {
+		try {
+			Reader reader = new InputStreamReader(new FileInputStream(path), UTF_8);
+			return load(reader, graph);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	/**
+	 * Decodes {@link SceneObservations} encoded in a YAML format from a reader.
+	 *
+	 * @param reader (Input/Output) Where the graph is read from
+	 * @param observations (Output) Optional storage for observations. If null a new instance is created.
+	 * @return Decoded observations
+	 */
+	public static SceneObservations load( Reader reader, @Nullable SceneObservations observations ) {
+		if (observations == null)
+			observations = new SceneObservations();
+		Yaml yaml = createYmlObject();
+
+		Map<String, Object> data = yaml.load(reader);
+
+		try {
+			reader.close();
+			List<Map<String, Object>> yamlViews = getOrThrow(data, "views");
+			List<Map<String, Object>> yamlViewsRigid = getOrThrow(data, "views_rigid");
+
+			observations.initialize(yamlViews.size(), !yamlViewsRigid.isEmpty());
+
+			loadObservations(observations.views, yamlViews);
+			loadObservations(observations.viewsRigid, yamlViewsRigid);
+		} catch( IOException e ) {
+			throw new UncheckedIOException(e);
+		}
+
+		return observations;
+	}
+
+	private static void loadObservations( FastAccess<SceneObservations.View> views, List<Map<String, Object>> yamlViews ) throws IOException {
+		for (int viewIdx = 0; viewIdx < yamlViews.size(); viewIdx++) {
+			Map<String, Object> yamlView = yamlViews.get(viewIdx);
+			List<Integer> pointValues = getOrThrow(yamlView, "point");
+			List<Float> observationValues = getOrThrow(yamlView, "observations");
+
+			SceneObservations.View v = views.get(viewIdx);
+			// Pre-declare memory
+			v.point.resize(pointValues.size());
+			for (int i = 0; i < pointValues.size(); i++) {
+				v.point.data[i] = pointValues.get(i);
+			}
+			v.observations.resize(observationValues.size());
+			for (int i = 0; i < observationValues.size(); i++) {
+				v.observations.data[i] = ((Number)observationValues.get(i)).floatValue();
+			}
+		}
 	}
 
 	public static LookUpSimilarImages loadSimilarImages( String path ) {
