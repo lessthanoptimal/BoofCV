@@ -107,7 +107,7 @@ class TestCodecSceneStructureMetric extends BoofStandardJUnit {
 
 		int numRigid = hasRigid ? 2 : 0;
 
-		out.initialize(2, 4, 4, 5, numRigid);
+		out.initialize(2, 4, 4, 6, numRigid);
 
 		out.setCamera(0, true, new CameraPinhole(200, 300,
 				0.1, 400, 500, 1, 1));
