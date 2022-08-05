@@ -139,14 +139,14 @@ class TestCodecSceneStructureMetric extends BoofStandardJUnit {
 			// assign All of first rigid's points to all views
 			SceneStructureMetric.Rigid r = out.rigids.data[0];
 			for (int idxPoint = 0; idxPoint < r.points.length; idxPoint++) {
-				for (int i = 0; i < 4; i++) {
-					r.points[idxPoint].views.add(i);
+				for (int i = 0; i < out.views.size; i++) {
+					r.connectPointToView(idxPoint, i);
 				}
 			}
 			// just the first point to each view after this
 			r = out.rigids.data[1];
-			for (int i = 0; i < 4; i++) {
-				r.points[0].views.add(i);
+			for (int i = 0; i < out.views.size; i++) {
+				r.connectPointToView(0, i);
 			}
 		}
 		out.assignIDsToRigidPoints();
@@ -185,7 +185,7 @@ class TestCodecSceneStructureMetric extends BoofStandardJUnit {
 			out.points.data[0].views.add(i);
 		}
 		for (int i = 1; i < out.points.size; i++) {
-			out.points.data[i].views.add(i - 1);
+			out.points.data[i].views.add((i - 1)%out.views.size);
 		}
 
 		return out;

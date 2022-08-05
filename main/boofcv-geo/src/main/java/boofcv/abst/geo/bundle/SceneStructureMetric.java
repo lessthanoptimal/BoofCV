@@ -557,6 +557,12 @@ public class SceneStructureMetric extends SceneStructureCommon {
 			}
 		}
 
+		public void connectPointToView( int pointIdx, int viewIdx ) {
+			if (points[pointIdx].views.contains(viewIdx))
+				throw new IllegalArgumentException("Tried to add the same view twice. viewIndex=" + viewIdx);
+			points[pointIdx].views.add(viewIdx);
+		}
+
 		public void setPoint( int which, double x, double y, double z ) {
 			points[which].set(x, y, z);
 		}

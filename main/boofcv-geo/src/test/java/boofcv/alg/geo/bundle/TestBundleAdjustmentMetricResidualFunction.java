@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,15 +52,15 @@ class TestBundleAdjustmentMetricResidualFunction extends BoofStandardJUnit {
 		SceneStructureMetric structure = createScene(rand, homogenous, hasRigid, hasRelative);
 		SceneObservations obs = createObservations(rand, structure);
 
-		double[] param = new double[structure.getParameterCount()];
+		var param = new double[structure.getParameterCount()];
 
 		new CodecSceneStructureMetric().encode(structure, param);
 
-		BundleAdjustmentMetricResidualFunction alg = new BundleAdjustmentMetricResidualFunction();
+		var alg = new BundleAdjustmentMetricResidualFunction();
 		alg.configure(structure, obs);
 
-		double[] expected = new double[alg.getNumOfOutputsM()];
-		double[] found = new double[alg.getNumOfOutputsM()];
+		var expected = new double[alg.getNumOfOutputsM()];
+		var found = new double[alg.getNumOfOutputsM()];
 
 		alg.process(param, expected);
 		alg.process(param, found);
@@ -79,18 +79,18 @@ class TestBundleAdjustmentMetricResidualFunction extends BoofStandardJUnit {
 
 	void changeInParamChangesOutput( boolean homogenous ) {
 		SceneStructureMetric structure = createScene(rand, homogenous, false, false);
-		double[] param = new double[structure.getParameterCount()];
+		var param = new double[structure.getParameterCount()];
 
 		new CodecSceneStructureMetric().encode(structure, param);
 
 		// Create random observations
 		SceneObservations obs = createObservations(rand, structure);
 
-		BundleAdjustmentMetricResidualFunction alg = new BundleAdjustmentMetricResidualFunction();
+		var alg = new BundleAdjustmentMetricResidualFunction();
 		alg.configure(structure, obs);
 
-		double[] original = new double[alg.getNumOfOutputsM()];
-		double[] found = new double[alg.getNumOfOutputsM()];
+		var original = new double[alg.getNumOfOutputsM()];
+		var found = new double[alg.getNumOfOutputsM()];
 		alg.process(param, original);
 
 		for (int paramIndex = 0; paramIndex < original.length; paramIndex++) {
@@ -125,18 +125,18 @@ class TestBundleAdjustmentMetricResidualFunction extends BoofStandardJUnit {
 		// Make each view be relative to the previous view
 		structure.views.forIdx(( i, v ) -> v.parent = i > 0 ? structure.views.data[i - 1] : null);
 
-		double[] param = new double[structure.getParameterCount()];
+		var param = new double[structure.getParameterCount()];
 
 		new CodecSceneStructureMetric().encode(structure, param);
 
 		// Create random observations
 		SceneObservations obs = createObservations(rand, structure);
 
-		BundleAdjustmentMetricResidualFunction alg = new BundleAdjustmentMetricResidualFunction();
+		var alg = new BundleAdjustmentMetricResidualFunction();
 		alg.configure(structure, obs);
 
-		double[] original = new double[alg.getNumOfOutputsM()];
-		double[] found = new double[alg.getNumOfOutputsM()];
+		var original = new double[alg.getNumOfOutputsM()];
+		var found = new double[alg.getNumOfOutputsM()];
 		alg.process(param, original);
 
 		// Now change view[1]. This should change residuals in 1,2,3 but not 0
@@ -159,7 +159,7 @@ class TestBundleAdjustmentMetricResidualFunction extends BoofStandardJUnit {
 	}
 
 	static SceneObservations createObservations( Random rand, SceneStructureMetric structure ) {
-		SceneObservations obs = new SceneObservations();
+		var obs = new SceneObservations();
 		obs.initialize(structure.views.size, structure.hasRigid());
 
 		for (int j = 0; j < structure.points.size; j++) {
