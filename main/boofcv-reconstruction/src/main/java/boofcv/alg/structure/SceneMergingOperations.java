@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -110,8 +110,8 @@ public class SceneMergingOperations implements VerbosePrint {
 		failedMerges.reset();
 
 		// Initializes data structures
-		commonViewCounts.resetResize(numScenes);
-		enabledScenes.resetResize(numScenes, true);
+		commonViewCounts.reset().resize(numScenes);
+		enabledScenes.reset().resize(numScenes, true);
 
 		// Go through each view and count the number of scenes that contain that view
 		for (int viewsIdx = 0; viewsIdx < scenesInEachView.views.size; viewsIdx++) {
@@ -445,7 +445,7 @@ public class SceneMergingOperations implements VerbosePrint {
 												 String viewID ) {
 		dbSimilar.lookupPixelFeats(viewID, dbPixels);
 
-		zeroViewPixels.resetResize(numCommon);
+		zeroViewPixels.reset().resize(numCommon);
 		for (int featureIdx = 0; featureIdx < zeroFeatureToCommonIndex.size; featureIdx++) {
 			// See if only one of the scenes had this feature as an inlier
 			int commonIdx = zeroFeatureToCommonIndex.get(featureIdx);
@@ -562,7 +562,7 @@ public class SceneMergingOperations implements VerbosePrint {
 								  int numObservations,
 								  DogArray_I32 zeroFeatureToCommonIndex ) {
 		// Create a histogram of occurrences that each observations is in the two inlier sets.
-		zeroFeatureToCommonIndex.resetResize(numObservations, 0);
+		zeroFeatureToCommonIndex.reset().resize(numObservations, 0);
 		indexesA.forEach(v -> zeroFeatureToCommonIndex.data[v]++);
 		indexesB.forEach(v -> zeroFeatureToCommonIndex.data[v]++);
 

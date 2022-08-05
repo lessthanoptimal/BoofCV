@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -110,7 +110,7 @@ class TestRecognitionNearestNeighborInvertedFile extends BoofStandardJUnit {
 		alg.observedWords.add(10);
 		alg.observedWords.add(15);
 		alg.observedWords.add(1);
-		alg.wordHistogram.resetResize(20, 0);
+		alg.wordHistogram.reset().resize(20, 0);
 		alg.wordHistogram.set(10, 10);
 		alg.wordHistogram.set(15, 1);
 		alg.wordHistogram.set(1, 40);

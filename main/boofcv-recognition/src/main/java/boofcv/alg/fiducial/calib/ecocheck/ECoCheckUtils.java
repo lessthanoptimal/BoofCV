@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -173,7 +173,7 @@ public class ECoCheckUtils {
 	 * @param d Pixel corresponding to (0,w)
 	 */
 	public boolean computeGridToImage( Point2D_F64 a, Point2D_F64 b, Point2D_F64 c, Point2D_F64 d ) {
-		storagePairs2D.resetResize(4);
+		storagePairs2D.reset().resize(4);
 		storagePairs2D.get(0).setTo(0, 0, a.x, a.y);
 		storagePairs2D.get(1).setTo(1, 0, b.x, b.y);
 		storagePairs2D.get(2).setTo(1, 1, c.x, c.y);
@@ -434,7 +434,7 @@ public class ECoCheckUtils {
 
 			// Make sure this is a valid pattern
 			GridShape shape = markers.get(f.markerID);
-			used.resetResize(maxCorners(shape.rows, shape.cols), false);
+			used.reset().resize(maxCorners(shape.rows, shape.cols), false);
 
 			ECoCheckFound match = null;
 			for (int mergedIdx = 0; mergedIdx < merged.size(); mergedIdx++) {

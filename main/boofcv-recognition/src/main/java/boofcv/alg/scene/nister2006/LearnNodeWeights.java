@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -80,7 +80,7 @@ public class LearnNodeWeights<Point> {
 	 */
 	public void reset( HierarchicalVocabularyTree<Point> tree ) {
 		this.tree = tree;
-		numberOfImagesWithNode.resetResize(tree.nodes.size, 0);
+		numberOfImagesWithNode.reset().resize(tree.nodes.size, 0);
 		totalImages = 0;
 	}
 

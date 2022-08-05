@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -105,7 +105,7 @@ public class RefineMetricGraphSubset implements VerbosePrint {
 	 */
 	private void copySubGraph( SceneWorkingGraph src, List<SceneWorkingGraph.View> srcViews ) {
 		// Mark all views as dynamic
-		viewsFixed.resetResize(srcViews.size(), false);
+		viewsFixed.reset().resize(srcViews.size(), false);
 		srcToCpy.clear();
 
 		// First copy each view's intrinsics/Intrinsics
@@ -115,7 +115,7 @@ public class RefineMetricGraphSubset implements VerbosePrint {
 		}
 
 		// Mark all cameras as dynamic
-		camerasFixed.resetResize(subgraph.cameras.size(), false);
+		camerasFixed.reset().resize(subgraph.cameras.size(), false);
 
 		// Copy the inlier sets. If a view is not in the subset, add it so we can triangulate the points
 		for (int listIdx = 0; listIdx < srcViews.size(); listIdx++) {

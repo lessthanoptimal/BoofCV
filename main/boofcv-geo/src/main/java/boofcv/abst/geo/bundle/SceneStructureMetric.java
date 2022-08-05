@@ -88,16 +88,11 @@ public class SceneStructureMetric extends SceneStructureCommon {
 		motions.resize(totalMotions);
 
 		// Reset first so that when it resizes it will call reset() on each object
-		cameras.reset();
-		views.reset();
+		cameras.reset().resize(totalCameras);
+		views.reset().resize(totalViews);
 		motions.reset();
-		points.reset();
-		rigids.reset();
-
-		cameras.resize(totalCameras);
-		views.resize(totalViews);
-		points.resize(totalPoints);
-		rigids.resize(totalRigid);
+		points.reset().resize(totalPoints);
+		rigids.reset().resize(totalRigid);
 
 		// forget old assignments
 		lookupRigid = new int[0];

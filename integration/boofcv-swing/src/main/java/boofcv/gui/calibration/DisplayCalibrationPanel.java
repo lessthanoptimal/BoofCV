@@ -148,7 +148,7 @@ public abstract class DisplayCalibrationPanel extends ImageZoomPanel {
 	public void setUnoccupied( List<RegionInfo> unoccupied ) {
 		BoofSwingUtil.checkGuiThread();
 
-		this.unoccupied.resetResize(unoccupied.size());
+		this.unoccupied.reset().resize(unoccupied.size());
 		for (int i = 0; i < unoccupied.size(); i++) {
 			this.unoccupied.get(i).setTo(unoccupied.get(i));
 		}

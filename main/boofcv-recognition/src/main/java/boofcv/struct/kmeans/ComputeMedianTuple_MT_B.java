@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,7 +64,7 @@ public class ComputeMedianTuple_MT_B extends ComputeMedianTuple_B {
 			final DogArray<int[]> bitCounts = data.bitCounts;
 			final DogArray_I32 assignmentCounts = data.assignmentCounts;
 
-			assignmentCounts.resetResize(numClusters, 0);
+			assignmentCounts.reset().resize(numClusters, 0);
 			bitCounts.resize(numClusters);
 			for (int i = 0; i < bitCounts.size; i++) {
 				Arrays.fill(bitCounts.data[i], 0);

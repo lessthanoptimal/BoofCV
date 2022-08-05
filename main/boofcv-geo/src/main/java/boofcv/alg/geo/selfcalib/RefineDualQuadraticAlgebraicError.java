@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -132,12 +132,12 @@ public class RefineDualQuadraticAlgebraicError implements VerbosePrint {
 		BoofMiscOps.checkTrue(numCameras >= 1 && numCameras <= numViews);
 		BoofMiscOps.checkTrue(numViews >= 2);
 
-		priorCameras.resetResize(numCameras);
-		cameras.resetResize(numCameras);
-		projectiveCameras.resetResize(numViews);
+		priorCameras.reset().resize(numCameras);
+		cameras.reset().resize(numCameras);
+		projectiveCameras.reset().resize(numViews);
 
 		// fill with -1 so that it will fail hard if not initialized
-		viewToCamera.resetResize(numViews, -1);
+		viewToCamera.reset().resize(numViews, -1);
 	}
 
 	/**

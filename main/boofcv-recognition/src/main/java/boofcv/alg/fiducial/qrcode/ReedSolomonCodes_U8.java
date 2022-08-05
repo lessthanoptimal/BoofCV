@@ -259,7 +259,7 @@ public class ReedSolomonCodes_U8 {
 		findErrorEvaluator(syndromes, errorLocator, err_eval);
 
 		// Compute error positions
-		errorX.resetResize(errorLocations.size, (byte)0);
+		errorX.reset().resize(errorLocations.size, (byte)0);
 		for (int i = 0; i < errorLocations.size; i++) {
 			int coef_pos = (length_msg_ecc - errorLocations.data[i] - 1);
 			errorX.data[i] = (byte)math.power(2, coef_pos);

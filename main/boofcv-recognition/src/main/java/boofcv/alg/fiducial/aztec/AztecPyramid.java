@@ -35,7 +35,7 @@ public class AztecPyramid {
 	public final DogArray<Layer> layers = new DogArray<>(Layer::new, Layer::reset);
 
 	public void resize( int numLayers ) {
-		layers.resetResize(numLayers);
+		layers.reset().resize(numLayers);
 	}
 
 	/** Returns a layer in the pyramid */
@@ -74,7 +74,7 @@ public class AztecPyramid {
 	}
 
 	public void setTo( AztecPyramid src ) {
-		this.layers.resetResize(src.layers.size);
+		this.layers.reset().resize(src.layers.size);
 		for (int i = 0; i < src.layers.size; i++) {
 			layers.get(i).setTo(src.layers.get(i));
 		}

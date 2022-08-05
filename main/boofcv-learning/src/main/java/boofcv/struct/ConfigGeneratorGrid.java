@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,7 +60,7 @@ public class ConfigGeneratorGrid<Config extends Configuration> extends ConfigGen
 		configurationWork = BoofMiscOps.copyConfig(configurationBase);
 
 		// Initialize every parameter to the first legal value
-		parameterStates.resetResize(parameters.size(), 0);
+		parameterStates.reset().resize(parameters.size(), 0);
 
 		numTrials = 1;
 		for (int i = 0; i < parameters.size(); i++) {

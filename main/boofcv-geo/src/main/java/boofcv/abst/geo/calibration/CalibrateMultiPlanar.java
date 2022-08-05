@@ -107,10 +107,10 @@ public class CalibrateMultiPlanar {
 		if (numTargets != 1)
 			throw new RuntimeException("Currently only supports one target");
 
-		statistics.resetResize(numCameras);
+		statistics.reset().resize(numCameras);
 		results.reset();
 		layouts.resize(numTargets);
-		cameras.resetResize(numCameras);
+		cameras.reset().resize(numCameras);
 		for (int i = 0; i < cameras.size; i++) {
 			cameras.get(i).index = i;
 			results.camerasToSensor.add(new Se3_F64());

@@ -85,8 +85,8 @@ public class ScoreCalibrationFill {
 		actualBorderPx = BoofMiscOps.thresholdByImageSizeI(borderExtent, width, height);
 
 		// Mark all regions as not occupied
-		occupiedBorder.resetResize(regionsBorder*4, false);
-		occupiedInner.resetResize(regionsInner*regionsInner, false);
+		occupiedBorder.reset().resize(regionsBorder*4, false);
+		occupiedInner.reset().resize(regionsInner*regionsInner, false);
 
 		innerWidth = imageWidth - actualBorderPx*2;
 		innerHeight = imageHeight - actualBorderPx*2;

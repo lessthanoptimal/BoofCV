@@ -287,7 +287,7 @@ class TestMultiViewIO extends BoofStandardJUnit {
 
 			PrimitiveArrays.shuffle(candidates.data, 0, candidates.size, rand);
 
-			v.inliers.resetResize(2);
+			v.inliers.reset().resize(2);
 			for (int infoIdx = 0; infoIdx < v.inliers.size; infoIdx++) {
 				SceneWorkingGraph.InlierInfo inlier = v.inliers.get(infoIdx);
 

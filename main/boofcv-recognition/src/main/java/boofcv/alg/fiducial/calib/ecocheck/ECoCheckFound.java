@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -80,7 +80,7 @@ public class ECoCheckFound {
 		}
 		this.touchBinary.setTo(src.touchBinary);
 		this.decodedCells.setTo(src.decodedCells);
-		this.metadata.resetResize(src.metadata.size);
+		this.metadata.reset().resize(src.metadata.size);
 		for (int i = 0; i < src.metadata.size; i++) {
 			this.metadata.get(i).setTo(src.metadata.get(i));
 		}

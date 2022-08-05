@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -147,7 +147,7 @@ class TestEstimateViewUtils extends BoofStandardJUnit {
 														   SceneObservations observations,
 														   List<CameraPinholeBrown> listPriors ) {
 			if (counter == 0) {
-				badFeatures.resetResize(numFeatures, false);
+				badFeatures.reset().resize(numFeatures, false);
 				for (int i = 0; i < numBad; i++) {
 					badFeatures.set(i, true);
 				}

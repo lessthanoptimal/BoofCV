@@ -55,7 +55,7 @@ public class GridToPixelHelper {
 		double r = squaresWide/2.0;
 
 		// Compute a homography from local grid coordinates around the square to image pixels
-		pairs.resetResize(4);
+		pairs.reset().resize(4);
 		pairs.get(0).setTo(-r, -r, polygon.get(0));
 		pairs.get(1).setTo(r, -r, polygon.get(1));
 		pairs.get(2).setTo(r, r, polygon.get(2));

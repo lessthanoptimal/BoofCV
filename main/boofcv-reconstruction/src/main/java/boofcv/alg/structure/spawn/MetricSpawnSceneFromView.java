@@ -272,7 +272,7 @@ public class MetricSpawnSceneFromView implements VerbosePrint {
 			SceneWorkingGraph.View wtarget = scene.lookupView(viewIds.get(constructIdx));
 			SceneWorkingGraph.InlierInfo inlier = wtarget.inliers.grow();
 			inlier.views.resize(viewIds.size());
-			inlier.observations.resetResize(viewIds.size());
+			inlier.observations.reset().resize(viewIds.size());
 			for (int offset = 0; offset < viewIds.size(); offset++) {
 				int viewIdx = (constructIdx + offset)%viewIds.size();
 

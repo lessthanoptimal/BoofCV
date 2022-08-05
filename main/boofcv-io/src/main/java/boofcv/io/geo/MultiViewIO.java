@@ -601,7 +601,7 @@ public class MultiViewIO {
 					String similarID = getOrThrow(yamlSimilar, "id");
 					List<Integer> yamlPairs = getOrThrow(yamlSimilar, "pairs");
 
-					pairs.resetResize(yamlPairs.size()/2);
+					pairs.reset().resize(yamlPairs.size()/2);
 					for (int j = 0; j < pairs.size; j++) {
 						pairs.get(j).setTo(yamlPairs.get(j*2), yamlPairs.get(j*2 + 1));
 					}
@@ -850,7 +850,7 @@ public class MultiViewIO {
 									   DogArray<InlierInfo> listInliers )
 			throws IOException {
 
-		listInliers.resetResize(list.size());
+		listInliers.reset().resize(list.size());
 		for (int infoIdx = 0; infoIdx < list.size(); infoIdx++) {
 			Map<String, Object> map = (Map)list.get(infoIdx);
 

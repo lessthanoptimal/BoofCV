@@ -53,11 +53,9 @@ public class SceneObservations {
 	 * @param rigidObjects If true then there are rigid objects that can be observed
 	 */
 	public void initialize( int numViews, boolean rigidObjects ) {
-		views.reset();
-		views.resize(numViews);
+		views.reset().resize(numViews);
 		if (rigidObjects) {
-			viewsRigid.reset();
-			viewsRigid.resize(numViews);
+			viewsRigid.reset().resize(numViews);
 		}
 	}
 
@@ -202,8 +200,8 @@ public class SceneObservations {
 		}
 
 		public void resize( int numPoints ) {
-			point.resetResize(numPoints, -1);
-			observations.resetResize(numPoints*2, -1);
+			point.reset().resize(numPoints, -1);
+			observations.reset().resize(numPoints*2, -1);
 		}
 
 		public boolean isIdentical( View other) {

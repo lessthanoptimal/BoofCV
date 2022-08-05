@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -133,14 +133,14 @@ public class SimilarImagesData implements LookUpSimilarImages {
 		if (swapped) {
 			String targetID = listImages.get(targetInfo.index);
 			Relationship related = Objects.requireNonNull(similarInfo.findRelated(targetID));
-			pairs.resetResize(related.pairs.size);
+			pairs.reset().resize(related.pairs.size);
 			for (int i = 0; i < pairs.size; i++) {
 				AssociatedIndex b = related.pairs.get(i);
 				pairs.get(i).setTo(/* src= */b.dst, /* dst= */b.src);
 			}
 		} else {
 			Relationship related = Objects.requireNonNull(targetInfo.findRelated(similarD));
-			pairs.resetResize(related.pairs.size);
+			pairs.reset().resize(related.pairs.size);
 			for (int i = 0; i < pairs.size; i++) {
 				pairs.get(i).setTo(related.pairs.get(i));
 			}

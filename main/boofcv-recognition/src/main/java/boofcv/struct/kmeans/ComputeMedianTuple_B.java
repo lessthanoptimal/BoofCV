@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,7 +53,7 @@ public class ComputeMedianTuple_B implements ComputeMeanClusters<TupleDesc_B> {
 			throw new IllegalArgumentException("Points and assignments need to be the same size");
 
 		// set the number of points in each cluster to zero and zero the clusters
-		assignmentCounts.resetResize(clusters.size, 0);
+		assignmentCounts.reset().resize(clusters.size, 0);
 		bitCounts.resize(clusters.size);
 		for (int i = 0; i < bitCounts.size; i++) {
 			Arrays.fill(bitCounts.get(i), 0);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -72,7 +72,7 @@ public class ComputeMeanTuple_MT_F64 extends ComputeMeanTuple_F64 {
 				sums.get(i).fill(0.0);
 			}
 			final DogArray_I32 counts = data.counts;
-			counts.resetResize(sums.size, 0);
+			counts.reset().resize(sums.size, 0);
 
 			for (int pointIdx = idx0; pointIdx < idx1; pointIdx++) {
 				points.getCopy(pointIdx, tuple);
@@ -88,7 +88,7 @@ public class ComputeMeanTuple_MT_F64 extends ComputeMeanTuple_F64 {
 		});
 
 		// Stitch results from threads back together
-		counts.resetResize(clusters.size, 0);
+		counts.reset().resize(clusters.size, 0);
 		for (int i = 0; i < clusters.size; i++) {
 			clusters.get(i).fill(0.0);
 		}

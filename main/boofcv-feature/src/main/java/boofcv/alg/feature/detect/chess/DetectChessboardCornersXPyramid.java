@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -113,7 +113,7 @@ public class DetectChessboardCornersXPyramid<T extends ImageGray<T>> {
 			PyramidLevel featsLevel = featureLevels.get(level);
 
 			List<ChessboardCorner> corners = detector.getCorners();
-			featsLevel.corners.resetResize(corners.size());
+			featsLevel.corners.reset().resize(corners.size());
 
 			for (int i = 0; i < corners.size(); i++) {
 				ChessboardCorner cf = corners.get(i);

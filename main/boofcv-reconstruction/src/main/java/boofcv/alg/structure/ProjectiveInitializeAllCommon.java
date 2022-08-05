@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -149,7 +149,7 @@ public class ProjectiveInitializeAllCommon implements VerbosePrint {
 		utils.dbSimilar = dbSimilar;
 		utils.dbCams = dbCams;
 		viewsByStructureIndex.reset();
-		inlierIndexes.resetResize(1 + seedConnIdx.size);
+		inlierIndexes.reset().resize(1 + seedConnIdx.size);
 
 		// find the 3 view combination with the best score
 		if (!selectInitialTriplet(seed, seedConnIdx, selectedTriple)) {

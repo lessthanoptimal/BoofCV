@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,7 +40,7 @@ public class ComputeMeanTuple_F64 implements ComputeMeanClusters<TupleDesc_F64> 
 			throw new IllegalArgumentException("Points and assignments need to be the same size");
 
 		// set the number of points in each cluster to zero and zero the clusters
-		counts.resetResize(clusters.size, 0);
+		counts.reset().resize(clusters.size, 0);
 		for (int i = 0; i < clusters.size; i++) {
 			clusters.get(i).fill(0.0);
 		}

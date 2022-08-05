@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -245,8 +245,8 @@ public class ProjectiveToMetricCameraDualQuadratic implements ProjectiveToMetric
 	void averageCommonCameras( List<ElevateViewInfo> views,
 							   FastAccess<SelfCalibrationLinearDualQuadratic.Intrinsic> solutions,
 							   int numCameras ) {
-		cameraCounts.resetResize(numCameras, 0);
-		workCameras.resetResize(numCameras);
+		cameraCounts.reset().resize(numCameras, 0);
+		workCameras.reset().resize(numCameras);
 		for (int i = 0; i < views.size(); i++) {
 			ElevateViewInfo info = views.get(i);
 			CameraPinhole merged = workCameras.get(info.cameraID);

@@ -215,7 +215,7 @@ public class DetectECoCheckApp extends DemonstrationBase {
 				visualizeUtils.update(detector);
 
 				// Copy found chessboard patterns
-				this.foundPatterns.resetResize(found.size);
+				this.foundPatterns.reset().resize(found.size);
 				for (int i = 0; i < found.size; i++) {
 					this.foundPatterns.get(i).setTo(found.get(i));
 

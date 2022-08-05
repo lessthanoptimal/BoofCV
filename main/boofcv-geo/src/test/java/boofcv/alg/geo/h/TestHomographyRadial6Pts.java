@@ -205,8 +205,8 @@ class TestHomographyRadial6Pts extends BoofStandardJUnit {
 		Point2Transform2_F64 distorter1 = new LensDistortionDivision(new CameraDivision().fsetRadial(radial1)).distort_F64(false, false);
 		Point2Transform2_F64 distorter2 = new LensDistortionDivision(new CameraDivision().fsetRadial(radial2)).distort_F64(false, false);
 
-		distorted.resetResize(numPoints);
-		undistorted.resetResize(numPoints);
+		distorted.reset().resize(numPoints);
+		undistorted.reset().resize(numPoints);
 		for (int i = 0; i < numPoints; i++) {
 			// Randomly generate undistorted observations
 			AssociatedPair a = undistorted.get(i);

@@ -695,7 +695,7 @@ public class DemoSceneRecognitionSimilarImagesApp<Gray extends ImageGray<Gray>, 
 				featureHandler.numFeatures = features.size;
 
 				// look up corresponding features in the mainImage
-				mainFeatureIdx.resetResize(words.size, -1);
+				mainFeatureIdx.reset().resize(words.size, -1);
 				SimilarInfo info = imagesSimilar.get(imageID);
 				if (info != null) {
 					info.associated.forEach(p -> mainFeatureIdx.set(p.dst, p.src));

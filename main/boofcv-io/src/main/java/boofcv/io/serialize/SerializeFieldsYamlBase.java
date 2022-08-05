@@ -316,7 +316,7 @@ public class SerializeFieldsYamlBase {
 			DogArray<Object> plist = (DogArray<Object>)f.get(parent);
 
 			// predeclare all the required elements
-			plist.resetResize(listOfStates.size());
+			plist.reset().resize(listOfStates.size());
 
 			// deserialize each element and add it to the list
 			for (int i = 0; i < listOfStates.size(); i++) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -95,7 +95,7 @@ public class MetricSanityChecks implements VerbosePrint {
 		SceneWorkingGraph.InlierInfo inliers = wview.inliers.get(setIdx);
 
 		int numFeatures = inliers.getInlierCount();
-		badFeatures.resetResize(numFeatures, false);
+		badFeatures.reset().resize(numFeatures, false);
 
 		List<SceneWorkingGraph.View> listViews = new ArrayList<>();
 		List<RemoveBrownPtoN_F64> listNormalize = new ArrayList<>();
@@ -221,7 +221,7 @@ public class MetricSanityChecks implements VerbosePrint {
 			}
 		}
 
-		badFeatures.resetResize(structure.points.size, false);
+		badFeatures.reset().resize(structure.points.size, false);
 
 		var worldP = new Point4D_F64(0, 0, 0, 1);
 		var viewP = new Point4D_F64();

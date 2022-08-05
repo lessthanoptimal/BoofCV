@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -103,7 +103,7 @@ public class ECoCheck_to_FiducialDetector<T extends ImageGray<T>> extends Fiduci
 			int markerID = found.markerID;
 
 			// create a list of pairs from marker coordinates to pixels
-			pairs.resetResize(found.corners.size);
+			pairs.reset().resize(found.corners.size);
 			for (int i = 0; i < found.corners.size; i++) {
 				PointIndex2D_F64 foundCorner = found.corners.get(i);
 
@@ -182,7 +182,7 @@ public class ECoCheck_to_FiducialDetector<T extends ImageGray<T>> extends Fiduci
 
 		ECoCheckFound found = foundIndexToFound(which);
 		MarkerShape marker = markerShapes.get(found.markerID);
-		points2D3D.resetResize(found.corners.size);
+		points2D3D.reset().resize(found.corners.size);
 
 		ECoCheckUtils utils = detector.getUtils();
 

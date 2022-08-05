@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -236,8 +236,8 @@ public class MetricMergeScenes implements VerbosePrint {
 		// Local copy of the 'src' scene
 		workScene.setTo(src);
 		// All views and cameras that are in 'src' will be modified
-		knownViews.resetResize(workScene.listViews.size(), false);
-		knownCameras.resetResize(workScene.listCameras.size(), false);
+		knownViews.reset().resize(workScene.listViews.size(), false);
+		knownCameras.reset().resize(workScene.listCameras.size(), false);
 
 		// Copy cameras from 'dst' into the workScene
 		copyDstCamerasIntoWork(dst);

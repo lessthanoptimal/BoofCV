@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -119,8 +119,8 @@ public class ConnectedTwoRowSpeckleFiller_F32 extends ConnectedTwoRowSpeckleFill
 		int idxRowB = startRowB;
 
 		// Initially nothing is merged together or connected
-		merge.resetResize(countsB.size, -1);
-		connectAtoB.resetResize(countsA.size, -1);
+		merge.reset().resize(countsB.size, -1);
+		connectAtoB.reset().resize(countsA.size, -1);
 
 		// Check for connectivity one column at a time
 		for (int col = 0; col < width; col++, idxRowA++, idxRowB++) {

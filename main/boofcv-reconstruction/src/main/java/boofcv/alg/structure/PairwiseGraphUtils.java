@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -149,7 +149,7 @@ public class PairwiseGraphUtils {
 			throw new RuntimeException("Called when there are no connections");
 
 		// if true then it is visible in all tracks
-		visibleAll.resetResize(seed.totalObservations, true);
+		visibleAll.reset().resize(seed.totalObservations, true);
 		// used to keep track of which features are visible in the current motion
 		visibleMotion.resize(seed.totalObservations);
 
@@ -461,7 +461,7 @@ public class PairwiseGraphUtils {
 	public static void createTableViewAtoB( View viewA,
 											Motion edge,
 											DogArray_I32 table_a_to_b ) {
-		table_a_to_b.resetResize(viewA.totalObservations, -1);
+		table_a_to_b.reset().resize(viewA.totalObservations, -1);
 		boolean src_is_A = edge.src == viewA;
 		for (int i = 0; i < edge.inliers.size; i++) {
 			AssociatedIndex assoc = edge.inliers.get(i);

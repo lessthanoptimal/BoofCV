@@ -354,7 +354,7 @@ public class SceneWorkingGraph {
 			pview = src.pview;
 			cameraIdx = src.cameraIdx;
 			projective.setTo(src.projective);
-			inliers.resetResize(src.inliers.size);
+			inliers.reset().resize(src.inliers.size);
 			for (int i = 0; i < src.inliers.size; i++) {
 				inliers.get(i).setTo(src.inliers.get(i));
 			}

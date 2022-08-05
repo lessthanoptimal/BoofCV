@@ -88,7 +88,7 @@ public class AztecEncoderAutomatic implements VerbosePrint {
 	}
 
 	void initialize() {
-		states.resetResize(latlen.length);
+		states.reset().resize(latlen.length);
 		State s = states.get(Mode.UPPER.ordinal());
 		s.curLen = 0;
 		s.characterCount = 0;

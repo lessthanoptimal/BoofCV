@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -137,7 +137,7 @@ public class ResolveSceneScaleAmbiguity implements VerbosePrint {
 		sanityCheckCommonObservations(numFeatures/2);
 
 		// Pre-allocate memory
-		workNormalized.resetResize(numFeatures);
+		workNormalized.reset().resize(numFeatures);
 
 		scales.reset();
 		scales.reserve(numFeatures);

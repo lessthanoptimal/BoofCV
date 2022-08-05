@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -203,7 +203,7 @@ public class EstimateViewKnownCalibration implements VerbosePrint {
 		list2D3D.reset();
 		inputPnP_to_inliersThreeView.reset();
 
-		listPixelToNorm.resetResize(3);
+		listPixelToNorm.reset().resize(3);
 
 		for (int tripleCnt = 0; tripleCnt < pairwiseUtils.inliersThreeView.size; tripleCnt++) {
 			AssociatedTriple triple = pairwiseUtils.inliersThreeView.get(tripleCnt);
