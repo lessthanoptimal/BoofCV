@@ -99,7 +99,7 @@ public class ExampleSceneRecognition {
 
 		// See if the recognition algorithm already has images loaded in to it
 		if (recognizer.getImageIds(null).isEmpty()) {
-			// Add images to the data base
+			// Add images to the database
 			System.out.println("Adding images to the database");
 			imageIterator.reset();
 			while (imageIterator.hasNext()) {
