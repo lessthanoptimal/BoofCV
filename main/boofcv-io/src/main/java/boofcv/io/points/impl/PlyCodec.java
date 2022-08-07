@@ -246,8 +246,7 @@ public class PlyCodec {
 				if (words[1].equals("vertex")) {
 					previousVertex = true;
 					header.vertexCount = Integer.parseInt(words[2]);
-				}
-				if (words[1].equals("face")) {
+				} else if (words[1].equals("face")) {
 					header.triangleCount = Integer.parseInt(words[2]);
 				}
 			} else if (words[0].equals("property") && previousVertex) {
@@ -282,8 +281,10 @@ public class PlyCodec {
 					default -> v = VarType.UNKNOWN;
 				}
 				header.dataWords.add(new DataWord(v, d));
+			} else if (words[0].equals("property") && words[1].equals("list")) {
+				// just ignore it. Previous line specified number of elements
 			} else {
-				throw new IOException("Unknown header element");
+				throw new IOException("Unknown header element: '" + line + "'");
 			}
 			line = readNextPly(input, true, buffer);
 		}
@@ -311,6 +312,7 @@ public class PlyCodec {
 				mesh.indexes.reset();
 				mesh.vertexes.reserve(vertexes);
 				mesh.indexes.reserve(triangles*3);
+				mesh.offsets.add(0);
 			}
 
 			@Override public void addVertex( double x, double y, double z, int rgb ) {
@@ -319,7 +321,7 @@ public class PlyCodec {
 			}
 
 			@Override public void addPolygon( int[] indexes, int offset, int length ) {
-				mesh.offsets.add(length);
+				mesh.offsets.add(mesh.indexes.size + length);
 				mesh.indexes.addAll(indexes, offset, offset + length);
 			}
 		});
@@ -460,16 +462,24 @@ public class PlyCodec {
 			output.addVertex(x, y, z, r << 16 | g << 8 | b);
 		}
 
-		int[] indexes = new int[100];
+		final var polygonLine = new byte[4*10];
+		final ByteBuffer polygonBB = ByteBuffer.wrap(polygonLine);
+		int[] indexes = new int[100];		int offset = 0;
 		for (int i = 0; i < triangleCount; i++) {
-			int found = reader.read(line);
-			if (line.length != found)
-				throw new IOException("Read unexpected number of bytes. " + found + " vs " + line.length);
+			if (1 != reader.read(line, 0, 1))
+				throw new RuntimeException("Couldn't read count byte");
 
-			int count = bb.get(0);
+			int count = line[0] & 0xFF;
+			int lineLength = count*4;
+			if (polygonLine.length < lineLength)
+				throw new RuntimeException("polygonLine is too small. vertexes=" + count);
+
+			int found = reader.read(polygonLine, 0, lineLength);
+			if (found != lineLength)
+				throw new IOException("Read unexpected number of bytes. " + found + " vs " + lineLength);
 
 			for (int wordIndex = 0; wordIndex < count; wordIndex++) {
-				indexes[wordIndex] = bb.getInt(1 + wordIndex*4);
+				indexes[wordIndex] = polygonBB.getInt(wordIndex*4);
 			}
 
 			output.addPolygon(indexes, 0, count);

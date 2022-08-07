@@ -126,8 +126,25 @@ public class PointCloudIO {
 	public static void load( Format format, InputStream input, PointCloudWriter output ) throws IOException {
 		switch (format) {
 			case PLY -> PlyCodec.readCloud(input, output);
+			default -> throw new RuntimeException("Unknown format");
 		}
 	}
+
+	/**
+	 * Reads a 3D mesh from the input stream in the specified format and writes it to the output.
+	 *
+	 * @param format Storage format
+	 * @param input Input stream
+	 * @param mesh (Output) 3D mesh
+	 * @param vertexRgb (Output) color of each vertex
+	 */
+	public static void load( Format format, InputStream input, VertexMesh mesh, DogArray_I32 vertexRgb ) throws IOException {
+		switch (format) {
+			case PLY -> PlyCodec.readMesh(input, mesh, vertexRgb);
+			default -> throw new RuntimeException("Unknown format");
+		}
+	}
+
 
 	/**
 	 * The same as {@link #load(Format, InputStream, PointCloudWriter)}, but with a simplified writer that

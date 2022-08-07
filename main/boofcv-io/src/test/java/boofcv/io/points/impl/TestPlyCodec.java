@@ -20,20 +20,26 @@ package boofcv.io.points.impl;
 
 import boofcv.alg.cloud.PointCloudReader;
 import boofcv.alg.cloud.PointCloudWriter;
+import boofcv.alg.meshing.VertexMesh;
 import boofcv.struct.Point3dRgbI_F64;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TestPlyCodec extends BoofStandardJUnit {
 	@Test void encode_decode_3D_ascii() throws IOException {
@@ -44,9 +50,9 @@ class TestPlyCodec extends BoofStandardJUnit {
 
 		DogArray<Point3D_F64> found = new DogArray<>(Point3D_F64::new);
 
-		Writer output = new StringWriter();
+		var output = new StringWriter();
 		PlyCodec.saveCloudAscii(PointCloudReader.wrapF64(expected), false, output);
-		InputStream input = new ByteArrayInputStream(output.toString().getBytes(UTF_8));
+		var input = new ByteArrayInputStream(output.toString().getBytes(UTF_8));
 		PlyCodec.readCloud(input, PointCloudWriter.wrapF64(found));
 
 		assertEquals(expected.size(), found.size);
@@ -69,9 +75,9 @@ class TestPlyCodec extends BoofStandardJUnit {
 
 		DogArray<Point3dRgbI_F64> found = new DogArray<>(Point3dRgbI_F64::new);
 
-		Writer output = new StringWriter();
+		var output = new StringWriter();
 		PlyCodec.saveCloudAscii(PointCloudReader.wrapF64RGB(expected), true, output);
-		InputStream input = new ByteArrayInputStream(output.toString().getBytes(UTF_8));
+		var input = new ByteArrayInputStream(output.toString().getBytes(UTF_8));
 		PlyCodec.readCloud(input, PointCloudWriter.wrapF64RGB(found));
 
 		assertEquals(expected.size(), found.size);
@@ -89,9 +95,9 @@ class TestPlyCodec extends BoofStandardJUnit {
 		for (boolean asFloat : new boolean[]{true, false}) {
 			DogArray<Point3D_F64> found = new DogArray<>(Point3D_F64::new);
 
-			ByteArrayOutputStream output = new ByteArrayOutputStream();
+			var output = new ByteArrayOutputStream();
 			PlyCodec.saveCloudBinary(PointCloudReader.wrapF64(expected), ByteOrder.BIG_ENDIAN, false, asFloat, output);
-			ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
+			var input = new ByteArrayInputStream(output.toByteArray());
 			PlyCodec.readCloud(input, PointCloudWriter.wrapF64(found));
 
 			assertEquals(expected.size(), found.size);
@@ -117,9 +123,9 @@ class TestPlyCodec extends BoofStandardJUnit {
 		for (boolean asFloat : new boolean[]{true, false}) {
 			DogArray<Point3dRgbI_F64> found = new DogArray<>(Point3dRgbI_F64::new);
 
-			ByteArrayOutputStream output = new ByteArrayOutputStream();
+			var output = new ByteArrayOutputStream();
 			PlyCodec.saveCloudBinary(PointCloudReader.wrapF64RGB(expected), ByteOrder.BIG_ENDIAN, false, asFloat, output);
-			ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
+			var input = new ByteArrayInputStream(output.toByteArray());
 			PlyCodec.readCloud(input, PointCloudWriter.wrapF64RGB(found));
 
 			assertEquals(expected.size(), found.size);
@@ -128,5 +134,35 @@ class TestPlyCodec extends BoofStandardJUnit {
 				assertEquals(0.0, found.get(i).distance(expected.get(i)), tol);
 			}
 		}
+	}
+
+	@Test void encode_decode_mesh_binary() throws IOException {
+		var mesh = new VertexMesh();
+		mesh.offsets.add(0);
+		for (int i = 0; i < 10; i++) {
+			mesh.vertexes.append(i, 2, 3);
+			mesh.indexes.add(i*3);
+			mesh.indexes.add(i*3 + 1);
+			mesh.indexes.add(i*3 + 2);
+			mesh.offsets.add(mesh.indexes.size);
+		}
+		var colors = new DogArray_I32();
+		for (int i = 0; i < mesh.vertexes.size(); i++) {
+			colors.add(i + 5);
+		}
+
+		var output = new ByteArrayOutputStream();
+		PlyCodec.saveMeshBinary(mesh, colors,ByteOrder.BIG_ENDIAN, true, output);
+
+		var foundMesh = new VertexMesh();
+		var foundColors = new DogArray_I32();
+
+		var input = new ByteArrayInputStream(output.toByteArray());
+		PlyCodec.readMesh(input, foundMesh, foundColors);
+
+		assertEquals(mesh.vertexes.size(), mesh.vertexes.size());
+		assertTrue(mesh.indexes.isEquals(foundMesh.indexes));
+		assertTrue(mesh.offsets.isEquals(foundMesh.offsets));
+		assertTrue(colors.isEquals(foundColors));
 	}
 }
