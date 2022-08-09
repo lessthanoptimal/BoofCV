@@ -25,7 +25,7 @@ import lombok.Getter;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
 import org.ddogleg.fitting.modelset.ModelGenerator;
 import org.ddogleg.fitting.modelset.ModelMatcherPost;
-import org.ddogleg.fitting.modelset.ransac.Ransac;
+import org.ddogleg.fitting.modelset.lmeds.LeastMedianOfSquares;
 import org.ddogleg.struct.Factory;
 
 import java.util.ArrayList;
@@ -33,20 +33,18 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Extension of {@link Ransac} for two calibrated camera views. Input point will be in normalized image coordinates
+ * Extension of {@link LeastMedianOfSquares} for two calibrated camera views. Input point must be
+ * normalized image coordinates.
  *
  * @author Peter Abeles
  */
-public class RansacCalibrated<Model, Point>
+public class LeastMedianOfSquaresCalibrated<Model, Point>
 		implements ModelMatcherMultiview<Model, Point>, ModelMatcherPost<Model, Point> {
-
-	/** Underlying RANSAC implementation */
-	@Getter Ransac<Model, Point> fitter;
-
+	private @Getter final LeastMedianOfSquares<Model, Point> fitter;
 	// All the passed in camera intrinsics
 	final List<CameraPinhole> listIntrinsics = new ArrayList<>();
 
-	public RansacCalibrated( Ransac<Model, Point> fitter ) {
+	public LeastMedianOfSquaresCalibrated( LeastMedianOfSquares<Model, Point> fitter ) {
 		this.fitter = fitter;
 
 		fitter.setInitializeModels(( generator, distance ) -> {
@@ -73,8 +71,8 @@ public class RansacCalibrated<Model, Point>
 		return listIntrinsics.size();
 	}
 
-	@Override public boolean process( List<Point> dataSet ) {
-		return fitter.process(dataSet);
+	@Override public boolean process( List<Point> list ) {
+		return fitter.process(list);
 	}
 
 	@Override public Model getModelParameters() {
@@ -85,8 +83,8 @@ public class RansacCalibrated<Model, Point>
 		return fitter.getMatchSet();
 	}
 
-	@Override public int getInputIndex( int matchIndex ) {
-		return fitter.getInputIndex(matchIndex);
+	@Override public int getInputIndex( int i ) {
+		return fitter.getInputIndex(i);
 	}
 
 	@Override public double getFitQuality() {

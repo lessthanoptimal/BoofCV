@@ -24,7 +24,6 @@ import boofcv.abst.geo.Triangulate2ViewsMetricH;
 import boofcv.abst.geo.fitting.DistanceFromModelResidual;
 import boofcv.abst.geo.fitting.GenerateEpipolarMatrix;
 import boofcv.abst.geo.fitting.ModelManagerEpipolarMatrix;
-import boofcv.alg.geo.DistanceFromModelMultiView;
 import boofcv.alg.geo.f.FundamentalResidualSampson;
 import boofcv.alg.geo.pose.PnPDistanceReprojectionSq;
 import boofcv.alg.geo.robust.*;
@@ -83,16 +82,17 @@ public class FactoryMultiViewRobust {
 		configPnP.checkValidity();
 		configLMedS.checkValidity();
 
-		Estimate1ofPnP estimatorPnP = FactoryMultiView.pnp_1(
-				configPnP.which, configPnP.epnpIterations, configPnP.numResolve);
+		var manager = new ModelManagerSe3_F64();
 
-		DistanceFromModelMultiView<Se3_F64, Point2D3D> distance = new PnPDistanceReprojectionSq();
-		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
-		EstimatorToGenerator<Se3_F64, Point2D3D> generator = new EstimatorToGenerator<>(estimatorPnP);
+		var lmeds = new LeastMedianOfSquaresCalibrated<>(createLMEDS(configLMedS, manager, Point2D3D.class));
+		lmeds.getFitter().setErrorFraction(configLMedS.errorFraction);
 
-		LeastMedianOfSquaresMultiView<Se3_F64, Point2D3D> lmeds = new LeastMedianOfSquaresMultiView<>(
-				configLMedS.randSeed, configLMedS.totalCycles, manager, generator, distance);
-		lmeds.setErrorFraction(configLMedS.errorFraction);
+		ConfigPnP _configPnP = configPnP;
+		lmeds.setModel(() -> {
+			Estimate1ofPnP estimatorPnP = FactoryMultiView.pnp_1(
+					_configPnP.which, _configPnP.epnpIterations, _configPnP.numResolve);
+			return new EstimatorToGenerator<>(estimatorPnP);
+		}, PnPDistanceReprojectionSq::new);
 		return lmeds;
 	}
 
@@ -116,20 +116,20 @@ public class FactoryMultiViewRobust {
 		configPnP.checkValidity();
 		configRansac.checkValidity();
 
-		var manager = new ModelManagerSe3_F64();
-		ConfigPnP _configPnP = configPnP;
-
 		// convert from pixels to pixels squared
 		double threshold = configRansac.inlierThreshold*configRansac.inlierThreshold;
 
-		Ransac<Se3_F64, Point2D3D> ransac = createRansac(configRansac, threshold, manager, Point2D3D.class);
+		var ransac = new RansacCalibrated<>(createRansac(
+				configRansac, threshold,  new ModelManagerSe3_F64(), Point2D3D.class));
+
+		ConfigPnP _configPnP = configPnP;
 		ransac.setModel(() -> {
 			Estimate1ofPnP estimatorPnP = FactoryMultiView.pnp_1(
 					_configPnP.which, _configPnP.epnpIterations, _configPnP.numResolve);
 			return new EstimatorToGenerator<>(estimatorPnP);
 		}, PnPDistanceReprojectionSq::new);
 
-		return new RansacCalibrated<>(ransac, 1);
+		return ransac;
 	}
 
 	/**
@@ -153,20 +153,25 @@ public class FactoryMultiViewRobust {
 		configEssential.checkValidity();
 		configLMedS.checkValidity();
 
-		Estimate1ofEpipolar epipolar = FactoryMultiView.
-				essential_1(configEssential.which, configEssential.numResolve);
-
-		Triangulate2ViewsMetricH triangulate = FactoryMultiView.triangulate2ViewMetricH(
-				new ConfigTriangulation(ConfigTriangulation.Type.GEOMETRIC));
 		var manager = new ModelManagerSe3_F64();
-		var generateEpipolarMotion = new Se3FromEssentialGenerator(epipolar, triangulate);
+		var lmeds = new LeastMedianOfSquaresCalibrated<>(createLMEDS(configLMedS, manager, AssociatedPair.class));
+		lmeds.getFitter().setErrorFraction(configLMedS.errorFraction);
 
-		var distanceSe3 = new DistanceSe3SymmetricSq(triangulate);
+		ConfigEssential _configEssential = configEssential;
+		lmeds.setModel(() -> {
+			Estimate1ofEpipolar epipolar = FactoryMultiView.
+					essential_1(_configEssential.which, _configEssential.numResolve);
+			Triangulate2ViewsMetricH triangulate = FactoryMultiView.triangulate2ViewMetricH(
+					new ConfigTriangulation(ConfigTriangulation.Type.GEOMETRIC));
+			return new Se3FromEssentialGenerator(epipolar, triangulate);
+		}, () -> {
+			Triangulate2ViewsMetricH triangulate = FactoryMultiView.triangulate2ViewMetricH(
+					new ConfigTriangulation(ConfigTriangulation.Type.GEOMETRIC));
+			return new DistanceSe3SymmetricSq(triangulate);
+		});
 
-		var config = new LeastMedianOfSquaresMultiView<>(
-				configLMedS.randSeed, configLMedS.totalCycles, manager, generateEpipolarMotion, distanceSe3);
-		config.setErrorFraction(configLMedS.errorFraction);
-		return config;
+
+		return lmeds;
 	}
 
 	public static ModelMatcher<DMatrixRMaj, AssociatedPair>
@@ -217,12 +222,13 @@ public class FactoryMultiViewRobust {
 			throw new RuntimeException("Error model has to be Euclidean");
 		}
 
-		ModelManager<Se3_F64> manager = new ModelManagerSe3_F64();
 		ConfigEssential _configEssential = configEssential;
 
 		double ransacTOL = configRansac.inlierThreshold*configRansac.inlierThreshold*2.0;
 
-		Ransac<Se3_F64, AssociatedPair> ransac = createRansac(configRansac, ransacTOL, manager, AssociatedPair.class);
+		var ransac = new RansacCalibrated<>(createRansac(
+				configRansac, ransacTOL, new ModelManagerSe3_F64(), AssociatedPair.class));
+
 		ransac.setModel(() -> {
 			Estimate1ofEpipolar epipolar = FactoryMultiView.
 					essential_1(_configEssential.which, _configEssential.numResolve);
@@ -235,7 +241,7 @@ public class FactoryMultiViewRobust {
 			return new DistanceSe3SymmetricSq(triangulate);
 		});
 
-		return new RansacCalibrated<>(ransac, 2);
+		return ransac;
 	}
 
 	public static ModelMatcherMultiview<DMatrixRMaj, AssociatedPair>
@@ -251,14 +257,12 @@ public class FactoryMultiViewRobust {
 			return new MmmvSe3ToEssential(baselineRansac(configEssential, configRansac));
 		}
 
-		var managerE = new ModelManagerEpipolarMatrix();
-
-		ConfigEssential _configEssential = configEssential;
-
-
 		double ransacTOL = configRansac.inlierThreshold*configRansac.inlierThreshold;
 
-		Ransac<DMatrixRMaj, AssociatedPair> ransac = createRansac(configRansac, ransacTOL, managerE, AssociatedPair.class);
+		RansacCalibrated<DMatrixRMaj, AssociatedPair> ransac = new RansacCalibrated(createRansac(
+				configRansac, ransacTOL, new ModelManagerEpipolarMatrix(), AssociatedPair.class));
+
+		ConfigEssential _configEssential = configEssential;
 		ransac.setModel(() -> {
 					Estimate1ofEpipolar estimateF = FactoryMultiView.essential_1(_configEssential.which,
 							_configEssential.numResolve);
@@ -266,7 +270,7 @@ public class FactoryMultiViewRobust {
 				},
 				DistanceMultiView_EssentialSampson::new);
 
-		return new RansacCalibrated<>(ransac, 2);
+		return ransac;
 	}
 
 	public static ModelMatcher<DMatrixRMaj, AssociatedPair> fundamentalRansac(
@@ -378,13 +382,14 @@ public class FactoryMultiViewRobust {
 	homographyCalibratedRansac( ConfigRansac configRansac ) {
 		configRansac.checkValidity();
 
-		var manager = new ModelManagerHomography2D_F64();
 		double ransacTol = configRansac.inlierThreshold*configRansac.inlierThreshold;
 
-		Ransac<Homography2D_F64, AssociatedPair> ransac = createRansac(configRansac, ransacTol, manager, AssociatedPair.class);
-		ransac.setModel(() -> new GenerateHomographyLinear(false), DistanceHomographyCalibratedSq::new);
+		var ransac = new RansacCalibrated<>(createRansac(
+				configRansac, ransacTol, new ModelManagerHomography2D_F64(), AssociatedPair.class));
+		ransac.setModel(() ->
+				new GenerateHomographyLinear(false), DistanceHomographyCalibratedSq::new);
 
-		return new RansacCalibrated<>(ransac, 2);
+		return ransac;
 	}
 
 	/**
