@@ -85,12 +85,11 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	 */
 	public void initialize( int totalCameras, int totalViews, int totalMotions, int totalPoints, int totalRigid ) {
 		// Declare enough memory to store all the motions, but the way motions are constructed they are grown
-		motions.resize(totalMotions);
+		motions.resize(totalMotions).reset();
 
 		// Reset first so that when it resizes it will call reset() on each object
 		cameras.reset().resize(totalCameras);
 		views.reset().resize(totalViews);
-		motions.reset();
 		points.reset().resize(totalPoints);
 		rigids.reset().resize(totalRigid);
 

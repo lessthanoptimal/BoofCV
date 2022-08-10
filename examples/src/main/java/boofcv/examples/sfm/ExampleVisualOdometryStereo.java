@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -123,7 +123,7 @@ public class ExampleVisualOdometryStereo {
 		if (!(alg instanceof AccessPointTracks3D))
 			return "";
 
-		AccessPointTracks3D access = (AccessPointTracks3D)alg;
+		var access = (AccessPointTracks3D)alg;
 
 		int N = access.getTotalTracks();
 		int totalInliers = 0;
