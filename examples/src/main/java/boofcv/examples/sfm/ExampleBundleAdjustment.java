@@ -58,14 +58,17 @@ import java.util.List;
  * modest problems shows performance that's comparable to Ceres Solver. BoofCV has yet to be applied to what would
  * be now considered a truly large scale problem that takes day(s) to solve.
  *
+ * To see how you create the scene graph look at {@link ExampleBundleAdjustmentGraph}. This code skips over
+ * that part since it's loaded from disk.
+ *
  * @author Peter Abeles
  */
 public class ExampleBundleAdjustment {
 	public static void main( String[] args ) throws IOException {
 		// Because the Bundle Adjustment in the Large data set is popular, a file reader and writer is included
 		// with BoofCV. BoofCV uses two data types to describe the parameters in a bundle adjustment problem
-		// BundleAdjustmentSceneStructure is used for camera parameters, camera locations, and 3D points
-		// BundleAdjustmentObservations for image observations of 3D points
+		// SceneStructureMetric is used for camera parameters, camera locations, and 3D points
+		// SceneObservations for pixel observations of 3D points in each image.
 		// ExampleMultiViewSceneReconstruction gives a better feel for these data structures or you can look
 		// at the source code of CodecBundleAdjustmentInTheLarge
 		var parser = new CodecBundleAdjustmentInTheLarge();
