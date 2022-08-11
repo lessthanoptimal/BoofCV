@@ -55,13 +55,14 @@ public class ExampleBundleAdjustmentGraph {
 		var view0_to_view1 = eulerXyz(-0.15, 0.05, 0, 0, 0, 0.05, null);
 
 		// Initialize data structures by telling it the number of features, cameras, views, motions
-		// Homogenous coordinates will be used since they can handle points at ininfity
+		// Homogenous coordinates will be used since they can handle points at infinity
 		var structure = new SceneStructureMetric(/*homogenous*/ true);
 		var observations = new SceneObservations();
 
 		// Index of the motion where the stereo baseline is stored
 		int baselineIndex = 0;
 
+		// Must call initialize() before all other functions.
 		structure.initialize(
 				numCameras, /*views*/ numMotions*numCameras, /* motions */numMotions + 1,
 				numPoints, /* known rigid objects */0);
@@ -81,8 +82,10 @@ public class ExampleBundleAdjustmentGraph {
 
 		// Add points to bundle adjustment parameters. Here we will add noise to make it more interesting.
 		for (int pointIdx = 0; pointIdx < cloud.size(); pointIdx++) {
+			// NOTE: All points must be in the global coordinate system
 			Point3D_F64 p = cloud.get(pointIdx);
 			structure.points.get(pointIdx).set(p.x, p.y, p.z, 1.0);
+
 			// ADDING NOISE IS FOR DEMONSTRATION PURPOSES. DO NOT DO THIS WITH REAL DATA
 			for (int i = 0; i < 3; i++) {
 				structure.points.get(pointIdx).coordinate[1] += rand.nextGaussian()*0.05;
@@ -111,8 +114,9 @@ public class ExampleBundleAdjustmentGraph {
 			SceneObservations.View pview0 = observations.getView(viewIdx0);
 			SceneObservations.View pview1 = observations.getView(viewIdx0 + 1);
 
-			// camera[0] is easy to configure since it's always relative to the global frame
-			// this view has a known location to anchor it at the origin. Otherwise everything will float
+			// camera[0] is easy to configure since it's always relative to the global frame.
+			// We will fix view[0] to stop the global coordinate system from randomly floating around.
+			// If this was a real problem, typically view[0] is defined as the global coordinate system's origin.
 			structure.setView(/* view */ viewIdx0, /* camera */0, /* known */motionIdx == 0, worldToView0, -1);
 
 			// camera[1] is more difficult since multiple views share the same motion, but link to camera[0] view
