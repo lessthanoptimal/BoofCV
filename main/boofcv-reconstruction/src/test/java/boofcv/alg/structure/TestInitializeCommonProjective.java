@@ -18,7 +18,6 @@
 
 package boofcv.alg.structure;
 
-import boofcv.BoofTesting;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureProjective;
 import boofcv.alg.geo.MultiViewOps;
@@ -47,7 +46,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -55,12 +53,9 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Peter Abeles
  */
 @SuppressWarnings("IntegerDivisionInFloatingPointContext")
-class TestInitializeAllCommonProjective extends BoofStandardJUnit {
-
+class TestInitializeCommonProjective extends BoofStandardJUnit {
 	final static double reprojectionTol = 1e-5;
 	final static double matrixTol = 1e-3;
-
-	Random rand = BoofTesting.createRandom(3);
 
 	/**
 	 * Perfect scene with 2 connections. This is the simplest case

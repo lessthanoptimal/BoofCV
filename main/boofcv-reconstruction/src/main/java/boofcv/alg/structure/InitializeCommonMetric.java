@@ -19,6 +19,7 @@
 package boofcv.alg.structure;
 
 import boofcv.abst.geo.bundle.SceneObservations;
+import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.geo.MetricCameras;
 import boofcv.alg.structure.PairwiseImageGraph.Motion;
 import boofcv.alg.structure.PairwiseImageGraph.View;
@@ -133,7 +134,7 @@ public class InitializeCommonMetric implements VerbosePrint {
 		utils.dbSimilar = dbSimilar;
 		utils.dbCams = dbCams;
 		viewsByStructureIndex.reset();
-		inlierIndexes.resetResize(1 + seedConnIdx.size);
+		inlierIndexes.reset().resize(1 + seedConnIdx.size);
 
 		// find the 3 view combination with the best score
 		if (!selectInitialTriplet(seed, seedConnIdx, selectedTriple)) {
@@ -343,5 +344,9 @@ public class InitializeCommonMetric implements VerbosePrint {
 	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
 		this.verbose = BoofMiscOps.addPrefix(this, out);
 		BoofMiscOps.verboseChildren(out, configuration, pixelToMetric3);
+	}
+
+	public SceneStructureMetric getStructure() {
+		return pixelToMetric3.getStructure();
 	}
 }
