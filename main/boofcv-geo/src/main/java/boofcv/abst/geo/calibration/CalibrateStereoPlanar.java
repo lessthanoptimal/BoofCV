@@ -222,7 +222,7 @@ public class CalibrateStereoPlanar implements VerbosePrint {
 		int numViews = structureLeft.views.size;
 
 		// left and right cameras. n views, and 1 known calibration target
-		structure.initialize(2, numViews*2, numViews + 1, layout.size(), 1);
+		structure.initialize(2, numViews*2, numViews + 1, 0, 1);
 		// initialize the cameras
 		structure.setCamera(0, false, structureLeft.cameras.get(0).model);
 		structure.setCamera(1, false, structureRight.cameras.get(0).model);
@@ -249,7 +249,7 @@ public class CalibrateStereoPlanar implements VerbosePrint {
 			for (int j = 0; j < left.size(); j++) {
 				PointIndex2D_F64 p = left.get(j);
 				oviewLeft.add(p.index, (float)p.p.x, (float)p.p.y);
-				structure.connectPointToView(p.index, viewIndex*2);
+				rigid.connectPointToView(p.index, viewIndex*2);
 			}
 		}
 		for (int viewIndex = 0; viewIndex < numViews; viewIndex++) {
@@ -258,7 +258,7 @@ public class CalibrateStereoPlanar implements VerbosePrint {
 			for (int j = 0; j < right.size(); j++) {
 				PointIndex2D_F64 p = right.get(j);
 				oviewRight.add(p.index, (float)p.p.x, (float)p.p.y);
-				structure.connectPointToView(p.index, viewIndex*2 + 1);
+				rigid.connectPointToView(p.index, viewIndex*2 + 1);
 			}
 		}
 

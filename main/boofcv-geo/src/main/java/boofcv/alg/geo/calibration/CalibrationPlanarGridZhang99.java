@@ -224,7 +224,7 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 											List<CalibrationObservation> calibrationObservations ) {
 
 		structure = new SceneStructureMetric(false);
-		structure.initialize(1, motions.size(), -1, layout.size(), 1);
+		structure.initialize(1, motions.size(), -1, 0, 1);
 
 		observations = new SceneObservations();
 		observations.initialize(motions.size(), true);
@@ -235,20 +235,20 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 		// A single rigid planar target is being viewed. It is assumed to be centered at the origin
 		structure.setRigid(0, true, new Se3_F64(), layout.size());
 		// Where the points are on the calibration target
-		SceneStructureMetric.Rigid rigid = structure.rigids.data[0];
+		SceneStructureMetric.Rigid srigid = structure.rigids.data[0];
 		for (int i = 0; i < layout.size(); i++) {
-			rigid.setPoint(i, layout.get(i).x, layout.get(i).y, 0);
+			srigid.setPoint(i, layout.get(i).x, layout.get(i).y, 0);
 		}
 
 		// Add the initial estimate of each view's location and the points observed
 		for (int viewIdx = 0; viewIdx < motions.size(); viewIdx++) {
 			structure.setView(viewIdx, 0, false, motions.get(viewIdx));
-			SceneObservations.View v = observations.getViewRigid(viewIdx);
+			SceneObservations.View vrigid = observations.getViewRigid(viewIdx);
 			CalibrationObservation ca = calibrationObservations.get(viewIdx);
 			for (int j = 0; j < ca.size(); j++) {
 				PointIndex2D_F64 p = ca.get(j);
-				v.add(p.index, (float)p.p.x, (float)p.p.y);
-				structure.connectPointToView(p.index, viewIdx);
+				vrigid.add(p.index, (float)p.p.x, (float)p.p.y);
+				srigid.connectPointToView(p.index, viewIdx);
 			}
 		}
 	}

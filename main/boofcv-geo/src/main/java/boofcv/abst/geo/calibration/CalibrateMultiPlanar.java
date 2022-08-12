@@ -357,7 +357,7 @@ public class CalibrateMultiPlanar {
 		int totalViews = frames.size()*cameras.size;
 		int totalMotions = cameras.size;
 
-		structure.initialize(cameras.size, totalViews, totalMotions, layout.size(), 1);
+		structure.initialize(cameras.size, totalViews, totalMotions, 0, 1);
 
 		// Configure the cameras
 		for (int i = 0; i < cameras.size; i++) {
@@ -408,6 +408,7 @@ public class CalibrateMultiPlanar {
 					for (int featIdx = 0; featIdx < o.size(); featIdx++) {
 						PointIndex2D_F64 p = o.get(featIdx);
 						sbaView.add(p.index, (float)p.p.x, (float)p.p.y);
+						rigid.connectPointToView(sbaViewIndex, p.index);
 					}
 				}
 			}
