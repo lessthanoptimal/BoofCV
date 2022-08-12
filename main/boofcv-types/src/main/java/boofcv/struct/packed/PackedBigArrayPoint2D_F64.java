@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -124,6 +124,8 @@ public class PackedBigArrayPoint2D_F64 implements PackedArray<Point2D_F64> {
 				temp.x = array[i];
 				temp.y = array[i + 1];
 				op.process(pointIndex++, temp);
+				array[i] = temp.x;
+				array[i + 1] = temp.y;
 			}
 		});
 	}

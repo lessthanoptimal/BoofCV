@@ -96,6 +96,8 @@ public class PackedArrayPoint2D_I16 implements PackedArray<Point2D_I16> {
 			temp.x = array.data[i];
 			temp.y = array.data[i + 1];
 			op.process(pointIndex++, temp);
+			array.data[i] = temp.x;
+			array.data[i + 1] = temp.y;
 		}
 	}
 }

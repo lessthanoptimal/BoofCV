@@ -144,6 +144,9 @@ public class PackedBigArrayPoint3D_F64 implements PackedArray<Point3D_F64> {
 				temp.y = array[i + 1];
 				temp.z = array[i + 2];
 				op.process(pointIndex++, temp);
+				array[i] = temp.x;
+				array[i + 1] = temp.y;
+				array[i + 2] = temp.z;
 			}
 		});
 	}

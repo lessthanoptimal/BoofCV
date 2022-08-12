@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -136,6 +136,10 @@ public class PackedBigArrayPoint4D_F64 implements PackedArray<Point4D_F64> {
 				temp.z = array[i + 2];
 				temp.w = array[i + 3];
 				op.process(pointIndex++, temp);
+				array[i] = temp.x;
+				array[i + 1] = temp.y;
+				array[i + 2] = temp.z;
+				array[i + 3] = temp.w;
 			}
 		});
 	}

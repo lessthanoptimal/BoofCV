@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,7 +49,8 @@ public interface PackedArray<T> extends LArrayAccessor<T> {
 	void append( T element );
 
 	/**
-	 * For each with index
+	 * Passes in each object and index within the specified range. Modifications to the passed in objcet
+	 * will be saved in the array.
 	 *
 	 * @param idx0 Initial index. Inclusive
 	 * @param idx1 Last index, Exclusive

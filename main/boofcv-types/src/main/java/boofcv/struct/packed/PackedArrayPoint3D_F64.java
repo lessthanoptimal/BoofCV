@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -98,6 +98,9 @@ public class PackedArrayPoint3D_F64 implements PackedArray<Point3D_F64> {
 			temp.y = array.data[i + 1];
 			temp.z = array.data[i + 2];
 			op.process(pointIndex++, temp);
+			array.data[i] = temp.x;
+			array.data[i + 1] = temp.y;
+			array.data[i + 2] = temp.z;
 		}
 	}
 }
