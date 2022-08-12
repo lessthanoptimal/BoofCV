@@ -137,14 +137,26 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 	}
 
 	/**
+	 * Use configurations to create new instances of algorithms.
+	 */
+	public void declareAlgorithms() {
+		// TODO let it specify image shape for each view independently
+		ransac = FactoryMultiViewRobust.metricThreeViewRansac(configSelfCalib, configRansac);
+		structure = new SceneStructureMetric(homogenous);
+		observations = new SceneObservations();
+		bundleAdjustment = FactoryMultiView.bundleSparseMetric(configSBA);
+		bundleAdjustment.configure(convergeSBA.ftol, convergeSBA.gtol, convergeSBA.maxIterations);
+	}
+
+	/**
 	 * Initializes data structures and fixates configurations
 	 *
 	 * @param width width of all images
 	 * @param height height of all images
 	 */
 	public void initialize( int width, int height ) {
-		// TODO let it specify image shape for each view independently
-		ransac = FactoryMultiViewRobust.metricThreeViewRansac(configSelfCalib, configRansac);
+		if (ransac == null)
+			declareAlgorithms();
 
 		// Let it know some information about the cameras. More than one view can share the same camera
 		for (int idx = 0; idx < 3; idx++) {
@@ -153,11 +165,6 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 			BoofMiscOps.checkTrue(camId >= 0 && camId < 3, "Camera must be from 0 to 2");
 			ransac.setView(idx, new ElevateViewInfo(width, height, camId));
 		}
-
-		structure = new SceneStructureMetric(homogenous);
-		observations = new SceneObservations();
-		bundleAdjustment = FactoryMultiView.bundleSparseMetric(configSBA);
-		bundleAdjustment.configure(convergeSBA.ftol, convergeSBA.gtol, convergeSBA.maxIterations);
 	}
 
 	/**
@@ -208,7 +215,7 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 		averageIntrinsicParameters(ransac.getModelParameters());
 
 		// Save extrinsics
-		listWorldToView.resetResize(3);
+		listWorldToView.reset().resize(3);
 		for (int i = 0; i < 3; i++) {
 			ransac.getModelParameters().getView1ToIdx(i, listWorldToView.get(i));
 		}
@@ -221,7 +228,7 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 	 */
 	private void setupMetricBundleAdjustment( List<AssociatedTriple> inliers ) {
 		// Construct bundle adjustment data structure
-		structure = new SceneStructureMetric(false);
+		structure = new SceneStructureMetric(homogenous);
 		structure.initialize(listPinhole.size(), 3, inliers.size());
 		observations = new SceneObservations();
 		observations.initialize(3);
@@ -271,15 +278,15 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 		pruner.prunePoints(1);
 		bundleAdjustment.setParameters(structure, observations);
 		double before = bundleAdjustment.getFitScore();
-		if (!bundleAdjustment.optimize(structure))
+		if (convergeSBA.maxIterations > 0 && !bundleAdjustment.optimize(structure))
 			return false;
 
 		// Save results
-		listPinhole.resetResize(structure.cameras.size);
+		listPinhole.reset().resize(structure.cameras.size);
 		for (int i = 0; i < structure.cameras.size; i++) {
 			BundleAdjustmentOps.convert(structure.cameras.get(i).model, width, height, listPinhole.get(i));
 		}
-		listWorldToView.resetResize(structure.views.size);
+		listWorldToView.reset().resize(structure.views.size);
 		for (int i = 0; i < structure.views.size; i++) {
 			listWorldToView.get(i).setTo(structure.getParentToView(i));
 		}
@@ -312,8 +319,7 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 
 		int total = 0;
 		for (int target = 0; target < 3 && total < 3; target++) {
-			listPinhole.grow().setTo(results.getIntrinsics(target));
-			CameraPinhole ave = listPinhole.getTail();
+			CameraPinhole ave = listPinhole.grow();
 
 			int count = 0;
 			for (int i = 0; i < viewToCamera.length; i++) {
