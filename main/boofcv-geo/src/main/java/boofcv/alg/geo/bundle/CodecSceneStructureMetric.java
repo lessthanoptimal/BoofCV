@@ -23,6 +23,8 @@ import boofcv.abst.geo.bundle.SceneStructureCommon;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.geo.bundle.jacobians.JacobianSo3;
 import boofcv.alg.geo.bundle.jacobians.JacobianSo3Rodrigues;
+import boofcv.misc.BoofMiscOps;
+import org.ejml.UtilEjml;
 
 /**
  * Encodes and decodes the values in a {@link SceneStructureMetric} using the following
@@ -110,6 +112,11 @@ public class CodecSceneStructureMetric implements BundleAdjustmentSchur.Codec<Sc
 			output[index++] = p.coordinate[2];
 			if (structure.isHomogenous())
 				output[index++] = p.coordinate[3];
+
+			// Make sure nothing blew up
+			for (int checkIdx = index - p.coordinate.length; checkIdx < index; checkIdx++) {
+				BoofMiscOps.checkTrue(!UtilEjml.isUncountable(output[checkIdx]), "Bad point");
+			}
 		}
 
 		for (int rigidIndex = 0; rigidIndex < structure.rigids.size; rigidIndex++) {
@@ -117,12 +124,19 @@ public class CodecSceneStructureMetric implements BundleAdjustmentSchur.Codec<Sc
 			// Decode the rigid body transform from object to world
 			if (rigid.known)
 				continue;
+
+			int indexBefore = index;
 			rotation.getParameters(rigid.object_to_world.R, output, index);
 			index += rotation.getParameterLength();
 
 			output[index++] = rigid.object_to_world.T.x;
 			output[index++] = rigid.object_to_world.T.y;
 			output[index++] = rigid.object_to_world.T.z;
+
+			// Make sure nothing blew up
+			for (int checkIdx = indexBefore; checkIdx < index; checkIdx++) {
+				BoofMiscOps.checkTrue(!UtilEjml.isUncountable(output[checkIdx]), "Bad rigid");
+			}
 		}
 
 		for (int motionIndex = 0; motionIndex < structure.motions.size; motionIndex++) {
@@ -130,20 +144,34 @@ public class CodecSceneStructureMetric implements BundleAdjustmentSchur.Codec<Sc
 			// Decode the rigid body transform from world to view
 			if (motion.known)
 				continue;
+
+			int indexBefore = index;
 			rotation.getParameters(motion.parent_to_view.R, output, index);
 			index += rotation.getParameterLength();
 
 			output[index++] = motion.parent_to_view.T.x;
 			output[index++] = motion.parent_to_view.T.y;
 			output[index++] = motion.parent_to_view.T.z;
+
+			// Make sure nothing blew up
+			for (int checkIdx = indexBefore; checkIdx < index; checkIdx++) {
+				BoofMiscOps.checkTrue(!UtilEjml.isUncountable(output[checkIdx]), "Bad rotation");
+			}
 		}
 
 		for (int i = 0; i < structure.cameras.size; i++) {
 			SceneStructureCommon.Camera camera = structure.cameras.data[i];
 			if (camera.known)
 				continue;
+
+			int indexBefore = index;
 			camera.model.getIntrinsic(output, index);
 			index += camera.model.getIntrinsicCount();
+
+			// Make sure nothing blew up
+			for (int checkIdx = indexBefore; checkIdx < index; checkIdx++) {
+				BoofMiscOps.checkTrue(!UtilEjml.isUncountable(output[checkIdx]), "Bad camera");
+			}
 		}
 	}
 }
