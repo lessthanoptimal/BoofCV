@@ -23,7 +23,7 @@ import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.geo.MetricCameras;
 import boofcv.misc.BoofMiscOps;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point4D_F64;
+import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
@@ -31,8 +31,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class TestInitializeCommonMetric extends GenericInitializeCommon {
 	/**
@@ -50,6 +49,9 @@ class TestInitializeCommonMetric extends GenericInitializeCommon {
 	}
 
 	private void performPerfectConnections( InitializeCommonMetric alg ) {
+		// Need to turn off pruning or else the structure indexes will get messed up and not match
+		alg.pixelToMetric3.pruneFraction = 1.0;
+
 		for (int seedIdx = 0; seedIdx < 3; seedIdx++) {
 			var dbSimilar = new MockLookupSimilarImagesRealistic().pathCircle(4, 2);
 			var dbCams = new MockLookUpCameraInfo(dbSimilar.intrinsic);
@@ -82,6 +84,7 @@ class TestInitializeCommonMetric extends GenericInitializeCommon {
 							  DogArray_I32 seedConnIdx) {
 
 		final SceneStructureMetric structure = alg.getStructure();
+		assertFalse(structure.isHomogenous(), "Code below assumes cartesian and not homogenous");
 
 		// Sanity check the number of each type of structure
 		assertEquals(seedConnIdx.size + 1, structure.views.size);
@@ -89,10 +92,10 @@ class TestInitializeCommonMetric extends GenericInitializeCommon {
 		List<String> viewIds = BoofMiscOps.collectList(db.views, v -> v.id);
 		int dbIndexSeed = viewIds.indexOf(alg.getPairwiseGraphViewByStructureIndex(0).id);
 
-		// Check results for consistency. Can't do a direct comparision to ground truth since a different
+		// Check results for consistency. Can't do a direct comparison to ground truth since a different
 		// but equivalent projective frame would have been estimated.
-		var X = new Point4D_F64();
-		var Xview = new Point4D_F64();
+		var X = new Point3D_F64();
+		var Xview = new Point3D_F64();
 		var found = new Point2D_F64();
 		var global_to_view = new Se3_F64();
 		DogArray_I32 inlierToSeed = alg.inlierIndexes.get(0);

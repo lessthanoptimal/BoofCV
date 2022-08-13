@@ -49,7 +49,7 @@ import static boofcv.misc.BoofMiscOps.checkEq;
 @SuppressWarnings("NullAway.Init")
 public class MetricSpawnSceneFromView implements VerbosePrint {
 
-	/** Computes the initial scene from the seed and some of it's neighbors */
+	/** Computes the initial scene from the seed and some of its neighbors */
 	private final @Getter InitializeCommonMetric initialize;
 
 	private final @Getter RefineMetricWorkingGraph refineWorking;
