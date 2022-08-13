@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -139,6 +139,9 @@ public class ColorizeMultiViewStereoResults<T extends ImageBase<T>> {
 		// Add the first view each point was seen in to the list
 		for (int pointIdx = 0; pointIdx < scene.points.size; pointIdx++) {
 			SceneStructureCommon.Point p = scene.points.get(pointIdx);
+			// Probably a miss configured scene, but skip over a point if it has no views
+			if (p.views.isEmpty())
+				continue;
 			lookupPointsByView.get(p.views.get(0)).add(pointIdx);
 		}
 
