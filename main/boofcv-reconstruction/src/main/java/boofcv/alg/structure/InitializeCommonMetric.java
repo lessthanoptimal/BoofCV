@@ -72,7 +72,7 @@ public class InitializeCommonMetric implements VerbosePrint {
 	protected @Getter final DogArray<DogArray_I32> inlierIndexes =
 			new DogArray<>(DogArray_I32::new, DogArray_I32::reset);
 
-	// Retrieve a Pairwise.View given it's index in the SBA structure
+	// Retrieve a Pairwise.View given its index in the SBA structure
 	protected @Getter final FastArray<View> viewsByStructureIndex = new FastArray<>(View.class);
 
 	//-------------- Internal workspace variables
