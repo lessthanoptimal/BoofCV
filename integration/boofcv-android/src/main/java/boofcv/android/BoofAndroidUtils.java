@@ -18,6 +18,7 @@
 
 package boofcv.android;
 
+import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
@@ -147,5 +148,49 @@ public class BoofAndroidUtils {
 			}
 		}
 		return allCameras;
+	}
+
+	/**
+	 * Converts a camera facing Integer into human-readable string
+	 */
+	public static String facingToString( Integer value ) {
+		if (value == null)
+			return "null";
+		return switch (value) {
+			case CameraCharacteristics.LENS_FACING_FRONT -> "front";
+			case CameraCharacteristics.LENS_FACING_BACK -> "back";
+			case CameraCharacteristics.LENS_FACING_EXTERNAL -> "external";
+			default -> "unknown";
+		};
+	}
+
+	/**
+	 * Converts camera format int into a human-readable string
+	 */
+	private String formatToString( int value ) {
+		return switch (value) {
+			case ImageFormat.DEPTH16 -> "DEPTH16";
+			case ImageFormat.DEPTH_POINT_CLOUD -> "DEPTH_POINT_CLOUD";
+			case ImageFormat.DEPTH_JPEG -> "DEPTH_JPEG";
+			case 0x1002 -> "RAW_DEPTH";
+			case 0x1003 -> "RAW_DEPTH10";
+			case ImageFormat.JPEG -> "JPEG";
+			case ImageFormat.NV16 -> "NV16";
+			case ImageFormat.NV21 -> "NV21";
+			case ImageFormat.RGB_565 -> "RGB_565";
+			case ImageFormat.YUY2 -> "YUY2";
+			case ImageFormat.YV12 -> "YV12";
+			case ImageFormat.YUV_420_888 -> "YUV_420_888";
+			case ImageFormat.YUV_422_888 -> "YUV_422_888";
+			case ImageFormat.YUV_444_888 -> "YUV_444_888";
+			case ImageFormat.FLEX_RGB_888 -> "FLEX_RGB_888";
+			case ImageFormat.FLEX_RGBA_8888 -> "FLEX_RGB_888";
+			case ImageFormat.PRIVATE -> "PRIVATE";
+			case ImageFormat.RAW_PRIVATE -> "RAW_PRIVATE";
+			case ImageFormat.RAW_SENSOR -> "RAW_SENSOR";
+			case ImageFormat.RAW10 -> "RAW10";
+			case ImageFormat.RAW12 -> "RAW12";
+			default -> "Unknown '" + value + "'";
+		};
 	}
 }

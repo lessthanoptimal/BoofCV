@@ -20,6 +20,8 @@ package boofcv.android.camera2;
 
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 /**
  * Specifies the ID for a camera, taking in account multi-camera systems.
  *
@@ -53,5 +55,21 @@ public class CameraID {
 		if (logical == null)
 			return id;
 		return logical + ":" + id;
+	}
+
+	@Override public boolean equals( Object obj ) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		CameraID a = (CameraID)obj;
+		return id.equals(a.id) && Objects.equals(logical, a.logical);
+	}
+
+	@Override public int hashCode() {
+		int hash = logical == null ? 0 : logical.hashCode();
+		return hash | id.hashCode();
 	}
 }
