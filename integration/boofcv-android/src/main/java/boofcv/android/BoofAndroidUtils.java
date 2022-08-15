@@ -167,7 +167,7 @@ public class BoofAndroidUtils {
 	/**
 	 * Converts camera format int into a human-readable string
 	 */
-	private String formatToString( int value ) {
+	public static String formatToString( int value ) {
 		return switch (value) {
 			case ImageFormat.DEPTH16 -> "DEPTH16";
 			case ImageFormat.DEPTH_POINT_CLOUD -> "DEPTH_POINT_CLOUD";
@@ -190,7 +190,7 @@ public class BoofAndroidUtils {
 			case ImageFormat.RAW_SENSOR -> "RAW_SENSOR";
 			case ImageFormat.RAW10 -> "RAW10";
 			case ImageFormat.RAW12 -> "RAW12";
-			default -> "Unknown '" + value + "'";
+			default -> "Unk:" + value;
 		};
 	}
 }

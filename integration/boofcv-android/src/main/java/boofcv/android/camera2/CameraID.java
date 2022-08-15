@@ -51,6 +51,12 @@ public class CameraID {
 		return logical != null ? logical : id;
 	}
 
+	public CameraID setTo( CameraID src ) {
+		this.id = src.id;
+		this.logical = src.logical;
+		return this;
+	}
+
 	@Override public String toString() {
 		if (logical == null)
 			return id;
