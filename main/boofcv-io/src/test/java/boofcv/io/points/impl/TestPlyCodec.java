@@ -137,32 +137,44 @@ class TestPlyCodec extends BoofStandardJUnit {
 	}
 
 	@Test void encode_decode_mesh_binary() throws IOException {
-		var mesh = new VertexMesh();
-		mesh.offsets.add(0);
-		for (int i = 0; i < 10; i++) {
-			mesh.vertexes.append(i, 2, 3);
-			mesh.indexes.add(i*3);
-			mesh.indexes.add(i*3 + 1);
-			mesh.indexes.add(i*3 + 2);
-			mesh.offsets.add(mesh.indexes.size);
+		for (var endian : new ByteOrder[]{ByteOrder.LITTLE_ENDIAN, ByteOrder.BIG_ENDIAN}) {
+			var mesh = new VertexMesh();
+			mesh.offsets.add(0);
+			for (int i = 0; i < 10; i++) {
+				mesh.vertexes.append(i, 2, 3);
+				mesh.indexes.add(i*3);
+				mesh.indexes.add(i*3 + 1);
+				mesh.indexes.add(i*3 + 2);
+				mesh.offsets.add(mesh.indexes.size);
+			}
+			var colors = new DogArray_I32();
+			for (int i = 0; i < mesh.vertexes.size(); i++) {
+				colors.add(i + 5);
+			}
+
+			var output = new ByteArrayOutputStream();
+			PlyCodec.saveMeshBinary(mesh, colors, endian, true, output);
+
+			var foundMesh = new VertexMesh();
+			var foundColors = new DogArray_I32();
+
+			var input = new ByteArrayInputStream(output.toByteArray());
+			PlyCodec.readMesh(input, foundMesh, foundColors);
+
+			assertEquals(mesh.vertexes.size(), mesh.vertexes.size());
+			assertTrue(mesh.indexes.isEquals(foundMesh.indexes));
+			assertTrue(mesh.offsets.isEquals(foundMesh.offsets));
+			assertTrue(colors.isEquals(foundColors));
+
+			for (int i = 0; i < mesh.vertexes.size(); i++) {
+				Point3D_F64 expected = mesh.vertexes.getTemp(i);
+				Point3D_F64 found = foundMesh.vertexes.getTemp(i);
+				assertEquals(0.0, expected.distance(found));
+			}
+
+			for (int i = 0; i < mesh.vertexes.size(); i++) {
+				assertEquals(mesh.indexes.get(i), foundMesh.indexes.get(i));
+			}
 		}
-		var colors = new DogArray_I32();
-		for (int i = 0; i < mesh.vertexes.size(); i++) {
-			colors.add(i + 5);
-		}
-
-		var output = new ByteArrayOutputStream();
-		PlyCodec.saveMeshBinary(mesh, colors,ByteOrder.BIG_ENDIAN, true, output);
-
-		var foundMesh = new VertexMesh();
-		var foundColors = new DogArray_I32();
-
-		var input = new ByteArrayInputStream(output.toByteArray());
-		PlyCodec.readMesh(input, foundMesh, foundColors);
-
-		assertEquals(mesh.vertexes.size(), mesh.vertexes.size());
-		assertTrue(mesh.indexes.isEquals(foundMesh.indexes));
-		assertTrue(mesh.offsets.isEquals(foundMesh.offsets));
-		assertTrue(colors.isEquals(foundColors));
 	}
 }

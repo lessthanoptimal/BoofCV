@@ -34,6 +34,7 @@ Version : 0.41
   - Fixed crash in Niblack Family when output image was not resized to match input image
   - Image.setTo() now returns 'this' to enable chaining.
   - Can now colorize points based on camera reference frame, not just global
+  - PlyCodec - writes correct header for little endian
 - Stereo Disparity: Fixed bug where invalid values got cast to a byte when image was float, causing artifacts.
 - RansacCalibrated now support concurrency
 - Photogrammetry

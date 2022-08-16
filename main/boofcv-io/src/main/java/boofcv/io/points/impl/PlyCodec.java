@@ -134,7 +134,7 @@ public class PlyCodec {
 			throws IOException {
 		String format = "UTF-8";
 		int dataLength = saveAsFloat ? 4 : 8;
-		writeBinaryHeader(data.getVertexCount(), data.getPolygonCount(), data.isColor(), saveAsFloat, format, outputWriter);
+		writeBinaryHeader(data.getVertexCount(), data.getPolygonCount(), order, data.isColor(), saveAsFloat, format, outputWriter);
 
 		boolean color = data.isColor();
 
@@ -166,7 +166,7 @@ public class PlyCodec {
 			outputWriter.write(bytes.array());
 		}
 
-		int[] indexes = new int[100];
+		var indexes = new int[100];
 		bytes = ByteBuffer.allocate(1 + indexes.length*4);
 		for (int i = 0; i < data.getPolygonCount(); i++) {
 			int size = data.getIndexes(i, indexes);
@@ -180,12 +180,17 @@ public class PlyCodec {
 		outputWriter.flush();
 	}
 
-	private static void writeBinaryHeader( int vertexCount, int triangleCount, boolean hasColor,
+	private static void writeBinaryHeader( int vertexCount, int triangleCount, ByteOrder order, boolean hasColor,
 										   boolean saveAsFloat, String format, OutputStream outputWriter )
 			throws IOException {
 		String dataType = saveAsFloat ? "float" : "double";
 		outputWriter.write("ply\n".getBytes(format));
-		outputWriter.write("format binary_big_endian 1.0\n".getBytes(format));
+		String orderStr = switch (order.toString()) {
+			case "LITTLE_ENDIAN" -> "little";
+			case "BIG_ENDIAN" -> "big";
+			default -> throw new RuntimeException("Unexpected order=" + order);
+		};
+		outputWriter.write(("format binary_" + orderStr + "_endian 1.0\n").getBytes(format));
 		outputWriter.write("comment Created using BoofCV!\n".getBytes(format));
 		outputWriter.write(("element vertex " + vertexCount + "\n").getBytes(format));
 		outputWriter.write((
@@ -464,7 +469,8 @@ public class PlyCodec {
 
 		final var polygonLine = new byte[4*10];
 		final ByteBuffer polygonBB = ByteBuffer.wrap(polygonLine);
-		int[] indexes = new int[100];		int offset = 0;
+		int[] indexes = new int[100];
+		int offset = 0;
 		for (int i = 0; i < triangleCount; i++) {
 			if (1 != reader.read(line, 0, 1))
 				throw new RuntimeException("Couldn't read count byte");
