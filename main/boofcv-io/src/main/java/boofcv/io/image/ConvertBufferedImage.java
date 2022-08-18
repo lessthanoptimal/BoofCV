@@ -19,7 +19,6 @@
 package boofcv.io.image;
 
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.*;
 import org.jetbrains.annotations.Nullable;
 
@@ -880,10 +879,5 @@ public class ConvertBufferedImage {
 	 */
 	public static boolean isSubImage( BufferedImage img ) {
 		return img.getRaster().getParent() != null;
-	}
-
-	/** Returns true if BuuferedImage sub images can be processed */
-	public static boolean isSubImageLegal() {
-		return BoofMiscOps.getJavaVersion() <= 8;
 	}
 }

@@ -96,9 +96,6 @@ public class TestConvertBufferedImage extends BoofStandardJUnit {
 		assertNotNull(found.data);
 		assertEquals(imgWidth*imgHeight*3, found.data.length);
 
-		if (!ConvertBufferedImage.isSubImageLegal())
-			return;
-
 		// test a sub-image input
 		origImg = origImg.getSubimage(1, 2, 5, 6);
 
@@ -137,9 +134,6 @@ public class TestConvertBufferedImage extends BoofStandardJUnit {
 		assertEquals(imgHeight, found.height);
 		assertNotNull(found.data);
 		assertEquals(imgWidth*imgHeight, found.data.length);
-
-		if (!ConvertBufferedImage.isSubImageLegal())
-			return;
 
 		// test a sub-image input
 		origImg = origImg.getSubimage(1, 2, 5, 6);
@@ -292,7 +286,7 @@ public class TestConvertBufferedImage extends BoofStandardJUnit {
 			else
 				origImg = TestConvertRaster.createIntBuff(imgWidth, imgHeight, rand);
 
-			int limit = ConvertBufferedImage.isSubImageLegal() ? 2 : 1;
+			int limit = 2;
 			for (int j = 0; j < limit; j++) {
 				if (j == 1) {
 					origImg = origImg.getSubimage(1, 2, imgWidth - 1, imgHeight - 2);
@@ -317,7 +311,7 @@ public class TestConvertBufferedImage extends BoofStandardJUnit {
 	@Test void convertFromSingle_I16() {
 		BufferedImage origImg = TestConvertRaster.createShortBuff(imgWidth, imgHeight, rand);
 
-		int limit = ConvertBufferedImage.isSubImageLegal() ? 2 : 1;
+		int limit = 2;
 		for (int j = 0; j < limit; j++) {
 			if (j == 1) {
 				origImg = origImg.getSubimage(1, 2, imgWidth - 1, imgHeight - 2);
@@ -354,7 +348,7 @@ public class TestConvertBufferedImage extends BoofStandardJUnit {
 			else
 				origImg = TestConvertRaster.createIntBuffRGBA(imgWidth, imgHeight, rand, false);
 
-			int limit = ConvertBufferedImage.isSubImageLegal() ? 2 : 1;
+			int limit = 2;
 			for (int j = 0; j < limit; j++) {
 				if (j == 1) {
 					origImg = origImg.getSubimage(1, 2, imgWidth - 1, imgHeight - 2);
@@ -401,7 +395,7 @@ public class TestConvertBufferedImage extends BoofStandardJUnit {
 			InterleavedU8 imgInt8 = new InterleavedU8(imgWidth, imgHeight, numBands);
 			InterleavedF32 imgF32 = new InterleavedF32(imgWidth, imgHeight, numBands);
 
-			int limit = ConvertBufferedImage.isSubImageLegal() ? 2 : 1;
+			int limit = 2;
 			for (int j = 0; j < limit; j++) {
 				if (j == 1) {
 					origImg = origImg.getSubimage(1, 2, imgWidth - 1, imgHeight - 2);
