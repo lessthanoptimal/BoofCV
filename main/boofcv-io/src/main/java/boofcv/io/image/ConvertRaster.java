@@ -272,15 +272,7 @@ public class ConvertRaster {
 		if (raster.getWritableParent() == null)
 			return 0;
 
-		int min = Integer.MAX_VALUE;
-		try {
-			for (int i = 0; i < raster.getNumDataElements(); i++) {
-				min = Math.min(min, (Integer)raster.getDataBuffer().getOffsets()[i]);
-			}
-		} catch (IndexOutOfBoundsException e) {
-			// TODO?
-		}
-		return min;
+		return raster.getDataBuffer().getOffset();
 	}
 
 	/**

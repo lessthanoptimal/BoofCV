@@ -171,7 +171,7 @@ public class BoofAndroidUtils {
 		return switch (value) {
 			case ImageFormat.DEPTH16 -> "DEPTH16";
 			case ImageFormat.DEPTH_POINT_CLOUD -> "DEPTH_POINT_CLOUD";
-//			case ImageFormat.DEPTH_JPEG -> "DEPTH_JPEG";
+			case ImageFormat.DEPTH_JPEG -> "DEPTH_JPEG";
 			case 0x1002 -> "RAW_DEPTH";
 			case 0x1003 -> "RAW_DEPTH10";
 			case ImageFormat.JPEG -> "JPEG";
