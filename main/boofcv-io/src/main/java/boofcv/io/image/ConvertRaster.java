@@ -272,22 +272,15 @@ public class ConvertRaster {
 		if (raster.getWritableParent() == null)
 			return 0;
 
+		int min = Integer.MAX_VALUE;
 		try {
-			Method m = raster.getClass().getMethod("getDataOffset", int.class);
-			int min = Integer.MAX_VALUE;
 			for (int i = 0; i < raster.getNumDataElements(); i++) {
-				min = Math.min(min, (Integer)m.invoke(raster, i));
+				min = Math.min(min, (Integer)raster.getDataBuffer().getOffsets()[i]);
 			}
-			return min;
-		} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-			if (BoofMiscOps.getJavaVersion() >= 17) {
-				throw new RuntimeException(
-						"Due to JRE encapsulation, low level data structures needed for fast conversion of " +
-								"BufferedImages are no longer accessible. You can work around this by adding the " +
-								"following to your java command: --add-exports=java.desktop/sun.awt.image=ALL-UNNAMED", e);
-			}
-			throw new IllegalArgumentException("BufferedImage subimages are not supported in Java 9 and beyond", e);
+		} catch (IndexOutOfBoundsException e) {
+			// TODO?
 		}
+		return min;
 	}
 
 	/**
