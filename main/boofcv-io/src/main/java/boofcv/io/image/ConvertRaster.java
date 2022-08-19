@@ -26,6 +26,7 @@ import boofcv.struct.image.*;
 
 import java.awt.image.*;
 import java.lang.reflect.Array;
+import java.lang.reflect.InaccessibleObjectException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -272,7 +273,36 @@ public class ConvertRaster {
 		if (raster.getWritableParent() == null)
 			return 0;
 
-		return raster.getDataBuffer().getOffset();
+		try {
+			int min = Integer.MAX_VALUE;
+			Method m = raster.getClass().getMethod("getDataOffset", int.class);
+			m.setAccessible(true);
+			for (int i = 0; i < raster.getNumDataElements(); i++) {
+				min = Math.min(min, (Integer)m.invoke(raster, i));
+			}
+			return min;
+		} catch (NoSuchMethodException | IllegalAccessException | InaccessibleObjectException | InvocationTargetException e) {
+
+			SampleModel sm = raster.getSampleModel();
+			if (sm instanceof ComponentSampleModel) {
+				ComponentSampleModel csm = (ComponentSampleModel)sm;
+				// according to https://github.com/frohoff/jdk8u-jdk/blob/master/src/share/classes/sun/awt/image/ByteInterleavedRaster.java,
+				// the desired offset is given by
+				return raster.getDataBuffer().getOffset() - raster.getSampleModelTranslateY()*csm.getScanlineStride() - raster.getSampleModelTranslateX()*csm.getPixelStride();
+			} else if (sm instanceof SinglePixelPackedSampleModel smm) {
+				return raster.getDataBuffer().getOffset() - raster.getSampleModelTranslateY()*smm.getScanlineStride() - raster.getSampleModelTranslateX();
+			} else if (sm instanceof MultiPixelPackedSampleModel msm) {
+				return raster.getDataBuffer().getOffset() - raster.getSampleModelTranslateY()*msm.getScanlineStride() - raster.getSampleModelTranslateX();
+			}
+
+			if (BoofMiscOps.getJavaVersion() >= 17) {
+				throw new RuntimeException(
+						"Due to JRE encapsulation, low level data structures needed for fast conversion of " +
+								"BufferedImages are no longer accessible. You can work around this by adding the " +
+								"following to your java command: --add-exports=java.desktop/sun.awt.image=ALL-UNNAMED", e);
+			}
+			throw new IllegalArgumentException("BufferedImage subimages are not supported in Java 9 and beyond", e);
+		}
 	}
 
 	/**

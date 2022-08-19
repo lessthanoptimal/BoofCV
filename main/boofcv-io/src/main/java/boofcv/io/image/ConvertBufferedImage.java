@@ -881,9 +881,4 @@ public class ConvertBufferedImage {
 	public static boolean isSubImage( BufferedImage img ) {
 		return img.getRaster().getParent() != null;
 	}
-
-	/** Returns true if BuuferedImage sub images can be processed */
-	public static boolean isSubImageLegal() {
-		return BoofMiscOps.getJavaVersion() <= 8;
-	}
 }
