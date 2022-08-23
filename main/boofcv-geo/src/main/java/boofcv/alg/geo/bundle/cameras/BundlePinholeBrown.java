@@ -21,8 +21,11 @@ package boofcv.alg.geo.bundle.cameras;
 import boofcv.abst.geo.bundle.BundleAdjustmentCamera;
 import boofcv.struct.calib.CameraPinholeBrown;
 import georegression.struct.point.Point2D_F64;
+import org.ejml.FancyPrint;
 import org.ejml.data.DMatrixRMaj;
 import org.jetbrains.annotations.Nullable;
+
+import static boofcv.struct.calib.CameraPinholeBrown.toStringArray;
 
 /**
  * Formulas for {@link CameraPinholeBrown}.
@@ -310,5 +313,25 @@ public class BundlePinholeBrown implements BundleAdjustmentCamera {
 	@Override
 	public int getIntrinsicCount() {
 		return 4 + radial.length + (tangential ? 2 : 0) + (zeroSkew ? 0 : 1);
+	}
+
+	@Override public String toString() {
+		var fp = new FancyPrint();
+
+		String distortion = "";
+
+		distortion += toStringArray(fp, "r", radial);
+
+		if (tangential) {
+			distortion += ", t1=" + fp.s(t1) + " t2=" + fp.s(t2);
+		}
+
+		return "BundlePinholeBrown{" +
+				"fx=" + fx +
+				", fy=" + fy +
+				", skew=" + skew +
+				", cx=" + cx +
+				", cy=" + cy + distortion +
+				'}';
 	}
 }

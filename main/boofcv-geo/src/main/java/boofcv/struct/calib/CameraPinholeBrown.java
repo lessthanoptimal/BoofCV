@@ -183,7 +183,7 @@ public class CameraPinholeBrown extends CameraPinhole implements Serializable {
 
 	@Override
 	public String toString() {
-		FancyPrint fp = new FancyPrint();
+		var fp = new FancyPrint();
 		String txt = "CameraPinholeRadial{" +
 				"fx=" + fx +
 				", fy=" + fy +
@@ -201,7 +201,7 @@ public class CameraPinholeBrown extends CameraPinhole implements Serializable {
 		return txt;
 	}
 
-	protected static String toStringArray( FancyPrint fp, String name, @Nullable double[] param ) {
+	public static String toStringArray( FancyPrint fp, String name, @Nullable double[] param ) {
 		if (param == null || param.length == 0)
 			return "";
 		String txt = ",";

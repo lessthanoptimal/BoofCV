@@ -921,7 +921,7 @@ public class BoofMiscOps {
 	 * Function which handles boilerplate for support recursive verbose print
 	 */
 	public static void verboseChildren( @Nullable PrintStream out, @Nullable Set<String> configuration,
-										VerbosePrint... children ) {
+										@Nullable VerbosePrint... children ) {
 		// See how many tabs have already been added
 		int numIndents = 0;
 		PrintStream originalOut = out;
@@ -932,13 +932,15 @@ public class BoofMiscOps {
 		}
 
 		// If not cursive then do nothing
-		if (configuration == null || !configuration.contains(BoofVerbose.RECURSIVE)) {
+		if (children == null || configuration == null || !configuration.contains(BoofVerbose.RECURSIVE)) {
 			return;
 		}
 
 		// If the output is null then its turning off print
 		if (out == null) {
 			for (int i = 0; i < children.length; i++) {
+				if (children[i] == null)
+					continue;
 				children[i].setVerbose(null, configuration);
 			}
 			return;
@@ -947,6 +949,8 @@ public class BoofMiscOps {
 		// Add tabs to children when in verbose mode
 		numIndents += 1;
 		for (int i = 0; i < children.length; i++) {
+			if (children[i] == null)
+				continue;
 			PrintStream tabbed = addPrefix(children[i], numIndents, originalOut);
 			children[i].setVerbose(tabbed, configuration);
 		}

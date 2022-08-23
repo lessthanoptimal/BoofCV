@@ -86,6 +86,8 @@ public class MultiBaselineDisparityMedian implements VerbosePrint {
 	 * @param pixelDist_to_Undist Transform from distorted to undistorted pixels
 	 */
 	public void initialize( CameraPinhole intrinsic, PixelTransform<Point2D_F64> pixelDist_to_Undist ) {
+		if (verbose != null)
+			verbose.printf("init: fx=%.1f shape=%dx%d\n", intrinsic.fx, intrinsic.width, intrinsic.height);
 		this.fusedIntrinsic.setTo(intrinsic);
 		this.images.reset();
 		this.fused.resize(intrinsic.width, intrinsic.height);
@@ -113,7 +115,7 @@ public class MultiBaselineDisparityMedian implements VerbosePrint {
 	}
 
 	/**
-	 * Processes all the disparity images and creates a composite disparity image
+	 * <p>Processes all the disparity images and creates a composite disparity image</p>
 	 *
 	 * NOTE: The rectifcation matrix and the rectification rotation matrix will be identity.
 	 *
@@ -131,6 +133,8 @@ public class MultiBaselineDisparityMedian implements VerbosePrint {
 			fusedBaseline = Math.max(fusedBaseline, images.get(i).parameters.baseline);
 		}
 
+		if (verbose != null) verbose.println("fusing: count=" + images.size + " fusedBaseline=" + fusedBaseline);
+
 		// For each image, map valid pixels back into the original and add to that
 		for (int i = 0; i < images.size; i++) {
 			if (!addToFusedImage(images.get(i)))
@@ -140,7 +144,7 @@ public class MultiBaselineDisparityMedian implements VerbosePrint {
 		// Combine all the disparity information together robustly
 		if (!computeFused(disparity)) {
 			if (verbose != null)
-				verbose.println("FAILED: Not a single disparity computed in any of the images. images.size=" + images.size);
+				verbose.println("FAILED: Not a single valid pixel in fused disparity. images.size=" + images.size);
 			return false;
 		}
 
@@ -168,9 +172,9 @@ public class MultiBaselineDisparityMedian implements VerbosePrint {
 		DConvertMatrixStruct.convert(image.undist_to_rect_px, rect);
 
 		// fused image undistorted pixel coordinates
-		Point2D_F64 undistPix = new Point2D_F64();
+		var undistPix = new Point2D_F64();
 		// rectified image coordinates
-		Point2D_F64 rectPix = new Point2D_F64();
+		var rectPix = new Point2D_F64();
 
 		// To avoid sampling issues, go from fused image to disparity image
 		for (int origPixY = 0; origPixY < fused.height; origPixY++) {
@@ -299,6 +303,8 @@ public class MultiBaselineDisparityMedian implements VerbosePrint {
 		// -1 because range is the number of possible values. The max range is range-1.
 		final float scale = (float)((this.fusedDisparityRange - 1)/Math.ceil(dispMax));
 		this.fusedBaseline *= scale;
+
+		if (verbose != null) verbose.printf("dispMax=%.1f scale=%.2f\n", dispMax, scale);
 
 		// Update the disparity image to include these adjustments
 		final float fRange = fusedDisparityRange;
