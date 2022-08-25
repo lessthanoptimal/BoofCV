@@ -25,16 +25,17 @@ import org.apache.commons.io.FilenameUtils;
 import org.ddogleg.struct.DogArray_I8;
 import org.jetbrains.annotations.Nullable;
 
+import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.stream.ImageOutputStream;
 import java.awt.image.*;
 import java.io.*;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static boofcv.io.UtilIO.UTF8;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -81,7 +82,7 @@ public class UtilImageIO {
 	}
 
 	public static BufferedImage loadImageNotNull( String fileName ) {
-		return Objects.requireNonNull(loadImage(UtilIO.ensureURL(fileName)), "Couldn't load '"+fileName+"'");
+		return Objects.requireNonNull(loadImage(UtilIO.ensureURL(fileName)), "Couldn't load '" + fileName + "'");
 	}
 
 	public static @Nullable BufferedImage loadImage( String directory, String fileName ) {
@@ -222,6 +223,33 @@ public class UtilImageIO {
 				} else
 					throw new IllegalArgumentException("No writer appropriate found");
 			}
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	/**
+	 * Saves a jpeg image to disk with an adjustable quality setting.
+	 *
+	 * @param img Image that's to be saved
+	 * @param path Where it should save the image
+	 * @param quality 0 to 1.0. 0 = lowest quality and 1.0 = best quality.
+	 */
+	public static void saveJpeg( BufferedImage img, String path, double quality ) {
+		try {
+			// in a unit test it seemed to append to the file otherwise
+			var file = new File(path);
+			if (file.exists())
+				file.delete();
+			ImageOutputStream ios = ImageIO.createImageOutputStream(file);
+			Iterator<ImageWriter> iter = ImageIO.getImageWritersByFormatName("jpeg");
+			ImageWriter writer = iter.next();
+			ImageWriteParam iwp = writer.getDefaultWriteParam();
+			iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+			iwp.setCompressionQuality((float)quality);
+			writer.setOutput(ios);
+			writer.write(null, new IIOImage(img, null, null), iwp);
+			writer.dispose();
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
