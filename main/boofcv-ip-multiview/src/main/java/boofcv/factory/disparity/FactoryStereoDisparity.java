@@ -190,7 +190,7 @@ public class FactoryStereoDisparity {
 				throw new IllegalArgumentException("With subpixel on, disparity image must be GrayF32");
 		} else {
 			if (dispType != GrayU8.class)
-				throw new IllegalArgumentException("With subpixel on, disparity image must be GrayU8");
+				throw new IllegalArgumentException("With subpixel off, disparity image must be GrayU8");
 		}
 
 		double maxError = (config.regionRadiusX*2 + 1)*(config.regionRadiusY*2 + 1)*config.maxPerPixelError;
