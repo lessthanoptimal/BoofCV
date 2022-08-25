@@ -1121,4 +1121,24 @@ public class BoofMiscOps {
 	public static int thresholdByImageSizeI( ConfigLength config, int width, int height ) {
 		return config.computeI((width + height)/2.0);
 	}
+
+	/**
+	 * Blocks until the provided function returns true.
+	 *
+	 * @param func Function
+	 * @param timeoutMS Timeout in milliseconds. If &le; 0 then it will never time out
+	 * @return true if the function return true or false if it timed out.
+	 */
+	public static boolean blockUntilTrue( BoofLambdas.CheckTrue func, long timeoutMS ) {
+		if (func.process())
+			return true;
+		long startTime = System.currentTimeMillis();
+		while (timeoutMS <= 0 || startTime + timeoutMS >= System.currentTimeMillis()) {
+			if (func.process()) {
+				return true;
+			}
+			Thread.yield();
+		}
+		return false;
+	}
 }

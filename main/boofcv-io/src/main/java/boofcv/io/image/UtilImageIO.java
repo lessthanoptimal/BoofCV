@@ -20,6 +20,7 @@ package boofcv.io.image;
 
 import boofcv.BoofVersion;
 import boofcv.io.UtilIO;
+import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.struct.image.*;
 import org.apache.commons.io.FilenameUtils;
 import org.ddogleg.struct.DogArray_I8;
@@ -656,5 +657,30 @@ public class UtilImageIO {
 		} catch (IOException ignore) {
 		}
 		return false;
+	}
+
+	/**
+	 * Converts a video into a sequence of png images. If the output does not exist a directory will
+	 * be created.
+	 *
+	 * @param pathVideo Path to video
+	 * @param pathOutput Path to destination
+	 */
+	public static void videoToImages( String pathVideo, String pathOutput ) {
+		// Make sure the output path exists
+		UtilIO.mkdirs(new File(pathOutput));
+
+		// Load te video
+		SimpleImageSequence<InterleavedU8> sequence = DefaultMediaManager.INSTANCE.openVideo(pathVideo, ImageType.IL_U8);
+		if (sequence == null)
+			throw new RuntimeException("Failed to load video sequence '" + pathVideo + "'");
+
+		// Extract the frames
+		int frame = 0;
+		while (sequence.hasNext()) {
+			InterleavedU8 image = sequence.next();
+			File imageFile = new File(pathOutput, String.format("frame%04d.png", frame++));
+			UtilImageIO.saveImage(image, imageFile.getPath());
+		}
 	}
 }

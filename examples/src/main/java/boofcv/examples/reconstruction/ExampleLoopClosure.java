@@ -27,21 +27,18 @@ import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.scene.FactorySceneRecognition;
 import boofcv.io.UtilIO;
-import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.image.UtilImageIO;
-import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageType;
-import boofcv.struct.image.InterleavedU8;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.FastAccess;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import static boofcv.io.image.UtilImageIO.videoToImages;
 
 /**
  * Shows how you can detect if two images are of the same scene. This is known as loop closure and is done in
@@ -185,24 +182,5 @@ public class ExampleLoopClosure {
 			}
 		}
 		System.out.println("Done!");
-	}
-
-	// Convenience functions to convert a video into images
-	public static void videoToImages( String pathVideo, String pathOutput ) {
-		// Make sure the output path exists
-		UtilIO.mkdirs(new File(pathOutput));
-
-		// Load te video
-		SimpleImageSequence<InterleavedU8> sequence = DefaultMediaManager.INSTANCE.openVideo(pathVideo, ImageType.IL_U8);
-		if (sequence == null)
-			throw new RuntimeException("Failed to load video sequence '" + pathVideo + "'");
-
-		// Extract the frames
-		int frame = 0;
-		while (sequence.hasNext()) {
-			InterleavedU8 image = sequence.next();
-			File imageFile = new File(pathOutput, String.format("frame%04d.png", frame++));
-			UtilImageIO.saveImage(image, imageFile.getPath());
-		}
 	}
 }
