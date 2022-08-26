@@ -18,10 +18,12 @@
 
 package boofcv.alg.geo.rectify;
 
+import boofcv.alg.geo.PerspectiveOps;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinhole;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Point4D_F64;
 import lombok.Data;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
@@ -44,8 +46,6 @@ public class DisparityParameters {
 	/** Rotation from view to rectified synthetic view */
 	public final DMatrixRMaj rotateToRectified = CommonOps_DDRM.identity(3);
 
-	// TODO update everything to use rectifiedR
-
 	public DisparityParameters() {}
 
 	public DisparityParameters( int disparityMin, int disparityRange,
@@ -66,7 +66,7 @@ public class DisparityParameters {
 	 * @param location (Output) Computed 3D coordinate
 	 * @return true if successful
 	 */
-	public boolean pixelTo3D( double pixelX, double pixelY, double value, Point3D_F64 location ) {
+	public boolean pixelToLeft3D( double pixelX, double pixelY, double value, Point3D_F64 location ) {
 		if (value >= disparityRange)
 			return false;
 
@@ -84,6 +84,35 @@ public class DisparityParameters {
 
 		// Bring it back into left camera frame
 		GeometryMath_F64.multTran(rotateToRectified, location, location);
+		return true;
+	}
+
+	/**
+	 * Give a pixel coordinate and raw disparity value, compute its homogenous location. This can handle
+	 * points at infinity.
+	 *
+	 * @param pixelX Pixel coordinate x-axis
+	 * @param pixelY Pixel coordinate y-axis
+	 * @param value Raw disparity value. DO NOT ADD MIN.
+	 * @param location (Output) Computed homogenous coordinate
+	 * @return true if successful
+	 */
+	public boolean pixelToLeft4D( double pixelX, double pixelY, double value, Point4D_F64 location ) {
+		BoofMiscOps.checkTrue(value >= 0.0, "Negative disparity value? BUG!");
+		if (value >= disparityRange)
+			return false;
+
+		value += disparityMin;
+
+		// Note that this will be in the rectified left camera's reference frame.
+		// An additional rotation is needed to put it into the original left camera frame.
+		location.w = value;
+		location.z = baseline*pinhole.fx;
+		location.x = location.z*(pixelX - pinhole.cx)/pinhole.fx;
+		location.y = location.z*(pixelY - pinhole.cy)/pinhole.fy;
+
+		// Bring it back into left camera frame
+		PerspectiveOps.rotateInvH(rotateToRectified, location, location);
 		return true;
 	}
 

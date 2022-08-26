@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -800,5 +800,13 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 		K_found.fill(2.5);
 		PerspectiveOps.invertCalibrationMatrix(K, K_found);
 		assertTrue(MatrixFeatures_DDRM.isIdentical(K_inv, K_found, 1e-6));
+	}
+
+	@Test void rotateH() {
+		fail("Implement");
+	}
+
+	@Test void rotateTranH() {
+		fail("Implement");
 	}
 }

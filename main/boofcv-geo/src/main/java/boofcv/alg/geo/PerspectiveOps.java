@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -1098,5 +1098,41 @@ public class PerspectiveOps {
 		K_inv.set(2, 2, 1.0);
 
 		return K_inv;
+	}
+
+	/**
+	 * Applies a rotation to a homogenous 3D point
+	 *
+	 * @param R rotation matrix.
+	 * @param src (Input) point
+	 * @param dst (Output) point. Can be same instance as src
+	 */
+	public static void rotateH( DMatrixRMaj R, Point4D_F64 src, Point4D_F64 dst ) {
+		double x = src.x;
+		double y = src.y;
+		double z = src.z;
+
+		dst.x = R.data[0]*x + R.data[1]*y + R.data[2]*z;
+		dst.y = R.data[3]*x + R.data[4]*y + R.data[5]*z;
+		dst.z = R.data[6]*x + R.data[7]*y + R.data[8]*z;
+		dst.w = src.w;
+	}
+
+	/**
+	 * Applies a rotation in reverse to a homogenous 3D point
+	 *
+	 * @param R rotation matrix.
+	 * @param src (Input) point
+	 * @param dst (Output) point. Can be same instance as src
+	 */
+	public static void rotateInvH( DMatrixRMaj R, Point4D_F64 src, Point4D_F64 dst ) {
+		double x = src.x;
+		double y = src.y;
+		double z = src.z;
+
+		dst.x = R.data[0]*x + R.data[3]*y + R.data[6]*z;
+		dst.y = R.data[1]*x + R.data[4]*y + R.data[7]*z;
+		dst.z = R.data[2]*x + R.data[5]*y + R.data[8]*z;
+		dst.w = src.w;
 	}
 }
