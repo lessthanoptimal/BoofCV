@@ -276,13 +276,13 @@ class TestBoofMiscOps extends BoofStandardJUnit {
 
 	@Test void blockUntilTrue() {
 		long startTime0 = System.currentTimeMillis();
-		assertTrue(BoofMiscOps.blockUntilTrue(()-> startTime0 + 250L < System.currentTimeMillis(), 1000L));
+		assertTrue(BoofMiscOps.blockUntilTrue(1000L, ()-> startTime0 + 250L < System.currentTimeMillis()));
 
 		long startTime1 = System.currentTimeMillis();
-		assertFalse(BoofMiscOps.blockUntilTrue(()-> startTime1 + 500L < System.currentTimeMillis(), 10L));
+		assertFalse(BoofMiscOps.blockUntilTrue(10L, ()-> startTime1 + 500L < System.currentTimeMillis()));
 
 		long startTime2 = System.currentTimeMillis();
-		assertTrue(BoofMiscOps.blockUntilTrue(()-> startTime0 + 250L < System.currentTimeMillis(), 0));
+		assertTrue(BoofMiscOps.blockUntilTrue(0, ()-> startTime0 + 250L < System.currentTimeMillis()));
 
 	}
 }
