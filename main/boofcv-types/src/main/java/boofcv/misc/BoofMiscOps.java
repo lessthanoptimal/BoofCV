@@ -1125,11 +1125,11 @@ public class BoofMiscOps {
 	/**
 	 * Blocks until the provided function returns true.
 	 *
-	 * @param func Function
 	 * @param timeoutMS Timeout in milliseconds. If &le; 0 then it will never time out
+	 * @param func Function
 	 * @return true if the function return true or false if it timed out.
 	 */
-	public static boolean blockUntilTrue( BoofLambdas.CheckTrue func, long timeoutMS ) {
+	public static boolean blockUntilTrue( long timeoutMS, BoofLambdas.CheckTrue func ) {
 		if (func.process())
 			return true;
 		long startTime = System.currentTimeMillis();
