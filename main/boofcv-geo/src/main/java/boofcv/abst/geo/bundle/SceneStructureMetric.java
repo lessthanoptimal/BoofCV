@@ -392,6 +392,13 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	}
 
 	/**
+	 * Returns the camera for this particular view
+	 */
+	public Camera getViewCamera( int viewIdx ) {
+		return cameras.get(views.get(viewIdx).camera);
+	}
+
+	/**
 	 * Returns the total number of parameters which will be optimised
 	 *
 	 * @return number of parameters

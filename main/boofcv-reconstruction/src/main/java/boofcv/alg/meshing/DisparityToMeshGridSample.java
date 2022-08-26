@@ -82,13 +82,13 @@ public class DisparityToMeshGridSample {
 				if (Math.abs(d0 - d3) > maxDisparityJump)
 					continue;
 
-				if (!parameters.pixelTo3D(x, y, d0, p0))
+				if (!parameters.pixelToLeft3D(x, y, d0, p0))
 					continue;
-				if (!parameters.pixelTo3D(x1, y, d1, p1))
+				if (!parameters.pixelToLeft3D(x1, y, d1, p1))
 					continue;
-				if (!parameters.pixelTo3D(x1, y1, d2, p2))
+				if (!parameters.pixelToLeft3D(x1, y1, d2, p2))
 					continue;
-				if (!parameters.pixelTo3D(x, y1, d3, p3))
+				if (!parameters.pixelToLeft3D(x, y1, d3, p3))
 					continue;
 
 				// save where they came from

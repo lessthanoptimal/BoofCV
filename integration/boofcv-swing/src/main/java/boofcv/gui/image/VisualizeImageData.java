@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -318,7 +318,9 @@ public class VisualizeImageData {
 					float v = src.get(x, y);
 
 					int rgb;
-					if (v > 0) {
+					if (Float.isNaN(v)) {
+						rgb = 0x000088;
+					} else if (v > 0) {
 						rgb = (int)(255*v/maxAbsValue) << 16;
 					} else {
 						rgb = (int)(-255*v/maxAbsValue) << 8;
@@ -341,7 +343,9 @@ public class VisualizeImageData {
 				float v = srcData[indexSrc++];
 
 				int rgb;
-				if (v > 0) {
+				if (Float.isNaN(v)) {
+					rgb = 0x000088;
+				} else if (v > 0) {
 					rgb = (int)(255*v/maxAbsValue) << 16;
 				} else {
 					rgb = (int)(-255*v/maxAbsValue) << 8;
