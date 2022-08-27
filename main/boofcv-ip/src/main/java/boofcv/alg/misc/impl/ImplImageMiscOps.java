@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ package boofcv.alg.misc.impl;
 
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.misc.BoofLambdas;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.border.ImageBorder_F32;
 import boofcv.struct.border.ImageBorder_F64;
 import boofcv.struct.border.ImageBorder_S32;
@@ -117,6 +118,27 @@ public class ImplImageMiscOps {
 		for (int y = 0; y < input.height; y++) {
 			int index = input.getStartIndex() + y*input.getStride();
 			Arrays.fill(input.data, index, index + input.width, (byte)value);
+		}
+		//CONCURRENT_ABOVE });
+	}
+
+	public static void maskFill( GrayI8 image, GrayU8 mask, int maskTarget, int value ) {
+		BoofMiscOps.checkEq(image.width, mask.width);
+		BoofMiscOps.checkEq(image.height, mask.height);
+
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, image.height, y->{
+		for (int y = 0; y < image.height; y++) {
+			int index = image.getStartIndex() + y*image.getStride();
+			int indexEnd = index + image.width;
+			int indexMask = mask.startIndex + y*image.stride;
+			
+			while (index < indexEnd) {
+				if (mask.data[indexMask] == maskTarget) {
+					image.data[index] = (byte)value;
+				}
+				index++;
+				indexMask++;
+			}
 		}
 		//CONCURRENT_ABOVE });
 	}
@@ -666,6 +688,27 @@ public class ImplImageMiscOps {
 		//CONCURRENT_ABOVE });
 	}
 
+	public static void maskFill( GrayI16 image, GrayU8 mask, int maskTarget, int value ) {
+		BoofMiscOps.checkEq(image.width, mask.width);
+		BoofMiscOps.checkEq(image.height, mask.height);
+
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, image.height, y->{
+		for (int y = 0; y < image.height; y++) {
+			int index = image.getStartIndex() + y*image.getStride();
+			int indexEnd = index + image.width;
+			int indexMask = mask.startIndex + y*image.stride;
+			
+			while (index < indexEnd) {
+				if (mask.data[indexMask] == maskTarget) {
+					image.data[index] = (short)value;
+				}
+				index++;
+				indexMask++;
+			}
+		}
+		//CONCURRENT_ABOVE });
+	}
+
 	public static void fill( InterleavedI16 input, int value ) {
 		for (int y = 0; y < input.height; y++) {
 			int index = input.getStartIndex() + y*input.getStride();
@@ -1207,6 +1250,27 @@ public class ImplImageMiscOps {
 		for (int y = 0; y < input.height; y++) {
 			int index = input.getStartIndex() + y*input.getStride();
 			Arrays.fill(input.data, index, index + input.width, value);
+		}
+		//CONCURRENT_ABOVE });
+	}
+
+	public static void maskFill( GrayS32 image, GrayU8 mask, int maskTarget, int value ) {
+		BoofMiscOps.checkEq(image.width, mask.width);
+		BoofMiscOps.checkEq(image.height, mask.height);
+
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, image.height, y->{
+		for (int y = 0; y < image.height; y++) {
+			int index = image.getStartIndex() + y*image.getStride();
+			int indexEnd = index + image.width;
+			int indexMask = mask.startIndex + y*image.stride;
+			
+			while (index < indexEnd) {
+				if (mask.data[indexMask] == maskTarget) {
+					image.data[index] = value;
+				}
+				index++;
+				indexMask++;
+			}
 		}
 		//CONCURRENT_ABOVE });
 	}
@@ -1755,6 +1819,27 @@ public class ImplImageMiscOps {
 		//CONCURRENT_ABOVE });
 	}
 
+	public static void maskFill( GrayS64 image, GrayU8 mask, int maskTarget, long value ) {
+		BoofMiscOps.checkEq(image.width, mask.width);
+		BoofMiscOps.checkEq(image.height, mask.height);
+
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, image.height, y->{
+		for (int y = 0; y < image.height; y++) {
+			int index = image.getStartIndex() + y*image.getStride();
+			int indexEnd = index + image.width;
+			int indexMask = mask.startIndex + y*image.stride;
+			
+			while (index < indexEnd) {
+				if (mask.data[indexMask] == maskTarget) {
+					image.data[index] = value;
+				}
+				index++;
+				indexMask++;
+			}
+		}
+		//CONCURRENT_ABOVE });
+	}
+
 	public static void fill( InterleavedS64 input, long value ) {
 		for (int y = 0; y < input.height; y++) {
 			int index = input.getStartIndex() + y*input.getStride();
@@ -2299,6 +2384,27 @@ public class ImplImageMiscOps {
 		//CONCURRENT_ABOVE });
 	}
 
+	public static void maskFill( GrayF32 image, GrayU8 mask, int maskTarget, float value ) {
+		BoofMiscOps.checkEq(image.width, mask.width);
+		BoofMiscOps.checkEq(image.height, mask.height);
+
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, image.height, y->{
+		for (int y = 0; y < image.height; y++) {
+			int index = image.getStartIndex() + y*image.getStride();
+			int indexEnd = index + image.width;
+			int indexMask = mask.startIndex + y*image.stride;
+			
+			while (index < indexEnd) {
+				if (mask.data[indexMask] == maskTarget) {
+					image.data[index] = value;
+				}
+				index++;
+				indexMask++;
+			}
+		}
+		//CONCURRENT_ABOVE });
+	}
+
 	public static void fill( InterleavedF32 input, float value ) {
 		for (int y = 0; y < input.height; y++) {
 			int index = input.getStartIndex() + y*input.getStride();
@@ -2839,6 +2945,27 @@ public class ImplImageMiscOps {
 		for (int y = 0; y < input.height; y++) {
 			int index = input.getStartIndex() + y*input.getStride();
 			Arrays.fill(input.data, index, index + input.width, value);
+		}
+		//CONCURRENT_ABOVE });
+	}
+
+	public static void maskFill( GrayF64 image, GrayU8 mask, int maskTarget, double value ) {
+		BoofMiscOps.checkEq(image.width, mask.width);
+		BoofMiscOps.checkEq(image.height, mask.height);
+
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, image.height, y->{
+		for (int y = 0; y < image.height; y++) {
+			int index = image.getStartIndex() + y*image.getStride();
+			int indexEnd = index + image.width;
+			int indexMask = mask.startIndex + y*image.stride;
+			
+			while (index < indexEnd) {
+				if (mask.data[indexMask] == maskTarget) {
+					image.data[index] = value;
+				}
+				index++;
+				indexMask++;
+			}
 		}
 		//CONCURRENT_ABOVE });
 	}

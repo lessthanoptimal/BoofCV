@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,11 +20,13 @@ package boofcv.alg.misc.impl;
 
 import boofcv.alg.misc.CompareToImplImageMiscOps;
 import boofcv.alg.misc.GImageMiscOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.*;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.misc.BoofLambdas;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.border.ImageBorder;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageInterleaved;
@@ -46,7 +48,7 @@ public class TestImplImageMiscOps extends BoofStandardJUnit {
 	int numBands = 3;
 
 	@Test void checkAll() {
-		int numExpected = 29*6 + 4*8;
+		int numExpected = 30*6 + 4*8;
 		Method[] methods = ImplImageMiscOps.class.getMethods();
 
 		// sanity check to make sure the functions are being found
@@ -60,6 +62,8 @@ public class TestImplImageMiscOps extends BoofStandardJUnit {
 					testCopy(m);
 				} else if (m.getName().compareTo("fill") == 0) {
 					testFill(m);
+				} else if (m.getName().compareTo("maskFill") == 0) {
+					testMaskFill(m);
 				} else if (m.getName().compareTo("fillBand") == 0) {
 					testFillBand(m);
 				} else if (m.getName().compareTo("insertBand") == 0) {
@@ -228,6 +232,35 @@ public class TestImplImageMiscOps extends BoofStandardJUnit {
 				testFill_Interleaved_array(m);
 			else
 				testFill_Interleaved(m);
+		}
+	}
+
+	private void testMaskFill( Method m ) throws InvocationTargetException, IllegalAccessException {
+		var mask = new GrayU8(width, height);
+		ImageMiscOps.fillUniform(mask, rand, 0, 1);
+
+		Class[] paramTypes = m.getParameterTypes();
+		ImageGray orig = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
+		GImageMiscOps.fillUniform(orig, rand, 0, 20);
+
+		ImageGray copy = (ImageGray)orig.createSameShape().setTo(orig);
+
+		if (orig.getDataType().isInteger()) {
+			m.invoke(null, orig, mask, 1, 10);
+		} else {
+			m.invoke(null, orig, mask, 1, 10.0f);
+		}
+
+		GImageGray a = FactoryGImageGray.wrap(orig);
+		GImageGray b = FactoryGImageGray.wrap(copy);
+		for (int i = 0; i < height; i++) {
+			for (int j = 0; j < width; j++) {
+				if (mask.unsafe_get(j, i) == 1) {
+					assertEquals(10.0, a.get(j, i).doubleValue(), 1e-4);
+				} else {
+					assertEquals(b.get(j, i).doubleValue(), a.get(j, i).doubleValue(), 1e-4);
+				}
+			}
 		}
 	}
 

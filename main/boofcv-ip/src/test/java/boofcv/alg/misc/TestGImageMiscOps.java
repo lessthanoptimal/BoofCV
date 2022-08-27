@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,9 +31,6 @@ import java.util.Random;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-/**
- * @author Peter Abeles
- */
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class TestGImageMiscOps extends BaseGClassChecksInMisc {
 
@@ -44,7 +41,7 @@ public class TestGImageMiscOps extends BaseGClassChecksInMisc {
 	}
 
 	@Test void compareToPixelMath() {
-		performTests(21);
+		performTests(22);
 	}
 
 	@Override
@@ -64,6 +61,7 @@ public class TestGImageMiscOps extends BaseGClassChecksInMisc {
 					inputA = GeneralizedImageOps.createInterleaved((Class)param[i], width, height, numBands);
 					inputSquare = GeneralizedImageOps.createInterleaved((Class)param[i], width, width, numBands);
 				}
+				break;
 			}
 		}
 		if (inputA == null)
@@ -110,6 +108,13 @@ public class TestGImageMiscOps extends BaseGClassChecksInMisc {
 				ret[0][0] = inputA;
 				ret[0][1] = 3;
 			}
+		} else if (name.equals("maskFill")) {
+			var mask = new GrayU8(width, height);
+			ImageMiscOps.fillUniform(mask, rand, 0, 1);
+			ret[0][0] = inputA;
+			ret[0][1] = mask;
+			ret[0][2] = 1;
+			ret[0][3] = 3;
 		} else if (name.equals("insertBand")) {
 			ImageBase input = GeneralizedImageOps.createSingleBand((Class)param[0], width, height);
 			ImageBase output = GeneralizedImageOps.createInterleaved((Class)param[2], width, height, numBands);

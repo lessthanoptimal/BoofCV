@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -91,6 +91,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 			printCopy();
 			printCopy_Interleaved();
 			printFill();
+			printMaskFill();
 			printFillInterleaved();
 			printFillInterleaved_bands();
 			printFillBand_Interleaved();
@@ -232,6 +233,24 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"//\t\t} else {\n" +
 				"\t\tImplImageMiscOps.fill(image, value);\n" +
 				"//\t\t}\n" +
+				"\t}\n\n");
+	}
+
+	private void printMaskFill() {
+		out.print("\t/**\n" +
+				"\t * Fills pixels in the image that match the mask target value image with the specified fill value\n" +
+				"\t *\n" +
+				"\t * @param image An image. Modified.\n" +
+				"\t * @param mask Mask that indicates which pixels to fill. Not modified.\n" +
+				"\t * @param maskTarget Pixels in the mask which match this value will be filled. \n" +
+				"\t * @param value The value that the image is being filled with.\n" +
+				"\t */\n" +
+				"\tpublic static void maskFill( " + imageName + " image, GrayU8 mask, int maskTarget, " + imageType.getSumType() + " value ) {\n" +
+				"\t\tif (runConcurrent(image)) {\n" +
+				"\t\t\tImplImageMiscOps_MT.maskFill(image, mask, maskTarget, value);\n" +
+				"\t\t} else {\n" +
+				"\t\t\tImplImageMiscOps.maskFill(image, mask, maskTarget, value);\n" +
+				"\t\t}\n" +
 				"\t}\n\n");
 	}
 
@@ -583,7 +602,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 		String genericType = genericType(imageName);
 		out.print("\t/** Transposes the image */\n" +
 				"\tpublic static <T extends " + genericType + "> T transpose( T input, @Nullable T output ) {\n" +
-				"\t\toutput = (T)InputSanityCheck.checkDeclareNoReshape(input, output);\n" +
+				"\t\toutput = (T)InputSanityCheck.declareOutput(input, output);\n" +
 				"\t\t//if (runConcurrent(input)) {\n" +
 				"\t\t//\tImplImageMiscOps_MT.transpose(input, output);\n" +
 				"\t\t//} else {\n" +
@@ -597,7 +616,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 		String genericType = genericType(imageNameI);
 		out.print("\t/** Transposes the image */\n" +
 				"\tpublic static <T extends " + genericType + "> T transpose( T input, @Nullable T output ) {\n" +
-				"\t\toutput = (T)InputSanityCheck.checkDeclareNoReshape(input, output);\n" +
+				"\t\toutput = (T)InputSanityCheck.declareOutput(input, output);\n" +
 				"\t\tif (runConcurrent(input)) {\n" +
 				"\t\t\tImplImageMiscOps_MT.transpose(input, output);\n" +
 				"\t\t} else {\n" +
@@ -622,7 +641,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 		String genericType = genericType(imageName);
 		out.print("\t/** Rotates the image 90 degrees in the clockwise direction. */\n" +
 				"\tpublic static <T extends " + genericType + "> T rotateCW( T input, @Nullable T output ) {\n" +
-				"\t\toutput = (T)InputSanityCheck.checkDeclareNoReshape(input, output);\n" +
+				"\t\toutput = (T)InputSanityCheck.declareOutput(input, output);\n" +
 				"\t\tif (runConcurrent(input)) {\n" +
 				"\t\t\tImplImageMiscOps_MT.rotateCW(input, output);\n" +
 				"\t\t} else {\n" +
@@ -636,7 +655,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 		String genericType = genericType(imageNameI);
 		out.print("\t/** Rotates the image 90 degrees in the clockwise direction. */\n" +
 				"\tpublic static <T extends " + genericType + "> T rotateCW( T input, @Nullable T output ) {\n" +
-				"\t\toutput = (T)InputSanityCheck.checkDeclareNoReshape(input, output);\n" +
+				"\t\toutput = (T)InputSanityCheck.declareOutput(input, output);\n" +
 				"\t\tif (runConcurrent(input)) {\n" +
 				"\t\t\tImplImageMiscOps_MT.rotateCW(input, output);\n" +
 				"\t\t} else {\n" +
@@ -661,7 +680,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 		String genericType = genericType(imageName);
 		out.print("\t/** Rotates the image 90 degrees in the counter-clockwise direction. */\n" +
 				"\tpublic static <T extends " + genericType + "> T rotateCCW( T input, @Nullable T output ) {\n" +
-				"\t\toutput = (T)InputSanityCheck.checkDeclareNoReshape(input, output);\n" +
+				"\t\toutput = (T)InputSanityCheck.declareOutput(input, output);\n" +
 				"\t\tif (runConcurrent(input)) {\n" +
 				"\t\t\tImplImageMiscOps_MT.rotateCCW(input, output);\n" +
 				"\t\t} else {\n" +
@@ -675,7 +694,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 		String genericType = genericType(imageNameI);
 		out.print("\t/** Rotates the image 90 degrees in the counter-clockwise direction. */\n" +
 				"\tpublic static <T extends " + genericType + "> T rotateCCW( T input, @Nullable T output ) {\n" +
-				"\t\toutput = (T)InputSanityCheck.checkDeclareNoReshape(input, output);\n" +
+				"\t\toutput = (T)InputSanityCheck.declareOutput(input, output);\n" +
 				"\t\tif (runConcurrent(input)) {\n" +
 				"\t\t\tImplImageMiscOps_MT.rotateCCW(input, output);\n" +
 				"\t\t} else {\n" +

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,7 +53,7 @@ public abstract class CompareToImplImageMiscOps extends CompareIdenticalFunction
 
 	@Test
 	void compareFunctions() {
-		super.performTests(29*6 + 4*8);
+		super.performTests(30*6 + 4*8);
 	}
 
 	@Override
@@ -108,6 +108,10 @@ public abstract class CompareToImplImageMiscOps extends CompareIdenticalFunction
 				else
 					p[1] = BoofTesting.randomArray(types[1], 2, rand);
 				break;
+			case "maskFill": {
+				p[2] = 1;
+				p[3] = BoofTesting.primitive(2, types[3]);
+			} break;
 			case "fillBand":p[1]=0;p[2]=BoofTesting.primitive(8,types[1]);break;
 			case "insertBand":p[1]=0;break;
 			case "extractBand":p[1]=0;break;

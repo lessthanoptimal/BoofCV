@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,6 +50,7 @@ public class GenerateImplImageMiscOps extends CodeGeneratorBase {
 				"//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;\n" +
 				"import boofcv.misc.BoofLambdas;\n" +
 				"import boofcv.struct.image.*;\n" +
+				"import boofcv.misc.BoofMiscOps;\n" +
 				"import boofcv.alg.misc.ImageMiscOps;\n" +
 				"import boofcv.struct.border.ImageBorder_F32;\n" +
 				"import boofcv.struct.border.ImageBorder_F64;\n" +
@@ -79,6 +80,7 @@ public class GenerateImplImageMiscOps extends CodeGeneratorBase {
 			printCopy();
 			printCopy_Interleaved();
 			printFill();
+			printMaskFill();
 			printFillInterleaved();
 			printFillInterleaved_bands();
 			printFillBand_Interleaved();
@@ -218,6 +220,31 @@ public class GenerateImplImageMiscOps extends CodeGeneratorBase {
 				"\t\tfor (int y = 0; y < input.height; y++) {\n" +
 				"\t\t\tint index = input.getStartIndex() + y*input.getStride();\n" +
 				"\t\t\tArrays.fill(input.data, index, index + input.width, " + typeCast + "value);\n" +
+				"\t\t}\n" +
+				"\t\t//CONCURRENT_ABOVE });\n" +
+				"\t}\n\n");
+	}
+
+	private void printMaskFill() {
+		String typeCast = imageType.getTypeCastFromSum();
+		out.print(
+				"\tpublic static void maskFill( " + imageName + " image, GrayU8 mask, int maskTarget, " + imageType.getSumType() + " value ) {\n" +
+				"\t\tBoofMiscOps.checkEq(image.width, mask.width);\n" +
+				"\t\tBoofMiscOps.checkEq(image.height, mask.height);\n" +
+				"\n" +
+				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0, image.height, y->{\n" +
+				"\t\tfor (int y = 0; y < image.height; y++) {\n" +
+				"\t\t\tint index = image.getStartIndex() + y*image.getStride();\n" +
+				"\t\t\tint indexEnd = index + image.width;\n" +
+				"\t\t\tint indexMask = mask.startIndex + y*image.stride;\n" +
+				"\t\t\t\n" +
+				"\t\t\twhile (index < indexEnd) {\n" +
+				"\t\t\t\tif (mask.data[indexMask] == maskTarget) {\n" +
+				"\t\t\t\t\timage.data[index] = " + typeCast + "value;\n" +
+				"\t\t\t\t}\n" +
+				"\t\t\t\tindex++;\n" +
+				"\t\t\t\tindexMask++;\n" +
+				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t\t//CONCURRENT_ABOVE });\n" +
 				"\t}\n\n");

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,6 +48,8 @@ public class BenchmarkImageMiscOps {
 	@Param({"1000"})
 	public int size;
 
+	GrayU8 mask = new GrayU8(size, size);
+
 	GrayU8 imgA_U8 = new GrayU8(size, size);
 	GrayU8 imgB_U8 = new GrayU8(size, size);
 
@@ -63,6 +65,7 @@ public class BenchmarkImageMiscOps {
 		BoofConcurrency.USE_CONCURRENT = concurrent;
 		rand = new Random(234);
 
+		mask.reshape(size, size);
 		imgA_U8.reshape(size, size);
 		imgB_U8.reshape(size, size);
 		imgA_F32.reshape(size, size);
@@ -72,6 +75,7 @@ public class BenchmarkImageMiscOps {
 		imgA_IF32.reshape(size, size);
 		imgB_IF32.reshape(size, size);
 
+		GImageMiscOps.fillUniform(mask, rand, 0, 1);
 		GImageMiscOps.fillUniform(imgA_U8, rand, 0, 200);
 		GImageMiscOps.fillUniform(imgB_U8, rand, 0, 200);
 		GImageMiscOps.fillUniform(imgA_F32, rand, -100, 100);
@@ -88,6 +92,8 @@ public class BenchmarkImageMiscOps {
 	@Benchmark public void fill_U8() {ImageMiscOps.fill(imgA_U8, 2);}
 	@Benchmark public void fill_F32() {ImageMiscOps.fill(imgA_F32, 2.0f);}
 	@Benchmark public void fill_IU8() {ImageMiscOps.fill(imgA_IU8, 2);}
+	@Benchmark public void maskFill_U8() {ImageMiscOps.maskFill(imgA_U8, mask, 1, 2);}
+	@Benchmark public void maskFill_F32() {ImageMiscOps.maskFill(imgA_F32, mask, 1, 2.0f);}
 	@Benchmark public void fill_IF32() {ImageMiscOps.fill(imgB_IF32, 2.0f);}
 	@Benchmark public void fill_mb_IU8() {ImageMiscOps.fill(imgA_IU8, new int[]{5,8,2});}
 	@Benchmark public void fill_mb_IF32() {ImageMiscOps.fill(imgB_IF32, new float[]{5,8,2});}
