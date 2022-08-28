@@ -25,7 +25,6 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.image.GrayF32;
 import boofcv.testing.BoofStandardJUnit;
-import org.ddogleg.struct.DogArray_F32;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
@@ -33,7 +32,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestMultiBaselineDisparityMedian extends BoofStandardJUnit {
+public class TestMultiBaselineDisparityErrors extends BoofStandardJUnit {
 
 	// Standard disparity parameters. Most test use the same for convenience
 	CameraPinhole intrinsic = new CameraPinhole(40, 41, 0, 42.1, 40.6, 80, 82);
@@ -54,8 +53,10 @@ public class TestMultiBaselineDisparityMedian extends BoofStandardJUnit {
 			var scores = new GrayF32(100, 80);
 			var rect = new DMatrixRMaj(3, 3);
 
-			// see next test below for an explanation of this logic
-			ImageMiscOps.fill(disparity, 5 + i);
+			// This will set only valid disparity values inside the image
+			ImageMiscOps.fill(disparity, parameters.disparityRange);
+			ImageMiscOps.fillRectangle(disparity, 5 + i, 1, 1, 79, 59);
+
 			CommonOps_DDRM.diag(rect, 3, 0.5, 0.5, 1); // undoes distortion model to keep pixels the same
 
 			alg.addDisparity(disparity, scores, parameters, rect);
@@ -70,11 +71,11 @@ public class TestMultiBaselineDisparityMedian extends BoofStandardJUnit {
 		for (int y = 0; y < intrinsic.height; y++) {
 			for (int x = 0; x < intrinsic.width; x++) {
 				if (y == 0 || x == 0) {
-					assertEquals(Float.NaN, found.get(x, y));
+					assertEquals(-1f, found.get(x, y));
 				} else if (y < 60 && x < 80) {
-					assertEquals(345345, found.get(x, y));
+					assertTrue(found.get(x, y) > 0);
 				} else {
-					assertEquals(Float.NaN, found.get(x, y));
+					assertEquals(-1f, found.get(x, y));
 				}
 			}
 		}
@@ -92,22 +93,28 @@ public class TestMultiBaselineDisparityMedian extends BoofStandardJUnit {
 
 		var image = new MultiBaselineDisparityErrors.DisparityImage();
 		image.disparity.reshape(intrinsic.width, intrinsic.height - 12);
+		image.score.reshape(image.disparity);
 		ImageMiscOps.fill(image.disparity, 5);
 		image.parameters.setTo(parameters);
 
-		// only part of the mask has valid values
-		ImageMiscOps.fillRectangle(image.disparity, parameters.disparityRange, 0, 0, intrinsic.width, 5);
+		// This will set only valid disparity values inside the image
+		ImageMiscOps.fill(image.disparity, parameters.disparityRange);
+		ImageMiscOps.fillRectangle(image.disparity, 5, 1, 1, 79, 59);
+
 		// when inverted this will counteract the distortion above
 		CommonOps_DDRM.diag(image.undist_to_rect_px, 3, 0.5, 0.5, 1);
 
 		assertTrue(alg.addToFusedImage(image));
 		for (int y = 0; y < intrinsic.height; y++) {
 			for (int x = 0; x < intrinsic.width; x++) {
-				if (y < 5) {
+				if (y == 0 || x == 0 || y >= image.disparity.height) {
 					assertEquals(0, alg.fused.get(x, y).size, x + " " + y);
-				} else {
+				} else if (y < 60 && x < 80) {
 					assertEquals(1, alg.fused.get(x, y).size);
-					assertEquals(10, alg.fused.get(x, y).get(0));
+					assertEquals(1, alg.fused.getScore(x, y).size);
+					assertTrue(alg.fused.get(x, y).get(0) > 0.0f);
+				} else {
+					assertEquals(0, alg.fused.get(x, y).size);
 				}
 			}
 		}
@@ -125,6 +132,7 @@ public class TestMultiBaselineDisparityMedian extends BoofStandardJUnit {
 
 		var image = new MultiBaselineDisparityErrors.DisparityImage();
 		image.disparity.reshape(intrinsic.width, intrinsic.height);
+		image.score.reshape(image.disparity);
 		image.parameters.setTo(parameters);
 		CommonOps_DDRM.diag(image.undist_to_rect_px, 3, 1, 1, 1);
 		// every point will be at infinity
@@ -156,27 +164,26 @@ public class TestMultiBaselineDisparityMedian extends BoofStandardJUnit {
 			for (int x = 0; x < 10; x++, counter++) {
 				for (int i = 0; i < counter; i++) {
 					alg.fused.get(x, y).add(i + 0.5f);
+					alg.fused.getScore(x, y).add(1.0f);
 				}
 			}
 		}
 
-		GrayF32 found = new GrayF32(10, 8);
+		var found = new GrayF32(10, 8);
 		assertTrue(alg.computeFused(found));
 
 		// manually compute the solution. Use a brute force approach for median value since it requires no thinking
-		DogArray_F32 expected = new DogArray_F32();
+		float sum = 0.0f;
+		float total = 0;
 		for (int y = 0; y < 8; y++) {
 			for (int x = 0; x < 10; x++) {
-				if (expected.size == 0)
-					assertEquals(Float.MAX_VALUE, found.get(x, y), UtilEjml.TEST_F32);
-				else if (expected.size == 1)
-					assertEquals(0.5f, found.get(x, y), UtilEjml.TEST_F32);
-				else if (expected.size == 2)
-					assertEquals(1.0f, found.get(x, y), UtilEjml.TEST_F32);
+				if (total == 0)
+					assertEquals(-1, found.get(x, y), UtilEjml.TEST_F32);
 				else {
-					assertEquals(expected.data[expected.size/2], found.get(x, y), UtilEjml.TEST_F32);
+					assertEquals(sum/total, found.get(x, y), UtilEjml.TEST_F32);
 				}
-				expected.add(expected.size + 0.5f);
+				sum += total + 0.5f;
+				total++;
 			}
 		}
 	}
@@ -222,6 +229,7 @@ public class TestMultiBaselineDisparityMedian extends BoofStandardJUnit {
 
 		var image = new MultiBaselineDisparityErrors.DisparityImage();
 		image.disparity.reshape(width, height);
+		image.score.reshape(image.disparity);
 		ImageMiscOps.fill(image.disparity, imageValue);
 		image.parameters.setTo(param2);
 		CommonOps_DDRM.setIdentity(image.undist_to_rect_px);
@@ -232,7 +240,7 @@ public class TestMultiBaselineDisparityMedian extends BoofStandardJUnit {
 				if (expected > 0) {
 					assertEquals(1, alg.fused.get(x, y).size);
 					float found = alg.fused.get(x, y).get(0);
-					assertEquals(expected, found, UtilEjml.TEST_F32);
+					assertTrue(found > 0);
 				} else {
 					assertEquals(0, alg.fused.get(x, y).size);
 				}

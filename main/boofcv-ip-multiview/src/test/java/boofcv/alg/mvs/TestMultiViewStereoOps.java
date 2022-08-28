@@ -57,52 +57,53 @@ public class TestMultiViewStereoOps extends BoofStandardJUnit {
 	DisparityParameters parameters = new DisparityParameters(2, 100, 1.5, intrinsic);
 
 	@Test void maskOutPointsInCloud() {
-		GrayF32 disparity = new GrayF32(width, height);
+		GrayF32 inverseDepth = new GrayF32(width, height);
 		List<Point3D_F64> cloud = UtilPoint3D_F64.random(new Point3D_F64(0, 0, 2), -1, 1, 100, rand);
 
-		Se3_F64 cloud_to_stereo = SpecialEuclideanOps_F64.eulerXyz(-0.1, 0.05, 0.2, 0.01, 0.02, -0.03, null);
+		Se3_F64 cloud_to_camera = SpecialEuclideanOps_F64.eulerXyz(-0.1, 0.05, 0.2, 0.01, 0.02, -0.03, null);
 		var norm_to_pixel = new LensDistortionPinhole(intrinsic).distort_F64(false, true);
-		float tolerance = 1.0f;
-		GrayU8 mask = disparity.createSameShape(GrayU8.class);
+		float tolerance = 1e-3f;
+		GrayU8 mask = inverseDepth.createSameShape(GrayU8.class);
 
 		// Render the cloud onto the disparity image
-		renderCloudToDisparity(cloud, cloud_to_stereo, new LensDistortionPinhole(intrinsic), parameters, disparity);
+		renderCloudToInverseDepth(cloud, cloud_to_camera, new LensDistortionPinhole(intrinsic), inverseDepth);
 
-		// The cloud and disparity image will match up perfectly. So each of the points in the cloud will cause
-		// the mask to be set to 1
-//		MultiViewStereoOps.maskOutPointsInCloud(
-//				cloud, disparity, parameters, cloud_to_stereo, norm_to_pixel, tolerance, mask);
-		assertEquals(cloud.size(), ImageStatistics.sum(mask));
+		// The cloud and inverse depth image will match up perfectly. So each of the points in the cloud will cause
+		// the mask to be close to one. Some points might render on top of each other.
+		MultiViewStereoOps.maskOutPointsInCloud(
+				cloud, inverseDepth, cloud_to_camera, norm_to_pixel, tolerance, mask);
+		assertTrue(cloud.size()*0.97 <= ImageStatistics.sum(mask));
 
-		// Make a disparity point barely within tolerance. The mask should not change
+		// Make a point barely within tolerance. The mask should not change
+		int maskCountBefore = ImageStatistics.sum(mask);
 		ImageMiscOps.fill(mask, 0);
-		ImageMiscOps.findAndProcess(disparity, ( v ) -> v < parameters.disparityRange, ( int x, int y ) -> {
-			disparity.data[disparity.getIndex(x, y)] += tolerance - 0.0001f;
+		ImageMiscOps.findAndProcess(inverseDepth, ( v ) -> v > 0, ( int x, int y ) -> {
+			inverseDepth.data[inverseDepth.getIndex(x, y)] += tolerance - 0.0001f;
 			return false;
 		});
-//		MultiViewStereoOps.maskOutPointsInCloud(
-//				cloud, disparity, parameters, cloud_to_stereo, norm_to_pixel, tolerance, mask);
-		assertEquals(cloud.size(), ImageStatistics.sum(mask));
+		MultiViewStereoOps.maskOutPointsInCloud(
+				cloud, inverseDepth, cloud_to_camera, norm_to_pixel, tolerance, mask);
+		assertEquals(maskCountBefore, ImageStatistics.sum(mask));
 
 		// Make that same point outside of tolerance. The pixel should not be masked
 		ImageMiscOps.fill(mask, 0);
-		ImageMiscOps.findAndProcess(disparity, ( v ) -> v < parameters.disparityRange, ( int x, int y ) -> {
-			disparity.data[disparity.getIndex(x, y)] += 0.0002f;
+		ImageMiscOps.findAndProcess(inverseDepth, ( v ) -> v > 0, ( int x, int y ) -> {
+			inverseDepth.data[inverseDepth.getIndex(x, y)] += tolerance + 0.0002f;
 			return false;
 		});
-//		MultiViewStereoOps.maskOutPointsInCloud(
-//				cloud, disparity, parameters, cloud_to_stereo, norm_to_pixel, tolerance, mask);
-		assertEquals(cloud.size() - 1, ImageStatistics.sum(mask));
+		MultiViewStereoOps.maskOutPointsInCloud(
+				cloud, inverseDepth, cloud_to_camera, norm_to_pixel, tolerance, mask);
+		assertEquals(maskCountBefore - 1, ImageStatistics.sum(mask));
 	}
 
 	/**
 	 * Renders the cloud into the disparity image and removes points which land on the same pixel
 	 */
-	void renderCloudToDisparity( List<Point3D_F64> cloud, Se3_F64 cloud_to_stereo,
-								 LensDistortionNarrowFOV distortion,
-								 DisparityParameters param, ImageGray<?> disparity ) {
+	void renderCloudToInverseDepth( List<Point3D_F64> cloud, Se3_F64 cloud_to_stereo,
+									LensDistortionNarrowFOV distortion,
+									ImageGray<?> inverseDepth ) {
 		// mark all pixels as invalid initially
-		GImageMiscOps.fill(disparity, param.disparityRange);
+		GImageMiscOps.fill(inverseDepth, -1);
 
 		var w2p = new WorldToCameraToPixel();
 		w2p.configure(distortion, cloud_to_stereo);
@@ -110,20 +111,19 @@ public class TestMultiViewStereoOps extends BoofStandardJUnit {
 		Point2D_F64 pixel = new Point2D_F64();
 		for (int i = cloud.size() - 1; i >= 0; i--) {
 			assertTrue(w2p.transform(cloud.get(i), pixel));
-			assertTrue(BoofMiscOps.isInside(disparity, pixel.x, pixel.y));
-			double d = param.baseline*param.pinhole.fx/w2p.getCameraPt().z - param.disparityMin;
-			assertTrue(d >= 0.0 && d < param.disparityRange);
+			assertTrue(BoofMiscOps.isInside(inverseDepth, pixel.x, pixel.y));
+			double z = w2p.getCameraPt().z;
+			if (z <= 0.0)
+				continue;
+
+			double inv = 1.0/z;
 
 			int xx = (int)(pixel.x + 0.5);
 			int yy = (int)(pixel.y + 0.5);
 
-			double value = GeneralizedImageOps.get(disparity, xx, yy);
+			double value = GeneralizedImageOps.get(inverseDepth, xx, yy);
 
-			if (Math.abs(value - param.disparityRange) > 5e-4) {
-				cloud.remove(i);
-			} else {
-				GeneralizedImageOps.set(disparity, xx, yy, d);
-			}
+			GeneralizedImageOps.set(inverseDepth, xx, yy, inv);
 		}
 	}
 

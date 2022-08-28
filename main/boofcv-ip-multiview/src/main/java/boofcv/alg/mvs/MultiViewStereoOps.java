@@ -51,7 +51,7 @@ public class MultiViewStereoOps {
 	 *
 	 * @param cloud (Input) set of 3D points
 	 * @param inverseDepth (Input) Disparity image.
-	 * @param cloud_to_stereo (Input) Transform from point cloud to rectified stereo coordinate systems.
+	 * @param cloud_to_camera (Input) Transform from point cloud to rectified stereo coordinate systems.
 	 * @param rectNorm_to_dispPixel (Input) Transform from undistorted normalized image coordinates in rectified
 	 * reference frame into disparity pixels.
 	 * @param tolerance (Input) How similar the projected point and observed disparity need to be for it to be
@@ -61,7 +61,7 @@ public class MultiViewStereoOps {
 	 */
 	public static void maskOutPointsInCloud( final List<Point3D_F64> cloud,
 											 final GrayF32 inverseDepth,
-											 final Se3_F64 cloud_to_stereo,
+											 final Se3_F64 cloud_to_camera,
 											 final Point2Transform2_F64 rectNorm_to_dispPixel,
 											 final double tolerance,
 											 final GrayU8 mask ) {
@@ -76,7 +76,7 @@ public class MultiViewStereoOps {
 		for (int cloudIdx = 0; cloudIdx < cloud.size(); cloudIdx++) {
 			// find the point in the camera's reference frame
 			Point3D_F64 cloudPt = cloud.get(cloudIdx);
-			SePointOps_F64.transform(cloud_to_stereo, cloudPt, cameraPt);
+			SePointOps_F64.transform(cloud_to_camera, cloudPt, cameraPt);
 
 			// If it's behind or on the camera, skip
 			if (cameraPt.z <= 0.0)

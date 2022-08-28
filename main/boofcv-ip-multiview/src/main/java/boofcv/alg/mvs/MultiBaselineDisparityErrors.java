@@ -136,7 +136,7 @@ public class MultiBaselineDisparityErrors implements VerbosePrint {
 	}
 
 	/**
-	 * Adds valid disparity values inside of this into the fused image
+	 * Adds valid information from the disparity image into the fused image
 	 *
 	 * @return true if successful and false if it failed
 	 */
