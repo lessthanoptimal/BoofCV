@@ -113,6 +113,8 @@ public class ControlPanelDisparityDense extends StandardAlgConfigPanel {
 		c.approachBM.disparityRange = disparityRange;
 		c.approachSGM.disparityMin = disparityMin;
 		c.approachSGM.disparityRange = disparityRange;
+		c.approachBM.saveScore = true;
+		c.approachBM5.saveScore = true;
 
 		return new ControlPanelDisparityDense(c, new ConfigSpeckleFilter(), imageType);
 	}
