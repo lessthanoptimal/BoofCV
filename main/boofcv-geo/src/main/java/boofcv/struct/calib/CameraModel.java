@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.struct.calib;
 
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageDimension;
 import org.jetbrains.annotations.Nullable;
 
@@ -53,6 +54,14 @@ public abstract class CameraModel implements Serializable {
 			dimension = new ImageDimension();
 		dimension.setTo(width, height);
 		return dimension;
+	}
+
+	public boolean isSameShape( ImageBase<?> image ) {
+		return image.width == width && image.height == height;
+	}
+
+	public boolean isSameShape( int width, int height ) {
+		return this.width == width && this.height == height;
 	}
 
 	/**

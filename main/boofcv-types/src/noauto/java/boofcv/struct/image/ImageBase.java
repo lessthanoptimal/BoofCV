@@ -176,6 +176,13 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 	}
 
 	/**
+	 * Returns true if these two images have the same shape
+	 */
+	public boolean isSameShape( ImageBase<?> image ) {
+		return width == image.width && height == image.height;
+	}
+
+	/**
 	 * Returns the number of pixels in the image. width*height
 	 */
 	public int totalPixels() {
