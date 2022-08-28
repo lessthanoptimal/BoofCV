@@ -27,6 +27,7 @@ import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyDistortImageOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
@@ -46,10 +47,7 @@ import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.DoNothing2Transform2_F64;
 import boofcv.struct.distort.Point2Transform2_F64;
-import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageGray;
-import boofcv.struct.image.ImageType;
+import boofcv.struct.image.*;
 import boofcv.visualize.PointCloudViewer;
 import boofcv.visualize.VisualizeData;
 import georegression.struct.point.Point2D_F64;
@@ -84,8 +82,7 @@ import static boofcv.gui.BoofSwingUtil.saveDisparityDialog;
  */
 @SuppressWarnings({"NullAway.Init"})
 public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGray<D>>
-		extends DemonstrationBase
-		implements ControlPanelDisparityDisplay.Listener {
+		extends DemonstrationBase implements ControlPanelDisparityDisplay.Listener {
 	// original input before rescaling
 	BufferedImage origLeft;
 	BufferedImage origRight;
@@ -103,6 +100,7 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 	// gray scale input images after rectification
 	private T rectLeft;
 	private T rectRight;
+	private GrayU8 mask = new GrayU8(1, 1);
 
 	// Stored disparity results. if a new instance of the detector is created we will
 	// still have a reference to the old image and things won't blow up
@@ -163,8 +161,7 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 		});
 	}
 
-	@Override
-	protected void customAddToFileMenu( JMenu menuFile ) {
+	@Override protected void customAddToFileMenu( JMenu menuFile ) {
 		menuFile.addSeparator();
 
 		JMenuItem itemSaveDisparity = new JMenuItem("Save Disparity");
@@ -191,8 +188,7 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 		}
 	}
 
-	@Override
-	protected void openFileMenuBar() {
+	@Override protected void openFileMenuBar() {
 		// TODO let user select split some how do you don't need to modify code to handle that image format
 		String[] files = BoofSwingUtil.openImageSetChooser(window, OpenImageSetDialog.Mode.AT_MOST, 2);
 		if (files == null)
@@ -200,18 +196,14 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 		BoofSwingUtil.invokeNowOrLater(() -> openImageSet(false, files));
 	}
 
-	@Override
-	public void reprocessInput() {
+	@Override public void reprocessInput() {
 		// this really should use the demonstration thread pool
 		processDisparityInThread();
 	}
 
-	@Override
-	public void processImage( int sourceID, long frameID, BufferedImage buffered, ImageBase input ) {}
+	@Override public void processImage( int sourceID, long frameID, BufferedImage buffered, ImageBase input ) {}
 
-	@Override
-	public void processFiles( String[] files ) {
-
+	@Override public void processFiles( String[] files ) {
 		StereoParameters calib = null;
 		BufferedImage left = null;
 		BufferedImage right = null;
@@ -235,9 +227,14 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 		}
 
 		if (left == null) {
-			left = media.openImageNotNull(files[0]);
-			if (files.length > 1)
-				right = media.openImageNotNull(files[1]);
+			try {
+				left = media.openImageNotNull(files[0]);
+				if (files.length > 1)
+					right = media.openImageNotNull(files[1]);
+			} catch (RuntimeException e) {
+				BoofSwingUtil.warningDialog(this, e);
+				return;
+			}
 		}
 
 		if (right == null) {
@@ -260,6 +257,15 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 			calib.right_to_left.T.x = 1;
 			calib.left = PerspectiveOps.createIntrinsic(origLeft.getWidth(), origLeft.getHeight(), 90, null);
 			calib.right = PerspectiveOps.createIntrinsic(origRight.getWidth(), origRight.getHeight(), 90, null);
+		}
+
+		if (!calib.left.isSameShape(left.getWidth(), left.getHeight())) {
+			JOptionPane.showMessageDialog(this, "Calibration shape doesn't match left image shape");
+			return;
+		}
+		if (!calib.right.isSameShape(right.getWidth(), right.getHeight())) {
+			JOptionPane.showMessageDialog(this, "Calibration shape doesn't match right image shape");
+			return;
 		}
 
 		origCalib = calib;
@@ -318,6 +324,11 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 			disparityImage = activeAlg.getDisparity();
 			disparityMin = activeAlg.getDisparityMin();
 			disparityRange = activeAlg.getDisparityRange();
+			BoofMiscOps.checkTrue(mask.isSameShape(disparityImage));
+
+			// Remove random matches outside the undistorted image border
+			GImageMiscOps.maskFill(disparityImage, mask, 0, disparityRange);
+
 			smoother.process(rectLeft, disparityImage, disparityRange);
 
 			long time1 = System.nanoTime();
@@ -430,7 +441,8 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 		rectR = rectifyAlg.getRectifiedRotation();
 
 		// adjust view to maximize viewing area while not including black regions
-		RectifyImageOps.allInsideLeft(calib.left, rect1, rect2, rectK, null);
+		var rectifiedShape = new ImageDimension();
+		RectifyImageOps.fullViewLeft(calib.left, rect1, rect2, rectK, rectifiedShape);
 
 		// compute transforms to apply rectify the images
 		leftRectToPixel = transformRectToPixel(calib.left, rect1);
@@ -447,15 +459,19 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 		ImageDistort<T, T> distortRect2 = RectifyDistortImageOps.rectifyImage(
 				calib.right, rect2_F32, BorderType.EXTENDED, imageType);
 
+		// Adjust the size to better fit the rectified image
+		mask.reshape(rectifiedShape.width, rectifiedShape.height);
+		rectLeft.reshape(rectifiedShape.width, rectifiedShape.height);
+		rectRight.reshape(rectifiedShape.width, rectifiedShape.height);
+
 		// rectify and undo distortion
-		distortRect1.apply(inputLeft, rectLeft);
+		distortRect1.apply(inputLeft, rectLeft, mask);
 		distortRect2.apply(inputRight, rectRight);
 
 		rectifiedImages = true;
 	}
 
-	@Override
-	public synchronized void algorithmChanged() {
+	@Override public synchronized void algorithmChanged() {
 		createAlgConcurrent();
 		// Only disparity of the user wants to on every setting change
 		if (control.recompute) {
@@ -463,20 +479,17 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 		}
 	}
 
-	@Override
-	public synchronized void recompute() {
+	@Override public synchronized void recompute() {
 		if (control.recompute) {
 			processDisparityInThread();
 		}
 	}
 
-	@Override
-	public synchronized void disparityGuiChange() {
+	@Override public synchronized void disparityGuiChange() {
 		disparityRender();
 	}
 
-	@Override
-	public synchronized void disparityRender() {
+	@Override public synchronized void disparityRender() {
 		if (!processCalled)
 			return;
 
@@ -488,8 +501,7 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 		changeImageView();
 	}
 
-	@Override
-	public synchronized void changeInputScale() {
+	@Override public synchronized void changeInputScale() {
 		calib = new StereoParameters(origCalib);
 
 		double scale = control.inputScale/100.0;
@@ -521,7 +533,7 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 
 		rectifyInputImages();
 
-		BoofSwingUtil.invokeNowOrLater(() -> control.setImageSize(rectLeft.width, rectLeft.height));
+		BoofSwingUtil.invokeNowOrLater(() -> control.setImageSize(inputLeft.width, inputLeft.height));
 
 		processDisparity();
 	}
@@ -533,20 +545,17 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 		BoofConcurrency.USE_CONCURRENT = true;
 	}
 
-	@Override
-	public void changeView3D() {
+	@Override public void changeView3D() {
 		double baseline = calib.getRightToLeft().getT().norm();
 		control.controlCloud.configure(pcv, baseline*10, baseline/30.0);
 		pcv.getComponent().repaint();
 	}
 
-	@Override
-	public void changeZoom() {
+	@Override public void changeZoom() {
 		imagePanel.setScale(control.zoom);
 	}
 
-	@Override
-	public void changeBackgroundColor() {
+	@Override public void changeBackgroundColor() {
 		if (control.selectedView == 0) {
 			disparityRender();
 		} else if (control.selectedView == 3) {
@@ -556,7 +565,7 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 	}
 
 	/**
-	 * Displays images and sets the user select a region of interest
+	 * Displays images and lets the user select a region of interest
 	 */
 	public class DisparityImageView extends ImageZoomPanel implements MouseListener, MouseMotionListener {
 		int x0, y0, x1, y1;
@@ -574,8 +583,7 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 			});
 		}
 
-		@Override
-		protected void paintInPanel( AffineTransform tran, Graphics2D g2 ) {
+		@Override 	protected void paintInPanel( AffineTransform tran, Graphics2D g2 ) {
 			if (state == 0)
 				return;
 			BoofSwingUtil.antialiasing(g2);
@@ -599,67 +607,65 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 			x1 = y1 = Integer.MAX_VALUE;
 		}
 
-		@Override
-		public void mouseClicked( MouseEvent e ) {
+		@Override 	public void mouseClicked( MouseEvent e ) {
 			// clear region if one has been selected
-			if (state != 0) {
-				boolean change = state == 2;
-				state = 0;
-				if (change) {
-					computedCloud = false;
-					changeImageView();
-				}
-				repaint();
+			if (state == 0) {
+				return;
 			}
-		}
-
-		@Override
-		public void mousePressed( MouseEvent e ) {
-			panel.requestFocus();
-			if (SwingUtilities.isLeftMouseButton(e)) {
-				Point2D_F64 p = pixelToPoint(e.getX(), e.getY());
-
-				// if shift it down the user is defining the ROI
-				if ((e.getModifiersEx() & InputEvent.SHIFT_DOWN_MASK) != 0) {
-					state = 1;
-					x0 = x1 = (int)Math.round(p.x);
-					y0 = y1 = (int)Math.round(p.y);
-				} else {
-					centerView(p.x, p.y);
-				}
-			}
-		}
-
-		@Override
-		public void mouseReleased( MouseEvent e ) {
-			// Finish defining the ROI, save it, and update the cloud
-			if (state == 1) {
-				Point2D_F64 p = pixelToPoint(e.getX(), e.getY());
-				x1 = (int)Math.round(p.x);
-				y1 = (int)Math.round(p.y);
-
-				// make sure the top left is the lower extent
-				int x0 = Math.min(this.x0, this.x1);
-				int x1 = Math.max(this.x0, this.x1);
-				int y0 = Math.min(this.y0, this.y1);
-				int y1 = Math.max(this.y0, this.y1);
-				this.x0 = x0;
-				this.x1 = x1;
-				this.y0 = y0;
-				this.y1 = y1;
-
-				// tell it to update the view with the new region
-				state = 2;
+			boolean change = state == 2;
+			state = 0;
+			if (change) {
 				computedCloud = false;
 				changeImageView();
 			}
+			repaint();
 		}
 
-		@Override
-		public void mouseEntered( MouseEvent e ) {}
+		@Override 	public void mousePressed( MouseEvent e ) {
+			panel.requestFocus();
+			if (!SwingUtilities.isLeftMouseButton(e)) {
+				return;
+			}
+			Point2D_F64 p = pixelToPoint(e.getX(), e.getY());
 
-		@Override
-		public void mouseExited( MouseEvent e ) {
+			// if shift it down the user is defining the ROI
+			if ((e.getModifiersEx() & InputEvent.SHIFT_DOWN_MASK) != 0) {
+				state = 1;
+				x0 = x1 = (int)Math.round(p.x);
+				y0 = y1 = (int)Math.round(p.y);
+			} else {
+				centerView(p.x, p.y);
+			}
+		}
+
+		@Override 	public void mouseReleased( MouseEvent e ) {
+			// Finish defining the ROI, save it, and update the cloud
+			if (state != 1) {
+				return;
+			}
+			Point2D_F64 p = pixelToPoint(e.getX(), e.getY());
+			x1 = (int)Math.round(p.x);
+			y1 = (int)Math.round(p.y);
+
+			// make sure the top left is the lower extent
+			int x0 = Math.min(this.x0, this.x1);
+			int x1 = Math.max(this.x0, this.x1);
+			int y0 = Math.min(this.y0, this.y1);
+			int y1 = Math.max(this.y0, this.y1);
+			this.x0 = x0;
+			this.x1 = x1;
+			this.y0 = y0;
+			this.y1 = y1;
+
+			// tell it to update the view with the new region
+			state = 2;
+			computedCloud = false;
+			changeImageView();
+		}
+
+		@Override 	public void mouseEntered( MouseEvent e ) {}
+
+		@Override 	public void mouseExited( MouseEvent e ) {
 			// user exited, clear the ROI that's in progress
 			if (state == 1) {
 				resetRoi();
@@ -669,8 +675,7 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 			}
 		}
 
-		@Override
-		public void mouseDragged( MouseEvent e ) {
+		@Override 	public void mouseDragged( MouseEvent e ) {
 			if (state == 1) {
 				Point2D_F64 p = pixelToPoint(e.getX(), e.getY());
 				x1 = (int)Math.round(p.x);
@@ -681,8 +686,7 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 			}
 		}
 
-		@Override
-		public void mouseMoved( MouseEvent e ) {}
+		@Override 	public void mouseMoved( MouseEvent e ) {}
 	}
 
 	/**
@@ -695,8 +699,7 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 			super(new ProgressMonitor(owner, "Computing Disparity", "", 0, 100));
 		}
 
-		@Override
-		public void doRun() {
+		@Override 	public void doRun() {
 			SwingUtilities.invokeLater(() -> {
 				monitor.setProgress(state);
 				state = (++state%100);
