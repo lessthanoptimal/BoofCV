@@ -43,8 +43,6 @@ public class TestConvertRaster extends CompareIdenticalFunctions {
 	int imgWidth = 10;
 	int imgHeight = 20;
 
-	int numMethods = 44;
-
 	TestConvertRaster() {
 		super(ConvertRaster.class, ImplConvertRaster.class);
 	}
@@ -101,20 +99,16 @@ public class TestConvertRaster extends CompareIdenticalFunctions {
 
 		input = createBufferedTestImages(paramTypes[0]);
 
-		boolean canSubImage = !System.getProperty("java.version").startsWith("1.9");
-
 		for (int i = 0; i < input.length; i++) {
 			// regular image
 			Class imageType = paramTypes.length == 2 ? paramTypes[1] : paramTypes[2];
 			ImageBase output = createImage(m, imageType, input[i]);
 			BoofTesting.checkSubImage(this, "performBufferedTo", true, m, input[i], output);
 
-			if (canSubImage) {
-				// subimage input
-				BufferedImage subimage = input[i].getSubimage(1, 2, imgWidth - 1, imgHeight - 2);
-				output = createImage(m, imageType, subimage);
-				BoofTesting.checkSubImage(this, "performBufferedTo", true, m, subimage, output);
-			}
+			// subimage input
+			BufferedImage subimage = input[i].getSubimage(1, 2, imgWidth - 1, imgHeight - 2);
+			output = createImage(m, imageType, subimage);
+			BoofTesting.checkSubImage(this, "performBufferedTo", true, m, subimage, output);
 		}
 	}
 
