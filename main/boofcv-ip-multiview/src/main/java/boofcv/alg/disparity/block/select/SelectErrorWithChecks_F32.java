@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,10 @@ package boofcv.alg.disparity.block.select;
 import boofcv.alg.disparity.block.DisparitySelect;
 import boofcv.alg.disparity.block.SelectDisparityWithChecksWta;
 import boofcv.misc.Compare_F32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>
@@ -53,22 +55,19 @@ public abstract class SelectErrorWithChecks_F32<DI extends ImageGray<DI>>
 		this(original.maxError, original.rightToLeftTolerance, original.textureThreshold, original.disparityType);
 	}
 
-	@Override
-	public void setTexture( double threshold ) {
+	@Override public void setTexture( double threshold ) {
 		textureThreshold = (float)threshold;
 	}
 
-	@Override
-	public void configure( DI imageDisparity, int disparityMin, int disparityMax, int radiusX ) {
-		super.configure(imageDisparity, disparityMin, disparityMax, radiusX);
+	@Override public void configure( DI imageDisparity, @Nullable GrayF32 imageScore,
+									 int disparityMin, int disparityMax, int radiusX ) {
+		super.configure(imageDisparity, imageScore, disparityMin, disparityMax, radiusX);
 
 		columnScore = new float[disparityRange];
 		imageWidth = imageDisparity.width;
 	}
 
-	@Override
-	public void process( int row, float[] scores ) {
-
+	@Override public void process( int row, float[] scores ) {
 		int indexDisparity = imageDisparity.startIndex + row*imageDisparity.stride;
 
 		// Mark all pixels as invalid which can't be estimate due to disparityMin
@@ -133,7 +132,7 @@ public abstract class SelectErrorWithChecks_F32<DI extends ImageGray<DI>>
 					bestDisparity = invalidDisparity;
 			}
 
-			setDisparity(indexDisparity++, bestDisparity);
+			setDisparity(indexDisparity++, bestDisparity, scoreBest);
 		}
 	}
 
@@ -161,8 +160,7 @@ public abstract class SelectErrorWithChecks_F32<DI extends ImageGray<DI>>
 		return indexBest;
 	}
 
-	@Override
-	public int compare( float scoreA, float scoreB ) {
+	@Override public int compare( float scoreA, float scoreB ) {
 		return Float.compare(-scoreA, -scoreB);
 	}
 
@@ -178,18 +176,16 @@ public abstract class SelectErrorWithChecks_F32<DI extends ImageGray<DI>>
 			super(original);
 		}
 
-		@Override
-		public DisparitySelect<float[], GrayU8> concurrentCopy() {
+		@Override public DisparitySelect<float[], GrayU8> concurrentCopy() {
 			return new DispU8(this);
 		}
 
-		@Override
-		protected void setDisparity( int index, int value ) {
+		@Override protected void setDisparity( int index, int value, float score ) {
 			imageDisparity.data[index] = (byte)value;
+			funcSaveScore.saveScore(index, score);
 		}
 
-		@Override
-		protected void setDisparityInvalid( int index ) {
+		@Override protected void setDisparityInvalid( int index ) {
 			imageDisparity.data[index] = (byte)invalidDisparity;
 		}
 	}

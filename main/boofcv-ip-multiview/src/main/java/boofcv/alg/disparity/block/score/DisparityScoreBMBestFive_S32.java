@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,16 +25,14 @@ import boofcv.alg.disparity.block.DisparitySelect;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.misc.Compare_S32;
 import boofcv.struct.border.ImageBorder;
-import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageGray;
-import boofcv.struct.image.ImageType;
+import boofcv.struct.image.*;
+import org.jetbrains.annotations.Nullable;
 import pabeles.concurrency.GrowArray;
 import pabeles.concurrency.IntRangeObjectConsumer;
 
 /**
  * <p>
- * Implementation of {@link boofcv.alg.feature.disparity.DisparityBlockMatchBestFive} for processing
+ * Implementation of {@link boofcv.alg.disparity.DisparityBlockMatchBestFive} for processing
  * images of type {@link GrayU8}.
  * </p>
  *
@@ -55,6 +53,7 @@ public class DisparityScoreBMBestFive_S32<T extends ImageBase<T>, DI extends Ima
 	// reference to input images;
 	T left, right;
 	DI disparity;
+	@Nullable GrayF32 score;
 
 	GrowArray<WorkSpace> workspace = new GrowArray<>(WorkSpace::new);
 	ComputeBlock computeBlock = new ComputeBlock();
@@ -84,13 +83,14 @@ public class DisparityScoreBMBestFive_S32<T extends ImageBase<T>, DI extends Ima
 	}
 
 	@Override
-	public void _process( T left, T right, DI disparity ) {
+	public void _process( T left, T right, DI disparity, @Nullable GrayF32 score ) {
 		InputSanityCheck.checkSameShape(left, right);
 		this.left = left;
 		this.right = right;
 		this.growBorderL.setImage(left);
 		this.growBorderR.setImage(right);
 		this.disparity = disparity;
+		this.score = score;
 		scoreRows.setInput(left, right);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -133,7 +133,7 @@ public class DisparityScoreBMBestFive_S32<T extends ImageBase<T>, DI extends Ima
 			if (computeDisparity == null) {
 				computeDisparity = disparitySelect0.concurrentCopy();
 			}
-			computeDisparity.configure(disparity, disparityMin, disparityMax, radiusX*2);
+			computeDisparity.configure(disparity, score, disparityMin, disparityMax, radiusX*2);
 		}
 	}
 

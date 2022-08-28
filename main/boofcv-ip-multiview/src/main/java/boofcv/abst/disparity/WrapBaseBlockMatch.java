@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,9 @@ package boofcv.abst.disparity;
 import boofcv.alg.disparity.DisparityBlockMatchRowFormat;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Base class for wrapped block matching algorithms.
@@ -35,13 +37,13 @@ public abstract class WrapBaseBlockMatch <In extends ImageGray<In>, T extends Im
 	DisparityBlockMatchRowFormat<T, DI> alg;
 
 	DI disparity;
+	@Nullable GrayF32 score;
 
 	protected WrapBaseBlockMatch(DisparityBlockMatchRowFormat<T,DI> alg) {
 		this.alg = alg;
 	}
 
-	@Override
-	public void process(In imageLeft, In imageRight) {
+	@Override public void process(In imageLeft, In imageRight) {
 		if( disparity == null || disparity.width != imageLeft.width || disparity.height != imageLeft.height )  {
 			// make sure the image borders are marked as invalid
 			disparity = GeneralizedImageOps.createSingleBand(alg.getDisparityType(),imageLeft.width,imageLeft.height);
@@ -51,43 +53,55 @@ public abstract class WrapBaseBlockMatch <In extends ImageGray<In>, T extends Im
 		}
 
 		disparity.reshape(imageLeft);
+		if (score != null)
+			score.reshape(disparity);
+
 		_process(imageLeft,imageRight);
 	}
 
 	protected abstract void _process(In imageLeft, In imageRight );
 
-	@Override
-	public DI getDisparity() {
+	public void setScoreEnabled( boolean enabled ) {
+		// see if the current state matches the request
+		if (enabled && score != null)
+			return;
+
+		if (enabled) {
+			score = new GrayF32(1,1);
+		} else {
+			score = null;
+		}
+	}
+
+	@Override public DI getDisparity() {
 		return disparity;
 	}
 
-	@Override
-	public int getBorderX() {
+	@Override public @Nullable GrayF32 getDisparityScore() {
+		return score;
+	}
+
+	@Override public int getBorderX() {
 		return alg.getBorderX();
 	}
 
-	@Override
-	public int getBorderY() {
+	@Override public int getBorderY() {
 		return alg.getBorderY();
 	}
 
-	@Override
-	public int getDisparityMin() {
+	@Override public int getDisparityMin() {
 		return alg.getDisparityMin();
 	}
 
-	@Override
-	public int getDisparityRange() {
+	@Override public int getDisparityRange() {
 		return alg.getDisparityRange();
 	}
 
-	@Override
-	public int getInvalidValue() {
+	@Override public int getInvalidValue() {
 		return getDisparityRange();
 	}
 
-	@Override
-	public Class<DI> getDisparityType() {
+	@Override public Class<DI> getDisparityType() {
 		return alg.getDisparityType();
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,10 @@ package boofcv.alg.disparity.block.select;
 import boofcv.alg.disparity.block.DisparitySelect;
 import boofcv.alg.disparity.block.SelectDisparityWithChecksWta;
 import boofcv.misc.Compare_S32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>
@@ -57,8 +59,8 @@ public abstract class SelectErrorWithChecks_S32<DI extends ImageGray<DI>>
 	}
 
 	@Override
-	public void configure( DI imageDisparity, int disparityMin, int disparityMax, int radiusX ) {
-		super.configure(imageDisparity, disparityMin, disparityMax, radiusX);
+	public void configure( DI imageDisparity, @Nullable GrayF32 imageScore, int disparityMin, int disparityMax, int radiusX ) {
+		super.configure(imageDisparity, imageScore, disparityMin, disparityMax, radiusX);
 
 		columnScore = new int[disparityRange];
 		imageWidth = imageDisparity.width;
@@ -66,7 +68,6 @@ public abstract class SelectErrorWithChecks_S32<DI extends ImageGray<DI>>
 
 	@Override
 	public void process( int row, int[] scores ) {
-
 		int indexDisparity = imageDisparity.startIndex + row*imageDisparity.stride;
 
 		// Mark all pixels as invalid which can't be estimate due to disparityMin
@@ -131,7 +132,7 @@ public abstract class SelectErrorWithChecks_S32<DI extends ImageGray<DI>>
 					bestDisparity = invalidDisparity;
 			}
 
-			setDisparity(indexDisparity++, bestDisparity);
+			setDisparity(indexDisparity++, bestDisparity, scoreBest);
 		}
 	}
 
@@ -182,8 +183,9 @@ public abstract class SelectErrorWithChecks_S32<DI extends ImageGray<DI>>
 		}
 
 		@Override
-		protected void setDisparity( int index, int value ) {
+		protected void setDisparity( int index, int value, float score ) {
 			imageDisparity.data[index] = (byte)value;
+			funcSaveScore.saveScore(index, score);
 		}
 
 		@Override

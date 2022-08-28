@@ -30,6 +30,7 @@ import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.se.Se3_F64;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
+import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import static boofcv.misc.BoofMiscOps.uniform;
@@ -120,6 +121,7 @@ class TestSparseSceneToDenseCloud extends BoofStandardJUnit {
 		}
 
 		// @formatter:off
+		@Override public @Nullable GrayF32 getDisparityScore() {return null;}
 		@Override public int getDisparityMin() {return 5;}
 		@Override public int getDisparityRange() {return 100;}
 		@Override public int getInvalidValue() {return 10;}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,12 +28,13 @@ import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import org.jetbrains.annotations.Nullable;
 import pabeles.concurrency.GrowArray;
 import pabeles.concurrency.IntRangeObjectConsumer;
 
 /**
  * <p>
- * Implementation of {@link boofcv.alg.feature.disparity.DisparityBlockMatchBestFive} for processing
+ * Implementation of {@link boofcv.alg.disparity.DisparityBlockMatchBestFive} for processing
  * images of type {@link GrayF32}.
  * </p>
  *
@@ -50,6 +51,7 @@ public class DisparityScoreBMBestFive_F32<DI extends ImageGray<DI>>
 	// reference to input images;
 	GrayF32 left, right;
 	DI disparity;
+	@Nullable GrayF32 score;
 
 	GrowArray<WorkSpace> workspace = new GrowArray<>(WorkSpace::new);
 	ComputeBlock computeBlock = new ComputeBlock();
@@ -73,7 +75,7 @@ public class DisparityScoreBMBestFive_F32<DI extends ImageGray<DI>>
 	}
 
 	@Override
-	public void _process( GrayF32 left, GrayF32 right, DI disparity ) {
+	public void _process( GrayF32 left, GrayF32 right, DI disparity, @Nullable GrayF32 score ) {
 		InputSanityCheck.checkSameShape(left, right);
 		disparity.reshape(left.width, left.height);
 		this.left = left;
@@ -81,6 +83,7 @@ public class DisparityScoreBMBestFive_F32<DI extends ImageGray<DI>>
 		this.growBorderL.setImage(left);
 		this.growBorderR.setImage(right);
 		this.disparity = disparity;
+		this.score = score;
 		scoreRows.setInput(left, right);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -123,7 +126,7 @@ public class DisparityScoreBMBestFive_F32<DI extends ImageGray<DI>>
 			if (computeDisparity == null) {
 				computeDisparity = disparitySelect0.concurrentCopy();
 			}
-			computeDisparity.configure(disparity, disparityMin, disparityMax, radiusX*2);
+			computeDisparity.configure(disparity, score, disparityMin, disparityMax, radiusX*2);
 		}
 	}
 

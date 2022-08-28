@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -58,7 +58,7 @@ public class WrapDisparityBlockMatchCensus
 		censusTran.process(imageRight,cright);
 
 		// Now compute the disparity
-		alg.process(cleft,cright,disparity);
+		alg.process(cleft,cright,disparity, score);
 	}
 
 	public C getCLeft() {

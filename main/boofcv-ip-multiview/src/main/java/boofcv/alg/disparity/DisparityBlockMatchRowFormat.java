@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,10 +23,12 @@ import boofcv.alg.border.GrowBorder;
 import boofcv.alg.disparity.block.DisparitySelect;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.struct.border.ImageBorder;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import lombok.Getter;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>
@@ -111,21 +113,22 @@ public abstract class DisparityBlockMatchRowFormat
 	 * @param left Left rectified stereo image. Input
 	 * @param right Right rectified stereo image. Input
 	 * @param disparity Disparity between the two images. Output
+	 * @param score Optional storage for best fit score
 	 */
-	public void process( Input left, Input right, Disparity disparity ) {
+	public void process( Input left, Input right, Disparity disparity, @Nullable GrayF32 score ) {
 		// initialize data structures
 		InputSanityCheck.checkSameShape(left, right);
 
 		// Stores error for all x-coordinates and disparity values along a single row
 		widthDisparityBlock = left.width*disparityRange;
 
-		_process(left, right, disparity);
+		_process(left, right, disparity, score);
 	}
 
 	/**
 	 * Inner function that computes the disparity.
 	 */
-	public abstract void _process( Input left, Input right, Disparity disparity );
+	public abstract void _process( Input left, Input right, Disparity disparity, @Nullable GrayF32 score );
 
 	public abstract ImageType<Input> getInputType();
 

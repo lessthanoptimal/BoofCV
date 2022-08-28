@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,16 +23,14 @@ import boofcv.alg.disparity.block.BlockRowScore;
 import boofcv.alg.disparity.block.DisparitySelect;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.border.ImageBorder;
-import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageGray;
-import boofcv.struct.image.ImageType;
+import boofcv.struct.image.*;
+import org.jetbrains.annotations.Nullable;
 import pabeles.concurrency.GrowArray;
 import pabeles.concurrency.IntRangeObjectConsumer;
 
 /**
  * <p>
- * Implementation of {@link boofcv.alg.feature.disparity.DisparityScoreSadRect} for processing
+ * Implementation of {@link boofcv.alg.disparity.DisparityBlockMatch} for processing
  * input images of type {@link GrayU8}.
  * </p>
  *
@@ -49,6 +47,7 @@ public class DisparityScoreBM_S32<T extends ImageBase<T>, DI extends ImageGray<D
 	// reference to input images;
 	T left, right;
 	DI disparity;
+	@Nullable GrayF32 score;
 
 	GrowArray<WorkSpace> workspace = new GrowArray<>(WorkSpace::new);
 	ComputeBlock computeBlock = new ComputeBlock();
@@ -70,10 +69,11 @@ public class DisparityScoreBM_S32<T extends ImageBase<T>, DI extends ImageGray<D
 	}
 
 	@Override
-	public void _process( T left, T right, DI disparity ) {
+	public void _process( T left, T right, DI disparity, @Nullable GrayF32 score ) {
 		this.left = left;
 		this.right = right;
 		this.disparity = disparity;
+		this.score = score;
 
 		growBorderL.setImage(left);
 		growBorderR.setImage(right);
@@ -119,7 +119,7 @@ public class DisparityScoreBM_S32<T extends ImageBase<T>, DI extends ImageGray<D
 			if (computeDisparity == null) {
 				computeDisparity = disparitySelect0.concurrentCopy();
 			}
-			computeDisparity.configure(disparity, disparityMin, disparityMax, radiusX);
+			computeDisparity.configure(disparity, score, disparityMin, disparityMax, radiusX);
 		}
 	}
 

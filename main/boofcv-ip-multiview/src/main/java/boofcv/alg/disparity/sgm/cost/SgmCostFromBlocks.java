@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,10 +24,8 @@ import boofcv.alg.disparity.block.BlockRowScore;
 import boofcv.alg.disparity.block.DisparitySelect;
 import boofcv.alg.disparity.sgm.SgmDisparityCost;
 import boofcv.misc.Compare_S32;
-import boofcv.struct.image.GrayU16;
-import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.Planar;
+import boofcv.struct.image.*;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Computes the error for SGM using {@link BlockRowScore block matching}.
@@ -59,11 +57,11 @@ public class SgmCostFromBlocks<T extends ImageBase<T>>
 		this.costYXD = costYXD;
 		costYXD.reshape(/* width= */disparityRange, /* height= */left.width, /* numberOfBands= */left.height);
 		maxRegionError = blockScore.getMaxRegionError();
-		blockScore.process(left, right, dummy);
+		blockScore.process(left, right, dummy, null);
 	}
 
 	@Override
-	public void configure( GrayU8 imageDisparity, int minDisparity, int maxDisparity, int radiusX ) {}
+	public void configure( GrayU8 imageDisparity, @Nullable GrayF32 score, int minDisparity, int maxDisparity, int radiusX ) {}
 
 	@Override
 	public void process( int row, int[] scoresArray ) {

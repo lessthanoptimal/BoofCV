@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,8 @@
 package boofcv.alg.disparity.sgm;
 
 import boofcv.struct.image.*;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Base class for SGM stereo implementations. It combines the cost computation, cost aggregation, and disparity
@@ -33,20 +35,23 @@ import boofcv.struct.image.*;
  */
 public abstract class SgmStereoDisparity<T extends ImageBase<T>, C extends ImageBase<C>> {
 	// Defines the disparity search range
-	protected int disparityMin = 0;     // minimum disparity considered
-	protected int disparityRange = 0;   // number of disparity values considered
+	@Getter @Setter protected int disparityMin = 0;     // minimum disparity considered
+	@Getter @Setter protected int disparityRange = 0;   // number of disparity values considered
 
 	// These perform different steps in the SGM algorithm
-	protected SgmDisparityCost<C> sgmCost;
-	protected SgmCostAggregation aggregation = new SgmCostAggregation();
-	protected SgmDisparitySelector selector;
-	protected SgmHelper helper = new SgmHelper();
+	@Getter protected SgmDisparityCost<C> sgmCost;
+	@Getter protected SgmCostAggregation aggregation = new SgmCostAggregation();
+	@Getter protected SgmDisparitySelector selector;
+	@Getter protected SgmHelper helper = new SgmHelper();
 
 	// Cost tensor. See SgmDisparityCost
 	protected Planar<GrayU16> costYXD = new Planar<>(GrayU16.class, 1, 1, 1);
 
 	// Storage for found disparity
-	protected GrayU8 disparity = new GrayU8(1, 1);
+	@Getter protected GrayU8 disparity = new GrayU8(1, 1);
+
+	// score for selected disparity
+	@Getter protected GrayF32 score = new GrayF32(1, 1);
 
 	protected SgmStereoDisparity( SgmDisparityCost<C> sgmCost, SgmDisparitySelector selector ) {
 		this.sgmCost = sgmCost;
@@ -91,43 +96,30 @@ public abstract class SgmStereoDisparity<T extends ImageBase<T>, C extends Image
 		}
 	}
 
-	public GrayU8 getDisparity() {
-		return disparity;
-	}
+	/**
+	 * Extracts the score from the cost volumn
+	 */
+	public void saveScore() {
+		Planar<GrayU16> aggregatedYXD = aggregation.getAggregated();
+		score.reshape(disparity);
 
-	public SgmDisparityCost<C> getSgmCost() {
-		return sgmCost;
-	}
-
-	public SgmCostAggregation getAggregation() {
-		return aggregation;
-	}
-
-	public Planar<GrayU16> getCostYXD() {
-		return costYXD;
+		for (int y = 0; y < aggregatedYXD.getNumBands(); y++) {
+			GrayU16 costXD = aggregatedYXD.getBand(y);
+			for (int x = 0; x < disparityMin; x++) {
+				score.unsafe_set(x, y, Float.NaN); // make as invalid
+			}
+			for (int x = disparityMin; x < costXD.height; x++) {
+				int d = disparity.unsafe_get(x, y);
+				if (d >= disparityRange) {
+					score.unsafe_set(x, y, Float.NaN);
+				} else {
+					score.unsafe_set(x, y, costXD.unsafe_get(d, x - disparityMin));
+				}
+			}
+		}
 	}
 
 	public int getInvalidDisparity() {
 		return selector.getInvalidDisparity();
-	}
-
-	public int getDisparityMin() {
-		return disparityMin;
-	}
-
-	public void setDisparityMin( int disparityMin ) {
-		this.disparityMin = disparityMin;
-	}
-
-	public int getDisparityRange() {
-		return disparityRange;
-	}
-
-	public void setDisparityRange( int disparityRange ) {
-		this.disparityRange = disparityRange;
-	}
-
-	public SgmDisparitySelector getSelector() {
-		return selector;
 	}
 }

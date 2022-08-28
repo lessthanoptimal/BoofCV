@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -68,7 +68,7 @@ public class MakeNccDenseLikeSparse
 		alg.getGrowBorderR().setBorder(ImageBorderWrapped.wrap(expandedRight, imageRight));
 
 		// Now compute the disparity
-		alg.process(imageLeft, imageRight, disparity);
+		alg.process(imageLeft, imageRight, disparity, null);
 	}
 
 	@Override

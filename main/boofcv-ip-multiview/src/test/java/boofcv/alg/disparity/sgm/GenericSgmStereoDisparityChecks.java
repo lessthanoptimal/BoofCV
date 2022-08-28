@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -61,6 +61,8 @@ public abstract class GenericSgmStereoDisparityChecks<T extends ImageGray<T>, C 
 				assertEquals(0, disparity.get(x, y));
 			}
 		}
+
+		assertTrue(disparity.isSameShape(alg.getScore()));
 	}
 
 	/**

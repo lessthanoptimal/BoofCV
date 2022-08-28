@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,7 +35,7 @@ public class WrapDisparityBlockMatchRowFormat<T extends ImageGray<T>, DI extends
 
 	@Override
 	public void _process( T imageLeft, T imageRight ) {
-		alg.process(imageLeft, imageRight, disparity);
+		alg.process(imageLeft, imageRight, disparity, score);
 	}
 
 	@Override

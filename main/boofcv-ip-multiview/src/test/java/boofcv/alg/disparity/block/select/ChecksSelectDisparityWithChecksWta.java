@@ -83,7 +83,7 @@ public abstract class ChecksSelectDisparityWithChecksWta<ArrayData, D extends Im
 		int r = 2;
 
 		SelectDisparityWithChecksWta<ArrayData, D> alg = createSelector(1, -1);
-		alg.configure(disparity, minDisparity, this.maxDisparity, r);
+		alg.configure(disparity, null, minDisparity, this.maxDisparity, r);
 
 		int[] scores = new int[w*rangeDisparity];
 
@@ -111,7 +111,7 @@ public abstract class ChecksSelectDisparityWithChecksWta<ArrayData, D extends Im
 
 		// sanity check, I now set the tolerance to zero
 		alg = createSelector(0, -1);
-		alg.configure(disparity, minDisparity, this.maxDisparity, 2);
+		alg.configure(disparity, null, minDisparity, this.maxDisparity, 2);
 		alg.process(y, copyToCorrectType(scores));
 		assertEquals(reject, getDisparity(4 + minDisparity, y), 1e-8);
 	}
@@ -126,7 +126,7 @@ public abstract class ChecksSelectDisparityWithChecksWta<ArrayData, D extends Im
 		int y = 3;
 
 		SelectDisparityWithChecksWta<ArrayData, D> alg = createSelector(-1, 0.25);
-		alg.configure(disparity, minDisparity, maxDisparity, 2);
+		alg.configure(disparity, null, minDisparity, maxDisparity, 2);
 
 		int[] scores = new int[w*rangeDisparity];
 
@@ -163,7 +163,7 @@ public abstract class ChecksSelectDisparityWithChecksWta<ArrayData, D extends Im
 		int r = 2;
 
 		SelectDisparityWithChecksWta<ArrayData, D> alg = createSelector(-1, 0.25);
-		alg.configure(disparity, minDisparity, maxDisparity, r);
+		alg.configure(disparity, null, minDisparity, maxDisparity, r);
 
 		int[] scores = new int[w*rangeDisparity];
 

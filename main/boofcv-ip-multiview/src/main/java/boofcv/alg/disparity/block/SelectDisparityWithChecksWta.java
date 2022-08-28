@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,9 @@
 
 package boofcv.alg.disparity.block;
 
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>
@@ -53,6 +55,9 @@ public abstract class SelectDisparityWithChecksWta<Array, DI extends ImageGray<D
 
 	// output containing disparity
 	protected DI imageDisparity;
+	// Goodness of fit score for disparity
+	protected @Nullable GrayF32 imageScore;
+
 	// minimum and maximum disparity that will be checked
 	protected int disparityMin;
 	protected int disparityMax;
@@ -73,6 +78,8 @@ public abstract class SelectDisparityWithChecksWta<Array, DI extends ImageGray<D
 	// type of disparity image
 	protected Class<DI> disparityType;
 
+	protected SaveScore funcSaveScore = ( index, value ) -> {};
+
 	/**
 	 * Configures tolerances
 	 *
@@ -92,8 +99,9 @@ public abstract class SelectDisparityWithChecksWta<Array, DI extends ImageGray<D
 	public abstract void setTexture( double threshold );
 
 	@Override
-	public void configure( DI imageDisparity, int disparityMin, int disparityMax, int radiusX ) {
+	public void configure( DI imageDisparity, @Nullable GrayF32 imageScore, int disparityMin, int disparityMax, int radiusX ) {
 		this.imageDisparity = imageDisparity;
+		this.imageScore = imageScore;
 		this.disparityMin = disparityMin;
 		this.disparityMax = disparityMax;
 		this.radiusX = radiusX;
@@ -104,6 +112,12 @@ public abstract class SelectDisparityWithChecksWta<Array, DI extends ImageGray<D
 
 		if (invalidDisparity > (int)imageDisparity.getDataType().getMaxValue() - 1)
 			throw new IllegalArgumentException("Max range exceeds maximum value in disparity image. v=" + invalidDisparity);
+
+		if (imageScore != null) {
+			funcSaveScore = ( index, value ) -> imageScore.data[index] = value;
+		} else {
+			funcSaveScore = ( index, value ) -> {};
+		}
 	}
 
 	/**
@@ -111,8 +125,9 @@ public abstract class SelectDisparityWithChecksWta<Array, DI extends ImageGray<D
 	 *
 	 * @param index Image pixel that is being set
 	 * @param disparityValue disparity value
+	 * @param bestScore Score of the best disparity value
 	 */
-	protected abstract void setDisparity( int index, int disparityValue );
+	protected abstract void setDisparity( int index, int disparityValue, float bestScore );
 
 	protected abstract void setDisparityInvalid( int index );
 
@@ -131,8 +146,11 @@ public abstract class SelectDisparityWithChecksWta<Array, DI extends ImageGray<D
 		localRange = value;
 	}
 
-	@Override
-	public Class<DI> getDisparityType() {
+	@Override public Class<DI> getDisparityType() {
 		return disparityType;
+	}
+
+	@FunctionalInterface public interface SaveScore {
+		void saveScore( int index, float score );
 	}
 }

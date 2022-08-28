@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,9 @@
 package boofcv.alg.disparity.block;
 
 import boofcv.alg.disparity.DisparityBlockMatch;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>
@@ -38,32 +40,33 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public interface DisparitySelect<Array , T extends ImageGray> {
+public interface DisparitySelect<Array, T extends ImageGray> {
 	/**
 	 * Specifies the output and algorithmic configuration.
 	 *
 	 * @param imageDisparity Output disparity image.
+	 * @param imageScore If not null, then the score for best fit disparity will be stored here.
 	 * @param disparityMin Minimum disparity that can be computed
 	 * @param disparityMax Maximum disparity that is calculated
 	 * @param radiusX Radius of the rectangular region being matched along x-axis.
 	 */
-	void configure(T imageDisparity, int disparityMin , int disparityMax, int radiusX);
+	void configure( T imageDisparity, @Nullable GrayF32 imageScore, int disparityMin, int disparityMax, int radiusX );
 
 	/**
 	 * Processes the array of scores. The score format is described in
 	 * {@link DisparityBlockMatch}. The results are written directly into the
-	 * disparity image passed to it in {@link #configure(ImageGray, int, int, int)}.
+	 * disparity image passed to it in {@link #configure}.
 	 *
 	 * @param row Image row the scores are from.
 	 * @param scoresArray Array containing scores. (int[] or float[])
 	 */
-	void process(int row, Array scoresArray);
+	void process( int row, Array scoresArray );
 
 	/**
 	 * Creates a copy with separate working space. Used for concurrency. Data structures which are threadsafe
 	 * can be shared
 	 */
-	DisparitySelect<Array,T> concurrentCopy();
+	DisparitySelect<Array, T> concurrentCopy();
 
 	/**
 	 * Type of image the disparity is

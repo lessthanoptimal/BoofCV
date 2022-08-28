@@ -53,7 +53,7 @@ public class SelectErrorSubpixel {
 		}
 
 		@Override
-		protected void setDisparity( int index, int disparityValue ) {
+		protected void setDisparity( int index, int disparityValue, float score ) {
 
 			if (disparityValue <= 0 || disparityValue >= localRange - 1) {
 				imageDisparity.data[index] = disparityValue;
@@ -66,6 +66,7 @@ public class SelectErrorSubpixel {
 
 				imageDisparity.data[index] = disparityValue + offset;
 			}
+			funcSaveScore.saveScore(index, score);
 		}
 
 		@Override
@@ -91,8 +92,7 @@ public class SelectErrorSubpixel {
 			super(original);
 		}
 
-		@Override
-		protected void setDisparity( int index, int disparityValue ) {
+		@Override protected void setDisparity( int index, int disparityValue, float score ) {
 
 			if (disparityValue <= 0 || disparityValue >= localRange - 1) {
 				imageDisparity.data[index] = disparityValue;
@@ -105,15 +105,14 @@ public class SelectErrorSubpixel {
 
 				imageDisparity.data[index] = disparityValue + offset;
 			}
+			funcSaveScore.saveScore(index, score);
 		}
 
-		@Override
-		protected void setDisparityInvalid( int index ) {
+		@Override protected void setDisparityInvalid( int index ) {
 			imageDisparity.data[index] = invalidDisparity;
 		}
 
-		@Override
-		public DisparitySelect<float[], GrayF32> concurrentCopy() {
+		@Override public DisparitySelect<float[], GrayF32> concurrentCopy() {
 			return new F32_F32(this);
 		}
 	}

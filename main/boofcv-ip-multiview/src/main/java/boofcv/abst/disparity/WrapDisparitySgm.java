@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,6 +38,7 @@ public class WrapDisparitySgm<DI extends ImageGray<DI>> implements StereoDispari
 	@Override
 	public void process(GrayU8 imageLeft, GrayU8 imageRight) {
 		sgm.process(imageLeft,imageRight);
+		sgm.saveScore();
 		if( subpixel != null ) {
 			sgm.subpixel(sgm.getDisparity(), subpixel);
 		}
@@ -50,6 +51,10 @@ public class WrapDisparitySgm<DI extends ImageGray<DI>> implements StereoDispari
 		} else {
 			return (DI)sgm.getDisparity();
 		}
+	}
+
+	@Override public @Nullable GrayF32 getDisparityScore() {
+		return sgm.getScore();
 	}
 
 	@Override

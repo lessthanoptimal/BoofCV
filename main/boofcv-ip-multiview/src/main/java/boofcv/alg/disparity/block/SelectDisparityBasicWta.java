@@ -18,7 +18,9 @@
 
 package boofcv.alg.disparity.block;
 
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>
@@ -35,6 +37,8 @@ public abstract class SelectDisparityBasicWta<Array, Disparity extends ImageGray
 		implements DisparitySelect<Array, Disparity> {
 	// Output disparity image
 	protected Disparity imageDisparity;
+	// Goodness of fit score for disparity
+	protected @Nullable GrayF32 imageScore;
 	// The minimum and maximum disparity it will search
 	protected int disparityMin;
 	protected int disparityMax;
@@ -46,8 +50,10 @@ public abstract class SelectDisparityBasicWta<Array, Disparity extends ImageGray
 	// How wide the image is
 	protected int imageWidth;
 
-	@Override
-	public void configure( Disparity imageDisparity, int disparityMin, int disparityMax, int radiusX ) {
+	protected SelectDisparityWithChecksWta.SaveScore funcSaveScore = ( index, value ) -> {};
+
+	@Override public void configure( Disparity imageDisparity, @Nullable GrayF32 imageScore,
+									 int disparityMin, int disparityMax, int radiusX ) {
 		this.imageDisparity = imageDisparity;
 		this.disparityMin = disparityMin;
 		this.disparityMax = disparityMax;
@@ -56,6 +62,12 @@ public abstract class SelectDisparityBasicWta<Array, Disparity extends ImageGray
 		disparityRange = disparityMax - disparityMin + 1;
 		regionWidth = radiusX*2 + 1;
 		imageWidth = imageDisparity.width;
+
+		if (imageScore != null) {
+			funcSaveScore = ( index, value ) -> imageScore.data[index] = value;
+		} else {
+			funcSaveScore = ( index, value ) -> {};
+		}
 	}
 
 	/**
