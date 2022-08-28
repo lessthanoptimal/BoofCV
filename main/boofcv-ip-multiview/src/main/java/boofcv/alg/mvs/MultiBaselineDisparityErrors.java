@@ -27,7 +27,6 @@ import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.transform.homography.HomographyPointOps_F64;
 import lombok.Getter;
-import org.ddogleg.sorting.QuickSelect;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_F32;
 import org.ddogleg.struct.VerbosePrint;
@@ -43,18 +42,13 @@ import static boofcv.misc.BoofMiscOps.checkTrue;
 
 /**
  * Given a set of disparity images, all of which were computed from the same left image, fuse into a single
- * disparity image which should have better fill in and lower noise. The output disparity image will be in
- * the original image's pixel coordinate and will not be a rectified image. The disparity for each pixel
- * is selected using a median filter.
- *
- * The fused disparity image will always have a disparityMin of 0 and disparityRange of 100.
- * The baseline is computed dynamically to ensure that max value
+ * disparity image. Stereo disparity pixel error is used to select the best disparity value when there's
+ * ambiguity.
  *
  * @author Peter Abeles
  */
 @SuppressWarnings({"NullAway.Init"})
-public class MultiBaselineDisparityMedian implements VerbosePrint {
-
+public class MultiBaselineDisparityErrors implements VerbosePrint {
 	/** Selected baseline to represent the fused stereo system */
 	@Getter public double fusedBaseline = 0.0;
 
@@ -90,15 +84,17 @@ public class MultiBaselineDisparityMedian implements VerbosePrint {
 	 * Adds a disparity image to the list
 	 *
 	 * @param disparity The disparity image. Does not need to be same shape as original.
+	 * @param score Fit score for disparity measurements
 	 * @param parameters Disparity parameters for this stereo pair.
 	 * @param undist_to_rect_px Rectification matrix (3x3) from undistorted to rectified pixel coordinates
 	 */
-	public void addDisparity( GrayF32 disparity, DisparityParameters parameters,
+	public void addDisparity( GrayF32 disparity, GrayF32 score, DisparityParameters parameters,
 							  DMatrixRMaj undist_to_rect_px ) {
 		parameters.checkValidity();
 
 		DisparityImage d = images.grow();
 		d.disparity.setTo(disparity);
+		d.score.setTo(score);
 		d.undist_to_rect_px.setTo(undist_to_rect_px);
 		d.parameters.setTo(parameters);
 	}
@@ -115,7 +111,8 @@ public class MultiBaselineDisparityMedian implements VerbosePrint {
 		checkTrue(!images.isEmpty(), "No images have been added");
 		inverseDepth.reshape(fused.width, fused.height);
 
-		if (verbose != null) verbose.printf("Fusing: shape=%dx%d images.size=%d", fused.width, fused.height, images.size);
+		if (verbose != null)
+			verbose.printf("Fusing: shape=%dx%d images.size=%d", fused.width, fused.height, images.size);
 
 		// Select the largest baseline to be representative
 		fusedBaseline = 0;
@@ -145,6 +142,7 @@ public class MultiBaselineDisparityMedian implements VerbosePrint {
 	 */
 	boolean addToFusedImage( DisparityImage image ) {
 		final GrayF32 disparityImage = image.disparity;
+		final GrayF32 scores = image.score;
 		final DisparityParameters imageParam = image.parameters;
 
 		// Only do the int to float and double to float conversion once
@@ -207,6 +205,7 @@ public class MultiBaselineDisparityMedian implements VerbosePrint {
 
 				// Save inverse depth
 				fused.get(origPixX, origPixY).add((float)(d/worldZ));
+				fused.getScore(origPixX, origPixY).add(scores.get(rectPixX, rectPixY));
 			}
 		}
 		return true;
@@ -227,7 +226,7 @@ public class MultiBaselineDisparityMedian implements VerbosePrint {
 	 */
 	boolean computeFused( GrayF32 inverseDepthImage ) {
 		// If there's one pixel with a valid value this will pass
-		boolean singleValidPixel = false;
+		boolean atLeastOneValidPixel = false;
 
 		for (int y = 0; y < fused.height; y++) {
 			int indexOut = inverseDepthImage.startIndex + y*inverseDepthImage.stride;
@@ -238,22 +237,27 @@ public class MultiBaselineDisparityMedian implements VerbosePrint {
 					// No depth information here. Mark it as invalid
 					inverseDepth = -1f;
 				} else if (values.size == 1) {
-					singleValidPixel = true;
+					atLeastOneValidPixel = true;
 					inverseDepth = values.data[0];
-				} else if (values.size == 2) {
-					singleValidPixel = true;
-					inverseDepth = 0.5f*(values.data[0] + values.data[1]);
 				} else {
-					// median value
-					inverseDepth = QuickSelect.select(values.data, values.size/2, values.size);
-					singleValidPixel = true;
+					DogArray_F32 scores = fused.getScore(x, y);
+					inverseDepth = 0.0f;
+					float sumWeights = 0.0f;
+					for (int i = 0; i < values.size; i++) {
+						// assumed that score is an error. e.g. >= 0 and 0 = perfect
+						float w = 1.0f/(1e-4f + scores.get(i));
+						inverseDepth += w*values.get(i);
+						sumWeights += w;
+					}
+					inverseDepth /= sumWeights;
+					atLeastOneValidPixel = true;
 				}
 
 				inverseDepthImage.data[indexOut++] = inverseDepth;
 			}
 		}
 
-		return singleValidPixel;
+		return atLeastOneValidPixel;
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
@@ -264,8 +268,13 @@ public class MultiBaselineDisparityMedian implements VerbosePrint {
 	static class DisparityImage {
 		/** The found disparity image */
 		public final GrayF32 disparity = new GrayF32(1, 1);
+
+		/** Fit score for each pixel in disparity image */
+		public final GrayF32 score = new GrayF32(1, 1);
+
 		/** Rectification matrix/homography. From undistorted pixel to rectified pixel */
 		public final DMatrixRMaj undist_to_rect_px = new DMatrixRMaj(3, 3);
+
 		/** Geometric meaning of disparity fo this view */
 		public final DisparityParameters parameters = new DisparityParameters();
 
@@ -282,15 +291,20 @@ public class MultiBaselineDisparityMedian implements VerbosePrint {
 	static class FusedImage {
 		// inverse depth estimates at each pixel coordinate
 		public final DogArray<DogArray_F32> pixels = new DogArray<>(DogArray_F32::new, DogArray_F32::reset);
+		public final DogArray<DogArray_F32> scores = new DogArray<>(DogArray_F32::new, DogArray_F32::reset);
 		public int width, height;
 
 		public DogArray_F32 get( int x, int y ) {
 			return pixels.get(y*width + x);
 		}
 
+		public DogArray_F32 getScore( int x, int y ) {
+			return scores.get(y*width + x);
+		}
+
 		public void resize( int width, int height ) {
-			pixels.reset();
-			pixels.resize(width*height);
+			pixels.reset().resize(width*height);
+			scores.reset().resize(width*height);
 			this.width = width;
 			this.height = height;
 		}

@@ -159,7 +159,7 @@ public class MultiViewStereoOps {
 	 * Inverse depth image to point cloud.
 	 */
 	public static void inverseToCloud( GrayF32 inverseDepth,
-									   @Nullable PixelTransform<Point2D_F64> pixelToNorm,
+									   PixelTransform<Point2D_F64> pixelToNorm,
 									   BoofLambdas.PixXyzConsumer_F64 consumer ) {
 		ImplMultiViewStereoOps.inverseToCloud(inverseDepth, pixelToNorm, consumer);
 	}
