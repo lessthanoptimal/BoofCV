@@ -50,6 +50,8 @@ Version : 0.41
   - Mono and Stereo GUIs have option to show border and inner coverage
   - Added Division camera model
   - Added multi camera calibration
+- ImageMiscOps
+  - Added maskFill()
 - Regression
   - TODO Template matching
 

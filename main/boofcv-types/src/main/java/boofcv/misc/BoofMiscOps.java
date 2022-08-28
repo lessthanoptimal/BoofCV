@@ -921,7 +921,7 @@ public class BoofMiscOps {
 	 * Function which handles boilerplate for support recursive verbose print
 	 */
 	public static void verboseChildren( @Nullable PrintStream out, @Nullable Set<String> configuration,
-										VerbosePrint... children ) {
+										@Nullable VerbosePrint... children ) {
 		// See how many tabs have already been added
 		int numIndents = 0;
 		PrintStream originalOut = out;
@@ -932,13 +932,15 @@ public class BoofMiscOps {
 		}
 
 		// If not cursive then do nothing
-		if (configuration == null || !configuration.contains(BoofVerbose.RECURSIVE)) {
+		if (children == null || configuration == null || !configuration.contains(BoofVerbose.RECURSIVE)) {
 			return;
 		}
 
 		// If the output is null then its turning off print
 		if (out == null) {
 			for (int i = 0; i < children.length; i++) {
+				if (children[i] == null)
+					continue;
 				children[i].setVerbose(null, configuration);
 			}
 			return;
@@ -947,6 +949,8 @@ public class BoofMiscOps {
 		// Add tabs to children when in verbose mode
 		numIndents += 1;
 		for (int i = 0; i < children.length; i++) {
+			if (children[i] == null)
+				continue;
 			PrintStream tabbed = addPrefix(children[i], numIndents, originalOut);
 			children[i].setVerbose(tabbed, configuration);
 		}
@@ -1116,5 +1120,25 @@ public class BoofMiscOps {
 	 */
 	public static int thresholdByImageSizeI( ConfigLength config, int width, int height ) {
 		return config.computeI((width + height)/2.0);
+	}
+
+	/**
+	 * Blocks until the provided function returns true.
+	 *
+	 * @param timeoutMS Timeout in milliseconds. If &le; 0 then it will never time out
+	 * @param func Function
+	 * @return true if the function return true or false if it timed out.
+	 */
+	public static boolean blockUntilTrue( long timeoutMS, BoofLambdas.CheckTrue func ) {
+		if (func.process())
+			return true;
+		long startTime = System.currentTimeMillis();
+		while (timeoutMS <= 0 || startTime + timeoutMS >= System.currentTimeMillis()) {
+			if (func.process()) {
+				return true;
+			}
+			Thread.yield();
+		}
+		return false;
 	}
 }

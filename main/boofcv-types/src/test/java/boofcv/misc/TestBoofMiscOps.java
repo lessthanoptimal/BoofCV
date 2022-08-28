@@ -273,4 +273,16 @@ class TestBoofMiscOps extends BoofStandardJUnit {
 		assertEquals((int)(250*0.6), BoofMiscOps.thresholdByImageSizeI(config, 200, 300));
 		assertEquals((int)(250*0.6), BoofMiscOps.thresholdByImageSizeI(config, 300, 200));
 	}
+
+	@Test void blockUntilTrue() {
+		long startTime0 = System.currentTimeMillis();
+		assertTrue(BoofMiscOps.blockUntilTrue(1000L, ()-> startTime0 + 250L < System.currentTimeMillis()));
+
+		long startTime1 = System.currentTimeMillis();
+		assertFalse(BoofMiscOps.blockUntilTrue(10L, ()-> startTime1 + 500L < System.currentTimeMillis()));
+
+		long startTime2 = System.currentTimeMillis();
+		assertTrue(BoofMiscOps.blockUntilTrue(0, ()-> startTime0 + 250L < System.currentTimeMillis()));
+
+	}
 }

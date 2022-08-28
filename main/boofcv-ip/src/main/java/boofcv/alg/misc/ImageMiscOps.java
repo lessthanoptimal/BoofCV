@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -138,6 +138,22 @@ public class ImageMiscOps {
 //		} else {
 		ImplImageMiscOps.fill(image, value);
 //		}
+	}
+
+	/**
+	 * Fills pixels in the image that match the mask target value image with the specified fill value
+	 *
+	 * @param image An image. Modified.
+	 * @param mask Mask that indicates which pixels to fill. Not modified.
+	 * @param maskTarget Pixels in the mask which match this value will be filled. 
+	 * @param value The value that the image is being filled with.
+	 */
+	public static void maskFill( GrayI8 image, GrayU8 mask, int maskTarget, int value ) {
+		if (runConcurrent(image)) {
+			ImplImageMiscOps_MT.maskFill(image, mask, maskTarget, value);
+		} else {
+			ImplImageMiscOps.maskFill(image, mask, maskTarget, value);
+		}
 	}
 
 	/**
@@ -560,6 +576,22 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Fills pixels in the image that match the mask target value image with the specified fill value
+	 *
+	 * @param image An image. Modified.
+	 * @param mask Mask that indicates which pixels to fill. Not modified.
+	 * @param maskTarget Pixels in the mask which match this value will be filled. 
+	 * @param value The value that the image is being filled with.
+	 */
+	public static void maskFill( GrayI16 image, GrayU8 mask, int maskTarget, int value ) {
+		if (runConcurrent(image)) {
+			ImplImageMiscOps_MT.maskFill(image, mask, maskTarget, value);
+		} else {
+			ImplImageMiscOps.maskFill(image, mask, maskTarget, value);
+		}
+	}
+
+	/**
 	 * Fills the whole image with the specified value
 	 *
 	 * @param image An image. Modified.
@@ -976,6 +1008,22 @@ public class ImageMiscOps {
 //		} else {
 		ImplImageMiscOps.fill(image, value);
 //		}
+	}
+
+	/**
+	 * Fills pixels in the image that match the mask target value image with the specified fill value
+	 *
+	 * @param image An image. Modified.
+	 * @param mask Mask that indicates which pixels to fill. Not modified.
+	 * @param maskTarget Pixels in the mask which match this value will be filled. 
+	 * @param value The value that the image is being filled with.
+	 */
+	public static void maskFill( GrayS32 image, GrayU8 mask, int maskTarget, int value ) {
+		if (runConcurrent(image)) {
+			ImplImageMiscOps_MT.maskFill(image, mask, maskTarget, value);
+		} else {
+			ImplImageMiscOps.maskFill(image, mask, maskTarget, value);
+		}
 	}
 
 	/**
@@ -1397,6 +1445,22 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Fills pixels in the image that match the mask target value image with the specified fill value
+	 *
+	 * @param image An image. Modified.
+	 * @param mask Mask that indicates which pixels to fill. Not modified.
+	 * @param maskTarget Pixels in the mask which match this value will be filled. 
+	 * @param value The value that the image is being filled with.
+	 */
+	public static void maskFill( GrayS64 image, GrayU8 mask, int maskTarget, long value ) {
+		if (runConcurrent(image)) {
+			ImplImageMiscOps_MT.maskFill(image, mask, maskTarget, value);
+		} else {
+			ImplImageMiscOps.maskFill(image, mask, maskTarget, value);
+		}
+	}
+
+	/**
 	 * Fills the whole image with the specified value
 	 *
 	 * @param image An image. Modified.
@@ -1815,6 +1879,22 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Fills pixels in the image that match the mask target value image with the specified fill value
+	 *
+	 * @param image An image. Modified.
+	 * @param mask Mask that indicates which pixels to fill. Not modified.
+	 * @param maskTarget Pixels in the mask which match this value will be filled. 
+	 * @param value The value that the image is being filled with.
+	 */
+	public static void maskFill( GrayF32 image, GrayU8 mask, int maskTarget, float value ) {
+		if (runConcurrent(image)) {
+			ImplImageMiscOps_MT.maskFill(image, mask, maskTarget, value);
+		} else {
+			ImplImageMiscOps.maskFill(image, mask, maskTarget, value);
+		}
+	}
+
+	/**
 	 * Fills the whole image with the specified value
 	 *
 	 * @param image An image. Modified.
@@ -2230,6 +2310,22 @@ public class ImageMiscOps {
 //		} else {
 		ImplImageMiscOps.fill(image, value);
 //		}
+	}
+
+	/**
+	 * Fills pixels in the image that match the mask target value image with the specified fill value
+	 *
+	 * @param image An image. Modified.
+	 * @param mask Mask that indicates which pixels to fill. Not modified.
+	 * @param maskTarget Pixels in the mask which match this value will be filled. 
+	 * @param value The value that the image is being filled with.
+	 */
+	public static void maskFill( GrayF64 image, GrayU8 mask, int maskTarget, double value ) {
+		if (runConcurrent(image)) {
+			ImplImageMiscOps_MT.maskFill(image, mask, maskTarget, value);
+		} else {
+			ImplImageMiscOps.maskFill(image, mask, maskTarget, value);
+		}
 	}
 
 	/**

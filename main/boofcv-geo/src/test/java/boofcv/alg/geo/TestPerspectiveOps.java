@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -800,5 +800,35 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 		K_found.fill(2.5);
 		PerspectiveOps.invertCalibrationMatrix(K, K_found);
 		assertTrue(MatrixFeatures_DDRM.isIdentical(K_inv, K_found, 1e-6));
+	}
+
+	/**
+	 * Compare it to a cartesian point. Should be the same since the only difference is scale.
+	 */
+	@Test void rotateH() {
+		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 1, -0.5, 0.7, null);
+
+		var p3 = new Point3D_F64(1,2,3);
+		var p4 = new Point4D_F64(1,2,3, 0.5);
+
+		GeometryMath_F64.mult(R, p3, p3);
+		PerspectiveOps.rotateH(R,p4, p4);
+
+		assertEquals(p3.x, p4.x, UtilEjml.TEST_F64);
+		assertEquals(p3.y, p4.y, UtilEjml.TEST_F64);
+		assertEquals(p3.z, p4.z, UtilEjml.TEST_F64);
+	}
+
+	@Test void rotateTranH() {
+		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 1, -0.5, 0.7, null);
+
+		var p4 = new Point4D_F64(1,2,3, 0.5);
+
+		PerspectiveOps.rotateH(R,p4, p4);
+		PerspectiveOps.rotateInvH(R,p4, p4);
+
+		assertEquals(1, p4.x, UtilEjml.TEST_F64);
+		assertEquals(2, p4.y, UtilEjml.TEST_F64);
+		assertEquals(3, p4.z, UtilEjml.TEST_F64);
 	}
 }

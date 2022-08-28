@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -176,6 +176,36 @@ public class GImageMiscOps {
 				fill(m.getBand(i), value);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: " + input.getClass().getSimpleName());
+		}
+	}
+
+	/**
+	 * 	 * Fills pixels in the image that match the mask target value image with the specified fill value
+	 *
+	 * @param input An image. Modified.
+	 * @param mask Mask that indicates which pixels to fill. Not modified.
+	 * @param maskTarget Pixels in the mask which match this value will be filled.
+	 * @param value The value that the image is being filled with.
+	 */
+	public static void maskFill( ImageBase input, GrayU8 mask, int maskTarget, double value ) {
+		if (input instanceof ImageGray) {
+			if (GrayI8.class.isAssignableFrom(input.getClass())) {
+				ImageMiscOps.maskFill((GrayI8)input, mask, maskTarget, (int)value);
+			} else if (GrayI16.class.isAssignableFrom(input.getClass())) {
+				ImageMiscOps.maskFill((GrayI16)input, mask, maskTarget, (int)value);
+			} else if (GrayS32.class == input.getClass()) {
+				ImageMiscOps.maskFill((GrayS32)input, mask, maskTarget, (int)value);
+			} else if (GrayS64.class == input.getClass()) {
+				ImageMiscOps.maskFill((GrayS64)input, mask, maskTarget, (long)value);
+			} else if (GrayF32.class == input.getClass()) {
+				ImageMiscOps.maskFill((GrayF32)input, mask, maskTarget, (float)value);
+			} else if (GrayF64.class == input.getClass()) {
+				ImageMiscOps.maskFill((GrayF64)input, mask, maskTarget, value);
+			} else {
+				throw new IllegalArgumentException("Unknown image Type: " + input.getClass().getSimpleName());
+			}
+		} else {
+			throw new IllegalArgumentException("Currently only gray scale images are supported. Fill out a feature request!");
 		}
 	}
 

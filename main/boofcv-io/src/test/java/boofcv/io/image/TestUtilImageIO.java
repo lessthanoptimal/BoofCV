@@ -39,7 +39,7 @@ public class TestUtilImageIO extends BoofStandardJUnit {
 	int height = 30;
 
 	@Test void loadImage_saveImage() throws IOException {
-		BufferedImage orig = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
+		var orig = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
 		for (int i = 0; i < height; i++) {
 			for (int j = 0; j < width; j++) {
 				int a = rand.nextInt(255);
@@ -69,7 +69,7 @@ public class TestUtilImageIO extends BoofStandardJUnit {
 
 	@Test void loadImage_saveImage_PPM() throws IOException {
 
-		Planar<GrayU8> orig = new Planar<>(GrayU8.class, width, height, 3);
+		var orig = new Planar<>(GrayU8.class, width, height, 3);
 		GImageMiscOps.fillUniform(orig, rand, 0, 256);
 
 		File temp = File.createTempFile("temp", ".png");
@@ -88,7 +88,7 @@ public class TestUtilImageIO extends BoofStandardJUnit {
 	}
 
 	@Test void loadImage_saveImage_PGM() throws IOException {
-		GrayU8 orig = new GrayU8(width, height);
+		var orig = new GrayU8(width, height);
 		GImageMiscOps.fillUniform(orig, rand, 0, 256);
 
 		File temp = File.createTempFile("temp", ".png");
@@ -103,6 +103,25 @@ public class TestUtilImageIO extends BoofStandardJUnit {
 
 		// clean up
 		temp.delete();// no assertTrue() here because in windows it will fail
+	}
+
+	@Test void saveJpeg() throws IOException {
+		var orig = new GrayU8(width, height);
+		GImageMiscOps.fillUniform(orig, rand, 0, 256);
+		var buff = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+		ConvertBufferedImage.convertTo(orig, buff);
+
+		File temp = File.createTempFile("temp", ".jpg");
+		UtilImageIO.saveJpeg(buff, temp.getPath(), 0.95);
+		double sizeA = temp.length();
+		UtilImageIO.saveJpeg(buff, temp.getPath(), 0.2);
+		double sizeB = temp.length();
+
+		// Make sure quality did something
+		assertTrue(sizeB < sizeA);
+
+		// clean up
+		temp.delete();
 	}
 
 	/**

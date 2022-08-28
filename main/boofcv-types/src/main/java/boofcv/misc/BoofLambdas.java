@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,10 @@ import java.util.List;
  * @author Peter Abeles
  */
 public interface BoofLambdas {
+	@FunctionalInterface interface CheckTrue {
+		boolean process();
+	}
+
 	@FunctionalInterface interface MassageString {
 		String process( String input );
 	}

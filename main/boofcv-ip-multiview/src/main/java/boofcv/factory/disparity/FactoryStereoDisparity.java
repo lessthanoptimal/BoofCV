@@ -59,7 +59,6 @@ import org.jetbrains.annotations.Nullable;
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class FactoryStereoDisparity {
-
 	/**
 	 * Function for creating any dense stereo disparity algorithm in BoofCV
 	 */
@@ -69,12 +68,12 @@ public class FactoryStereoDisparity {
 			case BLOCK_MATCH -> blockMatch(config.approachBM, imageType, dispType);
 			case BLOCK_MATCH_5 -> blockMatchBest5(config.approachBM5, imageType, dispType);
 			case SGM -> sgm(config.approachSGM, imageType, dispType);
-			default -> throw new IllegalArgumentException("Unknown approach "+config.approach);
+			default -> throw new IllegalArgumentException("Unknown approach " + config.approach);
 		};
 	}
 
 	public static <T extends ImageGray<T>, DI extends ImageGray<DI>> StereoDisparity<T, DI>
-	generic( ConfigDisparity config, Class<T> imageType) {
+	generic( ConfigDisparity config, Class<T> imageType ) {
 		// Determine the require disparity image type from the configuration
 		Class<DI> dispType = (Class)(config.isSubpixel() ? GrayF32.class : GrayU8.class);
 		return generic(config, imageType, dispType);
@@ -97,15 +96,14 @@ public class FactoryStereoDisparity {
 		double maxError = (config.regionRadiusX*2 + 1)*(config.regionRadiusY*2 + 1)*config.maxPerPixelError;
 
 		switch (config.errorType) {
-			case SAD: {
+			case SAD -> {
 				DisparitySelect select = createDisparitySelect(config, imageType, (int)maxError);
 				BlockRowScore rowScore = createScoreRowSad(config, imageType);
 				DisparityBlockMatchRowFormat alg = createBlockMatching(config, imageType, select, rowScore);
 				alg.setBorder(FactoryImageBorder.generic(config.border, rowScore.getImageType()));
 				return new WrapDisparityBlockMatchRowFormat(alg);
 			}
-
-			case CENSUS: {
+			case CENSUS -> {
 				DisparitySelect select = createDisparitySelect(config, imageType, (int)maxError);
 				FilterImageInterface censusTran = FactoryCensusTransform.variant(config.configCensus.variant, true, imageType);
 				BlockRowScore rowScore = createCensusRowScore(config, censusTran);
@@ -115,8 +113,7 @@ public class FactoryStereoDisparity {
 				alg.setBorder(FactoryImageBorder.generic(config.border, censusTran.getOutputType()));
 				return new WrapDisparityBlockMatchCensus<>(censusTran, alg);
 			}
-
-			case NCC: {
+			case NCC -> {
 				DisparitySelect select = createDisparitySelect(config, GrayF32.class, (int)maxError);
 				BlockRowScore rowScore = createScoreRowNcc(config, GrayF32.class);
 				DisparityBlockMatchRowFormat alg = createBlockMatching(config, GrayF32.class, select, rowScore);
@@ -125,9 +122,7 @@ public class FactoryStereoDisparity {
 				ret.setNormalizeInput(config.configNCC.normalizeInput);
 				return ret;
 			}
-
-			default:
-				throw new IllegalArgumentException("Unsupported error type " + config.errorType);
+			default -> throw new IllegalArgumentException("Unsupported error type " + config.errorType);
 		}
 	}
 
@@ -190,7 +185,7 @@ public class FactoryStereoDisparity {
 				throw new IllegalArgumentException("With subpixel on, disparity image must be GrayF32");
 		} else {
 			if (dispType != GrayU8.class)
-				throw new IllegalArgumentException("With subpixel on, disparity image must be GrayU8");
+				throw new IllegalArgumentException("With subpixel off, disparity image must be GrayU8");
 		}
 
 		double maxError = (config.regionRadiusX*2 + 1)*(config.regionRadiusY*2 + 1)*config.maxPerPixelError;
@@ -306,7 +301,7 @@ public class FactoryStereoDisparity {
 
 		DisparitySparseRectifiedScoreBM score = null;
 		switch (config.errorType) {
-			case SAD: {
+			case SAD -> {
 				if (imageType == GrayU8.class) {
 					score = new SparseScoreRectifiedSad.U8(config.regionRadiusX, config.regionRadiusY);
 				} else if (imageType == GrayF32.class) {
@@ -314,18 +309,14 @@ public class FactoryStereoDisparity {
 				} else
 					throw new RuntimeException("Image type not supported: " + imageType.getSimpleName());
 			}
-			break;
-
-			case NCC: {
+			case NCC -> {
 				SparseScoreRectifiedNcc _score_ =
 						new SparseScoreRectifiedNcc(config.regionRadiusX, config.regionRadiusY, imageType);
 				_score_.eps = (float)config.configNCC.eps;
 				_score_.normalizeInput = config.configNCC.normalizeInput;
 				score = _score_;
 			}
-			break;
-
-			case CENSUS: {
+			case CENSUS -> {
 				// no border since only the inner portion of the image "patch" is needed.
 				// See the sparse code for details
 				FilterCensusTransform censusTran = FactoryCensusTransform.variant(config.configCensus.variant, false, imageType);
@@ -342,7 +333,6 @@ public class FactoryStereoDisparity {
 					throw new RuntimeException("Image type not supported census: " + censusType.getSimpleName());
 				}
 			}
-			break;
 		}
 
 		if (score == null) {
@@ -390,7 +380,7 @@ public class FactoryStereoDisparity {
 	 */
 	public static <T extends ImageGray<T>, DI extends ImageGray<DI>>
 	DisparitySmoother<T, DI> removeSpeckle( @Nullable ConfigSpeckleFilter config, Class<DI> dispType ) {
-		if (config==null)
+		if (config == null)
 			config = new ConfigSpeckleFilter();
 
 		ConnectedSpeckleFiller<DI> filler;

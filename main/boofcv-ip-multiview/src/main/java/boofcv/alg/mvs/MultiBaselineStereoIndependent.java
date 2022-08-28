@@ -152,6 +152,7 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 	 */
 	public boolean process( SceneStructureMetric scene, int targetIdx, DogArray_I32 pairIdxs,
 							BoofLambdas.IndexToString sbaIndexToViewID ) {
+		if (verbose != null) verbose.println("ENTER process()");
 		// Reset profiling
 		timeDisparity = 0;
 		timeDisparitySmooth = 0;
@@ -207,6 +208,9 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 		fusedParam.baseline = performFusion.getFusedBaseline();
 		CommonOps_DDRM.setIdentity(fusedParam.rotateToRectified);
 
+		if (verbose != null) verbose.printf("fused_param: range=%d pinhole.f=%.1f baseline=%.1f\n",
+				fusedParam.disparityRange, fusedParam.pinhole.fx, fusedParam.baseline);
+
 		// Filter disparity
 		filterDisparity(image1, fusedDisparity, fusedParam);
 
@@ -230,6 +234,8 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 	 * @param rightIdx Which view to use for the right view
 	 */
 	private boolean computeDisparity( Image image1, int rightIdx, String rightID, StereoResults info ) {
+//		if (verbose != null) verbose.println("computeDisparity: idx=" + rightIdx + " id='" + rightID + "'");
+
 		long time0 = System.nanoTime();
 		// Look up the second image in the stereo image
 		if (!Objects.requireNonNull(lookUpImages).loadImage(rightID, image2)) {
@@ -305,7 +311,7 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
 		this.verbose = BoofMiscOps.addPrefix(this, out);
-		BoofMiscOps.verboseChildren(out, configuration, performFusion);
+		BoofMiscOps.verboseChildren(verbose, configuration, performFusion, disparitySmoother);
 
 		this.verboseProfiling = null;
 		if (configuration != null && configuration.contains(BoofVerbose.RUNTIME)) {
