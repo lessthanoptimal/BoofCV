@@ -23,6 +23,7 @@ Version : 0.41
   - ConfigPolygonFromContour doesn't produce identical results, but very similar
 - ConvertBufferedImage
   - RGBA with pre-multiplied alpha will have channels swapped correctly
+  - BufferedImage sub images work again, Thanks ConvertBufferedImage
 - Added Aztec Code encoder and decoder
 - QR Code
   - Fixed issue where it was rejecting version 1 QR codes at a highly skewed angle
