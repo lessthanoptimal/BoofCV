@@ -205,9 +205,6 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 			return false;
 		}
 
-		// Filter disparity TODO should this be added back?
-//		filterDisparity(image1, fusedInvDepth, fusedParam);
-
 		timeTotal = (System.nanoTime() - time0)*1e-6;
 
 		// Print out profiling information

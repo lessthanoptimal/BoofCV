@@ -19,16 +19,14 @@
 package boofcv.alg.mvs;
 
 import boofcv.alg.distort.pinhole.LensDistortionPinhole;
-import boofcv.alg.geo.rectify.DisparityParameters;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.distort.PointToPixelTransform_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofStandardJUnit;
-import georegression.geometry.ConvertRotation3D_F64;
-import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -40,29 +38,19 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * @author Peter Abeles
- */
 public class TestCreateCloudFromDisparityImages extends BoofStandardJUnit {
 
 	int width = 80;
 	int height = 50;
-	int disparityMin = 5;
-	int disparityRange = 30;
 
-	DisparityParameters parameters = new DisparityParameters();
 	Point2Transform2_F64 n_to_p;
 	PixelTransform<Point2D_F64> p_to_n;
 	Se3_F64 world_to_view = SpecialEuclideanOps_F64.eulerXyz(1.5, 0.05, 0.0, 0.05, 0, 0.01, null);
 
 	public TestCreateCloudFromDisparityImages() {
-		parameters.disparityMin = disparityMin;
-		parameters.disparityRange = disparityRange;
-		parameters.pinhole.fsetK(50, 50, 0.0, width/2, height/2, width, height);
-		parameters.baseline = 1.2;
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, -0.05, 0.0, -0.02, parameters.rotateToRectified);
-		n_to_p = new LensDistortionPinhole(parameters.pinhole).distort_F64(false, true);
-		p_to_n = new PointToPixelTransform_F64(new LensDistortionPinhole(parameters.pinhole).
+		var pinhole = new CameraPinhole(50, 50, 0.0, width/2, height/2, width, height);
+		n_to_p = new LensDistortionPinhole(pinhole).distort_F64(false, true);
+		p_to_n = new PointToPixelTransform_F64(new LensDistortionPinhole(pinhole).
 				distort_F64(true, false));
 	}
 
@@ -70,21 +58,21 @@ public class TestCreateCloudFromDisparityImages extends BoofStandardJUnit {
 	 * Adds a view and compares its cloud
 	 */
 	@Test void oneView() {
-		var disparity = new GrayF32(width, height);
+		var inverseDepth = new GrayF32(width, height);
 
-		ImageMiscOps.fillUniform(disparity, rand, 0, disparityRange - 1.0f);
+		ImageMiscOps.fillUniform(inverseDepth, rand, 0, 0.5f);
 
 		// set one pixel to be invalid as a test
-		disparity.set(20, 30, disparityRange);
+		inverseDepth.set(20, 30, -1);
 
 		var alg = new CreateCloudFromDisparityImages();
-//		assertEquals(0, alg.addInverseDepth(disparity, world_to_view, parameters, n_to_p, p_to_n));
+		assertEquals(0, alg.addInverseDepth(inverseDepth, world_to_view, n_to_p, p_to_n));
 
-		// Only the two pixels marked as invalid should be excluded
-		assertEquals(width*height - 2, alg.cloud.size);
+		// See if the invalid pixel was skipped over
+		assertEquals(width*height - 1, alg.cloud.size);
 
 		DogArray<Point3D_F64> expected = new DogArray<>(Point3D_F64::new);
-		MultiViewStereoOps.disparityToCloud(disparity, parameters,
+		MultiViewStereoOps.inverseToCloud(inverseDepth, p_to_n,
 				( pixX, pixY, x, y, z ) -> expected.grow().setTo(x, y, z));
 
 		// While not a strict requirement, the order of the two point clouds should match because they are both
@@ -100,18 +88,18 @@ public class TestCreateCloudFromDisparityImages extends BoofStandardJUnit {
 	 * If the views are identical then each point should only be added once
 	 */
 	@Test void twoIdenticalViews() {
-		var disparity = new GrayF32(width, height);
+		var inverseDepth = new GrayF32(width, height);
 
-		ImageMiscOps.fillUniform(disparity, rand, 0, disparityRange - 1.0f);
+		ImageMiscOps.fillUniform(inverseDepth, rand, 0, 0.5f);
 
 		var alg = new CreateCloudFromDisparityImages();
-//		assertEquals(0, alg.addInverseDepth(disparity, world_to_view, parameters, n_to_p, p_to_n));
+		assertEquals(0, alg.addInverseDepth(inverseDepth, world_to_view, n_to_p, p_to_n));
 
 		assertEquals(width*height, alg.cloud.size);
 		assertEquals(1, alg.viewPointIdx.size);
 
 		// add it again and see if no new points were added but the views increased
-//		assertEquals(1, alg.addInverseDepth(disparity, world_to_view, parameters, n_to_p, p_to_n));
+		assertEquals(1, alg.addInverseDepth(inverseDepth, world_to_view, n_to_p, p_to_n));
 
 		assertEquals(width*height, alg.cloud.size);
 		assertEquals(2, alg.viewPointIdx.size);
@@ -122,26 +110,26 @@ public class TestCreateCloudFromDisparityImages extends BoofStandardJUnit {
 	 */
 	@Test void disparitySimilarTol() {
 		float tol = 0.5f;
-		var disparity = new GrayF32(width, height);
-		GrayU8 mask = disparity.createSameShape(GrayU8.class);
+		var inverseDepth = new GrayF32(width, height);
+		GrayU8 mask = inverseDepth.createSameShape(GrayU8.class);
 
-		ImageMiscOps.fillUniform(disparity, rand, 0, disparityRange - 1.0f);
+		ImageMiscOps.fillUniform(inverseDepth, rand, 0, 0.5f);
 
 		var alg = new CreateCloudFromDisparityImages();
 		alg.disparitySimilarTol = tol;
-//		assertEquals(0, alg.addInverseDepth(disparity, world_to_view, parameters, n_to_p, p_to_n));
+		assertEquals(0, alg.addInverseDepth(inverseDepth, world_to_view, n_to_p, p_to_n));
 		assertEquals(width*height, alg.cloud.size);
 
 		// Changing the disparity, but just under the tolerance. Nothing should be added
-		disparity.data[72] += tol - 0.001f;
-//		assertEquals(1, alg.addInverseDepth(disparity, world_to_view, parameters, n_to_p, p_to_n));
+		inverseDepth.data[72] += tol - 0.001f;
+		assertEquals(1, alg.addInverseDepth(inverseDepth, world_to_view, n_to_p, p_to_n));
 		assertEquals(width*height, alg.cloud.size);
 
 		// It should now be above the tolerance
-		disparity.data[72] += 0.002f;
+		inverseDepth.data[72] += 0.002f;
 		// zero the mask again so that it can add points
 		ImageMiscOps.fill(mask, 0);
-//		assertEquals(2, alg.addInverseDepth(disparity, world_to_view, parameters, n_to_p, p_to_n));
+		assertEquals(2, alg.addInverseDepth(inverseDepth, world_to_view, n_to_p, p_to_n));
 		assertEquals(width*height + 1, alg.cloud.size);
 	}
 }
