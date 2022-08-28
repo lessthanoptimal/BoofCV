@@ -26,7 +26,6 @@ import boofcv.alg.cloud.PointCloudReader;
 import boofcv.alg.cloud.PointCloudUtils_F64;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.alg.geo.rectify.DisparityParameters;
-import boofcv.alg.misc.PixelMath;
 import boofcv.alg.mvs.ColorizeMultiViewStereoResults;
 import boofcv.alg.mvs.MultiViewStereoFromKnownSceneStructure;
 import boofcv.alg.similar.ConfigSimilarImagesSceneRecognition;
@@ -576,16 +575,12 @@ public class SceneReconstruction {
 		sparseToDense.getMultiViewStereo().setListener(new MultiViewStereoFromKnownSceneStructure.Listener<>() {
 			@Override
 			public void handlePairDisparity( String left, String right, GrayU8 rect0, GrayU8 rect1,
-											 GrayF32 disparity, GrayU8 mask, DisparityParameters parameters ) {}
+											 GrayF32 disparity, DisparityParameters parameters ) {}
 
 			@Override
-			public void handleFusedDisparity( String name, GrayF32 disparity, GrayU8 mask, DisparityParameters parameters ) {
-				if (disparityMin > 0) {
-					PixelMath.operator1(disparity, ( v ) -> v >= disparityMin ? v : parameters.disparityRange, disparity);
-				}
-
+			public void handleFused( String name, GrayF32 inverseDepth ) {
 				if (saveFusedDisparity) {
-					BufferedImage colorized = VisualizeImageData.disparity(disparity, null, parameters.disparityRange, 0);
+					BufferedImage colorized = VisualizeImageData.inverseDepth(inverseDepth, null, 1e6f, 0);
 					UtilImageIO.saveImage(colorized, new File(outputFused, "visualized_" + name + ".png").getPath());
 					// It's not obvious what format to save the float and binary images in. leaving that for the future
 				}

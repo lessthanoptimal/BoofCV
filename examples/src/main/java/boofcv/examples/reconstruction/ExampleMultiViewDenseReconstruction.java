@@ -65,10 +65,10 @@ import java.util.List;
 public class ExampleMultiViewDenseReconstruction {
 	public static void main( String[] args ) {
 		var example = new ExampleMultiViewSparseReconstruction();
-		example.compute("tree_snow_01.mp4", true);
+//		example.compute("tree_snow_01.mp4", true);
 //		example.compute("ditch_02.mp4", true);
 //		example.compute("holiday_display_01.mp4", true);
-//		example.compute("log_building_02.mp4", true);
+		example.compute("log_building_02.mp4", true);
 //		example.compute("drone_park_01.mp4", false);
 //		example.compute("stone_sign.mp4", true);
 
@@ -103,7 +103,7 @@ public class ExampleMultiViewDenseReconstruction {
 		sparseToDense.getMultiViewStereo().setListener(new MultiViewStereoFromKnownSceneStructure.Listener<>() {
 			@Override
 			public void handlePairDisparity( String left, String right, GrayU8 rect0, GrayU8 rect1,
-											 GrayF32 disparity, GrayU8 mask, DisparityParameters parameters ) {
+											 GrayF32 disparity, DisparityParameters parameters ) {
 				// Uncomment to display individual stereo pairs. Commented out by default because it generates
 				// a LOT of windows
 //				BufferedImage outLeft = ConvertBufferedImage.convertTo(rect0, null);
@@ -115,19 +115,18 @@ public class ExampleMultiViewDenseReconstruction {
 			}
 
 			@Override
-			public void handleFusedDisparity( String name,
-											  GrayF32 disparity, GrayU8 mask, DisparityParameters parameters ) {
+			public void handleFused( String name, GrayF32 inverseDepth ) {
 				// You can also do custom filtering of the disparity image in this function. If the line below is
 				// uncommented then points which are far away will be marked as invalid
-//				PixelMath.operator1(disparity, ( v ) -> v >= 20 ? v : parameters.disparityRange, disparity);
+//				PixelMath.operator1(inverseDepth, ( v ) -> v <= 1.0f ? v : Float.NaN, inverseDepth);
 
 				// Display the disparity for each center view
-				BufferedImage colorized = VisualizeImageData.disparity(disparity, null, parameters.disparityRange, 0);
+				BufferedImage colorized = VisualizeImageData.inverseDepth(inverseDepth, null, 0f, 0);
 				ShowImages.showWindow(colorized, "Center " + name);
 			}
 		});
 
-		// It needs a look up table to go from SBA view index to image name. It loads images as needed to perform
+		// It needs a lookup table to go from SBA view index to image name. It loads images as needed to perform
 		// stereo disparity
 		var viewToId = new TIntObjectHashMap<String>();
 		BoofMiscOps.forIdx(example.working.listViews, ( workIdxI, wv ) -> viewToId.put(wv.index, wv.pview.id));

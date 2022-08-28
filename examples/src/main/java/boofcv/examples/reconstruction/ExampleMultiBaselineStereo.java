@@ -19,9 +19,7 @@
 package boofcv.examples.reconstruction;
 
 import boofcv.alg.distort.brown.LensDistortionBrown;
-import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.bundle.BundleAdjustmentOps;
-import boofcv.alg.geo.rectify.DisparityParameters;
 import boofcv.alg.mvs.MultiBaselineStereoIndependent;
 import boofcv.alg.mvs.MultiViewStereoOps;
 import boofcv.alg.structure.SceneWorkingGraph;
@@ -144,15 +142,13 @@ public class ExampleMultiBaselineStereo {
 
 		// We will display intermediate results as they come in
 		multiBaseline.setListener(( leftView, rightView, rectLeft, rectRight,
-									disparity, mask, parameters, rect ) -> {
+									disparity, parameters, rect ) -> {
 			// Visualize the rectified stereo pair. You can interact with this window and verify
 			// that the y-axis is  aligned
 			var rectified = new RectifiedPairPanel(true);
 			rectified.setImages(ConvertBufferedImage.convertTo(rectLeft, null),
 					ConvertBufferedImage.convertTo(rectRight, null));
 
-			// Cleans up the disparity image by zeroing out pixels that are outside the original image bounds
-			RectifyImageOps.applyMask(disparity, mask, 0);
 			// Display the colorized disparity
 			BufferedImage colorized = VisualizeImageData.disparity(disparity, null, parameters.disparityRange, 0);
 
@@ -168,10 +164,9 @@ public class ExampleMultiBaselineStereo {
 		}
 
 		// Extract the point cloud from the fused disparity image
-		GrayF32 fusedDisparity = multiBaseline.getFusedDisparity();
-		DisparityParameters fusedParam = multiBaseline.getFusedParam();
-		BufferedImage colorizedDisp = VisualizeImageData.disparity(fusedDisparity, null, fusedParam.disparityRange, 0);
-		ShowImages.showWindow(colorizedDisp, "Fused Disparity");
+		GrayF32 fusedDisparity = multiBaseline.getFusedInvDepth();
+		BufferedImage colorizedDisp = VisualizeImageData.inverseDepth(fusedDisparity, null, -1f, 0);
+		ShowImages.showWindow(colorizedDisp, "Fused InverseDepth");
 
 		// Now compute the point cloud it represents and the color of each pixel.
 		// For the fused image, instead of being in rectified image coordinates it's in the original image coordinates
@@ -186,7 +181,7 @@ public class ExampleMultiBaselineStereo {
 		CameraPinholeBrown intrinsic = BundleAdjustmentOps.convert(example.scene.cameras.get(center.cameraIdx).model,
 				colorImage.width, colorImage.height, null);
 		Point2Transform2_F64 pixel_to_norm = new LensDistortionBrown(intrinsic).distort_F64(true, false);
-		MultiViewStereoOps.disparityToCloud(fusedDisparity, fusedParam, new PointToPixelTransform_F64(pixel_to_norm),
+		MultiViewStereoOps.inverseToCloud(fusedDisparity, new PointToPixelTransform_F64(pixel_to_norm),
 				( pixX, pixY, x, y, z ) -> {
 					cloud.grow().setTo(x, y, z);
 					cloudRgb.add(colorImage.get24(pixX, pixY));

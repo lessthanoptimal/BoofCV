@@ -28,7 +28,6 @@ import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
-import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -44,15 +43,14 @@ import java.util.List;
  */
 public class MultiViewStereoOps {
 	/**
-	 * <p>Masks out point in a disparity image which appear to be too similar to what's already in a point cloud. This
+	 * <p>Masks out point in a inverse depth image which appear to be too similar to what's already in a point cloud. This
 	 * is done to avoid adding the same point twice</p>
 	 *
 	 * <p>NOTE: The reason a transform is required to go from norm to pixel for stereo, which is normally a simple
 	 * equation, is that the disparity image might be a fused disparity image that includes lens distortion</p>
 	 *
 	 * @param cloud (Input) set of 3D points
-	 * @param disparity (Input) Disparity image.
-	 * @param parameters (Input) Parameters needed to understand geometric meaning of disparity values.
+	 * @param inverseDepth (Input) Disparity image.
 	 * @param cloud_to_stereo (Input) Transform from point cloud to rectified stereo coordinate systems.
 	 * @param rectNorm_to_dispPixel (Input) Transform from undistorted normalized image coordinates in rectified
 	 * reference frame into disparity pixels.
@@ -62,22 +60,16 @@ public class MultiViewStereoOps {
 	 * it for output.
 	 */
 	public static void maskOutPointsInCloud( final List<Point3D_F64> cloud,
-											 final GrayF32 disparity,
-											 final DisparityParameters parameters,
+											 final GrayF32 inverseDepth,
 											 final Se3_F64 cloud_to_stereo,
 											 final Point2Transform2_F64 rectNorm_to_dispPixel,
 											 final double tolerance,
 											 final GrayU8 mask ) {
-		InputSanityCheck.checkSameShape(disparity, mask);
-		parameters.checkValidity();
-
-		// d = baseline*f/z
-		final double baselineFocal = parameters.baseline*parameters.pinhole.fx;
+		InputSanityCheck.checkSameShape(inverseDepth, mask);
 
 		// 3D coordinate of point in original camera reference frame
 		Point3D_F64 cameraPt = new Point3D_F64();
-		// 3D coordinate of point in rectified reference frame
-		Point3D_F64 rectPt = new Point3D_F64();
+
 		// Pixel coordinate in disparity image
 		Point2D_F64 pixel = new Point2D_F64();
 
@@ -85,14 +77,13 @@ public class MultiViewStereoOps {
 			// find the point in the camera's reference frame
 			Point3D_F64 cloudPt = cloud.get(cloudIdx);
 			SePointOps_F64.transform(cloud_to_stereo, cloudPt, cameraPt);
+
+			// If it's behind or on the camera, skip
 			if (cameraPt.z <= 0.0)
 				continue;
 
-			// Convert it into rectified camera coordinates
-			GeometryMath_F64.mult(parameters.rotateToRectified, cameraPt, rectPt);
-
 			// Find the pixel it's projected onto
-			rectNorm_to_dispPixel.compute(rectPt.x/rectPt.z, rectPt.y/rectPt.z, pixel);
+			rectNorm_to_dispPixel.compute(cameraPt.x/cameraPt.z, cameraPt.y/cameraPt.z, pixel);
 
 			// Discretize the coordinate so that it can be looked up in the image
 			// Rounding minimized the expected error and less sensitive to noise
@@ -100,24 +91,22 @@ public class MultiViewStereoOps {
 			int py = (int)(pixel.y + 0.5); // The check below will fix this issue. Much faster than round()
 
 			// Make sure it's inside the image
-			if (pixel.x < -0.5 || pixel.y < -0.5 || px >= disparity.width || py >= disparity.height)
+			if (pixel.x < -0.5 || pixel.y < -0.5 || px >= inverseDepth.width || py >= inverseDepth.height)
 				continue;
 
 			// Make sure this pixel isn't already invalidated
 			if (mask.unsafe_get(px, py) != 0)
 				continue;
 
-			double imagD = disparity.unsafe_get(px, py);
-			if (imagD >= parameters.disparityRange)
+			float inv = inverseDepth.unsafe_get(px, py);
+			if (inv < 0.0f)
 				continue;
 
 			// Compute the disparity this would have
-			double projD = baselineFocal/rectPt.z - parameters.disparityMin;
-			if (projD < 0.0 || projD > parameters.disparityRange)
-				continue;
+			double projInv = 1.0/cameraPt.z;
 
-			// See if the disparities are too similar and it should be masked out
-			if (Math.abs(imagD - projD) > tolerance)
+			// See if the inverse depths are too similar and it should be masked out
+			if (Math.abs(inv - projInv) > tolerance)
 				continue;
 
 			mask.unsafe_set(px, py, 1);
@@ -130,13 +119,12 @@ public class MultiViewStereoOps {
 	 * and not rectified frame.
 	 *
 	 * @param disparity (Input) Disparity image
-	 * @param mask (Input) Mask specifying valid pixels in disparity image
 	 * @param parameters (Input) Parameters which describe the meaning of values in the disparity image
 	 */
-	public static void disparityToCloud( GrayF32 disparity, GrayU8 mask,
+	public static void disparityToCloud( GrayF32 disparity,
 										 DisparityParameters parameters,
 										 BoofLambdas.PixXyzConsumer_F64 consumer ) {
-		ImplMultiViewStereoOps.disparityToCloud(disparity, mask, parameters, consumer);
+		ImplMultiViewStereoOps.disparityToCloud(disparity, parameters, consumer);
 	}
 
 	/**
@@ -165,5 +153,14 @@ public class MultiViewStereoOps {
 		} else {
 			throw new IllegalArgumentException("Unknown image type. " + disparity.getClass().getSimpleName());
 		}
+	}
+
+	/**
+	 * Inverse depth image to point cloud.
+	 */
+	public static void inverseToCloud( GrayF32 inverseDepth,
+									   @Nullable PixelTransform<Point2D_F64> pixelToNorm,
+									   BoofLambdas.PixXyzConsumer_F64 consumer ) {
+		ImplMultiViewStereoOps.inverseToCloud(inverseDepth, pixelToNorm, consumer);
 	}
 }

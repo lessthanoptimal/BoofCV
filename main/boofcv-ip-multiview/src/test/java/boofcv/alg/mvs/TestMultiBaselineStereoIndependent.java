@@ -19,7 +19,6 @@
 package boofcv.alg.mvs;
 
 import boofcv.abst.geo.bundle.SceneStructureMetric;
-import boofcv.alg.geo.rectify.DisparityParameters;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.disparity.ConfigDisparityBMBest5;
 import boofcv.factory.disparity.DisparityError;
@@ -133,7 +132,7 @@ public class TestMultiBaselineStereoIndependent extends BoofStandardJUnit {
 
 		assertTrue(alg.process(scene, 0, DogArray_I32.array(1, 2), sbaIndexToViewID::get));
 
-		GrayF32 found = alg.getFusedDisparity();
+		GrayF32 found = alg.getFusedInvDepth();
 		assertEquals(listIntrinsic.get(0).width, found.width);
 		assertEquals(listIntrinsic.get(0).height, found.height);
 
@@ -142,19 +141,18 @@ public class TestMultiBaselineStereoIndependent extends BoofStandardJUnit {
 			BoofMiscOps.sleep(60_000);
 		}
 
-		DisparityParameters param = alg.getFusedParam();
-
 		// Check the results. Since the target fills the view and is a known constant Z away we can that here.
 		// however since a real disparity algorithm is being used its inputs will not be perfect
 		int totalFilled = 0;
 		int totalCorrect = 0;
 		for (int y = 0; y < found.height; y++) {
 			for (int x = 0; x < found.width; x++) {
-				float d = found.get(x, y);
-				assertTrue(d >= 0);
-				if (d >= param.disparityRange)
+				float inv = found.get(x, y);
+				if (Float.isNaN(inv))
 					continue;
-				double Z = param.baseline*param.pinhole.fx/(d + param.disparityMin);
+				assertTrue(inv >= 0);
+
+				double Z = 1.0/inv;
 				if (Math.abs(Z - 2.0) <= 0.1)
 					totalCorrect++;
 				totalFilled++;
@@ -191,7 +189,7 @@ public class TestMultiBaselineStereoIndependent extends BoofStandardJUnit {
 
 		// Override so that it will always be happy
 		alg.performFusion = new MultiBaselineDisparityMedian() {
-			@Override public boolean process( GrayF32 disparity ) {return true;}
+			@Override public boolean process( GrayF32 inverseDepth ) {return true;}
 		};
 
 		// just see if it blows up

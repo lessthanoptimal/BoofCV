@@ -26,6 +26,7 @@ import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyDistortImageOps;
 import boofcv.alg.geo.rectify.DisparityParameters;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.misc.BoofLambdas;
 import boofcv.misc.BoofMiscOps;
 import boofcv.misc.LookUpImages;
@@ -37,7 +38,6 @@ import lombok.Setter;
 import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.VerbosePrint;
 import org.ejml.data.DMatrixRMaj;
-import org.ejml.dense.row.CommonOps_DDRM;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
@@ -98,10 +98,8 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 	//------------ References to input objects
 	private SceneStructureMetric scene; // Camera placement and parameters
 
-	/** The computed disparity image in distorted pixel coordinates */
-	final @Getter GrayF32 fusedDisparity = new GrayF32(1, 1);
-	/** Disparity parameters for fused disparity image */
-	final @Getter DisparityParameters fusedParam = new DisparityParameters();
+	/** Inverse depth image in input image coordinates */
+	final @Getter GrayF32 fusedInvDepth = new GrayF32(1, 1);
 
 	// Storage for stereo disparity results
 	final StereoResults results = new StereoResults();
@@ -113,6 +111,9 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 
 	// Storage for rectified stereo images
 	Image rectified1, rectified2;
+
+	// Mask of valid disparity pixels
+	GrayU8 mask = new GrayU8(1, 1);
 
 	// Computes parameters how to rectify given the results from bundle adjustment
 	BundleToRectificationStereoParameters computeRectification = new BundleToRectificationStereoParameters();
@@ -178,7 +179,9 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 		world_to_left.invert(left_to_world);
 
 		// Compute disparity for all the images it has been paired with and add them to the fusion algorithm
-		performFusion.initialize(computeRectification.intrinsic1, computeRectification.view1_dist_to_undist);
+		performFusion.initialize(computeRectification.intrinsic1.width, computeRectification.intrinsic1.height,
+				computeRectification.view1_dist_to_undist);
+
 		for (int i = 0; i < pairIdxs.size; i++) {
 //			if (verbose != null) verbose.println("Computing stereo for view.idx=" + pairIdxs.get(i));
 
@@ -190,29 +193,20 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 			// allow access to the disparity before it's discarded
 			if (listener != null) listener.handlePairDisparity(targetIdx, pairIdxs.get(i),
 					rectified1, rectified2,
-					results.disparity, results.mask, results.param, results.undist_to_rect1);
-			performFusion.addDisparity(results.disparity, results.mask, results.param, results.undist_to_rect1);
+					results.disparity, results.param, results.undist_to_rect1);
+			performFusion.addDisparity(results.disparity, results.param, results.undist_to_rect1);
 		}
 
 		if (verbose != null) verbose.println("Created fused stereo disparity image. inputs.size=" + pairIdxs.size);
 
 		// Fuse all of these into a single disparity image
-		if (!performFusion.process(fusedDisparity)) {
+		if (!performFusion.process(fusedInvDepth)) {
 			if (verbose != null) verbose.println("FAILED: Can't fuse disparity images");
 			return false;
 		}
 
-		fusedParam.disparityMin = performFusion.getFusedDisparityMin();
-		fusedParam.disparityRange = performFusion.getFusedDisparityRange();
-		fusedParam.pinhole.setTo(computeRectification.intrinsic1);
-		fusedParam.baseline = performFusion.getFusedBaseline();
-		CommonOps_DDRM.setIdentity(fusedParam.rotateToRectified);
-
-		if (verbose != null) verbose.printf("fused_param: range=%d pinhole.f=%.1f baseline=%.1f\n",
-				fusedParam.disparityRange, fusedParam.pinhole.fx, fusedParam.baseline);
-
-		// Filter disparity
-		filterDisparity(image1, fusedDisparity, fusedParam);
+		// Filter disparity TODO should this be added back?
+//		filterDisparity(image1, fusedInvDepth, fusedParam);
 
 		timeTotal = (System.nanoTime() - time0)*1e-6;
 
@@ -270,11 +264,11 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 						computeRectification.undist_to_rect2_F32, BorderType.EXTENDED, image2.getImageType());
 
 		ImageDimension rectifiedShape = computeRectification.rectifiedShape;
-		info.mask.reshape(rectifiedShape.width, rectifiedShape.height);
+		mask.reshape(rectifiedShape.width, rectifiedShape.height);
 		rectified1.reshape(rectifiedShape.width, rectifiedShape.height);
 		rectified2.reshape(rectifiedShape.width, rectifiedShape.height);
 
-		distortLeft.apply(image1, rectified1, info.mask);
+		distortLeft.apply(image1, rectified1, mask);
 		distortRight.apply(image2, rectified2);
 
 		// Compute disparity from the rectified images
@@ -282,6 +276,9 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 
 		// Save the results
 		info.disparity = stereoDisparity.getDisparity();
+
+		// Filter out pixels outside the original image
+		ImageMiscOps.maskFill(info.disparity, mask, 0, info.param.disparityRange);
 
 		DisparityParameters param = info.param;
 		param.disparityMin = stereoDisparity.getDisparityMin();
@@ -326,8 +323,6 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 	static class StereoResults {
 		// disparity image
 		GrayF32 disparity;
-		// mask indicating which pixels are invalid because they are outside the FOV
-		final GrayU8 mask = new GrayU8(1, 1);
 		// Geometric description of the disparity
 		final DisparityParameters param = new DisparityParameters();
 		// Rectification matrix for view-1
@@ -346,13 +341,11 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 		 * @param leftView View index in SBA
 		 * @param rightView View index in SBA
 		 * @param disparity Computed disparity image between these two views
-		 * @param mask Disparity mask
 		 * @param parameters Disparity parameters
 		 * @param rect Disparity rectification matrix
 		 */
 		void handlePairDisparity( int leftView, int rightView,
 								  RectImage rectLeft, RectImage rectRight,
-								  GrayF32 disparity, GrayU8 mask,
-								  DisparityParameters parameters, DMatrixRMaj rect );
+								  GrayF32 disparity, DisparityParameters parameters, DMatrixRMaj rect );
 	}
 }
