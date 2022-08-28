@@ -286,7 +286,7 @@ public class ConvertRaster {
 			SampleModel sm = raster.getSampleModel();
 			if (sm instanceof ComponentSampleModel) {
 				ComponentSampleModel csm = (ComponentSampleModel)sm;
-				// according to https://github.com/frohoff/jdk8u-jdk/blob/master/src/share/classes/sun/awt/image/ByteInterleavedRaster.java,
+				// according to https://github.com/openjdk/jdk/blob/master/src/java.desktop/share/classes/sun/awt/image/ByteInterleavedRaster.java
 				// the desired offset is given by
 				return raster.getDataBuffer().getOffset() - raster.getSampleModelTranslateY()*csm.getScanlineStride() - raster.getSampleModelTranslateX()*csm.getPixelStride();
 			} else if (sm instanceof SinglePixelPackedSampleModel smm) {
