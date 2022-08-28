@@ -19,7 +19,6 @@
 package boofcv.io.image;
 
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.*;
 import org.jetbrains.annotations.Nullable;
 
