@@ -62,6 +62,7 @@ public abstract class GenericSgmStereoDisparityChecks<T extends ImageGray<T>, C 
 			}
 		}
 
+		alg.saveScore();
 		assertTrue(disparity.isSameShape(alg.getScore()));
 	}
 
