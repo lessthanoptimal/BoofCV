@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,7 +40,7 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
 public class ControlPanelDisparityDisplay extends StandardAlgConfigPanel
 		implements ChangeListener, ActionListener {
 	// which image to show
-	public int selectedView;
+	public View selectedView = View.DISPARITY;
 
 	public double zoom = 1;
 
@@ -62,7 +62,7 @@ public class ControlPanelDisparityDisplay extends StandardAlgConfigPanel
 	// how much the input should be scaled down by
 	JSpinner inputScaleSpinner = spinner(inputScale, 5, 100, 10);
 	// selects which image to view
-	JComboBox viewSelector = combo(selectedView, "Disparity", "Left", "Right", "View 3D");
+	JComboBox viewSelector = combo(selectedView.ordinal(), "Disparity", "Score", "Left", "Right", "View 3D");
 
 	public ControlCustomCloud controlCloud = new ControlCustomCloud();
 
@@ -144,7 +144,7 @@ public class ControlPanelDisparityDisplay extends StandardAlgConfigPanel
 			return;
 
 		if (e.getSource() == viewSelector) {
-			selectedView = viewSelector.getSelectedIndex();
+			selectedView = View.values()[viewSelector.getSelectedIndex()];
 			controlCloud.handleViewChange();
 			listener.disparityGuiChange();
 		} else if (e.getSource() == checkRecompute) {
@@ -174,20 +174,20 @@ public class ControlPanelDisparityDisplay extends StandardAlgConfigPanel
 		private void handleViewChange() {
 			setColorButtonColor(getActiveBackgroundColor());
 			// disable controls which can't be used
-			boolean view3D = selectedView == 3;
+			boolean view3D = selectedView == View.CLOUD;
 			comboColorizer.setEnabled(view3D);
 			sliderOffsetColor.setEnabled(view3D);
 			sliderPeriodColor.setEnabled(view3D);
 			sliderSpeed3D.setEnabled(view3D);
 			// Color is useful for disparity and 3D
-			bColorBackGround.setEnabled(selectedView == 0 || selectedView == 3);
+			bColorBackGround.setEnabled(selectedView == View.DISPARITY || selectedView == View.CLOUD);
 		}
 
 		@Override
 		public int getActiveBackgroundColor() {
-			if (selectedView == 0) {
+			if (selectedView == View.DISPARITY) {
 				return backgroundColorDisparity;
-			} else if (selectedView == 3) {
+			} else if (selectedView == View.CLOUD) {
 				return backgroundColor3D;
 			} else {
 				return bColorBackGround.getBackground().getRGB();
@@ -196,9 +196,9 @@ public class ControlPanelDisparityDisplay extends StandardAlgConfigPanel
 
 		@Override
 		public void setColorButtonColor( int colorRGB ) {
-			if (selectedView == 0) {
+			if (selectedView == View.DISPARITY) {
 				backgroundColorDisparity = colorRGB;
-			} else if (selectedView == 3) {
+			} else if (selectedView == View.CLOUD) {
 				backgroundColor3D = colorRGB;
 			} else {
 				return;
@@ -216,5 +216,14 @@ public class ControlPanelDisparityDisplay extends StandardAlgConfigPanel
 		void changeView3D();
 		void changeZoom();
 		void changeBackgroundColor();
+	}
+
+	/** What's being shown to the user */
+	public enum View {
+		DISPARITY,
+		SCORE,
+		LEFT,
+		RIGHT,
+		CLOUD
 	}
 }

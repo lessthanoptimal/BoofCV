@@ -56,7 +56,7 @@ public class ConfigDisparityBM implements Configuration {
 	public boolean subpixel = true;
 
 	/** If true it will save the disparity score for each pixel */
-	public boolean saveScore = false;
+	public boolean saveScore = true;
 
 	/** How the error is computed for each block */
 	public DisparityError errorType = DisparityError.CENSUS;

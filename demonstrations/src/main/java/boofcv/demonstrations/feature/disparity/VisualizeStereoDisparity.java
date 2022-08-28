@@ -32,6 +32,7 @@ import boofcv.concurrency.BoofConcurrency;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.controls.ControlPanelDisparityDisplay;
+import boofcv.gui.controls.ControlPanelDisparityDisplay.View;
 import boofcv.gui.d3.UtilDisparitySwing;
 import boofcv.gui.dialogs.OpenImageSetDialog;
 import boofcv.gui.image.ImageZoomPanel;
@@ -93,6 +94,7 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 	private BufferedImage colorRight;
 	// Output disparity color surface plot
 	private BufferedImage disparityOut;
+	private BufferedImage scoreOut;
 
 	// gray scale input image before rectification
 	private T inputLeft;
@@ -100,17 +102,18 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 	// gray scale input images after rectification
 	private T rectLeft;
 	private T rectRight;
-	private GrayU8 mask = new GrayU8(1, 1);
+	private final GrayU8 mask = new GrayU8(1, 1);
 
 	// Stored disparity results. if a new instance of the detector is created we will
 	// still have a reference to the old image and things won't blow up
 	private D disparityImage;
 	private int disparityMin, disparityRange;
+	private GrayF32 scoreImage;
 
 	// calibration parameters
 	private StereoParameters calib;
 	// rectification algorithm
-	private RectifyCalibrated rectifyAlg = RectifyImageOps.createCalibrated();
+	private final RectifyCalibrated rectifyAlg = RectifyImageOps.createCalibrated();
 
 	// GUI components
 	private final ControlPanelDisparityDisplay control = new ControlPanelDisparityDisplay(0, 150, GrayU8.class);
@@ -324,6 +327,7 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 			disparityImage = activeAlg.getDisparity();
 			disparityMin = activeAlg.getDisparityMin();
 			disparityRange = activeAlg.getDisparityRange();
+			scoreImage = activeAlg.getDisparityScore();
 			BoofMiscOps.checkTrue(mask.isSameShape(disparityImage));
 
 			// Remove random matches outside the undistorted image border
@@ -339,6 +343,14 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 		} finally {
 			BoofConcurrency.USE_CONCURRENT = true;
 			processCalled = true;
+		}
+
+		// Render score
+		if (scoreImage != null) {
+			scoreOut = VisualizeImageData.colorizeSign(scoreImage, null, 0.0);
+		} else {
+			// avoid a NPE
+			scoreOut = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
 		}
 
 		progress.stopThread();
@@ -358,11 +370,12 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 		if (!SwingUtilities.isEventDispatchThread())
 			throw new RuntimeException("Must be in UI thread");
 
-		if (control.selectedView < 3) {
+		if (control.selectedView.ordinal() < View.CLOUD.ordinal()) {
 			BufferedImage img = switch (control.selectedView) {
-				case 0 -> disparityOut;
-				case 1 -> colorLeft;
-				case 2 -> colorRight;
+				case DISPARITY -> disparityOut;
+				case SCORE -> scoreOut;
+				case LEFT -> colorLeft;
+				case RIGHT -> colorRight;
 				default -> throw new RuntimeException("Unknown option");
 			};
 
@@ -556,9 +569,9 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 	}
 
 	@Override public void changeBackgroundColor() {
-		if (control.selectedView == 0) {
+		if (control.selectedView == View.DISPARITY) {
 			disparityRender();
-		} else if (control.selectedView == 3) {
+		} else if (control.selectedView == View.CLOUD) {
 			pcv.setBackgroundColor(control.controlCloud.getActiveBackgroundColor());
 			pcv.getComponent().repaint();
 		}
@@ -583,7 +596,7 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 			});
 		}
 
-		@Override 	protected void paintInPanel( AffineTransform tran, Graphics2D g2 ) {
+		@Override protected void paintInPanel( AffineTransform tran, Graphics2D g2 ) {
 			if (state == 0)
 				return;
 			BoofSwingUtil.antialiasing(g2);
@@ -607,7 +620,7 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 			x1 = y1 = Integer.MAX_VALUE;
 		}
 
-		@Override 	public void mouseClicked( MouseEvent e ) {
+		@Override public void mouseClicked( MouseEvent e ) {
 			// clear region if one has been selected
 			if (state == 0) {
 				return;
@@ -621,7 +634,7 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 			repaint();
 		}
 
-		@Override 	public void mousePressed( MouseEvent e ) {
+		@Override public void mousePressed( MouseEvent e ) {
 			panel.requestFocus();
 			if (!SwingUtilities.isLeftMouseButton(e)) {
 				return;
@@ -638,7 +651,7 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 			}
 		}
 
-		@Override 	public void mouseReleased( MouseEvent e ) {
+		@Override public void mouseReleased( MouseEvent e ) {
 			// Finish defining the ROI, save it, and update the cloud
 			if (state != 1) {
 				return;
@@ -663,9 +676,9 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 			changeImageView();
 		}
 
-		@Override 	public void mouseEntered( MouseEvent e ) {}
+		@Override public void mouseEntered( MouseEvent e ) {}
 
-		@Override 	public void mouseExited( MouseEvent e ) {
+		@Override public void mouseExited( MouseEvent e ) {
 			// user exited, clear the ROI that's in progress
 			if (state == 1) {
 				resetRoi();
@@ -675,7 +688,7 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 			}
 		}
 
-		@Override 	public void mouseDragged( MouseEvent e ) {
+		@Override public void mouseDragged( MouseEvent e ) {
 			if (state == 1) {
 				Point2D_F64 p = pixelToPoint(e.getX(), e.getY());
 				x1 = (int)Math.round(p.x);
@@ -686,7 +699,7 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 			}
 		}
 
-		@Override 	public void mouseMoved( MouseEvent e ) {}
+		@Override public void mouseMoved( MouseEvent e ) {}
 	}
 
 	/**
@@ -699,7 +712,7 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 			super(new ProgressMonitor(owner, "Computing Disparity", "", 0, 100));
 		}
 
-		@Override 	public void doRun() {
+		@Override public void doRun() {
 			SwingUtilities.invokeLater(() -> {
 				monitor.setProgress(state);
 				state = (++state%100);
