@@ -723,7 +723,7 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 	public static void main( String[] args ) {
 		String stereoCalib = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess/stereo.yaml");
 
-		List<PathLabel> examples = new ArrayList<>();
+		var examples = new ArrayList<PathLabel>();
 		examples.add(new PathLabel("Chair 1", stereoCalib
 				, UtilIO.pathExample("stereo/chair01_left.jpg"), UtilIO.pathExample("stereo/chair01_right.jpg")));
 //		inputs.add(new PathLabel("Chair 2",  new File(dirCalib,"stereo.yaml"),dirImgs+"chair02_left.jpg",dirImgs+"chair02_right.jpg"));
@@ -740,8 +740,7 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 				, UtilIO.pathExample("stereo/sundial01_left.jpg"), UtilIO.pathExample("stereo/sundial01_right.jpg")));
 
 		SwingUtilities.invokeLater(() -> {
-			VisualizeStereoDisparity app = new VisualizeStereoDisparity(examples);
-
+			var app = new VisualizeStereoDisparity<>(examples);
 			app.openExample(examples.get(0));
 			app.waitUntilInputSizeIsKnown();
 			app.display("Stereo Disparity");
