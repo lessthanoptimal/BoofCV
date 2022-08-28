@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,8 +38,7 @@ import org.ejml.UtilEjml;
  * @author Peter Abeles
  */
 @SuppressWarnings({"MissingOverride", "NullAway.Init"})
-public class SparseScoreRectifiedNcc<T extends ImageGray<T>> extends DisparitySparseRectifiedScoreBM<float[],T>
-{
+public class SparseScoreRectifiedNcc<T extends ImageGray<T>> extends DisparitySparseRectifiedScoreBM<float[], T> {
 	// Storage for temporary images used to compute local mean and stdev
 	public final SparseStatistics statsLeft = new SparseStatistics();
 	public final SparseStatistics statsRight = new SparseStatistics();
@@ -49,37 +48,37 @@ public class SparseScoreRectifiedNcc<T extends ImageGray<T>> extends DisparitySp
 	private final BlurStorageFilter<GrayF32> meanFilter;
 
 	// NCC tuning parameter used to avoid divide by zero
-	public float eps= UtilEjml.F_EPS;
+	public float eps = UtilEjml.F_EPS;
 
 	// the image patches after they have been normalized
-	private final GrayF32 adjustedLeft = new GrayF32(1,1);
-	private final GrayF32 adjustedRight = new GrayF32(1,1);
+	private final GrayF32 adjustedLeft = new GrayF32(1, 1);
+	private final GrayF32 adjustedRight = new GrayF32(1, 1);
 
 	// If true then the input images are normalized. See code comments
-	public boolean normalizeInput=true;
+	public boolean normalizeInput = true;
 	NormalizeParameters parameters = new NormalizeParameters();
 
 	// Fit scores as a function of disparity. scores[0] = score at disparity of disparityMin
 	@Getter protected float[] scoreLtoR; // left to right
 	@Getter protected float[] scoreRtoL; // right to left
 
-	public SparseScoreRectifiedNcc(int blockRadiusX, int blockRadiusY, Class<T> imageType ) {
+	public SparseScoreRectifiedNcc( int blockRadiusX, int blockRadiusY, Class<T> imageType ) {
 		super(blockRadiusX, blockRadiusY, imageType);
-		super.setSampleRegion(0,0);
+		super.setSampleRegion(0, 0);
 		// this will skip over the image border. In this situation that is all but the inner post row
-		meanFilter = FactoryBlurFilter.meanB(ImageType.SB_F32,blockRadiusX,blockRadiusY,null);
+		meanFilter = FactoryBlurFilter.meanB(ImageType.SB_F32, blockRadiusX, blockRadiusY, null);
 	}
 
 	@Override
-	public void configure(int disparityMin, int disparityRange) {
+	public void configure( int disparityMin, int disparityRange ) {
 		super.configure(disparityMin, disparityRange);
-		scoreLtoR = new float[ disparityRange ];
-		scoreRtoL = new float[ disparityRange ];
+		scoreLtoR = new float[disparityRange];
+		scoreRtoL = new float[disparityRange];
 	}
 
 	@Override
-	protected void scoreDisparity(int disparityRange, final boolean leftToRight) {
-		if( normalizeInput ) {
+	protected void scoreDisparity( int disparityRange, final boolean leftToRight ) {
+		if (normalizeInput) {
 			// Apply normalization to the right patch because it tends to be larger. In the batch algorithm
 			// normalization is computed against the entire left image. Since doing so would make the runtime
 			// be O(width*height) that's not done here.
@@ -87,13 +86,13 @@ public class SparseScoreRectifiedNcc<T extends ImageGray<T>> extends DisparitySp
 			ImageNormalization.apply(patchTemplate, parameters, adjustedLeft);
 		} else {
 			// Don't normalize the image and just copy/convert the image type to float
-			GConvertImage.convert(patchTemplate,adjustedLeft);
-			GConvertImage.convert(patchCompare,adjustedRight);
+			GConvertImage.convert(patchTemplate, adjustedLeft);
+			GConvertImage.convert(patchCompare, adjustedRight);
 		}
 
 		// Compute local image statics for divisor in NCC error
-		computeStats(adjustedLeft,statsLeft);
-		computeStats(adjustedRight,statsRight);
+		computeStats(adjustedLeft, statsLeft);
+		computeStats(adjustedRight, statsRight);
 
 		// Save reference to internal data structures as short hand
 		final float[] dataLeft = adjustedLeft.data;
@@ -104,48 +103,48 @@ public class SparseScoreRectifiedNcc<T extends ImageGray<T>> extends DisparitySp
 		final int ry = radiusY;
 
 		// Extract left image patch information
-		final float meanL = statsLeft.mean.unsafe_get(rx,ry);
-		final float meanP2L = statsLeft.pow2mean.unsafe_get(rx,ry);
-		final float sigmaL = (float)Math.sqrt(Math.max(0,meanP2L-meanL*meanL));
+		final float meanL = statsLeft.mean.unsafe_get(rx, ry);
+		final float meanP2L = statsLeft.pow2mean.unsafe_get(rx, ry);
+		final float sigmaL = (float)Math.sqrt(Math.max(0, meanP2L - meanL*meanL));
 
 		// Area the mean filter is being applied to
 		final float area = blockWidth*blockHeight;
 
 		final float[] scores = leftToRight ? scoreLtoR : scoreRtoL;
 		for (int d = 0; d < disparityRange; d++) {
-			final float meanR = statsRight.mean.unsafe_get(rx+d,ry);
-			final float meanP2R = statsRight.pow2mean.unsafe_get(rx+d,ry);
-			final float sigmaR = (float)Math.sqrt(Math.max(0,meanP2R-meanR*meanR));
+			final float meanR = statsRight.mean.unsafe_get(rx + d, ry);
+			final float meanP2R = statsRight.pow2mean.unsafe_get(rx + d, ry);
+			final float sigmaR = (float)Math.sqrt(Math.max(0, meanP2R - meanR*meanR));
 
 			float correlation = 0;
 			for (int y = 0; y < blockHeight; y++) {
-				int idxLeft  = (y+sampleRadiusY)*adjustedLeft.stride + sampleRadiusX;
-				int idxRight = (y+sampleRadiusY)*adjustedRight.stride + sampleRadiusX+d;
+				int idxLeft = (y + sampleRadiusY)*adjustedLeft.stride + sampleRadiusX;
+				int idxRight = (y + sampleRadiusY)*adjustedRight.stride + sampleRadiusX + d;
 				for (int x = 0; x < blockWidth; x++) {
-					correlation += dataLeft[idxLeft++] * dataRight[idxRight++];
+					correlation += dataLeft[idxLeft++]*dataRight[idxRight++];
 				}
 			}
-			int index = leftToRight ? disparityRange-d-1 : d;
+			int index = leftToRight ? disparityRange - d - 1 : d;
 			correlation /= area;
-			scores[index] = (correlation - meanL*meanR)/(eps+sigmaL*sigmaR);
+			scores[index] = (correlation - meanL*meanR)/(eps + sigmaL*sigmaR);
 		}
 	}
 
 	/**
 	 * Computes local image statics needed by NCC error
 	 */
-	private void computeStats( GrayF32 input , SparseStatistics stats ) {
-		meanFilter.process(input,stats.mean);
-		GPixelMath.pow2(input,stats.pow2);
+	private void computeStats( GrayF32 input, SparseStatistics stats ) {
+		meanFilter.process(input, stats.mean);
+		GPixelMath.pow2(input, stats.pow2);
 		meanFilter.process(stats.pow2, stats.pow2mean);
 	}
 
 	private static class SparseStatistics {
 		// local mean
-		final GrayF32 mean = new GrayF32(1,1);
+		final GrayF32 mean = new GrayF32(1, 1);
 		// local mean of pixel value squared
-		final GrayF32 pow2mean = new GrayF32(1,1);
+		final GrayF32 pow2mean = new GrayF32(1, 1);
 		// pixel values squared
-		final GrayF32 pow2 = new GrayF32(1,1);
+		final GrayF32 pow2 = new GrayF32(1, 1);
 	}
 }

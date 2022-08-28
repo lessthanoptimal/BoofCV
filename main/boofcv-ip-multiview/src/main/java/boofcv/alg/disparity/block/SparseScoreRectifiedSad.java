@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,13 +31,13 @@ import boofcv.struct.image.GrayU8;
  */
 public interface SparseScoreRectifiedSad {
 	class F32 extends DisparitySparseRectifiedScoreBM_F32 {
-		public F32(int radiusX, int radiusY) {
+		public F32( int radiusX, int radiusY ) {
 			super(radiusX, radiusY);
-			setSampleRegion(0,0);
+			setSampleRegion(0, 0);
 		}
 
 		@Override
-		protected void scoreDisparity(final int disparityRange, final boolean leftToRight) {
+		protected void scoreDisparity( final int disparityRange, final boolean leftToRight ) {
 			final float[] scores = leftToRight ? scoreLtoR : scoreRtoL;
 			final float[] dataLeft = patchTemplate.data;
 			final float[] dataRight = patchCompare.data;
@@ -45,25 +45,25 @@ public interface SparseScoreRectifiedSad {
 				float total = 0;
 				int idxLeft = 0;
 				for (int y = 0; y < blockHeight; y++) {
-					int idxRight = y* patchCompare.stride+d;
+					int idxRight = y*patchCompare.stride + d;
 					for (int x = 0; x < blockWidth; x++) {
 						total += Math.abs(dataLeft[idxLeft++] - dataRight[idxRight++]);
 					}
 				}
-				int index = leftToRight ? disparityRange-d-1 : d;
+				int index = leftToRight ? disparityRange - d - 1 : d;
 				scores[index] = total;
 			}
 		}
 	}
 
 	class U8 extends DisparitySparseRectifiedScoreBM_S32<GrayU8> {
-		public U8(int radiusX, int radiusY) {
+		public U8( int radiusX, int radiusY ) {
 			super(radiusX, radiusY, GrayU8.class);
-			setSampleRegion(0,0);
+			setSampleRegion(0, 0);
 		}
 
 		@Override
-		protected void scoreDisparity(final int disparityRange, final boolean leftToRight) {
+		protected void scoreDisparity( final int disparityRange, final boolean leftToRight ) {
 			final int[] scores = leftToRight ? scoreLtoR : scoreRtoL;
 			final byte[] dataLeft = patchTemplate.data;
 			final byte[] dataRight = patchCompare.data;
@@ -71,25 +71,25 @@ public interface SparseScoreRectifiedSad {
 				int total = 0;
 				int idxLeft = 0;
 				for (int y = 0; y < blockHeight; y++) {
-					int idxRight = y* patchCompare.stride+d;
+					int idxRight = y*patchCompare.stride + d;
 					for (int x = 0; x < blockWidth; x++) {
-						total += Math.abs( (dataLeft[idxLeft++]&0xFF) - (dataRight[idxRight++]&0xFF) );
+						total += Math.abs((dataLeft[idxLeft++] & 0xFF) - (dataRight[idxRight++] & 0xFF));
 					}
 				}
-				int index = leftToRight ? disparityRange-d-1 : d;
+				int index = leftToRight ? disparityRange - d - 1 : d;
 				scores[index] = total;
 			}
 		}
 	}
 
 	class U16 extends DisparitySparseRectifiedScoreBM_S32<GrayU16> {
-		public U16(int radiusX, int radiusY) {
+		public U16( int radiusX, int radiusY ) {
 			super(radiusX, radiusY, GrayU16.class);
-			setSampleRegion(0,0);
+			setSampleRegion(0, 0);
 		}
 
 		@Override
-		protected void scoreDisparity(final int disparityRange, final boolean leftToRight) {
+		protected void scoreDisparity( final int disparityRange, final boolean leftToRight ) {
 			final int[] scores = leftToRight ? scoreLtoR : scoreRtoL;
 			final short[] dataLeft = patchTemplate.data;
 			final short[] dataRight = patchCompare.data;
@@ -97,25 +97,25 @@ public interface SparseScoreRectifiedSad {
 				int total = 0;
 				int idxLeft = 0;
 				for (int y = 0; y < blockHeight; y++) {
-					int idxRight = y* patchCompare.stride+d;
+					int idxRight = y*patchCompare.stride + d;
 					for (int x = 0; x < blockWidth; x++) {
-						total += Math.abs( (dataLeft[idxLeft++]&0xFFFF) - (dataRight[idxRight++]&0xFFFF) );
+						total += Math.abs((dataLeft[idxLeft++] & 0xFFFF) - (dataRight[idxRight++] & 0xFFFF));
 					}
 				}
-				int index = leftToRight ? disparityRange-d-1 : d;
+				int index = leftToRight ? disparityRange - d - 1 : d;
 				scores[index] = total;
 			}
 		}
 	}
 
 	class S16 extends DisparitySparseRectifiedScoreBM_S32<GrayS16> {
-		public S16(int radiusX, int radiusY) {
+		public S16( int radiusX, int radiusY ) {
 			super(radiusX, radiusY, GrayS16.class);
-			setSampleRegion(0,0);
+			setSampleRegion(0, 0);
 		}
 
 		@Override
-		protected void scoreDisparity(final int disparityRange, final boolean leftToRight) {
+		protected void scoreDisparity( final int disparityRange, final boolean leftToRight ) {
 			final int[] scores = leftToRight ? scoreLtoR : scoreRtoL;
 			final short[] dataLeft = patchTemplate.data;
 			final short[] dataRight = patchCompare.data;
@@ -123,12 +123,12 @@ public interface SparseScoreRectifiedSad {
 				int total = 0;
 				int idxLeft = 0;
 				for (int y = 0; y < blockHeight; y++) {
-					int idxRight = y* patchCompare.stride+d;
+					int idxRight = y*patchCompare.stride + d;
 					for (int x = 0; x < blockWidth; x++) {
-						total += Math.abs( (dataLeft[idxLeft++]&0xFFFF) - (dataRight[idxRight++]&0xFFFF) );
+						total += Math.abs((dataLeft[idxLeft++] & 0xFFFF) - (dataRight[idxRight++] & 0xFFFF));
 					}
 				}
-				int index = leftToRight ? disparityRange-d-1 : d;
+				int index = leftToRight ? disparityRange - d - 1 : d;
 				scores[index] = total;
 			}
 		}

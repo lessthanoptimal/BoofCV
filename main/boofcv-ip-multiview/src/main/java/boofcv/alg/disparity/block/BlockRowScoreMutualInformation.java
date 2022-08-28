@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,19 +30,20 @@ import boofcv.struct.image.ImageType;
  * @author Peter Abeles
  */
 public interface BlockRowScoreMutualInformation {
-	class U8 extends BlockRowScore.ArrayS32_BS32<GrayU8,byte[]> {
+	class U8 extends BlockRowScore.ArrayS32_BS32<GrayU8, byte[]> {
 		StereoMutualInformation mi;
-		public U8(StereoMutualInformation mi) {
+
+		public U8( StereoMutualInformation mi ) {
 			super(SgmDisparityCost.MAX_COST);
 			this.mi = mi;
 		}
 
 		@Override
-		public void score(byte[] leftRow, byte[] rightRow, int indexLeft, int indexRight, int offset, int length, int[] elementScore) {
-			for( int i = 0; i < length; i++ ) {
-				final int a = leftRow[ indexLeft++ ]& 0xFF;
-				final int b = rightRow[ indexRight++ ]& 0xFF;
-				elementScore[offset+i] = mi.costScaled(a,b);
+		public void score( byte[] leftRow, byte[] rightRow, int indexLeft, int indexRight, int offset, int length, int[] elementScore ) {
+			for (int i = 0; i < length; i++) {
+				final int a = leftRow[indexLeft++] & 0xFF;
+				final int b = rightRow[indexRight++] & 0xFF;
+				elementScore[offset + i] = mi.costScaled(a, b);
 			}
 		}
 
