@@ -273,7 +273,7 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 
 		// Save the results
 		info.disparity = stereoDisparity.getDisparity();
-		info.score = Objects.requireNonNull(stereoDisparity.getDisparityScore(), "Stereo must have errors");
+		info.score = Objects.requireNonNull(stereoDisparity.getDisparityScore(), "Stereo must have score turned on");
 
 		// Filter out pixels outside the original image
 		ImageMiscOps.maskFill(info.disparity, mask, 0, info.param.disparityRange);

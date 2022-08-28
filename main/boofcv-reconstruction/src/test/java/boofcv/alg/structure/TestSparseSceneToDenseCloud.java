@@ -37,9 +37,6 @@ import static boofcv.misc.BoofMiscOps.uniform;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * @author Peter Abeles
- */
 class TestSparseSceneToDenseCloud extends BoofStandardJUnit {
 
 	int width = 50;
@@ -50,8 +47,8 @@ class TestSparseSceneToDenseCloud extends BoofStandardJUnit {
 	 * and the number of times its called is recorded as a sanity check.
 	 */
 	@Test void simpleScenario() {
-		DummyLookUp lookup = new DummyLookUp();
-		DummyStereo stereo = new DummyStereo();
+		var lookup = new DummyLookUp();
+		var stereo = new DummyStereo();
 
 		SparseSceneToDenseCloud<GrayU8> alg = FactorySceneReconstruction.sparseSceneToDenseCloud(null, ImageType.SB_U8);
 		// Reduce tolerances to ensure that nothing is pruned
@@ -121,7 +118,7 @@ class TestSparseSceneToDenseCloud extends BoofStandardJUnit {
 		}
 
 		// @formatter:off
-		@Override public @Nullable GrayF32 getDisparityScore() {return null;}
+		@Override public @Nullable GrayF32 getDisparityScore() {return new GrayF32(width, height);}
 		@Override public int getDisparityMin() {return 5;}
 		@Override public int getDisparityRange() {return 100;}
 		@Override public int getInvalidValue() {return 10;}
