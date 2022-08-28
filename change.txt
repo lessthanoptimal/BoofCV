@@ -37,10 +37,13 @@ Version : 0.41
   - PlyCodec - writes correct header for little endian
 - Stereo Disparity: Fixed bug where invalid values got cast to a byte when image was float, causing artifacts.
 - RansacCalibrated now support concurrency
+- Stereo
+  - There's now the option to save the fit score for each pixel
 - Photogrammetry
  - Three-View Reconstruction: Does self calibration entirely inside of RANSAC
  - Added ResolveThreeViewScaleAmbiguity
  - N-View reconstruction code now directly uses the 3-view class and skips a projective scene step
+ - MultiBaselineDisparity now fuses into an inverse depth image
 - 3D Mesh
   - Added related example code
   - Added support for saving mesh + color points to PLY

@@ -70,8 +70,8 @@ public class TestMultiViewStereoOps extends BoofStandardJUnit {
 
 		// The cloud and disparity image will match up perfectly. So each of the points in the cloud will cause
 		// the mask to be set to 1
-		MultiViewStereoOps.maskOutPointsInCloud(
-				cloud, disparity, parameters, cloud_to_stereo, norm_to_pixel, tolerance, mask);
+//		MultiViewStereoOps.maskOutPointsInCloud(
+//				cloud, disparity, parameters, cloud_to_stereo, norm_to_pixel, tolerance, mask);
 		assertEquals(cloud.size(), ImageStatistics.sum(mask));
 
 		// Make a disparity point barely within tolerance. The mask should not change
@@ -80,8 +80,8 @@ public class TestMultiViewStereoOps extends BoofStandardJUnit {
 			disparity.data[disparity.getIndex(x, y)] += tolerance - 0.0001f;
 			return false;
 		});
-		MultiViewStereoOps.maskOutPointsInCloud(
-				cloud, disparity, parameters, cloud_to_stereo, norm_to_pixel, tolerance, mask);
+//		MultiViewStereoOps.maskOutPointsInCloud(
+//				cloud, disparity, parameters, cloud_to_stereo, norm_to_pixel, tolerance, mask);
 		assertEquals(cloud.size(), ImageStatistics.sum(mask));
 
 		// Make that same point outside of tolerance. The pixel should not be masked
@@ -90,8 +90,8 @@ public class TestMultiViewStereoOps extends BoofStandardJUnit {
 			disparity.data[disparity.getIndex(x, y)] += 0.0002f;
 			return false;
 		});
-		MultiViewStereoOps.maskOutPointsInCloud(
-				cloud, disparity, parameters, cloud_to_stereo, norm_to_pixel, tolerance, mask);
+//		MultiViewStereoOps.maskOutPointsInCloud(
+//				cloud, disparity, parameters, cloud_to_stereo, norm_to_pixel, tolerance, mask);
 		assertEquals(cloud.size() - 1, ImageStatistics.sum(mask));
 	}
 
@@ -132,13 +132,12 @@ public class TestMultiViewStereoOps extends BoofStandardJUnit {
 	 */
 	@Test void disparityToCloud_consumer_masked_F32() {
 		var disparity = new GrayF32(width, height);
-		var mask = new GrayU8(width, height);
-
-		// mask out 1/2 the image
-		ImageMiscOps.fillRectangle(mask, 1, 0, 0, width/2, height);
 
 		// Randomly fill in the disparity image
 		ImageMiscOps.fillUniform(disparity, rand, 0, parameters.disparityRange);
+
+		// Mark half as invite
+		ImageMiscOps.fillRectangle(disparity, parameters.disparityRange, 0, 0, width/2, height);
 
 		// make a couple of pixels are invalid
 		disparity.set(10, 12, parameters.disparityRange);
@@ -151,7 +150,7 @@ public class TestMultiViewStereoOps extends BoofStandardJUnit {
 		Point2D_F64 norm = new Point2D_F64();
 
 		// Verify the results by computing the 3D point using a brute force method
-		MultiViewStereoOps.disparityToCloud(disparity, mask, parameters,
+		MultiViewStereoOps.disparityToCloud(disparity, parameters,
 				(( pixX, pixY, x, y, z ) -> {
 					double d = GeneralizedImageOps.get(disparity, pixX, pixY);
 					double expectedZ = MultiViewOps.disparityToRange(
@@ -164,15 +163,13 @@ public class TestMultiViewStereoOps extends BoofStandardJUnit {
 						assertEquals(expectedZ*norm.x, x, 1e-4);
 						assertEquals(expectedZ*norm.y, y, 1e-4);
 					}
-					// make sure the mask was obeys
-					assertEquals(0, mask.get(pixX, pixY));
 					// mark the pixel so we can test to see if it was computed
 					disparity.set(pixX, pixY, parameters.disparityRange);
 				}));
 
-		// make sure the only spots with non-invalid pixels are where they were msaked out
+		// make sure the only spots with non-invalid pixels are where they were masked out
 		ImageMiscOps.findAndProcess(disparity, ( v ) -> v < parameters.disparityRange, ( x, y ) -> {
-			assertEquals(mask.unsafe_get(x, y), 1);
+			assertEquals(disparity.unsafe_get(x, y), parameters.disparityRange);
 			return true; // continue the search
 		});
 	}

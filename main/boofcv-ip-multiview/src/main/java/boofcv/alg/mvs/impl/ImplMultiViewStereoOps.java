@@ -18,7 +18,6 @@
 
 package boofcv.alg.mvs.impl;
 
-import boofcv.alg.InputSanityCheck;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.rectify.DisparityParameters;
 import boofcv.misc.BoofLambdas;
@@ -34,10 +33,9 @@ import georegression.struct.point.Point2D_F64;
  * @author Peter Abeles
  */
 public class ImplMultiViewStereoOps {
-	public static void disparityToCloud( GrayF32 disparity, GrayU8 mask,
+	public static void disparityToCloud( GrayF32 disparity,
 										 DisparityParameters parameters,
 										 BoofLambdas.PixXyzConsumer_F64 consumer ) {
-		InputSanityCheck.checkSameShape(disparity, mask);
 
 		final CameraPinhole intrinsic = parameters.pinhole;
 		final double baseline = parameters.baseline;
@@ -48,11 +46,8 @@ public class ImplMultiViewStereoOps {
 
 		for (int pixY = 0; pixY < disparity.height; pixY++) {
 			int indexDisp = disparity.startIndex + pixY*disparity.stride;
-			int indexMask = mask.startIndex + pixY*mask.stride;
 
-			for (int pixX = 0; pixX < disparity.width; pixX++, indexDisp++, indexMask++) {
-				if (mask.data[indexMask] != 0)
-					continue;
+			for (int pixX = 0; pixX < disparity.width; pixX++, indexDisp++) {
 				float d = disparity.data[indexDisp];
 				if (d >= parameters.disparityRange)
 					continue;
@@ -154,6 +149,36 @@ public class ImplMultiViewStereoOps {
 				double outZ = R[2]*X + R[5]*Y + R[8]*Z;
 
 				consumer.process(pixX, pixY, outX, outY, outZ);
+			}
+		}
+	}
+
+	public static void inverseToCloud( GrayF32 inverseDepthImage,
+									   PixelTransform<Point2D_F64> pixelToNorm,
+									   BoofLambdas.PixXyzConsumer_F64 consumer ) {
+
+		// pixel in normalized image coordinates
+		final Point2D_F64 norm = new Point2D_F64();
+
+		for (int pixY = 0; pixY < inverseDepthImage.height; pixY++) {
+			int indexDisp = inverseDepthImage.startIndex + pixY*inverseDepthImage.stride;
+
+			for (int pixX = 0; pixX < inverseDepthImage.width; pixX++, indexDisp++) {
+				float inv = inverseDepthImage.data[indexDisp];
+
+				// Skip over invalid and infinite points
+				if (inv <= 0.0f)
+					continue;
+
+				// Converts the pixel into normalized image coordinate
+				pixelToNorm.compute(pixX, pixY, norm);
+
+				// Compute the point in rectified reference frame
+				double X = norm.x/inv;
+				double Y = norm.y/inv;
+				double Z = 1.0/inv;
+
+				consumer.process(pixX, pixY, X, Y, Z);
 			}
 		}
 	}

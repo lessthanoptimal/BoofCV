@@ -22,10 +22,8 @@ import boofcv.alg.distort.DoNothingPixelTransform_F64;
 import boofcv.alg.distort.PixelTransformAffine_F64;
 import boofcv.alg.geo.rectify.DisparityParameters;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.alg.misc.ImageStatistics;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofStandardJUnit;
 import org.ddogleg.struct.DogArray_F32;
 import org.ejml.UtilEjml;
@@ -48,20 +46,18 @@ public class TestMultiBaselineDisparityMedian extends BoofStandardJUnit {
 		distort.getModel().setTo(2, 0, 0, 2, 0, 0);
 		intrinsic.width = 100;
 		intrinsic.height = 80;
-		alg.initialize(intrinsic, distort);
+		alg.initialize(intrinsic.width, intrinsic.height, distort);
 
 		for (int i = 0; i < 3; i++) {
 			// to make it easy every image is the same size as fused
 			var disparity = new GrayF32(100, 80);
-			var mask = new GrayU8(100, 80);
 			var rect = new DMatrixRMaj(3, 3);
 
 			// see next test below for an explanation of this logic
 			ImageMiscOps.fill(disparity, 5 + i);
-			ImageMiscOps.fillRectangle(mask, 1, 1, 1, 79, 59);
 			CommonOps_DDRM.diag(rect, 3, 0.5, 0.5, 1); // undoes distortion model to keep pixels the same
 
-			alg.addDisparity(disparity, mask, parameters, rect);
+			alg.addDisparity(disparity, parameters, rect);
 		}
 
 		// wrong size to make sure it's resized
@@ -73,11 +69,11 @@ public class TestMultiBaselineDisparityMedian extends BoofStandardJUnit {
 		for (int y = 0; y < intrinsic.height; y++) {
 			for (int x = 0; x < intrinsic.width; x++) {
 				if (y == 0 || x == 0) {
-					assertEquals(alg.fusedDisparityRange, found.get(x, y));
+					assertEquals(Float.NaN, found.get(x, y));
 				} else if (y < 60 && x < 80) {
-					assertEquals(alg.fusedDisparityRange - 1, found.get(x, y));
+					assertEquals(345345, found.get(x, y));
 				} else {
-					assertEquals(alg.fusedDisparityRange, found.get(x, y));
+					assertEquals(Float.NaN, found.get(x, y));
 				}
 			}
 		}
@@ -91,29 +87,26 @@ public class TestMultiBaselineDisparityMedian extends BoofStandardJUnit {
 		var alg = new MultiBaselineDisparityMedian();
 		var distort = new PixelTransformAffine_F64();
 		distort.getModel().setTo(2, 0, 0, 2, 0, 0);
-		alg.initialize(intrinsic, distort);
-		alg.fusedBaseline = parameters.baseline;
+		alg.initialize(intrinsic.width, intrinsic.height, distort);
 
 		var image = new MultiBaselineDisparityMedian.DisparityImage();
 		image.disparity.reshape(intrinsic.width, intrinsic.height - 12);
 		ImageMiscOps.fill(image.disparity, 5);
-		image.mask.reshape(image.disparity);
 		image.parameters.setTo(parameters);
+
 		// only part of the mask has valid values
-		ImageMiscOps.fillRectangle(image.mask, 1, 1, 1, 79, 59);
-		// when inverted this will counter act the distort above
+		ImageMiscOps.fillRectangle(image.disparity, parameters.disparityRange, 0, 0, intrinsic.width, 5);
+		// when inverted this will counteract the distortion above
 		CommonOps_DDRM.diag(image.undist_to_rect_px, 3, 0.5, 0.5, 1);
 
 		assertTrue(alg.addToFusedImage(image));
 		for (int y = 0; y < intrinsic.height; y++) {
 			for (int x = 0; x < intrinsic.width; x++) {
-				if (y == 0 || x == 0 || y >= image.disparity.height) {
+				if (y < 5) {
 					assertEquals(0, alg.fused.get(x, y).size, x + " " + y);
-				} else if (y < 60 && x < 80) {
+				} else {
 					assertEquals(1, alg.fused.get(x, y).size);
 					assertEquals(10, alg.fused.get(x, y).get(0));
-				} else {
-					assertEquals(0, alg.fused.get(x, y).size);
 				}
 			}
 		}
@@ -127,14 +120,11 @@ public class TestMultiBaselineDisparityMedian extends BoofStandardJUnit {
 		var alg = new MultiBaselineDisparityMedian();
 		var distort = new PixelTransformAffine_F64();
 		distort.getModel().setTo(1, 0, 0, 1, 0, 0);
-		alg.initialize(intrinsic, distort);
-		alg.fusedBaseline = parameters.baseline;
+		alg.initialize(intrinsic.width, intrinsic.height, distort);
 
 		var image = new MultiBaselineDisparityMedian.DisparityImage();
 		image.disparity.reshape(intrinsic.width, intrinsic.height);
-		image.mask.reshape(image.disparity);
 		image.parameters.setTo(parameters);
-		ImageMiscOps.fill(image.mask, 1);
 		CommonOps_DDRM.diag(image.undist_to_rect_px, 3, 1, 1, 1);
 		// every point will be at infinity
 		ImageMiscOps.fill(image.disparity, 0);
@@ -157,7 +147,7 @@ public class TestMultiBaselineDisparityMedian extends BoofStandardJUnit {
 		var alg = new MultiBaselineDisparityMedian();
 		intrinsic.width = 10;
 		intrinsic.height = 8;
-		alg.initialize(intrinsic, new DoNothingPixelTransform_F64());
+		alg.initialize(intrinsic.width, intrinsic.height, new DoNothingPixelTransform_F64());
 
 		// add elements to each fused pixel that will be easy to compute the solution for
 		int counter = 0;
@@ -197,7 +187,7 @@ public class TestMultiBaselineDisparityMedian extends BoofStandardJUnit {
 		var alg = new MultiBaselineDisparityMedian();
 		intrinsic.width = 10;
 		intrinsic.height = 8;
-		alg.initialize(intrinsic, new DoNothingPixelTransform_F64());
+		alg.initialize(intrinsic.width, intrinsic.height, new DoNothingPixelTransform_F64());
 
 		// This will fail because every pixel is empty
 		assertFalse(alg.computeFused(new GrayF32(10, 8)));
@@ -227,14 +217,11 @@ public class TestMultiBaselineDisparityMedian extends BoofStandardJUnit {
 		var param2 = new DisparityParameters(5, 100, 500*baselineScale, intrinsic2);
 
 		var alg = new MultiBaselineDisparityMedian();
-		alg.initialize(intrinsic, new DoNothingPixelTransform_F64());
-		alg.fusedBaseline = 500; // keep the baseline the same, yes this should be checked too but isn't here
+		alg.initialize(intrinsic.width, intrinsic.height, new DoNothingPixelTransform_F64());
 
 		var image = new MultiBaselineDisparityMedian.DisparityImage();
 		image.disparity.reshape(width, height);
 		ImageMiscOps.fill(image.disparity, imageValue);
-		image.mask.reshape(image.disparity);
-		ImageMiscOps.fill(image.mask, 1);
 		image.parameters.setTo(param2);
 		CommonOps_DDRM.setIdentity(image.undist_to_rect_px);
 
@@ -250,37 +237,5 @@ public class TestMultiBaselineDisparityMedian extends BoofStandardJUnit {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Ensures the adjusted disparity image produces the same point cloud and has an expected range
-	 */
-	@Test void computeDynamicParameters() {
-		float fx = 800.0f; // an arbitrary focal length
-		var alg = new MultiBaselineDisparityMedian();
-		var disparity = new GrayF32(40, 30);
-
-		//  Give it a max value more than the fixed range of 100
-		for (int i = 0; i < 30; i++) {
-			disparity.set(i, 5, i + 80);
-		}
-
-		// The max is too high and it should to scale it down
-		alg.fusedBaseline = 1.5;
-		alg.computeDynamicParameters(disparity);
-		assertEquals(alg.fusedDisparityRange - 1, ImageStatistics.max(disparity), UtilEjml.TEST_F32);
-		assertTrue(alg.fusedBaseline < 1.5);
-		// Compute the Z distance of a point with original parameters now try it again with the new parameters
-		assertEquals(1.5*fx/109.0, alg.fusedBaseline*fx/99.0, UtilEjml.TEST_F32);
-
-		// Max value is too small and range should be increased
-		for (int i = 0; i < 30; i++) {
-			disparity.set(i, 5, i + 5);
-		}
-		alg.fusedBaseline = 1.5;
-		alg.computeDynamicParameters(disparity);
-		assertEquals(alg.fusedDisparityRange - 1, ImageStatistics.max(disparity), UtilEjml.TEST_F32);
-		assertTrue(alg.fusedBaseline > 1.5);
-		assertEquals(1.5*fx/34, alg.fusedBaseline*fx/99.0, UtilEjml.TEST_F32);
 	}
 }

@@ -24,13 +24,15 @@ import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.distort.brown.LensDistortionBrown;
 import boofcv.alg.geo.bundle.BundleAdjustmentOps;
 import boofcv.alg.geo.rectify.DisparityParameters;
-import boofcv.alg.misc.ImageMiscOps;
 import boofcv.misc.BoofMiscOps;
 import boofcv.misc.LookUpImages;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.distort.PointToPixelTransform_F64;
-import boofcv.struct.image.*;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageDimension;
+import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import gnu.trove.map.TIntObjectMap;
@@ -125,9 +127,6 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 
 	// Which SBA view indexes are paired to the target
 	DogArray_I32 imagePairIndexesSba = new DogArray_I32();
-
-	// Used when a stereo mask is required but none is available
-	GrayU8 dummyMask = new GrayU8(1, 1);
 
 	CameraPinholeBrown brown = new CameraPinholeBrown();
 
@@ -225,10 +224,10 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 
 		if (listener != null) {
 			Listener<T> _listener = this.listener;
-			computeFused.setListener(( left, right, rectLeft, rectRight, disparity, mask, parameters, rect ) -> {
+			computeFused.setListener(( left, right, rectLeft, rectRight, disparity, parameters, rect ) -> {
 				String leftID = indexSbaToViewID.get(left);
 				String rightID = indexSbaToViewID.get(right);
-				_listener.handlePairDisparity(leftID, rightID, rectLeft, rectRight, disparity, mask, parameters);
+				_listener.handlePairDisparity(leftID, rightID, rectLeft, rectRight, disparity, parameters);
 			});
 		} else {
 			computeFused.setListener(null);
@@ -403,28 +402,33 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 
 		// The fused disparity doesn't compute a mask since all invalid pixels are marked as invalid using
 		// the disparity value
-		GrayF32 disparity = computeFused.fusedDisparity;
-		dummyMask.reshape(disparity);
-		ImageMiscOps.fill(dummyMask, 0);
+		GrayF32 inverseDepth = computeFused.fusedInvDepth;
+//		double fusedBaseline = computeFused.performFusion.fusedBaseline;
 
 		// Pass along results to the listener
 		if (listener != null) {
-			listener.handleFusedDisparity(center.relations.id, disparity, dummyMask, computeFused.fusedParam);
+			listener.handleFused(center.relations.id, inverseDepth);
 		}
 
 		// Convert data structures into a format which is understood by disparity to cloud
 		BundleAdjustmentCamera camera = scene.cameras.get(center.metric.camera).model;
-		BundleAdjustmentOps.convert(camera, disparity.width, disparity.height, brown);
+		BundleAdjustmentOps.convert(camera, inverseDepth.width, inverseDepth.height, brown);
+
 		// The fused disparity is in regular pixels and not rectified
 		Point2Transform2_F64 norm_to_pixel = new LensDistortionBrown(brown).distort_F64(false, true);
 		Point2Transform2_F64 pixel_to_norm = new LensDistortionBrown(brown).undistort_F64(true, false);
+
 		// world/cloud coordinates into this view
 		scene.getWorldToView(center.metric, world_to_view1, tmp);
 
 		// Use the computed disparity to add to the common point cloud while not adding points already in
 		// the cloud
-		disparityCloud.addDisparity(disparity, dummyMask, world_to_view1, computeFused.fusedParam,
+		//  TODO somehow related inverse depth back to pixels to determine observability
+//		disparityCloud.disparitySimilarTol = fusedBaseline;
+		disparityCloud.addInverseDepth(inverseDepth, world_to_view1,
 				norm_to_pixel, new PointToPixelTransform_F64(pixel_to_norm));
+
+		if (verbose != null) verbose.println("fused cloud.size=" + disparityCloud.cloud.size);
 
 		return true;
 	}
@@ -526,13 +530,12 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 		 * passed in
 		 */
 		void handlePairDisparity( String left, String right, RectImg rectLeft, RectImg rectRight,
-								  GrayF32 disparity, GrayU8 mask,
+								  GrayF32 disparity,
 								  DisparityParameters parameters );
 
 		/**
-		 * After a fused disparity image has been computed, this function is called and the results passed in
+		 * After a fused inverse depth image has been computed, this function is called and the results passed in
 		 */
-		void handleFusedDisparity( String centerViewName, GrayF32 disparity, GrayU8 mask,
-								   DisparityParameters parameters );
+		void handleFused( String centerViewName, GrayF32 inverseDepth );
 	}
 }

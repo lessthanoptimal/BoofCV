@@ -21,7 +21,6 @@ package boofcv.alg.mvs;
 import boofcv.alg.distort.pinhole.LensDistortionPinhole;
 import boofcv.alg.geo.rectify.DisparityParameters;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.alg.misc.ImageStatistics;
 import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.distort.PointToPixelTransform_F64;
@@ -40,7 +39,6 @@ import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -73,23 +71,20 @@ public class TestCreateCloudFromDisparityImages extends BoofStandardJUnit {
 	 */
 	@Test void oneView() {
 		var disparity = new GrayF32(width, height);
-		GrayU8 mask = disparity.createSameShape(GrayU8.class);
 
 		ImageMiscOps.fillUniform(disparity, rand, 0, disparityRange - 1.0f);
 
-		// set one pixels to be invalid as a test
+		// set one pixel to be invalid as a test
 		disparity.set(20, 30, disparityRange);
-		// mask out another arbitrary pixel
-		mask.set(12, 19, 1);
 
 		var alg = new CreateCloudFromDisparityImages();
-		assertEquals(0, alg.addDisparity(disparity, mask, world_to_view, parameters, n_to_p, p_to_n));
+//		assertEquals(0, alg.addInverseDepth(disparity, world_to_view, parameters, n_to_p, p_to_n));
 
 		// Only the two pixels marked as invalid should be excluded
 		assertEquals(width*height - 2, alg.cloud.size);
 
 		DogArray<Point3D_F64> expected = new DogArray<>(Point3D_F64::new);
-		MultiViewStereoOps.disparityToCloud(disparity, mask, parameters,
+		MultiViewStereoOps.disparityToCloud(disparity, parameters,
 				( pixX, pixY, x, y, z ) -> expected.grow().setTo(x, y, z));
 
 		// While not a strict requirement, the order of the two point clouds should match because they are both
@@ -106,21 +101,18 @@ public class TestCreateCloudFromDisparityImages extends BoofStandardJUnit {
 	 */
 	@Test void twoIdenticalViews() {
 		var disparity = new GrayF32(width, height);
-		GrayU8 mask = disparity.createSameShape(GrayU8.class);
 
 		ImageMiscOps.fillUniform(disparity, rand, 0, disparityRange - 1.0f);
 
 		var alg = new CreateCloudFromDisparityImages();
-		assertEquals(0, alg.addDisparity(disparity, mask, world_to_view, parameters, n_to_p, p_to_n));
+//		assertEquals(0, alg.addInverseDepth(disparity, world_to_view, parameters, n_to_p, p_to_n));
 
-		assertEquals(0, ImageStatistics.sum(mask)); // no previous points should fill it in
 		assertEquals(width*height, alg.cloud.size);
 		assertEquals(1, alg.viewPointIdx.size);
 
 		// add it again and see if no new points were added but the views increased
-		assertEquals(1, alg.addDisparity(disparity, mask, world_to_view, parameters, n_to_p, p_to_n));
+//		assertEquals(1, alg.addInverseDepth(disparity, world_to_view, parameters, n_to_p, p_to_n));
 
-		assertTrue(ImageStatistics.sum(mask) > 0); // it should be filled in with existing points
 		assertEquals(width*height, alg.cloud.size);
 		assertEquals(2, alg.viewPointIdx.size);
 	}
@@ -137,19 +129,19 @@ public class TestCreateCloudFromDisparityImages extends BoofStandardJUnit {
 
 		var alg = new CreateCloudFromDisparityImages();
 		alg.disparitySimilarTol = tol;
-		assertEquals(0, alg.addDisparity(disparity, mask, world_to_view, parameters, n_to_p, p_to_n));
+//		assertEquals(0, alg.addInverseDepth(disparity, world_to_view, parameters, n_to_p, p_to_n));
 		assertEquals(width*height, alg.cloud.size);
 
 		// Changing the disparity, but just under the tolerance. Nothing should be added
 		disparity.data[72] += tol - 0.001f;
-		assertEquals(1, alg.addDisparity(disparity, mask, world_to_view, parameters, n_to_p, p_to_n));
+//		assertEquals(1, alg.addInverseDepth(disparity, world_to_view, parameters, n_to_p, p_to_n));
 		assertEquals(width*height, alg.cloud.size);
 
 		// It should now be above the tolerance
 		disparity.data[72] += 0.002f;
 		// zero the mask again so that it can add points
 		ImageMiscOps.fill(mask, 0);
-		assertEquals(2, alg.addDisparity(disparity, mask, world_to_view, parameters, n_to_p, p_to_n));
+//		assertEquals(2, alg.addInverseDepth(disparity, world_to_view, parameters, n_to_p, p_to_n));
 		assertEquals(width*height + 1, alg.cloud.size);
 	}
 }

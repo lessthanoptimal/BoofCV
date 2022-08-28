@@ -308,6 +308,45 @@ public class VisualizeImageData {
 		return dst;
 	}
 
+	/**
+	 * Colorizes an inverse depth image.
+	 *
+	 * @param src Inverse depth image
+	 * @param dst Output rendering
+	 * @param maxValue Max possible value. Reminder that larger means closer
+	 * @param invalidColor What color to mark pixels with no depth info
+	 * @return rendered image
+	 */
+	public static BufferedImage inverseDepth( GrayF32 src, @Nullable BufferedImage dst,
+											  float maxValue, int invalidColor ) {
+		dst = ConvertBufferedImage.checkDeclare(src.width, src.height, dst, BufferedImage.TYPE_INT_RGB);
+
+		// Find max value ignoring NaN
+		if (maxValue <= 0.0f) {
+			maxValue = ImageStatistics.max(src);
+		}
+
+		for (int y = 0; y < src.height; y++) {
+			for (int x = 0; x < src.width; x++) {
+				float v = src.unsafe_get(x, y);
+
+				if (v < 0.0f) {
+					dst.setRGB(x, y, invalidColor);
+				} else if (v == 0.0f) {
+					dst.setRGB(x, y, 0);
+				} else {
+					v = Math.min(v, maxValue);
+					int r = (int)(255*v/maxValue);
+					int b = (int)(255*(maxValue - v)/maxValue);
+
+					dst.setRGB(x, y, r << 16 | b);
+				}
+			}
+		}
+
+		return dst;
+	}
+
 	private static void colorizeSign( GrayF32 src, BufferedImage dst, float maxAbsValue ) {
 		DataBuffer buffer = dst.getRaster().getDataBuffer();
 		if (buffer.getDataType() == DataBuffer.TYPE_INT) {

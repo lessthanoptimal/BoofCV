@@ -18,13 +18,11 @@
 
 package boofcv.alg.mvs;
 
-import boofcv.alg.InputSanityCheck;
 import boofcv.alg.geo.rectify.DisparityParameters;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayU8;
 import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.transform.homography.HomographyPointOps_F64;
@@ -33,7 +31,6 @@ import org.ddogleg.sorting.QuickSelect;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_F32;
 import org.ddogleg.struct.VerbosePrint;
-import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.ops.DConvertMatrixStruct;
@@ -58,11 +55,8 @@ import static boofcv.misc.BoofMiscOps.checkTrue;
 @SuppressWarnings({"NullAway.Init"})
 public class MultiBaselineDisparityMedian implements VerbosePrint {
 
-	// Disparity parameters for fused view
-	@Getter final CameraPinhole fusedIntrinsic = new CameraPinhole();
-	@Getter final int fusedDisparityMin = 0; // fixed
-	@Getter final int fusedDisparityRange = 100; // fixed. 100 seemed reasonable
-	@Getter double fusedBaseline; // computed dynamically
+	/** Selected baseline to represent the fused stereo system */
+	@Getter public double fusedBaseline = 0.0;
 
 	// undistorted to distorted pixel coordinates
 	PixelTransform<Point2D_F64> pixelOrig_to_Undist;
@@ -82,74 +76,66 @@ public class MultiBaselineDisparityMedian implements VerbosePrint {
 	 * Must call before adding images. Specifies the size of the original image before rectification and clears
 	 * previously saved results.
 	 *
-	 * @param intrinsic Camera parameters for the fused disparity image
-	 * @param pixelDist_to_Undist Transform from distorted to undistorted pixels
+	 * @param width Width of common image
+	 * @param height Height of common image
+	 * @param dist_to_undist Transform from distorted to undistorted pixels
 	 */
-	public void initialize( CameraPinhole intrinsic, PixelTransform<Point2D_F64> pixelDist_to_Undist ) {
-		if (verbose != null)
-			verbose.printf("init: fx=%.1f shape=%dx%d\n", intrinsic.fx, intrinsic.width, intrinsic.height);
-		this.fusedIntrinsic.setTo(intrinsic);
+	public void initialize( int width, int height, PixelTransform<Point2D_F64> dist_to_undist ) {
 		this.images.reset();
-		this.fused.resize(intrinsic.width, intrinsic.height);
-		this.pixelOrig_to_Undist = pixelDist_to_Undist;
+		this.fused.resize(width, height);
+		this.pixelOrig_to_Undist = dist_to_undist;
 	}
 
 	/**
 	 * Adds a disparity image to the list
 	 *
 	 * @param disparity The disparity image. Does not need to be same shape as original.
-	 * @param mask Indicates which pixels could have usable disparity information
 	 * @param parameters Disparity parameters for this stereo pair.
 	 * @param undist_to_rect_px Rectification matrix (3x3) from undistorted to rectified pixel coordinates
 	 */
-	public void addDisparity( GrayF32 disparity, GrayU8 mask, DisparityParameters parameters,
+	public void addDisparity( GrayF32 disparity, DisparityParameters parameters,
 							  DMatrixRMaj undist_to_rect_px ) {
-		InputSanityCheck.checkSameShape(disparity, mask);
 		parameters.checkValidity();
 
 		DisparityImage d = images.grow();
 		d.disparity.setTo(disparity);
-		d.mask.setTo(mask);
 		d.undist_to_rect_px.setTo(undist_to_rect_px);
 		d.parameters.setTo(parameters);
 	}
 
 	/**
-	 * <p>Processes all the disparity images and creates a composite disparity image</p>
+	 * <p>Processes all the disparity images and creates a composite inverse depth image image</p>
 	 *
 	 * NOTE: The rectifcation matrix and the rectification rotation matrix will be identity.
 	 *
-	 * @param disparity (Output) Disparity of the composite view. This will be in the original distorted pixels.
+	 * @param inverseDepth (Output) Inverse depth image
 	 * @return true if successful or false if it failed
 	 */
-	public boolean process( GrayF32 disparity ) {
+	public boolean process( GrayF32 inverseDepth ) {
 		checkTrue(!images.isEmpty(), "No images have been added");
+		inverseDepth.reshape(fused.width, fused.height);
 
-		disparity.reshape(fused.width, fused.height);
+		if (verbose != null) verbose.printf("Fusing: shape=%dx%d images.size=%d", fused.width, fused.height, images.size);
 
-		// select the initial value for the fused baseline using the inputs. Want to avoid being way too small.
+		// Select the largest baseline to be representative
 		fusedBaseline = 0;
-		for (int i = 0; i < images.size; i++) {
-			fusedBaseline = Math.max(fusedBaseline, images.get(i).parameters.baseline);
-		}
-
-		if (verbose != null) verbose.println("fusing: count=" + images.size + " fusedBaseline=" + fusedBaseline);
 
 		// For each image, map valid pixels back into the original and add to that
 		for (int i = 0; i < images.size; i++) {
 			if (!addToFusedImage(images.get(i)))
 				return false;
+
+			fusedBaseline = Math.max(fusedBaseline, images.get(i).parameters.getBaseline());
 		}
 
 		// Combine all the disparity information together robustly
-		if (!computeFused(disparity)) {
+		if (!computeFused(inverseDepth)) {
 			if (verbose != null)
 				verbose.println("FAILED: Not a single valid pixel in fused disparity. images.size=" + images.size);
 			return false;
 		}
 
-		// Adjust stereo parameters to ensure the fixed range is good
-		return computeDynamicParameters(disparity);
+		return true;
 	}
 
 	/**
@@ -158,8 +144,7 @@ public class MultiBaselineDisparityMedian implements VerbosePrint {
 	 * @return true if successful and false if it failed
 	 */
 	boolean addToFusedImage( DisparityImage image ) {
-		final GrayF32 disparity = image.disparity;
-		final GrayU8 mask = image.mask;
+		final GrayF32 disparityImage = image.disparity;
 		final DisparityParameters imageParam = image.parameters;
 
 		// Only do the int to float and double to float conversion once
@@ -193,40 +178,35 @@ public class MultiBaselineDisparityMedian implements VerbosePrint {
 				int rectPixX = (int)(rectPix.x + 0.5);
 				int rectPixY = (int)(rectPix.y + 0.5);
 
-				// Make sure it's inside the disparity image before sampling
-				if (rectPixX >= mask.width || rectPixY >= mask.height)
-					continue;
-
-				// If marked as invalid don't sample here
-				if (mask.unsafe_get(rectPixX, rectPixY) == 0)
+				// Final part of bounds check
+				if (rectPixX >= disparityImage.width || rectPixY >= disparityImage.height)
 					continue;
 
 				// Sample the disparity image and make sure it has a valid value
-				float imageDisp = disparity.unsafe_get(rectPixX, rectPixY);
+				float imageDisp = disparityImage.unsafe_get(rectPixX, rectPixY);
 				if (imageDisp >= imageRange)
 					continue;
+
 				// Don't trust the disparity if it's at the upper or lower extremes. It's likely that the true value
 				// was above or below but it wasn't allowed to match there
 //				if (imageDisp < 1.0f || imageDisp > imageRange-1.0f)
 //					continue;  TODO consider in the future once there are metrics
 
+				// The disparity
 				float d = imageDisp + imageMin;
-				if (d != 0) {
-					// Convert the disparity from "image" into "fused image"
-					// First compute the 3D point in the rectified coordinate system
-					double rectZ = imageBaseline*imageFocalX/d;
-					double rectX = rectZ*(rectPixX - imagePinhole.cx)/imagePinhole.fx;
-					double rectY = rectZ*(rectPixY - imagePinhole.cy)/imagePinhole.fy;
-					// Go from rectified to left camera, which is the fused camera
-					double worldZ = dotRightCol(imageParam.rotateToRectified, rectX, rectY, rectZ);
-					// Now that we know Z we can compute the disparity
-					float fusedDisp = (float)(fusedBaseline*fusedIntrinsic.fx/worldZ);
 
-					fused.get(origPixX, origPixY).add(fusedDisp);
-				} else {
-					// Points at infinity are a special case. They will remain at infinity
-					fused.get(origPixX, origPixY).add(0.0f);
-				}
+				// Convert the disparity from "image" into "fused image"
+				// First compute the 3D point in the rectified coordinate system
+				// This is a homogenous coordinate where w = d. It can handle infinity
+				double rectZ = imageBaseline*imageFocalX;
+				double rectX = rectZ*(rectPixX - imagePinhole.cx)/imagePinhole.fx;
+				double rectY = rectZ*(rectPixY - imagePinhole.cy)/imagePinhole.fy;
+
+				// Go from rectified to left camera, which is the fused camera
+				double worldZ = dotRightCol(imageParam.rotateToRectified, rectX, rectY, rectZ);
+
+				// Save inverse depth
+				fused.get(origPixX, origPixY).add((float)(d/worldZ));
 			}
 		}
 		return true;
@@ -245,84 +225,35 @@ public class MultiBaselineDisparityMedian implements VerbosePrint {
 	 *
 	 * @return true if the disparity image is not entirely empty
 	 */
-	boolean computeFused( GrayF32 disparity ) {
+	boolean computeFused( GrayF32 inverseDepthImage ) {
 		// If there's one pixel with a valid value this will pass
 		boolean singleValidPixel = false;
 
 		for (int y = 0; y < fused.height; y++) {
-			int indexOut = disparity.startIndex + y*disparity.stride;
+			int indexOut = inverseDepthImage.startIndex + y*inverseDepthImage.stride;
 			for (int x = 0; x < fused.width; x++) {
 				DogArray_F32 values = fused.get(x, y);
-				float outputValue;
+				float inverseDepth;
 				if (values.size == 0) {
-					// mark this pixel as invalid. The disparity will be rescaled later on and the max value at this
-					// time isn't known
-					outputValue = Float.MAX_VALUE;
+					// No depth information here. Mark it as invalid
+					inverseDepth = -1f;
 				} else if (values.size == 1) {
 					singleValidPixel = true;
-					outputValue = values.data[0];
+					inverseDepth = values.data[0];
 				} else if (values.size == 2) {
 					singleValidPixel = true;
-					outputValue = 0.5f*(values.data[0] + values.data[1]);
+					inverseDepth = 0.5f*(values.data[0] + values.data[1]);
 				} else {
 					// median value
-					outputValue = QuickSelect.select(values.data, values.size/2, values.size);
+					inverseDepth = QuickSelect.select(values.data, values.size/2, values.size);
 					singleValidPixel = true;
 				}
-				disparity.data[indexOut++] = outputValue;
+
+				inverseDepthImage.data[indexOut++] = inverseDepth;
 			}
 		}
 
 		return singleValidPixel;
-	}
-
-	/**
-	 * The baseline and disparityMin are dynamically computed to ensure a range of 100. After this adjustment the
-	 * resulting point cloud should be unchanged.
-	 *
-	 * @return true if a disparity value greater than zero was found
-	 */
-	boolean computeDynamicParameters( GrayF32 disparity ) {
-		// Find the min and max values for scaling the baseline
-		float dispMax = 0;
-		for (int y = 0; y < disparity.height; y++) {
-			int index = disparity.startIndex + y*disparity.stride;
-			for (int x = 0; x < disparity.width; x++) {
-				float d = disparity.data[index++];
-				if (d == Float.MAX_VALUE)
-					continue;
-				dispMax = Math.max(dispMax, d);
-			}
-		}
-
-		if (dispMax <= 0.0) {
-			if (verbose != null) verbose.println("FAILED: all valid points are at infinity");
-			return false;
-		}
-
-		// -1 because range is the number of possible values. The max range is range-1.
-		final float scale = (float)((this.fusedDisparityRange - 1)/Math.ceil(dispMax));
-		this.fusedBaseline *= scale;
-
-		if (verbose != null) verbose.printf("dispMax=%.1f scale=%.2f\n", dispMax, scale);
-
-		// Update the disparity image to include these adjustments
-		final float fRange = fusedDisparityRange;
-		for (int y = 0; y < disparity.height; y++) {
-			int index = disparity.startIndex + y*disparity.stride;
-			for (int x = 0; x < disparity.width; x++, index++) {
-				float d = disparity.data[index];
-				if (d == Float.MAX_VALUE) {
-					disparity.data[index] = fRange;
-					continue;
-				}
-				disparity.data[index] = disparity.data[index]*scale;
-				if (UtilEjml.isUncountable(disparity.data[index]))
-					throw new RuntimeException("BUG");
-			}
-		}
-
-		return true;
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
@@ -333,8 +264,6 @@ public class MultiBaselineDisparityMedian implements VerbosePrint {
 	static class DisparityImage {
 		/** The found disparity image */
 		public final GrayF32 disparity = new GrayF32(1, 1);
-		/** Mask which indicates pixels that have a source inside the original image and are valid */
-		public final GrayU8 mask = new GrayU8(1, 1);
 		/** Rectification matrix/homography. From undistorted pixel to rectified pixel */
 		public final DMatrixRMaj undist_to_rect_px = new DMatrixRMaj(3, 3);
 		/** Geometric meaning of disparity fo this view */
@@ -342,16 +271,16 @@ public class MultiBaselineDisparityMedian implements VerbosePrint {
 
 		public void reset() {
 			disparity.reshape(1, 1);
-			mask.reshape(1, 1);
 			CommonOps_DDRM.fill(undist_to_rect_px, 0);
 			parameters.reset();
 		}
 	}
 
 	/**
-	 * Contains disparity information mapped to original distorted pixels.
+	 * Contains depth information mapped to original distorted pixels.
 	 */
 	static class FusedImage {
+		// inverse depth estimates at each pixel coordinate
 		public final DogArray<DogArray_F32> pixels = new DogArray<>(DogArray_F32::new, DogArray_F32::reset);
 		public int width, height;
 

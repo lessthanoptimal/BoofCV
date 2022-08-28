@@ -18,15 +18,11 @@
 
 package boofcv.alg.mvs;
 
-import boofcv.alg.InputSanityCheck;
-import boofcv.alg.geo.rectify.DisparityParameters;
-import boofcv.alg.misc.ImageStatistics;
-import boofcv.struct.calib.CameraPinhole;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
-import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -34,7 +30,6 @@ import georegression.transform.se.SePointOps_F64;
 import lombok.Getter;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
-import org.ejml.UtilEjml;
 
 import java.util.List;
 
@@ -58,6 +53,9 @@ public class CreateCloudFromDisparityImages {
 	/** List of indices which specify the cloud size when a view 'i' was added. idx[i] &le; cloud < idx[i+1] */
 	final @Getter DogArray_I32 viewPointIdx = new DogArray_I32();
 
+	// Masked used to filter out duplicate points
+	final GrayU8 duplicateMask = new GrayU8(1, 1);
+
 	/**
 	 * Clears previously added views and points.
 	 */
@@ -80,73 +78,57 @@ public class CreateCloudFromDisparityImages {
 	}
 
 	/**
-	 * Add points from the disparity image which have not been masked out.
+	 * <p>Add points from the inverse depth image</p>
 	 *
 	 * NOTE: The reason point and pixel transforms are used is that combined disparity images might include lens
 	 * distortion.
 	 *
-	 * @param disparity (Input) Disparity image
-	 * @param mask (Input,Output) Mask that specifies which points in the disparity image are valid. When an existing
-	 * point in the cloud hits this image the mask is updated.
+	 * @param inverseDepth (Input) Disparity image
 	 * @param world_to_view (Input) Transform from world to view reference frame
-	 * @param parameters (Input) Describes how to interpret the disparity values
-	 * @param rectNorm_to_dispPixel (Input) Transform from rectified normalized image coordinates into disparity pixels
-	 * @param dispPixel_to_rectNorm (Input) Transform from disparity pixels into rectified normalized image coordinates.
+	 * @param norm_to_pixel (Input) Transform from normalized image coordinates into pixels
+	 * @param pixel_to_norm (Input) Transform from pixels into normalized image coordinates.
 	 * @return The index of the view that can be used to retrieve the specified points added
 	 */
-	public int addDisparity( GrayF32 disparity, GrayU8 mask, Se3_F64 world_to_view, DisparityParameters parameters,
-							 Point2Transform2_F64 rectNorm_to_dispPixel,
-							 PixelTransform<Point2D_F64> dispPixel_to_rectNorm ) {
-		InputSanityCheck.checkSameShape(disparity, mask);
+	public int addInverseDepth( GrayF32 inverseDepth, Se3_F64 world_to_view,
+								Point2Transform2_F64 norm_to_pixel,
+								PixelTransform<Point2D_F64> pixel_to_norm ) {
 
-		MultiViewStereoOps.maskOutPointsInCloud(cloud.toList(), disparity, parameters, world_to_view,
-				rectNorm_to_dispPixel, disparitySimilarTol, mask);
-
-		if (UtilEjml.isUncountable(ImageStatistics.sum(disparity)))
-			throw new RuntimeException("BUG");
+		// TODO disparitySimilarTol compute this dynamically based on stereo baseline
+		duplicateMask.reshape(inverseDepth);
+		GImageMiscOps.fill(duplicateMask, 0);
+		MultiViewStereoOps.maskOutPointsInCloud(cloud.toList(), inverseDepth, world_to_view,
+				norm_to_pixel, disparitySimilarTol, duplicateMask);
 
 		// normalized image coordinates of disparity image
 		final Point2D_F64 norm = new Point2D_F64();
-		// 3D point in rectified stereo reference frame
-		final Point3D_F64 rectP = new Point3D_F64();
-		// 3D point in left stereo camera reference frame
-		final Point3D_F64 leftP = new Point3D_F64();
+		// 3D point in stereo camera reference frame
+		final Point3D_F64 camP = new Point3D_F64();
 
-		final CameraPinhole intrinsic = parameters.pinhole;
-		final double baseline = parameters.baseline;
-		final double disparityMin = parameters.disparityMin;
+		for (int y = 0; y < inverseDepth.height; y++) {
+			int indexDisp = y*inverseDepth.stride + inverseDepth.startIndex;
+			int indexMask = y*duplicateMask.stride + duplicateMask.startIndex;
 
-		for (int y = 0; y < disparity.height; y++) {
-			int indexDisp = y*disparity.stride + disparity.startIndex;
-			int indexMask = y*mask.stride + mask.startIndex;
-
-			for (int x = 0; x < disparity.width; x++, indexDisp++, indexMask++) {
+			for (int x = 0; x < inverseDepth.width; x++, indexDisp++, indexMask++) {
 				// Check to see if it has been masked out as invalid
-				if (mask.data[indexMask] != 0)
+				if (duplicateMask.data[indexMask] != 0)
 					continue;
-				// Get the disparity and see if it has a valid value
-				double d = disparity.data[indexDisp];
-				if (d >= parameters.disparityRange)
-					continue;
+				float inv = inverseDepth.data[indexDisp];
 
-				// Make sure there are no points at infinity. THose can't be handled here
-				d += disparityMin;
-				if (d <= 0.0)
+				// if the inverse is invalid or at infinity, skip
+				// points at infinity can't be handled since cloud is in cartesian coordinates
+				if (inv <= 0.0)
 					continue;
 
 				// Get normalized image coordinates.
-				dispPixel_to_rectNorm.compute(x, y, norm);
+				pixel_to_norm.compute(x, y, norm);
 
-				// Find 3D point in rectified reference frame
-				rectP.z = baseline*intrinsic.fx/d;
-				rectP.x = rectP.z*norm.x;
-				rectP.y = rectP.z*norm.y;
-
-				// Rectified left camera to native left camera
-				GeometryMath_F64.multTran(parameters.rotateToRectified, rectP, leftP);
+				// Find 3D point in camera reference frame
+				camP.x = norm.x/inv;
+				camP.y = norm.y/inv;
+				camP.z = 1.0/inv;
 
 				// Left to world frame
-				SePointOps_F64.transformReverse(world_to_view, leftP, cloud.grow());
+				SePointOps_F64.transformReverse(world_to_view, camP, cloud.grow());
 			}
 		}
 
