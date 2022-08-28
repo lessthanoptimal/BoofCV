@@ -18,6 +18,7 @@
 
 package boofcv.alg.mvs;
 
+import boofcv.BoofTesting;
 import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.distort.pinhole.LensDistortionPinhole;
 import boofcv.alg.geo.MultiViewOps;
@@ -26,6 +27,7 @@ import boofcv.alg.geo.rectify.DisparityParameters;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.misc.ImageStatistics;
+import boofcv.core.image.ConvertImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinhole;
@@ -219,5 +221,61 @@ public class TestMultiViewStereoOps extends BoofStandardJUnit {
 						assertEquals(expectedZ*norm.y, y, 1e-4);
 					}
 				}));
+	}
+
+	@Test void averageScore() {
+		var grayU8 = new GrayU8(30, 40);
+		var scores = new GrayF32(grayU8.width, grayU8.height);
+
+		ImageMiscOps.fillUniform(grayU8, rand, 0, 200);
+		ImageMiscOps.fillUniform(scores, rand, 0, 200);
+
+		int maxRange = 100;
+
+		// Compute expected results using a lambda
+		var storage = new SumStorage();
+		grayU8.forEachPixel(( x, y, v ) -> {
+			if (v >= maxRange)
+				return;
+			storage.sum += scores.get(x, y);
+			storage.count++;
+		});
+
+		// Test against two image types
+		double expected = storage.sum/storage.count;
+		assertEquals(expected, MultiViewStereoOps.averageScore(grayU8, maxRange, scores), 1e-4);
+
+		var grayF32 = new GrayF32(30, 40);
+		ConvertImage.convert(grayU8, grayF32);
+		assertEquals(expected, MultiViewStereoOps.averageScore(grayF32, maxRange, scores), 1e-4);
+	}
+
+	@Test void invalidateUsingError() {
+		var grayU8 = new GrayU8(30, 40);
+		ImageMiscOps.fillUniform(grayU8, rand, 0, 200);
+		GrayU8 expected = grayU8.createSameShape().setTo(grayU8);
+
+		var grayF32 = new GrayF32(30, 40);
+		ConvertImage.convert(grayU8, grayF32);
+
+		var scores = new GrayF32(grayU8.width, grayU8.height);
+		ImageMiscOps.fillUniform(scores, rand, 0, 200);
+
+		float threshold = 50;
+		int maxRange = 100;
+
+		// Compare against a lambda implementation
+		ImageMiscOps.filter(expected, ( x, y, d ) -> scores.get(x, y) >= threshold ? maxRange : d);
+
+		MultiViewStereoOps.invalidateUsingError(grayU8, maxRange, scores, threshold);
+		BoofTesting.assertEquals(expected, grayU8, 1e-4);
+
+		MultiViewStereoOps.invalidateUsingError(grayF32, maxRange, scores, threshold);
+		BoofTesting.assertEquals(expected, grayF32, 1e-4);
+	}
+
+	private static class SumStorage {
+		public double sum = 0.0;
+		public int count = 0;
 	}
 }

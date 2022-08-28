@@ -163,4 +163,39 @@ public class MultiViewStereoOps {
 									   BoofLambdas.PixXyzConsumer_F64 consumer ) {
 		ImplMultiViewStereoOps.inverseToCloud(inverseDepth, pixelToNorm, consumer);
 	}
+
+	/**
+	 * Computes the average error for valid values inside a disparity image
+	 *
+	 * @param disparity (Input) disparity image
+	 * @param disparityRange (Input) range of disparity values. Used to identify invalid values.
+	 * @param score (Input) Disparity fit errors for all pixels
+	 */
+	public static float averageScore( ImageGray<?> disparity, double disparityRange, GrayF32 score ) {
+		if (disparity instanceof GrayU8) {
+			return ImplMultiViewStereoOps.averageScore((GrayU8)disparity, (int)disparityRange, score);
+		} else if (disparity instanceof GrayF32) {
+			return ImplMultiViewStereoOps.averageScore((GrayF32)disparity, (float)disparityRange, score);
+		} else {
+			throw new RuntimeException("Unsupported image type");
+		}
+	}
+
+	/**
+	 * Marks disparity pixels as invalid if their error exceeds the threshold
+	 *
+	 * @param disparity (Input) disparity image
+	 * @param disparityRange (Input) range of disparity values. Used to identify invalid values.
+	 * @param score (Input) Disparity fit errors for all pixels
+	 * @param threshold Score threshold
+	 */
+	public static void invalidateUsingError( ImageGray<?> disparity, double disparityRange, GrayF32 score, float threshold ) {
+		if (disparity instanceof GrayU8) {
+			ImplMultiViewStereoOps.invalidateUsingError((GrayU8)disparity, (int)disparityRange, score, threshold);
+		} else if (disparity instanceof GrayF32) {
+			ImplMultiViewStereoOps.invalidateUsingError((GrayF32)disparity, (float)disparityRange, score, threshold);
+		} else {
+			throw new RuntimeException("Unsupported image type");
+		}
+	}
 }

@@ -18,6 +18,7 @@
 
 package boofcv.alg.mvs.impl;
 
+import boofcv.alg.InputSanityCheck;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.rectify.DisparityParameters;
 import boofcv.misc.BoofLambdas;
@@ -179,6 +180,88 @@ public class ImplMultiViewStereoOps {
 				double Z = 1.0/inv;
 
 				consumer.process(pixX, pixY, X, Y, Z);
+			}
+		}
+	}
+
+	public static float averageScore( GrayU8 disparity, int disparityRange, GrayF32 score ) {
+		InputSanityCheck.checkSameShape(disparity, score);
+
+		float sum = 0.0f;
+		int count = 0;
+		for (int y = 0; y < disparity.height; y++) {
+			int indexDisp = disparity.startIndex + y*disparity.stride;
+			int indexScor = score.startIndex + y*score.stride;
+
+			int end = indexDisp + disparity.width;
+			while (indexDisp < end) {
+				int d = disparity.data[indexDisp++] & 0xFF;
+				float s = score.data[indexScor++];
+				if (d >= disparityRange)
+					continue;
+				sum += s;
+				count++;
+			}
+		}
+
+		return sum/count;
+	}
+
+	public static float averageScore( GrayF32 disparity, float disparityRange, GrayF32 score ) {
+		InputSanityCheck.checkSameShape(disparity, score);
+
+		float sum = 0.0f;
+		int count = 0;
+		for (int y = 0; y < disparity.height; y++) {
+			int indexDisp = disparity.startIndex + y*disparity.stride;
+			int indexScor = score.startIndex + y*score.stride;
+
+			int end = indexDisp + disparity.width;
+			while (indexDisp < end) {
+				float d = disparity.data[indexDisp++];
+				float s = score.data[indexScor++];
+				if (d >= disparityRange)
+					continue;
+				sum += s;
+				count++;
+			}
+		}
+
+		return sum/count;
+	}
+
+	public static void invalidateUsingError( GrayU8 disparity, int disparityRange, GrayF32 score, float threshold ) {
+		InputSanityCheck.checkSameShape(disparity, score);
+
+		for (int y = 0; y < disparity.height; y++) {
+			int indexDisp = disparity.startIndex + y*disparity.stride;
+			int indexScor = score.startIndex + y*score.stride;
+
+			int end = indexDisp + disparity.width;
+			while (indexDisp < end) {
+				float s = score.data[indexScor++];
+				if (s > threshold) {
+					disparity.data[indexDisp] = (byte)disparityRange;
+				}
+				indexDisp++;
+			}
+		}
+	}
+
+	public static void invalidateUsingError( GrayF32 disparity, float disparityRange, GrayF32 score, float threshold ) {
+		InputSanityCheck.checkSameShape(disparity, score);
+
+		for (int y = 0; y < disparity.height; y++) {
+			int indexDisp = disparity.startIndex + y*disparity.stride;
+			int indexScor = score.startIndex + y*score.stride;
+
+			int end = indexDisp + disparity.width;
+			while (indexDisp < end) {
+				float s = score.data[indexScor++];
+				if (s > threshold) {
+					disparity.data[indexDisp] = disparityRange;
+				}
+				indexDisp++;
 			}
 		}
 	}
