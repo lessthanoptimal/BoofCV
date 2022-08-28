@@ -188,7 +188,7 @@ public class TestMultiBaselineStereoIndependent extends BoofStandardJUnit {
 		alg.lookUpImages = new MockLookUp(images);
 
 		// Override so that it will always be happy
-		alg.performFusion = new MultiBaselineDisparityMedian() {
+		alg.performFusion = new MultiBaselineDisparityErrors() {
 			@Override public boolean process( GrayF32 inverseDepth ) {return true;}
 		};
 

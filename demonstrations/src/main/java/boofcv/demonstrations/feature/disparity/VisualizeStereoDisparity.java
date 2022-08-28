@@ -69,6 +69,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static boofcv.alg.geo.RectifyImageOps.transformRectToPixel;
 import static boofcv.gui.BoofSwingUtil.KEY_PREVIOUS_DIRECTORY;
@@ -327,7 +328,7 @@ public class VisualizeStereoDisparity<T extends ImageGray<T>, D extends ImageGra
 			disparityImage = activeAlg.getDisparity();
 			disparityMin = activeAlg.getDisparityMin();
 			disparityRange = activeAlg.getDisparityRange();
-			scoreImage = activeAlg.getDisparityScore();
+			scoreImage = Objects.requireNonNull(activeAlg.getDisparityScore(), "Turn on scores");
 			BoofMiscOps.checkTrue(mask.isSameShape(disparityImage));
 
 			// Remove random matches outside the undistorted image border

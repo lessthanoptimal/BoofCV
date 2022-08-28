@@ -41,7 +41,7 @@ public class TestMultiBaselineDisparityMedian extends BoofStandardJUnit {
 
 	/** Test everything all together with a simple problem */
 	@Test void simpleAll() {
-		var alg = new MultiBaselineDisparityMedian();
+		var alg = new MultiBaselineDisparityErrors();
 		var distort = new PixelTransformAffine_F64();
 		distort.getModel().setTo(2, 0, 0, 2, 0, 0);
 		intrinsic.width = 100;
@@ -51,13 +51,14 @@ public class TestMultiBaselineDisparityMedian extends BoofStandardJUnit {
 		for (int i = 0; i < 3; i++) {
 			// to make it easy every image is the same size as fused
 			var disparity = new GrayF32(100, 80);
+			var scores = new GrayF32(100, 80);
 			var rect = new DMatrixRMaj(3, 3);
 
 			// see next test below for an explanation of this logic
 			ImageMiscOps.fill(disparity, 5 + i);
 			CommonOps_DDRM.diag(rect, 3, 0.5, 0.5, 1); // undoes distortion model to keep pixels the same
 
-			alg.addDisparity(disparity, parameters, rect);
+			alg.addDisparity(disparity, scores, parameters, rect);
 		}
 
 		// wrong size to make sure it's resized
@@ -84,12 +85,12 @@ public class TestMultiBaselineDisparityMedian extends BoofStandardJUnit {
 	 * warping between the two images are handled correctly.
 	 */
 	@Test void addToFusedImage() {
-		var alg = new MultiBaselineDisparityMedian();
+		var alg = new MultiBaselineDisparityErrors();
 		var distort = new PixelTransformAffine_F64();
 		distort.getModel().setTo(2, 0, 0, 2, 0, 0);
 		alg.initialize(intrinsic.width, intrinsic.height, distort);
 
-		var image = new MultiBaselineDisparityMedian.DisparityImage();
+		var image = new MultiBaselineDisparityErrors.DisparityImage();
 		image.disparity.reshape(intrinsic.width, intrinsic.height - 12);
 		ImageMiscOps.fill(image.disparity, 5);
 		image.parameters.setTo(parameters);
@@ -117,12 +118,12 @@ public class TestMultiBaselineDisparityMedian extends BoofStandardJUnit {
 		// make the images smaller for slightly faster processing since size doesn't matter
 		intrinsic.fsetShape(10, 12);
 
-		var alg = new MultiBaselineDisparityMedian();
+		var alg = new MultiBaselineDisparityErrors();
 		var distort = new PixelTransformAffine_F64();
 		distort.getModel().setTo(1, 0, 0, 1, 0, 0);
 		alg.initialize(intrinsic.width, intrinsic.height, distort);
 
-		var image = new MultiBaselineDisparityMedian.DisparityImage();
+		var image = new MultiBaselineDisparityErrors.DisparityImage();
 		image.disparity.reshape(intrinsic.width, intrinsic.height);
 		image.parameters.setTo(parameters);
 		CommonOps_DDRM.diag(image.undist_to_rect_px, 3, 1, 1, 1);
@@ -144,7 +145,7 @@ public class TestMultiBaselineDisparityMedian extends BoofStandardJUnit {
 	 * Given an already constructed fused image, compute the disparity image output.
 	 */
 	@Test void computeFused() {
-		var alg = new MultiBaselineDisparityMedian();
+		var alg = new MultiBaselineDisparityErrors();
 		intrinsic.width = 10;
 		intrinsic.height = 8;
 		alg.initialize(intrinsic.width, intrinsic.height, new DoNothingPixelTransform_F64());
@@ -184,7 +185,7 @@ public class TestMultiBaselineDisparityMedian extends BoofStandardJUnit {
 	 * Should fail if it can't find a valid pixel
 	 */
 	@Test void computeFused_AllInvalid() {
-		var alg = new MultiBaselineDisparityMedian();
+		var alg = new MultiBaselineDisparityErrors();
 		intrinsic.width = 10;
 		intrinsic.height = 8;
 		alg.initialize(intrinsic.width, intrinsic.height, new DoNothingPixelTransform_F64());
@@ -216,10 +217,10 @@ public class TestMultiBaselineDisparityMedian extends BoofStandardJUnit {
 
 		var param2 = new DisparityParameters(5, 100, 500*baselineScale, intrinsic2);
 
-		var alg = new MultiBaselineDisparityMedian();
+		var alg = new MultiBaselineDisparityErrors();
 		alg.initialize(intrinsic.width, intrinsic.height, new DoNothingPixelTransform_F64());
 
-		var image = new MultiBaselineDisparityMedian.DisparityImage();
+		var image = new MultiBaselineDisparityErrors.DisparityImage();
 		image.disparity.reshape(width, height);
 		ImageMiscOps.fill(image.disparity, imageValue);
 		image.parameters.setTo(param2);

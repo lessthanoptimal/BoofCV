@@ -104,7 +104,7 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 	// Storage for stereo disparity results
 	final StereoResults results = new StereoResults();
 	/** Fuses multiple disparity images together provided they have the same "left" view */
-	@Getter MultiBaselineDisparityMedian performFusion = new MultiBaselineDisparityMedian();
+	@Getter MultiBaselineDisparityErrors performFusion = new MultiBaselineDisparityErrors();
 
 	// Storage for the original images in the stereo pair
 	Image image1, image2;
@@ -194,7 +194,7 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 			if (listener != null) listener.handlePairDisparity(targetIdx, pairIdxs.get(i),
 					rectified1, rectified2,
 					results.disparity, results.param, results.undist_to_rect1);
-			performFusion.addDisparity(results.disparity, results.param, results.undist_to_rect1);
+			performFusion.addDisparity(results.disparity, results.score, results.param, results.undist_to_rect1);
 		}
 
 		if (verbose != null) verbose.println("Created fused stereo disparity image. inputs.size=" + pairIdxs.size);
@@ -276,6 +276,7 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 
 		// Save the results
 		info.disparity = stereoDisparity.getDisparity();
+		info.score = Objects.requireNonNull(stereoDisparity.getDisparityScore(), "Stereo must have errors");
 
 		// Filter out pixels outside the original image
 		ImageMiscOps.maskFill(info.disparity, mask, 0, info.param.disparityRange);
@@ -323,6 +324,8 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 	static class StereoResults {
 		// disparity image
 		GrayF32 disparity;
+		// disparity image fit score
+		GrayF32 score;
 		// Geometric description of the disparity
 		final DisparityParameters param = new DisparityParameters();
 		// Rectification matrix for view-1
