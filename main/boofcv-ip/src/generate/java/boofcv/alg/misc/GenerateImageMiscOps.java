@@ -128,6 +128,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 			imageName = t.getSingleBandName();
 //			dataType = t.getDataType();
 //			bitWise = t.getBitWise();
+			printFilterSB();
 			printAddUniformSB();
 			printAddUniformIL();
 			printAddGaussianSB();
@@ -511,6 +512,17 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\tpublic static void fillGaussian( " + imageName + " input, Random rand, double mean, double sigma, "
 				+ sumType + " lowerBound, " + sumType + " upperBound ) {\n" +
 				"\t\tImplImageMiscOps.fillGaussian(input, rand, mean, sigma, lowerBound, upperBound);\n" +
+				"\t}\n\n");
+	}
+
+	private void printFilterSB() {
+		String suffix = imageType.getKernelType();
+
+		out.print("\t/**\n" +
+				"\t * Functional API for modifying an images pixel values based on coordinate and value\n" +
+				"\t */\n" +
+				"\tpublic static void filter( "+imageName+" image, BoofLambdas.FilterPixel_"+suffix+" op ) {\n" +
+				"\t\tImplImageMiscOps.filter(image, op);\n" +
 				"\t}\n\n");
 	}
 

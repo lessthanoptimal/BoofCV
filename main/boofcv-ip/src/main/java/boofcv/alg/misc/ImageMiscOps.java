@@ -2662,6 +2662,13 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Functional API for modifying an images pixel values based on coordinate and value
+	 */
+	public static void filter( GrayU8 image, BoofLambdas.FilterPixel_S32 op ) {
+		ImplImageMiscOps.filter(image, op);
+	}
+
+	/**
 	 * Adds uniform i.i.d noise to each pixel in the image. Noise range is min &le; X &lt; max.
 	 */
 	public static void addUniform(GrayU8 input, Random rand, int min, int max) {
@@ -2699,6 +2706,13 @@ public class ImageMiscOps {
 	 */
 	public static void addGaussian(InterleavedU8 image, Random rand, double sigma, int lowerBound, int upperBound ) {
 		ImplImageMiscOps.addGaussian(image, rand, sigma, lowerBound, upperBound);
+	}
+
+	/**
+	 * Functional API for modifying an images pixel values based on coordinate and value
+	 */
+	public static void filter( GrayS8 image, BoofLambdas.FilterPixel_S32 op ) {
+		ImplImageMiscOps.filter(image, op);
 	}
 
 	/**
@@ -2742,6 +2756,13 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Functional API for modifying an images pixel values based on coordinate and value
+	 */
+	public static void filter( GrayU16 image, BoofLambdas.FilterPixel_S32 op ) {
+		ImplImageMiscOps.filter(image, op);
+	}
+
+	/**
 	 * Adds uniform i.i.d noise to each pixel in the image. Noise range is min &le; X &lt; max.
 	 */
 	public static void addUniform(GrayU16 input, Random rand, int min, int max) {
@@ -2779,6 +2800,13 @@ public class ImageMiscOps {
 	 */
 	public static void addGaussian(InterleavedU16 image, Random rand, double sigma, int lowerBound, int upperBound ) {
 		ImplImageMiscOps.addGaussian(image, rand, sigma, lowerBound, upperBound);
+	}
+
+	/**
+	 * Functional API for modifying an images pixel values based on coordinate and value
+	 */
+	public static void filter( GrayS16 image, BoofLambdas.FilterPixel_S32 op ) {
+		ImplImageMiscOps.filter(image, op);
 	}
 
 	/**
@@ -2822,6 +2850,13 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Functional API for modifying an images pixel values based on coordinate and value
+	 */
+	public static void filter( GrayS32 image, BoofLambdas.FilterPixel_S32 op ) {
+		ImplImageMiscOps.filter(image, op);
+	}
+
+	/**
 	 * Adds uniform i.i.d noise to each pixel in the image. Noise range is min &le; X &lt; max.
 	 */
 	public static void addUniform(GrayS32 input, Random rand, int min, int max) {
@@ -2859,6 +2894,13 @@ public class ImageMiscOps {
 	 */
 	public static void addGaussian(InterleavedS32 image, Random rand, double sigma, int lowerBound, int upperBound ) {
 		ImplImageMiscOps.addGaussian(image, rand, sigma, lowerBound, upperBound);
+	}
+
+	/**
+	 * Functional API for modifying an images pixel values based on coordinate and value
+	 */
+	public static void filter( GrayS64 image, BoofLambdas.FilterPixel_S64 op ) {
+		ImplImageMiscOps.filter(image, op);
 	}
 
 	/**
@@ -2902,6 +2944,13 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Functional API for modifying an images pixel values based on coordinate and value
+	 */
+	public static void filter( GrayF32 image, BoofLambdas.FilterPixel_F32 op ) {
+		ImplImageMiscOps.filter(image, op);
+	}
+
+	/**
 	 * Adds uniform i.i.d noise to each pixel in the image. Noise range is min &le; X &lt; max.
 	 */
 	public static void addUniform(GrayF32 input, Random rand, float min, float max) {
@@ -2939,6 +2988,13 @@ public class ImageMiscOps {
 	 */
 	public static void addGaussian(InterleavedF32 image, Random rand, double sigma, float lowerBound, float upperBound ) {
 		ImplImageMiscOps.addGaussian(image, rand, sigma, lowerBound, upperBound);
+	}
+
+	/**
+	 * Functional API for modifying an images pixel values based on coordinate and value
+	 */
+	public static void filter( GrayF64 image, BoofLambdas.FilterPixel_F64 op ) {
+		ImplImageMiscOps.filter(image, op);
 	}
 
 	/**

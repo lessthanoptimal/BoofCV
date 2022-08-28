@@ -56,6 +56,7 @@ Version : 0.41
   - Added multi camera calibration
 - ImageMiscOps
   - Added maskFill()
+  - Added a generic filter()
 - Regression
   - TODO Template matching
 

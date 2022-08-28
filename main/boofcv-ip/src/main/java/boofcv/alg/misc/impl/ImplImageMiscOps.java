@@ -131,7 +131,7 @@ public class ImplImageMiscOps {
 			int index = image.getStartIndex() + y*image.getStride();
 			int indexEnd = index + image.width;
 			int indexMask = mask.startIndex + y*image.stride;
-			
+
 			while (index < indexEnd) {
 				if (mask.data[indexMask] == maskTarget) {
 					image.data[index] = (byte)value;
@@ -697,7 +697,7 @@ public class ImplImageMiscOps {
 			int index = image.getStartIndex() + y*image.getStride();
 			int indexEnd = index + image.width;
 			int indexMask = mask.startIndex + y*image.stride;
-			
+
 			while (index < indexEnd) {
 				if (mask.data[indexMask] == maskTarget) {
 					image.data[index] = (short)value;
@@ -1263,7 +1263,7 @@ public class ImplImageMiscOps {
 			int index = image.getStartIndex() + y*image.getStride();
 			int indexEnd = index + image.width;
 			int indexMask = mask.startIndex + y*image.stride;
-			
+
 			while (index < indexEnd) {
 				if (mask.data[indexMask] == maskTarget) {
 					image.data[index] = value;
@@ -1828,7 +1828,7 @@ public class ImplImageMiscOps {
 			int index = image.getStartIndex() + y*image.getStride();
 			int indexEnd = index + image.width;
 			int indexMask = mask.startIndex + y*image.stride;
-			
+
 			while (index < indexEnd) {
 				if (mask.data[indexMask] == maskTarget) {
 					image.data[index] = value;
@@ -2393,7 +2393,7 @@ public class ImplImageMiscOps {
 			int index = image.getStartIndex() + y*image.getStride();
 			int indexEnd = index + image.width;
 			int indexMask = mask.startIndex + y*image.stride;
-			
+
 			while (index < indexEnd) {
 				if (mask.data[indexMask] == maskTarget) {
 					image.data[index] = value;
@@ -2958,7 +2958,7 @@ public class ImplImageMiscOps {
 			int index = image.getStartIndex() + y*image.getStride();
 			int indexEnd = index + image.width;
 			int indexMask = mask.startIndex + y*image.stride;
-			
+
 			while (index < indexEnd) {
 				if (mask.data[indexMask] == maskTarget) {
 					image.data[index] = value;
@@ -3436,6 +3436,21 @@ public class ImplImageMiscOps {
 		}
 	}
 
+	public static void filter( GrayU8 image, BoofLambdas.FilterPixel_S32 op ) {
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, image.height, y->{
+		for (int y = 0; y < image.height; y++) {
+			int index = image.getStartIndex() + y*image.getStride();
+			int indexStart = index;
+			int indexEnd = index + image.width;
+
+			while (index < indexEnd) {
+				image.data[index] = (byte)op.filter(index - indexStart, y, image.data[index] & 0xFF);
+				index++;
+			}
+		}
+		//CONCURRENT_ABOVE });
+	}
+
 	public static void addUniform( GrayU8 image, Random rand, int min, int max ) {
 		int range = max - min;
 
@@ -3499,6 +3514,21 @@ public class ImplImageMiscOps {
 				image.data[index++] = (byte)value;
 			}
 		}
+	}
+
+	public static void filter( GrayS8 image, BoofLambdas.FilterPixel_S32 op ) {
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, image.height, y->{
+		for (int y = 0; y < image.height; y++) {
+			int index = image.getStartIndex() + y*image.getStride();
+			int indexStart = index;
+			int indexEnd = index + image.width;
+
+			while (index < indexEnd) {
+				image.data[index] = (byte)op.filter(index - indexStart, y, image.data[index]);
+				index++;
+			}
+		}
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void addUniform( GrayS8 image, Random rand, int min, int max ) {
@@ -3566,6 +3596,21 @@ public class ImplImageMiscOps {
 		}
 	}
 
+	public static void filter( GrayU16 image, BoofLambdas.FilterPixel_S32 op ) {
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, image.height, y->{
+		for (int y = 0; y < image.height; y++) {
+			int index = image.getStartIndex() + y*image.getStride();
+			int indexStart = index;
+			int indexEnd = index + image.width;
+
+			while (index < indexEnd) {
+				image.data[index] = (short)op.filter(index - indexStart, y, image.data[index] & 0xFFFF);
+				index++;
+			}
+		}
+		//CONCURRENT_ABOVE });
+	}
+
 	public static void addUniform( GrayU16 image, Random rand, int min, int max ) {
 		int range = max - min;
 
@@ -3629,6 +3674,21 @@ public class ImplImageMiscOps {
 				image.data[index++] = (short)value;
 			}
 		}
+	}
+
+	public static void filter( GrayS16 image, BoofLambdas.FilterPixel_S32 op ) {
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, image.height, y->{
+		for (int y = 0; y < image.height; y++) {
+			int index = image.getStartIndex() + y*image.getStride();
+			int indexStart = index;
+			int indexEnd = index + image.width;
+
+			while (index < indexEnd) {
+				image.data[index] = (short)op.filter(index - indexStart, y, image.data[index]);
+				index++;
+			}
+		}
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void addUniform( GrayS16 image, Random rand, int min, int max ) {
@@ -3696,6 +3756,21 @@ public class ImplImageMiscOps {
 		}
 	}
 
+	public static void filter( GrayS32 image, BoofLambdas.FilterPixel_S32 op ) {
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, image.height, y->{
+		for (int y = 0; y < image.height; y++) {
+			int index = image.getStartIndex() + y*image.getStride();
+			int indexStart = index;
+			int indexEnd = index + image.width;
+
+			while (index < indexEnd) {
+				image.data[index] = op.filter(index - indexStart, y, image.data[index]);
+				index++;
+			}
+		}
+		//CONCURRENT_ABOVE });
+	}
+
 	public static void addUniform( GrayS32 image, Random rand, int min, int max ) {
 		int range = max - min;
 
@@ -3753,6 +3828,21 @@ public class ImplImageMiscOps {
 				image.data[index++] = value;
 			}
 		}
+	}
+
+	public static void filter( GrayS64 image, BoofLambdas.FilterPixel_S64 op ) {
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, image.height, y->{
+		for (int y = 0; y < image.height; y++) {
+			int index = image.getStartIndex() + y*image.getStride();
+			int indexStart = index;
+			int indexEnd = index + image.width;
+
+			while (index < indexEnd) {
+				image.data[index] = op.filter(index - indexStart, y, image.data[index]);
+				index++;
+			}
+		}
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void addUniform( GrayS64 image, Random rand, long min, long max ) {
@@ -3814,6 +3904,21 @@ public class ImplImageMiscOps {
 		}
 	}
 
+	public static void filter( GrayF32 image, BoofLambdas.FilterPixel_F32 op ) {
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, image.height, y->{
+		for (int y = 0; y < image.height; y++) {
+			int index = image.getStartIndex() + y*image.getStride();
+			int indexStart = index;
+			int indexEnd = index + image.width;
+
+			while (index < indexEnd) {
+				image.data[index] = op.filter(index - indexStart, y, image.data[index]);
+				index++;
+			}
+		}
+		//CONCURRENT_ABOVE });
+	}
+
 	public static void addUniform( GrayF32 image, Random rand, float min, float max ) {
 		float range = max - min;
 
@@ -3871,6 +3976,21 @@ public class ImplImageMiscOps {
 				image.data[index++] = value;
 			}
 		}
+	}
+
+	public static void filter( GrayF64 image, BoofLambdas.FilterPixel_F64 op ) {
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, image.height, y->{
+		for (int y = 0; y < image.height; y++) {
+			int index = image.getStartIndex() + y*image.getStride();
+			int indexStart = index;
+			int indexEnd = index + image.width;
+
+			while (index < indexEnd) {
+				image.data[index] = op.filter(index - indexStart, y, image.data[index]);
+				index++;
+			}
+		}
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void addUniform( GrayF64 image, Random rand, double min, double max ) {

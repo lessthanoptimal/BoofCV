@@ -24,6 +24,10 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.*;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.misc.BoofLambdas;
+import boofcv.misc.BoofLambdas.FilterPixel_F32;
+import boofcv.misc.BoofLambdas.FilterPixel_F64;
+import boofcv.misc.BoofLambdas.FilterPixel_S32;
+import boofcv.misc.BoofLambdas.FilterPixel_S64;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.GrayU8;
@@ -48,7 +52,7 @@ public class TestImplImageMiscOps extends BoofStandardJUnit {
 	int numBands = 3;
 
 	@Test void checkAll() {
-		int numExpected = 30*6 + 4*8;
+		int numExpected = 30*6 + 5*8;
 		Method[] methods = ImplImageMiscOps.class.getMethods();
 
 		// sanity check to make sure the functions are being found
@@ -62,6 +66,8 @@ public class TestImplImageMiscOps extends BoofStandardJUnit {
 					testCopy(m);
 				} else if (m.getName().compareTo("fill") == 0) {
 					testFill(m);
+				} else if (m.getName().compareTo("filter") == 0) {
+					testFilter(m);
 				} else if (m.getName().compareTo("maskFill") == 0) {
 					testMaskFill(m);
 				} else if (m.getName().compareTo("fillBand") == 0) {
@@ -232,6 +238,36 @@ public class TestImplImageMiscOps extends BoofStandardJUnit {
 				testFill_Interleaved_array(m);
 			else
 				testFill_Interleaved(m);
+		}
+	}
+
+	private void testFilter( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class[] paramTypes = m.getParameterTypes();
+		ImageGray orig = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
+		GImageMiscOps.fillUniform(orig, rand, 0, 20);
+
+		ImageGray modified = (ImageGray)orig.createSameShape();
+		modified.setTo(orig);
+
+		// Create functions which will increment the value by one
+		Object op = switch (orig.getDataType()) {
+			case U8, S8, U16, S16, S32 -> (FilterPixel_S32)( x, y, value ) -> value + 1;
+			case S64 -> (FilterPixel_S64)( x, y, value ) -> value + 1;
+			case F32 -> (FilterPixel_F32)( x, y, value ) -> value + 1;
+			case F64 -> (FilterPixel_F64)( x, y, value ) -> value + 1;
+			default -> throw new RuntimeException("Unknown type");
+		};
+		m.invoke(null, modified, op);
+
+		GImageGray a = FactoryGImageGray.wrap(orig);
+		GImageGray b = FactoryGImageGray.wrap(modified);
+		for (int i = 0; i < height; i++) {
+			for (int j = 0; j < width; j++) {
+				double expected = a.get(j, i).doubleValue() + 1;
+				double found = b.get(j, i).doubleValue();
+
+				assertEquals(expected, found, 1e-4);
+			}
 		}
 	}
 

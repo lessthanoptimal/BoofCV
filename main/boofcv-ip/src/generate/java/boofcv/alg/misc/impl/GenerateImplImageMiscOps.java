@@ -119,6 +119,7 @@ public class GenerateImplImageMiscOps extends CodeGeneratorBase {
 			bitWise = t.getBitWise();
 			if (!bitWise.isEmpty())
 				bitWise = " " + bitWise;
+			printFilterSB();
 			printAddUniformSB();
 			printAddUniformIL();
 			printAddGaussianSB();
@@ -572,6 +573,28 @@ public class GenerateImplImageMiscOps extends CodeGeneratorBase {
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
+	}
+
+	private void printFilterSB() {
+		String suffix = imageType.getKernelType();
+		String typeCast = imageType.getTypeCastFromSum();
+
+		out.print(
+				"\tpublic static void filter( "+imageName+" image, BoofLambdas.FilterPixel_"+suffix+" op ) {\n" +
+				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0, image.height, y->{\n" +
+				"\t\tfor (int y = 0; y < image.height; y++) {\n" +
+				"\t\t\tint index = image.getStartIndex() + y*image.getStride();\n" +
+				"\t\t\tint indexStart = index;\n" +
+				"\t\t\tint indexEnd = index + image.width;\n" +
+				"\n" +
+				"\t\t\twhile (index < indexEnd) {\n" +
+				"\t\t\t\timage.data[index] = "+typeCast+"op.filter(index - indexStart, y, image.data[index]"+bitWise+");\n" +
+				"\t\t\t\tindex++;\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t\t//CONCURRENT_ABOVE });\n" +
+				"\t}\n\n"
+		);
 	}
 
 	private void printAddUniformSB() {

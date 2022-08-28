@@ -137,4 +137,18 @@ public interface BoofLambdas {
 	@FunctionalInterface interface Match_F32 { boolean process( float value ); }
 	@FunctionalInterface interface Match_F64 { boolean process( double value ); }
 	// @formatter:on
+
+	// @formatter:off
+	@FunctionalInterface interface FilterPixel_S32 { int filter( int x, int y, int value ); }
+	@FunctionalInterface interface FilterPixel_S64 { long filter( int x, int y, long value ); }
+	@FunctionalInterface interface FilterPixel_F32 { float filter( int x, int y, float value ); }
+	@FunctionalInterface interface FilterPixel_F64 { double filter( int x, int y, double value ); }
+	// @formatter:on
+
+	// @formatter:off
+	@FunctionalInterface interface FilterArray_S32 { int filter( int index, int value ); }
+	@FunctionalInterface interface FilterArray_S64 { long filter( int index, long value ); }
+	@FunctionalInterface interface FilterArray_F32 { float filter( int index, float value ); }
+	@FunctionalInterface interface FilterArray_F64 { double filter( int index, double value ); }
+	// @formatter:on
 }

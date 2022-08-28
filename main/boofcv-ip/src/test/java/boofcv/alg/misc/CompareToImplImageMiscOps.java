@@ -53,7 +53,7 @@ public abstract class CompareToImplImageMiscOps extends CompareIdenticalFunction
 
 	@Test
 	void compareFunctions() {
-		super.performTests(30*6 + 4*8);
+		super.performTests(30*6 + 5*8);
 	}
 
 	@Override
@@ -108,6 +108,15 @@ public abstract class CompareToImplImageMiscOps extends CompareIdenticalFunction
 				else
 					p[1] = BoofTesting.randomArray(types[1], 2, rand);
 				break;
+			case "filter": {
+				p[1] = switch (((ImageBase)p[0]).getImageType().getDataType()) {
+					case U8, S8, U16, S16, S32 -> (BoofLambdas.FilterPixel_S32)( x, y, value ) -> value + 1;
+					case S64 -> (BoofLambdas.FilterPixel_S64)( x, y, value ) -> value + 1;
+					case F32 -> (BoofLambdas.FilterPixel_F32)( x, y, value ) -> value + 1;
+					case F64 -> (BoofLambdas.FilterPixel_F64)( x, y, value ) -> value + 1;
+					default -> throw new RuntimeException("Unknown type");
+				};
+			} break;
 			case "maskFill": {
 				p[2] = 1;
 				p[3] = BoofTesting.primitive(2, types[3]);
