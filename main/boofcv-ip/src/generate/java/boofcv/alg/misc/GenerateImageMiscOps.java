@@ -522,7 +522,11 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t * Functional API for modifying an images pixel values based on coordinate and value\n" +
 				"\t */\n" +
 				"\tpublic static void filter( "+imageName+" image, BoofLambdas.FilterPixel_"+suffix+" op ) {\n" +
-				"\t\tImplImageMiscOps.filter(image, op);\n" +
+				"\t\tif (runConcurrent(image)) {\n" +
+				"\t\t\tImplImageMiscOps_MT.filter(image, op);\n" +
+				"\t\t} else {\n" +
+				"\t\t\tImplImageMiscOps.filter(image, op);\n" +
+				"\t\t}\n" +
 				"\t}\n\n");
 	}
 

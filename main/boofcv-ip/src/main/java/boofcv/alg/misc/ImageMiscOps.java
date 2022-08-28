@@ -2665,7 +2665,11 @@ public class ImageMiscOps {
 	 * Functional API for modifying an images pixel values based on coordinate and value
 	 */
 	public static void filter( GrayU8 image, BoofLambdas.FilterPixel_S32 op ) {
-		ImplImageMiscOps.filter(image, op);
+		if (runConcurrent(image)) {
+			ImplImageMiscOps_MT.filter(image, op);
+		} else {
+			ImplImageMiscOps.filter(image, op);
+		}
 	}
 
 	/**
@@ -2712,7 +2716,11 @@ public class ImageMiscOps {
 	 * Functional API for modifying an images pixel values based on coordinate and value
 	 */
 	public static void filter( GrayS8 image, BoofLambdas.FilterPixel_S32 op ) {
-		ImplImageMiscOps.filter(image, op);
+		if (runConcurrent(image)) {
+			ImplImageMiscOps_MT.filter(image, op);
+		} else {
+			ImplImageMiscOps.filter(image, op);
+		}
 	}
 
 	/**
@@ -2759,7 +2767,11 @@ public class ImageMiscOps {
 	 * Functional API for modifying an images pixel values based on coordinate and value
 	 */
 	public static void filter( GrayU16 image, BoofLambdas.FilterPixel_S32 op ) {
-		ImplImageMiscOps.filter(image, op);
+		if (runConcurrent(image)) {
+			ImplImageMiscOps_MT.filter(image, op);
+		} else {
+			ImplImageMiscOps.filter(image, op);
+		}
 	}
 
 	/**
@@ -2806,7 +2818,11 @@ public class ImageMiscOps {
 	 * Functional API for modifying an images pixel values based on coordinate and value
 	 */
 	public static void filter( GrayS16 image, BoofLambdas.FilterPixel_S32 op ) {
-		ImplImageMiscOps.filter(image, op);
+		if (runConcurrent(image)) {
+			ImplImageMiscOps_MT.filter(image, op);
+		} else {
+			ImplImageMiscOps.filter(image, op);
+		}
 	}
 
 	/**
@@ -2853,7 +2869,11 @@ public class ImageMiscOps {
 	 * Functional API for modifying an images pixel values based on coordinate and value
 	 */
 	public static void filter( GrayS32 image, BoofLambdas.FilterPixel_S32 op ) {
-		ImplImageMiscOps.filter(image, op);
+		if (runConcurrent(image)) {
+			ImplImageMiscOps_MT.filter(image, op);
+		} else {
+			ImplImageMiscOps.filter(image, op);
+		}
 	}
 
 	/**
@@ -2900,7 +2920,11 @@ public class ImageMiscOps {
 	 * Functional API for modifying an images pixel values based on coordinate and value
 	 */
 	public static void filter( GrayS64 image, BoofLambdas.FilterPixel_S64 op ) {
-		ImplImageMiscOps.filter(image, op);
+		if (runConcurrent(image)) {
+			ImplImageMiscOps_MT.filter(image, op);
+		} else {
+			ImplImageMiscOps.filter(image, op);
+		}
 	}
 
 	/**
@@ -2947,7 +2971,11 @@ public class ImageMiscOps {
 	 * Functional API for modifying an images pixel values based on coordinate and value
 	 */
 	public static void filter( GrayF32 image, BoofLambdas.FilterPixel_F32 op ) {
-		ImplImageMiscOps.filter(image, op);
+		if (runConcurrent(image)) {
+			ImplImageMiscOps_MT.filter(image, op);
+		} else {
+			ImplImageMiscOps.filter(image, op);
+		}
 	}
 
 	/**
@@ -2994,7 +3022,11 @@ public class ImageMiscOps {
 	 * Functional API for modifying an images pixel values based on coordinate and value
 	 */
 	public static void filter( GrayF64 image, BoofLambdas.FilterPixel_F64 op ) {
-		ImplImageMiscOps.filter(image, op);
+		if (runConcurrent(image)) {
+			ImplImageMiscOps_MT.filter(image, op);
+		} else {
+			ImplImageMiscOps.filter(image, op);
+		}
 	}
 
 	/**

@@ -89,6 +89,8 @@ public class BenchmarkImageMiscOps {
 	// @formatter:off
 	@Benchmark public void copy_U8() {ImageMiscOps.copy(10,10,0,0,size-10,size-10,imgA_U8,imgB_U8);}
 	@Benchmark public void copy_F32() {ImageMiscOps.copy(10,10,0,0,size-10,size-10,imgA_F32,imgB_F32);}
+	@Benchmark public void filter_U8() {ImageMiscOps.filter(imgA_U8, (x,y,v)->v*v + x);}
+	@Benchmark public void filter_F32() {ImageMiscOps.filter(imgA_F32, (x,y,v)->v*v + x);}
 	@Benchmark public void fill_U8() {ImageMiscOps.fill(imgA_U8, 2);}
 	@Benchmark public void fill_F32() {ImageMiscOps.fill(imgA_F32, 2.0f);}
 	@Benchmark public void fill_IU8() {ImageMiscOps.fill(imgA_IU8, 2);}
