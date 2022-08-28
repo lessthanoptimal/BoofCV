@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,8 +52,7 @@ public class SelectCorrelationSubpixel {
 			super(original);
 		}
 
-		@Override
-		protected void setDisparity( int index, int disparityValue ) {
+		@Override protected void setDisparity( int index, int disparityValue, float score ) {
 
 			if (disparityValue <= 0 || disparityValue >= localRange - 1) {
 				imageDisparity.data[index] = disparityValue;
@@ -66,20 +65,18 @@ public class SelectCorrelationSubpixel {
 
 				imageDisparity.data[index] = disparityValue + offset;
 			}
+			funcSaveScore.saveScore(index, score);
 		}
 
-		@Override
-		protected void setDisparityInvalid( int index ) {
+		@Override protected void setDisparityInvalid( int index ) {
 			imageDisparity.data[index] = (byte)invalidDisparity;
 		}
 
-		@Override
-		public DisparitySelect<float[], GrayF32> concurrentCopy() {
+		@Override public DisparitySelect<float[], GrayF32> concurrentCopy() {
 			return new F32_F32(this);
 		}
 
-		@Override
-		public Class<GrayF32> getDisparityType() {
+		@Override public Class<GrayF32> getDisparityType() {
 			return GrayF32.class;
 		}
 	}

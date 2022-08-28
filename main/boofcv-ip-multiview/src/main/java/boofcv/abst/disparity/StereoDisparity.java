@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,11 @@
 
 package boofcv.abst.disparity;
 
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>
@@ -58,6 +60,13 @@ public interface StereoDisparity<Image extends ImageBase<Image>, Disparity exten
 	 * @return Output disparity from left to right image.
 	 */
 	Disparity getDisparity();
+
+	/**
+	 * Returns a score that represents the goodness of fit for the selected value. Meaning of the score
+	 * is cost function dependent. If null is returned that means the score was not saved. This can be
+	 *
+	 */
+	@Nullable GrayF32 getDisparityScore();
 
 	/**
 	 * The minimum disparity which will be checked for.

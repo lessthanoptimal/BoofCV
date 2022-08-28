@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,7 +51,7 @@ public abstract class ChecksSelectDisparityWithChecksWtaError<ArrayData, D exten
 		int y = 3;
 
 		SelectDisparityWithChecksWta<ArrayData, D> alg = createSelector(2, -1, -1);
-		alg.configure(disparity, 0, maxDisparity, 2);
+		alg.configure(disparity, null, 0, maxDisparity, 2);
 
 		int[] scores = new int[w*rangeDisparity];
 
@@ -72,7 +72,7 @@ public abstract class ChecksSelectDisparityWithChecksWtaError<ArrayData, D exten
 
 		// Sanity check, much higher error threshold
 		alg = createSelector(20, -1, -1);
-		alg.configure(disparity, 0, maxDisparity, 2);
+		alg.configure(disparity, null, 0, maxDisparity, 2);
 		alg.process(y, copyToCorrectType(scores));
 		assertEquals(1, getDisparity(3, y), 1);
 		assertEquals(1, getDisparity(4, y), 1);

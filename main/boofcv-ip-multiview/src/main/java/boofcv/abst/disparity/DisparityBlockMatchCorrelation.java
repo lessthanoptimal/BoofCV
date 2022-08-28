@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,36 +32,35 @@ import boofcv.struct.image.ImageType;
  * @author Peter Abeles
  */
 public class DisparityBlockMatchCorrelation<T extends ImageGray<T>, D extends ImageGray<D>, TF extends ImageGray<TF>>
-		extends WrapBaseBlockMatch<T,TF,D>
-{
-	TF adjustedLeft,adjustedRight;
+		extends WrapBaseBlockMatch<T, TF, D> {
+	TF adjustedLeft, adjustedRight;
 
-	boolean normalizeInput=true;
+	boolean normalizeInput = true;
 	NormalizeParameters parameters = new NormalizeParameters();
 
 	ImageType<T> inputType;
 
-	public DisparityBlockMatchCorrelation(DisparityBlockMatchRowFormat<TF,D> alg, Class<T> inputType ) {
+	public DisparityBlockMatchCorrelation( DisparityBlockMatchRowFormat<TF, D> alg, Class<T> inputType ) {
 		super(alg);
 		this.inputType = ImageType.single(inputType);
 
-		adjustedLeft = alg.getInputType().createImage(1,1);
-		adjustedRight = alg.getInputType().createImage(1,1);
+		adjustedLeft = alg.getInputType().createImage(1, 1);
+		adjustedRight = alg.getInputType().createImage(1, 1);
 	}
 
 	@Override
-	public void _process(T imageLeft, T imageRight) {
-		if( normalizeInput ) {
+	public void _process( T imageLeft, T imageRight ) {
+		if (normalizeInput) {
 			// normalize to reduce numerical problems, e.g. overflow/underflow
 			ImageNormalization.zeroMeanMaxOne(imageLeft, adjustedLeft, parameters);
 			// Here I'm assuming the cameras have their gain/exposure synchronized so you want to use the same
 			// parameters or else you might degrade your performance.
 			ImageNormalization.apply(imageRight, parameters, adjustedRight);
 		} else {
-			GConvertImage.convert(imageLeft,adjustedLeft);
-			GConvertImage.convert(imageRight,adjustedRight);
+			GConvertImage.convert(imageLeft, adjustedLeft);
+			GConvertImage.convert(imageRight, adjustedRight);
 		}
-		alg.process(adjustedLeft,adjustedRight,disparity);
+		alg.process(adjustedLeft, adjustedRight, disparity, score);
 	}
 
 	@Override
@@ -81,7 +80,7 @@ public class DisparityBlockMatchCorrelation<T extends ImageGray<T>, D extends Im
 		return normalizeInput;
 	}
 
-	public void setNormalizeInput(boolean normalizeInput) {
+	public void setNormalizeInput( boolean normalizeInput ) {
 		this.normalizeInput = normalizeInput;
 	}
 }

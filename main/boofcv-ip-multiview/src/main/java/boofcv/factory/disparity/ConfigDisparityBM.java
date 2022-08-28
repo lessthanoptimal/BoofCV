@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,6 +54,10 @@ public class ConfigDisparityBM implements Configuration {
 	 * If false then GrayU8.
 	 */
 	public boolean subpixel = true;
+
+	/** If true it will save the disparity score for each pixel */
+	public boolean saveScore = false;
+
 	/** How the error is computed for each block */
 	public DisparityError errorType = DisparityError.CENSUS;
 	/** Used if error type is Census */
@@ -75,6 +79,7 @@ public class ConfigDisparityBM implements Configuration {
 		this.validateRtoL = src.validateRtoL;
 		this.texture = src.texture;
 		this.subpixel = src.subpixel;
+		this.saveScore = src.saveScore;
 		this.errorType = src.errorType;
 		this.configCensus.setTo(src.configCensus);
 		this.configNCC.setTo(src.configNCC);

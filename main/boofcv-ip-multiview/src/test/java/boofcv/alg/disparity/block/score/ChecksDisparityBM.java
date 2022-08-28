@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -114,7 +114,7 @@ public abstract class ChecksDisparityBM<I extends ImageGray<I>, DI extends Image
 	class BasicTests extends BasicDisparityTests<I, DI> {
 		DisparityBlockMatch<I, DI> alg;
 
-		BasicTests() { super(ChecksDisparityBM.this.minVal, ChecksDisparityBM.this.maxVal, imageType); }
+		BasicTests() {super(ChecksDisparityBM.this.minVal, ChecksDisparityBM.this.maxVal, imageType);}
 
 		@Override
 		public void initialize( int minDisparity, int maxDisparity ) {
@@ -124,7 +124,7 @@ public abstract class ChecksDisparityBM<I extends ImageGray<I>, DI extends Image
 		@Override
 		public DI computeDisparity( I left, I right ) {
 			DI ret = GeneralizedImageOps.createSingleBand(disparityType, left.width, left.height);
-			alg.process(left, right, ret);
+			alg.process(left, right, ret, null);
 			return ret;
 		}
 	}
@@ -165,7 +165,7 @@ public abstract class ChecksDisparityBM<I extends ImageGray<I>, DI extends Image
 		DI found = GeneralizedImageOps.createSingleBand(disparityType, w, h);
 		GrayF32 expected = new GrayF32(w, h);
 
-		alg.process(left, right, found);
+		alg.process(left, right, found, null);
 		naive.process(left, right, expected);
 
 		BoofTesting.assertEquals(found, expected, 1);
@@ -199,10 +199,10 @@ public abstract class ChecksDisparityBM<I extends ImageGray<I>, DI extends Image
 
 		BoofConcurrency.USE_CONCURRENT = false;
 		DisparityBlockMatch<I, DI> alg = createAlg(minDisparity, maxDisparity, radiusX, radiusY);
-		alg.process(left, right, expected);
+		alg.process(left, right, expected, null);
 		BoofConcurrency.USE_CONCURRENT = true;
 		alg = createAlg(minDisparity, maxDisparity, radiusX, radiusY);
-		alg.process(left, right, found);
+		alg.process(left, right, found, null);
 
 //		((GrayU8)expected).print();
 //		System.out.println();

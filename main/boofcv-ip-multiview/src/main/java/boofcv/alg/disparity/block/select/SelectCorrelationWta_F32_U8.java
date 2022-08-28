@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,9 @@ package boofcv.alg.disparity.block.select;
 import boofcv.alg.disparity.block.DisparitySelect;
 import boofcv.alg.disparity.block.SelectDisparityBasicWta;
 import boofcv.misc.Compare_F32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>
@@ -34,8 +36,9 @@ import boofcv.struct.image.GrayU8;
 public class SelectCorrelationWta_F32_U8 extends SelectDisparityBasicWta<float[], GrayU8>
 		implements Compare_F32 {
 	@Override
-	public void configure( GrayU8 imageDisparity, int disparityMin, int disparityMax, int radiusX ) {
-		super.configure(imageDisparity, disparityMin, disparityMax, radiusX);
+	public void configure( GrayU8 imageDisparity, @Nullable GrayF32 imageScore,
+						   int disparityMin, int disparityMax, int radiusX ) {
+		super.configure(imageDisparity, imageScore, disparityMin, disparityMax, radiusX);
 	}
 
 	@Override

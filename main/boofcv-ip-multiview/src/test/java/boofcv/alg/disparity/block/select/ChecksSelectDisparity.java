@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.alg.disparity.block.select;
 import boofcv.alg.disparity.block.DisparitySelect;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
@@ -45,6 +46,7 @@ public abstract class ChecksSelectDisparity<ArrayData, D extends ImageGray<D>> e
 	int rangeDisparity;
 
 	D disparity;
+	GrayF32 score = new GrayF32(1, 1);
 
 	DisparitySelect<ArrayData, D> alg;
 
@@ -52,6 +54,8 @@ public abstract class ChecksSelectDisparity<ArrayData, D extends ImageGray<D>> e
 
 		this.arrayType = arrayType;
 		disparity = GeneralizedImageOps.createSingleBand(disparityType, w, h);
+		score.reshape(w, h);
+
 
 		alg = createAlg();
 	}
@@ -66,13 +70,26 @@ public abstract class ChecksSelectDisparity<ArrayData, D extends ImageGray<D>> e
 	}
 
 	/**
-	 * Give it a hand crafted score with known results for WTA. See if it produces those results
+	 * Give it a handcrafted score with known results for WTA. See if it produces those results
 	 */
 	@Test
 	void simpleTest() {
 		simpleTest(0, 10, 2);
 		simpleTest(2, 10, 2);
 		simpleTest(4, 11, 3);
+	}
+
+	/**
+	 * See if it blows up if you feed it a null disparity
+	 */
+	@Test
+	void checkExplodeNullDisparity() {
+		init(2, 10, 2);
+
+		alg.configure(disparity, null, minDisparity, maxDisparity, rangeDisparity);
+
+		int[] scores = new int[w*rangeDisparity];
+		alg.process(3, copyToCorrectType(scores));
 	}
 
 	protected ArrayData copyToCorrectType( int[] scores ) {
@@ -99,7 +116,7 @@ public abstract class ChecksSelectDisparity<ArrayData, D extends ImageGray<D>> e
 		int y = 3;
 
 		GImageMiscOps.fill(disparity, 0);
-		alg.configure(disparity, minDisparity, maxDisparity, rangeDisparity);
+		alg.configure(disparity, score, minDisparity, maxDisparity, rangeDisparity);
 
 		int[] scores = new int[w*rangeDisparity];
 
