@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.factory.sfm;
 
+import boofcv.alg.mvs.MultiBaselineStereoIndependent;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.Configuration;
 
@@ -36,6 +37,9 @@ public class ConfigMultiviewStereo implements Configuration {
 	/** {@link boofcv.alg.mvs.MultiViewStereoFromKnownSceneStructure#maxCombinePairs} */
 	public int maxCombinePairs = 10;
 
+	/** {@link MultiBaselineStereoIndependent#disparityErrorThresholdScale}*/
+	public double disparityErrorThresholdScale = 2.0;
+
 	@Override public void checkValidity() {
 		BoofMiscOps.checkTrue(minimumQuality3D >= 0.0);
 		BoofMiscOps.checkTrue(maximumCenterOverlap >= 0.0 && maximumCenterOverlap <= 1.0);
@@ -45,6 +49,7 @@ public class ConfigMultiviewStereo implements Configuration {
 		this.minimumQuality3D = src.minimumQuality3D;
 		this.maximumCenterOverlap = src.maximumCenterOverlap;
 		this.maxCombinePairs = src.maxCombinePairs;
+		this.disparityErrorThresholdScale = src.disparityErrorThresholdScale;
 		return this;
 	}
 }

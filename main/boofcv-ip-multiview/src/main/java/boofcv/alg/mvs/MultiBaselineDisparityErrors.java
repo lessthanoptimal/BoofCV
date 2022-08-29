@@ -112,7 +112,7 @@ public class MultiBaselineDisparityErrors implements VerbosePrint {
 		inverseDepth.reshape(fused.width, fused.height);
 
 		if (verbose != null)
-			verbose.printf("Fusing: shape=%dx%d images.size=%d", fused.width, fused.height, images.size);
+			verbose.printf("Fusing: shape=%dx%d images.size=%d\n", fused.width, fused.height, images.size);
 
 		// Select the largest baseline to be representative
 		fusedBaseline = 0;

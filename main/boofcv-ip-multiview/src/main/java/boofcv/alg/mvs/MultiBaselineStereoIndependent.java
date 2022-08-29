@@ -85,6 +85,9 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 	/** Used to retrieve images by their ID */
 	@Getter @Setter @Nullable LookUpImages lookUpImages = null;
 
+	/** Scale factor for adaptive disparity error threshold */
+	@Getter @Setter public double disparityErrorThresholdScale = 2.0;
+
 	//------------ Profiling information
 	/** Sum of disparity calculations */
 	@Getter double timeDisparity;
@@ -276,7 +279,13 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 		info.score = Objects.requireNonNull(stereoDisparity.getDisparityScore(), "Stereo must have score turned on");
 
 		// Filter out pixels outside the original image
-		ImageMiscOps.maskFill(info.disparity, mask, 0, info.param.disparityRange);
+		final int disparityRange = info.param.disparityRange;
+		ImageMiscOps.maskFill(info.disparity, mask, 0, disparityRange);
+
+		// Adaptive error threshold
+		float threshold = MultiViewStereoOps.averageScore(info.disparity, disparityRange, info.score );
+		threshold = (float)(threshold*disparityErrorThresholdScale);
+		MultiViewStereoOps.invalidateUsingError(info.disparity, disparityRange, info.score , threshold);
 
 		DisparityParameters param = info.param;
 		param.disparityMin = stereoDisparity.getDisparityMin();

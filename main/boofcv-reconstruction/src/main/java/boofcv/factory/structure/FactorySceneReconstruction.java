@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -148,6 +148,7 @@ public class FactorySceneReconstruction {
 		mvs.minimumQuality3D = config.mvs.minimumQuality3D;
 		mvs.maximumCenterOverlap = config.mvs.maximumCenterOverlap;
 		mvs.maxCombinePairs = config.mvs.maxCombinePairs;
+		mvs.getComputeFused().disparityErrorThresholdScale = config.mvs.disparityErrorThresholdScale;
 
 		mvs.setStereoDisparity(FactoryStereoDisparity.generic(
 				config.disparity, grayType, GrayF32.class));
