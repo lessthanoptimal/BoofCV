@@ -32,6 +32,7 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeBrown;
+import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.distort.PointToPixelTransform_F64;
 import boofcv.struct.image.GrayF32;
@@ -43,12 +44,14 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.se.SpecialEuclideanOps_F64;
+import org.ejml.dense.row.CommonOps_DDRM;
 import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestMultiViewStereoOps extends BoofStandardJUnit {
 	int width = 80;
@@ -279,6 +282,39 @@ public class TestMultiViewStereoOps extends BoofStandardJUnit {
 	}
 
 	@Test void invalidateBorder() {
-		fail("Implement");
+		int width = 30;
+		int height = 20;
+		int radius = 3;
+		int invalid = 100;
+		var disparity = new GrayF32(width, height);
+		ImageMiscOps.fill(disparity, 50);
+
+		// shift the image
+		var dist_to_undist = new PixelTransform<Point2D_F64>() {
+			@Override public void compute( int x, int y, Point2D_F64 output ) {
+				output.setTo(x + 10, y + 1);
+			}
+		};
+
+		// don't distort the image
+		var undist_to_rect = CommonOps_DDRM.identity(3, 3);
+
+		MultiViewStereoOps.invalidateBorder(width, height,
+				dist_to_undist, undist_to_rect, radius, invalid, disparity);
+
+		// Find all the points removed
+		int found = 0;
+		for (int i = 0; i < height; i++) {
+			for (int j = 0; j < width; j++) {
+				if (disparity.get(j,i) == invalid)
+					found++;
+			}
+		}
+
+		// Compute the region blocked out by subtracting an outer rectangle from an inner rectangle
+		int expected = (width-(10-radius))*height;
+		expected -= (width-(10+radius+1))*(height-radius-2);
+
+		assertEquals(expected, found);
 	}
 }

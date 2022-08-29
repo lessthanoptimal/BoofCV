@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,5 +38,5 @@ public interface PixelTransform<T> {
 	 * which might be modified by a concurrent call to {@link #compute} is not passed to the 'copied' output.
 	 * Expensive to compute models might be passed in as a reference.
 	 */
-	PixelTransform<T> copyConcurrent();
+	default PixelTransform<T> copyConcurrent() { return this; }
 }

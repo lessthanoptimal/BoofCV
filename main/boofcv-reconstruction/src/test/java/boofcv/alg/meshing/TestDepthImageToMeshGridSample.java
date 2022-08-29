@@ -18,31 +18,28 @@
 
 package boofcv.alg.meshing;
 
+import boofcv.alg.distort.pinhole.LensDistortionPinhole;
 import boofcv.alg.geo.rectify.DisparityParameters;
 import boofcv.simulation.SimulatePlanarWorld;
 import boofcv.struct.calib.CameraPinhole;
+import boofcv.struct.distort.PointToPixelTransform_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.se.SpecialEuclideanOps_F64;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 class TestDepthImageToMeshGridSample extends BoofStandardJUnit {
+	CameraPinhole pinhole = new CameraPinhole().fsetK(200, 200, 0, 100, 100, 400, 400);
+
 	/**
 	 * Very basic test that checks to see if it can detect the object inside and now blow up
 	 */
 	@Test void disparitySimpleScene() {
-		// View a planar object that's at an angle. It will look like a trapazoid
-		Se3_F64 planeToWorld = SpecialEuclideanOps_F64.eulerXyz(0.2, 0.1, 1, 2.7, 0, 0, null);
-		CameraPinhole pinhole = new CameraPinhole().fsetK(200, 200, 0, 100, 100, 400, 400);
-		var sim = new SimulatePlanarWorld();
-		sim.setCamera(pinhole);
-		sim.addSurface(planeToWorld, 1.00, new GrayF32(20, 20));
-
-		sim.render();
+		SimulatePlanarWorld sim = renderPlanarWorld();
 
 		var param = new DisparityParameters();
 		param.pinhole.setTo(pinhole);
@@ -89,6 +86,32 @@ class TestDepthImageToMeshGridSample extends BoofStandardJUnit {
 	}
 
 	@Test void inverseDepthSimpleScene() {
-		fail("Implement");
+		SimulatePlanarWorld sim = renderPlanarWorld();
+
+		// Convert the depth image into an inverse depth image
+		GrayF32 depth = sim.getDepthMap();
+		GrayF32 invDepth = depth.createSameShape();
+		depth.forEachPixel((x,y,d)->invDepth.set(x,y, 1.0f/d));
+
+		// Convert it into a 3D mesh
+		var pixelToNorm = new PointToPixelTransform_F64(new LensDistortionPinhole(pinhole).undistort_F64(true, false));
+		var alg = new DepthImageToMeshGridSample();
+		alg.processInvDepth(invDepth, pixelToNorm, 1e-3f);
+		VertexMesh found = alg.getMesh();
+
+		assertTrue(found.vertexes.size() >= 4);
+		assertTrue(found.indexes.size() >= 4);
+		assertTrue(found.offsets.size() >= 1);
+	}
+
+	@NotNull private SimulatePlanarWorld renderPlanarWorld() {
+		// View a planar object that's at an angle. It will look like a trapazoid
+		Se3_F64 planeToWorld = SpecialEuclideanOps_F64.eulerXyz(0.2, 0.1, 1, 2.7, 0, 0, null);
+		var sim = new SimulatePlanarWorld();
+		sim.setCamera(pinhole);
+		sim.addSurface(planeToWorld, 1.00, new GrayF32(20, 20));
+
+		sim.render();
+		return sim;
 	}
 }
