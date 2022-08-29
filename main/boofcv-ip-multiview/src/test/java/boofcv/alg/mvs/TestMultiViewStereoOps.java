@@ -48,8 +48,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestMultiViewStereoOps extends BoofStandardJUnit {
 	int width = 80;
@@ -277,5 +276,9 @@ public class TestMultiViewStereoOps extends BoofStandardJUnit {
 	private static class SumStorage {
 		public double sum = 0.0;
 		public int count = 0;
+	}
+
+	@Test void invalidateBorder() {
+		fail("Implement");
 	}
 }

@@ -31,6 +31,7 @@ import boofcv.misc.BoofLambdas;
 import boofcv.misc.BoofMiscOps;
 import boofcv.misc.LookUpImages;
 import boofcv.struct.border.BorderType;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.*;
 import georegression.struct.se.Se3_F64;
 import lombok.Getter;
@@ -88,6 +89,12 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 	/** Scale factor for adaptive disparity error threshold */
 	@Getter @Setter public double disparityErrorThresholdScale = 2.0;
 
+	/**
+	 * Removes disparity from around the original image's border in rectified image. This parameter
+	 * specifies how big the kernel used to compute the disparity is to avoid artifacts.
+	 */
+	@Getter @Setter public int disparityBlockRadius = 0;
+
 	//------------ Profiling information
 	/** Sum of disparity calculations */
 	@Getter double timeDisparity;
@@ -118,8 +125,8 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 	// Mask of valid disparity pixels
 	GrayU8 mask = new GrayU8(1, 1);
 
-	// Computes parameters how to rectify given the results from bundle adjustment
-	BundleToRectificationStereoParameters computeRectification = new BundleToRectificationStereoParameters();
+	/** Computes parameters how to rectify given the results from bundle adjustment */
+	@Getter BundleToRectificationStereoParameters computeRectification = new BundleToRectificationStereoParameters();
 
 	// Specifies the relationships between reference frames
 	final Se3_F64 left_to_world = new Se3_F64();
@@ -282,10 +289,14 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 		final int disparityRange = info.param.disparityRange;
 		ImageMiscOps.maskFill(info.disparity, mask, 0, disparityRange);
 
+		// Blocks used to compute the disparity will be inaccurate if they touch regions outside
+		MultiViewStereoOps.invalidateBorder(image1.width, image1.height, computeRectification.view1_dist_to_undist,
+				computeRectification.undist_to_rect1, disparityBlockRadius, stereoDisparity.getDisparityRange(), info.disparity);
+
 		// Adaptive error threshold
-		float threshold = MultiViewStereoOps.averageScore(info.disparity, disparityRange, info.score );
+		float threshold = MultiViewStereoOps.averageScore(info.disparity, disparityRange, info.score);
 		threshold = (float)(threshold*disparityErrorThresholdScale);
-		MultiViewStereoOps.invalidateUsingError(info.disparity, disparityRange, info.score , threshold);
+		MultiViewStereoOps.invalidateUsingError(info.disparity, disparityRange, info.score, threshold);
 
 		DisparityParameters param = info.param;
 		param.disparityMin = stereoDisparity.getDisparityMin();
@@ -321,6 +332,13 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 		if (configuration != null && configuration.contains(BoofVerbose.RUNTIME)) {
 			verboseProfiling = out;
 		}
+	}
+
+	/**
+	 * Returns intrinsic camera parameters for the targeted view
+	 */
+	public CameraPinholeBrown getTargetIntrinsic() {
+		return computeRectification.intrinsic1;
 	}
 
 	/**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.factory.disparity;
 import boofcv.alg.disparity.sgm.SgmDisparityCost;
 import boofcv.alg.disparity.sgm.SgmStereoDisparityHmi;
 import boofcv.struct.Configuration;
+import boofcv.struct.KernelRadius2D;
 import boofcv.struct.border.BorderType;
 
 import static boofcv.alg.disparity.sgm.SgmDisparityCost.MAX_COST;
@@ -77,6 +78,14 @@ public class ConfigDisparitySGM implements Configuration {
 	 */
 	public BorderType border = BorderType.REFLECT;
 
+	public KernelRadius2D getBlockSize() {
+		if (useBlocks) {
+			return configBlockMatch.getBlockSize();
+		} else {
+			return new KernelRadius2D(1, 1);
+		}
+	}
+
 	public ConfigDisparitySGM setTo( ConfigDisparitySGM src ) {
 		this.disparityMin = src.disparityMin;
 		this.disparityRange = src.disparityRange;
@@ -107,6 +116,18 @@ public class ConfigDisparitySGM implements Configuration {
 		public int radiusY = 2;
 
 		public BlockMatchingApproach approach = BlockMatchingApproach.BEST5;
+
+		public KernelRadius2D getBlockSize() {
+			return switch (approach) {
+				case BASIC -> new KernelRadius2D(radiusX, radiusY);
+				case BEST5 -> {
+					int rx = (2*radiusX + 1)*3/2;
+					int ry = (2*radiusY + 1)*3/2;
+
+					yield new KernelRadius2D(rx, ry);
+				}
+			};
+		}
 
 		public ConfigBlockMatchError setTo( ConfigBlockMatchError src ) {
 			this.radiusX = src.radiusX;

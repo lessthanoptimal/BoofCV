@@ -37,7 +37,7 @@ import boofcv.alg.geo.bundle.BundleAdjustmentOps;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.alg.geo.rectify.DisparityParameters;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
-import boofcv.alg.meshing.DisparityToMeshGridSample;
+import boofcv.alg.meshing.DepthImageToMeshGridSample;
 import boofcv.alg.meshing.VertexMesh;
 import boofcv.alg.structure.ThreeViewEstimateMetricScene;
 import boofcv.core.image.ConvertImage;
@@ -287,10 +287,10 @@ public class DemoThreeViewStereoApp<TD extends TupleDesc<TD>> extends Demonstrat
 				parameters.rotateToRectified.setTo(rectifiedR);
 
 				// Convert the disparity image into a polygon mesh
-				var alg = new DisparityToMeshGridSample();
+				var alg = new DepthImageToMeshGridSample();
 				alg.maxDisparityJump = 2;
 				alg.samplePeriod.setFixed(2);
-				alg.process(parameters, (GrayF32)disparity);
+				alg.processDisparity(parameters, (GrayF32)disparity);
 				VertexMesh mesh = alg.getMesh();
 
 				// Specify the color of each vertex

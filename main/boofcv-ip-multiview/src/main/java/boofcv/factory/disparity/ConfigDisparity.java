@@ -19,6 +19,7 @@
 package boofcv.factory.disparity;
 
 import boofcv.struct.Configuration;
+import boofcv.struct.KernelRadius2D;
 
 /**
  * Generic configuration for any dense stereo disparity algorithm.
@@ -36,6 +37,14 @@ public class ConfigDisparity implements Configuration {
 	public final ConfigDisparityBMBest5 approachBM5 = new ConfigDisparityBMBest5();
 	/** Configuration for Semi Global Matching (SGM) appraoch */
 	public final ConfigDisparitySGM approachSGM = new ConfigDisparitySGM();
+
+	public KernelRadius2D getBlockSize() {
+		return switch (approach) {
+			case BLOCK_MATCH -> approachBM.getBlockSize();
+			case BLOCK_MATCH_5 -> approachBM5.getBlockSize();
+			case SGM -> approachSGM.getBlockSize();
+		};
+	}
 
 	@Override public void checkValidity() {
 		approachBM.checkValidity();

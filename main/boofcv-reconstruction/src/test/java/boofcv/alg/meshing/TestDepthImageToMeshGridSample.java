@@ -28,12 +28,13 @@ import georegression.struct.se.SpecialEuclideanOps_F64;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
-class TestDisparityToMeshGridSample extends BoofStandardJUnit {
+class TestDepthImageToMeshGridSample extends BoofStandardJUnit {
 	/**
 	 * Very basic test that checks to see if it can detect the object inside and now blow up
 	 */
-	@Test void simpleScene() {
+	@Test void disparitySimpleScene() {
 		// View a planar object that's at an angle. It will look like a trapazoid
 		Se3_F64 planeToWorld = SpecialEuclideanOps_F64.eulerXyz(0.2, 0.1, 1, 2.7, 0, 0, null);
 		CameraPinhole pinhole = new CameraPinhole().fsetK(200, 200, 0, 100, 100, 400, 400);
@@ -53,8 +54,8 @@ class TestDisparityToMeshGridSample extends BoofStandardJUnit {
 		GrayF32 disparity = depth.createSameShape();
 		depthToDisparityImage(pinhole, param, depth, disparity);
 
-		var alg = new DisparityToMeshGridSample();
-		alg.process(param, disparity);
+		var alg = new DepthImageToMeshGridSample();
+		alg.processDisparity(param, disparity);
 		VertexMesh found = alg.getMesh();
 
 		assertTrue(found.vertexes.size() >= 4);
@@ -85,5 +86,9 @@ class TestDisparityToMeshGridSample extends BoofStandardJUnit {
 				disparity.set(pixX, pixY, (float)d);
 			}
 		}
+	}
+
+	@Test void inverseDepthSimpleScene() {
+		fail("Implement");
 	}
 }

@@ -16,29 +16,43 @@
  * limitations under the License.
  */
 
-package boofcv.factory.disparity;
-
-import boofcv.alg.disparity.DisparityBlockMatchBestFive;
-import boofcv.struct.KernelRadius2D;
+package boofcv.struct;
 
 /**
- * A block matching algorithm which improved performance along edges by finding the score for 9 regions but only
- * selecting the 5 best.
+ * Specifies a size of a 2D kernel with a radius along each axis.
  *
  * @author Peter Abeles
- * @see DisparityBlockMatchBestFive
  */
-public class ConfigDisparityBMBest5 extends ConfigDisparityBM {
+public class KernelRadius2D {
+	public int radiusX;
+	public int radiusY;
 
-	@Override public KernelRadius2D getBlockSize() {
-		int radiusX = (2*regionRadiusX + 1)*3/2;
-		int radiusY = (2*regionRadiusY + 1)*3/2;
-
-		return new KernelRadius2D(radiusX, radiusY);
+	public KernelRadius2D() {
 	}
 
-	public ConfigDisparityBMBest5 setTo( ConfigDisparityBMBest5 src ) {
-		super.setTo(src);
+	public KernelRadius2D( int radiusX, int radiusY ) {
+		this.radiusX = radiusX;
+		this.radiusY = radiusY;
+	}
+
+	public int getLargestAxis() {
+		return Math.max(radiusX, radiusY);
+	}
+
+	public void reset() {
+		radiusX = 0;
+		radiusY = 0;
+	}
+
+	public KernelRadius2D setTo( int radiusX, int radiusY ) {
+		this.radiusX = radiusX;
+		this.radiusY = radiusY;
+		return this;
+	}
+
+	public KernelRadius2D setTo( KernelRadius2D src ) {
+		this.radiusX = src.radiusX;
+		this.radiusY = src.radiusY;
 		return this;
 	}
 }

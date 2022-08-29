@@ -20,6 +20,7 @@ package boofcv.factory.disparity;
 
 import boofcv.alg.disparity.DisparityBlockMatch;
 import boofcv.struct.Configuration;
+import boofcv.struct.KernelRadius2D;
 import boofcv.struct.border.BorderType;
 
 /**
@@ -69,6 +70,10 @@ public class ConfigDisparityBM implements Configuration {
 	 * error to prefer a region with lots of pixels outside the image border.
 	 */
 	public BorderType border = BorderType.REFLECT;
+
+	public KernelRadius2D getBlockSize() {
+		return new KernelRadius2D(regionRadiusX, regionRadiusY);
+	}
 
 	public ConfigDisparityBM setTo( ConfigDisparityBM src ) {
 		this.disparityMin = src.disparityMin;

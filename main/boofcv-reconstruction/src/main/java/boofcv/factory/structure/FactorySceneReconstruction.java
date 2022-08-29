@@ -44,6 +44,7 @@ import boofcv.factory.scene.FactorySceneRecognition;
 import boofcv.factory.sfm.ConfigBundleUtils;
 import boofcv.factory.struct.FactoryTupleDesc;
 import boofcv.factory.tracker.FactoryPointTracker;
+import boofcv.struct.KernelRadius2D;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.geo.AssociatedPair;
@@ -93,7 +94,7 @@ public class FactorySceneReconstruction {
 	/**
 	 * Creates a new instance of {@link EpipolarScore3D} based on the passed in configuration
 	 */
-	public static EpipolarScore3D epipolarScore3D( ConfigEpipolarScore3D config) {
+	public static EpipolarScore3D epipolarScore3D( ConfigEpipolarScore3D config ) {
 		ModelMatcher<DMatrixRMaj, AssociatedPair> ransac3D =
 				FactoryMultiViewRobust.fundamentalRansac(config.fundamental, config.ransacF);
 
@@ -142,7 +143,7 @@ public class FactorySceneReconstruction {
 
 		Class<T> grayType = imageType.getImageClass();
 
-		SparseSceneToDenseCloud<T> s2c = new SparseSceneToDenseCloud<>(grayType);
+		var s2c = new SparseSceneToDenseCloud<>(grayType);
 		MultiViewStereoFromKnownSceneStructure<T> mvs = s2c.getMultiViewStereo();
 
 		mvs.minimumQuality3D = config.mvs.minimumQuality3D;
@@ -160,6 +161,10 @@ public class FactorySceneReconstruction {
 		generateGraph.targetDisparity = config.graph.targetDisparity;
 		generateGraph.countSmootherParam = config.graph.countSmootherParam;
 		generateGraph.minimumCommonFeaturesFrac = config.graph.minimumCommonFeaturesFrac;
+
+		// Need to configure image border filter so that noisy edge conditions are pruned
+		KernelRadius2D blockSize = config.disparity.getBlockSize();
+		mvs.getComputeFused().disparityBlockRadius = blockSize.getLargestAxis();
 
 		return s2c;
 	}
@@ -241,7 +246,7 @@ public class FactorySceneReconstruction {
 		var alg = new SelectFramesForReconstruction3D<T>(describe);
 		alg.config.setTo(config);
 		alg.setTracker(FactoryPointTracker.tracker(config.tracker, grayType, null));
-		alg.setAssociate(FactoryAssociation.generic2(config.associate,describe));
+		alg.setAssociate(FactoryAssociation.generic2(config.associate, describe));
 		alg.setScorer(FactorySceneReconstruction.epipolarScore3D(config.scorer3D));
 
 		return alg;

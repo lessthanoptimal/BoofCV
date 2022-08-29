@@ -23,7 +23,7 @@ import boofcv.abst.disparity.DisparitySmoother;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.rectify.DisparityParameters;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
-import boofcv.alg.meshing.DisparityToMeshGridSample;
+import boofcv.alg.meshing.DepthImageToMeshGridSample;
 import boofcv.alg.meshing.VertexMesh;
 import boofcv.factory.disparity.FactoryStereoDisparity;
 import boofcv.io.UtilIO;
@@ -92,10 +92,10 @@ public class ExampleStereoMesh {
 		parameters.baseline = param.getBaseline()/10;
 
 		// Convert the disparity image into a polygon mesh
-		var alg = new DisparityToMeshGridSample();
+		var alg = new DepthImageToMeshGridSample();
 		alg.maxDisparityJump = 2;
 		alg.samplePeriod.setFixed(2);
-		alg.process(parameters, disparity);
+		alg.processDisparity(parameters, disparity);
 		VertexMesh mesh = alg.getMesh();
 
 		// Specify the color of each vertex

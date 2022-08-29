@@ -28,10 +28,12 @@ import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
+import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
+import org.ejml.data.DMatrixRMaj;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -196,6 +198,62 @@ public class MultiViewStereoOps {
 			ImplMultiViewStereoOps.invalidateUsingError((GrayF32)disparity, (float)disparityRange, score, threshold);
 		} else {
 			throw new RuntimeException("Unsupported image type");
+		}
+	}
+
+	/**
+	 * Projects the input image's border onto the rectified image and marks all pixels it touches
+	 * as invalid in the disparity image. This is done to remove certain false positives along the
+	 * border.
+	 *
+	 * @param width Input image's width
+	 * @param height Input image's height
+	 * @param dist_to_undist distorted pixel to undistorted
+	 * @param undist_to_rect undistorted to rectified images
+	 * @param radius Square region's radius
+	 * @param disparity (Output) Disparity image that's going to have pixels blocked out
+	 */
+	public static void invalidateBorder( int width, int height,
+										 PixelTransform<Point2D_F64> dist_to_undist,
+										 DMatrixRMaj undist_to_rect, int radius,
+										 float invalidValue,
+										 GrayF32 disparity ) {
+		// if the area has size zero just return. Don't need to deal with this edge case then.
+		if (radius <= 0)
+			return;
+
+		final var pixel = new Point2D_F64();
+
+		BoofLambdas.ProcessII op = ( x, y ) -> {
+			dist_to_undist.compute(x, y, pixel);
+			GeometryMath_F64.mult(undist_to_rect, pixel, pixel);
+			if (pixel.x < 0.0 || pixel.y < 0.0)
+				return;
+			int cx = (int)(pixel.x + 0.5);
+			int cy = (int)(pixel.y + 0.5);
+			if (cx >= disparity.width || cy >= disparity.height)
+				return;
+
+			for (int i = -radius; i <= radius; i++) {
+				int yy = cy + i;
+				if (yy < 0 || yy >= disparity.height)
+					continue;
+				for (int j = -radius; j <= radius; j++) {
+					int xx = cx + j;
+					if (xx < 0 || xx >= disparity.width)
+						continue;
+					disparity.unsafe_set(xx, yy, invalidValue);
+				}
+			}
+		};
+
+		for (int x = 0; x < width; x++) {
+			op.process(x, 0);
+			op.process(x, height - 1);
+		}
+		for (int y = 1; y < height - 1; y++) {
+			op.process(0, y);
+			op.process(width - 1, y);
 		}
 	}
 }
