@@ -52,7 +52,7 @@ class TestDepthImageToMeshGridSample extends BoofStandardJUnit {
 		depthToDisparityImage(pinhole, param, depth, disparity);
 
 		var alg = new DepthImageToMeshGridSample();
-		alg.processDisparity(param, disparity);
+		alg.processDisparity(param, disparity, 2);
 		VertexMesh found = alg.getMesh();
 
 		assertTrue(found.vertexes.size() >= 4);
@@ -91,7 +91,7 @@ class TestDepthImageToMeshGridSample extends BoofStandardJUnit {
 		// Convert the depth image into an inverse depth image
 		GrayF32 depth = sim.getDepthMap();
 		GrayF32 invDepth = depth.createSameShape();
-		depth.forEachPixel((x,y,d)->invDepth.set(x,y, 1.0f/d));
+		depth.forEachPixel(( x, y, d ) -> invDepth.set(x, y, 1.0f/d));
 
 		// Convert it into a 3D mesh
 		var pixelToNorm = new PointToPixelTransform_F64(new LensDistortionPinhole(pinhole).undistort_F64(true, false));

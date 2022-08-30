@@ -288,9 +288,8 @@ public class DemoThreeViewStereoApp<TD extends TupleDesc<TD>> extends Demonstrat
 
 				// Convert the disparity image into a polygon mesh
 				var alg = new DepthImageToMeshGridSample();
-				alg.maxDisparityJump = 2;
 				alg.samplePeriod.setFixed(2);
-				alg.processDisparity(parameters, (GrayF32)disparity);
+				alg.processDisparity(parameters, (GrayF32)disparity, 2);
 				VertexMesh mesh = alg.getMesh();
 
 				// Specify the color of each vertex

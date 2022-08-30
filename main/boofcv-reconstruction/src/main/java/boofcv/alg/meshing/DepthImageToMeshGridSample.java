@@ -19,9 +19,11 @@
 package boofcv.alg.meshing;
 
 import boofcv.alg.geo.rectify.DisparityParameters;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import lombok.Getter;
@@ -34,9 +36,6 @@ import org.ddogleg.struct.DogArray;
  * @author Peter Abeles
  */
 public class DepthImageToMeshGridSample {
-	/** If the disparity difference in a sample region is greater than this, the region is skipped */
-	public float maxDisparityJump = 2.0f;
-
 	/** Number of pixels in the regular grid that it samples. Relative to (w+h)/2 */
 	public ConfigLength samplePeriod = ConfigLength.fixed(4);
 
@@ -45,6 +44,8 @@ public class DepthImageToMeshGridSample {
 
 	/** Pixel coordinate each vertex came from. Useful for adding color */
 	@Getter DogArray<Point2D_F64> vertexPixels = new DogArray<>(Point2D_F64::new, Point2D_F64::zero);
+
+	GrayS32 indexImage = new GrayS32(1, 1);
 
 	// Workspace
 	Point3D_F64 p0 = new Point3D_F64();
@@ -61,9 +62,12 @@ public class DepthImageToMeshGridSample {
 	 * @param parameters Stereo parameters
 	 * @param disparity disparity image
 	 */
-	public void processDisparity( DisparityParameters parameters, GrayF32 disparity ) {
+	public void processDisparity( DisparityParameters parameters, GrayF32 disparity, float maxDisparityJump ) {
 		mesh.reset();
 		vertexPixels.reset();
+		// Fill index image with -1, indicating its empty
+		indexImage.reshape(disparity);
+		ImageMiscOps.fill(indexImage, -1);
 
 		int skip = samplePeriod.computeI((disparity.width + disparity.height)/2);
 
@@ -73,10 +77,10 @@ public class DepthImageToMeshGridSample {
 			for (int x = 0; x < disparity.width - skip; x += skip) {
 				int x1 = x + skip;
 
-				double d0 = disparity.get(x, y);
-				double d1 = disparity.get(x1, y);
-				double d2 = disparity.get(x1, y1);
-				double d3 = disparity.get(x, y1);
+				float d0 = disparity.get(x, y);
+				float d1 = disparity.get(x1, y);
+				float d2 = disparity.get(x1, y1);
+				float d3 = disparity.get(x, y1);
 
 				// If there's a large change in disparity it's probably not part of the same surface
 				if (Math.abs(d0 - d2) > maxDisparityJump)
@@ -86,36 +90,41 @@ public class DepthImageToMeshGridSample {
 				if (Math.abs(d0 - d3) > maxDisparityJump)
 					continue;
 
-				if (!parameters.pixelToLeft3D(x, y, d0, p0))
+				if (!checkAddIndexForIDisparity(x, y, d0, parameters))
 					continue;
-				if (!parameters.pixelToLeft3D(x1, y, d1, p1))
+				if (!checkAddIndexForIDisparity(x, y1, d1, parameters))
 					continue;
-				if (!parameters.pixelToLeft3D(x1, y1, d2, p2))
+				if (!checkAddIndexForIDisparity(x1, y1, d2, parameters))
 					continue;
-				if (!parameters.pixelToLeft3D(x, y1, d3, p3))
+				if (!checkAddIndexForIDisparity(x1, y, d3, parameters))
 					continue;
-
-				// save where they came from
-				vertexPixels.grow().setTo(x, y);
-				vertexPixels.grow().setTo(x1, y);
-				vertexPixels.grow().setTo(x1, y1);
-				vertexPixels.grow().setTo(x, y1);
-
-				// Define a square
-				int idx = mesh.vertexes.size();
-				mesh.vertexes.append(p0);
-				mesh.vertexes.append(p1);
-				mesh.vertexes.append(p2);
-				mesh.vertexes.append(p3);
-
-				mesh.indexes.add(idx + 3);
-				mesh.indexes.add(idx + 2);
-				mesh.indexes.add(idx + 1);
-				mesh.indexes.add(idx);
 
 				mesh.offsets.add(mesh.indexes.size);
 			}
 		}
+	}
+
+	/**
+	 * Adds vertexes as needed and specifies indexes in a mesh using the saved vertex indexes
+	 */
+	private boolean checkAddIndexForIDisparity( int x, int y, float disparity,
+												DisparityParameters parameters ) {
+
+		int index = indexImage.get(x, y);
+		if (index == -1) {
+			index = mesh.vertexes.size();
+			indexImage.set(x, y, index);
+
+			if (!parameters.pixelToLeft3D(x, y, disparity, p0))
+				return false;
+
+			mesh.vertexes.append(p0);
+
+			// save where they came from, used to add color later
+			vertexPixels.grow().setTo(x, y);
+		}
+		mesh.indexes.add(index);
+		return true;
 	}
 
 	/**
@@ -128,6 +137,9 @@ public class DepthImageToMeshGridSample {
 								 float maxInverseJump ) {
 		mesh.reset();
 		vertexPixels.reset();
+		// Fill index image with -1, indicating its empty
+		indexImage.reshape(inverseDepth);
+		ImageMiscOps.fill(indexImage, -1);
 
 		int skip = samplePeriod.computeI((inverseDepth.width + inverseDepth.height)/2);
 
@@ -137,13 +149,13 @@ public class DepthImageToMeshGridSample {
 			for (int x = 0; x < inverseDepth.width - skip; x += skip) {
 				int x1 = x + skip;
 
-				double d0 = inverseDepth.get(x, y);
-				double d1 = inverseDepth.get(x1, y);
-				double d2 = inverseDepth.get(x1, y1);
-				double d3 = inverseDepth.get(x, y1);
+				float d0 = inverseDepth.get(x, y);
+				float d1 = inverseDepth.get(x1, y);
+				float d2 = inverseDepth.get(x1, y1);
+				float d3 = inverseDepth.get(x, y1);
 
 				// Skip over points at infinity or invalid values
-				if (d0 <= 0.0 || d1 <= 0.0 || d2 <= 0.0 || d3 <= 0.0)
+				if (d0 <= 0.0f || d1 <= 0.0f || d2 <= 0.0f || d3 <= 0.0f)
 					continue;
 
 				// If there's a large change in inverse depth it's probably not part of the same surface
@@ -154,37 +166,34 @@ public class DepthImageToMeshGridSample {
 				if (Math.abs(d0 - d3) > maxInverseJump)
 					continue;
 
-				pixelToPoint(x,y,d0,pixelToNorm, p0);
-				pixelToPoint(x1,y,d1,pixelToNorm, p1);
-				pixelToPoint(x1,y1,d2,pixelToNorm, p2);
-				pixelToPoint(x,y1,d3,pixelToNorm, p3);
-
-				// save where they came from
-				vertexPixels.grow().setTo(x, y);
-				vertexPixels.grow().setTo(x1, y);
-				vertexPixels.grow().setTo(x1, y1);
-				vertexPixels.grow().setTo(x, y1);
-
-				// Define a square
-				int idx = mesh.vertexes.size();
-				mesh.vertexes.append(p0);
-				mesh.vertexes.append(p1);
-				mesh.vertexes.append(p2);
-				mesh.vertexes.append(p3);
-
-				mesh.indexes.add(idx + 3);
-				mesh.indexes.add(idx + 2);
-				mesh.indexes.add(idx + 1);
-				mesh.indexes.add(idx);
+				checkAddIndexForInverseDepth(x, y, d0, pixelToNorm);
+				checkAddIndexForInverseDepth(x, y1, d1, pixelToNorm);
+				checkAddIndexForInverseDepth(x1, y1, d2, pixelToNorm);
+				checkAddIndexForInverseDepth(x1, y, d3, pixelToNorm);
 
 				mesh.offsets.add(mesh.indexes.size);
 			}
 		}
 	}
 
-	private void pixelToPoint(int x, int y, double invDepth,
-							  PixelTransform<Point2D_F64> pixelToNorm, Point3D_F64 p)  {
-		pixelToNorm.compute(x,y, norm);
-		p.setTo(norm.x/invDepth, norm.y/invDepth, 1.0/invDepth);
+	/**
+	 * Adds vertexes as needed and specifies indexes in a mesh using the saved vertex indexes
+	 */
+	private void checkAddIndexForInverseDepth( int x, int y, float invDepth,
+											   PixelTransform<Point2D_F64> pixelToNorm ) {
+		int index = indexImage.get(x, y);
+		if (index == -1) {
+			index = mesh.vertexes.size();
+			indexImage.set(x, y, index);
+
+			pixelToNorm.compute(x, y, norm);
+			p0.setTo(norm.x/invDepth, norm.y/invDepth, 1.0/invDepth);
+
+			mesh.vertexes.append(p0);
+
+			// save where they came from, used to add color later
+			vertexPixels.grow().setTo(x, y);
+		}
+		mesh.indexes.add(index);
 	}
 }

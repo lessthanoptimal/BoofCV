@@ -93,9 +93,8 @@ public class ExampleStereoMesh {
 
 		// Convert the disparity image into a polygon mesh
 		var alg = new DepthImageToMeshGridSample();
-		alg.maxDisparityJump = 2;
 		alg.samplePeriod.setFixed(2);
-		alg.processDisparity(parameters, disparity);
+		alg.processDisparity(parameters, disparity, /* max disparity jump */ 2);
 		VertexMesh mesh = alg.getMesh();
 
 		// Specify the color of each vertex
