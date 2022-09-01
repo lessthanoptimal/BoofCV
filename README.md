@@ -62,34 +62,34 @@ BoofCV is on [Maven Central](http://search.maven.org/) and can be easily added t
 For Gradle projects:
 ```
 dependencies {
-    api(group: 'org.boofcv', name: 'boofcv-core', version: '0.40.1')
+    api(group: 'org.boofcv', name: 'boofcv-core', version: '0.41')
 }
 ```
 
 Here are a list of the most commonly used modules and what they are for:
 
-| Name                 |                 Description
-|----------------------|-------------------------------------------------------------------------------------
-| boofcv-core          | All the core libraries without any of the integration modules listed below
-| boofcv-android       | Useful functions for working inside of Android devices.
-| boofcv-ffmpeg        | [javacpp-presets](https://github.com/bytedeco/javacpp-presets) their ffmpeg wrapper is used for reading video files.
-| boofcv-javacv        | [JavaCV](https://github.com/bytedeco/javacv) is a wrapper around OpenCV mainly for file IO.
-| boofcv-jcodec        | [JCodec](http://jcodec.org/) is a pure Java video reader/writer.
-| boofcv-kotlin        | [Kotlin](https://kotlinlang.org/) extensions which take advantage of Kotlin's unique features.
-| boofcv-pdf           | Needed to render fiduals as PDF documents
-| boofcv-swing         | Visualization using Java Swing. Required for examples and demonstrations.
-| boofcv-WebcamCapture | A few functions that make [WebcamCapture](http://webcam-capture.sarxos.pl/) even easier to use.
+| Name                 | Description                                                                                                          |
+|----------------------|----------------------------------------------------------------------------------------------------------------------|
+| boofcv-core          | All the core libraries without any of the integration modules listed below                                           |
+| boofcv-android       | Useful functions for working inside of Android devices.                                                              |
+| boofcv-ffmpeg        | [javacpp-presets](https://github.com/bytedeco/javacpp-presets) their ffmpeg wrapper is used for reading video files. |
+| boofcv-javacv        | [JavaCV](https://github.com/bytedeco/javacv) is a wrapper around OpenCV mainly for file IO.                          |
+| boofcv-jcodec        | [JCodec](http://jcodec.org/) is a pure Java video reader/writer.                                                     |
+| boofcv-kotlin        | [Kotlin](https://kotlinlang.org/) extensions which take advantage of Kotlin's unique features.                       |
+| boofcv-pdf           | Needed to render fiduals as PDF documents                                                                            |
+| boofcv-swing         | Visualization using Java Swing. Required for examples and demonstrations.                                            |
+| boofcv-WebcamCapture | A few functions that make [WebcamCapture](http://webcam-capture.sarxos.pl/) even easier to use.                      |
 
 ## Directories
 
-| Directory       | Description
-|-----------------|-------------------------------------------------------------------------------------
-| applications/   | Helpful applications
-| data/           | Directory containing optional data used by applets and examples.
-| demonstrations/ | Demonstration code which typically lets experiment by changing parameters in real-time
-| examples/       | Set of example code designed to be easy to read and understand.
-| integration/    | Contains code which allows BoofCV to be easily integrated with 3rd party libraries. Primary for video input/output.
-| main/           | Contains the source code for BoofCV
+| Directory       | Description                                                                                                         |
+|-----------------|---------------------------------------------------------------------------------------------------------------------|
+| applications/   | Helpful applications                                                                                                |
+| data/           | Directory containing optional data used by applets and examples.                                                    |
+| demonstrations/ | Demonstration code which typically lets experiment by changing parameters in real-time                              |
+| examples/       | Set of example code designed to be easy to read and understand.                                                     |
+| integration/    | Contains code which allows BoofCV to be easily integrated with 3rd party libraries. Primary for video input/output. |
+| main/           | Contains the source code for BoofCV                                                                                 |
 
 ------------------------------------
 # Building from Source

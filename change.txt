@@ -3,7 +3,7 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
-Date    : 2022/
+Date    : 2022/Sep/02
 Version : 0.41
 
 - Applications
@@ -57,10 +57,6 @@ Version : 0.41
 - ImageMiscOps
   - Added maskFill()
   - Added a generic filter()
-- Regression
-  - TODO Template matching
-
-- TODO why does CalibrateMultiPlanar start with a large error?
 
 ---------------------------------------------
 Date    : 2022/Jan/24

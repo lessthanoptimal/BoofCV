@@ -5,6 +5,7 @@
   - TODO Stereo
 - Regression
   - TODO Video stabilization
+  - TODO Template matching
 
 TODO Applications for self calibration mono and stereo
 TODO Monocular VO
