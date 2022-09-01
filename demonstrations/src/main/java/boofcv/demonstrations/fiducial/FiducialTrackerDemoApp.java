@@ -201,7 +201,8 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>> extends Demonstratio
 		ConfigThreshold configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN, 21);
 
 		switch (name) {
-			case SQUARE_NUMBER -> detector = FactoryFiducial.squareBinary(new ConfigFiducialBinary(0.1), configThreshold, imageClass);
+			case SQUARE_NUMBER ->
+					detector = FactoryFiducial.squareBinary(new ConfigFiducialBinary(0.1), configThreshold, imageClass);
 			case SQUARE_PICTURE -> {
 				double length = 0.1;
 				detector = FactoryFiducial.squareImage(new ConfigFiducialImage(), configThreshold, imageClass);
@@ -237,10 +238,14 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>> extends Demonstratio
 			}
 			case QR_CODE -> detector = FactoryFiducial.qrcode3D(null, imageClass);
 			case MICRO_QR -> detector = FactoryFiducial.microqr3D(null, imageClass);
-			case CALIB_CHESS -> detector = FactoryFiducial.calibChessboardX(null, new ConfigGridDimen(7, 5, 0.03), imageClass);
-			case CALIB_SQUARE_GRID -> detector = FactoryFiducial.calibSquareGrid(null, new ConfigGridDimen(4, 3, 0.03, 0.03), imageClass);
-			case CALIB_CIRCLE_HEXAGONAL_GRID -> detector = FactoryFiducial.calibCircleHexagonalGrid(null, new ConfigGridDimen(24, 28, 1, 1.2), imageClass);
-			case CALIB_CIRCLE_REGULAR_GRID -> detector = FactoryFiducial.calibCircleRegularGrid(null, new ConfigGridDimen(10, 8, 1.5, 2.5), imageClass);
+			case CALIB_CHESS ->
+					detector = FactoryFiducial.calibChessboardX(null, new ConfigGridDimen(7, 5, 0.03), imageClass);
+			case CALIB_SQUARE_GRID ->
+					detector = FactoryFiducial.calibSquareGrid(null, new ConfigGridDimen(4, 3, 0.03, 0.03), imageClass);
+			case CALIB_CIRCLE_HEXAGONAL_GRID ->
+					detector = FactoryFiducial.calibCircleHexagonalGrid(null, new ConfigGridDimen(24, 28, 1, 1.2), imageClass);
+			case CALIB_CIRCLE_REGULAR_GRID ->
+					detector = FactoryFiducial.calibCircleRegularGrid(null, new ConfigGridDimen(10, 8, 1.5, 2.5), imageClass);
 			default -> throw new RuntimeException("Unknown selection");
 		}
 		controls.setShowStability(true);
@@ -267,11 +272,17 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>> extends Demonstratio
 		@Override
 		public void paintComponent( Graphics g ) {
 			super.paintComponent(g);
+			BufferedImage image = getImage();
+			if (image == null)
+				return;
+			// Scale location and size of objects based on where the image is rendered in the view
+			int viewWidth = Math.min(image.getWidth(), getWidth());
+			int viewHeight = Math.min(image.getHeight(), getHeight());
 
 			Graphics2D g2 = BoofSwingUtil.antialiasing(g);
 
 			// Make the lines thicker so it's easier to see in higher resolution images
-			int thickness = (int)Math.max(5, getWidth()*0.01);
+			int thickness = (int)Math.max(5, viewWidth*0.01);
 
 			synchronized (fiducialInfo) {
 				for (int i = 0; i < fiducialInfo.size(); i++) {
@@ -302,7 +313,7 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>> extends Demonstratio
 					}
 
 					if (controls.showStability)
-						handleStability(g2, info);
+						handleStability(g2, info, viewWidth, viewHeight);
 				}
 			}
 		}
@@ -310,13 +321,9 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>> extends Demonstratio
 		/**
 		 * Computes and visualizes the stability
 		 */
-		private void handleStability( Graphics2D g2, FiducialInfo info ) {
-			BufferedImage image = getImage();
-			if (info.totalObserved <= 20 || image == null)
+		private void handleStability( Graphics2D g2, FiducialInfo info, int viewWidth, int viewHeight ) {
+			if (info.totalObserved <= 20)
 				return;
-
-
-			int height = getHeight();
 
 			g2.setFont(font);
 
@@ -324,9 +331,9 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>> extends Demonstratio
 			double fractionOrientation = info.stability.orientation/stabilityMax.orientation;
 
 			// make bar width and bar space dynamic based on resolution
-			int bw = (int)Math.max(10, getWidth()*0.05 + 0.5);
+			int bw = (int)Math.max(10, viewWidth*0.05 + 0.5);
 			int bs = Math.max(2, bw/3);
-			int maxHeight = (int)(height*0.15 + 0.5);
+			int maxHeight = (int)(viewHeight*0.15 + 0.5);
 
 			int x = info.grid*(bw + 2*bs)*2;
 			int y = 10 + maxHeight;
