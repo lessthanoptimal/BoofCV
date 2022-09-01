@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -114,7 +114,8 @@ public abstract class Motion2DPanel extends ImagePanel {
 		}
 	}
 
-	private void drawPoints( int extraOffsetX, DogArray<Point2D_F64> all, Homography2D_F64 currToGlobal, Graphics2D g2, Point2D_F64 distPt, Color red ) {
+	private void drawPoints( int extraOffsetX, DogArray<Point2D_F64> all,
+							 Homography2D_F64 currToGlobal, Graphics2D g2, Point2D_F64 distPt, Color red ) {
 		for (int i = 0; i < all.size; i++) {
 			HomographyPointOps_F64.transform(currToGlobal, all.get(i), distPt);
 

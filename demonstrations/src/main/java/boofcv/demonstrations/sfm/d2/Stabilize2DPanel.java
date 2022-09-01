@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,8 +50,8 @@ public class Stabilize2DPanel extends Motion2DPanel {
 	@Override
 	public void updateImages( BufferedImage input, BufferedImage stitched ) {
 		Graphics2D g2 = combined.createGraphics();
-		g2.drawImage(input, 0, 0, null);
-		g2.drawImage(stitched, outputBorder + imageWidth, 0, null);
+		g2.drawImage(stitched, 0, 0, null);
+		g2.drawImage(input, outputBorder + imageWidth, 0, null);
 		setImage(combined);
 	}
 
