@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -260,7 +260,7 @@ public class GThresholdImageOps {
 			long sum_back = 0; // sum of the background pixels at a given threshold
 			long num_back = 0; // number of background pixels at a given threshold
 			for (int ih = 0; ih <= threshold; ih++) {
-				sum_back += ih*histogram[ih];
+				sum_back += ih*(long)histogram[ih];
 				num_back += histogram[ih];
 			}
 			mean_back = (num_back == 0 ? 0.0 : (sum_back/(double)num_back));
@@ -269,7 +269,7 @@ public class GThresholdImageOps {
 			long sum_obj = 0; // sum of the object pixels at a given threshold
 			long num_obj = 0; // number of object pixels at a given threshold
 			for (int ih = threshold + 1; ih < length; ih++) {
-				sum_obj += ih*histogram[ih];
+				sum_obj += ih*(long)histogram[ih];
 				num_obj += histogram[ih];
 			}
 			mean_obj = (num_obj == 0 ? 0.0 : (sum_obj/(double)num_obj));
@@ -318,14 +318,14 @@ public class GThresholdImageOps {
 	}
 
 	/**
-	 * Implements Huang's fuzzy thresholding method Uses Shannon's entropy
+	 * <p>Implements Huang's fuzzy thresholding method Uses Shannon's entropy
 	 * function (one can also use Yager's entropy function) Huang L.-K. and Wang
 	 * M.-J.J. (1995) "Image Thresholding by Minimizing the Measures of
-	 * Fuzziness" Pattern Recognition, 28(1): 41-51 M. Emre Celebi 06.15.2007
+	 * Fuzziness" Pattern Recognition, 28(1): 41-51 M. Emre Celebi 06.15.2007</p>
 	 *
-	 * Ported to ImageJ plugin by G.Landini from E Celebi's fourier_0.8 routines
+	 * <p>Ported to ImageJ plugin by G.Landini from E Celebi's fourier_0.8 routines
 	 * Ported from Imagej code (https://imagej.nih.gov/ij/developer/source/) to
-	 * BoofCV by Nico Stuurman
+	 * BoofCV by Nico Stuurman</p>
 	 *
 	 * @param histogram Histogram of pixel intensities.
 	 * @param length Number of elements in the histogram.
@@ -356,7 +356,7 @@ public class GThresholdImageOps {
 		{
 			long sum_pix = 0, num_pix = 0;
 			for (int ih = first_bin; ih < length; ih++) {
-				sum_pix += ih*histogram[ih];
+				sum_pix += ih*(long)histogram[ih];
 				num_pix += histogram[ih];
 				// NUM_PIX cannot be zero !
 				mu_0[ih] = sum_pix/(double)num_pix;
@@ -367,7 +367,7 @@ public class GThresholdImageOps {
 		{
 			long sum_pix = 0, num_pix = 0;
 			for (int ih = last_bin; ih >= 0; ih--) { // original: (ih = last_bin; ih > 0; ih--)
-				sum_pix += ih*histogram[ih];
+				sum_pix += ih*(long)histogram[ih];
 				num_pix += histogram[ih];
 				// NUM_PIX cannot be zero !
 				mu_1[ih] = sum_pix/(double)num_pix; // original: mu_1[ih -1] = sum_pix/(double) num_pix

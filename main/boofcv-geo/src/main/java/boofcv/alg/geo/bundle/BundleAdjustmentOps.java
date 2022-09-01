@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -174,7 +174,7 @@ public class BundleAdjustmentOps {
 		if (dst == null)
 			dst = new CameraPinhole();
 
-		dst.fsetK(src.f, src.f, 0.0, width/2, height/2, 0, 0);
+		dst.fsetK(src.f, src.f, 0.0, (float)(width/2), (float)(height/2), 0, 0);
 		dst.fsetShape(width, height);
 
 		return dst;

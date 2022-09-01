@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -92,9 +92,9 @@ public abstract class PolynomialPixel<T extends ImageGray<T>> implements Interpo
 
 	@Override
 	public boolean isInFastBounds( float x, float y ) {
-		float x0 = x - M/2 + offM;
+		float x0 = x - (float)(M/2) + offM;
 		float x1 = x0 + M;
-		float y0 = y - M/2 + offM;
+		float y0 = y - (float)(M/2) + offM;
 		float y1 = y0 + M;
 
 		return (x0 >= 0 && y0 >= 0 && x1 <= image.width - 1 && y1 <= image.height - 1);

@@ -329,8 +329,9 @@ public class FDistort {
 	 * Applies a distortion which will rotate the input image by the specified number of radians.
 	 */
 	public FDistort rotate( double angleInputToOutput ) {
-		PixelTransform<Point2D_F32> outputToInput = DistortSupport.transformRotate(input.width/2, input.height/2,
-				output.width/2, output.height/2, (float)angleInputToOutput);
+		PixelTransform<Point2D_F32> outputToInput = DistortSupport.transformRotate(
+				(float)(input.width/2), (float)(input.height/2), (float)(output.width/2), (float)(output.height/2),
+				(float)angleInputToOutput);
 
 		return transform(outputToInput);
 	}

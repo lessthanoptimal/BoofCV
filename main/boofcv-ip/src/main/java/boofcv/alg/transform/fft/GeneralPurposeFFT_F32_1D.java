@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,7 +45,7 @@ import java.util.Arrays;
  * @author Peter Abeles
  *
  */
-@SuppressWarnings({"OperatorPrecedence", "NullAway"})
+@SuppressWarnings({"OperatorPrecedence", "NullAway", "NarrowCalculation"})
 public class GeneralPurposeFFT_F32_1D {
 
 	private static enum Plans {
