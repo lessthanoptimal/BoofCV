@@ -47,9 +47,9 @@ public class ExampleCalibrateMulti {
 		String directory = UtilIO.pathExample("calibration/trinocular/");
 
 		// Images for each camera are in their own directory
-		List<String> left = UtilIO.listSmartImages(directory + "/left", true);
-		List<String> middle = UtilIO.listSmartImages(directory + "/middle", true);
-		List<String> right = UtilIO.listSmartImages(directory + "/right", true);
+		List<String> left = UtilIO.listSmartImages(directory + "left", true);
+		List<String> middle = UtilIO.listSmartImages(directory + "middle", true);
+		List<String> right = UtilIO.listSmartImages(directory + "right", true);
 
 		// Configure the calibration class for this scenario
 		var calibrator = new CalibrateMultiPlanar();
