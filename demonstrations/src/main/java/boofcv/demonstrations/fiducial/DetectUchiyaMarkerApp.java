@@ -58,10 +58,7 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -151,6 +148,7 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 
 	@Override
 	public void openFile( File file ) {
+		System.out.println("Uchiya openFile: " + file.getPath());
 		if (FilenameUtils.getExtension(file.getName()).equalsIgnoreCase("yaml")) {
 			loadDefinition(Objects.requireNonNull(UtilIO.ensureURL(file.getPath())));
 		} else {
@@ -178,28 +176,31 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 		if (method != InputMethod.IMAGE && method != InputMethod.VIDEO)
 			return;
 
+		Objects.requireNonNull(inputFilePath);
 		URL url = UtilIO.ensureUrlNotNull(inputFilePath);
 
-		if (url != null) {
-			// This "should" work with any URL protocol
-			try {
-				String protocol = url.getProtocol();
-				String path = URLDecoder.decode(url.getPath(), "UTF-8");
-				File intrinsicPath = new File(path);
-				File directory = intrinsicPath.getParentFile();
+		String inputParent = new File(inputFilePath).getParent();
+		// When dealing with jars it can lop off part of the prefix;
+		int startIndex = inputFilePath.indexOf(inputParent);
+		if (startIndex != 0) {
+			inputParent += inputParent.substring(0, startIndex);
+		}
 
-				// first see if there's an intrinsic specialized for this object
-				intrinsic = UtilIO.loadExampleIntrinsic(media, intrinsicPath);
+		// This "should" work with any URL protocol
+		try {
+			var intrinsicPath = new File(inputParent, "intrinsic.yaml");
 
-				File fileDef = new File(directory, "descriptions.yaml");
-				URL urlDef = new URL(protocol + ":" + fileDef.getPath());
+			// first see if there's an intrinsic specialized for this object
+			intrinsic = UtilIO.loadExampleIntrinsic(media, intrinsicPath);
 
-				if (!pathDefinitions.equals(urlDef.getPath())) {
-					loadDefinition(urlDef);
-				}
-			} catch (UnsupportedEncodingException | MalformedURLException e) {
-				e.printStackTrace();
+			File fileDef = new File(inputParent, "descriptions.yaml");
+			URL urlDef = new URL(fileDef.getPath());
+
+			if (!pathDefinitions.equals(urlDef.getPath())) {
+				loadDefinition(urlDef);
 			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 		// forget the previous state and update the camera model

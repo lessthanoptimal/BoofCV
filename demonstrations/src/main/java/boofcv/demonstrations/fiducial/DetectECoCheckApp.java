@@ -348,7 +348,7 @@ public class DetectECoCheckApp extends DemonstrationBase {
 			sliderTranslucent.addChangeListener(this);
 
 			var tabbedPane = new JTabbedPane();
-			tabbedPane.addTab("Controls", controlPanel);
+//			tabbedPane.addTab("Controls", TBD);
 			tabbedPane.addTab("Info", textArea);
 
 			addLabeled(processingTimeLabel, "Time (ms)");
