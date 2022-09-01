@@ -75,7 +75,7 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel {
 
 	/** Return only patterns that can be used to calibrate */
 	private static CalibrationPatterns[] supportedPatterns() {
-		var ret = new CalibrationPatterns[CalibrationPatterns.values().length-2];
+		var ret = new CalibrationPatterns[CalibrationPatterns.values().length - 2];
 		System.arraycopy(CalibrationPatterns.values(), 0, ret, 0, ret.length);
 		return ret;
 	}
@@ -117,7 +117,8 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel {
 	public DetectSingleFiducialCalibration createSingleTargetDetector() {
 		return switch (selected) {
 			case CHESSBOARD -> FactoryFiducialCalibration.chessboardX(null, configChessboard);
-			case ECOCHECK -> new MultiToSingleFiducialCalibration(FactoryFiducialCalibration.ecocheck(null, configECoCheck));
+			case ECOCHECK ->
+					new MultiToSingleFiducialCalibration(FactoryFiducialCalibration.ecocheck(null, configECoCheck));
 			case SQUARE_GRID -> FactoryFiducialCalibration.squareGrid(null, configSquare);
 			case CIRCLE_GRID -> FactoryFiducialCalibration.circleRegularGrid(null, configCircle);
 			case CIRCLE_HEXAGONAL -> FactoryFiducialCalibration.circleHexagonalGrid(null, configCircleHex);
@@ -178,7 +179,8 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel {
 			case HAMMING_CHESSBOARD -> config.hammingChess.setTo(configHammingChess);
 			case HAMMING_GRID -> config.hammingGrid.setTo(configHammingGrid);
 			default -> throw new RuntimeException("Target type not yet supported.");
-		};
+		}
+		;
 	}
 
 	public Object getActiveConfig() {
@@ -249,7 +251,6 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel {
 			addLabeled(sMarkers, "Count", "Number of unique markers");
 			addLabeled(comboErrorLevel, "Error Level", "Amount of error correction. 0 = none. 10 = max.");
 			addLabeled(comboChecksum, "Checksum", "Bits for checksum. 0 = none. 8 = max.");
-
 		}
 
 		@Override
@@ -381,7 +382,7 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel {
 		JSpinnerNumber sCols = spinnerWrap(configHammingChess.numCols, 1, 1000, 1);
 		JSpinnerNumber sWidth = spinnerWrap(configHammingChess.squareSize, 0, 1000000.0, 1);
 		JSpinnerNumber sScale = spinnerWrap(configHammingChess.markerScale, 0, 1.0, 0.02);
-		JComboBox<?> cDict = combo(configHammingChess.markers.dictionary.ordinal(), (Object[])HammingDictionary.allPredefined());
+		JComboBox<?> cDict = combo(configHammingChess.markers.dictionary.ordinal() - 1, (Object[])HammingDictionary.allPredefined());
 		JSpinnerNumber sOffset = spinnerWrap(configHammingChess.markerOffset, 0, 200, 1);
 		JCheckBoxValue cEven = checkboxWrap("Even pattern", configHammingChess.chessboardEven);
 
@@ -432,7 +433,7 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel {
 		JSpinnerNumber sCols = spinnerWrap(configHammingGrid.numCols, 1, 1000, 1);
 		JSpinnerNumber sWidth = spinnerWrap(configHammingGrid.squareSize, 0, 1000000.0, 1);
 		JSpinnerNumber sSpace = spinnerWrap(configHammingGrid.spaceToSquare, 0, 1.0, 0.02);
-		JComboBox<?> cDict = combo(configHammingGrid.markers.dictionary.ordinal(), (Object[])HammingDictionary.allPredefined());
+		JComboBox<?> cDict = combo(configHammingGrid.markers.dictionary.ordinal() - 1, (Object[])HammingDictionary.allPredefined());
 		JSpinnerNumber sOffset = spinnerWrap(configHammingGrid.markerOffset, 0, 200, 1);
 
 		public HammingGridPanel() {

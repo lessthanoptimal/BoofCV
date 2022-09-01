@@ -272,7 +272,7 @@ public class CreateCalibrationTargetGui extends JPanel
 		if (selectedType == CalibrationPatterns.ECOCHECK) {
 			ConfigECoCheckMarkers c = (ConfigECoCheckMarkers)selectedCalib;
 
-			ECoCheckUtils utils = new ECoCheckUtils();
+			var utils = new ECoCheckUtils();
 			utils.setParametersFromConfig(c);
 			utils.fixate();
 			ConfigECoCheckMarkers.MarkerShape shape = c.markerShapes.get(0);
@@ -283,7 +283,7 @@ public class CreateCalibrationTargetGui extends JPanel
 			// Render the marker. Adjust marker size so that when the border is added it will match the paper size
 			FiducialRenderEngineGraphics2D render = configureRenderGraphics2D(markerWidth, markerHeight, unitsToPixel);
 
-			ECoCheckGenerator generator = new ECoCheckGenerator(utils);
+			var generator = new ECoCheckGenerator(utils);
 			generator.squareWidth = shape.squareSize*unitsToPixel;
 			generator.setRender(render);
 			generator.render(0);
@@ -297,7 +297,7 @@ public class CreateCalibrationTargetGui extends JPanel
 
 			FiducialRenderEngineGraphics2D render = configureRenderGraphics2D(markerWidth, markerHeight, unitsToPixel);
 
-			HammingChessboardGenerator generator = new HammingChessboardGenerator(c);
+			var generator = new HammingChessboardGenerator(c);
 			generator.squareWidth = unitsToPixel;
 			generator.setRender(render);
 			generator.render();
@@ -319,7 +319,7 @@ public class CreateCalibrationTargetGui extends JPanel
 			return;
 		}
 
-		final RenderCalibrationTargetsGraphics2D renderer = new RenderCalibrationTargetsGraphics2D(-1, 400/paperWidth);
+		final var renderer = new RenderCalibrationTargetsGraphics2D(-1, 400/paperWidth);
 		renderer.setPaperSize(paperWidth, paperHeight);
 
 		if (selectedType == CalibrationPatterns.CHESSBOARD) {
