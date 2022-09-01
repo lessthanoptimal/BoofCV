@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -168,7 +168,7 @@ public class UtilIO {
 				canonical = (C)config.getClass().getConstructor().newInstance();
 			}
 		} catch (InvocationTargetException | InstantiationException |
-				IllegalAccessException | NoSuchMethodException e) {
+				 IllegalAccessException | NoSuchMethodException e) {
 			throw new RuntimeException(e);
 		}
 
@@ -426,11 +426,23 @@ public class UtilIO {
 		if (pathToBase != null) {
 			File pathExample = new File(pathToBase, "data/example/");
 			if (pathExample.exists()) {
-				return new File(pathExample.getPath(), path).getAbsolutePath();
+				return ensureTrailingSlash(path, new File(pathExample.getPath(), path).getAbsolutePath());
 			}
 		}
 
-		return pathExampleURL(path).toString();
+		return ensureTrailingSlash(path, pathExampleURL(path).toString());
+	}
+
+	private static String ensureTrailingSlash(String original, String result) {
+		// See if it originally had a slash
+		if (original.charAt(original.length()-1) != '/')
+			return result;
+
+		// See if it already has a slash
+		if (result.charAt(result.length()-1) == '/')
+			return result;
+
+		return result + '/';
 	}
 
 	public static File fileExample( String path ) {
@@ -861,17 +873,33 @@ public class UtilIO {
 				throw new UncheckedIOException(e);
 			}
 		} else {
-			File directory = new File(pathPattern);
-			if (directory.isFile()) {
-				if (filter.keep(directory.toPath()))
-					results.add(pathPattern);
-			} else if (directory.isDirectory()) {
-				File[] files = directory.listFiles();
-				if (files != null) {
-					for (File f : files) {
-						if (!filter.keep(f.toPath()))
-							continue;
-						results.add(f.getPath());
+			var directory = new File(pathPattern);
+
+			// Handle the case where it's referencing files inside a jar
+			if (!directory.isDirectory()) {
+				try {
+					URL url = new URL(pathPattern);
+					if (url.getProtocol().equals("file")) {
+						directory = new File(url.getFile());
+					} else if (url.getProtocol().equals("jar")) {
+						results.addAll(listJarFilter(url, ( name ) -> filter.keep(Path.of(name))));
+					}
+				} catch (MalformedURLException ignore) {
+				}
+			}
+
+			if (results.isEmpty()) {
+				if (directory.isFile()) {
+					if (filter.keep(directory.toPath()))
+						results.add(pathPattern);
+				} else if (directory.isDirectory()) {
+					File[] files = directory.listFiles();
+					if (files != null) {
+						for (File f : files) {
+							if (!filter.keep(f.toPath()))
+								continue;
+							results.add(f.getPath());
+						}
 					}
 				}
 			}
@@ -1078,6 +1106,35 @@ public class UtilIO {
 
 		Collections.sort(ret);
 		return ret;
+	}
+
+	/** Searches the jar looking for files that match the filter */
+	private static List<String> listJarFilter( URL url, BoofLambdas.Filter<String> filter ) {
+		var output = new ArrayList<String>();
+
+		JarFile jarfile;
+		try {
+			JarURLConnection connection = (JarURLConnection)url.openConnection();
+			jarfile = connection.getJarFile();
+
+			String targetPath = connection.getEntryName() + "/";
+
+			final Enumeration<JarEntry> e = jarfile.entries();
+			while (e.hasMoreElements()) {
+				final ZipEntry ze = (ZipEntry)e.nextElement();
+				if (ze.getName().startsWith(targetPath) && ze.getName().length() != targetPath.length()) {
+//					System.out.println("  ze.anme="+ze.getName());
+					if (filter.keep(ze.getName())) {
+						output.add("jar:file:" + jarfile.getName() + "!/" + ze.getName());
+					}
+				}
+			}
+
+			jarfile.close();
+			return output;
+		} catch (IOException e) {
+			return new ArrayList<>();
+		}
 	}
 
 	private static List<String> listJarPrefix( URL url, @Nullable String prefix, @Nullable String suffix ) {
