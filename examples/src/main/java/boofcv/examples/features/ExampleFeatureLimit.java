@@ -28,6 +28,7 @@ import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPoint;
 import boofcv.factory.feature.detect.selector.ConfigSelectLimit;
 import boofcv.factory.feature.detect.selector.SelectLimitTypes;
+import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ShowImages;
@@ -72,10 +73,12 @@ public class ExampleFeatureLimit {
 
 		// render each selected maximum with a circle
 		Graphics2D g2 = output.createGraphics();
-		g2.setColor(Color.blue);
+		BoofSwingUtil.antialiasing(g2);
+		g2.setStroke(new BasicStroke(2.0f));
+		g2.setColor(Color.WHITE);
 		for (int i = 0; i < features.size(); i++) {
 			LocalExtreme c = features.get(i);
-			VisualizeFeatures.drawCircle(g2, c.location.x, c.location.y, NON_MAX_RADIUS);
+			VisualizeFeatures.drawCircle(g2, c.location.x, c.location.y, 10);
 		}
 		return output;
 	}
