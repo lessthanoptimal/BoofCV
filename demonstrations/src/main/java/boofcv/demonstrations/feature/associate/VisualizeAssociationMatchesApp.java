@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -59,7 +59,7 @@ public class VisualizeAssociationMatchesApp<Image extends ImageGray<Image>, TD e
 		extends DemonstrationBase {
 	// algorithms
 	InterestPointDetector<Image> detector;
-	DescribePointRadiusAngle<Image, TD> descriptor;
+	DescribePointRadiusAngle<Planar<Image>, TD> descriptor;
 	AssociateDescription<TD> matcher;
 	OrientationImage<Image> orientation;
 	boolean algorithmChange = true;
@@ -153,9 +153,12 @@ public class VisualizeAssociationMatchesApp<Image extends ImageGray<Image>, TD e
 		}
 	}
 
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	private boolean declareAlgorithms() {
 		detector = controls.createDetector(imageType);
-		descriptor = controls.createDescriptor(imageType);
+
+		// A color image type is passed in but if the descriptor is gray only then that type will be returned
+		descriptor = controls.createDescriptor(ImageType.pl(3, imageType));
 
 		// estimate orientation using this once since it is fast and accurate
 		Class integralType = GIntegralImageOps.getIntegralType(imageType);
@@ -220,10 +223,7 @@ public class VisualizeAssociationMatchesApp<Image extends ImageGray<Image>, TD e
 
 	private void extractImageFeatures( Planar<Image> color, Image gray, DogArray<TD> descs, List<Point2D_F64> locs ) {
 		detector.detect(gray);
-		if (descriptor.getImageType().getFamily() == ImageType.Family.GRAY)
-			descriptor.setImage(gray);
-		else
-			((DescribePointRadiusAngle)descriptor).setImage(color);
+		descriptor.setImage(color);
 		orientation.setImage(gray);
 
 		if (detector.hasScale()) {
@@ -342,7 +342,7 @@ public class VisualizeAssociationMatchesApp<Image extends ImageGray<Image>, TD e
 	}
 
 	public static void main( String[] args ) {
-		List<PathLabel> examples = new ArrayList<>();
+		var examples = new ArrayList<PathLabel>();
 
 		examples.add(new PathLabel("Cave",
 				UtilIO.pathExample("stitch/cave_01.jpg"), UtilIO.pathExample("stitch/cave_02.jpg")));
@@ -356,7 +356,7 @@ public class VisualizeAssociationMatchesApp<Image extends ImageGray<Image>, TD e
 				UtilIO.pathExample("stitch/trees_rotate_01.jpg"), UtilIO.pathExample("stitch/trees_rotate_03.jpg")));
 
 		SwingUtilities.invokeLater(() -> {
-			VisualizeAssociationMatchesApp app = new VisualizeAssociationMatchesApp(examples, GrayF32.class);
+			var app = new VisualizeAssociationMatchesApp(examples, GrayF32.class);
 
 			// Processing time takes a bit so don't open right away
 			app.openExample(examples.get(0));

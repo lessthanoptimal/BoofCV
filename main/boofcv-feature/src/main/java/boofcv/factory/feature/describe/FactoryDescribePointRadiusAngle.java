@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,7 +48,8 @@ import java.util.Random;
 public class FactoryDescribePointRadiusAngle {
 
 	/**
-	 * Factory function for creating many different types of region descriptors
+	 * Factory function for creating many different types of region descriptors. If the image types do not match
+	 * it will automatically convert the input image
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T extends ImageBase<T>, TD extends TupleDesc<TD>>
@@ -56,13 +57,13 @@ public class FactoryDescribePointRadiusAngle {
 		Class imageClass = imageType.getImageClass();
 
 		DescribePointRadiusAngle<T, TD> ret = switch (config.type) {
-			case SURF_FAST -> (DescribePointRadiusAngle)surfFast(config.surfFast, imageClass);
-			case SURF_STABLE -> (DescribePointRadiusAngle)surfStable(config.surfStability, imageClass);
-			case SURF_COLOR_FAST -> (DescribePointRadiusAngle)surfColorFast(config.surfFast, (ImageType)imageType);
-			case SURF_COLOR_STABLE -> (DescribePointRadiusAngle)surfColorStable(config.surfStability, imageType);
-			case SIFT -> (DescribePointRadiusAngle)sift(config.scaleSpaceSift, config.sift, imageClass);
-			case BRIEF -> (DescribePointRadiusAngle)brief(config.brief, imageClass);
-			case TEMPLATE -> (DescribePointRadiusAngle)template(config.template, imageClass);
+			case SURF_FAST -> wrapIf(surfFast(config.surfFast, imageClass), imageType);
+			case SURF_STABLE -> wrapIf(surfStable(config.surfStability, imageClass), imageType);
+			case SURF_COLOR_FAST -> wrapIf(surfColorFast(config.surfFast, (ImageType)imageType), imageType);
+			case SURF_COLOR_STABLE -> wrapIf(surfColorStable(config.surfStability, imageType), imageType);
+			case SIFT -> wrapIf(sift(config.scaleSpaceSift, config.sift, imageClass), imageType);
+			case BRIEF -> wrapIf(brief(config.brief, imageClass), imageType);
+			case TEMPLATE -> wrapIf(template(config.template, imageClass), imageType);
 		};
 
 		// See if it's in the native format and no need to modify the descriptor
@@ -73,6 +74,17 @@ public class FactoryDescribePointRadiusAngle {
 		int dof = ret.createDescription().size();
 		ConvertTupleDesc converter = FactoryConvertTupleDesc.generic(config.convert, dof, ret.getDescriptionType());
 		return new DescribePointRadiusAngleConvertTuple(ret, converter);
+	}
+
+	/**
+	 * If needed, it will wrap to convert the input image type
+	 */
+	private static  <T extends ImageBase<T>, TD extends TupleDesc<TD>>
+	DescribePointRadiusAngle<T, TD> wrapIf( DescribePointRadiusAngle alg, ImageType<T> imageType) {
+		if (alg.getImageType().isSameType(imageType))
+			return alg;
+
+		return new DescribePointRadiusAngleConvertImage(alg, imageType);
 	}
 
 	/**
@@ -117,7 +129,7 @@ public class FactoryDescribePointRadiusAngle {
 
 			return new DescribeSurfPlanar_RadiusAngle(color, bandType, integralType);
 		} else {
-			throw new IllegalArgumentException("Unknown image type");
+			throw new IllegalArgumentException("Unsupported image family. " + imageType.getFamily());
 		}
 	}
 
@@ -164,7 +176,7 @@ public class FactoryDescribePointRadiusAngle {
 
 			return new DescribeSurfPlanar_RadiusAngle(color, bandType, integralType);
 		} else {
-			throw new IllegalArgumentException("Unknown image type");
+			throw new IllegalArgumentException("Unsupported image family. " + imageType.getFamily());
 		}
 	}
 

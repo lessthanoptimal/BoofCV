@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,7 @@ import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.abst.feature.orientation.OrientationImage;
 import boofcv.abst.feature.orientation.OrientationIntegral;
 import boofcv.alg.transform.ii.GIntegralImageOps;
+import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.describe.ConfigDescribeRegion;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
@@ -38,10 +39,7 @@ import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.feature.*;
-import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageGray;
-import boofcv.struct.image.ImageType;
+import boofcv.struct.image.*;
 import georegression.struct.point.Point2D_F64;
 
 import javax.swing.*;
@@ -62,19 +60,22 @@ import java.util.List;
  * @author Peter Abeles
  */
 @SuppressWarnings({"NullAway.Init"})
-public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends ImageGray<D>>
+public class VisualizeAssociationScoreApp<T extends ImageGray<T>, Desc extends TupleDesc<Desc>>
 		extends DemonstrationBase {
 	// These classes process the input images and compute association score
 	InterestPointDetector<T> detector;
-	DescribePointRadiusAngle descriptor;
+	DescribePointRadiusAngle<Planar<T>, Desc> descriptor;
 	OrientationImage<T> orientation;
 
 	// copies of input image
 	BufferedImage buffLeft;
 	BufferedImage buffRight;
 	// gray scale versions of input image
-	T imageLeft;
-	T imageRight;
+	T grayLeft;
+	T grayRight;
+	Planar<T> colorLeft;
+	Planar<T> colorRight;
+
 	Class<T> imageType;
 
 	// visualizes association score
@@ -83,11 +84,13 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 	boolean configChanged = false;
 
 	public VisualizeAssociationScoreApp( java.util.List<PathLabel> examples, Class<T> imageType ) {
-		super(true, false, examples, ImageType.single(imageType));
+		super(true, false, examples, ImageType.pl(3, imageType));
 		this.imageType = imageType;
 
-		imageLeft = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
-		imageRight = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
+		grayLeft = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
+		grayRight = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
+		colorLeft = new Planar<>(imageType, 1, 1, 3);
+		colorRight = new Planar<>(imageType, 1, 1, 3);
 
 		// estimate orientation using this once since it is fast
 		Class integralType = GIntegralImageOps.getIntegralType(imageType);
@@ -105,7 +108,7 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 
 	private void declareAlgorithms() {
 		detector = controls.createDetector(imageType);
-		descriptor = controls.createDescriptor(imageType);
+		descriptor = controls.createDescriptor(ImageType.pl(3, imageType));
 
 		SwingUtilities.invokeLater(() -> controls.setFeatureType(descriptor.getDescriptionType()));
 
@@ -126,35 +129,34 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 	@Override
 	protected void handleInputChange( int source, InputMethod method, final int width, final int height ) {
 		switch (source) {
-			case 0:
+			case 0 -> {
 				buffLeft = ConvertBufferedImage.checkDeclare(width, height, buffLeft, BufferedImage.TYPE_INT_RGB);
+				colorLeft.reshape(width, height);
 				SwingUtilities.invokeLater(() -> {
 					scorePanel.setPreferredSize(width, height, width, height);
 					controls.setImageSize(width, height);
 				});
-				break;
-
-			case 1:
-				buffRight = ConvertBufferedImage.checkDeclare(width, height, buffRight, BufferedImage.TYPE_INT_RGB);
-				break;
+			}
+			case 1 ->
+					buffRight = ConvertBufferedImage.checkDeclare(width, height, buffRight, BufferedImage.TYPE_INT_RGB);
 		}
 	}
 
 	@Override
 	public void processImage( int sourceID, long frameID, BufferedImage bufferedIn, ImageBase input ) {
 		switch (sourceID) {
-			case 0:
-				imageLeft.setTo((T)input);
+			case 0 -> {
+				colorLeft.setTo((Planar<T>)input);
+				GConvertImage.average(colorLeft, grayLeft);
 				buffLeft.createGraphics().drawImage(bufferedIn, 0, 0, null);
-				break;
-
-			case 1:
-				imageRight.setTo((T)input);
+			}
+			case 1 -> {
+				colorRight.setTo((Planar<T>)input);
+				GConvertImage.average(colorRight, grayRight);
 				buffRight.createGraphics().drawImage(bufferedIn, 0, 0, null);
-
 				BoofSwingUtil.invokeNowOrLater(() -> scorePanel.setImages(buffLeft, buffRight));
 				processImage();
-				break;
+			}
 		}
 	}
 
@@ -171,8 +173,8 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 		final ProgressMonitor progressMonitor = new ProgressMonitor(this,
 				"Compute Feature Information",
 				"", 0, 4);
-		extractImageFeatures(progressMonitor, 0, imageLeft, leftDesc, leftPts);
-		extractImageFeatures(progressMonitor, 2, imageRight, rightDesc, rightPts);
+		extractImageFeatures(progressMonitor, 0, grayLeft, colorLeft, leftDesc, leftPts);
+		extractImageFeatures(progressMonitor, 2, grayRight, colorRight, rightDesc, rightPts);
 
 		SwingUtilities.invokeLater(() -> {
 			progressMonitor.close();
@@ -188,6 +190,7 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 	 */
 	private void extractImageFeatures( final ProgressMonitor progressMonitor, final int progress,
 									   T image,
+									   Planar<T> color,
 									   List<TupleDesc> descs, List<Point2D_F64> locs ) {
 		if (configChanged) {
 			configChanged = false;
@@ -200,7 +203,7 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 			progressMonitor.setProgress(progress + 1);
 			progressMonitor.setNote("Describing");
 		});
-		descriptor.setImage(image);
+		descriptor.setImage(color);
 		orientation.setImage(image);
 
 		// See if the detector can detect the feature's scale
@@ -215,7 +218,7 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 					yaw = orientation.compute(pt.x, pt.y);
 				}
 
-				TupleDesc d = descriptor.createDescription();
+				Desc d = descriptor.createDescription();
 				if (descriptor.process(pt.x, pt.y, yaw, radius, d)) {
 					descs.add(d);
 					locs.add(pt.copy());
@@ -232,7 +235,7 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 					yaw = orientation.compute(pt.x, pt.y);
 				}
 
-				TupleDesc d = descriptor.createDescription();
+				Desc d = descriptor.createDescription();
 				if (descriptor.process(pt.x, pt.y, yaw, 1, d)) {
 					descs.add(d);
 					locs.add(pt.copy());

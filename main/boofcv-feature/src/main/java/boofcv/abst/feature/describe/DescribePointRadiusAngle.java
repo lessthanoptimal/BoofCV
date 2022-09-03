@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,17 +38,17 @@ public interface DescribePointRadiusAngle<T extends ImageBase<T>, Desc extends T
 	void setImage( T image );
 
 	/**
-	 * Extract a description of the local image at the given point, scale, and orientation.
+	 * <p>Extract a description of the local image at the given point, scale, and orientation.</p>
 	 *
-	 * WARNING: Check the returned value to make sure a description was actually computed. Some implementations
-	 * might now allow features to extend outside the image border and will return false.
+	 * <p>WARNING: Check the returned value to make sure a description was actually computed. Some implementations
+	 * might now allow features to extend outside the image border and will return false.</p>
 	 *
 	 * @param x Coordinate of the point.
 	 * @param y Coordinate of the point.
 	 * @param orientation Direction the feature is pointing at in radians. 0 = x-axis PI/2 = y-axis
 	 * @param radius Radius of the detected object in pixels.
 	 * @param description (output) Storage for extracted feature. Use {@link #createDescription} to create descriptor.
-	 * @return true if a descriptor can computed or false if not.
+	 * @return true if a descriptor can be computed or false if not.
 	 */
 	boolean process( double x, double y, double orientation, double radius, Desc description );
 

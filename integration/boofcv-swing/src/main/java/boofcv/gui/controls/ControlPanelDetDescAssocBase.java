@@ -36,6 +36,7 @@ import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.feature.*;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.feature.TupleDesc_F64;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
@@ -167,7 +168,7 @@ public abstract class ControlPanelDetDescAssocBase extends StandardAlgConfigPane
 
 	public <T extends ImageGray<T>, D extends ImageGray<D>>
 	InterestPointDetector<T> createDetector( Class<T> imageType ) {
-		ConfigDetectInterestPoint c = new ConfigDetectInterestPoint();
+		var c = new ConfigDetectInterestPoint();
 		c.type = configDetDesc.typeDetector;
 		c.fastHessian = configDetDesc.detectFastHessian;
 		c.point = configDetDesc.detectPoint;
@@ -179,7 +180,12 @@ public abstract class ControlPanelDetDescAssocBase extends StandardAlgConfigPane
 
 	public <T extends ImageGray<T>, TD extends TupleDesc<TD>>
 	DescribePointRadiusAngle<T, TD> createDescriptor( Class<T> imageType ) {
-		ConfigDescribeRegion c = new ConfigDescribeRegion();
+		return createDescriptor(ImageType.single(imageType));
+	}
+
+	public <T extends ImageBase<T>, TD extends TupleDesc<TD>>
+	DescribePointRadiusAngle<T, TD> createDescriptor( ImageType<T> imageType ) {
+		var c = new ConfigDescribeRegion();
 		c.type = configDetDesc.typeDescribe;
 		c.brief = configDetDesc.describeBrief;
 		c.surfFast = configDetDesc.describeSurfFast;
@@ -187,7 +193,7 @@ public abstract class ControlPanelDetDescAssocBase extends StandardAlgConfigPane
 		c.scaleSpaceSift = configDetDesc.scaleSpaceSift;
 		c.template = configDetDesc.describeTemplate;
 
-		return FactoryDescribePointRadiusAngle.generic(c, ImageType.single(imageType));
+		return FactoryDescribePointRadiusAngle.generic(c, imageType);
 	}
 
 	public AssociateDescription createAssociate( DescriptorInfo descriptor ) {
