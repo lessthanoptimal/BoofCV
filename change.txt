@@ -3,6 +3,23 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
+Date    :
+Version : 0.42
+
+- Calibration
+  - TODO Visualize Multi Camera Calibration
+- Image Processing
+  - TODO hough circle detector
+- Scene Reconstruction
+  - TODO Robust optimization
+  - TODO 3D reconstruction to 3D mesh
+- SLAM
+  - TODO traditional monocular SLAM
+- Regression
+  - TODO Video stabilization
+  - TODO Template matching
+
+---------------------------------------------
 Date    : 2022/Sep/02
 Version : 0.41
 

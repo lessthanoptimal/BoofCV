@@ -1,11 +1,7 @@
 - Calibration
   - TODO calibration targets Hamming Marker grid and chessboard, e.g. ChArUco and ArUco grids.
 - SLAM
-  - TODO Monocular
   - TODO Stereo
-- Regression
-  - TODO Video stabilization
-  - TODO Template matching
 
 TODO Applications for self calibration mono and stereo
 TODO Monocular VO
@@ -74,7 +70,6 @@ TODO Videos - hough line detectors
             - stereo and VO updates
 
 TODO assisted self calibration
-TODO hough circle detector
 TODO concurrent dense features?
 TODO Estimate focal lengths given disparity image
 TODO Scharr gradient http://www.hlevkin.com/articles/SobelScharrGradients5x5.pdf
@@ -253,8 +248,6 @@ Future
   * When optimizing the edges don't sample points tangent to the line sample points parallel to the adjacent sides
     that way it will sample inside the square more often.  Maybe interpolate between slope of both sides?
   * Look at alternative methods for generatng interpolated inner image.  bilinear is probably exagerating.  surface integral?
-
-- Multi camera calibration using square binary patterns.
 
 - Look at OpenCV's watershed example.  It's actually a useful technique!
 
