@@ -1063,17 +1063,18 @@ public class PerspectiveOps {
 	}
 
 	/**
-	 * Checks to see if a point in homogenous coordinates is behind the camera. This is made more complex as
-	 * the possibility that it's at infinity needs to be explicitly checked and handled.
+	 * <p>Checks to see if a point in homogenous coordinates is behind the camera, including z=0.
+	 * This is made more complex as the possibility that it's at infinity needs to be explicitly checked
+	 * and handled.</p>
 	 *
-	 * if a point lies on the (x-y) plane exactly it will be considered behind the camera.
+	 * <p>if a point lies on the (x-y) plane exactly it will be considered behind the camera.</p>
 	 *
 	 * @return true if it's behind the camera (z < 0.0)
 	 */
 	public static boolean isBehindCamera( Point4D_F64 p ) {
 		// check to see if it's at infinity
 		if (p.w == 0.0)
-			return p.z < 0.0;
+			return p.z <= 0.0;
 		// Not at infinity. Don't compute the z-coordinate since that requires dividing by p.w, which could be very
 		// small and blow up. Worst case here is that the multiplication becomes zero or infinity
 		return p.z*p.w <= 0.0;

@@ -754,6 +754,9 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 		isBehindCamera_homogenous(1e20);
 		isBehindCamera_homogenous(1e-20);
 
+		// Check an edge case
+		assertTrue(PerspectiveOps.isBehindCamera(new Point4D_F64(0, 0, 0, 0)));
+
 		// Mix very large and small numbers
 		checkBehindSwapSign(new Point4D_F64(0, 0, -1e20, 1e-20), true);
 		checkBehindSwapSign(new Point4D_F64(0, 0, 1e-20, 1e20), false);
