@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -390,9 +390,9 @@ public class VisualizeBinaryData {
 			WritableRaster raster = out.getRaster();
 			DataBuffer buffer = raster.getDataBuffer();
 			if (buffer.getDataType() == DataBuffer.TYPE_BYTE) {
-				renderBinary(binaryImage, invert, (DataBufferByte)buffer, raster);
+				_renderBinary(binaryImage, invert, (DataBufferByte)buffer, raster);
 			} else if (buffer.getDataType() == DataBuffer.TYPE_INT) {
-				renderBinary(binaryImage, invert, (DataBufferInt)buffer);
+				_renderBinary(binaryImage, invert, (DataBufferInt)buffer);
 			} else {
 				_renderBinary(binaryImage, invert, out);
 			}
@@ -427,8 +427,8 @@ public class VisualizeBinaryData {
 		}
 	}
 
-	private static void renderBinary( GrayU8 binaryImage, boolean invert,
-									  DataBufferByte buffer, WritableRaster raster ) {
+	private static void _renderBinary( GrayU8 binaryImage, boolean invert,
+									   DataBufferByte buffer, WritableRaster raster ) {
 		int rasterIndex = 0;
 		byte[] data = buffer.getData();
 
@@ -501,7 +501,7 @@ public class VisualizeBinaryData {
 		}
 	}
 
-	private static void renderBinary( GrayU8 binaryImage, boolean invert, DataBufferInt buffer ) {
+	private static void _renderBinary( GrayU8 binaryImage, boolean invert, DataBufferInt buffer ) {
 		int rasterIndex = 0;
 		int[] data = buffer.getData();
 
