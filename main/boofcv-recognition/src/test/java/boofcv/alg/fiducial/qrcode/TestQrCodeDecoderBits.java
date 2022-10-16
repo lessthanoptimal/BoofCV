@@ -108,4 +108,28 @@ public class TestQrCodeDecoderBits extends BoofStandardJUnit {
 		assertEquals("ISO8859_7", alg.encodingEci);
 		assertEquals(8, newBit);
 	}
+
+
+	/**
+	 * Feed in a message which isn't encoded correctly and should cause an exception. It shouldn't
+	 * actually throw the exception.
+	 */
+	@Test void invalidEncoding() {
+		QrCode qr = new QrCodeEncoder().addAlphanumeric("ABCD123").fixate();
+
+		var alg = new QrCodeDecoderBits(EciEncoding.UTF8, EciEncoding.BINARY);
+
+		// This will fill in the corrected array, which is needed for decoding
+		alg.applyErrorCorrection(qr);
+
+		// Sanity check
+		assertTrue(alg.decodeMessage(qr));
+
+		// Scramble the data
+		qr.corrected[3] = (byte)0xFF;
+
+		// See if it gracefully handled the issue
+		assertFalse(alg.decodeMessage(qr));
+		assertEquals(qr.failureCause, QrCode.Failure.DECODING_MESSAGE);
+	}
 }

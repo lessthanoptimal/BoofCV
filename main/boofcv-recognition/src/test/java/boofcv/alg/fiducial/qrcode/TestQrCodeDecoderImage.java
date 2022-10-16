@@ -70,7 +70,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 		decoder.process(pps.toList(), helper.image);
 
 		assertEquals(1, decoder.successes.size());
-		QrCode found = decoder.getFound().get(0);
+		QrCode found = decoder.getSuccesses().get(0);
 		assertEquals(found.message, "123");
 	}
 
@@ -90,7 +90,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 
 		alg.process(pps.toList(), transposedImage);
 		assertEquals(1, alg.successes.size());
-		assertEquals(message, alg.getFound().get(0).message);
+		assertEquals(message, alg.getSuccesses().get(0).message);
 
 		// fail when you turn it off
 		alg.considerTransposed = false;
@@ -132,7 +132,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 			decoder.process(pps.toList(), generator.getGray());
 
 			assertEquals(1, decoder.successes.size());
-			QrCode found = decoder.getFound().get(0);
+			QrCode found = decoder.getSuccesses().get(0);
 
 			assertEquals(expected.version, found.version);
 			assertEquals(expected.error, found.error);
@@ -163,7 +163,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 			decoder.process(pps.toList(), generator.getGray());
 
 			assertEquals(1, decoder.successes.size());
-			QrCode found = decoder.getFound().get(0);
+			QrCode found = decoder.getSuccesses().get(0);
 
 			assertEquals(expected.version, found.version);
 			assertEquals(expected.error, found.error);
@@ -190,7 +190,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 		decoder.process(pps.toList(), generator.getGray());
 
 		assertEquals(1, decoder.successes.size());
-		QrCode found = decoder.getFound().get(0);
+		QrCode found = decoder.getSuccesses().get(0);
 
 		assertEquals(expected.version, found.version);
 		assertEquals(expected.error, found.error);
@@ -217,7 +217,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 		decoder.process(pps.toList(), generator.getGray());
 
 		assertEquals(1, decoder.successes.size());
-		QrCode found = decoder.getFound().get(0);
+		QrCode found = decoder.getSuccesses().get(0);
 
 		assertEquals(expected.version, found.version);
 		assertEquals(expected.error, found.error);
@@ -243,7 +243,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 		decoder.process(pps.toList(), generator.getGray());
 
 		assertEquals(1, decoder.successes.size());
-		QrCode found = decoder.getFound().get(0);
+		QrCode found = decoder.getSuccesses().get(0);
 
 		assertEquals(expected.version, found.version);
 		assertEquals(expected.error, found.error);
@@ -291,7 +291,7 @@ public class TestQrCodeDecoderImage extends BoofStandardJUnit {
 		decoder.process(pps.toList(), generator.getGray());
 
 		assertEquals(1, decoder.successes.size());
-		QrCode found = decoder.getFound().get(0);
+		QrCode found = decoder.getSuccesses().get(0);
 
 		// Check format info
 		assertEquals(expected.error, found.error);
