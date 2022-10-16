@@ -18,10 +18,14 @@
 
 package boofcv.alg.fiducial.qrcode;
 
+import boofcv.misc.BoofMiscOps;
 import org.ddogleg.struct.DogArray_I8;
+import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.PrintStream;
 import java.util.Objects;
+import java.util.Set;
 
 import static boofcv.alg.fiducial.qrcode.EciEncoding.getEciCharacterSet;
 import static boofcv.alg.fiducial.qrcode.QrCodeCodecBitsUtils.flipBits8;
@@ -31,7 +35,7 @@ import static boofcv.alg.fiducial.qrcode.QrCodeCodecBitsUtils.flipBits8;
  *
  * @author Peter Abeles
  */
-public class QrCodeDecoderBits {
+public class QrCodeDecoderBits implements VerbosePrint {
 
 	// used to compute error correction
 	ReedSolomonCodes_U8 rscodes = new ReedSolomonCodes_U8(8, 0b100011101, 0);
@@ -47,6 +51,8 @@ public class QrCodeDecoderBits {
 
 	// Number of errors it found while applying error correction
 	int totalErrorBits;
+
+	@Nullable PrintStream verbose = null;
 
 	/**
 	 * @param forceEncoding If null then the default byte encoding is used. If not null then the specified
@@ -132,25 +138,63 @@ public class QrCodeDecoderBits {
 	 * @return true if no error occurred
 	 */
 	public boolean decodeMessage( QrCode qr ) {
-		qr.byteEncoding = "";
+		if (verbose != null) verbose.println("decodeMessage: qr.corner="+qr.ppCorner.get(0));
 		encodingEci = null;
-		PackedBits8 bits = new PackedBits8();
-		bits.data = qr.corrected;
-		bits.size = qr.corrected.length*8;
 
 		utils.workString.setLength(0);
 
-		// Which decoding was used with BYTE messages
-		String byteEncoding = "";
-
 		// if there isn't enough bits left to read the mode it must be done
+		try {
+			int location = decideMessageBits(qr);
+			if (location < 0)
+				return false;
+
+			// ensure the length is byte aligned
+			location = alignToBytes(location);
+			int lengthBytes = location/8;
+
+			// At this point, even if fails, return whatever it was able to decode
+			qr.message = utils.workString.toString();
+
+			// sanity check padding
+			if (!checkPaddingBytes(qr, lengthBytes)) {
+				qr.failureCause = QrCode.Failure.READING_PADDING;
+				return false;
+			}
+
+			return true;
+		} catch (RuntimeException e) {
+			if (verbose != null) {
+				e.printStackTrace(verbose);
+			}
+			qr.failureCause = QrCode.Failure.DECODING_MESSAGE;
+			qr.message = utils.workString.toString();
+			return false;
+		}
+	}
+
+	/**
+	 * Decodes the bits and converts into a message and returns the number of bits processed or -1 if it failed
+	 */
+	private int decideMessageBits( QrCode qr) {
+		qr.byteEncoding = "";
+
+		var bits = new PackedBits8();
+		bits.data = qr.corrected;
+		bits.size = qr.corrected.length*8;
+
 		int location = 0;
 		while (location + 4 <= bits.size) {
 			int modeBits = bits.read(location, 4, true);
 			location += 4;
-			if (modeBits == 0) // escape indicator
+			if (modeBits == 0) { // escape indicator
+				if (verbose != null) verbose.printf("bit_loc=%d/%d escape mode\n", location, bits.size);
 				break;
+			}
 			QrCode.Mode mode = QrCode.Mode.lookup(modeBits);
+
+			if (verbose != null) verbose.printf("bit_loc=%d/%d mode=%s\n", location, bits.size, mode);
+
 			qr.mode = updateModeLogic(qr.mode, mode);
 			switch (mode) {
 				case NUMERIC -> location = decodeNumeric(qr, bits, location);
@@ -158,8 +202,8 @@ public class QrCodeDecoderBits {
 				case BYTE -> {
 					location = decodeByte(qr, bits, location);
 					// Only record the encoding of the first BYTE segment encountered
-					if (byteEncoding.isEmpty()) {
-						byteEncoding = utils.selectedByteEncoding;
+					if (qr.byteEncoding.isEmpty()) {
+						qr.byteEncoding = utils.selectedByteEncoding;
 					}
 				}
 				case KANJI -> location = decodeKanji(qr, bits, location);
@@ -170,28 +214,16 @@ public class QrCodeDecoderBits {
 				}
 				default -> {
 					qr.failureCause = QrCode.Failure.UNKNOWN_MODE;
-					return false;
+					return -1;
 				}
 			}
 
 			if (location < 0) {
 				qr.failureCause = utils.failureCause;
-				return false;
+				return -1;
 			}
 		}
-		// ensure the length is byte aligned
-		location = alignToBytes(location);
-		int lengthBytes = location/8;
-
-		// sanity check padding
-		if (!checkPaddingBytes(qr, lengthBytes)) {
-			qr.failureCause = QrCode.Failure.READING_PADDING;
-			return false;
-		}
-
-		qr.byteEncoding = byteEncoding;
-		qr.message = utils.workString.toString();
-		return true;
+		return location;
 	}
 
 	/**
@@ -325,5 +357,10 @@ public class QrCodeDecoderBits {
 		encodingEci = getEciCharacterSet(assignmentValue);
 
 		return bitLocation;
+	}
+
+	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
+		this.verbose = BoofMiscOps.addPrefix(this, out);
+		BoofMiscOps.verboseChildren(verbose, configuration, utils);
 	}
 }

@@ -129,8 +129,8 @@ public class DetectQrCodeMessagePanel extends StandardAlgConfigPanel
 		String error = qr.error == null ? "" : qr.error.toString();
 
 		if (failure) {
-			textArea.setText(String.format("Version %2d   Error %1s\nMask %4s   Mode %s\n\n%s",
-					qr.version, error, mask, mode, qr.failureCause.toString()));
+			textArea.setText(String.format("Version %2d   Error %1s\nMask %4s   Mode %s\n\nCause:\n%s\n\n%s",
+					qr.version, error, mask, mode, qr.failureCause.toString(), qr.message));
 		} else {
 			textArea.setText(String.format("Version %2d   Error %1s\nMask %4s   Mode %s\nBit Errors %d\n\n%s",
 					qr.version, error, mask, mode, qr.totalBitErrors, qr.message));

@@ -25,6 +25,7 @@ import georegression.metric.Intersection2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
+import lombok.Getter;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_F32;
 import org.jetbrains.annotations.Nullable;
@@ -38,8 +39,8 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class QrCodeDecoderImage<T extends ImageGray<T>> {
-	// used to compute error correction
-	QrCodeDecoderBits decoder;
+	/** used to compute error correction */
+	@Getter QrCodeDecoderBits decoder;
 
 	/**
 	 * Should it consider a QR code which has been encoded with a transposed bit pattern?
@@ -49,8 +50,12 @@ public class QrCodeDecoderImage<T extends ImageGray<T>> {
 	public boolean considerTransposed = true;
 
 	DogArray<QrCode> storageQR = new DogArray<>(QrCode::new, QrCode::reset);
-	List<QrCode> successes = new ArrayList<>();
-	List<QrCode> failures = new ArrayList<>();
+
+	/** All the markers it could successfully decode */
+	@Getter List<QrCode> successes = new ArrayList<>();
+
+	/** All the markers it couldn't decode without a fault */
+	@Getter List<QrCode> failures = new ArrayList<>();
 
 	// storage for read in bits from the grid
 	PackedBits8 bits = new PackedBits8();
@@ -59,8 +64,8 @@ public class QrCodeDecoderImage<T extends ImageGray<T>> {
 	Point2D_F64 grid = new Point2D_F64();
 	Polygon2D_F64 tempTranspose = new Polygon2D_F64();
 
-	QrCodeAlignmentPatternLocator<T> alignmentLocator;
-	QrCodeBinaryGridReader<T> gridReader;
+	@Getter QrCodeAlignmentPatternLocator<T> alignmentLocator;
+	@Getter QrCodeBinaryGridReader<T> gridReader;
 
 	// Storage for pixel intensity. There are N samples for each bit
 	DogArray_F32 intensityBits = new DogArray_F32();
@@ -616,17 +621,5 @@ public class QrCodeDecoderImage<T extends ImageGray<T>> {
 //		System.out.println(" decoder version region 1 =  "+Integer.toBinaryString(bits.data[0]));
 
 		return true;
-	}
-
-	public QrCodeAlignmentPatternLocator<T> getAlignmentLocator() {
-		return alignmentLocator;
-	}
-
-	public List<QrCode> getFound() {
-		return successes;
-	}
-
-	public List<QrCode> getFailures() {
-		return failures;
 	}
 }

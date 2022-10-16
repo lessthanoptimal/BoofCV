@@ -335,7 +335,7 @@ public class QrCodeCodecBitsUtils implements VerbosePrint {
 
 	public static char valueToAlphanumeric( int value ) {
 		if (value < 0 || value >= ALPHANUMERIC.length())
-			throw new RuntimeException("Value out of range. value=" + value);
+			throw new RuntimeException("Alphanumeric: Value out of range. value=" + value);
 		return ALPHANUMERIC.charAt(value);
 	}
 

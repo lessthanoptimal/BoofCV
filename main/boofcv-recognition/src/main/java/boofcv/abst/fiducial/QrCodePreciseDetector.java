@@ -96,7 +96,7 @@ public class QrCodePreciseDetector<T extends ImageGray<T>> implements QrCodeDete
 
 	@Override
 	public List<QrCode> getDetections() {
-		return decoder.getFound();
+		return decoder.getSuccesses();
 	}
 
 	@Override
