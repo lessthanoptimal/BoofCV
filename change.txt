@@ -6,6 +6,10 @@ Date Format: year/month/day
 Date    :
 Version : 0.42
 
+- QR Code
+  - An incorrectly encoded QR message will no longer cause an exception
+  - More support for VerbosePrint interface
+
 - Calibration
   - TODO Visualize Multi Camera Calibration
 - Image Processing
@@ -13,6 +17,8 @@ Version : 0.42
 - Scene Reconstruction
   - TODO Robust optimization
   - TODO 3D reconstruction to 3D mesh
+  - TODO Support STL format
+  - TODO Support OBJ format
 - SLAM
   - TODO traditional monocular SLAM
 - Regression
