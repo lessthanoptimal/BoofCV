@@ -24,6 +24,8 @@ Version : 0.42
 - Regression
   - TODO Video stabilization
   - TODO Template matching
+- Android
+  - TODO Add new Fragment based API
 
 ---------------------------------------------
 Date    : 2022/Sep/02
