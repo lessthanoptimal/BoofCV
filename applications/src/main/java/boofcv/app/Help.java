@@ -39,6 +39,7 @@ public class Help {
 			FiducialDetection.class,
 			CameraCalibrationMono.class,
 			CameraCalibrationStereo.class,
+			CameraCalibrationMulti.class,
 			BatchScanQrCodes.class,
 			BatchScanMicroQrCodes.class,
 			CreateCalibrationTarget.class,
