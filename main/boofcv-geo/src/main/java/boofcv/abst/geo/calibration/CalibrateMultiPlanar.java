@@ -545,14 +545,14 @@ public class CalibrateMultiPlanar {
 	}
 
 	/**
-	 * Summarizes calibration quality and residual errors in a human readable text string
+	 * Summarizes calibration quality and residual errors in a human-readable text string
 	 */
 	public String computeQualityText() {
 		var builder = new StringBuilder();
 		builder.append("Calibration Quality Metrics:\n");
 		for (int camId = 0; camId < statistics.size; camId++) {
 			CameraStatistics cam = statistics.get(camId);
-			builder.append(String.format("  camera[%d] fill_border=%5.1f fill_inner=%5.1f geometric=%5.1f\n",
+			builder.append(String.format("  camera[%d] fill_border=%5.3f fill_inner=%5.3f geometric=%5.3f\n",
 					camId, cam.quality.borderFill, cam.quality.innerFill, cam.quality.geometric));
 		}
 		builder.append('\n');
