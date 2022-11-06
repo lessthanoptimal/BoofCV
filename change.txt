@@ -10,6 +10,7 @@ Version : 0.42
   - An incorrectly encoded QR message will no longer cause an exception
   - More support for VerbosePrint interface
 - Applications
+  - Command line application for multi camera calibration
   - PDF Titles for Fiducials are now independent of file name and informative
 
 - Calibration
