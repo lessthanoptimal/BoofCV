@@ -274,13 +274,13 @@ public class CreateCalibrationTarget {
 		System.out.println("   info      : " + !disablePrintInfo);
 
 		if (type == CalibrationPatterns.ECOCHECK) {
-			CreateECoCheckDocumentPDF doc = ecoCheckToPdf(fileName + suffix,
+			CreateECoCheckDocumentPDF doc = ecoCheckToPdf(
 					paperSize, unit, !disablePrintInfo, rows, columns, shapeWidth, numMarkers, chessBitsError, ecocheckChecksum);
 			doc.showInfo = !disablePrintInfo;
 			if (sendToPrinter) {
 				doc.sendToPrinter();
 			} else {
-				doc.saveToDisk();
+				doc.saveToDisk(fileName + suffix);
 			}
 			if (saveLandmarks) {
 				// make sure its saves the corners in the expected units
@@ -292,12 +292,12 @@ public class CreateCalibrationTarget {
 			}
 			return;
 		} else if (type == CalibrationPatterns.HAMMING_CHESSBOARD) {
-			CreateHammingChessboardDocumentPDF doc = hammingChessToPdf(fileName + suffix,
+			CreateHammingChessboardDocumentPDF doc = hammingChessToPdf(
 					paperSize, unit, !disablePrintInfo, rows, columns, chessboardOdd, shapeWidth, markerScale, encodingName, encodingOffset);
 			if (sendToPrinter) {
 				doc.sendToPrinter();
 			} else {
-				doc.saveToDisk();
+				doc.saveToDisk(fileName + suffix);
 			}
 
 			if (saveLandmarks) {
@@ -311,12 +311,12 @@ public class CreateCalibrationTarget {
 			}
 			return;
 		} else if (type == CalibrationPatterns.HAMMING_GRID) {
-			CreateHammingGridDocumentPDF doc = hammingGridToPdf(fileName + suffix,
+			CreateHammingGridDocumentPDF doc = hammingGridToPdf(
 					paperSize, unit, !disablePrintInfo, rows, columns, shapeWidth, shapeSpace, encodingName, encodingOffset);
 			if (sendToPrinter) {
 				doc.sendToPrinter();
 			} else {
-				doc.saveToDisk();
+				doc.saveToDisk(fileName + suffix);
 			}
 			if (saveLandmarks) {
 				// make sure its saves the corners in the expected units
@@ -365,7 +365,7 @@ public class CreateCalibrationTarget {
 		}
 	}
 
-	public static CreateECoCheckDocumentPDF ecoCheckToPdf( String outputFile, PaperSize paper, Unit units,
+	public static CreateECoCheckDocumentPDF ecoCheckToPdf( PaperSize paper, Unit units,
 														   boolean showInfo,
 														   int rows, int columns, float squareWidth,
 														   int numMarkers, int errorLevel, int checksum ) throws IOException {
@@ -377,7 +377,11 @@ public class CreateCalibrationTarget {
 		utils.setParametersFromConfig(config);
 		utils.fixate();
 
-		var doc = new CreateECoCheckDocumentPDF(outputFile, paper, units);
+		// Give it a more descriptive title
+		String documentTitle = "ECoCheck by BoofCV: " + config.compactName() + " sq: " + squareWidth + " " + units.getAbbreviation();
+
+		var doc = new CreateECoCheckDocumentPDF(paper, units);
+		doc.getDocument().getDocumentInformation().setTitle(documentTitle);
 		doc.markerWidth = (columns - 1)*squareWidth;
 		doc.markerHeight = (rows - 1)*squareWidth;
 		doc.spaceBetween = squareWidth/2.0f;
@@ -387,7 +391,7 @@ public class CreateCalibrationTarget {
 		return doc;
 	}
 
-	public static CreateHammingChessboardDocumentPDF hammingChessToPdf( String outputFile, PaperSize paper, Unit units,
+	public static CreateHammingChessboardDocumentPDF hammingChessToPdf( PaperSize paper, Unit units,
 																		boolean showInfo,
 																		int rows, int columns, boolean chessboardEven,
 																		float squareWidth, float markerScale,
@@ -399,7 +403,11 @@ public class CreateCalibrationTarget {
 		config.squareSize = squareWidth;
 		config.chessboardEven = chessboardEven;
 
-		var doc = new CreateHammingChessboardDocumentPDF(outputFile, paper, units);
+		// Give it a more descriptive title
+		String documentTitle = "Hamming Chessboard by BoofCV: " + rows + "x" + columns + " sq: " + squareWidth + " " + units.getAbbreviation();
+
+		var doc = new CreateHammingChessboardDocumentPDF(paper, units);
+		doc.getDocument().getDocumentInformation().setTitle(documentTitle);
 		doc.markerWidth = columns*squareWidth;
 		doc.markerHeight = rows*squareWidth;
 		doc.spaceBetween = squareWidth/2.0f;
@@ -409,7 +417,7 @@ public class CreateCalibrationTarget {
 		return doc;
 	}
 
-	public static CreateHammingGridDocumentPDF hammingGridToPdf( String outputFile, PaperSize paper, Unit units,
+	public static CreateHammingGridDocumentPDF hammingGridToPdf( PaperSize paper, Unit units,
 																 boolean showInfo,
 																 int rows, int columns,
 																 float squareWidth, float spaceToSquare,
@@ -420,7 +428,11 @@ public class CreateCalibrationTarget {
 		config.spaceToSquare = spaceToSquare;
 		config.squareSize = squareWidth;
 
-		var doc = new CreateHammingGridDocumentPDF(outputFile, paper, units);
+		// Give it a more descriptive title
+		String documentTitle = "Hamming Grid by BoofCV: " + rows + "x" + columns + " sq: " + squareWidth + " " + units.getAbbreviation();
+
+		var doc = new CreateHammingGridDocumentPDF(paper, units);
+		doc.getDocument().getDocumentInformation().setTitle(documentTitle);
 		doc.markerWidth = (float)config.getMarkerWidth();
 		doc.markerHeight = (float)config.getMarkerHeight();
 		doc.spaceBetween = squareWidth/2.0f;

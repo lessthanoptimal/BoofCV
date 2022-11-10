@@ -172,7 +172,7 @@ public class CreateQrCodeDocument extends BaseMarkerDocument {
 		switch (fileType) {
 			case "pdf" -> {
 				Objects.requireNonNull(unit);
-				CreateQrCodeDocumentPDF renderer = new CreateQrCodeDocumentPDF(fileName, paperSize, unit);
+				CreateQrCodeDocumentPDF renderer = new CreateQrCodeDocumentPDF(paperSize, unit);
 				renderer.markerWidth = markerWidth;
 				renderer.spaceBetween = gridFill || markers.size() > 1 ? spaceBetween : 0.0f;
 				renderer.gridFill = gridFill;
@@ -182,7 +182,7 @@ public class CreateQrCodeDocument extends BaseMarkerDocument {
 				if (sendToPrinter) {
 					renderer.sendToPrinter();
 				} else
-					renderer.saveToDisk();
+					renderer.saveToDisk(fileName);
 			}
 			default -> {
 				// TODO support the ability to specify how large the QR code is in pixels

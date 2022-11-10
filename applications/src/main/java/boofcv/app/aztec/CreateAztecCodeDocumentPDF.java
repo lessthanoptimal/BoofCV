@@ -39,8 +39,8 @@ public class CreateAztecCodeDocumentPDF extends CreateFiducialDocumentPDF {
 	public java.util.List<AztecCode> markers;
 	public AztecGenerator g;
 
-	public CreateAztecCodeDocumentPDF( String documentName, PaperSize paper, Unit units ) {
-		super(documentName, paper, units);
+	public CreateAztecCodeDocumentPDF( PaperSize paper, Unit units ) {
+		super("Aztec Code by BoofCV", paper, units);
 	}
 
 	@Override

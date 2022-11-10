@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,8 +48,8 @@ public class CreateHammingChessboardDocumentPDF extends CreateFiducialDocumentPD
 	public double squareWidth;
 	public ConfigHammingChessboard config;
 
-	public CreateHammingChessboardDocumentPDF( String documentName, PaperSize paper, Unit units ) {
-		super(documentName, paper, units);
+	public CreateHammingChessboardDocumentPDF(PaperSize paper, Unit units ) {
+		super("Hamming Chessboard by BoofCV", paper, units);
 	}
 
 	@Override

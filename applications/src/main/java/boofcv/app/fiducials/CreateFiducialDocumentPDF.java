@@ -22,6 +22,7 @@ import boofcv.app.PaperSize;
 import boofcv.generate.Unit;
 import boofcv.pdf.PdfFiducialEngine;
 import georegression.struct.point.Point2D_F64;
+import lombok.Getter;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -48,7 +49,7 @@ import java.util.List;
 public abstract class CreateFiducialDocumentPDF {
 
 	// objects for writing PDF document
-	protected PDDocument document;
+	@Getter PDDocument document;
 
 	protected PaperSize paper;
 	protected Unit units;
@@ -63,8 +64,6 @@ public abstract class CreateFiducialDocumentPDF {
 	public float markerHeight = -1.0f;
 	public float spaceBetween;
 
-	String documentName;
-
 	public float UNIT_TO_POINTS;
 	public static final float CM_TO_POINTS = 72.0f/2.54f;
 
@@ -75,15 +74,10 @@ public abstract class CreateFiducialDocumentPDF {
 	// name of each pattern
 	protected java.util.List<String> names;
 
-	protected CreateFiducialDocumentPDF( String documentName, PaperSize paper, Unit units ) {
+	protected CreateFiducialDocumentPDF( String documentTitle, PaperSize paper, Unit units ) {
 		this.paper = paper;
 		this.units = units;
-		this.documentName = documentName;
 
-		// ensure that it has the correct suffix
-		if (!documentName.toLowerCase().endsWith(".pdf")) {
-			this.documentName += ".pdf";
-		}
 
 		UNIT_TO_POINTS = (float)units.getUnitToMeter()*100.0f*CM_TO_POINTS;
 
@@ -93,7 +87,7 @@ public abstract class CreateFiducialDocumentPDF {
 
 		PDDocumentInformation info = document.getDocumentInformation();
 		info.setCreator("BoofCV");
-		info.setTitle(documentName);
+		info.setTitle(documentTitle);
 	}
 
 	public void render() throws IOException {
@@ -276,7 +270,12 @@ public abstract class CreateFiducialDocumentPDF {
 		}
 	}
 
-	public void saveToDisk() throws IOException {
+	public void saveToDisk( String documentName ) throws IOException {
+		// ensure that it has the correct suffix
+		if (!documentName.toLowerCase().endsWith(".pdf")) {
+			documentName += ".pdf";
+		}
+
 		document.save(documentName);
 		document.close();
 	}

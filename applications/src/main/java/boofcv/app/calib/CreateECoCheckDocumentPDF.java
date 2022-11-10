@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,8 +48,8 @@ public class CreateECoCheckDocumentPDF extends CreateFiducialDocumentPDF {
 	public double squareWidth;
 	public ECoCheckUtils utils;
 
-	public CreateECoCheckDocumentPDF( String documentName, PaperSize paper, Unit units ) {
-		super(documentName, paper, units);
+	public CreateECoCheckDocumentPDF( PaperSize paper, Unit units ) {
+		super("ECoCheck by BoofCV", paper, units);
 	}
 
 	@Override

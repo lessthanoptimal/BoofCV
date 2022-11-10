@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -125,7 +125,7 @@ public abstract class BaseFiducialSquare {
 			if (sendToPrinter) {
 				renderer.sendToPrinter();
 			} else {
-				renderer.saveToDisk();
+				renderer.saveToDisk(fileName);
 			}
 		} else {
 			CreateFiducialDocumentImage renderer = createRendererImage(fileName);

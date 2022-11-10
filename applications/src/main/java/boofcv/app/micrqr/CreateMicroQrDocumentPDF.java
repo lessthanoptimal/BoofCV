@@ -39,8 +39,8 @@ public class CreateMicroQrDocumentPDF extends CreateFiducialDocumentPDF {
 	public java.util.List<MicroQrCode> markers;
 	public MicroQrCodeGenerator g;
 
-	public CreateMicroQrDocumentPDF( String documentName, PaperSize paper, Unit units ) {
-		super(documentName, paper, units);
+	public CreateMicroQrDocumentPDF( PaperSize paper, Unit units ) {
+		super("Micro QR by BoofCV", paper, units);
 	}
 
 	@Override
