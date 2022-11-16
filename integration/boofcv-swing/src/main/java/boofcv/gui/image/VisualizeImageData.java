@@ -319,6 +319,21 @@ public class VisualizeImageData {
 	 */
 	public static BufferedImage inverseDepth( GrayF32 src, @Nullable BufferedImage dst,
 											  float maxValue, int invalidColor ) {
+		return inverseDepth(src, dst, 0.0f, maxValue, invalidColor);
+	}
+
+	/**
+	 * Colorizes an inverse depth image.
+	 *
+	 * @param src Inverse depth image
+	 * @param dst Output rendering
+	 * @param minValue Minimum possible value. Reminder that larger means closer. If < 0.0f it will auto select
+	 * @param maxValue Max possible value. Reminder that larger means closer. If <= 0.0f it will auto select
+	 * @param invalidColor What color to mark pixels with no depth info
+	 * @return rendered image
+	 */
+	public static BufferedImage inverseDepth( GrayF32 src, @Nullable BufferedImage dst,
+											  float minValue, float maxValue, int invalidColor ) {
 		dst = ConvertBufferedImage.checkDeclare(src.width, src.height, dst, BufferedImage.TYPE_INT_RGB);
 
 		// Find max value ignoring NaN
@@ -326,18 +341,37 @@ public class VisualizeImageData {
 			maxValue = ImageStatistics.max(src);
 		}
 
+		// Find the smallest valid value that's not at infinity
+		if (minValue < 0.0f) {
+			minValue = maxValue;
+			for (int y = 0; y < src.height; y++) {
+				int index = src.getIndex(0,y);
+				int end = index + src.width;
+				while (index < end) {
+					float v = src.data[index++];
+					if (v > 0.0f && v < minValue)
+						minValue = v;
+				}
+			}
+		}
+		float range = maxValue - minValue;
+
+		// Avoid divide by zero
+		if (range == 0.0f)
+			range = 1f;
+
 		for (int y = 0; y < src.height; y++) {
 			for (int x = 0; x < src.width; x++) {
 				float v = src.unsafe_get(x, y);
 
-				if (v < 0.0f) {
+				if (v < minValue) {
 					dst.setRGB(x, y, invalidColor);
 				} else if (v == 0.0f) {
 					dst.setRGB(x, y, 0);
 				} else {
-					v = Math.min(v, maxValue);
-					int r = (int)(255*v/maxValue);
-					int b = (int)(255*(maxValue - v)/maxValue);
+					v = Math.min(v, maxValue) - minValue;
+					int r = (int)(255*v/range);
+					int b = (int)(255*(range - v)/range);
 
 					dst.setRGB(x, y, r << 16 | b);
 				}
