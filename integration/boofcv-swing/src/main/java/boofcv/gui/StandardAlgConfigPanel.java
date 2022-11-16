@@ -274,6 +274,27 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 		return c;
 	}
 
+	public JRadioButton radio( String text, boolean value, @Nullable String tooltip ) {
+		var c = new JRadioButton(text);
+		c.setSelected(value);
+		c.addActionListener(this);
+
+		if (tooltip != null)
+			c.setToolTipText(tooltip);
+
+		return c;
+	}
+
+	/**
+	 * Creates a {@link ButtonGroup} for the buttons
+	 */
+	public static void group(AbstractButton ...buttons) {
+		var buttonGroup = new ButtonGroup();
+		for (AbstractButton b : buttons) {
+			buttonGroup.add(b);
+		}
+	}
+
 	public JCheckBoxValue checkboxWrap( String text, boolean value ) {
 		JCheckBox c = new JCheckBox(text);
 		c.setSelected(value);
