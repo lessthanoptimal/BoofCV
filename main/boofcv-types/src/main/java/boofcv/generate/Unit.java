@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,6 +42,16 @@ public enum Unit {
 	Unit( double unitToMeter, String abbreviation ) {
 		this.unitToMeter = unitToMeter;
 		this.abbreviation = abbreviation;
+	}
+
+	/**
+	 * Returns value of all units which are not "UNKNOWN"
+	 */
+	public Unit[] valuesKnown() {
+		var all = values();
+		var ret = new Unit[all.length-1];
+		System.arraycopy(all, 1, ret, 0, all.length - 1);
+		return ret;
 	}
 
 	/**
