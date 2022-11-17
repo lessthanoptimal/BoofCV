@@ -41,9 +41,11 @@ import org.kohsuke.args4j.Option;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Camera calibration for an arbitrary number of cameras
@@ -164,22 +166,22 @@ public class CameraCalibrationMulti {
 		UtilIO.mkdirs(new File(outputDirectory));
 
 		// Save quality summary
-		try (var out = new PrintWriter(new File(outputDirectory, "quality.txt"))) {
+		try (var out = new PrintWriter(new File(outputDirectory, "quality.txt"), UTF_8)) {
 			out.println(calibrator.computeQualityText());
-		} catch (FileNotFoundException e) {
+		} catch (IOException e) {
 			System.err.println("Failed to save quality.txt");
 		}
 
 		// Save mapping from index to camera name
 		System.out.println("\nIndex to Camera Name");
-		try (var out = new PrintWriter(new File(outputDirectory, "index_to_camera.txt"))) {
+		try (var out = new PrintWriter(new File(outputDirectory, "index_to_camera.txt"), UTF_8)) {
 			for (int cameraID = 0; cameraID < cameras.size(); cameraID++) {
 				String cameraName = cameras.get(cameraID);
 				out.println(cameraID + " " + cameraName);
 				System.out.println(cameraID + " " + cameraName);
 			}
 			System.out.println();
-		} catch (FileNotFoundException e) {
+		} catch (IOException e) {
 			System.err.println("Failed to save quality.txt");
 		}
 
@@ -237,7 +239,7 @@ public class CameraCalibrationMulti {
 			// Create a synchronized observation for this image/frame
 			var syncObs = new SynchronizedCalObs();
 			camerasWithImage.forEach(cameraID -> {
-				ImageDimension imageShape = cameraToShape.get(cameras.get(cameraID));
+				ImageDimension imageShape = Objects.requireNonNull(cameraToShape.get(cameras.get(cameraID)));
 				var imagePath = new File(inputDirectory, cameras.get(cameraID) + "/" + imageName);
 				addCameraObservations(cameraID, imagePath, imageShape, detector, syncObs);
 			});
