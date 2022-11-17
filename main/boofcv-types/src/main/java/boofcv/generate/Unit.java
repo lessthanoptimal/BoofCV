@@ -48,7 +48,7 @@ public enum Unit {
 	 * Returns value of all units which are not "UNKNOWN"
 	 */
 	public Unit[] valuesKnown() {
-		var all = values();
+		Unit[] all = values();
 		var ret = new Unit[all.length-1];
 		System.arraycopy(all, 1, ret, 0, all.length - 1);
 		return ret;
