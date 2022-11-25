@@ -67,10 +67,10 @@ public class CameraCalibrationMulti {
 	@Option(name = "--Pattern", usage = "Which calibration pattern it should use. chessboard, echocheck, square_grid, circle_hexagonal, circle_grid, hamming_chessboard, hamming_grid")
 	String targetType = "";
 
-	@Option(name = "--EcoCheck", usage = "Abbreviated EcoCheck target description. If using ECoCheck this is all you need to specify. E.g. 9x7e3n1")
+	@Option(name = "--ECoCheck", usage = "Abbreviated EcoCheck target description. If using ECoCheck this is all you need to specify. E.g. 9x7n1e3")
 	String ecocheck = "";
 
-	@Option(name = "--Grid", usage = "Number of rows and column in target. 9x7 for 9 rows and 7 columns")
+	@Option(name = "--Grid", usage = "Number of rows and column in target. 9x7 for 9 rows and 7 columns. Not needed for ECoCheck")
 	String gridText = "";
 
 	@Option(name = "--Verbose", usage = "Prints out verbose debugging information")
@@ -94,6 +94,11 @@ public class CameraCalibrationMulti {
 		if (!ecocheck.isEmpty()) {
 			configTarget.type = CalibrationPatterns.ECOCHECK;
 			configTarget.ecocheck = ConfigECoCheckMarkers.parse(ecocheck, shapeSize);
+
+			if (!gridText.isEmpty()) {
+				System.err.println("Do not specify a grid if you use --ECoCheck");
+				System.exit(1);
+			}
 		} else if (targetType.isEmpty()) {
 			System.err.println("You must specify which type of pattern you wish to detect");
 			System.exit(1);
