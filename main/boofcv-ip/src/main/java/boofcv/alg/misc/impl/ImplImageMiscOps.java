@@ -44,10 +44,10 @@ import java.util.Random;
 @Generated("boofcv.alg.misc.impl.GenerateImplImageMiscOps")
 public class ImplImageMiscOps {
 
-	public static < T extends GrayI8<T>> void copy( int srcX, int srcY, int dstX, int dstY, int width, int height,
-							 T input, ImageBorder_S32<T> border, GrayI8 output ) {
+	public static <T extends GrayI8<T>> void copy( int srcX, int srcY, int dstX, int dstY, int width, int height,
+												   T input, ImageBorder_S32<T> border, GrayI8 output ) {
 		if (output.width < dstX + width || output.height < dstY + height)
-			throw new IllegalArgumentException("Copy region must be contained in the output image. w="+output.width+" < "+(dstX+width)+" or y="+output.height+" < "+(dstY+height));
+			throw new IllegalArgumentException("Copy region must be contained in the output image. w=" + output.width + " < " + (dstX + width) + " or y=" + output.height + " < " + (dstY + height));
 
 		// Check to see if it's entirely contained inside the input image
 		if (srcX >= 0 && srcX + width <= input.width && srcY >= 0 && srcY + height <= input.height) {
@@ -276,8 +276,10 @@ public class ImplImageMiscOps {
 		int x1 = x0 + width;
 		int y1 = y0 + height;
 
-		if (x0 < 0) x0 = 0; if (x1 > image.width) x1 = image.width;
-		if (y0 < 0) y0 = 0; if (y1 > image.height) y1 = image.height;
+		if (x0 < 0) x0 = 0;
+		if (x1 > image.width) x1 = image.width;
+		if (y0 < 0) y0 = 0;
+		if (y1 > image.height) y1 = image.height;
 		final int _x0 = x0;
 		final int _x1 = x1;
 
@@ -289,12 +291,14 @@ public class ImplImageMiscOps {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void fillRectangle(InterleavedI8 image, int value, int x0, int y0, int width, int height ) {
+	public static void fillRectangle( InterleavedI8 image, int value, int x0, int y0, int width, int height ) {
 		int x1 = x0 + width;
 		int y1 = y0 + height;
 
-		if (x0 < 0) x0 = 0; if (x1 > image.width) x1 = image.width;
-		if (y0 < 0) y0 = 0; if (y1 > image.height) y1 = image.height;
+		if (x0 < 0) x0 = 0;
+		if (x1 > image.width) x1 = image.width;
+		if (y0 < 0) y0 = 0;
+		if (y1 > image.height) y1 = image.height;
 		final int _x0 = x0;
 
 		int length = (x1 - x0)*image.numBands;
@@ -610,10 +614,10 @@ public class ImplImageMiscOps {
 		}
 	}
 
-	public static < T extends GrayI16<T>> void copy( int srcX, int srcY, int dstX, int dstY, int width, int height,
-							 T input, ImageBorder_S32<T> border, GrayI16 output ) {
+	public static <T extends GrayI16<T>> void copy( int srcX, int srcY, int dstX, int dstY, int width, int height,
+													T input, ImageBorder_S32<T> border, GrayI16 output ) {
 		if (output.width < dstX + width || output.height < dstY + height)
-			throw new IllegalArgumentException("Copy region must be contained in the output image. w="+output.width+" < "+(dstX+width)+" or y="+output.height+" < "+(dstY+height));
+			throw new IllegalArgumentException("Copy region must be contained in the output image. w=" + output.width + " < " + (dstX + width) + " or y=" + output.height + " < " + (dstY + height));
 
 		// Check to see if it's entirely contained inside the input image
 		if (srcX >= 0 && srcX + width <= input.width && srcY >= 0 && srcY + height <= input.height) {
@@ -842,8 +846,10 @@ public class ImplImageMiscOps {
 		int x1 = x0 + width;
 		int y1 = y0 + height;
 
-		if (x0 < 0) x0 = 0; if (x1 > image.width) x1 = image.width;
-		if (y0 < 0) y0 = 0; if (y1 > image.height) y1 = image.height;
+		if (x0 < 0) x0 = 0;
+		if (x1 > image.width) x1 = image.width;
+		if (y0 < 0) y0 = 0;
+		if (y1 > image.height) y1 = image.height;
 		final int _x0 = x0;
 		final int _x1 = x1;
 
@@ -855,12 +861,14 @@ public class ImplImageMiscOps {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void fillRectangle(InterleavedI16 image, int value, int x0, int y0, int width, int height ) {
+	public static void fillRectangle( InterleavedI16 image, int value, int x0, int y0, int width, int height ) {
 		int x1 = x0 + width;
 		int y1 = y0 + height;
 
-		if (x0 < 0) x0 = 0; if (x1 > image.width) x1 = image.width;
-		if (y0 < 0) y0 = 0; if (y1 > image.height) y1 = image.height;
+		if (x0 < 0) x0 = 0;
+		if (x1 > image.width) x1 = image.width;
+		if (y0 < 0) y0 = 0;
+		if (y1 > image.height) y1 = image.height;
 		final int _x0 = x0;
 
 		int length = (x1 - x0)*image.numBands;
@@ -1179,7 +1187,7 @@ public class ImplImageMiscOps {
 	public static void copy( int srcX, int srcY, int dstX, int dstY, int width, int height,
 							 GrayS32 input, ImageBorder_S32 border, GrayS32 output ) {
 		if (output.width < dstX + width || output.height < dstY + height)
-			throw new IllegalArgumentException("Copy region must be contained in the output image. w="+output.width+" < "+(dstX+width)+" or y="+output.height+" < "+(dstY+height));
+			throw new IllegalArgumentException("Copy region must be contained in the output image. w=" + output.width + " < " + (dstX + width) + " or y=" + output.height + " < " + (dstY + height));
 
 		// Check to see if it's entirely contained inside the input image
 		if (srcX >= 0 && srcX + width <= input.width && srcY >= 0 && srcY + height <= input.height) {
@@ -1408,8 +1416,10 @@ public class ImplImageMiscOps {
 		int x1 = x0 + width;
 		int y1 = y0 + height;
 
-		if (x0 < 0) x0 = 0; if (x1 > image.width) x1 = image.width;
-		if (y0 < 0) y0 = 0; if (y1 > image.height) y1 = image.height;
+		if (x0 < 0) x0 = 0;
+		if (x1 > image.width) x1 = image.width;
+		if (y0 < 0) y0 = 0;
+		if (y1 > image.height) y1 = image.height;
 		final int _x0 = x0;
 		final int _x1 = x1;
 
@@ -1421,12 +1431,14 @@ public class ImplImageMiscOps {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void fillRectangle(InterleavedS32 image, int value, int x0, int y0, int width, int height ) {
+	public static void fillRectangle( InterleavedS32 image, int value, int x0, int y0, int width, int height ) {
 		int x1 = x0 + width;
 		int y1 = y0 + height;
 
-		if (x0 < 0) x0 = 0; if (x1 > image.width) x1 = image.width;
-		if (y0 < 0) y0 = 0; if (y1 > image.height) y1 = image.height;
+		if (x0 < 0) x0 = 0;
+		if (x1 > image.width) x1 = image.width;
+		if (y0 < 0) y0 = 0;
+		if (y1 > image.height) y1 = image.height;
 		final int _x0 = x0;
 
 		int length = (x1 - x0)*image.numBands;
@@ -1744,7 +1756,7 @@ public class ImplImageMiscOps {
 	public static void copy( int srcX, int srcY, int dstX, int dstY, int width, int height,
 							 GrayS64 input, ImageBorder_S64 border, GrayS64 output ) {
 		if (output.width < dstX + width || output.height < dstY + height)
-			throw new IllegalArgumentException("Copy region must be contained in the output image. w="+output.width+" < "+(dstX+width)+" or y="+output.height+" < "+(dstY+height));
+			throw new IllegalArgumentException("Copy region must be contained in the output image. w=" + output.width + " < " + (dstX + width) + " or y=" + output.height + " < " + (dstY + height));
 
 		// Check to see if it's entirely contained inside the input image
 		if (srcX >= 0 && srcX + width <= input.width && srcY >= 0 && srcY + height <= input.height) {
@@ -1973,8 +1985,10 @@ public class ImplImageMiscOps {
 		int x1 = x0 + width;
 		int y1 = y0 + height;
 
-		if (x0 < 0) x0 = 0; if (x1 > image.width) x1 = image.width;
-		if (y0 < 0) y0 = 0; if (y1 > image.height) y1 = image.height;
+		if (x0 < 0) x0 = 0;
+		if (x1 > image.width) x1 = image.width;
+		if (y0 < 0) y0 = 0;
+		if (y1 > image.height) y1 = image.height;
 		final int _x0 = x0;
 		final int _x1 = x1;
 
@@ -1986,12 +2000,14 @@ public class ImplImageMiscOps {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void fillRectangle(InterleavedS64 image, long value, int x0, int y0, int width, int height ) {
+	public static void fillRectangle( InterleavedS64 image, long value, int x0, int y0, int width, int height ) {
 		int x1 = x0 + width;
 		int y1 = y0 + height;
 
-		if (x0 < 0) x0 = 0; if (x1 > image.width) x1 = image.width;
-		if (y0 < 0) y0 = 0; if (y1 > image.height) y1 = image.height;
+		if (x0 < 0) x0 = 0;
+		if (x1 > image.width) x1 = image.width;
+		if (y0 < 0) y0 = 0;
+		if (y1 > image.height) y1 = image.height;
 		final int _x0 = x0;
 
 		int length = (x1 - x0)*image.numBands;
@@ -2309,7 +2325,7 @@ public class ImplImageMiscOps {
 	public static void copy( int srcX, int srcY, int dstX, int dstY, int width, int height,
 							 GrayF32 input, ImageBorder_F32 border, GrayF32 output ) {
 		if (output.width < dstX + width || output.height < dstY + height)
-			throw new IllegalArgumentException("Copy region must be contained in the output image. w="+output.width+" < "+(dstX+width)+" or y="+output.height+" < "+(dstY+height));
+			throw new IllegalArgumentException("Copy region must be contained in the output image. w=" + output.width + " < " + (dstX + width) + " or y=" + output.height + " < " + (dstY + height));
 
 		// Check to see if it's entirely contained inside the input image
 		if (srcX >= 0 && srcX + width <= input.width && srcY >= 0 && srcY + height <= input.height) {
@@ -2538,8 +2554,10 @@ public class ImplImageMiscOps {
 		int x1 = x0 + width;
 		int y1 = y0 + height;
 
-		if (x0 < 0) x0 = 0; if (x1 > image.width) x1 = image.width;
-		if (y0 < 0) y0 = 0; if (y1 > image.height) y1 = image.height;
+		if (x0 < 0) x0 = 0;
+		if (x1 > image.width) x1 = image.width;
+		if (y0 < 0) y0 = 0;
+		if (y1 > image.height) y1 = image.height;
 		final int _x0 = x0;
 		final int _x1 = x1;
 
@@ -2551,12 +2569,14 @@ public class ImplImageMiscOps {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void fillRectangle(InterleavedF32 image, float value, int x0, int y0, int width, int height ) {
+	public static void fillRectangle( InterleavedF32 image, float value, int x0, int y0, int width, int height ) {
 		int x1 = x0 + width;
 		int y1 = y0 + height;
 
-		if (x0 < 0) x0 = 0; if (x1 > image.width) x1 = image.width;
-		if (y0 < 0) y0 = 0; if (y1 > image.height) y1 = image.height;
+		if (x0 < 0) x0 = 0;
+		if (x1 > image.width) x1 = image.width;
+		if (y0 < 0) y0 = 0;
+		if (y1 > image.height) y1 = image.height;
 		final int _x0 = x0;
 
 		int length = (x1 - x0)*image.numBands;
@@ -2874,7 +2894,7 @@ public class ImplImageMiscOps {
 	public static void copy( int srcX, int srcY, int dstX, int dstY, int width, int height,
 							 GrayF64 input, ImageBorder_F64 border, GrayF64 output ) {
 		if (output.width < dstX + width || output.height < dstY + height)
-			throw new IllegalArgumentException("Copy region must be contained in the output image. w="+output.width+" < "+(dstX+width)+" or y="+output.height+" < "+(dstY+height));
+			throw new IllegalArgumentException("Copy region must be contained in the output image. w=" + output.width + " < " + (dstX + width) + " or y=" + output.height + " < " + (dstY + height));
 
 		// Check to see if it's entirely contained inside the input image
 		if (srcX >= 0 && srcX + width <= input.width && srcY >= 0 && srcY + height <= input.height) {
@@ -3103,8 +3123,10 @@ public class ImplImageMiscOps {
 		int x1 = x0 + width;
 		int y1 = y0 + height;
 
-		if (x0 < 0) x0 = 0; if (x1 > image.width) x1 = image.width;
-		if (y0 < 0) y0 = 0; if (y1 > image.height) y1 = image.height;
+		if (x0 < 0) x0 = 0;
+		if (x1 > image.width) x1 = image.width;
+		if (y0 < 0) y0 = 0;
+		if (y1 > image.height) y1 = image.height;
 		final int _x0 = x0;
 		final int _x1 = x1;
 
@@ -3116,12 +3138,14 @@ public class ImplImageMiscOps {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void fillRectangle(InterleavedF64 image, double value, int x0, int y0, int width, int height ) {
+	public static void fillRectangle( InterleavedF64 image, double value, int x0, int y0, int width, int height ) {
 		int x1 = x0 + width;
 		int y1 = y0 + height;
 
-		if (x0 < 0) x0 = 0; if (x1 > image.width) x1 = image.width;
-		if (y0 < 0) y0 = 0; if (y1 > image.height) y1 = image.height;
+		if (x0 < 0) x0 = 0;
+		if (x1 > image.width) x1 = image.width;
+		if (y0 < 0) y0 = 0;
+		if (y1 > image.height) y1 = image.height;
 		final int _x0 = x0;
 
 		int length = (x1 - x0)*image.numBands;
@@ -4051,5 +4075,4 @@ public class ImplImageMiscOps {
 			}
 		}
 	}
-
 }

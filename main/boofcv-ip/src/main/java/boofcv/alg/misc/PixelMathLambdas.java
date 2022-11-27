@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,6 +29,11 @@ public abstract class PixelMathLambdas {
 	public interface Function1 {}
 
 	public interface Function2 {}
+
+	@FunctionalInterface
+	public interface ImageIndexes extends Function2 {
+		void process( int indexSrc, int indexDst );
+	}
 
 	@FunctionalInterface
 	public interface Function2_I8 extends Function2 {
