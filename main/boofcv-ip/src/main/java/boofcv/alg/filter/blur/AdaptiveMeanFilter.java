@@ -48,7 +48,10 @@ public class AdaptiveMeanFilter {
 	public void process( GrayU8 src, double noiseVariance, GrayU8 dst ) {
 		InputSanityCheck.checkReshape(src, dst);
 
-		// TODO modified so that this will work with threads
+		// Note: This could be made to run WAY faster by using a histogram,
+		//       then adding modifying it while sliding it across the image
+
+		// Note: Add concurrent implementation
 
 		// Apply filter to inner region
 		ImageLambdaFilters.filterRectCenterInner(src, radiusX, radiusY, dst, localValues, ( indexCenter, w ) -> {

@@ -34,8 +34,6 @@ import org.jetbrains.annotations.Nullable;
  * @author Peter Abeles
  */
 public class ImageLambdaFilters {
-	// TODO add workspace for threads?
-
 	public static void filterRectCenterInner( GrayU8 src, int radiusX, int radiusY, GrayU8 dst,
 											  @Nullable Object workspace, RectCenter_S32 filter ) {
 		final int y0 = radiusY;
@@ -61,13 +59,13 @@ public class ImageLambdaFilters {
 	public static void filterRectCenterEdge( GrayU8 src, int radiusX, int radiusY, GrayU8 dst,
 											 @Nullable Object workspace, Rect_S32 filter ) {
 		// top edge
-		for (int y = 0; y < radiusX; y++) {
+		for (int y = 0; y < radiusY; y++) {
 			int y0 = 0;
 			int y1 = Math.min(src.height, y + radiusY + 1);
 
 			int indexDstRow = dst.startIndex + y*dst.stride;
 			for (int x = 0; x < src.width; x++) {
-				int x0 = Math.min(0, x - radiusX);
+				int x0 = Math.max(0, x - radiusX);
 				int x1 = Math.min(src.width, x + radiusX + 1);
 				dst.data[indexDstRow + x] = (byte)filter.apply(x, y, x0, y0, x1, y1, workspace);
 			}
@@ -80,7 +78,7 @@ public class ImageLambdaFilters {
 
 			int indexDstRow = dst.startIndex + y*dst.stride;
 			for (int x = 0; x < src.width; x++) {
-				int x0 = Math.min(0, x - radiusX);
+				int x0 = Math.max(0, x - radiusX);
 				int x1 = Math.min(src.width, x + radiusX + 1);
 				dst.data[indexDstRow + x] = (byte)filter.apply(x, y, x0, y0, x1, y1, workspace);
 			}
