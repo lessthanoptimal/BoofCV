@@ -24,7 +24,14 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.fail;
 
 class TestAdaptiveMeanFilter extends BoofStandardJUnit {
-	@Test void implement() {
+	@Test void compareToNaive() {
+		fail("Implement");
+	}
+
+	/**
+	 * Directly test the filter algorithm on raw data. Checks nominal and edges cases
+	 */
+	@Test void computeFilter() {
 		fail("Implement");
 	}
 }
