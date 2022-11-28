@@ -18,9 +18,11 @@
 
 package boofcv.alg.filter.blur;
 
-import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.misc.ImageLambdaFilters;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.GrayU8;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * <p>Given an estimate of image noise sigma, adaptive applies a mean filter dependent on local image statistics in
@@ -39,14 +41,35 @@ import boofcv.struct.image.GrayU8;
  * @author Peter Abeles
  */
 public class AdaptiveMeanFilter {
-	int radiusX, radiusY;
-	int regionX = radiusX*2 + 1;
-	int regionY = radiusY*2 + 1;
+	/** Defines the symmetric rectangular region. width = 2*radius + 1 */
+	@Getter @Setter int radiusX, radiusY;
 
-	int[] localValues = new int[regionX*regionY];
+	/** Defines the expective additive Gaussian pixel noise */
+	@Getter double noiseVariance;
 
-	public void process( GrayU8 src, double noiseVariance, GrayU8 dst ) {
-		InputSanityCheck.checkReshape(src, dst);
+	public AdaptiveMeanFilter( int radiusX, int radiusY ) {
+		this.radiusX = radiusX;
+		this.radiusY = radiusY;
+	}
+
+	public AdaptiveMeanFilter() {}
+
+	/**
+	 * Applies the filter to the src image and saves the results to the dst image. The shape of dst is modified
+	 * to match src.
+	 *
+	 * @param src (Input) Image. Not modified.
+	 * @param dst (Output) Image. Modified.
+	 */
+	public void process( GrayU8 src, GrayU8 dst ) {
+		BoofMiscOps.checkTrue(radiusX >= 0, "Radius must not be negative");
+		BoofMiscOps.checkTrue(radiusY >= 0, "Radius must not be negative");
+		dst.reshape(src.width, src.height);
+
+		int regionX = radiusX*2 + 1;
+		int regionY = radiusY*2 + 1;
+		int[] localValues = new int[regionX*regionY];
+
 
 		// Note: This could be made to run WAY faster by using a histogram,
 		//       then adding modifying it while sliding it across the image
@@ -59,7 +82,7 @@ public class AdaptiveMeanFilter {
 
 			// copy values of local region into an array
 			int valueIndex = 0;
-			int pixelRowIndex = indexCenter - regionX - regionY*src.stride;
+			int pixelRowIndex = indexCenter - radiusX - radiusY*src.stride;
 
 			for (int y = 0; y < regionY; y++) {
 				int pixelIndex = pixelRowIndex + y*src.stride;
@@ -114,7 +137,17 @@ public class AdaptiveMeanFilter {
 			localVariance += diff*diff;
 		}
 
+		localVariance /= N;
+
+		if (localVariance == 0.0)
+			return centerValue;
+
 		// Apply the formula. 0.5 is to round instead of floor. Works because it's always positive
 		return (int)(centerValue - Math.min(1.0, noiseVariance/localVariance)*(centerValue - localMean) + 0.5);
+	}
+
+	public void setNoiseVariance( double value ) {
+		BoofMiscOps.checkTrue(value > 0, "Variance must be positive");
+		this.noiseVariance = value;
 	}
 }

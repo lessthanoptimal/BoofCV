@@ -61,8 +61,7 @@ class TestGeometricMeanFilter extends BoofStandardJUnit {
 		int x1 = Math.min(src.width, cx + radiusX + 1);
 		int y0 = Math.max(0, cy - radiusY);
 		int y1 = Math.min(src.height, cy + radiusY + 1);
-
-
+		
 		double product = 1.0;
 		for (int y = y0; y < y1; y++) {
 			for (int x = x0; x < x1; x++) {
