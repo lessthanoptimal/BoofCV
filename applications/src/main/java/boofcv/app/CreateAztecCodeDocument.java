@@ -23,6 +23,7 @@ import boofcv.alg.fiducial.aztec.AztecEncoder;
 import boofcv.app.aztec.CreateAztecCodeDocumentImage;
 import boofcv.app.aztec.CreateAztecCodeDocumentPDF;
 import boofcv.app.micrqr.CreateMicroQrGui;
+import boofcv.generate.PaperSize;
 import boofcv.generate.Unit;
 import boofcv.gui.BoofSwingUtil;
 import org.apache.commons.io.FilenameUtils;

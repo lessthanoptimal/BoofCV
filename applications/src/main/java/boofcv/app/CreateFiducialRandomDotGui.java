@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.app;
 
 import boofcv.alg.fiducial.dots.RandomDotMarkerGenerator;
 import boofcv.alg.fiducial.dots.RandomDotMarkerGeneratorImage;
+import boofcv.generate.PaperSize;
 import boofcv.generate.Unit;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.StandardAlgConfigPanel;

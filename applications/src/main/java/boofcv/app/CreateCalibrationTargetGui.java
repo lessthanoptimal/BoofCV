@@ -27,6 +27,7 @@ import boofcv.alg.fiducial.calib.hammingchess.HammingChessboardGenerator;
 import boofcv.alg.fiducial.calib.hamminggrids.HammingGridGenerator;
 import boofcv.factory.fiducial.ConfigHammingChessboard;
 import boofcv.factory.fiducial.ConfigHammingGrid;
+import boofcv.generate.PaperSize;
 import boofcv.generate.Unit;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.FiducialRenderEngineGraphics2D;

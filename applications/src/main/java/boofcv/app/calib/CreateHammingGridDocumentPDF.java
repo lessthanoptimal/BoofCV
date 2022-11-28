@@ -19,9 +19,9 @@
 package boofcv.app.calib;
 
 import boofcv.alg.fiducial.calib.hamminggrids.HammingGridGenerator;
-import boofcv.app.PaperSize;
 import boofcv.app.fiducials.CreateFiducialDocumentPDF;
 import boofcv.factory.fiducial.ConfigHammingGrid;
+import boofcv.generate.PaperSize;
 import boofcv.generate.Unit;
 import boofcv.pdf.PdfFiducialEngine;
 import lombok.Getter;

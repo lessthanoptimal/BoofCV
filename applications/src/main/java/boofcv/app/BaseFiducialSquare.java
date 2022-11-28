@@ -21,6 +21,7 @@ package boofcv.app;
 import boofcv.app.fiducials.CreateFiducialDocumentImage;
 import boofcv.app.fiducials.CreateFiducialDocumentPDF;
 import boofcv.generate.LengthUnit;
+import boofcv.generate.PaperSize;
 import boofcv.generate.Unit;
 import org.apache.commons.io.FilenameUtils;
 import org.kohsuke.args4j.CmdLineParser;

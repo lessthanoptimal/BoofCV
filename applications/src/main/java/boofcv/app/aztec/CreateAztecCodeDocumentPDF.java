@@ -20,8 +20,8 @@ package boofcv.app.aztec;
 
 import boofcv.alg.fiducial.aztec.AztecCode;
 import boofcv.alg.fiducial.aztec.AztecGenerator;
-import boofcv.app.PaperSize;
 import boofcv.app.fiducials.CreateFiducialDocumentPDF;
+import boofcv.generate.PaperSize;
 import boofcv.generate.Unit;
 import boofcv.pdf.PdfFiducialEngine;
 

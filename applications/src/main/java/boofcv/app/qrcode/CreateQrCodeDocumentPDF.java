@@ -20,8 +20,8 @@ package boofcv.app.qrcode;
 
 import boofcv.alg.fiducial.qrcode.QrCode;
 import boofcv.alg.fiducial.qrcode.QrCodeGenerator;
-import boofcv.app.PaperSize;
 import boofcv.app.fiducials.CreateFiducialDocumentPDF;
+import boofcv.generate.PaperSize;
 import boofcv.generate.Unit;
 import boofcv.pdf.PdfFiducialEngine;
 

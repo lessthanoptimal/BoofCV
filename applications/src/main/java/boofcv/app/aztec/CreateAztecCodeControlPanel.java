@@ -19,7 +19,7 @@
 package boofcv.app.aztec;
 
 import boofcv.alg.fiducial.aztec.AztecCode;
-import boofcv.app.PaperSize;
+import boofcv.generate.PaperSize;
 import boofcv.generate.Unit;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.StandardAlgConfigPanel;

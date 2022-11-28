@@ -25,6 +25,7 @@ import boofcv.alg.fiducial.qrcode.QrCode;
 import boofcv.app.micrqr.CreateMicroQrDocumentImage;
 import boofcv.app.micrqr.CreateMicroQrDocumentPDF;
 import boofcv.app.micrqr.CreateMicroQrGui;
+import boofcv.generate.PaperSize;
 import boofcv.generate.Unit;
 import boofcv.gui.BoofSwingUtil;
 import org.apache.commons.io.FilenameUtils;

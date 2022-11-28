@@ -18,7 +18,7 @@
 
 package boofcv.app.fiducials;
 
-import boofcv.app.PaperSize;
+import boofcv.generate.PaperSize;
 import boofcv.generate.Unit;
 import boofcv.pdf.PdfFiducialEngine;
 import georegression.struct.point.Point2D_F64;

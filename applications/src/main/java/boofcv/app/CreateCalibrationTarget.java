@@ -30,6 +30,7 @@ import boofcv.factory.fiducial.ConfigHammingGrid;
 import boofcv.factory.fiducial.ConfigHammingMarker;
 import boofcv.factory.fiducial.HammingDictionary;
 import boofcv.generate.LengthUnit;
+import boofcv.generate.PaperSize;
 import boofcv.generate.Unit;
 import georegression.struct.point.Point2D_F64;
 import org.kohsuke.args4j.CmdLineException;

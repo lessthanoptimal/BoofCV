@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.app.dots.CreateRandomDotDocumentImage;
 import boofcv.app.dots.CreateRandomDotDocumentPDF;
 import boofcv.app.fiducials.CreateFiducialDocumentImage;
 import boofcv.app.fiducials.CreateFiducialDocumentPDF;
+import boofcv.generate.PaperSize;
 import boofcv.generate.Unit;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.io.fiducial.FiducialIO;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,9 +16,8 @@
  * limitations under the License.
  */
 
-package boofcv.app;
+package boofcv.generate;
 
-import boofcv.generate.Unit;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;

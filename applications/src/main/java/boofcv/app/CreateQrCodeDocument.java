@@ -24,6 +24,7 @@ import boofcv.alg.fiducial.qrcode.QrCodeMaskPattern;
 import boofcv.app.qrcode.CreateQrCodeDocumentImage;
 import boofcv.app.qrcode.CreateQrCodeDocumentPDF;
 import boofcv.app.qrcode.CreateQrCodeGui;
+import boofcv.generate.PaperSize;
 import boofcv.generate.Unit;
 import boofcv.gui.BoofSwingUtil;
 import org.apache.commons.io.FilenameUtils;

@@ -21,7 +21,7 @@ package boofcv.app.micrqr;
 import boofcv.alg.fiducial.microqr.MicroQrCode;
 import boofcv.alg.fiducial.microqr.MicroQrCodeMaskPattern;
 import boofcv.alg.fiducial.qrcode.QrCode;
-import boofcv.app.PaperSize;
+import boofcv.generate.PaperSize;
 import boofcv.generate.Unit;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.StandardAlgConfigPanel;

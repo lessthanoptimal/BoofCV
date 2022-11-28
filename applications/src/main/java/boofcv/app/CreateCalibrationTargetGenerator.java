@@ -18,6 +18,7 @@
 
 package boofcv.app;
 
+import boofcv.generate.PaperSize;
 import boofcv.generate.Unit;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;

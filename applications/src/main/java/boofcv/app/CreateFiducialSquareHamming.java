@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,7 @@ import boofcv.app.fiducials.CreateSquareHammingDocumentImage;
 import boofcv.app.fiducials.CreateSquareHammingDocumentPDF;
 import boofcv.factory.fiducial.ConfigHammingMarker;
 import boofcv.factory.fiducial.HammingDictionary;
+import boofcv.generate.PaperSize;
 import boofcv.generate.Unit;
 import boofcv.gui.BoofSwingUtil;
 import org.ddogleg.struct.DogArray_I32;

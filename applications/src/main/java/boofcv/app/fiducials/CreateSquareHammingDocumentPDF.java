@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,8 @@
 package boofcv.app.fiducials;
 
 import boofcv.alg.fiducial.square.FiducialSquareHammingGenerator;
-import boofcv.app.PaperSize;
 import boofcv.factory.fiducial.ConfigHammingMarker;
+import boofcv.generate.PaperSize;
 import boofcv.generate.Unit;
 import boofcv.pdf.PdfFiducialEngine;
 import org.ddogleg.struct.DogArray_I32;

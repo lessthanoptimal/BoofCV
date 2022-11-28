@@ -19,6 +19,7 @@
 package boofcv.app;
 
 import boofcv.generate.LengthUnit;
+import boofcv.generate.PaperSize;
 import boofcv.generate.Unit;
 import org.kohsuke.args4j.Option;
 

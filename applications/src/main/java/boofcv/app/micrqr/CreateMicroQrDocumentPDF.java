@@ -20,8 +20,8 @@ package boofcv.app.micrqr;
 
 import boofcv.alg.fiducial.microqr.MicroQrCode;
 import boofcv.alg.fiducial.microqr.MicroQrCodeGenerator;
-import boofcv.app.PaperSize;
 import boofcv.app.fiducials.CreateFiducialDocumentPDF;
+import boofcv.generate.PaperSize;
 import boofcv.generate.Unit;
 import boofcv.pdf.PdfFiducialEngine;
 
