@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
-class TestAdaptiveMeanFilter extends BoofStandardJUnit {
+class TestImplGeometricMeanInner extends BoofStandardJUnit {
 	@Test void implement() {
 		fail("Implement");
 	}
