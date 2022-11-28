@@ -39,11 +39,24 @@ import boofcv.struct.image.GrayU8;
  *
  * @author Peter Abeles
  */
-public class ImplGeometricMeanInner {
-	public static void filter( int radiusX, int radiusY, GrayU8 src, double mean, GrayU8 dst ) {
+public class GeometricMeanFilter {
+	/**
+	 * Applies the geometric mean blur operator.
+	 *
+	 * @param src Input image
+	 * @param radiusX Region's radius along x-axis
+	 * @param radiusY Region's radius along y-axis
+	 * @param mean Mean of input image. Used to scale pixel values so that they average 1.0
+	 * @param dst Output image with results
+	 */
+	public static void filter( GrayU8 src, int radiusX, int radiusY, double mean, GrayU8 dst ) {
+		dst.reshape(src.width, src.height);
+
+		// Width and height of kernel
 		int kx = radiusX*2 + 1;
 		int ky = radiusY*2 + 1;
 
+		// What power the product is multiplied by
 		double power = 1.0/(kx*ky);
 
 		// apply to the inner image
@@ -59,7 +72,7 @@ public class ImplGeometricMeanInner {
 				}
 			}
 
-			return (int)(mean*Math.pow(product, power));
+			return (int)(mean*Math.pow(product, power) + 0.5);
 		});
 
 		// Apply to image edge with an adaptive region size
@@ -73,7 +86,8 @@ public class ImplGeometricMeanInner {
 				}
 			}
 
-			return (int)(mean*Math.pow(product, 1.0/((x1 - x0)*(y1 - y0))));
+			// + 0.5 so that it rounds to nearest integer
+			return (int)(mean*Math.pow(product, 1.0/((x1 - x0)*(y1 - y0))) + 0.5);
 		});
 	}
 }
