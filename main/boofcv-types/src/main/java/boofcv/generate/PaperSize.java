@@ -18,6 +18,7 @@
 
 package boofcv.generate;
 
+import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -50,10 +51,17 @@ public class PaperSize {
 		this.unit = unit;
 	}
 
-	public String name;
-	public Unit unit;
-	public double width;
-	public double height;
+	/** What the name of this document is */
+	@Getter public String name;
+
+	/** Units the size is specified in */
+	@Getter public Unit unit;
+
+	/** Length of the document along x-axis */
+	@Getter public double width;
+
+	/** Length of the document along y-axis */
+	@Getter public double height;
 
 	public static List<PaperSize> values() {
 		return values;
@@ -71,11 +79,10 @@ public class PaperSize {
 		values.add(LETTER);
 	}
 
-	/**
-	 * Sees if the specified work matches any of the units full name or short name.
-	 */
+	/** Sees if the specified string matches any of the document's name. */
 	public static @Nullable PaperSize lookup( String word ) {
-		for (PaperSize paper : values) {
+		for (int i = 0; i < values.size(); i++) {
+			PaperSize paper = values.get(i);
 			if (paper.name.compareToIgnoreCase(word) == 0) {
 				return paper;
 			}
@@ -84,28 +91,14 @@ public class PaperSize {
 		return null;
 	}
 
+	/** Returns the document's width in the specified units */
 	public double convertWidth( Unit outputUnit ) {
 		return this.unit.convert(width, outputUnit);
 	}
 
+	/** Returns the document's height in the specified units */
 	public double convertHeight( Unit outputUnit ) {
 		return this.unit.convert(height, outputUnit);
-	}
-
-	public Unit getUnit() {
-		return unit;
-	}
-
-	public double getWidth() {
-		return width;
-	}
-
-	public double getHeight() {
-		return height;
-	}
-
-	public String getName() {
-		return name;
 	}
 
 	@Override
