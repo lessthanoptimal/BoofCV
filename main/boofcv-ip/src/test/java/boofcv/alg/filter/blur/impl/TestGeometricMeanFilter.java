@@ -27,6 +27,7 @@ import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 class TestGeometricMeanFilter extends BoofStandardJUnit {
 	int width = 30;
@@ -71,5 +72,9 @@ class TestGeometricMeanFilter extends BoofStandardJUnit {
 
 		double rootOf = (y1 - y0)*(x1 - x0);
 		return Math.pow(product, 1.0/rootOf);
+	}
+
+	@Test void implementAllTypes() {
+		fail("Umplement");
 	}
 }

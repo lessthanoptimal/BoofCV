@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.blur.impl.*;
 import boofcv.alg.filter.convolve.ConvolveImageMean;
 import boofcv.alg.filter.convolve.ConvolveImageNormalized;
+import boofcv.alg.misc.ImageStatistics;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
@@ -62,8 +63,8 @@ public class BlurImageOps {
 	 * @param storage (Optional) Storage for intermediate results. Same size as input image. Can be null.
 	 * @return Output blurred image.
 	 */
-	public static GrayU8 mean(GrayU8 input, @Nullable GrayU8 output, int radius,
-							  @Nullable GrayU8 storage, @Nullable GrowArray<DogArray_I32> workVert ) {
+	public static GrayU8 mean( GrayU8 input, @Nullable GrayU8 output, int radius,
+							   @Nullable GrayU8 storage, @Nullable GrowArray<DogArray_I32> workVert ) {
 		return mean(input, output, radius, radius, storage, workVert);
 	}
 
@@ -78,7 +79,7 @@ public class BlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static GrayU8 mean( GrayU8 input, @Nullable GrayU8 output, int radiusX, int radiusY,
-							  @Nullable GrayU8 storage, @Nullable GrowArray<DogArray_I32> workVert ) {
+							   @Nullable GrayU8 storage, @Nullable GrowArray<DogArray_I32> workVert ) {
 		if (radiusX <= 0 || radiusY <= 0)
 			throw new IllegalArgumentException("Radius must be > 0");
 
@@ -107,8 +108,8 @@ public class BlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static GrayU8 meanB( GrayU8 input, @Nullable GrayU8 output, int radiusX, int radiusY,
-							  @Nullable ImageBorder_S32<GrayU8> binput,
-							  @Nullable GrayU8 storage, @Nullable GrowArray<DogArray_I32> workVert ) {
+								@Nullable ImageBorder_S32<GrayU8> binput,
+								@Nullable GrayU8 storage, @Nullable GrowArray<DogArray_I32> workVert ) {
 		if (radiusX <= 0 || radiusY <= 0)
 			throw new IllegalArgumentException("Radius must be > 0");
 
@@ -137,8 +138,8 @@ public class BlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static GrayU8 gaussian( GrayU8 input, @Nullable GrayU8 output, double sigma, int radius,
-								  @Nullable GrayU8 storage ) {
-		return gaussian(input,output,sigma,radius,sigma,radius,storage);
+								   @Nullable GrayU8 storage ) {
+		return gaussian(input, output, sigma, radius, sigma, radius, storage);
 	}
 
 	/**
@@ -153,18 +154,18 @@ public class BlurImageOps {
 	 * @param storage (Optional) Storage for intermediate results. Same size as input image. Can be null.
 	 * @return Output blurred image.
 	 */
-	public static GrayU8 gaussian( GrayU8 input, @Nullable GrayU8 output, 
-								  double sigmaX, int radiusX, double sigmaY, int radiusY,
-								  @Nullable GrayU8 storage ) {
+	public static GrayU8 gaussian( GrayU8 input, @Nullable GrayU8 output,
+								   double sigmaX, int radiusX, double sigmaY, int radiusY,
+								   @Nullable GrayU8 storage ) {
 		output = InputSanityCheck.declareOrReshape(input, output);
 		storage = InputSanityCheck.declareOrReshape(input, storage);
 
-		boolean processed = BOverrideBlurImageOps.invokeNativeGaussian(input, output, sigmaX,radiusX,sigmaY,radiusY, storage);
+		boolean processed = BOverrideBlurImageOps.invokeNativeGaussian(input, output, sigmaX, radiusX, sigmaY, radiusY, storage);
 
 		if (!processed) {
 			Kernel1D_S32 kernelX = FactoryKernelGaussian.gaussian(Kernel1D_S32.class, sigmaX, radiusX);
-			Kernel1D_S32 kernelY = sigmaX==sigmaY&&radiusX==radiusY ? 
-					kernelX:
+			Kernel1D_S32 kernelY = sigmaX == sigmaY && radiusX == radiusY ?
+					kernelX :
 					FactoryKernelGaussian.gaussian(Kernel1D_S32.class, sigmaY, radiusY);
 
 			ConvolveImageNormalized.horizontal(kernelX, input, storage);
@@ -185,8 +186,8 @@ public class BlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static InterleavedU8 gaussian( InterleavedU8 input, @Nullable InterleavedU8 output, double sigma, int radius,
-								  @Nullable InterleavedU8 storage ) {
-		return gaussian(input,output,sigma,radius,sigma,radius,storage);
+										  @Nullable InterleavedU8 storage ) {
+		return gaussian(input, output, sigma, radius, sigma, radius, storage);
 	}
 
 	/**
@@ -201,18 +202,18 @@ public class BlurImageOps {
 	 * @param storage (Optional) Storage for intermediate results. Same size as input image. Can be null.
 	 * @return Output blurred image.
 	 */
-	public static InterleavedU8 gaussian( InterleavedU8 input, @Nullable InterleavedU8 output, 
-								  double sigmaX, int radiusX, double sigmaY, int radiusY,
-								  @Nullable InterleavedU8 storage ) {
+	public static InterleavedU8 gaussian( InterleavedU8 input, @Nullable InterleavedU8 output,
+										  double sigmaX, int radiusX, double sigmaY, int radiusY,
+										  @Nullable InterleavedU8 storage ) {
 		output = InputSanityCheck.declareOrReshape(input, output);
 		storage = InputSanityCheck.declareOrReshape(input, storage);
 
-		boolean processed = BOverrideBlurImageOps.invokeNativeGaussian(input, output, sigmaX,radiusX,sigmaY,radiusY, storage);
+		boolean processed = BOverrideBlurImageOps.invokeNativeGaussian(input, output, sigmaX, radiusX, sigmaY, radiusY, storage);
 
 		if (!processed) {
 			Kernel1D_S32 kernelX = FactoryKernelGaussian.gaussian(Kernel1D_S32.class, sigmaX, radiusX);
-			Kernel1D_S32 kernelY = sigmaX==sigmaY&&radiusX==radiusY ? 
-					kernelX:
+			Kernel1D_S32 kernelY = sigmaX == sigmaY && radiusX == radiusY ?
+					kernelX :
 					FactoryKernelGaussian.gaussian(Kernel1D_S32.class, sigmaY, radiusY);
 
 			ConvolveImageNormalized.horizontal(kernelX, input, storage);
@@ -231,8 +232,8 @@ public class BlurImageOps {
 	 * @param storage (Optional) Storage for intermediate results. Same size as input image. Can be null.
 	 * @return Output blurred image.
 	 */
-	public static GrayU16 mean(GrayU16 input, @Nullable GrayU16 output, int radius,
-							  @Nullable GrayU16 storage, @Nullable GrowArray<DogArray_I32> workVert ) {
+	public static GrayU16 mean( GrayU16 input, @Nullable GrayU16 output, int radius,
+								@Nullable GrayU16 storage, @Nullable GrowArray<DogArray_I32> workVert ) {
 		return mean(input, output, radius, radius, storage, workVert);
 	}
 
@@ -247,7 +248,7 @@ public class BlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static GrayU16 mean( GrayU16 input, @Nullable GrayU16 output, int radiusX, int radiusY,
-							  @Nullable GrayU16 storage, @Nullable GrowArray<DogArray_I32> workVert ) {
+								@Nullable GrayU16 storage, @Nullable GrowArray<DogArray_I32> workVert ) {
 		if (radiusX <= 0 || radiusY <= 0)
 			throw new IllegalArgumentException("Radius must be > 0");
 
@@ -276,8 +277,8 @@ public class BlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static GrayU16 meanB( GrayU16 input, @Nullable GrayU16 output, int radiusX, int radiusY,
-							  @Nullable ImageBorder_S32<GrayU16> binput,
-							  @Nullable GrayU16 storage, @Nullable GrowArray<DogArray_I32> workVert ) {
+								 @Nullable ImageBorder_S32<GrayU16> binput,
+								 @Nullable GrayU16 storage, @Nullable GrowArray<DogArray_I32> workVert ) {
 		if (radiusX <= 0 || radiusY <= 0)
 			throw new IllegalArgumentException("Radius must be > 0");
 
@@ -306,8 +307,8 @@ public class BlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static GrayU16 gaussian( GrayU16 input, @Nullable GrayU16 output, double sigma, int radius,
-								  @Nullable GrayU16 storage ) {
-		return gaussian(input,output,sigma,radius,sigma,radius,storage);
+									@Nullable GrayU16 storage ) {
+		return gaussian(input, output, sigma, radius, sigma, radius, storage);
 	}
 
 	/**
@@ -322,18 +323,18 @@ public class BlurImageOps {
 	 * @param storage (Optional) Storage for intermediate results. Same size as input image. Can be null.
 	 * @return Output blurred image.
 	 */
-	public static GrayU16 gaussian( GrayU16 input, @Nullable GrayU16 output, 
-								  double sigmaX, int radiusX, double sigmaY, int radiusY,
-								  @Nullable GrayU16 storage ) {
+	public static GrayU16 gaussian( GrayU16 input, @Nullable GrayU16 output,
+									double sigmaX, int radiusX, double sigmaY, int radiusY,
+									@Nullable GrayU16 storage ) {
 		output = InputSanityCheck.declareOrReshape(input, output);
 		storage = InputSanityCheck.declareOrReshape(input, storage);
 
-		boolean processed = BOverrideBlurImageOps.invokeNativeGaussian(input, output, sigmaX,radiusX,sigmaY,radiusY, storage);
+		boolean processed = BOverrideBlurImageOps.invokeNativeGaussian(input, output, sigmaX, radiusX, sigmaY, radiusY, storage);
 
 		if (!processed) {
 			Kernel1D_S32 kernelX = FactoryKernelGaussian.gaussian(Kernel1D_S32.class, sigmaX, radiusX);
-			Kernel1D_S32 kernelY = sigmaX==sigmaY&&radiusX==radiusY ? 
-					kernelX:
+			Kernel1D_S32 kernelY = sigmaX == sigmaY && radiusX == radiusY ?
+					kernelX :
 					FactoryKernelGaussian.gaussian(Kernel1D_S32.class, sigmaY, radiusY);
 
 			ConvolveImageNormalized.horizontal(kernelX, input, storage);
@@ -354,8 +355,8 @@ public class BlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static InterleavedU16 gaussian( InterleavedU16 input, @Nullable InterleavedU16 output, double sigma, int radius,
-								  @Nullable InterleavedU16 storage ) {
-		return gaussian(input,output,sigma,radius,sigma,radius,storage);
+										   @Nullable InterleavedU16 storage ) {
+		return gaussian(input, output, sigma, radius, sigma, radius, storage);
 	}
 
 	/**
@@ -370,18 +371,18 @@ public class BlurImageOps {
 	 * @param storage (Optional) Storage for intermediate results. Same size as input image. Can be null.
 	 * @return Output blurred image.
 	 */
-	public static InterleavedU16 gaussian( InterleavedU16 input, @Nullable InterleavedU16 output, 
-								  double sigmaX, int radiusX, double sigmaY, int radiusY,
-								  @Nullable InterleavedU16 storage ) {
+	public static InterleavedU16 gaussian( InterleavedU16 input, @Nullable InterleavedU16 output,
+										   double sigmaX, int radiusX, double sigmaY, int radiusY,
+										   @Nullable InterleavedU16 storage ) {
 		output = InputSanityCheck.declareOrReshape(input, output);
 		storage = InputSanityCheck.declareOrReshape(input, storage);
 
-		boolean processed = BOverrideBlurImageOps.invokeNativeGaussian(input, output, sigmaX,radiusX,sigmaY,radiusY, storage);
+		boolean processed = BOverrideBlurImageOps.invokeNativeGaussian(input, output, sigmaX, radiusX, sigmaY, radiusY, storage);
 
 		if (!processed) {
 			Kernel1D_S32 kernelX = FactoryKernelGaussian.gaussian(Kernel1D_S32.class, sigmaX, radiusX);
-			Kernel1D_S32 kernelY = sigmaX==sigmaY&&radiusX==radiusY ? 
-					kernelX:
+			Kernel1D_S32 kernelY = sigmaX == sigmaY && radiusX == radiusY ?
+					kernelX :
 					FactoryKernelGaussian.gaussian(Kernel1D_S32.class, sigmaY, radiusY);
 
 			ConvolveImageNormalized.horizontal(kernelX, input, storage);
@@ -400,8 +401,8 @@ public class BlurImageOps {
 	 * @param storage (Optional) Storage for intermediate results. Same size as input image. Can be null.
 	 * @return Output blurred image.
 	 */
-	public static GrayF32 mean(GrayF32 input, @Nullable GrayF32 output, int radius,
-							  @Nullable GrayF32 storage, @Nullable GrowArray<DogArray_F32> workVert ) {
+	public static GrayF32 mean( GrayF32 input, @Nullable GrayF32 output, int radius,
+								@Nullable GrayF32 storage, @Nullable GrowArray<DogArray_F32> workVert ) {
 		return mean(input, output, radius, radius, storage, workVert);
 	}
 
@@ -416,7 +417,7 @@ public class BlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static GrayF32 mean( GrayF32 input, @Nullable GrayF32 output, int radiusX, int radiusY,
-							  @Nullable GrayF32 storage, @Nullable GrowArray<DogArray_F32> workVert ) {
+								@Nullable GrayF32 storage, @Nullable GrowArray<DogArray_F32> workVert ) {
 		if (radiusX <= 0 || radiusY <= 0)
 			throw new IllegalArgumentException("Radius must be > 0");
 
@@ -445,8 +446,8 @@ public class BlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static GrayF32 meanB( GrayF32 input, @Nullable GrayF32 output, int radiusX, int radiusY,
-							  @Nullable ImageBorder_F32 binput,
-							  @Nullable GrayF32 storage, @Nullable GrowArray<DogArray_F32> workVert ) {
+								 @Nullable ImageBorder_F32 binput,
+								 @Nullable GrayF32 storage, @Nullable GrowArray<DogArray_F32> workVert ) {
 		if (radiusX <= 0 || radiusY <= 0)
 			throw new IllegalArgumentException("Radius must be > 0");
 
@@ -475,8 +476,8 @@ public class BlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static GrayF32 gaussian( GrayF32 input, @Nullable GrayF32 output, double sigma, int radius,
-								  @Nullable GrayF32 storage ) {
-		return gaussian(input,output,sigma,radius,sigma,radius,storage);
+									@Nullable GrayF32 storage ) {
+		return gaussian(input, output, sigma, radius, sigma, radius, storage);
 	}
 
 	/**
@@ -491,18 +492,18 @@ public class BlurImageOps {
 	 * @param storage (Optional) Storage for intermediate results. Same size as input image. Can be null.
 	 * @return Output blurred image.
 	 */
-	public static GrayF32 gaussian( GrayF32 input, @Nullable GrayF32 output, 
-								  double sigmaX, int radiusX, double sigmaY, int radiusY,
-								  @Nullable GrayF32 storage ) {
+	public static GrayF32 gaussian( GrayF32 input, @Nullable GrayF32 output,
+									double sigmaX, int radiusX, double sigmaY, int radiusY,
+									@Nullable GrayF32 storage ) {
 		output = InputSanityCheck.declareOrReshape(input, output);
 		storage = InputSanityCheck.declareOrReshape(input, storage);
 
-		boolean processed = BOverrideBlurImageOps.invokeNativeGaussian(input, output, sigmaX,radiusX,sigmaY,radiusY, storage);
+		boolean processed = BOverrideBlurImageOps.invokeNativeGaussian(input, output, sigmaX, radiusX, sigmaY, radiusY, storage);
 
 		if (!processed) {
 			Kernel1D_F32 kernelX = FactoryKernelGaussian.gaussian(Kernel1D_F32.class, sigmaX, radiusX);
-			Kernel1D_F32 kernelY = sigmaX==sigmaY&&radiusX==radiusY ? 
-					kernelX:
+			Kernel1D_F32 kernelY = sigmaX == sigmaY && radiusX == radiusY ?
+					kernelX :
 					FactoryKernelGaussian.gaussian(Kernel1D_F32.class, sigmaY, radiusY);
 
 			ConvolveImageNormalized.horizontal(kernelX, input, storage);
@@ -523,8 +524,8 @@ public class BlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static InterleavedF32 gaussian( InterleavedF32 input, @Nullable InterleavedF32 output, double sigma, int radius,
-								  @Nullable InterleavedF32 storage ) {
-		return gaussian(input,output,sigma,radius,sigma,radius,storage);
+										   @Nullable InterleavedF32 storage ) {
+		return gaussian(input, output, sigma, radius, sigma, radius, storage);
 	}
 
 	/**
@@ -539,18 +540,18 @@ public class BlurImageOps {
 	 * @param storage (Optional) Storage for intermediate results. Same size as input image. Can be null.
 	 * @return Output blurred image.
 	 */
-	public static InterleavedF32 gaussian( InterleavedF32 input, @Nullable InterleavedF32 output, 
-								  double sigmaX, int radiusX, double sigmaY, int radiusY,
-								  @Nullable InterleavedF32 storage ) {
+	public static InterleavedF32 gaussian( InterleavedF32 input, @Nullable InterleavedF32 output,
+										   double sigmaX, int radiusX, double sigmaY, int radiusY,
+										   @Nullable InterleavedF32 storage ) {
 		output = InputSanityCheck.declareOrReshape(input, output);
 		storage = InputSanityCheck.declareOrReshape(input, storage);
 
-		boolean processed = BOverrideBlurImageOps.invokeNativeGaussian(input, output, sigmaX,radiusX,sigmaY,radiusY, storage);
+		boolean processed = BOverrideBlurImageOps.invokeNativeGaussian(input, output, sigmaX, radiusX, sigmaY, radiusY, storage);
 
 		if (!processed) {
 			Kernel1D_F32 kernelX = FactoryKernelGaussian.gaussian(Kernel1D_F32.class, sigmaX, radiusX);
-			Kernel1D_F32 kernelY = sigmaX==sigmaY&&radiusX==radiusY ? 
-					kernelX:
+			Kernel1D_F32 kernelY = sigmaX == sigmaY && radiusX == radiusY ?
+					kernelX :
 					FactoryKernelGaussian.gaussian(Kernel1D_F32.class, sigmaY, radiusY);
 
 			ConvolveImageNormalized.horizontal(kernelX, input, storage);
@@ -569,8 +570,8 @@ public class BlurImageOps {
 	 * @param storage (Optional) Storage for intermediate results. Same size as input image. Can be null.
 	 * @return Output blurred image.
 	 */
-	public static GrayF64 mean(GrayF64 input, @Nullable GrayF64 output, int radius,
-							  @Nullable GrayF64 storage, @Nullable GrowArray<DogArray_F64> workVert ) {
+	public static GrayF64 mean( GrayF64 input, @Nullable GrayF64 output, int radius,
+								@Nullable GrayF64 storage, @Nullable GrowArray<DogArray_F64> workVert ) {
 		return mean(input, output, radius, radius, storage, workVert);
 	}
 
@@ -585,7 +586,7 @@ public class BlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static GrayF64 mean( GrayF64 input, @Nullable GrayF64 output, int radiusX, int radiusY,
-							  @Nullable GrayF64 storage, @Nullable GrowArray<DogArray_F64> workVert ) {
+								@Nullable GrayF64 storage, @Nullable GrowArray<DogArray_F64> workVert ) {
 		if (radiusX <= 0 || radiusY <= 0)
 			throw new IllegalArgumentException("Radius must be > 0");
 
@@ -614,8 +615,8 @@ public class BlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static GrayF64 meanB( GrayF64 input, @Nullable GrayF64 output, int radiusX, int radiusY,
-							  @Nullable ImageBorder_F64 binput,
-							  @Nullable GrayF64 storage, @Nullable GrowArray<DogArray_F64> workVert ) {
+								 @Nullable ImageBorder_F64 binput,
+								 @Nullable GrayF64 storage, @Nullable GrowArray<DogArray_F64> workVert ) {
 		if (radiusX <= 0 || radiusY <= 0)
 			throw new IllegalArgumentException("Radius must be > 0");
 
@@ -644,8 +645,8 @@ public class BlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static GrayF64 gaussian( GrayF64 input, @Nullable GrayF64 output, double sigma, int radius,
-								  @Nullable GrayF64 storage ) {
-		return gaussian(input,output,sigma,radius,sigma,radius,storage);
+									@Nullable GrayF64 storage ) {
+		return gaussian(input, output, sigma, radius, sigma, radius, storage);
 	}
 
 	/**
@@ -660,18 +661,18 @@ public class BlurImageOps {
 	 * @param storage (Optional) Storage for intermediate results. Same size as input image. Can be null.
 	 * @return Output blurred image.
 	 */
-	public static GrayF64 gaussian( GrayF64 input, @Nullable GrayF64 output, 
-								  double sigmaX, int radiusX, double sigmaY, int radiusY,
-								  @Nullable GrayF64 storage ) {
+	public static GrayF64 gaussian( GrayF64 input, @Nullable GrayF64 output,
+									double sigmaX, int radiusX, double sigmaY, int radiusY,
+									@Nullable GrayF64 storage ) {
 		output = InputSanityCheck.declareOrReshape(input, output);
 		storage = InputSanityCheck.declareOrReshape(input, storage);
 
-		boolean processed = BOverrideBlurImageOps.invokeNativeGaussian(input, output, sigmaX,radiusX,sigmaY,radiusY, storage);
+		boolean processed = BOverrideBlurImageOps.invokeNativeGaussian(input, output, sigmaX, radiusX, sigmaY, radiusY, storage);
 
 		if (!processed) {
 			Kernel1D_F64 kernelX = FactoryKernelGaussian.gaussian(Kernel1D_F64.class, sigmaX, radiusX);
-			Kernel1D_F64 kernelY = sigmaX==sigmaY&&radiusX==radiusY ? 
-					kernelX:
+			Kernel1D_F64 kernelY = sigmaX == sigmaY && radiusX == radiusY ?
+					kernelX :
 					FactoryKernelGaussian.gaussian(Kernel1D_F64.class, sigmaY, radiusY);
 
 			ConvolveImageNormalized.horizontal(kernelX, input, storage);
@@ -692,8 +693,8 @@ public class BlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static InterleavedF64 gaussian( InterleavedF64 input, @Nullable InterleavedF64 output, double sigma, int radius,
-								  @Nullable InterleavedF64 storage ) {
-		return gaussian(input,output,sigma,radius,sigma,radius,storage);
+										   @Nullable InterleavedF64 storage ) {
+		return gaussian(input, output, sigma, radius, sigma, radius, storage);
 	}
 
 	/**
@@ -708,18 +709,18 @@ public class BlurImageOps {
 	 * @param storage (Optional) Storage for intermediate results. Same size as input image. Can be null.
 	 * @return Output blurred image.
 	 */
-	public static InterleavedF64 gaussian( InterleavedF64 input, @Nullable InterleavedF64 output, 
-								  double sigmaX, int radiusX, double sigmaY, int radiusY,
-								  @Nullable InterleavedF64 storage ) {
+	public static InterleavedF64 gaussian( InterleavedF64 input, @Nullable InterleavedF64 output,
+										   double sigmaX, int radiusX, double sigmaY, int radiusY,
+										   @Nullable InterleavedF64 storage ) {
 		output = InputSanityCheck.declareOrReshape(input, output);
 		storage = InputSanityCheck.declareOrReshape(input, storage);
 
-		boolean processed = BOverrideBlurImageOps.invokeNativeGaussian(input, output, sigmaX,radiusX,sigmaY,radiusY, storage);
+		boolean processed = BOverrideBlurImageOps.invokeNativeGaussian(input, output, sigmaX, radiusX, sigmaY, radiusY, storage);
 
 		if (!processed) {
 			Kernel1D_F64 kernelX = FactoryKernelGaussian.gaussian(Kernel1D_F64.class, sigmaX, radiusX);
-			Kernel1D_F64 kernelY = sigmaX==sigmaY&&radiusX==radiusY ? 
-					kernelX:
+			Kernel1D_F64 kernelY = sigmaX == sigmaY && radiusX == radiusY ?
+					kernelX :
 					FactoryKernelGaussian.gaussian(Kernel1D_F64.class, sigmaY, radiusY);
 
 			ConvolveImageNormalized.horizontal(kernelX, input, storage);
@@ -746,9 +747,9 @@ public class BlurImageOps {
 		if (storage == null)
 			storage = GeneralizedImageOps.createSingleBand(input.getBandType(), input.width, input.height);
 		if (output == null)
-			output = input.createNew(input.width,input.height);
+			output = input.createNew(input.width, input.height);
 
-		for( int band = 0; band < input.getNumBands(); band++ ) {
+		for (int band = 0; band < input.getNumBands(); band++) {
 			GBlurImageOps.gaussian(input.getBand(band), output.getBand(band), sigma, radius, storage);
 		}
 		return output;
@@ -767,14 +768,14 @@ public class BlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static <T extends ImageGray<T>>
-	Planar<T> gaussian(Planar<T> input, @Nullable Planar<T> output, double sigmaX, int radiusX, double sigmaY, int radiusY, @Nullable T storage ) {
+	Planar<T> gaussian( Planar<T> input, @Nullable Planar<T> output, double sigmaX, int radiusX, double sigmaY, int radiusY, @Nullable T storage ) {
 
 		if (storage == null)
 			storage = GeneralizedImageOps.createSingleBand(input.getBandType(), input.width, input.height);
 		if (output == null)
-			output = input.createNew(input.width,input.height);
+			output = input.createNew(input.width, input.height);
 
-		for( int band = 0; band < input.getNumBands(); band++ ) {
+		for (int band = 0; band < input.getNumBands(); band++) {
 			GBlurImageOps.gaussian(input.getBand(band), output.getBand(band), sigmaX, radiusX, sigmaY, radiusY, storage);
 		}
 		return output;
@@ -791,9 +792,9 @@ public class BlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static <T extends ImageGray<T>>
-	Planar<T> mean(Planar<T> input, @Nullable Planar<T> output, int radius ,
-				   @Nullable T storage, @Nullable GrowArray workVert ) {
-		return mean(input,output,radius,radius,storage,workVert);
+	Planar<T> mean( Planar<T> input, @Nullable Planar<T> output, int radius,
+					@Nullable T storage, @Nullable GrowArray workVert ) {
+		return mean(input, output, radius, radius, storage, workVert);
 	}
 
 	/**
@@ -808,13 +809,13 @@ public class BlurImageOps {
 	 */
 	public static <T extends ImageGray<T>>
 	Planar<T> mean( Planar<T> input, @Nullable Planar<T> output, int radiusX, int radiusY,
-				   @Nullable T storage, @Nullable GrowArray workVert ) {
+					@Nullable T storage, @Nullable GrowArray workVert ) {
 		if (storage == null)
 			storage = GeneralizedImageOps.createSingleBand(input.getBandType(), input.width, input.height);
 		if (output == null)
-			output = input.createNew(input.width,input.height);
+			output = input.createNew(input.width, input.height);
 
-		for( int band = 0; band < input.getNumBands(); band++ ) {
+		for (int band = 0; band < input.getNumBands(); band++) {
 			GBlurImageOps.mean(input.getBand(band), output.getBand(band), radiusX, radiusY, storage, workVert);
 		}
 		return output;
@@ -832,13 +833,13 @@ public class BlurImageOps {
 	 */
 	public static <T extends ImageGray<T>>
 	Planar<T> meanB( Planar<T> input, @Nullable Planar<T> output, int radiusX, int radiusY,
-				   @Nullable ImageBorder<T> binput,
-				   @Nullable T storage, @Nullable GrowArray workVert ) {
+					 @Nullable ImageBorder<T> binput,
+					 @Nullable T storage, @Nullable GrowArray workVert ) {
 		if (storage == null)
 			storage = GeneralizedImageOps.createSingleBand(input.getBandType(), input.width, input.height);
 		if (output == null)
-			output = input.createNew(input.width,input.height);
-		for( int band = 0; band < input.getNumBands(); band++ ) {
+			output = input.createNew(input.width, input.height);
+		for (int band = 0; band < input.getNumBands(); band++) {
 			GBlurImageOps.meanB(input.getBand(band), output.getBand(band), radiusX, radiusY, binput, storage, workVert);
 		}
 		return output;
@@ -886,7 +887,7 @@ public class BlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static GrayF32 median( GrayF32 input, @Nullable GrayF32 output, int radiusX, int radiusY,
-								 @Nullable GrowArray<DogArray_F32> work ) {
+								  @Nullable GrowArray<DogArray_F32> work ) {
 		if (radiusX <= 0 || radiusY <= 0)
 			throw new IllegalArgumentException("Radius must be > 0");
 
@@ -927,4 +928,26 @@ public class BlurImageOps {
 		return output;
 	}
 
+	/**
+	 * Applies a geometric mean box filter with re-weighted image borders.
+	 *
+	 * @see GeometricMeanFilter
+	 *
+	 * @param input Input image. Not modified.
+	 * @param output (Optional) Storage for output image, Can be null. Modified.
+	 * @param radiusX Radius of the box blur function along the x-axis
+	 * @param radiusY Radius of the box blur function along the y-axis
+	 * @return Output blurred image.
+	 */
+	public static GrayU8 meanGeometric( GrayU8 input, @Nullable GrayU8 output, int radiusX, int radiusY ) {
+		if (radiusX <= 0 || radiusY <= 0)
+			throw new IllegalArgumentException("Radius must be > 0");
+
+		output = InputSanityCheck.declareOrReshape(input, output);
+
+		double meanValue = ImageStatistics.mean(input);
+		GeometricMeanFilter.filter(input, radiusX, radiusY, meanValue, output);
+
+		return output;
+	}
 }
