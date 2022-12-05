@@ -19,7 +19,12 @@
 package boofcv.alg.filter.blur.impl;
 
 import boofcv.alg.filter.misc.ImageLambdaFilters;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayF64;
+import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.GrayU8;
+
+import javax.annotation.Generated;
 
 /**
  * Implementation of Geometric Mean filter as describes in [1] with modifications to avoid numerical issues.
@@ -37,9 +42,13 @@ import boofcv.struct.image.GrayU8;
  *      <li> Rafael C. Gonzalez and Richard E. Woods, "Digital Image Processing" 4nd Ed. 2018.</li>
  * </ol>
  *
+ * <p>DO NOT MODIFY. Automatically generated code created by GenerateGeometricMeanFilter</p>
+ *
  * @author Peter Abeles
  */
+@Generated("boofcv.alg.filter.blur.impl.GenerateGeometricMeanFilter")
 public class GeometricMeanFilter {
+
 	/**
 	 * Applies the geometric mean blur operator.
 	 *
@@ -88,6 +97,159 @@ public class GeometricMeanFilter {
 
 			// + 0.5 so that it rounds to nearest integer
 			return (int)(mean*Math.pow(product, 1.0/((x1 - x0)*(y1 - y0))) + 0.5);
+		});
+	}
+
+	/**
+	 * Applies the geometric mean blur operator.
+	 *
+	 * @param src Input image
+	 * @param radiusX Region's radius along x-axis
+	 * @param radiusY Region's radius along y-axis
+	 * @param mean Mean of input image. Used to scale pixel values so that they average 1.0
+	 * @param dst Output image with results
+	 */
+	public static void filter( GrayU16 src, int radiusX, int radiusY, double mean, GrayU16 dst ) {
+		dst.reshape(src.width, src.height);
+
+		// Width and height of kernel
+		int kx = radiusX*2 + 1;
+		int ky = radiusY*2 + 1;
+
+		// What power the product is multiplied by
+		double power = 1.0/(kx*ky);
+
+		// apply to the inner image
+		ImageLambdaFilters.filterRectCenterInner(src, radiusX, radiusY, dst, null, ( indexCenter, w ) -> {
+			int indexRow = indexCenter - radiusX - src.stride*radiusY;
+
+			double product = 1.0;
+
+			for (int y = 0; y < ky; y++) {
+				int indexPixel = indexRow + src.stride*y;
+				for (int x = 0; x < kx; x++) {
+					product *= (src.data[indexPixel++] & 0xFFFF)/mean;
+				}
+			}
+
+			return (int)(mean*Math.pow(product, power) + 0.5);
+		});
+
+		// Apply to image edge with an adaptive region size
+		ImageLambdaFilters.filterRectCenterEdge(src, radiusX, radiusY, dst, null, ( cx, cy, x0, y0, x1, y1, w ) -> {
+			double product = 1.0;
+
+			for (int y = y0; y < y1; y++) {
+				int indexPixel = src.startIndex + y*src.stride + x0;
+				for (int x = x0; x < x1; x++) {
+					product *= (src.data[indexPixel++] & 0xFFFF)/mean;
+				}
+			}
+
+			// + 0.5 so that it rounds to nearest integer
+			return (int)(mean*Math.pow(product, 1.0/((x1 - x0)*(y1 - y0))) + 0.5);
+		});
+	}
+
+	/**
+	 * Applies the geometric mean blur operator.
+	 *
+	 * @param src Input image
+	 * @param radiusX Region's radius along x-axis
+	 * @param radiusY Region's radius along y-axis
+	 * @param mean Mean of input image. Used to scale pixel values so that they average 1.0
+	 * @param dst Output image with results
+	 */
+	public static void filter( GrayF32 src, int radiusX, int radiusY, float mean, GrayF32 dst ) {
+		dst.reshape(src.width, src.height);
+
+		// Width and height of kernel
+		int kx = radiusX*2 + 1;
+		int ky = radiusY*2 + 1;
+
+		// What power the product is multiplied by
+		float power = 1.0f/(kx*ky);
+
+		// apply to the inner image
+		ImageLambdaFilters.filterRectCenterInner(src, radiusX, radiusY, dst, null, ( indexCenter, w ) -> {
+			int indexRow = indexCenter - radiusX - src.stride*radiusY;
+
+			float product = 1.0f;
+
+			for (int y = 0; y < ky; y++) {
+				int indexPixel = indexRow + src.stride*y;
+				for (int x = 0; x < kx; x++) {
+					product *= (src.data[indexPixel++])/mean;
+				}
+			}
+
+			return (float)(mean*Math.pow(product, power));
+		});
+
+		// Apply to image edge with an adaptive region size
+		ImageLambdaFilters.filterRectCenterEdge(src, radiusX, radiusY, dst, null, ( cx, cy, x0, y0, x1, y1, w ) -> {
+			float product = 1.0f;
+
+			for (int y = y0; y < y1; y++) {
+				int indexPixel = src.startIndex + y*src.stride + x0;
+				for (int x = x0; x < x1; x++) {
+					product *= (src.data[indexPixel++])/mean;
+				}
+			}
+
+			// + 0.5 so that it rounds to nearest integer
+			return (float)(mean*Math.pow(product, 1.0f/((x1 - x0)*(y1 - y0))));
+		});
+	}
+
+	/**
+	 * Applies the geometric mean blur operator.
+	 *
+	 * @param src Input image
+	 * @param radiusX Region's radius along x-axis
+	 * @param radiusY Region's radius along y-axis
+	 * @param mean Mean of input image. Used to scale pixel values so that they average 1.0
+	 * @param dst Output image with results
+	 */
+	public static void filter( GrayF64 src, int radiusX, int radiusY, double mean, GrayF64 dst ) {
+		dst.reshape(src.width, src.height);
+
+		// Width and height of kernel
+		int kx = radiusX*2 + 1;
+		int ky = radiusY*2 + 1;
+
+		// What power the product is multiplied by
+		double power = 1.0/(kx*ky);
+
+		// apply to the inner image
+		ImageLambdaFilters.filterRectCenterInner(src, radiusX, radiusY, dst, null, ( indexCenter, w ) -> {
+			int indexRow = indexCenter - radiusX - src.stride*radiusY;
+
+			double product = 1.0;
+
+			for (int y = 0; y < ky; y++) {
+				int indexPixel = indexRow + src.stride*y;
+				for (int x = 0; x < kx; x++) {
+					product *= (src.data[indexPixel++])/mean;
+				}
+			}
+
+			return (double)(mean*Math.pow(product, power));
+		});
+
+		// Apply to image edge with an adaptive region size
+		ImageLambdaFilters.filterRectCenterEdge(src, radiusX, radiusY, dst, null, ( cx, cy, x0, y0, x1, y1, w ) -> {
+			double product = 1.0;
+
+			for (int y = y0; y < y1; y++) {
+				int indexPixel = src.startIndex + y*src.stride + x0;
+				for (int x = x0; x < x1; x++) {
+					product *= (src.data[indexPixel++])/mean;
+				}
+			}
+
+			// + 0.5 so that it rounds to nearest integer
+			return (double)(mean*Math.pow(product, 1.0/((x1 - x0)*(y1 - y0))));
 		});
 	}
 }

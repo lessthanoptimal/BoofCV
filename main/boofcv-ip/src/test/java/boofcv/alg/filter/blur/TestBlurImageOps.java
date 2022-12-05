@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,6 +39,8 @@ import pabeles.concurrency.GrowArray;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import static org.junit.jupiter.api.Assertions.fail;
+
 /**
  * @author Peter Abeles
  */
@@ -60,8 +62,7 @@ import java.lang.reflect.Method;
 			ImageType.pl(2, GrayU8.class), ImageType.pl(2, GrayF32.class),
 			ImageType.il(2, InterleavedU8.class), ImageType.il(2, InterleavedF32.class)}; // delete after all support interleaved
 
-	@Test
-	void mean() {
+	@Test void mean() {
 		for (ImageType type : imageTypes) {
 			ImageBase input = type.createImage(width, height);
 			ImageBase found = type.createImage(width, height);
@@ -102,8 +103,7 @@ import java.lang.reflect.Method;
 		}
 	}
 
-	@Test
-	void meanBorder() {
+	@Test void meanBorder() {
 		for (ImageType type : imageTypes) {
 			if (type.getFamily() == ImageType.Family.INTERLEAVED)
 				continue;
@@ -129,11 +129,16 @@ import java.lang.reflect.Method;
 						ImageGray.class : input.getClass();
 				Class work = GeneralizedImageOps.createGrowArray(type).getClass();
 				Class borderType = ImageBorder.class;
-				if( type.getFamily() == ImageType.Family.GRAY ) {
-					switch( type.getDataType() ) {
-						case U8: borderType = ImageBorder_S32.class; break;
-						case F32: borderType = ImageBorder_F32.class; break;
-						default: break;
+				if (type.getFamily() == ImageType.Family.GRAY) {
+					switch (type.getDataType()) {
+						case U8:
+							borderType = ImageBorder_S32.class;
+							break;
+						case F32:
+							borderType = ImageBorder_F32.class;
+							break;
+						default:
+							break;
 					}
 				}
 				try {
@@ -175,8 +180,7 @@ import java.lang.reflect.Method;
 		}
 	}
 
-	@Test
-	void gaussian() {
+	@Test void gaussian() {
 		for (ImageType type : imageTypesGaussian) {
 			ImageBase input = type.createImage(width, height);
 			ImageBase found = type.createImage(width, height);
@@ -207,8 +211,7 @@ import java.lang.reflect.Method;
 		}
 	}
 
-	@Test
-	void median() {
+	@Test void median() {
 		for (ImageType type : imageTypes) {
 			ImageBase input = type.createImage(width, height);
 			ImageBase found = type.createImage(width, height);
@@ -244,5 +247,13 @@ import java.lang.reflect.Method;
 				}
 			}
 		}
+	}
+
+	@Test void meanGeometric() {
+		fail("Implement");
+	}
+
+	@Test void meanAdaptive() {
+		fail("Implement");
 	}
 }
