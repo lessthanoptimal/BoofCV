@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -122,6 +122,61 @@ public class GBlurImageOps {
 					(GrayF64)storage, (GrowArray<DogArray_F64>)workVert);
 		} else if (input instanceof Planar) {
 			return (T)BlurImageOps.meanB((Planar)input, (Planar)output, radiusX, radiusY, (ImageBorder)border, (ImageGray)storage, workVert);
+		} else {
+			throw new IllegalArgumentException("Unsupported image type");
+		}
+	}
+
+	/**
+	 * Applies a geometric mean box filter with re-weighted image borders.
+	 *
+	 * @param input Input image. Not modified.
+	 * @param output (Optional) Storage for output image, Can be null. Modified.
+	 * @param radiusX Radius of the box blur function along the x-axis
+	 * @param radiusY Radius of the box blur function along the y-axis.
+	 * @param <T> Input image type.
+	 * @return Output blurred image.
+	 */
+	public static <T extends ImageBase<T>>
+	T meanGeometric( T input, @Nullable T output, int radiusX, int radiusY ) {
+		if (input instanceof GrayU8) {
+			return (T)BlurImageOps.meanGeometric((GrayU8)input, (GrayU8)output, radiusX, radiusY);
+		} else if (input instanceof GrayU16) {
+			return (T)BlurImageOps.meanGeometric((GrayU16)input, (GrayU16)output, radiusX, radiusY);
+		} else if (input instanceof GrayF32) {
+			return (T)BlurImageOps.meanGeometric((GrayF32)input, (GrayF32)output, radiusX, radiusY);
+		} else if (input instanceof GrayF64) {
+			return (T)BlurImageOps.meanGeometric((GrayF64)input, (GrayF64)output, radiusX, radiusY);
+		} else if (input instanceof Planar) {
+			throw new IllegalArgumentException("Implement planar");
+		} else {
+			throw new IllegalArgumentException("Unsupported image type");
+		}
+	}
+
+	/**
+	 * Adaptive applies mean blur filter while maintaining edge sharpness with re-weighted image borders.
+	 *
+	 * @param input Input image. Not modified.
+	 * @param output (Optional) Storage for output image, Can be null. Modified.
+	 * @param radiusX Radius of the box blur function along the x-axis
+	 * @param radiusY Radius of the box blur function along the y-axis.
+	 * @param noiseVariance Amount of additive pixel noise
+	 * @param <T> Input image type.
+	 * @return Output blurred image.
+	 */
+	public static <T extends ImageBase<T>>
+	T meanAdaptive( T input, @Nullable T output, int radiusX, int radiusY, double noiseVariance  ) {
+		if (input instanceof GrayU8) {
+			return (T)BlurImageOps.meanAdaptive((GrayU8)input, (GrayU8)output, radiusX, radiusY, noiseVariance);
+		} else if (input instanceof GrayU16) {
+			return (T)BlurImageOps.meanAdaptive((GrayU16)input, (GrayU16)output, radiusX, radiusY, noiseVariance);
+		} else if (input instanceof GrayF32) {
+			return (T)BlurImageOps.meanAdaptive((GrayF32)input, (GrayF32)output, radiusX, radiusY, noiseVariance);
+		} else if (input instanceof GrayF64) {
+			return (T)BlurImageOps.meanAdaptive((GrayF64)input, (GrayF64)output, radiusX, radiusY, noiseVariance);
+		} else if (input instanceof Planar) {
+			throw new IllegalArgumentException("Implement planar");
 		} else {
 			throw new IllegalArgumentException("Unsupported image type");
 		}
