@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,9 +25,6 @@ import java.io.FileNotFoundException;
 
 import static boofcv.generate.AutoTypeImage.*;
 
-/**
- * @author Peter Abeles
- */
 public class GenerateBlurImageOps  extends CodeGeneratorBase {
 	@Override
 	public void generateCode() throws FileNotFoundException {
@@ -36,14 +33,15 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 		for( AutoTypeImage type : new AutoTypeImage[]{U8,U16,F32,F64}) {
 			generateMeanWeighted(type);
 			generateMeanBorder(type);
+			generateMeanGeometric(type);
+			generateMeanAdaptive(type);
 			generateGaussian(type.getSingleBandName(),type.getKernelType());
 			generateGaussian(type.getInterleavedName(),type.getKernelType());
 		}
 		printPlanar();
 		printMedian();
 
-		out.print("\n" +
-				"}\n");
+		out.print("\n}\n");
 	}
 
 	private void printPreamble() {
@@ -51,7 +49,8 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"import boofcv.alg.filter.blur.impl.*;\n" +
 				"import boofcv.alg.filter.convolve.ConvolveImageMean;\n" +
 				"import boofcv.alg.filter.convolve.ConvolveImageNormalized;\n" +
-				"import boofcv.concurrency.*;\n" +
+				"import boofcv.alg.misc.ImageStatistics;\n" +
+				"import boofcv.concurrency.BoofConcurrency;\n" +
 				"import boofcv.core.image.GeneralizedImageOps;\n" +
 				"import boofcv.factory.filter.kernel.FactoryKernelGaussian;\n" +
 				"import boofcv.misc.BoofMiscOps;\n" +
@@ -67,6 +66,7 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"import org.ddogleg.struct.DogArray_F64;\n" +
 				"import org.ddogleg.struct.DogArray_I32;\n" +
 				"import org.jetbrains.annotations.Nullable;\n" +
+				"import pabeles.concurrency.GrowArray;\n" +
 				"\n" +
 				"import javax.annotation.Generated;\n" +
 				"\n" +
@@ -110,8 +110,8 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"\t\tif (radiusX <= 0 || radiusY <= 0)\n" +
 				"\t\t\tthrow new IllegalArgumentException(\"Radius must be > 0\");\n" +
 				"\n" +
-				"\t\toutput = InputSanityCheck.checkDeclare(input, output);\n" +
-				"\t\tstorage = InputSanityCheck.checkDeclare(input, storage);\n" +
+				"\t\toutput = InputSanityCheck.declareOrReshape(input, output);\n" +
+				"\t\tstorage = InputSanityCheck.declareOrReshape(input, storage);\n" +
 				"\n" +
 				"\t\tboolean processed = BOverrideBlurImageOps.invokeNativeMeanWeighted(input, output, radiusX, radiusY, storage);\n" +
 				"\n" +
@@ -147,8 +147,8 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"\t\tif (radiusX <= 0 || radiusY <= 0)\n" +
 				"\t\t\tthrow new IllegalArgumentException(\"Radius must be > 0\");\n" +
 				"\n" +
-				"\t\toutput = InputSanityCheck.checkDeclare(input, output);\n" +
-				"\t\tstorage = InputSanityCheck.checkDeclare(input, storage);\n" +
+				"\t\toutput = InputSanityCheck.declareOrReshape(input, output);\n" +
+				"\t\tstorage = InputSanityCheck.declareOrReshape(input, storage);\n" +
 				"\n" +
 				"\t\tboolean processed = BOverrideBlurImageOps.invokeNativeMeanBorder(input, output, radiusX, radiusY, binput, storage);\n" +
 				"\n" +
@@ -157,6 +157,62 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"\n" +
 				"\t\tConvolveImageMean.horizontal(input, storage, radiusX, radiusX*2 + 1, binput);\n" +
 				"\t\tConvolveImageMean.vertical(storage, output, radiusY, radiusY*2 + 1, binput, workVert);\n" +
+				"\n" +
+				"\t\treturn output;\n" +
+				"\t}\n\n");
+	}
+
+	private void generateMeanGeometric( AutoTypeImage type ) {
+		String imageName = type.getSingleBandName();
+		String meanType = type.getSumType().equals("float") ? "float" : "double";
+		out.print("\t/**\n" +
+				"\t * Applies a geometric mean box filter with re-weighted image borders.\n" +
+				"\t *\n" +
+				"\t * @see GeometricMeanFilter\n" +
+				"\t *\n" +
+				"\t * @param input Input image. Not modified.\n" +
+				"\t * @param output (Optional) Storage for output image, Can be null. Modified.\n" +
+				"\t * @param radiusX Radius of the box blur function along the x-axis\n" +
+				"\t * @param radiusY Radius of the box blur function along the y-axis\n" +
+				"\t * @return Output blurred image.\n" +
+				"\t */\n" +
+				"\tpublic static "+imageName+" meanGeometric( "+imageName+" input, @Nullable "+imageName+" output, int radiusX, int radiusY ) {\n" +
+				"\t\tif (radiusX <= 0 || radiusY <= 0)\n" +
+				"\t\t\tthrow new IllegalArgumentException(\"Radius must be > 0\");\n" +
+				"\n" +
+				"\t\toutput = InputSanityCheck.declareOrReshape(input, output);\n" +
+				"\n" +
+				"\t\t"+meanType+" meanValue = ImageStatistics.mean(input);\n" +
+				"\t\tGeometricMeanFilter.filter(input, radiusX, radiusY, meanValue, output);\n" +
+				"\n" +
+				"\t\treturn output;\n" +
+				"\t}\n\n");
+	}
+
+	private void generateMeanAdaptive( AutoTypeImage type ) {
+		String imageName = type.getSingleBandName();
+
+		out.print("\t/**\n" +
+				"\t * Adaptive applies mean blur filter while maintaining edge sharpness with re-weighted image borders.\n" +
+				"\t *\n" +
+				"\t * @see AdaptiveMeanFilter\n" +
+				"\t *\n" +
+				"\t * @param input Input image. Not modified.\n" +
+				"\t * @param output (Optional) Storage for output image, Can be null. Modified.\n" +
+				"\t * @param radiusX Radius of the box blur function along the x-axis\n" +
+				"\t * @param radiusY Radius of the box blur function along the y-axis\n" +
+				"\t * @param noiseVariance Amount of additive pixel noise\n" +
+				"\t * @return Output blurred image.\n" +
+				"\t */\n" +
+				"\tpublic static "+imageName+" meanAdaptive( "+imageName+" input, @Nullable "+imageName+" output, int radiusX, int radiusY, double noiseVariance ) {\n" +
+				"\t\tif (radiusX <= 0 || radiusY <= 0)\n" +
+				"\t\t\tthrow new IllegalArgumentException(\"Radius must be > 0\");\n" +
+				"\n" +
+				"\t\toutput = InputSanityCheck.declareOrReshape(input, output);\n" +
+				"\n" +
+				"\t\tvar filter = new AdaptiveMeanFilter(radiusX, radiusY);\n" +
+				"\t\tfilter.noiseVariance = noiseVariance;\n" +
+				"\t\tfilter.process(input, output);\n" +
 				"\n" +
 				"\t\treturn output;\n" +
 				"\t}\n\n");
@@ -176,7 +232,7 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"\t */\n" +
 				"\tpublic static "+imageName+" gaussian( "+imageName+" input, @Nullable "+imageName+" output, double sigma, int radius,\n" +
 				"\t\t\t\t\t\t\t\t  @Nullable "+imageName+" storage ) {\n" +
-				"\t\treturn gaussian(input,output,sigma,radius,sigma,radius,storage);\n" +
+				"\t\treturn gaussian(input, output, sigma, radius, sigma, radius, storage);\n" +
 				"\t}\n" +
 				"\n" +
 				"\t/**\n" +
@@ -194,16 +250,15 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"\tpublic static "+imageName+" gaussian( "+imageName+" input, @Nullable "+imageName+" output, \n" +
 				"\t\t\t\t\t\t\t\t  double sigmaX, int radiusX, double sigmaY, int radiusY,\n" +
 				"\t\t\t\t\t\t\t\t  @Nullable "+imageName+" storage ) {\n" +
-				"\t\toutput = InputSanityCheck.checkDeclare(input, output);\n" +
-				"\t\tstorage = InputSanityCheck.checkDeclare(input, storage);\n" +
+				"\t\toutput = InputSanityCheck.declareOrReshape(input, output);\n" +
+				"\t\tstorage = InputSanityCheck.declareOrReshape(input, storage);\n" +
 				"\n" +
-				"\t\tboolean processed = BOverrideBlurImageOps.invokeNativeGaussian(input, output, sigmaX,radiusX,sigmaY,radiusY, storage);\n" +
+				"\t\tboolean processed = BOverrideBlurImageOps.invokeNativeGaussian(input, output, sigmaX, radiusX, sigmaY, radiusY, storage);\n" +
 				"\n" +
 				"\t\tif (!processed) {\n" +
 				"\t\t\t"+kernel+" kernelX = FactoryKernelGaussian.gaussian("+kernel+".class, sigmaX, radiusX);\n" +
-				"\t\t\t"+kernel+" kernelY = sigmaX==sigmaY&&radiusX==radiusY ? \n" +
-				"\t\t\t\t\tkernelX:\n" +
-				"\t\t\t\t\tFactoryKernelGaussian.gaussian("+kernel+".class, sigmaY, radiusY);\n" +
+				"\t\t\t"+kernel+" kernelY = sigmaX == sigmaY && radiusX == radiusY ? \n" +
+				"\t\t\t\t\tkernelX : FactoryKernelGaussian.gaussian("+kernel+".class, sigmaY, radiusY);\n" +
 				"\n" +
 				"\t\t\tConvolveImageNormalized.horizontal(kernelX, input, storage);\n" +
 				"\t\t\tConvolveImageNormalized.vertical(kernelY, storage, output);\n" +
@@ -260,7 +315,7 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"\t\tif (radiusX <= 0 || radiusY <= 0)\n" +
 				"\t\t\tthrow new IllegalArgumentException(\"Radius must be > 0\");\n" +
 				"\n" +
-				"\t\toutput = InputSanityCheck.checkDeclare(input, output);\n" +
+				"\t\toutput = InputSanityCheck.declareOrReshape(input, output);\n" +
 				"\n" +
 				"\t\tboolean processed = BOverrideBlurImageOps.invokeNativeMedian(input, output, radiusX, radiusY);\n" +
 				"\n" +
@@ -316,9 +371,9 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"\t\tif (storage == null)\n" +
 				"\t\t\tstorage = GeneralizedImageOps.createSingleBand(input.getBandType(), input.width, input.height);\n" +
 				"\t\tif (output == null)\n" +
-				"\t\t\toutput = input.createNew(input.width,input.height);\n" +
+				"\t\t\toutput = input.createNew(input.width, input.height);\n" +
 				"\n" +
-				"\t\tfor( int band = 0; band < input.getNumBands(); band++ ) {\n" +
+				"\t\tfor (int band = 0; band < input.getNumBands(); band++) {\n" +
 				"\t\t\tGBlurImageOps.gaussian(input.getBand(band), output.getBand(band), sigma, radius, storage);\n" +
 				"\t\t}\n" +
 				"\t\treturn output;\n" +
@@ -341,9 +396,9 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"\t\tif (storage == null)\n" +
 				"\t\t\tstorage = GeneralizedImageOps.createSingleBand(input.getBandType(), input.width, input.height);\n" +
 				"\t\tif (output == null)\n" +
-				"\t\t\toutput = input.createNew(input.width,input.height);\n" +
+				"\t\t\toutput = input.createNew(input.width, input.height);\n" +
 				"\n" +
-				"\t\tfor( int band = 0; band < input.getNumBands(); band++ ) {\n" +
+				"\t\tfor (int band = 0; band < input.getNumBands(); band++) {\n" +
 				"\t\t\tGBlurImageOps.gaussian(input.getBand(band), output.getBand(band), sigmaX, radiusX, sigmaY, radiusY, storage);\n" +
 				"\t\t}\n" +
 				"\t\treturn output;\n" +
@@ -381,9 +436,9 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"\t\tif (storage == null)\n" +
 				"\t\t\tstorage = GeneralizedImageOps.createSingleBand(input.getBandType(), input.width, input.height);\n" +
 				"\t\tif (output == null)\n" +
-				"\t\t\toutput = input.createNew(input.width,input.height);\n" +
+				"\t\t\toutput = input.createNew(input.width, input.height);\n" +
 				"\n" +
-				"\t\tfor( int band = 0; band < input.getNumBands(); band++ ) {\n" +
+				"\t\tfor (int band = 0; band < input.getNumBands(); band++) {\n" +
 				"\t\t\tGBlurImageOps.mean(input.getBand(band), output.getBand(band), radiusX, radiusY, storage, workVert);\n" +
 				"\t\t}\n" +
 				"\t\treturn output;\n" +
@@ -407,8 +462,8 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"\t\tif (storage == null)\n" +
 				"\t\t\tstorage = GeneralizedImageOps.createSingleBand(input.getBandType(), input.width, input.height);\n" +
 				"\t\tif (output == null)\n" +
-				"\t\t\toutput = input.createNew(input.width,input.height);\n" +
-				"\t\tfor( int band = 0; band < input.getNumBands(); band++ ) {\n" +
+				"\t\t\toutput = input.createNew(input.width, input.height);\n" +
+				"\t\tfor (int band = 0; band < input.getNumBands(); band++) {\n" +
 				"\t\t\tGBlurImageOps.meanB(input.getBand(band), output.getBand(band), radiusX, radiusY, binput, storage, workVert);\n" +
 				"\t\t}\n" +
 				"\t\treturn output;\n" +
