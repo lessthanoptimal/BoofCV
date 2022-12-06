@@ -148,7 +148,7 @@ public class GBlurImageOps {
 		} else if (input instanceof GrayF64) {
 			return (T)BlurImageOps.meanGeometric((GrayF64)input, (GrayF64)output, radiusX, radiusY);
 		} else if (input instanceof Planar) {
-			throw new IllegalArgumentException("Implement planar");
+			return (T)BlurImageOps.meanGeometric((Planar)input, (Planar)output, radiusX, radiusY);
 		} else {
 			throw new IllegalArgumentException("Unsupported image type");
 		}
@@ -166,7 +166,7 @@ public class GBlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static <T extends ImageBase<T>>
-	T meanAdaptive( T input, @Nullable T output, int radiusX, int radiusY, double noiseVariance  ) {
+	T meanAdaptive( T input, @Nullable T output, int radiusX, int radiusY, double noiseVariance ) {
 		if (input instanceof GrayU8) {
 			return (T)BlurImageOps.meanAdaptive((GrayU8)input, (GrayU8)output, radiusX, radiusY, noiseVariance);
 		} else if (input instanceof GrayU16) {
@@ -176,7 +176,7 @@ public class GBlurImageOps {
 		} else if (input instanceof GrayF64) {
 			return (T)BlurImageOps.meanAdaptive((GrayF64)input, (GrayF64)output, radiusX, radiusY, noiseVariance);
 		} else if (input instanceof Planar) {
-			throw new IllegalArgumentException("Implement planar");
+			return (T)BlurImageOps.meanAdaptive((Planar)input, (Planar)output, radiusX, radiusY, noiseVariance);
 		} else {
 			throw new IllegalArgumentException("Unsupported image type");
 		}

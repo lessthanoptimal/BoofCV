@@ -1006,6 +1006,51 @@ public class BlurImageOps {
 	}
 
 	/**
+	 * Applies a geometric mean box filter with re-weighted image borders.
+	 *
+	 * @param input Input image. Not modified.
+	 * @param output (Optional) Storage for output image, Can be null. Modified.
+	 * @param radiusX Radius of the box blur function along the x-axis
+	 * @param radiusY Radius of the box blur function along the y-axis.
+	 * @param <T> Input image type.
+	 * @return Output blurred image.
+	 */
+	public static <T extends ImageGray<T>>
+	Planar<T> meanGeometric( Planar<T> input, @Nullable Planar<T> output, int radiusX, int radiusY ) {
+
+		if (output == null)
+			output = input.createNew(input.width, input.height);
+
+		for (int band = 0; band < input.getNumBands(); band++) {
+			GBlurImageOps.meanGeometric(input.getBand(band), output.getBand(band), radiusX, radiusY);
+		}
+		return output;
+	}
+
+	/**
+	 * Adaptive applies mean blur filter while maintaining edge sharpness with re-weighted image borders.
+	 *
+	 * @param input Input image. Not modified.
+	 * @param output (Optional) Storage for output image, Can be null. Modified.
+	 * @param radiusX Radius of the box blur function along the x-axis
+	 * @param radiusY Radius of the box blur function along the y-axis.
+	 * @param noiseVariance Amount of additive pixel noise
+	 * @param <T> Input image type.
+	 * @return Output blurred image.
+	 */
+	public static <T extends ImageGray<T>>
+	Planar<T> meanAdaptive( Planar<T> input, @Nullable Planar<T> output, int radiusX, int radiusY, double noiseVariance ) {
+
+		if (output == null)
+			output = input.createNew(input.width, input.height);
+
+		for (int band = 0; band < input.getNumBands(); band++) {
+			GBlurImageOps.meanAdaptive(input.getBand(band), output.getBand(band), radiusX, radiusY, noiseVariance);
+		}
+		return output;
+	}
+
+	/**
 	 * Applies a mean box filter with extended borders.
 	 *
 	 * @param input Input image. Not modified.
