@@ -41,6 +41,9 @@ public class GenerateGeometricMeanFilter extends CodeGeneratorBase {
 				"\n" +
 				"import javax.annotation.Generated;\n" +
 				"\n" +
+				"//CONCURRENT_INLINE import boofcv.alg.filter.misc.ImageLambdaFilters_MT;\n" +
+				"//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;\n" +
+				"\n" +
 				"/**\n" +
 				" * Implementation of Geometric Mean filter as describes in [1] with modifications to avoid numerical issues.\n" +
 				" *\n" +
@@ -91,6 +94,7 @@ public class GenerateGeometricMeanFilter extends CodeGeneratorBase {
 				"\t\t" + productType + " power = " + one + "/(kx*ky);\n" +
 				"\n" +
 				"\t\t// apply to the inner image\n" +
+				"\t\t//CONCURRENT_BELOW ImageLambdaFilters_MT.filterRectCenterInner(src, radiusX, radiusY, dst, null, ( indexCenter, w ) -> {\n" +
 				"\t\tImageLambdaFilters.filterRectCenterInner(src, radiusX, radiusY, dst, null, ( indexCenter, w ) -> {\n" +
 				"\t\t\tint indexRow = indexCenter - radiusX - src.stride*radiusY;\n" +
 				"\n" +
@@ -107,6 +111,7 @@ public class GenerateGeometricMeanFilter extends CodeGeneratorBase {
 				"\t\t});\n" +
 				"\n" +
 				"\t\t// Apply to image edge with an adaptive region size\n" +
+				"\t\t//CONCURRENT_BELOW ImageLambdaFilters_MT.filterRectCenterEdge(src, radiusX, radiusY, dst, null, ( cx, cy, x0, y0, x1, y1, w ) -> {\n" +
 				"\t\tImageLambdaFilters.filterRectCenterEdge(src, radiusX, radiusY, dst, null, ( cx, cy, x0, y0, x1, y1, w ) -> {\n" +
 				"\t\t\t" + productType + " product = " + one + ";\n" +
 				"\n" +

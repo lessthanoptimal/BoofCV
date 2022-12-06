@@ -145,7 +145,11 @@ public class BlurImageOps {
 		output = InputSanityCheck.declareOrReshape(input, output);
 
 		double meanValue = ImageStatistics.mean(input);
-		GeometricMeanFilter.filter(input, radiusX, radiusY, meanValue, output);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			GeometricMeanFilter_MT.filter(input, radiusX, radiusY, meanValue, output);
+		} else {
+			GeometricMeanFilter.filter(input, radiusX, radiusY, meanValue, output);
+		}
 
 		return output;
 	}
@@ -360,7 +364,11 @@ public class BlurImageOps {
 		output = InputSanityCheck.declareOrReshape(input, output);
 
 		double meanValue = ImageStatistics.mean(input);
-		GeometricMeanFilter.filter(input, radiusX, radiusY, meanValue, output);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			GeometricMeanFilter_MT.filter(input, radiusX, radiusY, meanValue, output);
+		} else {
+			GeometricMeanFilter.filter(input, radiusX, radiusY, meanValue, output);
+		}
 
 		return output;
 	}
@@ -575,7 +583,11 @@ public class BlurImageOps {
 		output = InputSanityCheck.declareOrReshape(input, output);
 
 		float meanValue = ImageStatistics.mean(input);
-		GeometricMeanFilter.filter(input, radiusX, radiusY, meanValue, output);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			GeometricMeanFilter_MT.filter(input, radiusX, radiusY, meanValue, output);
+		} else {
+			GeometricMeanFilter.filter(input, radiusX, radiusY, meanValue, output);
+		}
 
 		return output;
 	}
@@ -790,7 +802,11 @@ public class BlurImageOps {
 		output = InputSanityCheck.declareOrReshape(input, output);
 
 		double meanValue = ImageStatistics.mean(input);
-		GeometricMeanFilter.filter(input, radiusX, radiusY, meanValue, output);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			GeometricMeanFilter_MT.filter(input, radiusX, radiusY, meanValue, output);
+		} else {
+			GeometricMeanFilter.filter(input, radiusX, radiusY, meanValue, output);
+		}
 
 		return output;
 	}

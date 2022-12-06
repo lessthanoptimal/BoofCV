@@ -23,6 +23,8 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Generated;
 
+//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
+
 /**
  * Image filters which have been abstracted using lambdas. In most situations the 'src' image is assumed to be
  * passed in directory to the lambda, along with any other input parameters. What's given to the lambda
