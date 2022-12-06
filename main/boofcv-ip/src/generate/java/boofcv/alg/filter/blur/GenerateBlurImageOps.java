@@ -444,6 +444,51 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"\t\treturn output;\n" +
 				"\t}\n\n");
 
+		out.print("\t/**\n" +
+				"\t * Applies a geometric mean box filter with re-weighted image borders.\n" +
+				"\t *\n" +
+				"\t * @param input Input image. Not modified.\n" +
+				"\t * @param output (Optional) Storage for output image, Can be null. Modified.\n" +
+				"\t * @param radiusX Radius of the box blur function along the x-axis\n" +
+				"\t * @param radiusY Radius of the box blur function along the y-axis.\n" +
+				"\t * @param <T> Input image type.\n" +
+				"\t * @return Output blurred image.\n" +
+				"\t */\n" +
+				"\tpublic static <T extends ImageGray<T>>\n" +
+				"\tPlanar<T> meanGeometric( Planar<T> input, @Nullable Planar<T> output, int radiusX, int radiusY ) {\n" +
+				"\n" +
+				"\t\tif (output == null)\n" +
+				"\t\t\toutput = input.createNew(input.width, input.height);\n" +
+				"\n" +
+				"\t\tfor (int band = 0; band < input.getNumBands(); band++) {\n" +
+				"\t\t\tGBlurImageOps.meanGeometric(input.getBand(band), output.getBand(band), radiusX, radiusY);\n" +
+				"\t\t}\n" +
+				"\t\treturn output;\n" +
+				"\t}\n\n");
+
+		out.print("\t/**\n" +
+				"\t * Adaptive applies mean blur filter while maintaining edge sharpness with re-weighted image borders.\n" +
+				"\t *\n" +
+				"\t * @param input Input image. Not modified.\n" +
+				"\t * @param output (Optional) Storage for output image, Can be null. Modified.\n" +
+				"\t * @param radiusX Radius of the box blur function along the x-axis\n" +
+				"\t * @param radiusY Radius of the box blur function along the y-axis.\n" +
+				"\t * @param noiseVariance Amount of additive pixel noise\n" +
+				"\t * @param <T> Input image type.\n" +
+				"\t * @return Output blurred image.\n" +
+				"\t */\n" +
+				"\tpublic static <T extends ImageGray<T>>\n" +
+				"\tPlanar<T> meanAdaptive( Planar<T> input, @Nullable Planar<T> output, int radiusX, int radiusY, double noiseVariance ) {\n" +
+				"\n" +
+				"\t\tif (output == null)\n" +
+				"\t\t\toutput = input.createNew(input.width, input.height);\n" +
+				"\n" +
+				"\t\tfor (int band = 0; band < input.getNumBands(); band++) {\n" +
+				"\t\t\tGBlurImageOps.meanAdaptive(input.getBand(band), output.getBand(band), radiusX, radiusY, noiseVariance);\n" +
+				"\t\t}\n" +
+				"\t\treturn output;\n" +
+				"\t}\n\n");
+
 		out.print(
 				"\t/**\n" +
 				"\t * Applies a mean box filter with extended borders.\n" +

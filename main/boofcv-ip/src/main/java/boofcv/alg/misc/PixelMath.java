@@ -42,23 +42,6 @@ public class PixelMath {
 	public static int SMALL_IMAGE = 100*100;
 
 	/**
-	 * Passes in the index for cooresponding pixels in each image across the entire image
-	 *
-	 * @param input The input image. Not modified.
-	 * @param output Where the absolute value image is written to. Modified.
-	 */
-	public static void operatorIndexes( ImageBase<?> input, ImageBase<?> output, ImageIndexes function ) {
-		output.reshape(input.width, input.height);
-
-		int N = input.width*input.height;
-		if (BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
-			ImplPixelMath.operatorIndexes(input, function, output);
-		} else {
-			ImplPixelMath.operatorIndexes(input, function, output);
-		}
-	}
-
-	/**
 	 * Applies the lambda operation to each element in the input image. output[i] = function(input[i])
 	 *
 	 * @param input The input image. Not modified.

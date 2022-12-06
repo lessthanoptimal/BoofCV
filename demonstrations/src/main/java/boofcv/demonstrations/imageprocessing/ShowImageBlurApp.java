@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,10 +31,8 @@ import boofcv.struct.image.*;
 import pabeles.concurrency.GrowArray;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -48,6 +46,7 @@ import java.util.ArrayList;
 public class ShowImageBlurApp<T extends ImageGray<T>> extends DemonstrationBase {
 	int radius = 2;
 	int active = 0;
+	double imageStdev = 20.0;
 
 	ImagePanel gui = new ImagePanel();
 	BlurControls controls = new BlurControls();
@@ -97,19 +96,15 @@ public class ShowImageBlurApp<T extends ImageGray<T>> extends DemonstrationBase 
 		ProgressMonitorThread monitor = new MyMonitor(this, "Please Wait");
 		monitor.start();
 
+		double noiseVariance = imageStdev*imageStdev;
+
 		long time0 = System.nanoTime();
 		switch (active) {
-			case 0:
-				GBlurImageOps.gaussian(image, output, -1, radius, storage);
-				break;
-
-			case 1:
-				GBlurImageOps.mean(image, output, radius, storage, workspaces);
-				break;
-
-			case 2:
-				GBlurImageOps.median(image, output, radius, radius, workspaces);
-				break;
+			case 0 -> GBlurImageOps.gaussian(image, output, -1, radius, storage);
+			case 1 -> GBlurImageOps.mean(image, output, radius, storage, workspaces);
+			case 2 -> GBlurImageOps.median(image, output, radius, radius, workspaces);
+			case 3 -> GBlurImageOps.meanGeometric(image, output, radius, radius);
+			case 4 -> GBlurImageOps.meanAdaptive(image, output, radius, radius, noiseVariance);
 		}
 		long time1 = System.nanoTime();
 
@@ -141,20 +136,21 @@ public class ShowImageBlurApp<T extends ImageGray<T>> extends DemonstrationBase 
 	class BlurControls extends StandardAlgConfigPanel implements ChangeListener, ActionListener {
 		JLabel labelTime = new JLabel();
 		JLabel labelSize = new JLabel();
-		JSpinner spinnerRadius;
-		JComboBox<String> comboAlg;
+		JSpinner spinnerRadius = spinner(radius, 1, 100, 2);
+		JComboBox<String> comboAlg = combo(0, "Gaussian", "Mean", "Median", "Mean Geometric", "Mean Adaptive");
+		JSpinner spinnerStdev = spinner(imageStdev, 0.0, 200.0, 1.0);
 
 		public BlurControls() {
-			spinnerRadius = spinner(radius, 1, 100, 2);
-			comboAlg = combo(0, "Gaussian", "Mean", "Median");
-
 			labelTime.setPreferredSize(new Dimension(70, 26));
 			labelTime.setHorizontalAlignment(SwingConstants.RIGHT);
+
+			spinnerStdev.setEnabled(false);
 
 			addLabeled(labelTime, "Time (ms)");
 			add(labelSize);
 			addAlignLeft(comboAlg);
 			addLabeled(spinnerRadius, "Radius");
+			addLabeled(spinnerStdev, "Pixel Stdev");
 		}
 
 		public void setTime( double milliseconds ) {
@@ -165,19 +161,17 @@ public class ShowImageBlurApp<T extends ImageGray<T>> extends DemonstrationBase 
 			labelSize.setText(width + " x " + height);
 		}
 
-		@Override
-		public void stateChanged( ChangeEvent e ) {
-			if (spinnerRadius == e.getSource()) {
+		@Override public void controlChanged( Object source ) {
+			if (spinnerRadius == source) {
 				radius = ((Number)spinnerRadius.getValue()).intValue();
 				reprocessImageOnly();
-			}
-		}
-
-		@Override
-		public void actionPerformed( ActionEvent e ) {
-			if (comboAlg == e.getSource()) {
+			} else if (spinnerStdev == source) {
+				imageStdev = ((Number)spinnerStdev.getValue()).doubleValue();
+				reprocessImageOnly();
+			} else if (comboAlg == source) {
 				active = comboAlg.getSelectedIndex();
 				reprocessImageOnly();
+				spinnerStdev.setEnabled(active == 4);
 			}
 		}
 	}
@@ -193,8 +187,7 @@ public class ShowImageBlurApp<T extends ImageGray<T>> extends DemonstrationBase 
 		examples.add(new PathLabel("Face Paint", UtilIO.pathExample("standard/kodim15.jpg")));
 
 		SwingUtilities.invokeLater(() -> {
-			ShowImageBlurApp app = new ShowImageBlurApp(examples, GrayU8.class);
-
+			var app = new ShowImageBlurApp(examples, GrayU8.class);
 			app.openExample(examples.get(0));
 			app.display("Blur Image Ops");
 		});
