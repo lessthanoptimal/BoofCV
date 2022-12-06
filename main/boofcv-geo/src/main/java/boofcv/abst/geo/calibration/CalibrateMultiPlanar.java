@@ -201,8 +201,8 @@ public class CalibrateMultiPlanar {
 				SynchronizedCalObs synch = frameObs.get(frameIdx);
 
 				// See if this frame has observations from the target camera
-				for (int camIdx = 0; camIdx < synch.cameras.size; camIdx++) {
-					CalibrationObservationSet os = synch.cameras.get(cameraIdx);
+				for (int frameCamIdx = 0; frameCamIdx < synch.cameras.size; frameCamIdx++) {
+					CalibrationObservationSet os = synch.cameras.get(frameCamIdx);
 					if (os.cameraID != c.index)
 						continue;
 

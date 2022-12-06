@@ -61,7 +61,7 @@ public class CameraCalibrationMulti {
 	@Option(name = "-o", aliases = {"--Output"}, usage = "Directory it saves calibration results to")
 	String outputDirectory = "CalibrationResults";
 
-	@Option(name = "--ShapeSize", usage = "Length of a square's side or diameter of a circle, depending on target type.")
+	@Option(name = "--ShapeSize", usage = "Length of a square's side or diameter of a circle, depending on target type. Do not need to specify units, those are implied.")
 	double shapeSize = -1;
 
 	@Option(name = "--Pattern", usage = "Which calibration pattern it should use. chessboard, echocheck, square_grid, circle_hexagonal, circle_grid, hamming_chessboard, hamming_grid")
@@ -86,7 +86,7 @@ public class CameraCalibrationMulti {
 		}
 
 		if (shapeSize <= 0) {
-			System.err.println("You must specify shapeSize");
+			System.err.println("You must set --ShapeSize");
 			System.exit(1);
 		}
 		configTarget.grid.shapeSize = shapeSize;
@@ -112,9 +112,11 @@ public class CameraCalibrationMulti {
 			configTarget.grid.numCols = Integer.parseInt(words[1]);
 		}
 
-		if (configTarget.grid.numRows <= 0 || configTarget.grid.numCols <= 0) {
-			System.err.println("You must specify the grid's size");
-			System.exit(1);
+		if (configTarget.type != CalibrationPatterns.ECOCHECK) {
+			if (configTarget.grid.numRows <= 0 || configTarget.grid.numCols <= 0) {
+				System.err.println("You must specify the grid's size");
+				System.exit(1);
+			}
 		}
 	}
 
@@ -206,7 +208,9 @@ public class CameraCalibrationMulti {
 		return cameras;
 	}
 
-	private void configureCameraAndSortImages( List<String> cameras, CalibrateMultiPlanar calibrator, Map<String, Set<String>> cameraImageSets, Map<String, ImageDimension> cameraToShape ) {
+	private void configureCameraAndSortImages( List<String> cameras, CalibrateMultiPlanar calibrator,
+											   Map<String, Set<String>> cameraImageSets,
+											   Map<String, ImageDimension> cameraToShape ) {
 		// Go through each camera and set properties and create a set of images
 		for (int cameraID = 0; cameraID < cameras.size(); cameraID++) {
 			String cameraName = cameras.get(cameraID);
@@ -228,8 +232,16 @@ public class CameraCalibrationMulti {
 		}
 	}
 
-	private void createSynchronizedDetections( List<String> cameras, DetectSingleFiducialCalibration detector, CalibrateMultiPlanar calibrator, Map<String, Set<String>> cameraImageSets, Map<String, ImageDimension> cameraToShape, Set<String> allImages ) {
-		for (String imageName : allImages) {
+	private void createSynchronizedDetections( List<String> cameras, DetectSingleFiducialCalibration detector,
+											   CalibrateMultiPlanar calibrator,
+											   Map<String, Set<String>> cameraImageSets,
+											   Map<String, ImageDimension> cameraToShape,
+											   Set<String> allImages ) {
+		// Sort the images to ensure everything is reproducible
+		var allImagesSorted = new ArrayList<>(allImages);
+		Collections.sort(allImagesSorted);
+
+		for (String imageName : allImagesSorted) {
 			// Find all cameras with a synchronized image at this time
 			var camerasWithImage = new DogArray_I32();
 
