@@ -323,11 +323,11 @@ public class DetectECoCheckApp extends DemonstrationBase {
 	class ControlPanel extends DetectBlackShapePanel {
 		JTextArea textArea = new JTextArea();
 
-		JSpinnerNumber gridRows = spinnerWrap(configMarker.markerShapes.get(0).numRows, 3, 500, 1);
-		JSpinnerNumber gridCols = spinnerWrap(configMarker.markerShapes.get(0).numCols, 4, 500, 1);
-		JSpinnerNumber numMarkers = spinnerWrap(configMarker.firstTargetDuplicated, 1, 1000, 1);
-		JSpinnerNumber errorLevel = spinnerWrap(configMarker.errorCorrectionLevel, 0, 9, 1);
-		JSpinnerNumber checksum = spinnerWrap(configMarker.checksumBits, 0, 8, 1);
+		JSpinnerNumber gridRows = spinnerWrap(configMarker.markerShapes.get(0).numRows, 3, 500, 1).tt("rows");
+		JSpinnerNumber gridCols = spinnerWrap(configMarker.markerShapes.get(0).numCols, 4, 500, 1).tt("cols");
+		JSpinnerNumber numMarkers = spinnerWrap(configMarker.firstTargetDuplicated, 1, 1000, 1).tt("Number of unique markers in this set");
+		JSpinnerNumber errorLevel = spinnerWrap(configMarker.errorCorrectionLevel, 0, 9, 1).tt("Error correction level");
+		JSpinnerNumber checksum = spinnerWrap(configMarker.checksumBits, 0, 8, 1).tt("Number of checksum bits");
 
 		int translucent = 0;
 
