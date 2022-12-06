@@ -183,7 +183,11 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"\t\toutput = InputSanityCheck.declareOrReshape(input, output);\n" +
 				"\n" +
 				"\t\t"+meanType+" meanValue = ImageStatistics.mean(input);\n" +
-				"\t\tGeometricMeanFilter.filter(input, radiusX, radiusY, meanValue, output);\n" +
+				"\t\tif (BoofConcurrency.USE_CONCURRENT) {\n" +
+				"\t\t\tGeometricMeanFilter_MT.filter(input, radiusX, radiusY, meanValue, output);\n" +
+				"\t\t} else {\n" +
+				"\t\t\tGeometricMeanFilter.filter(input, radiusX, radiusY, meanValue, output);\n" +
+				"\t\t}\n" +
 				"\n" +
 				"\t\treturn output;\n" +
 				"\t}\n\n");

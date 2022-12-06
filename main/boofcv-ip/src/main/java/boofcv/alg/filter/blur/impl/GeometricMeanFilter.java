@@ -26,6 +26,9 @@ import boofcv.struct.image.GrayU8;
 
 import javax.annotation.Generated;
 
+//CONCURRENT_INLINE import boofcv.alg.filter.misc.ImageLambdaFilters_MT;
+//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
+
 /**
  * Implementation of Geometric Mean filter as describes in [1] with modifications to avoid numerical issues.
  *
@@ -69,6 +72,7 @@ public class GeometricMeanFilter {
 		double power = 1.0/(kx*ky);
 
 		// apply to the inner image
+		//CONCURRENT_BELOW ImageLambdaFilters_MT.filterRectCenterInner(src, radiusX, radiusY, dst, null, ( indexCenter, w ) -> {
 		ImageLambdaFilters.filterRectCenterInner(src, radiusX, radiusY, dst, null, ( indexCenter, w ) -> {
 			int indexRow = indexCenter - radiusX - src.stride*radiusY;
 
@@ -85,6 +89,7 @@ public class GeometricMeanFilter {
 		});
 
 		// Apply to image edge with an adaptive region size
+		//CONCURRENT_BELOW ImageLambdaFilters_MT.filterRectCenterEdge(src, radiusX, radiusY, dst, null, ( cx, cy, x0, y0, x1, y1, w ) -> {
 		ImageLambdaFilters.filterRectCenterEdge(src, radiusX, radiusY, dst, null, ( cx, cy, x0, y0, x1, y1, w ) -> {
 			double product = 1.0;
 
@@ -120,6 +125,7 @@ public class GeometricMeanFilter {
 		double power = 1.0/(kx*ky);
 
 		// apply to the inner image
+		//CONCURRENT_BELOW ImageLambdaFilters_MT.filterRectCenterInner(src, radiusX, radiusY, dst, null, ( indexCenter, w ) -> {
 		ImageLambdaFilters.filterRectCenterInner(src, radiusX, radiusY, dst, null, ( indexCenter, w ) -> {
 			int indexRow = indexCenter - radiusX - src.stride*radiusY;
 
@@ -136,6 +142,7 @@ public class GeometricMeanFilter {
 		});
 
 		// Apply to image edge with an adaptive region size
+		//CONCURRENT_BELOW ImageLambdaFilters_MT.filterRectCenterEdge(src, radiusX, radiusY, dst, null, ( cx, cy, x0, y0, x1, y1, w ) -> {
 		ImageLambdaFilters.filterRectCenterEdge(src, radiusX, radiusY, dst, null, ( cx, cy, x0, y0, x1, y1, w ) -> {
 			double product = 1.0;
 
@@ -171,6 +178,7 @@ public class GeometricMeanFilter {
 		float power = 1.0f/(kx*ky);
 
 		// apply to the inner image
+		//CONCURRENT_BELOW ImageLambdaFilters_MT.filterRectCenterInner(src, radiusX, radiusY, dst, null, ( indexCenter, w ) -> {
 		ImageLambdaFilters.filterRectCenterInner(src, radiusX, radiusY, dst, null, ( indexCenter, w ) -> {
 			int indexRow = indexCenter - radiusX - src.stride*radiusY;
 
@@ -187,6 +195,7 @@ public class GeometricMeanFilter {
 		});
 
 		// Apply to image edge with an adaptive region size
+		//CONCURRENT_BELOW ImageLambdaFilters_MT.filterRectCenterEdge(src, radiusX, radiusY, dst, null, ( cx, cy, x0, y0, x1, y1, w ) -> {
 		ImageLambdaFilters.filterRectCenterEdge(src, radiusX, radiusY, dst, null, ( cx, cy, x0, y0, x1, y1, w ) -> {
 			float product = 1.0f;
 
@@ -222,6 +231,7 @@ public class GeometricMeanFilter {
 		double power = 1.0/(kx*ky);
 
 		// apply to the inner image
+		//CONCURRENT_BELOW ImageLambdaFilters_MT.filterRectCenterInner(src, radiusX, radiusY, dst, null, ( indexCenter, w ) -> {
 		ImageLambdaFilters.filterRectCenterInner(src, radiusX, radiusY, dst, null, ( indexCenter, w ) -> {
 			int indexRow = indexCenter - radiusX - src.stride*radiusY;
 
@@ -238,6 +248,7 @@ public class GeometricMeanFilter {
 		});
 
 		// Apply to image edge with an adaptive region size
+		//CONCURRENT_BELOW ImageLambdaFilters_MT.filterRectCenterEdge(src, radiusX, radiusY, dst, null, ( cx, cy, x0, y0, x1, y1, w ) -> {
 		ImageLambdaFilters.filterRectCenterEdge(src, radiusX, radiusY, dst, null, ( cx, cy, x0, y0, x1, y1, w ) -> {
 			double product = 1.0;
 
@@ -252,4 +263,5 @@ public class GeometricMeanFilter {
 			return (double)(mean*Math.pow(product, 1.0/((x1 - x0)*(y1 - y0))));
 		});
 	}
+
 }
