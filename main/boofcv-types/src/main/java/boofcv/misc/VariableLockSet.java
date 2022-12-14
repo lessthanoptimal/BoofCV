@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -17,8 +17,6 @@
  */
 
 package boofcv.misc;
-
-import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
@@ -53,8 +51,10 @@ public class VariableLockSet {
 	 * Safe but with a timeout for aquiring the lock
 	 */
 	public boolean safe( long timeoutMS, Runnable r ) {
+		boolean wasLocked = false;
 		try {
 			if (lock.tryLock(timeoutMS, TimeUnit.MILLISECONDS)) {
+				wasLocked = true;
 				r.run();
 			} else {
 				return false;
@@ -62,7 +62,8 @@ public class VariableLockSet {
 		} catch (InterruptedException e) {
 			return false;
 		} finally {
-			lock.unlock();
+			if (wasLocked)
+				lock.unlock();
 		}
 		return true;
 	}
@@ -75,54 +76,32 @@ public class VariableLockSet {
 	 * @return Results which indicate of the lock was acquired and the found object
 	 */
 	public <T> SelectResults<T> select( long timeoutMS, SelectObject<T> select ) {
-		var results = new SelectResults<T>();
-		try {
-			results.success = lock.tryLock(timeoutMS, TimeUnit.MILLISECONDS);
-			if (results.success)
-				results.selected = select.select();
-		} catch (InterruptedException e) {
-			results.success = false;
-		} finally {
-			lock.unlock();
-		}
-		return results;
-	}
-
-	public <T> @Nullable T selectNull( SelectObjectNull<T> select ) {
-		lock.lock();
-		try {
-			return select.select();
-		} finally {
-			lock.unlock();
-		}
-	}
-
-	/**
-	 * Selects an object with a timeout for acquiring the lock.
-	 *
-	 * @param timeoutMS How long it will wait to get the lock in milliseconds
-	 * @param select Function used to select object
-	 * @return Results which indicate of the lock was acquired and the found object
-	 */
-	public <T> @Nullable SelectResults<T> selectNull( long timeoutMS, SelectObjectNull<T> select ) {
+		boolean wasLocked = false;
 		var results = new SelectResults<T>();
 		try {
 			results.success = lock.tryLock(timeoutMS, TimeUnit.MILLISECONDS);
 			if (results.success) {
-				T found = select.select();
-				if (found == null)
-					return null;
-				results.selected = found;
+				wasLocked = true;
+				results.selected = select.select();
 			}
 		} catch (InterruptedException e) {
 			results.success = false;
 		} finally {
-			lock.unlock();
+			if (wasLocked)
+				lock.unlock();
 		}
 		return results;
 	}
 
 	public void lock() {lock.lock();}
+
+	public boolean lock( long timeoutMS ) {
+		try {
+			return lock.tryLock(timeoutMS, TimeUnit.MILLISECONDS);
+		} catch (InterruptedException e) {
+			return false;
+		}
+	}
 
 	public void unlock() {lock.unlock();}
 
@@ -133,11 +112,6 @@ public class VariableLockSet {
 		T select();
 	}
 
-	@FunctionalInterface public interface SelectObjectNull<T> {
-		@Nullable T select();
-	}
-
-	@SuppressWarnings("NullAway.Init")
 	public static class SelectResults<T> {
 		/** True if it was able to acquire a lock */
 		public boolean success = false;
