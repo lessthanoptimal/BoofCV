@@ -21,8 +21,7 @@ package boofcv.misc;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestVariableLockSet extends BoofStandardJUnit {
 	@Test void safe_timeout() throws InterruptedException {
@@ -69,6 +68,30 @@ public class TestVariableLockSet extends BoofStandardJUnit {
 		// This will time out because it's already locked
 		alg.lock.lock();
 		new Thread(() -> assertFalse(alg.select(100L, () -> 1.0).success)).start();
+		Thread.sleep(400L);
+		alg.lock.unlock();
+	}
+
+	@Test void selectNull_timeout() throws InterruptedException {
+		var alg = new VariableLockSet();
+
+		// Locked by the same thread. Should run just fine and unlock it
+		assertNotNull(alg.selectNull(100L, () -> 1.0));
+		assertFalse(alg.lock.isLocked());
+
+		// Lock it before. It shouldn't unlock it
+		alg.lock.lock();
+		assertNotNull(alg.selectNull(100L, () -> 1.0));
+		assertTrue(alg.lock.isLocked());
+		alg.lock.unlock();
+
+		// Shouldn't time out since it's not locked
+		new Thread(() -> assertNotNull(alg.selectNull(100L, () -> 1.0))).start();
+		Thread.sleep(400L);
+
+		// This will time out because it's already locked
+		alg.lock.lock();
+		new Thread(() -> assertNull(alg.selectNull(100L, () -> 1.0))).start();
 		Thread.sleep(400L);
 		alg.lock.unlock();
 	}

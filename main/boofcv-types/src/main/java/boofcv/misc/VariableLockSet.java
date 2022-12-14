@@ -18,6 +18,8 @@
 
 package boofcv.misc;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -93,6 +95,38 @@ public class VariableLockSet {
 		return results;
 	}
 
+	public <T> @Nullable T selectNull( SelectObjectNull<T> select ) {
+		lock.lock();
+		try {
+			return select.select();
+		} finally {
+			lock.unlock();
+		}
+	}
+
+	/**
+	 * Selects an object with a timeout for acquiring the lock.
+	 *
+	 * @param timeoutMS How long it will wait to get the lock in milliseconds
+	 * @param select Function used to select object
+	 * @return Results which indicate of the lock was acquired and the found object
+	 */
+	public <T> @Nullable T selectNull( long timeoutMS, SelectObjectNull<T> select ) {
+		boolean wasLocked = false;
+		try {
+			;
+			if (lock.tryLock(timeoutMS, TimeUnit.MILLISECONDS)) {
+				wasLocked = true;
+				return select.select();
+			}
+		} catch (InterruptedException ignored) {
+		} finally {
+			if (wasLocked)
+				lock.unlock();
+		}
+		return null;
+	}
+
 	public void lock() {lock.lock();}
 
 	public boolean lock( long timeoutMS ) {
@@ -112,6 +146,11 @@ public class VariableLockSet {
 		T select();
 	}
 
+	@FunctionalInterface public interface SelectObjectNull<T> {
+		@Nullable T select();
+	}
+
+	@SuppressWarnings("NullAway")
 	public static class SelectResults<T> {
 		/** True if it was able to acquire a lock */
 		public boolean success = false;
