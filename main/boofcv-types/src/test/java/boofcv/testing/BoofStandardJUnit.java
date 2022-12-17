@@ -20,6 +20,7 @@ package boofcv.testing;
 
 import boofcv.BoofTesting;
 import boofcv.struct.Configuration;
+import org.ddogleg.struct.FastAccess;
 import org.ejml.data.DMatrix;
 import org.ejml.data.FMatrix;
 import org.ejml.ops.MatrixFeatures_D;
@@ -136,6 +137,8 @@ public class BoofStandardJUnit {
 						throw new RuntimeException("BUG " + f.getType().getSimpleName());
 					}
 					f.set(config, o);
+				} else if (f.getType().isAssignableFrom(String.class)) {
+					f.set(config, rand.nextInt() + "");
 				} else if (f.getType().isAssignableFrom(List.class)) {
 					// If it's a list, create a "non-default" element for each item in the original
 					List originalList = (List)f.get(config);
@@ -168,7 +171,7 @@ public class BoofStandardJUnit {
 	/**
 	 * Looks for a method names setTo() which takes in a single argument that 'type' can be assigned from
 	 */
-	private static Method findCompatibleSetTo( Class<?> type ) throws NoSuchMethodException{
+	private static Method findCompatibleSetTo( Class<?> type ) throws NoSuchMethodException {
 		Method[] methods = type.getMethods();
 		for (Method m : methods) {
 			if (!m.getName().equals("setTo"))
@@ -257,12 +260,19 @@ public class BoofStandardJUnit {
 		for (Field f : fields) {
 			if (f.getType().isEnum() || f.getType().isPrimitive() || f.get(src) == null)
 				assertEquals(f.get(src), f.get(dst), "Field Name: '" + f.getName() + "' in " + src.getClass().getSimpleName());
-			else if (f.getType() != Object.class && f.getType().isAssignableFrom(List.class)) {
+			else if (f.getType().isAssignableFrom(FastAccess.class)) {
+				FastAccess listSrc = (FastAccess)f.get(src);
+				FastAccess listDst = (FastAccess)f.get(dst);
+				assertEquals(listSrc.size(), listDst.size());
+				for (int i = 0; i < listSrc.size(); i++) {
+					throw new RuntimeException("Implement!");
+				}
+			} else if (f.getType() != Object.class && f.getType().isAssignableFrom(List.class)) {
 				List listSrc = (List)f.get(src);
 				List listDst = (List)f.get(dst);
 				assertEquals(listSrc.size(), listDst.size());
 				for (int i = 0; i < listSrc.size(); i++) {
-					throw new RuntimeException("IMplement!");
+					throw new RuntimeException("Implement!");
 				}
 			} else if (f.getType().isAssignableFrom(String.class)) {
 				assertEquals(f.get(src), f.get(dst), "Field Name: '" + f.getName() + "'");
