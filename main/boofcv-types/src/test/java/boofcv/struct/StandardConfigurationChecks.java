@@ -27,9 +27,6 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * @author Peter Abeles
- */
 public abstract class StandardConfigurationChecks extends BoofStandardJUnit {
 
 	Class<Configuration> type;
@@ -49,13 +46,9 @@ public abstract class StandardConfigurationChecks extends BoofStandardJUnit {
 		return (Configuration)createNotDefault(type, rand);
 	}
 
-	@Test void implementsConfiguration() {
-		assertTrue(Configuration.class.isAssignableFrom(type));
-	}
+	@Test void implementsConfiguration() {assertTrue(Configuration.class.isAssignableFrom(type));}
 
-	@Test void setTo() {
-		checkSetTo(type, true);
-	}
+	@Test void setTo() {checkSetTo(type, true);}
 
 	private static final Set<Class<?>> WRAPPER_TYPES = getWrapperTypes();
 

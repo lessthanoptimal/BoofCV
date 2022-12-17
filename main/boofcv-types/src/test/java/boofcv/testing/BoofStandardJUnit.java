@@ -149,10 +149,10 @@ public class BoofStandardJUnit {
 						originalList.clear();
 						originalList.addAll(outputList);
 					}
-				} else if (Modifier.isFinal(f.getModifiers())) {
+				} else {
 					// if final and it has a setTo(), then create a random instance and call setTo
 					try {
-						Method m = f.getType().getMethod("setTo", f.getType());
+						Method m = findCompatibleSetTo(f.getType());
 						m.invoke(f.get(config), createNotDefault(f.getType(), rand));
 					} catch (NoSuchMethodException | SecurityException | InvocationTargetException |
 							 IllegalArgumentException | IllegalAccessException ignore) {
@@ -163,6 +163,24 @@ public class BoofStandardJUnit {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	/**
+	 * Looks for a method names setTo() which takes in a single argument that 'type' can be assigned from
+	 */
+	private static Method findCompatibleSetTo( Class<?> type ) throws NoSuchMethodException{
+		Method[] methods = type.getMethods();
+		for (Method m : methods) {
+			if (!m.getName().equals("setTo"))
+				continue;
+			Class<?>[] params = m.getParameterTypes();
+			if (params.length != 1)
+				continue;
+
+			if (params[0].isAssignableFrom(type))
+				return m;
+		}
+		throw new NoSuchMethodException();
 	}
 
 	protected Class<?> lookUpClassFromTestName() {
@@ -178,7 +196,7 @@ public class BoofStandardJUnit {
 	protected void checkSetTo( Class<?> type, boolean returnThis ) {
 		Method m;
 		try {
-			m = type.getMethod("setTo", type);
+			m = findCompatibleSetTo(type);
 
 			Object dst = type.getConstructor().newInstance();
 			Object src = createNotDefault(type, rand);
@@ -228,7 +246,7 @@ public class BoofStandardJUnit {
 			checkSameFieldValues(fields, src, dst);
 		} catch (NoSuchMethodException e) {
 			e.printStackTrace();
-			fail("setTo() isn't implemented yet");
+			fail("Could not find setTo() method");
 		} catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
 			e.printStackTrace();
 			fail("BAD");
@@ -263,7 +281,7 @@ public class BoofStandardJUnit {
 					Object fsrc = f.get(src);
 					Object fdst = f.get(dst);
 					try {
-						Method m = fsrc.getClass().getMethod("setTo", fsrc.getClass());
+						Method m = findCompatibleSetTo(fsrc.getClass());
 						checkSameFieldValues(fsrc.getClass().getFields(), fsrc, fdst);
 					} catch (NoSuchMethodException | SecurityException |
 							 IllegalArgumentException | IllegalAccessException ignore) {
@@ -271,6 +289,35 @@ public class BoofStandardJUnit {
 				}
 			}
 			// if they are equal that means it copied the reference
+		}
+	}
+
+	/**
+	 * Checks to see if reset() works by randomly assigning values to an instance, then comparing it to the default
+	 * state.
+	 */
+	public void checkReset( Class<?> type, String resetName ) throws Exception {
+
+		// Use reflections to get the reset function
+		Method m;
+		try {
+			m = type.getMethod(resetName);
+		} catch (NoSuchMethodException e) {
+			// If the method hasn't been implemented don't test it
+			return;
+		}
+		Field[] fields = type.getFields();
+
+		// Do it several times to make dumb luck less likely causing a false pass
+		for (int i = 0; i < 5; i++) {
+			// Apply reset to an instance with random values
+			Object resetA = createNotDefault(type, rand);
+			m.invoke(resetA);
+
+			// This should be the initial state of the object
+			Object initialState = type.getConstructor().newInstance();
+
+			checkSameFieldValues(fields, initialState, resetA);
 		}
 	}
 

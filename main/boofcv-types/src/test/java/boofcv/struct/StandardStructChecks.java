@@ -16,40 +16,26 @@
  * limitations under the License.
  */
 
-package boofcv.struct.geo;
+package boofcv.struct;
 
-import georegression.struct.GeoTuple;
-import lombok.Getter;
-import lombok.Setter;
+import boofcv.testing.BoofStandardJUnit;
+import org.junit.jupiter.api.Test;
 
 /**
- * Base class for all PointIndex implementations.
- *
- * @author Peter Abeles
+ * Checks simple data structures which implement setTo() and reset()
  */
-public abstract class PointIndex<T extends PointIndex<T, P>, P extends GeoTuple<P>> {
-	public @Getter final P p;
-	public @Getter @Setter int index;
+public abstract class StandardStructChecks extends BoofStandardJUnit {
 
-	protected PointIndex( P p ) {
-		this.p = p;
+	Class<?> type;
+	protected String resetName = "reset";
+
+	protected StandardStructChecks( Class<?> type ) {
+		this.type = type;
 	}
 
-	public void setTo( P point, int index ) {
-		this.p.setTo(point);
-		this.index = index;
-	}
+	protected StandardStructChecks() {type = lookUpClassFromTestName();}
 
-	public T setTo( T src ) {
-		this.p.setTo(src.p);
-		this.index = src.index;
-		return (T)this;
-	}
+	@Test void setTo() {checkSetTo(type, true);}
 
-	public void zero() {
-		p.zero();
-		index = 0;
-	}
-
-	public abstract T copy();
+	@Test void reset() throws Exception {checkReset(type, resetName);}
 }

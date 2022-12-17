@@ -18,38 +18,6 @@
 
 package boofcv.struct.geo;
 
-import georegression.struct.GeoTuple;
-import lombok.Getter;
-import lombok.Setter;
+import boofcv.struct.StandardStructChecks;
 
-/**
- * Base class for all PointIndex implementations.
- *
- * @author Peter Abeles
- */
-public abstract class PointIndex<T extends PointIndex<T, P>, P extends GeoTuple<P>> {
-	public @Getter final P p;
-	public @Getter @Setter int index;
-
-	protected PointIndex( P p ) {
-		this.p = p;
-	}
-
-	public void setTo( P point, int index ) {
-		this.p.setTo(point);
-		this.index = index;
-	}
-
-	public T setTo( T src ) {
-		this.p.setTo(src.p);
-		this.index = src.index;
-		return (T)this;
-	}
-
-	public void zero() {
-		p.zero();
-		index = 0;
-	}
-
-	public abstract T copy();
-}
+public class TestPairLineNorm extends StandardStructChecks {{this.resetName = "zero";}}

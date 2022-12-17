@@ -57,6 +57,11 @@ public class Point2D4D {
 		return this;
 	}
 
+	public void zero() {
+		observation.zero();
+		location.zero();
+	}
+
 	public Point2D4D copy() {
 		return new Point2D4D(observation.copy(), location.copy());
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,16 +18,17 @@
 
 package boofcv.struct.geo;
 
-import boofcv.testing.BoofStandardJUnit;
+import boofcv.struct.StandardStructChecks;
 import georegression.struct.point.Point2D_F64;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * @author Peter Abeles
- */
-public class TestAssociatedTriple extends BoofStandardJUnit {
+
+public class TestAssociatedTriple extends StandardStructChecks {
+	{
+		this.resetName = "zero";
+	}
 
 	@Test void constructor_ThreePts() {
 		Point2D_F64 p1 = new Point2D_F64(1,2);

@@ -19,6 +19,8 @@
 package boofcv.struct.geo;
 
 import georegression.struct.point.Vector3D_F64;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * A pair of line observations found in two different images. The line is described by a vector, which is the normal
@@ -31,11 +33,11 @@ public class PairLineNorm {
 	/**
 	 * Location of the feature in the first image
 	 */
-	public Vector3D_F64 l1;
+	@Getter @Setter public Vector3D_F64 l1;
 	/**
 	 * Location of the feature in the second image.
 	 */
-	public Vector3D_F64 l2;
+	@Getter @Setter public Vector3D_F64 l2;
 
 	public PairLineNorm() {
 		l1 = new Vector3D_F64();
@@ -77,6 +79,12 @@ public class PairLineNorm {
 		this.l2.setTo(l2);
 	}
 
+	public PairLineNorm setTo( PairLineNorm src ) {
+		this.l1.setTo(src.l1);
+		this.l2.setTo(src.l2);
+		return this;
+	}
+
 	public void zero() {
 		this.l1.zero();
 		this.l2.zero();
@@ -87,22 +95,6 @@ public class PairLineNorm {
 	 */
 	public void assign( Vector3D_F64 l1, Vector3D_F64 l2 ) {
 		this.l1 = l1;
-		this.l2 = l2;
-	}
-
-	public Vector3D_F64 getL1() {
-		return l1;
-	}
-
-	public void setL1( Vector3D_F64 l1 ) {
-		this.l1 = l1;
-	}
-
-	public Vector3D_F64 getL2() {
-		return l2;
-	}
-
-	public void setL2( Vector3D_F64 l2 ) {
 		this.l2 = l2;
 	}
 }

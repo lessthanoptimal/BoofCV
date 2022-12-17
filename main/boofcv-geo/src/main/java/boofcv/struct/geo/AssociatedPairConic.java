@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -83,17 +83,19 @@ public class AssociatedPairConic {
 		}
 	}
 
-	public void setTo( AssociatedPairConic original ) {
+	public AssociatedPairConic setTo( AssociatedPairConic original ) {
 		this.p1.setTo(original.p1);
 		this.p2.setTo(original.p2);
+		return this;
 	}
 
 	/**
 	 * Assigns this object to be equal to the passed in values.
 	 */
-	public void setTo( ConicGeneral_F64 p1, ConicGeneral_F64 p2 ) {
+	public AssociatedPairConic setTo( ConicGeneral_F64 p1, ConicGeneral_F64 p2 ) {
 		this.p1.setTo(p1);
 		this.p2.setTo(p2);
+		return this;
 	}
 
 	/**
@@ -114,6 +116,11 @@ public class AssociatedPairConic {
 
 	public AssociatedPairConic copy() {
 		return new AssociatedPairConic(p1, p2, true);
+	}
+
+	public void zero() {
+		this.p1.zero();
+		this.p2.zero();
 	}
 
 	@Override

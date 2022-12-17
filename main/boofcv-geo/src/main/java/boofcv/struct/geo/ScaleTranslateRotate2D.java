@@ -51,10 +51,11 @@ public class ScaleTranslateRotate2D {
 		scale = transX = transY = theta = 0;
 	}
 
-	public void setTo( ScaleTranslateRotate2D src ) {
+	public ScaleTranslateRotate2D setTo( ScaleTranslateRotate2D src ) {
 		this.theta = src.theta;
 		this.scale = src.scale;
 		this.transX = src.transX;
 		this.transY = src.transY;
+		return this;
 	}
 }
