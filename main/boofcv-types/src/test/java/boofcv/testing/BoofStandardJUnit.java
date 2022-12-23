@@ -80,6 +80,10 @@ public class BoofStandardJUnit {
 			for (Field f : fields) {
 				if (Modifier.isStatic(f.getModifiers()))
 					continue;
+				// If the field is object, we won't test that as it's undefined
+				if (f.getType() == Object.class)
+					continue;
+
 				if (f.getType().isEnum()) {
 					// Select an e num value which isn't the same as the current value
 					Object[] values = f.getType().getEnumConstants();
@@ -156,7 +160,10 @@ public class BoofStandardJUnit {
 					// if final and it has a setTo(), then create a random instance and call setTo
 					try {
 						Method m = findCompatibleSetTo(f.getType());
-						m.invoke(f.get(config), createNotDefault(f.getType(), rand));
+						// f.getType() could be an abstract class. To avoid that ambiguity we create
+						// an object based on the specific instance's type
+						Object o = f.get(config);
+						m.invoke(o, createNotDefault(o.getClass(), rand));
 					} catch (NoSuchMethodException | SecurityException | InvocationTargetException |
 							 IllegalArgumentException | IllegalAccessException ignore) {
 					}
@@ -238,7 +245,6 @@ public class BoofStandardJUnit {
 				}
 			}
 
-
 			Object ret = m.invoke(dst, src);
 			if (returnThis) {
 				assertSame(dst, ret, "setTo() must return 'this'");
@@ -258,6 +264,10 @@ public class BoofStandardJUnit {
 
 	private void checkSameFieldValues( Field[] fields, Object src, Object dst ) throws IllegalAccessException {
 		for (Field f : fields) {
+			// Object typed fields are not handled due to ambiguity
+			if (f.getType() == Object.class)
+				continue;
+
 			if (f.getType().isEnum() || f.getType().isPrimitive() || f.get(src) == null)
 				assertEquals(f.get(src), f.get(dst), "Field Name: '" + f.getName() + "' in " + src.getClass().getSimpleName());
 			else if (f.getType().isAssignableFrom(FastAccess.class)) {
@@ -267,7 +277,7 @@ public class BoofStandardJUnit {
 				for (int i = 0; i < listSrc.size(); i++) {
 					throw new RuntimeException("Implement!");
 				}
-			} else if (f.getType() != Object.class && f.getType().isAssignableFrom(List.class)) {
+			} else if (f.getType().isAssignableFrom(List.class)) {
 				List listSrc = (List)f.get(src);
 				List listDst = (List)f.get(dst);
 				assertEquals(listSrc.size(), listDst.size());
