@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,4 @@ package boofcv.alg.structure;
 
 import boofcv.struct.StandardConfigurationChecks;
 
-/**
- * @author Peter Abeles
- */
 class TestConfigProjectiveReconstruction extends StandardConfigurationChecks {}

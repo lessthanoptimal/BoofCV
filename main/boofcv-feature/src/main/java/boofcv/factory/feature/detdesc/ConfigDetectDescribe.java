@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -121,6 +121,7 @@ public class ConfigDetectDescribe implements Configuration {
 		this.detectPoint.setTo(src.detectPoint);
 		this.detectFastHessian.setTo(src.detectFastHessian);
 		this.detectSift.setTo(src.detectSift);
+		this.orientation.setTo(src.orientation);
 		this.convertDescriptor.setTo(src.convertDescriptor);
 		return this;
 	}

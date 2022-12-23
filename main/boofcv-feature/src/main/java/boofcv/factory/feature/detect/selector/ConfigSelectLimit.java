@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -66,7 +66,7 @@ public class ConfigSelectLimit implements Configuration {
 	public ConfigSelectLimit setTo( ConfigSelectLimit src ) {
 		this.type = src.type;
 		this.randomSeed = src.randomSeed;
-		this.uniform.setTo(uniform);
+		this.uniform.setTo(src.uniform);
 		return this;
 	}
 

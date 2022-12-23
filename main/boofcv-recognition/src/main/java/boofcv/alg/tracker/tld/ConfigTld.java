@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -163,6 +163,7 @@ public class ConfigTld implements Configuration {
 		this.fernSize = src.fernSize;
 		this.confidenceAccept = src.confidenceAccept;
 		this.scaleSpread = src.scaleSpread;
+		this.trackerConfig.setTo(src.trackerConfig);
 		return this;
 	}
 

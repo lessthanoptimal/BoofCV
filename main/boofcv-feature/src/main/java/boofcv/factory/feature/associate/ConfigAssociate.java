@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,11 +36,11 @@ public class ConfigAssociate implements Configuration {
 	public ConfigAssociateNearestNeighbor nearestNeighbor = new ConfigAssociateNearestNeighbor();
 
 	/**
-	 * Specifies the maximum distance allowed between associated pixels. This is only used when creating
-	 * an association algorithm that supports 2D information.
+	 * <p>Specifies the maximum distance allowed between associated pixels. This is only used when creating
+	 * an association algorithm that supports 2D information.</p>
 	 *
-	 * If an absolute value is specified then it's in units of pixels. If relative then it is a fraction of
-	 * max(imageWidth, imageHeight)
+	 * <p>If an absolute value is specified then it's in units of pixels. If relative then it is a fraction of
+	 * max(imageWidth, imageHeight)</p>
 	 */
 	public ConfigLength maximumDistancePixels = ConfigLength.relative(1.0, 0.0);
 
@@ -58,6 +58,7 @@ public class ConfigAssociate implements Configuration {
 		this.type = src.type;
 		this.greedy.setTo(src.greedy);
 		this.nearestNeighbor.setTo(src.nearestNeighbor);
+		this.maximumDistancePixels.setTo(src.maximumDistancePixels);
 		return this;
 	}
 
