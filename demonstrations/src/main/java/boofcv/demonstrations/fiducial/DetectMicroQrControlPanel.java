@@ -25,9 +25,7 @@ import boofcv.factory.fiducial.ConfigMicroQrCode;
 import boofcv.gui.controls.JCheckBoxValue;
 
 import javax.swing.*;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionListener;
 
 import static boofcv.gui.BoofSwingUtil.MAX_ZOOM;
 import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
@@ -37,7 +35,7 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
  *
  * @author Peter Abeles
  */
-public class DetectMicroQrControlPanel extends DetectBlackShapePanel implements ActionListener, ChangeListener {
+public class DetectMicroQrControlPanel extends DetectBlackShapePanel {
 	ConfigMicroQrCode config = new ConfigMicroQrCode();
 	DetectMicroQrApp<?> owner;
 

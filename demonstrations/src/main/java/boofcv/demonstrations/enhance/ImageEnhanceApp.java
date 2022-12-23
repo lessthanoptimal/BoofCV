@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,9 +22,11 @@ import boofcv.alg.enhance.EnhanceImageOps;
 import boofcv.alg.enhance.GEnhanceImageOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.ConvertImage;
+import boofcv.demonstrations.shapes.DetectBlackShapePanel;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
-import boofcv.gui.StandardAlgConfigPanel;
+import boofcv.gui.controls.JCheckBoxValue;
+import boofcv.gui.controls.JSpinnerNumber;
 import boofcv.gui.image.ImageZoomPanel;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
@@ -37,11 +39,7 @@ import org.ddogleg.struct.DogArray_I32;
 import pabeles.concurrency.GrowArray;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
@@ -57,9 +55,7 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
  *
  * @author Peter Abeles
  */
-// TODO Add wavelet denoising
 public class ImageEnhanceApp extends DemonstrationBase {
-
 	public static String HISTOGRAM_GLOBAL = "Histogram Global";
 	public static String HISTOGRAM_LOCAL = "Histogram Local";
 	public static String SHARPEN_4 = "Sharpen-4";
@@ -105,14 +101,14 @@ public class ImageEnhanceApp extends DemonstrationBase {
 		enhancedColor.reshape(width, height);
 		output = ConvertBufferedImage.checkDeclare(width, height, output, output.getType());
 
-		BoofSwingUtil.invokeNowOrLater(new Runnable() {
-			@Override
-			public void run() {
-				double zoom = BoofSwingUtil.selectZoomToShowAll(imagePanel, width, height);
-				controls.setZoom(zoom);
-				imagePanel.getVerticalScrollBar().setValue(0);
-				imagePanel.getHorizontalScrollBar().setValue(0);
-			}
+		BoofSwingUtil.invokeNowOrLater(() -> {
+			double zoom = BoofSwingUtil.selectZoomToShowAll(imagePanel, width, height);
+			controls.setImageSize(width, height);
+			controls.setZoom(zoom);
+			imagePanel.setScale(zoom);
+			imagePanel.updateSize(width, height);
+			imagePanel.getVerticalScrollBar().setValue(0);
+			imagePanel.getHorizontalScrollBar().setValue(0);
 		});
 	}
 
@@ -122,14 +118,14 @@ public class ImageEnhanceApp extends DemonstrationBase {
 
 		ConvertImage.average(color, gray);
 
-		if (controls.showInput) {
+		if (controls.checkShowInput.value) {
 			output.createGraphics().drawImage(buffered, 0, 0, null);
 		} else {
 			long before = System.nanoTime();
 			if (controls.activeAlgorithm.equals(HISTOGRAM_GLOBAL)) {
 				ImageStatistics.histogram(gray, 0, histogram);
 				EnhanceImageOps.equalize(histogram, transform);
-				if (controls.color) {
+				if (controls.checkColor.value) {
 					for (int i = 0; i < color.getNumBands(); i++) {
 						EnhanceImageOps.applyTransform(color.getBand(i), transform, enhancedColor.getBand(i));
 					}
@@ -137,19 +133,19 @@ public class ImageEnhanceApp extends DemonstrationBase {
 					EnhanceImageOps.applyTransform(gray, transform, enhancedGray);
 				}
 			} else if (controls.activeAlgorithm.equals(HISTOGRAM_LOCAL)) {
-				if (controls.color) {
+				if (controls.checkColor.value) {
 					GEnhanceImageOps.equalizeLocal(color, controls.radius, enhancedColor, 256, workArrays);
 				} else {
 					EnhanceImageOps.equalizeLocal(gray, controls.radius, enhancedGray, 256, workArrays);
 				}
 			} else if (controls.activeAlgorithm.equals(SHARPEN_4)) {
-				if (controls.color) {
+				if (controls.checkColor.value) {
 					GEnhanceImageOps.sharpen4(color, enhancedColor);
 				} else {
 					GEnhanceImageOps.sharpen4(gray, enhancedGray);
 				}
 			} else if (controls.activeAlgorithm.equals(SHARPEN_8)) {
-				if (controls.color) {
+				if (controls.checkColor.value) {
 					GEnhanceImageOps.sharpen8(color, enhancedColor);
 				} else {
 					GEnhanceImageOps.sharpen8(gray, enhancedGray);
@@ -157,9 +153,9 @@ public class ImageEnhanceApp extends DemonstrationBase {
 			}
 			long after = System.nanoTime();
 
-			controls.setProcessingTime((after - before)*1e-9);
+			controls.setProcessingTimeS((after - before)*1e-9);
 
-			if (controls.color) {
+			if (controls.checkColor.value) {
 				ConvertBufferedImage.convertTo(enhancedColor, output, true);
 			} else {
 				ConvertBufferedImage.convertTo(enhancedGray, output);
@@ -172,11 +168,6 @@ public class ImageEnhanceApp extends DemonstrationBase {
 		});
 	}
 
-	protected void handleVisualsUpdate() {
-		imagePanel.setScale(controls.zoom);
-		imagePanel.repaint();
-	}
-
 	protected void handleSettingsChanged() {
 		if (inputMethod == InputMethod.IMAGE) {
 			reprocessInput();
@@ -184,23 +175,17 @@ public class ImageEnhanceApp extends DemonstrationBase {
 	}
 
 	@SuppressWarnings({"JdkObsolete", "NullAway.Init"})
-	class ControlPanel extends StandardAlgConfigPanel implements ChangeListener, ActionListener {
-		protected JLabel processingTimeLabel = new JLabel();
-
+	class ControlPanel extends DetectBlackShapePanel {
 		Vector<String> comboBoxItems = new Vector<>();
 		JComboBox<String> comboAlgorithms;
 		List<Runnable> comboRunnable = new ArrayList<>();
 
-		protected JSpinner selectZoom;
-		JSpinner spinnerRadius;
-		JCheckBox checkShowInput = new JCheckBox("Show Input");
-		JCheckBox checkColor = new JCheckBox("Color");
+		JSpinnerNumber spinnerRadius = spinnerWrap(50, 1, 200, 1);
+		JCheckBoxValue checkShowInput = checkboxWrap("Show Input", false);
+		JCheckBoxValue checkColor = checkboxWrap("Color", false);
 
 		String activeAlgorithm;
-		protected double zoom = 1;
 		protected int radius = 50;
-		protected boolean showInput = false;
-		protected boolean color = false;
 
 		public ControlPanel() {
 			final DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>(comboBoxItems);
@@ -212,27 +197,19 @@ public class ImageEnhanceApp extends DemonstrationBase {
 				handleSettingsChanged();
 			});
 
-			selectZoom = new JSpinner(new SpinnerNumberModel(zoom, MIN_ZOOM, MAX_ZOOM, 1));
-			selectZoom.addChangeListener(this);
-			selectZoom.setMaximumSize(selectZoom.getPreferredSize());
-
-			checkShowInput = checkbox("Show Input", showInput);
-			checkColor = checkbox("Color", color);
-
-			spinnerRadius = new JSpinner(new SpinnerNumberModel(radius, 1, 200, 1));
-			spinnerRadius.addChangeListener(this);
-			spinnerRadius.setMaximumSize(spinnerRadius.getPreferredSize());
+			selectZoom = spinner(1.0, MIN_ZOOM, MAX_ZOOM, 1.0);
 
 			addAlgorithms();
 			comboAlgorithms.setSelectedIndex(0);
 			comboAlgorithms.setMaximumSize(comboAlgorithms.getPreferredSize());
 
-			add(comboAlgorithms);
 			addLabeled(processingTimeLabel, "Time (ms)");
-			addAlignLeft(checkShowInput);
-			addAlignLeft(checkColor);
+			addLabeled(imageSizeLabel, "Size");
+			add(comboAlgorithms);
+			addAlignLeft(checkShowInput.check);
+			addAlignLeft(checkColor.check);
 			addLabeled(selectZoom, "Zoom");
-			addLabeled(spinnerRadius, "Radius");
+			addLabeled(spinnerRadius.spinner, "Radius");
 			addVerticalGlue(this);
 		}
 
@@ -245,52 +222,22 @@ public class ImageEnhanceApp extends DemonstrationBase {
 
 		public void addAlgorithm( String name, final boolean usesRadius ) {
 			comboBoxItems.add(name);
-			comboRunnable.add(() -> spinnerRadius.setEnabled(usesRadius));
+			comboRunnable.add(() -> spinnerRadius.spinner.setEnabled(usesRadius));
 		}
 
-		public void setZoom( double zoom ) {
-			zoom = Math.max(MIN_ZOOM, zoom);
-			zoom = Math.min(MAX_ZOOM, zoom);
-			this.zoom = zoom;
-
-			BoofSwingUtil.invokeNowOrLater(new Runnable() {
-				@Override
-				public void run() {
-					selectZoom.setValue(ControlPanel.this.zoom);
-				}
-			});
-		}
-
-		public void setProcessingTime( double seconds ) {
-			processingTimeLabel.setText(String.format("%7.1f", (seconds*1000)));
-		}
-
-		@Override
-		public void stateChanged( ChangeEvent e ) {
-			if (e.getSource() == selectZoom) {
-				zoom = ((Number)selectZoom.getValue()).doubleValue();
-				handleVisualsUpdate();
+		@Override public void controlChanged( final Object source ) {
+			if (source == selectZoom) {
+				// tell the image that it's zoom factor has changed
+				imagePanel.setScale(controls.zoom);
+				imagePanel.repaint();
 				return;
-			} else if (e.getSource() == spinnerRadius) {
-				radius = ((Number)spinnerRadius.getValue()).intValue();
 			}
 			handleSettingsChanged();
-		}
-
-		@Override
-		public void actionPerformed( ActionEvent e ) {
-			if (e.getSource() == checkShowInput) {
-				showInput = checkShowInput.isSelected();
-				handleSettingsChanged(); // doesn't need to reprocess but easiest way to show input or not
-			} else if (e.getSource() == checkColor) {
-				color = checkColor.isSelected();
-				handleSettingsChanged();
-			}
 		}
 	}
 
 	public static void main( String[] args ) {
-		List<PathLabel> examples = new ArrayList<>();
+		var examples = new ArrayList<PathLabel>();
 		examples.add(new PathLabel("dark", UtilIO.pathExample("enhance/dark.jpg")));
 		examples.add(new PathLabel("dull", UtilIO.pathExample("enhance/dull.jpg")));
 		examples.add(new PathLabel("dark qr", UtilIO.pathExample("fiducial/qrcode/image04.jpg")));
@@ -298,9 +245,8 @@ public class ImageEnhanceApp extends DemonstrationBase {
 		examples.add(new PathLabel("intersection", UtilIO.pathExample("background/street_intersection.mp4")));
 		examples.add(new PathLabel("night driving", UtilIO.pathExample("tracking/night_follow_car.mjpeg")));
 
-
 		SwingUtilities.invokeLater(() -> {
-			ImageEnhanceApp app = new ImageEnhanceApp(examples);
+			var app = new ImageEnhanceApp(examples);
 
 			app.openExample(examples.get(0));
 			app.display("Image Enhancement");
