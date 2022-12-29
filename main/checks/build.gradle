@@ -1,31 +1,17 @@
+
+// Create a list of all core sub-projects automatically that need to be tested
+def coreModules = rootProject.subprojects.findAll {it -> it.path.startsWith(":main:boofcv-")}
+
 dependencies {
 	api project(':main:boofcv-core')
 	api project(':main:autocode')
 
-	testImplementation project(':main:boofcv-feature').sourceSets.test.output
-	testImplementation project(':main:boofcv-geo').sourceSets.test.output
-	testImplementation project(':main:boofcv-io').sourceSets.test.output
-	testImplementation project(':main:boofcv-ip').sourceSets.test.output
-	testImplementation project(':main:boofcv-ip-multiview').sourceSets.test.output
-	testImplementation project(':main:boofcv-learning').sourceSets.test.output
-	testImplementation project(':main:boofcv-recognition').sourceSets.test.output
-	testImplementation project(':main:boofcv-reconstruction').sourceSets.test.output
-	testImplementation project(':main:boofcv-sfm').sourceSets.test.output
-	testImplementation project(':main:boofcv-simulation').sourceSets.test.output
-	testImplementation project(':main:boofcv-types').sourceSets.test.output
+	coreModules.forEach {valid->testImplementation(valid.sourceSets.test.output)}
 	testImplementation project(':integration:boofcv-swing')
 
-	runtimeClasspath project(':main:boofcv-feature').sourceSets.experimental.output
-	runtimeClasspath project(':main:boofcv-feature').sourceSets.benchmark.output
-	runtimeClasspath project(':main:boofcv-geo').sourceSets.benchmark.output
-	runtimeClasspath project(':main:boofcv-io').sourceSets.benchmark.output
-	runtimeClasspath project(':main:boofcv-ip').sourceSets.benchmark.output
-	runtimeClasspath project(':main:boofcv-ip-multiview').sourceSets.benchmark.output
-	runtimeClasspath project(':main:boofcv-learning').sourceSets.benchmark.output
-	runtimeClasspath project(':main:boofcv-recognition').sourceSets.benchmark.output
-	runtimeClasspath project(':main:boofcv-reconstruction').sourceSets.benchmark.output
-	runtimeClasspath project(':main:boofcv-sfm').sourceSets.benchmark.output
-	runtimeClasspath project(':integration:boofcv-ffmpeg') // one test decodes a mp4
+	coreModules.forEach {valid->runtimeOnly(valid.sourceSets.benchmark.output)}
+	runtimeOnly project(':main:boofcv-feature').sourceSets.experimental.output
+	runtimeOnly project(':integration:boofcv-ffmpeg') // one test decodes a mp4
 
 	implementation(group: 'com.peterabeles', name: 'regression', version: auto64to32_version) {
 		exclude(group: "org.openjdk.jmh")
