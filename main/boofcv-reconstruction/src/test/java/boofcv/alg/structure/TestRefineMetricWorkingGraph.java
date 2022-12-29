@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,13 +29,13 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.se.SpecialEuclideanOps_F64;
-import joptsimple.internal.Objects;
 import org.ddogleg.struct.DogArray_I32;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -262,7 +262,7 @@ class TestRefineMetricWorkingGraph extends BoofStandardJUnit {
 		var world_to_vew = SpecialEuclideanOps_F64.eulerXyz(0.1, -0.2, 2, 0, 0.05, -0.05, null);
 		var normToPixels = new LensDistortionPinhole(intrinsic).distort_F64(false, true);
 		var observed = PerspectiveOps.renderPixel(world_to_vew, intrinsic, X, null);
-		Objects.ensureNotNull(observed);
+		Objects.requireNonNull(observed);
 		// homogenous coordinates are scale invariant
 		X.scale(-5.0);
 
