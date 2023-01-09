@@ -840,9 +840,16 @@ public class UtilIO {
 	}
 
 	/**
+	 * <p>
 	 * An intelligent image file search. If the passed in string starts with "glob:" or "regex:" then it will use
 	 * a glob or regex pattern to find the files. Otherwise it will see if it's a file or directory. If a file
 	 * then just that file is returned in the list. If a directory then all the files in that directory are returned.
+	 * </p>
+	 *
+	 * <p>Because Windows uses backslash instead of forward slash things are more complex. You either need to
+	 * modify the path to escape the backslash '\' -> '\\' or replace all backslashes with a forward slash. This isn't done
+	 * automatically because REGEX uses backslashes too. In summary: Windows path like foo\bar needs to be changed to
+	 * foo/bar or foo\\bar. If you know of a clean fix for this mess please create a PR on Github</p>
 	 *
 	 * @param pathPattern Either a path to the file/directory or a glob/regex pattern.
 	 * @param sort If the output should be sorted first
