@@ -20,10 +20,7 @@ package boofcv.alg.filter.blur;
 
 import boofcv.alg.filter.misc.ImageLambdaFilters;
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayF64;
-import boofcv.struct.image.GrayU16;
-import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -65,6 +62,22 @@ public class AdaptiveMeanFilter {
 	}
 
 	public AdaptiveMeanFilter() {}
+
+	/**
+	 * Generic version for single band images. Applies filter to the input image.
+	 *
+	 * @param src (Input) Image. Not modified.
+	 * @param dst (Output) Image. Modified.
+	 */
+	public <T extends ImageGray<T>> void process( T src, T dst ) {
+		switch (src.getDataType()) {
+			case U8 -> process((GrayU8)src, (GrayU8)dst);
+			case U16 -> process((GrayU16)src, (GrayU16)dst);
+			case F32 -> process((GrayF32)src, (GrayF32)dst);
+			case F64 -> process((GrayF64)src, (GrayF64)dst);
+			default -> throw new IllegalArgumentException("Unsupported image type: " + src.getDataType());
+		}
+	}
 
 	/**
 	 * Applies the filter to the src image and saves the results to the dst image. The shape of dst is modified
