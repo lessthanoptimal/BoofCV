@@ -19,6 +19,8 @@ Version : 0.42
 - Image Restoration
   - Geometric Mean filter
   - Adaptive mean filter
+- Reconstruction
+  - Support OBJ file format
 
 - Calibration
   - TODO Visualize Multi Camera Calibration
@@ -28,7 +30,6 @@ Version : 0.42
   - TODO Robust optimization
   - TODO 3D reconstruction to 3D mesh
   - TODO Support STL format
-  - TODO Support OBJ format
 - SLAM
   - TODO traditional monocular SLAM
 - Regression
