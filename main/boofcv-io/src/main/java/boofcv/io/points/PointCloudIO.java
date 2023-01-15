@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,9 @@ import boofcv.alg.cloud.AccessPointIndex;
 import boofcv.alg.cloud.PointCloudReader;
 import boofcv.alg.cloud.PointCloudWriter;
 import boofcv.alg.meshing.VertexMesh;
+import boofcv.io.points.impl.ObjFileCodec;
+import boofcv.io.points.impl.ObjFileReader;
+import boofcv.io.points.impl.ObjFileWriter;
 import boofcv.io.points.impl.PlyCodec;
 import boofcv.struct.Point3dRgbI_F64;
 import georegression.struct.point.Point3D_F32;
@@ -34,6 +37,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.nio.ByteOrder;
 
 /**
@@ -51,6 +55,8 @@ public class PointCloudIO {
 			throws IOException {
 		switch (format) {
 			case PLY -> PlyCodec.saveCloudBinary(cloud, ByteOrder.BIG_ENDIAN, saveRGB, false, outputStream);
+			case OBJ -> ObjFileCodec.save(cloud, new OutputStreamWriter(outputStream));
+			default -> throw new IllegalArgumentException("Unknown format " + format);
 		}
 	}
 
@@ -58,6 +64,8 @@ public class PointCloudIO {
 			throws IOException {
 		switch (format) {
 			case PLY -> PlyCodec.saveMeshBinary(mesh, colorRGB, ByteOrder.BIG_ENDIAN, false, outputStream);
+			case OBJ -> ObjFileCodec.save(mesh, new OutputStreamWriter(outputStream));
+			default -> throw new IllegalArgumentException("Unknown format " + format);
 		}
 	}
 
@@ -71,18 +79,21 @@ public class PointCloudIO {
 	public static void save3D( Format format,
 							   AccessPointIndex<Point3D_F64> accessPoint,
 							   AccessColorIndex accessColor,
-							   int size , boolean saveRGB, OutputStream outputStream )
+							   int size, boolean saveRGB, OutputStream outputStream )
 			throws IOException {
 
 		PointCloudReader reader = new PointCloudReader() {
 			final Point3D_F64 tmp = new Point3D_F64();
+
 			@Override public void get( int index, Point3D_F32 point ) {
 				accessPoint.getPoint(index, tmp);
 				point.setTo((float)tmp.x, (float)tmp.y, (float)tmp.z);
 			}
 
 			@Override public int size() {return size;}
+
 			@Override public void get( int index, Point3D_F64 point ) {accessPoint.getPoint(index, point);}
+
 			@Override public int getRGB( int index ) {return accessColor.getRGB(index);}
 		};
 
@@ -126,6 +137,7 @@ public class PointCloudIO {
 	public static void load( Format format, InputStream input, PointCloudWriter output ) throws IOException {
 		switch (format) {
 			case PLY -> PlyCodec.readCloud(input, output);
+			case OBJ -> ObjFileCodec.load(input, output);
 			default -> throw new RuntimeException("Unknown format");
 		}
 	}
@@ -141,10 +153,10 @@ public class PointCloudIO {
 	public static void load( Format format, InputStream input, VertexMesh mesh, DogArray_I32 vertexRgb ) throws IOException {
 		switch (format) {
 			case PLY -> PlyCodec.readMesh(input, mesh, vertexRgb);
+			case OBJ -> ObjFileCodec.load(input, mesh);
 			default -> throw new RuntimeException("Unknown format");
 		}
 	}
-
 
 	/**
 	 * The same as {@link #load(Format, InputStream, PointCloudWriter)}, but with a simplified writer that
@@ -171,10 +183,17 @@ public class PointCloudIO {
 
 	public enum Format {
 		/**
-		 * https://en.wikipedia.org/wiki/PLY_(file_format)
+		 * <a href="https://en.wikipedia.org/wiki/PLY_(file_format)">PLY</a>
 		 *
 		 * @see PlyCodec
 		 */
-		PLY
+		PLY,
+		/**
+		 * Save in Wavefront's OBJ file format
+		 *
+		 * @see ObjFileReader
+		 * @see ObjFileWriter
+		 */
+		OBJ,
 	}
 }
