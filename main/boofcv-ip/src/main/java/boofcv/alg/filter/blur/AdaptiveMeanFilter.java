@@ -48,7 +48,7 @@ import javax.annotation.Generated;
 public class AdaptiveMeanFilter {
 	// Note: This could be made to run WAY faster by using a histogram,
 	//       then modifying it while sliding it across the image
-	// Note: Add concurrent implementation
+	// Note: Alternatively, computing mean image, then variance image, then applying this formula.
 
 	/** Defines the symmetric rectangular region. width = 2*radius + 1 */
 	@Getter @Setter int radiusX, radiusY;
@@ -87,8 +87,8 @@ public class AdaptiveMeanFilter {
 	 * @param dst (Output) Image. Modified.
 	 */
 	public void process( GrayU8 src, GrayU8 dst ) {
-		BoofMiscOps.checkTrue(radiusX >= 0, "Radius must not be negative");
-		BoofMiscOps.checkTrue(radiusY >= 0, "Radius must not be negative");
+		BoofMiscOps.checkTrue(radiusX >= 0, "radiusX must not be negative");
+		BoofMiscOps.checkTrue(radiusY >= 0, "radiusY must not be negative");
 		dst.reshape(src.width, src.height);
 
 		int regionX = radiusX*2 + 1;
@@ -143,8 +143,8 @@ public class AdaptiveMeanFilter {
 	 * @param dst (Output) Image. Modified.
 	 */
 	public void process( GrayU16 src, GrayU16 dst ) {
-		BoofMiscOps.checkTrue(radiusX >= 0, "Radius must not be negative");
-		BoofMiscOps.checkTrue(radiusY >= 0, "Radius must not be negative");
+		BoofMiscOps.checkTrue(radiusX >= 0, "radiusX must not be negative");
+		BoofMiscOps.checkTrue(radiusY >= 0, "radiusY must not be negative");
 		dst.reshape(src.width, src.height);
 
 		int regionX = radiusX*2 + 1;
@@ -199,8 +199,8 @@ public class AdaptiveMeanFilter {
 	 * @param dst (Output) Image. Modified.
 	 */
 	public void process( GrayF32 src, GrayF32 dst ) {
-		BoofMiscOps.checkTrue(radiusX >= 0, "Radius must not be negative");
-		BoofMiscOps.checkTrue(radiusY >= 0, "Radius must not be negative");
+		BoofMiscOps.checkTrue(radiusX >= 0, "radiusX must not be negative");
+		BoofMiscOps.checkTrue(radiusY >= 0, "radiusY must not be negative");
 		dst.reshape(src.width, src.height);
 
 		int regionX = radiusX*2 + 1;
@@ -255,8 +255,8 @@ public class AdaptiveMeanFilter {
 	 * @param dst (Output) Image. Modified.
 	 */
 	public void process( GrayF64 src, GrayF64 dst ) {
-		BoofMiscOps.checkTrue(radiusX >= 0, "Radius must not be negative");
-		BoofMiscOps.checkTrue(radiusY >= 0, "Radius must not be negative");
+		BoofMiscOps.checkTrue(radiusX >= 0, "radiusX must not be negative");
+		BoofMiscOps.checkTrue(radiusY >= 0, "radiusY must not be negative");
 		dst.reshape(src.width, src.height);
 
 		int regionX = radiusX*2 + 1;
