@@ -15,8 +15,8 @@ Version : 0.42
   - Command line application for multi camera calibration
   - PDF Titles for Fiducials are now independent of file name and informative
 - Image Restoration
-  - TODO Geometric Mean filter
-  - TODO Adaptive mean filter
+  - Geometric Mean filter
+  - Adaptive mean filter
   - TODO Adaptive median filter
 
 - Calibration
