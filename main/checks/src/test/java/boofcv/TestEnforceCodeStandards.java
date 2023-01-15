@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -58,7 +58,7 @@ public class TestEnforceCodeStandards {
 		String pathToMain = UtilIO.path("main");
 
 		var checker = new CheckForbiddenLanguage();
-		CheckForbiddenHelper.forbidNonExplicitVar(checker, true);
+		CheckForbiddenHelper.forbidNonExplicitVar(checker, true, true);
 		CheckForbiddenHelper.forbidForEach(checker);
 
 		File[] moduleDirectories = new File(pathToMain).listFiles();
