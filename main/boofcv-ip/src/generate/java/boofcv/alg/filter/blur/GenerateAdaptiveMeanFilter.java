@@ -176,7 +176,7 @@ public class GenerateAdaptiveMeanFilter extends CodeGeneratorBase {
 				"\t * @param centerValue Value of image at center pixel\n" +
 				"\t * @param N Length of array\n" +
 				"\t */\n" +
-				"\tprivate static " + valueType + " computeFilter( " + sumType + " noiseVariance, " + valueType + " centerValue, " + valueType + "[] values, int N ) {\n" +
+				"\tstatic " + valueType + " computeFilter( " + sumType + " noiseVariance, " + valueType + " centerValue, " + valueType + "[] values, int N ) {\n" +
 				"\t\t// Compute local mean and variance statistics\n" +
 				"\t\t" + sumType + " localMean = " + zero + ";\n" +
 				"\t\tfor (int i = 0; i < N; i++) {\n" +
@@ -186,7 +186,7 @@ public class GenerateAdaptiveMeanFilter extends CodeGeneratorBase {
 				"\n" +
 				"\t\t" + sumType + " localVariance = " + zero + ";\n" +
 				"\t\tfor (int i = 0; i < N; i++) {\n" +
-				"\t\t\tdouble diff = values[i] - localMean;\n" +
+				"\t\t\t" + sumType + " diff = values[i] - localMean;\n" +
 				"\t\t\tlocalVariance += diff*diff;\n" +
 				"\t\t}\n" +
 				"\n" +

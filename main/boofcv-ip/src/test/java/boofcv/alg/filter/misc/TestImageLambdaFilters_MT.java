@@ -18,15 +18,79 @@
 
 package boofcv.alg.filter.misc;
 
-import boofcv.testing.BoofStandardJUnit;
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.image.ImageGray;
+import boofcv.testing.CompareIdenticalFunctions;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import java.lang.reflect.Method;
 
-class TestImageLambdaFilters_MT extends BoofStandardJUnit {
+@SuppressWarnings("rawtypes")
+class TestImageLambdaFilters_MT extends CompareIdenticalFunctions {
+
+	protected TestImageLambdaFilters_MT() {
+		super(ImageLambdaFilters_MT.class, ImageLambdaFilters.class);
+	}
+
 	@Test
-	void compareToSingle() {
-		fail("implement");
+	void performTests() {
+		performTests(6);
+	}
+
+	@Override
+	protected boolean isTestMethod( Method m ) {
+		return m.getName().equals("filterRectCenterInner");
+	}
+
+	// Sub-images are problematic because we don't have access to the image inside the lambda.
+	// This will effectively disable the  check.
+	@Override
+	protected Object[] createSubImageInputs( Object[] param ) {
+		return param;
+	}
+
+	@Override protected Object[][] createInputParam( Method candidate, Method validation ) {
+		Class[] paramTypes = candidate.getParameterTypes();
+
+		var src = GeneralizedImageOps.createSingleBand(paramTypes[0], 300, 200);
+		var dst = src.createSameShape();
+
+		// Noise up the input image
+		GImageMiscOps.fillUniform(src, rand, 0, 200);
+
+		// Create the appropriate lambda
+		Object lambda;
+		int bits = src.getImageType().getDataType().getNumBits();
+		if (src.getImageType().getDataType().isInteger()) {
+			if (bits <= 32) {
+				lambda = (ImageLambdaFilters.RectCenter_S32)( indexPixel, workspace ) -> {
+					int x = indexPixel%src.stride;
+					int y = indexPixel/src.stride;
+					return (int)GeneralizedImageOps.get((ImageGray)src, x, y) + 5;
+				};
+			} else {
+				lambda = (ImageLambdaFilters.RectCenter_S64)( indexPixel, workspace ) -> {
+					int x = indexPixel%src.stride;
+					int y = indexPixel/src.stride;
+					return (long)GeneralizedImageOps.get((ImageGray)src, x, y) + 5;
+				};
+			}
+		} else if (bits == 32) {
+			lambda = (ImageLambdaFilters.RectCenter_F32)( indexPixel, workspace ) -> {
+				int x = indexPixel%src.width;
+				int y = indexPixel/src.width;
+				return (float)GeneralizedImageOps.get((ImageGray)src, x, y) + 5;
+			};
+		} else {
+			lambda = (ImageLambdaFilters.RectCenter_F64)( indexPixel, workspace ) -> {
+				int x = indexPixel%src.width;
+				int y = indexPixel/src.width;
+				return (double)GeneralizedImageOps.get((ImageGray)src, x, y) + 5;
+			};
+		}
+
+		return new Object[][]{{src, 4, 6, dst, null, lambda}};
 	}
 }
 
