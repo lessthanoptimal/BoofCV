@@ -18,11 +18,12 @@
 
 package boofcv.alg.filter.misc;
 
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
-class TestImageLambdaFilters_MT {
+class TestImageLambdaFilters_MT extends BoofStandardJUnit {
 	@Test
 	void compareToSingle() {
 		fail("implement");

@@ -19,9 +19,11 @@
 package boofcv.alg.filter.blur;
 
 import boofcv.BoofTesting;
+import boofcv.alg.filter.blur.impl.GeometricMeanFilter;
 import boofcv.alg.filter.blur.impl.ImplMedianSortNaive;
 import boofcv.alg.filter.convolve.GConvolveImageOps;
 import boofcv.alg.misc.GImageMiscOps;
+import boofcv.alg.misc.GImageStatistics;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.factory.filter.kernel.FactoryKernel;
@@ -39,8 +41,6 @@ import pabeles.concurrency.GrowArray;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import static org.junit.jupiter.api.Assertions.fail;
-
 /**
  * @author Peter Abeles
  */
@@ -53,12 +53,12 @@ import static org.junit.jupiter.api.Assertions.fail;
 	int height = 20;
 
 	ImageType[] imageTypes = new ImageType[]{
-			ImageType.single(GrayU8.class), ImageType.single(GrayF32.class),
+			ImageType.SB_U8, ImageType.SB_F32,
 			ImageType.pl(2, GrayU8.class), ImageType.pl(2, GrayF32.class)};
 //			ImageType.il(2,InterleavedU8.class),ImageType.il(2,InterleavedF32.class)}; TODO add in future
 
 	ImageType[] imageTypesGaussian = new ImageType[]{
-			ImageType.single(GrayU8.class), ImageType.single(GrayF32.class),
+			ImageType.SB_U8, ImageType.SB_F32,
 			ImageType.pl(2, GrayU8.class), ImageType.pl(2, GrayF32.class),
 			ImageType.il(2, InterleavedU8.class), ImageType.il(2, InterleavedF32.class)}; // delete after all support interleaved
 
@@ -249,11 +249,120 @@ import static org.junit.jupiter.api.Assertions.fail;
 		}
 	}
 
-	@Test void meanGeometric() {
-		fail("Implement");
+	/**
+	 * Compare to low level implementation
+	 */
+	@Test void meanGeometric() throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+		for (ImageType type : new ImageType[]{ImageType.SB_U8, ImageType.SB_F32}) {
+			ImageBase input = type.createImage(width, height);
+			ImageBase found = type.createImage(width, height);
+			ImageBase expected = type.createImage(width, height);
+
+			GImageMiscOps.fillUniform(input, rand, 0, 20);
+
+			for (int radiusX = 1; radiusX <= 4; radiusX++) {
+				int radiusY = radiusX + 1;
+				Method mTest = BlurImageOps.class.getMethod("meanGeometric", input.getClass(),
+						found.getClass(), int.class, int.class);
+				mTest.invoke(null, input, found, radiusX, radiusY);
+
+				computeExpectedMeanGeometricSB(input, expected, radiusX, radiusY);
+
+				BoofTesting.assertEquals(expected, found, 2);
+			}
+
+			meanGeometricPlanar(type);
+		}
 	}
 
-	@Test void meanAdaptive() {
-		fail("Implement");
+	private static void computeExpectedMeanGeometricSB( ImageBase input, ImageBase expected, int radiusX, int radiusY ) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+		Number mean = GImageStatistics.mean(input);
+		Class meanClass = double.class;
+		if (!input.getImageType().getDataType().isInteger()) {
+			mean = mean.floatValue();
+			meanClass = float.class;
+		}
+		Method mExpected = GeometricMeanFilter.class.getMethod("filter", input.getClass(),
+				int.class, int.class, meanClass, input.getClass());
+		mExpected.invoke(null, input, radiusX, radiusY, mean, expected);
+	}
+
+	@SuppressWarnings("unchecked")
+	void meanGeometricPlanar( ImageType bandType ) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+		int numBands = 2;
+		int radiusX = 2;
+		int radiusY = 3;
+
+		var input = new Planar(bandType.getImageClass(), width, height, numBands);
+		var found = new Planar(bandType.getImageClass(), width, height, numBands);
+		var expected = bandType.createImage(width, height);
+
+		GImageMiscOps.fillUniform(input, rand, 0, 20);
+
+		BlurImageOps.meanGeometric(input, found, radiusX, radiusY);
+
+		for (int bandIdx = 0; bandIdx < numBands; bandIdx++) {
+			computeExpectedMeanGeometricSB(input.getBand(bandIdx), expected, radiusX, radiusY);
+
+			BoofTesting.assertEquals(expected, found.getBand(bandIdx), 2);
+		}
+	}
+
+	@Test void meanAdaptive() throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+		double paramVar = 1.5;
+		var alg = new AdaptiveMeanFilter();
+		alg.noiseVariance = paramVar;
+
+		for (ImageType type : new ImageType[]{ImageType.SB_U8, ImageType.SB_F32}) {
+			ImageBase input = type.createImage(width, height);
+			ImageBase found = type.createImage(width, height);
+			ImageBase expected = type.createImage(width, height);
+
+			GImageMiscOps.fillUniform(input, rand, 0, 20);
+
+			for (int radiusX = 1; radiusX <= 4; radiusX++) {
+				int radiusY = radiusX + 1;
+				Method mTest = BlurImageOps.class.getMethod("meanAdaptive", input.getClass(),
+						found.getClass(), int.class, int.class, double.class);
+				mTest.invoke(null, input, found, radiusX, radiusY, paramVar);
+
+				// Compare to low level implementation
+				alg.radiusX = radiusX;
+				alg.radiusY = radiusY;
+				alg.process((ImageGray)input, (ImageGray)expected);
+
+				BoofTesting.assertEquals(expected, found, 2);
+			}
+
+			meanAdaptivePlanar(type);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	void meanAdaptivePlanar( ImageType bandType ) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+		double paramVar = 1.5;
+		var alg = new AdaptiveMeanFilter();
+		alg.noiseVariance = paramVar;
+
+		int numBands = 2;
+		int radiusX = 2;
+		int radiusY = 3;
+
+		alg.radiusX = radiusX;
+		alg.radiusY = radiusY;
+
+		var input = new Planar(bandType.getImageClass(), width, height, numBands);
+		var found = new Planar(bandType.getImageClass(), width, height, numBands);
+		var expected = bandType.createImage(width, height);
+
+		GImageMiscOps.fillUniform(input, rand, 0, 20);
+
+		BlurImageOps.meanAdaptive(input, found, radiusX, radiusY, paramVar);
+
+		for (int bandIdx = 0; bandIdx < numBands; bandIdx++) {
+			alg.process((ImageGray)input.getBand(bandIdx), (ImageGray)expected);
+
+			BoofTesting.assertEquals(expected, found.getBand(bandIdx), 2);
+		}
 	}
 }

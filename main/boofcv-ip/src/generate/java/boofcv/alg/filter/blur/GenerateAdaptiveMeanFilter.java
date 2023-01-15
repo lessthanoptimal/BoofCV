@@ -27,6 +27,7 @@ public class GenerateAdaptiveMeanFilter extends CodeGeneratorBase {
 	@Override protected void generateCode() throws FileNotFoundException {
 		printPreamble();
 
+		printGeneric();
 		printProcess(AutoTypeImage.U8);
 		printProcess(AutoTypeImage.U16);
 		printProcess(AutoTypeImage.F32);
@@ -79,6 +80,24 @@ public class GenerateAdaptiveMeanFilter extends CodeGeneratorBase {
 				"\t}\n" +
 				"\n" +
 				"\tpublic AdaptiveMeanFilter() {}\n");
+	}
+
+	private void printGeneric() {
+		out.print("\t/**\n" +
+				"\t * Generic version for single band images. Applies filter to the input image.\n" +
+				"\t *\n" +
+				"\t * @param src (Input) Image. Not modified.\n" +
+				"\t * @param dst (Output) Image. Modified.\n" +
+				"\t */\n" +
+				"\tpublic <T extends ImageGray<T>> void process( T src, T dst ) {\n" +
+				"\t\tswitch (src.getDataType()) {\n" +
+				"\t\t\tcase U8 -> process((GrayU8)src, (GrayU8)dst);\n" +
+				"\t\t\tcase U16 -> process((GrayU16)src, (GrayU16)dst);\n" +
+				"\t\t\tcase F32 -> process((GrayF32)src, (GrayF32)dst);\n" +
+				"\t\t\tcase F64 -> process((GrayF64)src, (GrayF64)dst);\n" +
+				"\t\t\tdefault -> throw new IllegalArgumentException(\"Unsupported image type: \" + src.getDataType());\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
 	}
 
 	private void printProcess( AutoTypeImage image ) {

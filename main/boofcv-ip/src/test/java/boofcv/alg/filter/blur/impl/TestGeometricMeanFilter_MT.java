@@ -18,11 +18,12 @@
 
 package boofcv.alg.filter.blur.impl;
 
+import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
-class TestGeometricMeanFilter_MT {
+class TestGeometricMeanFilter_MT extends BoofStandardJUnit {
 	@Test
 	void compareToSingle() {
 		fail("implement");
