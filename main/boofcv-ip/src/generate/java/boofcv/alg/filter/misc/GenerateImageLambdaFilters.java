@@ -29,9 +29,13 @@ public class GenerateImageLambdaFilters extends CodeGeneratorBase {
 
 		for (AutoTypeImage type : AutoTypeImage.getGenericTypes()) {
 			printInner(type);
+			out.println("\t//CONCURRENT_OMIT_BEGIN");
 			printBorder(type);
+			out.println("\t//CONCURRENT_OMIT_END");
 		}
+		out.println("\t//CONCURRENT_OMIT_BEGIN");
 		printLambdaFunctions();
+		out.println("\t//CONCURRENT_OMIT_END");
 
 		out.print("}\n");
 	}
@@ -41,6 +45,9 @@ public class GenerateImageLambdaFilters extends CodeGeneratorBase {
 				"import org.jetbrains.annotations.Nullable;\n" +
 				"\n" +
 				"import javax.annotation.Generated;\n" +
+				"\n" +
+				"//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;\n" +
+				"//CONCURRENT_INLINE import boofcv.alg.filter.misc.ImageLambdaFilters.*;\n" +
 				"\n" +
 				"/**\n" +
 				" * Image filters which have been abstracted using lambdas. In most situations the 'src' image is assumed to be\n" +

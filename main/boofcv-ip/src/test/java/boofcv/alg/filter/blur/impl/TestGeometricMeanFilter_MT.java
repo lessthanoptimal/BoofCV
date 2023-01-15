@@ -18,15 +18,40 @@
 
 package boofcv.alg.filter.blur.impl;
 
+import boofcv.BoofTesting;
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+@SuppressWarnings("rawtypes")
+public class TestGeometricMeanFilter_MT extends BoofStandardJUnit {
+	@Test void compareToSingle() {
+		for (var type : new ImageType[]{ImageType.SB_U8, ImageType.SB_U16, ImageType.SB_F32, ImageType.SB_F64}) {
+			var src = (ImageGray)type.createImage(200, 210);
+			var found = (ImageGray)src.createSameShape();
+			var expected = (ImageGray)src.createSameShape();
 
-class TestGeometricMeanFilter_MT extends BoofStandardJUnit {
-	@Test
-	void compareToSingle() {
-		fail("implement");
+			GImageMiscOps.fillUniform(src, rand, 0, 200);
+
+			BoofTesting.checkSubImage(this, "compareToSingle", true, src, found, expected);
+		}
+	}
+
+	public <T extends ImageGray<T>> void compareToSingle( T image, T found, T expected ) {
+		double mean = 100.0;
+
+		for (int radiusX = 1; radiusX <= 3; radiusX++) {
+			int radiusY = radiusX + 1;
+			GImageMiscOps.fill(found, 0);
+			GImageMiscOps.fill(expected, 0);
+
+			GeometricMeanFilter.filter(image, radiusX, radiusY, mean, expected);
+			GeometricMeanFilter_MT.filter(image, radiusX, radiusY, mean, found);
+
+			BoofTesting.assertEquals(expected, found, 0);
+		}
 	}
 }
 
