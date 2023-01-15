@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,6 +35,11 @@ import java.lang.reflect.Method;
  */
 public abstract class CompareIdenticalFunctions extends CompareEquivalentFunctions {
 
+	/**
+	 *
+	 * @param testClass Class being tested
+	 * @param validationClass Class used to verify
+	 */
 	protected CompareIdenticalFunctions( Class<?> testClass, Class<?>... validationClass ) {
 		super(testClass, validationClass);
 	}

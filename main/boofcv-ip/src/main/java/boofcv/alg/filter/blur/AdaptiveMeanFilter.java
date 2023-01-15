@@ -350,7 +350,7 @@ public class AdaptiveMeanFilter {
 
 		float localVariance = 0.0f;
 		for (int i = 0; i < N; i++) {
-			double diff = values[i] - localMean;
+			float diff = values[i] - localMean;
 			localVariance += diff*diff;
 		}
 
