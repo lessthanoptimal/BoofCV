@@ -66,7 +66,7 @@ public class GenerateAdaptiveMeanFilter extends CodeGeneratorBase {
 				"public class AdaptiveMeanFilter {\n" +
 				"\t// Note: This could be made to run WAY faster by using a histogram,\n" +
 				"\t//       then modifying it while sliding it across the image\n" +
-				"\t// Note: Add concurrent implementation\n" +
+				"\t// Note: Alternatively, computing mean image, then variance image, then applying this formula.\n" +
 				"\n" +
 				"\t/** Defines the symmetric rectangular region. width = 2*radius + 1 */\n" +
 				"\t@Getter @Setter int radiusX, radiusY;\n" +
@@ -114,8 +114,8 @@ public class GenerateAdaptiveMeanFilter extends CodeGeneratorBase {
 				"\t * @param dst (Output) Image. Modified.\n" +
 				"\t */\n" +
 				"\tpublic void process( " + imageName + " src, " + imageName + " dst ) {\n" +
-				"\t\tBoofMiscOps.checkTrue(radiusX >= 0, \"Radius must not be negative\");\n" +
-				"\t\tBoofMiscOps.checkTrue(radiusY >= 0, \"Radius must not be negative\");\n" +
+				"\t\tBoofMiscOps.checkTrue(radiusX >= 0, \"radiusX must not be negative\");\n" +
+				"\t\tBoofMiscOps.checkTrue(radiusY >= 0, \"radiusY must not be negative\");\n" +
 				"\t\tdst.reshape(src.width, src.height);\n" +
 				"\n" +
 				"\t\tint regionX = radiusX*2 + 1;\n" +
