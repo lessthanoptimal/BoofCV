@@ -310,7 +310,7 @@ public class AdaptiveMeanFilter {
 	 * @param centerValue Value of image at center pixel
 	 * @param N Length of array
 	 */
-	private static int computeFilter( double noiseVariance, int centerValue, int[] values, int N ) {
+	static int computeFilter( double noiseVariance, int centerValue, int[] values, int N ) {
 		// Compute local mean and variance statistics
 		double localMean = 0.0;
 		for (int i = 0; i < N; i++) {
@@ -340,7 +340,7 @@ public class AdaptiveMeanFilter {
 	 * @param centerValue Value of image at center pixel
 	 * @param N Length of array
 	 */
-	private static float computeFilter( float noiseVariance, float centerValue, float[] values, int N ) {
+	static float computeFilter( float noiseVariance, float centerValue, float[] values, int N ) {
 		// Compute local mean and variance statistics
 		float localMean = 0.0f;
 		for (int i = 0; i < N; i++) {
@@ -370,7 +370,7 @@ public class AdaptiveMeanFilter {
 	 * @param centerValue Value of image at center pixel
 	 * @param N Length of array
 	 */
-	private static double computeFilter( double noiseVariance, double centerValue, double[] values, int N ) {
+	static double computeFilter( double noiseVariance, double centerValue, double[] values, int N ) {
 		// Compute local mean and variance statistics
 		double localMean = 0.0;
 		for (int i = 0; i < N; i++) {
