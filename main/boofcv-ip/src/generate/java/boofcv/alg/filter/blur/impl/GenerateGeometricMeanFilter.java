@@ -27,6 +27,7 @@ public class GenerateGeometricMeanFilter extends CodeGeneratorBase {
 	@Override protected void generateCode() throws FileNotFoundException {
 		printPreamble();
 
+		printGeneric();
 		printFunction(AutoTypeImage.U8);
 		printFunction(AutoTypeImage.U16);
 		printFunction(AutoTypeImage.F32);
@@ -61,6 +62,21 @@ public class GenerateGeometricMeanFilter extends CodeGeneratorBase {
 				" * </ol>\n" +
 				generateDocString("Peter Abeles") +
 				"public class " + className + " {\n");
+	}
+
+	private void printGeneric() {
+		out.print("\t/**\n" +
+				"\t * Applies filter with type determined at runtime.\n" +
+				"\t */\n" +
+				"\tpublic static <T extends ImageGray<T>> void filter( T src, int radiusX, int radiusY, double mean, T dst ) {\n" +
+				"\t\tswitch (src.getDataType()) {\n" +
+				"\t\t\tcase U8 -> filter((GrayU8)src, radiusX, radiusY, mean, (GrayU8)dst);\n" +
+				"\t\t\tcase U16 -> filter((GrayU16)src, radiusX, radiusY, mean, (GrayU16)dst);\n" +
+				"\t\t\tcase F32 -> filter((GrayF32)src, radiusX, radiusY, (float)mean, (GrayF32)dst);\n" +
+				"\t\t\tcase F64 -> filter((GrayF64)src, radiusX, radiusY, mean, (GrayF64)dst);\n" +
+				"\t\t\tdefault -> throw new IllegalArgumentException(\"Unsupported data type: \" + src.getDataType());\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
 	}
 
 	private void printFunction( AutoTypeImage image ) {

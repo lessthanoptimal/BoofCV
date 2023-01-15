@@ -19,10 +19,7 @@
 package boofcv.alg.filter.blur.impl;
 
 import boofcv.alg.filter.misc.ImageLambdaFilters;
-import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayF64;
-import boofcv.struct.image.GrayU16;
-import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.*;
 
 import javax.annotation.Generated;
 
@@ -51,6 +48,19 @@ import javax.annotation.Generated;
  */
 @Generated("boofcv.alg.filter.blur.impl.GenerateGeometricMeanFilter")
 public class GeometricMeanFilter {
+
+	/**
+	 * Applies filter with type determined at runtime.
+	 */
+	public static <T extends ImageGray<T>> void filter( T src, int radiusX, int radiusY, double mean, T dst ) {
+		switch (src.getDataType()) {
+			case U8 -> filter((GrayU8)src, radiusX, radiusY, mean, (GrayU8)dst);
+			case U16 -> filter((GrayU16)src, radiusX, radiusY, mean, (GrayU16)dst);
+			case F32 -> filter((GrayF32)src, radiusX, radiusY, (float)mean, (GrayF32)dst);
+			case F64 -> filter((GrayF64)src, radiusX, radiusY, mean, (GrayF64)dst);
+			default -> throw new IllegalArgumentException("Unsupported data type: " + src.getDataType());
+		}
+	}
 
 	/**
 	 * Applies the geometric mean blur operator.

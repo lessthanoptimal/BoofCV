@@ -18,17 +18,17 @@
 
 package boofcv.alg.filter.blur.impl;
 
-import boofcv.alg.misc.ImageMiscOps;
-import boofcv.alg.misc.ImageStatistics;
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.alg.misc.GImageStatistics;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 
+@SuppressWarnings({"rawtypes", "unchecked"})
 class TestGeometricMeanFilter extends BoofStandardJUnit {
 	int width = 30;
 	int height = 20;
@@ -39,20 +39,23 @@ class TestGeometricMeanFilter extends BoofStandardJUnit {
 	 * Compares to a simple implementation that's easily checked through visual inspection
 	 */
 	@Test void compareToNaive() {
-		var src = new GrayU8(width, height);
-		var dst = new GrayU8(1, 1);
+		for (var type : new ImageType[]{ImageType.SB_U8, ImageType.SB_U16, ImageType.SB_F32, ImageType.SB_F64}) {
+			var src = (ImageGray)type.createImage(width, height);
+			var dst = (ImageGray)type.createImage(1, 1);
 
-		ImageMiscOps.fillUniform(src, rand, 0, 100);
+			GImageMiscOps.fillUniform(src, rand, 0, 100);
 
-		double mean = ImageStatistics.mean(src);
-		GeometricMeanFilter.filter(src, radiusX, radiusY, mean, dst);
+			double mean = GImageStatistics.mean(src);
+			GeometricMeanFilter.filter(src, radiusX, radiusY, mean, dst);
 
-		assertEquals(width, dst.width);
-		assertEquals(height, dst.height);
+			assertEquals(width, dst.width);
+			assertEquals(height, dst.height);
 
-		for (int y = 0; y < dst.height; y++) {
-			for (int x = 0; x < dst.width; x++) {
-				assertEquals(naiveMean(src, x, y, radiusX, radiusY), dst.get(x, y), 1.0);
+			for (int y = 0; y < dst.height; y++) {
+				for (int x = 0; x < dst.width; x++) {
+					double found = GeneralizedImageOps.get(dst, x, y);
+					assertEquals(naiveMean(src, x, y, radiusX, radiusY), found, 1.0);
+				}
 			}
 		}
 	}
@@ -72,9 +75,5 @@ class TestGeometricMeanFilter extends BoofStandardJUnit {
 
 		double rootOf = (y1 - y0)*(x1 - x0);
 		return Math.pow(product, 1.0/rootOf);
-	}
-
-	@Test void implementAllTypes() {
-		fail("Umplement");
 	}
 }
