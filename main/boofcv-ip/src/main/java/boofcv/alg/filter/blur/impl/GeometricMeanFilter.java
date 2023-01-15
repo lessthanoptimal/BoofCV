@@ -99,7 +99,6 @@ public class GeometricMeanFilter {
 		});
 
 		// Apply to image edge with an adaptive region size
-		//CONCURRENT_BELOW ImageLambdaFilters_MT.filterRectCenterEdge(src, radiusX, radiusY, dst, null, ( cx, cy, x0, y0, x1, y1, w ) -> {
 		ImageLambdaFilters.filterRectCenterEdge(src, radiusX, radiusY, dst, null, ( cx, cy, x0, y0, x1, y1, w ) -> {
 			double product = 1.0;
 
@@ -152,7 +151,6 @@ public class GeometricMeanFilter {
 		});
 
 		// Apply to image edge with an adaptive region size
-		//CONCURRENT_BELOW ImageLambdaFilters_MT.filterRectCenterEdge(src, radiusX, radiusY, dst, null, ( cx, cy, x0, y0, x1, y1, w ) -> {
 		ImageLambdaFilters.filterRectCenterEdge(src, radiusX, radiusY, dst, null, ( cx, cy, x0, y0, x1, y1, w ) -> {
 			double product = 1.0;
 
@@ -205,7 +203,6 @@ public class GeometricMeanFilter {
 		});
 
 		// Apply to image edge with an adaptive region size
-		//CONCURRENT_BELOW ImageLambdaFilters_MT.filterRectCenterEdge(src, radiusX, radiusY, dst, null, ( cx, cy, x0, y0, x1, y1, w ) -> {
 		ImageLambdaFilters.filterRectCenterEdge(src, radiusX, radiusY, dst, null, ( cx, cy, x0, y0, x1, y1, w ) -> {
 			float product = 1.0f;
 
@@ -258,7 +255,6 @@ public class GeometricMeanFilter {
 		});
 
 		// Apply to image edge with an adaptive region size
-		//CONCURRENT_BELOW ImageLambdaFilters_MT.filterRectCenterEdge(src, radiusX, radiusY, dst, null, ( cx, cy, x0, y0, x1, y1, w ) -> {
 		ImageLambdaFilters.filterRectCenterEdge(src, radiusX, radiusY, dst, null, ( cx, cy, x0, y0, x1, y1, w ) -> {
 			double product = 1.0;
 

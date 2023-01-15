@@ -24,6 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.annotation.Generated;
 
 //CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
+//CONCURRENT_INLINE import boofcv.alg.filter.misc.ImageLambdaFilters.*;
 
 /**
  * Image filters which have been abstracted using lambdas. In most situations the 'src' image is assumed to be
@@ -64,6 +65,7 @@ public class ImageLambdaFilters {
 		//CONCURRENT_ABOVE });
 	}
 
+	//CONCURRENT_OMIT_BEGIN
 	public static void filterRectCenterEdge( GrayI8 src, int radiusX, int radiusY, GrayI8 dst,
 											 @Nullable Object workspace, Rect_S32 filter ) {
 		// top edge
@@ -113,6 +115,7 @@ public class ImageLambdaFilters {
 		}
 	}
 
+	//CONCURRENT_OMIT_END
 	public static void filterRectCenterInner( GrayI16 src, int radiusX, int radiusY, GrayI16 dst,
 											  @Nullable Object workspace, RectCenter_S32 filter ) {
 		final int y0 = radiusY;
@@ -135,6 +138,7 @@ public class ImageLambdaFilters {
 		//CONCURRENT_ABOVE });
 	}
 
+	//CONCURRENT_OMIT_BEGIN
 	public static void filterRectCenterEdge( GrayI16 src, int radiusX, int radiusY, GrayI16 dst,
 											 @Nullable Object workspace, Rect_S32 filter ) {
 		// top edge
@@ -184,6 +188,7 @@ public class ImageLambdaFilters {
 		}
 	}
 
+	//CONCURRENT_OMIT_END
 	public static void filterRectCenterInner( GrayS32 src, int radiusX, int radiusY, GrayS32 dst,
 											  @Nullable Object workspace, RectCenter_S32 filter ) {
 		final int y0 = radiusY;
@@ -206,6 +211,7 @@ public class ImageLambdaFilters {
 		//CONCURRENT_ABOVE });
 	}
 
+	//CONCURRENT_OMIT_BEGIN
 	public static void filterRectCenterEdge( GrayS32 src, int radiusX, int radiusY, GrayS32 dst,
 											 @Nullable Object workspace, Rect_S32 filter ) {
 		// top edge
@@ -255,6 +261,7 @@ public class ImageLambdaFilters {
 		}
 	}
 
+	//CONCURRENT_OMIT_END
 	public static void filterRectCenterInner( GrayS64 src, int radiusX, int radiusY, GrayS64 dst,
 											  @Nullable Object workspace, RectCenter_S64 filter ) {
 		final int y0 = radiusY;
@@ -277,6 +284,7 @@ public class ImageLambdaFilters {
 		//CONCURRENT_ABOVE });
 	}
 
+	//CONCURRENT_OMIT_BEGIN
 	public static void filterRectCenterEdge( GrayS64 src, int radiusX, int radiusY, GrayS64 dst,
 											 @Nullable Object workspace, Rect_S64 filter ) {
 		// top edge
@@ -326,6 +334,7 @@ public class ImageLambdaFilters {
 		}
 	}
 
+	//CONCURRENT_OMIT_END
 	public static void filterRectCenterInner( GrayF32 src, int radiusX, int radiusY, GrayF32 dst,
 											  @Nullable Object workspace, RectCenter_F32 filter ) {
 		final int y0 = radiusY;
@@ -348,6 +357,7 @@ public class ImageLambdaFilters {
 		//CONCURRENT_ABOVE });
 	}
 
+	//CONCURRENT_OMIT_BEGIN
 	public static void filterRectCenterEdge( GrayF32 src, int radiusX, int radiusY, GrayF32 dst,
 											 @Nullable Object workspace, Rect_F32 filter ) {
 		// top edge
@@ -397,6 +407,7 @@ public class ImageLambdaFilters {
 		}
 	}
 
+	//CONCURRENT_OMIT_END
 	public static void filterRectCenterInner( GrayF64 src, int radiusX, int radiusY, GrayF64 dst,
 											  @Nullable Object workspace, RectCenter_F64 filter ) {
 		final int y0 = radiusY;
@@ -419,6 +430,7 @@ public class ImageLambdaFilters {
 		//CONCURRENT_ABOVE });
 	}
 
+	//CONCURRENT_OMIT_BEGIN
 	public static void filterRectCenterEdge( GrayF64 src, int radiusX, int radiusY, GrayF64 dst,
 											 @Nullable Object workspace, Rect_F64 filter ) {
 		// top edge
@@ -468,6 +480,8 @@ public class ImageLambdaFilters {
 		}
 	}
 
+	//CONCURRENT_OMIT_END
+	//CONCURRENT_OMIT_BEGIN
 	// indexPixel = index of pixel in the src image. Pixel index is passed in to avoid extra math
 
 	// @formatter:off
@@ -485,4 +499,5 @@ public class ImageLambdaFilters {
 	public @FunctionalInterface interface Rect_F32 { float apply( int cx, int cy, int x0, int y0, int x1, int y1, Object workspace ); }
 	public @FunctionalInterface interface Rect_F64 { double apply(int cx, int cy,  int x0, int y0, int x1, int y1, Object workspace ); }
 	// @formatter:on
+	//CONCURRENT_OMIT_END
 }
