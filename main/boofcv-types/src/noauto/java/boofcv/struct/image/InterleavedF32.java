@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,13 +45,11 @@ public class InterleavedF32 extends ImageInterleaved<InterleavedF32> {
 
 	public InterleavedF32() {data = new float[0];}
 
-	@Override
-	public String toString_element( int index ) {
+	@Override public String toString_element( int index ) {
 		return String.format("%5f", data[index]);
 	}
 
-	@Override
-	public ImageDataType getDataType() {
+	@Override public ImageDataType getDataType() {
 		return ImageDataType.F32;
 	}
 
@@ -144,8 +142,7 @@ public class InterleavedF32 extends ImageInterleaved<InterleavedF32> {
 		data[getIndex(x, y, band)] = value;
 	}
 
-	@Override
-	public void copyCol( int col, int row0, int row1, int offset, Object array ) {
+	@Override public void copyCol( int col, int row0, int row1, int offset, Object array ) {
 		float[] dst = (float[])array;
 		int idxSrc = startIndex + stride*row0 + col*numBands;
 		int idxDst = offset;
@@ -158,26 +155,40 @@ public class InterleavedF32 extends ImageInterleaved<InterleavedF32> {
 		}
 	}
 
-	@Override
-	protected Object _getData() {
+	@Override protected Object _getData() {
 		return data;
 	}
 
-	@Override
-	protected Class getPrimitiveDataType() {
+	@Override protected Class getPrimitiveDataType() {
 		return float.class;
 	}
 
-	@Override
-	protected void _setData( Object data ) {
+	@Override protected void _setData( Object data ) {
 		this.data = (float[])data;
 	}
 
-	@Override
-	public InterleavedF32 createNew( int imgWidth, int imgHeight ) {
+	@Override public InterleavedF32 createNew( int imgWidth, int imgHeight ) {
 		if (imgWidth == -1 || imgHeight == -1)
 			return new InterleavedF32();
 		return new InterleavedF32(imgWidth, imgHeight, numBands);
+	}
+
+	/**
+	 * Functional interface for accessing the pixel values and their coordinates
+	 *
+	 * @param function (Input) The function
+	 */
+	public void forEachPixel( EachPixel function ) {
+		var pixelBands = new float[numBands];
+		for (int y = 0; y < height; y++) {
+			int index = startIndex + y*stride;
+			for (int x = 0; x < width; x++) {
+				for (int b = 0; b < numBands; b++) {
+					pixelBands[b] = data[index++];
+				}
+				function.process(x, y, pixelBands);
+			}
+		}
 	}
 
 	public void print( String format ) {
@@ -187,5 +198,9 @@ public class InterleavedF32 extends ImageInterleaved<InterleavedF32> {
 			}
 			System.out.println();
 		}
+	}
+
+	@FunctionalInterface public interface EachPixel {
+		void process( int x, int y, float[] value );
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -98,4 +98,28 @@ public abstract class InterleavedInteger<T extends InterleavedInteger<T>> extend
 	 * @param value The new value of the element.
 	 */
 	public abstract void setBand( int x, int y, int band, int value );
+
+	protected abstract int getArrayValue(int index);
+
+	/**
+	 * Returns the value inside each image
+	 *
+	 * @param function (Input) The function
+	 */
+	public void forEachPixel( EachPixel function ) {
+		var pixelBands = new int[numBands];
+		for (int y = 0; y < height; y++) {
+			int index = startIndex + y*stride;
+			for (int x = 0; x < width; x++) {
+				for (int b = 0; b < numBands; b++) {
+					pixelBands[b] = getArrayValue(index++);
+				}
+				function.process(x, y, pixelBands);
+			}
+		}
+	}
+
+	@FunctionalInterface public interface EachPixel {
+		void process( int x, int y, int[] value );
+	}
 }

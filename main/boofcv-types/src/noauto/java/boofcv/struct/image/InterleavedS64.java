@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -172,5 +172,27 @@ public class InterleavedS64 extends ImageInterleaved<InterleavedS64> {
 		if (imgWidth == -1 || imgHeight == -1)
 			return new InterleavedS64();
 		return new InterleavedS64(imgWidth, imgHeight, numBands);
+	}
+
+	/**
+	 * Functional interface for accessing the pixel values and their coordinates
+	 *
+	 * @param function (Input) The function
+	 */
+	public void forEachPixel( EachPixel function ) {
+		var pixelBands = new long[numBands];
+		for (int y = 0; y < height; y++) {
+			int index = startIndex + y*stride;
+			for (int x = 0; x < width; x++) {
+				for (int b = 0; b < numBands; b++) {
+					pixelBands[b] = data[index++];
+				}
+				function.process(x, y, pixelBands);
+			}
+		}
+	}
+
+	@FunctionalInterface public interface EachPixel {
+		void process( int x, int y, long[] value );
 	}
 }

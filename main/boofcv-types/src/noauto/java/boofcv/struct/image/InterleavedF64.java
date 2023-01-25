@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,13 +45,11 @@ public class InterleavedF64 extends ImageInterleaved<InterleavedF64> {
 
 	public InterleavedF64() {data = new double[0];}
 
-	@Override
-	public String toString_element( int index ) {
+	@Override public String toString_element( int index ) {
 		return String.format("%5f", data[index]);
 	}
 
-	@Override
-	public ImageDataType getDataType() {
+	@Override public ImageDataType getDataType() {
 		return ImageDataType.F64;
 	}
 
@@ -138,8 +136,7 @@ public class InterleavedF64 extends ImageInterleaved<InterleavedF64> {
 		data[getIndex(x, y, band)] = value;
 	}
 
-	@Override
-	public void copyCol( int col, int row0, int row1, int offset, Object array ) {
+	@Override public void copyCol( int col, int row0, int row1, int offset, Object array ) {
 		double[] dst = (double[])array;
 		int idxSrc = startIndex + stride*row0 + col*numBands;
 		int idxDst = offset;
@@ -152,25 +149,43 @@ public class InterleavedF64 extends ImageInterleaved<InterleavedF64> {
 		}
 	}
 
-	@Override
-	protected Object _getData() {
+	@Override protected Object _getData() {
 		return data;
 	}
 
-	@Override
-	protected Class getPrimitiveDataType() {
+	@Override protected Class getPrimitiveDataType() {
 		return double.class;
 	}
 
-	@Override
-	protected void _setData( Object data ) {
+	@Override protected void _setData( Object data ) {
 		this.data = (double[])data;
 	}
 
-	@Override
-	public InterleavedF64 createNew( int imgWidth, int imgHeight ) {
+	@Override public InterleavedF64 createNew( int imgWidth, int imgHeight ) {
 		if (imgWidth == -1 || imgHeight == -1)
 			return new InterleavedF64();
 		return new InterleavedF64(imgWidth, imgHeight, numBands);
+	}
+
+	/**
+	 * Functional interface for accessing the pixel values and their coordinates
+	 *
+	 * @param function (Input) The function
+	 */
+	public void forEachPixel( EachPixel function ) {
+		var pixelBands = new double[numBands];
+		for (int y = 0; y < height; y++) {
+			int index = startIndex + y*stride;
+			for (int x = 0; x < width; x++) {
+				for (int b = 0; b < numBands; b++) {
+					pixelBands[b] = data[index++];
+				}
+				function.process(x, y, pixelBands);
+			}
+		}
+	}
+
+	@FunctionalInterface public interface EachPixel {
+		void process( int x, int y, double[] value );
 	}
 }

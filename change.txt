@@ -14,10 +14,11 @@ Version : 0.42
 - Applications
   - Command line application for multi camera calibration
   - PDF Titles for Fiducials are now independent of file name and informative
+- Image Data Type
+  - forEachPixel added to interleaved images
 - Image Restoration
   - Geometric Mean filter
   - Adaptive mean filter
-  - TODO Adaptive median filter
 
 - Calibration
   - TODO Visualize Multi Camera Calibration

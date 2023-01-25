@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -69,6 +69,10 @@ public class InterleavedS8 extends InterleavedI8<InterleavedS8> {
 		for (int i = 0; i < numBands; i++, index++) {
 			storage[i] = data[index];
 		}
+	}
+
+	@Override protected int getArrayValue( int index ) {
+		return data[index];
 	}
 
 	@Override

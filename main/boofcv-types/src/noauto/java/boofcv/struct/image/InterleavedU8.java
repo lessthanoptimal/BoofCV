@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -84,6 +84,10 @@ public class InterleavedU8 extends InterleavedI8<InterleavedU8> {
 		data[i] = (byte)value;
 	}
 
+	@Override protected int getArrayValue( int index ) {
+		return data[index] & 0xFF;
+	}
+
 	/**
 	 * Returns the value of the specified band in the specified pixel.
 	 *
@@ -115,5 +119,24 @@ public class InterleavedU8 extends InterleavedI8<InterleavedU8> {
 		if (imgWidth == -1 || imgHeight == -1)
 			return new InterleavedU8();
 		return new InterleavedU8(imgWidth, imgHeight, numBands);
+	}
+
+	/**
+	 * For a 3-band image, it passes in the value of each pixel by putting it into an int.
+	 *
+	 * @see #get24
+	 *
+	 * @param function (Input) The function
+	 */
+	public void forEachPixel24( EachPixelInt function ) {
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				function.process(x, y, get24(x, y));
+			}
+		}
+	}
+
+	@FunctionalInterface public interface EachPixelInt {
+		void process( int x, int y, int value );
 	}
 }

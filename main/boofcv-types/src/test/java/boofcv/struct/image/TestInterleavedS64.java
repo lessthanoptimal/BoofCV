@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -17,6 +17,10 @@
  */
 
 package boofcv.struct.image;
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
@@ -41,5 +45,16 @@ public class TestInterleavedS64 extends StandardImageInterleavedTests<Interleave
 	@Override
 	public Number getNumber( Number value) {
 		return value.longValue();
+	}
+
+	@Test void forEachPixel() {
+		var img = new InterleavedS64(2, 3, 4);
+		setRandom(img);
+
+		img.forEachPixel(( x, y, found ) -> {
+			for (int i = 0; i < 4; i++) {
+				assertEquals(found[i], img.getBand(x, y, i));
+			}
+		});
 	}
 }

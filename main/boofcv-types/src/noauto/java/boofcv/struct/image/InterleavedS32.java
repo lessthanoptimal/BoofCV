@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -92,6 +92,10 @@ public class InterleavedS32 extends InterleavedInteger<InterleavedS32> {
 			throw new ImageAccessException("Invalid band requested.");
 
 		return data[getIndex(x, y, band)];
+	}
+
+	@Override protected int getArrayValue( int index ) {
+		return data[index];
 	}
 
 	/**

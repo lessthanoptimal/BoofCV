@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -69,6 +69,10 @@ public class InterleavedU16 extends InterleavedI16<InterleavedU16> {
 			throw new ImageAccessException("Invalid band requested.");
 
 		return data[getIndex(x, y, band)] & 0xFFFF;
+	}
+
+	@Override protected int getArrayValue( int index ) {
+		return data[index] & 0xFFFF;
 	}
 
 	@Override
