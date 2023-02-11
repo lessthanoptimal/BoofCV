@@ -225,9 +225,9 @@ subprojects {
     javadoc {
         configure(options) {
             links = ['https://docs.oracle.com/en/java/javase/11/docs/api/',
-                     'http://ejml.org/javadoc/',
-                     'http://ddogleg.org/javadoc/',
-                     'http://georegression.org/javadoc/']
+                     'https://ejml.org/javadoc/',
+                     'https://ddogleg.org/javadoc/',
+                     'https://georegression.org/javadoc/']
             failOnError = false
             enabled = !project.version.contains("SNAPSHOT") // disable to stop it from spamming stdout
         }
@@ -451,10 +451,10 @@ task alljavadoc(type: Javadoc, group: "Documentation", dependsOn: javadocProject
     configure(options) {
         failOnError = false
         title = "BoofCV ($project.version)"
-        links = ['http://docs.oracle.com/en/java/javase/11/docs/api',
-                 'http://ejml.org/javadoc/',
-                 'http://georegression.org/javadoc/',
-                 'http://ddogleg.org/javadoc/']
+        links = ['https://docs.oracle.com/en/java/javase/11/docs/api',
+                 'https://ejml.org/javadoc/',
+                 'https://georegression.org/javadoc/',
+                 'https://ddogleg.org/javadoc/']
     }
 
     // Work around a Gradle design flaw. It won't copy over files in doc-files
