@@ -45,6 +45,6 @@ Update prebuilt applications and demonstrations using https://github.com/lesstha
 
 - Publish Stable Release:
 
-git clean -fd main;./gradlew autogenerate;./gradlew assemble;./gradlew publish -Dorg.gradle.parallel=false
+git clean -fd main && ./gradlew autogenerate && ./gradlew assemble && ./gradlew publish -Dorg.gradle.parallel=false
 
 log onto http://oss.sonatype.org
