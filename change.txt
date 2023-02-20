@@ -3,7 +3,7 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
-Date    :
+Date    : 2023/Feb/20
 Version : 0.42
 
 - Build
@@ -21,22 +21,6 @@ Version : 0.42
   - Adaptive mean filter
 - Reconstruction
   - Support OBJ file format
-
-- Calibration
-  - TODO Visualize Multi Camera Calibration
-- Image Processing
-  - TODO hough circle detector
-- Scene Reconstruction
-  - TODO Robust optimization
-  - TODO 3D reconstruction to 3D mesh
-  - TODO Support STL format
-- SLAM
-  - TODO traditional monocular SLAM
-- Regression
-  - TODO Video stabilization
-  - TODO Template matching
-- Android
-  - TODO Add new Fragment based API
 
 ---------------------------------------------
 Date    : 2022/Sep/02
