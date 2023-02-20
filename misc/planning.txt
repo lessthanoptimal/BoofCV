@@ -1,22 +1,4 @@
-- Calibration
-  - TODO Visualize Multi Camera Calibration
-- Image Processing
-  - TODO hough circle detector
-- Scene Reconstruction
-  - TODO Robust optimization
-  - TODO 3D reconstruction to 3D mesh
-  - TODO Support STL format
-- SLAM
-  - TODO traditional monocular SLAM
-- Regression
-  - TODO Video stabilization
-  - TODO Template matching
-- Android
-  - TODO Add new Fragment based API
-- Calibration
-  - TODO calibration targets Hamming Marker grid and chessboard, e.g. ChArUco and ArUco grids.
-- SLAM
-  - TODO Stereo
+
 
 TODO Applications for self calibration mono and stereo
 TODO Monocular VO
