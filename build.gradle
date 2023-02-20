@@ -2,7 +2,7 @@ import net.ltgt.gradle.errorprone.CheckSeverity
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
-    id "com.peterabeles.gversion" version "1.10.1" apply false
+    id "com.peterabeles.gversion" version "1.10.2" apply false
     id "net.ltgt.errorprone" version "2.0.2" apply false
     id "com.diffplug.spotless" version "6.9.1" apply false
 }
