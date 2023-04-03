@@ -127,7 +127,7 @@ Similar to IntelliJ, you can now import Gradle projects like BoofCV using the Bu
 
 Core BoofCV modules depends on the following libraries
 
-- [ args4f        ]( http://args4j.kohsuke.org/)
+- [ args4j        ]( http://args4j.kohsuke.org/)
 - [ EJML          ]( http://code.google.com/p/efficient-java-matrix-library )
 - [ GeoRegression ]( http://georegression.org )
 - [ DDogleg       ]( http://ddogleg.org)
