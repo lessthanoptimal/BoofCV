@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,7 @@ import georegression.metric.UtilAngle;
 import georegression.struct.line.LineParametric2D_F32;
 import georegression.struct.line.LineSegment2D_F32;
 import georegression.struct.point.Point2D_F32;
+import org.ddogleg.struct.DogArray;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -38,6 +39,8 @@ import java.util.List;
 public class ImageLinePruneMerge {
 
 	List<Data> lines = new ArrayList<>();
+
+	DogArray<LineSegment2D_F32> segments = new DogArray<>(LineSegment2D_F32::new, LineSegment2D_F32::zero);
 
 	public void reset() {
 		lines.clear();
@@ -102,13 +105,13 @@ public class ImageLinePruneMerge {
 		sortByIntensity();
 
 		float[] theta = new float[lines.size()];
-		List<LineSegment2D_F32> segments = new ArrayList<>(lines.size());
+		segments.reset().resize(lines.size());
 
 		for (int i = 0; i < lines.size(); i++) {
 			Data d = lines.get(i);
 			LineParametric2D_F32 l = d.line;
 			theta[i] = UtilAngle.atanSafe(l.getSlopeY(), l.getSlopeX());
-			segments.add(LineImageOps.convert(l, imgWidth, imgHeight));
+			segments.get(i).setTo(LineImageOps.convert(l, imgWidth, imgHeight));
 		}
 
 		for (int i = 0; i < segments.size(); i++) {
@@ -149,8 +152,12 @@ public class ImageLinePruneMerge {
 						continue;
 					}
 
-					distA = Distance2D_F32.distance(b, b.a);
-					distB = Distance2D_F32.distance(b, b.b);
+					// These distances will probably be the same as the previously computed distA and distB
+					// someone should try to prove/disprove this... Maybe if the intersection doesn't lie on
+					// the same image border line?
+
+					distA = Distance2D_F32.distance(b, a.a);
+					distB = Distance2D_F32.distance(b, a.b);
 
 					if (distA > toleranceDist && distB > toleranceDist) {
 						continue;
@@ -163,15 +170,17 @@ public class ImageLinePruneMerge {
 					if (lines.get(j).intensity > lines.get(i).intensity) {
 						lines.get(i).intensity = lines.get(j).intensity;
 					}
-					segments.set(j, null);
+
+					// Mark it so that it will be filtered
+					segments.get(j).a.x = Float.NaN;
 				}
 			}
 		}
 
-		List<Data> filtered = new ArrayList<>();
+		var filtered = new ArrayList<Data>();
 
 		for (int i = 0; i < segments.size(); i++) {
-			if (segments.get(i) != null) {
+			if (!Float.isNaN(segments.get(i).a.x)) {
 				filtered.add(lines.get(i));
 			}
 		}

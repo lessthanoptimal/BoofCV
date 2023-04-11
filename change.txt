@@ -5,6 +5,9 @@ Date Format: year/month/day
 Date    : 2023/
 Version : 0.43
 
+- ImageLinePruneMerge
+  * Fixed type-o in near intersection formula. Thanks Erhan Erdemir for finding the problem.
+
 - TODO mesh rendering engine
 
 - Calibration
