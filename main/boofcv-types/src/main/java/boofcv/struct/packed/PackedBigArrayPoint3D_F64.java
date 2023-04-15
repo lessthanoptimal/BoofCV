@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.struct.packed;
 
 import boofcv.misc.BoofLambdas;
 import boofcv.struct.PackedArray;
+import georegression.struct.GeoTuple3D_F64;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.BigDogArray_F64;
 import org.ddogleg.struct.BigDogGrowth;
@@ -116,6 +117,10 @@ public class PackedBigArrayPoint3D_F64 implements PackedArray<Point3D_F64> {
 	}
 
 	@Override public void getCopy( int index, Point3D_F64 dst ) {
+		getCopy(index, (GeoTuple3D_F64<?>)dst);
+	}
+
+	public void getCopy( int index, GeoTuple3D_F64<?> dst ) {
 		index *= DOF;
 		double[] block = dog.getBlocks().get(index/dog.getBlockSize());
 		int element = index%dog.getBlockSize();
