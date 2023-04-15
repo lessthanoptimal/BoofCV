@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,10 +27,14 @@ import lombok.Getter;
  */
 public enum Unit {
 	UNKNOWN(Double.NaN, "?"),
+	/** A.k.a. Micron */
+	MICROMETER(1e-5, "um"),
 	MILLIMETER(0.001, "mm"),
 	CENTIMETER(0.01, "cm"),
 	METER(1, "m"),
 	KILOMETER(1000, "km"),
+	/** 0.001 inch a.k.a. thou */
+	MIL(2.54e-5, "mil"),
 	INCH(0.0254, "in"),
 	FOOT(0.3048, "ft"),
 	YARD(0.9144, "yd"),
