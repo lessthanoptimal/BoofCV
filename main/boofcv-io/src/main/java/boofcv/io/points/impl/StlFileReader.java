@@ -29,7 +29,6 @@ import java.nio.charset.StandardCharsets;
 /**
  * Reads in a file that's in STL format and saves to a {@link StlDataStructure}.
  *
- * @author Peter Abeles
  * @see StlDataStructure
  */
 public class StlFileReader {

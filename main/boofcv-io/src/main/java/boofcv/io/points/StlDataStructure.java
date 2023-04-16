@@ -18,11 +18,13 @@
 
 package boofcv.io.points;
 
+import boofcv.alg.meshing.VertexMesh;
 import boofcv.struct.packed.PackedBigArrayPoint3D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>Data structure used to store 3D objects that is native to the STL file format [1,2]. One deviation is
@@ -97,5 +99,27 @@ public class StlDataStructure {
 		for (int i = 0; i < 3; i++) {
 			StlDataStructure.this.vertexes.getCopy(facetVertsIdx.get(idx0 + i), outVertexes.get(i));
 		}
+	}
+
+	/**
+	 * Converts this into a {@link VertexMesh}. Information about normals and the name are discarded.
+	 *
+	 * @param out Storage for output mesh. Can be null.
+	 * @return The converted mesh.
+	 */
+	public VertexMesh toMesh( @Nullable VertexMesh out ) {
+		if (out == null)
+			out = new VertexMesh();
+
+		out.vertexes.setTo(vertexes);
+		out.indexes.setTo(facetVertsIdx);
+
+		// All facets are triangles
+		out.offsets.resize(facetCount());
+		for (int i = 0; i < out.offsets.size; i++) {
+			out.offsets.set(i, i*3);
+		}
+
+		return out;
 	}
 }
