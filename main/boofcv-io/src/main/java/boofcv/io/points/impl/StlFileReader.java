@@ -32,7 +32,7 @@ import java.nio.charset.StandardCharsets;
  * @author Peter Abeles
  * @see StlDataStructure
  */
-public abstract class StlFileReader {
+public class StlFileReader {
 	/**
 	 * Operation used to add a vertex. This can be used to compress the amount of storage used
 	 * to save the mesh by re-using vertexes. By default this employs a mindless approach
@@ -61,7 +61,7 @@ public abstract class StlFileReader {
 			if (line.isEmpty())
 				continue;
 
-			String[] words = line.split("\\R+");
+			String[] words = line.split("\\s+");
 
 			switch (words[0]) {
 				case "solid" -> {
@@ -113,7 +113,15 @@ public abstract class StlFileReader {
 		if (amountRead != 80)
 			throw new IOException("Couldn't read in entire header. amount=" + amountRead);
 
-		out.name = new String(line, 0, 80, StandardCharsets.UTF_8);
+		// Find length of text, assuming it's null terminating
+		int stringLength = line.length;
+		for (int i = 0; i < line.length; i++) {
+			if (line[i] == 0) {
+				stringLength = i;
+				break;
+			}
+		}
+		out.name = new String(line, 0, stringLength, StandardCharsets.UTF_8);
 
 		if (4 != input.read(line, 0, 4)) {
 			throw new IOException("Failed to read number of facets");
@@ -123,7 +131,7 @@ public abstract class StlFileReader {
 		int numFacets = bb.getInt(0);
 
 		// Number of bytes it takes to store a Facet
-		int facetBytes = 4*3*4 + 2;
+		int facetBytes = 4*3*4;
 
 		// pre-allocate memory
 		out.facetVertsIdx.resize(numFacets*3).reset();
