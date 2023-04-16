@@ -18,11 +18,15 @@
 
 package boofcv.io.points;
 
+import boofcv.struct.mesh.MeshPolygonAccess;
+import boofcv.struct.mesh.VertexMesh;
 import boofcv.struct.packed.PackedBigArrayPoint3D_F64;
+import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>Data structure used to store 3D objects that is native to the STL file format [1,2]. One deviation is
@@ -66,12 +70,82 @@ public class StlDataStructure {
 		name = "";
 	}
 
+	public StlDataStructure setTo( StlDataStructure src ) {
+		this.vertexes.setTo(src.vertexes);
+		this.normals.setTo(src.normals);
+		this.facetVertsIdx.setTo(src.facetVertsIdx);
+		this.name = src.name;
+		return this;
+	}
+
+	/**
+	 * Adds the facet with the provided normal vector
+	 */
+	public void addFacet( Point3D_F64 v1, Point3D_F64 v2, Point3D_F64 v3, Vector3D_F64 normal ) {
+		for (int i = 0; i < 3; i++) {
+			facetVertsIdx.add(vertexes.size() + i);
+		}
+		vertexes.append(v1);
+		vertexes.append(v2);
+		vertexes.append(v3);
+		normals.append(normal);
+	}
+
+	/**
+	 * Adds the facet. Computes the normal vector using cross product on the input points
+	 */
+	public void addFacet( Point3D_F64 v1, Point3D_F64 v2, Point3D_F64 v3 ) {
+		for (int i = 0; i < 3; i++) {
+			facetVertsIdx.add(vertexes.size() + i);
+		}
+
+		vertexes.append(v1);
+		vertexes.append(v2);
+		vertexes.append(v3);
+
+		addNormal(v1, v2, v3);
+	}
+
+	public void addFacet( int vertIdx1, int vertIdx2, int vertIdx3, Vector3D_F64 normal ) {
+		facetVertsIdx.add(vertIdx1);
+		facetVertsIdx.add(vertIdx2);
+		facetVertsIdx.add(vertIdx3);
+
+		normals.append(normal);
+	}
+
+	private void addNormal( Point3D_F64 v1, Point3D_F64 v2, Point3D_F64 v3 ) {
+		// Compute the normal using a cross product
+		double ax = v2.x - v1.x;
+		double ay = v2.y - v1.y;
+		double az = v2.z - v1.z;
+
+		double bx = v3.x - v1.x;
+		double by = v3.y - v1.y;
+		double bz = v3.z - v1.z;
+
+		Point3D_F64 t = vertexes.temp;
+		GeometryMath_F64.cross(ax, ay, az, bx, by, bz, t);
+
+		// Ensure the norm is 1
+		double n = t.norm();
+		t.divideIP(n);
+
+		// Save the results
+		normals.append(t.x, t.y, t.z);
+	}
+
 	/**
 	 * Number of Facets in this solid
 	 */
 	public int facetCount() {
 		return normals.size();
 	}
+
+	/**
+	 * Same as {@link #facetCount()}
+	 */
+	public int size() {return normals.size();}
 
 	/**
 	 * Retrieves the 3D structure of a facet
@@ -97,5 +171,47 @@ public class StlDataStructure {
 		for (int i = 0; i < 3; i++) {
 			StlDataStructure.this.vertexes.getCopy(facetVertsIdx.get(idx0 + i), outVertexes.get(i));
 		}
+	}
+
+	/**
+	 * Converts this into a {@link VertexMesh}. Information about normals and the name are discarded.
+	 *
+	 * @param out Storage for output mesh. Can be null.
+	 * @return The converted mesh.
+	 */
+	public VertexMesh toMesh( @Nullable VertexMesh out ) {
+		if (out == null)
+			out = new VertexMesh();
+
+		out.vertexes.setTo(vertexes);
+		out.indexes.setTo(facetVertsIdx);
+
+		// All facets are triangles
+		out.offsets.resize(facetCount() + 1);
+		out.offsets.set(0, 0);
+		for (int i = 1; i < out.offsets.size; i++) {
+			out.offsets.set(i, i*3);
+		}
+
+		return out;
+	}
+
+	/**
+	 * Wraps the data structure inside {@link MeshPolygonAccess}.
+	 */
+	public MeshPolygonAccess toAccess() {
+		return new MeshPolygonAccess() {
+			// Mesh Polygon doesn't keep track of the normals, but STL does. So we need this to save into but it's
+			// never read
+			Vector3D_F64 dummy = new Vector3D_F64();
+
+			@Override public int size() {
+				return facetCount();
+			}
+
+			@Override public void getPolygon( int which, DogArray<Point3D_F64> vertexes ) {
+				getFacet(which, dummy, vertexes);
+			}
+		};
 	}
 }

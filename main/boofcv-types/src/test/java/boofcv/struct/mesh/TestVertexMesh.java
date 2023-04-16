@@ -16,14 +16,13 @@
  * limitations under the License.
  */
 
-package boofcv.io.points.impl;
+package boofcv.struct.mesh;
 
-/**
- *
- * <p>[1] StereoLithography Interface Specification, 3D Systems, Inc., October 1989</p>
- * <p>[2] <a href=https://www.fabbers.com/tech/STL_Format>The STL Format</a></p>
- *
- * @author Peter Abeles
- */
-public class StlFileCodec {
+import boofcv.testing.BoofStandardJUnit;
+import org.junit.jupiter.api.Test;
+
+public class TestVertexMesh extends BoofStandardJUnit {
+	@Test void setTo() {checkSetTo(VertexMesh.class, true);}
+
+	@Test void reset() throws Exception {checkReset(VertexMesh.class, "reset");}
 }

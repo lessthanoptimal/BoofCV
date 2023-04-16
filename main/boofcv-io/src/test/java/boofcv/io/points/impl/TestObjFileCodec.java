@@ -20,7 +20,7 @@ package boofcv.io.points.impl;
 
 import boofcv.alg.cloud.PointCloudReader;
 import boofcv.alg.cloud.PointCloudWriter;
-import boofcv.alg.meshing.VertexMesh;
+import boofcv.struct.mesh.VertexMesh;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.DogArray;

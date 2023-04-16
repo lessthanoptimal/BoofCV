@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,6 @@ import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.rectify.DisparityParameters;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.alg.meshing.DepthImageToMeshGridSample;
-import boofcv.alg.meshing.VertexMesh;
 import boofcv.factory.disparity.FactoryStereoDisparity;
 import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
@@ -34,6 +33,7 @@ import boofcv.io.points.PointCloudIO;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.mesh.VertexMesh;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;

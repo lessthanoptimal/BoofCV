@@ -16,15 +16,25 @@
  * limitations under the License.
  */
 
-package boofcv.io.points.impl;
+package boofcv.struct.mesh;
 
-import boofcv.testing.BoofStandardJUnit;
-import org.junit.jupiter.api.Test;
+import georegression.struct.point.Point3D_F64;
+import org.ddogleg.struct.DogArray;
 
-import static org.junit.jupiter.api.Assertions.fail;
+/**
+ * Provides access to an arbitrary mesh. The mesh is assumed to be stored in a format with planar polygons.
+ * The idea is that you can access a mesh in this abstract format and not need to convert it to some other common
+ * format first
+ */
+public interface MeshPolygonAccess {
+	/** Number of polygons in this mesh */
+	int size();
 
-class TestStlFileCodec extends BoofStandardJUnit {
-	@Test void implement() {
-		fail("Implement");
-	}
+	/**
+	 * Retries a planar polygon in 3D
+	 *
+	 * @param which Which polygon should it access
+	 * @param vertexes Storage for vertexes on the polygon
+	 */
+	void getPolygon( int which, DogArray<Point3D_F64> vertexes );
 }
