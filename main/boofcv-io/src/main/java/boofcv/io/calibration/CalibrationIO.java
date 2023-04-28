@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,6 +30,7 @@ import org.apache.commons.io.IOUtils;
 import org.ejml.data.DMatrixRMaj;
 import org.jetbrains.annotations.Nullable;
 import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.representer.Representer;
@@ -732,10 +733,10 @@ public class CalibrationIO {
 			filtered = filtered.replace("%YAML:1.0", "");
 			filtered = filtered.replace("!!opencv-matrix", "");
 
-			Representer representer = new Representer();
+			var representer = new Representer(new DumperOptions());
 			representer.getPropertyUtils().setSkipMissingProperties(true);
 
-			Yaml yaml = new Yaml(new Constructor(), representer);
+			var yaml = new Yaml(new Constructor(new LoaderOptions()), representer);
 			Map<String, Object> map = yaml.load(filtered);
 
 			int width = getOrThrow(map, "image_width");
