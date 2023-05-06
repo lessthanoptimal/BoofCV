@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.testing;
 
 import boofcv.BoofTesting;
 import boofcv.struct.Configuration;
+import org.ddogleg.struct.DogArrayPrimitive;
 import org.ddogleg.struct.FastAccess;
 import org.ejml.data.DMatrix;
 import org.ejml.data.FMatrix;
@@ -31,10 +32,7 @@ import org.junit.jupiter.api.BeforeEach;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -156,6 +154,12 @@ public class BoofStandardJUnit {
 						originalList.clear();
 						originalList.addAll(outputList);
 					}
+				} else if (DogArrayPrimitive.class.isAssignableFrom(f.getType())) {
+					var array = (DogArrayPrimitive<?>)f.get(config);
+					int size = rand.nextInt(10) + 1;
+					array.resize(size);
+					Field fieldData = f.getType().getField("data");
+					randomFillArray(fieldData.get(array), size, rand);
 				} else {
 					// if final and it has a setTo(), then create a random instance and call setTo
 					try {
@@ -172,6 +176,52 @@ public class BoofStandardJUnit {
 			return config;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
+		}
+	}
+
+	private static void randomFillArray( Object o, int size, Random rand ) {
+		Class<?> type = o.getClass();
+
+		if (size < 0)
+			size = Array.getLength(o);
+
+		if (char[].class == type) {
+			char[] array = (char[])o;
+			for (int i = 0; i < size; i++) {
+				array[i] = (char)rand.nextInt();
+			}
+		} else if (byte[].class == type) {
+			byte[] array = (byte[])o;
+			for (int i = 0; i < size; i++) {
+				array[i] = (byte)rand.nextInt();
+			}
+		} else if (short[].class == type) {
+			short[] array = (short[])o;
+			for (int i = 0; i < size; i++) {
+				array[i] = (short)rand.nextInt();
+			}
+		} else if (int[].class == type) {
+			int[] array = (int[])o;
+			for (int i = 0; i < size; i++) {
+				array[i] = rand.nextInt();
+			}
+		} else if (long[].class == type) {
+			long[] array = (long[])o;
+			for (int i = 0; i < size; i++) {
+				array[i] = rand.nextLong();
+			}
+		} else if (float[].class == type) {
+			float[] array = (float[])o;
+			for (int i = 0; i < size; i++) {
+				array[i] = rand.nextFloat();
+			}
+		} else if (double[].class == type) {
+			double[] array = (double[])o;
+			for (int i = 0; i < size; i++) {
+				array[i] = rand.nextDouble();
+			}
+		} else {
+			throw new RuntimeException("Unknown array type: " + type.getName());
 		}
 	}
 
