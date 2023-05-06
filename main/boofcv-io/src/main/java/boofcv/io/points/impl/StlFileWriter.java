@@ -158,6 +158,8 @@ public class StlFileWriter {
 				putGeoTuple3(bb, p0);
 				putGeoTuple3(bb, poly.get(idx1 - 2));
 				putGeoTuple3(bb, poly.get(idx1 - 1));
+				// Attribute byte count. spec says to set to zero
+				bb.putShort((short)0);
 				output.write(line, 0, bb.position());
 			}
 		}

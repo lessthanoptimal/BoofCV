@@ -59,7 +59,6 @@ public class TestObjFileCodec extends BoofStandardJUnit {
 
 	@Test void encode_decode_mesh() throws IOException {
 		var mesh = new VertexMesh();
-		mesh.offsets.add(0);
 		for (int i = 0; i < 10; i++) {
 			mesh.vertexes.append(i, 2, 3);
 			for (int foo = 0; foo < 3; foo++) {

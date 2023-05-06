@@ -133,7 +133,7 @@ public class StlFileReader {
 		int numFacets = bb.getInt(0);
 
 		// Number of bytes it takes to store a Facet
-		int facetBytes = 4*3*4;
+		int facetBytes = 4*3*4 + 2;
 
 		// pre-allocate memory
 		out.facetVertsIdx.resize(numFacets*3).reset();
@@ -143,8 +143,9 @@ public class StlFileReader {
 		// Read in all the facets
 		for (int i = 0; i < numFacets; i++) {
 			// Read in all the data for a facet at once
-			if (facetBytes != input.read(line, 0, facetBytes)) {
-				throw new IOException("Failed to read data for facet " + i);
+			int readBytes = input.read(line, 0, facetBytes);
+			if (facetBytes != readBytes) {
+				throw new IOException("Failed to read data for facet " + i + ". bytes=" + readBytes);
 			}
 
 			out.normals.append(bb.getFloat(0), bb.getFloat(4), bb.getFloat(8));

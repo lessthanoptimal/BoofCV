@@ -107,8 +107,8 @@ public class ExampleStereoMesh {
 		}
 
 		// Save results. Display using a 3rd party application
-		try (OutputStream out = new FileOutputStream("mesh.ply")) {
-			PointCloudIO.save3D(PointCloudIO.Format.PLY, mesh, colors, out);
+		try (OutputStream out = new FileOutputStream("mesh.stl")) {
+			PointCloudIO.save3D(PointCloudIO.Format.STL, mesh, colors, out);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
