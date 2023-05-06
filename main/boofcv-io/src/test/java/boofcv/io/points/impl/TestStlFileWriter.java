@@ -24,7 +24,29 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.fail;
 
 class TestStlFileWriter extends BoofStandardJUnit {
-	@Test void implement() {
+	/**
+	 * Save a mesh then load it again and see if it gets the same results
+	 */
+	@Test void ascii_CompareToOriginal() {
 		fail("Implement");
+	}
+
+	@Test void binary_CompareToOriginal() {
+		fail("Implement");
+	}
+
+	/**
+	 * See if it handles the case where there is more then 3 vertexes correctly
+	 */
+	@Test void ascii_HandleSquare() {
+		fail("Implement");
+	}
+
+	@Test void binary_HandleSquare() {
+		fail("Implement");
+	}
+
+	@Test void computeNormal() {
+		fail("implement");
 	}
 }

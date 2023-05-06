@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -470,7 +470,6 @@ public class PlyCodec {
 		final var polygonLine = new byte[4*10];
 		final ByteBuffer polygonBB = ByteBuffer.wrap(polygonLine);
 		int[] indexes = new int[100];
-		int offset = 0;
 		for (int i = 0; i < triangleCount; i++) {
 			if (1 != reader.read(line, 0, 1))
 				throw new RuntimeException("Couldn't read count byte");

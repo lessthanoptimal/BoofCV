@@ -24,6 +24,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -127,6 +128,8 @@ public class StlFileReader {
 		}
 
 		final ByteBuffer bb = ByteBuffer.wrap(line);
+		bb.order(ByteOrder.LITTLE_ENDIAN);
+
 		int numFacets = bb.getInt(0);
 
 		// Number of bytes it takes to store a Facet
