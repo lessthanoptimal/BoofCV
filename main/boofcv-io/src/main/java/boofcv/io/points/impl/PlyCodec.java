@@ -20,8 +20,8 @@ package boofcv.io.points.impl;
 
 import boofcv.alg.cloud.PointCloudReader;
 import boofcv.alg.cloud.PointCloudWriter;
-import boofcv.alg.meshing.VertexMesh;
 import boofcv.io.UtilIO;
+import boofcv.struct.mesh.VertexMesh;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.DogArray_I32;
 import org.jetbrains.annotations.Nullable;
@@ -313,11 +313,9 @@ public class PlyCodec {
 		read(input, new PlyReader() {
 			@Override public void initialize( int vertexes, int triangles, boolean color ) {
 				colorRGB.reset();
-				mesh.vertexes.reset();
-				mesh.indexes.reset();
+				mesh.reset();
 				mesh.vertexes.reserve(vertexes);
 				mesh.indexes.reserve(triangles*3);
-				mesh.offsets.add(0);
 			}
 
 			@Override public void addVertex( double x, double y, double z, int rgb ) {

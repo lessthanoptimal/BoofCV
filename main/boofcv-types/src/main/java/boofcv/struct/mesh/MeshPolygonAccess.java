@@ -16,14 +16,25 @@
  * limitations under the License.
  */
 
-package boofcv.io.points.impl;
+package boofcv.struct.mesh;
+
+import georegression.struct.point.Point3D_F64;
+import org.ddogleg.struct.DogArray;
 
 /**
- *
- * <p>[1] StereoLithography Interface Specification, 3D Systems, Inc., October 1989</p>
- * <p>[2] <a href=https://www.fabbers.com/tech/STL_Format>The STL Format</a></p>
- *
- * @author Peter Abeles
+ * Provides access to an arbitrary mesh. The mesh is assumed to be stored in a format with planar polygons.
+ * The idea is that you can access a mesh in this abstract format and not need to convert it to some other common
+ * format first
  */
-public class StlFileCodec {
+public interface MeshPolygonAccess {
+	/** Number of polygons in this mesh */
+	int size();
+
+	/**
+	 * Retries a planar polygon in 3D
+	 *
+	 * @param which Which polygon should it access
+	 * @param vertexes Storage for vertexes on the polygon
+	 */
+	void getPolygon( int which, DogArray<Point3D_F64> vertexes );
 }

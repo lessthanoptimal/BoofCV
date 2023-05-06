@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,7 @@ import boofcv.struct.ConfigLength;
 import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS32;
+import boofcv.struct.mesh.VertexMesh;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import lombok.Getter;

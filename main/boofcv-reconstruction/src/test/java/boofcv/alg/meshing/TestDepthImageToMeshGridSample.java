@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,7 @@ import boofcv.simulation.SimulatePlanarWorld;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.distort.PointToPixelTransform_F64;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.mesh.VertexMesh;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.se.SpecialEuclideanOps_F64;

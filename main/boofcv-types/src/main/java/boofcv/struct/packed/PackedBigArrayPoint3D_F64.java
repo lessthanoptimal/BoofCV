@@ -97,6 +97,10 @@ public class PackedBigArrayPoint3D_F64 implements PackedArray<Point3D_F64> {
 		size++;
 	}
 
+	public void append( GeoTuple3D_F64<?> element ) {
+		append(element.x, element.y, element.z);
+	}
+
 	@Override public void append( Point3D_F64 element ) {
 		dog.add(element.x);
 		dog.add(element.y);

@@ -18,7 +18,7 @@
 
 package boofcv.io.points.impl;
 
-import boofcv.io.points.MeshPolygonAccess;
+import boofcv.struct.mesh.MeshPolygonAccess;
 import georegression.fitting.plane.FitPlane3D_F64;
 import georegression.struct.GeoTuple3D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -54,7 +54,7 @@ public class StlFileWriter {
 	public String precision = "%.10f";
 
 	/** With a bad polygon is detected this function is called. Replace with custom logic */
-	public HandleBadPolygon errorHandler = ( w, e ) -> {System.err.println("Bad Polygon: " + w + " " + e);};
+	public HandleBadPolygon errorHandler = ( w, e ) -> System.err.println("Bad Polygon: " + w + " " + e);
 
 	/**
 	 * Generates an STL file in ASCII format given a mesh in {@link MeshPolygonAccess} format.
@@ -63,11 +63,11 @@ public class StlFileWriter {
 	 * @param name (Input) What you want to call this mesh
 	 * @param writer (Output) where it's written to
 	 */
-	public void ascii( MeshPolygonAccess mesh, String name, Writer writer ) throws IOException {
+	public void writeAscii( MeshPolygonAccess mesh, String name, Writer writer ) throws IOException {
 		// Massage the name to make it compatible with this format
 		String nameMassaged = name.trim().replaceAll("\\s", "");
 		// Add the name line for the solid. Remove all white spaces to avoid any issues
-		writer.write("solid " + nameMassaged);
+		writer.write("solid " + nameMassaged + "\n");
 
 		// Pre-generate format strings at the desired precision
 		String formatNorm = String.format("  facet normal %s %s %s\n", precision, precision, precision);
@@ -100,22 +100,23 @@ public class StlFileWriter {
 			}
 		}
 
-		writer.write("endsolid " + nameMassaged);
+		writer.write("endsolid " + nameMassaged + "\n");
 	}
 
-	 /**
+	/**
 	 * Generates an STL file in binary format given a mesh in {@link MeshPolygonAccess} format.
 	 *
 	 * @param mesh (Input) Mesh accessor
 	 * @param name (Input) What you want to call this mesh
 	 * @param output (Output) where it's saved to
 	 */
-	public void binary( MeshPolygonAccess mesh, String name, OutputStream output ) throws IOException {
+	public void writeBinary( MeshPolygonAccess mesh, String name, OutputStream output ) throws IOException {
 		// Zero the array so that old rand data isn't written
 		Arrays.fill(line, (byte)0);
 
 		final ByteBuffer bb = ByteBuffer.wrap(line);
 		bb.order(ByteOrder.LITTLE_ENDIAN);
+		bb.mark();
 
 		var poly = new DogArray<>(Point3D_F64::new);
 
@@ -137,7 +138,6 @@ public class StlFileWriter {
 		// Save the number of triangles
 		bb.putInt(totalTriangles);
 		output.write(line, 0, 4);
-		bb.reset();
 
 		// Save all the triangles
 		for (int polygonIdx = 0; polygonIdx < mesh.size(); polygonIdx++) {
@@ -158,7 +158,7 @@ public class StlFileWriter {
 				putGeoTuple3(bb, p0);
 				putGeoTuple3(bb, poly.get(idx1 - 2));
 				putGeoTuple3(bb, poly.get(idx1 - 1));
-				output.write(line, 0, 4*3*4);
+				output.write(line, 0, bb.position());
 			}
 		}
 	}
@@ -173,7 +173,7 @@ public class StlFileWriter {
 	/**
 	 * Carefully compute the normal of the polygon. Return false if the polygon is bad and should be skipped.
 	 */
-	private boolean computeNormal( DogArray<Point3D_F64> poly, int polygonIdx ) {
+	boolean computeNormal( DogArray<Point3D_F64> poly, int polygonIdx ) {
 		// Find the normal angle for the plane.
 		if (poly.size == 3) {
 			// Use a cross product since we can't do better than that

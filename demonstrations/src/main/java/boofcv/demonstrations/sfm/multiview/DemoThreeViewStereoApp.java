@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,7 +38,6 @@ import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.alg.geo.rectify.DisparityParameters;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.alg.meshing.DepthImageToMeshGridSample;
-import boofcv.alg.meshing.VertexMesh;
 import boofcv.alg.structure.ThreeViewEstimateMetricScene;
 import boofcv.core.image.ConvertImage;
 import boofcv.factory.feature.associate.FactoryAssociation;
@@ -66,6 +65,7 @@ import boofcv.struct.feature.AssociatedTripleIndex;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.geo.AssociatedTriple;
 import boofcv.struct.image.*;
+import boofcv.struct.mesh.VertexMesh;
 import boofcv.visualize.PointCloudViewer;
 import boofcv.visualize.VisualizeData;
 import georegression.struct.point.Point2D_F64;
