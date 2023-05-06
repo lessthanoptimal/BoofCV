@@ -22,10 +22,7 @@ import boofcv.alg.cloud.AccessColorIndex;
 import boofcv.alg.cloud.AccessPointIndex;
 import boofcv.alg.cloud.PointCloudReader;
 import boofcv.alg.cloud.PointCloudWriter;
-import boofcv.io.points.impl.ObjFileCodec;
-import boofcv.io.points.impl.ObjFileReader;
-import boofcv.io.points.impl.ObjFileWriter;
-import boofcv.io.points.impl.PlyCodec;
+import boofcv.io.points.impl.*;
 import boofcv.struct.Point3dRgbI_F64;
 import boofcv.struct.mesh.VertexMesh;
 import georegression.struct.point.Point3D_F32;
@@ -56,6 +53,7 @@ public class PointCloudIO {
 		switch (format) {
 			case PLY -> PlyCodec.saveCloudBinary(cloud, ByteOrder.BIG_ENDIAN, saveRGB, false, outputStream);
 			case OBJ -> ObjFileCodec.save(cloud, new OutputStreamWriter(outputStream));
+			case STL -> throw new IllegalArgumentException("STL doesn't support point clouds");
 			default -> throw new IllegalArgumentException("Unknown format " + format);
 		}
 	}
@@ -65,6 +63,7 @@ public class PointCloudIO {
 		switch (format) {
 			case PLY -> PlyCodec.saveMeshBinary(mesh, colorRGB, ByteOrder.BIG_ENDIAN, false, outputStream);
 			case OBJ -> ObjFileCodec.save(mesh, new OutputStreamWriter(outputStream));
+			case STL -> new StlFileWriter().writeBinary(mesh.toAccess(), "MeshBoofCV", outputStream);
 			default -> throw new IllegalArgumentException("Unknown format " + format);
 		}
 	}
@@ -154,6 +153,13 @@ public class PointCloudIO {
 		switch (format) {
 			case PLY -> PlyCodec.readMesh(input, mesh, vertexRgb);
 			case OBJ -> ObjFileCodec.load(input, mesh);
+			case STL -> {
+				var stlMesh = new StlDataStructure();
+				new StlFileReader().readBinary(input, stlMesh);
+				stlMesh.toMesh(mesh);
+				// NOTE: In the future it might be a good idea to add the capability to read straight into mesh
+				//       because large meshes might use up all memory
+			}
 			default -> throw new RuntimeException("Unknown format");
 		}
 	}
@@ -195,5 +201,12 @@ public class PointCloudIO {
 		 * @see ObjFileWriter
 		 */
 		OBJ,
+		/**
+		 * Save in 3D Systems' STL file format
+		 *
+		 * @see StlFileReader
+		 * @see StlFileWriter
+		 */
+		STL,
 	}
 }

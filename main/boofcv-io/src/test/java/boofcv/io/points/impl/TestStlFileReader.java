@@ -26,6 +26,8 @@ import org.ddogleg.struct.DogArray;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -65,26 +67,33 @@ class TestStlFileReader extends BoofStandardJUnit {
 		byte[] textBytes = "cube_corner".getBytes(StandardCharsets.UTF_8);
 		System.arraycopy(textBytes, 0, labelBlock, 0, textBytes.length);
 
-		var byteStream = new ByteArrayOutputStream();
-		var out = new DataOutputStream(byteStream);
+		var out = new ByteArrayOutputStream();
 		out.write(labelBlock);
-		out.writeInt(2);
+		// unsigned int in little endian
+		out.write(2);
+		out.write(0);
+		out.write(0);
+		out.write(0);
+
 		write(out, 0.0f, -1.0f, 0.0f);
 		write(out, 0.0f, 0.0f, 0.0f);
 		write(out, 1.0f, 0.0f, 0.0f);
 		write(out, 0.0f, 0.0f, 1.0f);
+		out.write(0);
+		out.write(0);
 
 		write(out, 0.0f, 0.0f, -1.0f);
 		write(out, 0.0f, 0.0f, 0.0f);
 		write(out, 0.0f, 1.0f, 0.0f);
 		write(out, 1.0f, 0.0f, 0.0f);
+		out.write(0);
+		out.write(0);
 
-		out.writeShort(0);
 		out.flush();
 
 		var alg = new StlFileReader();
 		var found = new StlDataStructure();
-		alg.readBinary(new ByteArrayInputStream(byteStream.toByteArray()), found);
+		alg.readBinary(new ByteArrayInputStream(out.toByteArray()), found);
 
 		checkResults(found);
 	}
@@ -111,9 +120,12 @@ class TestStlFileReader extends BoofStandardJUnit {
 		assertTrue(vertexes.get(2).isIdentical(1.0, 0.0, 0.0));
 	}
 
-	void write( DataOutputStream out, float a, float b, float c ) throws IOException {
-		out.writeFloat(a);
-		out.writeFloat(b);
-		out.writeFloat(c);
+	void write( OutputStream out, float a, float b, float c ) throws IOException {
+		var bytes = ByteBuffer.allocate(4*3);
+		bytes.order(ByteOrder.LITTLE_ENDIAN);
+		bytes.putFloat(a);
+		bytes.putFloat(b);
+		bytes.putFloat(c);
+		out.write(bytes.array());
 	}
 }
