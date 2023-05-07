@@ -59,6 +59,8 @@ public class MeshViewerPanel extends JPanel {
 	// Horizontal FOV in degrees
 	double hfov = 90;
 
+	MouseRotateAroundPoint mouseControls = new MouseRotateAroundPoint();
+
 	public MeshViewerPanel() {
 		addComponentListener(new ComponentAdapter() {
 			@Override public void componentResized( ComponentEvent e ) {
@@ -70,6 +72,12 @@ public class MeshViewerPanel extends JPanel {
 				}
 			}
 		});
+
+		mouseControls.handleCameraChanged = this::requestRender;
+		addMouseListener(mouseControls);
+		addMouseMotionListener(mouseControls);
+		addMouseWheelListener(mouseControls);
+		requestFocus();
 	}
 
 	/**
@@ -87,7 +95,6 @@ public class MeshViewerPanel extends JPanel {
 
 	public void shutdownRenderThread() {
 		shutdownRequested = true;
-		renderThread.interrupt();
 	}
 
 	public void clearMesh() {
@@ -99,14 +106,20 @@ public class MeshViewerPanel extends JPanel {
 		if (copy) {
 			mesh = new VertexMesh().setTo(mesh);
 		}
+		mouseControls.selectTargetPoint(mesh);
 		this.mesh = mesh;
-		requestRender();
+	}
+
+	/**
+	 * Let's ou specify the RGB color for each vertex in the mesh.
+	 */
+	public void setVertexColor( int[] colorsRgb ) {
+		renderer.surfaceColor = ( index ) -> colorsRgb[index] | 0xFF000000;
 	}
 
 	public void requestRender() {
 		// tell the render thread to stop rendering
 		renderRequested = true;
-		renderThread.interrupt();
 	}
 
 	private void renderLoop() {
@@ -117,10 +130,11 @@ public class MeshViewerPanel extends JPanel {
 				render();
 			}
 
-			try {
-				Thread.sleep(250);
-			} catch (InterruptedException ignore) {
-			}
+			// Stop it from sucking up all the CPU
+			Thread.yield();
+
+			// Can't sleep or wait here. That requires interrupting the thread to wake it up, unfortunately
+			// that conflicts with the concurrency code and interrupts that too
 		}
 		System.out.println("Finished render loop");
 	}
@@ -136,6 +150,9 @@ public class MeshViewerPanel extends JPanel {
 
 			PerspectiveOps.createIntrinsic(dimension.width, dimension.height, hfov, -1, renderer.getIntrinsics());
 		}
+
+		mouseControls.setCamera(renderer.getIntrinsics());
+		renderer.worldToView.setTo(mouseControls.getWorldToCamera());
 
 		System.out.println("Rendering. size: " + dimension.width + "x" + dimension.height);
 
@@ -153,7 +170,7 @@ public class MeshViewerPanel extends JPanel {
 		try {
 			InterleavedU8 rgb = renderer.getRgbImage();
 			work = ConvertBufferedImage.checkDeclare(rgb.width, rgb.height, work, work.getType());
-			ConvertBufferedImage.convertTo(renderer.rgbImage, work, true);
+			ConvertBufferedImage.convertTo(renderer.rgbImage, work, false);
 			pendingUpdate = true;
 		} catch (Exception e) {
 			e.printStackTrace(System.out);

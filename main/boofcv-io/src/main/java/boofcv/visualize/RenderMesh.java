@@ -32,10 +32,15 @@ import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.Rectangle2D_I32;
 import lombok.Getter;
 import lombok.Setter;
+import org.ddogleg.struct.VerbosePrint;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.PrintStream;
+import java.util.Set;
 
 /**
  * Simple algorithm that renders a 3D mesh and computes a depth image. This rendering engine is fairly basic and makes
- * the following assumptions: each shape has a single color and all colors are opaque. All RGB colors are in RGBA
+ * the following assumptions: each shape has a single color and all colors are opaque. All RGB colors are in ARGB
  * 32-bit int format. Various aspects are configurable:
  *
  * <ul>
@@ -47,12 +52,12 @@ import lombok.Setter;
  *
  * @author Peter Abeles
  */
-public class RenderMesh {
+public class RenderMesh implements VerbosePrint {
 	/** What color background pixels are set to by default in RGBA. Default value is transparent black */
 	public @Getter @Setter int defaultColorRgba = 0x00000000;
 
 	/** Used to change what color a surface is. By default, it's red. */
-	public @Getter @Setter SurfaceColor surfaceColor = ( surface ) -> 0xFF0000FF;
+	public @Getter @Setter SurfaceColor surfaceColor = ( surface ) -> 0xFFFF0000;
 
 	/** Rendered depth image. Values with no depth information are set to NaN. */
 	public @Getter final GrayF32 depthImage = new GrayF32(1, 1);
@@ -71,6 +76,8 @@ public class RenderMesh {
 	private final Point2D_F64 point = new Point2D_F64();
 	private final Polygon2D_F64 polygon = new Polygon2D_F64();
 	private final Rectangle2D_I32 aabb = new Rectangle2D_I32();
+
+	@Nullable PrintStream verbose = null;
 
 	/**
 	 * Renders the mesh onto an image. Produces an RGB image and depth image. Must have configured
@@ -99,8 +106,8 @@ public class RenderMesh {
 
 		for (int shapeIdx = 1; shapeIdx < mesh.offsets.size; shapeIdx++) {
 			// First and last point in the polygon
-			int idx0 = mesh.offsets.get(shapeIdx - 1);
-			int idx1 = mesh.offsets.get(shapeIdx);
+			final int idx0 = mesh.offsets.get(shapeIdx - 1);
+			final int idx1 = mesh.offsets.get(shapeIdx);
 
 			// skip pathological case
 			if (idx0 >= idx1)
@@ -108,14 +115,17 @@ public class RenderMesh {
 
 			// Project points on the shape onto the image and store in polygon
 			polygon.vertexes.reset().reserve(idx1 - idx0);
-			int countBehind = 0;
+			boolean behindCamera = false;
 			for (int i = idx0; i < idx1; i++) {
 				Point3D_F64 world = mesh.vertexes.getTemp(mesh.indexes.get(i));
 				worldToView.transform(world, camera);
 
-				// If the entire mesh is behind the camera then it can be skipped
-				if (camera.z <= 0)
-					countBehind++;
+				// If any part is behind the camera skip it. While not ideal this keeps the code simple,
+				// speeds it up a lot, and removes weird rendering artifacts
+				if (camera.z <= 0) {
+					behindCamera = true;
+					break;
+				}
 
 				// normalized image coordinates
 				double normX = camera.x/camera.z;
@@ -129,7 +139,7 @@ public class RenderMesh {
 			}
 
 			// Skip if not visible
-			if (countBehind == polygon.size())
+			if (behindCamera)
 				continue;
 
 			// Compute the pixels which might be able to see polygon
@@ -140,7 +150,7 @@ public class RenderMesh {
 			shapesRenderedCount++;
 		}
 
-		System.out.println("total shapes rendered: "+shapesRenderedCount);
+		if (verbose != null ) verbose.println("total shapes rendered: " + shapesRenderedCount);
 	}
 
 	/**
@@ -189,26 +199,30 @@ public class RenderMesh {
 		//
 		// IDEA: Use a homography to map location on 2D polygon to 3D polygon, then rotate just the Z to get
 		//       local depth on the surface.
-		Point3D_F64 world = mesh.vertexes.getTemp(mesh.indexes.get(idx0));
+		int vertexIndex = mesh.indexes.get(idx0);
+		Point3D_F64 world = mesh.vertexes.getTemp(vertexIndex);
 		worldToView.transform(world, camera);
 
 		float depth = (float)camera.z;
 
+		// TODO look at vertexes and get min/max depth. Use that to quickly reject pixels based on depth without
+		//      convex intersection or computing the depth at that pixel on this surface
+
 		// The entire surface will have one color
-		int color = surfaceColor.surfaceRgb(idx0);
+		int color = surfaceColor.surfaceRgb(vertexIndex);
 
 		// Go through all pixels and see if the points are inside the polygon. If so
 		for (int pixelY = aabb.y0; pixelY < aabb.y1; pixelY++) {
 			for (int pixelX = aabb.x0; pixelX < aabb.x1; pixelX++) {
-				point.setTo(pixelX, pixelY);
-				if (!Intersection2D_F64.containsConvex(polygon, point))
-					continue;
-
 				// See if this is the closest point appearing at this pixel
 				float pixelDepth = depthImage.unsafe_get(pixelX, pixelY);
 				if (!Float.isNaN(pixelDepth) && depth >= pixelDepth) {
 					continue;
 				}
+
+				point.setTo(pixelX, pixelY);
+				if (!Intersection2D_F64.containsConvex(polygon, point))
+					continue;
 
 				// Update depth and image
 				// Make sure the alpha channel is set to 100% in RGBA format
@@ -216,6 +230,10 @@ public class RenderMesh {
 				rgbImage.set32(pixelX, pixelY, color);
 			}
 		}
+	}
+
+	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
+		verbose = BoofMiscOps.addPrefix(this, out);
 	}
 
 	@FunctionalInterface
