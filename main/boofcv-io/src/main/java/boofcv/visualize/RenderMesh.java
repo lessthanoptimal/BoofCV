@@ -31,22 +31,30 @@ import georegression.struct.se.Se3_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.Rectangle2D_I32;
 import lombok.Getter;
+import lombok.Setter;
 
 /**
- * Renders a 3D mesh and computes a depth image.
+ * Simple algorithm that renders a 3D mesh and computes a depth image. This rendering engine is fairly basic and makes
+ * the following assumptions: each shape has a single color and all colors are opaque. All RGB colors are in RGBA
+ * 32-bit int format. Various aspects are configurable:
  *
- * TODO describe how to use. i.e. set up intrinsic
- * TODO add ability to set color of mesh
- * TODO ste brightness using dot product or something
- * TODO describe algorithm more
+ * <ul>
+ *     <li>{@link #defaultColorRgba} Specifies what color the background is.</li>
+ *     <li>{@link #surfaceColor} Function which returns the color of a shape. The shape's index is passed.</li>
+ *     <li>{@link #intrinsics} Camera intrinsics. This must be set before use.</li>
+ *     <li>{@link #worldToView} Transform from work to the current view.</li>
+ * </ul>
  *
  * @author Peter Abeles
  */
 public class RenderMesh {
 	/** What color background pixels are set to by default in RGBA. Default value is transparent black */
-	public int defaultColorRgba = 0x00000000;
+	public @Getter @Setter int defaultColorRgba = 0x00000000;
 
-	/** Rendered depth image */
+	/** Used to change what color a surface is. By default, it's red. */
+	public @Getter @Setter SurfaceColor surfaceColor = ( surface ) -> 0xFF0000FF;
+
+	/** Rendered depth image. Values with no depth information are set to NaN. */
 	public @Getter final GrayF32 depthImage = new GrayF32(1, 1);
 
 	/** Rendered color image. Pixels are in RGBA format. */
@@ -56,14 +64,20 @@ public class RenderMesh {
 	public @Getter final CameraPinhole intrinsics = new CameraPinhole();
 
 	/** Transform from world (what the mesh is in) to the camera view */
-	public Se3_F64 worldToView = new Se3_F64();
+	public @Getter final Se3_F64 worldToView = new Se3_F64();
 
 	// Workspace variables
-	Point3D_F64 camera = new Point3D_F64();
-	Point2D_F64 point = new Point2D_F64();
-	Polygon2D_F64 polygon = new Polygon2D_F64();
-	Rectangle2D_I32 aabb = new Rectangle2D_I32();
+	private final Point3D_F64 camera = new Point3D_F64();
+	private final Point2D_F64 point = new Point2D_F64();
+	private final Polygon2D_F64 polygon = new Polygon2D_F64();
+	private final Rectangle2D_I32 aabb = new Rectangle2D_I32();
 
+	/**
+	 * Renders the mesh onto an image. Produces an RGB image and depth image. Must have configured
+	 * {@link #intrinsics} already and set {@link #worldToView}.
+	 *
+	 * @param mesh The mesh that's going to be rendered.
+	 */
 	public void render( VertexMesh mesh ) {
 		// Sanity check to see if intrinsics has been configured
 		BoofMiscOps.checkTrue(intrinsics.width > 0 && intrinsics.height > 0);
@@ -80,6 +94,8 @@ public class RenderMesh {
 		final double fy = intrinsics.fy;
 		final double cx = intrinsics.cx;
 		final double cy = intrinsics.cy;
+
+		int shapesRenderedCount = 0;
 
 		for (int shapeIdx = 1; shapeIdx < mesh.offsets.size; shapeIdx++) {
 			// First and last point in the polygon
@@ -120,9 +136,21 @@ public class RenderMesh {
 			computeBoundingBox(width, height, polygon, aabb);
 
 			projectSurfaceOntoImage(mesh, polygon, idx0);
+
+			shapesRenderedCount++;
 		}
+
+		System.out.println("total shapes rendered: "+shapesRenderedCount);
 	}
 
+	/**
+	 * Computes the AABB for the polygon inside the image.
+	 *
+	 * @param width (Input) image width
+	 * @param height (Input) image height
+	 * @param polygon (Input) projected polygon onto image
+	 * @param aabb (Output) Found AABB clipped to be inside the image.
+	 */
 	private static void computeBoundingBox( int width, int height, Polygon2D_F64 polygon, Rectangle2D_I32 aabb ) {
 		// Find the pixel bounds that contain this polygon
 		double x0 = polygon.vertexes.get(0).x;
@@ -150,16 +178,24 @@ public class RenderMesh {
 		aabb.y1 = (int)Math.ceil(Math.min(height, y1 + 1));
 	}
 
+	/**
+	 * Renders the polygon onto the image as a single color. The AABB that the polygon is contained inside
+	 * is searched exhaustively. If the projected 2D polygon contains a pixels and the polygon is closer than
+	 * the current depth of the pixel it is rendered there and the depth image is updated.
+	 */
 	private void projectSurfaceOntoImage( VertexMesh mesh, Polygon2D_F64 polygon, int idx0 ) {
 		// TODO temp hack. Best way is to find the distance to the 3D polygon at this point. Instead we will
-		// use the depth of the first point
+		// use the depth of the first point.
+		//
+		// IDEA: Use a homography to map location on 2D polygon to 3D polygon, then rotate just the Z to get
+		//       local depth on the surface.
 		Point3D_F64 world = mesh.vertexes.getTemp(mesh.indexes.get(idx0));
 		worldToView.transform(world, camera);
 
 		float depth = (float)camera.z;
 
-		// hard code color for now.
-		int color = 0xFFFF0000;
+		// The entire surface will have one color
+		int color = surfaceColor.surfaceRgb(idx0);
 
 		// Go through all pixels and see if the points are inside the polygon. If so
 		for (int pixelY = aabb.y0; pixelY < aabb.y1; pixelY++) {
@@ -170,7 +206,7 @@ public class RenderMesh {
 
 				// See if this is the closest point appearing at this pixel
 				float pixelDepth = depthImage.unsafe_get(pixelX, pixelY);
-				if (!Float.isNaN(pixelDepth) && depth > pixelDepth) {
+				if (!Float.isNaN(pixelDepth) && depth >= pixelDepth) {
 					continue;
 				}
 
@@ -180,5 +216,13 @@ public class RenderMesh {
 				rgbImage.set32(pixelX, pixelY, color);
 			}
 		}
+	}
+
+	@FunctionalInterface
+	public interface SurfaceColor {
+		/**
+		 * Returns RGB color of the specified surface
+		 */
+		int surfaceRgb( int which );
 	}
 }
