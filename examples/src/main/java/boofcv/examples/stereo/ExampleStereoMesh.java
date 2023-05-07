@@ -25,6 +25,8 @@ import boofcv.alg.geo.rectify.DisparityParameters;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.alg.meshing.DepthImageToMeshGridSample;
 import boofcv.factory.disparity.FactoryStereoDisparity;
+import boofcv.gui.image.ShowImages;
+import boofcv.gui.mesh.MeshViewerPanel;
 import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
@@ -38,6 +40,7 @@ import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -105,6 +108,12 @@ public class ExampleStereoMesh {
 			int v = rectLeft.get((int)p.x, (int)p.y);
 			colors.add(v << 16 | v << 8 | v);
 		}
+
+		var panel = new MeshViewerPanel();
+		panel.setMesh(mesh, false);
+		panel.setPreferredSize(new Dimension(500, 500));
+		panel.startRenderThread();
+		ShowImages.showWindow(panel, "Mesh Viewer");
 
 		// Save results. Display using a 3rd party application
 		try (OutputStream out = new FileOutputStream("mesh.ply")) {

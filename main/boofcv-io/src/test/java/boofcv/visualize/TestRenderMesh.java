@@ -24,7 +24,18 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class TestRenderMesh extends BoofStandardJUnit {
-	@Test void implement() {
+	/**
+	 * Render a simple shape that has a known depth and rendered image
+	 */
+	@Test void allTogether() {
+		fail("Implement");
+	}
+
+	@Test void computeBoundingBox() {
+		fail("Implement");
+	}
+
+	@Test void projectSurfaceOntoImage() {
 		fail("Implement");
 	}
 }

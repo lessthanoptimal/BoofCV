@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -92,12 +92,15 @@ public class PerspectiveOps {
 	 *
 	 * @param width Image width
 	 * @param height Image height
-	 * @param hfov Horizontal FOV in degrees
-	 * @param vfov Vertical FOV in degrees
+	 * @param hfov Horizontal FOV in degrees. If <= 0 then it will be set to the vfov
+	 * @param vfov Vertical FOV in degrees. If <= 0 then it will be set to the hfov
 	 * @return guess camera parameters
 	 */
 	public static CameraPinhole createIntrinsic( int width, int height, double hfov, double vfov,
 												 @Nullable CameraPinhole intrinsic ) {
+		if (hfov <= 0.0 && vfov <= 0.0)
+			throw new IllegalArgumentException("At least one of hfov or vfov must be > 0");
+
 		if (intrinsic == null)
 			intrinsic = new CameraPinhole();
 		else {
@@ -108,8 +111,15 @@ public class PerspectiveOps {
 		intrinsic.height = height;
 		intrinsic.cx = width/2;
 		intrinsic.cy = height/2;
-		intrinsic.fx = intrinsic.cx/Math.tan(UtilAngle.degreeToRadian(hfov/2.0));
-		intrinsic.fy = intrinsic.cy/Math.tan(UtilAngle.degreeToRadian(vfov/2.0));
+		if (hfov > 0.0)
+			intrinsic.fx = intrinsic.cx/Math.tan(UtilAngle.degreeToRadian(hfov/2.0));
+		if (vfov > 0.0)
+			intrinsic.fy = intrinsic.cy/Math.tan(UtilAngle.degreeToRadian(vfov/2.0));
+
+		if (hfov <= 0.0)
+			intrinsic.fx = intrinsic.fy;
+		else if (vfov <= 0.0)
+			intrinsic.fy = intrinsic.fx;
 
 		return intrinsic;
 	}
