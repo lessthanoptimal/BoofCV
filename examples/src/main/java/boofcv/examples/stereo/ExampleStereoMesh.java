@@ -114,6 +114,7 @@ public class ExampleStereoMesh {
 		panel.setVertexColor(colors.data);
 		panel.setPreferredSize(new Dimension(500, 500));
 		panel.startRenderThread();
+//		panel.setVerbose(System.out, null);
 		ShowImages.showWindow(panel, "Mesh Viewer", true);
 
 		// Save results. Display using a 3rd party application

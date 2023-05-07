@@ -20,22 +20,29 @@ package boofcv.gui.mesh;
 
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageDimension;
 import boofcv.struct.image.InterleavedU8;
 import boofcv.struct.mesh.VertexMesh;
 import boofcv.visualize.RenderMesh;
+import org.ddogleg.struct.VerbosePrint;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.image.BufferedImage;
+import java.io.PrintStream;
+import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
+ * Displays a rendered mesh in a JPanel. Has controls to change the view. Rendering is done in a seperate thread.
+ *
  * @author Peter Abeles
  */
-public class MeshViewerPanel extends JPanel {
+public class MeshViewerPanel extends JPanel implements VerbosePrint {
 	RenderMesh renderer = new RenderMesh();
 	VertexMesh mesh;
 
@@ -60,6 +67,8 @@ public class MeshViewerPanel extends JPanel {
 	double hfov = 90;
 
 	MouseRotateAroundPoint mouseControls = new MouseRotateAroundPoint();
+
+	@Nullable PrintStream verbose = null;
 
 	public MeshViewerPanel() {
 		addComponentListener(new ComponentAdapter() {
@@ -144,7 +153,7 @@ public class MeshViewerPanel extends JPanel {
 		synchronized (dimension) {
 			// Skip if not visible
 			if (dimension.width <= 0 || dimension.height <= 0) {
-				System.out.println("invalid size");
+				if (verbose != null) verbose.println("invalid size");
 				return;
 			}
 
@@ -154,14 +163,13 @@ public class MeshViewerPanel extends JPanel {
 		mouseControls.setCamera(renderer.getIntrinsics());
 		renderer.worldToView.setTo(mouseControls.getWorldToCamera());
 
-		System.out.println("Rendering. size: " + dimension.width + "x" + dimension.height);
-
 		// Render the mesh
 		long time0 = System.currentTimeMillis();
 		renderer.render(mesh);
 		long time1 = System.currentTimeMillis();
 
-		System.out.println("After render. " + (time1 - time0) + " (ms)");
+		if (verbose != null)
+			verbose.println("After render. size: " + dimension.width + "x" + dimension.height + "  time: " + (time1 - time0) + " (ms)");
 		// TODO fix case where there is already a pending update, the work buffer has another update requested
 		//      and when the buffers are swapped the work buffer is being drawn and converted at the same time
 
@@ -180,7 +188,6 @@ public class MeshViewerPanel extends JPanel {
 
 		// Tell Swing to redraw this panel so that we can see what has been rendered
 		super.repaint();
-		System.out.println("Exit render");
 	}
 
 	public void setHorizontalFov( double degrees ) {
@@ -195,7 +202,6 @@ public class MeshViewerPanel extends JPanel {
 		if (lockUpdate.tryLock()) {
 			if (pendingUpdate) {
 				pendingUpdate = false;
-				System.out.println("swapped buffers");
 				BufferedImage tmp = buffered;
 				buffered = work;
 				work = tmp;
@@ -205,5 +211,10 @@ public class MeshViewerPanel extends JPanel {
 
 		var g2 = (Graphics2D)g;
 		g2.drawImage(buffered, 0, 0, null);
+	}
+
+	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
+		verbose = BoofMiscOps.addPrefix(this, out);
+		BoofMiscOps.verboseChildren(out, configuration, renderer);
 	}
 }

@@ -78,7 +78,6 @@ public class OrbitAroundPoint {
 				cameraLoc.y + targetPoint.y,
 				cameraLoc.z + targetPoint.z);
 		worldToView.R.setTo(rotationAroundTarget);
-		System.out.println("radiusScale=" + radiusScale + " T=" + worldToView.T);
 	}
 
 	public void handleMouseWheel( double ticks, double scale ) {
