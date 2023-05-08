@@ -26,6 +26,7 @@ import georegression.metric.UtilAngle;
 import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import lombok.Getter;
 import org.ejml.data.DMatrixRMaj;
@@ -44,6 +45,9 @@ public class OrbitAroundPoint {
 
 	DMatrixRMaj localRotation = new DMatrixRMaj(3, 3);
 	DMatrixRMaj rotationAroundTarget = new DMatrixRMaj(3, 3);
+	DMatrixRMaj tmp = new DMatrixRMaj(3, 3);
+
+	Vector3D_F64 translateWorld = new Vector3D_F64();
 
 	Point3D_F64 targetPoint = new Point3D_F64();
 	double radiusScale = 1.0;
@@ -54,12 +58,12 @@ public class OrbitAroundPoint {
 	Point2D_F64 norm2 = new Point2D_F64();
 
 	public OrbitAroundPoint() {
-		reset();
+		resetView();
 	}
 
-	public void reset() {
+	public void resetView() {
 		radiusScale = 1.0;
-		targetPoint.zero();
+		translateWorld.zero();
 		CommonOps_DDRM.setIdentity(rotationAroundTarget);
 	}
 
@@ -74,17 +78,17 @@ public class OrbitAroundPoint {
 
 		// Compute the full transform
 		worldToView.T.setTo(
-				cameraLoc.x + targetPoint.x,
-				cameraLoc.y + targetPoint.y,
-				cameraLoc.z + targetPoint.z);
+				cameraLoc.x + targetPoint.x + translateWorld.x,
+				cameraLoc.y + targetPoint.y + translateWorld.y,
+				cameraLoc.z + targetPoint.z + translateWorld.z);
 		worldToView.R.setTo(rotationAroundTarget);
 	}
 
-	public void handleMouseWheel( double ticks, double scale ) {
-		radiusScale = Math.max(0.005, radiusScale*(1.0 + 0.01*ticks*scale));
+	public void mouseWheel( double ticks, double scale ) {
+		radiusScale = Math.max(0.005, radiusScale*(1.0 + 0.02*ticks*scale));
 	}
 
-	public void handleMouseDrag( double x0, double y0, double x1, double y1 ) {
+	public void mouseDragRotate( double x0, double y0, double x1, double y1 ) {
 		// do nothing if the camera isn't configured yet
 		if (camera.fx == 0.0 || camera.fy == 0.0)
 			return;
@@ -101,6 +105,31 @@ public class OrbitAroundPoint {
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, -rotY, rotX, 0, localRotation);
 
 		// Update the global rotation
-		CommonOps_DDRM.mult(localRotation, rotationAroundTarget.copy(), rotationAroundTarget);
+		CommonOps_DDRM.mult(localRotation, rotationAroundTarget, tmp);
+		rotationAroundTarget.setTo(tmp);
+	}
+
+	/**
+	 * Uses mouse drag motion to translate the view
+	 *
+	 * @param yIsUp if true then dragging along y axis moves the view up. False moves it in and out
+	 */
+	public void mouseDragTranslate( double x0, double y0, double x1, double y1, boolean yIsUp ) {
+		// do nothing if the camera isn't configured yet
+		if (camera.fx == 0.0 || camera.fy == 0.0)
+			return;
+
+		// convert into normalize image coordinates
+		PerspectiveOps.convertPixelToNorm(camera, x0, y0, norm1);
+		PerspectiveOps.convertPixelToNorm(camera, x1, y1, norm2);
+
+		// Figure out the distance along the projection at the plane at the distance of the target point
+		double z = targetPoint.plus(translateWorld).norm()*radiusScale;
+
+		translateWorld.x += (norm2.x - norm1.x)*z;
+		if (yIsUp)
+			translateWorld.y += (norm2.y - norm1.y)*z;
+		else
+			translateWorld.z += (norm2.y - norm1.y)*z;
 	}
 }
