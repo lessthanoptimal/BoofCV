@@ -25,6 +25,7 @@ import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_F64;
 
+import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
@@ -34,7 +35,6 @@ import java.awt.event.MouseWheelEvent;
  * Dragging the mouse will rotate the camera around this point. Using the mouse wheel will zoom in and out.
  * This has been designed so that multiple threads can access it at the same time
  *
- *
  * @author Peter Abeles
  */
 public class MouseRotateAroundPoint extends MouseAdapter {
@@ -43,12 +43,28 @@ public class MouseRotateAroundPoint extends MouseAdapter {
 	/**
 	 * Called every time the camera has changed
 	 */
-	public Runnable handleCameraChanged = ()->{};
+	public Runnable handleCameraChanged = () -> {};
 
 	// Math for computing the orbit. All read/write must be synchronized for thread safety
 	final OrbitAroundPoint orbit = new OrbitAroundPoint();
 
 	int prevX, prevY;
+
+	public void attachControls( JComponent parent ) {
+		parent.addMouseListener(this);
+		parent.addMouseMotionListener(this);
+		parent.addMouseWheelListener(this);
+	}
+
+	public void detachControls( JComponent parent ) {
+		parent.removeMouseListener(this);
+		parent.removeMouseMotionListener(this);
+		parent.removeMouseWheelListener(this);
+	}
+
+	public void reset() {
+		orbit.resetView();
+	}
 
 	/**
 	 * By default sets the focal point that it rotates around to the medium point
@@ -100,14 +116,19 @@ public class MouseRotateAroundPoint extends MouseAdapter {
 
 	@Override public void mouseWheelMoved( MouseWheelEvent e ) {
 		synchronized (orbit) {
-			orbit.handleMouseWheel(e.getPreciseWheelRotation(), 1.0);
+			orbit.mouseWheel(e.getPreciseWheelRotation(), 1.0);
 		}
 		handleCameraChanged.run();
 	}
 
 	@Override public void mouseDragged( MouseEvent e ) {
 		synchronized (orbit) {
-			orbit.handleMouseDrag(prevX, prevY, e.getX(), e.getY());
+			if (e.isShiftDown() || SwingUtilities.isMiddleMouseButton(e))
+				orbit.mouseDragTranslate(prevX, prevY, e.getX(), e.getY(), true);
+			else if (e.isControlDown() || SwingUtilities.isRightMouseButton(e))
+				orbit.mouseDragTranslate(prevX, prevY, e.getX(), e.getY(), false);
+			else
+				orbit.mouseDragRotate(prevX, prevY, e.getX(), e.getY());
 		}
 		prevX = e.getX();
 		prevY = e.getY();

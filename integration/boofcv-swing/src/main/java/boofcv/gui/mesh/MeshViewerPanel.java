@@ -30,8 +30,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.PrintStream;
 import java.util.Set;
@@ -42,7 +41,7 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  * @author Peter Abeles
  */
-public class MeshViewerPanel extends JPanel implements VerbosePrint {
+public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDispatcher {
 	RenderMesh renderer = new RenderMesh();
 	VertexMesh mesh;
 
@@ -73,7 +72,6 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint {
 	public MeshViewerPanel() {
 		addComponentListener(new ComponentAdapter() {
 			@Override public void componentResized( ComponentEvent e ) {
-				System.out.println("Updating camera shape");
 				synchronized (dimension) {
 					dimension.width = getWidth();
 					dimension.height = getHeight();
@@ -83,9 +81,19 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint {
 		});
 
 		mouseControls.handleCameraChanged = this::requestRender;
-		addMouseListener(mouseControls);
-		addMouseMotionListener(mouseControls);
-		addMouseWheelListener(mouseControls);
+		mouseControls.attachControls(this);
+
+		addFocusListener(new FocusListener() {
+			@Override public void focusGained( FocusEvent e ) {
+				KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(MeshViewerPanel.this);
+			}
+
+			@Override public void focusLost( FocusEvent e ) {
+				KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(MeshViewerPanel.this);
+			}
+		});
+
+		setFocusable(true);
 		requestFocus();
 	}
 
@@ -96,10 +104,6 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint {
 	public void removeNotify() {
 		super.removeNotify();
 		shutdownRenderThread();
-	}
-
-	public void startRenderThread() {
-		renderThread.start();
 	}
 
 	public void shutdownRenderThread() {
@@ -132,7 +136,7 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint {
 	}
 
 	private void renderLoop() {
-		System.out.println("Starting render loop");
+		if (verbose != null) verbose.println("Starting render loop");
 		while (!shutdownRequested) {
 			if (renderRequested) {
 				renderRequested = false;
@@ -145,7 +149,7 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint {
 			// Can't sleep or wait here. That requires interrupting the thread to wake it up, unfortunately
 			// that conflicts with the concurrency code and interrupts that too
 		}
-		System.out.println("Finished render loop");
+		if (verbose != null) verbose.println("Finished render loop");
 	}
 
 	private void render() {
@@ -198,6 +202,13 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint {
 	public void paintComponent( Graphics g ) {
 		super.paintComponent(g);
 
+		// Start the render thread if it hasn't already started
+		try {
+			if (!renderThread.isAlive())
+				renderThread.start();
+		} catch (Exception ignore) {
+		}
+
 		// Check to see if there's a new rendered image, if so swap it with the work buffer
 		if (lockUpdate.tryLock()) {
 			if (pendingUpdate) {
@@ -216,5 +227,14 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint {
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
 		verbose = BoofMiscOps.addPrefix(this, out);
 		BoofMiscOps.verboseChildren(out, configuration, renderer);
+	}
+
+	@Override public boolean dispatchKeyEvent( KeyEvent e ) {
+		// H = Home and resets the view
+		if (e.getKeyCode() == KeyEvent.VK_H) {
+			mouseControls.reset();
+			requestRender();
+		}
+		return false;
 	}
 }
