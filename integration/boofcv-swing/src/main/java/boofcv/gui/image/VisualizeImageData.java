@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,10 +26,9 @@ import boofcv.io.image.ConvertRaster;
 import boofcv.struct.image.*;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBuffer;
-import java.awt.image.DataBufferInt;
-import java.awt.image.WritableRaster;
+import java.awt.image.*;
+
+import static boofcv.io.image.ConvertRaster.isKnownByteFormat;
 
 /**
  * Renders different primitive image types into a BufferedImage for visualization purposes.
@@ -334,7 +333,8 @@ public class VisualizeImageData {
 	 */
 	public static BufferedImage inverseDepth( GrayF32 src, @Nullable BufferedImage dst,
 											  float minValue, float maxValue, int invalidColor ) {
-		dst = ConvertBufferedImage.checkDeclare(src.width, src.height, dst, BufferedImage.TYPE_INT_RGB);
+		int bufferedType = dst == null ? BufferedImage.TYPE_INT_RGB : dst.getType();
+		dst = ConvertBufferedImage.checkDeclare(src.width, src.height, dst, bufferedType);
 
 		// Find max value ignoring NaN
 		if (maxValue <= 0.0f) {
@@ -345,7 +345,7 @@ public class VisualizeImageData {
 		if (minValue < 0.0f) {
 			minValue = maxValue;
 			for (int y = 0; y < src.height; y++) {
-				int index = src.getIndex(0,y);
+				int index = src.getIndex(0, y);
 				int end = index + src.width;
 				while (index < end) {
 					float v = src.data[index++];
@@ -360,25 +360,45 @@ public class VisualizeImageData {
 		if (range == 0.0f)
 			range = 1f;
 
-		for (int y = 0; y < src.height; y++) {
-			for (int x = 0; x < src.width; x++) {
-				float v = src.unsafe_get(x, y);
+		PixelToRgb colorizer = createInverseDepthColorizer(src, minValue, maxValue, invalidColor, range);
 
-				if (v < minValue) {
-					dst.setRGB(x, y, invalidColor);
-				} else if (v == 0.0f) {
-					dst.setRGB(x, y, 0);
-				} else {
-					v = Math.min(v, maxValue) - minValue;
-					int r = (int)(255*v/range);
-					int b = (int)(255*(range - v)/range);
-
-					dst.setRGB(x, y, r << 16 | b);
+		DataBuffer buffer = dst.getRaster().getDataBuffer();
+		if (buffer.getDataType() == DataBuffer.TYPE_BYTE && isKnownByteFormat(dst)) {
+			applyTo(colorizer, src.width, src.height, (DataBufferByte)buffer, dst.getRaster());
+		} else if (buffer.getDataType() == DataBuffer.TYPE_INT) {
+			applyTo(colorizer, src.width, src.height, (DataBufferInt)buffer, dst.getRaster());
+		} else {
+			for (int y = 0; y < src.height; y++) {
+				for (int x = 0; x < src.width; x++) {
+					dst.setRGB(x, y, colorizer.getRgb(x, y));
 				}
 			}
 		}
 
+		// hack so that it knows the buffer has been modified
+		dst.setRGB(0, 0, dst.getRGB(0, 0));
+
 		return dst;
+	}
+
+	private static PixelToRgb createInverseDepthColorizer( GrayF32 src,
+														   float minValue, float maxValue,
+														   int invalidColor, float range ) {
+		return ( x, y ) -> {
+			float v = src.unsafe_get(x, y);
+
+			if (v < minValue) {
+				return invalidColor;
+			} else if (v == 0.0f) {
+				return 0;
+			} else {
+				v = Math.min(v, maxValue) - minValue;
+				int r = (int)(255*v/range);
+				int b = (int)(255*(range - v)/range);
+
+				return r << 16 | b;
+			}
+		};
 	}
 
 	private static void colorizeSign( GrayF32 src, BufferedImage dst, float maxAbsValue ) {
@@ -628,5 +648,74 @@ public class VisualizeImageData {
 		}
 
 		return output;
+	}
+
+	private static void applyTo( PixelToRgb src, int width, int height, DataBufferByte buffer, WritableRaster dst ) {
+		final byte[] dstData = buffer.getData();
+
+		final int numBands = dst.getNumBands();
+
+		if (numBands == 1) {
+			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, src.height, y -> {
+			for (int y = 0; y < height; y++) {
+				int indexDst = y*width*numBands;
+
+				for (int x = 0; x < width; x++) {
+					int rgb = src.getRgb(x, y);
+					int band0 = rgb & 0xFF;
+					int band1 = (rgb >> 8) & 0xFF;
+					int band2 = (rgb >> 16) & 0xFF;
+
+					dstData[indexDst++] = (byte)((band0 + band1 + band2)/3);
+				}
+			}
+			//CONCURRENT_ABOVE });
+		} else if (numBands == 3) {
+			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, src.height, y -> {
+			for (int y = 0; y < height; y++) {
+				int indexDst = y*width*numBands;
+
+				for (int x = 0; x < width; x++) {
+					int rgb = src.getRgb(x, y);
+					dstData[indexDst++] = (byte)(rgb & 0xFF);
+					dstData[indexDst++] = (byte)((rgb >> 8) & 0xFF);
+					dstData[indexDst++] = (byte)((rgb >> 16) & 0xFF);
+				}
+			}
+			//CONCURRENT_ABOVE });
+		} else {
+			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, src.height, y -> {
+			for (int y = 0; y < height; y++) {
+				int indexDst = y*width*numBands;
+
+				for (int x = 0; x < width; x++) {
+					int rgb = src.getRgb(x, y);
+					dstData[indexDst++] = (byte)(rgb & 0xFF);
+					dstData[indexDst++] = (byte)((rgb >> 8) & 0xFF);
+					dstData[indexDst++] = (byte)((rgb >> 16) & 0xFF);
+					dstData[indexDst++] = (byte)0xFF;
+				}
+			}
+			//CONCURRENT_ABOVE });
+		}
+	}
+
+	private static void applyTo( PixelToRgb src, int width, int height, DataBufferInt buffer, WritableRaster dst ) {
+		final int[] dstData = buffer.getData();
+
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, src.height, y -> {
+		for (int y = 0; y < height; y++) {
+			int indexDst = y*width;
+
+			for (int x = 0; x < width; x++) {
+				dstData[indexDst++] = src.getRgb(x, y) | 0xFF000000;
+			}
+		}
+		//CONCURRENT_ABOVE });
+
+	}
+
+	@FunctionalInterface interface PixelToRgb {
+		int getRgb( int x, int y );
 	}
 }
