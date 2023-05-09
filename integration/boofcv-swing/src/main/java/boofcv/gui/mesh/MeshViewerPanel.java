@@ -19,6 +19,7 @@
 package boofcv.gui.mesh;
 
 import boofcv.alg.geo.PerspectiveOps;
+import boofcv.gui.image.SaveImageOnClick;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageDimension;
@@ -37,11 +38,16 @@ import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Displays a rendered mesh in a JPanel. Has controls to change the view. Rendering is done in a seperate thread.
+ * Displays a rendered mesh in a JPanel. Has controls to change the view. Rendering is done in a separate thread.
  *
  * @author Peter Abeles
  */
 public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDispatcher {
+	// TODO document clearly what is owned by which lock and which thread.
+	// TODO add a way to view the depth buffer
+	// TODO add WASD controls
+	// TODO add help dialog that let's you change control and view instructions
+
 	RenderMesh renderer = new RenderMesh();
 	VertexMesh mesh;
 
@@ -57,19 +63,23 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 
 	boolean shutdownRequested = false;
 	boolean renderRequested = false;
-	Thread renderThread = new Thread(() -> renderLoop(), "MeshRender");
+	Thread renderThread = new Thread(this::renderLoop, "MeshRender");
 
-	// only read/write when synchornized
+	// only read/write when synchronized
 	final ImageDimension dimension = new ImageDimension();
 
 	// Horizontal FOV in degrees
 	double hfov = 90;
 
-	MouseRotateAroundPoint mouseControls = new MouseRotateAroundPoint();
+	Swing3dCameraControl cameraControls = new MouseRotateAroundPoint();
 
 	@Nullable PrintStream verbose = null;
 
 	public MeshViewerPanel() {
+		// Add the standard way to save images
+		addMouseListener(new SaveImageOnClick(this));
+
+		// Listen to when this component is resized so that it can update the camera model and re-render the scene
 		addComponentListener(new ComponentAdapter() {
 			@Override public void componentResized( ComponentEvent e ) {
 				synchronized (dimension) {
@@ -80,9 +90,11 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 			}
 		});
 
-		mouseControls.handleCameraChanged = this::requestRender;
-		mouseControls.attachControls(this);
+		// Configure camera controls so that they can respond to UI events
+		cameraControls.setChangeHandler(this::requestRender);
+		cameraControls.attachControls(this);
 
+		// Add and remove a keyboard listener
 		addFocusListener(new FocusListener() {
 			@Override public void focusGained( FocusEvent e ) {
 				KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(MeshViewerPanel.this);
@@ -110,16 +122,11 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 		shutdownRequested = true;
 	}
 
-	public void clearMesh() {
-		mesh = new VertexMesh();
-		requestRender();
-	}
-
 	public void setMesh( VertexMesh mesh, boolean copy ) {
 		if (copy) {
 			mesh = new VertexMesh().setTo(mesh);
 		}
-		mouseControls.selectTargetPoint(mesh);
+		cameraControls.selectInitialParameters(mesh);
 		this.mesh = mesh;
 	}
 
@@ -130,6 +137,10 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 		renderer.surfaceColor = ( index ) -> colorsRgb[index] | 0xFF000000;
 	}
 
+	/**
+	 * Requests that a new image is rendered. Typically this is done when a configuration has changed. It will render
+	 * when the rendering thread has a chance.
+	 */
 	public void requestRender() {
 		// tell the render thread to stop rendering
 		renderRequested = true;
@@ -152,6 +163,11 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 		if (verbose != null) verbose.println("Finished render loop");
 	}
 
+	/**
+	 * Renders the scene onto a buffered image. Every time this is called the intrinsic parameters are recomputed
+	 * based on the current panel dimensions. Rendering is done using a double buffer to avoid artifacts when
+	 * drawn.
+	 */
 	private void render() {
 		// Update render parameters from GUI
 		synchronized (dimension) {
@@ -164,8 +180,8 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 			PerspectiveOps.createIntrinsic(dimension.width, dimension.height, hfov, -1, renderer.getIntrinsics());
 		}
 
-		mouseControls.setCamera(renderer.getIntrinsics());
-		renderer.worldToView.setTo(mouseControls.getWorldToCamera());
+		cameraControls.setCamera(renderer.getIntrinsics());
+		renderer.worldToView.setTo(cameraControls.getWorldToCamera());
 
 		// Render the mesh
 		long time0 = System.currentTimeMillis();
@@ -194,8 +210,13 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 		super.repaint();
 	}
 
+	/**
+	 * Changes the camera's horizontal field-of-view.
+	 * @param degrees FOV in degrees
+	 */
 	public void setHorizontalFov( double degrees ) {
 		this.hfov = degrees;
+		requestRender();
 	}
 
 	@Override
@@ -232,7 +253,7 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 	@Override public boolean dispatchKeyEvent( KeyEvent e ) {
 		// H = Home and resets the view
 		if (e.getKeyCode() == KeyEvent.VK_H) {
-			mouseControls.reset();
+			cameraControls.reset();
 			requestRender();
 		}
 		return false;

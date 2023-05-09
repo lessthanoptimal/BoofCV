@@ -37,7 +37,7 @@ import java.awt.event.MouseWheelEvent;
  *
  * @author Peter Abeles
  */
-public class MouseRotateAroundPoint extends MouseAdapter {
+public class MouseRotateAroundPoint extends MouseAdapter implements Swing3dCameraControl {
 	public int maxSamplePoints = 1000;
 
 	/**
@@ -50,13 +50,13 @@ public class MouseRotateAroundPoint extends MouseAdapter {
 
 	int prevX, prevY;
 
-	public void attachControls( JComponent parent ) {
+	@Override public void attachControls( JComponent parent ) {
 		parent.addMouseListener(this);
 		parent.addMouseMotionListener(this);
 		parent.addMouseWheelListener(this);
 	}
 
-	public void detachControls( JComponent parent ) {
+	@Override public void detachControls( JComponent parent ) {
 		parent.removeMouseListener(this);
 		parent.removeMouseMotionListener(this);
 		parent.removeMouseWheelListener(this);
@@ -69,9 +69,15 @@ public class MouseRotateAroundPoint extends MouseAdapter {
 	/**
 	 * By default sets the focal point that it rotates around to the medium point
 	 */
-	public void selectTargetPoint( VertexMesh mesh ) {
+	@Override public void selectInitialParameters( VertexMesh mesh ) {
 		// sub-sample points to keep compute at a reasonable speed.
 		final int N = Math.min(maxSamplePoints, mesh.vertexes.size());
+
+		// Give tell it to look in front of the camera if there is nothing to look at
+		if (N == 0) {
+			orbit.targetPoint.setTo(0, 0, 1);
+			return;
+		}
 
 		var sampled = new DogArray<>(Point3D_F64::new);
 		sampled.reserve(N);
@@ -96,17 +102,21 @@ public class MouseRotateAroundPoint extends MouseAdapter {
 		}
 	}
 
-	public void setCamera( CameraPinhole camera ) {
+	@Override public void setCamera( CameraPinhole camera ) {
 		synchronized (orbit) {
 			orbit.getCamera().setTo(camera);
 		}
 	}
 
-	public Se3_F64 getWorldToCamera() {
+	@Override public Se3_F64 getWorldToCamera() {
 		synchronized (orbit) {
 			orbit.updateTransform();
 			return orbit.worldToView.copy();
 		}
+	}
+
+	@Override public void setChangeHandler( Runnable handler ) {
+		this.handleCameraChanged = handler;
 	}
 
 	@Override public void mousePressed( MouseEvent e ) {
