@@ -28,6 +28,8 @@ import boofcv.struct.image.ImageDimension;
 import boofcv.struct.image.InterleavedU8;
 import boofcv.struct.mesh.VertexMesh;
 import boofcv.visualize.RenderMesh;
+import lombok.Getter;
+import lombok.Setter;
 import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,26 +47,28 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author Peter Abeles
  */
 public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDispatcher {
-	// TODO document clearly what is owned by which lock and which thread.
-	// TODO add a way to view the depth buffer
 	// TODO add WASD controls
 	// TODO add help dialog that let's you change control and view instructions
 
-	RenderMesh renderer = new RenderMesh();
+	/** Renders the mesh into a projected image */
+	@Getter RenderMesh renderer = new RenderMesh();
 	VertexMesh mesh;
 
-	// use a double buffer approach. Work is updated by the render thread only
-	// The UI thread checks to see if the work thread has been update, if so swaps
-	// This is done safely using thread locks
+	// Lock for swapping the double buffer for rendering. When the active buffer is being drawn this lock is
+	// active. When the render thread wants to swap the buffers it will activate the lock just for the swap.
+	ReentrantLock lockSwap = new ReentrantLock();
+
+	// Use a double buffer approach. Work is updated by the render thread only and 'buffered' is read by the
+	// draw/UI thread. lockSwap is used to deconflict when both threads need to access 'buffered'
 	BufferedImage buffered = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
 	BufferedImage work = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
 
-	// Lock for swapping BufferedImages and setting pending update
-	ReentrantLock lockUpdate = new ReentrantLock();
-	boolean pendingUpdate;
-
+	// If true a request to shutdown the render thread has been made
 	boolean shutdownRequested = false;
+	// if true a request to render another frame has been made
 	boolean renderRequested = false;
+
+	// The thread which performs the rendering
 	Thread renderThread = new Thread(this::renderLoop, "MeshRender");
 
 	// only read/write when synchronized
@@ -74,7 +78,7 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 	double hfov = 90;
 
 	// If true it will show the depth buffer instead of the regular rendered image
-	boolean showDepth = false;
+	@Getter @Setter boolean showDepth = false;
 
 	Swing3dCameraControl cameraControls = new MouseRotateAroundPoint();
 
@@ -196,13 +200,7 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 		renderer.render(mesh);
 		long time1 = System.currentTimeMillis();
 
-		if (verbose != null)
-			verbose.println("After render. size: " + dimension.width + "x" + dimension.height + "  time: " + (time1 - time0) + " (ms)");
-		// TODO fix case where there is already a pending update, the work buffer has another update requested
-		//      and when the buffers are swapped the work buffer is being drawn and converted at the same time
-
 		// Copy the rendered image into the work buffer
-		lockUpdate.lock();
 		try {
 			if (showDepth) {
 				GrayF32 depth = renderer.getDepthImage();
@@ -223,11 +221,23 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 				work = ConvertBufferedImage.checkDeclare(rgb.width, rgb.height, work, work.getType());
 				ConvertBufferedImage.convertTo(rgb, work, false);
 			}
-			pendingUpdate = true;
 		} catch (Exception e) {
-			e.printStackTrace(System.out);
+			e.printStackTrace(System.err);
+		}
+		long time2 = System.currentTimeMillis();
+		if (verbose != null)
+			verbose.printf("render(): %dx%d  mesh: %d (ms) convert: %d (ms)\n",
+					dimension.width, dimension.height, time1 - time0, time2 - time1);
+
+
+		// After rendering in the work buffer swap it with the active buffer that will be displayed in the UI
+		lockSwap.lock();
+		try {
+			BufferedImage tmp = buffered;
+			buffered = work;
+			work = tmp;
 		} finally {
-			lockUpdate.unlock();
+			lockSwap.unlock();
 		}
 
 		// Tell Swing to redraw this panel so that we can see what has been rendered
@@ -255,19 +265,15 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 		} catch (Exception ignore) {
 		}
 
-		// Check to see if there's a new rendered image, if so swap it with the work buffer
-		if (lockUpdate.tryLock()) {
-			if (pendingUpdate) {
-				pendingUpdate = false;
-				BufferedImage tmp = buffered;
-				buffered = work;
-				work = tmp;
-			}
-			lockUpdate.unlock();
-		}
-
 		var g2 = (Graphics2D)g;
-		g2.drawImage(buffered, 0, 0, null);
+
+		// Lock here to ensure the render thread doesn't swap buffers then update it while we are drawing it here
+		lockSwap.lock();
+		try {
+			g2.drawImage(buffered, 0, 0, null);
+		} finally {
+			lockSwap.unlock();
+		}
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
@@ -276,6 +282,7 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 	}
 
 	long coolDownTIme = 0L;
+
 	@Override public boolean dispatchKeyEvent( KeyEvent e ) {
 		if (System.currentTimeMillis() <= coolDownTIme)
 			return false;
