@@ -111,7 +111,7 @@ public class ExampleStereoMesh {
 
 		var panel = new MeshViewerPanel();
 		panel.setMesh(mesh, false);
-		panel.setVertexColor(colors.data);
+		panel.setVertexColors("RGB", colors.data);
 		panel.setPreferredSize(new Dimension(500, 500));
 //		panel.setVerbose(System.out, null);
 		ShowImages.showWindow(panel, "Mesh Viewer", true);

@@ -40,8 +40,7 @@ import java.util.Set;
 
 /**
  * Simple algorithm that renders a 3D mesh and computes a depth image. This rendering engine is fairly basic and makes
- * the following assumptions: each shape has a single color and all colors are opaque. All RGB colors are in ARGB
- * 32-bit int format. Various aspects are configurable:
+ * the following assumptions: each shape has a single color and all colors are opaque. What's configurable:
  *
  * <ul>
  *     <li>{@link #defaultColorRgba} Specifies what color the background is.</li>
@@ -53,17 +52,17 @@ import java.util.Set;
  * @author Peter Abeles
  */
 public class RenderMesh implements VerbosePrint {
-	/** What color background pixels are set to by default in RGBA. Default value is transparent black */
-	public @Getter @Setter int defaultColorRgba = 0x00000000;
+	/** What color background pixels are set to by default in RGBA. Default value is white */
+	public @Getter @Setter int defaultColorRgba = 0xFFFFFF;
 
 	/** Used to change what color a surface is. By default, it's red. */
-	public @Getter @Setter SurfaceColor surfaceColor = ( surface ) -> 0xFFFF0000;
+	public @Getter @Setter SurfaceColor surfaceColor = ( surface ) -> 0xFF0000;
 
 	/** Rendered depth image. Values with no depth information are set to NaN. */
 	public @Getter final GrayF32 depthImage = new GrayF32(1, 1);
 
 	/** Rendered color image. Pixels are in RGBA format. */
-	public @Getter final InterleavedU8 rgbImage = new InterleavedU8(1, 1, 4);
+	public @Getter final InterleavedU8 rgbImage = new InterleavedU8(1, 1, 3);
 
 	/** Pinhole camera model needed to go from depth image to 3D point */
 	public @Getter final CameraPinhole intrinsics = new CameraPinhole();
@@ -145,7 +144,7 @@ public class RenderMesh implements VerbosePrint {
 			// Compute the pixels which might be able to see polygon
 			computeBoundingBox(width, height, polygon, aabb);
 
-			projectSurfaceOntoImage(mesh, polygon, idx0);
+			projectSurfaceOntoImage(mesh, polygon, shapeIdx-1);
 
 			shapesRenderedCount++;
 		}
@@ -193,13 +192,13 @@ public class RenderMesh implements VerbosePrint {
 	 * is searched exhaustively. If the projected 2D polygon contains a pixels and the polygon is closer than
 	 * the current depth of the pixel it is rendered there and the depth image is updated.
 	 */
-	private void projectSurfaceOntoImage( VertexMesh mesh, Polygon2D_F64 polygon, int idx0 ) {
+	private void projectSurfaceOntoImage( VertexMesh mesh, Polygon2D_F64 polygon, int shapeIdx ) {
 		// TODO temp hack. Best way is to find the distance to the 3D polygon at this point. Instead we will
 		// use the depth of the first point.
 		//
 		// IDEA: Use a homography to map location on 2D polygon to 3D polygon, then rotate just the Z to get
 		//       local depth on the surface.
-		int vertexIndex = mesh.indexes.get(idx0);
+		int vertexIndex = mesh.indexes.get(mesh.offsets.data[shapeIdx]);
 		Point3D_F64 world = mesh.vertexes.getTemp(vertexIndex);
 		worldToView.transform(world, camera);
 
@@ -209,7 +208,7 @@ public class RenderMesh implements VerbosePrint {
 		//      convex intersection or computing the depth at that pixel on this surface
 
 		// The entire surface will have one color
-		int color = surfaceColor.surfaceRgb(vertexIndex);
+		int color = surfaceColor.surfaceRgb(shapeIdx);
 
 		// Go through all pixels and see if the points are inside the polygon. If so
 		for (int pixelY = aabb.y0; pixelY < aabb.y1; pixelY++) {
@@ -227,7 +226,7 @@ public class RenderMesh implements VerbosePrint {
 				// Update depth and image
 				// Make sure the alpha channel is set to 100% in RGBA format
 				depthImage.unsafe_set(pixelX, pixelY, depth);
-				rgbImage.set32(pixelX, pixelY, color);
+				rgbImage.set24(pixelX, pixelY, color);
 			}
 		}
 	}
