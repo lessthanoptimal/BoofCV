@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -75,6 +75,7 @@ public class ApplicationLauncherGui extends JPanel {
 		JButton bUtilDown = createButton("Batch Downsize", BatchDownsizeImageGui::new);
 		JButton bUtilUndist = createButton("Batch Undistort", BatchRemoveLensDistortionGui::new);
 		JButton bUtilViewCloud = createButton("Cloud Viewer", PointCloudViewerApp::new);
+		JButton bUtilViewMesh = createButton("Mesh Viewer", MeshViewerApp::new);
 
 		// open the man website for help
 		JButton bHelp = new JButton("Help");
@@ -103,7 +104,8 @@ public class ApplicationLauncherGui extends JPanel {
 		JComponent panelLeft = buttonPanel("Create / Print",
 				bCreateQR, bCreateAztec, bCreateMicroQR, bCreateDots, bCreateCalib, bCreateFidBin, bCreateFidImage, bCreateFidHamming);
 		JComponent panelRight = buttonPanel("Tools",
-				bUtilAssisted, bUtilCalib, bUtilStereoCalib, bUtilScanQrCode, bUtilScanMicroQr, bUtilDown, bUtilUndist, bUtilViewCloud);
+				bUtilAssisted, bUtilCalib, bUtilStereoCalib, bUtilScanQrCode, bUtilScanMicroQr, bUtilDown,
+				bUtilUndist, bUtilViewCloud, bUtilViewMesh);
 
 		layout.putConstraint(SpringLayout.WEST, panelLeft, 60, SpringLayout.WEST, this);
 		layout.putConstraint(SpringLayout.NORTH, panelLeft, 0, SpringLayout.SOUTH, logo);
