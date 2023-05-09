@@ -38,10 +38,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -52,7 +49,6 @@ import java.util.concurrent.locks.ReentrantLock;
 public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDispatcher {
 	/** Name given to the default approach that colorizes based on normal angle */
 	public static final String COLOR_NORMAL = "Normal";
-	// TODO add WASD controls
 	// TODO add help dialog that let's you change control and view instructions
 
 	/** Renders the mesh into a projected image */
@@ -85,7 +81,10 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 	// If true it will show the depth buffer instead of the regular rendered image
 	@Getter @Setter boolean showDepth = false;
 
-	Swing3dCameraControl cameraControls = new MouseRotateAroundPoint();
+	// controls and activeControls are synchronized against controls
+	/** Map of all camera controls */
+	final Map<String, Swing3dCameraControl> controls = new HashMap<>();
+	Swing3dCameraControl activeControl;
 
 	// Contains all the possible ways to colorize the mesh.
 	// You must synchronize before accessing these two fields since multiple threads can access them
@@ -114,8 +113,9 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 		});
 
 		// Configure camera controls so that they can respond to UI events
-		cameraControls.setChangeHandler(this::requestRender);
-		cameraControls.attachControls(this);
+		controls.put("Orbit", new OrbitAroundPointControl());
+		controls.put("FPS", new FirstPersonCameraControl());
+		setActiveControl("Orbit");
 
 		// Add and remove a keyboard listener
 		addFocusListener(new FocusListener() {
@@ -130,6 +130,22 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 
 		setFocusable(true);
 		requestFocus();
+	}
+
+	/**
+	 * Changes the active camera control
+	 */
+	public void setActiveControl( String name ) {
+		synchronized (controls) {
+			if (activeControl != null)
+				activeControl.detachControls(this);
+
+			activeControl = Objects.requireNonNull(controls.get(name));
+			activeControl.setChangeHandler(this::requestRender);
+			activeControl.attachControls(this);
+			if (mesh != null)
+				activeControl.selectInitialParameters(mesh);
+		}
 	}
 
 	/**
@@ -149,7 +165,7 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 		if (copy) {
 			mesh = new VertexMesh().setTo(mesh);
 		}
-		cameraControls.selectInitialParameters(mesh);
+		activeControl.selectInitialParameters(mesh);
 		this.mesh = mesh;
 
 		colorizers.clear();
@@ -230,8 +246,10 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 			PerspectiveOps.createIntrinsic(dimension.width, dimension.height, hfov, -1, renderer.getIntrinsics());
 		}
 
-		cameraControls.setCamera(renderer.getIntrinsics());
-		renderer.worldToView.setTo(cameraControls.getWorldToCamera());
+		synchronized (controls) {
+			activeControl.setCamera(renderer.getIntrinsics());
+			renderer.worldToView.setTo(activeControl.getWorldToCamera());
+		}
 
 		// Render the mesh
 		long time0 = System.currentTimeMillis();
@@ -348,7 +366,7 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 
 		// H = Home and resets the view
 		if (e.getKeyCode() == KeyEvent.VK_H) {
-			cameraControls.reset();
+			activeControl.reset();
 			requestRender();
 		} else if (e.getKeyCode() == KeyEvent.VK_J) {
 			cycleColorizer();

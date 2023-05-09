@@ -41,19 +41,25 @@ public class OrbitAroundPoint {
 	/** Intrinsics camera model. Used to interpret mouse motions */
 	@Getter CameraPinhole camera = new CameraPinhole();
 
+	/** Transform from world to camera view reference frames */
 	Se3_F64 worldToView = new Se3_F64();
 
 	DMatrixRMaj localRotation = new DMatrixRMaj(3, 3);
 	DMatrixRMaj rotationAroundTarget = new DMatrixRMaj(3, 3);
 	DMatrixRMaj tmp = new DMatrixRMaj(3, 3);
 
+	// Translation applied after the orbit has been done
 	Vector3D_F64 translateWorld = new Vector3D_F64();
 
+	// Point it's orbiting around
 	Point3D_F64 targetPoint = new Point3D_F64();
+
+	// Adjustment applied to distance from target point in final transform
 	double radiusScale = 1.0;
 
 	Point3D_F64 cameraLoc = new Point3D_F64();
 
+	// Storage for normalized image coordinates
 	Point2D_F64 norm1 = new Point2D_F64();
 	Point2D_F64 norm2 = new Point2D_F64();
 

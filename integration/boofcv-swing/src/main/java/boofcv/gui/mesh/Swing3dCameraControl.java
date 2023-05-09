@@ -53,7 +53,7 @@ public interface Swing3dCameraControl {
 	/**
 	 * Specifies the camera used to render the scene
 	 */
-	void setCamera( CameraPinhole camera );
+	void setCamera( CameraPinhole intrinsics );
 
 	/**
 	 * Transform from world to camera

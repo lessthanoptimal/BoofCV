@@ -37,7 +37,7 @@ import java.awt.event.MouseWheelEvent;
  *
  * @author Peter Abeles
  */
-public class MouseRotateAroundPoint extends MouseAdapter implements Swing3dCameraControl {
+public class OrbitAroundPointControl extends MouseAdapter implements Swing3dCameraControl {
 	public int maxSamplePoints = 1000;
 
 	/**
@@ -48,6 +48,7 @@ public class MouseRotateAroundPoint extends MouseAdapter implements Swing3dCamer
 	// Math for computing the orbit. All read/write must be synchronized for thread safety
 	final OrbitAroundPoint orbit = new OrbitAroundPoint();
 
+	// Previous mouse location
 	int prevX, prevY;
 
 	@Override public void attachControls( JComponent parent ) {
@@ -102,9 +103,9 @@ public class MouseRotateAroundPoint extends MouseAdapter implements Swing3dCamer
 		}
 	}
 
-	@Override public void setCamera( CameraPinhole camera ) {
+	@Override public void setCamera( CameraPinhole intrinsics ) {
 		synchronized (orbit) {
-			orbit.getCamera().setTo(camera);
+			orbit.getCamera().setTo(intrinsics);
 		}
 	}
 
