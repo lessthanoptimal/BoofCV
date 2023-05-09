@@ -38,6 +38,9 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -47,6 +50,8 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author Peter Abeles
  */
 public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDispatcher {
+	/** Name given to the default approach that colorizes based on normal angle */
+	public static final String COLOR_NORMAL = "Normal";
 	// TODO add WASD controls
 	// TODO add help dialog that let's you change control and view instructions
 
@@ -60,8 +65,8 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 
 	// Use a double buffer approach. Work is updated by the render thread only and 'buffered' is read by the
 	// draw/UI thread. lockSwap is used to deconflict when both threads need to access 'buffered'
-	BufferedImage buffered = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
-	BufferedImage work = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+	BufferedImage buffered = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
+	BufferedImage work = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
 
 	// If true a request to shutdown the render thread has been made
 	boolean shutdownRequested = false;
@@ -81,6 +86,12 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 	@Getter @Setter boolean showDepth = false;
 
 	Swing3dCameraControl cameraControls = new MouseRotateAroundPoint();
+
+	// Contains all the possible ways to colorize the mesh.
+	// You must synchronize before accessing these two fields since multiple threads can access them
+	final Map<String, RenderMesh.SurfaceColor> colorizers = new HashMap<>();
+	// Index of the active colorizer. Used to cycle through all the options
+	int activeColorizer;
 
 	// Work image for rendering depth
 	GrayF32 inverseDepth = new GrayF32(1, 1);
@@ -140,13 +151,40 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 		}
 		cameraControls.selectInitialParameters(mesh);
 		this.mesh = mesh;
+
+		colorizers.clear();
+
+		// Add colorization based on normal angle. This works even if RGB colors are not known
+		synchronized (colorizers) {
+			colorizers.put(COLOR_NORMAL, MeshColorizeOps.colorizeByNormal(mesh));
+			renderer.surfaceColor = colorizers.get(COLOR_NORMAL);
+			activeColorizer = 0;
+		}
 	}
 
 	/**
 	 * Let's ou specify the RGB color for each vertex in the mesh.
+	 *
+	 * @param name Name given to this colorization approach
 	 */
-	public void setVertexColor( int[] colorsRgb ) {
-		renderer.surfaceColor = ( index ) -> colorsRgb[index] | 0xFF000000;
+	public void setSurfaceColor( String name, RenderMesh.SurfaceColor colorizer ) {
+		synchronized (colorizers) {
+			colorizers.put(name, colorizer);
+			renderer.surfaceColor = colorizers.get(name);
+			activeColorizer = colorizers.size();
+		}
+	}
+
+	/**
+	 * It will colorize each surface using the color of the vertexes
+	 *
+	 * @param name Name given to this colorization approach
+	 */
+	public void setVertexColors( String name, int[] vertexColors ) {
+		if (mesh == null)
+			throw new IllegalArgumentException("You must first specify the mesh before calling this function");
+
+		setSurfaceColor(name, MeshColorizeOps.colorizeByVertex(mesh, vertexColors));
 	}
 
 	/**
@@ -254,6 +292,27 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 		requestRender();
 	}
 
+	/**
+	 * Each time this is called it will change the colorizer being used, if more than one has been specified
+	 */
+	public void cycleColorizer() {
+		synchronized (colorizers) {
+			var list = new ArrayList<>(colorizers.keySet());
+
+			// go to the next one and make sure it's valid
+			activeColorizer++;
+			if (activeColorizer >= list.size()) {
+				activeColorizer = 0;
+			}
+
+			// Change the colorizer
+			renderer.surfaceColor = colorizers.get(list.get(activeColorizer));
+
+			// Re-render the image
+			requestRender();
+		}
+	}
+
 	@Override
 	public void paintComponent( Graphics g ) {
 		super.paintComponent(g);
@@ -291,6 +350,8 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 		if (e.getKeyCode() == KeyEvent.VK_H) {
 			cameraControls.reset();
 			requestRender();
+		} else if (e.getKeyCode() == KeyEvent.VK_J) {
+			cycleColorizer();
 		} else if (e.getKeyCode() == KeyEvent.VK_K) {
 			showDepth = !showDepth;
 			requestRender();
