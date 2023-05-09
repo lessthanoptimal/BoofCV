@@ -20,8 +20,10 @@ package boofcv.gui.mesh;
 
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.gui.image.SaveImageOnClick;
+import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.misc.BoofMiscOps;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageDimension;
 import boofcv.struct.image.InterleavedU8;
 import boofcv.struct.mesh.VertexMesh;
@@ -71,7 +73,13 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 	// Horizontal FOV in degrees
 	double hfov = 90;
 
+	// If true it will show the depth buffer instead of the regular rendered image
+	boolean showDepth = false;
+
 	Swing3dCameraControl cameraControls = new MouseRotateAroundPoint();
+
+	// Work image for rendering depth
+	GrayF32 inverseDepth = new GrayF32(1, 1);
 
 	@Nullable PrintStream verbose = null;
 
@@ -196,9 +204,25 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 		// Copy the rendered image into the work buffer
 		lockUpdate.lock();
 		try {
-			InterleavedU8 rgb = renderer.getRgbImage();
-			work = ConvertBufferedImage.checkDeclare(rgb.width, rgb.height, work, work.getType());
-			ConvertBufferedImage.convertTo(renderer.rgbImage, work, false);
+			if (showDepth) {
+				GrayF32 depth = renderer.getDepthImage();
+
+				// easier to scale up close and very far away colors when using inverse depth
+				inverseDepth.reshapeTo(depth);
+				int N = depth.totalPixels();
+				for (int i = 0; i < N; i++) {
+					float d = depth.data[i];
+					if (Float.isNaN(d) || d <= 0.0f)
+						inverseDepth.data[i] = -1;
+					else
+						inverseDepth.data[i] = 1.0f/d;
+				}
+				work = VisualizeImageData.inverseDepth(inverseDepth, work, 0.0f, -1, 0x000000);
+			} else {
+				InterleavedU8 rgb = renderer.getRgbImage();
+				work = ConvertBufferedImage.checkDeclare(rgb.width, rgb.height, work, work.getType());
+				ConvertBufferedImage.convertTo(rgb, work, false);
+			}
 			pendingUpdate = true;
 		} catch (Exception e) {
 			e.printStackTrace(System.out);
@@ -212,6 +236,7 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 
 	/**
 	 * Changes the camera's horizontal field-of-view.
+	 *
 	 * @param degrees FOV in degrees
 	 */
 	public void setHorizontalFov( double degrees ) {
@@ -250,12 +275,22 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 		BoofMiscOps.verboseChildren(out, configuration, renderer);
 	}
 
+	long coolDownTIme = 0L;
 	@Override public boolean dispatchKeyEvent( KeyEvent e ) {
+		if (System.currentTimeMillis() <= coolDownTIme)
+			return false;
+
 		// H = Home and resets the view
 		if (e.getKeyCode() == KeyEvent.VK_H) {
 			cameraControls.reset();
 			requestRender();
+		} else if (e.getKeyCode() == KeyEvent.VK_K) {
+			showDepth = !showDepth;
+			requestRender();
+		} else {
+			return false;
 		}
+		coolDownTIme = System.currentTimeMillis() + 200L;
 		return false;
 	}
 }
