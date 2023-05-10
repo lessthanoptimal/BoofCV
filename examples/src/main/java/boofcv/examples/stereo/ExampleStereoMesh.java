@@ -40,7 +40,6 @@ import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -109,14 +108,12 @@ public class ExampleStereoMesh {
 			colors.add(v << 16 | v << 8 | v);
 		}
 
-		var panel = new MeshViewerPanel();
-		panel.setMesh(mesh, false);
+		// Open a window displaying the mesh that the user can interact with
+		var panel = new MeshViewerPanel(mesh);
 		panel.setVertexColors("RGB", colors.data);
-		panel.setPreferredSize(new Dimension(500, 500));
-//		panel.setVerbose(System.out, null);
 		ShowImages.showWindow(panel, "Mesh Viewer", true);
 
-		// Save results. Display using a 3rd party application
+		// Save results. This can be viewed in by external applications.
 		try (OutputStream out = new FileOutputStream("mesh.ply")) {
 			PointCloudIO.save3D(PointCloudIO.Format.PLY, mesh, colors, out);
 		} catch (IOException e) {

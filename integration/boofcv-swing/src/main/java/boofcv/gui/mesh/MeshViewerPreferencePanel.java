@@ -39,8 +39,13 @@ public class MeshViewerPreferencePanel extends StandardAlgConfigPanel {
 	// Help about controls
 	JTextArea textArea = new JTextArea();
 
+	// The owner
 	MeshViewerPanel panel;
 
+	/**
+	 *
+	 * @param panel The viewer that this is adjusting
+	 */
 	public MeshViewerPreferencePanel( MeshViewerPanel panel ) {
 		this.panel = panel;
 

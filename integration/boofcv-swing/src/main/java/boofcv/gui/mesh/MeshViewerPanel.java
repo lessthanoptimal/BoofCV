@@ -44,7 +44,14 @@ import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Displays a rendered mesh in a JPanel. Has controls to change the view. Rendering is done in a separate thread.
+ * <p>Displays a rendered mesh in 3D and provides mouse and keyboard controls for moving the camera. Each shape in the
+ * mesh can be assigned a single color. By default this colorization will be based on the normal angle, but the user
+ * can provide custom colors. Two styles of control are provided by default {@link OrbitAroundPointControl orbit} and
+ * {@link FirstPersonCameraControl first person}, again the user can provide others easily.</p>
+ *
+ * <p>To ensure smooth updates a double buffer is used and rendering is done in a separate thread. All rendering
+ * is done in software and can't use a GPU. The rendering thread will automatically stop and stop depending
+ * on the lifecycle of this panel.</p>
  *
  * @author Peter Abeles
  */
@@ -107,6 +114,19 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 
 	@Nullable PrintStream verbose = null;
 
+	/**
+	 * Convenience constructor that calls {@link #setMesh(VertexMesh, boolean)} and the default constructor.
+	 *
+	 * @param mesh That mesh which is to be viewed. A reference is saved internally.
+	 */
+	public MeshViewerPanel(VertexMesh mesh) {
+		this();
+		setMesh(mesh, false);
+	}
+
+	/**
+	 * Default constructor. Configures the GUI and adds in default controls and colorizations.
+	 */
 	public MeshViewerPanel() {
 		// Add the standard way to save images
 		addMouseListener(new SaveImageOnClick(this));
@@ -150,6 +170,9 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 
 		setFocusable(true);
 		requestFocus();
+
+		// Give it a reasonable initial size
+		setPreferredSize(new Dimension(500, 500));
 	}
 
 	/**
@@ -181,10 +204,19 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 		shutdownRenderThread();
 	}
 
+	/**
+	 * Send a request that the rendering thread
+	 */
 	public void shutdownRenderThread() {
 		shutdownRequested = true;
 	}
 
+	/**
+	 * Sets the mesh which will be rendered.
+	 *
+	 * @param copy If true then a copy of the mesh will be made and saved. If false then a reference will be saved.
+	 * You should create a copy if this mesh is going to be modified.
+	 */
 	public void setMesh( VertexMesh mesh, boolean copy ) {
 		if (copy) {
 			mesh = new VertexMesh().setTo(mesh);
@@ -236,6 +268,9 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 		renderRequested = true;
 	}
 
+	/**
+	 * Performs the main render loop. This will only exit when a request to shutdown has been made.
+	 */
 	private void renderLoop() {
 		if (verbose != null) verbose.println("Starting render loop");
 		while (!shutdownRequested) {
@@ -422,6 +457,9 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 
 	long coolDownTIme = 0L;
 
+	/**
+	 * Provides keyboard commands that adjust how and what data is displayed
+	 */
 	@Override public boolean dispatchKeyEvent( KeyEvent e ) {
 		if (System.currentTimeMillis() <= coolDownTIme)
 			return false;

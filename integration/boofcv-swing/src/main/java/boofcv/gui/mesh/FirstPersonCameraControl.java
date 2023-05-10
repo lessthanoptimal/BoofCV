@@ -57,14 +57,20 @@ public class FirstPersonCameraControl extends MouseAdapter implements Swing3dCam
 	// Adjusts how much it translate
 	double translateScale = 1.0;
 
-	private Se3_F64 worldToCamera = new Se3_F64();
+	private final Se3_F64 worldToCamera = new Se3_F64();
 
-	private KeyPressHandler keyHandler = new KeyPressHandler();
+	// Processes key presses and keeps tracks of which keys are being held down
+	private final KeyPressHandler keyHandler = new KeyPressHandler();
 
+	// Periodic task the causes a key being held down to cause continuous motions
 	@Nullable ScheduledExecutorService pressedTask = null;
 	final Object lockPressed = new Object();
 
-	private FocusListener focusListener = new FocusListener() {
+	/**
+	 * Enable and disable the key pressed task. This is to prevent a key being held down from triggering
+	 * actions in the display when it's not the active window.
+	 */
+	private final FocusListener focusListener = new FocusListener() {
 		@Override public void focusGained( FocusEvent e ) {
 			KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(keyHandler);
 			synchronized (lockPressed) {
@@ -234,6 +240,9 @@ public class FirstPersonCameraControl extends MouseAdapter implements Swing3dCam
 			return false;
 		}
 
+		/**
+		 * See which keys are held down and apply the action that they stimulate.
+		 */
 		public void applyKeyAction() {
 			int dx = 0, dy = 0, dz = 0;
 
@@ -248,6 +257,7 @@ public class FirstPersonCameraControl extends MouseAdapter implements Swing3dCam
 			if (dx == 0 && dy == 0 && dz == 0)
 				return;
 
+			// Update the camera location then tell the listener that the camera has changed
 			fps.translateKey(dx, dy, dz, translateScale);
 			handleCameraChanged.run();
 		}

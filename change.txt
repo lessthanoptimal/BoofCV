@@ -9,8 +9,9 @@ Version : 0.43
   * Fixed type-o in near intersection formula. Thanks Erhan Erdemir for finding the problem.
 - PointCloudIO
   * Added support for STL mesh files
-
-- TODO mesh rendering engine
+- Added a mesh viewer
+  * Swing panel, multiple controls, and help
+  * Generic rendering engine
 
 - Calibration
   - TODO Visualize Multi Camera Calibration
