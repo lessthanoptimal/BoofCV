@@ -120,7 +120,7 @@ public class OrbitAroundPoint {
 	 *
 	 * @param yIsUp if true then dragging along y axis moves the view up. False moves it in and out
 	 */
-	public void mouseDragTranslate( double x0, double y0, double x1, double y1, boolean yIsUp ) {
+	public void mouseDragTranslate( double x0, double y0, double x1, double y1 ) {
 		// do nothing if the camera isn't configured yet
 		if (camera.fx == 0.0 || camera.fy == 0.0)
 			return;
@@ -133,9 +133,27 @@ public class OrbitAroundPoint {
 		double z = targetPoint.plus(translateWorld).norm()*radiusScale;
 
 		translateWorld.x += (norm2.x - norm1.x)*z;
-		if (yIsUp)
-			translateWorld.y += (norm2.y - norm1.y)*z;
-		else
-			translateWorld.z += (norm2.y - norm1.y)*z;
+		translateWorld.y += (norm2.y - norm1.y)*z;
+	}
+
+	public void mouseDragZoomRoll( double x0, double y0, double x1, double y1 ) {
+		// do nothing if the camera isn't configured yet
+		if (camera.fx == 0.0 || camera.fy == 0.0)
+			return;
+
+		// convert into normalize image coordinates
+		PerspectiveOps.convertPixelToNorm(camera, x0, y0, norm1);
+		PerspectiveOps.convertPixelToNorm(camera, x1, y1, norm2);
+
+		// Zoom in and out using the mouse
+		double z = targetPoint.plus(translateWorld).norm()*radiusScale;
+		translateWorld.z += (norm2.y - norm1.y)*z;
+
+		// Perform roll around the z-axis
+		double rotX = UtilAngle.minus(Math.atan(norm1.x), Math.atan(norm2.x));
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0, 0, -rotX, localRotation);
+		CommonOps_DDRM.mult(localRotation, rotationAroundTarget, tmp);
+		rotationAroundTarget.setTo(tmp);
+
 	}
 }
