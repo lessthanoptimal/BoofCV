@@ -163,6 +163,20 @@ public class FirstPersonCameraControl extends MouseAdapter implements Swing3dCam
 		this.handleCameraChanged = handler;
 	}
 
+	@Override public String getHelpText() {
+		return """
+				First Person Shooter Controls
+				a   left
+				d   right
+				w   forward
+				s   backwards
+				q   Own
+				e   Up
+				Mouse for pan and tilt
+				Mouse right for roll
+				""";
+	}
+
 	@Override public void mousePressed( MouseEvent e ) {
 		prevX = e.getX();
 		prevY = e.getY();

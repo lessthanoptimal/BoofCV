@@ -51,13 +51,7 @@ public class MeshViewerPreferencePanel extends StandardAlgConfigPanel {
 		textArea.setLineWrap(true);
 		textArea.setFont(new Font("monospaced", Font.PLAIN, 12));
 
-		String text = """
-				h   Set view to home
-				j   Cycle colorization
-				k   Show depth image
-				""";
-
-		textArea.setText(text);
+		setHelpText();
 
 		addLabeled(comboControls, "Controls");
 		addAlignLeft(checkHide);
@@ -66,10 +60,22 @@ public class MeshViewerPreferencePanel extends StandardAlgConfigPanel {
 		setPreferredSize(new Dimension(300, 400));
 	}
 
+	private void setHelpText() {
+		String text = """
+				h   Set view to home
+				j   Cycle colorization
+				k   Show depth image
+				""";
+		text += "\n" + panel.controls.get((String)comboControls.getSelectedItem()).getHelpText();
+
+		textArea.setText(text);
+	}
+
 	@Override public void controlChanged( final Object source ) {
 		if (source == comboControls) {
 			var selected = (String)comboControls.getSelectedItem();
 			panel.setActiveControl(selected);
+			setHelpText();
 		} else if (source == checkHide) {
 			panel.helpButtonActive = checkHide.isSelected();
 			panel.repaint();
