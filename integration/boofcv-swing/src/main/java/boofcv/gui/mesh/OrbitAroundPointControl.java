@@ -145,4 +145,13 @@ public class OrbitAroundPointControl extends MouseAdapter implements Swing3dCame
 		prevY = e.getY();
 		handleCameraChanged.run();
 	}
+
+	@Override public String getHelpText() {
+		return """
+				Rotates around a single point
+				Mouse left to rotate around the point
+				Mouse middle (shift) to translate
+				Mouse right (ctrl) to zoom and roll
+				""";
+	}
 }

@@ -64,4 +64,9 @@ public interface Swing3dCameraControl {
 	 * This is called whenever the settings have changed and the rendering should be updated.
 	 */
 	void setChangeHandler( Runnable handler );
+
+	/**
+	 * Explains how to use the control
+	 */
+	String getHelpText();
 }
