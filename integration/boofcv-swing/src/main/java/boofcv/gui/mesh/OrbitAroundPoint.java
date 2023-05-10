@@ -117,8 +117,6 @@ public class OrbitAroundPoint {
 
 	/**
 	 * Uses mouse drag motion to translate the view
-	 *
-	 * @param yIsUp if true then dragging along y axis moves the view up. False moves it in and out
 	 */
 	public void mouseDragTranslate( double x0, double y0, double x1, double y1 ) {
 		// do nothing if the camera isn't configured yet
@@ -136,6 +134,9 @@ public class OrbitAroundPoint {
 		translateWorld.y += (norm2.y - norm1.y)*z;
 	}
 
+	/**
+	 * Drag will move in the +z direction and roll the camera
+	 */
 	public void mouseDragZoomRoll( double x0, double y0, double x1, double y1 ) {
 		// do nothing if the camera isn't configured yet
 		if (camera.fx == 0.0 || camera.fy == 0.0)

@@ -36,8 +36,10 @@ public class FirstPersonShooterCamera {
 	/** Intrinsics camera model. Used to interpret mouse motions */
 	@Getter CameraPinhole camera = new CameraPinhole();
 
+	// Storage for the output transform
 	final Se3_F64 worldToView = new Se3_F64();
 
+	// Workspace when applying rotation from mouse motion
 	final Se3_F64 mouseMotion = new Se3_F64();
 
 	/** How much it will move in a single translation step */
@@ -67,10 +69,6 @@ public class FirstPersonShooterCamera {
 		worldToView.T.x += dx*motionUnit*scale;
 		worldToView.T.y += dy*motionUnit*scale;
 		worldToView.T.z += dz*motionUnit*scale;
-	}
-
-	public void mouseWheel( double ticks, double scale ) {
-
 	}
 
 	/**
