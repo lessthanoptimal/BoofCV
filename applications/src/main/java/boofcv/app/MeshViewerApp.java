@@ -39,7 +39,7 @@ import java.io.IOException;
  */
 public class MeshViewerApp {
 	public MeshViewerApp() {
-		main(null);
+		main(new String[]{});
 	}
 
 	private static void loadFile( File file ) {

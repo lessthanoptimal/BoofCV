@@ -23,6 +23,7 @@ import boofcv.gui.StandardAlgConfigPanel;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * Lets the user configure controls and provides help explaining how to control.
@@ -66,12 +67,14 @@ public class MeshViewerPreferencePanel extends StandardAlgConfigPanel {
 	}
 
 	private void setHelpText() {
+		Swing3dCameraControl control = Objects.requireNonNull(panel.controls.get((String)comboControls.getSelectedItem()));
+
 		String text = """
 				h   Set view to home
 				j   Cycle colorization
 				k   Show depth image
 				""";
-		text += "\n" + panel.controls.get((String)comboControls.getSelectedItem()).getHelpText();
+		text += "\n" + control.getHelpText();
 
 		textArea.setText(text);
 	}

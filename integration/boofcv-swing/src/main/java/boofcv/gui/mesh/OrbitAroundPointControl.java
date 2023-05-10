@@ -63,7 +63,7 @@ public class OrbitAroundPointControl extends MouseAdapter implements Swing3dCame
 		parent.removeMouseWheelListener(this);
 	}
 
-	public void reset() {
+	@Override public void reset() {
 		orbit.resetView();
 	}
 

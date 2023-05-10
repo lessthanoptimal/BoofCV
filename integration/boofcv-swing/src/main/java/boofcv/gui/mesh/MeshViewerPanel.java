@@ -55,6 +55,7 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"NullAway.Init"})
 public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDispatcher {
 	/** Name given to the default approach that colorizes based on normal angle */
 	public static final String COLOR_NORMAL = "Normal";
@@ -383,7 +384,7 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 			}
 
 			// Change the colorizer
-			renderer.surfaceColor = colorizers.get(list.get(activeColorizer));
+			renderer.surfaceColor = Objects.requireNonNull(colorizers.get(list.get(activeColorizer)));
 
 			// Re-render the image
 			requestRender();

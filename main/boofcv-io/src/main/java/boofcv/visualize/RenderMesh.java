@@ -24,6 +24,7 @@ import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.InterleavedU8;
 import boofcv.struct.mesh.VertexMesh;
+import georegression.geometry.UtilPolygons2D_F64;
 import georegression.metric.Intersection2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -74,7 +75,7 @@ public class RenderMesh implements VerbosePrint {
 	private final Point3D_F64 camera = new Point3D_F64();
 	private final Point2D_F64 point = new Point2D_F64();
 	private final Polygon2D_F64 polygon = new Polygon2D_F64();
-	private final Rectangle2D_I32 aabb = new Rectangle2D_I32();
+	final Rectangle2D_I32 aabb = new Rectangle2D_I32();
 
 	@Nullable PrintStream verbose = null;
 
@@ -89,10 +90,7 @@ public class RenderMesh implements VerbosePrint {
 		BoofMiscOps.checkTrue(intrinsics.width > 0 && intrinsics.height > 0);
 
 		// Initialize output images
-		depthImage.reshape(intrinsics.width, intrinsics.height);
-		rgbImage.reshape(intrinsics.width, intrinsics.height);
-		ImageMiscOps.fill(rgbImage, defaultColorRgba);
-		ImageMiscOps.fill(depthImage, Float.NaN);
+		initializeImages();
 
 		final int width = intrinsics.width;
 		final int height = intrinsics.height;
@@ -152,6 +150,13 @@ public class RenderMesh implements VerbosePrint {
 		if (verbose != null ) verbose.println("total shapes rendered: " + shapesRenderedCount);
 	}
 
+	void initializeImages() {
+		depthImage.reshape(intrinsics.width, intrinsics.height);
+		rgbImage.reshape(intrinsics.width, intrinsics.height);
+		ImageMiscOps.fill(rgbImage, defaultColorRgba);
+		ImageMiscOps.fill(depthImage, Float.NaN);
+	}
+
 	/**
 	 * Computes the AABB for the polygon inside the image.
 	 *
@@ -160,31 +165,14 @@ public class RenderMesh implements VerbosePrint {
 	 * @param polygon (Input) projected polygon onto image
 	 * @param aabb (Output) Found AABB clipped to be inside the image.
 	 */
-	private static void computeBoundingBox( int width, int height, Polygon2D_F64 polygon, Rectangle2D_I32 aabb ) {
-		// Find the pixel bounds that contain this polygon
-		double x0 = polygon.vertexes.get(0).x;
-		double y0 = polygon.vertexes.get(0).y;
-		double x1 = x0;
-		double y1 = y0;
-
-		for (int i = 1; i < polygon.size(); i++) {
-			Point2D_F64 p = polygon.get(i);
-			if (p.x < x0)
-				x0 = p.x;
-			else if (p.x > x1)
-				x1 = p.x;
-
-			if (p.y < y0)
-				y0 = p.y;
-			else if (p.y > y1)
-				y1 = p.y;
-		}
+	static void computeBoundingBox( int width, int height, Polygon2D_F64 polygon, Rectangle2D_I32 aabb ) {
+		UtilPolygons2D_F64.bounding(polygon, aabb);
 
 		// Make sure the bounding box is within the image
-		aabb.x0 = (int)Math.max(0, x0);
-		aabb.y0 = (int)Math.max(0, y0);
-		aabb.x1 = (int)Math.ceil(Math.min(width, x1 + 1));
-		aabb.y1 = (int)Math.ceil(Math.min(height, y1 + 1));
+		aabb.x0 = Math.max(0, aabb.x0);
+		aabb.y0 = Math.max(0, aabb.y0);
+		aabb.x1 = Math.min(width, aabb.x1);
+		aabb.y1 = Math.min(height, aabb.y1);
 	}
 
 	/**
@@ -192,7 +180,7 @@ public class RenderMesh implements VerbosePrint {
 	 * is searched exhaustively. If the projected 2D polygon contains a pixels and the polygon is closer than
 	 * the current depth of the pixel it is rendered there and the depth image is updated.
 	 */
-	private void projectSurfaceOntoImage( VertexMesh mesh, Polygon2D_F64 polygon, int shapeIdx ) {
+	void projectSurfaceOntoImage( VertexMesh mesh, Polygon2D_F64 polygon, int shapeIdx ) {
 		// TODO temp hack. Best way is to find the distance to the 3D polygon at this point. Instead we will
 		// use the depth of the first point.
 		//
