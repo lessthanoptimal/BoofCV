@@ -36,6 +36,8 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.font.GlyphVector;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.PrintStream;
 import java.util.*;
@@ -49,7 +51,12 @@ import java.util.concurrent.locks.ReentrantLock;
 public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDispatcher {
 	/** Name given to the default approach that colorizes based on normal angle */
 	public static final String COLOR_NORMAL = "Normal";
-	// TODO add help dialog that let's you change control and view instructions
+
+	/** How big the help button appears to be */
+	public int buttonSize = 60;
+	public Font helpButtonFont = new Font("Serif", Font.BOLD, 45);
+	/** If the help button exists */
+	public boolean helpButtonActive = true;
 
 	/** Renders the mesh into a projected image */
 	@Getter RenderMesh renderer = new RenderMesh();
@@ -95,6 +102,9 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 	// Work image for rendering depth
 	GrayF32 inverseDepth = new GrayF32(1, 1);
 
+	// Window with help and settings
+	@Nullable JFrame helpWindow;
+
 	@Nullable PrintStream verbose = null;
 
 	public MeshViewerPanel() {
@@ -128,6 +138,16 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 			}
 		});
 
+		// If the user clicks in the top-left corner open the help screen
+		addMouseListener(new MouseAdapter() {
+			@Override public void mouseClicked( MouseEvent e ) {
+				if (!helpButtonActive || e.getX() >= buttonSize || e.getY() >= buttonSize)
+					return;
+				if (helpWindow == null)
+					showHelpWindow();
+			}
+		});
+
 		setFocusable(true);
 		requestFocus();
 	}
@@ -154,6 +174,10 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 	@Override
 	public void removeNotify() {
 		super.removeNotify();
+		if (helpWindow != null) {
+			helpWindow.setVisible(false);
+			helpWindow = null;
+		}
 		shutdownRenderThread();
 	}
 
@@ -351,6 +375,44 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 		} finally {
 			lockSwap.unlock();
 		}
+
+		if (helpButtonActive)
+			drawHelpButton(g2);
+	}
+
+	private void drawHelpButton( Graphics2D g2 ) {
+		String text = "H";
+
+		// Draw a white rectangle to show the button's bounds
+		g2.setColor(Color.WHITE);
+		g2.fillRect(0, 0, buttonSize, buttonSize);
+		g2.setFont(helpButtonFont);
+
+		// Draw an H to make it easier to understand what it does and so the user investigates
+		GlyphVector gv = helpButtonFont.createGlyphVector(g2.getFontRenderContext(), text);
+		Rectangle2D bounds = gv.getVisualBounds();
+		g2.setColor(Color.RED);
+		float offsetX = (float)((buttonSize - bounds.getWidth())/2.0);
+		float offsetY = (float)((buttonSize - bounds.getHeight())/2.0 + bounds.getHeight());
+		g2.drawString(text, offsetX, offsetY);
+	}
+
+	/**
+	 * Opens a window which provides help about keys and let's the user modify control settings
+	 */
+	private void showHelpWindow() {
+		helpWindow = new JFrame("Mesh Viewer Help");
+		helpWindow.setLocationRelativeTo(this);
+		helpWindow.add(new MeshViewerPreferencePanel(this), BorderLayout.CENTER);
+		helpWindow.pack();
+		helpWindow.setAlwaysOnTop(true);
+		helpWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		helpWindow.addWindowListener(new WindowAdapter() {
+			@Override public void windowClosed( WindowEvent e ) {
+				MeshViewerPanel.this.helpWindow = null;
+			}
+		});
+		helpWindow.setVisible(true);
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
