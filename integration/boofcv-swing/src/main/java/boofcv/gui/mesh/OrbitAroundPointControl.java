@@ -135,9 +135,9 @@ public class OrbitAroundPointControl extends MouseAdapter implements Swing3dCame
 	@Override public void mouseDragged( MouseEvent e ) {
 		synchronized (orbit) {
 			if (e.isShiftDown() || SwingUtilities.isMiddleMouseButton(e))
-				orbit.mouseDragTranslate(prevX, prevY, e.getX(), e.getY(), true);
+				orbit.mouseDragTranslate(prevX, prevY, e.getX(), e.getY());
 			else if (e.isControlDown() || SwingUtilities.isRightMouseButton(e))
-				orbit.mouseDragTranslate(prevX, prevY, e.getX(), e.getY(), false);
+				orbit.mouseDragZoomRoll(prevX, prevY, e.getX(), e.getY());
 			else
 				orbit.mouseDragRotate(prevX, prevY, e.getX(), e.getY());
 		}
