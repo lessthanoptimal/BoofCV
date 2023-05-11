@@ -59,6 +59,12 @@ public class MeshColorizeOps {
 		for (int i = 0; i < mesh.size(); i++) {
 			mesh.getShape(i, facet);
 
+			// Handle case of invalid facet gracefully by assigning it to an arbitrary color
+			if (facet.size < 3) {
+				colors[i] = 0xFFFF0000;
+				continue;
+			}
+
 			va.minus(facet.get(1), facet.get(0));
 			vb.minus(facet.get(2), facet.get(0));
 			normal.crossSetTo(va, vb);
