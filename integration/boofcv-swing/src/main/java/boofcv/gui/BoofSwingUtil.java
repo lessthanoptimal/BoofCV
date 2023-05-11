@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -309,6 +309,7 @@ public class BoofSwingUtil {
 				case XML -> new FileNameExtensionFilter("xml", "xml");
 				case IMAGES -> new FileNameExtensionFilter("Images", ImageIO.getReaderFileSuffixes());
 				case VIDEOS -> new FileNameExtensionFilter("Videos", "mpg", "mp4", "mov", "avi", "wmv");
+				case MESH -> new FileNameExtensionFilter("Mesh3D", "ply", "stl", "obj");
 				case DIRECTORIES -> {
 					selectDirectories = true;
 					yield null;
@@ -396,11 +397,17 @@ public class BoofSwingUtil {
 				case XML:
 					ff = new FileNameExtensionFilter("xml", "xml");
 					break;
+
 				case IMAGES:
 					ff = new FileNameExtensionFilter("Images", UtilImageIO.IMAGE_SUFFIXES);
 					break;
+
 				case VIDEOS:
 					ff = new FileNameExtensionFilter("Videos", "mpg", "mp4", "mov", "avi", "wmv");
+					break;
+
+				case MESH:
+					ff = new FileNameExtensionFilter("Mesh3D", "ply", "stl", "obj");
 					break;
 
 				case DIRECTORIES:
@@ -952,5 +959,5 @@ public class BoofSwingUtil {
 		public java.util.List<String> files;
 	}
 
-	public enum FileTypes {FILES, YAML, XML, IMAGES, VIDEOS, DIRECTORIES}
+	public enum FileTypes {FILES, YAML, XML, IMAGES, VIDEOS, DIRECTORIES, MESH}
 }

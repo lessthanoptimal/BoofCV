@@ -68,7 +68,7 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 
 	/** Renders the mesh into a projected image */
 	@Getter RenderMesh renderer = new RenderMesh();
-	VertexMesh mesh;
+	VertexMesh mesh = new VertexMesh(); // empty mesh to avoid NPE
 
 	// Lock for swapping the double buffer for rendering. When the active buffer is being drawn this lock is
 	// active. When the render thread wants to swap the buffers it will activate the lock just for the swap.
@@ -436,7 +436,10 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 	/**
 	 * Opens a window which provides help about keys and let's the user modify control settings
 	 */
-	private void showHelpWindow() {
+	public void showHelpWindow() {
+		// See if the window is already visible
+		if (helpWindow != null)
+			return;
 		helpWindow = new JFrame("Mesh Viewer Help");
 		helpWindow.setLocationRelativeTo(this);
 		helpWindow.add(new MeshViewerPreferencePanel(this), BorderLayout.CENTER);

@@ -35,7 +35,7 @@ public class MeshViewerPreferencePanel extends StandardAlgConfigPanel {
 	JComboBox<String> comboControls;
 
 	// Allows the user to hide the help. Good for screenshots
-	JCheckBox checkHide = checkbox("Hide Help", true);
+	JCheckBox checkHide;
 
 	// Help about controls
 	JTextArea textArea = new JTextArea();
@@ -50,6 +50,7 @@ public class MeshViewerPreferencePanel extends StandardAlgConfigPanel {
 	public MeshViewerPreferencePanel( MeshViewerPanel panel ) {
 		this.panel = panel;
 
+		checkHide = checkbox("Show Help", panel.helpButtonActive);
 		comboControls = combo(0, new ArrayList<>(panel.controls.keySet()).toArray());
 
 		textArea.setEditable(false);

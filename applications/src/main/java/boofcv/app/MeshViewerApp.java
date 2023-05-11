@@ -75,7 +75,7 @@ public class MeshViewerApp {
 
 	public static void main( String[] args ) {
 		SwingUtilities.invokeLater(() -> {
-			File file = BoofSwingUtil.openFileChooser("MeshViewer", BoofSwingUtil.FileTypes.FILES);
+			File file = BoofSwingUtil.openFileChooser("MeshViewer", BoofSwingUtil.FileTypes.MESH);
 			if (file == null)
 				return;
 
