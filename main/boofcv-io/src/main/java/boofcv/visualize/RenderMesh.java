@@ -87,7 +87,7 @@ public class RenderMesh implements VerbosePrint {
 	 */
 	public void render( VertexMesh mesh ) {
 		// Sanity check to see if intrinsics has been configured
-		BoofMiscOps.checkTrue(intrinsics.width > 0 && intrinsics.height > 0);
+		BoofMiscOps.checkTrue(intrinsics.width > 0 && intrinsics.height > 0, "Intrinsics not set");
 
 		// Initialize output images
 		initializeImages();

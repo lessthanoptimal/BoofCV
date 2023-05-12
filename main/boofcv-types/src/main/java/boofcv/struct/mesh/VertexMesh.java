@@ -24,6 +24,8 @@ import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
 /**
  * Specifies a 3D mesh. BigArray types are used since a 3D mesh can have a very large number of points in it.
  *
@@ -72,6 +74,20 @@ public class VertexMesh {
 		for (int i = idx0; i < idx1; i++) {
 			vertexes.getCopy(indexes.get(i), output.get(i - idx0));
 		}
+	}
+
+	/**
+	 * Adds a new shape with the specified vertexes.
+	 */
+	public void addShape( List<Point3D_F64> shape ) {
+		// All the vertexes for this shape will reference newly added vertexes
+		int idx0 = vertexes.size();
+		for (int i = 0; i < shape.size(); i++) {
+			indexes.add(idx0 + i);
+		}
+
+		offsets.add(idx0 + shape.size());
+		vertexes.appendAll(shape);
 	}
 
 	public VertexMesh setTo( VertexMesh src ) {

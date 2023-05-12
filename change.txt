@@ -20,7 +20,6 @@ Version : 0.43
 - Scene Reconstruction
   - TODO Robust optimization
   - TODO 3D reconstruction to 3D mesh
-  - TODO Support STL format
 - SLAM
   - TODO traditional monocular SLAM
 - Regression

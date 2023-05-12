@@ -25,6 +25,8 @@ import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.BigDogArray_F64;
 import org.ddogleg.struct.BigDogGrowth;
 
+import java.util.Collection;
+
 /**
  * Packed array of {@link Point3D_F64}. Internally the point is stored in an interleaved format.
  *
@@ -99,6 +101,19 @@ public class PackedBigArrayPoint3D_F64 implements PackedArray<Point3D_F64> {
 
 	public void append( GeoTuple3D_F64<?> element ) {
 		append(element.x, element.y, element.z);
+	}
+
+	/**
+	 * Adds all the points in the collection
+	 */
+	public <T extends GeoTuple3D_F64<T>> void appendAll( Collection<T> collection ) {
+		// Preallocate memory for all the items in the list
+		reserve(collection.size());
+
+		// Add each element in the list
+		for (T p : collection) { // lint:forbidden ignore_line"
+			append(p);
+		}
 	}
 
 	@Override public void append( Point3D_F64 element ) {

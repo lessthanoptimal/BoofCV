@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,13 +22,13 @@ import boofcv.struct.PackedArray;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.BigDogGrowth;
 import org.ejml.UtilEjml;
+import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-/**
- * @author Peter Abeles
- */
 public class TestPackedBigArrayPoint3D_F64 extends GenericPackedArrayChecks<Point3D_F64> {
 
 	@Override protected PackedArray<Point3D_F64> createAlg() {
@@ -37,9 +37,9 @@ public class TestPackedBigArrayPoint3D_F64 extends GenericPackedArrayChecks<Poin
 
 	@Override protected Point3D_F64 createRandomPoint() {
 		var point = new Point3D_F64();
-		point.x = (double) rand.nextGaussian();
-		point.y = (double) rand.nextGaussian();
-		point.z = (double) rand.nextGaussian();
+		point.x = (double)rand.nextGaussian();
+		point.y = (double)rand.nextGaussian();
+		point.z = (double)rand.nextGaussian();
 		return point;
 	}
 
@@ -49,5 +49,21 @@ public class TestPackedBigArrayPoint3D_F64 extends GenericPackedArrayChecks<Poin
 
 	@Override protected void checkNotEquals( Point3D_F64 a, Point3D_F64 b ) {
 		assertNotEquals(0.0, a.distance(b), UtilEjml.TEST_F64);
+	}
+
+	@Test public void appendAll() {
+		var points = new ArrayList<Point3D_F64>();
+		points.add(new Point3D_F64(1, 2, 3));
+		points.add(new Point3D_F64(-1, -2, -3));
+		points.add(new Point3D_F64(3, 4, 5));
+
+		var alg = new PackedBigArrayPoint3D_F64();
+		alg.appendAll(points);
+
+		assertEquals(points.size(), alg.size);
+
+		for (int i = 0; i < points.size(); i++) {
+			assertEquals(0.0, points.get(i).distance(alg.getTemp(i)));
+		}
 	}
 }
