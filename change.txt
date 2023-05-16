@@ -2,7 +2,7 @@ Change Log
 
 Date Format: year/month/day
 ---------------------------------------------
-Date    : 2023/
+Date    : 2023/May/15
 Version : 0.43
 
 - ImageLinePruneMerge
@@ -12,25 +12,6 @@ Version : 0.43
 - Added a mesh viewer
   * Swing panel, multiple controls, and help
   * Generic rendering engine
-
-- Calibration
-  - TODO Visualize Multi Camera Calibration
-- Image Processing
-  - TODO hough circle detector
-- Scene Reconstruction
-  - TODO Robust optimization
-  - TODO 3D reconstruction to 3D mesh
-- SLAM
-  - TODO traditional monocular SLAM
-- Regression
-  - TODO Video stabilization
-  - TODO Template matching
-- Android
-  - TODO Add new Fragment based API
-- Calibration
-  - TODO calibration targets Hamming Marker grid and chessboard, e.g. ChArUco and ArUco grids.
-- SLAM
-  - TODO Stereo
 
 ---------------------------------------------
 Date    : 2023/Feb/20
