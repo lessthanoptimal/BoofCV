@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,13 +43,19 @@ public enum DisparityError {
 	NCC;
 
 	public boolean isCorrelation() {
-		switch (this) {
-			case SAD:
-			case CENSUS:
-				return false;
+		return switch (this) {
+			case SAD, CENSUS -> false;
+			default -> true;
+		};
+	}
 
-			default:
-				return true;
-		}
+	/**
+	 * If the error is distance squared or false if distance
+	 */
+	public boolean isSquared() {
+		return switch (this) {
+			case SAD, CENSUS -> false;
+			default -> true;
+		};
 	}
 }

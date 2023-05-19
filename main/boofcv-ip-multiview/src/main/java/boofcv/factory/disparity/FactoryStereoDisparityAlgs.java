@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,6 +43,7 @@ import static boofcv.factory.disparity.FactoryStereoDisparity.*;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class FactoryStereoDisparityAlgs {
 
 	/**
@@ -211,13 +212,13 @@ public class FactoryStereoDisparityAlgs {
 	}
 
 	public static DisparitySelect<int[], GrayF32>
-	selectDisparitySubpixel_S32( int maxError, int tolR2L, double texture ) {
-		return new SelectErrorSubpixel.S32_F32(maxError, tolR2L, texture);
+	selectDisparitySubpixel_S32( int maxError, int tolR2L, double texture, boolean squaredError ) {
+		return new SelectErrorSubpixel.S32_F32(maxError, tolR2L, texture, squaredError);
 	}
 
 	public static DisparitySelect<float[], GrayF32>
-	selectDisparitySubpixel_F32( int maxError, int tolR2L, double texture ) {
-		return new SelectErrorSubpixel.F32_F32(maxError, tolR2L, texture);
+	selectDisparitySubpixel_F32( int maxError, int tolR2L, double texture, boolean squaredError ) {
+		return new SelectErrorSubpixel.F32_F32(maxError, tolR2L, texture, squaredError);
 	}
 
 	public static DisparitySparseSelect<int[]>
@@ -237,12 +238,12 @@ public class FactoryStereoDisparityAlgs {
 	}
 
 	public static DisparitySparseSelect<int[]>
-	selectDisparitySparseSubpixel_S32( int maxError, double texture, int tolRightToLeft ) {
-		return new SelectSparseErrorSubpixel.S32(maxError, texture, tolRightToLeft);
+	selectDisparitySparseSubpixel_S32( int maxError, double texture, int tolRightToLeft, boolean squaredError  ) {
+		return new SelectSparseErrorSubpixel.S32(maxError, texture, tolRightToLeft, squaredError);
 	}
 
 	public static DisparitySparseSelect<float[]>
-	selectDisparitySparseSubpixel_F32( int maxError, double texture, int tolRightToLeft ) {
-		return new SelectSparseErrorSubpixel.F32(maxError, texture, tolRightToLeft);
+	selectDisparitySparseSubpixel_F32( int maxError, double texture, int tolRightToLeft, boolean squaredError  ) {
+		return new SelectSparseErrorSubpixel.F32(maxError, texture, tolRightToLeft, squaredError);
 	}
 }

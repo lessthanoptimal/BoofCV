@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -153,7 +153,8 @@ public class FactoryStereoDisparity {
 			if (config.errorType.isCorrelation())
 				throw new IllegalArgumentException("Can't do correlation scores for integer image types");
 			if (config.subpixel) {
-				select = FactoryStereoDisparityAlgs.selectDisparitySubpixel_S32(maxError, config.validateRtoL, config.texture);
+				select = FactoryStereoDisparityAlgs.selectDisparitySubpixel_S32(
+						maxError, config.validateRtoL, config.texture, config.errorType.isSquared());
 			} else {
 				select = FactoryStereoDisparityAlgs.selectDisparity_S32(maxError, config.validateRtoL, config.texture);
 			}
@@ -162,7 +163,8 @@ public class FactoryStereoDisparity {
 				if (config.errorType.isCorrelation()) {
 					select = FactoryStereoDisparityAlgs.selectCorrelation_F32(config.validateRtoL, config.texture, true);
 				} else {
-					select = FactoryStereoDisparityAlgs.selectDisparitySubpixel_F32(maxError, config.validateRtoL, config.texture);
+					select = FactoryStereoDisparityAlgs.selectDisparitySubpixel_F32(
+							maxError, config.validateRtoL, config.texture, config.errorType.isSquared());
 				}
 			} else {
 				if (config.errorType.isCorrelation())
@@ -293,12 +295,14 @@ public class FactoryStereoDisparity {
 			}
 		} else if (GeneralizedImageOps.isFloatingPoint(imageType) && config.errorType != DisparityError.CENSUS) {
 			if (config.subpixel)
-				select = FactoryStereoDisparityAlgs.selectDisparitySparseSubpixel_F32((int)maxError, config.texture, config.validateRtoL);
+				select = FactoryStereoDisparityAlgs.selectDisparitySparseSubpixel_F32(
+						(int)maxError, config.texture, config.validateRtoL, config.errorType.isSquared());
 			else
 				select = FactoryStereoDisparityAlgs.selectDisparitySparse_F32((int)maxError, config.texture, config.validateRtoL);
 		} else {
 			if (config.subpixel)
-				select = FactoryStereoDisparityAlgs.selectDisparitySparseSubpixel_S32((int)maxError, config.texture, config.validateRtoL);
+				select = FactoryStereoDisparityAlgs.selectDisparitySparseSubpixel_S32(
+						(int)maxError, config.texture, config.validateRtoL, config.errorType.isSquared());
 			else
 				select = FactoryStereoDisparityAlgs.selectDisparitySparse_S32((int)maxError, config.texture, config.validateRtoL);
 		}
