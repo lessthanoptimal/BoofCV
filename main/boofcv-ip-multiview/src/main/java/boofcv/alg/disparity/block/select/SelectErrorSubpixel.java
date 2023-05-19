@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,12 +44,17 @@ public class SelectErrorSubpixel {
 	 * For scores of type int[]
 	 */
 	public static class S32_F32 extends SelectErrorWithChecks_S32<GrayF32> {
-		public S32_F32( int maxError, int rightToLeftTolerance, double texture ) {
+		/** If the error is a squared error. If false then it's assumed to be distance */
+		final boolean squaredError;
+
+		public S32_F32( int maxError, int rightToLeftTolerance, double texture, boolean squaredError ) {
 			super(maxError, rightToLeftTolerance, texture, GrayF32.class);
+			this.squaredError = squaredError;
 		}
 
-		S32_F32( S32_F32 original ) {
+		S32_F32( S32_F32 original, boolean squaredError ) {
 			super(original);
+			this.squaredError = squaredError;
 		}
 
 		@Override
@@ -58,11 +63,17 @@ public class SelectErrorSubpixel {
 			if (disparityValue <= 0 || disparityValue >= localRange - 1) {
 				imageDisparity.data[index] = disparityValue;
 			} else {
-				int c0 = columnScore[disparityValue - 1];
-				int c1 = columnScore[disparityValue];
-				int c2 = columnScore[disparityValue + 1];
+				float c0 = columnScore[disparityValue - 1];
+				float c1 = columnScore[disparityValue];
+				float c2 = columnScore[disparityValue + 1];
 
-				float offset = (float)(c0 - c2)/(float)(2*(c0 - 2*c1 + c2));
+				if (!squaredError) {
+					c0 *= c0;
+					c1 *= c1;
+					c2 *= c2;
+				}
+
+				float offset = (c0 - c2)/(2f*(c0 - 2f*c1 + c2));
 
 				imageDisparity.data[index] = disparityValue + offset;
 			}
@@ -76,7 +87,7 @@ public class SelectErrorSubpixel {
 
 		@Override
 		public DisparitySelect<int[], GrayF32> concurrentCopy() {
-			return new S32_F32(this);
+			return new S32_F32(this, squaredError);
 		}
 	}
 
@@ -84,12 +95,17 @@ public class SelectErrorSubpixel {
 	 * For scores of type float[]
 	 */
 	public static class F32_F32 extends SelectErrorWithChecks_F32<GrayF32> {
-		public F32_F32( int maxError, int rightToLeftTolerance, double texture ) {
+		/** If the error is a squared error. If false then it's assumed to be distance */
+		final boolean squaredError;
+
+		public F32_F32( int maxError, int rightToLeftTolerance, double texture, boolean squaredError ) {
 			super(maxError, rightToLeftTolerance, texture, GrayF32.class);
+			this.squaredError = squaredError;
 		}
 
-		F32_F32( F32_F32 original ) {
+		F32_F32( F32_F32 original, boolean squaredError ) {
 			super(original);
+			this.squaredError = squaredError;
 		}
 
 		@Override protected void setDisparity( int index, int disparityValue, float score ) {
@@ -100,6 +116,12 @@ public class SelectErrorSubpixel {
 				float c0 = columnScore[disparityValue - 1];
 				float c1 = columnScore[disparityValue];
 				float c2 = columnScore[disparityValue + 1];
+
+				if (!squaredError) {
+					c0 *= c0;
+					c1 *= c1;
+					c2 *= c2;
+				}
 
 				float offset = (c0 - c2)/(2f*(c0 - 2f*c1 + c2));
 
@@ -113,7 +135,7 @@ public class SelectErrorSubpixel {
 		}
 
 		@Override public DisparitySelect<float[], GrayF32> concurrentCopy() {
-			return new F32_F32(this);
+			return new F32_F32(this, squaredError);
 		}
 	}
 }

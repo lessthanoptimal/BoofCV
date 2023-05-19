@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,7 +36,7 @@ public class TestSelectSparseErrorSubpixel_F32
 
 	@Override
 	protected SelectSparseStandardWta<float[]> createAlg( int maxError, double texture, int tolRightToLeft ) {
-		return new SelectSparseErrorSubpixel.F32(maxError, texture, tolRightToLeft);
+		return new SelectSparseErrorSubpixel.F32(maxError, texture, tolRightToLeft, true);
 	}
 
 	/**
@@ -44,7 +44,7 @@ public class TestSelectSparseErrorSubpixel_F32
 	 */
 	@Test
 	void addSubpixelBias() {
-		SelectSparseErrorSubpixel.F32 alg = new SelectSparseErrorSubpixel.F32(-1, -1, -1);
+		SelectSparseErrorSubpixel.F32 alg = new SelectSparseErrorSubpixel.F32(-1, -1, -1, true);
 
 		float[] scores = new float[30];
 		Arrays.fill(scores, 0, 10, 500);

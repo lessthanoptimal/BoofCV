@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,12 @@ import boofcv.alg.disparity.block.score.DisparitySparseRectifiedScoreBM;
 public class SelectSparseErrorSubpixel {
 
 	public static class S32 extends SelectSparseErrorWithChecksWta_S32 {
-		public S32( int maxError, double texture, int tolRightToLeft ) {
+		/** If the error is a squared error. If false then it's assumed to be distance */
+		final boolean squaredError;
+
+		public S32( int maxError, double texture, int tolRightToLeft, boolean squaredError ) {
 			super(maxError, texture, tolRightToLeft);
+			this.squaredError = squaredError;
 		}
 
 		@Override
@@ -45,11 +49,17 @@ public class SelectSparseErrorSubpixel {
 				if (disparityValue == 0 || disparityValue == disparityRange - 1) {
 					return true;
 				} else {
-					int c0 = scores[disparityValue - 1];
-					int c1 = scores[disparityValue];
-					int c2 = scores[disparityValue + 1];
+					double c0 = scores[disparityValue - 1];
+					double c1 = scores[disparityValue];
+					double c2 = scores[disparityValue + 1];
 
-					double offset = (double)(c0 - c2)/(double)(2*(c0 - 2*c1 + c2));
+					if (!squaredError) {
+						c0 *= c0;
+						c1 *= c1;
+						c2 *= c2;
+					}
+
+					double offset = (c0 - c2)/(2.0*(c0 - 2.0*c1 + c2));
 
 					disparity += offset;
 					return true;
@@ -61,8 +71,12 @@ public class SelectSparseErrorSubpixel {
 	}
 
 	public static class F32 extends SelectSparseErrorWithChecksWta_F32 {
-		public F32( int maxError, double texture, int tolRightToLeft ) {
+		/** If the error is a squared error. If false then it's assumed to be distance */
+		final boolean squaredError;
+
+		public F32( int maxError, double texture, int tolRightToLeft, boolean squaredError ) {
 			super(maxError, texture, tolRightToLeft);
+			this.squaredError = squaredError;
 		}
 
 		@Override
@@ -78,6 +92,12 @@ public class SelectSparseErrorSubpixel {
 					float c0 = scores[disparityValue - 1];
 					float c1 = scores[disparityValue];
 					float c2 = scores[disparityValue + 1];
+
+					if (!squaredError) {
+						c0 *= c0;
+						c1 *= c1;
+						c2 *= c2;
+					}
 
 					float offset = (c0 - c2)/(2f*(c0 - 2*c1 + c2));
 

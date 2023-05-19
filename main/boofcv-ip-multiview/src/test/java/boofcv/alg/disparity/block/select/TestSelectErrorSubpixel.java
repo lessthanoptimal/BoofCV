@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,7 @@ public class TestSelectErrorSubpixel extends BoofStandardJUnit {
 
 		@Override
 		public SelectErrorWithChecks_F32<GrayF32> createSelector( int maxError, int rightToLeftTolerance, double texture ) {
-			return new SelectErrorSubpixel.F32_F32(maxError, rightToLeftTolerance, texture);
+			return new SelectErrorSubpixel.F32_F32(maxError, rightToLeftTolerance, texture, true);
 		}
 
 		/**
@@ -43,7 +43,7 @@ public class TestSelectErrorSubpixel extends BoofStandardJUnit {
 		@Test public void addSubpixelBias() {
 			var img = new GrayF32(w, h);
 
-			var alg = new SelectErrorSubpixel.F32_F32(-1, -1, -1);
+			var alg = new SelectErrorSubpixel.F32_F32(-1, -1, -1, true);
 
 			alg.configure(img, null, 0, 20, 2);
 			alg.setLocalDisparityMax(20);
@@ -72,7 +72,7 @@ public class TestSelectErrorSubpixel extends BoofStandardJUnit {
 
 		@Override
 		public SelectErrorWithChecks_S32<GrayF32> createSelector( int maxError, int rightToLeftTolerance, double texture ) {
-			return new SelectErrorSubpixel.S32_F32(maxError, rightToLeftTolerance, texture);
+			return new SelectErrorSubpixel.S32_F32(maxError, rightToLeftTolerance, texture, true);
 		}
 
 		/**
@@ -82,7 +82,7 @@ public class TestSelectErrorSubpixel extends BoofStandardJUnit {
 
 			var img = new GrayF32(w, h);
 
-			var alg = new SelectErrorSubpixel.S32_F32(-1, -1, -1);
+			var alg = new SelectErrorSubpixel.S32_F32(-1, -1, -1, true);
 
 			alg.configure(img, null, 0, 20, 2);
 			alg.setLocalDisparityMax(20);
