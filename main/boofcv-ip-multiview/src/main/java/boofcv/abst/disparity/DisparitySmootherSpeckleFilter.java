@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,7 @@ import java.util.Set;
  * @author Peter Abeles
  */
 public class DisparitySmootherSpeckleFilter<Image extends ImageBase<Image>, Disp extends ImageGray<Disp>>
-		implements DisparitySmoother<Image,Disp> {
+		implements DisparitySmoother<Image, Disp> {
 
 	@Getter ConnectedSpeckleFiller<Disp> filler;
 
@@ -52,12 +52,12 @@ public class DisparitySmootherSpeckleFilter<Image extends ImageBase<Image>, Disp
 		int size = config.maximumArea.computeI(disp.totalPixels());
 
 		// Do nothing if it can't filer anything since the maximum size is zero
-		if (size==0)
+		if (size == 0)
 			return;
-		filler.process(disp,size,config.similarTol,disparityRange);
+		filler.process(disp, size, config.similarTol, disparityRange);
 
-		if (out!=null)
-			out.println("Speckle maxArea="+size+" filled="+filler.getTotalFilled());
+		if (out != null)
+			out.println("Speckle maxArea=" + size + " filled=" + filler.getTotalFilled());
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {

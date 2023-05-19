@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,9 +30,8 @@ import boofcv.struct.image.ImageType;
  * @author Peter Abeles
  */
 public class WrapDisparityBlockMatchCensus
-		<T extends ImageGray<T>, C extends ImageGray<C>,DI extends ImageGray<DI>>
-		extends WrapBaseBlockMatch<T,C,DI>
-{
+		<T extends ImageGray<T>, C extends ImageGray<C>, DI extends ImageGray<DI>>
+		extends WrapBaseBlockMatch<T, C, DI> {
 
 	FilterImageInterface<T, C> censusTran;
 
@@ -40,25 +39,24 @@ public class WrapDisparityBlockMatchCensus
 	C cleft;
 	C cright;
 
-	public WrapDisparityBlockMatchCensus(FilterImageInterface<T, C> censusTran,
-										 DisparityBlockMatchRowFormat<C, DI> alg)
-	{
+	public WrapDisparityBlockMatchCensus( FilterImageInterface<T, C> censusTran,
+										  DisparityBlockMatchRowFormat<C, DI> alg ) {
 		super(alg);
 		this.censusTran = censusTran;
 		this.alg = alg;
-		disparity = GeneralizedImageOps.createSingleBand(alg.getDisparityType(),1,1);
-		cleft = censusTran.getOutputType().createImage(1,1);
-		cright = censusTran.getOutputType().createImage(1,1);
+		disparity = GeneralizedImageOps.createSingleBand(alg.getDisparityType(), 1, 1);
+		cleft = censusTran.getOutputType().createImage(1, 1);
+		cright = censusTran.getOutputType().createImage(1, 1);
 	}
 
 	@Override
-	public void _process(T imageLeft, T imageRight) {
+	public void _process( T imageLeft, T imageRight ) {
 		// Apply Census Transform to input images
-		censusTran.process(imageLeft,cleft);
-		censusTran.process(imageRight,cright);
+		censusTran.process(imageLeft, cleft);
+		censusTran.process(imageRight, cright);
 
 		// Now compute the disparity
-		alg.process(cleft,cright,disparity, score);
+		alg.process(cleft, cright, disparity, score);
 	}
 
 	public C getCLeft() {

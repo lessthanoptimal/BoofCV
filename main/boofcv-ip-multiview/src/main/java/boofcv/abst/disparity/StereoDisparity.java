@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,8 +41,6 @@ import org.jetbrains.annotations.Nullable;
  * </p>
  *
  * @see StereoDisparitySparse
- *
- * @author Peter Abeles
  */
 public interface StereoDisparity<Image extends ImageBase<Image>, Disparity extends ImageGray<Disparity>> {
 
@@ -52,7 +50,7 @@ public interface StereoDisparity<Image extends ImageBase<Image>, Disparity exten
 	 * @param imageLeft Input left rectified image.
 	 * @param imageRight Input right rectified image.
 	 */
-	void process( Image imageLeft , Image imageRight );
+	void process( Image imageLeft, Image imageRight );
 
 	/**
 	 * Return the computed disparity image. See comments in class description on disparity image format.
@@ -64,7 +62,6 @@ public interface StereoDisparity<Image extends ImageBase<Image>, Disparity exten
 	/**
 	 * Returns a score that represents the goodness of fit for the selected value. Meaning of the score
 	 * is cost function dependent. If null is returned that means the score was not saved. This can be
-	 *
 	 */
 	@Nullable GrayF32 getDisparityScore();
 
@@ -90,12 +87,14 @@ public interface StereoDisparity<Image extends ImageBase<Image>, Disparity exten
 
 	/**
 	 * Border around the image's x-axis which is not processed.
+	 *
 	 * @return border x-axis
 	 */
 	int getBorderX();
 
 	/**
 	 * Border around the image's y-axis which is not processed.
+	 *
 	 * @return border y-axis
 	 */
 	int getBorderY();
@@ -113,5 +112,4 @@ public interface StereoDisparity<Image extends ImageBase<Image>, Disparity exten
 	 * @return Output image type
 	 */
 	Class<Disparity> getDisparityType();
-
 }

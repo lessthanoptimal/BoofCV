@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,26 +27,26 @@ import org.jetbrains.annotations.Nullable;
 
 public class WrapDisparitySgm<DI extends ImageGray<DI>> implements StereoDisparity<GrayU8, DI> {
 
-	SgmStereoDisparity<GrayU8,?> sgm;
+	SgmStereoDisparity<GrayU8, ?> sgm;
 	@Nullable GrayF32 subpixel;
 
-	public WrapDisparitySgm( SgmStereoDisparity<GrayU8,?> sgm, boolean subPixel) {
+	public WrapDisparitySgm( SgmStereoDisparity<GrayU8, ?> sgm, boolean subPixel ) {
 		this.sgm = sgm;
-		this.subpixel = subPixel ? new GrayF32(1,1) : null;
+		this.subpixel = subPixel ? new GrayF32(1, 1) : null;
 	}
 
 	@Override
-	public void process(GrayU8 imageLeft, GrayU8 imageRight) {
-		sgm.process(imageLeft,imageRight);
+	public void process( GrayU8 imageLeft, GrayU8 imageRight ) {
+		sgm.process(imageLeft, imageRight);
 		sgm.saveScore();
-		if( subpixel != null ) {
+		if (subpixel != null) {
 			sgm.subpixel(sgm.getDisparity(), subpixel);
 		}
 	}
 
 	@Override
 	public DI getDisparity() {
-		if( subpixel != null ) {
+		if (subpixel != null) {
 			return (DI)subpixel;
 		} else {
 			return (DI)sgm.getDisparity();
@@ -92,7 +92,7 @@ public class WrapDisparitySgm<DI extends ImageGray<DI>> implements StereoDispari
 		return (Class)(subpixel == null ? GrayF32.class : GrayU8.class);
 	}
 
-	public SgmStereoDisparity<GrayU8,?> getAlgorithm() {
+	public SgmStereoDisparity<GrayU8, ?> getAlgorithm() {
 		return sgm;
 	}
 }

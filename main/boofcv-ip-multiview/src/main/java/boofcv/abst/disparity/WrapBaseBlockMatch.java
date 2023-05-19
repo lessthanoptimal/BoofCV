@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,23 +31,22 @@ import org.jetbrains.annotations.Nullable;
  * @author Peter Abeles
  */
 @SuppressWarnings({"NullAway.Init"})
-public abstract class WrapBaseBlockMatch <In extends ImageGray<In>, T extends ImageGray<T>, DI extends ImageGray<DI>>
-		implements StereoDisparity<In, DI>
-{
+public abstract class WrapBaseBlockMatch<In extends ImageGray<In>, T extends ImageGray<T>, DI extends ImageGray<DI>>
+		implements StereoDisparity<In, DI> {
 	DisparityBlockMatchRowFormat<T, DI> alg;
 
 	DI disparity;
 	@Nullable GrayF32 score;
 
-	protected WrapBaseBlockMatch(DisparityBlockMatchRowFormat<T,DI> alg) {
+	protected WrapBaseBlockMatch( DisparityBlockMatchRowFormat<T, DI> alg ) {
 		this.alg = alg;
 	}
 
-	@Override public void process(In imageLeft, In imageRight) {
-		if( disparity == null || disparity.width != imageLeft.width || disparity.height != imageLeft.height )  {
+	@Override public void process( In imageLeft, In imageRight ) {
+		if (disparity == null || disparity.width != imageLeft.width || disparity.height != imageLeft.height) {
 			// make sure the image borders are marked as invalid
-			disparity = GeneralizedImageOps.createSingleBand(alg.getDisparityType(),imageLeft.width,imageLeft.height);
-			GImageMiscOps.fill(disparity, getInvalidValue() );
+			disparity = GeneralizedImageOps.createSingleBand(alg.getDisparityType(), imageLeft.width, imageLeft.height);
+			GImageMiscOps.fill(disparity, getInvalidValue());
 			// TODO move this outside and run it every time. Need to fill border
 			//      left border will be radius + min disparity
 		}
@@ -56,10 +55,10 @@ public abstract class WrapBaseBlockMatch <In extends ImageGray<In>, T extends Im
 		if (score != null)
 			score.reshape(disparity);
 
-		_process(imageLeft,imageRight);
+		_process(imageLeft, imageRight);
 	}
 
-	protected abstract void _process(In imageLeft, In imageRight );
+	protected abstract void _process( In imageLeft, In imageRight );
 
 	public void setScoreEnabled( boolean enabled ) {
 		// see if the current state matches the request
@@ -67,7 +66,7 @@ public abstract class WrapBaseBlockMatch <In extends ImageGray<In>, T extends Im
 			return;
 
 		if (enabled) {
-			score = new GrayF32(1,1);
+			score = new GrayF32(1, 1);
 		} else {
 			score = null;
 		}
@@ -105,7 +104,7 @@ public abstract class WrapBaseBlockMatch <In extends ImageGray<In>, T extends Im
 		return alg.getDisparityType();
 	}
 
-	public DisparityBlockMatchRowFormat<T,DI> getAlg() {
+	public DisparityBlockMatchRowFormat<T, DI> getAlg() {
 		return alg;
 	}
 }

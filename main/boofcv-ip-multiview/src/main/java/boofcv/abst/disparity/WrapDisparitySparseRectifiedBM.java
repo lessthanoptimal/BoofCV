@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,35 +28,34 @@ import lombok.Getter;
  *
  * @author Peter Abeles
  */
-public class WrapDisparitySparseRectifiedBM<ArrayData,T extends ImageGray<T>>
-		implements StereoDisparitySparse<T>
-{
-	@Getter DisparitySparseRectifiedScoreBM<ArrayData,T> computeScore;
+public class WrapDisparitySparseRectifiedBM<ArrayData, T extends ImageGray<T>>
+		implements StereoDisparitySparse<T> {
+	@Getter DisparitySparseRectifiedScoreBM<ArrayData, T> computeScore;
 	@Getter DisparitySparseSelect<ArrayData> select;
 
 	// for an insignificant speed boost save this constant as a floating point number
 	double minDisparityFloat;
 
-	public WrapDisparitySparseRectifiedBM(DisparitySparseRectifiedScoreBM<ArrayData,T> computeScore,
-										  DisparitySparseSelect<ArrayData> select ) {
+	public WrapDisparitySparseRectifiedBM( DisparitySparseRectifiedScoreBM<ArrayData, T> computeScore,
+										   DisparitySparseSelect<ArrayData> select ) {
 		this.computeScore = computeScore;
 		this.select = select;
 	}
 
 	@Override
-	public void setImages(T imageLeft, T imageRight ) {
-		computeScore.setImages(imageLeft,imageRight);
+	public void setImages( T imageLeft, T imageRight ) {
+		computeScore.setImages(imageLeft, imageRight);
 		minDisparityFloat = computeScore.getDisparityMin();
 	}
 
 	@Override
 	public double getDisparity() {
-		return minDisparityFloat+select.getDisparity();
+		return minDisparityFloat + select.getDisparity();
 	}
 
 	@Override
-	public boolean process(int x, int y) {
-		return select.select(computeScore,x,y);
+	public boolean process( int x, int y ) {
+		return select.select(computeScore, x, y);
 	}
 
 	@Override

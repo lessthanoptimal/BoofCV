@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,6 @@ import boofcv.struct.image.ImageGray;
  * </p>
  *
  * @see StereoDisparity
- *
- * @author Peter Abeles
  */
 public interface StereoDisparitySparse<Image extends ImageGray> {
 
@@ -42,7 +40,7 @@ public interface StereoDisparitySparse<Image extends ImageGray> {
 	 * @param imageLeft Input left rectified image.
 	 * @param imageRight Input right rectified image.
 	 */
-	public void setImages( Image imageLeft , Image imageRight );
+	void setImages( Image imageLeft, Image imageRight );
 
 	/**
 	 * Calculates the disparity at the specified point. Returns true if a valid
@@ -52,45 +50,47 @@ public interface StereoDisparitySparse<Image extends ImageGray> {
 	 * @param y center of region y-axis
 	 * @return true if a correspondence was found
 	 */
-	public boolean process( int x  , int y );
+	boolean process( int x, int y );
 
 	/**
 	 * The found disparity at the selected point
 	 *
 	 * @return disparity.
 	 */
-	public double getDisparity();
+	double getDisparity();
 
 	/**
 	 * Border around the image's x-axis which is not processed.
+	 *
 	 * @return border x-axis
 	 */
-	public int getBorderX();
+	int getBorderX();
 
 	/**
 	 * Border around the image's y-axis which is not processed.
+	 *
 	 * @return border y-axis
 	 */
-	public int getBorderY();
+	int getBorderY();
 
 	/**
 	 * The minimum disparity which will be checked for.
 	 *
 	 * @return Minimum disparity.
 	 */
-	public int getMinDisparity();
+	int getMinDisparity();
 
 	/**
 	 * The maximum disparity which will be checked for.
 	 *
 	 * @return Maximum disparity.
 	 */
-	public int getMaxDisparity();
+	int getMaxDisparity();
 
 	/**
 	 * Type of input images it can process
 	 *
 	 * @return Input image type
 	 */
-	public Class<Image> getInputType();
+	Class<Image> getInputType();
 }

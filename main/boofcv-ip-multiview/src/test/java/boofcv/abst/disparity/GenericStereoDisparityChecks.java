@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,8 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Peter Abeles
  */
 public abstract class GenericStereoDisparityChecks<Image extends ImageBase<Image>, Disparity extends ImageGray<Disparity>>
-		extends BoofStandardJUnit
-{
+		extends BoofStandardJUnit {
 	int width = 80;
 	int height = 60;
 
@@ -51,11 +50,17 @@ public abstract class GenericStereoDisparityChecks<Image extends ImageBase<Image
 		this.inputType = inputType;
 		this.disparityType = disparityType;
 
-		if( inputType.getDataType().isInteger() ) {
-			switch( inputType.getDataType().getNumBits() ) {
-				case 8: minPixelValue=0; maxPixelValue=255; break;
-				case 16: minPixelValue=0; maxPixelValue=2000; break;
-				default: throw new RuntimeException("Unexpected input image");
+		if (inputType.getDataType().isInteger()) {
+			switch (inputType.getDataType().getNumBits()) {
+				case 8 -> {
+					minPixelValue = 0;
+					maxPixelValue = 255;
+				}
+				case 16 -> {
+					minPixelValue = 0;
+					maxPixelValue = 2000;
+				}
+				default -> throw new RuntimeException("Unexpected input image");
 			}
 		} else {
 			minPixelValue = -1;
@@ -104,8 +109,8 @@ public abstract class GenericStereoDisparityChecks<Image extends ImageBase<Image
 	/** Checks to see if it blows up if the image's width is smaller than the maximum disparity */
 	@Test void disparityLargerThanImage() {
 		BoofConcurrency.USE_CONCURRENT = false;
-		Image left = this.left.createNew(15,30);
-		Image right = this.right.createNew(15,30);
+		Image left = this.left.createNew(15, 30);
+		Image right = this.right.createNew(15, 30);
 
 		createAlg(0, 30).process(left, right);
 	}
