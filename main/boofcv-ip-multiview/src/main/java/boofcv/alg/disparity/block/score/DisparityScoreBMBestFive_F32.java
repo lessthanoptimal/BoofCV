@@ -31,6 +31,8 @@ import org.jetbrains.annotations.Nullable;
 import pabeles.concurrency.GrowArray;
 import pabeles.concurrency.IntRangeObjectConsumer;
 
+import java.util.Arrays;
+
 /**
  * <p>
  * Implementation of {@link boofcv.alg.disparity.DisparityBlockMatchBestFive} for processing
@@ -166,13 +168,7 @@ public class DisparityScoreBMBestFive_F32<DI extends ImageGray<DI>>
 
 		// compute score for the top possible row
 		final float[] firstRow = ws.verticalScore[0];
-		for (int i = 0; i < widthDisparityBlock; i++) {
-			float sum = 0;
-			for (int row = 0; row < regionHeight; row++) {
-				sum += ws.horizontalScore[row][i];
-			}
-			firstRow[i] = sum;
-		}
+		computeVerticalScoreFromScratch(ws, firstRow);
 
 		if (scoreRows.isRequireNormalize() && row0 + radiusY >= 0) {
 			scoreRows.normalizeRegionScores(row0 + radiusY,
@@ -187,6 +183,8 @@ public class DisparityScoreBMBestFive_F32<DI extends ImageGray<DI>>
 	 */
 	private void computeRemainingRows( final int row0, final int row1, final WorkSpace ws ) {
 		int disparityMax = Math.min(left.width, this.disparityMax);
+
+		int nextReset = row0 + catastrophicReset;
 
 		for (int row = row0 + regionHeight; row < row1; row++, ws.activeVerticalScore++) {
 			int activeIndex = ws.activeVerticalScore%regionHeight;
@@ -204,9 +202,15 @@ public class DisparityScoreBMBestFive_F32<DI extends ImageGray<DI>>
 			growBorderR.growRow(row, radiusX, radiusX, ws.rightRow, 0);
 			scoreRows.scoreRow(row, ws.leftRow, ws.rightRow, scores, disparityMin, disparityMax, regionWidth, ws.elementScore);
 
-			// add the new score
-			for (int i = 0; i < widthDisparityBlock; i++) {
-				active[i] += scores[i];
+			// Here we mitigate catastrophic cancellation. See catastrophicReset for an explanation
+			if (row == nextReset) {
+				nextReset = row + catastrophicReset;
+				computeVerticalScoreFromScratch(ws, active);
+			} else {
+				// add the new score
+				for (int i = 0; i < widthDisparityBlock; i++) {
+					active[i] += scores[i];
+				}
 			}
 
 			if (scoreRows.isRequireNormalize() && row >= radiusY && row < left.height + radiusY) {
@@ -230,7 +234,7 @@ public class DisparityScoreBMBestFive_F32<DI extends ImageGray<DI>>
 					off2 = off2 - (disparityY + radiusY - left.height) - 1;
 				}
 
-				// The five-regions have different rows seperated by -radiusY. Use either normalized
+				// The five-regions have different rows separated by -radiusY. Use either normalized
 				// or unnormalized scores
 				float[] top, middle, bottom;
 				if (scoreRows.isRequireNormalize()) {
@@ -245,6 +249,20 @@ public class DisparityScoreBMBestFive_F32<DI extends ImageGray<DI>>
 
 				computeScoreFive(top, middle, bottom, ws.fiveScore, left.width, (Compare_F32)ws.computeDisparity);
 				ws.computeDisparity.process(disparityY, ws.fiveScore);
+			}
+		}
+	}
+
+	/**
+	 * Computes the score from scratch by summing up all the horizontal scores.
+	 */
+	private void computeVerticalScoreFromScratch( WorkSpace ws, float[] rowScore ) {
+		// update rowScore in this order to minimize cache misses
+		Arrays.fill(rowScore, 0, widthDisparityBlock, 0.0f);
+		for (int row = 0; row < regionHeight; row++) {
+			float[] scores = ws.horizontalScore[row];
+			for (int i = 0; i < widthDisparityBlock; i++) {
+				rowScore[i] += scores[i];
 			}
 		}
 	}

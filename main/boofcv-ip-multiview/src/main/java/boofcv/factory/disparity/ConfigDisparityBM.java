@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -71,6 +71,16 @@ public class ConfigDisparityBM implements Configuration {
 	 */
 	public BorderType border = BorderType.REFLECT;
 
+	/**
+	 * This recomputes from scratch the disparity score every N rows. If this is not done then large errors
+	 * can build up resulting in inaccurate range estimates. This is hardly noticeable in most stereo benchmarks
+	 * as everything is up close. Set to 1 to maximize numerical stability and set to {@link Integer#MAX_VALUE}
+	 * to disable.
+	 *
+	 * @see DisparityBlockMatch#catastrophicReset
+	 */
+	public int catastrophicReset = 25;
+
 	public KernelRadius2D getBlockSize() {
 		return new KernelRadius2D(regionRadiusX, regionRadiusY);
 	}
@@ -89,6 +99,7 @@ public class ConfigDisparityBM implements Configuration {
 		this.configCensus.setTo(src.configCensus);
 		this.configNCC.setTo(src.configNCC);
 		this.border = src.border;
+		this.catastrophicReset = src.catastrophicReset;
 		return this;
 	}
 

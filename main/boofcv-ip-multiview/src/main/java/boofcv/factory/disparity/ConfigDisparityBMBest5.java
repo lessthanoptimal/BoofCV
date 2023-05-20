@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,6 +29,11 @@ import boofcv.struct.KernelRadius2D;
  * @see DisparityBlockMatchBestFive
  */
 public class ConfigDisparityBMBest5 extends ConfigDisparityBM {
+
+	public ConfigDisparityBMBest5() {
+		// Empirically determined that this needed to be set to a lower value
+		catastrophicReset = 20;
+	}
 
 	@Override public KernelRadius2D getBlockSize() {
 		int radiusX = (2*regionRadiusX + 1)*3/2;

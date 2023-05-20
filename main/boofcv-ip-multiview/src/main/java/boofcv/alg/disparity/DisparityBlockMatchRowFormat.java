@@ -28,6 +28,7 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import lombok.Getter;
+import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -77,13 +78,13 @@ public abstract class DisparityBlockMatchRowFormat
 	 * <p>
 	 * NOTE: Under nominal situations this won't be noticeable. A specialized performance benchmark where a flat
 	 * plane was moved away from the camera is where it was first noticed and only when very far away.
-	 * How bad the errors are also depends on the error distribution. For example, SAD had large errors while
-	 * Census has small errors.
+	 * How bad the errors are also depends on the error distribution. This only affects floating point scores.
+	 * CENSUS has integer scores and is unaffected.
 	 * </p>
 	 *
 	 * <p>The value below was determined empirically in a test scenario. Set to 1 to always run.</p>
 	 */
-	public int catastrophicReset = 25;
+	public @Setter @Getter int catastrophicReset = 25;
 
 	/**
 	 * Configures disparity calculation.

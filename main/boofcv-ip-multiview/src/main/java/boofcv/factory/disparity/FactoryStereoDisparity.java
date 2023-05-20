@@ -264,6 +264,7 @@ public class FactoryStereoDisparity {
 					ImageType.single(imageType));
 		}
 		alg.configure(config.disparityMin, config.disparityRange);
+		alg.setCatastrophicReset(config.catastrophicReset);
 		return alg;
 	}
 
@@ -277,6 +278,7 @@ public class FactoryStereoDisparity {
 					ImageType.single(imageType));
 		}
 		alg.configure(config.disparityMin, config.disparityRange);
+		alg.setCatastrophicReset(config.catastrophicReset);
 		return alg;
 	}
 
