@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,8 +33,7 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author Peter Abeles
  */
-public abstract class BasicDisparityTests<I extends ImageGray<I>, DI extends ImageGray<DI>>
-		extends BoofStandardJUnit {
+public abstract class BasicDisparityTests<I extends ImageGray<I>, DI extends ImageGray<DI>> extends BoofStandardJUnit {
 	I left;
 	I right;
 
@@ -63,8 +62,7 @@ public abstract class BasicDisparityTests<I extends ImageGray<I>, DI extends Ima
 	/**
 	 * A random image is generated then it's shifted by a fixed amount into the right image
 	 */
-	@Test
-	void checkShifted() {
+	@Test void checkShifted() {
 		initialize(0, maxDisparity);
 
 		int disparity = 5;
@@ -81,8 +79,7 @@ public abstract class BasicDisparityTests<I extends ImageGray<I>, DI extends Ima
 	/**
 	 * Set the minimum disparity to a non-zero value and see if it has the expected results
 	 */
-	@Test
-	void checkMinimumDisparity() {
+	@Test void checkMinimumDisparity() {
 		int disparity = 4;
 		int minDisparity = disparity + 2;
 		initialize(disparity + 2, maxDisparity);

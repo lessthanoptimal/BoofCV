@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,6 +39,8 @@ import org.ejml.UtilEjml;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+
+import java.util.Random;
 
 /**
  * @author Peter Abeles
@@ -81,14 +83,9 @@ public abstract class ChecksDisparityBM<I extends ImageGray<I>, DI extends Image
 		config.regionRadiusX = radiusX;
 		config.regionRadiusY = radiusY;
 		switch (errorType) {
-			case SAD:
-				scoreRow = FactoryStereoDisparity.createScoreRowSad(config, imageType);
-				break;
-			case NCC:
-				scoreRow = FactoryStereoDisparity.createScoreRowNcc(config, imageType);
-				break;
-			default:
-				throw new IllegalArgumentException("Only NCC and SAD supported");
+			case SAD -> scoreRow = FactoryStereoDisparity.createScoreRowSad(config, imageType);
+			case NCC -> scoreRow = FactoryStereoDisparity.createScoreRowNcc(config, imageType);
+			default -> throw new IllegalArgumentException("Only NCC and SAD supported");
 		}
 	}
 
@@ -133,8 +130,7 @@ public abstract class ChecksDisparityBM<I extends ImageGray<I>, DI extends Image
 	 * Compare to a simplistic implementation of stereo disparity. Need to turn off special
 	 * configurations
 	 */
-	@Test
-	void compareToNaive() {
+	@Test void compareToNaive() {
 		BoofConcurrency.USE_CONCURRENT = false;
 		int w = 20, h = 25;
 		I left = GeneralizedImageOps.createSingleBand(imageType, w, h);
@@ -171,8 +167,7 @@ public abstract class ChecksDisparityBM<I extends ImageGray<I>, DI extends Image
 		BoofTesting.assertEquals(found, expected, 1);
 	}
 
-	@Test
-	void checkConcurrent() {
+	@Test void checkConcurrent() {
 		int w = 35, h = 40;
 		I left = GeneralizedImageOps.createSingleBand(imageType, w, h);
 		I right = GeneralizedImageOps.createSingleBand(imageType, w, h);
@@ -208,6 +203,45 @@ public abstract class ChecksDisparityBM<I extends ImageGray<I>, DI extends Image
 //		System.out.println();
 //		((GrayU8)found).print();
 
-		BoofTesting.assertEquals(found, expected, 1);
+		BoofTesting.assertEquals(found, expected, 0);
+	}
+
+	/**
+	 * Calls it more than once with different images and sees if it gets the same results
+	 */
+	@Test void multipleCalls() {
+		// Start with the same seed to ensure we get the same results for both
+		long seed = rand.nextLong();
+		multipleCalls(seed, false);
+		multipleCalls(seed, true);
+	}
+
+	void multipleCalls( long seed, boolean concurrent ) {
+		var rand = new Random(seed);
+		BoofConcurrency.USE_CONCURRENT = concurrent;
+
+		int w = 35, h = 40;
+		I left = GeneralizedImageOps.createSingleBand(imageType, w, h);
+		I right = GeneralizedImageOps.createSingleBand(imageType, w, h);
+
+		DI expected = GeneralizedImageOps.createSingleBand(disparityType, w, h);
+		DI found = GeneralizedImageOps.createSingleBand(disparityType, w, h);
+
+		DisparityBlockMatch<I, DI> callMultiple = createAlg(0, 10, 3, 2);
+
+		for (int trial = 0; trial < 3; trial++) {
+			GImageMiscOps.fillUniform(left, rand, minVal, maxVal);
+			GImageMiscOps.fillUniform(right, rand, minVal, maxVal);
+
+			// Call again with the original instance and see if everything got reset properly
+			callMultiple.process(left, right, found, null);
+
+			// Create a new instance that to compare against
+			DisparityBlockMatch<I, DI> callOnce = createAlg(0, 10, 3, 2);
+			callOnce.process(left, right, expected, null);
+
+			// Results should be identical
+			BoofTesting.assertEquals(found, expected, 0);
+		}
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -67,6 +67,23 @@ public abstract class DisparityBlockMatchRowFormat
 	// Used to extract a row with the border added to it
 	protected @Getter GrowBorder<Input, Object> growBorderL;
 	protected @Getter GrowBorder<Input, Object> growBorderR;
+
+	/**
+	 * <p>To speed up computations a rolling sum is performed where it subtracts the old row then adds the new row
+	 * from the score sum. Every time you update the sum noise is added. When disparity values get small then
+	 * this error becomes noticeable and can lead to drastically incorrect answers. This
+	 * is known as catastrophic cancellation. To fix this issue, the sum is recomputed from scratch every N rows.</p>
+	 *
+	 * <p>
+	 * NOTE: Under nominal situations this won't be noticeable. A specialized performance benchmark where a flat
+	 * plane was moved away from the camera is where it was first noticed and only when very far away.
+	 * How bad the errors are also depends on the error distribution. For example, SAD had large errors while
+	 * Census has small errors.
+	 * </p>
+	 *
+	 * <p>The value below was determined empirically in a test scenario. Set to 1 to always run.</p>
+	 */
+	public int catastrophicReset = 25;
 
 	/**
 	 * Configures disparity calculation.
