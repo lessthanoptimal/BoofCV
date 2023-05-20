@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,6 +29,8 @@ import boofcv.struct.image.ImageType;
 import org.jetbrains.annotations.Nullable;
 import pabeles.concurrency.GrowArray;
 import pabeles.concurrency.IntRangeObjectConsumer;
+
+import java.util.Arrays;
 
 /**
  * <p>
@@ -128,7 +130,6 @@ public class DisparityScoreBM_F32<DI extends ImageGray<DI>>
 	private class ComputeBlock implements IntRangeObjectConsumer<WorkSpace> {
 		@Override
 		public void accept( WorkSpace workspace, int minInclusive, int maxExclusive ) {
-
 			workspace.checkSize();
 			int row0 = minInclusive - radiusY;
 			int row1 = maxExclusive + radiusY;
@@ -156,14 +157,8 @@ public class DisparityScoreBM_F32<DI extends ImageGray<DI>>
 			scoreRows.scoreRow(row0 + row, ws.leftRow, ws.rightRow, scores, disparityMin, disparityMax, regionWidth, ws.elementScore);
 		}
 
-		// compute score for the top most row
-		for (int i = 0; i < widthDisparityBlock; i++) {
-			float sum = 0;
-			for (int row = 0; row < regionHeight; row++) {
-				sum += ws.horizontalScore[row][i];
-			}
-			ws.verticalScore[i] = sum;
-		}
+		// compute score for the top most row.
+		computeVerticalScoreFromScratch(ws);
 
 		// compute disparity
 		if (scoreRows.isRequireNormalize()) {
@@ -182,6 +177,8 @@ public class DisparityScoreBM_F32<DI extends ImageGray<DI>>
 	private void computeRemainingRows( int row0, int row1, WorkSpace ws ) {
 		int disparityMax = Math.min(left.width, this.disparityMax);
 
+		int nextReset = row0 + catastrophicReset;
+
 		for (int row = row0 + regionHeight; row < row1; row++) {
 			int oldRow = (row - row0)%regionHeight;
 
@@ -195,9 +192,15 @@ public class DisparityScoreBM_F32<DI extends ImageGray<DI>>
 			growBorderR.growRow(row, radiusX, radiusX, ws.rightRow, 0);
 			scoreRows.scoreRow(row, ws.leftRow, ws.rightRow, scores, disparityMin, disparityMax, regionWidth, ws.elementScore);
 
-			// add the new score
-			for (int i = 0; i < widthDisparityBlock; i++) {
-				ws.verticalScore[i] += scores[i];
+			// Here we mitigate catastrophic cancellation. See catastrophicReset for an explanation
+			if (row == nextReset) {
+				nextReset = row + catastrophicReset;
+				computeVerticalScoreFromScratch(ws);
+			} else {
+				// Perform the faster score sum that adds a tinny bit of floating point noise each time
+				for (int i = 0; i < widthDisparityBlock; i++) {
+					ws.verticalScore[i] += scores[i];
+				}
 			}
 
 			// compute disparity
@@ -207,6 +210,23 @@ public class DisparityScoreBM_F32<DI extends ImageGray<DI>>
 				ws.computeDisparity.process(row - regionHeight + 1 + radiusY, ws.verticalScoreNorm);
 			} else {
 				ws.computeDisparity.process(row - regionHeight + 1 + radiusY, ws.verticalScore);
+			}
+		}
+	}
+
+	/**
+	 * Computes vertical score from scratch. This is done because there is either no initial score or as a way
+	 * to mitigate catastrophic cancellation.
+	 */
+	private void computeVerticalScoreFromScratch( WorkSpace ws ) {
+		float[] verticalScore = ws.verticalScore;
+
+		// Summing the score in this order avoids cache misses
+		Arrays.fill(verticalScore, 0, widthDisparityBlock, 0.0f);
+		for (int h = 0; h < regionHeight; h++) {
+			final float[] scoreRow = ws.horizontalScore[h];
+			for (int i = 0; i < widthDisparityBlock; i++) {
+				verticalScore[i] += scoreRow[i];
 			}
 		}
 	}

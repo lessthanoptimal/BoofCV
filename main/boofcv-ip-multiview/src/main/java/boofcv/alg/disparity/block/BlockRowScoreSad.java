@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,15 +21,19 @@ package boofcv.alg.disparity.block;
 import boofcv.struct.image.*;
 
 /**
- * Computes the Sum of Absolute Difference (SAD) for block matching based algorithms.
+ * <p>Computes the Sum of Absolute Difference (SAD) for block matching based algorithms.</p>
  *
- * Notes on scoreSad():
+ * <p>
+ * Notes on scoreSad():<br>
  * compute the score for each element all at once to encourage the JVM to optimize and
  * encourage the JVM to optimize this section of code.
+ * </p>
  *
+ * <p>
  * Was original inline, but was actually slightly slower by about 3% consistently,  It
  * is in its own function so that it can be overridden and have different cost functions
  * inserted easily.
+ * </p>
  *
  * @author Peter Abeles
  */

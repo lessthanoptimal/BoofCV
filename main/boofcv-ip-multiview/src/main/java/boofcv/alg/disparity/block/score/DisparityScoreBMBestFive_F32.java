@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,6 @@ import boofcv.alg.InputSanityCheck;
 import boofcv.alg.disparity.DisparityBlockMatchBestFive;
 import boofcv.alg.disparity.block.BlockRowScore;
 import boofcv.alg.disparity.block.DisparitySelect;
-import boofcv.concurrency.BoofConcurrency;
 import boofcv.misc.Compare_F32;
 import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.GrayF32;
@@ -86,11 +85,11 @@ public class DisparityScoreBMBestFive_F32<DI extends ImageGray<DI>>
 		this.score = score;
 		scoreRows.setInput(left, right);
 
-		if (BoofConcurrency.USE_CONCURRENT) {
-			BoofConcurrency.loopBlocks(0, left.height, regionHeight, workspace, computeBlock);
-		} else {
+//		if (BoofConcurrency.USE_CONCURRENT) {
+//			BoofConcurrency.loopBlocks(0, left.height, regionHeight, workspace, computeBlock);
+//		} else {
 			computeBlock.accept((WorkSpace)workspace.get(0), 0, left.height);
-		}
+//		}
 	}
 
 	@SuppressWarnings({"NullAway.Init"})
