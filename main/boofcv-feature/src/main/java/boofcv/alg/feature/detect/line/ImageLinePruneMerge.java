@@ -111,17 +111,27 @@ public class ImageLinePruneMerge {
 			Data d = lines.get(i);
 			LineParametric2D_F32 l = d.line;
 			theta[i] = UtilAngle.atanSafe(l.getSlopeY(), l.getSlopeX());
-			segments.get(i).setTo(LineImageOps.convert(l, imgWidth, imgHeight));
+			LineSegment2D_F32 converted = LineImageOps.convert(l, imgWidth, imgHeight);
+
+			// mark the segment as bad
+			if (converted == null)
+				segments.get(i).a.x = Float.NaN;
+			else
+				segments.get(i).setTo(converted);
 		}
 
 		for (int i = 0; i < segments.size(); i++) {
 			LineSegment2D_F32 a = segments.get(i);
-			if (a == null) continue;
+
+			// see if it was marked bad previously
+			if (Float.isNaN(a.a.x))
+				continue;
 
 			for (int j = i + 1; j < segments.size(); j++) {
 				LineSegment2D_F32 b = segments.get(j);
 
-				if (b == null)
+				// see if it was marked bad previously
+				if (Float.isNaN(b.a.x))
 					continue;
 
 				// see if they are nearly parallel

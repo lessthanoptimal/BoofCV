@@ -2,6 +2,13 @@ Change Log
 
 Date Format: year/month/day
 ---------------------------------------------
+Date    : 2023/??
+Version : 0.44
+
+- ImageLinePruneMerge
+  * Fixed NPE introduced in the previous fix that was somehow missed
+
+---------------------------------------------
 Date    : 2023/May/15
 Version : 0.43
 
