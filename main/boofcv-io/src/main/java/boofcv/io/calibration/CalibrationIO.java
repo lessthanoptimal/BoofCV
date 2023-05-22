@@ -123,9 +123,15 @@ public class CalibrationIO {
 	}
 
 	public static Yaml createYmlObject() {
-		DumperOptions options = new DumperOptions();
-		options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-		return new Yaml(options);
+		var dumperOptions = new DumperOptions();
+		dumperOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+
+		// Configure to get around point limit (as of SnakeYaml 1.32) causing a crash in a regression test
+		var loaderOptions = new LoaderOptions();
+		loaderOptions.setCodePointLimit(30_145_728);
+
+		return new Yaml(new Constructor(new LoaderOptions()), new Representer(dumperOptions),
+				dumperOptions, loaderOptions);
 	}
 
 	/**
