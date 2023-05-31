@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,8 @@
 package boofcv.alg.fiducial.qrcode;
 
 import boofcv.misc.BoofMiscOps;
+import lombok.Getter;
+import lombok.Setter;
 import org.ddogleg.struct.DogArray_I8;
 import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
@@ -51,6 +53,11 @@ public class QrCodeDecoderBits implements VerbosePrint {
 
 	// Number of errors it found while applying error correction
 	int totalErrorBits;
+
+	/**
+	 * If true to it won't check the value of padding bytes. Run into an off by one error
+	 */
+	public @Getter @Setter boolean ignorePaddingBytes = false;
 
 	@Nullable PrintStream verbose = null;
 
@@ -138,7 +145,7 @@ public class QrCodeDecoderBits implements VerbosePrint {
 	 * @return true if no error occurred
 	 */
 	public boolean decodeMessage( QrCode qr ) {
-		if (verbose != null) verbose.println("decodeMessage: qr.corner="+qr.ppCorner.get(0));
+		if (verbose != null) verbose.println("decodeMessage: qr.corner=" + qr.ppCorner.get(0));
 		encodingEci = null;
 
 		utils.workString.setLength(0);
@@ -157,7 +164,7 @@ public class QrCodeDecoderBits implements VerbosePrint {
 			qr.message = utils.workString.toString();
 
 			// sanity check padding
-			if (!checkPaddingBytes(qr, lengthBytes)) {
+			if (!ignorePaddingBytes && !checkPaddingBytes(qr, lengthBytes)) {
 				qr.failureCause = QrCode.Failure.READING_PADDING;
 				return false;
 			}
@@ -176,7 +183,7 @@ public class QrCodeDecoderBits implements VerbosePrint {
 	/**
 	 * Decodes the bits and converts into a message and returns the number of bits processed or -1 if it failed
 	 */
-	private int decideMessageBits( QrCode qr) {
+	private int decideMessageBits( QrCode qr ) {
 		qr.byteEncoding = "";
 
 		var bits = new PackedBits8();

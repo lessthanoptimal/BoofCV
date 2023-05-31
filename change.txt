@@ -3,10 +3,13 @@ Change Log
 Date Format: year/month/day
 ---------------------------------------------
 Date    : 2023/??
-Version : 0.44
+Version : 0.43.1
 
 - ImageLinePruneMerge
   * Fixed NPE introduced in the previous fix that was somehow missed
+- QR Code
+  * Padding bytes are ignored by default so that poorly encoded markers can be decoded
+  * Thanks Simon Staal for identifying this "issue"
 
 ---------------------------------------------
 Date    : 2023/May/15

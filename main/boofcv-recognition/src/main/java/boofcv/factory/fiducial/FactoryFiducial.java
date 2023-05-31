@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -230,6 +230,7 @@ public class FactoryFiducial {
 				config.forceEncoding, config.defaultEncoding, false, imageType);
 		detector.getGraphPositionPatterns().setMaxVersionQR(config.versionMaximum);
 		detector.getDecoder().considerTransposed = config.considerTransposed;
+		detector.getDecoder().getDecoder().ignorePaddingBytes = config.ignorePaddingBytes;
 		return detector;
 	}
 
