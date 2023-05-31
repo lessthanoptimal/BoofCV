@@ -2,7 +2,7 @@ Change Log
 
 Date Format: year/month/day
 ---------------------------------------------
-Date    : 2023/??
+Date    : 2023/May/31
 Version : 0.43.1
 
 - ImageLinePruneMerge
