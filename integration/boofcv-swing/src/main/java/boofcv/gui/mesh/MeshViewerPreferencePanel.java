@@ -43,6 +43,9 @@ public class MeshViewerPreferencePanel extends StandardAlgConfigPanel {
 	// The owner
 	MeshViewerPanel panel;
 
+	// button which shows / selects the cloud's background
+	protected final JButton bColorBackGround = new JButton();
+
 	/**
 	 *
 	 * @param panel The viewer that this is adjusting
@@ -58,9 +61,30 @@ public class MeshViewerPreferencePanel extends StandardAlgConfigPanel {
 		textArea.setLineWrap(true);
 		textArea.setFont(new Font("monospaced", Font.PLAIN, 12));
 
+		// Create a button that's a small square with a black border
+		bColorBackGround.setPreferredSize(new Dimension(24, 24));
+		bColorBackGround.setMinimumSize(bColorBackGround.getPreferredSize());
+		bColorBackGround.setMaximumSize(bColorBackGround.getPreferredSize());
+		bColorBackGround.setBorder(BorderFactory.createLineBorder(Color.BLACK, 4));
+		bColorBackGround.setIcon(new FlatIcon());
+		bColorBackGround.setToolTipText("Click to change the background color");
+		bColorBackGround.addActionListener(e -> {
+			// Show a color picker dialog when pressed
+			Color newColor = JColorChooser.showDialog(
+					this,
+					"Background Color",
+					new Color(panel.getRenderBackgroundColor()));
+			if (newColor == null)
+				return;
+			bColorBackGround.repaint();
+			panel.setRenderBackgroundColor(newColor.getRGB());
+			panel.requestRender();
+		});
+
 		setHelpText();
 
 		addLabeled(comboControls, "Controls");
+		addLabeled(bColorBackGround, "Background");
 		addAlignLeft(checkHide);
 		addAlignCenter(textArea);
 
@@ -89,5 +113,19 @@ public class MeshViewerPreferencePanel extends StandardAlgConfigPanel {
 			panel.helpButtonActive = checkHide.isSelected();
 			panel.repaint();
 		}
+	}
+
+	private class FlatIcon implements Icon {
+		@Override
+		public void paintIcon( Component c, Graphics g, int x, int y ) {
+			g.setColor(new Color(panel.getRenderBackgroundColor()));
+			g.fillRect(0, 0, c.getWidth(), c.getHeight());
+		}
+
+		@Override
+		public int getIconWidth() {return 20;}
+
+		@Override
+		public int getIconHeight() {return 20;}
 	}
 }

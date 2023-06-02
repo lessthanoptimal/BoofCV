@@ -120,7 +120,7 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 	 *
 	 * @param mesh That mesh which is to be viewed. A reference is saved internally.
 	 */
-	public MeshViewerPanel(VertexMesh mesh) {
+	public MeshViewerPanel( VertexMesh mesh ) {
 		this();
 		setMesh(mesh, false);
 	}
@@ -417,7 +417,7 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 	}
 
 	private void drawHelpButton( Graphics2D g2 ) {
-		String text = "H";
+		String text = "?";
 
 		// Draw a white rectangle to show the button's bounds
 		g2.setColor(Color.WHITE);
@@ -459,13 +459,24 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 		BoofMiscOps.verboseChildren(out, configuration, renderer);
 	}
 
-	long coolDownTIme = 0L;
+	/**
+	 * Color of background when rendering
+	 */
+	public void setRenderBackgroundColor( int rgba ) {
+		renderer.defaultColorRgba = rgba;
+	}
+
+	public int getRenderBackgroundColor() {
+		return renderer.defaultColorRgba;
+	}
+
+	long coolDownTime = 0L;
 
 	/**
 	 * Provides keyboard commands that adjust how and what data is displayed
 	 */
 	@Override public boolean dispatchKeyEvent( KeyEvent e ) {
-		if (System.currentTimeMillis() <= coolDownTIme)
+		if (System.currentTimeMillis() <= coolDownTime)
 			return false;
 
 		// H = Home and resets the view
@@ -480,7 +491,7 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 		} else {
 			return false;
 		}
-		coolDownTIme = System.currentTimeMillis() + 200L;
+		coolDownTime = System.currentTimeMillis() + 200L;
 		return false;
 	}
 }
