@@ -67,6 +67,9 @@ subprojects {
     // Enable incremental compile. Should make single file changes faster
     tasks.withType(JavaCompile) { options.incremental = true }
 
+    // For some reason examplesJar has a duplicate of ffmpeg pom
+    tasks.withType(Jar) { duplicatesStrategy = DuplicatesStrategy.EXCLUDE }
+
     // To make ErrorProne and Kotlin plugins happy
     configurations.configureEach {
         resolutionStrategy {
