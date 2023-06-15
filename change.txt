@@ -1,6 +1,19 @@
 Change Log
-
 Date Format: year/month/day
+
+---------------------------------------------
+Date    : 2023/XXX/XX
+Version : 0.43.2
+
+- TODO restrict yaml parsing
+- TODO restrict config parser
+- Image Processing
+  - TODO hough circle detector
+- SLAM
+  - TODO traditional monocular SLAM
+- Regression
+  - TODO Template matching
+
 ---------------------------------------------
 Date    : 2023/May/31
 Version : 0.43.1
