@@ -1,10 +1,23 @@
 import net.ltgt.gradle.errorprone.CheckSeverity
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
+buildscript {
+    repositories {
+        google()
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:4.0.0'
+
+    }
+}
+
+
 plugins {
     id "com.peterabeles.gversion" version "1.10.2" apply false
     id "net.ltgt.errorprone" version "2.0.2" apply false
     id "com.diffplug.spotless" version "6.9.1" apply false
+    id 'org.jetbrains.kotlin.android' version '1.7.20' apply false
 }
 
 ext.libpath = file('./').absolutePath
