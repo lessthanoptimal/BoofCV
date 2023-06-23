@@ -1,48 +1,39 @@
-// Forsake the standard Android build environment since it's too complex
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:4.0.0'
+        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.20'
+    }
+}
 
-// Find all the possible versions of android that it could use and use the most recent
-ext.ANDROID_HOME = System.getenv()['ANDROID_HOME'];
-ext.ANDROID_PLATFORMS = new File((String)ext.ANDROID_HOME+"/platforms").list().grep{it.contains("android-")}
+plugins {
+    id 'com.android.library'
+    id 'maven-publish'
+    id 'kotlin-android'
+}
 
-if( ext.ANDROID_PLATFORMS.isEmpty() ) {
-    ext.ANDROID_PLATFORMS = new File((String)ext.ANDROID_HOME).list().grep{it.contains("android-")}
-    if( ext.ANDROID_PLATFORMS.isEmpty() )
-        throw new RuntimeException("Can't find any platforms in "+ext.ANDROID_HOME+"/platforms")
-    else
-        ext.ANDROID_PATH = ext.ANDROID_HOME+ext.ANDROID_PLATFORMS.sort().last()
-} else
-    ext.ANDROID_PATH = ext.ANDROID_HOME+"/platforms/"+ext.ANDROID_PLATFORMS.sort().last()
 
-ext.ANDROID_VERSION = ext.ANDROID_PATH.substring(ext.ANDROID_PATH.indexOf('-')+1,ext.ANDROID_PATH.length())
-
-println "Build Android module using $ext.ANDROID_PATH"
-println "Android version is $ext.ANDROID_VERSION"
-
-// disable tests since they can't be run on a regular desktop
-test.enabled = false
 
 repositories {
-    maven {
-        url 'https://maven.google.com/'
-        name 'Google'
-    }
+    mavenCentral()
+    mavenLocal()
 }
 
-task unzipJar(type: Copy) {
-    from zipTree('commons-collections-3.2.jar')
-    into ("$buildDir/libs/commons-collection")
-    include "**/*.class"
-    exclude "**/Unmodifiable.class"
-}
+android {
+    compileSdkVersion 33
 
-try {
-    if( Integer.parseInt(ext.ANDROID_VERSION) >= 29 ) {
-        println("WARNING!!! javadoc will fail with this version of Android")
+    defaultConfig {
+        minSdkVersion 24
+        targetSdkVersion 33
     }
-} catch (NumberFormatException e) {
-    // Did Google just switch their versions to letter?? BAD GOOGLE!
-    System.err.println("Bad number format for version: "+ext.ANDROID_VERSION)
-    System.err.println(e.getMessage());
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
@@ -50,13 +41,20 @@ dependencies {
     api project(':main:boofcv-feature')
     api project(':main:boofcv-geo')
 
-    // Google doesn't provide access to an android.jar
-    // A proper android library could be built but that seems to make
-    // the build become wonky and IntelliJ doesn't like it. This is less error prone
-    implementation fileTree(dir: ANDROID_PATH, include: '*.jar')
-    implementation fileTree(dir: ANDROID_PATH+'data/', include: '*.jar')
+    implementation 'androidx.core:core-ktx:1.8.0'
+    implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation 'com.google.android.material:material:1.5.0'
+    testImplementation 'junit:junit:4.13.2'
+}
 
-    // This imports files as aar which require extra work to import
-    // instead I modified the code to not require them
-    compileOnly 'com.android.support:support-media-compat:27.1.1'
+afterEvaluate {
+    publishing {
+        publications {
+            maven(MavenPublication) {
+                groupId 'org.boofcv'
+                artifactId = 'android'
+                version '1.0.0'
+            }
+        }
+    }
 }
