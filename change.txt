@@ -5,6 +5,9 @@ Date Format: year/month/day
 Date    : 2023/XXX/XX
 Version : 0.43.2
 
+- SimulatePlanarWorld
+  - Handles edge of objects better making motion appear smoother
+
 - TODO restrict yaml parsing
 - TODO restrict config parser
 - Image Processing

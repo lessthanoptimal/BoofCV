@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,6 +49,7 @@ import org.ddogleg.struct.DogArray;
 import org.ejml.UtilEjml;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -218,40 +219,58 @@ public class SimulatePlanarWorld {
 		int pointingPixelStride = samplesPerPixel*3;
 		int pointingStride = output.width*pointingPixelStride;
 
+		// Storage for all the samples that it does for each pixel
+		var pixelValues = new float[samplesPerPixel];
+		var pixelDepths = new float[samplesPerPixel];
+
 		for (int pixelY = y0; pixelY < y1; pixelY++) {
 			int depthIdx = pixelY*depthMap.stride;
 			for (int pixelX = 0; pixelX < output.width; pixelX++) {
 				if (Float.isNaN(depthMap.data[depthIdx++]))
 					continue;
 
+				// Initialize to be a pixel that hits nothing
+				Arrays.fill(pixelValues, 0, pixelValues.length, background);
+				Arrays.fill(pixelDepths, 0, pixelDepths.length, Float.MAX_VALUE);
+
 				for (int i = 0; i < scene.size(); i++) {
 					SurfaceRect r = scene.get(i);
 					if (!r.visible)
 						continue;
 
-					float sumValue = 0.0f;
-					float sumDepth = 0.0f;
 					int pointingIndex = pixelY*pointingStride + pixelX*pointingPixelStride;
 					for (int sampleIdx = 0; sampleIdx < samplesPerPixel; sampleIdx++) {
 						ray.slope.x = pointing[pointingIndex++];
 						ray.slope.y = pointing[pointingIndex++];
 						ray.slope.z = pointing[pointingIndex++];
 
-						if (pixelX >= r.pixelRect.x0 && pixelX < r.pixelRect.x1 && pixelY >= r.pixelRect.y0 && pixelY < r.pixelRect.y1) {
-							if (renderPixel.render(ray, r, depthMap.unsafe_get(pixelX, pixelY))) {
-								sumValue += renderPixel.value;
-								sumDepth += renderPixel.depth;
-							} else {
-								sumDepth = 0.0f;
-								break;
-							}
+						if (!(pixelX >= r.pixelRect.x0 && pixelX < r.pixelRect.x1 && pixelY >= r.pixelRect.y0 && pixelY < r.pixelRect.y1)) {
+							continue;
 						}
-					}
+						if (!renderPixel.render(ray, r, pixelDepths[sampleIdx])) {
+							continue;
+						}
 
-					if (sumDepth > 0.0f) {
-						output.unsafe_set(pixelX, pixelY, sumValue/samplesPerPixel);
-						depthMap.unsafe_set(pixelX, pixelY, sumDepth/samplesPerPixel);
+						pixelDepths[sampleIdx] = renderPixel.depth;
+						pixelValues[sampleIdx] = renderPixel.value;
 					}
+				}
+
+				// Average all the rays together
+				float sumValue = 0.0f;
+				float sumDepth = 0.0f;
+				int count = 0;
+				for (int i = 0; i < samplesPerPixel; i++) {
+					if (pixelDepths[i] != Float.MAX_VALUE) {
+						sumValue += pixelValues[i];
+						sumDepth += pixelDepths[i];
+						count++;
+					}
+				}
+
+				if (count > 0) {
+					output.unsafe_set(pixelX, pixelY, sumValue/count);
+					depthMap.unsafe_set(pixelX, pixelY, sumDepth/count);
 				}
 			}
 		}
