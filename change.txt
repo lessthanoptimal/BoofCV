@@ -7,6 +7,9 @@ Version : 0.43.2
 
 - SimulatePlanarWorld
   - Handles edge of objects better making motion appear smoother
+- MicroQR
+  - Rendering doesn't crash in special situations if you specify error level. Thanks for reporting Simon-Staal
+  - You can ignore padding bytes now. Thanks for reporting Simon-Staal
 
 - TODO restrict yaml parsing
 - TODO restrict config parser

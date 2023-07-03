@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,7 @@ import boofcv.alg.fiducial.qrcode.QrCodeCodecBitsUtils;
 import boofcv.alg.fiducial.qrcode.ReedSolomonCodes_U8;
 import boofcv.misc.BoofMiscOps;
 import lombok.Getter;
+import lombok.Setter;
 import org.ddogleg.struct.DogArray_I8;
 import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
@@ -48,6 +49,11 @@ public class MicroQrCodeDecoderBits implements VerbosePrint {
 	DogArray_I8 ecc = new DogArray_I8();
 
 	@Getter QrCodeCodecBitsUtils utils;
+
+	/**
+	 * If true to it won't check the value of padding bytes. Run into an off by one error
+	 */
+	public @Getter @Setter boolean ignorePaddingBytes = false;
 
 	//------------------ Workspace
 	PackedBits8 decodeBits = new PackedBits8();
@@ -185,14 +191,11 @@ public class MicroQrCodeDecoderBits implements VerbosePrint {
 			}
 		}
 
-		if (location < decodeBits.size && !checkPadding(location)) {
+		if (location < decodeBits.size && !ignorePaddingBytes && !checkPadding(location)) {
 			if (verbose != null) verbose.println("_ bad padding");
 			qr.failureCause = QrCode.Failure.READING_PADDING;
 			return false;
 		}
-
-		// NOTE: We could check padding for correctness here as an additional sanity check
-		//       I don't think this has ever caught an error with regular QR codes
 
 		qr.byteEncoding = byteEncoding;
 		qr.message = utils.workString.toString();

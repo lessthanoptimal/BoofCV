@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -61,6 +61,13 @@ public class ConfigMicroQrCode implements Configuration {
 	 */
 	public boolean considerTransposed = true;
 
+	/**
+	 * This turns off the check to ensure padding bytes have the expected pattern. This was added due to a bug
+	 * in a popular encoder where for messages of a certain length it would be off by one. Since no data
+	 * is encoded in the padding and bugs are so common in encoders, by default we will ignore the padding.
+	 */
+	public boolean ignorePaddingBytes = true;
+
 	{
 		// 40% slower but better at detecting fiducials by a few percentage points
 //		ConfigThreshold configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN,15);
@@ -109,6 +116,7 @@ public class ConfigMicroQrCode implements Configuration {
 		this.forceEncoding = src.forceEncoding;
 		this.defaultEncoding = src.defaultEncoding;
 		this.considerTransposed = src.considerTransposed;
+		this.ignorePaddingBytes = src.ignorePaddingBytes;
 		return this;
 	}
 

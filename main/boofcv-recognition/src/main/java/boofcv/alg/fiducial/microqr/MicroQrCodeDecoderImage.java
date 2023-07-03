@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,8 +42,8 @@ import java.util.Set;
  * @author Peter Abeles
  */
 public class MicroQrCodeDecoderImage<T extends ImageGray<T>> implements VerbosePrint {
-	// Converts read bits into a message
-	MicroQrCodeDecoderBits decoder;
+	/** Converts read bits into a message */
+	@Getter MicroQrCodeDecoderBits decoder;
 
 	public boolean considerTransposed = true;
 
