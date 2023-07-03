@@ -78,4 +78,11 @@ public class TestMicroQrCode extends BoofStandardJUnit {
 		found ^= MicroQrCode.FORMAT_MASK;
 		assertEquals(0b100_1011_0001_1100, found);
 	}
+
+	/**
+	 * Requeset an illegal level and see if it returns 0
+	 */
+	@Test void maxDataBits_Illegal() {
+		assertEquals(0, MicroQrCode.maxDataBits(1,ErrorLevel.Q));
+	}
 }

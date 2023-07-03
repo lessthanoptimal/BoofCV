@@ -50,6 +50,7 @@ import boofcv.demonstrations.feature.orientation.ShowFeatureOrientationApp;
 import boofcv.demonstrations.fiducial.*;
 import boofcv.demonstrations.imageprocessing.*;
 import boofcv.demonstrations.recognition.DemoSceneRecognitionSimilarImagesApp;
+import boofcv.demonstrations.segmentation.SegmentColorDemoApp;
 import boofcv.demonstrations.segmentation.VisualizeImageSegmentationApp;
 import boofcv.demonstrations.segmentation.VisualizeWatershedApp;
 import boofcv.demonstrations.sfm.d2.VideoMosaicSequentialPointApp;
@@ -100,6 +101,7 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 				DetectCalibrationCircleRegularApp.class);
 
 		createNodes(root,"Color",
+				SegmentColorDemoApp.class,
 				ShowColorModelApp.class);
 
 		createNodes(root,"Distort",

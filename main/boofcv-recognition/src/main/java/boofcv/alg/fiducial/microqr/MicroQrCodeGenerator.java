@@ -58,6 +58,13 @@ public class MicroQrCodeGenerator extends QrGeneratorBase<MicroQrCodeGenerator> 
 
 		if (renderData) {
 			MicroQrCode.VersionInfo info = MicroQrCode.VERSION_INFO[qr.version];
+
+			// Give an informative error message instead of a random NPE
+			if (!info.isErrorSupported(qr.error)) {
+				throw new IllegalStateException("ErrorLevel " + qr.error +
+						" not supported with version " + qr.version + " marker.");
+			}
+
 			MicroQrCode.DataInfo data = info.levels(qr.error);
 			int eccWords = info.codewords - data.dataCodewords;
 			int dataBits = qr.getMaxDataBits();

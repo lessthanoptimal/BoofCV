@@ -50,7 +50,7 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
  * @author Maxim Dossioukov
  */
 
-public class DemoSegmentColor extends DemonstrationBase {
+public class SegmentColorDemoApp extends DemonstrationBase {
 	// private variables
 	private int mouseX, mouseY = 0;
 	private float threshold = 0.4f;
@@ -77,7 +77,7 @@ public class DemoSegmentColor extends DemonstrationBase {
 	}
 
 	// default constructor for DemonstrationBase
-	public DemoSegmentColor( List<?> exampleInputs ) {
+	public SegmentColorDemoApp( List<?> exampleInputs ) {
 		super(exampleInputs, ImageType.pl(3, GrayU8.class));
 
 		imageZoomPanel.setPreferredSize(new Dimension(800, 400));
@@ -94,7 +94,7 @@ public class DemoSegmentColor extends DemonstrationBase {
 		imageZoomPanel.addMouseWheelListener(new MouseAdapter() {
 			@Override
 			public void mouseWheelMoved( MouseWheelEvent e ) {
-				controls.setZoom(BoofSwingUtil.mouseWheelImageZoom(DemoSegmentColor.this.controls.zoom, e));
+				controls.setZoom(BoofSwingUtil.mouseWheelImageZoom(SegmentColorDemoApp.this.controls.zoom, e));
 			}
 		});
 
@@ -257,7 +257,7 @@ public class DemoSegmentColor extends DemonstrationBase {
 		examples.add(new PathLabel("Chessboard Movie", UtilIO.pathExample("fiducial/chessboard/movie.mjpeg")));
 
 		SwingUtilities.invokeLater(() -> {
-			var app = new DemoSegmentColor(examples);
+			var app = new SegmentColorDemoApp(examples);
 
 			app.openExample(examples.get(0));
 			app.display("Segment Color Demo");
