@@ -200,7 +200,7 @@ public class MicroQrCode implements Cloneable {
 		if (corrected < 0)
 			return false;
 		mask = MicroQrCodeMaskPattern.lookupMask(corrected & 0x03);
-		return decodeVersionAndECC((corrected >> 2)&0x07);
+		return decodeVersionAndECC((corrected >> 2) & 0x07);
 	}
 
 	/** Computes the 3-bit format which encodes marker version and ECC level */
@@ -298,6 +298,10 @@ public class MicroQrCode implements Cloneable {
 
 	/** Returns number of data bits which can be encoded */
 	public static int maxDataBits( int version, ErrorLevel level ) {
+		// If this error level isn't supported return 0 since it can't encode any data
+		if (!VERSION_INFO[version].isErrorSupported(level)) {
+			return 0;
+		}
 		int bits = VERSION_INFO[version].levels(level).dataCodewords*8;
 
 		// last data code word is 4 bits in these cases
@@ -400,8 +404,16 @@ public class MicroQrCode implements Cloneable {
 			this.codewords = codewords;
 		}
 
+		/**
+		 * Returns true if you can use this level of error correction for this version
+		 */
+		public boolean isErrorSupported( ErrorLevel level ) {
+			return levels.containsKey(level);
+		}
+
 		public DataInfo levels( ErrorLevel level ) {
-			return Objects.requireNonNull(levels.get(level));
+			return Objects.requireNonNull(levels.get(level),
+					"ErrorLevel " + level.name() + " not supported for this version");
 		}
 
 		public void add( ErrorLevel level, int dataCodewords ) {
