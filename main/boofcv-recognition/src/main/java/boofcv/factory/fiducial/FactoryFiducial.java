@@ -278,6 +278,7 @@ public class FactoryFiducial {
 		var detector = new MicroQrCodePreciseDetector<>(inputToBinary, detectPositionPatterns,
 				config.forceEncoding, config.defaultEncoding, false, imageType);
 		detector.getDecoder().considerTransposed = config.considerTransposed;
+		detector.getDecoder().getDecoder().ignorePaddingBytes = config.ignorePaddingBytes;
 		return detector;
 	}
 
