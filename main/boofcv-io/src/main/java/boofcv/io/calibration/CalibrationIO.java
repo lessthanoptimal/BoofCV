@@ -32,7 +32,7 @@ import org.jetbrains.annotations.Nullable;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.Constructor;
+import org.yaml.snakeyaml.constructor.SafeConstructor;
 import org.yaml.snakeyaml.representer.Representer;
 
 import java.io.*;
@@ -130,7 +130,7 @@ public class CalibrationIO {
 		var loaderOptions = new LoaderOptions();
 		loaderOptions.setCodePointLimit(30_145_728);
 
-		return new Yaml(new Constructor(new LoaderOptions()), new Representer(dumperOptions),
+		return new Yaml(new SafeConstructor(new LoaderOptions()), new Representer(dumperOptions),
 				dumperOptions, loaderOptions);
 	}
 
@@ -742,7 +742,7 @@ public class CalibrationIO {
 			var representer = new Representer(new DumperOptions());
 			representer.getPropertyUtils().setSkipMissingProperties(true);
 
-			var yaml = new Yaml(new Constructor(new LoaderOptions()), representer);
+			var yaml = new Yaml(new SafeConstructor(new LoaderOptions()), representer);
 			Map<String, Object> map = yaml.load(filtered);
 
 			int width = getOrThrow(map, "image_width");

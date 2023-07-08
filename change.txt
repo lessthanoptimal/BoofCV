@@ -16,8 +16,10 @@ Version : 0.43.2
   - Completely new build system that doesn't use any local files
   - New fragment camera code is available for use
   - Thanks Maxim Dossioukov for getting the first prototype of the build running
+- Security
+  - When de-serializing YAML it now uses Yaml(new SafeConstructor()) to prevent arbitrary code execution
+  - Thanks Letian Yuan for the disclosure
 
-- TODO restrict yaml parsing
 - TODO restrict config parser
 - Image Processing
   - TODO hough circle detector
