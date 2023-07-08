@@ -10,6 +10,12 @@ Version : 0.43.2
 - MicroQR
   - Rendering doesn't crash in special situations if you specify error level. Thanks for reporting Simon-Staal
   - You can ignore padding bytes now. Thanks for reporting Simon-Staal
+- Demos
+  - Added a color segmentation demo. Thanks Maxim Dossioukov.
+- Android
+  - Completely new build system that doesn't use any local files
+  - New fragment camera code is available for use
+  - Thanks Maxim Dossioukov for getting the first prototype of the build running
 
 - TODO restrict yaml parsing
 - TODO restrict config parser
