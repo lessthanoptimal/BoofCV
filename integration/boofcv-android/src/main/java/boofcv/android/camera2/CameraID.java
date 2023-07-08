@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,6 +54,12 @@ public class CameraID {
 	public CameraID setTo( CameraID src ) {
 		this.id = src.id;
 		this.logical = src.logical;
+		return this;
+	}
+
+	public CameraID setTo( String id, @Nullable String logical ) {
+		this.id = id;
+		this.logical = logical;
 		return this;
 	}
 
