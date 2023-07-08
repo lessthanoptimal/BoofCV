@@ -442,7 +442,6 @@ public class BoofSwingUtil {
 	}
 
 	public static java.util.List<RecentFiles> getListOfRecentFiles( String preferenceName ) {
-
 		Preferences prefs = Preferences.userRoot().node(preferenceName);
 		String encodedString = prefs.get(KEY_RECENT_FILES, "");
 		// See if recent file list exists, if not just return an empty list
