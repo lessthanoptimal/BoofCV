@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.demonstrations.shapes;
 
 import boofcv.gui.StandardAlgConfigPanel;
+import boofcv.gui.controls.BaseImageControlPanel;
 import boofcv.struct.ConnectRule;
 import lombok.Getter;
 
@@ -32,7 +33,7 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
  *
  * @author Peter Abeles
  */
-public class PolylineAppControlPanel extends DetectBlackShapePanel
+public class PolylineAppControlPanel extends BaseImageControlPanel
 {
 	ShapeGuiListener owner;
 

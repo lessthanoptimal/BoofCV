@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.demonstrations.shapes;
 
 import boofcv.factory.shape.ConfigEllipseDetector;
+import boofcv.gui.controls.BaseImageControlPanel;
 import boofcv.gui.controls.JConfigLength;
 
 import javax.swing.*;
@@ -33,7 +34,7 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
  *
  * @author Peter Abeles
  */
-public class DetectEllipseControlPanel extends DetectBlackShapePanel implements ActionListener, ChangeListener {
+public class DetectEllipseControlPanel extends BaseImageControlPanel implements ActionListener, ChangeListener {
 	ConfigEllipseDetector config = new ConfigEllipseDetector();
 	DetectBlackEllipseApp owner;
 

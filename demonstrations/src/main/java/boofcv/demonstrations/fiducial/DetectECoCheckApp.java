@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,13 +24,13 @@ import boofcv.alg.feature.detect.chess.ChessboardCorner;
 import boofcv.alg.fiducial.calib.ecocheck.ECoCheckDetector;
 import boofcv.alg.fiducial.calib.ecocheck.ECoCheckFound;
 import boofcv.demonstrations.calibration.VisualizeChessboardXCornerUtils;
-import boofcv.demonstrations.shapes.DetectBlackShapePanel;
 import boofcv.demonstrations.shapes.ShapeVisualizePanel;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.calibration.UtilCalibrationGui;
+import boofcv.gui.controls.BaseImageControlPanel;
 import boofcv.gui.controls.JCheckBoxValue;
 import boofcv.gui.controls.JSpinnerNumber;
 import boofcv.gui.image.VisualizeImageData;
@@ -320,7 +320,7 @@ public class DetectECoCheckApp extends DemonstrationBase {
 		}
 	}
 
-	class ControlPanel extends DetectBlackShapePanel {
+	class ControlPanel extends BaseImageControlPanel {
 		JTextArea textArea = new JTextArea();
 
 		JSpinnerNumber gridRows = spinnerWrap(configMarker.markerShapes.get(0).numRows, 3, 500, 1).tt("rows");

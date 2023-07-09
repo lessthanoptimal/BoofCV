@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,8 @@
 
 package boofcv.demonstrations.shapes;
 
+import boofcv.gui.controls.BaseImageControlPanel;
+
 import javax.swing.*;
 
 import static boofcv.gui.BoofSwingUtil.MAX_ZOOM;
@@ -28,7 +30,7 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
  *
  * @author Peter Abeles
  */
-public class DetectBlackPolygonAppControlPanel extends DetectBlackShapePanel {
+public class DetectBlackPolygonAppControlPanel extends BaseImageControlPanel {
 	ShapeGuiListener owner;
 
 	// selects which image to view

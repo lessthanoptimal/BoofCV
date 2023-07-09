@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,12 +29,12 @@ import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.filter.derivative.GradientThree;
 import boofcv.alg.misc.PixelMath;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.demonstrations.shapes.DetectBlackShapePanel;
 import boofcv.demonstrations.shapes.ShapeVisualizePanel;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
+import boofcv.gui.controls.BaseImageControlPanel;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
@@ -298,7 +298,7 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 	}
 
 	@SuppressWarnings({"NullAway.Init"})
-	class ControlPanel extends DetectBlackShapePanel implements ActionListener, ChangeListener {
+	class ControlPanel extends BaseImageControlPanel implements ActionListener, ChangeListener {
 		JComboBox<String> comboView;
 		JComboBox<String> comboAlgorithm;
 		JSpinner spinnerRadiusCorner;

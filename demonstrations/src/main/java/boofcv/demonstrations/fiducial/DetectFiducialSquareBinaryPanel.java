@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,10 +19,10 @@
 package boofcv.demonstrations.fiducial;
 
 import boofcv.demonstrations.shapes.DetectBlackPolygonControlPanel;
-import boofcv.demonstrations.shapes.DetectBlackShapePanel;
 import boofcv.demonstrations.shapes.ShapeGuiListener;
 import boofcv.demonstrations.shapes.ThresholdControlPanel;
 import boofcv.factory.fiducial.ConfigFiducialBinary;
+import boofcv.gui.controls.BaseImageControlPanel;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -38,7 +38,7 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
  *
  * @author Peter Abeles
  */
-public class DetectFiducialSquareBinaryPanel extends DetectBlackShapePanel
+public class DetectFiducialSquareBinaryPanel extends BaseImageControlPanel
 		implements ActionListener, ChangeListener {
 	ShapeGuiListener owner;
 

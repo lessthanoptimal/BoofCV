@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,13 +25,13 @@ import boofcv.alg.feature.detect.chess.ChessboardCorner;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.misc.PixelMath;
-import boofcv.demonstrations.shapes.DetectBlackShapePanel;
 import boofcv.demonstrations.shapes.ShapeVisualizePanel;
 import boofcv.demonstrations.shapes.ThresholdControlPanel;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.calibration.UtilCalibrationGui;
+import boofcv.gui.controls.BaseImageControlPanel;
 import boofcv.gui.controls.JCheckBoxValue;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
@@ -352,7 +352,7 @@ public class DetectCalibrationChessboardXCornerApp extends DemonstrationBase {
 		}
 	}
 
-	class ControlPanel extends DetectBlackShapePanel
+	class ControlPanel extends BaseImageControlPanel
 			implements ActionListener, ChangeListener, ThresholdControlPanel.Listener {
 		JTextArea textArea = new JTextArea();
 

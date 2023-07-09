@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,6 @@ import boofcv.abst.sfm.d3.WrapVisOdomDualTrackPnP;
 import boofcv.abst.sfm.d3.WrapVisOdomMonoStereoDepthPnP;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BTrack;
-import boofcv.demonstrations.shapes.DetectBlackShapePanel;
 import boofcv.factory.feature.describe.ConfigDescribeRegion;
 import boofcv.factory.feature.detect.interest.ConfigDetectInterestPoint;
 import boofcv.factory.feature.detect.selector.SelectLimitTypes;
@@ -38,10 +37,7 @@ import boofcv.factory.tracker.ConfigPointTracker;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.StandardAlgConfigPanel;
-import boofcv.gui.controls.ControlPanelPointCloud;
-import boofcv.gui.controls.ControlPanelStereoDualTrackPnP;
-import boofcv.gui.controls.ControlPanelStereoMonoTrackPnP;
-import boofcv.gui.controls.ControlPanelStereoQuadPnP;
+import boofcv.gui.controls.*;
 import boofcv.gui.dialogs.OpenStereoSequencesChooser;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.settings.GlobalDemoSettings;
@@ -624,7 +620,7 @@ public class VisualizeStereoVisualOdometryApp<T extends ImageGray<T>> extends De
 		public int lastFrame; // last frame the track was seen in
 	}
 
-	class ControlPanel extends DetectBlackShapePanel {
+	class ControlPanel extends BaseImageControlPanel {
 		// flags that toggle what's visualized in stereo panel view
 		boolean showInliers = false;
 		boolean showNew = false;

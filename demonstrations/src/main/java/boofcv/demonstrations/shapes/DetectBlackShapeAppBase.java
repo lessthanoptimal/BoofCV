@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.binary.VisualizeBinaryData;
+import boofcv.gui.controls.BaseImageControlPanel;
 import boofcv.gui.image.ImageZoomPanel;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
@@ -43,7 +44,7 @@ public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends De
 		implements ThresholdControlPanel.Listener {
 	protected Class<T> imageClass;
 
-	protected DetectBlackShapePanel controls;
+	protected BaseImageControlPanel controls;
 
 	protected ImageZoomPanel guiImage;
 
@@ -74,7 +75,7 @@ public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends De
 		menuBar.add(menu);
 	}
 
-	protected void setupGui( ImageZoomPanel guiImage, DetectBlackShapePanel controls ) {
+	protected void setupGui( ImageZoomPanel guiImage, BaseImageControlPanel controls ) {
 		this.guiImage = guiImage;
 		this.controls = controls;
 

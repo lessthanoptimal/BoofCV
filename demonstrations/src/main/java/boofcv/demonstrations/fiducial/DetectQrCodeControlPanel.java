@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,9 +19,9 @@
 package boofcv.demonstrations.fiducial;
 
 import boofcv.demonstrations.shapes.DetectBlackPolygonControlPanel;
-import boofcv.demonstrations.shapes.DetectBlackShapePanel;
 import boofcv.demonstrations.shapes.ThresholdControlPanel;
 import boofcv.factory.fiducial.ConfigQrCode;
+import boofcv.gui.controls.BaseImageControlPanel;
 import boofcv.gui.controls.JCheckBoxValue;
 
 import javax.swing.*;
@@ -35,7 +35,7 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
  *
  * @author Peter Abeles
  */
-public class DetectQrCodeControlPanel extends DetectBlackShapePanel {
+public class DetectQrCodeControlPanel extends BaseImageControlPanel {
 	ConfigQrCode config = new ConfigQrCode();
 	DetectQrCodeApp<?> owner;
 

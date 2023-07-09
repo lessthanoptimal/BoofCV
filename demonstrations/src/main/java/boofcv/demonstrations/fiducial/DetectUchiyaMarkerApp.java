@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,6 @@ import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.shapes.ellipse.BinaryEllipseDetectorPixel;
 import boofcv.demonstrations.shapes.DetectBlackShapeAppBase;
-import boofcv.demonstrations.shapes.DetectBlackShapePanel;
 import boofcv.demonstrations.shapes.ShapeVisualizePanel;
 import boofcv.demonstrations.shapes.ThresholdControlPanel;
 import boofcv.factory.distort.LensDistortionFactory;
@@ -34,6 +33,7 @@ import boofcv.factory.fiducial.ConfigUchiyaMarker;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.binary.VisualizeBinaryData;
+import boofcv.gui.controls.BaseImageControlPanel;
 import boofcv.gui.controls.JConfigLength;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.feature.VisualizeShapes;
@@ -299,7 +299,7 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 		reprocessImageOnly();
 	}
 
-	class ControlPanel extends DetectBlackShapePanel implements LlahControlPanel.Listener {
+	class ControlPanel extends BaseImageControlPanel implements LlahControlPanel.Listener {
 		boolean showBounds = true;
 		boolean showID = true;
 		boolean showCenter = false;

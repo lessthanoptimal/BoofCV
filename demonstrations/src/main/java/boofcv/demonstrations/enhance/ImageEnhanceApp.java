@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,9 +22,9 @@ import boofcv.alg.enhance.EnhanceImageOps;
 import boofcv.alg.enhance.GEnhanceImageOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.ConvertImage;
-import boofcv.demonstrations.shapes.DetectBlackShapePanel;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
+import boofcv.gui.controls.BaseImageControlPanel;
 import boofcv.gui.controls.JCheckBoxValue;
 import boofcv.gui.controls.JSpinnerNumber;
 import boofcv.gui.image.ImageZoomPanel;
@@ -175,7 +175,7 @@ public class ImageEnhanceApp extends DemonstrationBase {
 	}
 
 	@SuppressWarnings({"JdkObsolete", "NullAway.Init"})
-	class ControlPanel extends DetectBlackShapePanel {
+	class ControlPanel extends BaseImageControlPanel {
 		Vector<String> comboBoxItems = new Vector<>();
 		JComboBox<String> comboAlgorithms;
 		List<Runnable> comboRunnable = new ArrayList<>();

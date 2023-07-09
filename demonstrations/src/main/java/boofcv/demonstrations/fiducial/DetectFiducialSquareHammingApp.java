@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,10 @@ import boofcv.alg.fiducial.square.FoundFiducial;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
-import boofcv.demonstrations.shapes.*;
+import boofcv.demonstrations.shapes.DetectBlackPolygonControlPanel;
+import boofcv.demonstrations.shapes.ShapeGuiListener;
+import boofcv.demonstrations.shapes.ShapeVisualizePanel;
+import boofcv.demonstrations.shapes.ThresholdControlPanel;
 import boofcv.factory.fiducial.ConfigFiducialHammingDetector;
 import boofcv.factory.fiducial.ConfigHammingMarker;
 import boofcv.factory.fiducial.HammingDictionary;
@@ -34,6 +37,7 @@ import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.binary.VisualizeBinaryData;
+import boofcv.gui.controls.BaseImageControlPanel;
 import boofcv.gui.controls.JCheckBoxValue;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.fiducial.VisualizeFiducial;
@@ -276,7 +280,7 @@ public class DetectFiducialSquareHammingApp extends DemonstrationBase implements
 		}
 	}
 
-	public class Controls extends DetectBlackShapePanel {
+	public class Controls extends BaseImageControlPanel {
 		ConfigHammingMarker configMarker = ConfigHammingMarker.loadDictionary(HammingDictionary.ARUCO_MIP_25h7);
 		ConfigFiducialHammingDetector configDetector = new ConfigFiducialHammingDetector();
 

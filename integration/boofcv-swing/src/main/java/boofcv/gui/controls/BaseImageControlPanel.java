@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.demonstrations.shapes;
+package boofcv.gui.controls;
 
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.StandardAlgConfigPanel;
@@ -26,12 +26,16 @@ import javax.swing.*;
 import static boofcv.gui.BoofSwingUtil.MAX_ZOOM;
 import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
 
+/**
+ * Control panel which shows you the image's size, how long it took to process,
+ * and current zoom factor.
+ */
 @SuppressWarnings({"NullAway.Init"})
-public abstract class DetectBlackShapePanel extends StandardAlgConfigPanel {
+public abstract class BaseImageControlPanel extends StandardAlgConfigPanel {
 
-	protected JSpinner selectZoom;
-	protected JLabel processingTimeLabel = new JLabel();
-	protected JLabel imageSizeLabel = new JLabel();
+	public JSpinner selectZoom;
+	public JLabel processingTimeLabel = new JLabel();
+	public JLabel imageSizeLabel = new JLabel();
 
 	public int selectedView = 0;
 

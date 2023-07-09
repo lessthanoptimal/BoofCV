@@ -19,9 +19,9 @@
 package boofcv.demonstrations.segmentation;
 
 import boofcv.alg.color.ColorHsv;
-import boofcv.demonstrations.shapes.DetectBlackShapePanel;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
+import boofcv.gui.controls.BaseImageControlPanel;
 import boofcv.gui.image.ImageZoomPanel;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
@@ -211,7 +211,7 @@ public class SegmentColorDemoApp extends DemonstrationBase {
 		});
 	}
 
-	class ControlPanel extends DetectBlackShapePanel {
+	class ControlPanel extends BaseImageControlPanel {
 		JSlider thresholdSlider = new JSlider(0, 100);
 
 		public ControlPanel() {

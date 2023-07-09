@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,13 +19,13 @@
 package boofcv.demonstrations.binary;
 
 import boofcv.abst.filter.binary.InputToBinary;
-import boofcv.demonstrations.shapes.DetectBlackShapePanel;
 import boofcv.demonstrations.shapes.ShapeVisualizePanel;
 import boofcv.demonstrations.shapes.ThresholdControlPanel;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.binary.VisualizeBinaryData;
+import boofcv.gui.controls.BaseImageControlPanel;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
@@ -118,7 +118,7 @@ public class DemoImageThresholdingApp<T extends ImageGray<T>>
 		reprocessInput();
 	}
 
-	class ControlPanel extends DetectBlackShapePanel implements ActionListener, ChangeListener {
+	class ControlPanel extends BaseImageControlPanel implements ActionListener, ChangeListener {
 		// selects which image to view
 		JComboBox imageView;
 		ThresholdControlPanel threshold = new ThresholdControlPanel(DemoImageThresholdingApp.this);
