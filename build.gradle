@@ -20,7 +20,7 @@ allprojects {
 
 project.ext.commons_io_version = '2.12.0'
 project.ext.deepboof_version = '0.5.2'
-project.ext.lombok_version = '1.18.24'
+project.ext.lombok_version = '1.18.28'
 project.ext.jabel_version = '1.0.0'
 project.ext.guava_version = '31.1-jre'
 project.ext.args4j_version = '2.33'
