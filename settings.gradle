@@ -26,5 +26,5 @@ include 'examples','demonstrations','applications',
 if (System.getenv()['ANDROID_HOME']) {
     include 'integration:boofcv-android'
 } else {
-    logger.warn('Skipping integration/android because ANDROID_HOME has not been set!  See integration/android/readme.txt')
+    logger.warn('Skipping integration/android because ANDROID_HOME has not been set! See integration/android/readme.txt')
 }

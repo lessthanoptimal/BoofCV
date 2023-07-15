@@ -18,7 +18,7 @@
    - Provide support for GrayS32?
    - Do a better job normalizing?
    - See ShowImageDerivative
- * Check comments for Sobel and Prewitt.  Can you really compute it from those kernels?
+ * Check comments for Sobel and Prewitt. Can you really compute it from those kernels?
  * Include the image border for the Laplacian
 
 - Denoise
@@ -51,11 +51,11 @@
  * Sparse Kernel Convolve for when there is a lot of zeros in the kernel
    - Unroll
    - Compare speed to hand derived kernels in gradient
- * Special unroll for symmetric kernels.  need to store fewer elements.
+ * Special unroll for symmetric kernels. need to store fewer elements.
 
 - Kernels
  * Should Gaussian kernels be provided with only the exp() part?
-   - For numerical stability.  These are not app
+   - For numerical stability. These are not app
  * Support kernels with an even size
  * Support different width and height
 

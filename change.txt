@@ -1025,7 +1025,7 @@ Version : 0.27
   * Unrolled matrix inverse in pinhole and radtan
 - Equirectangular
   * Added PinholeRadialToEquirectangular
-  * Fixed the meaning of latitude and longitude being swapped.  Thanks xzfinet
+  * Fixed the meaning of latitude and longitude being swapped. Thanks xzfinet
 - Updated generics to take advantage of Java 7 more
 - Image Pyramids
   * PyramidDiscreteSampleBlur supports generic images
@@ -1075,13 +1075,13 @@ Version : 0.27
   * Added support for detection of circle grid patterns
   * Calibration targets with circles now specify circle size with diameter instead of radius
 - Gradle
-  * Change directory structure to avoid jar naming conflict on maven central.  Idiotic that this is even possible...
+  * Change directory structure to avoid jar naming conflict on maven central. Idiotic that this is even possible...
 - Imaga Data Types
   * Fixed ImageInterleaved.setNumBands() NOT correctly setting the stride and growing the data array
 - Removed XML all serialization
   * Changed old XML files into YAML files
 - YAML format for camera calibration
-  * Added version parameter.  Assumed to be 0 if not present
+  * Added version parameter. Assumed to be 0 if not present
 - Fixed histogram in ImageStatistics
   * For unsigned data types minimum value was being ignored
   * Thanks André Ambrósio Boechat for reporting the problem
@@ -1178,8 +1178,8 @@ Version : 0.25
   * Fixed bug where if a lens model with distortion was used then exchanged for one without the old distortion was not fully removed.
   * Fixed bug where if intrinsic was not set it would still claim it could estimate the target's pose
 - Binary Fiducial
-  * When decoding the image it now ignores border pixels of inner squares.  These tend to be very noisy.
-  * 7% improvement in regression test.  Idea taken from ArUco
+  * When decoding the image it now ignores border pixels of inner squares. These tend to be very noisy.
+  * 7% improvement in regression test. Idea taken from ArUco
 - Commandline Fiducial Generator
   * Can specify custom document size
 - Added command line application for calibration fiducials
@@ -1187,7 +1187,7 @@ Version : 0.25
 - OpenCV Integration
   * can read and write camera calibration for pinhole cameras with radial + tangential distortion
 - FancyInterestPointRender
-  * Fixed addString() being a no-op.  Thanks R-Gerard for the bug report!
+  * Fixed addString() being a no-op. Thanks R-Gerard for the bug report!
 - Generate Square Fiducial Applications
   * The post script format has been tweaked so that the page size is specified with the /PageSize command also
   * A printing company was having issues correcting sizing the document until this change was made.
@@ -1228,7 +1228,7 @@ Version : 0.24
 - Module "all" can be used to import everything in boofcv/main AND boofcv/integration
 - Adjusted assisted calibration so that it's possible to provide a custom output directory
 - Video
-  * Xuggler's Maven repository was taken down.  Effectively killing the zombie project
+  * Xuggler's Maven repository was taken down. Effectively killing the zombie project
   * JavaCV has been integrated in as a replacement.
 
 ---------------------------------------------
@@ -1247,7 +1247,7 @@ Version : 0.23
 - FactoryDescribeImageDense
   * Now accepts null for configuration and creates a default
 - FactoryOrientation
-  * SIFT now accepts a null argument.  Thanks pcmoen for pointing out this bug.
+  * SIFT now accepts a null argument. Thanks pcmoen for pointing out this bug.
 - ImplOrientationImageAverageIntegral
   * Fixed internal null pointer exception
   * Fixed bad unit test
@@ -1266,7 +1266,7 @@ Date    : 2016/03/04
 Version : Alpha 0.22
 
 - Deleted MedianImageFilter
-  * Use BlurStorageFilter instead.  Create with FactoryBlurFilter
+  * Use BlurStorageFilter instead. Create with FactoryBlurFilter
 - Applications package now uploaded to Central
 - CameraCalibration
   * Made internal data structures and function protected to make it easier to extend by an external class
@@ -1279,9 +1279,9 @@ Version : Alpha 0.22
   * Removed configure() since it couldn't be generalized to HOG
   * Created config classes for all dense descriptors
 - No argument constructor in most image types
-  * Fixed bug where defaultType was not being set.  Thanks pcmoen for reporting the bug
+  * Fixed bug where defaultType was not being set. Thanks pcmoen for reporting the bug
 - Fixed bug in ConvertBufferedImage.extract where number of bands in interleaved images was not being set in ImageType
-  * Fixed bug where defaultType was not being set.  Thanks pcmoen for reporting the bug
+  * Fixed bug where defaultType was not being set. Thanks pcmoen for reporting the bug
 - PixelMath
   * Added partial support for Interleaved images
   * GPixelMath supports more than just single band images
@@ -1297,7 +1297,7 @@ Version : Alpha 0.21
   * getScale() has been replaced with getRadius(), which refers to the radius of the detected object
 - SURF
   * Fixed a bug dealing with gradient calculation and improved stability for very small objects
-  * Exposed an inner parameter.  You can now change the kernel size increment between scales
+  * Exposed an inner parameter. You can now change the kernel size increment between scales
 - WebcamTrackFiducial renamed to FiducialDetection
   * Can now process more inputs sources;  still images, videos, and webcams.
   * Output to a file is a possibility
@@ -1330,7 +1330,7 @@ Version : Alpha 0.21
   * Links squares together using corners instead of two independently detected grids
   * Can now detect targets in which the outer squares have been clipped by the image's border
 - Square Grid Detector
-  * Changed how the pattern is specified.  Based on black squares now
+  * Changed how the pattern is specified. Based on black squares now
 - DetectLineHoughPolar
   * Fixed issue were a strict non-maximum was used when a non-strict was needed, causing valid lines to be discarded
 - WebcamCapture
@@ -1340,7 +1340,7 @@ Version : Alpha 0.21
   * Enabled the detection of black objects partially outside the view
   * Is very fast
 - Android
-  * Will automatically detect if image needs to be rotated 180 degrees and then does it.  Needed for the Nexus 5x
+  * Will automatically detect if image needs to be rotated 180 degrees and then does it. Needed for the Nexus 5x
 
 ---------------------------------------------
 Date    : 2015/11/09
@@ -1381,12 +1381,12 @@ Version : Alpha 0.20
 - Chessboard Detector
   * Improved stability especially for slightly blurred images
 - PointTrackerKltPyramid
-  * Fixed uninitialized variable in one of the constructors.  Thanks ericbhatti
+  * Fixed uninitialized variable in one of the constructors. Thanks ericbhatti
   * Change it from two constructors down to one constructor
 - Created built in class for removing perspective distortion
   * RemovePerspectiveDistortion
 - Partially observable calibration targets are now supported
-  * Mathematically at least.  Targets which can be partially observed are not supported yet
+  * Mathematically at least. Targets which can be partially observed are not supported yet
 - ConvertBufferedImage.stripAlphaChannel()
   * Can be used to ensure that an alpha channel is not in the buffered image
   * Inspired by an issue pete-experimenter had
@@ -1414,7 +1414,7 @@ Version : Alpha 0.19
   * Fixed bug where subimages were not assigned an image type.
 - Scene classification
   * Bag-of-Words based techniques
-  * K-Nearest-Neighbor classification.  Learning and Classifier
+  * K-Nearest-Neighbor classification. Learning and Classifier
 - Image setTo() will now automatically resize the image to match it's input
 - Added invert option to visualizing binary images
   * swing and android
@@ -1432,18 +1432,18 @@ Version : Alpha 0.19
 - Camera Model
   * Support for tangential distortion has been added
   * Intrinsic parameters can now use a flow style assignment of parameters
-  * Removed support for flipY to simplify the code.  Just flip the image if this is an issue.
-  * Lens distortion.  More abstracted
+  * Removed support for flipY to simplify the code. Just flip the image if this is an issue.
+  * Lens distortion. More abstracted
 - LensDistortionOps
   * refactored several functions to make it more consistent and easier to use
   * Change fullView to expand
   * Many functions will now correct for lens distortion.
 - Square grid calibration target
-  * Fixed.  Multiple bugs were introduced at some point in the past but were not caught due to the
+  * Fixed. Multiple bugs were introduced at some point in the past but were not caught due to the
     lack of regression tests
-  * Change underlying algorithm.  Now uses polygon detector for corners.
+  * Change underlying algorithm. Now uses polygon detector for corners.
 - Chessboard calibration target
-   * Complete re-write.  Now uses polygon detector
+   * Complete re-write. Now uses polygon detector
    * Corner precision appears to have improved and runs faster
 - Calibration
   * A single class fully specifies the calibration target now
@@ -1477,19 +1477,19 @@ Version : Alpha 0.19
   * Moved NV21 out of Android because it's also useful with Webcams
 - Added support for YV12 image format
 - BinaryImageOps
-  * BinaryImageOps.labelToBinary() now has an easier to use variant.  No need to explicitly declare a boolean array
+  * BinaryImageOps.labelToBinary() now has an easier to use variant. No need to explicitly declare a boolean array
   * Added thin() operator for thinning/skeletonization
 - Template Matching
   * Can provide a mask for a template and effectively make pixels transparent or translucent
   * Requested by Rafael Maus and others
 - ConvertBufferedImage
-  * Tweaked defaults for boof to BufferedImage.  Single band images return single band images.
+  * Tweaked defaults for boof to BufferedImage. Single band images return single band images.
     - Thanks thhart for pointing this out
   * Added partial support for images encoded with SunWritableRaster
   * Much improved support of BoofCV Interleaved images
 - ThresholdImageOps
   * Changed threshold up from >= to >.
-  * Turns out the original choice was bad.  Images were not inverses of each other
+  * Turns out the original choice was bad. Images were not inverses of each other
   * Was possible the threshold an image with two values up and end up with all 0.
 - PyBoof has been added to integration
   * Python wrapper for BoofCV
@@ -1555,7 +1555,7 @@ Version : Alpha 0.18
 - Added ExampleConvolution
 - Convolution
   * ConvolveNormalizedNaive correctly handles offsets in the kernel
-  * 2D convolution correctly supports offset.  Before it used radius no matter what
+  * 2D convolution correctly supports offset. Before it used radius no matter what
   * Normalized convolution makes sure the input kernel sums up to 1 for floating point
 - Processing
   * Added new thresholding and fiducials
@@ -1570,11 +1570,11 @@ Version : Alpha 0.17
 - Added WeightSample2D_F32 for computing the weight of a sample in an abstract manor
   * Reduced MeanShiftPeak from 3 classes into one
 - Edge Non-Maximum suppression's documentation now clearly states that it suppresses only if adjacent pixel is
-  less than.  This is not true non-maximum suppression since it allows equal values but seems to produce
+  less than. This is not true non-maximum suppression since it allows equal values but seems to produce
   better results
   * Improved unit tests to explicitly test for this behavior
 - Canny edge detector would fail if threshold was zero and the image had no texture
-  * HysteresisEdge* code was using a value of 0 to mark traversed regions.  It now uses -1 and sanity checks
+  * HysteresisEdge* code was using a value of 0 to mark traversed regions. It now uses -1 and sanity checks
     the lower threshold.
   * Thanks Lucaro for finding this bug
 - Added GImageMultiBand for generalized access to multi-band image data
@@ -1592,7 +1592,7 @@ Version : Alpha 0.17
   * Horn Schunck Pyramid
   * Brox Spacial Warping
 - Fixed bugs in ConvertNV21
-  * Was applying YV12 byte alignment to NV21 images.  Depending on image size, this could cause a crash.
+  * Was applying YV12 byte alignment to NV21 images. Depending on image size, this could cause a crash.
 - Fixed bug in ImplConvertToBitmap.multiToArray_F32()
   * Didn't handle case where the input image has 3 bands and not 4
 - ImageBase now provides a method for getting ImageType information
@@ -1611,7 +1611,7 @@ Version : Alpha 0.17
   * 1D convolution now supports kernels which are not symmetric
 - Image gradient from a difference of two neighbors added
 - Square grid calibration grid detector has been improved.
-  * No longer permutes through all combinations.  Selects each valid square and assumes its the first instead
+  * No longer permutes through all combinations. Selects each valid square and assumes its the first instead
   * Graph connection rule has been improved too to reduce false connections
 - Moved serializeXML from BoofMiscOps to UtilIO
   * Removing an IO function which shouldn't be in image processing
@@ -1643,14 +1643,14 @@ Version : Alpha 0.16
   * Laplacian sign calculation doesn't declare new memory for every single feature any more
   * Added a color SURF descriptor
 - Fixed SIFT bug which produced a feature with NaN in its descriptor
-  * The extractor border was not being taken in account when examining features.  The net result was that the
+  * The extractor border was not being taken in account when examining features. The net result was that the
   localization interpolation would messed up since the center would not be a maximum, causing really bad stuff.
   * Unit tests updated so that it they can detect it.
   * Thanks Lefteris for detecting this bug.
 - SURF detector (Fast-Hessian)
-  * Was affected in a similar fashion to the SIFT bug.  The fix doesn't seem to change its stability at all.
+  * Was affected in a similar fashion to the SIFT bug. The fix doesn't seem to change its stability at all.
 - NCC error now more "correct" and divides by the number of elements
-- Integral image operations now support more image types.  S64 and F64
+- Integral image operations now support more image types. S64 and F64
 - KltTracker.setDescription() can now fail due to lack of texture
 - Created TrackObjectQuad for tracking user select objects inside an image
   * Added TLD tracker
@@ -1683,7 +1683,7 @@ Version : Alpha 0.16
   * Added adaptiveSquare
   * Added adaptiveGaussian
 - Convolution and ImageBlurOps
-  * Improved accuracy of operations on integer images.  Rounded instead of floored.
+  * Improved accuracy of operations on integer images. Rounded instead of floored.
 - Removed GeoModelRefine and replaced with ModelFitter
 - Image Types
   * Improved and renamed interleaved image types
@@ -1697,20 +1697,20 @@ Version : Alpha 0.16
 - Fixed sub-image support for ConvertBufferedImage.extract*
   * Thanks pcmoen
 - Calibration target detection
-  * Locally adaptive thresholding is now used for square and chessboard target types.  Less sensitive to lighting
+  * Locally adaptive thresholding is now used for square and chessboard target types. Less sensitive to lighting
     conditions
-  * Chessboard target detector works much better on small targets.  Uses QuadBlob corners to estimate initial
+  * Chessboard target detector works much better on small targets. Uses QuadBlob corners to estimate initial
     calibration point position then uses mean-shift for refinement
-  * Chessboard now orders calibration points using QuadBlobs.  Allowing orientation ambiguity to be correctly resolved
+  * Chessboard now orders calibration points using QuadBlobs. Allowing orientation ambiguity to be correctly resolved
     when the target is not symmetric.
 - ImplConvertBitmap incorrectly converted floating point images
   * Was doing an integer divide instead of a floating point divide
   * Thanks Vagoster for reporting the bug
 - KLT can now track features which partially extend outside the image
 - Image Interpolation
-  * Almost all interpolation routines incorrectly treated pixels 1 outside of the image as inside.  Unit tests
+  * Almost all interpolation routines incorrectly treated pixels 1 outside of the image as inside. Unit tests
   have been added and other classes modified for the change in behavior.
-- Fixed FactoryDistort.scale().  Off by one error when specifying scale factor
+- Fixed FactoryDistort.scale(). Off by one error when specifying scale factor
 - SearchLocalPeak high level interface
   * For algorithms which perform a local search for a peak
   * Added two mean-shift variants
@@ -1722,11 +1722,11 @@ Version : Alpha 0.16
   * Reorganized package structure
 - VisOdomDualTrackPnP
   * It is now possible for it to produce a fatal error when all its tracks are lost
-  * Computes a descriptor of the feature each time as needed.  Doesn't extract it from the track itself.
-    Made the code base more complex.  Maybe old version has a slight runtime speed advantage
+  * Computes a descriptor of the feature each time as needed. Doesn't extract it from the track itself.
+    Made the code base more complex. Maybe old version has a slight runtime speed advantage
 - Fixed overflow issue in HarrisCorner_S16 weighted and unweighted
 - Improved Maven support by breaking it up into multiple modules
-- Fixed bug in UtilWavelet for integer images.  X and Y got reversed in for loop
+- Fixed bug in UtilWavelet for integer images. X and Y got reversed in for loop
 
 ---------------------------------------------
 Date    : 2013/06/21
@@ -1766,11 +1766,11 @@ Version : Alpha 0.15
 - Added index setters and getters to GImageSingleBand
 - CreateSyntheticOverheadView for converting an image into an overhead view when the scene is planar
 - Added numBands to ImageDataType
-- Fixed type-o in triangulation JavaDoc.  Thanks tverbele
+- Fixed type-o in triangulation JavaDoc. Thanks tverbele
 - Fixed bug in SIFT where a change in non-maximum behavior caused features to be detected too close to image border.
   * Thanks lefman for pointing it out
-- Fixed ConvertBufferedImage.orderBandsIntoRGB() for ABGR images.  Thanks André Ambrósio Boechat
-- Maven build working again.  Thanks JensKapitza for the help.
+- Fixed ConvertBufferedImage.orderBandsIntoRGB() for ABGR images. Thanks André Ambrósio Boechat
+- Maven build working again. Thanks JensKapitza for the help.
 - Moved boofcv/applet into boofcv/integration/applet
 
 ---------------------------------------------
@@ -1779,7 +1779,7 @@ Version : Alpha 0.14
 
 - Added histogram to ImageStatistics
 - Calibration target's binary threshold is selected using image histogram to make it more tolerant to shadows
-- Calibration grid size does not refer to number of black squares any more.  Instead to number of square total.
+- Calibration grid size does not refer to number of black squares any more. Instead to number of square total.
 - Added image enhancement operations
   * Global histogram
   * Local histogram
@@ -1804,7 +1804,7 @@ Version : Alpha 0.14
 - Added ConfigFast. Configuration class for FAST feature detector
 - Image Pyramids and Scale-Space
   * Added additional functions to ImagePyramid interface that provide information on how the image is sample and the amount of blur in it
-  * There is no separate class for updating image pyramids any more.  The image pyramid takes in the input image
+  * There is no separate class for updating image pyramids any more. The image pyramid takes in the input image
   * Scale-Space pyramids have been moved into the pyramid package instead of having its own
   * Bug Fix: FeatureLaplacePyramid now looks for local maximum or minimum in searching across scales
   * Removed GaussianScaleSpace class since it can now be represented using ImageFloatPyramid
@@ -1881,7 +1881,7 @@ Version : Alpha 0.13
 - GeneralFeatureDetector
   * moved to alg package
   * can now detect local minimums
-  * Removed ability to segment image.  Turned out to not be all that useful, just increase the size of the non-maximum region.
+  * Removed ability to segment image. Turned out to not be all that useful, just increase the size of the non-maximum region.
 - Non-Maximum supression
   * Renamed FeatureExtractor to NonMaxSuppression
     - Removed the parameter for requesting the number of returned features
@@ -1921,7 +1921,7 @@ Version : Alpha 0.12
   * Changed contract, more fully specified contract, improved tests
   * Updated behavior of implementing classes
 - Deleted KeyFramePointTracker
-  * Added pointless complexity.  Use ImagePointTracker instead
+  * Added pointless complexity. Use ImagePointTracker instead
   * Changed 2D and 3D SFM algorithms which were using it
 - Fixed bugs in various feature descriptors setTo() and copy() functions:
   * SurfFeature
@@ -1978,7 +1978,7 @@ Version : Alpha 0.11
   * TemplateScoreType: ERROR_SQUARED renamed to SUM_DIFF_SQ
 - ModelSet
   * Original index of inlier set can be requested now
-  * Removed the ability to generate multiple hypotheses.  Was not needed after all.
+  * Removed the ability to generate multiple hypotheses. Was not needed after all.
   * RANSAC score has been deleted and RANSAC simplified
 - RectifyImageOps
   * Cleaned up function names and improved documentation
@@ -2030,9 +2030,9 @@ Version : Alpha 0.10
   * Pushed implementations of ScoreAssociation into abst package
   * Put most association distance algorithms into DescriptorDistance
   * Added hamming lookup table
-  * Brief now uses a look up table.  About a 7x speed improvement.
+  * Brief now uses a look up table. About a 7x speed improvement.
   * FactoryAssociate now can create instances of ScoreAssociate.
-  * Fixed incorrect NCC equation.  Thanks Christian Kramer.
+  * Fixed incorrect NCC equation. Thanks Christian Kramer.
 - DescribeRegionPoint has been redesigned
   * Now more generic and can work with any feature descriptor
   * Separate function for checking to see if feature is inside bounds
@@ -2042,12 +2042,12 @@ Version : Alpha 0.10
 - Brief descriptor renamed to TupleDesc_B
   * Acts as a generic binary feature descriptor
 - Descriptors
-  * BRIEF and BRIEF-SO now can process features along the image border.  Bit set to false in that case.
+  * BRIEF and BRIEF-SO now can process features along the image border. Bit set to false in that case.
 - Visualization Apps
   * VisualizeAssociationScoreApp has score type in a separate panel and can support binary descriptors
 - InterestPointDetector
   * WrapFHtoInterestPoint now returns the correct detection radius
-  * Fixed non-compliant implementations with incorrectly handled unsupported features.  Thanks jasonnn for submitting this bug
+  * Fixed non-compliant implementations with incorrectly handled unsupported features. Thanks jasonnn for submitting this bug
 - FAST Feature Detector
   * Original implementation was buggy and did not produce same results as original author's code
   * Rewrote from scratch and replicates original author results
@@ -2170,7 +2170,7 @@ Version : Alpha 0.7
     - Analytic Jacobian
     - A bit slow right now
 - Changed behavior of GeneralFeatureDetector
-  * Supports sub-region extraction.  Forces features to be more spread out
+  * Supports sub-region extraction. Forces features to be more spread out
   * Max N now is the total number of features, including excludes
 - Improved speed of Levenberg algorithm by taking advantage of symmetry
 - UtilEpipolar
@@ -2243,7 +2243,7 @@ Version : Alpha 0.6
 - Found subtle bug in Harris corner detector.
   * Surprisingly doesn't seem to change output that much.
 - Interleaved image
-  * get_unsafe and set_unsafe changed to unsafe_get and unsafe_set respectively.  For consistency.
+  * get_unsafe and set_unsafe changed to unsafe_get and unsafe_set respectively. For consistency.
 
 ---------------------------------------------
 Date    : 2012/02/01

@@ -35,7 +35,7 @@ project.ext.jsr250_version = '1.0'
 project.ext.jsr305_version = '3.0.2'
 project.ext.trove4j_version = '3.0.3'
 
-// Which native platforms are supported can be specified in the command line.  Otherwise
+// Which native platforms are supported can be specified in the command line. Otherwise
 // the default is to support all of them
 if (project.hasProperty("native_arch")) {
     project.ext.native_arch = [project.native_arch]

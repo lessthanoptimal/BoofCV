@@ -20,7 +20,7 @@
  * Add sub-pixel using a polynomial fit
 
 - Canny Edge Detector
- * Uses generalized algorithm for non-max right now.  It should use a specialized one for speed that traces
+ * Uses generalized algorithm for non-max right now. It should use a specialized one for speed that traces
    the edge intensity and direction
 
 - Add whole image detection capability to SSD detectors
@@ -35,5 +35,5 @@
   * Used round to reduce round off error?  Right now it is equivalent of floor
 
 
-- Add an escape value to score associate.  if the value computed so far isn't better than X, stop.
+- Add an escape value to score associate. if the value computed so far isn't better than X, stop.
   Suggested by David G Ortega

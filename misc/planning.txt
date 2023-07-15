@@ -250,23 +250,23 @@ Future
 - Fiducial Square
   * Regression tests that can determine if orientation is consistent
     - If multiple squares on same surface see if their orientation is the same
-  * Image fiducial.  Look at all the images and compute pixel weighting of pattern based on variance.
+  * Image fiducial. Look at all the images and compute pixel weighting of pattern based on variance.
                      Put all patterns which meet the correctness fraction then use the weighted sum to
                      select the winner.
   * For is black border black test, ignore the outer and inner most pixels to reduce false negative rate
-  * Consider alternative algorithm for small (or all) squares.  Contour -> gradient -> cluster/hough
+  * Consider alternative algorithm for small (or all) squares. Contour -> gradient -> cluster/hough
   * When optimizing the edges don't sample points tangent to the line sample points parallel to the adjacent sides
-    that way it will sample inside the square more often.  Maybe interpolate between slope of both sides?
-  * Look at alternative methods for generatng interpolated inner image.  bilinear is probably exagerating.  surface integral?
+    that way it will sample inside the square more often. Maybe interpolate between slope of both sides?
+  * Look at alternative methods for generatng interpolated inner image. bilinear is probably exagerating. surface integral?
 
-- Look at OpenCV's watershed example.  It's actually a useful technique!
+- Look at OpenCV's watershed example. It's actually a useful technique!
 
 - Background Model
   * Shadow removal
   * remove support for Planar once Interleaved is supported enough
 
 - ImplSsdCorner_S16
-  * Handle the border.  Currently is is just skipped
+  * Handle the border. Currently is is just skipped
   * If the image is resized that will cause problems since the border can affect the location of local
     maximums
   * Create a generic function for handling borders?  Give it a function and it returns a solution?
