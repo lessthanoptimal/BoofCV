@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,6 +64,7 @@ public class SerializeConfigYaml extends SerializeFieldsYamlBase {
 			for (String key : state.keySet()) {
 				if (key.startsWith("BoofCV"))
 					continue;
+				checkBeforeDeserialize(key);
 				T config = (T)Class.forName(key).getConstructor().newInstance();
 				deserialize(config, (Map<String, Object>)Objects.requireNonNull(state.get(key)));
 				config.serializeInitialize();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,6 +48,9 @@ public class SerializeFieldsYamlBase {
 			throw e;
 		else throw new RuntimeException(description);
 	};
+
+	/** Specifies which classes it can deserialize for security. */
+	public AllowClasses allowClasses = SerializeFieldsYamlBase::allowedDeserialize;
 
 	/**
 	 * Serializes the specified config. If a 'canonical' reference is provided then only what is not identical
@@ -176,7 +179,9 @@ public class SerializeFieldsYamlBase {
 			try {
 				Field f = type.getField(key);
 				Class ftype = f.getType();
+
 				if (ftype.isEnum()) {
+					checkBeforeDeserialize(ftype);
 					Object value = state.get(key);
 					// Older serialization code encoded it as an enum not as the enum's name. This was much more
 					// verbose. We still consider that case for backwards compatibility
@@ -194,6 +199,7 @@ public class SerializeFieldsYamlBase {
 				} else if (FastAccess.class.isAssignableFrom(ftype)) {
 					deserializeFastAccess(parent, state, key, f);
 				} else {
+					checkBeforeDeserialize(ftype);
 					Object child = ftype.getConstructor().newInstance();
 					deserialize(child, (Map<String, Object>)state.get(key));
 					Class c = child.getClass();
@@ -294,6 +300,7 @@ public class SerializeFieldsYamlBase {
 		if (FastArray.class.isAssignableFrom(f.get(parent).getClass())) {
 			FastArray<Object> plist = (FastArray<Object>)f.get(parent);
 			Class<?> itemType = plist.type;
+			checkBeforeDeserialize(itemType);
 			boolean basic = itemType.isEnum() || itemType.isPrimitive() || itemType.getName().equals("java.lang.String");
 
 			// deserialize each element and add it to the list
@@ -327,6 +334,35 @@ public class SerializeFieldsYamlBase {
 		}
 	}
 
+	protected void checkBeforeDeserialize(Class type) throws IllegalAccessException {
+		checkBeforeDeserialize(type.getName());
+	}
+
+	protected void checkBeforeDeserialize(String name) throws IllegalAccessException {
+		if (!allowClasses.allow(name))
+			throw new IllegalAccessException("Attempted to deserialize a class that's not allowed. "+name);
+	}
+
+	/**
+	 * Default algorithm which allows classes to be deserialized. A static function is provided
+	 * so that the allowed list can be easily extended. This works by only allowing certain packages to load.
+	 * You could by pass this by adding a jar with one of these class paths, but if that happens you're already
+	 * screwed.
+	 */
+	public static boolean allowedDeserialize( String name ) {
+		if (name.startsWith("boofcv"))
+			return true;
+		if (name.startsWith("org.ejml"))
+			return true;
+		if (name.startsWith("org.ddogleg"))
+			return true;
+		if (name.startsWith("org.georegression"))
+			return true;
+		if (name.startsWith("java.lang.String"))
+			return true;
+		return false;
+	}
+
 	public static Yaml createYmlObject() {
 		DumperOptions options = new DumperOptions();
 		options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
@@ -354,5 +390,13 @@ public class SerializeFieldsYamlBase {
 		 * @param e The exception which caused the error. Null if there was no exception
 		 */
 		void handle( ErrorType type, String description, @Nullable RuntimeException e );
+	}
+
+	/**
+	 * Allows added security by allowing only certain classes to be deserialized for security
+	 */
+	@FunctionalInterface
+	public interface AllowClasses {
+		boolean allow( String name );
 	}
 }

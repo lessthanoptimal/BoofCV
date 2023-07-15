@@ -19,12 +19,12 @@ Version : 0.43.2
 - Security
   - When de-serializing YAML it now uses Yaml(new SafeConstructor()) to prevent arbitrary code execution
   - Thanks Letian Yuan for the disclosure
+  - SerializeFieldsYamlBase now has a whitelist of what can be deserialized
 - Disparity
   * Fixed a catastrophic cancellation (CC) issue with floating point math with disparity score.
   * This CC issue effects SAD and NCC when dealing with distant objects.
   * Sub-pixel math is adjusted depending on type of error function. Improved SAD and CENSUS subpixel
 
-- TODO restrict config parser
 - Image Processing
   - TODO hough circle detector
 - SLAM
