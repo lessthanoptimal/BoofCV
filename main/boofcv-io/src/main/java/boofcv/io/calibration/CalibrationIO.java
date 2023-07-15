@@ -351,7 +351,7 @@ public class CalibrationIO {
 			CameraUniversalOmni parameters = new CameraUniversalOmni(0);
 
 			loadPinhole(getOrThrow(data, "pinhole"), parameters);
-			parameters.mirrorOffset = (double)data.get("mirror_offset");
+			parameters.mirrorOffset = getOrThrow(data, "mirror_offset");
 
 			Map<String, Object> distortion = getOrThrow(data, "radial_tangential");
 			if (distortion.containsKey("radial")) {

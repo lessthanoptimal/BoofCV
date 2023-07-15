@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -517,7 +517,7 @@ public class MultiViewIO {
 
 			loadObservations(observations.views, yamlViews);
 			loadObservations(observations.viewsRigid, yamlViewsRigid);
-		} catch( IOException e ) {
+		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
 
@@ -887,8 +887,12 @@ public class MultiViewIO {
 		if (dimension == null)
 			dimension = new ImageDimension();
 
-		dimension.width = (int)map.get("width");
-		dimension.height = (int)map.get("height");
+		try {
+			dimension.width = getOrThrow(map, "width");
+			dimension.height = getOrThrow(map, "height");
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
 
 		return dimension;
 	}
@@ -913,23 +917,27 @@ public class MultiViewIO {
 		if (intrinsic == null)
 			intrinsic = new BundlePinholeBrown();
 
-		intrinsic.fx = (double)map.get("fx");
-		intrinsic.fy = (double)map.get("fy");
-		intrinsic.skew = (double)map.getOrDefault("skew", 0.0);
-		intrinsic.cx = (double)map.get("cx");
-		intrinsic.cy = (double)map.get("cy");
+		try {
+			intrinsic.fx = getOrThrow(map, "fx");
+			intrinsic.fy = getOrThrow(map, "fy");
+			intrinsic.skew = (double)map.getOrDefault("skew", 0.0);
+			intrinsic.cx = getOrThrow(map, "cx");
+			intrinsic.cy = getOrThrow(map, "cy");
 
-		intrinsic.t1 = (double)map.getOrDefault("t1", 0.0);
-		intrinsic.t2 = (double)map.getOrDefault("t2", 0.0);
+			intrinsic.t1 = (double)map.getOrDefault("t1", 0.0);
+			intrinsic.t2 = (double)map.getOrDefault("t2", 0.0);
 
-		List<Double> radialList = (List<Double>)map.get("radial");
-		if (radialList == null)
-			intrinsic.radial = new double[0];
-		else {
-			intrinsic.radial = radialList.stream().mapToDouble(i -> i).toArray();
+			List<Double> radialList = (List<Double>)map.get("radial");
+			if (radialList == null)
+				intrinsic.radial = new double[0];
+			else {
+				intrinsic.radial = radialList.stream().mapToDouble(i -> i).toArray();
+			}
+
+			return intrinsic;
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
 		}
-
-		return intrinsic;
 	}
 
 	public static BundlePinholeSimplified loadPinholeSimplified( Map<String, Object> map,
@@ -937,9 +945,13 @@ public class MultiViewIO {
 		if (intrinsic == null)
 			intrinsic = new BundlePinholeSimplified();
 
-		intrinsic.f = (double)map.get("f");
-		intrinsic.k1 = (double)map.get("k1");
-		intrinsic.k2 = (double)map.get("k2");
+		try {
+			intrinsic.f = getOrThrow(map, "f");
+			intrinsic.k1 = getOrThrow(map, "k1");
+			intrinsic.k2 = getOrThrow(map, "k2");
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
 
 		return intrinsic;
 	}
@@ -970,9 +982,9 @@ public class MultiViewIO {
 		if (m == null)
 			m = new Se3_F64();
 
-		m.T.x = (double)map.get("x");
-		m.T.y = (double)map.get("y");
-		m.T.z = (double)map.get("z");
+		m.T.x = getOrThrow(map, "x");
+		m.T.y = getOrThrow(map, "y");
+		m.T.z = getOrThrow(map, "z");
 
 		copyIntoMatrix(getOrThrow(map, "R"), m.R);
 
