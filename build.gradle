@@ -397,17 +397,18 @@ def integrationProjects = [
         ':integration:boofcv-WebcamCapture',
 ]
 
-checkProjectExistsAddToList(':integration:boofcv-javafx', integrationProjects)
-checkProjectExistsAddToList(':integration:boofcv-android', integrationProjects)
+// Exclude Android because it doesn't generate a jar it creates an aar which is problematic for the script below
+def libraryProjects = mainProjects + integrationProjects
 
 def javadocProjects = mainProjects + integrationProjects
+checkProjectExistsAddToList(':integration:boofcv-javafx', javadocProjects)
+checkProjectExistsAddToList(':integration:boofcv-android', javadocProjects)
 
 // Creates a directory with all the compiled BoofCV jars and the dependencies for main
-task createLibraryDirectory(dependsOn: javadocProjects.collect { [it + ':jar', it + ':sourcesJar'] }.flatten()) {
+task createLibraryDirectory(dependsOn: libraryProjects.collect { [it + ':jar', it + ':sourcesJar'] }.flatten()) {
     doLast {
         // Collects BoofCV jars and external jars
-        ext.listJars = files(javadocProjects.collect { project(it).configurations.runtimeClasspath })
-        ext.listJars = ext.listJars.findAll({ !it.getName().contains("android.jar") })
+        ext.listJars = files(libraryProjects.collect { project(it).configurations.runtimeClasspath })
         ext.listJars = ext.listJars.findAll({ !it.isDirectory() }) // remove .class files
 
         ext.fileName = "boofcv-v" + version + "-libs"
