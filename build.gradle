@@ -13,7 +13,7 @@ allprojects {
     apply plugin: 'com.peterabeles.gversion'
 
     group = 'org.boofcv'
-    version = '0.44-SNAPSHOT'
+    version = '0.44'
 
     createVersionFile.enabled = false // run only once. enabled in types
 }

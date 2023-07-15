@@ -2,35 +2,29 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
-Date    : 2023/XXX/XX
-Version : 0.43.2
+Date    : 2023/July/15
+Version : 0.44
 
 - SimulatePlanarWorld
-  - Handles edge of objects better making motion appear smoother
+  * Handles edge of objects better making motion appear smoother
 - MicroQR
-  - Rendering doesn't crash in special situations if you specify error level. Thanks for reporting Simon-Staal
-  - You can ignore padding bytes now. Thanks for reporting Simon-Staal
+  * Rendering doesn't crash in special situations if you specify error level. Thanks for reporting Simon-Staal
+  * You can ignore padding bytes now. Thanks for reporting Simon-Staal
 - Demos
-  - Added a color segmentation demo. Thanks Maxim Dossioukov.
+  * Added a color segmentation demo. Thanks Maxim Dossioukov.
 - Android
-  - Completely new build system that doesn't use any local files
-  - New fragment camera code is available for use
-  - Thanks Maxim Dossioukov for getting the first prototype of the build running
+  * Completely new build system that doesn't use any local files
+  * New fragment camera code is available for use
+  * Thanks Maxim Dossioukov for getting the first prototype of the build running
 - Security
-  - When de-serializing YAML it now uses Yaml(new SafeConstructor()) to prevent arbitrary code execution
-  - Thanks Letian Yuan for the disclosure
-  - SerializeFieldsYamlBase now has a whitelist of what can be deserialized
+  * When de-serializing YAML it now uses Yaml(new SafeConstructor()) to prevent arbitrary code execution
+  * Thanks Letian Yuan for the disclosure
+  * SerializeFieldsYamlBase now has a whitelist of what can be deserialized
 - Disparity
   * Fixed a catastrophic cancellation (CC) issue with floating point math with disparity score.
   * This CC issue effects SAD and NCC when dealing with distant objects.
   * Sub-pixel math is adjusted depending on type of error function. Improved SAD and CENSUS subpixel
-
-- Image Processing
-  - TODO hough circle detector
-- SLAM
-  - TODO traditional monocular SLAM
-- Regression
-  - TODO Template matching
+  * Most application won't see a significant change in performance
 
 ---------------------------------------------
 Date    : 2023/May/31
@@ -59,93 +53,93 @@ Date    : 2023/Feb/20
 Version : 0.42
 
 - Build
-  - Added StandardStructChecks for simple data structures for follow setTo() reset() pattern
+  * Added StandardStructChecks for simple data structures for follow setTo() reset() pattern
 - QR Code
-  - An incorrectly encoded QR message will no longer cause an exception
-  - More support for VerbosePrint interface
+  * An incorrectly encoded QR message will no longer cause an exception
+  * More support for VerbosePrint interface
 - Applications
-  - Command line application for multi camera calibration
-  - PDF Titles for Fiducials are now independent of file name and informative
+  * Command line application for multi camera calibration
+  * PDF Titles for Fiducials are now independent of file name and informative
 - Image Data Type
-  - forEachPixel added to interleaved images
+  * forEachPixel added to interleaved images
 - Image Restoration
-  - Geometric Mean filter
-  - Adaptive mean filter
+  * Geometric Mean filter
+  * Adaptive mean filter
 - Reconstruction
-  - Support OBJ file format
+  * Support OBJ file format
 
 ---------------------------------------------
 Date    : 2022/Sep/02
 Version : 0.41
 
 - Applications
-  - Added Aztec Code generator
-  - Removed unused flag to disable printing info in PDF documents
-  - QR and other markers no longer require spacing between markers when there is only a single marker
-  - Fixed units in manually specified document size
-  - Create Calibration: Fixed units in manually specified paper size
-  - Create Calibration: Fixed disable info flag
+  * Added Aztec Code generator
+  * Removed unused flag to disable printing info in PDF documents
+  * QR and other markers no longer require spacing between markers when there is only a single marker
+  * Fixed units in manually specified document size
+  * Create Calibration: Fixed units in manually specified paper size
+  * Create Calibration: Fixed disable info flag
 - Android
-  - Properly handles multi camera systems by finding physical cameras inside a logical camera
+  * Properly handles multi camera systems by finding physical cameras inside a logical camera
 - Demonstrations
-  - Better Micro QR Code visualizations
+  * Better Micro QR Code visualizations
 - Contour Tracing
-  - Can specify max and minimum contours using fractional size, i.e. ConfigLength instead of int
-  - Added ability to specify maximum contour in places it was missing
-  - ConfigPolygonFromContour doesn't produce identical results, but very similar
+  * Can specify max and minimum contours using fractional size, i.e. ConfigLength instead of int
+  * Added ability to specify maximum contour in places it was missing
+  * ConfigPolygonFromContour doesn't produce identical results, but very similar
 - ConvertBufferedImage
-  - RGBA with pre-multiplied alpha will have channels swapped correctly
-  - BufferedImage sub images work again, Thanks GenieTim
+  * RGBA with pre-multiplied alpha will have channels swapped correctly
+  * BufferedImage sub images work again, Thanks GenieTim
 - Added Aztec Code encoder and decoder
 - QR Code
-  - Fixed issue where it was rejecting version 1 QR codes at a highly skewed angle
-  - Fixed issue where it failed to detect all QR when there was a cluster of several high version
-  - If error correction passes it will stop processing the QR. Easier to diagnose issues.
+  * Fixed issue where it was rejecting version 1 QR codes at a highly skewed angle
+  * Fixed issue where it failed to detect all QR when there was a cluster of several high version
+  * If error correction passes it will stop processing the QR. Easier to diagnose issues.
 - Micro QR Code
-  - Doesn't keep on trying to decode a marker if it fails after the ECC check
+  * Doesn't keep on trying to decode a marker if it fails after the ECC check
 - Various
-  - Fixed crash in Niblack Family when output image was not resized to match input image
-  - Image.setTo() now returns 'this' to enable chaining.
-  - Can now colorize points based on camera reference frame, not just global
-  - PlyCodec - writes correct header for little endian
+  * Fixed crash in Niblack Family when output image was not resized to match input image
+  * Image.setTo() now returns 'this' to enable chaining.
+  * Can now colorize points based on camera reference frame, not just global
+  * PlyCodec - writes correct header for little endian
 - Stereo Disparity: Fixed bug where invalid values got cast to a byte when image was float, causing artifacts.
 - RansacCalibrated now support concurrency
 - Stereo
-  - There's now the option to save the fit score for each pixel
+  * There's now the option to save the fit score for each pixel
 - Photogrammetry
- - Three-View Reconstruction: Does self calibration entirely inside of RANSAC
- - Added ResolveThreeViewScaleAmbiguity
- - N-View reconstruction code now directly uses the 3-view class and skips a projective scene step
- - MultiBaselineDisparity now fuses into an inverse depth image
+  * Three-View Reconstruction: Does self calibration entirely inside of RANSAC
+  * Added ResolveThreeViewScaleAmbiguity
+  * N-View reconstruction code now directly uses the 3-view class and skips a projective scene step
+  * MultiBaselineDisparity now fuses into an inverse depth image
 - 3D Mesh
-  - Added related example code
-  - Added support for saving mesh + color points to PLY
-  - Added algorithms for converting stereo disparity into a 3D mesh
+  * Added related example code
+  * Added support for saving mesh + color points to PLY
+  * Added algorithms for converting stereo disparity into a 3D mesh
 - Calibration
-  - Mono and Stereo apps now generate calibration quality metrics for coverage and geometry
-  - Mono and Stereo GUIs have option to show border and inner coverage
-  - Added Division camera model
-  - Added multi camera calibration
+  * Mono and Stereo apps now generate calibration quality metrics for coverage and geometry
+  * Mono and Stereo GUIs have option to show border and inner coverage
+  * Added Division camera model
+  * Added multi camera calibration
 - ImageMiscOps
-  - Added maskFill()
-  - Added a generic filter()
+  * Added maskFill()
+  * Added a generic filter()
 
 ---------------------------------------------
 Date    : 2022/Jan/24
 Version : 0.40.1
 
 - Build
-  - Compiles using Java 17. bytecode is still Java 11
-  - Updated to Gradle 7
+  * Compiles using Java 17. bytecode is still Java 11
+  * Updated to Gradle 7
 - Applications
-  - Batch scanning of Micro QR Codes
+  * Batch scanning of Micro QR Codes
 - QR Code and Micro QR Code
-  - Much stricter and more accurate test that looks for UTF-8 strings in BYTE data
-  - Config has defaultEncoding which is the encoding it uses if it decides BYTE isn't UTF-8
-  - Added an example demonstrating how raw data can be used ExampleQrCodeRawData
-  - Added JMH Benchmarks for regression testing
+  * Much stricter and more accurate test that looks for UTF-8 strings in BYTE data
+  * Config has defaultEncoding which is the encoding it uses if it decides BYTE isn't UTF-8
+  * Added an example demonstrating how raw data can be used ExampleQrCodeRawData
+  * Added JMH Benchmarks for regression testing
 - Concurrency
-  - Added threaded KLT tracker
+  * Added threaded KLT tracker
 
 ---------------------------------------------
 Date    : 2022/Jan/17
@@ -726,9 +720,9 @@ Version : 0.32
   * All applications have a GUI
   * Centralized GUI for launching
 - QR Code
-  - QrCodeDetectorPnP can estimate 6-DOF pose from a QR
-  - Encoder does a better job of rejecting invalid QR configurations
-  - Detector can optionally estimate in undistorted image coordinates
+ * QrCodeDetectorPnP can estimate 6-DOF pose from a QR
+ * Encoder does a better job of rejecting invalid QR configurations
+ * Detector can optionally estimate in undistorted image coordinates
 - Changed Fiducial stability calculation to use 4 synthetic corners as way to improve speed
 - InterleavedU8 and Planar<GrayU8>
   * Added set32/get32 and set24/get24

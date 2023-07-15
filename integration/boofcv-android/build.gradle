@@ -4,6 +4,7 @@ plugins {
     id 'org.jetbrains.kotlin.android' version '1.7.20'
 }
 apply plugin: 'maven-publish'
+apply plugin: 'signing'
 
 android {
     namespace "${project.group}.android.ibrary"
@@ -121,7 +122,10 @@ afterEvaluate {
                     }
                 }
             }
+        }
 
+        if (ext.ossrhPassword != "dummy") {
+            signing { sign publishing.publications }
         }
     }
 }

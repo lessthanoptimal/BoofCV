@@ -1,3 +1,10 @@
+- Image Processing
+  - TODO hough circle detector
+- SLAM
+  - TODO traditional monocular SLAM
+- Regression
+  - TODO Template matching
+
 - Calibration
   - TODO Visualize Multi Camera Calibration
 - Scene Reconstruction
@@ -6,8 +13,6 @@
 - Regression
   - TODO Video stabilization
   - TODO Template matching
-- Android
-  - TODO Add new Fragment based API
 - Calibration
   - TODO calibration targets Hamming Marker grid and chessboard, e.g. ChArUco and ArUco grids.
 - SLAM

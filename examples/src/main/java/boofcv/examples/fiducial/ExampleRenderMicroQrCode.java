@@ -39,7 +39,7 @@ public class ExampleRenderMicroQrCode {
 		// Uses a flow pattern to specify the QR Code. You can control all aspects of the Micro QR
 		// like specifying the version, mask, and message types or let it select all of that for you.
 		MicroQrCode qr = new MicroQrCodeEncoder()
-//				.setError(MicroQrCode.ErrorLevel.L) <-- 99% you should let it automatically select
+//				.setError(MicroQrCode.ErrorLevel.L) <-- 99% of the time you should let it automatically select
 				.addAutomatic("Test ん鞠").fixate();
 		// NOTE: The final function you call must be fixate(), that's how it knows it's done
 
