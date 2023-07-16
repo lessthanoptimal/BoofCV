@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,6 @@ package boofcv.alg.geo.bundle;
 import org.ddogleg.optimization.wrap.SchurJacobian_to_NtoMxN;
 import org.ejml.data.DMatrixRMaj;
 
-/**
- * @author Peter Abeles
- */
 public class TestBundleAdjustmentMetricSchurJacobian_DDRM
 		extends CommonBundleAdjustmentMetricSchurJacobian<DMatrixRMaj> {
 

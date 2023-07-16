@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -360,6 +360,7 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	 * @return true if it's in front of the camera or false if it's behind
 	 */
 	public boolean projectToPixel( int pointIdx, int viewIdx,
+								   @Nullable BundleCameraState cameraState,
 								   Se3_F64 world_to_view, Se3_F64 tmpSE,
 								   Point3D_F64 tmpX, Point2D_F64 pixel ) {
 
@@ -375,8 +376,10 @@ public class SceneStructureMetric extends SceneStructureCommon {
 		z = p.coordinate[2];
 		w = homogenous ? p.coordinate[3] : 1.0;
 
-		// Project the pixel while being careful for points at infinity
+		// Project the pixel while being careful of points at infinity
 		BundleAdjustmentCamera camera = Objects.requireNonNull(getViewCamera(view).model);
+		if (cameraState != null)
+			camera.setCameraState(cameraState);
 		SePointOps_F64.transformV(world_to_view, x, y, z, w, tmpX);
 		camera.project(tmpX.x, tmpX.y, tmpX.z, pixel);
 

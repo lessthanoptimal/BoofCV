@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_F32;
 import org.ddogleg.struct.DogArray_I32;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Storage for feature observation in each view. Input for bundle adjustment. When possible arrays are used to
@@ -101,6 +102,8 @@ public class SceneObservations {
 		public DogArray_I32 point = new DogArray_I32();
 		/** Pixel observations of features in 'point' in an interleaved format (x,y) */
 		public DogArray_F32 observations = new DogArray_F32();
+		/** Camera's state when this view was observed. E.g. focal length / zoom */
+		public @Nullable BundleCameraState cameraState = null;
 
 		public int size() {
 			return point.size;
@@ -197,6 +200,7 @@ public class SceneObservations {
 		public void reset() {
 			point.reset();
 			observations.reset();
+			cameraState = null;
 		}
 
 		public void resize( int numPoints ) {
@@ -204,12 +208,20 @@ public class SceneObservations {
 			observations.reset().resize(numPoints*2, -1);
 		}
 
-		public boolean isIdentical( View other) {
+		public boolean isIdentical( View other ) {
 			if (!point.isEquals(other.point))
 				return false;
 			if (!observations.isEquals(other.observations))
 				return false;
-			return true;
+
+			// Handle null values
+			if (cameraState == other.cameraState)
+				return true;
+			if (cameraState == null || other.cameraState == null)
+				return false;
+
+			// Both can't be null, so compare
+			return cameraState.isIdentical(other.cameraState);
 		}
 	}
 

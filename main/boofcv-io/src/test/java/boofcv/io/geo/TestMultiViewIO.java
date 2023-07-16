@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.abst.geo.bundle.SceneStructureCommon;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeBrown;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
+import boofcv.alg.geo.bundle.cameras.BundleZoomState;
 import boofcv.alg.similar.SimilarImagesData;
 import boofcv.alg.structure.LookUpSimilarImages;
 import boofcv.alg.structure.PairwiseImageGraph;
@@ -419,6 +420,27 @@ class TestMultiViewIO extends BoofStandardJUnit {
 			for (int i = 0; i < numObs; i++) {
 				v.add(rand.nextInt(100), rand.nextFloat(), rand.nextFloat());
 			}
+		}
+
+		var output = new ByteArrayOutputStream();
+		MultiViewIO.save(expected, new OutputStreamWriter(output, UTF_8));
+
+		var input = new ByteArrayInputStream(output.toByteArray());
+		SceneObservations found = MultiViewIO.load(new InputStreamReader(input, UTF_8), (SceneObservations)null);
+		assertTrue(expected.isIdentical(found));
+	}
+
+	/**
+	 * Add a camera state and see if it's handled correctly.
+	 */
+	@Test void save_load_SceneObservationsCameraState() {
+		var expected = new SceneObservations();
+		expected.initialize(4, true);
+		for (int viewidx = 0; viewidx < expected.views.size; viewidx++) {
+			SceneObservations.View v = expected.views.get(viewidx);
+
+			// Each camera state will have a unique value for zoom
+			v.cameraState = new BundleZoomState(5.0 + viewidx);
 		}
 
 		var output = new ByteArrayOutputStream();

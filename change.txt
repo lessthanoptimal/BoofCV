@@ -1,6 +1,30 @@
 Change Log
 Date Format: year/month/day
 
+Version Meaning: <compatible>.<feature>.<bug fix>
+- First digit indicates if there has been a "major" refactoring or a ton of new features
+- Second digit indicates if a new feature was added and/or if only a minor refactoring has been done
+- Last digit always indicates a bug fix and other minor changes
+
+---------------------------------------------
+Date    : 2023/XX
+Version : 1.0.0
+
+- Version
+  * Arbitrarily declared this as version 1.0.0
+  * This was done to make version info more informative.
+  * Originally it was decided that when face detection was added that would be 1.0 and that's still not on the menu
+- Bundle Adjustment
+  * Added a way to specify the camera state when a frame was captured
+  * Added a new camera model that adjusts the focal length based on zoom factor
+
+- Image Processing
+  - TODO hough circle detector
+- SLAM
+  - TODO traditional monocular SLAM
+- Regression
+  - TODO Template matching
+
 ---------------------------------------------
 Date    : 2023/July/15
 Version : 0.44

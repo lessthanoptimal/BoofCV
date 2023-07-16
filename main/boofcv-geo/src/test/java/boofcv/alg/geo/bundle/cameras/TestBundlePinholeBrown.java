@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,13 +29,8 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * @author Peter Abeles
- */
 public class TestBundlePinholeBrown extends BoofStandardJUnit {
-
-	@Test
-	void compareForward() {
+	@Test void compareForward() {
 		CameraPinholeBrown cam = new CameraPinholeBrown(1);
 		cam.fx = 300; cam.fy = 200;
 		cam.cx = cam.cy = 400;
@@ -58,24 +53,21 @@ public class TestBundlePinholeBrown extends BoofStandardJUnit {
 		assertEquals(0.0, found.distance(expected), UtilEjml.TEST_F64);
 	}
 
-	@Test
-	void withSkew() {
+	@Test void withSkew() {
 		double[][] parameters = new double[][]{{300, 200, 400, 400, 0.01, 0.02, -0.001, 0.002, 0.1}, {400, 600, 1000, 1000, 0.01, 0.02, -0.001, 0.002, 2}};
 		new GenericChecksBundleAdjustmentCamera(new BundlePinholeBrown(false, true), 0.02) {}
 				.setParameters(parameters)
 				.checkAll();
 	}
 
-	@Test
-	void withoutSkew() {
+	@Test void withoutSkew() {
 		double[][] parameters = new double[][]{{300, 200, 400, 400, 0.01, 0.02, -0.001, 0.002}, {400, 600, 1000, 1000, 0.01, 0.02, -0.001, 0.002}};
 		new GenericChecksBundleAdjustmentCamera(new BundlePinholeBrown(true, true), 0.02) {}
 				.setParameters(parameters)
 				.checkAll();
 	}
 
-	@Test
-	void variousRadialLengths() {
+	@Test void variousRadialLengths() {
 		for (int i = 0; i <= 3; i++) {
 			CameraPinholeBrown cam = new CameraPinholeBrown(i);
 			cam.fx = 300; cam.fy = 200;
@@ -96,8 +88,7 @@ public class TestBundlePinholeBrown extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	void zeroTangential() {
+	@Test void zeroTangential() {
 		CameraPinholeBrown cam = new CameraPinholeBrown(1);
 		cam.fx = 300; cam.fy = 200;
 		cam.cx = cam.cy = 400;

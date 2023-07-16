@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -140,7 +140,7 @@ public class TestSceneStructureMetric extends BoofStandardJUnit {
 
 		// Point in front of camera
 		var pixel = new Point2D_F64();
-		assertTrue(scene.projectToPixel(0, 0, new Se3_F64(), new Se3_F64(), new Point3D_F64(), pixel));
+		assertTrue(scene.projectToPixel(0, 0, null, new Se3_F64(), new Se3_F64(), new Point3D_F64(), pixel));
 
 		var expected = new Point2D_F64();
 		PerspectiveOps.renderPixel(world_to_view, intrinsic, new Point3D_F64(0.1, -0.5, 1.1), expected);
@@ -150,6 +150,6 @@ public class TestSceneStructureMetric extends BoofStandardJUnit {
 
 		// sanity check for behind
 		scene.setPoint(0, 0.1, -0.5, -1.1);
-		assertFalse(scene.projectToPixel(0, 0, new Se3_F64(), new Se3_F64(), new Point3D_F64(), pixel));
+		assertFalse(scene.projectToPixel(0, 0, null, new Se3_F64(), new Se3_F64(), new Point3D_F64(), pixel));
 	}
 }

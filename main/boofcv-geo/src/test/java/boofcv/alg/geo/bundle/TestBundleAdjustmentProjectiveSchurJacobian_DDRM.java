@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,9 +32,6 @@ import static boofcv.alg.geo.bundle.TestCodecSceneStructureProjective.createScen
 import static boofcv.alg.geo.bundle.TestCodecSceneStructureProjective.createSceneH;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * @author Peter Abeles
- */
 class TestBundleAdjustmentProjectiveSchurJacobian_DDRM extends BoofStandardJUnit {
 	@Test
 	void compareToNumerical_3D() {

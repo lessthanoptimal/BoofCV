@@ -18,21 +18,10 @@
 
 package boofcv.alg.geo.bundle.cameras;
 
-import boofcv.testing.BoofStandardJUnit;
-import org.junit.jupiter.api.Test;
-
-public class TestBundlePinhole extends BoofStandardJUnit {
-	@Test void withSkew() {
-		double[][] parameters = new double[][]{{300, 200, 400, 400, 0.1}, {400, 600, 1000, 1000, 2}};
-		new GenericChecksBundleAdjustmentCamera(new BundlePinhole(false)) {}
-				.setParameters(parameters)
-				.checkAll();
-	}
-
-	@Test void withoutSkew() {
-		double[][] parameters = new double[][]{{300, 200, 400, 400}, {400, 600, 1000, 1000}};
-		new GenericChecksBundleAdjustmentCamera(new BundlePinhole(true)) {}
-				.setParameters(parameters)
-				.checkAll();
+public class TestBundleZoomSimplified extends GenericChecksBundleAdjustmentCamera {
+	public TestBundleZoomSimplified() {
+		super(new BundleZoomSimplified());
+		setCameraState(new BundleZoomState(1.1));
+		setParameters(new double[][]{{0, 300, 0, 0}, {0, 300, 1e-1, 1e-2}});
 	}
 }

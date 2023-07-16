@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.alg.geo.bundle;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureCommon;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
+import boofcv.alg.geo.bundle.cameras.BundleZoomState;
 import boofcv.testing.BoofStandardJUnit;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
@@ -28,18 +29,14 @@ import org.junit.jupiter.api.Test;
 import java.util.Random;
 
 import static boofcv.alg.geo.bundle.TestCodecSceneStructureMetric.createScene;
+import static boofcv.alg.geo.bundle.TestCodecSceneStructureMetric.createSceneZoomState;
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * @author Peter Abeles
- */
 class TestBundleAdjustmentMetricResidualFunction extends BoofStandardJUnit {
-
 	/**
 	 * Makes sure that when given the same input it produces the same output
 	 */
-	@Test
-	void multipleCalls() {
+	@Test void multipleCalls() {
 		multipleCalls(true, false, false);
 		multipleCalls(false, false, false);
 		multipleCalls(true, true, false);
@@ -71,8 +68,7 @@ class TestBundleAdjustmentMetricResidualFunction extends BoofStandardJUnit {
 	/**
 	 * Change each parameter and see if it changes the output
 	 */
-	@Test
-	void changeInParamChangesOutput() {
+	@Test void changeInParamChangesOutput() {
 		changeInParamChangesOutput(true);
 		changeInParamChangesOutput(false);
 	}
@@ -114,8 +110,7 @@ class TestBundleAdjustmentMetricResidualFunction extends BoofStandardJUnit {
 	 * Multiple views are relative to each other. See if changing the value in an earlier view affects the final
 	 * output down the chain.
 	 */
-	@Test
-	void chainedRelativeViews() {
+	@Test void chainedRelativeViews() {
 		chainedRelativeViews(true);
 		chainedRelativeViews(false);
 	}
@@ -155,6 +150,36 @@ class TestBundleAdjustmentMetricResidualFunction extends BoofStandardJUnit {
 			} else {
 				assertNotEquals(original[i], found[i], UtilEjml.TEST_F64);
 			}
+		}
+	}
+
+	/**
+	 * Provide a camera model that will fail if the camera state isn't handled correctly
+	 */
+	@Test void cameraState() {
+		cameraState(true);
+		cameraState(false);
+	}
+
+	void cameraState( boolean homogenous ) {
+		SceneStructureMetric structure = createSceneZoomState(rand, homogenous);
+		SceneObservations observations = createObservations(rand, structure);
+
+		// Add the camera state to all observation views
+		observations.views.forEach(v -> v.cameraState = new BundleZoomState(400.0));
+
+		var alg = new BundleAdjustmentMetricResidualFunction();
+		alg.configure(structure, observations);
+
+		var param = new double[structure.getParameterCount()];
+		new CodecSceneStructureMetric().encode(structure, param);
+
+		var residuals = new double[alg.getNumOfOutputsM()];
+		alg.process(param, residuals);
+
+		// If the camera state isn't set this should be NaN
+		for (int i = 0; i < residuals.length; i++) {
+			assertFalse(UtilEjml.isUncountable(residuals[i]));
 		}
 	}
 

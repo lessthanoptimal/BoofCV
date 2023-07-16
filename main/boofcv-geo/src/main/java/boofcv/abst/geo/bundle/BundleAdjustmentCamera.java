@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,6 +44,15 @@ public interface BundleAdjustmentCamera {
 	 * @param offset Location of first index in the array which the parameters are stored
 	 */
 	void getIntrinsic( double[] parameters, int offset );
+
+	/**
+	 * Measured / known state of the camera when observations were made. This can indicate the camera's
+	 * zoom level when a mechanical zoom is available. If the model has a fixed state then this function is
+	 * optional.
+	 *
+	 * @param state Camera's state.
+	 */
+	default void setCameraState( BundleCameraState state ) {}
 
 	/**
 	 * Project the 3D point in the camera reference frame onto the camera's image plane.

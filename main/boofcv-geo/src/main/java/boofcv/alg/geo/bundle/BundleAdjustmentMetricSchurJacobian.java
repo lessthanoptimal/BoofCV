@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -254,6 +254,9 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 		SceneObservations.View obsView = observations.views.get(viewIndex);
 		SceneStructureMetric.View strView = structure.views.get(viewIndex);
 
+		if (obsView.cameraState != null)
+			camera.model.setCameraState(obsView.cameraState);
+
 		for (int i = 0; i < obsView.size(); i++) {
 			int featureIndex = obsView.point.get(i);
 			int columnOfPointInJac = featureIndex*lengthPoint;
@@ -375,6 +378,8 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 									int cameraParamStartIndex ) {
 		SceneObservations.View obsView = observations.viewsRigid.get(viewIndex);
 		SceneStructureMetric.View view = structure.views.data[viewIndex];
+		if (obsView.cameraState != null)
+			camera.model.setCameraState(obsView.cameraState);
 
 		for (int i = 0; i < obsView.size(); i++) {
 			int featureIndex = obsView.point.get(i);
