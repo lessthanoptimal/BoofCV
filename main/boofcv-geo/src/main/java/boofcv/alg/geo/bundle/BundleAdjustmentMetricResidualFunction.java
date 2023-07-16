@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -144,6 +144,9 @@ public class BundleAdjustmentMetricResidualFunction
 			//=========== Project General Points in this View
 			{
 				SceneObservations.View obsView = observations.views.get(viewIndex);
+				if (obsView.cameraState != null)
+					camera.model.setCameraState(obsView.cameraState);
+
 				for (int i = 0; i < obsView.size(); i++) {
 					obsView.getPixel(i, observedPixel);
 					SceneStructureCommon.Point worldPt = structure.points.data[observedPixel.index];
@@ -163,6 +166,9 @@ public class BundleAdjustmentMetricResidualFunction
 			//=========== Project Rigid Object Points in this View
 			if (observations.hasRigid()) {
 				SceneObservations.View obsView = observations.viewsRigid.get(viewIndex);
+				if (obsView.cameraState != null)
+					camera.model.setCameraState(obsView.cameraState);
+
 				for (int i = 0; i < obsView.size(); i++) {
 					obsView.getPixel(i, observedPixel);
 
@@ -206,6 +212,8 @@ public class BundleAdjustmentMetricResidualFunction
 			//=========== Project General Points in this View
 			{
 				SceneObservations.View obsView = observations.views.get(viewIndex);
+				if (obsView.cameraState != null)
+					camera.model.setCameraState(obsView.cameraState);
 
 				for (int i = 0; i < obsView.size(); i++) {
 					obsView.getPixel(i, observedPixel);
@@ -227,6 +235,8 @@ public class BundleAdjustmentMetricResidualFunction
 			//=========== Project Rigid Object Points in this View
 			if (observations.hasRigid()) {
 				SceneObservations.View obsView = observations.viewsRigid.get(viewIndex);
+				if (obsView.cameraState != null)
+					camera.model.setCameraState(obsView.cameraState);
 
 				for (int i = 0; i < obsView.size(); i++) {
 					obsView.getPixel(i, observedPixel);

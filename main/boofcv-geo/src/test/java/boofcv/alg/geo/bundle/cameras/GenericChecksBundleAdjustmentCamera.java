@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.geo.bundle.cameras;
 
 import boofcv.abst.geo.bundle.BundleAdjustmentCamera;
+import boofcv.abst.geo.bundle.BundleCameraState;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.optimization.DerivativeChecker;
@@ -26,6 +27,8 @@ import org.ddogleg.optimization.functions.FunctionNtoM;
 import org.ddogleg.optimization.functions.FunctionNtoMxN;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
+import org.jetbrains.annotations.Nullable;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -33,11 +36,11 @@ import java.util.Arrays;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * @author Peter Abeles
- */
 public abstract class GenericChecksBundleAdjustmentCamera extends BoofStandardJUnit {
 	BundleAdjustmentCamera model;
+
+	// Optional camera state. Only passed in if not null
+	@Nullable BundleCameraState cameraState = null;
 
 	// set of parameters to test
 	double[][] parameters;
@@ -70,6 +73,15 @@ public abstract class GenericChecksBundleAdjustmentCamera extends BoofStandardJU
 	public void checkAll() {
 		jacobians();
 		compare_input_jacobians();
+	}
+
+	public void setCameraState( @Nullable BundleCameraState cameraState ) {
+		this.cameraState = cameraState;
+	}
+
+	@BeforeEach void assignCameraState() {
+		if (cameraState != null)
+			model.setCameraState(cameraState);
 	}
 
 	/**

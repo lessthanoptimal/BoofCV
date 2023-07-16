@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.geo.bundle;
 
 import boofcv.abst.geo.bundle.SceneStructureCommon;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
+import boofcv.alg.geo.bundle.cameras.BundleZoomSimplified;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.geometry.ConvertRotation3D_F64;
@@ -34,12 +35,8 @@ import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * @author Peter Abeles
- */
 class TestCodecSceneStructureMetric extends BoofStandardJUnit {
-	@Test
-	void encode_decode() {
+	@Test void encode_decode() {
 		encode_decode(true, false);
 		encode_decode(false, false);
 		encode_decode(true, true);
@@ -103,7 +100,7 @@ class TestCodecSceneStructureMetric extends BoofStandardJUnit {
 	}
 
 	static SceneStructureMetric createScene( Random rand, boolean homogenous, boolean hasRigid, boolean hasRelative ) {
-		SceneStructureMetric out = new SceneStructureMetric(homogenous);
+		var out = new SceneStructureMetric(homogenous);
 
 		int numRigid = hasRigid ? 2 : 0;
 
@@ -196,7 +193,7 @@ class TestCodecSceneStructureMetric extends BoofStandardJUnit {
 	 * across all views
 	 */
 	static SceneStructureMetric createSceneStereo( Random rand, boolean homogenous ) {
-		SceneStructureMetric out = new SceneStructureMetric(homogenous);
+		var out = new SceneStructureMetric(homogenous);
 
 		int numSteps = 2;
 		out.initialize(2, 2*numSteps, 10);
@@ -243,6 +240,52 @@ class TestCodecSceneStructureMetric extends BoofStandardJUnit {
 		// Sanity check
 		assertEquals(numSteps + 1, out.motions.size);
 		assertEquals(numSteps*2, out.views.size);
+		return out;
+	}
+
+	/**
+	 * Create a scene where the camera has an adjustable zoom
+	 */
+	static SceneStructureMetric createSceneZoomState( Random rand, boolean homogenous ) {
+		var out = new SceneStructureMetric(homogenous);
+
+		out.initialize(1, 4, 4, 6, 0);
+
+		out.setCamera(0, true, new BundleZoomSimplified(0.0, 1.0, 0.04, -0.01));
+
+		if (homogenous) {
+			for (int i = 0; i < out.points.size; i++) {
+				double w = rand.nextDouble()*0.5 + 0.5;
+				out.setPoint(i, w*(i + 1), w*(i + 2*rand.nextGaussian()), w*(2*i - 3*rand.nextGaussian()), w);
+			}
+		} else {
+			for (int i = 0; i < out.points.size; i++) {
+				out.setPoint(i, i + 1, i + 2*rand.nextGaussian(), 2*i - 3*rand.nextGaussian());
+			}
+		}
+
+		for (int i = 0; i < out.views.size; i++) {
+			boolean fixed = i%2 == 0;
+
+			Se3_F64 a = new Se3_F64();
+			if (fixed) {
+				ConvertRotation3D_F64.eulerToMatrix(EulerType.YXY, 0.2*i + 0.1, 0.7, 0, a.R);
+				a.T.setTo(2, 3, i*7.3 + 5);
+			} else {
+				ConvertRotation3D_F64.eulerToMatrix(EulerType.YXY, 0.2*i + 0.1, rand.nextGaussian()*0.1, 0, a.R);
+				a.T.setTo(rand.nextGaussian()*0.2, 3*rand.nextGaussian()*0.2, i*7.3 + 5);
+			}
+			out.setView(i, 0, fixed, a);
+		}
+
+		// Assign first point to all views then the other points to just one view
+		for (int i = 0; i < out.views.size; i++) {
+			out.points.data[0].views.add(i);
+		}
+		for (int i = 1; i < out.points.size; i++) {
+			out.points.data[i].views.add((i - 1)%out.views.size);
+		}
+
 		return out;
 	}
 }

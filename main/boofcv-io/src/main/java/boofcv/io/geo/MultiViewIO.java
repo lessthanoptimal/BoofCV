@@ -19,6 +19,7 @@
 package boofcv.io.geo;
 
 import boofcv.BoofVersion;
+import boofcv.abst.geo.bundle.BundleCameraState;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureCommon;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
@@ -45,10 +46,8 @@ import org.jetbrains.annotations.Nullable;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
 
 import static boofcv.io.calibration.CalibrationIO.*;
 import static boofcv.misc.BoofMiscOps.getOrThrow;
@@ -59,6 +58,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class MultiViewIO {
 
 	public static void save( LookUpSimilarImages db, String path ) {
@@ -336,6 +336,9 @@ public class MultiViewIO {
 		Map<String, Object> encoded = new HashMap<>();
 		encoded.put("point", v.point.toArray());
 		encoded.put("observations", v.observations.toArray());
+		if (v.cameraState != null) {
+			encoded.put("camera_state", encodeCameraState(v.cameraState));
+		}
 		return encoded;
 	}
 
@@ -404,6 +407,26 @@ public class MultiViewIO {
 		};
 
 		return c;
+	}
+
+	private static Map<String, Object> encodeCameraState( BundleCameraState c ) {
+		Map<String, Object> encoded = c.toMap();
+		encoded.put("class-name", c.getClass().getCanonicalName());
+		return encoded;
+	}
+
+	/**
+	 * Determines the type of class the state is stored in, declares it using reflection, and sets the values.
+	 */
+	private static BundleCameraState decodeCameraState( Map<String, Object> encoded ) {
+		try {
+			String className = (String)Objects.requireNonNull(encoded.get("class-name"));
+			var c = (BundleCameraState)Class.forName(className).getConstructor().newInstance();
+			return c.setTo(encoded);
+		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException | NoSuchMethodException |
+				 InvocationTargetException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public static SceneStructureMetric load( String path, @Nullable SceneStructureMetric graph ) {
@@ -531,6 +554,7 @@ public class MultiViewIO {
 			List<Float> observationValues = getOrThrow(yamlView, "observations");
 
 			SceneObservations.View v = views.get(viewIdx);
+
 			// Pre-declare memory
 			v.point.resize(pointValues.size());
 			for (int i = 0; i < pointValues.size(); i++) {
@@ -539,6 +563,10 @@ public class MultiViewIO {
 			v.observations.resize(observationValues.size());
 			for (int i = 0; i < observationValues.size(); i++) {
 				v.observations.data[i] = ((Number)observationValues.get(i)).floatValue();
+			}
+
+			if (yamlView.containsKey("camera_state")) {
+				v.cameraState = decodeCameraState((Map<String, Object>)yamlView.get("camera_state"));
 			}
 		}
 	}

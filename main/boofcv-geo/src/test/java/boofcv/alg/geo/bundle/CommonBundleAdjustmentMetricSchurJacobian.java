@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.geo.bundle;
 
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
+import boofcv.alg.geo.bundle.cameras.BundleZoomState;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.se.SpecialEuclideanOps_F64;
@@ -32,14 +33,10 @@ import org.junit.jupiter.api.Test;
 import java.util.Random;
 
 import static boofcv.alg.geo.bundle.TestBundleAdjustmentMetricResidualFunction.createObservations;
-import static boofcv.alg.geo.bundle.TestCodecSceneStructureMetric.createScene;
-import static boofcv.alg.geo.bundle.TestCodecSceneStructureMetric.createSceneStereo;
+import static boofcv.alg.geo.bundle.TestCodecSceneStructureMetric.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * @author Peter Abeles
- */
 public abstract class CommonBundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 		extends BoofStandardJUnit {
 
@@ -168,6 +165,32 @@ public abstract class CommonBundleAdjustmentMetricSchurJacobian<M extends DMatri
 		SceneStructureMetric structure = createSceneChainSameMotion(rand, homogenous);
 		SceneObservations observations = createObservations(rand, structure);
 
+		var param = new double[structure.getParameterCount()];
+		new CodecSceneStructureMetric().encode(structure, param);
+
+		var alg = createAlg();
+
+		var jac = createJacobian(alg);
+		var func = new BundleAdjustmentMetricResidualFunction();
+
+		alg.configure(structure, observations);
+		func.configure(structure, observations);
+
+//		DerivativeChecker.jacobianPrint(func, jac, param, 100*UtilEjml.TEST_F64_SQ );
+		assertTrue(DerivativeChecker.jacobian(func, jac, param, 100*UtilEjml.TEST_F64_SQ));
+	}
+
+	/**
+	 * Makes sure the camera set is specified correctly. This will blow up if not.
+	 */
+	@Test void setsCameraState() {
+		SceneStructureMetric structure = createSceneZoomState(rand, false);
+		SceneObservations observations = createObservations(rand, structure);
+
+		// Add the camera state to all observation views
+		observations.views.forEach(v -> v.cameraState = new BundleZoomState(400.0));
+
+		// Standard test for now on
 		var param = new double[structure.getParameterCount()];
 		new CodecSceneStructureMetric().encode(structure, param);
 

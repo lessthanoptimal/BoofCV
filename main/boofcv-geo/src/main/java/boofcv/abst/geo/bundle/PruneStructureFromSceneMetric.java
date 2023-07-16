@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -69,6 +69,10 @@ public class PruneStructureFromSceneMetric {
 			SceneStructureMetric.View view = structure.views.data[viewIndex];
 			structure.getWorldToView(view, world_to_view, tmp);
 
+			SceneStructureCommon.Camera camera = structure.cameras.data[view.camera];
+			if (v.cameraState != null)
+				camera.model.setCameraState(v.cameraState);
+
 			for (int pointIndex = 0; pointIndex < v.point.size; pointIndex++) {
 				int pointID = v.point.data[pointIndex];
 				SceneStructureCommon.Point f = structure.points.data[pointID];
@@ -82,7 +86,6 @@ public class PruneStructureFromSceneMetric {
 				world_to_view.transform(X, X);
 
 				// predicted pixel
-				SceneStructureCommon.Camera camera = structure.cameras.data[view.camera];
 				camera.model.project(X.x, X.y, X.z, predicted);
 
 				Errors e = new Errors();
