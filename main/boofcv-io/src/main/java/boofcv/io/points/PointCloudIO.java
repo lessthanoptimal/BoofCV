@@ -36,6 +36,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Code for reading different point cloud formats
@@ -52,7 +53,7 @@ public class PointCloudIO {
 			throws IOException {
 		switch (format) {
 			case PLY -> PlyCodec.saveCloudBinary(cloud, ByteOrder.BIG_ENDIAN, saveRGB, false, outputStream);
-			case OBJ -> ObjFileCodec.save(cloud, new OutputStreamWriter(outputStream));
+			case OBJ -> ObjFileCodec.save(cloud, new OutputStreamWriter(outputStream, StandardCharsets.UTF_8));
 			case STL -> throw new IllegalArgumentException("STL doesn't support point clouds");
 			default -> throw new IllegalArgumentException("Unknown format " + format);
 		}
@@ -62,7 +63,7 @@ public class PointCloudIO {
 			throws IOException {
 		switch (format) {
 			case PLY -> PlyCodec.saveMeshBinary(mesh, colorRGB, ByteOrder.BIG_ENDIAN, false, outputStream);
-			case OBJ -> ObjFileCodec.save(mesh, new OutputStreamWriter(outputStream));
+			case OBJ -> ObjFileCodec.save(mesh, new OutputStreamWriter(outputStream, StandardCharsets.UTF_8));
 			case STL -> new StlFileWriter().writeBinary(mesh.toAccess(), "MeshBoofCV", outputStream);
 			default -> throw new IllegalArgumentException("Unknown format " + format);
 		}

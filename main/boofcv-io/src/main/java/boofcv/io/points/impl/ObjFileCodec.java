@@ -25,6 +25,7 @@ import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.DogArray_I32;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 /**
  * High level interface for reading and writing OBJ files. Takes in BoofCV specific data structures
@@ -82,7 +83,7 @@ public class ObjFileCodec {
 			@Override protected void addLine( DogArray_I32 vertexes ) {}
 			@Override protected void addFace( DogArray_I32 vertexes ) {}
 		};
-		obj.parse(new BufferedReader(new InputStreamReader(input)));
+		obj.parse(new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8)));
 	}
 
 	public static void load( InputStream input, VertexMesh output ) throws IOException {
@@ -98,6 +99,6 @@ public class ObjFileCodec {
 				output.offsets.add(output.indexes.size);
 			}
 		};
-		obj.parse(new BufferedReader(new InputStreamReader(input)));
+		obj.parse(new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8)));
 	}
 }
