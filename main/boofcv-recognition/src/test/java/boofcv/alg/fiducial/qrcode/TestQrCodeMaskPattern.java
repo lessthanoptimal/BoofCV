@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,9 +25,6 @@ import static boofcv.alg.fiducial.qrcode.QrCodeMaskPattern.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * @author Peter Abeles
- */
 public class TestQrCodeMaskPattern extends BoofStandardJUnit {
 	/**
 	 * Exhaustively check to make sure the output is always 0 or 1 when given an input of 0 or 1

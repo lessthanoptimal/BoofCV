@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,9 +39,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 //CUSTOM ignore KannalaBrandtUtils_F64
 //CUSTOM ignore DMatrixRMaj
 
-/**
- * @author Peter Abeles
- */
 class TestKannalaBrandtPtoS_F64 extends BoofStandardJUnit {
 	/**
 	 * Given spherical coordinates, compute pixel coordinates and see if we can invert them correctly.

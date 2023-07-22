@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,9 +24,6 @@ import georegression.struct.point.Point2D_I32;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-/**
- * @author Peter Abeles
- */
 public class TestPackedArrayPoint2D_I32 extends GenericPackedArrayChecks<Point2D_I32> {
 
 	@Override protected PackedArray<Point2D_I32> createAlg() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,9 +27,6 @@ import org.junit.jupiter.api.Test;
 import static boofcv.alg.scene.vocabtree.TestHierarchicalVocabularyTree.createTree;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * @author Peter Abeles
- */
 class TestLearnNodeWeights extends BoofStandardJUnit {
 	// location of leaves, see create2x2tree
 	Point2D_F64 leaf0 = new Point2D_F64(-5, -1); // Node 3

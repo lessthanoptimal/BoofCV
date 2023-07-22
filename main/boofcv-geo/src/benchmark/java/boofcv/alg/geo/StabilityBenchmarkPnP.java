@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,9 +28,6 @@ import georegression.struct.se.Se3_F64;
 
 import java.util.Random;
 
-/**
- * @author Peter Abeles
- */
 public class StabilityBenchmarkPnP extends ArtificialStereoScene {
 
 	static final int NUM_POINTS = 500;

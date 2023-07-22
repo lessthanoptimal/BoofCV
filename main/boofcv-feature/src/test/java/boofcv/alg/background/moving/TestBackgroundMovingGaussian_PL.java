@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,9 +27,6 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.homography.Homography2D_F32;
 
-/**
- * @author Peter Abeles
- */
 public class TestBackgroundMovingGaussian_PL extends GenericBackgroundMovingGaussianChecks {
 	public TestBackgroundMovingGaussian_PL() {
 		imageTypes.add(ImageType.pl(2, GrayU8.class));

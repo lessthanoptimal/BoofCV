@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,9 +40,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * @author Peter Abeles
- */
 class TestVisOdomBundleAdjustment extends BoofStandardJUnit {
 	CameraPinholeBrown pinhole = new CameraPinholeBrown(400, 400, 0, 500, 500, 1000, 1000);
 

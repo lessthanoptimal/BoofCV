@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,9 +25,6 @@ import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
 
-/**
- * @author Peter Abeles
- */
 public abstract class StandardAssociateDescription2DChecks<Desc> extends StandardAssociateDescriptionChecks<Desc>{
 
 	protected StandardAssociateDescription2DChecks(Class<Desc> descType) {

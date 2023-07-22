@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,9 +24,6 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
 
-/**
- * @author Peter Abeles
- */
 public class TestFhEdgeWeights8_PLU8 extends GenericFhEdgeWeightsChecks<Planar<GrayU8>>{
 
 	TestFhEdgeWeights8_PLU8() {

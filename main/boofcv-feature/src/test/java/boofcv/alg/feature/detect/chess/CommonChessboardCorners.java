@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,9 +28,6 @@ import org.junit.jupiter.api.BeforeEach;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author Peter Abeles
- */
 abstract class CommonChessboardCorners extends BoofStandardJUnit {
 	protected int p = 40;
 	protected int w = 20;
@@ -38,30 +35,29 @@ abstract class CommonChessboardCorners extends BoofStandardJUnit {
 	protected int cols = 5;
 	protected double angle;
 
-	@BeforeEach
-	void setup() {
+	@BeforeEach void setup() {
 		p = 40;
 		w = 20;
 		angle = 0;
 	}
 
-	List<ChessboardCorner> createExpected(int rows , int cols , int width , int height ) {
+	List<ChessboardCorner> createExpected( int rows, int cols, int width, int height ) {
 		List<ChessboardCorner> list = new ArrayList<>();
 
-		PixelTransform<Point2D_F32> inputToOutput = DistortSupport.transformRotate(width/2,height/2,
-				width/2,height/2,(float)-angle);
+		PixelTransform<Point2D_F32> inputToOutput = DistortSupport.transformRotate(width/2, height/2,
+				width/2, height/2, (float)-angle);
 
 		Point2D_F32 tmp = new Point2D_F32();
 
 		for (int row = 1; row < rows; row++) {
-			for( int col = 1; col < cols; col++ ) {
+			for (int col = 1; col < cols; col++) {
 				ChessboardCorner c = new ChessboardCorner();
-				inputToOutput.compute(p+col*w,p+row*w,tmp);
+				inputToOutput.compute(p + col*w, p + row*w, tmp);
 				c.x = tmp.x;
 				c.y = tmp.y;
-				c.orientation = ((row%2)+(col%2))%2 == 0 ? Math.PI/4 : -Math.PI/4;
+				c.orientation = ((row%2) + (col%2))%2 == 0 ? Math.PI/4 : -Math.PI/4;
 				// take in account the image being rotated
-				c.orientation = UtilAngle.boundHalf(c.orientation+angle);
+				c.orientation = UtilAngle.boundHalf(c.orientation + angle);
 
 				list.add(c);
 			}

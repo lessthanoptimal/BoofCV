@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,9 +31,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * @author Peter Abeles
- */
 public class TestTriangulate2ViewsReprojectionMetricError extends BoofStandardJUnit {
 	// pick two very different cameras to make sure the error is being indpendently computed in image each image correctly
 	CameraPinhole cameraA = new CameraPinhole(400,400,0,500,500,1000,1000);

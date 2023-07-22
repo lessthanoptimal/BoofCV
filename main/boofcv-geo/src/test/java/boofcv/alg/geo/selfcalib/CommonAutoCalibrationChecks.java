@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,9 +32,6 @@ import org.ejml.data.DMatrixRMaj;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author Peter Abeles
- */
 public class CommonAutoCalibrationChecks extends BoofStandardJUnit {
 
 	List<Point3D_F64> cloud = new ArrayList<>();

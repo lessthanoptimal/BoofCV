@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,9 +23,6 @@ import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.struct.feature.TupleDesc_F64;
 import org.ddogleg.struct.FastAccess;
 
-/**
- * @author Peter Abeles
- */
 class TestAssociateGreedyDesc extends GenericAssociateGreedyChecks {
 
 	ScoreAssociation<TupleDesc_F64> score = new ScoreAssociateEuclidean_F64();

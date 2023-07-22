@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,6 @@ package boofcv.alg.interpolate.impl;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.struct.image.GrayS32;
 
-/**
- * @author Peter Abeles
- */
 public class TestNearestNeighborPixel_S32 extends GeneralChecksInterpolationPixelS<GrayS32>
 {
 	@Override

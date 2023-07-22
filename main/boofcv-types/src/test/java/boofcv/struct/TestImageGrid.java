@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,9 +29,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
-/**
- * @author Peter Abeles
- */
 public class TestImageGrid extends BoofStandardJUnit {
 	@Test void initialize() {
 		ImageGrid<List<Point2D_F64>> grid = new ImageGrid<>(ArrayList::new, List::clear);

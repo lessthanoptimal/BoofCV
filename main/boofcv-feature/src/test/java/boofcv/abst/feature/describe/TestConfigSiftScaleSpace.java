@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,4 @@ package boofcv.abst.feature.describe;
 
 import boofcv.struct.StandardConfigurationChecks;
 
-/**
- * @author Peter Abeles
- */
 class TestConfigSiftScaleSpace extends StandardConfigurationChecks {}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,9 +31,6 @@ import java.util.Random;
 
 import static boofcv.alg.transform.census.impl.TestImplCensusTransformInner.createSamples;
 
-/**
- * @author Peter Abeles
- */
 class TestGCensusTransform extends CompareIdenticalFunctions {
 	int width = 70, height = 80;
 	Random rand = new Random(234);

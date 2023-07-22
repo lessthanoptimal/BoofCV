@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,6 @@ package boofcv.abst.shapes.polyline;
 import boofcv.factory.shape.ConfigSplitMergeLineFit;
 import boofcv.factory.shape.FactoryPointsToPolyline;
 
-/**
- * @author Peter Abeles
- */
 public class TestSplitMergeLineRefine_to_PointsToPolyline extends ChecksGenericPointsToPolyline{
 
 	@Override

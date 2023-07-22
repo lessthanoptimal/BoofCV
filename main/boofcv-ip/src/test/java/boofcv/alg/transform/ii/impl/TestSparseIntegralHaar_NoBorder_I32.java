@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,9 +26,6 @@ import boofcv.struct.sparse.GradientValue_I32;
 import org.junit.jupiter.api.Test;
 
 
-/**
- * @author Peter Abeles
- */
 public class TestSparseIntegralHaar_NoBorder_I32
 		extends GeneralSparseGradientIntegralTests<GrayS32,GradientValue_I32>
 {

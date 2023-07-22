@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,6 @@ package boofcv.struct.kmeans;
 import boofcv.struct.feature.TupleDesc_B;
 import org.ddogleg.clustering.PointDistance;
 
-/**
- * @author Peter Abeles
- */
 public class TestTuplePointDistanceHamming extends GenericPointDistanceChecks<TupleDesc_B> {
 	@Override protected PointDistance<TupleDesc_B> createAlg() {
 		return new TuplePointDistanceHamming();

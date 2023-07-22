@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,9 +26,6 @@ import java.nio.*;
 import static org.bytedeco.javacpp.opencv_core.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * @author Peter Abeles
- */
 public class TestConvertIplImage {
 	@Test void convertFrom_1U8() {
 		IplImage ipl = IplImage.create(4, 5, IPL_DEPTH_8U, 1);

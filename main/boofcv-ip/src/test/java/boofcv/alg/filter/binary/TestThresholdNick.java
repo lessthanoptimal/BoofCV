@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,9 +23,6 @@ import boofcv.alg.filter.binary.impl.GenericThresholdCommon;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayF32;
 
-/**
- * @author Peter Abeles
- */
 public class TestThresholdNick extends GenericThresholdCommon<GrayF32> {
 	public TestThresholdNick() {
 		super(GrayF32.class);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,10 +26,8 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * @author Peter Abeles
- */
-@SuppressWarnings("unchecked") public abstract class CommonConnectedTwoRowSpeckleFiller<T extends ImageGray<T>>
+@SuppressWarnings("unchecked")
+public abstract class CommonConnectedTwoRowSpeckleFiller<T extends ImageGray<T>>
 		extends CommonConnectedSpeckleFiller<T> {
 	protected CommonConnectedTwoRowSpeckleFiller( ImageType<T> imageType ) {
 		super(imageType);

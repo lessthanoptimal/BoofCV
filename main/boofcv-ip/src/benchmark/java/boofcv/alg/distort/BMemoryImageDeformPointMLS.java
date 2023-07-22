@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,11 +25,8 @@ import georegression.struct.point.Point2D_F32;
 
 import java.util.Random;
 
-/**
- * @author Peter Abeles
- */
 public class BMemoryImageDeformPointMLS {
-	public static void main(String[] args) {
+	public static void main( String[] args ) {
 		var alg = new ImageDeformPointMLS_F32(TypeDeformMLS.RIGID);
 		var rand = new Random(2345);
 		var out = new Point2D_F32();
@@ -37,30 +34,30 @@ public class BMemoryImageDeformPointMLS {
 		int N = 20_000;
 		int size = 1000;
 
-		long beforeUsedMem=Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
+		long beforeUsedMem = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
 		for (int trial = 0; trial < 10; trial++) {
 			alg.reset();
-			alg.configure(size,size,30,30);
+			alg.configure(size, size, 30, 30);
 			for (int i = 0; i < N; i++) {
-				float sx = rand.nextFloat()*(size-1);
-				float sy = rand.nextFloat()*(size-1);
-				float dx = sx + (rand.nextFloat()-0.5f)*20f;
-				float dy = sy + (rand.nextFloat()-0.5f)*20f;
-				dx = BoofMiscOps.bound(dx,0,size-1);
-				dy = BoofMiscOps.bound(dy,0,size-1);
+				float sx = rand.nextFloat()*(size - 1);
+				float sy = rand.nextFloat()*(size - 1);
+				float dx = sx + (rand.nextFloat() - 0.5f)*20f;
+				float dy = sy + (rand.nextFloat() - 0.5f)*20f;
+				dx = BoofMiscOps.bound(dx, 0, size - 1);
+				dy = BoofMiscOps.bound(dy, 0, size - 1);
 
-				alg.add(sx,sy,dx,dy);
+				alg.add(sx, sy, dx, dy);
 			}
 			alg.fixate();
 
 			for (int y = 0; y < size; y++) {
 				for (int x = 0; x < size; x++) {
-					alg.compute(x,y,out);
+					alg.compute(x, y, out);
 				}
 			}
-			long afterUsedMem=Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
-			long memory = afterUsedMem-beforeUsedMem;
-			System.out.printf("Memory Usage %6.2f MB\n",memory/1024.0/1024.0);
+			long afterUsedMem = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+			long memory = afterUsedMem - beforeUsedMem;
+			System.out.printf("Memory Usage %6.2f MB\n", memory/1024.0/1024.0);
 		}
 	}
 }

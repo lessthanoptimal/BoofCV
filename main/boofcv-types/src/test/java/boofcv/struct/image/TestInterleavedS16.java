@@ -22,9 +22,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * @author Peter Abeles
- */
 public class TestInterleavedS16 extends StandardImageInterleavedTests<InterleavedS16> {
 
 

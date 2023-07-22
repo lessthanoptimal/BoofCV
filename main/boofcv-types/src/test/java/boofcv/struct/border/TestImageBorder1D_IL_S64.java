@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,6 @@ package boofcv.struct.border;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.InterleavedS64;
 
-/**
- * @author Peter Abeles
- */
 public class TestImageBorder1D_IL_S64 extends GenericImageBorder1DTests<InterleavedS64> {
 
 	public TestImageBorder1D_IL_S64() {

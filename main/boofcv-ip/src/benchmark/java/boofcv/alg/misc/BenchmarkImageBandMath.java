@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,30 +30,27 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author Peter Abeles
- */
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @Warmup(iterations = 2)
 @Measurement(iterations = 5)
 @State(Scope.Benchmark)
-@Fork(value=2)
+@Fork(value = 2)
 public class BenchmarkImageBandMath {
 
 	public static final int radius = 5;
 
-	@Param({"true","false"})
+	@Param({"true", "false"})
 	public boolean concurrent;
 
-//	@Param({"100", "500", "1000", "5000", "10000"})
+	//	@Param({"100", "500", "1000", "5000", "10000"})
 	@Param({"1000"})
 	public int size;
 
-	@Param({"10","11"})
+	@Param({"10", "11"})
 	int numBands = 10;
 
-	Planar<GrayU8> input = new Planar<>(GrayU8.class,size, size, numBands);
+	Planar<GrayU8> input = new Planar<>(GrayU8.class, size, size, numBands);
 	GrayU8 output = new GrayU8(size, size);
 	GrayU8 tmp = new GrayU8(size, size);
 
@@ -66,35 +63,30 @@ public class BenchmarkImageBandMath {
 		output.reshape(size, size);
 		tmp.reshape(size, size);
 
-		GImageMiscOps.fillUniform(input,rand,0,200);
+		GImageMiscOps.fillUniform(input, rand, 0, 200);
 	}
 
-	@Benchmark
-	public void minimum() {
-		GImageBandMath.minimum(input,output);
+	@Benchmark public void minimum() {
+		GImageBandMath.minimum(input, output);
 	}
 
-	@Benchmark
-	public void maximum() {
-		GImageBandMath.maximum(input,output);
+	@Benchmark public void maximum() {
+		GImageBandMath.maximum(input, output);
 	}
 
-	@Benchmark
-	public void median() {
-		GImageBandMath.median(input,output);
+	@Benchmark public void median() {
+		GImageBandMath.median(input, output);
 	}
 
-	@Benchmark
-	public void average() {
-		GImageBandMath.average(input,output);
+	@Benchmark public void average() {
+		GImageBandMath.average(input, output);
 	}
 
-	@Benchmark
-	public void stdDev() {
-		GImageBandMath.stdDev(input,output,tmp);
+	@Benchmark public void stdDev() {
+		GImageBandMath.stdDev(input, output, tmp);
 	}
 
-	public static void main(String[] args) throws RunnerException {
+	public static void main( String[] args ) throws RunnerException {
 		Options opt = new OptionsBuilder()
 				.include(BenchmarkImageBandMath.class.getSimpleName())
 				.build();

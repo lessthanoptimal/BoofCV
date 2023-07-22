@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,9 +29,6 @@ import pabeles.concurrency.GrowArray;
 
 import java.util.Random;
 
-/**
- * @author Peter Abeles
- */
 public class CommonBenchmarkConvolve_SB {
 	protected static int width = 800, height = 600;
 
@@ -65,7 +62,7 @@ public class CommonBenchmarkConvolve_SB {
 		ImageMiscOps.fillUniform(input_S32, rand, 0, 20);
 		ImageMiscOps.fillUniform(input_F32, rand, 0, 20);
 		ImageMiscOps.fillUniform(input_F64, rand, 0, 20);
-		System.arraycopy(input_S16.data,0,input_U16.data,0,input_S16.data.length);
+		System.arraycopy(input_S16.data, 0, input_U16.data, 0, input_S16.data.length);
 
 		kernelF64 = FactoryKernelGaussian.gaussian(Kernel1D_F64.class, -1, radius);
 		kernelF32 = FactoryKernelGaussian.gaussian(Kernel1D_F32.class, -1, radius);

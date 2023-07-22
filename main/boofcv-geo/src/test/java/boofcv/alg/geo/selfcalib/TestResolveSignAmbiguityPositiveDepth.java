@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,6 @@ package boofcv.alg.geo.selfcalib;
 import boofcv.BoofTesting;
 import org.junit.jupiter.api.Test;
 
-/**
- * @author Peter Abeles
- */
 class TestResolveSignAmbiguityPositiveDepth extends CommonThreeViewSelfCalibration {
 	@Test
 	void simple() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,9 +35,6 @@ import static boofcv.alg.misc.TestPixelMath.createOperator2_AddPlus5;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * @author Peter Abeles
- */
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class TestGPixelMath extends BaseGClassChecksInMisc {
 

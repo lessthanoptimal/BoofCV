@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,9 +31,6 @@ import java.lang.reflect.Method;
 
 import static boofcv.alg.filter.misc.impl.TestImplAverageDownSampleN.naive;
 
-/**
- * @author Peter Abeles
- */
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class TestImplAverageDownSample2 extends BoofStandardJUnit {
 

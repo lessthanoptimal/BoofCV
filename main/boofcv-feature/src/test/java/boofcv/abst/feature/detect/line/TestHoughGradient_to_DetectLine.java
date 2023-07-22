@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,9 +30,6 @@ import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
-/**
- * @author Peter Abeles
- */
 public class TestHoughGradient_to_DetectLine extends GeneralDetectLineGradientTests {
 	@Override
 	public <T extends ImageGray<T>> DetectLine<T> createAlg(Class<T> imageType) {

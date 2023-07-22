@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,9 +33,6 @@ import java.util.Random;
 
 import static boofcv.alg.filter.convolve.noborder.TestImplConvolveMean.createTableKernel;
 
-/**
- * @author Peter Abeles
- */
 public class TestConvolveImageMean extends CompareEquivalentFunctions {
 
 	Random rand = new Random(0xFF);

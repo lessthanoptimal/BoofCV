@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,9 +26,6 @@ import org.ejml.data.DMatrixRMaj;
 
 import java.util.List;
 
-/**
- * @author Peter Abeles
- */
 class TestWrapNViewsTriangulateMetricHgDLT extends GeneralCheckNViewsTriangulateMetricH {
 	WrapNViewsTriangulateMetricHgDLT alg;
 

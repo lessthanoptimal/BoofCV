@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,9 +34,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
-/**
- * @author Peter Abeles
- */
 public class TestPyramidFloatGaussianScale extends GenericPyramidTests<GrayF32> {
 
 	double[] sigmas = new double[]{1,2};

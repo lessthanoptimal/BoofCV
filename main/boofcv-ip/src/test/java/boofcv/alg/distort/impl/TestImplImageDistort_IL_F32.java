@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,9 +28,6 @@ import boofcv.struct.image.ImageType;
 import boofcv.struct.image.InterleavedF32;
 import georegression.struct.point.Point2D_F32;
 
-/**
- * @author Peter Abeles
- */
 public class TestImplImageDistort_IL_F32 extends GeneralImageDistortTests<InterleavedF32>{
 
 	public TestImplImageDistort_IL_F32() {

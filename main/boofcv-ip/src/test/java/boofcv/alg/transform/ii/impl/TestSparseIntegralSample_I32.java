@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,9 +22,6 @@ import boofcv.alg.filter.derivative.GeneralSparseSampleTests;
 import boofcv.struct.image.GrayS32;
 import org.junit.jupiter.api.Test;
 
-/**
- * @author Peter Abeles
- */
 public class TestSparseIntegralSample_I32 extends GeneralSparseSampleTests<GrayS32> {
 
 	private static int baseR = 2;

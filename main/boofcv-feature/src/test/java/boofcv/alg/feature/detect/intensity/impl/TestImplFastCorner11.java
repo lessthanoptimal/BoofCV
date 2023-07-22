@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,9 +20,6 @@ package boofcv.alg.feature.detect.intensity.impl;
 
 import boofcv.alg.feature.detect.intensity.FastCornerDetector;
 
-/**
- * @author Peter Abeles
- */
 public class TestImplFastCorner11 extends GenericFastCorner {
 	public TestImplFastCorner11() {
 		super(new FastCornerDetector<>(new ImplFastCorner11_U8(20)), 11, 20);

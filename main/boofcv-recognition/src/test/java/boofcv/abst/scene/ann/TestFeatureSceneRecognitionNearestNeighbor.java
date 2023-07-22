@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,9 +23,6 @@ import boofcv.abst.scene.GenericFeatureSceneRecognitionChecks;
 import boofcv.factory.scene.FactorySceneRecognition;
 import boofcv.struct.feature.TupleDesc_F32;
 
-/**
- * @author Peter Abeles
- */
 public class TestFeatureSceneRecognitionNearestNeighbor extends GenericFeatureSceneRecognitionChecks<TupleDesc_F32> {
 	@Override public FeatureSceneRecognition<TupleDesc_F32> createAlg() {
 		return FactorySceneRecognition.createSceneNearestNeighbor(null, ()->new TupleDesc_F32(64));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,9 +29,6 @@ import pabeles.concurrency.GrowArray;
 
 import java.lang.reflect.Method;
 
-/**
- * @author Peter Abeles
- */
 public class TestConvolveImageUnrolled_SB_U8_I8_Div extends BoofStandardJUnit {
 	CompareToStandardConvolution compareToStandard = new CompareToStandardConvolution(ConvolveImageUnrolled_SB_U8_I8_Div.class);
 

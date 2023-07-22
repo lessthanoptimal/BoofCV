@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,9 +25,6 @@ import boofcv.alg.feature.orientation.OrientationHistogramSift;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.struct.image.GrayF32;
 
-/**
- * @author Peter Abeles
- */
 public class TestOrientationSiftToImage extends GenericOrientationImageTests<GrayF32> {
 	final static double angleTol = 0.1;
 	final static ConfigSiftOrientation config = new ConfigSiftOrientation();

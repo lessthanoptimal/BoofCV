@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,9 +35,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * @author Peter Abeles
- */
 public class TestDistancePlane2DToPixelSq extends BoofStandardJUnit {
 
 	CameraPinholeBrown intrinsic = new CameraPinholeBrown(200, 210, 0, 320, 240, 640, 480).fsetRadial(0, 0);

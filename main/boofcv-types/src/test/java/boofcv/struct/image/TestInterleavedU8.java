@@ -22,9 +22,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * @author Peter Abeles
- */
 public class TestInterleavedU8 extends StandardImageInterleavedTests<InterleavedU8> {
 
 	@Override

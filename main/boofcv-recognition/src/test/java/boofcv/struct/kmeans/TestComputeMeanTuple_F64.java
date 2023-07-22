@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,9 +27,6 @@ import org.ddogleg.clustering.ComputeMeanClusters;
 import org.ddogleg.struct.DogArray_F64;
 import org.ejml.UtilEjml;
 
-/**
- * @author Peter Abeles
- */
 class TestComputeMeanTuple_F64 extends GenericComputeMeanClustersChecks<TupleDesc_F64> {
 
 	public TestComputeMeanTuple_F64() {

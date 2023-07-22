@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,9 +22,6 @@ import boofcv.alg.filter.convolve.normalized.CompareToStandardConvolutionNormali
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
-/**
- * @author Peter Abeles
- */
 class TestConvolveImageNormalized extends BoofStandardJUnit {
 	@Test
 	void compareToNaive() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,9 +27,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * @author Peter Abeles
- */
 class TestConfigGeneratorRandom extends BoofStandardJUnit {
 	@Test void generate() {
 		var alg = new ConfigGeneratorRandom<>(100, 0xBEEF, ConfigDummyA.class);

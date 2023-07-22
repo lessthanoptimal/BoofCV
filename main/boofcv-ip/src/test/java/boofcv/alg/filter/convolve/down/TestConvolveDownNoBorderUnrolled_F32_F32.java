@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,9 +23,6 @@ import boofcv.struct.convolve.Kernel2D_F32;
 import boofcv.struct.image.GrayF32;
 
 
-/**
- * @author Peter Abeles
- */
 public class TestConvolveDownNoBorderUnrolled_F32_F32 extends StandardConvolveUnrolledTests {
 
 	public TestConvolveDownNoBorderUnrolled_F32_F32() {

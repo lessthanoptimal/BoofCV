@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,9 +24,6 @@ import boofcv.struct.ConnectRule;
 
 import java.io.FileNotFoundException;
 
-/**
- * @author Peter Abeles
- */
 public class GenerateFhEdgeWeights_SB extends CodeGeneratorBase {
 
 
@@ -40,7 +37,7 @@ public class GenerateFhEdgeWeights_SB extends CodeGeneratorBase {
 
 	protected void create( AutoTypeImage imageType , ConnectRule rule ) throws FileNotFoundException {
 
-		String name = "FhEdgeWeights"+rule.getShortName()+"_"+imageType.getAbbreviatedType();
+		String name = "FhEdgeWeights" + rule.getShortName() + "_" + imageType.getAbbreviatedType();
 		setOutputFile(name);
 		printPreamble(imageType,rule);
 		printProcess(imageType,rule);

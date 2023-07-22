@@ -50,9 +50,6 @@ import java.util.List;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * @author Peter Abeles
- */
 class TestMultiViewIO extends BoofStandardJUnit {
 	@Test void save_load_SimilarImages() {
 		SimilarImagesData expected = new SimilarImagesData();

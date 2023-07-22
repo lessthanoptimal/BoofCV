@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,9 +24,6 @@ import boofcv.alg.feature.describe.DescribePointBinaryCompare;
 import boofcv.alg.feature.describe.brief.BinaryCompareDefinition_I32;
 import boofcv.struct.image.GrayU8;
 
-/**
- * @author Peter Abeles
- */
 public class TestImplDescribeBinaryCompare_U8 extends BaseTestDescribePointBinaryCompare<GrayU8> {
 	public TestImplDescribeBinaryCompare_U8() {
 		super(GrayU8.class);

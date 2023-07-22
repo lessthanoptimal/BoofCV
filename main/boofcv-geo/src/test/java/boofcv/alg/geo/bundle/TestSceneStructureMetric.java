@@ -31,9 +31,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * @author Peter Abeles
- */
 public class TestSceneStructureMetric extends BoofStandardJUnit {
 	@Test void assignIDsToRigidPoints() {
 		var scene = new SceneStructureMetric(false);

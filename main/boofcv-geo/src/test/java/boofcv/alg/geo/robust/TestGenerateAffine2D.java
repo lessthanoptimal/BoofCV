@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,9 +30,6 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 
-/**
- * @author Peter Abeles
- */
 public class TestGenerateAffine2D extends BoofStandardJUnit
 		implements ModelTestingInterface<Affine2D_F64,AssociatedPair>
 {

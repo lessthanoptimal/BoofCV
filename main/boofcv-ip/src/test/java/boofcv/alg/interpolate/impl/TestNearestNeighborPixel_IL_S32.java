@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,9 +24,6 @@ import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.InterleavedS32;
 
-/**
- * @author Peter Abeles
- */
 public class TestNearestNeighborPixel_IL_S32 extends GeneralChecksInterpolationPixelMB<InterleavedS32> {
 
 	@Override

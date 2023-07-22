@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,6 @@
 
 package boofcv.alg.filter.convolve.noborder;
 
-/**
- * @author Peter Abeles
- */
 public class TestConvolveImageUnrolled_SB_MT_S32_S32_Div extends CommonConvolveMultiThreadToSingle {
 	TestConvolveImageUnrolled_SB_MT_S32_S32_Div() {
 		super(ConvolveImageUnrolled_SB_MT_S32_S32_Div.class,ConvolveImageUnrolled_SB_S32_S32_Div.class,3);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,9 +20,6 @@ package boofcv.abst.geo.bundle;
 
 import boofcv.factory.geo.FactoryMultiView;
 
-/**
- * @author Peter Abeles
- */
 public class TestBundleAdjustmentSchur_DSCC_Projective extends GenericBundleAdjustmentProjectiveChecks {
 
 	@Override

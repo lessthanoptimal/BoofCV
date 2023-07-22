@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,6 @@ package boofcv.alg.background.stationary;
 import boofcv.alg.background.BackgroundModelStationary;
 import boofcv.struct.image.*;
 
-/**
- * @author Peter Abeles
- */
 public class TestBackgroundStationaryGmm_MB extends GenericBackgroundModelStationaryChecks {
 
 	public TestBackgroundStationaryGmm_MB() {

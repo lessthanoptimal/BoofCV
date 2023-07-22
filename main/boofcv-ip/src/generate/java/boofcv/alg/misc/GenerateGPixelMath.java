@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,9 +25,6 @@ import java.io.FileNotFoundException;
 
 import static boofcv.generate.AutoTypeImage.*;
 
-/**
- * @author Peter Abeles
- */
 public class GenerateGPixelMath extends CodeGeneratorBase {
 
 	private boolean singleBand;

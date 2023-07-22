@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,6 @@ package boofcv.alg.disparity.block.select;
 import boofcv.alg.disparity.block.DisparitySelect;
 import boofcv.struct.image.GrayU8;
 
-/**
- * @author Peter Abeles
- */
 public class TestSelectErrorBasicWta_S32_U8 extends ChecksSelectDisparity<int[], GrayU8> {
 
 	TestSelectErrorBasicWta_S32_U8() {

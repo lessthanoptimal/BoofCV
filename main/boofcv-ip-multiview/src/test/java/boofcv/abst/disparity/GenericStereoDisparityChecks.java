@@ -31,9 +31,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * @author Peter Abeles
- */
 public abstract class GenericStereoDisparityChecks<Image extends ImageBase<Image>, Disparity extends ImageGray<Disparity>>
 		extends BoofStandardJUnit {
 	int width = 80;

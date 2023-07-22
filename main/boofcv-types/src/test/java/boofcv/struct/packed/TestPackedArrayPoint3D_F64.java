@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,9 +25,6 @@ import org.ejml.UtilEjml;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-/**
- * @author Peter Abeles
- */
 public class TestPackedArrayPoint3D_F64 extends GenericPackedArrayChecks<Point3D_F64> {
 
 	@Override protected PackedArray<Point3D_F64> createAlg() {

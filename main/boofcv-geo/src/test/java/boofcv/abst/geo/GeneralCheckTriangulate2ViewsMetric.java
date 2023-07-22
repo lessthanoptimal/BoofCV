@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,9 +29,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * @author Peter Abeles
- */
 public abstract class GeneralCheckTriangulate2ViewsMetric extends BoofStandardJUnit {
 
 	public abstract Triangulate2ViewsMetric createAlg();
@@ -42,26 +39,26 @@ public abstract class GeneralCheckTriangulate2ViewsMetric extends BoofStandardJU
 	@Test void triangulate() {
 		Point3D_F64 world = new Point3D_F64(0.5, -0.1, 4);
 
-		Se3_F64 worldToA = new Se3_F64();
-		Se3_F64 worldToB = new Se3_F64();
-		worldToB.getT().setTo(2,0.1,-0.5);
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0, 0.05, 0,worldToB.getR());
+		var worldToA = new Se3_F64();
+		var worldToB = new Se3_F64();
+		worldToB.getT().setTo(2, 0.1, -0.5);
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0, 0.05, 0, worldToB.getR());
 
-		Point3D_F64 pointA = SePointOps_F64.transform(worldToA,world,null);
-		Point2D_F64 viewA = new Point2D_F64();
+		Point3D_F64 pointA = SePointOps_F64.transform(worldToA, world, null);
+		var viewA = new Point2D_F64();
 		viewA.x = pointA.x/pointA.z;
 		viewA.y = pointA.y/pointA.z;
-		
-		Point3D_F64 pointB = SePointOps_F64.transform(worldToB,world,null);
-		Point2D_F64 viewB = new Point2D_F64();
+
+		Point3D_F64 pointB = SePointOps_F64.transform(worldToB, world, null);
+		var viewB = new Point2D_F64();
 		viewB.x = pointB.x/pointB.z;
 		viewB.y = pointB.y/pointB.z;
 
-		
+
 		Triangulate2ViewsMetric alg = createAlg();
-		Point3D_F64 found = new Point3D_F64();
-		
-		alg.triangulate(viewA,viewB,worldToB,found);
+		var found = new Point3D_F64();
+
+		alg.triangulate(viewA, viewB, worldToB, found);
 		assertEquals(found.x, world.x, 1e-8);
 		assertEquals(found.y, world.y, 1e-8);
 		assertEquals(found.z, world.z, 1e-8);

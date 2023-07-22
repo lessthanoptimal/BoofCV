@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,33 +23,28 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.image.Planar;
 
 import java.awt.image.BufferedImage;
 
-/**
- * @author Peter Abeles
- */
-public class ExampleWebcamJavaCV
-{
-	public static void main(String[] args) {
+public class ExampleWebcamJavaCV {
+	public static void main( String[] args ) {
 
-		WebcamOpenCV webcam = new WebcamOpenCV();
+		var webcam = new WebcamOpenCV();
 
-		SimpleImageSequence sequence = webcam.open("0",1280,960,
-				ImageType.pl(3,GrayU8.class) );
+		SimpleImageSequence<Planar<GrayU8>> sequence =
+				webcam.open("0", 1280, 960, ImageType.pl(3, GrayU8.class));
 
-		BufferedImage output = new BufferedImage(
-				sequence.getWidth(),sequence.getHeight(),BufferedImage.TYPE_INT_RGB);
+		var output = new BufferedImage(
+				sequence.getWidth(), sequence.getHeight(), BufferedImage.TYPE_INT_RGB);
 
-		ImagePanel gui = new ImagePanel(output);
-		ShowImages.showWindow(gui,"Webam using JavaCV",true);
+		var gui = new ImagePanel(output);
+		ShowImages.showWindow(gui, "Webam using JavaCV", true);
 
-		while( sequence.hasNext() ) {
-			ImageBase gray = sequence.next();
-
-			ConvertBufferedImage.convertTo(gray,output,true);
+		while (sequence.hasNext()) {
+			Planar<GrayU8> gray = sequence.next();
+			ConvertBufferedImage.convertTo(gray, output, true);
 
 			gui.repaint();
 		}

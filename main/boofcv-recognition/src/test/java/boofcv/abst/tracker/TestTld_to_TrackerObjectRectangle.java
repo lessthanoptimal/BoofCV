@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,9 +22,6 @@ import boofcv.factory.tracker.FactoryTrackerObjectQuad;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 
-/**
- * @author Peter Abeles
- */
 public class TestTld_to_TrackerObjectRectangle extends TextureGrayTrackerObjectRectangleChecks {
 
 	public TestTld_to_TrackerObjectRectangle() {

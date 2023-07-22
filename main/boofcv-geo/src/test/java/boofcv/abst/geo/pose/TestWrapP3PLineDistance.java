@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,9 +23,6 @@ import georegression.fitting.se.FitSpecialEuclideanOps_F64;
 import org.ddogleg.solver.PolynomialOps;
 import org.ddogleg.solver.RootFinderType;
 
-/**
- * @author Peter Abeles
- */
 public class TestWrapP3PLineDistance extends CheckEstimateNofPnP {
 	public TestWrapP3PLineDistance() {
 		super(true);

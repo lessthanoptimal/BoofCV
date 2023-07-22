@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,9 +23,6 @@ import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.struct.image.GrayF32;
 
-/**
- * @author Peter Abeles
- */
 public abstract class GenericFeatureScaleDetectorTests extends GenericFeatureDetectorTests {
 
 	int r = 2;

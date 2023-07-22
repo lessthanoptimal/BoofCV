@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,9 +25,6 @@ import georegression.transform.affine.AffinePointOps_F64;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
 
 
-/**
- * @author Peter Abeles
- */
 public class TestDistanceAffine2DSq extends TestDistanceAffine2D {
 
 	@Override

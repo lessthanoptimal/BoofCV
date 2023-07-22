@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,9 +24,6 @@ import boofcv.struct.image.GrayS16;
 import georegression.struct.line.LinePolar2D_F32;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 
-/**
- * @author Peter Abeles
- */
 public class TestImplGridRansacLineDetector_S16 extends CommonGridRansacLineDetectorChecks<GrayS16> {
 
 	public TestImplGridRansacLineDetector_S16() {

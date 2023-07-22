@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,9 +34,6 @@ import org.junit.jupiter.api.Nested;
 import static boofcv.factory.disparity.FactoryStereoDisparity.*;
 import static boofcv.factory.transform.census.FactoryCensusTransform.CENSUS_BORDER;
 
-/**
- * @author Peter Abeles
- */
 public class TestWrapDisparitySparseRectifiedBM extends BoofStandardJUnit {
 	@Nested
 	class SAD_U8 extends CompareSparseToDenseDisparityChecks<GrayU8> {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,13 +35,10 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * @author Peter Abeles
- */
 public class CommonHomographyInducedPlane extends BoofStandardJUnit {
 	public DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(500, 520, 0.1, 400, 450);
 
-	public Se3_F64 rightToLeft = SpecialEuclideanOps_F64.eulerXyz(10,0.1,-0.05,0.01,0.02,-0.01,null);
+	public Se3_F64 rightToLeft = SpecialEuclideanOps_F64.eulerXyz(10, 0.1, -0.05, 0.01, 0.02, -0.01, null);
 
 	public Point3D_F64 X1 = new Point3D_F64(1, 0, 5);
 	public Point3D_F64 X2 = new Point3D_F64(1, 1, 5);

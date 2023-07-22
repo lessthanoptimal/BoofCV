@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,9 +23,6 @@ import boofcv.abst.transform.fft.GeneralFft_to_DiscreteFourierTransform_F64;
 import boofcv.struct.image.GrayF64;
 import boofcv.struct.image.InterleavedF64;
 
-/**
- * @author Peter Abeles
- */
 public class TestGeneralFft_to_DiscreteFourierTransform_F64
 		extends GenericTestDiscreteFourierTransform<GrayF64,InterleavedF64> {
 

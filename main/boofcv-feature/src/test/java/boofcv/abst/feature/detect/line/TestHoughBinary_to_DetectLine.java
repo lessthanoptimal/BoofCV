@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,9 +28,6 @@ import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.struct.image.ImageGray;
 
-/**
- * @author Peter Abeles
- */
 class TestHoughBinary_to_DetectLine extends GeneralDetectLineGradientTests {
 	@Override
 	public <T extends ImageGray<T>> DetectLine<T> createAlg(Class<T> imageType) {

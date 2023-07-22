@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,9 +24,6 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
 
-/**
- * @author Peter Abeles
- */
 public class TestSurfPlanar_to_DetectDescribe extends
 		GenericTestsDetectDescribePoint<Planar<GrayF32>,TupleDesc_F64>
 {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,9 +31,6 @@ import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 
-/**
- * @author Peter Abeles
- */
 public class TestDerivativeIntegralImage extends BoofStandardJUnit {
 
 	int width = 30;

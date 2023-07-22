@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,9 +24,6 @@ import boofcv.struct.image.ImageType;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * @author Peter Abeles
- */
 public abstract class GenericImageBorder1DTests<T extends ImageBase<T>> extends GenericImageBorderTests<T> {
 
 	DummyBorderIndex1D_Wrap wrap = new DummyBorderIndex1D_Wrap();

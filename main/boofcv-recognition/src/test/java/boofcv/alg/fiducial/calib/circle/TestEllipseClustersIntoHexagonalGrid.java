@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,12 +35,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static boofcv.alg.fiducial.calib.circle.TestEllipseClustersIntoGrid.connectEllipses;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * @author Peter Abeles
- */
 public class TestEllipseClustersIntoHexagonalGrid extends BoofStandardJUnit {
 
 	private static final double hexY = Math.sqrt(3.0/4.0);
@@ -49,8 +45,7 @@ public class TestEllipseClustersIntoHexagonalGrid extends BoofStandardJUnit {
 	 * See if it can handle a very easy case
 	 */
 	@Test void process() {
-
-		EllipseClustersIntoHexagonalGrid alg = new EllipseClustersIntoHexagonalGrid();
+		var alg = new EllipseClustersIntoHexagonalGrid();
 
 //		process(3, 3, alg); // too small. Simplies the code by igniring this case
 		process(4, 3, alg);
@@ -60,22 +55,21 @@ public class TestEllipseClustersIntoHexagonalGrid extends BoofStandardJUnit {
 		process(5, 8, alg);
 	}
 
-	private void process(int rows, int cols, EllipseClustersIntoHexagonalGrid alg) {
-		Tuple2<List<Node>,List<EllipseRotated_F64>> grid = createHexagonalGrid(rows, cols, 0.5, 1);
+	private void process( int rows, int cols, EllipseClustersIntoHexagonalGrid alg ) {
+		Tuple2<List<Node>, List<EllipseRotated_F64>> grid = createHexagonalGrid(rows, cols, 0.5, 1);
 		List<List<Node>> nodes = new ArrayList<>();
-		nodes.add( grid.d0 );
+		nodes.add(grid.d0);
 
 		processAndCheck(rows, cols, alg, grid, nodes);
 	}
 
-
-	private void checkShape(int rows, int cols, Grid found) {
-		if( rows == found.rows ) {
-			assertEquals(rows , found.rows);
+	private void checkShape( int rows, int cols, Grid found ) {
+		if (rows == found.rows) {
+			assertEquals(rows, found.rows);
 			assertEquals(cols, found.columns);
 		} else {
-			assertEquals(rows , found.columns);
-			assertEquals(cols , found.rows);
+			assertEquals(rows, found.columns);
+			assertEquals(cols, found.rows);
 		}
 	}
 
@@ -84,45 +78,45 @@ public class TestEllipseClustersIntoHexagonalGrid extends BoofStandardJUnit {
 	 */
 	@Test void process_affine() {
 		// scale different amounts along each axis and translate for fun
-		Affine2D_F64 affine0 = new Affine2D_F64(1.05,0,0,0.95,1,2);
+		Affine2D_F64 affine0 = new Affine2D_F64(1.05, 0, 0, 0.95, 1, 2);
 		// rotate a bit
-		Affine2D_F64 affine1 = ConvertTransform_F64.convert(new Se2_F64(0,0,0.5),(Affine2D_F64)null);
+		Affine2D_F64 affine1 = ConvertTransform_F64.convert(new Se2_F64(0, 0, 0.5), (Affine2D_F64)null);
 
 //		process_affine( 3,3,affine0);
-		process_affine( 4,3,affine0);
-		process_affine( 4,4,affine0);
-		process_affine( 4,5,affine0);
-		process_affine( 5,5,affine0);
+		process_affine(4, 3, affine0);
+		process_affine(4, 4, affine0);
+		process_affine(4, 5, affine0);
+		process_affine(5, 5, affine0);
 
 //		process_affine( 3,3,affine1);
-		process_affine( 4,3,affine1);
-		process_affine( 4,4,affine1);
-		process_affine( 4,5,affine1);
-		process_affine( 5,5,affine1);
+		process_affine(4, 3, affine1);
+		process_affine(4, 4, affine1);
+		process_affine(4, 5, affine1);
+		process_affine(5, 5, affine1);
 	}
 
-	private void process_affine( int rows , int cols , Affine2D_F64 affine ) {
+	private void process_affine( int rows, int cols, Affine2D_F64 affine ) {
 		// create a grid in the expected format
-		EllipseClustersIntoHexagonalGrid alg = new EllipseClustersIntoHexagonalGrid();
+		var alg = new EllipseClustersIntoHexagonalGrid();
 
-		Tuple2<List<Node>,List<EllipseRotated_F64>> grid = createHexagonalGrid(rows, cols, 0.5, 1);
+		Tuple2<List<Node>, List<EllipseRotated_F64>> grid = createHexagonalGrid(rows, cols, 0.5, 1);
 
-		for( EllipseRotated_F64 e : grid.d1 ) {
+		for (EllipseRotated_F64 e : grid.d1) {
 			AffinePointOps_F64.transform(affine, e.center, e.center);
 		}
 
 		List<List<Node>> nodes = new ArrayList<>();
-		nodes.add( grid.d0 );
+		nodes.add(grid.d0);
 
 		processAndCheck(rows, cols, alg, grid, nodes);
 	}
 
-	private void processAndCheck(int rows, int cols, EllipseClustersIntoHexagonalGrid alg, Tuple2<List<Node>, List<EllipseRotated_F64>> grid, List<List<Node>> nodes) {
+	private void processAndCheck( int rows, int cols, EllipseClustersIntoHexagonalGrid alg, Tuple2<List<Node>, List<EllipseRotated_F64>> grid, List<List<Node>> nodes ) {
 		alg.process(grid.d1, nodes);
 
 		DogArray<Grid> found = alg.getGrids();
 
-		assertEquals( 1 , found.size() );
+		assertEquals(1, found.size());
 		checkShape(rows, cols, found.get(0));
 	}
 
@@ -131,20 +125,21 @@ public class TestEllipseClustersIntoHexagonalGrid extends BoofStandardJUnit {
 	 */
 	@Test void process_multiple_grids() {
 		// create two grids
-		int rows = 4; int cols = 3;
-		Tuple2<List<Node>,List<EllipseRotated_F64>> grid0 = createHexagonalGrid(rows, cols, 0.5, 1);
-		Tuple2<List<Node>,List<EllipseRotated_F64>> grid1 = createHexagonalGrid(rows, cols, 0.5, 1);
+		int rows = 4;
+		int cols = 3;
+		Tuple2<List<Node>, List<EllipseRotated_F64>> grid0 = createHexagonalGrid(rows, cols, 0.5, 1);
+		Tuple2<List<Node>, List<EllipseRotated_F64>> grid1 = createHexagonalGrid(rows, cols, 0.5, 1);
 
 		List<List<Node>> nodes = new ArrayList<>();
 		List<EllipseRotated_F64> ellipses = new ArrayList<>();
 
-		nodes.add( grid0.d0 );
-		nodes.add( grid1.d0 );
-		ellipses.addAll( grid0.d1 );
-		ellipses.addAll( grid1.d1 );
+		nodes.add(grid0.d0);
+		nodes.add(grid1.d0);
+		ellipses.addAll(grid0.d1);
+		ellipses.addAll(grid1.d1);
 
 		// adjust indexing for second grid
-		for( Node n : grid1.d0 ) {
+		for (Node n : grid1.d0) {
 			n.cluster = 1;
 			n.which += grid0.d1.size();
 			for (int i = 0; i < n.connections.size(); i++) {
@@ -152,13 +147,13 @@ public class TestEllipseClustersIntoHexagonalGrid extends BoofStandardJUnit {
 			}
 		}
 
-		EllipseClustersIntoHexagonalGrid alg = new EllipseClustersIntoHexagonalGrid();
+		var alg = new EllipseClustersIntoHexagonalGrid();
 
 		alg.process(ellipses, nodes);
 
 		DogArray<Grid> found = alg.getGrids();
 
-		assertEquals( 2 , found.size() );
+		assertEquals(2, found.size());
 		checkShape(rows, cols, found.get(0));
 		checkShape(rows, cols, found.get(1));
 	}
@@ -168,22 +163,24 @@ public class TestEllipseClustersIntoHexagonalGrid extends BoofStandardJUnit {
 	 */
 	@Test void process_multiple_calls() {
 		// create a grid in the expected format
-		int rows = 4; int cols = 3;
-		Tuple2<List<Node>,List<EllipseRotated_F64>> grid = createHexagonalGrid(rows, cols, 0.5, 1);
+		int rows = 4;
+		int cols = 3;
+		Tuple2<List<Node>, List<EllipseRotated_F64>> grid = createHexagonalGrid(rows, cols, 0.5, 1);
 
-		EllipseClustersIntoHexagonalGrid alg = new EllipseClustersIntoHexagonalGrid();
+		var alg = new EllipseClustersIntoHexagonalGrid();
 
 		List<List<Node>> nodes = new ArrayList<>();
-		nodes.add( grid.d0 );
+		nodes.add(grid.d0);
 
 		processAndCheck(rows, cols, alg, grid, nodes);
 
 		// process it a second time with a different grid
-		rows = 4; cols = 3;
+		rows = 4;
+		cols = 3;
 		grid = createHexagonalGrid(rows, cols, 0.5, 1);
 		alg = new EllipseClustersIntoHexagonalGrid();
 		nodes.clear();
-		nodes.add( grid.d0 );
+		nodes.add(grid.d0);
 
 		processAndCheck(rows, cols, alg, grid, nodes);
 	}
@@ -192,12 +189,12 @@ public class TestEllipseClustersIntoHexagonalGrid extends BoofStandardJUnit {
 	 * Give it input with a grid that's too small and see if it blows up
 	 */
 	@Test void process_too_small() {
-		Tuple2<List<Node>,List<EllipseRotated_F64>> grid = TestEllipseClustersIntoGrid.createRegularGrid(2, 1);
+		Tuple2<List<Node>, List<EllipseRotated_F64>> grid = TestEllipseClustersIntoGrid.createRegularGrid(2, 1);
 
 		EllipseClustersIntoHexagonalGrid alg = new EllipseClustersIntoHexagonalGrid();
 
 		List<List<Node>> nodes = new ArrayList<>();
-		nodes.add( grid.d0 );
+		nodes.add(grid.d0);
 
 		alg.process(grid.d1, nodes);
 
@@ -211,15 +208,15 @@ public class TestEllipseClustersIntoHexagonalGrid extends BoofStandardJUnit {
 		List<EllipseRotated_F64> ellipses = new ArrayList<>();
 
 		for (int i = 0; i < 3; i++) {
-			ellipses.add(new EllipseRotated_F64(i , 0, 1, 1, 0));
+			ellipses.add(new EllipseRotated_F64(i, 0, 1, 1, 0));
 			ellipses.add(new EllipseRotated_F64(i + 0.5, hexY, 1, 1, 0));
-			ellipses.add(new EllipseRotated_F64(i , hexY*2, 1, 1, 0));
+			ellipses.add(new EllipseRotated_F64(i, hexY*2, 1, 1, 0));
 		}
 
-		Tuple2<List<Node>,List<EllipseRotated_F64>> input = connectEllipses(ellipses,hexY*2.1);
+		Tuple2<List<Node>, List<EllipseRotated_F64>> input = connectEllipses(ellipses, hexY*2.1);
 
-		EllipseClustersIntoHexagonalGrid alg = new EllipseClustersIntoHexagonalGrid();
-		alg.computeNodeInfo(input.d1,input.d0);
+		var alg = new EllipseClustersIntoHexagonalGrid();
+		alg.computeNodeInfo(input.d1, input.d0);
 		alg.findContour(true);
 
 		List<NodeInfo> column0 = new ArrayList<>();
@@ -230,14 +227,14 @@ public class TestEllipseClustersIntoHexagonalGrid extends BoofStandardJUnit {
 		NodeInfo next = alg.listInfo.get(5);
 
 		corner.marked = next.marked = true;
-		alg.bottomTwoColumns(corner, next,column0, column1);
+		alg.bottomTwoColumns(corner, next, column0, column1);
 
-		assertEquals(3,column0.size());
-		assertEquals(3,column1.size());
+		assertEquals(3, column0.size());
+		assertEquals(3, column1.size());
 
 		for (int i = 0; i < 3; i++) {
-			assertTrue(column0.get(i).ellipse.center.distance(i,hexY*2) < 1e-4);
-			assertTrue(column1.get(i).ellipse.center.distance(i+0.5,hexY) < 1e-4);
+			assertTrue(column0.get(i).ellipse.center.distance(i, hexY*2) < 1e-4);
+			assertTrue(column1.get(i).ellipse.center.distance(i + 0.5, hexY) < 1e-4);
 			assertTrue(column0.get(i).marked);
 			assertTrue(column1.get(i).marked);
 		}
@@ -251,17 +248,17 @@ public class TestEllipseClustersIntoHexagonalGrid extends BoofStandardJUnit {
 
 		for (int i = 0; i < 2; i++) {
 			ellipses.add(new EllipseRotated_F64(i, 0, 1, 1, 0));
-			ellipses.add(new EllipseRotated_F64(i, hexY * 2, 1, 1, 0));
+			ellipses.add(new EllipseRotated_F64(i, hexY*2, 1, 1, 0));
 			if (i == 0) {
 				ellipses.add(new EllipseRotated_F64(i + 0.5, hexY, 1, 1, 0));
 				ellipses.add(new EllipseRotated_F64(i + 0.5, 1.732, 1, 1, 0));
 			}
 		}
 
-		Tuple2<List<Node>,List<EllipseRotated_F64>> input = connectEllipses(ellipses,1.1);
+		Tuple2<List<Node>, List<EllipseRotated_F64>> input = connectEllipses(ellipses, 1.1);
 
-		EllipseClustersIntoHexagonalGrid alg = new EllipseClustersIntoHexagonalGrid();
-		alg.computeNodeInfo(input.d1,input.d0);
+		var alg = new EllipseClustersIntoHexagonalGrid();
+		alg.computeNodeInfo(input.d1, input.d0);
 		alg.findContour(true);
 
 		List<NodeInfo> column0 = new ArrayList<>();
@@ -271,111 +268,110 @@ public class TestEllipseClustersIntoHexagonalGrid extends BoofStandardJUnit {
 		NodeInfo next = alg.listInfo.get(0);
 
 		corner.marked = next.marked = true;
-		alg.bottomTwoColumns(corner,next, column0, column1);
+		alg.bottomTwoColumns(corner, next, column0, column1);
 
-		assertEquals(2,column0.size());
-		assertEquals(1,column1.size());
+		assertEquals(2, column0.size());
+		assertEquals(1, column1.size());
 
-		assertTrue(column0.get(0).ellipse.center.distance(1,0) < 1e-4);
-		assertTrue(column0.get(1).ellipse.center.distance(0,0) < 1e-4);
-		assertTrue(column1.get(0).ellipse.center.distance(0.5,hexY) < 1e-4);
+		assertTrue(column0.get(0).ellipse.center.distance(1, 0) < 1e-4);
+		assertTrue(column0.get(1).ellipse.center.distance(0, 0) < 1e-4);
+		assertTrue(column1.get(0).ellipse.center.distance(0.5, hexY) < 1e-4);
 	}
 
 	@Test void selectClosest() {
 
 		List<EllipseRotated_F64> ellipses = new ArrayList<>();
 
-		ellipses.add( new EllipseRotated_F64(0,0,1,1,0) );
-		ellipses.add( new EllipseRotated_F64(0.5,0.866,1,1,0) );
-		ellipses.add( new EllipseRotated_F64(0.5,1.2,1,1,0) );
-		ellipses.add( new EllipseRotated_F64(1,0,1,1,0) );
+		ellipses.add(new EllipseRotated_F64(0, 0, 1, 1, 0));
+		ellipses.add(new EllipseRotated_F64(0.5, 0.866, 1, 1, 0));
+		ellipses.add(new EllipseRotated_F64(0.5, 1.2, 1, 1, 0));
+		ellipses.add(new EllipseRotated_F64(1, 0, 1, 1, 0));
 
-		Tuple2<List<Node>,List<EllipseRotated_F64>> input = connectEllipses(ellipses,2);
+		Tuple2<List<Node>, List<EllipseRotated_F64>> input = connectEllipses(ellipses, 2);
 
-		EllipseClustersIntoHexagonalGrid alg = new EllipseClustersIntoHexagonalGrid();
-		alg.computeNodeInfo(input.d1,input.d0);
+		var alg = new EllipseClustersIntoHexagonalGrid();
+		alg.computeNodeInfo(input.d1, input.d0);
 
-		NodeInfo found = EllipseClustersIntoHexagonalGrid.selectClosestN(alg.listInfo.get(0),alg.listInfo.get(1));
+		NodeInfo found = EllipseClustersIntoHexagonalGrid.selectClosestN(alg.listInfo.get(0), alg.listInfo.get(1));
 
-		assertTrue(found != null);
+		assertNotNull(found);
 
-		assertTrue( found.ellipse == ellipses.get(3));
+		assertSame(found.ellipse, ellipses.get(3));
 
 		// move the node out of range it nothing should be accepted
 
-		alg.listInfo.get(3).ellipse.setTo(0,1,1,1,0);
-		input = connectEllipses(ellipses,1.1);
-		alg.computeNodeInfo(input.d1,input.d0);
-		found = EllipseClustersIntoHexagonalGrid.selectClosestN(alg.listInfo.get(0),alg.listInfo.get(1));
-		assertTrue(found == null);
-
+		alg.listInfo.get(3).ellipse.setTo(0, 1, 1, 1, 0);
+		input = connectEllipses(ellipses, 1.1);
+		alg.computeNodeInfo(input.d1, input.d0);
+		found = EllipseClustersIntoHexagonalGrid.selectClosestN(alg.listInfo.get(0), alg.listInfo.get(1));
+		assertNull(found);
 	}
 
 	@Test void selectClosestSide() {
 		List<EllipseRotated_F64> ellipses = new ArrayList<>();
 
-		ellipses.add( new EllipseRotated_F64(0,0,1,1,0) );
-		ellipses.add( new EllipseRotated_F64(1,0,1,1,0) );
-		ellipses.add( new EllipseRotated_F64(0.5,0.866,1,1,0) );
-		ellipses.add( new EllipseRotated_F64(0,0.866*2,1,1,0) );
-		ellipses.add( new EllipseRotated_F64(1,0.866*2,1,1,0) );
+		ellipses.add(new EllipseRotated_F64(0, 0, 1, 1, 0));
+		ellipses.add(new EllipseRotated_F64(1, 0, 1, 1, 0));
+		ellipses.add(new EllipseRotated_F64(0.5, 0.866, 1, 1, 0));
+		ellipses.add(new EllipseRotated_F64(0, 0.866*2, 1, 1, 0));
+		ellipses.add(new EllipseRotated_F64(1, 0.866*2, 1, 1, 0));
 
-		Tuple2<List<Node>,List<EllipseRotated_F64>> input = connectEllipses(ellipses,2);
+		Tuple2<List<Node>, List<EllipseRotated_F64>> input = connectEllipses(ellipses, 2);
 
-		EllipseClustersIntoHexagonalGrid alg = new EllipseClustersIntoHexagonalGrid();
-		alg.computeNodeInfo(input.d1,input.d0);
+		var alg = new EllipseClustersIntoHexagonalGrid();
+		alg.computeNodeInfo(input.d1, input.d0);
 
-		NodeInfo found = EllipseClustersIntoHexagonalGrid.selectClosestSide(alg.listInfo.get(2),alg.listInfo.get(0));
+		NodeInfo found = EllipseClustersIntoHexagonalGrid.selectClosestSide(alg.listInfo.get(2), alg.listInfo.get(0));
 
-		assertTrue(found != null);
+		assertNotNull(found);
 
-		assertTrue( found.ellipse == ellipses.get(3));
+		assertSame(found.ellipse, ellipses.get(3));
 
 		// move the node out of range it nothing should be accepted
 
-		alg.listInfo.get(3).ellipse.setTo(0,1,1,1,0);
-		input = connectEllipses(ellipses,1.1);
-		alg.computeNodeInfo(input.d1,input.d0);
-		found = EllipseClustersIntoHexagonalGrid.selectClosestN(alg.listInfo.get(0),alg.listInfo.get(1));
-		assertTrue(found == null);
+		alg.listInfo.get(3).ellipse.setTo(0, 1, 1, 1, 0);
+		input = connectEllipses(ellipses, 1.1);
+		alg.computeNodeInfo(input.d1, input.d0);
+		found = EllipseClustersIntoHexagonalGrid.selectClosestN(alg.listInfo.get(0), alg.listInfo.get(1));
+		assertNull(found);
 	}
 
 	@Test void saveResults() {
 		// construct a dummy graph
 		List<List<NodeInfo>> graph = new ArrayList<>();
 		for (int i = 0; i < 3; i++) {
-			graph.add( new ArrayList<NodeInfo>());
+			graph.add(new ArrayList<NodeInfo>());
 		}
 
 		for (int i = 0; i < 2; i++) {
-			graph.get(0).add( new NodeInfo());
-			graph.get(2).add( new NodeInfo());
+			graph.get(0).add(new NodeInfo());
+			graph.get(2).add(new NodeInfo());
 		}
-		graph.get(1).add( new NodeInfo());
-		for (List<NodeInfo> row : graph ) {
-			for( NodeInfo n : row ) {
+		graph.get(1).add(new NodeInfo());
+		for (List<NodeInfo> row : graph) {
+			for (NodeInfo n : row) {
 				n.ellipse = new EllipseRotated_F64();
 			}
 		}
 
-		EllipseClustersIntoHexagonalGrid alg = new EllipseClustersIntoHexagonalGrid();
+		var alg = new EllipseClustersIntoHexagonalGrid();
 		alg.saveResults(graph);
 
 		Grid g = alg.getGrids().get(0);
-		assertEquals(3,g.columns);
-		assertEquals(3,g.rows);
+		assertEquals(3, g.columns);
+		assertEquals(3, g.rows);
 		for (int row = 0; row < 3; row++) {
 			for (int col = 0; col < 3; col++) {
-				if( row%2 == col%2 ) {
-					assertTrue(g.get(row,col)!=null);
+				if (row%2 == col%2) {
+					assertNotNull(g.get(row, col));
 				} else {
-					assertTrue(g.get(row,col)==null);
+					assertNull(g.get(row, col));
 				}
 			}
 		}
 	}
 
-	private Tuple2<List<Node>,List<EllipseRotated_F64>> createHexagonalGrid(int rows, int cols, double diameter, double distance) {
+	private Tuple2<List<Node>, List<EllipseRotated_F64>> createHexagonalGrid( int rows, int cols, double diameter, double distance ) {
 		List<EllipseRotated_F64> ellipses = new ArrayList<>();
 
 		double spaceX = distance/2.0;
@@ -385,13 +381,13 @@ public class TestEllipseClustersIntoHexagonalGrid extends BoofStandardJUnit {
 
 		for (int row = 0; row < rows; row++) {
 			double y = row*spaceY;
-			for (int col = row%2; col < cols; col+=2) {
+			for (int col = row%2; col < cols; col += 2) {
 				double x = col*spaceX;
 
-				ellipses.add( new EllipseRotated_F64(x,y,r,r,0) );
+				ellipses.add(new EllipseRotated_F64(x, y, r, r, 0));
 			}
 		}
 
-		return connectEllipses(ellipses, distance*2 );
+		return connectEllipses(ellipses, distance*2);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,9 +20,6 @@ package boofcv.alg.flow;
 
 import boofcv.struct.image.GrayU8;
 
-/**
- * @author Peter Abeles
- */
 public class TestDenseOpticalFlowBlockPyramid_F32 extends ChecksDenseOpticalFlowBlockPyramid<GrayU8> {
 
 	public TestDenseOpticalFlowBlockPyramid_F32() {

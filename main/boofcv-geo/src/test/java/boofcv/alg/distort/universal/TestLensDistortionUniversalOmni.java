@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,9 +23,6 @@ import boofcv.alg.distort.LensDistortionWideFOV;
 
 import static boofcv.alg.distort.universal.TestUniOmniPtoS_F64.createModel;
 
-/**
- * @author Peter Abeles
- */
 public class TestLensDistortionUniversalOmni extends GeneralLensDistortionWideFOVChecks {
 
 	@Override

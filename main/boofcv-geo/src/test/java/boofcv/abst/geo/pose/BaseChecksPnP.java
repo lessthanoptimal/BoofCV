@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,9 +37,6 @@ import georegression.transform.se.SePointOps_F64;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author Peter Abeles
- */
 public class BaseChecksPnP extends BoofStandardJUnit {
 	CameraPinholeBrown intrinsic = new CameraPinholeBrown(500,490,0,320,240,640,480).fsetRadial(0.1,-0.05);
 
