@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,6 @@ package boofcv.abst.geo.f;
 import boofcv.abst.geo.CheckRefineFundamental;
 import boofcv.abst.geo.RefineEpipolar;
 
-/**
- * @author Peter Abeles
- */
 public class TestLeastSquaresFundamental extends CheckRefineFundamental {
 
 	@Override

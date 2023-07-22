@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,9 +25,6 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import org.junit.jupiter.api.Test;
 
-/**
- * @author Peter Abeles
- */
 public class TestImplMedianCorner_F32 extends GenericCornerIntensityTests
 {
 	GrayF32 median = new GrayF32(width,height);

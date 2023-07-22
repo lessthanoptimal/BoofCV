@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,9 +25,6 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
-/**
- * @author Peter Abeles
- */
 public class TestMeanShift_to_ImageSuperpixels<T extends ImageBase<T>> extends GeneralImageSuperpixelsChecks<T> {
 	public TestMeanShift_to_ImageSuperpixels() {
 		super(ImageType.single(GrayU8.class),

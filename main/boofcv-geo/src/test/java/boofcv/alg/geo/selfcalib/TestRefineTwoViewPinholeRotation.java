@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,9 +39,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * @author Peter Abeles
- */
 class TestRefineTwoViewPinholeRotation extends BoofStandardJUnit {
 	Se3_F64 view1_to_view2 = SpecialEuclideanOps_F64.eulerXyz(0, 0, 0, 0.1, -0.05, 0.15, null);
 

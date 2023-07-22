@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,10 +31,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
-/**
- * @author Peter Abeles
- */
 public abstract class GeneralBilinearRectangleChecks<T extends ImageGray<T>> extends BoofStandardJUnit {
 	Class<T> imageType;
 
@@ -46,11 +42,11 @@ public abstract class GeneralBilinearRectangleChecks<T extends ImageGray<T>> ext
 	float tl_x;
 	float tl_y;
 
-	protected GeneralBilinearRectangleChecks(Class<T> imageType) {
+	protected GeneralBilinearRectangleChecks( Class<T> imageType ) {
 		this.imageType = imageType;
 	}
 
-	protected abstract T createImage( int width , int height );
+	protected abstract T createImage( int width, int height );
 
 	public InterpolatePixelS<T> createPixelInterpolate() {
 		return FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
@@ -75,15 +71,14 @@ public abstract class GeneralBilinearRectangleChecks<T extends ImageGray<T>> ext
 		checkRegion(10, 15, width - 10 - 1, height - 15 - 1);
 	}
 
-
 	@Test void outsideImageBorder() {
 		T img = createImage(width, height);
 		InterpolateRectangle<T> interp = createRectangleInterpolate();
 		interp.setImage(img);
 
-		GrayF32 out = new GrayF32(20,20);
+		GrayF32 out = new GrayF32(20, 20);
 		assertThrows(IllegalArgumentException.class,
-				()->interp.region(width-1, height-1, out ));
+				() -> interp.region(width - 1, height - 1, out));
 	}
 
 	@Test void outsideImageBorder1_barely() {
@@ -91,9 +86,9 @@ public abstract class GeneralBilinearRectangleChecks<T extends ImageGray<T>> ext
 		InterpolateRectangle<T> interp = createRectangleInterpolate();
 		interp.setImage(img);
 
-		GrayF32 out = new GrayF32(20,25);
+		GrayF32 out = new GrayF32(20, 25);
 		assertThrows(IllegalArgumentException.class,
-				()->interp.region(-0.1f, -0.1f, out ));
+				() -> interp.region(-0.1f, -0.1f, out));
 	}
 
 	@Test void outsideImageBorder2_barely() {
@@ -101,11 +96,10 @@ public abstract class GeneralBilinearRectangleChecks<T extends ImageGray<T>> ext
 		InterpolateRectangle<T> interp = createRectangleInterpolate();
 		interp.setImage(img);
 
-		GrayF32 out = new GrayF32(20,25);
+		GrayF32 out = new GrayF32(20, 25);
 		assertThrows(IllegalArgumentException.class,
-				()->interp.region(0.1f, 0.1f, out ));
+				() -> interp.region(0.1f, 0.1f, out));
 	}
-
 
 	/**
 	 * Should produce identical results when given a sub-image.
@@ -118,28 +112,29 @@ public abstract class GeneralBilinearRectangleChecks<T extends ImageGray<T>> ext
 		regionHeight = 25;
 
 		InterpolateRectangle<T> interpA = createRectangleInterpolate();
-		GrayF32 outA = new GrayF32(regionWidth,regionHeight);
+		GrayF32 outA = new GrayF32(regionWidth, regionHeight);
 
 		T imgB = BoofTesting.createSubImageOf(imgA);
 		InterpolateRectangle<T> interpB = createRectangleInterpolate();
-		GrayF32 outB = new GrayF32(regionWidth,regionHeight);
+		GrayF32 outB = new GrayF32(regionWidth, regionHeight);
 
 		interpA.setImage(imgA);
 		interpB.setImage(imgB);
 
-		interpA.region(5.4f, 8.6f, outA );
-		interpB.region(5.4f, 8.6f, outB );
+		interpA.region(5.4f, 8.6f, outA);
+		interpB.region(5.4f, 8.6f, outB);
 
 		for (int y = 0; y < regionHeight; y++) {
 			for (int x = 0; x < regionWidth; x++) {
-				assertTrue(outA.get(x, y) == outB.get(x, y),"( " + x + " , " + y + " )");
+				assertTrue(outA.get(x, y) == outB.get(x, y), "( " + x + " , " + y + " )");
 			}
 		}
 	}
+
 	/**
 	 * Compare region against the value returned by get ImplBilinearPixel_F32
 	 */
-	public void checkRegion(int regionWidth, int regionHeight, float x, float y) {
+	public void checkRegion( int regionWidth, int regionHeight, float x, float y ) {
 		T img = createImage(width, height);
 		GImageMiscOps.fillUniform(img, rand, 0, 20);
 
@@ -150,19 +145,19 @@ public abstract class GeneralBilinearRectangleChecks<T extends ImageGray<T>> ext
 		BoofTesting.checkSubImage(this, "region", false, img);
 	}
 
-	public void region(T img) {
+	public void region( T img ) {
 		InterpolatePixelS<T> interpPt = createPixelInterpolate();
 		InterpolateRectangle<T> interp = createRectangleInterpolate();
 		interp.setImage(img);
 		interpPt.setImage(img);
 
-		GrayF32 out = new GrayF32(regionWidth,regionHeight);
+		GrayF32 out = new GrayF32(regionWidth, regionHeight);
 
-		interp.region(tl_x, tl_y, out );
+		interp.region(tl_x, tl_y, out);
 
 		for (int y = 0; y < regionHeight; y++) {
 			for (int x = 0; x < regionWidth; x++) {
-				assertEquals(interpPt.get(x + tl_x, y + tl_y), out.get(x,y), 1e-4,"( "+x+" , "+y+" )");
+				assertEquals(interpPt.get(x + tl_x, y + tl_y), out.get(x, y), 1e-4, "( " + x + " , " + y + " )");
 			}
 		}
 	}

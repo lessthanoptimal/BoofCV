@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,9 +26,6 @@ import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
 import pabeles.concurrency.GrowArray;
 
-/**
- * @author Peter Abeles
- */
 public class TestImplMedianHistogramInner_MT extends BoofStandardJUnit {
 
 	@Test

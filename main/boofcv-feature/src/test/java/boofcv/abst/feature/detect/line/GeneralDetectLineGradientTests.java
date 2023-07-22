@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,9 +33,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * @author Peter Abeles
- */
 @SuppressWarnings({"unchecked"})
 public abstract class GeneralDetectLineGradientTests extends BoofStandardJUnit {
 
@@ -49,17 +46,17 @@ public abstract class GeneralDetectLineGradientTests extends BoofStandardJUnit {
 
 	Class[] imageTypes;
 
-	protected GeneralDetectLineGradientTests(Class... imageTypes) {
+	protected GeneralDetectLineGradientTests( Class... imageTypes ) {
 		this.imageTypes = imageTypes;
 	}
 
-	public abstract <T extends ImageGray<T>> DetectLine<T> createAlg(Class<T> imageType );
+	public abstract <T extends ImageGray<T>> DetectLine<T> createAlg( Class<T> imageType );
 
 	/**
 	 * See if it can detect an obvious line in an image.
 	 */
 	@Test void obviousLine() {
-		for( Class c : imageTypes ) {
+		for (Class c : imageTypes) {
 			obviousLine(c);
 		}
 	}
@@ -68,12 +65,12 @@ public abstract class GeneralDetectLineGradientTests extends BoofStandardJUnit {
 	 * Check to see if an subimage produces the same result as a regular image.
 	 */
 	@Test void subImages() {
-		for( Class c : imageTypes ) {
+		for (Class c : imageTypes) {
 			subImages(c);
 		}
 	}
 
-	private <T extends ImageGray<T>> void obviousLine(Class<T> imageType ) {
+	private <T extends ImageGray<T>> void obviousLine( Class<T> imageType ) {
 		T input = GeneralizedImageOps.createSingleBand(imageType, width, height);
 
 		GImageMiscOps.fillRectangle(input, 30, 0, 0, lineLocation, height);
@@ -86,14 +83,13 @@ public abstract class GeneralDetectLineGradientTests extends BoofStandardJUnit {
 		// see if at least one of the lines is within tolerance
 
 		boolean foundMatch = false;
-		for( LineParametric2D_F32 l : found ) {
+		for (LineParametric2D_F32 l : found) {
 			Point2D_F32 p = l.getPoint();
 			double angle = l.getAngle();
 
-			if( Math.abs(p.x-lineLocation) < toleranceLocation &&
-				((UtilAngle.dist(Math.PI/2, angle) <= toleranceAngle) ||
-					(UtilAngle.dist(-Math.PI/2, angle) <= toleranceAngle)) )
-			{
+			if (Math.abs(p.x - lineLocation) < toleranceLocation &&
+					((UtilAngle.dist(Math.PI/2, angle) <= toleranceAngle) ||
+							(UtilAngle.dist(-Math.PI/2, angle) <= toleranceAngle))) {
 				foundMatch = true;
 				break;
 			}
@@ -102,19 +98,19 @@ public abstract class GeneralDetectLineGradientTests extends BoofStandardJUnit {
 		assertTrue(foundMatch);
 	}
 
-	private <T extends ImageGray<T>> void subImages(Class<T> imageType ) {
+	private <T extends ImageGray<T>> void subImages( Class<T> imageType ) {
 		T input = GeneralizedImageOps.createSingleBand(imageType, width, height);
 
-		GImageMiscOps.fillRectangle(input,30,0,0,lineLocation,height);
+		GImageMiscOps.fillRectangle(input, 30, 0, 0, lineLocation, height);
 		T sub = BoofTesting.createSubImageOf(input);
 
 		List<LineParametric2D_F32> foundA = createAlg(imageType).detect(input);
-	    List<LineParametric2D_F32> foundB = createAlg(imageType).detect(sub);
+		List<LineParametric2D_F32> foundB = createAlg(imageType).detect(sub);
 
 		// the output should be exactly identical
-		assertEquals(foundA.size(),foundB.size());
+		assertEquals(foundA.size(), foundB.size());
 
-		for( int i = 0; i < foundA.size(); i++ ) {
+		for (int i = 0; i < foundA.size(); i++) {
 			LineParametric2D_F32 a = foundA.get(i);
 
 			// When run in concurrent mode the order might be different
@@ -122,12 +118,12 @@ public abstract class GeneralDetectLineGradientTests extends BoofStandardJUnit {
 			for (int j = 0; j < foundB.size(); j++) {
 				LineParametric2D_F32 b = foundB.get(j);
 
-				if( a.slope.x == b.slope.x && a.slope.y == b.slope.y && a.p.x == b.p.x && a.p.y == b.p.y ) {
+				if (a.slope.x == b.slope.x && a.slope.y == b.slope.y && a.p.x == b.p.x && a.p.y == b.p.y) {
 					matched = true;
 					break;
 				}
 			}
-			if( !matched )
+			if (!matched)
 				throw new RuntimeException();
 			assertTrue(matched);
 		}

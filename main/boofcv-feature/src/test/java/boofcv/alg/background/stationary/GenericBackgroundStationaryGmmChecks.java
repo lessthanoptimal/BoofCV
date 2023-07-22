@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,6 @@ package boofcv.alg.background.stationary;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * @author Peter Abeles
- */
 public abstract class GenericBackgroundStationaryGmmChecks extends GenericBackgroundModelStationaryChecks {
 
 	float initialVariance;

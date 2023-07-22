@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,9 +28,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * @author Peter Abeles
- */
 public abstract class CommonHoughBinaryChecks extends BoofStandardJUnit {
 	int width = 30;
 	int height = 40;
@@ -41,25 +38,25 @@ public abstract class CommonHoughBinaryChecks extends BoofStandardJUnit {
 	 * See if it can detect an obvious line in the image
 	 */
 	@Test void obviousLines() {
-		GrayU8 image = new GrayU8(width,height);
+		GrayU8 image = new GrayU8(width, height);
 
-		for( int i = 0; i < height; i++ ) {
-			image.set(5,i,1);
+		for (int i = 0; i < height; i++) {
+			image.set(5, i, 1);
 		}
 
 		HoughTransformBinary alg = createAlgorithm();
 
 		alg.transform(image);
 
-		List<LineParametric2D_F32> lines =  alg.getLinesMerged();
+		List<LineParametric2D_F32> lines = alg.getLinesMerged();
 
 		assertTrue(lines.size() > 0);
 
-		for( int i = 0; i < lines.size(); i++ ) {
+		for (int i = 0; i < lines.size(); i++) {
 			LineParametric2D_F32 l = lines.get(i);
-			assertEquals(5,l.p.x,0.1);
-			assertEquals(0,Math.abs(l.slope.x),1e-4);
-			assertEquals(1,Math.abs(l.slope.y),0.1);
+			assertEquals(5, l.p.x, 0.1);
+			assertEquals(0, Math.abs(l.slope.x), 1e-4);
+			assertEquals(1, Math.abs(l.slope.y), 0.1);
 		}
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,9 +22,6 @@ import boofcv.struct.ConnectRule;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 
-/**
- * @author Peter Abeles
- */
 public class TestSegmentSlic_F32 extends GeneralSegmentSlicColorChecks<GrayF32> {
 
 	public TestSegmentSlic_F32() {

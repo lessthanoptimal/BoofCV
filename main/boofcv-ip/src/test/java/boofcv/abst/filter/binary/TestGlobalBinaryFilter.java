@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,9 +30,6 @@ import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-/**
- * @author Peter Abeles
- */
 class TestGlobalBinaryFilter extends BoofStandardJUnit {
 	Class[] imageTypes = new Class[]{GrayU8.class, GrayF32.class};
 

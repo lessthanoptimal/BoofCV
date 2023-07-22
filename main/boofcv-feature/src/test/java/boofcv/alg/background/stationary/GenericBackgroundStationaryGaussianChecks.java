@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,9 +27,6 @@ import boofcv.struct.image.ImageType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * @author Peter Abeles
- */
 public abstract class GenericBackgroundStationaryGaussianChecks extends GenericBackgroundModelStationaryChecks {
 
 	float initialVariance;

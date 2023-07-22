@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,9 +30,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * @author Peter Abeles
- */
 public class TestPixelTransformHomography_F32 extends BoofStandardJUnit {
 	@Test void constructor_32() {
 		Homography2D_F32 a = new Homography2D_F32(1,2,3,4,5,6,7,8,9);

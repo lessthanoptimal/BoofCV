@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,9 +22,6 @@ import boofcv.alg.filter.derivative.GeneralSparseGradientTests;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.sparse.GradientValue;
 
-/**
- * @author Peter Abeles
- */
 public abstract class GeneralSparseGradientIntegralTests<T extends ImageGray<T>,G extends GradientValue>
 	extends GeneralSparseGradientTests<T,T,G>
 {

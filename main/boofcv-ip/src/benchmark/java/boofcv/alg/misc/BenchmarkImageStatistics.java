@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,21 +30,18 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author Peter Abeles
- */
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @Warmup(iterations = 3)
 @Measurement(iterations = 5)
 @State(Scope.Benchmark)
-@Fork(value=1)
+@Fork(value = 1)
 public class BenchmarkImageStatistics {
 
-	@Param({"true","false"})
+	@Param({"true", "false"})
 	public boolean concurrent;
 
-//	@Param({"100", "500", "1000", "5000", "10000"})
+	//	@Param({"100", "500", "1000", "5000", "10000"})
 	@Param({"1000"})
 	public int size;
 
@@ -56,8 +53,7 @@ public class BenchmarkImageStatistics {
 
 	int[] histogram = new int[256];
 
-	@Setup
-	public void setup() {
+	@Setup public void setup() {
 		BoofConcurrency.USE_CONCURRENT = concurrent;
 		Random rand = new Random(234);
 
@@ -66,58 +62,49 @@ public class BenchmarkImageStatistics {
 		imgA_F32.reshape(size, size);
 		imgB_F32.reshape(size, size);
 
-		GImageMiscOps.fillUniform(imgA_U8,rand,0,200);
-		GImageMiscOps.fillUniform(imgB_U8,rand,0,200);
-		GImageMiscOps.fillUniform(imgA_F32,rand,-100,100);
-		GImageMiscOps.fillUniform(imgB_F32,rand,-100,100);
+		GImageMiscOps.fillUniform(imgA_U8, rand, 0, 200);
+		GImageMiscOps.fillUniform(imgB_U8, rand, 0, 200);
+		GImageMiscOps.fillUniform(imgA_F32, rand, -100, 100);
+		GImageMiscOps.fillUniform(imgB_F32, rand, -100, 100);
 	}
 
-	@Benchmark
-	public void maxAbs() {
+	@Benchmark public void maxAbs() {
 		GImageStatistics.maxAbs(imgA_U8);
 	}
 
-	@Benchmark
-	public void histogram() {
-		GImageStatistics.histogram(imgA_U8,0,histogram);
+	@Benchmark public void histogram() {
+		GImageStatistics.histogram(imgA_U8, 0, histogram);
 	}
 
-	@Benchmark
-	public void max() {
+	@Benchmark public void max() {
 		GImageStatistics.max(imgA_U8);
 	}
 
-	@Benchmark
-	public void min() {
+	@Benchmark public void min() {
 		GImageStatistics.min(imgA_U8);
 	}
 
-	@Benchmark
-	public void mean() {
+	@Benchmark public void mean() {
 		GImageStatistics.mean(imgA_U8);
 	}
 
-	@Benchmark
-	public void meanDiffAbs() {
-		GImageStatistics.meanDiffAbs(imgA_F32,imgB_F32);
+	@Benchmark public void meanDiffAbs() {
+		GImageStatistics.meanDiffAbs(imgA_F32, imgB_F32);
 	}
 
-	@Benchmark
-	public void meanDiffSq() {
-		GImageStatistics.meanDiffSq(imgA_U8,imgB_U8);
+	@Benchmark public void meanDiffSq() {
+		GImageStatistics.meanDiffSq(imgA_U8, imgB_U8);
 	}
 
-	@Benchmark
-	public void sum() {
+	@Benchmark public void sum() {
 		GImageStatistics.sum(imgA_U8);
 	}
 
-	@Benchmark
-	public void variance() {
-		GImageStatistics.variance(imgA_U8,120);
+	@Benchmark public void variance() {
+		GImageStatistics.variance(imgA_U8, 120);
 	}
 
-	public static void main(String[] args) throws RunnerException {
+	public static void main( String[] args ) throws RunnerException {
 		Options opt = new OptionsBuilder()
 				.include(BenchmarkImageStatistics.class.getSimpleName())
 				.build();

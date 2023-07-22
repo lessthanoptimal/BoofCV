@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,6 @@ package boofcv.alg.segmentation.cc;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 
-/**
- * @author Peter Abeles
- */
 public class TestConnectedNaiveSpeckleFiller_F32 extends CommonConnectedSpeckleFiller<GrayF32> {
 	public TestConnectedNaiveSpeckleFiller_F32() {
 		super(ImageType.SB_F32);

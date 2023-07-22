@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,9 +26,6 @@ import boofcv.struct.feature.TupleDesc_U8;
 import org.ddogleg.clustering.ComputeMeanClusters;
 import org.ddogleg.struct.DogArray_F64;
 
-/**
- * @author Peter Abeles
- */
 class TestComputeMeanTuple_U8 extends GenericComputeMeanClustersChecks<TupleDesc_U8> {
 
 	public TestComputeMeanTuple_U8() {

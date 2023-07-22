@@ -25,9 +25,6 @@ import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * @author Peter Abeles
- */
 public class TestSelectSparseErrorSubpixel_F32
 		extends ChecksSelectSparseDisparityWithChecks.CheckError<float[]> {
 	TestSelectSparseErrorSubpixel_F32() {

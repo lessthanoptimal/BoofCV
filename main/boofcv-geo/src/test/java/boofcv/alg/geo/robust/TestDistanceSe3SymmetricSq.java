@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,9 +42,6 @@ import static georegression.geometry.ConvertRotation3D_F64.eulerToMatrix;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * @author Peter Abeles
- */
 public class TestDistanceSe3SymmetricSq extends BoofStandardJUnit {
 
 	Triangulate2ViewsMetricH triangulate = FactoryMultiView.triangulate2ViewMetricH(

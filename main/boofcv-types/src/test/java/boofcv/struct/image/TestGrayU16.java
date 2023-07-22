@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,6 @@
 
 package boofcv.struct.image;
 
-/**
- * @author Peter Abeles
- */
 public class TestGrayU16 extends StandardImageIntegerTests<GrayU16> {
 
 	public TestGrayU16() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,9 +29,6 @@ import java.util.List;
 import static boofcv.alg.shapes.polyline.splitmerge.TestPolylineSplitMerge.line;
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * @author Peter Abeles
- */
 public abstract class ChecksGenericPointsToPolyline extends BoofStandardJUnit {
 
 	public abstract PointsToPolyline createAlg( boolean loop );

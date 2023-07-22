@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,6 @@ package boofcv.abst.feature.associate;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.struct.feature.TupleDesc_F64;
 
-/**
- * @author Peter Abeles
- */
 class TestAssociateDescriptionSets extends GenericAssociateDescriptionSetsChecks {
 	@Override protected BaseAssociateDescriptionSets<TupleDesc_F64> createAlg() {
 		return new AssociateDescriptionArraySets<>(FactoryAssociation.greedy(

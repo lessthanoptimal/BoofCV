@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,9 +25,6 @@ import boofcv.factory.tracker.ConfigPointTracker;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.pyramid.ConfigDiscreteLevels;
 
-/**
- * @author Peter Abeles
- */
 public class TestMonoMotion2D_to_MonocularPlaneVisualOdometry extends CheckVisualOdometryMonoPlaneSim<GrayU8> {
 
 	public TestMonoMotion2D_to_MonocularPlaneVisualOdometry() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,9 +31,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * @author Peter Abeles
- */
 public abstract class GeneralCheckTriangulateRefineMetric extends CommonTriangulationChecks {
 
 	public abstract void triangulate( List<Point2D_F64> obsPts, List<Se3_F64> motion,
@@ -44,7 +41,7 @@ public abstract class GeneralCheckTriangulateRefineMetric extends CommonTriangul
 		createScene();
 
 		Point3D_F64 initial = worldPoint.copy();
-		Point3D_F64 found = new Point3D_F64();
+		var found = new Point3D_F64();
 		triangulate(obsNorm, motionWorldToCamera, essential, initial, found);
 
 		assertEquals(0.0, worldPoint.distance(found), UtilEjml.TEST_F64_SQ);
@@ -58,7 +55,7 @@ public abstract class GeneralCheckTriangulateRefineMetric extends CommonTriangul
 		initial.y += 0.1;
 		initial.z += -0.05;
 
-		Point3D_F64 found = new Point3D_F64();
+		var found = new Point3D_F64();
 		triangulate(obsNorm, motionWorldToCamera, essential, initial, found);
 
 		double error2 = worldPoint.distance(initial);

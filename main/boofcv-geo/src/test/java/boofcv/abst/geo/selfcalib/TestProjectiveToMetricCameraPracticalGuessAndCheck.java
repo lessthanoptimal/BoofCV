@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,9 +22,6 @@ import boofcv.alg.geo.selfcalib.SelfCalibrationPraticalGuessAndCheckFocus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * @author Peter Abeles
- */
 class TestProjectiveToMetricCameraPracticalGuessAndCheck extends CommonProjectiveToMetricCamerasChecks {
 	@BeforeEach void adjustTestParameters() {
 		// This approach is unstable and the tests needed to be made less strict and less difficult

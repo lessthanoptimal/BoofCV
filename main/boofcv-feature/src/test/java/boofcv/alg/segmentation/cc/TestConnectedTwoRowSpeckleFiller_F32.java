@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,9 +25,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * @author Peter Abeles
- */
 class TestConnectedTwoRowSpeckleFiller_F32 extends CommonConnectedTwoRowSpeckleFiller<GrayF32> {
 	public TestConnectedTwoRowSpeckleFiller_F32() {
 		super(ImageType.SB_F32);

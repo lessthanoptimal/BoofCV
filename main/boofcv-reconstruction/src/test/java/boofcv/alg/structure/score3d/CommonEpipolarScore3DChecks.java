@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,9 +42,6 @@ import java.util.List;
 import static georegression.struct.se.SpecialEuclideanOps_F64.eulerXyz;
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * @author Peter Abeles
- */
 public abstract class CommonEpipolarScore3DChecks extends BoofStandardJUnit {
 
 	CameraPinholeBrown intrinsic1 = new CameraPinholeBrown(400, 400, 0, 500, 500, 1000, 1000).fsetRadial(0.0, 0.0);

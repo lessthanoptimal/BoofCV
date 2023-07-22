@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,9 +20,6 @@ package boofcv.alg.geo.h;
 
 import boofcv.alg.geo.ModelObservationResidualN;
 
-/**
- * @author Peter Abeles
- */
 public class TestHomographyResidualTransfer extends HomographyResidualTests {
 	@Override
 	public ModelObservationResidualN createAlg() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,9 +20,6 @@ package boofcv.alg.flow;
 
 import boofcv.struct.image.GrayF32;
 
-/**
- * @author Peter Abeles
- */
 public class TestHornSchunck_F32 extends ChecksHornSchunck<GrayF32,GrayF32>{
 
 	public TestHornSchunck_F32() {

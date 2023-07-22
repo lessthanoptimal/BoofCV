@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,9 +23,6 @@ import boofcv.abst.geo.RefineEpipolar;
 import boofcv.alg.geo.ModelObservationResidualN;
 import boofcv.alg.geo.h.HomographyResidualSampson;
 
-/**
- * @author Peter Abeles
- */
 public class TestLeastSquaresHomography extends CheckRefineHomography {
 
 	@Override

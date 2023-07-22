@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,9 +29,6 @@ import boofcv.struct.image.Planar;
 import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import boofcv.struct.pyramid.ImagePyramid;
 
-/**
- * @author Peter Abeles
- */
 public class TestPyramidDirectColorDepth_to_DepthVisualOdometry extends CheckVisualOdometryDepthSim<GrayU8, GrayU16> {
 
 	public TestPyramidDirectColorDepth_to_DepthVisualOdometry() {

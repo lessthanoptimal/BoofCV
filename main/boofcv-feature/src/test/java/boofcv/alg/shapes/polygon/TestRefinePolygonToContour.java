@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,9 +32,6 @@ import static boofcv.alg.shapes.polygon.TestContourEdgeIntensity.computeContourV
 import static boofcv.alg.shapes.polygon.TestContourEdgeIntensity.rectToContour;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * @author Peter Abeles
- */
 public class TestRefinePolygonToContour extends BoofStandardJUnit {
 	@Test void basic() {
 		RectangleLength2D_I32 rect = new RectangleLength2D_I32(0,0,10,5);

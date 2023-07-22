@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,9 +23,6 @@ import boofcv.alg.distort.PointTransformHomography_F32;
 import boofcv.struct.image.*;
 import georegression.struct.homography.Homography2D_F32;
 
-/**
- * @author Peter Abeles
- */
 public class TestBackgroundMovingGmm_MB extends GenericBackgroundMovingGaussianChecks {
 	public TestBackgroundMovingGmm_MB() {
 		imageTypes.add(ImageType.il(3, InterleavedU8.class));

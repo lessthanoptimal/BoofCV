@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,11 +28,8 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * @author Peter Abeles
- */
 public abstract class CommonHoughGradientChecks extends BoofStandardJUnit {
-	Class[] imageTypes = new Class[]{GrayS16.class, GrayS32.class,GrayF32.class};
+	Class[] imageTypes = new Class[]{GrayS16.class, GrayS32.class, GrayF32.class};
 	int width = 30;
 	int height = 40;
 
@@ -40,35 +37,35 @@ public abstract class CommonHoughGradientChecks extends BoofStandardJUnit {
 
 	@Test
 	void obviousLines() {
-		for( Class imageType : imageTypes ) {
+		for (Class imageType : imageTypes) {
 			obviousLines(imageType);
 		}
 	}
 
-	private <D extends ImageGray<D>> void obviousLines(Class<D> derivType ) {
-		GrayU8 binary = new GrayU8(width,height);
+	private <D extends ImageGray<D>> void obviousLines( Class<D> derivType ) {
+		GrayU8 binary = new GrayU8(width, height);
 		D derivX = GeneralizedImageOps.createSingleBand(derivType, width, height);
 		D derivY = GeneralizedImageOps.createSingleBand(derivType, width, height);
 
-		for( int i = 0; i < height; i++ ) {
+		for (int i = 0; i < height; i++) {
 			binary.set(5, i, 1);
-			GeneralizedImageOps.set(derivX,5,i,20);
+			GeneralizedImageOps.set(derivX, 5, i, 20);
 		}
 
 		HoughTransformGradient alg = createAlgorithm(derivType);
 
-		alg.transform(derivX,derivY,binary);
+		alg.transform(derivX, derivY, binary);
 
-		List<LineParametric2D_F32> lines =  alg.getLinesMerged();
+		List<LineParametric2D_F32> lines = alg.getLinesMerged();
 
-		assertEquals(1,lines.size());
+		assertEquals(1, lines.size());
 
 		LineParametric2D_F32 l = lines.get(0);
-		assertEquals(l.p.x,5,0.1);
+		assertEquals(l.p.x, 5, 0.1);
 		// normalize the line for easier evaluation
 		l.slope.x /= l.slope.norm();
 		l.slope.y /= l.slope.norm();
-		assertEquals(0,Math.abs(l.slope.x), 0.1);
-		assertEquals(1,Math.abs(l.slope.y), 0.1);
+		assertEquals(0, Math.abs(l.slope.x), 0.1);
+		assertEquals(1, Math.abs(l.slope.y), 0.1);
 	}
 }

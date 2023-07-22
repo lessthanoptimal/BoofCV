@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,9 +32,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * @author Peter Abeles
- */
 public abstract class GeneralCheckNViewsTriangulateMetricH extends CommonTriangulationChecks {
 
 	public abstract boolean triangulate( List<Point2D_F64> obsPts, List<Se3_F64> motion,
@@ -44,7 +41,7 @@ public abstract class GeneralCheckNViewsTriangulateMetricH extends CommonTriangu
 	@Test void perfectInput() {
 		createScene();
 
-		Point4D_F64 found = new Point4D_F64();
+		var found = new Point4D_F64();
 		assertTrue(triangulate(obsNorm, motionWorldToCamera, essential, found));
 
 		assertEquals(0.0, worldPoint.distance(convertH(found)), UtilEjml.TEST_F64_SQ);
@@ -53,7 +50,7 @@ public abstract class GeneralCheckNViewsTriangulateMetricH extends CommonTriangu
 	@Test void pointAtInfinity() {
 		this.createScene(new Point4D_F64(0.1, -0.2, 4.0, 0.0));
 
-		Point4D_F64 found = new Point4D_F64();
+		var found = new Point4D_F64();
 		assertTrue(triangulate(obsNorm, motionWorldToCamera, essential, found));
 		assertEquals(0.0, PerspectiveOps.distance(worldPointH, found), UtilEjml.TEST_F64);
 	}

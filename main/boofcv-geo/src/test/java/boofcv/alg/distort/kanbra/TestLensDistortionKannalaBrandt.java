@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,9 +22,6 @@ import boofcv.alg.distort.GeneralLensDistortionWideFOVChecks;
 import boofcv.alg.distort.LensDistortionWideFOV;
 import boofcv.struct.calib.CameraKannalaBrandt;
 
-/**
- * @author Peter Abeles
- */
 class TestLensDistortionKannalaBrandt extends GeneralLensDistortionWideFOVChecks {
 	@Override public LensDistortionWideFOV create() {
 		CameraKannalaBrandt model = new CameraKannalaBrandt().fsetK(500, 550, 0.0, 600, 650).fsetSymmetric(1.0, 0.1, -0.05, 0.01);

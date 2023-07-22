@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,9 +32,6 @@ import static boofcv.alg.fiducial.calib.circle.TestDetectCircleHexagonalGrid.cre
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
-/**
- * @author Peter Abeles
- */
 public class TestDetectCircleGrid extends BoofStandardJUnit {
 
 	static Grid flipHorizontal( Grid g ) {

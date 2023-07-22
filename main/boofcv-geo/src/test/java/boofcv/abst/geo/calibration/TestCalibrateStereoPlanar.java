@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,9 +39,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * @author Peter Abeles
- */
 public class TestCalibrateStereoPlanar extends BoofStandardJUnit {
 	CameraPinholeBrown intrinsic = new CameraPinholeBrown(250,260,0,320,240,640,480).
 			fsetRadial(0.01, -0.02).fsetTangental(0.03,0.03);

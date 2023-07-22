@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,9 +26,6 @@ import static boofcv.struct.image.ImageType.Family.GRAY;
 import static boofcv.struct.image.ImageType.Family.INTERLEAVED;
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * @author Peter Abeles
- */
 @SuppressWarnings("rawtypes")
 public class TestImageType extends BoofStandardJUnit {
 

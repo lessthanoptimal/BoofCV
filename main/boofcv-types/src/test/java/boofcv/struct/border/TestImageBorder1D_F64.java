@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,6 @@ package boofcv.struct.border;
 import boofcv.struct.image.GrayF64;
 import boofcv.struct.image.ImageType;
 
-/**
- * @author Peter Abeles
- */
 public class TestImageBorder1D_F64 extends GenericImageBorder1DTests<GrayF64> {
 
 	public TestImageBorder1D_F64() {

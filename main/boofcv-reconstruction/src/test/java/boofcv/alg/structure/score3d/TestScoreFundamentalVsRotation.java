@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,9 +27,6 @@ import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ejml.data.DMatrixRMaj;
 import org.junit.jupiter.api.Test;
 
-/**
- * @author Peter Abeles
- */
 class TestScoreFundamentalVsRotation extends CommonEpipolarScore3DChecks {
 
 	// self calibration things its zooming if it can adjust two cameras

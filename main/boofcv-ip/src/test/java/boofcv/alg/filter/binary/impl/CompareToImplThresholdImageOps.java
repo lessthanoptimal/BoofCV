@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,9 +30,6 @@ import java.lang.reflect.Method;
 
 import static boofcv.BoofTesting.primitive;
 
-/**
- * @author Peter Abeles
- */
 public abstract class CompareToImplThresholdImageOps extends CompareIdenticalFunctions {
 	final int width = 100, height = 110;
 

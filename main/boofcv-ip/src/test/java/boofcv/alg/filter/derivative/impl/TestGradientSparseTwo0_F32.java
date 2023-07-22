@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,9 +25,6 @@ import boofcv.struct.border.ImageBorder_F32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.sparse.SparseImageGradient;
 
-/**
- * @author Peter Abeles
- */
 public class TestGradientSparseTwo0_F32 extends GeneralGradientSparse {
 
 	public TestGradientSparseTwo0_F32() {

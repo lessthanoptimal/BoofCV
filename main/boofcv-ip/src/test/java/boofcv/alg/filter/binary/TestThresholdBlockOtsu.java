@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,6 @@ package boofcv.alg.filter.binary;
 import boofcv.alg.filter.binary.impl.GenericThresholdBlock;
 import boofcv.struct.image.GrayU8;
 
-/**
- * @author Peter Abeles
- */
 public class TestThresholdBlockOtsu extends GenericThresholdBlock<GrayU8> {
 	public TestThresholdBlockOtsu() {
 		super(GrayU8.class);

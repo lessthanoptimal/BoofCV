@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,6 @@ package boofcv.alg.filter.binary.impl;
 import boofcv.alg.filter.binary.ThresholdBlockMinMax;
 import boofcv.struct.image.GrayF32;
 
-/**
- * @author Peter Abeles
- */
 public class TestThresholdBlockMinMax_F32
 		extends GenericThresholdBlockMinMaxChecks<GrayF32> {
 

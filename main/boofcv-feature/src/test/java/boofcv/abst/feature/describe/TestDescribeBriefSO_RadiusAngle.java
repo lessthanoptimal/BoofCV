@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,9 +23,6 @@ import boofcv.struct.feature.TupleDesc_B;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 
-/**
- * @author Peter Abeles
- */
 class TestDescribeBriefSO_RadiusAngle extends GenericDescribePointRadiusAngleChecks<GrayF32, TupleDesc_B> {
 	TestDescribeBriefSO_RadiusAngle() {
 		super(ImageType.single(GrayF32.class));

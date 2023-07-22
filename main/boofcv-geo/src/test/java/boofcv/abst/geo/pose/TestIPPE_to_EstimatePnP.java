@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,6 @@ package boofcv.abst.geo.pose;
 import boofcv.factory.geo.EnumPNP;
 import boofcv.factory.geo.FactoryMultiView;
 
-/**
- * @author Peter Abeles
- */
 public class TestIPPE_to_EstimatePnP extends CheckEstimate1ofPnP {
 	public TestIPPE_to_EstimatePnP() {
 		super(FactoryMultiView.pnp_1(EnumPNP.IPPE,-1,-1), false);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,9 +24,6 @@ import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 
-/**
- * @author Peter Abeles
- */
 public class TestWrapperLaplacianBlobIntensity<I extends ImageGray<I>, D extends ImageGray<D>>
 		extends ChecksGeneralFeatureIntensity<I,D>
 {

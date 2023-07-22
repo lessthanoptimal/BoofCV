@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,9 +33,6 @@ import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * @author Peter Abeles
- */
 public abstract class CommonConvolveMultiThreadToSingle extends BoofStandardJUnit {
 	protected int width = 100, height = 90;
 	Class targetClass, testClass;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,9 +23,6 @@ import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.ImageDimension;
 
-/**
- * @author Peter Abeles
- */
 public class MockLookUpCameraInfo extends LookUpCameraInfo {
 	CameraPinholeBrown intrinsics = new CameraPinholeBrown(2);
 	boolean known = false;

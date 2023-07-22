@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,9 +33,6 @@ import static boofcv.alg.fiducial.microqr.MicroQrCodeMaskPattern.M00;
 import static boofcv.alg.fiducial.microqr.MicroQrCodeMaskPattern.M01;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * @author Peter Abeles
- */
 public class TestMicroQrCodeDecoderImage extends BoofStandardJUnit {
 	/**
 	 * Render then decode images with all possible versions, masks, and error correction levels.

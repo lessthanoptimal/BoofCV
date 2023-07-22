@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,14 +34,11 @@ import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.affine.Affine2D_F32;
 import org.junit.jupiter.api.Test;
 
-/**
- * @author Peter Abeles
- */
 public abstract class CommonImageDistortCacheTests<T extends ImageGray<T>> extends BoofStandardJUnit {
 
 	Class<T> imageType;
 
-	Affine2D_F32 affine = new Affine2D_F32(1,2,3,4,5,6);
+	Affine2D_F32 affine = new Affine2D_F32(1, 2, 3, 4, 5, 6);
 	PixelTransformAffine_F32 tran = new PixelTransformAffine_F32(affine);
 
 	InterpolatePixelS<T> interp;
@@ -50,46 +47,46 @@ public abstract class CommonImageDistortCacheTests<T extends ImageGray<T>> exten
 	T dst0;
 	T dst1;
 
-	protected CommonImageDistortCacheTests(Class<T> imageType) {
+	protected CommonImageDistortCacheTests( Class<T> imageType ) {
 		this.imageType = imageType;
 		interp = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
 		interp.setBorder(FactoryImageBorder.singleValue(1, imageType));
 
-		src = GeneralizedImageOps.createSingleBand(imageType,200,300);
-		dst0 = GeneralizedImageOps.createSingleBand(imageType,200,300);
-		dst1 = GeneralizedImageOps.createSingleBand(imageType,200,300);
+		src = GeneralizedImageOps.createSingleBand(imageType, 200, 300);
+		dst0 = GeneralizedImageOps.createSingleBand(imageType, 200, 300);
+		dst1 = GeneralizedImageOps.createSingleBand(imageType, 200, 300);
 
 		GImageMiscOps.addGaussian(src, rand, 10, 0, 255);
 	}
 
 	@Test void compareNoCrop() {
 
-		ImageDistort<T,T> standard = FactoryDistort.distortSB(false, interp, imageType);
-		ImageDistortCache_SB<T,T> alg = create(interp,imageType);
-		
+		ImageDistort<T, T> standard = FactoryDistort.distortSB(false, interp, imageType);
+		ImageDistortCache_SB<T, T> alg = create(interp, imageType);
+
 		standard.setModel(tran);
 		alg.setModel(tran);
-		
-		standard.apply(src,dst0);
-		alg.apply(src,dst1);
+
+		standard.apply(src, dst0);
+		alg.apply(src, dst1);
 
 		BoofTesting.assertEquals(dst0, dst1, 1e-4);
 	}
 
 	@Test void compareCrop() {
 
-		ImageDistort<T,T> standard = FactoryDistort.distortSB(false, interp, imageType);
-		ImageDistortCache_SB<T,T> alg = create(interp,imageType);
+		ImageDistort<T, T> standard = FactoryDistort.distortSB(false, interp, imageType);
+		ImageDistortCache_SB<T, T> alg = create(interp, imageType);
 
 		standard.setModel(tran);
 		alg.setModel(tran);
 
-		standard.apply(src,dst0,10,30,80,60);
-		alg.apply(src,dst1,10,30,80,60);
+		standard.apply(src, dst0, 10, 30, 80, 60);
+		alg.apply(src, dst1, 10, 30, 80, 60);
 
 		BoofTesting.assertEquals(dst0, dst1, 1e-4);
 	}
-	
-	public abstract ImageDistortCache_SB<T,T>
-	create(InterpolatePixelS<T> interp, Class<T> imageType );
+
+	public abstract ImageDistortCache_SB<T, T>
+	create( InterpolatePixelS<T> interp, Class<T> imageType );
 }

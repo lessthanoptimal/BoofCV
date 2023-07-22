@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,9 +26,6 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 
 
-/**
- * @author Peter Abeles
- */
 public class GenerateConvolveWithBorderSparse extends CodeGeneratorBase {
 	String className = "ConvolveWithBorderSparse";
 

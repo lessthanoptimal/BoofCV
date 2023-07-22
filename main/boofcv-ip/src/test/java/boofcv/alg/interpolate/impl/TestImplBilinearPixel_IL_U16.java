@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,9 +20,6 @@ package boofcv.alg.interpolate.impl;
 
 import boofcv.struct.image.InterleavedU16;
 
-/**
- * @author Peter Abeles
- */
 public class TestImplBilinearPixel_IL_U16 extends GeneralBilinearPixelMultiChecks<InterleavedU16>
 {
 	@Override

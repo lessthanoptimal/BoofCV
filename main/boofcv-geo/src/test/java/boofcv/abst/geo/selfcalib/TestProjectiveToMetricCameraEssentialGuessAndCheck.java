@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,9 +20,6 @@ package boofcv.abst.geo.selfcalib;
 
 import boofcv.alg.geo.selfcalib.SelfCalibrationEssentialGuessAndCheck;
 
-/**
- * @author Peter Abeles
- */
 class TestProjectiveToMetricCameraEssentialGuessAndCheck extends CommonProjectiveToMetricCamerasChecks {
 	@Override
 	public ProjectiveToMetricCameras createEstimator( boolean singleCamera ) {

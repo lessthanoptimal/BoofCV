@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,9 +26,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * @author Peter Abeles
- */
 public class TestP3PFinsterwalder extends CommonP3PSideChecks {
 
 	P3PFinsterwalder alg = new P3PFinsterwalder(PolynomialOps.createRootFinder(4, RootFinderType.STURM));

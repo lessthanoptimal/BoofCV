@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,9 +27,6 @@ import boofcv.testing.CompareEquivalentFunctions;
 
 import java.lang.reflect.Method;
 
-/**
- * @author Peter Abeles
- */
 public abstract class BaseGClassChecksInMisc extends CompareEquivalentFunctions {
 
 	int width = 20;

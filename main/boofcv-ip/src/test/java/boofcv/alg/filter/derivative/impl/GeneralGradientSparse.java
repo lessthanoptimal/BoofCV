@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,20 +33,17 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * @author Peter Abeles
- */
 @SuppressWarnings("unchecked")
 public abstract class GeneralGradientSparse extends BoofStandardJUnit {
 
-	Class imageType,derivType;
+	Class imageType, derivType;
 	ImageGray image;
-	ImageGray derivX,derivY;
+	ImageGray derivX, derivY;
 
-	protected int lower=-1;
-	protected int upper=1;
+	protected int lower = -1;
+	protected int upper = 1;
 
-	protected GeneralGradientSparse(Class imageType, Class derivType) {
+	protected GeneralGradientSparse( Class imageType, Class derivType ) {
 		this.imageType = imageType;
 		this.derivType = derivType;
 	}
@@ -57,32 +54,31 @@ public abstract class GeneralGradientSparse extends BoofStandardJUnit {
 
 	@BeforeEach
 	public void initialize() {
-		image = GeneralizedImageOps.createSingleBand(imageType,20,15);
-		derivX = GeneralizedImageOps.createSingleBand(derivType,20,15);
-		derivY = GeneralizedImageOps.createSingleBand(derivType,20,15);
+		image = GeneralizedImageOps.createSingleBand(imageType, 20, 15);
+		derivX = GeneralizedImageOps.createSingleBand(derivType, 20, 15);
+		derivY = GeneralizedImageOps.createSingleBand(derivType, 20, 15);
 		GImageMiscOps.fillUniform(image, rand, 0, 255);
 	}
 
-
 	@Test void compareToFullImage_noBorder() {
 
-		createGradient().process(image,derivX,derivY);
+		createGradient().process(image, derivX, derivY);
 		SparseImageGradient alg = createAlg(null);
 
 		alg.setImage(image);
 
 		for (int i = 0; i < image.height; i++) {
 			for (int j = 0; j < image.width; j++) {
-				if( i >= -lower && j >= -lower && i < image.height-upper && j < image.width-upper ) {
-					assertTrue(image.isInBounds(j, i),j + " " + i);
+				if (i >= -lower && j >= -lower && i < image.height - upper && j < image.width - upper) {
+					assertTrue(image.isInBounds(j, i), j + " " + i);
 					GradientValue g = alg.compute(j, i);
-					double expectedX = GeneralizedImageOps.get(derivX,j,i);
-					double expectedY = GeneralizedImageOps.get(derivY,j,i);
+					double expectedX = GeneralizedImageOps.get(derivX, j, i);
+					double expectedY = GeneralizedImageOps.get(derivY, j, i);
 
 					assertEquals(expectedX, g.getX(), 1e-4f);
-					assertEquals(expectedY, g.getY(), 1e-4f,j+" "+i);
+					assertEquals(expectedY, g.getY(), 1e-4f, j + " " + i);
 				} else {
-					assertFalse(alg.isInBounds(j, i),j+" "+i);
+					assertFalse(alg.isInBounds(j, i), j + " " + i);
 				}
 			}
 		}
@@ -102,9 +98,9 @@ public abstract class GeneralGradientSparse extends BoofStandardJUnit {
 
 		for (int i = 0; i < image.height; i++) {
 			for (int j = 0; j < image.width; j++) {
-				assertTrue( image.isInBounds(j, i) , j + " " + i);
+				assertTrue(image.isInBounds(j, i), j + " " + i);
 				GradientValue g = alg.compute(j, i);
-				double expectedX = GeneralizedImageOps.get(derivX,j,i);
+				double expectedX = GeneralizedImageOps.get(derivX, j, i);
 				double expectedY = GeneralizedImageOps.get(derivY, j, i);
 
 				assertEquals(expectedX, g.getX(), 1e-4f);

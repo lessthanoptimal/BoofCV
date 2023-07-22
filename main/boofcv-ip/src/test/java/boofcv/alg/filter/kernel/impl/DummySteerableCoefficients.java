@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,19 +20,16 @@ package boofcv.alg.filter.kernel.impl;
 
 import boofcv.alg.filter.kernel.SteerableCoefficients;
 
-/**
- * @author Peter Abeles
- */
 public class DummySteerableCoefficients implements SteerableCoefficients {
 
-	double value[];
+	double[] value;
 
-	public DummySteerableCoefficients(double... value) {
+	public DummySteerableCoefficients( double... value ) {
 		this.value = value;
 	}
 
 	@Override
-	public double compute(double angle, int basis) {
+	public double compute( double angle, int basis ) {
 		return value[basis];
 	}
 }

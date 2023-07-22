@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,9 +41,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * @author Peter Abeles
- */
 public class TestSelfCalibrationLinearRotationMulti
 		extends CommonAutoCalibrationChecks {
 	CameraPinhole camera = new CameraPinhole(400, 410, 0, 500, 520, 0, 0);

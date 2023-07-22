@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,9 +34,6 @@ import org.junit.jupiter.api.Test;
 import java.util.Random;
 
 
-/**
- * @author Peter Abeles
- */
 public class TestImplPolynomialPixel_I extends GeneralChecksInterpolationPixelS<GrayU8> {
 
 	int DOF = 2;

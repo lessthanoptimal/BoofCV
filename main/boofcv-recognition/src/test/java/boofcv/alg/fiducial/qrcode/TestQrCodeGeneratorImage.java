@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,9 +27,6 @@ import org.junit.jupiter.api.Test;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
-/**
- * @author Peter Abeles
- */
 public class TestQrCodeGeneratorImage extends BoofStandardJUnit {
 	boolean showImage = false; // use a boolean to make it easier to turn on and off. Don't need to add import
 

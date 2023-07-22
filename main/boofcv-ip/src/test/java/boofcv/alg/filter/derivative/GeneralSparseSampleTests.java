@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,9 +24,6 @@ import boofcv.struct.sparse.SparseImageSample_F64;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * @author Peter Abeles
- */
 public class GeneralSparseSampleTests <T extends ImageGray<T>>
 	extends GeneralSparseOperatorTests<T>
 {

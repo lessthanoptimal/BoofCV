@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,9 +25,6 @@ import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 
-/**
- * @author Peter Abeles
- */
 public class TestFilterCensusTransformD55S32 extends GenericFilterCensusTransformChecks<GrayU8,GrayS32> {
 
 	public TestFilterCensusTransformD55S32() {

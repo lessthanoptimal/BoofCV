@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,9 +29,6 @@ import georegression.struct.InvertibleTransform;
 import georegression.struct.homography.Homography2D_F32;
 import org.junit.jupiter.api.Test;
 
-/**
- * @author Peter Abeles
- */
 public abstract class GenericBackgroundMovingGmmChecks extends GenericBackgroundModelMovingChecks {
 
 	@Test void performStationaryTests() {

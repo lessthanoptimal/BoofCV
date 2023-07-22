@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,9 +27,6 @@ import org.ddogleg.fitting.modelset.DistanceFromModel;
 import java.util.Random;
 
 
-/**
- * @author Peter Abeles
- */
 public class TestDistanceAffine2D extends StandardDistanceTest<Affine2D_F64, AssociatedPair> {
 
 	Random rand = new Random(234);

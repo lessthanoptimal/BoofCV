@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,9 +22,6 @@ import boofcv.generate.CodeGeneratorBase;
 
 import java.io.FileNotFoundException;
 
-/**
- * @author Peter Abeles
- */
 public class GenerateConvolveStandardSparse extends CodeGeneratorBase {
 	String className = "ConvolveImageStandardSparse";
 

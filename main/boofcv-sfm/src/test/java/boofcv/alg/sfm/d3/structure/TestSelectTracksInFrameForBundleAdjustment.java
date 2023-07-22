@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,9 +32,6 @@ import static boofcv.alg.sfm.d3.structure.TestMaxGeoKeyFrameManager.connectFrame
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
-/**
- * @author Peter Abeles
- */
 class TestSelectTracksInFrameForBundleAdjustment extends BoofStandardJUnit {
 	final int width = 100;
 	final int height = 200;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,9 +23,6 @@ import boofcv.alg.feature.detect.intensity.impl.ImplFastCorner11_U8;
 import boofcv.alg.feature.detect.selector.FeatureSelectN;
 import boofcv.struct.image.GrayU8;
 
-/**
- * @author Peter Abeles
- */
 class TestFastToInterestPoint extends GeneralInterestPointDetectorChecks<GrayU8> {
 	public TestFastToInterestPoint() {
 		super(new FastToInterestPoint<>(new FastCornerDetector<>(new ImplFastCorner11_U8(20)),

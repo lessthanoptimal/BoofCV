@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,13 +23,10 @@ import boofcv.io.video.VideoInterface;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
-/**
- * @author Peter Abeles
- */
 public class FfmpegVideo implements VideoInterface {
 	@Override
 	public <T extends ImageBase<T>> SimpleImageSequence<T>
-	load(String fileName, ImageType<T> imageType) {
+	load( String fileName, ImageType<T> imageType ) {
 		return new FfmpegVideoImageSequence<>(fileName, imageType);
 	}
 }

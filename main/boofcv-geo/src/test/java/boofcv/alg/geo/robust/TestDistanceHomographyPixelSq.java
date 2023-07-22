@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,9 +34,6 @@ import org.ejml.data.DMatrixRMaj;
 
 import java.util.Random;
 
-/**
- * @author Peter Abeles
- */
 public class TestDistanceHomographyPixelSq extends StandardDistanceTest<Homography2D_F64, AssociatedPair> {
 
 	Random rand = new Random(234);

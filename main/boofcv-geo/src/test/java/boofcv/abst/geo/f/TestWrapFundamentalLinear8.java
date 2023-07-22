@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,6 @@
 
 package boofcv.abst.geo.f;
 
-/**
- * @author Peter Abeles
- */
 public class TestWrapFundamentalLinear8 extends CheckEstimate1ofEpipolar {
 	public TestWrapFundamentalLinear8() {
 		super(new WrapFundamentalLinear8(true), true);

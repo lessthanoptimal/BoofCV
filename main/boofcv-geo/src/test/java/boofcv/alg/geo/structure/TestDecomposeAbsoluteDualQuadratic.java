@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,9 +31,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * @author Peter Abeles
- */
 class TestDecomposeAbsoluteDualQuadratic extends BoofStandardJUnit {
 
 	DMatrixRMaj K = new DMatrixRMaj(new double[][]{{400,1.1,450},{0,420,460},{0,0,1}});

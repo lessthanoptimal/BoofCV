@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,9 +41,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-/**
- * @author Peter Abeles
- */
 public abstract class ChecksDisparityBMBestFive<I extends ImageGray<I>, DI extends ImageGray<DI>> extends BoofStandardJUnit {
 
 	float eps = UtilEjml.F_EPS;

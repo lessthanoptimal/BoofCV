@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,9 +23,6 @@ import boofcv.alg.distort.ImageDistortCache_SB;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.struct.image.GrayF32;
 
-/**
- * @author Peter Abeles
- */
 public class TestImplImageDistortCache_F32 extends CommonImageDistortCacheTests<GrayF32> {
 
 	public TestImplImageDistortCache_F32() {

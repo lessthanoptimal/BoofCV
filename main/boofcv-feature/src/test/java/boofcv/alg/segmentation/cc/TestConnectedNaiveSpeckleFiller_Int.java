@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,6 @@ package boofcv.alg.segmentation.cc;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 
-/**
- * @author Peter Abeles
- */
 public class TestConnectedNaiveSpeckleFiller_Int extends CommonConnectedSpeckleFiller<GrayU8> {
 	public TestConnectedNaiveSpeckleFiller_Int() {
 		super(ImageType.SB_U8);

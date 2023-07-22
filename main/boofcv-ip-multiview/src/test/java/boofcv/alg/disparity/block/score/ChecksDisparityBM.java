@@ -42,9 +42,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-/**
- * @author Peter Abeles
- */
 public abstract class ChecksDisparityBM<I extends ImageGray<I>, DI extends ImageGray<DI>> extends BoofStandardJUnit {
 
 	float eps = UtilEjml.F_EPS;

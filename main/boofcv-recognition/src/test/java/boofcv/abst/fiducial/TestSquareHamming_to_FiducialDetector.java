@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,9 +28,6 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
-/**
- * @author Peter Abeles
- */
 public class TestSquareHamming_to_FiducialDetector extends GenericFiducialDetectorChecks {
 
 	ConfigHammingMarker config = ConfigHammingMarker.loadDictionary(HammingDictionary.ARUCO_MIP_36h12);

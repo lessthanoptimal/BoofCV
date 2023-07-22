@@ -41,9 +41,6 @@ import pabeles.concurrency.GrowArray;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-/**
- * @author Peter Abeles
- */
 @SuppressWarnings("rawtypes") class TestBlurImageOps extends BoofStandardJUnit {
 	// TODO full support of interleaved image for all types
 	// TODO unit tests for different kernels along x and y axis. Can't do that just yet because

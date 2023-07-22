@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,9 +31,6 @@ import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I16;
 import org.junit.jupiter.api.Nested;
 
-/**
- * @author Peter Abeles
- */
 @SuppressWarnings("unchecked")
 public class TestWrapFHtoInterestPoint extends BoofStandardJUnit {
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,9 +31,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * @author Peter Abeles
- */
 public class TestWorldToCameraToPixel extends BoofStandardJUnit {
 	CameraPinholeBrown intrinsic = new CameraPinholeBrown(500,500,0,320,240,640,480).fsetRadial(-0.1,-0.05);
 	Point2Transform2_F64 normToPixel = LensDistortionFactory.narrow(intrinsic).distort_F64(false,true);

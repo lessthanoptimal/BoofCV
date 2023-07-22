@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,9 +25,6 @@ import georegression.struct.point.Point2D_F64;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * @author Peter Abeles
- */
 abstract class TestEquirectangularDistortBase_F64 extends BoofStandardJUnit {
 
 	void copy( EquirectangularDistortBase_F64 original , int equiWidth, int equiHeight) {

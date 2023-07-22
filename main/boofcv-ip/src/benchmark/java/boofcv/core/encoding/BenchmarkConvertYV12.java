@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,18 +28,15 @@ import org.openjdk.jmh.annotations.*;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author Peter Abeles
- */
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @Warmup(iterations = 2)
 @Measurement(iterations = 5)
 @State(Scope.Benchmark)
-@Fork(value=1)
+@Fork(value = 1)
 public class BenchmarkConvertYV12 {
 
-	@Param({"true","false"})
+	@Param({"true", "false"})
 	public boolean concurrent;
 
 	//	@Param({"100", "500", "1000", "5000", "10000"})
@@ -60,52 +57,29 @@ public class BenchmarkConvertYV12 {
 		BoofConcurrency.USE_CONCURRENT = concurrent;
 		Random rand = new Random(234);
 
-		yv12 = new byte[size*size * 2];
+		yv12 = new byte[size*size*2];
 		rand.nextBytes(yv12);
 
-		grayU8.reshape(size,size);
-		grayF32.reshape(size,size);
-		interU8.reshape(size,size);
-		interF32.reshape(size,size);
-		planarU8.reshape(size,size);
-		planarF32.reshape(size,size);
+		grayU8.reshape(size, size);
+		grayF32.reshape(size, size);
+		interU8.reshape(size, size);
+		interF32.reshape(size, size);
+		planarU8.reshape(size, size);
+		planarF32.reshape(size, size);
 
 		// convert is faster than more random numbers
-		GImageMiscOps.fillUniform(grayU8,rand,0,200);
-		ConvertImage.convert(grayU8,grayF32);
-		GImageMiscOps.fillUniform(interU8,rand,0,200);
-		ConvertImage.convert(interU8,interF32);
-		GImageMiscOps.fillUniform(planarU8,rand,0,200);
-		GConvertImage.convert(planarU8,planarF32);
+		GImageMiscOps.fillUniform(grayU8, rand, 0, 200);
+		ConvertImage.convert(grayU8, grayF32);
+		GImageMiscOps.fillUniform(interU8, rand, 0, 200);
+		ConvertImage.convert(interU8, interF32);
+		GImageMiscOps.fillUniform(planarU8, rand, 0, 200);
+		GConvertImage.convert(planarU8, planarF32);
 	}
 
-	@Benchmark
-	public void nv21ToGray_U8() {
-		ConvertYV12.yu12ToBoof(yv12, size, size, grayU8);
-	}
-
-	@Benchmark
-	public void nv21ToGray_F32() {
-		ConvertYV12.yu12ToBoof(yv12, size, size, grayF32);
-	}
-
-	@Benchmark
-	public void nv21TPlanarRgb_U8() {
-		ConvertYV12.yu12ToBoof(yv12, size, size, planarU8);
-	}
-
-	@Benchmark
-	public void nv21ToPlanarRgb_F32() {
-		ConvertYV12.yu12ToBoof(yv12, size, size, planarF32);
-	}
-
-	@Benchmark
-	public void nv21ToInterleaved_U8() {
-		ConvertYV12.yu12ToBoof(yv12, size, size, interU8);
-	}
-
-	@Benchmark
-	public void nv21ToInterleaved_F32() {
-		ConvertYV12.yu12ToBoof(yv12, size, size, interF32);
-	}
+	@Benchmark public void nv21ToGray_U8() {ConvertYV12.yu12ToBoof(yv12, size, size, grayU8);}
+	@Benchmark public void nv21ToGray_F32() {ConvertYV12.yu12ToBoof(yv12, size, size, grayF32);}
+	@Benchmark public void nv21TPlanarRgb_U8() {ConvertYV12.yu12ToBoof(yv12, size, size, planarU8);}
+	@Benchmark public void nv21ToPlanarRgb_F32() {ConvertYV12.yu12ToBoof(yv12, size, size, planarF32);}
+	@Benchmark public void nv21ToInterleaved_U8() {ConvertYV12.yu12ToBoof(yv12, size, size, interU8);}
+	@Benchmark public void nv21ToInterleaved_F32() {ConvertYV12.yu12ToBoof(yv12, size, size, interF32);}
 }

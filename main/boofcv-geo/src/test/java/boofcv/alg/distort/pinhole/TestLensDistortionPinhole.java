@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,9 +22,6 @@ import boofcv.alg.distort.GeneralLensDistortionNarrowFOVChecks;
 import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.struct.calib.CameraPinholeBrown;
 
-/**
- * @author Peter Abeles
- */
 public class TestLensDistortionPinhole extends GeneralLensDistortionNarrowFOVChecks
 {
 	@Override

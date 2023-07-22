@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,9 +25,6 @@ import boofcv.struct.image.ImageType;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Nested;
 
-/**
- * @author Peter Abeles
- */
 class TestBlockRowScoreMutualInformation extends BoofStandardJUnit {
 
 	@Nested

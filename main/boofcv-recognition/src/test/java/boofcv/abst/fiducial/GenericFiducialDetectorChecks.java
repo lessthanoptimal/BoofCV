@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,9 +47,6 @@ import java.util.List;
 import static georegression.struct.se.SpecialEuclideanOps_F64.eulerXyz;
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * @author Peter Abeles
- */
 @SuppressWarnings({"rawtypes", "unchecked"})
 public abstract class GenericFiducialDetectorChecks extends BoofStandardJUnit {
 

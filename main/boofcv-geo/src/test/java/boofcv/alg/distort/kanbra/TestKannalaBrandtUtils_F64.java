@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,9 +29,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 //CUSTOM ignore KannalaBrandtUtils_F64
 
-/**
- * @author Peter Abeles
- */
 class TestKannalaBrandtUtils_F64 extends BoofStandardJUnit {
 	/**
 	 * Compare to numerical derivative. This is linear so it should be very accurate
