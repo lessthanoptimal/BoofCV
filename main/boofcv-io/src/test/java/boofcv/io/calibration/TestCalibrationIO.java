@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,7 +64,7 @@ public class TestCalibrationIO extends BoofStandardJUnit {
 
 		model.fsetK(1, 2, 3, 4, 0.65, 100, 7);
 		model.fsetRadial(.1, .2, .3);
-		model.fsetTangental(0.5, 0.7);
+		model.fsetTangential(0.5, 0.7);
 
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		CalibrationIO.saveOpencv(model, new OutputStreamWriter(stream));

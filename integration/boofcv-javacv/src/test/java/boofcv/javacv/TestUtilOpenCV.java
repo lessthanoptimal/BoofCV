@@ -60,7 +60,7 @@ public class TestUtilOpenCV {
 
 		expected.fsetK(1, 2, 3, 4, 0.65, 100, 7);
 		expected.fsetRadial(.1, .2, .3);
-		expected.fsetTangental(0.5, 0.7);
+		expected.fsetTangential(0.5, 0.7);
 
 		UtilOpenCV.save(expected, "temp.yml");
 
@@ -91,7 +91,7 @@ public class TestUtilOpenCV {
 
 		model.fsetK(1, 2, 3, 4, 0.65, 100, 7);
 		model.fsetRadial(.1, .2, .3);
-		model.fsetTangental(0.5, 0.7);
+		model.fsetTangential(0.5, 0.7);
 
 		UtilOpenCV.save(model, "temp.yml");
 

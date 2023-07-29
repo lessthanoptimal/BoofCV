@@ -41,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestCalibrateStereoPlanar extends BoofStandardJUnit {
 	CameraPinholeBrown intrinsic = new CameraPinholeBrown(250,260,0,320,240,640,480).
-			fsetRadial(0.01, -0.02).fsetTangental(0.03,0.03);
+			fsetRadial(0.01, -0.02).fsetTangential(0.03,0.03);
 	Point2Transform2_F64 normToPixel = LensDistortionFactory.narrow(intrinsic).distort_F64(false, true);
 
 	List<Se3_F64> targetToLeft = new ArrayList<>();

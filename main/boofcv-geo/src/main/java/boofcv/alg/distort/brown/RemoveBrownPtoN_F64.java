@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.distort.brown;
 
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F64;
 import georegression.misc.GrlConstants;
 import georegression.struct.point.Point2D_F64;
@@ -102,6 +103,11 @@ public class RemoveBrownPtoN_F64 implements Point2Transform2_F64 {
 		return this;
 	}
 
+	/** Convenience function for assigning all parameters from a brown camera model */
+	public RemoveBrownPtoN_F64 setParameters( CameraPinholeBrown p ) {
+		return setK(p.fx, p.fy, p.skew, p.cx, p.cy).setDistortion(p.radial, p.t1, p.t2);
+	}
+
 	/**
 	 * Removes radial distortion
 	 *
@@ -109,8 +115,7 @@ public class RemoveBrownPtoN_F64 implements Point2Transform2_F64 {
 	 * @param y Distorted y-coordinate pixel
 	 * @param out Undistorted normalized coordinate.
 	 */
-	@Override
-	public void compute( double x, double y, Point2D_F64 out ) {
+	@Override public void compute( double x, double y, Point2D_F64 out ) {
 		// initial estimate of undistorted point
 		out.x = a11*x + a12*y + a13;
 		out.y = a22*y + a23;
@@ -118,9 +123,8 @@ public class RemoveBrownPtoN_F64 implements Point2Transform2_F64 {
 		removeRadial(out.x, out.y, params.radial, params.t1, params.t2, out, tol);
 	}
 
-	@Override
-	public RemoveBrownPtoN_F64 copyConcurrent() {
-		RemoveBrownPtoN_F64 ret = new RemoveBrownPtoN_F64(tol);
+	@Override public RemoveBrownPtoN_F64 copyConcurrent() {
+		var ret = new RemoveBrownPtoN_F64(tol);
 		ret.fx = fx; // don't use set since it recomputes it. inputs would be floats not double, so diff solution
 		ret.fy = fy;
 		ret.skew = skew;

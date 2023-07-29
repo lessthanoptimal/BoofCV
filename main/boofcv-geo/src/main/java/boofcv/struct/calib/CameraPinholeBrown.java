@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -99,7 +99,7 @@ public class CameraPinholeBrown extends CameraPinhole implements Serializable {
 		return this;
 	}
 
-	public CameraPinholeBrown fsetTangental( double t1, double t2 ) {
+	public CameraPinholeBrown fsetTangential( double t1, double t2 ) {
 		this.t1 = t1;
 		this.t2 = t2;
 		return this;

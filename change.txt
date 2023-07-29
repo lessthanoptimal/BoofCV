@@ -19,6 +19,7 @@ Version : 1.0.0
   * Added a new camera model that adjusts the focal length based on zoom factor
 - Calibration
   * TODO support multiple calibration targets
+  * Tangental -> Tangential for consistency
 
 - Image Processing
   - TODO hough circle detector

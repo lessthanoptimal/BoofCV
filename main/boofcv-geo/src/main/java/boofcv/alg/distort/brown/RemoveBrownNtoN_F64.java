@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -58,14 +58,12 @@ public class RemoveBrownNtoN_F64 implements Point2Transform2_F64 {
 	 * @param y Distorted y-coordinate normalized image coordinate
 	 * @param out Undistorted normalized coordinate.
 	 */
-	@Override
-	public void compute( double x, double y, Point2D_F64 out ) {
+	@Override public void compute( double x, double y, Point2D_F64 out ) {
 		removeRadial(x, y, params.radial, params.t1, params.t2, out, tol);
 	}
 
-	@Override
-	public RemoveBrownNtoN_F64 copyConcurrent() {
-		RemoveBrownNtoN_F64 ret = new RemoveBrownNtoN_F64();
+	@Override public RemoveBrownNtoN_F64 copyConcurrent() {
+		var ret = new RemoveBrownNtoN_F64();
 		ret.tol = tol;
 		ret.params = new RadialTangential_F64(this.params);
 		return ret;

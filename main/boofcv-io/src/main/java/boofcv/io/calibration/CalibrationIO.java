@@ -758,7 +758,7 @@ public class CalibrationIO {
 			else if (distortion.getNumElements() >= 2)
 				out.setRadial(distortion.get(0), distortion.get(1));
 			if (distortion.getNumElements() >= 5)
-				out.fsetTangental(distortion.get(2), distortion.get(3));
+				out.fsetTangential(distortion.get(2), distortion.get(3));
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}

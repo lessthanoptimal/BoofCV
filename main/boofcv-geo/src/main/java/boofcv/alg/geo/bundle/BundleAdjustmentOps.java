@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,7 +51,7 @@ public class BundleAdjustmentOps {
 			dst = new CameraPinholeBrown();
 
 		if (src instanceof BundlePinhole) {
-			dst.fsetRadial().fsetTangental(0, 0); // remove distortion terms
+			dst.fsetRadial().fsetTangential(0, 0); // remove distortion terms
 			convert((BundlePinhole)src, width, height, (CameraPinhole)dst);
 		} else if (src instanceof BundlePinholeBrown) {
 			convert((BundlePinholeBrown)src, width, height, dst);
@@ -134,7 +134,7 @@ public class BundleAdjustmentOps {
 		if (dst == null)
 			dst = new CameraPinholeBrown();
 
-		dst.fsetRadial(src.k1, src.k2).fsetTangental(0.0, 0.0);
+		dst.fsetRadial(src.k1, src.k2).fsetTangential(0.0, 0.0);
 		dst.fsetK(src.f, src.f, 0.0, width/2, height/2, 0, 0);
 		dst.fsetShape(width, height);
 

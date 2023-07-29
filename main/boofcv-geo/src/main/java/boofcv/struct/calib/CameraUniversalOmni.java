@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -104,7 +104,7 @@ public class CameraUniversalOmni extends CameraPinhole {
 		return this;
 	}
 
-	public CameraUniversalOmni fsetTangental( double t1, double t2 ) {
+	public CameraUniversalOmni fsetTangential( double t1, double t2 ) {
 		this.t1 = t1;
 		this.t2 = t2;
 		return this;

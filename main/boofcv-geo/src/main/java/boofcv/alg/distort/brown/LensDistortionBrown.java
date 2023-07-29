@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,8 +40,7 @@ public class LensDistortionBrown implements LensDistortionNarrowFOV {
 		this.p = p;
 	}
 
-	@Override
-	public Point2Transform2_F64 distort_F64( boolean pixelIn, boolean pixelOut ) {
+	@Override public Point2Transform2_F64 distort_F64( boolean pixelIn, boolean pixelOut ) {
 		if (pixelIn) {
 			Point2Transform2_F64 p_to_n =
 					new AddBrownPtoN_F64().setK(p.fx, p.fy, p.skew, p.cx, p.cy).setDistortion(p.radial, p.t1, p.t2);
@@ -60,8 +59,7 @@ public class LensDistortionBrown implements LensDistortionNarrowFOV {
 		}
 	}
 
-	@Override
-	public Point2Transform2_F64 undistort_F64( boolean pixelIn, boolean pixelOut ) {
+	@Override public Point2Transform2_F64 undistort_F64( boolean pixelIn, boolean pixelOut ) {
 		if (pixelIn) {
 			Point2Transform2_F64 p_to_n =
 					new RemoveBrownPtoN_F64().setK(p.fx, p.fy, p.skew, p.cx, p.cy).setDistortion(p.radial, p.t1, p.t2);
@@ -80,8 +78,7 @@ public class LensDistortionBrown implements LensDistortionNarrowFOV {
 		}
 	}
 
-	@Override
-	public Point2Transform2_F32 distort_F32( boolean pixelIn, boolean pixelOut ) {
+	@Override public Point2Transform2_F32 distort_F32( boolean pixelIn, boolean pixelOut ) {
 		if (pixelIn) {
 			Point2Transform2_F32 p_to_n =
 					new AddBrownPtoN_F32().setK(p.fx, p.fy, p.skew, p.cx, p.cy).setDistortion(p.radial, p.t1, p.t2);
@@ -100,8 +97,7 @@ public class LensDistortionBrown implements LensDistortionNarrowFOV {
 		}
 	}
 
-	@Override
-	public Point2Transform2_F32 undistort_F32( boolean pixelIn, boolean pixelOut ) {
+	@Override public Point2Transform2_F32 undistort_F32( boolean pixelIn, boolean pixelOut ) {
 		if (pixelIn) {
 			Point2Transform2_F32 p_to_n =
 					new RemoveBrownPtoN_F32().setK(p.fx, p.fy, p.skew, p.cx, p.cy).setDistortion(p.radial, p.t1, p.t2);

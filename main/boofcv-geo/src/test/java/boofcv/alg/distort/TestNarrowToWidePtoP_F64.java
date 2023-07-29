@@ -127,7 +127,7 @@ public class TestNarrowToWidePtoP_F64 extends BoofStandardJUnit {
 		model.fsetK(1.349e3,1.343e3,0,480,480,960,1080);
 		model.fsetMirror(3.61);
 		model.fsetRadial(7.308e-1,1.855e1);
-		model.fsetTangental(-1.288e-2,-1.1342e-2);
+		model.fsetTangential(-1.288e-2,-1.1342e-2);
 		return new LensDistortionUniversalOmni(model);
 	}
 

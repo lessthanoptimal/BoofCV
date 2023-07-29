@@ -100,7 +100,7 @@ public class TestUniOmniPtoS_F64 extends BoofStandardJUnit {
 		model.fsetK(400,405,0.01,320,240,640,480);
 		model.fsetMirror(mirror);
 		model.fsetRadial(0.01,-0.03);
-		model.fsetTangental(0.001,0.002);
+		model.fsetTangential(0.001,0.002);
 		return model;
 	}
 }

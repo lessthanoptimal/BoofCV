@@ -56,7 +56,7 @@ public class TestBundleAdjustmentOps extends BoofStandardJUnit {
 
 	@Test void convert_bundleBrown_brown() {
 		var src = new BundlePinholeBrown().setK(2, 3, 0, 7, 3).setRadial(1, 2).setTangential(-1, -9);
-		var dst = new CameraPinholeBrown().fsetK(1, 2, 3, 4, 5, 6, 7).fsetRadial(-1, -2).fsetTangental(0.1, 0.2);
+		var dst = new CameraPinholeBrown().fsetK(1, 2, 3, 4, 5, 6, 7).fsetRadial(-1, -2).fsetTangential(0.1, 0.2);
 
 		assertSame(dst, BundleAdjustmentOps.convert(src, width, height, dst));
 
@@ -74,7 +74,7 @@ public class TestBundleAdjustmentOps extends BoofStandardJUnit {
 
 	@Test void convert_bundleSimple_brown() {
 		var src = new BundlePinholeSimplified(10, 1, 2);
-		var dst = new CameraPinholeBrown().fsetK(1, 2, 3, 4, 5, 6, 7).fsetRadial(-1, -2).fsetTangental(0.1, 0.2);
+		var dst = new CameraPinholeBrown().fsetK(1, 2, 3, 4, 5, 6, 7).fsetRadial(-1, -2).fsetTangential(0.1, 0.2);
 
 		assertSame(dst, BundleAdjustmentOps.convert(src, width, height, dst));
 
@@ -91,7 +91,7 @@ public class TestBundleAdjustmentOps extends BoofStandardJUnit {
 	}
 
 	@Test void convert_brown_to_bundlePinhole() {
-		var src = new CameraPinholeBrown().fsetK(1, 2, 3, 4, 5, 6, 7).fsetRadial(-1, -2).fsetTangental(0.1, 0.2);
+		var src = new CameraPinholeBrown().fsetK(1, 2, 3, 4, 5, 6, 7).fsetRadial(-1, -2).fsetTangential(0.1, 0.2);
 		var dst = new BundlePinhole(true);
 
 		assertSame(dst, BundleAdjustmentOps.convert(src, dst));
@@ -105,7 +105,7 @@ public class TestBundleAdjustmentOps extends BoofStandardJUnit {
 	}
 
 	@Test void convert_brown_to_bundleBrown() {
-		var src = new CameraPinholeBrown().fsetK(1, 2, 3, 4, 5, 6, 7).fsetRadial(-1, -2).fsetTangental(0.1, 0.2);
+		var src = new CameraPinholeBrown().fsetK(1, 2, 3, 4, 5, 6, 7).fsetRadial(-1, -2).fsetTangential(0.1, 0.2);
 		var dst = new BundlePinholeBrown(true, false);
 
 		assertSame(dst, BundleAdjustmentOps.convert(src, dst));

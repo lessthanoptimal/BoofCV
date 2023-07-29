@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,6 @@ import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.calib.CameraPinholeBrown;
 import org.bytedeco.javacpp.IntPointer;
 import org.bytedeco.javacpp.indexer.DoubleRawIndexer;
-import org.bytedeco.javacpp.opencv_core.*;
 import org.ejml.data.DMatrixRMaj;
 
 import java.io.File;
@@ -73,7 +72,7 @@ public class UtilOpenCV {
 		else if( distortion.rows() >= 2 )
 			boof.setRadial(indexerD.get(0,0),indexerD.get(1,0));
 		if( distortion.rows() >= 5 )
-			boof.fsetTangental(indexerD.get(2,0),indexerD.get(3,0));
+			boof.fsetTangential(indexerD.get(2,0),indexerD.get(3,0));
 
 		return boof;
 	}

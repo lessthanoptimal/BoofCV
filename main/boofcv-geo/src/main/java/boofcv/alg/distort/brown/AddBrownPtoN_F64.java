@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -77,8 +77,7 @@ public class AddBrownPtoN_F64 implements Point2Transform2_F64 {
 	 * @param y Undistorted y-coordinate pixel
 	 * @param out Distorted pixel coordinate.
 	 */
-	@Override
-	public void compute( double x, double y, Point2D_F64 out ) {
+	@Override public void compute( double x, double y, Point2D_F64 out ) {
 		double sum = 0;
 
 		double radial[] = params.radial;
@@ -104,9 +103,8 @@ public class AddBrownPtoN_F64 implements Point2Transform2_F64 {
 		out.y = out.y*(1 + sum) + ty;
 	}
 
-	@Override
-	public AddBrownPtoN_F64 copyConcurrent() {
-		AddBrownPtoN_F64 ret = new AddBrownPtoN_F64();
+	@Override public AddBrownPtoN_F64 copyConcurrent() {
+		var ret = new AddBrownPtoN_F64();
 		ret.a11 = a11;
 		ret.a12 = a12;
 		ret.a13 = a13;

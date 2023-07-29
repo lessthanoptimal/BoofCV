@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ public class TestCameraPinholeBrown extends CommonCameraChecks {
 	@Test void set_radial() {
 		CameraPinholeBrown p = new CameraPinholeBrown(200,210,1,320,240,640,380);
 		p.fsetRadial(1,2);
-		p.fsetTangental(2,3);
+		p.fsetTangential(2,3);
 
 		CameraPinholeBrown f = new CameraPinholeBrown();
 		f.setTo(p);
@@ -40,7 +40,7 @@ public class TestCameraPinholeBrown extends CommonCameraChecks {
 
 		CameraPinholeBrown f = new CameraPinholeBrown(200,210,1,320,240,640,380);
 		f.fsetRadial(1,2);
-		f.fsetTangental(2,3);
+		f.fsetTangential(2,3);
 
 		f.setTo(p);
 
@@ -93,10 +93,10 @@ public class TestCameraPinholeBrown extends CommonCameraChecks {
 		assertEquals(0,p.t2, 1e-8);
 	}
 
-	@Test void fsetTangental() {
+	@Test void fsetTangential() {
 		CameraPinholeBrown p = new CameraPinholeBrown(200,210,1,320,240,640,380);
 
-		assertSame(p, p.fsetTangental(1.1, 2.2));
+		assertSame(p, p.fsetTangential(1.1, 2.2));
 
 		assertEquals(1.1,p.t1,1e-8);
 		assertEquals(2.2,p.t2, 1e-8);
@@ -118,6 +118,6 @@ public class TestCameraPinholeBrown extends CommonCameraChecks {
 		assertFalse(p.fsetRadial(0,0).isDistorted());
 		assertTrue(p.fsetRadial(1,0).isDistorted());
 		assertFalse(p.fsetRadial(0,0).isDistorted());
-		assertTrue(p.fsetTangental(0, 0.1).isDistorted());
+		assertTrue(p.fsetTangential(0, 0.1).isDistorted());
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,7 +40,7 @@ public class ContourEdgeIntensity<T extends ImageGray<T>> {
 	// how many points along the contour are sampled
 	private final int contourSamples;
 
-	// How many tangental sample points will there be
+	// How many tangential sample points will there be
 	private final int tangentSamples;
 
 	// Distance in pixels between tangential sample points

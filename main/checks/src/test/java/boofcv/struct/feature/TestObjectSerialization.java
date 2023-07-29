@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -177,7 +177,7 @@ class TestObjectSerialization {
 	@Test
 	void tebstIntrinsicParamters() {
 		CameraPinholeBrown original = new CameraPinholeBrown().
-				fsetK(1, 2, 3, 4, 5, 6, 7).fsetRadial(8,9).fsetTangental(10, 11);
+				fsetK(1, 2, 3, 4, 5, 6, 7).fsetRadial(8,9).fsetTangential(10, 11);
 
 		CameraPinholeBrown found = serializeDeSerialize(original);
 

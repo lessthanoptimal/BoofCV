@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,8 +51,7 @@ public class AddBrownNtoN_F64 implements Point2Transform2_F64 {
 	 * @param y Undistorted y-coordinate normalized image coordinates
 	 * @param out Distorted normalized image coordinate.
 	 */
-	@Override
-	public void compute( double x, double y, Point2D_F64 out ) {
+	@Override public void compute( double x, double y, Point2D_F64 out ) {
 
 		double[] radial = params.radial;
 		double t1 = params.t1;
@@ -71,9 +70,8 @@ public class AddBrownNtoN_F64 implements Point2Transform2_F64 {
 		out.y = y*(1 + sum) + t1*(r2 + 2*y*y) + 2*t2*x*y;
 	}
 
-	@Override
-	public AddBrownNtoN_F64 copyConcurrent() {
-		AddBrownNtoN_F64 ret = new AddBrownNtoN_F64();
+	@Override public AddBrownNtoN_F64 copyConcurrent() {
+		var ret = new AddBrownNtoN_F64();
 		ret.params = new RadialTangential_F64(this.params);
 		return ret;
 	}
