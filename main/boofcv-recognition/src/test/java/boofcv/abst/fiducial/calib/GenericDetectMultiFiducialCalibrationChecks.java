@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public abstract class GenericDetectMultiFiducialCalibrationChecks extends BoofStandardJUnit {
 
@@ -55,14 +56,14 @@ public abstract class GenericDetectMultiFiducialCalibrationChecks extends BoofSt
 		DetectMultiFiducialCalibration detector = createDetector();
 
 //		CameraPinholeBrown model = CalibrationIO.load(getClass().getResource("pinhole_radial.yaml"));
-		CameraPinholeBrown model = new CameraPinholeBrown().fsetK(600,600,0,400,400,800,800);
+		CameraPinholeBrown model = new CameraPinholeBrown().fsetK(600, 600, 0, 400, 400, 800, 800);
 		SimulatePlanarWorld simulator = new SimulatePlanarWorld();
 		simulator.setCamera(model);
 
 		DogArray<List<PointIndex2D_F64>> markerPoints = new DogArray<>(ArrayList::new);
 		for (int i = 0; i < Math.min(2, detector.getTotalUniqueMarkers()); i++) {
 			GrayF32 pattern = renderPattern(i, markerPoints.grow());
-			Se3_F64 markerToWorld = SpecialEuclideanOps_F64.eulerXyz((-0.5+i)*0.32,0,.5,0,Math.PI,0, null);
+			Se3_F64 markerToWorld = SpecialEuclideanOps_F64.eulerXyz((-0.5 + i)*0.32, 0, .5, 0, Math.PI, 0, null);
 			simulator.addSurface(markerToWorld, simulatedTargetWidth, pattern);
 		}
 
@@ -70,7 +71,7 @@ public abstract class GenericDetectMultiFiducialCalibrationChecks extends BoofSt
 		// marker systems since that requires encoding that should remove that ambiguity
 		for (int cameraOriIdx = 0; cameraOriIdx < 10; cameraOriIdx++) {
 			double roll = 2.0*Math.PI*cameraOriIdx/10;
-			simulator.setWorldToCamera(SpecialEuclideanOps_F64.eulerXyz(0,0,0,0,0,roll,null));
+			simulator.setWorldToCamera(SpecialEuclideanOps_F64.eulerXyz(0, 0, 0, 0, 0, roll, null));
 			simulator.render();
 
 			// Process the image and see if it detected everything
@@ -104,8 +105,8 @@ public abstract class GenericDetectMultiFiducialCalibrationChecks extends BoofSt
 				assertEquals(markerPoints.get(markerID).size(), detector.getDetectedPoints(i).size());
 
 				// TODO check the actual coordinates
+				assertTrue(!detector.getLayout(markerID).isEmpty());
 			}
 		}
-
 	}
 }

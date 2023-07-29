@@ -17,6 +17,8 @@ Version : 1.0.0
 - Bundle Adjustment
   * Added a way to specify the camera state when a frame was captured
   * Added a new camera model that adjusts the focal length based on zoom factor
+- Calibration
+  * TODO support multiple calibration targets
 
 - Image Processing
   - TODO hough circle detector
