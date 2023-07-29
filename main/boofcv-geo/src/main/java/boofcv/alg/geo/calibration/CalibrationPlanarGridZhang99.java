@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -99,7 +99,8 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 
 	/** contains found parameters */
 	@Getter public SceneStructureMetric structure;
-	public SceneObservations observations;
+	/** observations for bundle adjustment */
+	@Getter public SceneObservations observations;
 
 	/** provides information on calibration status as it's being computed */
 	@Getter @Setter private Listener listener;

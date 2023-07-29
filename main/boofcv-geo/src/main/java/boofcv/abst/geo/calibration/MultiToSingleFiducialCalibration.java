@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,12 +40,17 @@ public class MultiToSingleFiducialCalibration implements DetectSingleFiducialCal
 	/** Specifies which marker it will return. All other markers will be ignored */
 	@Getter @Setter int targetMarker = 0;
 
-	// which detection matches the target ID. -1 means it was not detected
-	private int detectedID;
+	// Index of the detected target that matches the target marker. -1 means no matches found.
+	private int detectedIndex;
 
 	int width, height;
 
 	public MultiToSingleFiducialCalibration( DetectMultiFiducialCalibration alg ) {
+		this.multi = alg;
+	}
+
+	public MultiToSingleFiducialCalibration( int target, DetectMultiFiducialCalibration alg ) {
+		this.targetMarker = target;
 		this.multi = alg;
 	}
 
@@ -54,22 +59,22 @@ public class MultiToSingleFiducialCalibration implements DetectSingleFiducialCal
 		width = input.width;
 		height = input.height;
 
-		detectedID = -1;
+		detectedIndex = -1;
 		for (int i = 0; i < multi.getDetectionCount(); i++) {
 			if (multi.getMarkerID(i) == targetMarker) {
-				detectedID = i;
+				detectedIndex = i;
 				break;
 			}
 		}
 
-		return detectedID != -1;
+		return detectedIndex != -1;
 	}
 
 	@Override public CalibrationObservation getDetectedPoints() {
-		if (detectedID == -1)
+		if (detectedIndex == -1)
 			return new CalibrationObservation();
 
-		return multi.getDetectedPoints(detectedID);
+		return multi.getDetectedPoints(detectedIndex);
 	}
 
 	@Override public List<Point2D_F64> getLayout() {

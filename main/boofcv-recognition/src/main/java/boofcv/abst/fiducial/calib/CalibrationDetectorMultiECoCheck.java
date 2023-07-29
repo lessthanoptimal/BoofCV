@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,6 +49,9 @@ public class CalibrationDetectorMultiECoCheck implements DetectMultiFiducialCali
 	/** Description of the types of markers it can detect */
 	@Getter List<ConfigECoCheckMarkers.MarkerShape> markers;
 
+	/** Number of targets which have the same shape as markers[0] */
+	@Getter int firstTargetDuplicated = 0;
+
 	// Dimension of the most recently processed image
 	ImageDimension dimension = new ImageDimension();
 
@@ -56,8 +59,10 @@ public class CalibrationDetectorMultiECoCheck implements DetectMultiFiducialCali
 	TIntObjectMap<List<Point2D_F64>> cacheLayouts = new TIntObjectHashMap<>();
 
 	public CalibrationDetectorMultiECoCheck( ECoCheckDetector<GrayF32> detector,
+											 int firstTargetDuplicated,
 											 List<ConfigECoCheckMarkers.MarkerShape> markers ) {
 		this.detector = detector;
+		this.firstTargetDuplicated = firstTargetDuplicated;
 		this.markers = markers;
 	}
 
@@ -89,23 +94,26 @@ public class CalibrationDetectorMultiECoCheck implements DetectMultiFiducialCali
 	}
 
 	@Override public List<Point2D_F64> getLayout( int markerID ) {
-		List<Point2D_F64> layout = cacheLayouts.get(markerID);
+		// Handle special case of first target clones
+		int layoutIndex = Math.max(0, markerID - firstTargetDuplicated);
+
+		List<Point2D_F64> layout = cacheLayouts.get(layoutIndex);
 		if (layout != null)
 			return layout;
 
 		ECoCheckUtils utils = detector.getUtils();
-		ConfigECoCheckMarkers.MarkerShape shape = markers.get(markerID);
+		ConfigECoCheckMarkers.MarkerShape shape = markers.get(layoutIndex);
 
 		// Create a list of points that defines the layout
 		Point3D_F64 p = new Point3D_F64();
 		layout = new ArrayList<>();
 		int numCorners = shape.getNumCorners();
 		for (int cornerID = 0; cornerID < numCorners; cornerID++) {
-			utils.cornerToMarker3D(markerID, cornerID, shape.squareSize, p);
+			utils.cornerToMarker3D(layoutIndex, cornerID, shape.squareSize, p);
 			layout.add(cornerID, new Point2D_F64(p.x, p.y));
 		}
 
-		cacheLayouts.put(markerID, layout);
+		cacheLayouts.put(layoutIndex, layout);
 
 		return layout;
 	}

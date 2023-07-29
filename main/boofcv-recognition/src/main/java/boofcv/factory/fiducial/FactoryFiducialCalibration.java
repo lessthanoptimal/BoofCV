@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -109,7 +109,8 @@ public class FactoryFiducialCalibration {
 		ECoCheckDetector<GrayF32> detector = FactoryFiducial.ecocheck(
 				configDetector, configMarkers, GrayF32.class).getDetector();
 
-		return new CalibrationDetectorMultiECoCheck(detector, configMarkers.markerShapes.toList());
+		return new CalibrationDetectorMultiECoCheck(detector,
+				configMarkers.firstTargetDuplicated, configMarkers.markerShapes.toList());
 	}
 
 	/**
