@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,14 @@ import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DMatrix3x3;
 import org.ejml.data.DMatrixRMaj;
 import org.jetbrains.annotations.Nullable;
+
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static boofcv.misc.BoofMiscOps.getOrThrow;
 
 /**
  * Implementation of {@link boofcv.struct.calib.CameraUniversalOmni} for bundle adjustment
@@ -382,5 +390,43 @@ public class BundleUniversalOmni implements BundleAdjustmentCamera {
 			totalIntrinsic += 1;
 
 		return totalIntrinsic;
+	}
+
+	@Override public BundleAdjustmentCamera setTo( Map<String, Object> map ) {
+		try {
+			fx = getOrThrow(map, "fx");
+			fy = getOrThrow(map, "fy");
+			skew = (double)map.getOrDefault("skew", 0.0);
+			cx = getOrThrow(map, "cx");
+			cy = getOrThrow(map, "cy");
+			mirrorOffset = getOrThrow(map, "mirror-offset");
+
+			t1 = (double)map.getOrDefault("t1", 0.0);
+			t2 = (double)map.getOrDefault("t2", 0.0);
+
+			List<Double> radialList = (List<Double>)map.get("radial");
+			if (radialList == null)
+				radial = new double[0];
+			else {
+				radial = radialList.stream().mapToDouble(i -> i).toArray();
+			}
+			return this;
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	@Override public Map<String, Object> toMap() {
+		var map = new HashMap<String, Object>();
+		map.put("fx", fx);
+		map.put("fy", fy);
+		map.put("skew", skew);
+		map.put("cx", cx);
+		map.put("cy", cy);
+		map.put("t1", t1);
+		map.put("t2", t2);
+		map.put("radial", radial);
+		map.put("mirror-offset", mirrorOffset);
+		return map;
 	}
 }

@@ -31,6 +31,7 @@ import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -126,6 +127,24 @@ public abstract class GenericChecksBundleAdjustmentCamera extends BoofStandardJU
 					assertEquals(found0[i], found2[i], UtilEjml.TEST_F64);
 					assertEquals(found1[i], found3[i], UtilEjml.TEST_F64);
 				}
+			}
+		}
+	}
+
+	/** Test the toMap() functions */
+	@Test
+	void encode_decode() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+		BundleAdjustmentCamera modelB = model.getClass().getConstructor().newInstance();
+		for (var parameter : parameters) {
+			// encode into a map and assign modelB using the map
+			model.setIntrinsic(parameter, 0);
+			modelB.setTo(model.toMap());
+
+			// Extract the encoding to see if modelB has the same state
+			var found = new double[parameter.length];
+			modelB.getIntrinsic(found, 0);
+			for (int i = 0; i < found.length; i++) {
+				assertEquals(parameter[i], found[i], 0.0);
 			}
 		}
 	}

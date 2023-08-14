@@ -24,12 +24,21 @@ import georegression.struct.point.Point2D_F64;
 import org.ejml.FancyPrint;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.HashMap;
+import java.util.Map;
+
+import static boofcv.misc.BoofMiscOps.getOrThrow;
+
 /**
  * A simplified camera model that assumes the camera's zoom is known as part of the camera state
  *
  * @author Peter Abeles
  */
 public class BundleZoomSimplified implements BundleAdjustmentCamera {
+	public final static String TYPE_NAME = "ZoomSimplified";
+
 	// Offset for focal length
 	public double fOff = 0;
 	// Scale for focal length
@@ -138,6 +147,28 @@ public class BundleZoomSimplified implements BundleAdjustmentCamera {
 	@Override
 	public int getIntrinsicCount() {
 		return 4;
+	}
+
+	@Override public BundleAdjustmentCamera setTo( Map<String, Object> src ) {
+		try {
+			fOff = getOrThrow(src, "f-off");
+			fScale = getOrThrow(src, "f-scale");
+			k1 = getOrThrow(src, "k1");
+			k2 = getOrThrow(src, "k2");
+			return this;
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	@Override public Map<String, Object> toMap() {
+		var map = new HashMap<String, Object>();
+		map.put("type", TYPE_NAME);
+		map.put("f-off", fOff);
+		map.put("f-scale", fScale);
+		map.put("k1", k1);
+		map.put("k2", k2);
+		return map;
 	}
 
 	@Override

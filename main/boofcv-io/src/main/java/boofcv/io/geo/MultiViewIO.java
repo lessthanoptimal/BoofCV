@@ -19,12 +19,10 @@
 package boofcv.io.geo;
 
 import boofcv.BoofVersion;
-import boofcv.abst.geo.bundle.BundleCameraState;
-import boofcv.abst.geo.bundle.SceneObservations;
-import boofcv.abst.geo.bundle.SceneStructureCommon;
-import boofcv.abst.geo.bundle.SceneStructureMetric;
+import boofcv.abst.geo.bundle.*;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeBrown;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
+import boofcv.alg.geo.bundle.cameras.BundleZoomSimplified;
 import boofcv.alg.similar.SimilarImagesData;
 import boofcv.alg.structure.LookUpSimilarImages;
 import boofcv.alg.structure.PairwiseImageGraph;
@@ -377,18 +375,7 @@ public class MultiViewIO {
 	private static Map<String, Object> encodeSceneCamera( SceneStructureCommon.Camera c ) {
 		Map<String, Object> encoded = new HashMap<>();
 		encoded.put("known", c.known);
-
-		Map<String, Object> model;
-		if (c.model instanceof BundlePinholeSimplified) {
-			model = putPinholeSimplified((BundlePinholeSimplified)c.model);
-			model.put("type", "PinholeSimplified");
-		} else if (c.model instanceof BundlePinholeBrown) {
-			model = putPinholeBrown((BundlePinholeBrown)c.model);
-			model.put("type", "PinholeBrown");
-		} else {
-			throw new RuntimeException("Camera type not yet supported. type='" + c.model.getClass().getSimpleName() + "'");
-		}
-		encoded.put("model", model);
+		encoded.put("model", c.model.toMap());
 		return encoded;
 	}
 
@@ -399,12 +386,31 @@ public class MultiViewIO {
 			c = new SceneStructureCommon.Camera();
 		c.known = getOrThrow(map, "known");
 		Map<String, Object> model = getOrThrow(map, "model");
-		String type = getOrThrow(model, "type");
-		c.model = switch (type) {
-			case "PinholeSimplified" -> loadPinholeSimplified(model, null);
-			case "PinholeBrown" -> loadPinholeBrown(model, null);
-			default -> throw new RuntimeException("Unknown camera. type='" + type + "'");
-		};
+		Class type = null;
+
+		// Built in camera types have a simplified format. This is primarily for backwards compatibility
+		if (model.containsKey("type")) {
+			switch ((String)model.get("type")) {
+				case BundlePinholeSimplified.TYPE_NAME -> type = BundlePinholeSimplified.class;
+				case BundlePinholeBrown.TYPE_NAME -> type = BundlePinholeBrown.class;
+				case BundleZoomSimplified.TYPE_NAME -> type = BundleZoomSimplified.class;
+				default -> throw new RuntimeException("Unknown camera. type='" + type + "'");
+			}
+		}
+		try {
+			// If not a built-in time, try loading it using reflection
+			if (type == null) {
+				if (!model.containsKey("class-name"))
+					throw new RuntimeException("Camera type not specified by 'type' or 'class-name'");
+				type = Class.forName((String)Objects.requireNonNull(model.get("class-name")));
+			}
+
+			c.model = (BundleAdjustmentCamera)type.getConstructor().newInstance();
+			c.model.setTo(model);
+		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException | NoSuchMethodException |
+				 InvocationTargetException e) {
+			throw new RuntimeException(e);
+		}
 
 		return c;
 	}

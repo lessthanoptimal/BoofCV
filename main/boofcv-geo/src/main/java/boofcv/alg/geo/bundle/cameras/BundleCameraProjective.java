@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,9 @@ package boofcv.alg.geo.bundle.cameras;
 import boofcv.abst.geo.bundle.BundleAdjustmentCamera;
 import georegression.struct.point.Point2D_F64;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Projective camera model. pixel (x,y) = (X/Z , Y/Z)
@@ -52,8 +55,15 @@ public class BundleCameraProjective implements BundleAdjustmentCamera {
 		// there are no calibration parameters to differentiate
 	}
 
-	@Override
-	public int getIntrinsicCount() {
+	@Override public int getIntrinsicCount() {
 		return 0;
+	}
+
+	@Override public BundleAdjustmentCamera setTo( Map<String, Object> src ) {
+		return this;
+	}
+
+	@Override public Map<String, Object> toMap() {
+		return new HashMap<>();
 	}
 }

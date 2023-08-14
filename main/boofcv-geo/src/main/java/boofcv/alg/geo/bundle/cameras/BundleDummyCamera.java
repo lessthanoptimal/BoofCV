@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,8 @@ package boofcv.alg.geo.bundle.cameras;
 import boofcv.abst.geo.bundle.BundleAdjustmentCamera;
 import georegression.struct.point.Point2D_F64;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Map;
 
 /**
  * Model that does nothing other than throw exceptions. Used to make sure everything is correctly initialized
@@ -50,6 +52,14 @@ public class BundleDummyCamera implements BundleAdjustmentCamera {
 	}
 
 	@Override public int getIntrinsicCount() {
+		throw new RuntimeException("Camera model not initialized correctly");
+	}
+
+	@Override public BundleAdjustmentCamera setTo( Map<String, Object> src ) {
+		throw new RuntimeException("Camera model not initialized correctly");
+	}
+
+	@Override public Map<String, Object> toMap() {
 		throw new RuntimeException("Camera model not initialized correctly");
 	}
 }
