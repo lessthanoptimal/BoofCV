@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,8 @@
 
 package boofcv.alg.mvs;
 
+import boofcv.abst.geo.bundle.BundleCameraState;
+import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureCommon;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.distort.brown.LensDistortionBrown;
@@ -35,6 +37,7 @@ import georegression.struct.se.Se3_F64;
 import lombok.Getter;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,10 +85,12 @@ public class ColorizeMultiViewStereoResults<T extends ImageBase<T>> {
 	 * Extracts color information for the point cloud on a view by view basis.
 	 *
 	 * @param scene (Input) Geometric description of the scene
+	 * @param observations (Input) Observations of the camera state
 	 * @param mvs (Input) Contains the 3D point cloud
 	 * @param indexColor (Output) RGB values are passed through to this function.
 	 */
 	public void processMvsCloud( SceneStructureMetric scene,
+								 @Nullable SceneObservations observations,
 								 MultiViewStereoFromKnownSceneStructure<?> mvs,
 								 BoofLambdas.IndexRgbConsumer indexColor ) {
 
@@ -106,8 +111,11 @@ public class ColorizeMultiViewStereoResults<T extends ImageBase<T>> {
 			int idx0 = mvs.getDisparityCloud().viewPointIdx.get(centerIdx);
 			int idx1 = mvs.getDisparityCloud().viewPointIdx.get(centerIdx + 1);
 
+			// State of the camera in this view
+			@Nullable BundleCameraState state = observations != null ? observations.getView(centerIdx).cameraState : null;
+
 			// Setup the camera projection model using bundle adjustment model directly
-			BundleAdjustmentOps.convert(scene.getViewCamera(center.metric).model, image.width, image.height, intrinsic);
+			BundleAdjustmentOps.convert(scene.getViewCamera(center.metric).model, state, image.width, image.height, intrinsic);
 			Point2Transform2_F64 norm_to_pixel = new LensDistortionBrown(intrinsic).distort_F64(false, true);
 
 			// Get the transform from world/cloud to this view
@@ -122,10 +130,12 @@ public class ColorizeMultiViewStereoResults<T extends ImageBase<T>> {
 	 * Looks up the colors for all the points in the scene by reprojecting them back onto their original images.
 	 *
 	 * @param scene (Input) Scene's structure
+	 * @param observations (Input) Observations of the camera state. Null if fixed focus.
 	 * @param indexToId (Input) Convert view index to view ID
 	 * @param indexColor (Output) RGB values are passed through to this function.
 	 */
 	public void processScenePoints( SceneStructureMetric scene,
+									@Nullable SceneObservations observations,
 									BoofLambdas.IndexToString indexToId,
 									BoofLambdas.IndexRgbConsumer indexColor ) {
 
@@ -158,8 +168,11 @@ public class ColorizeMultiViewStereoResults<T extends ImageBase<T>> {
 			// Get the view that is being processed
 			SceneStructureMetric.View v = scene.views.get(viewIdx);
 
+			// State of the camera in this view
+			@Nullable BundleCameraState state = observations != null ? observations.getView(viewIdx).cameraState : null;
+
 			// Setup the camera projection model using bundle adjustment model directly
-			BundleAdjustmentOps.convert(scene.getViewCamera(v).model, image.width, image.height, intrinsic);
+			BundleAdjustmentOps.convert(scene.getViewCamera(v).model, state, image.width, image.height, intrinsic);
 			Point2Transform2_F64 norm_to_pixel = new LensDistortionBrown(intrinsic).distort_F64(false, true);
 
 			// Get the transform from world/cloud to this view

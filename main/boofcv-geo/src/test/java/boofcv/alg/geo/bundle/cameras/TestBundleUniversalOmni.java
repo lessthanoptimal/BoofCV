@@ -29,11 +29,10 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestBundleUniversalOmni extends BoofStandardJUnit {
-
-	@Test
-	void compareForward() {
+	@Test void compareForward() {
 		CameraUniversalOmni cam = new CameraUniversalOmni(2);
-		cam.fx = 300; cam.fy = 200;
+		cam.fx = 300;
+		cam.fy = 200;
 		cam.cx = cam.cy = 400;
 		cam.radial[0] = 0.01;
 		cam.radial[1] = -0.02;
@@ -58,35 +57,32 @@ public class TestBundleUniversalOmni extends BoofStandardJUnit {
 		assertTrue(found.distance(expected) < UtilEjml.TEST_F64);
 	}
 
-	@Test
-	void withAllParameters() {
+	@Test void withAllParameters() throws Exception {
 		double[][] parameters = new double[][]{{300, 200, 400, 400, 0.01, 0.015, -0.001, 0.002, 0.1, 0.9}, {400, 600, 1000, 1000, 0.01, 0.015, -0.001, 0.002, 2, 0.9}};
 		new GenericChecksBundleAdjustmentCamera(new BundleUniversalOmni(false, 2, true, false), 0.02) {}
 				.setParameters(parameters)
 				.checkAll();
 	}
 
-	@Test
-	void withFixedMirror() {
+	@Test void withFixedMirror() throws Exception {
 		double[][] parameters = new double[][]{{300, 200, 400, 400, 0.01, 0.015, -0.001, 0.002, 0.1}, {400, 600, 1000, 1000, 0.01, 0.015, -0.001, 0.002, 2}};
 		new GenericChecksBundleAdjustmentCamera(new BundleUniversalOmni(false, 2, true, 0.9), 0.02) {}
 				.setParameters(parameters)
 				.checkAll();
 	}
 
-	@Test
-	void withoutSkew() {
+	@Test void withoutSkew() throws Exception {
 		double[][] parameters = new double[][]{{300, 200, 400, 400, 0.01, 0.02, -0.001, 0.002, 0.9}, {400, 600, 1000, 1000, 0.01, 0.02, -0.001, 0.002, 0.9}};
 		new GenericChecksBundleAdjustmentCamera(new BundleUniversalOmni(true, 2, true, false), 0.02) {}
 				.setParameters(parameters)
 				.checkAll();
 	}
 
-	@Test
-	void variousRadialLengths() {
+	@Test void variousRadialLengths() throws Exception {
 		for (int i = 0; i <= 3; i++) {
 			CameraUniversalOmni cam = new CameraUniversalOmni(i);
-			cam.fx = 300; cam.fy = 200;
+			cam.fx = 300;
+			cam.fy = 200;
 			cam.cx = cam.cy = 400;
 			cam.skew = 0.01;
 			for (int j = 0; j < i; j++) {
@@ -105,10 +101,10 @@ public class TestBundleUniversalOmni extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	void zeroTangential() {
+	@Test void zeroTangential() throws Exception {
 		CameraUniversalOmni cam = new CameraUniversalOmni(1);
-		cam.fx = 300; cam.fy = 200;
+		cam.fx = 300;
+		cam.fy = 200;
 		cam.cx = cam.cy = 400;
 		cam.skew = 0.01;
 		cam.radial[0] = 0.01;

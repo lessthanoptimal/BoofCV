@@ -136,7 +136,13 @@ public class BundlePinhole implements BundleAdjustmentCamera {
 		try {
 			fx = getOrThrow(map, "fx");
 			fy = getOrThrow(map, "fy");
-			skew = (double)map.getOrDefault("skew", 0.0);
+			if (map.containsKey("skew")) {
+				skew = getOrThrow(map, "skew");
+				zeroSkew = false;
+			} else {
+				skew = 0.0;
+				zeroSkew = true;
+			}
 			cx = getOrThrow(map, "cx");
 			cy = getOrThrow(map, "cy");
 			return this;
@@ -149,7 +155,8 @@ public class BundlePinhole implements BundleAdjustmentCamera {
 		var map = new HashMap<String, Object>();
 		map.put("fx", fx);
 		map.put("fy", fy);
-		map.put("skew", skew);
+		if (!zeroSkew)
+			map.put("skew", skew);
 		map.put("cx", cx);
 		map.put("cy", cy);
 		return map;

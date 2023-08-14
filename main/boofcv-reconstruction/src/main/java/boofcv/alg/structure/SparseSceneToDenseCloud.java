@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.structure;
 
+import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.mvs.ColorizeMultiViewStereoResults;
 import boofcv.alg.mvs.MultiViewStereoFromKnownSceneStructure;
@@ -67,7 +68,8 @@ public class SparseSceneToDenseCloud<T extends ImageGray<T>> {
 	 * @param lookUpImages Used to lookup images by name
 	 * @return true if successful or false if it failed
 	 */
-	public boolean process( SceneStructureMetric scene, TIntObjectMap<String> viewIdx_to_ImageID,
+	public boolean process( SceneStructureMetric scene, SceneObservations observations,
+							TIntObjectMap<String> viewIdx_to_ImageID,
 							LookUpImages lookUpImages ) {
 		// reset variables
 		timeCreateGraphMS = 0;
@@ -82,14 +84,14 @@ public class SparseSceneToDenseCloud<T extends ImageGray<T>> {
 
 		// Compute the dense cloud
 		mvs.setImageLookUp(lookUpImages);
-		mvs.process(scene, generateGraph.getStereoGraph());
+		mvs.process(scene, observations, generateGraph.getStereoGraph());
 		long time2 = System.nanoTime();
 		timeMultiViewStereoMS = (time2 - time1)*1e-6;
 
 		// Extract colors from cloud
 		colorRgb.resize(mvs.getCloud().size());
 		var colorizeMvs = new ColorizeMultiViewStereoResults<>(new LookUpColorRgbFormats.PL_U8(), lookUpImages);
-		colorizeMvs.processMvsCloud(scene, mvs, ( idx, r, g, b ) -> colorRgb.set(idx, (r << 16) | (g << 8) | b));
+		colorizeMvs.processMvsCloud(scene, observations, mvs, ( idx, r, g, b ) -> colorRgb.set(idx, (r << 16) | (g << 8) | b));
 		long time3 = System.nanoTime();
 		timeColorizeMS = (time3 - time2)*1e-6;
 

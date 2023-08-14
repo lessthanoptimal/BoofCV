@@ -72,7 +72,7 @@ class TestColorizeMultiViewStereoResults extends BoofStandardJUnit {
 		mvs.disparityCloud.cloud.grow().setTo(0, 0, 1);
 
 		var alg = new ColorizeMultiViewStereoResults<>(new LookUpColorRgbFormats.SB_U8(), new MockLookUp());
-		alg.processMvsCloud(scene, mvs, ( idx, r, g, b ) -> {
+		alg.processMvsCloud(scene, null, mvs, ( idx, r, g, b ) -> {
 			// we can assume the first view is called first, but that's not strictly required to be correct
 			int expected = idx == 0 ? 10 : 15;
 			assertEquals(expected, r);
@@ -104,7 +104,7 @@ class TestColorizeMultiViewStereoResults extends BoofStandardJUnit {
 		scene.points.get(1).views.addAll(DogArray_I32.array(1, 0));
 
 		var alg = new ColorizeMultiViewStereoResults<>(new LookUpColorRgbFormats.SB_U8(), new MockLookUp());
-		alg.processScenePoints(scene, ( idx ) -> (5*idx + 10) + "", ( idx, r, g, b ) -> {
+		alg.processScenePoints(scene, null, ( idx ) -> (5*idx + 10) + "", ( idx, r, g, b ) -> {
 			// we can assume the first view is called first, but that's not strictly required to be correct
 			int expected = idx == 0 ? 10 : 15;
 			assertEquals(expected, r);

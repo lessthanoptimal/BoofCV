@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -130,7 +130,7 @@ public class ExampleMultiViewDenseReconstruction {
 		// stereo disparity
 		var viewToId = new TIntObjectHashMap<String>();
 		BoofMiscOps.forIdx(example.working.listViews, ( workIdxI, wv ) -> viewToId.put(wv.index, wv.pview.id));
-		if (!sparseToDense.process(example.scene, viewToId, imageLookup))
+		if (!sparseToDense.process(example.scene, null, viewToId, imageLookup))
 			throw new RuntimeException("Dense reconstruction failed!");
 
 		saveCloudToDisk(sparseToDense);

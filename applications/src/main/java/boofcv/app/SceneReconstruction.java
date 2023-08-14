@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.app;
 
 import boofcv.BoofVerbose;
+import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTracker;
@@ -170,6 +171,7 @@ public class SceneReconstruction {
 	LookUpSimilarImages dbSimilar;
 	LookUpCameraInfo dbCams = new LookUpCameraInfo();
 	SceneStructureMetric scene;
+	SceneObservations observations;
 	SparseSceneToDenseCloud<GrayU8> sparseToDense;
 
 	// List of all the independent scenes it was able to construct
@@ -352,6 +354,7 @@ public class SceneReconstruction {
 			MultiViewIO.save(working, new File(sceneDirectory, "working.yaml").getPath());
 		} else {
 			scene = MultiViewIO.load(new File(sceneDirectory, "structure.yaml").getPath(), (SceneStructureMetric)null);
+			observations = MultiViewIO.load(new File(sceneDirectory, "observations.yaml").getPath(), (SceneObservations)null);
 		}
 		printSparseSummary(working);
 
@@ -367,7 +370,7 @@ public class SceneReconstruction {
 		ConfigDisparitySGM configSgm = configSparseToDense.disparity.approachSGM;
 		configSgm.validateRtoL = 0;
 		configSgm.texture = 0.75;
-		configSgm.disparityRange = disparityRange <= 0 ? 250: disparityRange;
+		configSgm.disparityRange = disparityRange <= 0 ? 250 : disparityRange;
 		configSgm.paths = ConfigDisparitySGM.Paths.P4;
 		configSgm.configBlockMatch.radiusX = 3;
 		configSgm.configBlockMatch.radiusY = 3;
@@ -595,7 +598,7 @@ public class SceneReconstruction {
 		// stereo disparity
 		var viewToId = new TIntObjectHashMap<String>();
 		BoofMiscOps.forIdx(working.listViews, ( workIdxI, wv ) -> viewToId.put(wv.index, wv.pview.id));
-		if (!sparseToDense.process(scene, viewToId, imageLookup))
+		if (!sparseToDense.process(scene, observations, viewToId, imageLookup))
 			throw new RuntimeException("Dense reconstruction failed!");
 	}
 
@@ -633,7 +636,7 @@ public class SceneReconstruction {
 
 		DogArray_I32 colorsRgb = new DogArray_I32();
 		colorsRgb.resize(scene.points.size);
-		colorize.processScenePoints(scene,
+		colorize.processScenePoints(scene, observations,
 				( viewIdx ) -> viewIdx + "", // String encodes the image's index
 				( pointIdx, r, g, b ) -> colorsRgb.set(pointIdx, (r << 16) | (g << 8) | b)); // Assign the RGB color
 
