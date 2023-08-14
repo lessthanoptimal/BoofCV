@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,13 @@ import boofcv.abst.geo.bundle.BundleAdjustmentCamera;
 import boofcv.struct.calib.CameraPinhole;
 import georegression.struct.point.Point2D_F64;
 import org.jetbrains.annotations.Nullable;
+
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.HashMap;
+import java.util.Map;
+
+import static boofcv.misc.BoofMiscOps.getOrThrow;
 
 /**
  * Formulas for {@link boofcv.struct.calib.CameraPinhole}.
@@ -123,6 +130,29 @@ public class BundlePinhole implements BundleAdjustmentCamera {
 	@Override
 	public int getIntrinsicCount() {
 		return zeroSkew ? 4 : 5;
+	}
+
+	@Override public BundleAdjustmentCamera setTo( Map<String, Object> map ) {
+		try {
+			fx = getOrThrow(map, "fx");
+			fy = getOrThrow(map, "fy");
+			skew = (double)map.getOrDefault("skew", 0.0);
+			cx = getOrThrow(map, "cx");
+			cy = getOrThrow(map, "cy");
+			return this;
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	@Override public Map<String, Object> toMap() {
+		var map = new HashMap<String, Object>();
+		map.put("fx", fx);
+		map.put("fy", fy);
+		map.put("skew", skew);
+		map.put("cx", cx);
+		map.put("cy", cy);
+		return map;
 	}
 
 	@Override

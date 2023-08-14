@@ -21,6 +21,8 @@ package boofcv.abst.geo.bundle;
 import georegression.struct.point.Point2D_F64;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Map;
+
 /**
  * Generalized camera model for bundle adjustment. By implementing this function you can swap in and out
  * arbitrary camera models.
@@ -90,4 +92,15 @@ public interface BundleAdjustmentCamera {
 	 * @return number of intrinsic parameters.
 	 */
 	int getIntrinsicCount();
+
+	/**
+	 * Set's the classes state to the value contained in this map. Used when deserializing.
+	 */
+	BundleAdjustmentCamera setTo( Map<String, Object> src );
+
+	/**
+	 * Convert's the values into a map format where each class's field has a corresponding key with the same name and
+	 * primitive value or primitive array. This is used for serialization to YAML.
+	 */
+	Map<String, Object> toMap();
 }

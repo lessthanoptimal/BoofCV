@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,13 @@ import georegression.struct.point.Point2D_F64;
 import org.ejml.FancyPrint;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.HashMap;
+import java.util.Map;
+
+import static boofcv.misc.BoofMiscOps.getOrThrow;
+
 /**
  * A pinhole camera with radial distortion that is fully described using three parameters. Focal length and two
  * radial distortion parameters.
@@ -40,6 +47,8 @@ import org.jetbrains.annotations.Nullable;
  * @author Peter Abeles
  */
 public class BundlePinholeSimplified implements BundleAdjustmentCamera {
+	public final static String TYPE_NAME = "PinholeSimplified";
+
 	// focal length
 	public double f;
 	// radial distortion parameters
@@ -131,6 +140,26 @@ public class BundlePinholeSimplified implements BundleAdjustmentCamera {
 	@Override
 	public int getIntrinsicCount() {
 		return 3;
+	}
+
+	@Override public BundleAdjustmentCamera setTo( Map<String, Object> src ) {
+		try {
+			f = getOrThrow(src, "f");
+			k1 = getOrThrow(src, "k1");
+			k2 = getOrThrow(src, "k2");
+			return this;
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	@Override public Map<String, Object> toMap() {
+		var map = new HashMap<String, Object>();
+		map.put("type", TYPE_NAME);
+		map.put("f", f);
+		map.put("k1", k1);
+		map.put("k2", k2);
+		return map;
 	}
 
 	@Override

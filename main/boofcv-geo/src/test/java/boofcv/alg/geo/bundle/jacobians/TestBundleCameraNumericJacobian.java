@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.bundle.jacobians;
 
-import boofcv.abst.geo.bundle.BundleAdjustmentCamera;
+import boofcv.alg.geo.bundle.cameras.BundleDummyCamera;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.UtilEjml;
@@ -74,8 +74,7 @@ public class TestBundleCameraNumericJacobian extends BoofStandardJUnit {
 		}
 	}
 
-	public static class SimpleCamera implements BundleAdjustmentCamera {
-
+	public static class SimpleCamera extends BundleDummyCamera {
 		double a, b;
 
 		@Override

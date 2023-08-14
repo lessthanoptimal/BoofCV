@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,13 @@ import georegression.struct.point.Point2D_F64;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import static boofcv.alg.distort.kanbra.KannalaBrandtUtils_F64.*;
+import static boofcv.misc.BoofMiscOps.getOrThrow;
 
 /**
  * Implementation of {@link CameraKannalaBrandt} for bundle adjustment
@@ -341,5 +347,38 @@ public class BundleKannalaBrandt implements BundleAdjustmentCamera {
 
 	@Override public int getIntrinsicCount() {
 		return dof;
+	}
+
+	@Override public BundleAdjustmentCamera setTo( Map<String, Object> map ) {
+		try {
+			model.fx = getOrThrow(map, "fx");
+			model.fy = getOrThrow(map, "fy");
+			model.skew = (double)map.getOrDefault("skew", 0.0);
+			model.cx = getOrThrow(map, "cx");
+			model.cy = getOrThrow(map, "cy");
+			model.symmetric = getOrThrow(map, "symmetric");
+			model.tangent = getOrThrow(map, "tangent");
+			model.radial = getOrThrow(map, "radial");
+			model.tangentTrig = getOrThrow(map, "tangent-trig");
+			model.radialTrig = getOrThrow(map, "radial-trig");
+			return this;
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	@Override public Map<String, Object> toMap() {
+		var map = new HashMap<String, Object>();
+		map.put("fx", model.fx);
+		map.put("fy", model.fy);
+		map.put("skew", model.skew);
+		map.put("cx", model.cx);
+		map.put("cy", model.cy);
+		map.put("symmetric", model.symmetric);
+		map.put("tangent", model.tangent);
+		map.put("radial", model.radial);
+		map.put("tangent-trig", model.tangentTrig);
+		map.put("radial-trig", model.radialTrig);
+		return map;
 	}
 }

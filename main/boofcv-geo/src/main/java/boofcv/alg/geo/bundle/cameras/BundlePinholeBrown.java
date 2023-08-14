@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,13 @@ import org.ejml.FancyPrint;
 import org.ejml.data.DMatrixRMaj;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static boofcv.misc.BoofMiscOps.getOrThrow;
 import static boofcv.struct.calib.CameraPinholeBrown.toStringArray;
 
 /**
@@ -34,6 +41,7 @@ import static boofcv.struct.calib.CameraPinholeBrown.toStringArray;
  */
 @SuppressWarnings({"NullAway.Init"})
 public class BundlePinholeBrown implements BundleAdjustmentCamera {
+	public final static String TYPE_NAME = "PinholeBrown";
 
 	// if true skew is assumed to be zero
 	public boolean zeroSkew = true;
@@ -313,6 +321,43 @@ public class BundlePinholeBrown implements BundleAdjustmentCamera {
 	@Override
 	public int getIntrinsicCount() {
 		return 4 + radial.length + (tangential ? 2 : 0) + (zeroSkew ? 0 : 1);
+	}
+
+	@Override public BundleAdjustmentCamera setTo( Map<String, Object> map ) {
+		try {
+			fx = getOrThrow(map, "fx");
+			fy = getOrThrow(map, "fy");
+			skew = (double)map.getOrDefault("skew", 0.0);
+			cx = getOrThrow(map, "cx");
+			cy = getOrThrow(map, "cy");
+
+			t1 = (double)map.getOrDefault("t1", 0.0);
+			t2 = (double)map.getOrDefault("t2", 0.0);
+
+			List<Double> radialList = (List<Double>)map.get("radial");
+			if (radialList == null)
+				radial = new double[0];
+			else {
+				radial = radialList.stream().mapToDouble(i -> i).toArray();
+			}
+			return this;
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	@Override public Map<String, Object> toMap() {
+		var map = new HashMap<String, Object>();
+		map.put("type", TYPE_NAME);
+		map.put("fx", fx);
+		map.put("fy", fy);
+		map.put("skew", skew);
+		map.put("cx", cx);
+		map.put("cy", cy);
+		map.put("t1", t1);
+		map.put("t2", t2);
+		map.put("radial", radial);
+		return map;
 	}
 
 	@Override public String toString() {
