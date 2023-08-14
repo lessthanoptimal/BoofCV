@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.mvs;
 
 import boofcv.abst.geo.bundle.BundleAdjustmentCamera;
+import boofcv.abst.geo.bundle.BundleCameraState;
 import boofcv.alg.distort.brown.LensDistortionBrown;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
@@ -36,6 +37,7 @@ import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.FMatrixRMaj;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.ejml.ops.ConvertMatrixData;
+import org.jetbrains.annotations.Nullable;
 
 import static boofcv.misc.BoofMiscOps.checkTrue;
 
@@ -89,11 +91,12 @@ public class BundleToRectificationStereoParameters {
 	 * Specifies lens parameters for view-1. This is done independently since often the same view is compared against
 	 * multiple other views
 	 */
-	public void setView1( BundleAdjustmentCamera bundle1, int width, int height ) {
+	public void setView1( BundleAdjustmentCamera bundle1, @Nullable BundleCameraState state1,
+						  int width, int height ) {
 		BoofMiscOps.checkTrue(width > 0);
 		BoofMiscOps.checkTrue(height > 0);
 
-		BundleAdjustmentOps.convert(bundle1, width, height, intrinsic1);
+		BundleAdjustmentOps.convert(bundle1, state1, width, height, intrinsic1);
 		PerspectiveOps.pinholeToMatrix(intrinsic1, K1);
 
 		intrinsic1.width = width;
@@ -109,9 +112,10 @@ public class BundleToRectificationStereoParameters {
 	 * @param bundle2 (Input) Intrinsic lens distortion parameters
 	 * @param view1_to_view2 (Input) Extrinsic relationship between view-1 and view-2
 	 */
-	public void processView2( BundleAdjustmentCamera bundle2, int width, int height , Se3_F64 view1_to_view2 ) {
+	public void processView2( BundleAdjustmentCamera bundle2, @Nullable BundleCameraState state2,
+							  int width, int height, Se3_F64 view1_to_view2 ) {
 		checkTrue(intrinsic1.width != 0, "Did you call setView1() Must be called first.");
-		BundleAdjustmentOps.convert(bundle2, width, height, intrinsic2);
+		BundleAdjustmentOps.convert(bundle2, state2, width, height, intrinsic2);
 		PerspectiveOps.pinholeToMatrix(intrinsic2, K2);
 
 		// Compute the parameters for the rectified view

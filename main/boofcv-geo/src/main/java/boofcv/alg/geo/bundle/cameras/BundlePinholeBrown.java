@@ -28,10 +28,10 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static boofcv.misc.BoofMiscOps.getOrThrow;
+import static boofcv.misc.BoofMiscOps.listToArrayDouble;
 import static boofcv.struct.calib.CameraPinholeBrown.toStringArray;
 
 /**
@@ -140,6 +140,8 @@ public class BundlePinholeBrown implements BundleAdjustmentCamera {
 		if (tangential) {
 			t1 = parameters[offset++];
 			t2 = parameters[offset++];
+		} else {
+			t1 = t2 = 0.0;
 		}
 
 		if (!zeroSkew) {
@@ -327,19 +329,27 @@ public class BundlePinholeBrown implements BundleAdjustmentCamera {
 		try {
 			fx = getOrThrow(map, "fx");
 			fy = getOrThrow(map, "fy");
-			skew = (double)map.getOrDefault("skew", 0.0);
 			cx = getOrThrow(map, "cx");
 			cy = getOrThrow(map, "cy");
 
-			t1 = (double)map.getOrDefault("t1", 0.0);
-			t2 = (double)map.getOrDefault("t2", 0.0);
-
-			List<Double> radialList = (List<Double>)map.get("radial");
-			if (radialList == null)
-				radial = new double[0];
-			else {
-				radial = radialList.stream().mapToDouble(i -> i).toArray();
+			if (map.containsKey("skew")) {
+				skew = getOrThrow(map, "skew");
+				zeroSkew = false;
+			} else {
+				skew = 0;
+				zeroSkew = true;
 			}
+
+			if (map.containsKey("t1")) {
+				t1 = getOrThrow(map, "t1");
+				t2 = getOrThrow(map, "t2");
+				tangential = true;
+			} else {
+				t1 = t2 = 0.0;
+				tangential = false;
+			}
+
+			radial = listToArrayDouble(getOrThrow(map, "radial"));
 			return this;
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
@@ -351,11 +361,14 @@ public class BundlePinholeBrown implements BundleAdjustmentCamera {
 		map.put("type", TYPE_NAME);
 		map.put("fx", fx);
 		map.put("fy", fy);
-		map.put("skew", skew);
+		if (!zeroSkew)
+			map.put("skew", skew);
 		map.put("cx", cx);
 		map.put("cy", cy);
-		map.put("t1", t1);
-		map.put("t2", t2);
+		if (tangential) {
+			map.put("t1", t1);
+			map.put("t2", t2);
+		}
 		map.put("radial", radial);
 		return map;
 	}

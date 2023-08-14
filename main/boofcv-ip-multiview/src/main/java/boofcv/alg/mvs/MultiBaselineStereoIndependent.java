@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,8 @@ package boofcv.alg.mvs;
 import boofcv.BoofVerbose;
 import boofcv.abst.disparity.DisparitySmoother;
 import boofcv.abst.disparity.StereoDisparity;
+import boofcv.abst.geo.bundle.BundleCameraState;
+import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.geo.PerspectiveOps;
@@ -107,6 +109,7 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 
 	//------------ References to input objects
 	private SceneStructureMetric scene; // Camera placement and parameters
+	private @Nullable SceneObservations observations;
 
 	/** Inverse depth image in input image coordinates */
 	final @Getter GrayF32 fusedInvDepth = new GrayF32(1, 1);
@@ -161,7 +164,8 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 	 * @param sbaIndexToViewID Look up table from view index to view ID
 	 * @return true if successful or false if it failed
 	 */
-	public boolean process( SceneStructureMetric scene, int targetIdx, DogArray_I32 pairIdxs,
+	public boolean process( SceneStructureMetric scene, @Nullable SceneObservations observations,
+							int targetIdx, DogArray_I32 pairIdxs,
 							BoofLambdas.IndexToString sbaIndexToViewID ) {
 		if (verbose != null) verbose.println("ENTER process()");
 		// Reset profiling
@@ -174,6 +178,7 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 		requireNonNull(stereoDisparity, "stereoDisparity must be configured");
 		requireNonNull(lookUpImages, "lookUpImages must be configured");
 		this.scene = scene;
+		this.observations = observations;
 
 		// Load the "center" image and initialize related data structures
 		if (!lookUpImages.loadImage(sbaIndexToViewID.process(targetIdx), image1)) {
@@ -184,7 +189,8 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 		timeLookUpImages += (time1 - time0)*1e-6;
 
 		int targetCamera = scene.views.get(targetIdx).camera;
-		computeRectification.setView1(scene.cameras.get(targetCamera).model, image1.width, image1.height);
+		BundleCameraState targetState = observations != null ? observations.getView(targetIdx).cameraState : null;
+		computeRectification.setView1(scene.cameras.get(targetCamera).model, targetState, image1.width, image1.height);
 		scene.getWorldToView(scene.views.get(targetIdx), world_to_left, tmpse3);
 		world_to_left.invert(left_to_world);
 
@@ -253,7 +259,8 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 		left_to_world.concat(world_to_right, left_to_right);
 
 		// Compute rectification data
-		computeRectification.processView2(scene.cameras.get(rightCamera).model,
+		BundleCameraState rightState = observations != null ? observations.getView(rightIdx).cameraState : null;
+		computeRectification.processView2(scene.cameras.get(rightCamera).model, rightState,
 				image2.getWidth(), image2.getHeight(), left_to_right);
 
 		// Save the results

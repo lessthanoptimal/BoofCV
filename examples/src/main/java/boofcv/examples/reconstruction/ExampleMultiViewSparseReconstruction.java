@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -96,7 +96,7 @@ public class ExampleMultiViewSparseReconstruction {
 	SceneWorkingGraph working = null;
 	SceneStructureMetric scene = null;
 
-	boolean rebuild = false;
+	boolean forceRebuild = false;
 
 	public static void main( String[] args ) {
 		var example = new ExampleMultiViewSparseReconstruction();
@@ -120,7 +120,7 @@ public class ExampleMultiViewSparseReconstruction {
 		workDirectory = "mvs_work/" + FilenameUtils.getBaseName(videoName);
 
 		// Attempt to reload intermediate results if previously computed
-		if (!rebuild) {
+		if (!forceRebuild) {
 			try {
 				pairwise = MultiViewIO.load(new File(workDirectory, "pairwise.yaml").getPath(), (PairwiseImageGraph)null);
 			} catch (UncheckedIOException ignore) {}
@@ -361,7 +361,7 @@ public class ExampleMultiViewSparseReconstruction {
 
 		DogArray_I32 rgb = new DogArray_I32();
 		rgb.resize(scene.points.size);
-		colorize.processScenePoints(scene,
+		colorize.processScenePoints(scene, null,
 				( viewIdx ) -> viewIdx + "", // String encodes the image's index
 				( pointIdx, r, g, b ) -> rgb.set(pointIdx, (r << 16) | (g << 8) | b)); // Assign the RGB color
 

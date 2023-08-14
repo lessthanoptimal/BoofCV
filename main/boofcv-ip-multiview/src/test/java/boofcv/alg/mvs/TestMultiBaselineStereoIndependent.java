@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.mvs;
 
+import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.disparity.ConfigDisparityBMBest5;
@@ -99,6 +100,9 @@ public class TestMultiBaselineStereoIndependent extends BoofStandardJUnit {
 		scene.setView(1, 1, true, world_to_view1);
 		scene.setView(2, 2, true, world_to_view2);
 
+		var observations = new SceneObservations();
+		observations.initialize(scene.views.size);
+
 		var lookup = new MockLookUp();
 		var alg = new MultiBaselineStereoIndependent<>(lookup, ImageType.SB_F32);
 		// Not mocking disparity because of how complex that would be to pull off. This makes it a bit of an inexact
@@ -130,7 +134,7 @@ public class TestMultiBaselineStereoIndependent extends BoofStandardJUnit {
 		}
 		lookup.images = images;
 
-		assertTrue(alg.process(scene, 0, DogArray_I32.array(1, 2), sbaIndexToViewID::get));
+		assertTrue(alg.process(scene, observations, 0, DogArray_I32.array(1, 2), sbaIndexToViewID::get));
 
 		GrayF32 found = alg.getFusedInvDepth();
 		assertEquals(listIntrinsic.get(0).width, found.width);
@@ -160,7 +164,7 @@ public class TestMultiBaselineStereoIndependent extends BoofStandardJUnit {
 
 		int N = found.width*found.height;
 		assertTrue(N*tolFilled <= totalFilled);
-		assertTrue(totalFilled*tolCorrect <= totalCorrect, "correct "+(totalCorrect/(double)totalFilled));
+		assertTrue(totalFilled*tolCorrect <= totalCorrect, "correct " + (totalCorrect/(double)totalFilled));
 	}
 
 	/** In this scene there is only one camera for several views */
@@ -171,6 +175,9 @@ public class TestMultiBaselineStereoIndependent extends BoofStandardJUnit {
 		for (int i = 0; i < 3; i++) {
 			scene.setView(i, 0, true, eulerXyz(i, 0, 0, 0, 0, 0, null));
 		}
+
+		var observations = new SceneObservations();
+		observations.initialize(scene.views.size);
 
 		var alg = new MultiBaselineStereoIndependent<>(ImageType.SB_F32);
 
@@ -192,7 +199,7 @@ public class TestMultiBaselineStereoIndependent extends BoofStandardJUnit {
 		};
 
 		// just see if it blows up
-		assertTrue(alg.process(scene, 0, DogArray_I32.array(1, 2), sbaIndexToViewID::get));
+		assertTrue(alg.process(scene, observations, 0, DogArray_I32.array(1, 2), sbaIndexToViewID::get));
 	}
 
 	class MockLookUp implements LookUpImages {

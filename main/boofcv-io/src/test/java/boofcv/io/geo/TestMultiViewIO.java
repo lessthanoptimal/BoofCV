@@ -382,7 +382,6 @@ class TestMultiViewIO extends BoofStandardJUnit {
 		brown.fy = rand.nextGaussian();
 		brown.cx = rand.nextGaussian();
 		brown.cy = rand.nextGaussian();
-		brown.skew = rand.nextGaussian();
 		brown.t1 = rand.nextGaussian();
 		brown.t2 = rand.nextGaussian();
 		brown.radial = new double[]{1, 2, 3};

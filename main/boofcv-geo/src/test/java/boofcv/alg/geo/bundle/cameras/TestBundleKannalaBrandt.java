@@ -38,7 +38,7 @@ public class TestBundleKannalaBrandt extends BoofStandardJUnit {
 		model.fsetSymmetric(1.0, 0.4).fsetRadial(1.1, 0.2, -0.01).fsetTangent(0.5, -0.1, 0.06).
 				fsetRadialTrig(0.01, 0.02, -0.03, 0.12).fsetTangentTrig(0.01, 0.2, 0.1, 0.4);
 
-		BundleKannalaBrandt alg = new BundleKannalaBrandt(model);
+		var alg = new BundleKannalaBrandt(model);
 
 		// Get the parameters
 		double[] parameters = new double[alg.getIntrinsicCount()+4];
@@ -60,7 +60,7 @@ public class TestBundleKannalaBrandt extends BoofStandardJUnit {
 		model.fsetSymmetric(1.0, 0.4).fsetRadial(1.1, 0.2, -0.01).fsetTangent(0.5, -0.1, 0.06).
 				fsetRadialTrig(0.01, 0.02, -0.03, 0.12).fsetTangentTrig(0.01, 0.2, 0.1, 0.4);
 
-		BundleKannalaBrandt alg = new BundleKannalaBrandt(model);
+		var alg = new BundleKannalaBrandt(model);
 		Point3Transform2_F64 n2p = LensDistortionFactory.wide(model).distortStoP_F64();
 
 		Point2D_F64 found = new Point2D_F64();
@@ -79,11 +79,11 @@ public class TestBundleKannalaBrandt extends BoofStandardJUnit {
 	/**
 	 * Check the Jacobian with all parameters
 	 */
-	@Test void jacobian_all() {
+	@Test void jacobian_all() throws Exception {
 		CameraKannalaBrandt model = new CameraKannalaBrandt().fsetK(500, 550, 0.1, 600, 650);
 		model.fsetSymmetric(1.0, 0.4).fsetRadial(1.1, 0.2, -0.01).fsetTangent(0.5, -0.1, 0.06).
 				fsetRadialTrig(0.01, 0.02, -0.03, 0.12).fsetTangentTrig(0.01, 0.2, 0.1, 0.4);
-		BundleKannalaBrandt alg = new BundleKannalaBrandt(model);
+		var alg = new BundleKannalaBrandt(model);
 		double[] parameters = new double[alg.getIntrinsicCount()];
 		alg.getIntrinsic(parameters, 0);
 
@@ -96,11 +96,11 @@ public class TestBundleKannalaBrandt extends BoofStandardJUnit {
 	/**
 	 * Check the Jacobian when skew is set to zero
 	 */
-	@Test void jacobian_ZeroSkew() {
+	@Test void jacobian_ZeroSkew() throws Exception {
 		CameraKannalaBrandt model = new CameraKannalaBrandt().fsetK(500, 550, 0.0, 600, 650);
 		model.fsetSymmetric(1.0, 0.4).fsetRadial(1.1, 0.2, -0.05).fsetTangent(0.5, -0.1, 0.06).
 				fsetRadialTrig(0.01, 0.02, -0.03, 0.12).fsetTangentTrig(0.01, 0.2, 0.1, 0.4);
-		BundleKannalaBrandt alg = new BundleKannalaBrandt(model);
+		var alg = new BundleKannalaBrandt(model);
 		assertTrue(alg.isZeroSkew()); // sanity check
 		double[] parameters = new double[alg.getIntrinsicCount()];
 		alg.getIntrinsic(parameters, 0);
@@ -114,9 +114,9 @@ public class TestBundleKannalaBrandt extends BoofStandardJUnit {
 	/**
 	 * Check the Jacobian with only radial parameters
 	 */
-	@Test void jacobian_RadialOnly() {
+	@Test void jacobian_RadialOnly() throws Exception {
 		double[][] parameters = new double[][]{{300, 200, 400, 405, 0.04, 0.02, -0.01}};
-		BundleKannalaBrandt alg = new BundleKannalaBrandt();
+		var alg = new BundleKannalaBrandt();
 		alg.configure(false, 2, 0);
 		new GenericChecksBundleAdjustmentCamera(alg, 0.01) {}
 //				.setPrint(true)

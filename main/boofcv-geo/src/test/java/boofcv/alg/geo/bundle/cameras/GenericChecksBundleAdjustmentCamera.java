@@ -71,9 +71,10 @@ public abstract class GenericChecksBundleAdjustmentCamera extends BoofStandardJU
 		return this;
 	}
 
-	public void checkAll() {
+	public void checkAll() throws Exception {
 		jacobians();
 		compare_input_jacobians();
+		encode_decode();
 	}
 
 	public void setCameraState( @Nullable BundleCameraState cameraState ) {
@@ -132,8 +133,7 @@ public abstract class GenericChecksBundleAdjustmentCamera extends BoofStandardJU
 	}
 
 	/** Test the toMap() functions */
-	@Test
-	void encode_decode() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+	@Test void encode_decode() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
 		BundleAdjustmentCamera modelB = model.getClass().getConstructor().newInstance();
 		for (var parameter : parameters) {
 			// encode into a map and assign modelB using the map

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,8 @@ package boofcv.alg.mvs;
 
 import boofcv.abst.disparity.StereoDisparity;
 import boofcv.abst.geo.bundle.BundleAdjustmentCamera;
+import boofcv.abst.geo.bundle.BundleCameraState;
+import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.distort.brown.LensDistortionBrown;
 import boofcv.alg.geo.bundle.BundleAdjustmentOps;
@@ -160,13 +162,15 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 	 * Computes a point cloud given the known scene and a set of stereo pairs.
 	 *
 	 * @param scene (Input) Specifies the scene parameters for each view. Extrinsic and intrinsic.
+	 * @param observations (Input) Specifies the observed state of the camera.
 	 * @param pairs (Input) Which views are to be used and their relationship to each other
 	 */
-	public void process( SceneStructureMetric scene, StereoPairGraph pairs ) {
+	public void process( SceneStructureMetric scene, @Nullable SceneObservations observations,
+						 StereoPairGraph pairs ) {
 		initializeListener();
 		// Go through each view and compute score for use as a common / "left" stereo image
 		initializeScores(scene, pairs);
-		scoreViewsSelectStereoPairs(scene);
+		scoreViewsSelectStereoPairs(scene, observations);
 
 		// Initialize data structures
 		disparityCloud.reset();
@@ -176,7 +180,7 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 		Collections.sort(arrayScores.toList(), Comparator.comparingDouble(a -> -a.score));
 
 		// Prune centers with redundant information
-		pruneViewsThatAreSimilarByNeighbors(scene);
+		pruneViewsThatAreSimilarByNeighbors(scene, observations);
 
 		// Go through the list of views and use unused views as center views when computing the overall 3D cloud
 		for (int index = 0; index < arrayScores.size; index++) {
@@ -207,7 +211,7 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 			indexSbaToViewID.put(center.relations.indexSba, center.relations.id);
 
 			// Compute the fused disparity from all the views, then add points to the point cloud
-			if (!computeFusedDisparityAddCloud(scene, center, indexSbaToViewID, imagePairIndexesSba)) {
+			if (!computeFusedDisparityAddCloud(scene, observations, center, indexSbaToViewID, imagePairIndexesSba)) {
 				// Failed to compute a fused disparity image
 				// Remove it from the lists
 				listCenters.remove(listCenters.size() - 1);
@@ -256,12 +260,14 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 	/**
 	 * Compute the score for using each view as the center based on coverage and geometric quality
 	 */
-	void scoreViewsSelectStereoPairs( SceneStructureMetric scene ) {
+	void scoreViewsSelectStereoPairs( SceneStructureMetric scene, @Nullable SceneObservations observations ) {
 		for (int i = 0; i < arrayScores.size; i++) {
 			ViewInfo center = arrayScores.get(i);
 			List<StereoPairGraph.Edge> pairs = center.relations.pairs;
 			BundleAdjustmentCamera candidateCamera = scene.cameras.get(center.metric.camera).model;
-			computeRectification.setView1(candidateCamera, center.dimension.width, center.dimension.height);
+			BundleCameraState candidateState = observations != null ? observations.getView(center.index).cameraState : null;
+			computeRectification.setView1(candidateCamera, candidateState,
+					center.dimension.width, center.dimension.height);
 
 			scoreCoverage.initialize(center.dimension.width, center.dimension.height,
 					computeRectification.view1_dist_to_undist);
@@ -287,13 +293,14 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 				// Look up information that the "center" under consideration is connected to
 				ViewInfo connected = Objects.requireNonNull(mapScores.get(pair.other(center.relations).id));
 				BundleAdjustmentCamera connectedCamera = scene.cameras.get(connected.metric.camera).model;
+				BundleCameraState connectedState = observations != null ? observations.getView(connected.index).cameraState : null;
 
 				// Compute the transform from view-1 to view-2
 				scene.getWorldToView(connected.metric, world_to_view2, tmp);
 				world_to_view1.invert(tmp).concat(world_to_view2, view1_to_view2);
 
 				// Compute rectification then apply coverage with geometric score
-				computeRectification.processView2(connectedCamera,
+				computeRectification.processView2(connectedCamera, connectedState,
 						connected.dimension.width, connected.dimension.height, view1_to_view2);
 				scoreCoverage.addView(connected.dimension.width, connected.dimension.height,
 						computeRectification.undist_to_rect2, (float)pair.quality3D, Float::sum);
@@ -315,12 +322,14 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 	 * view which has a higher score and most of the view area is covered by other views. The exception to this
 	 * rule is if there are a significant number of pixels not covered by any neighbors.
 	 */
-	protected void pruneViewsThatAreSimilarByNeighbors( SceneStructureMetric scene ) {
+	protected void pruneViewsThatAreSimilarByNeighbors( SceneStructureMetric scene, @Nullable SceneObservations observations ) {
 		for (int rankIndex = 0; rankIndex < arrayScores.size; rankIndex++) {
 			ViewInfo center = arrayScores.get(rankIndex);
 			List<StereoPairGraph.Edge> pairs = center.relations.pairs;
 			BundleAdjustmentCamera candidateCamera = scene.cameras.get(center.metric.camera).model;
-			computeRectification.setView1(candidateCamera, center.dimension.width, center.dimension.height);
+			BundleCameraState candidateState = observations != null ? observations.getView(center.index).cameraState : null;
+			computeRectification.setView1(candidateCamera, candidateState,
+					center.dimension.width, center.dimension.height);
 			scoreCoverage.initialize(center.dimension.width, center.dimension.height,
 					computeRectification.view1_dist_to_undist);
 
@@ -346,7 +355,7 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 				if (connected.score == center.score && connected.relations.id.compareTo(center.relations.id) < 0)
 					continue;
 
-				double intersection = computeIntersection(scene, connected);
+				double intersection = computeIntersection(scene, observations, connected);
 
 				// NOTE: This can be problematic if one stereo image is much closer than the other. It will be
 				// contained inside it 100% but the areas will be very different. IOU was attempted but that ran
@@ -374,7 +383,8 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 	 *
 	 * @return fraction of intersection, 0.0 to 1.0
 	 */
-	protected double computeIntersection( SceneStructureMetric scene, ViewInfo connected ) {
+	protected double computeIntersection( SceneStructureMetric scene, @Nullable SceneObservations observations,
+										  ViewInfo connected ) {
 		BundleAdjustmentCamera connectedCamera = scene.cameras.get(connected.metric.camera).model;
 
 		// Compute the transform from view-1 to view-2
@@ -382,7 +392,8 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 		world_to_view1.invert(tmp).concat(world_to_view2, view1_to_view2);
 
 		// Compute rectification then apply coverage with geometric score
-		computeRectification.processView2(connectedCamera,
+		BundleCameraState state = observations != null ? observations.getView(connected.index).cameraState : null;
+		computeRectification.processView2(connectedCamera, state,
 				connected.dimension.width, connected.dimension.height, view1_to_view2);
 
 		// Find how much the rectified image intersects
@@ -393,9 +404,10 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 	/**
 	 * Combing stereo information from all images in this cluster, compute a disparity image and add it to the cloud
 	 */
-	boolean computeFusedDisparityAddCloud( SceneStructureMetric scene, ViewInfo center,
+	boolean computeFusedDisparityAddCloud( SceneStructureMetric scene, @Nullable SceneObservations observations,
+										   ViewInfo center,
 										   TIntObjectMap<String> sbaIndexToName, DogArray_I32 pairIndexes ) {
-		if (!computeFused.process(scene, center.relations.indexSba, pairIndexes, sbaIndexToName::get)) {
+		if (!computeFused.process(scene, observations, center.relations.indexSba, pairIndexes, sbaIndexToName::get)) {
 			if (verbose != null) verbose.println("FAILED: fused disparity. center.index=" + center.index);
 			return false;
 		}
@@ -412,7 +424,8 @@ public class MultiViewStereoFromKnownSceneStructure<T extends ImageGray<T>> impl
 
 		// Convert data structures into a format which is understood by disparity to cloud
 		BundleAdjustmentCamera camera = scene.cameras.get(center.metric.camera).model;
-		BundleAdjustmentOps.convert(camera, inverseDepth.width, inverseDepth.height, brown);
+		BundleCameraState state = observations != null ? observations.getView(center.index).cameraState : null;
+		BundleAdjustmentOps.convert(camera, state, inverseDepth.width, inverseDepth.height, brown);
 
 		// The fused disparity is in regular pixels and not rectified
 		Point2Transform2_F64 norm_to_pixel = new LensDistortionBrown(brown).distort_F64(false, true);

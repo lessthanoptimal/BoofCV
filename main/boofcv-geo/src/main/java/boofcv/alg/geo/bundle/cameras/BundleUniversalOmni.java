@@ -28,10 +28,10 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static boofcv.misc.BoofMiscOps.getOrThrow;
+import static boofcv.misc.BoofMiscOps.listToArrayDouble;
 
 /**
  * Implementation of {@link boofcv.struct.calib.CameraUniversalOmni} for bundle adjustment
@@ -75,6 +75,10 @@ public class BundleUniversalOmni implements BundleAdjustmentCamera {
 								int numRadial, boolean includeTangential, double mirrorOffset ) {
 		this(zeroSkew, numRadial, includeTangential, true);
 		this.mirrorOffset = mirrorOffset;
+	}
+
+	public BundleUniversalOmni() {
+		this(false, 0, false, 0.0);
 	}
 
 	public BundleUniversalOmni( CameraUniversalOmni intrinsic ) {
@@ -396,20 +400,28 @@ public class BundleUniversalOmni implements BundleAdjustmentCamera {
 		try {
 			fx = getOrThrow(map, "fx");
 			fy = getOrThrow(map, "fy");
-			skew = (double)map.getOrDefault("skew", 0.0);
 			cx = getOrThrow(map, "cx");
 			cy = getOrThrow(map, "cy");
 			mirrorOffset = getOrThrow(map, "mirror-offset");
-
-			t1 = (double)map.getOrDefault("t1", 0.0);
-			t2 = (double)map.getOrDefault("t2", 0.0);
-
-			List<Double> radialList = (List<Double>)map.get("radial");
-			if (radialList == null)
-				radial = new double[0];
-			else {
-				radial = radialList.stream().mapToDouble(i -> i).toArray();
+			if (map.containsKey("skew")) {
+				skew = getOrThrow(map, "skew");
+				zeroSkew = false;
+			} else {
+				skew = 0.0;
+				zeroSkew = true;
 			}
+
+			if (map.containsKey("t1")) {
+				t1 = getOrThrow(map, "t1");
+				t2 = getOrThrow(map, "t2");
+				tangential = true;
+			} else {
+				t1 = t2 = 0.0;
+				tangential = false;
+			}
+
+			radial = listToArrayDouble(getOrThrow(map, "radial"));
+			fixedMirror = getOrThrow(map, "fixed-mirror");
 			return this;
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
@@ -420,13 +432,17 @@ public class BundleUniversalOmni implements BundleAdjustmentCamera {
 		var map = new HashMap<String, Object>();
 		map.put("fx", fx);
 		map.put("fy", fy);
-		map.put("skew", skew);
+		if (!zeroSkew)
+			map.put("skew", skew);
 		map.put("cx", cx);
 		map.put("cy", cy);
-		map.put("t1", t1);
-		map.put("t2", t2);
+		if (tangential) {
+			map.put("t1", t1);
+			map.put("t2", t2);
+		}
 		map.put("radial", radial);
 		map.put("mirror-offset", mirrorOffset);
+		map.put("fixed-mirror", fixedMirror);
 		return map;
 	}
 }

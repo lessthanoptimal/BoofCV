@@ -33,6 +33,7 @@ import java.util.Map;
 
 import static boofcv.alg.distort.kanbra.KannalaBrandtUtils_F64.*;
 import static boofcv.misc.BoofMiscOps.getOrThrow;
+import static boofcv.misc.BoofMiscOps.listToArrayDouble;
 
 /**
  * Implementation of {@link CameraKannalaBrandt} for bundle adjustment
@@ -353,14 +354,22 @@ public class BundleKannalaBrandt implements BundleAdjustmentCamera {
 		try {
 			model.fx = getOrThrow(map, "fx");
 			model.fy = getOrThrow(map, "fy");
-			model.skew = (double)map.getOrDefault("skew", 0.0);
 			model.cx = getOrThrow(map, "cx");
 			model.cy = getOrThrow(map, "cy");
-			model.symmetric = getOrThrow(map, "symmetric");
-			model.tangent = getOrThrow(map, "tangent");
-			model.radial = getOrThrow(map, "radial");
-			model.tangentTrig = getOrThrow(map, "tangent-trig");
-			model.radialTrig = getOrThrow(map, "radial-trig");
+			if (map.containsKey("skew")) {
+				model.skew = getOrThrow(map, "skew");
+				zeroSkew = false;
+			} else {
+				model.skew = 0.0;
+				zeroSkew = true;
+			}
+			model.symmetric = listToArrayDouble(getOrThrow(map, "symmetric"));
+			model.tangent = listToArrayDouble(getOrThrow(map, "tangent"));
+			model.radial = listToArrayDouble(getOrThrow(map, "radial"));
+			model.tangentTrig = listToArrayDouble(getOrThrow(map, "tangent-trig"));
+			model.radialTrig = listToArrayDouble(getOrThrow(map, "radial-trig"));
+
+			isAsymmetric = model.symmetric.length > 0;
 			return this;
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
@@ -371,7 +380,8 @@ public class BundleKannalaBrandt implements BundleAdjustmentCamera {
 		var map = new HashMap<String, Object>();
 		map.put("fx", model.fx);
 		map.put("fy", model.fy);
-		map.put("skew", model.skew);
+		if (!zeroSkew)
+			map.put("skew", model.skew);
 		map.put("cx", model.cx);
 		map.put("cy", model.cy);
 		map.put("symmetric", model.symmetric);

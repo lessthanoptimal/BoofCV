@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -278,7 +278,8 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 		// Save results
 		listPinhole.reset().resize(structure.cameras.size);
 		for (int i = 0; i < structure.cameras.size; i++) {
-			BundleAdjustmentOps.convert(structure.cameras.get(i).model, width, height, listPinhole.get(i));
+			// NOTE: If a camera model isn't fixed this won't work
+			BundleAdjustmentOps.convert(structure.cameras.get(i).model, null, width, height, listPinhole.get(i));
 		}
 		listWorldToView.reset().resize(structure.views.size);
 		for (int i = 0; i < structure.views.size; i++) {

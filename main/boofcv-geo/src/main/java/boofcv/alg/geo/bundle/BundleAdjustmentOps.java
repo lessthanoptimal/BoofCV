@@ -19,6 +19,7 @@
 package boofcv.alg.geo.bundle;
 
 import boofcv.abst.geo.bundle.BundleAdjustmentCamera;
+import boofcv.abst.geo.bundle.BundleCameraState;
 import boofcv.alg.geo.bundle.cameras.BundleKannalaBrandt;
 import boofcv.alg.geo.bundle.cameras.BundlePinhole;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeBrown;
@@ -35,6 +36,22 @@ import org.jetbrains.annotations.Nullable;
  * @author Peter Abeles
  */
 public class BundleAdjustmentOps {
+	/**
+	 * Functions for converting. Change to support more camera types
+	 */
+	public static ConvertToBrown convertOp = ( src, state, width, height, dst ) -> {
+		if (src instanceof BundlePinhole) {
+			dst.fsetRadial().fsetTangential(0, 0); // remove distortion terms
+			convert((BundlePinhole)src, width, height, (CameraPinhole)dst);
+		} else if (src instanceof BundlePinholeBrown) {
+			convert((BundlePinholeBrown)src,  width, height, dst);
+		} else if (src instanceof BundlePinholeSimplified) {
+			convert((BundlePinholeSimplified)src,  width, height, dst);
+		} else {
+			throw new RuntimeException("Unknown src type. " + src + " See BundleAdjustmentOps.convertOp for a way" +
+					" to support more cameras.");
+		}
+	};
 
 	/**
 	 * Converts the {@link BundleAdjustmentCamera} into {@link CameraPinholeBrown}. Sets the width and height
@@ -45,22 +62,14 @@ public class BundleAdjustmentOps {
 	 * @param height (Input) Input image height
 	 * @param dst (Output) Storage for output.
 	 */
-	public static CameraPinholeBrown convert( BundleAdjustmentCamera src, int width, int height,
+	public static CameraPinholeBrown convert( BundleAdjustmentCamera src, @Nullable BundleCameraState state,
+											  int width, int height,
 											  @Nullable CameraPinholeBrown dst ) {
 		if (dst == null)
 			dst = new CameraPinholeBrown();
 
-		if (src instanceof BundlePinhole) {
-			dst.fsetRadial().fsetTangential(0, 0); // remove distortion terms
-			convert((BundlePinhole)src, width, height, (CameraPinhole)dst);
-		} else if (src instanceof BundlePinholeBrown) {
-			convert((BundlePinholeBrown)src, width, height, dst);
-			dst.fsetShape(width, height);
-		} else if (src instanceof BundlePinholeSimplified) {
-			convert((BundlePinholeSimplified)src, width, height, dst);
-		} else {
-			throw new RuntimeException("Unknown src type. " + src);
-		}
+		convertOp.convert(src, state, width, height, dst);
+
 		return dst;
 	}
 
@@ -306,5 +315,15 @@ public class BundleAdjustmentOps {
 		dst.unsafe_set(2, 2, 1);
 
 		return dst;
+	}
+
+	/**
+	 * Converts any bundle adjustment camera into a {@link CameraPinholeBrown}.
+	 */
+	@FunctionalInterface
+	public interface ConvertToBrown {
+		void convert( BundleAdjustmentCamera bundle, @Nullable BundleCameraState state,
+					  int width, int height,
+					  CameraPinholeBrown output );
 	}
 }

@@ -22,14 +22,14 @@ import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 public class TestBundlePinhole extends BoofStandardJUnit {
-	@Test void withSkew() {
+	@Test void withSkew() throws Exception {
 		double[][] parameters = new double[][]{{300, 200, 400, 400, 0.1}, {400, 600, 1000, 1000, 2}};
 		new GenericChecksBundleAdjustmentCamera(new BundlePinhole(false)) {}
 				.setParameters(parameters)
 				.checkAll();
 	}
 
-	@Test void withoutSkew() {
+	@Test void withoutSkew() throws Exception {
 		double[][] parameters = new double[][]{{300, 200, 400, 400}, {400, 600, 1000, 1000}};
 		new GenericChecksBundleAdjustmentCamera(new BundlePinhole(true)) {}
 				.setParameters(parameters)

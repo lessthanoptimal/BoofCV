@@ -31,7 +31,6 @@ import boofcv.alg.structure.SceneWorkingGraph.InlierInfo;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.feature.AssociatedIndex;
-import boofcv.struct.image.ImageDimension;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
 import gnu.trove.map.TObjectIntMap;
@@ -290,6 +289,14 @@ public class MultiViewIO {
 		yaml.dump(data, out);
 
 		out.close();
+	}
+
+	public static void save( SceneObservations scene, File destination ) {
+		try (var writer = new FileWriter(destination)) {
+			save(scene, writer);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
 	}
 
 	private static Map<String, Object> encodeSceneView( SceneStructureMetric scene,
@@ -905,72 +912,6 @@ public class MultiViewIO {
 				dst.reset();
 				src.forEach(dst::add);
 			}
-		}
-	}
-
-	public static Map<String, Object> putDimension( ImageDimension d ) {
-		Map<String, Object> map = new HashMap<>();
-
-		map.put("width", d.width);
-		map.put("height", d.height);
-
-		return map;
-	}
-
-	public static ImageDimension loadDimension( Map<String, Object> map, @Nullable ImageDimension dimension ) {
-		if (dimension == null)
-			dimension = new ImageDimension();
-
-		try {
-			dimension.width = getOrThrow(map, "width");
-			dimension.height = getOrThrow(map, "height");
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
-
-		return dimension;
-	}
-
-	public static Map<String, Object> putPinholeBrown( BundlePinholeBrown intrinsic ) {
-		Map<String, Object> map = new HashMap<>();
-
-		map.put("fx", intrinsic.fx);
-		map.put("fy", intrinsic.fy);
-		map.put("skew", intrinsic.skew);
-		map.put("cx", intrinsic.cx);
-		map.put("cy", intrinsic.cy);
-		map.put("t1", intrinsic.t1);
-		map.put("t2", intrinsic.t2);
-		map.put("radial", intrinsic.radial);
-
-		return map;
-	}
-
-	public static BundlePinholeBrown loadPinholeBrown( Map<String, Object> map,
-													   @Nullable BundlePinholeBrown intrinsic ) {
-		if (intrinsic == null)
-			intrinsic = new BundlePinholeBrown();
-
-		try {
-			intrinsic.fx = getOrThrow(map, "fx");
-			intrinsic.fy = getOrThrow(map, "fy");
-			intrinsic.skew = (double)map.getOrDefault("skew", 0.0);
-			intrinsic.cx = getOrThrow(map, "cx");
-			intrinsic.cy = getOrThrow(map, "cy");
-
-			intrinsic.t1 = (double)map.getOrDefault("t1", 0.0);
-			intrinsic.t2 = (double)map.getOrDefault("t2", 0.0);
-
-			List<Double> radialList = (List<Double>)map.get("radial");
-			if (radialList == null)
-				intrinsic.radial = new double[0];
-			else {
-				intrinsic.radial = radialList.stream().mapToDouble(i -> i).toArray();
-			}
-
-			return intrinsic;
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
 		}
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -789,6 +789,22 @@ public class BoofMiscOps {
 		if (value == null)
 			throw new IOException("Key not found in map. key=" + key);
 		return value;
+	}
+
+	/**
+	 * Converts <code>List&#60double&#62</code> into double[]. If already an array it simply returns the
+	 * original array
+	 */
+	public static double[] listToArrayDouble( Object o ) {
+		if (o instanceof double[]) {
+			return (double[])o;
+		}
+		List<Double> list = (List<Double>)o;
+		var out = new double[list.size()];
+		for (int i = 0; i < list.size(); i++) {
+			out[i] = list.get(i);
+		}
+		return out;
 	}
 
 	/**

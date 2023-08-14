@@ -39,7 +39,7 @@ public class TestBundleToRectificationStereoParameters extends BoofStandardJUnit
 		var alg = new BundleToRectificationStereoParameters();
 		var bundle1 = new BundlePinholeSimplified(200, 0.1, -0.5);
 
-		alg.setView1(bundle1, 100, 150);
+		alg.setView1(bundle1, null, 100, 150);
 
 		// This conversion is tested more rigorously in a different unittest
 		assertEquals(200.0, alg.intrinsic1.fx, UtilEjml.TEST_F64);
@@ -62,10 +62,10 @@ public class TestBundleToRectificationStereoParameters extends BoofStandardJUnit
 		Se3_F64 view1_to_view2 = SpecialEuclideanOps_F64.eulerXyz(1.0, 0, -0.1, 0, 0, 0, null);
 
 		// Easiest to initialize view-1 this way
-		alg.setView1(bundle1, 100, 150);
+		alg.setView1(bundle1, null, 100, 150);
 
 		// Invoke the function being tested
-		alg.processView2(bundle2, 100, 150, view1_to_view2);
+		alg.processView2(bundle2, null, 100, 150, view1_to_view2);
 
 		// See if everything is initialized
 		assertTrue(CommonOps_DDRM.elementSum(alg.undist_to_rect1) != 0);

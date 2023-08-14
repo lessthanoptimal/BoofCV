@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.structure;
 
 import boofcv.abst.disparity.StereoDisparity;
+import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureCommon;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.misc.GImageMiscOps;
@@ -64,8 +65,11 @@ class TestSparseSceneToDenseCloud extends BoofStandardJUnit {
 
 		createSparseScene(scene, viewIdx_to_imageID);
 
+		var observations = new SceneObservations();
+		observations.initialize(scene.views.size);
+
 		// Invoke the code being tested
-		alg.process(scene, viewIdx_to_imageID, lookup);
+		alg.process(scene, observations, viewIdx_to_imageID, lookup);
 
 		// Each view should be used in a stereo pair at least once
 		assertTrue(stereo.total >= 7);

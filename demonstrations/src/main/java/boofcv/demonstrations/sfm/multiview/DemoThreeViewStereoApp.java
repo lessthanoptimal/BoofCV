@@ -681,10 +681,10 @@ public class DemoThreeViewStereoApp<TD extends TupleDesc<TD>> extends Demonstrat
 			SceneStructureMetric.View viewObj0 = structure.views.get(view0);
 			SceneStructureMetric.View viewObj1 = structure.views.get(view1);
 
-			BundleAdjustmentOps.convert((BundleAdjustmentCamera)structure.getCameraModel(viewObj0.camera),
+			BundleAdjustmentOps.convert((BundleAdjustmentCamera)structure.getCameraModel(viewObj0.camera), null,
 					dimensions[view0].width, dimensions[view0].height, intrinsic01);
 
-			BundleAdjustmentOps.convert((BundleAdjustmentCamera)structure.getCameraModel(viewObj1.camera),
+			BundleAdjustmentOps.convert((BundleAdjustmentCamera)structure.getCameraModel(viewObj1.camera), null,
 					dimensions[view1].width, dimensions[view1].height, intrinsic02);
 
 			Se3_F64 w_to_0 = structure.getParentToView(view0);

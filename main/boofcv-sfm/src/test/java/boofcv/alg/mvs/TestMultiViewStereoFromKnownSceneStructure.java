@@ -18,6 +18,7 @@
 
 package boofcv.alg.mvs;
 
+import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.geo.bundle.BundleAdjustmentOps;
 import boofcv.alg.geo.bundle.cameras.BundlePinhole;
@@ -78,7 +79,7 @@ public class TestMultiViewStereoFromKnownSceneStructure extends BoofStandardJUni
 
 		MultiViewStereoFromKnownSceneStructure<GrayF32> alg = createAlg();
 
-		alg.process(scene, pairs);
+		alg.process(scene, null, pairs);
 
 		assertEquals(0, alg.getCloud().size());
 	}
@@ -92,7 +93,7 @@ public class TestMultiViewStereoFromKnownSceneStructure extends BoofStandardJUni
 		// This also checks calling it multiple times
 		for (int numViews = 2; numViews <= 4; numViews++) {
 			createScene(numViews);
-			alg.process(scene, pairs);
+			alg.process(scene, null, pairs);
 			if (visualize) visualizeResults(alg);
 			checkCloudPlane(alg.getCloud());
 			// sanity checks
@@ -113,7 +114,7 @@ public class TestMultiViewStereoFromKnownSceneStructure extends BoofStandardJUni
 		prunePairs(pairs.vertexes.get("id=3").pairs, 2, 3);
 
 		MultiViewStereoFromKnownSceneStructure<GrayF32> alg = createAlg();
-		alg.process(scene, pairs);
+		alg.process(scene, null, pairs);
 
 		if (visualize) visualizeResults(alg);
 
@@ -162,7 +163,7 @@ public class TestMultiViewStereoFromKnownSceneStructure extends BoofStandardJUni
 		assertEquals(0, dummy.requestImage.size());
 
 		// Call function being tested
-		alg.scoreViewsSelectStereoPairs(scene);
+		alg.scoreViewsSelectStereoPairs(scene, null);
 
 		// First one should not have a score since every connection was below the threshold
 		assertEquals(0.0, alg.arrayScores.find(( a ) -> a.relations.indexSba == 0).score);
@@ -215,7 +216,9 @@ public class TestMultiViewStereoFromKnownSceneStructure extends BoofStandardJUni
 		// All views will always intersect by the same amount
 		var alg = new MultiViewStereoFromKnownSceneStructure<>(new DummyLookUp(), ImageType.SB_U8) {
 			final double fraction = 0.6;
-			@Override protected double computeIntersection( SceneStructureMetric scene, ViewInfo connected ) {
+			@Override protected double computeIntersection( SceneStructureMetric scene,
+															SceneObservations observations,
+															ViewInfo connected ) {
 				return fraction;
 			}
 		};
@@ -231,12 +234,12 @@ public class TestMultiViewStereoFromKnownSceneStructure extends BoofStandardJUni
 		alg.arrayScores.forEach(v->v.dimension.setTo(width, height));
 
 		// everything should be connected
-		alg.pruneViewsThatAreSimilarByNeighbors(scene);
+		alg.pruneViewsThatAreSimilarByNeighbors(scene, null);
 		alg.arrayScores.forEach(v->assertFalse(v.used));
 
 		// only one view should be unused since all views are connected to each other and overlap with each other
 		alg.maximumCenterOverlap = 0.5999999;
-		alg.pruneViewsThatAreSimilarByNeighbors(scene);
+		alg.pruneViewsThatAreSimilarByNeighbors(scene, null);
 		int totalUnused = 0;
 		for( var v : alg.arrayScores.toList() ) {
 			if (!v.used)

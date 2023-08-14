@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -159,7 +159,8 @@ public class ExampleMultiBaselineStereo {
 		});
 
 		// Process the images and compute a single combined disparity image
-		if (!multiBaseline.process(example.scene, center.index, pairedViewIdxs, sbaIndexToImageID::get)) {
+		if (!multiBaseline.process(example.scene, null,
+				center.index, pairedViewIdxs, sbaIndexToImageID::get)) {
 			throw new RuntimeException("Failed to fuse stereo views");
 		}
 
@@ -179,7 +180,7 @@ public class ExampleMultiBaselineStereo {
 		// Since the fused image is in the original (i.e. distorted) pixel coordinates and is not rectified,
 		// that needs to be taken in account by undistorting the image to create the point cloud.
 		CameraPinholeBrown intrinsic = BundleAdjustmentOps.convert(example.scene.cameras.get(center.cameraIdx).model,
-				colorImage.width, colorImage.height, null);
+				null, colorImage.width, colorImage.height, null);
 		Point2Transform2_F64 pixel_to_norm = new LensDistortionBrown(intrinsic).distort_F64(true, false);
 		MultiViewStereoOps.inverseToCloud(fusedDisparity, new PointToPixelTransform_F64(pixel_to_norm),
 				( pixX, pixY, x, y, z ) -> {
