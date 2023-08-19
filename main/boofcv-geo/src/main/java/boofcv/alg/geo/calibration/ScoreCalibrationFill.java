@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -76,6 +76,8 @@ public class ScoreCalibrationFill {
 	 * Resets and initializes for an image of the specified shape
 	 */
 	public void initialize( int width, int height ) {
+		if (width <= 0 || height <= 0)
+			throw new IllegalArgumentException("Image width or height can't be zero or less. " + width + "x" + height);
 		this.imageWidth = width;
 		this.imageHeight = height;
 		scoreBorder = 0.0;
@@ -96,6 +98,9 @@ public class ScoreCalibrationFill {
 	 * See if any observed calibration points hit a target. if so remove the target.
 	 */
 	public void addObservation( CalibrationObservation obs ) {
+		if (this.imageWidth <= 0)
+			throw new IllegalArgumentException("You must call initialize first.");
+
 		for (int obsIdx = 0; obsIdx < obs.size(); obsIdx++) {
 			Point2D_F64 o = obs.get(obsIdx).p;
 
