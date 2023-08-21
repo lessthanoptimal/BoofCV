@@ -13,16 +13,16 @@ allprojects {
     apply plugin: 'com.peterabeles.gversion'
 
     group = 'org.boofcv'
-    version = '1.0.0'
+    version = '1.0.1-SNAPSHOT'
 
     createVersionFile.enabled = false // run only once. enabled in types
 }
 
-project.ext.commons_io_version = '2.12.0'
+project.ext.commons_io_version = '2.13.0'
 project.ext.deepboof_version = '0.5.2'
 project.ext.lombok_version = '1.18.28'
 project.ext.jabel_version = '1.0.0'
-project.ext.guava_version = '32.1.1-jre'
+project.ext.guava_version = '32.1.2-jre'
 project.ext.args4j_version = '2.33'
 project.ext.junit_version = '5.9.1'
 project.ext.errorprone_version = '2.11.0'

@@ -7,6 +7,19 @@ Version Meaning: <compatible>.<feature>.<bug fix>
 - Last digit always indicates a bug fix and other minor changes
 
 ---------------------------------------------
+Date    : 2023/XX/XX
+Version : 1.0.1
+
+- Calibration
+  * TODO support multiple calibration targets
+- Image Processing
+  - TODO hough circle detector
+- SLAM
+  - TODO traditional monocular SLAM
+- Regression
+  - TODO Template matching
+
+---------------------------------------------
 Date    : 2023/Aug/21
 Version : 1.0.0
 
