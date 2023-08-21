@@ -7,7 +7,7 @@ Version Meaning: <compatible>.<feature>.<bug fix>
 - Last digit always indicates a bug fix and other minor changes
 
 ---------------------------------------------
-Date    : 2023/XX
+Date    : 2023/Aug/21
 Version : 1.0.0
 
 - Version
@@ -18,15 +18,7 @@ Version : 1.0.0
   * Added a way to specify the camera state when a frame was captured
   * Added a new camera model that adjusts the focal length based on zoom factor
 - Calibration
-  * TODO support multiple calibration targets
   * Tangental -> Tangential for consistency
-
-- Image Processing
-  - TODO hough circle detector
-- SLAM
-  - TODO traditional monocular SLAM
-- Regression
-  - TODO Template matching
 
 ---------------------------------------------
 Date    : 2023/July/15
