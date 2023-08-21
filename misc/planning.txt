@@ -1,12 +1,11 @@
+- Calibration
+  * TODO support multiple calibration targets
 - Image Processing
   - TODO hough circle detector
 - SLAM
   - TODO traditional monocular SLAM
 - Regression
   - TODO Template matching
-
-- Calibration
-  - TODO Visualize Multi Camera Calibration
 - Scene Reconstruction
   - TODO Robust optimization
   - TODO 3D reconstruction to 3D mesh
