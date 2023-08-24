@@ -74,7 +74,7 @@ public abstract class GenericCalibrationZhang99<CM extends CameraModel> extends 
 			Zhang99Camera zhangCamera = createGenerator(config, inputs.layout);
 
 			var alg = new CalibrationPlanarGridZhang99(zhangCamera);
-			alg.setLayout(inputs.layout);
+			alg.setLayouts(List.of(inputs.layout));
 
 			// estimate camera parameters using full non-linear methods
 			alg.process(inputs.observations);
@@ -96,7 +96,7 @@ public abstract class GenericCalibrationZhang99<CM extends CameraModel> extends 
 			Zhang99Camera zhangCamera = createGenerator(config, inputs.layout);
 
 			var alg = new CalibrationPlanarGridZhang99(zhangCamera);
-			alg.setLayout(inputs.layout);
+			alg.setLayouts(List.of(inputs.layout));
 			alg.setZeroSkew(true);
 
 			alg.linearEstimate(inputs.observations);
@@ -150,7 +150,7 @@ public abstract class GenericCalibrationZhang99<CM extends CameraModel> extends 
 			K.data[4] += (rand.nextDouble()-0.5)*noiseMagnitude;
 
 			var alg = new CalibrationPlanarGridZhang99(zhangCamera);
-			alg.setLayout(inputs.layout);
+			alg.setLayouts(List.of(inputs.layout));
 			alg.convertIntoBundleStructure(inputs.worldToViews, K, inputs.homographies, inputs.observations);
 			assertTrue(alg.performBundleAdjustment());
 
@@ -188,7 +188,7 @@ public abstract class GenericCalibrationZhang99<CM extends CameraModel> extends 
 		ret.layout = GenericCalibrationGrid.standardLayout();
 
 		var computeHomography = new Zhang99ComputeTargetHomography();
-		computeHomography.setWorldPoints(ret.layout);
+		computeHomography.setTargetLayout(ret.layout);
 
 		for (int viewIdx = 0; viewIdx < numViews; viewIdx++) {
 			// randomly generate a view location
@@ -218,7 +218,7 @@ public abstract class GenericCalibrationZhang99<CM extends CameraModel> extends 
 			}
 
 			assertTrue(computeHomography.computeHomography(obs.points));
-			ret.homographies.add(computeHomography.getHomography());
+			ret.homographies.add(computeHomography.getCopyOfHomography());
 		}
 
 		return ret;

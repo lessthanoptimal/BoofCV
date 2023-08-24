@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -78,7 +78,7 @@ public class ExampleCalibrateFisheye {
 			if (detector.process(image)) {
 				// Need to tell it the image shape and the layout once
 				if (usedImages.isEmpty())
-					calibrator.initialize(image.getWidth(), image.getHeight(), detector.getLayout());
+					calibrator.initialize(image.getWidth(), image.getHeight(), List.of(detector.getLayout()));
 				calibrator.addImage(detector.getDetectedPoints().copy());
 				usedImages.add(n);
 			} else {

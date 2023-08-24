@@ -174,7 +174,7 @@ public class AssistedCalibrationMono {
 		synchronized (detectorLock) {
 			detector = gui.targetPanel.configPanel.createSingleTargetDetector();
 			totalLandmarks = detector.getLayout().size();
-			quality = new ScoreCalibrationGeometricDiversity(true, detector.getLayout());
+			quality = new ScoreCalibrationGeometricDiversity(true);
 
 			if (detector instanceof CalibrationDetectorChessboardX) {
 				view = new CalibrationView.Chessboard();
@@ -523,7 +523,7 @@ public class AssistedCalibrationMono {
 		for (int i = 0; i < sidesCollision.size(); i++) {
 			p.get(i).setTo(sidesCollision.get(i));
 		}
-		quality.addObservation(detector.getDetectedPoints().points);
+		quality.addObservation(detector.getDetectedPoints().points, detector.getLayout());
 		quality.computeScore();
 		gui.getInfoPanel().updateGeometry(quality.getScore());
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -73,10 +73,9 @@ public class RadialDistortionEstimateLinear {
 	private final LinearSolverDense<DMatrixRMaj> solver = LinearSolverFactory_DDRM.leastSquares(0, 0);
 
 	/**
-	 * location of grid coordinates in the world frame.
-	 * the z-axis is assumed to be zero
+	 * Spatial location of calibration points on each target. Z-axis is assumed to be zero.
 	 */
-	private @Setter List<Point2D_F64> worldPoints;
+	private @Setter List<List<Point2D_F64>> layouts;
 
 	/**
 	 * Creates a estimator for the specified number of distortion parameters.
@@ -96,7 +95,7 @@ public class RadialDistortionEstimateLinear {
 	public void process( DMatrixRMaj cameraCalibration,
 						 List<DMatrixRMaj> homographies,
 						 List<CalibrationObservation> observations ) {
-		Objects.requireNonNull(worldPoints, "Must specify world points first");
+		Objects.requireNonNull(layouts, "Must specify world points first");
 		init(observations);
 
 		setupA_and_B(cameraCalibration, homographies, observations);
@@ -131,20 +130,21 @@ public class RadialDistortionEstimateLinear {
 		double v0 = K.get(1, 2); // image center y-coordinate
 
 		// projected predicted
-		Point2D_F64 projCalibrated = new Point2D_F64();
-		Point2D_F64 projPixel = new Point2D_F64();
+		var projCalibrated = new Point2D_F64();
+		var projPixel = new Point2D_F64();
 
 		int pointIndex = 0;
 		for (int indexObs = 0; indexObs < N; indexObs++) {
 			DMatrixRMaj H = homographies.get(indexObs);
 			CalibrationObservation set = observations.get(indexObs);
+			List<Point2D_F64> layout = layouts.get(set.target);
 
 			for (int i = 0; i < set.size(); i++) {
 				int gridIndex = set.get(i).index;
 				Point2D_F64 obsPixel = set.get(i).p;
 
 				// location of grid point in world coordinate (x,y,0)  assume z=0
-				Point2D_F64 gridPt = worldPoints.get(gridIndex);
+				Point2D_F64 gridPt = layout.get(gridIndex);
 
 				// compute the predicted location of the point in calibrated units
 				GeometryMath_F64.mult(H, gridPt, projCalibrated);

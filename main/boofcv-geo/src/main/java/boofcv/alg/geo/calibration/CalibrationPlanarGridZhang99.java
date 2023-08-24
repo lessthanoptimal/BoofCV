@@ -106,7 +106,7 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 	@Getter @Setter private Listener listener;
 
 	/** where calibration points are layout on the target. */
-	private @Setter List<Point2D_F64> layout;
+	private @Setter List<List<Point2D_F64>> layouts;
 
 	/** Use a robust non-linear solver. This can run significantly slower */
 	@Getter @Setter private boolean robust = false;
@@ -130,7 +130,7 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 	 * @return true if successful and false if it failed
 	 */
 	public boolean process( List<CalibrationObservation> observations ) {
-		Objects.requireNonNull(layout, "Must specify the layout first");
+		Objects.requireNonNull(layouts, "Must specify the layout first");
 		computeK.setAssumeZeroSkew(zeroSkew);
 
 		// compute initial parameter estimates using linear algebra
@@ -150,15 +150,17 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 	 */
 	protected boolean linearEstimate( List<CalibrationObservation> observations ) {
 		status("Estimating Homographies");
-		List<DMatrixRMaj> homographies = new ArrayList<>();
-		List<Se3_F64> motions = new ArrayList<>();
+		var homographies = new ArrayList<DMatrixRMaj>();
+		var motions = new ArrayList<Se3_F64>();
 
-		computeHomography.setWorldPoints(layout);
 		for (int i = 0; i < observations.size(); i++) {
-			if (!computeHomography.computeHomography(observations.get(i).points))
+			CalibrationObservation observation = observations.get(i);
+
+			computeHomography.setTargetLayout(layouts.get(observation.target));
+			if (!computeHomography.computeHomography(observation.points))
 				return false;
 
-			DMatrixRMaj H = computeHomography.getHomography();
+			DMatrixRMaj H = computeHomography.getCopyOfHomography();
 
 			homographies.add(H);
 		}
@@ -223,20 +225,27 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 											List<CalibrationObservation> calibrationObservations ) {
 
 		structure = new SceneStructureMetric(false);
-		structure.initialize(1, motions.size(), -1, 0, 1);
+		structure.initialize(1, motions.size(), -1, 0, layouts.size());
 
 		observations = new SceneObservations();
 		observations.initialize(motions.size(), true);
 
 		// A single camera is assumed, that's what is being calibrated!
-		cameraGenerator.setLayout(layout);
+		cameraGenerator.setLayouts(layouts);
 		structure.setCamera(0, false, cameraGenerator.initializeCamera(K, homographies, calibrationObservations));
-		// A single rigid planar target is being viewed. It is assumed to be centered at the origin
-		structure.setRigid(0, true, new Se3_F64(), layout.size());
-		// Where the points are on the calibration target
-		SceneStructureMetric.Rigid srigid = structure.rigids.data[0];
-		for (int i = 0; i < layout.size(); i++) {
-			srigid.setPoint(i, layout.get(i).x, layout.get(i).y, 0);
+
+		// Specify the structure of calibration targets
+		for (int layoutID = 0; layoutID < layouts.size(); layoutID++) {
+			List<Point2D_F64> layout = layouts.get(layoutID);
+
+			// All the calibration targets are at the origin, the camera pivots around
+			structure.setRigid(layoutID, true, new Se3_F64(), layout.size());
+
+			// Where the points are on the calibration target
+			SceneStructureMetric.Rigid srigid = structure.rigids.data[layoutID];
+			for (int i = 0; i < layout.size(); i++) {
+				srigid.setPoint(i, layout.get(i).x, layout.get(i).y, 0);
+			}
 		}
 
 		// Add the initial estimate of each view's location and the points observed
@@ -244,6 +253,9 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 			structure.setView(viewIdx, 0, false, motions.get(viewIdx));
 			SceneObservations.View vrigid = observations.getViewRigid(viewIdx);
 			CalibrationObservation ca = calibrationObservations.get(viewIdx);
+
+			SceneStructureMetric.Rigid srigid = structure.rigids.data[ca.target];
+
 			for (int j = 0; j < ca.size(); j++) {
 				PointIndex2D_F64 p = ca.get(j);
 				vrigid.add(p.index, (float)p.p.x, (float)p.p.y);
@@ -253,14 +265,14 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 	}
 
 	public List<ImageResults> computeErrors() {
-		List<ImageResults> errors = new ArrayList<>();
+		var errors = new ArrayList<ImageResults>();
 
-		double[] parameters = new double[structure.getParameterCount()];
-		double[] residuals = new double[observations.getObservationCount()*2];
-		CodecSceneStructureMetric codec = new CodecSceneStructureMetric();
+		var parameters = new double[structure.getParameterCount()];
+		var residuals = new double[observations.getObservationCount()*2];
+		var codec = new CodecSceneStructureMetric();
 		codec.encode(structure, parameters);
 
-		BundleAdjustmentMetricResidualFunction function = new BundleAdjustmentMetricResidualFunction();
+		var function = new BundleAdjustmentMetricResidualFunction();
 		function.configure(structure, observations);
 		function.process(parameters, residuals);
 

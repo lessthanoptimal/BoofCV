@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,6 +38,7 @@ import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import lombok.Getter;
 import org.ddogleg.struct.DogArray_B;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
 
@@ -73,11 +74,14 @@ public class CalibrateStereoPlanar implements VerbosePrint {
 	List<Se3_F64> viewLeft = new ArrayList<>();
 	List<Se3_F64> viewRight = new ArrayList<>();
 
+	// Which calibration target was observed in this view
+	DogArray_I32 viewTarget = new DogArray_I32();
+
 	// calibrates the left and right camera image
 	@Getter CalibrateMonoPlanar calibLeft = new CalibrateMonoPlanar();
 	@Getter CalibrateMonoPlanar calibRight = new CalibrateMonoPlanar();
 
-	List<Point2D_F64> layout;
+	List<List<Point2D_F64>> layouts;
 
 	MetricBundleAdjustmentUtils bundleUtils = new MetricBundleAdjustmentUtils();
 
@@ -86,10 +90,10 @@ public class CalibrateStereoPlanar implements VerbosePrint {
 	/**
 	 * Configures stereo calibration
 	 *
-	 * @param layout How calibration points are laid out on the target
+	 * @param layouts How calibration points are laid out on each of the targets
 	 */
-	public CalibrateStereoPlanar( List<Point2D_F64> layout ) {
-		this.layout = layout;
+	public CalibrateStereoPlanar( List<List<Point2D_F64>> layouts ) {
+		this.layouts = layouts;
 	}
 
 	/**
@@ -101,8 +105,9 @@ public class CalibrateStereoPlanar implements VerbosePrint {
 	public void initialize( ImageDimension left, ImageDimension right ) {
 		viewLeft.clear();
 		viewRight.clear();
-		calibLeft.initialize(left.width, left.height, layout);
-		calibRight.initialize(right.width, right.height, layout);
+		viewTarget.reset();
+		calibLeft.initialize(left.width, left.height, layouts);
+		calibRight.initialize(right.width, right.height, layouts);
 	}
 
 	/**
@@ -122,13 +127,16 @@ public class CalibrateStereoPlanar implements VerbosePrint {
 	/**
 	 * Adds a pair of images that observed the same target.
 	 *
+	 * @param targetID The calibration target being observed
 	 * @param left Image of left target.
 	 * @param right Image of right target.
 	 */
-	public void addPair( CalibrationObservation left,
-						 CalibrationObservation right ) {
-		calibLeft.addImage(left);
-		calibRight.addImage(right);
+	public void addPair( int targetID,
+						 List<PointIndex2D_F64> left,
+						 List<PointIndex2D_F64> right ) {
+		viewTarget.add(targetID);
+		calibLeft.addImage(new CalibrationObservation(targetID, left));
+		calibRight.addImage(new CalibrationObservation(targetID, right));
 	}
 
 	/**
@@ -175,11 +183,14 @@ public class CalibrateStereoPlanar implements VerbosePrint {
 	 */
 	private Se3_F64 computeRightToLeft() {
 		// location of points in the world coordinate system
-		List<Point2D_F64> points2D = layout;
-		List<Point3D_F64> points3D = new ArrayList<>();
+		List<List<Point3D_F64>> listPoints3D = new ArrayList<>();
 
-		for (Point2D_F64 p : points2D) { // lint:forbidden ignore_line
-			points3D.add(new Point3D_F64(p.x, p.y, 0));
+		for (int targetID = 0; targetID < layouts.size(); targetID++) {
+			var points3D = new ArrayList<Point3D_F64>();
+			for (Point2D_F64 p : layouts.get(targetID)) { // lint:forbidden ignore_line
+				points3D.add(new Point3D_F64(p.x, p.y, 0));
+			}
+			listPoints3D.add(points3D);
 		}
 
 		// create point cloud in each view
@@ -189,6 +200,7 @@ public class CalibrateStereoPlanar implements VerbosePrint {
 		for (int i = 0; i < viewLeft.size(); i++) {
 			Se3_F64 worldToLeft = viewLeft.get(i);
 			Se3_F64 worldToRight = viewRight.get(i);
+			List<Point3D_F64> points3D = listPoints3D.get(viewTarget.get(i));
 
 			// These points can really be arbitrary and don't have to be target points
 			for (Point3D_F64 p : points3D) { // lint:forbidden ignore_line
@@ -222,15 +234,24 @@ public class CalibrateStereoPlanar implements VerbosePrint {
 		int numViews = structureLeft.views.size;
 
 		// left and right cameras. n views, and 1 known calibration target
-		structure.initialize(2, numViews*2, numViews + 1, 0, 1);
+		structure.initialize(2, numViews*2, numViews + 1, 0, layouts.size());
+
 		// initialize the cameras
 		structure.setCamera(0, false, structureLeft.cameras.get(0).model);
 		structure.setCamera(1, false, structureRight.cameras.get(0).model);
-		// configure the known calibration target
-		structure.setRigid(0, true, new Se3_F64(), layout.size());
-		SceneStructureMetric.Rigid rigid = structure.rigids.data[0];
-		for (int i = 0; i < layout.size(); i++) {
-			rigid.setPoint(i, layout.get(i).x, layout.get(i).y, 0);
+
+		// Specify the structure of calibration targets
+		for (int layoutID = 0; layoutID < layouts.size(); layoutID++) {
+			List<Point2D_F64> layout = layouts.get(layoutID);
+
+			// All the calibration targets are at the origin, the cameras pivots around them
+			structure.setRigid(layoutID, true, new Se3_F64(), layout.size());
+
+			// Where the points are on the calibration target
+			SceneStructureMetric.Rigid srigid = structure.rigids.data[layoutID];
+			for (int i = 0; i < layout.size(); i++) {
+				srigid.setPoint(i, layout.get(i).x, layout.get(i).y, 0);
+			}
 		}
 
 		// initialize the views. Right views will be relative to left and will share the same baseline
@@ -246,19 +267,25 @@ public class CalibrateStereoPlanar implements VerbosePrint {
 		for (int viewIndex = 0; viewIndex < numViews; viewIndex++) {
 			SceneObservations.View oviewLeft = observations.getViewRigid(viewIndex*2);
 			CalibrationObservation left = calibLeft.observations.get(viewIndex);
+
+			SceneStructureMetric.Rigid srigid = structure.rigids.data[left.target];
+
 			for (int j = 0; j < left.size(); j++) {
 				PointIndex2D_F64 p = left.get(j);
 				oviewLeft.add(p.index, (float)p.p.x, (float)p.p.y);
-				rigid.connectPointToView(p.index, viewIndex*2);
+				srigid.connectPointToView(p.index, viewIndex*2);
 			}
 		}
 		for (int viewIndex = 0; viewIndex < numViews; viewIndex++) {
 			SceneObservations.View oviewRight = observations.getViewRigid(viewIndex*2 + 1);
 			CalibrationObservation right = calibRight.observations.get(viewIndex);
+
+			SceneStructureMetric.Rigid srigid = structure.rigids.data[right.target];
+
 			for (int j = 0; j < right.size(); j++) {
 				PointIndex2D_F64 p = right.get(j);
 				oviewRight.add(p.index, (float)p.p.x, (float)p.p.y);
-				rigid.connectPointToView(p.index, viewIndex*2 + 1);
+				srigid.connectPointToView(p.index, viewIndex*2 + 1);
 			}
 		}
 
@@ -282,9 +309,9 @@ public class CalibrateStereoPlanar implements VerbosePrint {
 		var qualityLeft = new CalibrationQuality();
 		var qualityRight = new CalibrationQuality();
 
-		CalibrateMonoPlanar.computeQuality(getCalibLeft().getIntrinsic(), fillScorer, layout,
+		CalibrateMonoPlanar.computeQuality(getCalibLeft().getIntrinsic(), fillScorer, layouts,
 				getCalibLeft().getObservations(), qualityLeft);
-		CalibrateMonoPlanar.computeQuality(getCalibRight().getIntrinsic(), fillScorer, layout,
+		CalibrateMonoPlanar.computeQuality(getCalibRight().getIntrinsic(), fillScorer, layouts,
 				getCalibRight().getObservations(), qualityRight);
 
 		List<ImageResults> errors = computeErrors();

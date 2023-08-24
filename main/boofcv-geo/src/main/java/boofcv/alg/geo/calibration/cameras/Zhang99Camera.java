@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,9 +33,9 @@ import java.util.List;
  */
 public interface Zhang99Camera {
 	/**
-	 * Specifies layout of calibration target
+	 * Specifies layouts of calibration targets
 	 */
-	void setLayout( List<Point2D_F64> layout );
+	void setLayouts( List<List<Point2D_F64>> layouts );
 
 	/**
 	 * Provide an initial estimate for the camera parameters given 1) estimated pinhole camera parameters,

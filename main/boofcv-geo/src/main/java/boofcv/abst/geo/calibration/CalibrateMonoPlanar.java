@@ -75,8 +75,8 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 	// detects calibration points inside of images
 	protected DetectSingleFiducialCalibration detector;
 
-	// how the points are laid out
-	protected List<Point2D_F64> layout;
+	/** Layout of points on each calibration target */
+	protected List<List<Point2D_F64>> layouts;
 
 	/** computes calibration parameters */
 	@Getter protected CalibrationPlanarGridZhang99 zhang99;
@@ -101,12 +101,12 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 	 * @param width Image width
 	 * @param height Image height
 	 */
-	public void initialize( int width, int height, List<Point2D_F64> layout ) {
+	public void initialize( int width, int height, List<List<Point2D_F64>> layouts ) {
 		observations = new ArrayList<>();
 		errors = new ArrayList<>();
 		imageWidth = width;
 		imageHeight = height;
-		this.layout = layout;
+		this.layouts = layouts;
 	}
 
 	/**
@@ -180,7 +180,7 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 			throw new RuntimeException("Must call initialize() first");
 		if (zhang99 == null)
 			throw new IllegalArgumentException("Please call configure first.");
-		zhang99.setLayout(layout);
+		zhang99.setLayouts(layouts);
 		zhang99.setVerbose(verbose, null);
 		if (!zhang99.process(observations)) {
 			throw new RuntimeException("Zhang99 algorithm failed!");
@@ -207,7 +207,7 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 	public String computeQualityText( List<String> imageNames ) {
 		var fillScore = new ScoreCalibrationFill();
 		var quality = new CalibrationQuality();
-		computeQuality(foundIntrinsic, fillScore, layout, observations, quality);
+		computeQuality(foundIntrinsic, fillScore, layouts, observations, quality);
 		return computeQualityText(errors, imageNames, quality);
 	}
 
@@ -245,21 +245,22 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 	 *
 	 * @param intrinsic Estimated camera model from calibration
 	 * @param fillScorer Used to compute image fill score
-	 * @param worldPoints Known location of points in world coordinates
+	 * @param targetLayouts Known location of points in world coordinates
 	 * @param observations Observed calibration points
 	 * @param quality (Output) Metrics used to evaluate how good the calibration is
 	 */
 	public static void computeQuality( CameraModel intrinsic,
 									   ScoreCalibrationFill fillScorer,
-									   List<Point2D_F64> worldPoints,
+									   List<List<Point2D_F64>> targetLayouts,
 									   List<CalibrationObservation> observations,
 									   CalibrationQuality quality ) {
 		fillScorer.initialize(intrinsic.width, intrinsic.height);
-		var geoScorer = new ScoreCalibrationGeometricDiversity(true, worldPoints);
+		var geoScorer = new ScoreCalibrationGeometricDiversity(true);
 
 		for (int i = 0; i < observations.size(); i++) {
-			fillScorer.addObservation(observations.get(i).points);
-			geoScorer.addObservation(observations.get(i).points);
+			CalibrationObservation obs = observations.get(i);
+			fillScorer.addObservation(obs.points);
+			geoScorer.addObservation(obs.points, targetLayouts.get(obs.target));
 		}
 		geoScorer.computeScore();
 

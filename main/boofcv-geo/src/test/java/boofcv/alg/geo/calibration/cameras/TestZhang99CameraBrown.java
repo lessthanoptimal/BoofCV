@@ -35,9 +35,9 @@ public class TestZhang99CameraBrown extends GenericCalibrationZhang99<CameraPinh
 	@Override
 	public Zhang99Camera createGenerator( CameraConfig config, List<Point2D_F64> layout ) {
 		BrownConfig c = (BrownConfig)config;
-		var m = new Zhang99CameraBrown(c.assumeZeroSkew, c.includeTangential, c.numRadial);
-		m.setLayout(layout);
-		return m;
+		var alg = new Zhang99CameraBrown(c.assumeZeroSkew, c.includeTangential, c.numRadial);
+		alg.setLayouts(List.of(layout));
+		return alg;
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -514,7 +514,7 @@ public class CameraCalibrationMono extends BaseStandardInputApp {
 
 				// need to pass in the layout and image size
 				if (firstImage) {
-					calibrationAlg.initialize(image.width, image.height, detector.getLayout());
+					calibrationAlg.initialize(image.width, image.height, List.of(detector.getLayout()));
 					firstImage = false;
 				}
 

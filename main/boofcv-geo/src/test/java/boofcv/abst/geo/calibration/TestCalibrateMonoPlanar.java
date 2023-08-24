@@ -38,8 +38,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestCalibrateMonoPlanar extends BoofStandardJUnit {
 
-	CameraPinholeBrown intrinsic = new CameraPinholeBrown(200,210,0,320,240,640,480).
-	fsetRadial(0.01, -0.02).fsetTangential(0.03,0.03);
+	CameraPinholeBrown intrinsic = new CameraPinholeBrown(200, 210, 0, 320, 240, 640, 480).
+			fsetRadial(0.01, -0.02).fsetTangential(0.03, 0.03);
 	Point2Transform2_F64 normToPixel = LensDistortionFactory.narrow(intrinsic).distort_F64(false, true);
 
 	List<Se3_F64> targetToCamera = new ArrayList<>();
@@ -50,11 +50,11 @@ public class TestCalibrateMonoPlanar extends BoofStandardJUnit {
 		double z = 250;
 		double w = 40;
 
-		targetToCamera.add(SpecialEuclideanOps_F64.eulerXyz(0,0,z,0,0,0,null));
-		targetToCamera.add(SpecialEuclideanOps_F64.eulerXyz(w,0,z,0.1,0,0,null));
-		targetToCamera.add(SpecialEuclideanOps_F64.eulerXyz(w,w,z,0,0.1,0,null));
-		targetToCamera.add(SpecialEuclideanOps_F64.eulerXyz(0,-w,z,0,0,0.1,null));
-		targetToCamera.add(SpecialEuclideanOps_F64.eulerXyz(0,-w,z,0,-0.1,0.1,null));
+		targetToCamera.add(SpecialEuclideanOps_F64.eulerXyz(0, 0, z, 0, 0, 0, null));
+		targetToCamera.add(SpecialEuclideanOps_F64.eulerXyz(w, 0, z, 0.1, 0, 0, null));
+		targetToCamera.add(SpecialEuclideanOps_F64.eulerXyz(w, w, z, 0, 0.1, 0, null));
+		targetToCamera.add(SpecialEuclideanOps_F64.eulerXyz(0, -w, z, 0, 0, 0.1, null));
+		targetToCamera.add(SpecialEuclideanOps_F64.eulerXyz(0, -w, z, 0, -0.1, 0.1, null));
 	}
 
 	/**
@@ -63,9 +63,9 @@ public class TestCalibrateMonoPlanar extends BoofStandardJUnit {
 	 */
 	@Test void fullBasic() {
 		var alg = new CalibrateMonoPlanar();
-		alg.initialize(intrinsic.width, intrinsic.height, layout);
+		alg.initialize(intrinsic.width, intrinsic.height, List.of(layout));
 //		alg.setVerbose(System.out,0);
-		alg.configurePinhole(true,2,true);
+		alg.configurePinhole(true, 2, true);
 
 		for (int i = 0; i < targetToCamera.size(); i++) {
 			alg.addImage(createFakeObservations(i));
@@ -75,37 +75,37 @@ public class TestCalibrateMonoPlanar extends BoofStandardJUnit {
 
 		// NOTE: When optimization switched from using a dense method + SVD to sparse using cholesky
 		//       it's ability to handle the test scenario got worse. I've noticed no change in real world data
-		assertEquals(intrinsic.fx,found.fx,intrinsic.width*1e-3);
-		assertEquals(intrinsic.fy,found.fy,intrinsic.width*1e-3);
-		assertEquals(intrinsic.cx,found.cx,intrinsic.width*1e-3);
-		assertEquals(intrinsic.cy,found.cy,intrinsic.width*1e-3);
-		assertEquals(intrinsic.skew,found.skew,intrinsic.width*1e-3);
+		assertEquals(intrinsic.fx, found.fx, intrinsic.width*1e-3);
+		assertEquals(intrinsic.fy, found.fy, intrinsic.width*1e-3);
+		assertEquals(intrinsic.cx, found.cx, intrinsic.width*1e-3);
+		assertEquals(intrinsic.cy, found.cy, intrinsic.width*1e-3);
+		assertEquals(intrinsic.skew, found.skew, intrinsic.width*1e-3);
 
-		assertEquals(intrinsic.radial[0],found.radial[0],1e-5);
-		assertEquals(intrinsic.radial[1],found.radial[1],1e-5);
+		assertEquals(intrinsic.radial[0], found.radial[0], 1e-5);
+		assertEquals(intrinsic.radial[1], found.radial[1], 1e-5);
 
-		assertEquals(intrinsic.t1,found.t1,1e-5);
-		assertEquals(intrinsic.t2,found.t2,1e-5);
+		assertEquals(intrinsic.t1, found.t1, 1e-5);
+		assertEquals(intrinsic.t2, found.t2, 1e-5);
 
-		assertEquals(intrinsic.width,found.width,1e-3);
-		assertEquals(intrinsic.height,found.height,1e-3);
+		assertEquals(intrinsic.width, found.width, 1e-3);
+		assertEquals(intrinsic.height, found.height, 1e-3);
 	}
 
 	private CalibrationObservation createFakeObservations( int which ) {
 		Se3_F64 t2c = targetToCamera.get(which);
 		var set = new CalibrationObservation();
 
-		for( int i = 0; i < layout.size(); i++ ) {
+		for (int i = 0; i < layout.size(); i++) {
 			Point2D_F64 p2 = layout.get(i);
 			// location of calibration point on the target
-			Point3D_F64 p3 = new Point3D_F64(p2.x,p2.y,0);
+			Point3D_F64 p3 = new Point3D_F64(p2.x, p2.y, 0);
 
-			Point3D_F64 a = SePointOps_F64.transform(t2c,p3,null);
+			Point3D_F64 a = SePointOps_F64.transform(t2c, p3, null);
 
 			Point2D_F64 pixel = new Point2D_F64();
-			normToPixel.compute(a.x / a.z, a.y / a.z, pixel);
+			normToPixel.compute(a.x/a.z, a.y/a.z, pixel);
 
-			if( pixel.x < 0 || pixel.x >= intrinsic.width-1 || pixel.y < 0 || pixel.y >= intrinsic.height-1 )
+			if (pixel.x < 0 || pixel.x >= intrinsic.width - 1 || pixel.y < 0 || pixel.y >= intrinsic.height - 1)
 				throw new RuntimeException("Adjust test setup, bad observation");
 
 			set.add(i, pixel);

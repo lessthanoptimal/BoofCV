@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -111,7 +111,7 @@ public class ExampleCalibrateStereo {
 	 */
 	public void process() {
 		// Declare and setup the calibration algorithm
-		var calibrator = new CalibrateStereoPlanar(detector.getLayout());
+		var calibrator = new CalibrateStereoPlanar(List.of(detector.getLayout()));
 		calibrator.configure(/*zero skew*/true, /* radial */4, /* tangential */false);
 
 		// Uncomment to print more information to stdout
@@ -147,7 +147,7 @@ public class ExampleCalibrateStereo {
 			}
 			calibRight = detector.getDetectedPoints();
 
-			calibrator.addPair(calibLeft, calibRight);
+			calibrator.addPair(calibLeft.target, calibLeft.points, calibRight.points);
 			usedImages.add(left.get(i));
 		}
 

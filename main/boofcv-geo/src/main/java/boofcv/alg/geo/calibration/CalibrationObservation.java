@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,6 +43,11 @@ public class CalibrationObservation {
 	@Getter public List<PointIndex2D_F64> points = new ArrayList<>();
 
 	public CalibrationObservation() {}
+
+	public CalibrationObservation( int target, List<PointIndex2D_F64> points ) {
+		this.target = target;
+		this.points.addAll(points);
+	}
 
 	public void setTo( CalibrationObservation obs ) {
 		reset();
