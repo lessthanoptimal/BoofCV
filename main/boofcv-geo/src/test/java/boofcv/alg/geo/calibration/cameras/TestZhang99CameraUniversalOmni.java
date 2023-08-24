@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -117,7 +117,7 @@ public class TestZhang99CameraUniversalOmni extends GenericCalibrationZhang99<Ca
 	public Zhang99Camera createGenerator( CameraConfig config, List<Point2D_F64> layout ) {
 		OmniConfig c = (OmniConfig)config;
 		var a = new Zhang99CameraUniversalOmni(c.assumeZeroSkew, c.includeTangential, c.numRadial);
-		a.setLayout(layout);
+		a.setLayouts(List.of(layout));
 		a.fixedMirror = c.fixedMirror;
 		return a;
 	}

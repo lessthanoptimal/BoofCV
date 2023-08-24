@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,6 +54,7 @@ import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageDimension;
+import georegression.struct.point.Point2D_F64;
 import lombok.Getter;
 import org.apache.commons.io.FilenameUtils;
 import org.ddogleg.struct.DogArray;
@@ -540,7 +541,9 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 		// by default assume the calibration will be unsuccessful
 		detectorSet.calibrationSuccess = false;
 		try {
-			detectorSet.calibrator.initialize(shape.width, shape.height, detectorSet.detector.getLayout());
+			List<List<Point2D_F64>> layouts = List.of(detectorSet.detector.getLayout());
+
+			detectorSet.calibrator.initialize(shape.width, shape.height, layouts);
 
 			results.safe(() -> {
 				for (int usedIdx = 0; usedIdx < results.usedImages.size(); usedIdx++) {
@@ -556,7 +559,7 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 			// Save results for visualization
 			results.safe(() -> {
 				CalibrateMonoPlanar.computeQuality(detectorSet.calibrator.getIntrinsic(), results.fillScorer,
-						detectorSet.detector.getLayout(), results.allUsedObservations, results.quality);
+						layouts, results.allUsedObservations, results.quality);
 				// Compute the bounds of regions which do not have points for visualization
 				results.fillScorer.updateUnoccupied();
 

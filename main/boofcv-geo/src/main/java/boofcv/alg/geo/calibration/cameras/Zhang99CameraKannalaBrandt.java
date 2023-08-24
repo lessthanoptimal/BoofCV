@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,7 +45,7 @@ public class Zhang99CameraKannalaBrandt implements Zhang99Camera {
 		this.numAsymmetric = numAsymmetric;
 	}
 
-	@Override public void setLayout( List<Point2D_F64> layout ) {}
+	@Override public void setLayouts( List<List<Point2D_F64>> layouts ) {}
 
 	@Override
 	public BundleAdjustmentCamera initializeCamera( DMatrixRMaj K,
@@ -71,7 +71,7 @@ public class Zhang99CameraKannalaBrandt implements Zhang99Camera {
 	}
 
 	@Override public CameraModel getCameraModel( BundleAdjustmentCamera bundleCam ) {
-		BundleKannalaBrandt cam = (BundleKannalaBrandt)bundleCam;
+		var cam = (BundleKannalaBrandt)bundleCam;
 		return BundleAdjustmentOps.convert(cam, 0, 0, (CameraKannalaBrandt)null);
 	}
 }

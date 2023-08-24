@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,6 +47,7 @@ import boofcv.misc.VariableLockSet;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageDimension;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
 import lombok.Getter;
 import org.apache.commons.io.FilenameUtils;
@@ -343,7 +344,7 @@ public class CalibrateStereoPlanarApp extends JPanel {
 				algorithms.detector = configurePanel.targetPanel.createSingleTargetDetector();
 
 			if (targetChanged || calibratorChanged) {
-				algorithms.calibrator = new CalibrateStereoPlanar(algorithms.detector.getLayout());
+				algorithms.calibrator = new CalibrateStereoPlanar(List.of(algorithms.detector.getLayout()));
 				ControlPanelPinhole controls = configurePanel.pinhole;
 				algorithms.calibrator.configure(controls.skew.value, controls.numRadial.vint(), controls.tangential.value);
 			}
@@ -481,11 +482,12 @@ public class CalibrateStereoPlanarApp extends JPanel {
 			results.right.errors.put(imageName, algorithms.calibrator.getCalibRight().getErrors().get(usedIdx));
 			usedIdx += 1;
 		}
+		List<List<Point2D_F64>> layouts = List.of(algorithms.detector.getLayout());
 		CalibrateMonoPlanar.computeQuality(algorithms.calibrator.getCalibLeft().getIntrinsic(),
-				results.left.fillScorer, algorithms.detector.getLayout(),
+				results.left.fillScorer, layouts,
 				algorithms.calibrator.getCalibLeft().getObservations(), results.left.quality);
 		CalibrateMonoPlanar.computeQuality(algorithms.calibrator.getCalibRight().getIntrinsic(),
-				results.right.fillScorer, algorithms.detector.getLayout(),
+				results.right.fillScorer, layouts,
 				algorithms.calibrator.getCalibRight().getObservations(), results.right.quality);
 		results.left.fillScorer.updateUnoccupied();
 		results.right.fillScorer.updateUnoccupied();
@@ -507,7 +509,11 @@ public class CalibrateStereoPlanarApp extends JPanel {
 					continue;
 				CalibrationObservation left = Objects.requireNonNull(results.left.observations.get(imageName));
 				CalibrationObservation right = Objects.requireNonNull(results.right.observations.get(imageName));
-				algorithms.calibrator.addPair(left, right);
+
+				if (left.target != right.target)
+					throw new RuntimeException("Observation not of the same target");
+
+				algorithms.calibrator.addPair(left.target, left.points, right.points);
 			}
 		} finally {
 			algorithms.unlock();

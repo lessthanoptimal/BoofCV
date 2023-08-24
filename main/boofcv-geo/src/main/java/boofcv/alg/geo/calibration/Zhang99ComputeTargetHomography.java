@@ -25,6 +25,7 @@ import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.struct.point.Point2D_F64;
 import lombok.Setter;
 import org.ejml.data.DMatrixRMaj;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +57,7 @@ public class Zhang99ComputeTargetHomography {
 	 * location of calibration points in the target frame, which is also the world coordinate system's origin.
 	 * z-axis is assumed to be zero.
 	 */
-	@Setter List<Point2D_F64> worldPoints;
+	@Setter @Nullable List<Point2D_F64> targetLayout;
 
 	/**
 	 * Computes the homography from a list of detected grid points in the image. The
@@ -67,17 +68,17 @@ public class Zhang99ComputeTargetHomography {
 	 * @return True if it computed a Homography and false if it failed to compute a homography matrix.
 	 */
 	public boolean computeHomography( List<PointIndex2D_F64> observedPoints ) {
-		Objects.requireNonNull(worldPoints, "Must specify worldPoints first");
+		Objects.requireNonNull(targetLayout, "Must specify targetLayout first");
 		if (observedPoints.size() < MINIMUM_POINTS)
 			throw new IllegalArgumentException("At least 4 points needed in each set of observations. " +
 					" Filter these first please");
 
-		List<AssociatedPair> pairs = new ArrayList<>();
+		var pairs = new ArrayList<AssociatedPair>();
 		for (int i = 0; i < observedPoints.size(); i++) {
 			int which = observedPoints.get(i).index;
 			Point2D_F64 obs = observedPoints.get(i).p;
 
-			pairs.add(new AssociatedPair(worldPoints.get(which), obs, true));
+			pairs.add(new AssociatedPair(targetLayout.get(which), obs, true));
 		}
 
 		if (!computeHomography.process(pairs, found))
@@ -93,7 +94,7 @@ public class Zhang99ComputeTargetHomography {
 	 *
 	 * @return Homography matrix.
 	 */
-	public DMatrixRMaj getHomography() {
+	public DMatrixRMaj getCopyOfHomography() {
 		return found.copy();
 	}
 }

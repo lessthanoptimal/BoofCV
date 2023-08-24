@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -76,8 +76,6 @@ import static boofcv.abst.geo.calibration.CalibrateMonoPlanar.computeQuality;
  * <p> Internally it assumes that the targets are stationary and the camera system is moving. It will work just fine
  * if the opposite is true as these are mathematically identical. </p>
  *
- * TODO add support for multiple targets. Current version has been simplified for one target.
- *
  * @author Peter Abeles
  */
 public class CalibrateMultiPlanar {
@@ -147,6 +145,27 @@ public class CalibrateMultiPlanar {
 	 * @return true if successful or false if it failed
 	 */
 	public boolean process() {
+		List<TargetCameraPair> pairs = findTargetCameraPairs();
+
+		// Calibrate all cameras independently, which building up a scene with all the targets observed by each camera
+		for (int pairIdx = 0; pairIdx < pairs.size(); pairIdx++) {
+			TargetCameraPair pair = pairs.get(pairIdx);
+
+			// TODO calibrate camera if unknown and create a new scene
+
+			// Algorithm if camera is already known:
+			//     Search for the frame where the target's observation has the largest convex bounding box
+			//     estimate the target's location using that frame
+			//     Add to the scene
+		}
+
+		// TODO Sort cameras by their "calibration score"
+		// TODO Pick a camera and then select the camera that has the "best connection" to its scene
+		// TODO merge the two scenes together
+		// TODO repeat until no more cameras can be merged together
+
+
+
 		// Assume there's only one target for now. This should be changed in the future
 		int targetID = 0;
 
@@ -175,6 +194,41 @@ public class CalibrateMultiPlanar {
 	}
 
 	/**
+	 * Returns all camera target pairs when a target was observed by a camera at least once. This is done
+	 * my exhaustively trying all pairs.
+	 */
+	private ArrayList<TargetCameraPair> findTargetCameraPairs() {
+		var pairs = new ArrayList<TargetCameraPair>();
+
+		for (int targetID = 0; targetID < layouts.size; targetID++) {
+			for (int cameraID = 0; cameraID < cameras.size; cameraID++) {
+				var pair = new TargetCameraPair();
+				pair.targetID = targetID;
+				pair.cameraID = cameraID;
+
+				// Brute force algorithm for finding all the observations of this pairing
+				for (int frameIdx = 0; frameIdx < frameObs.size(); frameIdx++) {
+					SynchronizedCalObs syncObs = frameObs.get(frameIdx);
+					CalibrationObservationSet set = syncObs.findCamera(cameraID);
+					if (set == null)
+						continue;
+					CalibrationObservation targetObs = set.findTarget(targetID);
+					if (targetObs == null)
+						continue;
+					pair.observations.add(targetObs);
+				}
+
+				// See if there are observations. If not there's no reason to save it
+				if (pair.observations.isEmpty())
+					continue;
+
+				pairs.add(pair);
+			}
+		}
+		return pairs;
+	}
+
+	/**
 	 * Calibrate each camera independently. Save extrinsic relationship between targets and each camera
 	 * in all the views
 	 *
@@ -194,7 +248,7 @@ public class CalibrateMultiPlanar {
 			CameraPriors c = cameras.get(cameraIdx);
 
 			// Tell it information about the camera and target
-			calibratorMono.initialize(c.width, c.height, layouts.get(targetID));
+			calibratorMono.initialize(c.width, c.height, layouts.toList());
 
 			// Go through all the data frames
 			for (int frameIdx = 0; frameIdx < frameObs.size(); frameIdx++) {
@@ -220,7 +274,7 @@ public class CalibrateMultiPlanar {
 			results.getIntrinsics().add(calibratorMono.process());
 
 			// Compute quality of image coverage
-			computeQuality(calibratorMono.foundIntrinsic, fillScore, layouts.get(0),
+			computeQuality(calibratorMono.foundIntrinsic, fillScore, layouts.toList(),
 					calibratorMono.observations, statistics.get(cameraIdx).quality);
 
 			// Save the extrinsic relationship between the camera in each frame and the targets it observed

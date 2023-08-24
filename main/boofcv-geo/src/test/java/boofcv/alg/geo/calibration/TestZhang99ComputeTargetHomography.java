@@ -61,11 +61,11 @@ public class TestZhang99ComputeTargetHomography extends BoofStandardJUnit {
 
 		// compute the homography
 		var alg = new Zhang99ComputeTargetHomography();
-		alg.setWorldPoints(layout);
+		alg.setTargetLayout(layout);
 
 		assertTrue(alg.computeHomography(observations.points));
 
-		DMatrixRMaj H = alg.getHomography();
+		DMatrixRMaj H = alg.getCopyOfHomography();
 
 		// test this homography property: x2 = H*x1
 		for( int i = 0; i < observations.size(); i++ ) {

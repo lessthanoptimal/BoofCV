@@ -45,23 +45,26 @@ public class ScoreCalibrationGeometricDiversity {
 	 */
 	@Getter double score = 0;
 
-	public ScoreCalibrationGeometricDiversity( boolean assumeZeroSkew, List<Point2D_F64> worldPoints ) {
+	public ScoreCalibrationGeometricDiversity( boolean assumeZeroSkew ) {
 		computeCalib = new Zhang99CalibrationMatrixFromHomographies(assumeZeroSkew);
 		computeHomography = new Zhang99ComputeTargetHomography();
-		computeHomography.setWorldPoints(worldPoints);
 	}
 
 	/**
 	 * Adds information from the provided set of observations
+	 *
+	 * @param observation Observation of calibration target
+	 * @param layout The layout of the calibration target
 	 */
-	public void addObservation( List<PointIndex2D_F64> observation ) {
+	public void addObservation( List<PointIndex2D_F64> observation, List<Point2D_F64> layout ) {
 		if (observation.size() <= 4)
 			return;
+		computeHomography.setTargetLayout(layout);
 		if (!computeHomography.computeHomography(observation)) {
 			System.err.println("Failed to compute homography");
 			return;
 		}
-		homographies.add(computeHomography.getHomography().copy());
+		homographies.add(computeHomography.getCopyOfHomography());
 	}
 
 	/**

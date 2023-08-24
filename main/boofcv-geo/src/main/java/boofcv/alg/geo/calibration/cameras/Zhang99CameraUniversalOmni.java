@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -61,8 +61,8 @@ public class Zhang99CameraUniversalOmni implements Zhang99Camera {
 		computeRadial = new RadialDistortionEstimateLinear(numRadial);
 	}
 
-	@Override public void setLayout( List<Point2D_F64> layout ) {
-		computeRadial.setWorldPoints(layout);
+	@Override public void setLayouts( List<List<Point2D_F64>> layouts ) {
+		computeRadial.setLayouts(layouts);
 	}
 
 	@Override public BundleAdjustmentCamera initializeCamera(
@@ -83,8 +83,8 @@ public class Zhang99CameraUniversalOmni implements Zhang99Camera {
 
 	@Override
 	public CameraModel getCameraModel( BundleAdjustmentCamera bundleCam ) {
-		BundleUniversalOmni cam = (BundleUniversalOmni)bundleCam;
-		CameraUniversalOmni out = new CameraUniversalOmni(cam.radial.length);
+		var cam = (BundleUniversalOmni)bundleCam;
+		var out = new CameraUniversalOmni(cam.radial.length);
 		cam.convert(out);
 		return out;
 	}

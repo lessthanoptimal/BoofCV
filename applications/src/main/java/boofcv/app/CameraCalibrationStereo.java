@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -219,7 +219,7 @@ public class CameraCalibrationStereo {
 	void process() {
 		// Create detector and calibrator from configurations
 		DetectSingleFiducialCalibration detector = FactoryFiducialCalibration.genericSingle(configTarget);
-		var calibrator = new CalibrateStereoPlanar(detector.getLayout());
+		var calibrator = new CalibrateStereoPlanar(List.of(detector.getLayout()));
 		if (verboseDebug) {
 			calibrator.setVerbose(System.out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));
 		}
@@ -296,15 +296,16 @@ public class CameraCalibrationStereo {
 
 			// One image in the pair needs to be usable
 			if (calibLeft.size() >= minLandmarks || calibRight.size() >= minLandmarks) {
-				calibrator.addPair(calibLeft, calibRight);
+				calibrator.addPair(calibLeft.target, calibLeft.points, calibRight.points);
 
 				// Save landmarks to disk if configured to do so
-				if (saveLandmarks) {
-					String leftName = stereoImages.getLeftName();
-					String rightName = stereoImages.getRightName();
-					CalibrationIO.saveLandmarksCsv(leftName, detectorName, calibLeft, new File(landmarksPath, leftName + ".csv"));
-					CalibrationIO.saveLandmarksCsv(rightName, detectorName, calibLeft, new File(landmarksPath, rightName + ".csv"));
-				}
+				if (!saveLandmarks)
+					continue;
+
+				String leftName = stereoImages.getLeftName();
+				String rightName = stereoImages.getRightName();
+				CalibrationIO.saveLandmarksCsv(leftName, detectorName, calibLeft, new File(landmarksPath, leftName + ".csv"));
+				CalibrationIO.saveLandmarksCsv(rightName, detectorName, calibLeft, new File(landmarksPath, rightName + ".csv"));
 			}
 
 			if (verbose && frame%30 == 29)
