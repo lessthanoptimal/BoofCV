@@ -217,7 +217,7 @@ public abstract class GenericCalibrationZhang99<CM extends CameraModel> extends 
 				obs.points.add(pixel);
 			}
 
-			assertTrue(computeHomography.computeHomography(obs));
+			assertTrue(computeHomography.computeHomography(obs.points));
 			ret.homographies.add(computeHomography.getHomography());
 		}
 

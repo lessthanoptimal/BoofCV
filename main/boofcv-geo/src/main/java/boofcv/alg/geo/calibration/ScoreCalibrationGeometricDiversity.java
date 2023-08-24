@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo.calibration;
 
+import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.struct.point.Point2D_F64;
 import lombok.Getter;
 import org.ejml.data.DMatrixRMaj;
@@ -53,10 +54,10 @@ public class ScoreCalibrationGeometricDiversity {
 	/**
 	 * Adds information from the provided set of observations
 	 */
-	public void addObservations( CalibrationObservation observations ) {
-		if (observations.size() <= 4)
+	public void addObservation( List<PointIndex2D_F64> observation ) {
+		if (observation.size() <= 4)
 			return;
-		if (!computeHomography.computeHomography(observations)) {
+		if (!computeHomography.computeHomography(observation)) {
 			System.err.println("Failed to compute homography");
 			return;
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -523,7 +523,7 @@ public class AssistedCalibrationMono {
 		for (int i = 0; i < sidesCollision.size(); i++) {
 			p.get(i).setTo(sidesCollision.get(i));
 		}
-		quality.addObservations(detector.getDetectedPoints());
+		quality.addObservation(detector.getDetectedPoints().points);
 		quality.computeScore();
 		gui.getInfoPanel().updateGeometry(quality.getScore());
 

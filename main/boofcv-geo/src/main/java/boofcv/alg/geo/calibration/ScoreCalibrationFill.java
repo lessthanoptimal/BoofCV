@@ -20,12 +20,15 @@ package boofcv.alg.geo.calibration;
 
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ConfigLength;
+import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Rectangle2D_I32;
 import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_B;
+
+import java.util.List;
 
 /**
  * Computes a score for amount of coverage across the image, with independent scores for the border region and inner
@@ -97,7 +100,7 @@ public class ScoreCalibrationFill {
 	/**
 	 * See if any observed calibration points hit a target. if so remove the target.
 	 */
-	public void addObservation( CalibrationObservation obs ) {
+	public void addObservation( List<PointIndex2D_F64> obs ) {
 		if (this.imageWidth <= 0)
 			throw new IllegalArgumentException("You must call initialize first.");
 

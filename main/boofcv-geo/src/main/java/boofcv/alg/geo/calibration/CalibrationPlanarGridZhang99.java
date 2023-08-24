@@ -155,9 +155,7 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 
 		computeHomography.setWorldPoints(layout);
 		for (int i = 0; i < observations.size(); i++) {
-			CalibrationObservation obs = observations.get(i);
-
-			if (!computeHomography.computeHomography(obs))
+			if (!computeHomography.computeHomography(observations.get(i).points))
 				return false;
 
 			DMatrixRMaj H = computeHomography.getHomography();
