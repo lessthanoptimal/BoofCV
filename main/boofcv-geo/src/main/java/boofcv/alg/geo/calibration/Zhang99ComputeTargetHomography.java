@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.alg.geo.calibration;
 import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.struct.point.Point2D_F64;
 import lombok.Setter;
 import org.ejml.data.DMatrixRMaj;
@@ -52,8 +53,8 @@ public class Zhang99ComputeTargetHomography {
 	private final DMatrixRMaj found = new DMatrixRMaj(3, 3);
 
 	/**
-	 * location of calibration points in the target frame's in world units.
-	 * he z-axis is assumed to be zero
+	 * location of calibration points in the target frame, which is also the world coordinate system's origin.
+	 * z-axis is assumed to be zero.
 	 */
 	@Setter List<Point2D_F64> worldPoints;
 
@@ -65,7 +66,7 @@ public class Zhang99ComputeTargetHomography {
 	 * @param observedPoints List of ordered detected grid points in image pixels.
 	 * @return True if it computed a Homography and false if it failed to compute a homography matrix.
 	 */
-	public boolean computeHomography( CalibrationObservation observedPoints ) {
+	public boolean computeHomography( List<PointIndex2D_F64> observedPoints ) {
 		Objects.requireNonNull(worldPoints, "Must specify worldPoints first");
 		if (observedPoints.size() < MINIMUM_POINTS)
 			throw new IllegalArgumentException("At least 4 points needed in each set of observations. " +

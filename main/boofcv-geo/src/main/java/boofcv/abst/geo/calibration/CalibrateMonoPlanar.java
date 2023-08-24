@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -258,8 +258,8 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 		var geoScorer = new ScoreCalibrationGeometricDiversity(true, worldPoints);
 
 		for (int i = 0; i < observations.size(); i++) {
-			fillScorer.addObservation(observations.get(i));
-			geoScorer.addObservations(observations.get(i));
+			fillScorer.addObservation(observations.get(i).points);
+			geoScorer.addObservation(observations.get(i).points);
 		}
 		geoScorer.computeScore();
 
