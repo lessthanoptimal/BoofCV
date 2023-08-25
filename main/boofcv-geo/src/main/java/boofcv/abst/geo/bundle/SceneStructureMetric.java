@@ -569,6 +569,8 @@ public class SceneStructureMetric extends SceneStructureCommon {
 
 		/**
 		 * Indicates that this point has been observed in this view and performs sanity checks.
+		 *
+		 * @deprecated Use {@link #connectPointToView(int, int, float, float, SceneObservations)} instead.
 		 */
 		public void connectPointToView( int pointIdx, int viewIdx ) {
 			if (points[pointIdx].views.contains(viewIdx))
