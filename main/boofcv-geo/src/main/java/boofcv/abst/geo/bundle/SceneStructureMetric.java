@@ -18,6 +18,7 @@
 
 package boofcv.abst.geo.bundle;
 
+import boofcv.misc.BoofMiscOps;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
@@ -98,8 +99,8 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	}
 
 	/**
-	 * Assigns an ID to all rigid points. This function does not need to be called by the user as it will be called
-	 * by the residual function if needed
+	 * Assigns an ID to all rigid points. Call this function after the structure of all the rigid objects has
+	 * been specified. You must call this before you assign observations to rigid bodies,
 	 */
 	public void assignIDsToRigidPoints() {
 		// return if it has already been assigned
@@ -566,10 +567,32 @@ public class SceneStructureMetric extends SceneStructureCommon {
 			}
 		}
 
+		/**
+		 * Indicates that this point has been observed in this view and performs sanity checks.
+		 */
 		public void connectPointToView( int pointIdx, int viewIdx ) {
 			if (points[pointIdx].views.contains(viewIdx))
 				throw new IllegalArgumentException("Tried to add the same view twice. viewIndex=" + viewIdx);
 			points[pointIdx].views.add(viewIdx);
+		}
+
+		/**
+		 * Connects the point to the view and adds the pixel observations. These steps can be easy to mess up, so
+		 * it's recommended that you use this function.
+		 *
+		 * <p>NOTE: Make sure you call {@link SceneStructureMetric#assignIDsToRigidPoints()} before calling this
+		 * function.</p>
+		 *
+		 * @param pointIdx Index of the feature on the rigid object
+		 * @param viewIdx Which view this observation is from
+		 * @param pixX The pixel-x observation
+		 * @param pixY The pixel-y observation
+		 * @param sceneObs Data structure storing the observations
+		 */
+		public void connectPointToView( int pointIdx, int viewIdx, float pixX, float pixY, SceneObservations sceneObs ) {
+			BoofMiscOps.checkTrue(indexFirst >= 0, "Please call scene.assignIDsToRigidPoints() first");
+			sceneObs.getViewRigid(viewIdx).add(indexFirst + pointIdx, pixX, pixY);
+			connectPointToView(pointIdx, viewIdx);
 		}
 
 		public void setPoint( int which, double x, double y, double z ) {
