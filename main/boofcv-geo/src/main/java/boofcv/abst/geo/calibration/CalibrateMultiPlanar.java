@@ -34,6 +34,7 @@ import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
+import georegression.transform.se.AverageRotationMatrix_F64;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import lombok.Getter;
@@ -42,6 +43,7 @@ import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_F64;
 import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastArray;
+import org.ejml.data.DMatrixRMaj;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -100,11 +102,11 @@ public class CalibrateMultiPlanar {
 	// Observations from the camera system taken at a single time step
 	final List<SynchronizedCalObs> frameObs = new ArrayList<>();
 
+	// Stores information about each captured data frame
+	final DogArray<FrameState> frames = new DogArray<>(FrameState::new, FrameState::reset);
+
 	/** Must call this function first. Specifies the number of cameras and calibration targets */
 	public void initialize( int numCameras, int numTargets ) {
-		if (numTargets != 1)
-			throw new RuntimeException("Currently only supports one target");
-
 		statistics.reset().resize(numCameras);
 		results.reset();
 		layouts.resize(numTargets);
@@ -128,6 +130,11 @@ public class CalibrateMultiPlanar {
 		layouts.set(which, layout);
 	}
 
+	public void setTargetLayouts( List<List<Point2D_F64>> layouts ) {
+		this.layouts.clear();
+		this.layouts.addAll(layouts);
+	}
+
 	/**
 	 * Adds an observation. Order does not matter. All cameras are assumed to have synchronized shutters
 	 * and observed the world at the exact same time.
@@ -145,45 +152,18 @@ public class CalibrateMultiPlanar {
 	 * @return true if successful or false if it failed
 	 */
 	public boolean process() {
-		List<TargetCameraPair> pairs = findTargetCameraPairs();
-
-		// Calibrate all cameras independently, which building up a scene with all the targets observed by each camera
-		for (int pairIdx = 0; pairIdx < pairs.size(); pairIdx++) {
-			TargetCameraPair pair = pairs.get(pairIdx);
-
-			// TODO calibrate camera if unknown and create a new scene
-
-			// Algorithm if camera is already known:
-			//     Search for the frame where the target's observation has the largest convex bounding box
-			//     estimate the target's location using that frame
-			//     Add to the scene
-		}
-
-		// TODO Sort cameras by their "calibration score"
-		// TODO Pick a camera and then select the camera that has the "best connection" to its scene
-		// TODO merge the two scenes together
-		// TODO repeat until no more cameras can be merged together
-
-
-
-		// Assume there's only one target for now. This should be changed in the future
-		int targetID = 0;
-
-		var frames = new ArrayList<FrameState>();
-		for (int i = 0; i < frameObs.size(); i++) {
-			frames.add(new FrameState());
-		}
+		frames.reset().resize(frameObs.size());
 
 		// Do monocular calibration first
-		monocularCalibration(targetID, frames);
+		monocularCalibration();
 
 		// Find extrinsic relationship between all the cameras
-		estimateCameraToSensor(frames);
+		estimateCameraToSensor();
 
 		// Find relationship of sensor reference frame to world reference frame
-		estimateSensorToWorldInAllFrames(frames);
+		estimateSensorToWorldInAllFrames();
 
-		setupSbaScene(targetID, frames);
+		setupSbaScene();
 
 		if (!bundleUtils.process())
 			return false;
@@ -194,57 +174,22 @@ public class CalibrateMultiPlanar {
 	}
 
 	/**
-	 * Returns all camera target pairs when a target was observed by a camera at least once. This is done
-	 * my exhaustively trying all pairs.
-	 */
-	private ArrayList<TargetCameraPair> findTargetCameraPairs() {
-		var pairs = new ArrayList<TargetCameraPair>();
-
-		for (int targetID = 0; targetID < layouts.size; targetID++) {
-			for (int cameraID = 0; cameraID < cameras.size; cameraID++) {
-				var pair = new TargetCameraPair();
-				pair.targetID = targetID;
-				pair.cameraID = cameraID;
-
-				// Brute force algorithm for finding all the observations of this pairing
-				for (int frameIdx = 0; frameIdx < frameObs.size(); frameIdx++) {
-					SynchronizedCalObs syncObs = frameObs.get(frameIdx);
-					CalibrationObservationSet set = syncObs.findCamera(cameraID);
-					if (set == null)
-						continue;
-					CalibrationObservation targetObs = set.findTarget(targetID);
-					if (targetObs == null)
-						continue;
-					pair.observations.add(targetObs);
-				}
-
-				// See if there are observations. If not there's no reason to save it
-				if (pair.observations.isEmpty())
-					continue;
-
-				pairs.add(pair);
-			}
-		}
-		return pairs;
-	}
-
-	/**
 	 * Calibrate each camera independently. Save extrinsic relationship between targets and each camera
 	 * in all the views
-	 *
-	 * @param targetID Which target is going to be used to calibrate the cameras
-	 * @param frames All the time step frames
 	 */
-	void monocularCalibration( int targetID, List<FrameState> frames ) {
+	void monocularCalibration() {
 		// used to compute calibration quality metrics
 		var fillScore = new ScoreCalibrationFill();
 
-		// Store the index of each frame that had observations from a camera and the specified target
-		var usedFrames = new DogArray_I32();
+		// A frame in the mono calibrate does not correspond to the original frame because
+		// observations of multiple targets in the same image gets split up into independent observations.
+		// This data structure is a lookup table that goes from mono image to original frame index
+		var monoViewToInputFrame = new DogArray_I32();
 
 		// Go through all cameras
 		for (int cameraIdx = 0; cameraIdx < cameras.size; cameraIdx++) {
-			usedFrames.reset();
+			monoViewToInputFrame.reset();
+
 			CameraPriors c = cameras.get(cameraIdx);
 
 			// Tell it information about the camera and target
@@ -260,12 +205,11 @@ public class CalibrateMultiPlanar {
 					if (os.cameraID != c.index)
 						continue;
 
-					// Add the observations, record which frame it came from, escape the loop
-					var monoObs = new CalibrationObservation();
-					monoObs.points.addAll(os.targets.get(0).points); // NOTE: assumes only one target
-					calibratorMono.addImage(monoObs);
-
-					usedFrames.add(frameIdx);
+					// Each calibration target observation is treated as being its own image
+					for (int targetIdx = 0; targetIdx < os.targets.size; targetIdx++) {
+						calibratorMono.addImage(os.targets.get(targetIdx));
+						monoViewToInputFrame.add(frameIdx);
+					}
 					break;
 				}
 			}
@@ -278,10 +222,13 @@ public class CalibrateMultiPlanar {
 					calibratorMono.observations, statistics.get(cameraIdx).quality);
 
 			// Save the extrinsic relationship between the camera in each frame and the targets it observed
-			for (int usedIdx = 0; usedIdx < usedFrames.size(); usedIdx++) {
-				int frameID = usedFrames.get(usedIdx);
-				CalibrationObservationSet obs = frameObs.get(frameID).findCamera(c.index);
-				Objects.requireNonNull(obs, "BUG!");
+			for (int monoViewIdx = 0; monoViewIdx < monoViewToInputFrame.size(); monoViewIdx++) {
+
+				// Look up the original frame that this target observation came from
+				int frameID = monoViewToInputFrame.get(monoViewIdx);
+
+				CalibrationObservationSet os = frameObs.get(frameID).findCamera(c.index);
+				Objects.requireNonNull(os, "BUG!");
 
 				FrameState frame = frames.get(frameID);
 				FrameCamera cam = frame.cameras.get(cameraIdx);
@@ -290,9 +237,15 @@ public class CalibrateMultiPlanar {
 					frame.cameras.put(cameraIdx, cam);
 				}
 
+				// Get the target observation
+				CalibrationObservation calObs = calibratorMono.getObservations().get(monoViewIdx);
+
+				// Save the estimated extrinsics
+				// Remember that all targets have been put at the origin of the world coordinate system
 				var target = new TargetExtrinsics();
-				target.targetID = targetID;
-				target.targetToCamera.setTo(calibratorMono.getTargetToView(usedIdx));
+				target.targetID = calObs.target;
+				target.targetToCamera.setTo(calibratorMono.getTargetToView(monoViewIdx));
+
 				cam.observations.add(target);
 			}
 		}
@@ -304,11 +257,11 @@ public class CalibrateMultiPlanar {
 	 * iteratively going through the list of cameras with unknown relationships to the sensor frame and seeing
 	 * if they share an observation with a known camera.
 	 */
-	void estimateCameraToSensor( List<FrameState> frames ) {
+	void estimateCameraToSensor() {
 		// Known contains cameras where the extrinsics is known
-		List<CameraPriors> known = new ArrayList<>();
+		var known = new ArrayList<CameraPriors>();
 		// Unknown contains cameras with unknown extrinsics
-		List<CameraPriors> unknown = new ArrayList<>();
+		var unknown = new ArrayList<CameraPriors>();
 		for (int i = 1; i < cameras.size; i++) {
 			unknown.add(cameras.get(i));
 		}
@@ -316,8 +269,8 @@ public class CalibrateMultiPlanar {
 		// This effectively sets camera[0] as the origin of the sensor frame
 		known.add(cameras.get(0));
 
-		// Iterate untol it's solved or doesn't change and failed
-		while (unknown.size() > 0) {
+		// Iterate until it's solved or doesn't change and failed
+		while (!unknown.isEmpty()) {
 			boolean change = false;
 			for (int unknownIdx = unknown.size() - 1; unknownIdx >= 0; unknownIdx--) {
 				CameraPriors unknownCam = unknown.get(unknownIdx);
@@ -351,7 +304,7 @@ public class CalibrateMultiPlanar {
 				}
 			}
 
-			// If there is no change, that means there are no common observatiosn and nothing more can be done
+			// If there is no change, that means there are no common observations and nothing more can be done
 			if (!change) {
 				break;
 			}
@@ -362,10 +315,68 @@ public class CalibrateMultiPlanar {
 	}
 
 	/**
+	 * Estimates the location of a target in the world frame. This uses the current estimated camera location.
+	 */
+	Se3_F64 estimateWorldToTarget( int targetID ) {
+		// All the estimated locations for this target
+		var listTargetToWorld = new DogArray<>(Se3_F64::new);
+
+		// Target to sensor reference frame
+		var targetToSensor = new Se3_F64();
+
+		for (int frameIdx = 0; frameIdx < frames.size(); frameIdx++) {
+			FrameState frame = frames.get(frameIdx);
+			frame.cameras.forEachEntry(( cameraID, frameCamera ) -> {
+				for (int obsIdx = 0; obsIdx < frameCamera.observations.size(); obsIdx++) {
+					TargetExtrinsics t = frameCamera.observations.get(obsIdx);
+					if (t.targetID != targetID)
+						continue;
+
+					// Find transform from target to common sensor frame
+					t.targetToCamera.concat(results.camerasToSensor.get(cameraID), targetToSensor);
+
+					// Now transform it to world reference frame
+					targetToSensor.concat(frame.sensorToWorld, listTargetToWorld.grow());
+				}
+				return true;
+			});
+		}
+
+		return computeAverageSe3(listTargetToWorld.toList());
+	}
+
+	static Se3_F64 computeAverageSe3( List<Se3_F64> listTargetToWorld ) {
+		if (listTargetToWorld.isEmpty()) {
+			// This target has never been observed. Just return identity since what's returned doesn't matter.
+			return new Se3_F64();
+		}
+
+		// Storage for the average transform
+		var average = new Se3_F64();
+
+		// Find average location
+		for (int i = 0; i < listTargetToWorld.size(); i++) {
+			average.T.plusIP(listTargetToWorld.get(i).T);
+		}
+		average.T.divideIP(listTargetToWorld.size());
+
+		// Find average rotation matrix
+		var listR = new ArrayList<DMatrixRMaj>();
+		for (int i = 0; i < listTargetToWorld.size(); i++) {
+			listR.add(listTargetToWorld.get(i).R);
+		}
+		if (!new AverageRotationMatrix_F64().process(listR, average.R)) {
+			throw new RuntimeException("Average rotation computation failed");
+		}
+
+		return average;
+	}
+
+	/**
 	 * Find the sensor to world transform for every frame. For each frame, it selects an arbitrary target
 	 * observation and uses the known camera to sensor and target to world transform, to find sensor to world.
 	 */
-	void estimateSensorToWorldInAllFrames( List<FrameState> frames ) {
+	void estimateSensorToWorldInAllFrames() {
 		for (int frameIdx = 0; frameIdx < frames.size(); frameIdx++) {
 			FrameState f = frames.get(frameIdx);
 
@@ -400,18 +411,17 @@ public class CalibrateMultiPlanar {
 	/**
 	 * Given the initial estimates already found, create a scene graph that can be optimized by SBA
 	 */
-	void setupSbaScene( int targetID, List<FrameState> frames ) {
+	void setupSbaScene() {
 		// Refine everything with bundle adjustment
 		final SceneStructureMetric structure = bundleUtils.getStructure();
 		final SceneObservations observations = bundleUtils.getObservations();
-		final List<Point2D_F64> layout = layouts.get(targetID);
 
 		// There will be a view for every camera in every frame, even if a camera did not observe anything in
 		// that frame as it makes the structure much easier to manage
 		int totalViews = frames.size()*cameras.size;
 		int totalMotions = cameras.size;
 
-		structure.initialize(cameras.size, totalViews, totalMotions, 0, 1);
+		structure.initialize(cameras.size, totalViews, totalMotions, 0, layouts.size);
 
 		// Configure the cameras
 		for (int i = 0; i < cameras.size; i++) {
@@ -422,6 +432,21 @@ public class CalibrateMultiPlanar {
 		for (int camIdx = 0; camIdx < cameras.size; camIdx++) {
 			structure.addMotion(camIdx == 0, results.getCameraToSensor(camIdx).invert(null));
 		}
+
+		// Specify the structure of calibration targets
+		for (int layoutID = 0; layoutID < layouts.size(); layoutID++) {
+			List<Point2D_F64> layout = layouts.get(layoutID);
+
+			// Use the estimated camera location to estimate the location of each target
+			structure.setRigid(layoutID, false, estimateWorldToTarget(layoutID), layout.size());
+
+			// Where the points are on the calibration target
+			SceneStructureMetric.Rigid srigid = structure.rigids.get(layoutID);
+			for (int i = 0; i < layout.size(); i++) {
+				srigid.setPoint(i, layout.get(i).x, layout.get(i).y, 0);
+			}
+		}
+		structure.assignIDsToRigidPoints();
 
 		// Specific the views
 		int viewIdx = 0;
@@ -438,13 +463,6 @@ public class CalibrateMultiPlanar {
 			}
 		}
 
-		// NOTE: Only one target is currently allowed and it's the world of the world frame
-		structure.setRigid(0, true, new Se3_F64(), layout.size());
-		SceneStructureMetric.Rigid rigid = structure.rigids.data[0];
-		for (int i = 0; i < layout.size(); i++) {
-			rigid.setPoint(i, layout.get(i).x, layout.get(i).y, 0);
-		}
-
 		// Add observations to bundle adjustment
 		observations.initialize(totalViews, true);
 		for (int frameIdx = 0; frameIdx < frameObs.size(); frameIdx++) {
@@ -455,14 +473,14 @@ public class CalibrateMultiPlanar {
 
 				// Remember, one view for every camera in every frame
 				int sbaViewIndex = frameIdx*cameras.size + c.cameraID;
-				SceneObservations.View sbaView = observations.getViewRigid(sbaViewIndex);
 
-				for (int obsIdx = 0; obsIdx < c.targets.size; obsIdx++) {
-					CalibrationObservation o = c.targets.get(obsIdx);
-					for (int featIdx = 0; featIdx < o.size(); featIdx++) {
-						PointIndex2D_F64 p = o.get(featIdx);
-						sbaView.add(p.index, (float)p.p.x, (float)p.p.y);
-						rigid.connectPointToView(sbaViewIndex, p.index);
+				for (int targetIdx = 0; targetIdx < c.targets.size; targetIdx++) {
+					CalibrationObservation obs = c.targets.get(targetIdx);
+					SceneStructureMetric.Rigid srigid = structure.rigids.get(obs.target);
+
+					for (int featIdx = 0; featIdx < obs.size(); featIdx++) {
+						PointIndex2D_F64 p = obs.get(featIdx);
+						srigid.connectPointToView(p.index, sbaViewIndex, (float)p.p.x, (float)p.p.y, observations);
 					}
 				}
 			}
@@ -673,6 +691,11 @@ public class CalibrateMultiPlanar {
 
 		/** Transform from the sensor coordinate system at this time step to the world frame */
 		Se3_F64 sensorToWorld = new Se3_F64();
+
+		public void reset() {
+			cameras.clear();
+			sensorToWorld.reset();
+		}
 	}
 
 	/**

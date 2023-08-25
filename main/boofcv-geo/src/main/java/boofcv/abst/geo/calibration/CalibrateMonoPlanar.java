@@ -156,7 +156,9 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 	}
 
 	/**
-	 * Adds the observations from a calibration target detector
+	 * Adds the observations from a calibration target detector.
+	 *
+	 * <p>Note: If you see two targets in one image then that image is treated as two image, one for each observations. </p>
 	 *
 	 * @param observation Detected calibration points
 	 */
