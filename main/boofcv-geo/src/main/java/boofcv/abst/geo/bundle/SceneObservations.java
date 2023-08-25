@@ -91,10 +91,10 @@ public class SceneObservations {
 	}
 
 	/**
-	 * Returns the view for rigid objects with this index.
+	 * Returns the rigid object specific view for the view with the specified index.
 	 */
-	public View getViewRigid( int which ) {
-		return viewsRigid.data[which];
+	public View getViewRigid( int viewIndex ) {
+		return viewsRigid.data[viewIndex];
 	}
 
 	public static class View {
@@ -173,6 +173,10 @@ public class SceneObservations {
 
 		/**
 		 * Adds an observation of the specified feature.
+		 *
+		 * <p>NOTE: For rigid body features you need to add the offset for the specific rigid object to
+		 * the internal index. You should call
+		 * {@link SceneStructureMetric.Rigid#connectPointToView(int, int, float, float, SceneObservations)}instead</p>
 		 *
 		 * @param featureIndex Feature index
 		 * @param x pixel x-coordinate

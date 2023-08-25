@@ -37,7 +37,8 @@ import java.util.Random;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-@SuppressWarnings("ALL") public abstract class GenericBundleAdjustmentMetricChecks extends BoofStandardJUnit {
+@SuppressWarnings("ALL")
+public abstract class GenericBundleAdjustmentMetricChecks extends BoofStandardJUnit {
 	public abstract BundleAdjustment<SceneStructureMetric> createAlg();
 
 	@Test void horizontalPerfect() {
@@ -110,6 +111,24 @@ import static org.junit.jupiter.api.Assertions.fail;
 		// close to the optimal one
 		Tuple2<SceneStructureMetric, SceneObservations> b = createHorizontalMotion(123, true);
 		assertEquals(a.d0, b.d0, 0, 0.1, 1e-3);
+	}
+
+	/**
+	 * Test rigid object code. No regular features just observations of rigid objects
+	 */
+	@Test void rigidObjects() {
+		// Test with variable number of rigid objects
+		for (int count = 1; count <= 3; count++) {
+//			System.out.println("count=" + count);
+			Tuple2<SceneStructureMetric, SceneObservations> a = createRigidObject(123, count);
+
+			BundleAdjustment<SceneStructureMetric> alg = createAlg();
+			alg.setParameters(a.d0, a.d1);
+			alg.optimize(a.d0); // don't assertTrue() since it can fail
+
+			Tuple2<SceneStructureMetric, SceneObservations> b = createRigidObject(123, count);
+			assertEquals(a.d0, b.d0, 0.0, 0.1, 3e-3);
+		}
 	}
 
 	private void addNoiseToPoint3D( Tuple2<SceneStructureMetric, SceneObservations> a ) {
@@ -233,18 +252,18 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 	public Tuple2<SceneStructureMetric, SceneObservations>
 	createHorizontalMotion( long seed, boolean cameraFixed ) {
-		Random rand = new Random(seed);
+		var rand = new Random(seed);
 
 		int width = 600;
-		CameraPinhole intrinsic = new CameraPinhole(400, 400, 0, 300, 300, width, width);
+		var intrinsic = new CameraPinhole(400, 400, 0, 300, 300, width, width);
 
 		int numViews = 5;
 		int numFeatures = 250;
 
-		SceneStructureMetric structure = new SceneStructureMetric(false);
+		var structure = new SceneStructureMetric(false);
 		structure.initialize(1, numViews, numFeatures);
 
-		SceneObservations observations = new SceneObservations();
+		var observations = new SceneObservations();
 		observations.initialize(numViews);
 
 		structure.setCamera(0, cameraFixed, intrinsic);
@@ -256,13 +275,13 @@ import static org.junit.jupiter.api.Assertions.fail;
 			structure.setView(i, 0, i == 0, worldToView);
 		}
 
-		WorldToCameraToPixel wcp = new WorldToCameraToPixel();
-		Point2D_F64 pixel = new Point2D_F64();
+		var wcp = new WorldToCameraToPixel();
+		var pixel = new Point2D_F64();
 
 		for (int featureIndex = 0; featureIndex < numFeatures; featureIndex++) {
 			// Run until it finds a location where it's visible in at least two views
 			while (true) {
-				Point3D_F64 P = new Point3D_F64();
+				var P = new Point3D_F64();
 				P.x = (maxX - minX)*rand.nextDouble() + minX;
 				P.y = rand.nextGaussian()/3;
 				P.z = rand.nextGaussian()/10 + maxX/3;
@@ -293,6 +312,103 @@ import static org.junit.jupiter.api.Assertions.fail;
 				}
 			}
 		}
+
+		return new Tuple2<>(structure, observations);
+	}
+
+	/**
+	 * Scene with observations of rigid objects only
+	 */
+	public Tuple2<SceneStructureMetric, SceneObservations>
+	createRigidObject( long seed, int numRigid ) {
+		var rand = new Random(seed);
+
+		int width = 600;
+		var intrinsic = new CameraPinhole(width*0.5, width*0.5, 0, width/2.0, width/2.0, width, width);
+
+		int numViews = 5;
+		int numFeatures = 250;
+
+		var structure = new SceneStructureMetric(false);
+		structure.initialize(1, numViews, numViews, 0, numRigid);
+
+		// Create rigid objects with a variable number of points
+		for (int rigidID = 0; rigidID < numRigid; rigidID++) {
+			// Set the rigid object's location
+			var pose = new Se3_F64();
+			pose.T.x = 0.10*0%2 - 0.2;
+			pose.T.y = -0.1;
+			pose.T.z = 0.5;
+
+			int sideN = 3 + rigidID;
+			structure.setRigid(rigidID, true, pose, sideN*sideN);
+			SceneStructureMetric.Rigid r = structure.rigids.get(rigidID);
+
+			// how wide a size is. More points just mean more density
+			double sideLength = 0.3;
+
+			// Scatter the points in an approximate plane
+			for (int row = 0; row < sideN; row++) {
+				double y = sideLength*(row/(double)(sideN - 1) - 0.5)/2.0;
+				for (int col = 0; col < sideN; col++) {
+					double x = sideLength*(col/(double)(sideN - 1) - 0.5)/2.0;
+					int pointIdx = row*sideN + col;
+					r.setPoint(pointIdx, x, y, rand.nextGaussian()*0.1);
+				}
+			}
+		}
+		structure.assignIDsToRigidPoints();
+
+		var observations = new SceneObservations();
+		observations.initialize(numViews, true);
+
+		structure.setCamera(0, true, intrinsic);
+
+		double minX = -0.3, maxX = 0.3;
+		for (int i = 0; i < numViews; i++) {
+			var worldToView = new Se3_F64();
+			worldToView.T.x = -((maxX - minX)*i/(numViews - 1) + minX);
+			structure.setView(i, 0, i == 0, worldToView);
+		}
+
+		// workspace
+		var wcp = new WorldToCameraToPixel();
+		var pixel = new Point2D_F64();
+		int totalPointsInView = 0;
+		int totalPoints = 0;
+
+		// Gemerate observations
+		var worldP = new Point3D_F64();
+		for (int rigidID = 0; rigidID < numRigid; rigidID++) {
+			var srigid = structure.rigids.get(rigidID);
+
+			totalPoints += srigid.getTotalPoints()*numViews;
+			for (int pointID = 0; pointID < srigid.getTotalPoints(); pointID++) {
+				// Find point on rigid object's location in the world view
+				srigid.getPoint(pointID, worldP);
+				srigid.object_to_world.transform(worldP, worldP);
+
+				for (int viewIndex = 0; viewIndex < numViews; viewIndex++) {
+					var origid = observations.getViewRigid(viewIndex);
+					wcp.configure(intrinsic, structure.getParentToView(viewIndex));
+					if (!wcp.transform(worldP, pixel))
+						continue; // behind camera
+
+					if (!intrinsic.isInside(pixel.x, pixel.y))
+						continue;
+
+					// Add points to the observations
+					srigid.connectPointToView(pointID, viewIndex,
+							(float)(pixel.x + rand.nextGaussian()*0.05),
+							(float)(pixel.y + rand.nextGaussian()*0.05),
+							observations);
+					totalPointsInView++;
+				}
+			}
+		}
+
+		// Make sure it's a good scenario
+		assertTrue(totalPointsInView >= 0.7*totalPoints, totalPointsInView + " / " + totalPoints);
 
 		return new Tuple2<>(structure, observations);
 	}
