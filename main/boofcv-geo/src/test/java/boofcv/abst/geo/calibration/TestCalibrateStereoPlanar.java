@@ -48,7 +48,9 @@ public class TestCalibrateStereoPlanar extends BoofStandardJUnit {
 
 	Se3_F64 leftToRight = new Se3_F64();
 
-	List<Point2D_F64> layout = CalibrationDetectorSquareGrid.createLayout(4, 3, 30, 30);
+	List<List<Point2D_F64>> layouts =
+			List.of(CalibrationDetectorSquareGrid.createLayout(4, 3, 30, 30),
+					CalibrationDetectorSquareGrid.createLayout(5, 4, 25, 25));
 
 	public TestCalibrateStereoPlanar() {
 		double z = 250;
@@ -70,12 +72,38 @@ public class TestCalibrateStereoPlanar extends BoofStandardJUnit {
 	 * estimate the camera parameters.
 	 */
 	@Test void fullBasic() {
-		var alg = new CalibrateStereoPlanar(List.of(layout));
+		var alg = new CalibrateStereoPlanar(List.of(layouts.get(0)));
 		alg.initialize(intrinsic.getDimension(null), intrinsic.getDimension(null));
 		alg.configure(true, 2, true);
 
 		for (int i = 0; i < targetToLeft.size(); i++) {
-			alg.addPair(0, createFakeObservations(i, true), createFakeObservations(i, false));
+			alg.addPair(0, createFakeObservations(i, true, 0), createFakeObservations(i, false, 0));
+		}
+
+		StereoParameters found = alg.process();
+
+		checkIntrinsic(found.left);
+		checkIntrinsic(found.right);
+		Se3_F64 rightToLeft = found.getRightToLeft();
+		Se3_F64 expected = leftToRight.invert(null);
+
+		assertEquals(0, expected.getT().distance(rightToLeft.T), Math.abs(rightToLeft.T.x)*0.01);
+		assertTrue(MatrixFeatures_DDRM.isIdentity(rightToLeft.getR(), 2e-3));
+	}
+
+	/**
+	 * Multiple targets are used to generate observations
+	 */
+	@Test void multiTarget() {
+		var alg = new CalibrateStereoPlanar(layouts);
+		alg.initialize(intrinsic.getDimension(null), intrinsic.getDimension(null));
+		alg.configure(true, 2, true);
+
+		for (int i = 0; i < targetToLeft.size(); i++) {
+			int targetID = i%layouts.size();
+			alg.addPair(targetID,
+					createFakeObservations(i, true, targetID),
+					createFakeObservations(i, false, targetID));
 		}
 
 		StereoParameters found = alg.process();
@@ -106,7 +134,7 @@ public class TestCalibrateStereoPlanar extends BoofStandardJUnit {
 		assertEquals(intrinsic.height, found.height, 1e-3);
 	}
 
-	private List<PointIndex2D_F64> createFakeObservations( int which, boolean left ) {
+	private List<PointIndex2D_F64> createFakeObservations( int which, boolean left, int targetID ) {
 		Se3_F64 t2l = targetToLeft.get(which);
 		Se3_F64 t2c;
 
@@ -119,6 +147,7 @@ public class TestCalibrateStereoPlanar extends BoofStandardJUnit {
 
 		var set = new ArrayList<PointIndex2D_F64>();
 
+		List<Point2D_F64> layout = layouts.get(targetID);
 		for (int i = 0; i < layout.size(); i++) {
 			Point2D_F64 p2 = layout.get(i);
 			// location of calibration point on the target

@@ -253,6 +253,7 @@ public class CalibrateStereoPlanar implements VerbosePrint {
 				srigid.setPoint(i, layout.get(i).x, layout.get(i).y, 0);
 			}
 		}
+		structure.assignIDsToRigidPoints();
 
 		// initialize the views. Right views will be relative to left and will share the same baseline
 		int left_to_right_idx = structure.addMotion(false, left_to_right);
@@ -265,27 +266,23 @@ public class CalibrateStereoPlanar implements VerbosePrint {
 		// Add observations for left and right camera
 		observations.initialize(structure.views.size, true);
 		for (int viewIndex = 0; viewIndex < numViews; viewIndex++) {
-			SceneObservations.View oviewLeft = observations.getViewRigid(viewIndex*2);
 			CalibrationObservation left = calibLeft.observations.get(viewIndex);
 
 			SceneStructureMetric.Rigid srigid = structure.rigids.data[left.target];
 
 			for (int j = 0; j < left.size(); j++) {
 				PointIndex2D_F64 p = left.get(j);
-				oviewLeft.add(p.index, (float)p.p.x, (float)p.p.y);
-				srigid.connectPointToView(p.index, viewIndex*2);
+				srigid.connectPointToView(p.index, viewIndex*2, (float)p.p.x, (float)p.p.y, observations);
 			}
 		}
 		for (int viewIndex = 0; viewIndex < numViews; viewIndex++) {
-			SceneObservations.View oviewRight = observations.getViewRigid(viewIndex*2 + 1);
 			CalibrationObservation right = calibRight.observations.get(viewIndex);
 
 			SceneStructureMetric.Rigid srigid = structure.rigids.data[right.target];
 
 			for (int j = 0; j < right.size(); j++) {
 				PointIndex2D_F64 p = right.get(j);
-				oviewRight.add(p.index, (float)p.p.x, (float)p.p.y);
-				srigid.connectPointToView(p.index, viewIndex*2 + 1);
+				srigid.connectPointToView(p.index, viewIndex*2 + 1, (float)p.p.x, (float)p.p.y, observations);
 			}
 		}
 
