@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class TestPoint2Transform2BundleCamera extends BoofStandardJUnit {
 	@Test void compare() {
 		var camera = new BundlePinhole();
-		camera.setK(100,100,0,100,100);
+		camera.setK(100, 100, 0, 100, 100);
 
 		var alg = new Point2Transform2BundleCamera();
 		alg.setModel(camera);
@@ -40,9 +40,9 @@ class TestPoint2Transform2BundleCamera extends BoofStandardJUnit {
 		var expected = new Point2D_F64();
 		var found = new Point2D_F64();
 
-		PerspectiveOps.renderPixel(new CameraPinhole(100,100,0,100,100,0,0),
-				new Point3D_F64(0.1,-0.05,1.0), expected);
-		alg.compute(0.1,-0.05, found);
+		PerspectiveOps.renderPixel(new CameraPinhole(100, 100, 0, 100, 100, 0, 0),
+				new Point3D_F64(0.1, -0.05, 1.0), expected);
+		alg.compute(0.1, -0.05, found);
 		assertEquals(0.0, expected.distance(found), UtilEjml.TEST_F64);
 	}
 }

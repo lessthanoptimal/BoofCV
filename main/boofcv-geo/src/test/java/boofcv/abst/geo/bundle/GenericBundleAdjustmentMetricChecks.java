@@ -43,13 +43,13 @@ import static org.junit.jupiter.api.Assertions.fail;
 	@Test void horizontalPerfect() {
 		BundleAdjustment<SceneStructureMetric> alg = createAlg();
 
-		Tuple2<SceneStructureMetric, SceneObservations> a = createHorizontalMotion( 123,true);
+		Tuple2<SceneStructureMetric, SceneObservations> a = createHorizontalMotion(123, true);
 
-		alg.setParameters(a.d0,a.d1);
+		alg.setParameters(a.d0, a.d1);
 		alg.optimize(a.d0); // don't assertTrue() since it can fail
 
-		Tuple2<SceneStructureMetric, SceneObservations> b = createHorizontalMotion( 123,true);
-		assertEquals(a.d0,b.d0,1e-6,1e-6,1e-6);
+		Tuple2<SceneStructureMetric, SceneObservations> b = createHorizontalMotion(123, true);
+		assertEquals(a.d0, b.d0, 1e-6, 1e-6, 1e-6);
 	}
 
 	/**
@@ -58,61 +58,61 @@ import static org.junit.jupiter.api.Assertions.fail;
 	@Test void multipleCalls() {
 		BundleAdjustment<SceneStructureMetric> alg = createAlg();
 
-		Tuple2<SceneStructureMetric, SceneObservations> a = createHorizontalMotion( 123,true);
-		Tuple2<SceneStructureMetric, SceneObservations> c = createHorizontalMotion( 234,true);
+		Tuple2<SceneStructureMetric, SceneObservations> a = createHorizontalMotion(123, true);
+		Tuple2<SceneStructureMetric, SceneObservations> c = createHorizontalMotion(234, true);
 		addNoiseToPoint3D(c);
-		alg.setParameters(a.d0,a.d1);
+		alg.setParameters(a.d0, a.d1);
 		alg.optimize(c.d0);
-		alg.setParameters(a.d0,a.d1);
+		alg.setParameters(a.d0, a.d1);
 		alg.optimize(a.d0);
 
-		Tuple2<SceneStructureMetric, SceneObservations> b = createHorizontalMotion( 123,true);
-		assertEquals(a.d0,b.d0,1e-6,1e-6,1e-6);
+		Tuple2<SceneStructureMetric, SceneObservations> b = createHorizontalMotion(123, true);
+		assertEquals(a.d0, b.d0, 1e-6, 1e-6, 1e-6);
 	}
 
 	@Test void horizontalNoisyObs() {
 		BundleAdjustment<SceneStructureMetric> alg = createAlg();
 
-		Tuple2<SceneStructureMetric, SceneObservations> a = createHorizontalMotion( 123,true);
+		Tuple2<SceneStructureMetric, SceneObservations> a = createHorizontalMotion(123, true);
 
 		// Add noise to every observation
 		SceneObservations observations = a.d1;
 		for (int i = 0; i < observations.views.size; i++) {
 			SceneObservations.View v = observations.views.data[i];
 			for (int j = 0; j < v.point.size; j++) {
-				v.observations.data[j*2+0] += (float) rand.nextGaussian()*0.1f;
-				v.observations.data[j*2+1] += (float) rand.nextGaussian()*0.1f;
+				v.observations.data[j*2 + 0] += (float)rand.nextGaussian()*0.1f;
+				v.observations.data[j*2 + 1] += (float)rand.nextGaussian()*0.1f;
 			}
 		}
 
-		alg.setParameters(a.d0,a.d1);
+		alg.setParameters(a.d0, a.d1);
 		assertTrue(alg.optimize(a.d0));
 
-		Tuple2<SceneStructureMetric, SceneObservations> b = createHorizontalMotion( 123,true);
-		assertEquals(a.d0,b.d0,1e-6,0.01,0.01);
+		Tuple2<SceneStructureMetric, SceneObservations> b = createHorizontalMotion(123, true);
+		assertEquals(a.d0, b.d0, 1e-6, 0.01, 0.01);
 	}
 
 	@Test void horizontalNoisyFeatures() {
 		BundleAdjustment<SceneStructureMetric> alg = createAlg();
 
-		Tuple2<SceneStructureMetric, SceneObservations> a = createHorizontalMotion( 123,true);
+		Tuple2<SceneStructureMetric, SceneObservations> a = createHorizontalMotion(123, true);
 
 		// Add noise to every 3D point
 		addNoiseToPoint3D(a);
 
-		alg.setParameters(a.d0,a.d1);
+		alg.setParameters(a.d0, a.d1);
 		assertTrue(alg.optimize(a.d0));
 
 		// Since reprojection errors are perfect it should do a very good job reducing the residuals
-		checkReprojectionError(a.d0,a.d1,1e-4);
+		checkReprojectionError(a.d0, a.d1, 1e-4);
 
 		// even though observations are perfect it might have only converged towards a locally optimal solution thats
 		// close to the optimal one
-		Tuple2<SceneStructureMetric, SceneObservations> b = createHorizontalMotion( 123,true);
-		assertEquals(a.d0,b.d0,0,0.1,1e-3);
+		Tuple2<SceneStructureMetric, SceneObservations> b = createHorizontalMotion(123, true);
+		assertEquals(a.d0, b.d0, 0, 0.1, 1e-3);
 	}
 
-	private void addNoiseToPoint3D(Tuple2<SceneStructureMetric, SceneObservations> a) {
+	private void addNoiseToPoint3D( Tuple2<SceneStructureMetric, SceneObservations> a ) {
 		SceneStructureMetric structure = a.d0;
 		for (int i = 0; i < structure.points.size; i++) {
 			SceneStructureCommon.Point p = structure.points.data[i];
@@ -125,7 +125,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 	@Test void horizontalNoisyPose() {
 		BundleAdjustment<SceneStructureMetric> alg = createAlg();
 
-		Tuple2<SceneStructureMetric, SceneObservations> a = createHorizontalMotion( 123,true);
+		Tuple2<SceneStructureMetric, SceneObservations> a = createHorizontalMotion(123, true);
 
 		// Add noise to every view pose estimate. Except 0 since that's the world coordinates and it's easier to check
 		// errors if that's unmolested
@@ -137,31 +137,31 @@ import static org.junit.jupiter.api.Assertions.fail;
 			parent_to_view.T.z += rand.nextGaussian()*0.1;
 		}
 
-		alg.setParameters(a.d0,a.d1);
+		alg.setParameters(a.d0, a.d1);
 		assertTrue(alg.optimize(a.d0));
 
 		// Since reprojection errors are perfect it should do a very good job reducing the residuals
-		checkReprojectionError(a.d0,a.d1,1e-4);
+		checkReprojectionError(a.d0, a.d1, 1e-4);
 
 		// even though observations are perfect it might have only converged towards a locally optimal solution thats
 		// close to the optimal one
-		Tuple2<SceneStructureMetric, SceneObservations> b = createHorizontalMotion( 123,true);
-		assertEquals(a.d0,b.d0,1e-6,0.1,1e-3);
+		Tuple2<SceneStructureMetric, SceneObservations> b = createHorizontalMotion(123, true);
+		assertEquals(a.d0, b.d0, 1e-6, 0.1, 1e-3);
 	}
 
-	public static void checkReprojectionError(SceneStructureMetric structure , SceneObservations observations , double tol ) {
+	public static void checkReprojectionError( SceneStructureMetric structure, SceneObservations observations, double tol ) {
 
 		BundlePinhole c = (BundlePinhole)structure.cameras.get(0).model;
 
 		// making a bunch of assumptions here...
-		CameraPinhole intrinsic = new CameraPinhole(c.fx,c.fy,c.skew,c.cx,c.cy,600,600);
+		CameraPinhole intrinsic = new CameraPinhole(c.fx, c.fy, c.skew, c.cx, c.cy, 600, 600);
 
 		WorldToCameraToPixel wcp = new WorldToCameraToPixel();
 
 		PointIndex2D_F64 o = new PointIndex2D_F64();
 		Point2D_F64 predicted = new Point2D_F64();
 
-		if( structure.homogenous ) {
+		if (structure.homogenous) {
 			Point4D_F64 p4 = new Point4D_F64();
 			Point3D_F64 p3 = new Point3D_F64();
 			for (int viewIndex = 0; viewIndex < observations.views.size; viewIndex++) {
@@ -200,12 +200,12 @@ import static org.junit.jupiter.api.Assertions.fail;
 		}
 	}
 
-	public static void assertEquals(SceneStructureMetric a , SceneStructureMetric b ,
-									double tolCamera , double tolDistance , double tolRotation  ) {
+	public static void assertEquals( SceneStructureMetric a, SceneStructureMetric b,
+									 double tolCamera, double tolDistance, double tolRotation ) {
 
 		Assertions.assertEquals(a.homogenous, b.homogenous);
 
-		if( a.homogenous ) {
+		if (a.homogenous) {
 //			Point4D_F64 pa = new Point4D_F64();
 //			Point4D_F64 pb = new Point4D_F64();
 
@@ -214,48 +214,46 @@ import static org.junit.jupiter.api.Assertions.fail;
 				a.points.data[i].normalizeH();
 				b.points.data[i].normalizeH();
 				double error = a.points.data[i].distance(b.points.data[i]);
-				assertTrue( error < tolDistance);
+				assertTrue(error < tolDistance);
 			}
 		} else {
 			for (int i = 0; i < a.points.size; i++) {
 				double error = a.points.data[i].distance(b.points.data[i]);
-				assertTrue( error < tolDistance);
+				assertTrue(error < tolDistance);
 			}
 		}
 
 		for (int i = 0; i < a.motions.size; i++) {
 			double error = a.motions.data[i].parent_to_view.T.distance(b.motions.data[i].parent_to_view.T);
-			assertTrue( error < tolDistance );
+			assertTrue(error < tolDistance);
 			assertTrue(MatrixFeatures_DDRM.isIdentical(a.motions.data[i].parent_to_view.R,
-					b.motions.data[i].parent_to_view.R,tolRotation));
+					b.motions.data[i].parent_to_view.R, tolRotation));
 		}
-
 	}
 
 	public Tuple2<SceneStructureMetric, SceneObservations>
-	createHorizontalMotion( long seed , boolean cameraFixed )
-	{
+	createHorizontalMotion( long seed, boolean cameraFixed ) {
 		Random rand = new Random(seed);
 
 		int width = 600;
-		CameraPinhole intrinsic = new CameraPinhole(400,400,0,300,300,width,width);
+		CameraPinhole intrinsic = new CameraPinhole(400, 400, 0, 300, 300, width, width);
 
 		int numViews = 5;
 		int numFeatures = 250;
 
 		SceneStructureMetric structure = new SceneStructureMetric(false);
-		structure.initialize(1,numViews,numFeatures);
+		structure.initialize(1, numViews, numFeatures);
 
 		SceneObservations observations = new SceneObservations();
 		observations.initialize(numViews);
 
-		structure.setCamera(0,cameraFixed,intrinsic);
+		structure.setCamera(0, cameraFixed, intrinsic);
 
 		double minX = 0, maxX = 5;
 		for (int i = 0; i < numViews; i++) {
 			Se3_F64 worldToView = new Se3_F64();
-			worldToView.T.x = -((maxX-minX)*i/(numViews-1) + minX);
-			structure.setView(i, 0, i==0,worldToView);
+			worldToView.T.x = -((maxX - minX)*i/(numViews - 1) + minX);
+			structure.setView(i, 0, i == 0, worldToView);
 		}
 
 		WorldToCameraToPixel wcp = new WorldToCameraToPixel();
@@ -263,11 +261,11 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 		for (int featureIndex = 0; featureIndex < numFeatures; featureIndex++) {
 			// Run until it finds a location where it's visible in at least two views
-			while( true ) {
+			while (true) {
 				Point3D_F64 P = new Point3D_F64();
-				P.x = (maxX - minX) * rand.nextDouble() + minX;
-				P.y = rand.nextGaussian() / 3;
-				P.z = rand.nextGaussian() / 10 + maxX / 3;
+				P.x = (maxX - minX)*rand.nextDouble() + minX;
+				P.y = rand.nextGaussian()/3;
+				P.z = rand.nextGaussian()/10 + maxX/3;
 
 				structure.setPoint(featureIndex, P.x, P.y, P.z);
 
@@ -287,7 +285,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 						wcp.configure(intrinsic, parent_to_view);
 						wcp.transform(P, pixel);
 						if (pixel.x >= 0 && pixel.x < width && pixel.y >= 0 && pixel.y < width) {
-							observations.getView(viewIndex).add(featureIndex, (float) pixel.x, (float) pixel.y);
+							observations.getView(viewIndex).add(featureIndex, (float)pixel.x, (float)pixel.y);
 							structure.connectPointToView(featureIndex, viewIndex);
 						}
 					}
@@ -296,6 +294,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 			}
 		}
 
-		return new Tuple2<>(structure,observations);
+		return new Tuple2<>(structure, observations);
 	}
 }
