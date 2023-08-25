@@ -11,7 +11,7 @@ Date    : 2023/XX/XX
 Version : 1.0.1
 
 - Calibration
-  * TODO support multiple calibration targets
+  * Support for multiple calibration targets
 - Image Processing
   - TODO hough circle detector
 - SLAM
