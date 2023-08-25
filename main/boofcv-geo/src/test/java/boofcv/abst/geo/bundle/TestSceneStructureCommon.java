@@ -24,7 +24,6 @@ import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -32,23 +31,20 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 class TestSceneStructureCommon extends BoofStandardJUnit {
 	@Test
 	void removePoints() {
-
-		MockSceneStructureCommon structure = new MockSceneStructureCommon(false);
+		var structure = new MockSceneStructureCommon(false);
 		structure.homogenous = false;
 		structure.pointSize = 3;
 
-		List<Point> original = new ArrayList<>();
+		var original = new ArrayList<Point>();
 		for (int i = 0; i < 20; i++) {
 			original.add(structure.points.grow());
 		}
 
-		DogArray_I32 which = new DogArray_I32();
-		which.add(2);
-		which.add(5);
+		var which = DogArray_I32.array(2, 5);
 
 		structure.removePoints(which);
 
-		assertEquals(18,structure.points.size);
+		assertEquals(18, structure.points.size);
 
 		assertSame(original.get(0), structure.points.data[0]);
 		assertSame(original.get(3), structure.points.data[2]);
@@ -59,7 +55,7 @@ class TestSceneStructureCommon extends BoofStandardJUnit {
 
 	@Test
 	void Point_removeView() {
-		Point p = new Point(3);
+		var p = new Point(3);
 
 		p.views.add(1);
 		p.views.add(6);
@@ -69,22 +65,20 @@ class TestSceneStructureCommon extends BoofStandardJUnit {
 
 		p.removeView(9);
 
-		assertEquals(4,p.views.size);
-		assertEquals(1,p.views.get(0));
-		assertEquals(6,p.views.get(1));
-		assertEquals(3,p.views.get(2));
-		assertEquals(4,p.views.get(3));
-
+		assertEquals(4, p.views.size);
+		assertEquals(1, p.views.get(0));
+		assertEquals(6, p.views.get(1));
+		assertEquals(3, p.views.get(2));
+		assertEquals(4, p.views.get(3));
 	}
 
 	private static class MockSceneStructureCommon extends SceneStructureCommon {
 
-		MockSceneStructureCommon(boolean homogenous) {
+		MockSceneStructureCommon( boolean homogenous ) {
 			super(homogenous);
 		}
 
-		@Override
-		public int getParameterCount() {
+		@Override public int getParameterCount() {
 			return 0;
 		}
 	}

@@ -39,12 +39,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TestScaleSceneStructure extends BoofStandardJUnit {
 
-	@Test
-	void computePointStatistics() {
-		SceneStructureMetric scene = new SceneStructureMetric(false);
+	@Test void computePointStatistics() {
+		var scene = new SceneStructureMetric(false);
 		createProjectiveScene(scene, 0xBEEF);
 
-		ScaleSceneStructure alg = new ScaleSceneStructure();
+		var alg = new ScaleSceneStructure();
 		alg.computePointStatistics(scene.points);
 
 		// See if it's near the center of the distribution, crudely
@@ -52,18 +51,17 @@ class TestScaleSceneStructure extends BoofStandardJUnit {
 		assertTrue(alg.medianDistancePoint > 0 && alg.medianDistancePoint < 2);
 	}
 
-	@Test
-	void apply_undo_metric() {
+	@Test void apply_undo_metric() {
 		for (int h = 0; h < 2; h++) {
 			boolean homogenous = h == 1;
 
-			ScaleSceneStructure alg = new ScaleSceneStructure();
+			var alg = new ScaleSceneStructure();
 
 			alg.medianPoint.setTo(0.5, 0.9, 1.3);
 			alg.medianDistancePoint = 1.2;
 
-			SceneStructureMetric expected = new SceneStructureMetric(homogenous);
-			SceneStructureMetric found = new SceneStructureMetric(homogenous);
+			var expected = new SceneStructureMetric(homogenous);
+			var found = new SceneStructureMetric(homogenous);
 
 			SceneObservations obs = createProjectiveScene(found, 0xBEEF);
 			createProjectiveScene(expected, 0xBEEF);
@@ -89,20 +87,19 @@ class TestScaleSceneStructure extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	void apply_undo_projective() {
+	@Test void apply_undo_projective() {
 		for (int p = 0; p < 2; p++) {
 			boolean pointsStats = p == 1;
 
 			for (int h = 0; h < 2; h++) {
 				boolean homogenous = h == 1;
-				ScaleSceneStructure alg = new ScaleSceneStructure();
+				var alg = new ScaleSceneStructure();
 				alg.setScalePixelsUsingStats(pointsStats);
 				alg.medianPoint.setTo(0.5, 0.9, 1.3);
 				alg.medianDistancePoint = 1.2;
 
-				SceneStructureProjective expected = new SceneStructureProjective(homogenous);
-				SceneStructureProjective found = new SceneStructureProjective(homogenous);
+				var expected = new SceneStructureProjective(homogenous);
+				var found = new SceneStructureProjective(homogenous);
 
 				SceneObservations obs = createProjectiveScene(found, 0xBEEF);
 				createProjectiveScene(expected, 0xBEEF);
@@ -136,14 +133,13 @@ class TestScaleSceneStructure extends BoofStandardJUnit {
 	/**
 	 * Very basic check to see if observations are scaled from -0.5 to 0.5
 	 */
-	@Test
-	void applyScaleToPixelsAndCameraMatrix() {
+	@Test void applyScaleToPixelsAndCameraMatrix() {
 		// homogenous or not doesn't matter
-		SceneStructureProjective structure = new SceneStructureProjective(false);
+		var structure = new SceneStructureProjective(false);
 
 		SceneObservations obs = createProjectiveScene(structure, 0xBEEF);
 
-		ScaleSceneStructure alg = new ScaleSceneStructure();
+		var alg = new ScaleSceneStructure();
 		alg.setScalePixelsUsingStats(false);
 		alg.computePixelScaling(structure, null);
 		alg.applyScaleToPixelsAndCameraMatrix(structure, obs);
@@ -160,20 +156,20 @@ class TestScaleSceneStructure extends BoofStandardJUnit {
 
 	public static SceneObservations createProjectiveScene( SceneStructureMetric scene,
 														   long seed ) {
-		Random rand = new Random(seed);
+		var rand = new Random(seed);
 
 		scene.initialize(2, 5, 20);
-		SceneObservations observations = new SceneObservations();
+		var observations = new SceneObservations();
 		observations.initialize(scene.views.size);
 
-		CameraPinhole camera0 = new CameraPinhole(500 + rand.nextDouble()*10, 510 + rand.nextDouble()*10, 0, 450, 400, 900, 800);
-//		CameraPinhole camera1 = new CameraPinhole(456+rand.nextDouble()*10,510+rand.nextDouble()*10,0,420,410,900,800);
+		var camera0 = new CameraPinhole(500 + rand.nextDouble()*10, 510 + rand.nextDouble()*10, 0, 450, 400, 900, 800);
+//		var camera1 = new CameraPinhole(456+rand.nextDouble()*10,510+rand.nextDouble()*10,0,420,410,900,800);
 
 		scene.setCamera(0, false, camera0);
 //		scene.setCamera(1,false,camera1);
 
 		for (int i = 0; i < scene.views.size; i++) {
-			Se3_F64 worldToView = new Se3_F64();
+			var worldToView = new Se3_F64();
 
 			worldToView.T.x = i*0.2 + rand.nextGaussian()*0.1;
 			worldToView.T.y = -i*0.1 + rand.nextGaussian()*0.1;
@@ -188,10 +184,10 @@ class TestScaleSceneStructure extends BoofStandardJUnit {
 			scene.setView(i, 0, false, worldToView);
 		}
 
-		WorldToCameraToPixel w2p = new WorldToCameraToPixel();
+		var w2p = new WorldToCameraToPixel();
 		for (int i = 0; i < scene.points.size; i++) {
 			// Point in world frame
-			Point3D_F64 X = new Point3D_F64(rand.nextGaussian(), rand.nextGaussian(), 3 + rand.nextGaussian());
+			var X = new Point3D_F64(rand.nextGaussian(), rand.nextGaussian(), 3 + rand.nextGaussian());
 			if (scene.homogenous) {
 				scene.points.data[i].set(X.x, X.y, X.z, 1);
 			} else {
@@ -215,16 +211,16 @@ class TestScaleSceneStructure extends BoofStandardJUnit {
 
 	static SceneObservations createProjectiveScene( SceneStructureProjective scene,
 													long seed ) {
-		Random rand = new Random(seed);
+		var rand = new Random(seed);
 
 		scene.initialize(5, 20);
-		SceneObservations observations = new SceneObservations();
+		var observations = new SceneObservations();
 		observations.initialize(scene.views.size);
 
-		CameraPinhole camera0 = new CameraPinhole(500 + rand.nextDouble()*10, 510 + rand.nextDouble()*10, 0, 450, 400, 900, 800);
+		var camera0 = new CameraPinhole(500 + rand.nextDouble()*10, 510 + rand.nextDouble()*10, 0, 450, 400, 900, 800);
 
 		DMatrixRMaj K0 = PerspectiveOps.pinholeToMatrix(camera0, (DMatrixRMaj)null);
-		DMatrixRMaj P = new DMatrixRMaj(3, 4);
+		var P = new DMatrixRMaj(3, 4);
 
 		for (int i = 0; i < scene.views.size; i++) {
 			Se3_F64 worldToView = new Se3_F64();
@@ -243,10 +239,10 @@ class TestScaleSceneStructure extends BoofStandardJUnit {
 			scene.setView(i, false, P, camera0.width, camera0.height);
 		}
 
-		Point2D_F64 pixel = new Point2D_F64();
+		var pixel = new Point2D_F64();
 		for (int i = 0; i < scene.points.size; i++) {
 			// Point in world frame
-			Point3D_F64 X = new Point3D_F64(rand.nextGaussian(), rand.nextGaussian(), 3 + rand.nextGaussian());
+			var X = new Point3D_F64(rand.nextGaussian(), rand.nextGaussian(), 3 + rand.nextGaussian());
 			if (scene.homogenous) {
 				scene.points.data[i].set(X.x, X.y, X.z, 1);
 			} else {

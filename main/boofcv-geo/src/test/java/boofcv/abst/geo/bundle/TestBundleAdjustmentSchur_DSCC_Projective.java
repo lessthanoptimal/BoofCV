@@ -22,11 +22,10 @@ import boofcv.factory.geo.FactoryMultiView;
 
 public class TestBundleAdjustmentSchur_DSCC_Projective extends GenericBundleAdjustmentProjectiveChecks {
 
-	@Override
-	public BundleAdjustment<SceneStructureProjective> createAlg() {
+	@Override public BundleAdjustment<SceneStructureProjective> createAlg() {
 		BundleAdjustment<SceneStructureProjective> ret = FactoryMultiView.bundleSparseProjective(null);
 //		ret.setVerbose(System.out,0);
-		ret.configure(1e-5,1e-5,20);
+		ret.configure(1e-5, 1e-5, 20);
 		return ret;
 	}
 }
