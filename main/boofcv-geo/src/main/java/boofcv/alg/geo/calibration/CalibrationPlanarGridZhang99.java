@@ -28,6 +28,7 @@ import boofcv.alg.geo.calibration.cameras.Zhang99Camera;
 import boofcv.factory.geo.ConfigBundleAdjustment;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.misc.BoofMiscOps;
+import boofcv.misc.ConfigConverge;
 import boofcv.struct.calib.CameraModel;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.geo.PointIndex2D_F64;
@@ -92,6 +93,12 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 	/** Should it assume zero skew when estimating a pinhole camera? */
 	@Getter @Setter public boolean zeroSkew = true;
 
+	/** Convergence parameters for SBA */
+	@Getter public final ConfigConverge configConvergeSBA = new ConfigConverge(1e-20, 1e-20, 200);
+
+	/** Config for Levenberg Marquardt optimizer */
+	@Getter public final ConfigLevenbergMarquardt configLM = new ConfigLevenbergMarquardt();
+
 	// estimation algorithms
 	private final Zhang99ComputeTargetHomography computeHomography;
 	private final Zhang99CalibrationMatrixFromHomographies computeK;
@@ -112,6 +119,10 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 	@Getter @Setter private boolean robust = false;
 
 	private @Nullable PrintStream verbose = null;
+
+	{
+		configLM.hessianScaling = false;
+	}
 
 	/**
 	 * Configures calibration process.
@@ -183,9 +194,8 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 	}
 
 	private void status( String message ) {
-		if (listener != null) {
-			if (!listener.zhangUpdate(message))
-				throw new RuntimeException("User requested termination of calibration");
+		if (listener != null && !listener.zhangUpdate(message)) {
+			throw new RuntimeException("User requested termination of calibration");
 		}
 	}
 
@@ -193,11 +203,7 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 	 * Use non-linear optimization to improve the parameter estimates
 	 */
 	public boolean performBundleAdjustment() {
-		// Configure the sparse Levenberg-Marquardt solver
-		ConfigLevenbergMarquardt configLM = new ConfigLevenbergMarquardt();
-		configLM.hessianScaling = false;
-
-		ConfigBundleAdjustment configSBA = new ConfigBundleAdjustment();
+		var configSBA = new ConfigBundleAdjustment();
 		configSBA.configOptimizer = configLM;
 
 		BundleAdjustment<SceneStructureMetric> bundleAdjustment;
@@ -208,9 +214,11 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 			bundleAdjustment = FactoryMultiView.bundleSparseMetric(configSBA);
 		}
 
+		// Print status to stdout if configured to do so
 		bundleAdjustment.setVerbose(verbose, null);
+
 		// Specifies convergence criteria
-		bundleAdjustment.configure(1e-20, 1e-20, 200);
+		bundleAdjustment.configure(configConvergeSBA.ftol, configConvergeSBA.gtol, configConvergeSBA.maxIterations);
 
 		bundleAdjustment.setParameters(structure, observations);
 		return bundleAdjustment.optimize(structure);
@@ -222,17 +230,17 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 	public void convertIntoBundleStructure( List<Se3_F64> motions,
 											DMatrixRMaj K,
 											List<DMatrixRMaj> homographies,
-											List<CalibrationObservation> calibrationObservations ) {
+											List<CalibrationObservation> observations ) {
 
 		structure = new SceneStructureMetric(false);
 		structure.initialize(1, motions.size(), -1, 0, layouts.size());
 
-		observations = new SceneObservations();
-		observations.initialize(motions.size(), true);
+		this.observations = new SceneObservations();
+		this.observations.initialize(motions.size(), true);
 
 		// A single camera is assumed, that's what is being calibrated!
 		cameraGenerator.setLayouts(layouts);
-		structure.setCamera(0, false, cameraGenerator.initializeCamera(K, homographies, calibrationObservations));
+		structure.setCamera(0, false, cameraGenerator.initializeCamera(K, homographies, observations));
 
 		// Specify the structure of calibration targets
 		for (int layoutID = 0; layoutID < layouts.size(); layoutID++) {
@@ -242,24 +250,27 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 			structure.setRigid(layoutID, true, new Se3_F64(), layout.size());
 
 			// Where the points are on the calibration target
-			SceneStructureMetric.Rigid srigid = structure.rigids.data[layoutID];
+			SceneStructureMetric.Rigid srigid = structure.rigids.get(layoutID);
 			for (int i = 0; i < layout.size(); i++) {
 				srigid.setPoint(i, layout.get(i).x, layout.get(i).y, 0);
 			}
 		}
+		structure.assignIDsToRigidPoints();
+
 
 		// Add the initial estimate of each view's location and the points observed
 		for (int viewIdx = 0; viewIdx < motions.size(); viewIdx++) {
-			structure.setView(viewIdx, 0, false, motions.get(viewIdx));
-			SceneObservations.View vrigid = observations.getViewRigid(viewIdx);
-			CalibrationObservation ca = calibrationObservations.get(viewIdx);
+			CalibrationObservation ca = observations.get(viewIdx);
 
-			SceneStructureMetric.Rigid srigid = structure.rigids.data[ca.target];
+			// Tell it thinks each view is
+			structure.setView(viewIdx, 0, false, motions.get(viewIdx));
+
+			// Handle observations
+			SceneStructureMetric.Rigid srigid = structure.rigids.get(ca.target);
 
 			for (int j = 0; j < ca.size(); j++) {
 				PointIndex2D_F64 p = ca.get(j);
-				vrigid.add(p.index, (float)p.p.x, (float)p.p.y);
-				srigid.connectPointToView(p.index, viewIdx);
+				srigid.connectPointToView(p.index, viewIdx, (float)p.p.x, (float)p.p.y, this.observations);
 			}
 		}
 	}
@@ -279,7 +290,7 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 		int idx = 0;
 		for (int i = 0; i < observations.viewsRigid.size; i++) {
 			SceneObservations.View v = observations.viewsRigid.data[i];
-			ImageResults r = new ImageResults(v.size());
+			var r = new ImageResults(v.size());
 
 			double sumX = 0;
 			double sumY = 0;

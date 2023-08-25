@@ -44,7 +44,9 @@ public class TestCalibrateMonoPlanar extends BoofStandardJUnit {
 
 	List<Se3_F64> targetToCamera = new ArrayList<>();
 
-	List<Point2D_F64> layout = CalibrationDetectorSquareGrid.createLayout(4, 3, 30, 30);
+	List<List<Point2D_F64>> layouts =
+			List.of(CalibrationDetectorSquareGrid.createLayout(4, 3, 30, 30),
+					CalibrationDetectorSquareGrid.createLayout(5, 4, 25, 25));
 
 	public TestCalibrateMonoPlanar() {
 		double z = 250;
@@ -63,16 +65,18 @@ public class TestCalibrateMonoPlanar extends BoofStandardJUnit {
 	 */
 	@Test void fullBasic() {
 		var alg = new CalibrateMonoPlanar();
-		alg.initialize(intrinsic.width, intrinsic.height, List.of(layout));
-//		alg.setVerbose(System.out,0);
+		alg.initialize(intrinsic.width, intrinsic.height, List.of(layouts.get(0)));
+//		alg.setVerbose(System.out, null);
 		alg.configurePinhole(true, 2, true);
 
 		for (int i = 0; i < targetToCamera.size(); i++) {
-			alg.addImage(createFakeObservations(i));
+			alg.addImage(createFakeObservations(i, 0));
 		}
 
-		CameraPinholeBrown found = alg.process();
+		checkSolution(alg.process());
+	}
 
+	private void checkSolution( CameraPinholeBrown found ) {
 		// NOTE: When optimization switched from using a dense method + SVD to sparse using cholesky
 		//       it's ability to handle the test scenario got worse. I've noticed no change in real world data
 		assertEquals(intrinsic.fx, found.fx, intrinsic.width*1e-3);
@@ -91,10 +95,12 @@ public class TestCalibrateMonoPlanar extends BoofStandardJUnit {
 		assertEquals(intrinsic.height, found.height, 1e-3);
 	}
 
-	private CalibrationObservation createFakeObservations( int which ) {
-		Se3_F64 t2c = targetToCamera.get(which);
+	private CalibrationObservation createFakeObservations( int whichPose, int targetID ) {
+		Se3_F64 t2c = targetToCamera.get(whichPose);
 		var set = new CalibrationObservation();
+		set.target = targetID;
 
+		List<Point2D_F64> layout = layouts.get(targetID);
 		for (int i = 0; i < layout.size(); i++) {
 			Point2D_F64 p2 = layout.get(i);
 			// location of calibration point on the target
@@ -112,5 +118,22 @@ public class TestCalibrateMonoPlanar extends BoofStandardJUnit {
 		}
 
 		return set;
+	}
+
+	/**
+	 * Two different targets will be feed into the calibration algorithm.
+	 */
+	@Test void multiTarget() {
+		var alg = new CalibrateMonoPlanar();
+		alg.initialize(intrinsic.width, intrinsic.height, layouts);
+//		alg.setVerbose(System.out, null);
+		alg.configurePinhole(true, 2, true);
+
+		// Create observations from multiple targets
+		for (int i = 0; i < targetToCamera.size(); i++) {
+			alg.addImage(createFakeObservations(i, i%2));
+		}
+
+		checkSolution(alg.process());
 	}
 }
