@@ -72,12 +72,12 @@ public class TestMultiToSingleFiducialCalibration extends BoofStandardJUnit {
 
 		@Override public int getDetectionCount() { return detectedMarkers.size; }
 
-		@Override public int getMarkerID( int detectionID ) { return detectedMarkers.get(detectionID); }
-
 		@Override public int getTotalUniqueMarkers() { return numMarkers; }
 
 		@Override public CalibrationObservation getDetectedPoints( int detectionID ) {
 			var det = new CalibrationObservation();
+			det.target = detectedMarkers.get(detectionID);
+
 			for (int i = 0; i < 3; i++) {
 				det.add(i+2, 1.0, 2.0);
 			}
