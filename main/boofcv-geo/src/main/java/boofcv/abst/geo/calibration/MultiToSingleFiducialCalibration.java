@@ -61,7 +61,8 @@ public class MultiToSingleFiducialCalibration implements DetectSingleFiducialCal
 
 		detectedIndex = -1;
 		for (int i = 0; i < multi.getDetectionCount(); i++) {
-			if (multi.getMarkerID(i) == targetMarker) {
+			CalibrationObservation o = multi.getDetectedPoints(i);
+			if (o.target == targetMarker) {
 				detectedIndex = i;
 				break;
 			}

@@ -75,10 +75,6 @@ public class CalibrationDetectorMultiECoCheck implements DetectMultiFiducialCali
 		return detector.getFound().size;
 	}
 
-	@Override public int getMarkerID( int detectionID ) {
-		return detector.getFound().get(detectionID).markerID;
-	}
-
 	@Override public int getTotalUniqueMarkers() {
 		return detector.getUtils().markers.size();
 	}
@@ -87,6 +83,7 @@ public class CalibrationDetectorMultiECoCheck implements DetectMultiFiducialCali
 		FastAccess<PointIndex2D_F64> original = detector.getFound().get(detectionID).corners;
 
 		var found = new CalibrationObservation();
+		found.target = detector.getFound().get(detectionID).markerID;
 		for (int i = 0; i < original.size; i++) {
 			found.points.add(original.get(i).copy());
 		}
