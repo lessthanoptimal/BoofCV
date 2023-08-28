@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,8 @@ import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -42,9 +44,6 @@ public interface DetectMultiFiducialCalibration {
 
 	/** Returns the number of detected markers */
 	int getDetectionCount();
-
-	/** Returns which marker was seen for a particular detection */
-	int getMarkerID( int detectionID );
 
 	/** Returns the number of unique markers that it can detect */
 	int getTotalUniqueMarkers();
@@ -65,6 +64,35 @@ public interface DetectMultiFiducialCalibration {
 	 * @return List of calibration points
 	 */
 	List<Point2D_F64> getLayout( int markerID );
+
+	/**
+	 * Returns the layout for all markers as a list.
+	 */
+	default List<List<Point2D_F64>> getLayouts() {
+		var list = new ArrayList<List<Point2D_F64>>();
+		for (int i = 0; i < getTotalUniqueMarkers(); i++) {
+			list.add(getLayout(i));
+		}
+		return list;
+	}
+
+	/**
+	 * Returns the observations with the most detected landmarks for each specific target
+	 */
+	default List<CalibrationObservation> getBestForEachTarget() {
+		var markerToObservations = new HashMap<Integer, CalibrationObservation>();
+		for (int i = 0; i < getDetectionCount(); i++) {
+			CalibrationObservation o = getDetectedPoints(i);
+			CalibrationObservation previousBest = markerToObservations.get(o.target);
+
+			// First time it's seen this target ID or if the new observation has more points
+			if (previousBest == null || previousBest.size() < o.size()) {
+				markerToObservations.put(o.target, o);
+			}
+		}
+
+		return new ArrayList<>(markerToObservations.values());
+	}
 
 	/**
 	 * Explicitly handles lens distortion when detecting image features. If used, features will be found in

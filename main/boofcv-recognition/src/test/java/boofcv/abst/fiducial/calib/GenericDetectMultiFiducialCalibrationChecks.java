@@ -19,6 +19,7 @@
 package boofcv.abst.fiducial.calib;
 
 import boofcv.abst.geo.calibration.DetectMultiFiducialCalibration;
+import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
@@ -33,6 +34,7 @@ import org.ddogleg.struct.DogArray;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -81,21 +83,27 @@ public abstract class GenericDetectMultiFiducialCalibrationChecks extends BoofSt
 //			BoofMiscOps.sleep(2_000);
 
 			// Number of markers which are not anonymous
-			int totalIdentified = 0;
+			var foundTargets = new HashSet<Integer>();
 			for (int i = 0; i < detector.getDetectionCount(); i++) {
-				if (detector.getMarkerID(i) >= 0)
-					totalIdentified++;
+				CalibrationObservation o = detector.getDetectedPoints(i);
+				if (o.target < 0)
+					continue;
+				foundTargets.add(o.target);
 			}
 
-			if (visualizeFailures && 2 != totalIdentified) {
+			// See if each target was found
+			assertTrue(foundTargets.contains(0));
+			assertTrue(foundTargets.contains(1));
+			assertEquals(2, foundTargets.size());
+
+			if (visualizeFailures && 2 != foundTargets.size()) {
 				UtilImageIO.saveImage(simulator.getOutput(), "failed.png");
 				ShowImages.showWindow(simulator.getOutput(), "Simulated");
 				BoofMiscOps.sleep(10_000);
 			}
-			assertEquals(2, totalIdentified);
 
 			for (int i = 0; i < detector.getDetectionCount(); i++) {
-				int markerID = detector.getMarkerID(i);
+				int markerID = detector.getDetectedPoints(i).target;
 
 				// Ignore anonymous markers
 				if (markerID < 0)
