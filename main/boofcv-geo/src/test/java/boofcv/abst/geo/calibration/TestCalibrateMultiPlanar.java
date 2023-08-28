@@ -372,6 +372,8 @@ public class TestCalibrateMultiPlanar extends BoofStandardJUnit {
 		createScenarioAndConfigure(alg, expected, 1);
 
 		List<Se3_F64> listSensorToWorld = createCameraLocations();
+		var targetToWorld = layoutPose.get(0);
+		var targetToSensor = new Se3_F64();
 
 		// Configure it with ground truth
 		for (int frameIdx = 0; frameIdx < listSensorToWorld.size(); frameIdx++) {
@@ -380,7 +382,11 @@ public class TestCalibrateMultiPlanar extends BoofStandardJUnit {
 			for (int camIdx = 0; camIdx < expected.camerasToSensor.size(); camIdx++) {
 				var te = new TargetExtrinsics();
 				te.targetID = 0;
-				s.sensorToWorld.invert(te.targetToCamera);
+
+				Se3_F64 cameraToSensor = expected.getCameraToSensor(camIdx);
+				targetToWorld.concat(s.sensorToWorld.invert(null), targetToSensor);
+				targetToSensor.concat(cameraToSensor.invert(null), te.targetToCamera);
+
 
 				var fc = new FrameCamera();
 				fc.observations.add(te);

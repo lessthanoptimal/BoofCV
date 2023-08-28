@@ -21,6 +21,7 @@ package boofcv.examples.calibration;
 import boofcv.abst.fiducial.calib.CalibrationDetectorMultiECoCheck;
 import boofcv.abst.fiducial.calib.ConfigECoCheckMarkers;
 import boofcv.abst.geo.calibration.CalibrateMultiPlanar;
+import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.geo.calibration.SynchronizedCalObs;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.io.UtilIO;
@@ -102,9 +103,10 @@ public class ExampleCalibrateMulti {
 		var set = dst.cameras.grow();
 		set.cameraID = cameraID;
 		for (int i = 0; i < detector.getDetectionCount(); i++) {
-			if (detector.getMarkerID(i) != 0)
+			CalibrationObservation o = detector.getDetectedPoints(i);
+			if (o.target != 0)
 				continue;
-			set.targets.grow().setTo(detector.getDetectedPoints(i));
+			set.targets.grow().setTo(o);
 			break;
 		}
 
