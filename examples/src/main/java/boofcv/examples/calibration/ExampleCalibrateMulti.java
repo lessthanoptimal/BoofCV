@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,6 +41,7 @@ import java.util.List;
 public class ExampleCalibrateMulti {
 	public static void main( String[] args ) {
 		// Creates a detector and specifies its physical characteristics
+		// Size units are not explicitly specified. You just need to be consistent.
 		CalibrationDetectorMultiECoCheck detector = FactoryFiducialCalibration.ecocheck(null,
 				ConfigECoCheckMarkers.parse("14x10n1", /* square size */1.0));
 
@@ -55,10 +56,8 @@ public class ExampleCalibrateMulti {
 		var calibrator = new CalibrateMultiPlanar();
 		// Tell it what type of camera model to use
 		calibrator.getCalibratorMono().configurePinhole(true, 3, false);
-		// NOTE: For now only one calibration target is supported. Support for multiple targets is planned for
-		//       the future.
-		calibrator.initialize(/*num cameras*/3, /*num targets*/1);
-		calibrator.setTargetLayout(0, detector.getLayout(0));
+		calibrator.initialize(/*num cameras*/3, /*num targets*/ detector.getTotalUniqueMarkers());
+		calibrator.setTargetLayouts(detector.getLayouts());
 		calibrator.setCameraProperties(0, 1224, 1024);
 		calibrator.setCameraProperties(1, 1224, 1024);
 		calibrator.setCameraProperties(2, 1224, 1024);
