@@ -26,11 +26,12 @@ import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.controls.BaseImageControlPanel;
 import boofcv.gui.controls.JCheckBoxValue;
-import boofcv.gui.controls.JSpinnerNumber;
+import boofcv.gui.controls.JConfigLength;
 import boofcv.gui.image.ImageZoomPanel;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
@@ -180,7 +181,7 @@ public class ImageEnhanceApp extends DemonstrationBase {
 		JComboBox<String> comboAlgorithms;
 		List<Runnable> comboRunnable = new ArrayList<>();
 
-		JSpinnerNumber spinnerRadius = spinnerWrap(50, 1, 200, 1);
+		JConfigLength configRadius = configLength(ConfigLength.fixed(50), 1.0, 200);
 		JCheckBoxValue checkShowInput = checkboxWrap("Show Input", false);
 		JCheckBoxValue checkColor = checkboxWrap("Color", false);
 
@@ -209,7 +210,7 @@ public class ImageEnhanceApp extends DemonstrationBase {
 			addAlignLeft(checkShowInput.check);
 			addAlignLeft(checkColor.check);
 			addLabeled(selectZoom, "Zoom");
-			addLabeled(spinnerRadius.spinner, "Radius");
+			addLabeled(configRadius, "Radius");
 			addVerticalGlue(this);
 		}
 
@@ -222,7 +223,7 @@ public class ImageEnhanceApp extends DemonstrationBase {
 
 		public void addAlgorithm( String name, final boolean usesRadius ) {
 			comboBoxItems.add(name);
-			comboRunnable.add(() -> spinnerRadius.spinner.setEnabled(usesRadius));
+			comboRunnable.add(() -> configRadius.setEnabled(usesRadius));
 		}
 
 		@Override public void controlChanged( final Object source ) {
@@ -231,6 +232,8 @@ public class ImageEnhanceApp extends DemonstrationBase {
 				imagePanel.setScale(controls.zoom);
 				imagePanel.repaint();
 				return;
+			} else if (source == configRadius) {
+				radius = configRadius.getValue().computeI(Math.max(gray.width, gray.height));
 			}
 			handleSettingsChanged();
 		}
