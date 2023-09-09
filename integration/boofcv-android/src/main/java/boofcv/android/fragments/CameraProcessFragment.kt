@@ -78,6 +78,13 @@ abstract class CameraProcessFragment : Fragment() {
      * Stops all camera capture sessions and cleans up
      */
     protected fun closeAllCameras() = lifecycleScope.launch(Dispatchers.Main) {
+        closeAllCamerasNow()
+    }
+
+    /**
+     * Immediately invokes the close all functions. Does not wait for the main dispatcher
+     */
+    protected fun closeAllCamerasNow() {
         for (cam in cameraDevices.values) {
             cam.session?.stopRepeating()
             cam.device.close()
