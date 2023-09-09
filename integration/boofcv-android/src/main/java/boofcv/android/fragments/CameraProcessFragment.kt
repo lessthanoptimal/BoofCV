@@ -77,7 +77,7 @@ abstract class CameraProcessFragment : Fragment() {
     /**
      * Stops all camera capture sessions and cleans up
      */
-    protected fun closeAllCameras() = lifecycleScope.launch(Dispatchers.Main){
+    protected fun closeAllCameras() = lifecycleScope.launch(Dispatchers.Main) {
         for (cam in cameraDevices.values) {
             cam.session?.stopRepeating()
             cam.device.close()
@@ -211,8 +211,8 @@ abstract class CameraProcessFragment : Fragment() {
             }
 
             override fun onDisconnected(camera: CameraDevice) {
-                Log.w(TAG, "Camera $cameraID has been disconnected")
-                requireActivity().finish()
+                Log.w(TAG, "Camera $cameraID has been disconnected. null-activity=${activity == null}")
+                activity?.finish()
                 results.finished = true
             }
 
@@ -240,6 +240,10 @@ abstract class CameraProcessFragment : Fragment() {
         while (!results.finished && System.currentTimeMillis() < startTime + 10_000L) {
             Thread.yield()
         }
+
+        if (results.camera == null)
+            Log.e(TAG, "Failed to get camera object when opening camera.")
+
         return results.camera!!
     }
 
