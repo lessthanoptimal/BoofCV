@@ -1,5 +1,3 @@
-- Calibration
-  * TODO support multiple calibration targets
 - Image Processing
   - TODO hough circle detector
 - SLAM

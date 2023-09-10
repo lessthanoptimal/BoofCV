@@ -7,8 +7,8 @@ Version Meaning: <compatible>.<feature>.<bug fix>
 - Last digit always indicates a bug fix and other minor changes
 
 ---------------------------------------------
-Date    : 2023/XX/XX
-Version : 1.0.1
+Date    : 2023/Sep/9
+Version : 1.1.0
 
 - Calibration
   * Support for multiple calibration targets
@@ -17,12 +17,6 @@ Version : 1.0.1
   * Support for pruning observation of rigid objects
 - Android: CameraProcessFragment
   * A few small bug fixes and quality of life improvements
-- Image Processing
-  - TODO hough circle detector
-- SLAM
-  - TODO traditional monocular SLAM
-- Regression
-  - TODO Template matching
 
 ---------------------------------------------
 Date    : 2023/Aug/21
