@@ -13,7 +13,7 @@ allprojects {
     apply plugin: 'com.peterabeles.gversion'
 
     group = 'org.boofcv'
-    version = '1.1.0'
+    version = '1.1.1-SNAPSHOT'
 
     createVersionFile.enabled = false // run only once. enabled in types
 }
@@ -24,11 +24,11 @@ project.ext.lombok_version = '1.18.28'
 project.ext.jabel_version = '1.0.0'
 project.ext.guava_version = '32.1.2-jre'
 project.ext.args4j_version = '2.33'
-project.ext.junit_version = '5.9.1'
-project.ext.errorprone_version = '2.11.0'
+project.ext.junit_version = '5.10.0'
+project.ext.errorprone_version = '2.21.1'
 project.ext.nullaway_version = '0.10.11'
 project.ext.auto64to32_version = '3.2.1'
-project.ext.snakeyaml_version = '2.0'
+project.ext.snakeyaml_version = '2.2'
 project.ext.jmh_version = '1.36'
 project.ext.jetnull_version = '23.0.0'
 project.ext.jsr250_version = '1.0'
@@ -203,11 +203,12 @@ subprojects {
                 "CatchAndPrintStackTrace", // Should clean up, but done too often right now
                 "SameNameButDifferent", // Lombok confuses it
                 "UnescapedEntity",
+                "NarrowCalculation", // too many false positives where integer math is done intentionally
                 "EmptyBlockTag", // E.g. "@param name" is not defined. This should be cleaned up
                 "AlreadyChecked", // This inspection appears to be broken/too simplistic. False positives galore
         )
         options.errorprone.error("MissingOverride", "MissingCasesInEnumSwitch", "BadInstanceof",
-                "PublicConstructorForAbstractClass", "NarrowingCompoundAssignment", "JdkObsolete", "MissingSummary")
+                "NarrowingCompoundAssignment", "JdkObsolete", "MissingSummary")
 
         // Allow sloppy code where it's not published
         if (!(name.endsWith("compileJava") || name.endsWith("compileNoautoJava"))) {

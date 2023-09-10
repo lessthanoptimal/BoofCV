@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,7 @@ import org.ddogleg.struct.DogArray_I8;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Encodes the data message into binary data.
@@ -78,7 +79,7 @@ public class AztecEncoder extends AztecMessageErrorCorrection {
 	}
 
 	public AztecEncoder addUpper( String message ) {
-		message = message.toUpperCase();
+		message = message.toUpperCase(Locale.ROOT);
 		var values = new DogArray_I8(message.length());
 		for (int i = 0; i < message.length(); i++) {
 			char c = message.charAt(i);
@@ -97,7 +98,7 @@ public class AztecEncoder extends AztecMessageErrorCorrection {
 	}
 
 	public AztecEncoder addLower( String message ) {
-		message = message.toLowerCase();
+		message = message.toLowerCase(Locale.ROOT);
 		var values = new DogArray_I8(message.length());
 		for (int i = 0; i < message.length(); i++) {
 			char c = message.charAt(i);

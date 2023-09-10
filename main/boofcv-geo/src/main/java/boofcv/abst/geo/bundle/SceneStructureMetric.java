@@ -575,6 +575,7 @@ public class SceneStructureMetric extends SceneStructureCommon {
 		 *
 		 * @deprecated Use {@link #connectPointToView(int, int, float, float, SceneObservations)} instead.
 		 */
+		@Deprecated
 		public void connectPointToView( int pointIdx, int viewIdx ) {
 			if (points[pointIdx].views.contains(viewIdx))
 				throw new IllegalArgumentException("Tried to add the same view twice. viewIndex=" + viewIdx);

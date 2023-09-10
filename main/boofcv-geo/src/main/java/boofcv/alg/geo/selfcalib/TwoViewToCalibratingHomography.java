@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -179,7 +179,7 @@ public class TwoViewToCalibratingHomography {
 
 			// computes the reprojection error, valid projections, and fixes sign/scale of H
 			int invalid = checkGeometry(list_view_1_to_2.get(motionIdx), hypothesesH.get(motionIdx), K1, K2, observations);
-			if (invalid == Double.MAX_VALUE)
+			if (invalid == Integer.MAX_VALUE)
 				continue;
 
 			// All hypotheses should have the same reprojection error. Only by applying a geometric constraints do you

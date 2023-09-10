@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,7 +49,7 @@ public interface TrackerObjectQuad<T extends ImageBase<T>> {
 	 * @param location Initial location of the object being tracked
 	 * @return true if successful and false if not.
 	 */
-	boolean initialize( T image , Quadrilateral_F64 location );
+	boolean initialize( T image, Quadrilateral_F64 location );
 
 	/**
 	 * Provide a hint for where the tracked object is. How and if this hint is used at all is implementation specific.
@@ -70,7 +70,7 @@ public interface TrackerObjectQuad<T extends ImageBase<T>> {
 	 * @param results (Output) Storage for new location if tracking is successful.
 	 * @return true if the target was found and 'location' updated.
 	 */
-	boolean process( T image , Quadrilateral_F64 results );
+	boolean process( T image, Quadrilateral_F64 results );
 
 	/**
 	 * Returns information on the type of image that it can process.
@@ -82,7 +82,8 @@ public interface TrackerObjectQuad<T extends ImageBase<T>> {
 	/**
 	 * Provides access to the inner low level tracker. You need to be familiar with the tracker's source code
 	 * to make sure of this function. Returns null if implementing it doesn't make sense.
+	 *
 	 * @return Tracking algorithm.
 	 */
-	<T extends Object>T getLowLevelTracker();
+	<TT> TT getLowLevelTracker();
 }

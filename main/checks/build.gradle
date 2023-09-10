@@ -13,7 +13,9 @@ dependencies {
 	runtimeOnly project(':main:boofcv-feature').sourceSets.experimental.output
 	runtimeOnly project(':integration:boofcv-ffmpeg') // one test decodes a mp4
 
-	implementation(group: 'com.peterabeles', name: 'regression', version: auto64to32_version)
+	implementation(group: 'com.peterabeles', name: 'regression', version: auto64to32_version) {
+		exclude(group: 'org.yaml')
+	}
 	implementation group: 'com.peterabeles', name: 'language', version: auto64to32_version
 	api("org.openjdk.jmh:jmh-core:$jmh_version")
 }

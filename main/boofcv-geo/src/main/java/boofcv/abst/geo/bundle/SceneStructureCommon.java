@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -308,7 +308,11 @@ public abstract class SceneStructureCommon implements SceneStructure {
 		}
 
 		public double distance( Point3D_F64 p ) {
-			return Math.sqrt(distance(p));
+			double dx = coordinate[0] - p.x;
+			double dy = coordinate[1] - p.y;
+			double dz = coordinate[2] - p.z;
+
+			return Math.sqrt(dx*dx + dy*dy + dz*dz);
 		}
 
 		public double distance( Point p ) {

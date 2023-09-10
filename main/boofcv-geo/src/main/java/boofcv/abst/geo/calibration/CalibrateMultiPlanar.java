@@ -94,7 +94,7 @@ public class CalibrateMultiPlanar {
 	@Getter DogArray<CameraStatistics> statistics = new DogArray<>(CameraStatistics::new, CameraStatistics::reset);
 
 	// Specifies locations of landmarks are calibration targets
-	final FastArray<List<Point2D_F64>> layouts = new FastArray<>((Class)(ArrayList.class));
+	final FastArray<List<Point2D_F64>> layouts = new FastArray<>((Class)ArrayList.class);
 
 	// Monocular calibration results
 	final DogArray<CameraPriors> cameras = new DogArray<>(CameraPriors::new);
