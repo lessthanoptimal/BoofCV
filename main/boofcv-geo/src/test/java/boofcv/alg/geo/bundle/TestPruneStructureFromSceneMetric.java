@@ -22,16 +22,16 @@ import boofcv.abst.geo.bundle.*;
 import boofcv.abst.geo.bundle.SceneStructureCommon.Point;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.testing.BoofStandardJUnit;
-import georegression.geometry.UtilPoint3D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.FastAccess;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
-import java.util.List;
 
+import static georegression.geometry.UtilPoint3D_F64.noiseNormal;
 import static georegression.struct.se.SpecialEuclideanOps_F64.eulerXyz;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -43,11 +43,10 @@ class TestPruneStructureFromSceneMetric extends BoofStandardJUnit {
 	CameraPinholeBrown intrinsic = new CameraPinholeBrown(300, 300, 0, 250, 200, 500, 400);
 	Point3D_F64 center = new Point3D_F64(0, 0, 4);
 
-	@Test
-	void pruneObservationsByErrorRank() {
+	@Test void pruneObservationsByErrorRank() {
 		createPerfectScene();
 		int N = observations.getObservationCount();
-		addCorruptObservations((int)(N*0.05));
+		addCorruptObservations(0.05);
 
 		PruneStructureFromSceneMetric alg = new PruneStructureFromSceneMetric(structure, observations);
 
@@ -55,7 +54,7 @@ class TestPruneStructureFromSceneMetric extends BoofStandardJUnit {
 		alg.pruneObservationsByErrorRank(0.95);
 
 		// first see if the expected number of observations were prune
-		assertEquals(N*95/100, observations.getObservationCount());
+		assertEquals((double)N*95/100, observations.getObservationCount(), 1);
 
 		// All bad observations should have been removed
 		checkAllObservationsArePerfect();
@@ -64,14 +63,20 @@ class TestPruneStructureFromSceneMetric extends BoofStandardJUnit {
 	/**
 	 * Take this many observations and turn into garbage observations
 	 */
-	private void addCorruptObservations( int count ) {
-		List<ObsId> list = new ArrayList<>();
-		for (int viewIdx = 0; viewIdx < structure.views.size; viewIdx++) {
-			for (int i = 0; i < observations.views.data[viewIdx].size(); i++) {
+	private void addCorruptObservations( double fraction ) {
+		corruptObservations(fraction, observations.views);
+		corruptObservations(fraction, observations.viewsRigid);
+	}
+
+	private void corruptObservations( double fraction, FastAccess<SceneObservations.View> views ) {
+		var list = new ArrayList<ObsId>();
+		for (int viewIdx = 0; viewIdx < views.size; viewIdx++) {
+			for (int i = 0; i < views.data[viewIdx].size(); i++) {
 				list.add(new ObsId(viewIdx, i));
 			}
 		}
 
+		int count = (int)(list.size()*fraction);
 		for (int i = 0; i < count; i++) {
 			int selected = rand.nextInt(list.size() - i);
 			ObsId o = list.get(selected);
@@ -80,18 +85,53 @@ class TestPruneStructureFromSceneMetric extends BoofStandardJUnit {
 			list.set(selected, list.get(list.size() - i - 1));
 			list.set(list.size() - i - 1, o);
 
-			observations.views.data[o.view].setPixel(o.point, 1000f, 1000f);
+			views.data[o.view].setPixel(o.point, 1000f, 1000f);
 		}
-		observations.checkOneObservationPerView();
 	}
 
-	@Test
-	void pruneObservationsBehindCamera() {
+	@Test void pruneObservationsByReprojection() {
+		createPerfectScene();
+		int N = observations.getObservationCount();
+		addCorruptObservations(0.05);
+
+		var alg = new PruneStructureFromSceneMetric(structure, observations);
+
+		// The corrupted observations will have a very large error, this should remove them
+		alg.pruneObservationsByReprojection(2.0);
+
+		// first see if the expected number of observations were prune
+		assertEquals((double)N*95/100, observations.getObservationCount(), 1);
+
+		// All bad observations should have been removed
+		checkAllObservationsArePerfect();
+	}
+
+	/**
+	 * Make sure it works with rigid objects too
+	 */
+	@Test void pruneObservationsByReprojection_Rigid() {
+		createPerfectRigidScene();
+		int N = observations.getObservationCount();
+		addCorruptObservations(0.05);
+
+		var alg = new PruneStructureFromSceneMetric(structure, observations);
+
+		// The corrupted observations will have a very large error, this should remove them
+		alg.pruneObservationsByReprojection(2.0);
+
+		// first see if the expected number of observations were prune
+		assertEquals((double)N*95/100, observations.getObservationCount(), 1);
+
+		// All bad observations should have been removed
+		checkAllObservationsArePerfect();
+	}
+
+	@Test void pruneObservationsBehindCamera() {
 		createPerfectScene();
 		int N = observations.getObservationCount();
 		movePointBehindCameras((int)(N*0.1));
 
-		PruneStructureFromSceneMetric alg = new PruneStructureFromSceneMetric(structure, observations);
+		var alg = new PruneStructureFromSceneMetric(structure, observations);
 
 		// 5% of the observations are bad. This should remove them all
 		alg.pruneObservationsBehindCamera();
@@ -114,7 +154,7 @@ class TestPruneStructureFromSceneMetric extends BoofStandardJUnit {
 			indexes[i] = i;
 		}
 
-		Point3D_F64 world = new Point3D_F64();
+		var world = new Point3D_F64();
 		for (int i = 0; i < count; i++) {
 			int selected = rand.nextInt(points.size() - i);
 			Point p = points.get(indexes[selected]);
@@ -131,13 +171,12 @@ class TestPruneStructureFromSceneMetric extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	void prunePoints_count() {
+	@Test void prunePoints_count() {
 		createPerfectScene();
 		int countPoints = structure.points.size;
 		int countObservations = observations.getObservationCount();
 
-		PruneStructureFromSceneMetric alg = new PruneStructureFromSceneMetric(structure, observations);
+		var alg = new PruneStructureFromSceneMetric(structure, observations);
 
 		// no change expected
 		alg.prunePoints(1);
@@ -160,13 +199,12 @@ class TestPruneStructureFromSceneMetric extends BoofStandardJUnit {
 	/**
 	 * Qualitative test of prune by nearest neighbor.
 	 */
-	@Test
-	void prunePoints_neighbors() {
+	@Test void prunePoints_neighbors() {
 		createPerfectScene();
 		int countPoints0 = structure.points.size;
 		int countObservations0 = observations.getObservationCount();
 
-		PruneStructureFromSceneMetric alg = new PruneStructureFromSceneMetric(structure, observations);
+		var alg = new PruneStructureFromSceneMetric(structure, observations);
 
 		// This should just prune the outliers far from the center
 		alg.prunePoints(2, 0.5);
@@ -188,11 +226,10 @@ class TestPruneStructureFromSceneMetric extends BoofStandardJUnit {
 	/**
 	 * Prunes and makes sure the distance and count are correctly implemented
 	 */
-	@Test
-	void prunePoints_neighbors_exact() {
+	@Test void prunePoints_neighbors_exact() {
 		createPerfectScene(2, 5);
 
-		PruneStructureFromSceneMetric alg = new PruneStructureFromSceneMetric(structure, observations);
+		var alg = new PruneStructureFromSceneMetric(structure, observations);
 
 		// no pruning should occur
 		alg.prunePoints(1, 5.01);
@@ -210,8 +247,7 @@ class TestPruneStructureFromSceneMetric extends BoofStandardJUnit {
 		assertEquals(5, structure.points.size);
 	}
 
-	@Test
-	void pruneViews() {
+	@Test void pruneViews() {
 		createPerfectScene();
 
 		// original point count
@@ -254,8 +290,7 @@ class TestPruneStructureFromSceneMetric extends BoofStandardJUnit {
 		checkAllObservationsArePerfect();
 	}
 
-	@Test
-	void pruneUnusedCameras() {
+	@Test void pruneUnusedCameras() {
 		createPerfectScene();
 
 		var alg = new PruneStructureFromSceneMetric(structure, observations);
@@ -283,8 +318,7 @@ class TestPruneStructureFromSceneMetric extends BoofStandardJUnit {
 	/**
 	 * If nothing points to a motion then prune it
 	 */
-	@Test
-	void pruneUnusedMotions() {
+	@Test void pruneUnusedMotions() {
 		createPerfectScene();
 
 		var alg = new PruneStructureFromSceneMetric(structure, observations);
@@ -308,8 +342,7 @@ class TestPruneStructureFromSceneMetric extends BoofStandardJUnit {
 	/**
 	 * Make sure that if there are relative views in a chain those are handled currently when pruning
 	 */
-	@Test
-	void handleRelativeViews_pruneObservationsBehindCamera() {
+	@Test void handleRelativeViews_pruneObservationsBehindCamera() {
 		structure = new SceneStructureMetric(false);
 		structure.initialize(1, 2, 1);
 
@@ -342,8 +375,7 @@ class TestPruneStructureFromSceneMetric extends BoofStandardJUnit {
 		}
 	}
 
-	@Test
-	void handleRelativeViews_pruneViews() {
+	@Test void handleRelativeViews_pruneViews() {
 		structure = new SceneStructureMetric(false);
 		structure.initialize(1, 3, 3);
 
@@ -382,19 +414,17 @@ class TestPruneStructureFromSceneMetric extends BoofStandardJUnit {
 
 		structure.setCamera(0, true, intrinsic);
 
-		List<Point3D_F64> points = new ArrayList<>();
 		for (int i = 0; i < grid; i++) {
 			for (int j = 0; j < grid; j++) {
 				double x = (i - (int)(grid/2))*space;
 				double y = (j - (int)(grid/2))*space;
 
 				Point3D_F64 p = new Point3D_F64(center.x + x, center.y + y, center.z);
-				points.add(p);
 				structure.points.data[i*grid + j].set(p.x, p.y, p.z);
 			}
 		}
 
-		createRestOfTheScene(points, false);
+		createRestOfTheScene(false);
 	}
 
 	private void createPerfectScene() {
@@ -404,41 +434,69 @@ class TestPruneStructureFromSceneMetric extends BoofStandardJUnit {
 		structure.setCamera(0, true, intrinsic);
 		structure.setCamera(1, false, intrinsic);
 
-		List<Point3D_F64> points = new ArrayList<>();
 		for (int i = 0; i < structure.points.size; i++) {
-			Point3D_F64 p = UtilPoint3D_F64.noiseNormal(center, 0.5, 0.5, 0.5, rand, null);
-			points.add(p);
+			Point3D_F64 p = noiseNormal(center, 0.5, 0.5, 0.5, rand, null);
 			structure.points.data[i].set(p.x, p.y, p.z);
 		}
 
-		createRestOfTheScene(points, true);
+		createRestOfTheScene(true);
 	}
 
-	private void createRestOfTheScene( List<Point3D_F64> points, boolean sanityCheck ) {
+	private void createPerfectRigidScene() {
+		structure = new SceneStructureMetric(false);
+		structure.initialize(2, 10, 10, 0, 2);
+
+		structure.setCamera(0, true, intrinsic);
+		structure.setCamera(1, false, intrinsic);
+
+		structure.setRigid(0, true,
+				eulerXyz(0.1, -0.15, 1, 0, 0.05, -0.2, null),
+				100);
+		structure.setRigid(0, true,
+				eulerXyz(0.11, 0.1, -0.7, -0.03, 0.01, -0.3, null),
+				120);
+		structure.assignIDsToRigidPoints();
+
+		var p = new Point3D_F64();
+		for (int rigidIdx = 0; rigidIdx < structure.rigids.size; rigidIdx++) {
+			SceneStructureMetric.Rigid rigid = structure.getRigid(rigidIdx);
+
+			for (int landmarkIdx = 0; landmarkIdx < rigid.getTotalPoints(); landmarkIdx++) {
+				noiseNormal(center, 0.5, 0.5, 0.0, rand, p);
+				rigid.setPoint(landmarkIdx, p.x, p.y, p.z);
+			}
+		}
+
+		createRestOfTheScene(true);
+	}
+
+	private void createRestOfTheScene( boolean sanityCheck ) {
 		for (int i = 0; i < structure.views.size; i++) {
 			double x = -1.5 + (int)(3*i/Math.max(1, (structure.views.size - 1)));
 			structure.setView(i, i%2, false, eulerXyz(x, 0, 0, 0, 0, 0, null));
 		}
 
 		observations = new SceneObservations();
-		observations.initialize(structure.views.size);
+		observations.initialize(structure.views.size, !structure.rigids.isEmpty());
 
-		Se3_F64 world_to_view = new Se3_F64();
-		Se3_F64 tmp = new Se3_F64();
+		var world_to_view = new Se3_F64();
+		var tmp = new Se3_F64();
 
+		var rigidX = new Point3D_F64();
+		var worldX = new Point3D_F64();
 		// 3D point in camera coordinate system
-		Point3D_F64 cameraX = new Point3D_F64();
+		var cameraX = new Point3D_F64();
 		// observed pixel coordinate of 3D point
-		Point2D_F64 pixel = new Point2D_F64();
+		var pixel = new Point2D_F64();
+
 		for (int viewIdx = 0; viewIdx < structure.views.size; viewIdx++) {
 			SceneStructureMetric.View v = structure.views.data[viewIdx];
 			BundleAdjustmentCamera camera = structure.cameras.get(v.camera).model;
 			structure.getWorldToView(v, world_to_view, tmp);
 
 			for (int pointIdx = 0; pointIdx < structure.points.size; pointIdx++) {
-				Point3D_F64 p = points.get(pointIdx);
-
-				world_to_view.transform(p, cameraX);
+				structure.points.get(pointIdx).get(worldX);
+				world_to_view.transform(worldX, cameraX);
 
 				if (cameraX.z <= 0)
 					continue;
@@ -450,6 +508,37 @@ class TestPruneStructureFromSceneMetric extends BoofStandardJUnit {
 
 				observations.views.data[viewIdx].add(pointIdx, (float)pixel.x, (float)pixel.y);
 				structure.connectPointToView(pointIdx, viewIdx);
+			}
+		}
+
+		for (int viewIdx = 0; viewIdx < observations.viewsRigid.size; viewIdx++) {
+			SceneObservations.View obsView = observations.viewsRigid.get(viewIdx);
+			SceneStructureMetric.View strView = structure.views.data[viewIdx];
+			structure.getWorldToView(strView, world_to_view, tmp);
+
+			BundleAdjustmentCamera camera = structure.cameras.data[strView.camera].model;
+			if (obsView.cameraState != null)
+				camera.setCameraState(obsView.cameraState);
+
+			for (int rigidIdx = 0; rigidIdx < structure.rigids.size; rigidIdx++) {
+				SceneStructureMetric.Rigid rigid = structure.getRigid(rigidIdx);
+
+
+				for (int landmarkIdx = 0; landmarkIdx < rigid.getTotalPoints(); landmarkIdx++) {
+					rigid.getPoint(landmarkIdx, rigidX);
+					rigid.object_to_world.transform(rigidX, worldX);
+					world_to_view.transform(worldX, cameraX);
+
+					if (cameraX.z <= 0)
+						continue;
+
+					camera.project(cameraX.x, cameraX.y, cameraX.z, pixel);
+
+					if (!intrinsic.isInside(pixel.x, pixel.y))
+						continue;
+
+					rigid.connectPointToView(landmarkIdx, viewIdx, (float)pixel.x, (float)pixel.y, observations);
+				}
 			}
 		}
 
@@ -466,6 +555,8 @@ class TestPruneStructureFromSceneMetric extends BoofStandardJUnit {
 		}
 
 		for (int viewIdx = 0; viewIdx < observations.views.size; viewIdx++) {
+			if (structure.points.isEmpty())
+				continue;
 			if (observations.views.data[viewIdx].size() == 0)
 				throw new RuntimeException("View with no observations");
 		}
@@ -477,15 +568,18 @@ class TestPruneStructureFromSceneMetric extends BoofStandardJUnit {
 	 * See if all the observations are perfect. This acts as a sanity check on the scenes structure after modification
 	 */
 	private void checkAllObservationsArePerfect() {
-		Se3_F64 world_to_view = new Se3_F64();
-		Se3_F64 tmp = new Se3_F64();
+		var world_to_view = new Se3_F64();
+		var tmp = new Se3_F64();
 
-		Point3D_F64 worldX = new Point3D_F64();
+		var worldX = new Point3D_F64();
+
 		// 3D point in camera coordinate system
-		Point3D_F64 cameraX = new Point3D_F64();
+		var cameraX = new Point3D_F64();
+
 		// observed pixel coordinate of 3D point
-		Point2D_F64 predicted = new Point2D_F64();
-		Point2D_F64 found = new Point2D_F64();
+		var predicted = new Point2D_F64();
+		var found = new Point2D_F64();
+
 		for (int viewIdx = 0; viewIdx < structure.views.size; viewIdx++) {
 			SceneStructureMetric.View v = structure.views.data[viewIdx];
 			BundleAdjustmentCamera camera = structure.cameras.get(v.camera).model;

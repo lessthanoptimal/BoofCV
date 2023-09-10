@@ -18,16 +18,20 @@
 
 package boofcv.abst.geo.bundle;
 
+import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.helper.KdTreePoint3D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
+import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
+import org.jetbrains.annotations.Nullable;
 
+import java.io.PrintStream;
 import java.util.*;
 
 /**
@@ -40,6 +44,8 @@ public class PruneStructureFromSceneMetric {
 
 	SceneStructureMetric structure;
 	SceneObservations observations;
+
+	public @Nullable PrintStream verbose;
 
 	public PruneStructureFromSceneMetric( SceneStructureMetric structure,
 										  SceneObservations observations ) {
@@ -111,6 +117,107 @@ public class PruneStructureFromSceneMetric {
 	}
 
 	/**
+	 * Computes reprojection error for all features and removes the ones with reprojection errors larger than this value
+	 *
+	 * @param errorThreshold If the reprojection error is greater than this threshold prune them
+	 */
+	public void pruneObservationsByReprojection( double errorThreshold ) {
+		double thresh = errorThreshold*errorThreshold;
+
+		var observation = new Point2D_F64();
+		var predicted = new Point2D_F64();
+		var X = new Point3D_F64();
+		var world_to_view = new Se3_F64();
+		var tmp = new Se3_F64();
+
+		// Examine observations of regular points
+		for (int viewIndex = 0; viewIndex < observations.views.size; viewIndex++) {
+			SceneObservations.View obsView = observations.views.data[viewIndex];
+			SceneStructureMetric.View strView = structure.views.data[viewIndex];
+			structure.getWorldToView(strView, world_to_view, tmp);
+
+			SceneStructureCommon.Camera camera = structure.cameras.data[strView.camera];
+			if (obsView.cameraState != null)
+				camera.model.setCameraState(obsView.cameraState);
+
+			int totalMarked = 0;
+			for (int indexInView = 0; indexInView < obsView.point.size; indexInView++) {
+				int pointID = obsView.getPointId(indexInView);
+				SceneStructureCommon.Point f = structure.points.data[pointID];
+
+				// Get feature location in world
+				f.get(X);
+				// Get observation in image pixels
+				obsView.getPixel(indexInView, observation);
+
+				// Find the point in this view
+				world_to_view.transform(X, X);
+
+				// predicted pixel
+				camera.model.project(X.x, X.y, X.z, predicted);
+
+				if (predicted.distance2(observation) <= thresh)
+					continue;
+
+
+				// Mark the feature for removal
+				obsView.setPixel(indexInView, Float.NaN, Float.NaN);
+				totalMarked++;
+			}
+
+			if (verbose != null && totalMarked > 0)
+				verbose.printf("view[%d] marked: %d / %d\n", viewIndex, totalMarked, obsView.size());
+		}
+
+		// Examine observation of points on rigid objects
+		var observedPixel = new PointIndex2D_F64();
+		for (int viewIndex = 0; viewIndex < observations.viewsRigid.size; viewIndex++) {
+			SceneObservations.View obsView = observations.viewsRigid.get(viewIndex);
+			SceneStructureMetric.View strView = structure.views.data[viewIndex];
+			structure.getWorldToView(strView, world_to_view, tmp);
+
+			SceneStructureCommon.Camera camera = structure.cameras.data[strView.camera];
+			if (obsView.cameraState != null)
+				camera.model.setCameraState(obsView.cameraState);
+
+			int totalMarked = 0;
+			for (int indexInView = 0; indexInView < obsView.size(); indexInView++) {
+				obsView.getPixel(indexInView, observedPixel);
+
+				// Use lookup table to figure out which rigid object it belongs to
+				int rigidIndex = structure.lookupRigid[observedPixel.index];
+				SceneStructureMetric.Rigid rigid = structure.rigids.get(rigidIndex);
+				// Compute the point's index on the rigid object
+				int landmarkIdx = observedPixel.index - rigid.indexFirst;
+
+				// Load the 3D location of point on the rigid body
+				SceneStructureCommon.Point objectPt = rigid.points[landmarkIdx];
+				objectPt.get(X);
+
+				// Transform to world frame and from world to camera
+				SePointOps_F64.transform(rigid.object_to_world, X, X);
+				SePointOps_F64.transform(world_to_view, X, X);
+
+				// Project and compute residual
+				camera.model.project(X.x, X.y, X.z, predicted);
+
+				if (predicted.distance2(observedPixel.p) <= thresh)
+					continue;
+
+				// Mark the observation for removal
+				obsView.setPixel(indexInView, Float.NaN, Float.NaN);
+				totalMarked++;
+			}
+
+			if (verbose != null && totalMarked > 0)
+				verbose.printf("struct-view[%d] marked: %d / %d\n", viewIndex, totalMarked, obsView.size());
+		}
+
+		// Remove all marked features
+		removeMarkedObservations();
+	}
+
+	/**
 	 * Removes observations which have been marked with NaN
 	 */
 	private void removeMarkedObservations() {
@@ -118,12 +225,12 @@ public class PruneStructureFromSceneMetric {
 
 		for (int viewIndex = 0; viewIndex < observations.views.size; viewIndex++) {
 //			System.out.println("ViewIndex="+viewIndex);
-			SceneObservations.View v = observations.views.data[viewIndex];
-			for (int pointIndex = v.point.size - 1; pointIndex >= 0; pointIndex--) {
-				int pointID = v.getPointId(pointIndex);
+			SceneObservations.View obsView = observations.views.data[viewIndex];
+			for (int pointIndex = obsView.point.size - 1; pointIndex >= 0; pointIndex--) {
+				int pointID = obsView.getPointId(pointIndex);
 				SceneStructureCommon.Point f = structure.points.data[pointID];
 //				System.out.println("   pointIndex="+pointIndex+" pointID="+pointID+" hash="+f.hashCode());
-				v.getPixel(pointIndex, observation);
+				obsView.getPixel(pointIndex, observation);
 
 				if (!Double.isNaN(observation.x))
 					continue;
@@ -134,7 +241,29 @@ public class PruneStructureFromSceneMetric {
 				// Tell the feature it is no longer visible in this view
 				f.removeView(viewIndex);
 				// Remove the observation of this feature from the view
-				v.remove(pointIndex);
+				obsView.remove(pointIndex);
+			}
+		}
+
+		// Only remove observations for rigid objects. The 3D structure of a rigid object is fixed.
+		for (int viewIndex = 0; viewIndex < observations.viewsRigid.size; viewIndex++) {
+			SceneObservations.View obsView = observations.viewsRigid.data[viewIndex];
+			for (int indexInView = obsView.point.size - 1; indexInView >= 0; indexInView--) {
+				obsView.getPixel(indexInView, observation);
+
+				if (!Double.isNaN(observation.x))
+					continue;
+
+				// Use lookup table to figure out which rigid object it belongs to
+				int pointID = obsView.getPointId(indexInView);
+				int rigidIndex = structure.lookupRigid[pointID];
+				SceneStructureMetric.Rigid rigid = structure.rigids.get(rigidIndex);
+
+				// Remove the reference to this point being observed in that view
+				rigid.points[pointID - rigid.indexFirst].removeView(viewIndex);
+
+				// Remove the observation of this feature from the view
+				obsView.remove(indexInView);
 			}
 		}
 	}

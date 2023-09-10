@@ -12,6 +12,11 @@ Version : 1.0.1
 
 - Calibration
   * Support for multiple calibration targets
+- Bundle Adjustment
+  * Can prune by reprojection error now
+  * Support for pruning observation of rigid objects
+- Android: CameraProcessFragment
+  * A few small bug fixes and quality of life improvements
 - Image Processing
   - TODO hough circle detector
 - SLAM

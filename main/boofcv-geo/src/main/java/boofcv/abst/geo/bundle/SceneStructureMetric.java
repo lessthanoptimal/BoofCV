@@ -24,6 +24,7 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
+import lombok.Getter;
 import org.ddogleg.struct.DogArray;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,13 +46,14 @@ import static boofcv.misc.BoofMiscOps.checkTrue;
 public class SceneStructureMetric extends SceneStructureCommon {
 
 	/** List of views. A view is composed of a camera model and it's pose. */
-	public final DogArray<View> views = new DogArray<>(View::new, View::reset);
+	@Getter public final DogArray<View> views = new DogArray<>(View::new, View::reset);
 
 	/** List of motions for the views that specifies their spatial relationship */
-	public final DogArray<Motion> motions = new DogArray<>(Motion::new, Motion::reset);
+	@Getter public final DogArray<Motion> motions = new DogArray<>(Motion::new, Motion::reset);
 
 	/** List of rigid objects. A rigid object is a group of 3D points that have a known relationship with each other. */
-	public final DogArray<Rigid> rigids = new DogArray<>(Rigid::new);
+	@Getter public final DogArray<Rigid> rigids = new DogArray<>(Rigid::new);
+
 	// Lookup table from rigid point to rigid object
 	public int[] lookupRigid = new int[0];
 
@@ -412,11 +414,12 @@ public class SceneStructureMetric extends SceneStructureCommon {
 		return getUnknownMotionCount()*6 + getUnknownRigidCount()*6 + points.size*pointSize + getUnknownCameraParameterCount();
 	}
 
-	public DogArray<View> getViews() {
-		return views;
+	/**
+	 * Returns the specified {@link Rigid}.
+	 */
+	public Rigid getRigid(int rigidIdx ) {
+		return rigids.get(rigidIdx);
 	}
-
-	public DogArray<Rigid> getRigids() {return rigids;}
 
 	/**
 	 * Checks to see if the passed in scene is identical to "this" scene. Floating point values are checked to within
