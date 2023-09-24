@@ -7,6 +7,13 @@ Version Meaning: <compatible>.<feature>.<bug fix>
 - Last digit always indicates a bug fix and other minor changes
 
 ---------------------------------------------
+Date    : 2023/Sep/24
+Version : 1.1.1
+
+- Updated dependencies so that a bug in EJML could be fixed
+- The bug caused bundle adjustment to fail if all views were fixed.
+
+---------------------------------------------
 Date    : 2023/Sep/9
 Version : 1.1.0
 
