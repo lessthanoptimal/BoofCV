@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,12 +21,14 @@ package boofcv.abst.geo.triangulate;
 import boofcv.abst.geo.Triangulate2ViewsMetric;
 import boofcv.abst.geo.TriangulateNViewsMetric;
 import boofcv.alg.geo.GeometricResult;
+import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.triangulate.TriangulateMetricLinearDLT;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 import lombok.Getter;
+import org.ejml.UtilEjml;
 
 import java.util.List;
 
@@ -44,17 +46,11 @@ public class WrapNViewsTriangulateMetricDLT implements TriangulateNViewsMetric {
 	@Override
 	public boolean triangulate( List<Point2D_F64> observations, List<Se3_F64> listWorldToView,
 								Point3D_F64 location ) {
-
-		if (GeometricResult.SUCCESS == algorithm.triangulate(observations, listWorldToView, pointH)) {
-			// can't handle points at infinity with this interface
-			if (pointH.w == 0)
-				return false;
-			location.x = pointH.x/pointH.w;
-			location.y = pointH.y/pointH.w;
-			location.z = pointH.z/pointH.w;
-			return true;
+		if (GeometricResult.SUCCESS != algorithm.triangulate(observations, listWorldToView, pointH)) {
+			return false;
 		}
 
-		return false;
+		PerspectiveOps.homogenousTo3dPositiveZ(pointH, 1e20, UtilEjml.EPS, location);
+		return true;
 	}
 }

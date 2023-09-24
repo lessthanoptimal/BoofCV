@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,8 +60,8 @@ public class TriangulateMetricLinearDLT {
 
 	/**
 	 * <p>
-	 * Given N observations of the same point from two views and a known motion between the
-	 * two views, triangulate the point's position in camera 'b' reference frame.
+	 * Given N observations of the same point from N views and a known pose of each view in the world reference frame,
+	 * triangulate the point's position in the world reference frame.
 	 * </p>
 	 * <p>
 	 * Modification of [1] to be less generic and use calibrated cameras.
@@ -69,7 +69,7 @@ public class TriangulateMetricLinearDLT {
 	 *
 	 * @param observations Observation in each view in normalized coordinates. Not modified.
 	 * @param worldToView Transformations from world to the view. Not modified.
-	 * @param found (Output) 3D point in homogenous coordinates. Modified.
+	 * @param found (Output) 3D point in homogenous coordinates in world reference frame. Modified.
 	 */
 	public GeometricResult triangulate( List<Point2D_F64> observations,
 										List<Se3_F64> worldToView,
@@ -102,7 +102,7 @@ public class TriangulateMetricLinearDLT {
 	 * @param a Observation 'a' in normalized coordinates. Not modified.
 	 * @param b Observation 'b' in normalized coordinates. Not modified.
 	 * @param fromAtoB Transformation from camera view 'a' to 'b'  Not modified.
-	 * @param foundInA Output, the found 3D position of the point. Modified.
+	 * @param foundInA Output, the found 3D position of the point in 'a' reference frame. Modified.
 	 */
 	public GeometricResult triangulate( Point2D_F64 a, Point2D_F64 b,
 										Se3_F64 fromAtoB,
@@ -128,16 +128,16 @@ public class TriangulateMetricLinearDLT {
 
 	/**
 	 * <p>
-	 * Given N observations of the same point from two views and a known motion between the
-	 * two views, triangulate the point's position in camera 'b' reference frame.
+	 * Given N observations of the same point from N views and a known pose of each view in the world reference frame,
+	 * triangulate the point's position in the world reference frame.
 	 * </p>
 	 * <p>
 	 * Modification of [1] to be less generic and use calibrated cameras.
 	 * </p>
 	 *
-	 * @param observations Observation in each view 3d pointing vectors. Not modified.
+	 * @param observations Observation in each view in 3d pointing vectors. Not modified.
 	 * @param worldToView Transformations from world to the view. Not modified.
-	 * @param found (Output) 3D point in homogenous coordinates. Modified.
+	 * @param found (Output) 3D point in homogenous coordinates in world reference frame. Modified.
 	 */
 	public GeometricResult triangulateP( List<Point3D_F64> observations,
 										 List<Se3_F64> worldToView,
@@ -170,7 +170,7 @@ public class TriangulateMetricLinearDLT {
 	 * @param a Observation 'a' as a 3d pointing vector. Not modified.
 	 * @param b Observation 'b' as a 3d pointing vector. Not modified.
 	 * @param fromAtoB Transformation from camera view 'a' to 'b'  Not modified.
-	 * @param foundInA Output, the found 3D position of the point. Modified.
+	 * @param foundInA Output, the found 3D position of the point in 'a' reference frame. Modified.
 	 */
 	public GeometricResult triangulateP( Point3D_F64 a, Point3D_F64 b,
 										 Se3_F64 fromAtoB,
