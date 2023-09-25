@@ -12,7 +12,10 @@ dependencies {
 	implementation project(':integration:boofcv-jcodec')
 	implementation project(':integration:boofcv-WebcamCapture')
 
-	api 'org.reflections:reflections:0.9.10'
+	api("org.reflections:reflections:0.10.2") {
+		exclude group: "org.slf4j"
+		exclude group: "com.google.guava"
+	}
 }
 
 // Create a jar which contains all the applications
