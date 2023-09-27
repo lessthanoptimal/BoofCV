@@ -64,10 +64,10 @@ abstract class CameraProcessFragment : Fragment() {
     }
 
     /** [HandlerThread] where all camera operations run */
-    private val cameraThread = HandlerThread("CameraHandler").apply { start() }
+    protected val cameraThread = HandlerThread("CameraHandler").apply { start() }
 
     /** [Handler] corresponding to [cameraThread] */
-    private val cameraHandler = Handler(cameraThread.looper)
+    protected val cameraHandler = Handler(cameraThread.looper)
 
     override fun onDestroyView() {
         closeAllCameras()
