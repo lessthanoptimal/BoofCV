@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -70,7 +70,7 @@ public class ImplConvertYuv420_888 {
 				bufferY.get(work, 0, width);
 				positionY += strideY;
 
-				if (y % periodUV == 0) {
+				if (y%periodUV == 0) {
 					bufferU.position(positionUV);
 					bufferU.get(work, offsetU, rowBytesUV);
 					bufferV.position(positionUV);
@@ -86,12 +86,16 @@ public class ImplConvertYuv420_888 {
 					processor.processYUV(work[indexY] & 0xFF, work[indexU] & 0xFF, work[indexV] & 0xFF);
 
 					// this is intended to be a fast way to do if a == 0 ? 1 : 0
-					int stepUV = stridePixelUV * ((x + 1) % periodUV == 0 ? 1 : 0);
+					int stepUV = stridePixelUV*((x + 1)%periodUV == 0 ? 1 : 0);
 					indexU += stepUV;
 					indexV += stepUV;
 				}
 			}
-		} catch( RuntimeException e ) {
+		} catch ( IllegalStateException e ) {
+			// Don't need to print out the debugging info below. It happens if the buffer's source is blocked.
+			// happens on android.
+			throw e;
+		} catch( Exception e ) {
 			e.printStackTrace();
 
 			String message = "Crashed in YUV. "+e.getMessage()+" bytes Y="+totalBytesY+" U="+totalBytesU+

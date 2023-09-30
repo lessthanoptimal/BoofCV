@@ -126,7 +126,7 @@ abstract class ImageProcessingFragment : CameraProcessFragment() {
      * the image into a usable format by BoofCV then tell the processing thread that another
      * image is available.
      */
-    fun processImage(dataFrame: Image) {
+    open fun processImage(dataFrame: Image) {
         frameCount++
         val image = imagesCam
         if (!image.requestProcess())
@@ -135,11 +135,25 @@ abstract class ImageProcessingFragment : CameraProcessFragment() {
         val time0 = System.nanoTime()
         // Perform a fast copy from the camera image into a format we can understand
         // YUV format requires a simple copy to get a gray image
-        ConvertCameraImage.imageToBoof(dataFrame, ColorFormat.RGB, image.gray, workspace)
-        ConvertCameraImage.imageToBoof(dataFrame, ColorFormat.RGB, image.color, workspace)
-        image.timestamp = dataFrame.timestamp
-        image.sequenceID = frameCount
-        image.releaseProcessing()
+        try {
+            ConvertCameraImage.imageToBoof(dataFrame, ColorFormat.RGB, image.gray, workspace)
+            ConvertCameraImage.imageToBoof(dataFrame, ColorFormat.RGB, image.color, workspace)
+            image.timestamp = dataFrame.timestamp
+            image.sequenceID = frameCount
+        } catch (e: IllegalStateException) {
+            // If the screen is locked the camera can be killed before this camera capture shutdown.
+            // Detect this issue and log it with a less verbose warning message
+            if (e.message == "buffer is inaccessible") {
+                Log.w(TAG, "Can't convert frame. Buffer isn't accessible.")
+            } else {
+                Log.e(TAG, "Exception", e)
+            }
+        } catch (e:Exception) {
+            // Catch other random exceptions and log them so they don't blow up android
+            Log.e(TAG, "Exception", e)
+        } finally {
+            image.releaseProcessing()
+        }
         val time1 = System.nanoTime()
 
         // Print out profiling information for debugging
