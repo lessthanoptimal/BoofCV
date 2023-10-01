@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -135,9 +135,9 @@ public class ConvertRaster {
 		}
 	}
 
-	public static int stride( WritableRaster raster ) {
-		while (raster.getWritableParent() != null) {
-			raster = raster.getWritableParent();
+	public static int stride( Raster raster ) {
+		while (raster.getParent() != null) {
+			raster = raster.getParent();
 		}
 		return raster.getWidth()*raster.getNumDataElements();
 	}
@@ -269,8 +269,8 @@ public class ConvertRaster {
 		}
 	}
 
-	public static int getOffset( WritableRaster raster ) {
-		if (raster.getWritableParent() == null)
+	public static int getOffset( Raster raster ) {
+		if (raster.getParent() == null)
 			return 0;
 
 		try {
