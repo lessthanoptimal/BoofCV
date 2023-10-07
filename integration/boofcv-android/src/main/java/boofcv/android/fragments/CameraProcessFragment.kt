@@ -84,12 +84,16 @@ abstract class CameraProcessFragment : Fragment() {
     /**
      * Immediately invokes the close all functions. Does not wait for the main dispatcher
      */
-    protected fun closeAllCamerasNow() {
+    protected open fun closeAllCamerasNow() {
         for (cam in cameraDevices.values) {
             cam.session?.stopRepeating()
-            cam.device.close()
-            for (reader in cam.readers) {
-                reader.close()
+            try {
+                cam.device.close()
+                for (reader in cam.readers) {
+                    reader.close()
+                }
+            } catch( IllegalStateException: e) {
+                Log.e(TAG, "Failed to close a camera", e)
             }
         }
         cameraDevices.clear()
