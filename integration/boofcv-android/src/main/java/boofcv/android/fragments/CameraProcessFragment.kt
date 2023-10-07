@@ -77,7 +77,7 @@ abstract class CameraProcessFragment : Fragment() {
     /**
      * Stops all camera capture sessions and cleans up
      */
-    protected fun closeAllCameras() = lifecycleScope.launch(Dispatchers.Main) {
+    protected open fun closeAllCameras() = lifecycleScope.launch(Dispatchers.Main) {
         closeAllCamerasNow()
     }
 
@@ -92,7 +92,7 @@ abstract class CameraProcessFragment : Fragment() {
                 for (reader in cam.readers) {
                     reader.close()
                 }
-            } catch( IllegalStateException: e) {
+            } catch( e: IllegalStateException) {
                 Log.e(TAG, "Failed to close a camera", e)
             }
         }
@@ -103,7 +103,7 @@ abstract class CameraProcessFragment : Fragment() {
      * Adds a surface for the camera device which will invoke the following operator every
      * time a new image is captured. Blocks until finished.
      */
-    protected fun addCameraProcessor(
+    protected open fun addCameraProcessor(
         cameraID: CameraID,
         width: Int,
         height: Int,
@@ -128,7 +128,7 @@ abstract class CameraProcessFragment : Fragment() {
     /**
      * Adds a new surface for the device. Blocks until finished.
      */
-    protected fun addCameraSurface(cameraID: CameraID, surface: Surface) {
+    protected open fun addCameraSurface(cameraID: CameraID, surface: Surface) {
         Log.i(TAG, "camera: add surface: id=$cameraID")
         val camera: DeviceSurfaces = lookupDeviceSurfaces(cameraID)
         camera.surfaces.add(surface)
@@ -155,7 +155,7 @@ abstract class CameraProcessFragment : Fragment() {
      *
      * @param configure Optional Lambda to do additional configurations for a camera.
      */
-    protected fun initializeCamera(configure: (cameraID: CameraID, builder: CaptureRequest.Builder) -> Unit = { _, _ -> }) =
+    protected open fun initializeCamera(configure: (cameraID: CameraID, builder: CaptureRequest.Builder) -> Unit = { _, _ -> }) =
         lifecycleScope.launch(Dispatchers.Main) {
             Log.i(TAG, "Inside initializeCamera")
 
@@ -196,7 +196,7 @@ abstract class CameraProcessFragment : Fragment() {
      * Changes the camera's zoom level. With a Pixel 6 Pro this will be done by down sampling
      * the image less up to 2x zoom, after that it will be a digital zoom.
      */
-    public fun setZoom(cameraID: String, zoomValue: Double, builder: CaptureRequest.Builder) {
+    public open fun setZoom(cameraID: String, zoomValue: Double, builder: CaptureRequest.Builder) {
         val characteristics = cameraManager.getCameraCharacteristics(cameraID)
         val sensorSize = characteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE)!!
         val width = sensorSize.width()
@@ -212,7 +212,7 @@ abstract class CameraProcessFragment : Fragment() {
     }
 
     @SuppressLint("MissingPermission")
-    private fun openCamera(cameraID: String): CameraDevice {
+    protected open fun openCamera(cameraID: String): CameraDevice {
         val results = OpenResult()
         cameraManager.openCamera(cameraID, object : CameraDevice.StateCallback() {
             override fun onOpened(camera: CameraDevice) {
@@ -295,7 +295,7 @@ abstract class CameraProcessFragment : Fragment() {
     /**
      * Handle new images from the camera when they are available
      */
-    private fun createOnAvailableListener(op: (image: Image) -> Unit): ImageReader.OnImageAvailableListener {
+    protected open fun createOnAvailableListener(op: (image: Image) -> Unit): ImageReader.OnImageAvailableListener {
         return ImageReader.OnImageAvailableListener { reader ->
             reader.acquireNextImage().use { dataFrame ->
                 // This can happen if the process is closed out of order
@@ -316,7 +316,7 @@ abstract class CameraProcessFragment : Fragment() {
     /**
      * Selects the resolution which has the closest number of pixels to the target
      */
-    fun selectResolution(id: String, targetWidth: Int, targetHeight: Int): Size {
+    protected open fun selectResolution(id: String, targetWidth: Int, targetHeight: Int): Size {
         // Search to find best match
         val characteristics = cameraManager.getCameraCharacteristics(id)
         val map = characteristics[CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP]
