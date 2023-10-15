@@ -12,6 +12,8 @@ Version : 1.1.2
 
 - Android
   * Better handling when the camera becomes inaccessible while it was reading it
+- WorldToCameraToPixel
+  * Supports homogenous coordinates
 
 ---------------------------------------------
 Date    : 2023/Sep/24

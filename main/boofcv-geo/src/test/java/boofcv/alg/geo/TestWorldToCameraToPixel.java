@@ -24,52 +24,65 @@ import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestWorldToCameraToPixel extends BoofStandardJUnit {
-	CameraPinholeBrown intrinsic = new CameraPinholeBrown(500,500,0,320,240,640,480).fsetRadial(-0.1,-0.05);
-	Point2Transform2_F64 normToPixel = LensDistortionFactory.narrow(intrinsic).distort_F64(false,true);
+	CameraPinholeBrown intrinsic = new CameraPinholeBrown(500, 500, 0, 320, 240, 640, 480).fsetRadial(-0.1, -0.05);
+	Point2Transform2_F64 normToPixel = LensDistortionFactory.narrow(intrinsic).distort_F64(false, true);
 
 	Se3_F64 worldToCamera = new Se3_F64();
 
-	Point3D_F64 infront = new Point3D_F64(-0.1,0.2,0);
-	Point3D_F64 behind = new Point3D_F64(-0.1,0.2,-4);
+	Point3D_F64 infront = new Point3D_F64(-0.1, 0.2, 0);
+	Point3D_F64 behind = new Point3D_F64(-0.1, 0.2, -4);
+
+	Point4D_F64 infront4 = new Point4D_F64(-0.2, 0.4, 0, 2.0);
+	Point4D_F64 behind4 = new Point4D_F64(0.2, -0.4, 8, -2.0);
 
 	Point2D_F64 expectedInFront = new Point2D_F64();
 
 	public TestWorldToCameraToPixel() {
-		worldToCamera.getT().setTo(0,0,3);
+		worldToCamera.getT().setTo(0, 0, 3);
 
-		Point3D_F64 tmp = new Point3D_F64();
-		SePointOps_F64.transform(worldToCamera,infront,tmp);
-		normToPixel.compute(tmp.x/tmp.z,tmp.y/tmp.z,expectedInFront);
+		var tmp = new Point3D_F64();
+		SePointOps_F64.transform(worldToCamera, infront, tmp);
+		normToPixel.compute(tmp.x/tmp.z, tmp.y/tmp.z, expectedInFront);
 	}
 
 	@Test void transform_two() {
+		var worldToPixel = new WorldToCameraToPixel();
+		worldToPixel.configure(intrinsic, worldToCamera);
 
-		WorldToCameraToPixel worldToPixel = new WorldToCameraToPixel();
-		worldToPixel.configure(intrinsic,worldToCamera);
+		var found = new Point2D_F64();
 
-		Point2D_F64 found = new Point2D_F64();
-
-		assertTrue(worldToPixel.transform(infront,found));
-		assertTrue(found.distance(expectedInFront)<1e-8);
+		assertTrue(worldToPixel.transform(infront, found));
+		assertTrue(found.distance(expectedInFront) < 1e-8);
 		assertFalse(worldToPixel.transform(behind, found));
 	}
 
 	@Test void transform_one() {
-		WorldToCameraToPixel worldToPixel = new WorldToCameraToPixel();
-		worldToPixel.configure(intrinsic,worldToCamera);
+		var worldToPixel = new WorldToCameraToPixel();
+		worldToPixel.configure(intrinsic, worldToCamera);
 
-		Point2D_F64 found = worldToPixel.transform(infront);
+		var found = worldToPixel.transform(infront);
 
 		assertTrue(found != null);
-		assertTrue(found.distance(expectedInFront)<1e-8);
+		assertTrue(found.distance(expectedInFront) < 1e-8);
 		assertTrue(null == worldToPixel.transform(behind));
+	}
+
+	@Test void transform4_two() {
+		var worldToPixel = new WorldToCameraToPixel();
+		worldToPixel.configure(intrinsic, worldToCamera);
+
+		var found = new Point2D_F64();
+
+		assertTrue(worldToPixel.transform(infront4, found));
+		assertEquals(0.0, found.distance(expectedInFront), 1e-8);
+		assertFalse(worldToPixel.transform(behind4, found));
 	}
 }

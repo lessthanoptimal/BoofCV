@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,7 @@ import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import lombok.Getter;
@@ -45,6 +46,8 @@ public class WorldToCameraToPixel {
 
 	/** storage for point in camera frame */
 	@Getter private Point3D_F64 cameraPt = new Point3D_F64();
+
+	@Getter private Point4D_F64 cameraPt4 = new Point4D_F64();
 
 	/** transform from normalized image coordinates into pixels */
 	@Getter private Point2Transform2_F64 normToPixel;
@@ -105,6 +108,25 @@ public class WorldToCameraToPixel {
 		normPt.y = cameraPt.y/cameraPt.z;
 
 		normToPixel.compute(normPt.x, normPt.y, pixelPt);
+		return true;
+	}
+
+	/**
+	 * Computes the observed location of the specified point in world coordinates in the camera pixel. If
+	 * the object can't be viewed because it is behind the camera then false is returned.
+	 *
+	 * @param worldPt Location of point in world frame. Homogenous coordinates.
+	 * @param pixelPt Pixel observation of point.
+	 * @return True if visible (+z) or false if not visible (-z)
+	 */
+	public boolean transform( Point4D_F64 worldPt, Point2D_F64 pixelPt ) {
+		SePointOps_F64.transform(worldToCamera, worldPt, cameraPt4);
+
+		// can't see the point
+		if (PerspectiveOps.isBehindCamera(cameraPt4))
+			return false;
+
+		normToPixel.compute(cameraPt4.x/cameraPt4.z, cameraPt4.y/cameraPt4.z, pixelPt);
 		return true;
 	}
 
