@@ -567,6 +567,10 @@ public class SceneStructureMetric extends SceneStructureCommon {
 				for (int i = 0; i < numPoints; i++) {
 					points[i] = new Point(dof);
 				}
+			} else {
+				for (int i = 0; i < numPoints; i++) {
+					points[i].reset();
+				}
 			}
 		}
 
