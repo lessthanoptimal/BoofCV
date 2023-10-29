@@ -57,6 +57,7 @@ public class BundleAdjustmentMetricResidualFunction
 
 	// feature location in world coordinates
 	private final Point3D_F64 worldPt = new Point3D_F64();
+	private final Point4D_F64 worldPt4 = new Point4D_F64();
 
 	// number of parameters being optimised
 	private int numParameters;
@@ -252,8 +253,8 @@ public class BundleAdjustmentMetricResidualFunction
 					objectPt.get(p4);
 
 					// Transform to world frame and from world to camera
-					SePointOps_F64.transformV(rigid.object_to_world, p4, worldPt);
-					SePointOps_F64.transform(world_to_view, worldPt, cameraPt);
+					SePointOps_F64.transform(rigid.object_to_world, p4, worldPt4);
+					SePointOps_F64.transformV(world_to_view, worldPt4, cameraPt);
 
 					camera.model.project(cameraPt.x, cameraPt.y, cameraPt.z, predictedPixel);
 

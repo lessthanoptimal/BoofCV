@@ -123,8 +123,10 @@ class TestCodecSceneStructureMetric extends BoofStandardJUnit {
 				SceneStructureMetric.Rigid r = out.rigids.data[i];
 				if (homogenous) {
 					for (int j = 0; j < r.points.length; j++) {
+						// sign shouldn't matter
+						double sign = rand.nextBoolean() ? -1 : 1;
 						double w = rand.nextDouble()*3 + 0.5;
-						r.setPoint(j, rand.nextGaussian()*0.2, rand.nextGaussian()*0.1, rand.nextGaussian()*0.2, w);
+						r.setPoint(j, sign*rand.nextGaussian()*0.2, sign*rand.nextGaussian()*0.1, sign*rand.nextGaussian()*0.2, sign*w);
 					}
 				} else {
 					for (int j = 0; j < r.points.length; j++) {
@@ -150,7 +152,9 @@ class TestCodecSceneStructureMetric extends BoofStandardJUnit {
 
 		if (homogenous) {
 			for (int i = 0; i < out.points.size; i++) {
-				double w = rand.nextDouble()*0.5 + 0.5;
+				// sign shouldn't matter
+				double sign = rand.nextBoolean() ? -1 : 1;
+				double w = sign*(rand.nextDouble()*0.5 + 0.5);
 				out.setPoint(i, w*(i + 1), w*(i + 2*rand.nextGaussian()), w*(2*i - 3*rand.nextGaussian()), w);
 			}
 		} else {

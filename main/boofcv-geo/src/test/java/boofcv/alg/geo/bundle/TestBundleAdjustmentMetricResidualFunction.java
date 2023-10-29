@@ -21,8 +21,13 @@ package boofcv.alg.geo.bundle;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureCommon;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
+import boofcv.alg.geo.WorldToCameraToPixel;
 import boofcv.alg.geo.bundle.cameras.BundleZoomState;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.testing.BoofStandardJUnit;
+import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point4D_F64;
+import georegression.struct.se.SpecialEuclideanOps_F64;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
@@ -216,5 +221,55 @@ class TestBundleAdjustmentMetricResidualFunction extends BoofStandardJUnit {
 		}
 
 		return obs;
+	}
+
+	/**
+	 * Test to see if rigid objects are projected correctly. This is related to a bug that was found.
+	 */
+	@Test void rigidObjectProjectionH() {
+		// Create a simple scene with a simple rigid object
+		var worldToObject = SpecialEuclideanOps_F64.eulerXyz(0.1, -0.05, 0.04, 0.04, -0.03, 0.09, null);
+		var worldToView = SpecialEuclideanOps_F64.eulerXyz(0.15, -0.08, 0.04, 0.09, -0.01, 0.09, null);
+		var brown = new CameraPinholeBrown().fsetK(500, 500, 0, 250, 250, 1000, 1000).fsetRadial(0.005, -0.004);
+
+		var structure = new SceneStructureMetric(true);
+		structure.initialize(1, 1, 1, 0, 1);
+		structure.setRigid(0, true, worldToObject, 1);
+		structure.setView(0, 0, true, worldToView);
+		structure.setCamera(0, true, brown);
+		structure.assignIDsToRigidPoints();
+		structure.getRigid(0).setPoint(0, 0.2, 0.3, -1.1, -0.96);
+
+		structure.rigids.get(0).connectPointToView(0, 0);
+
+		SceneObservations obs = createObservations(rand, structure);
+
+		var param = new double[structure.getParameterCount()];
+
+		new CodecSceneStructureMetric().encode(structure, param);
+
+		var alg = new BundleAdjustmentMetricResidualFunction();
+		alg.configure(structure, obs);
+
+		var found = new double[alg.getNumOfOutputsM()];
+		alg.process(param, found);
+
+		var rigid4 = new Point4D_F64();
+		var world4 = new Point4D_F64();
+		var predicted = new Point2D_F64();
+		var observed = new Point2D_F64();
+		var w2p = new WorldToCameraToPixel();
+		w2p.configure(brown, worldToView);
+		for (int i = 0; i < structure.rigids.size; i++) {
+			// For the one point on the rigid object, compute where it should be
+			SceneStructureMetric.Rigid rigid = structure.rigids.get(i);
+			rigid.getPoint(0, rigid4);
+			worldToObject.transform(rigid4, world4);
+			assertTrue(w2p.transform(world4, predicted));
+
+			obs.viewsRigid.get(0).getPixel(0, observed);
+			assertEquals(predicted.x - observed.x, found[0], UtilEjml.TEST_F64);
+			assertEquals(predicted.y - observed.y, found[1], UtilEjml.TEST_F64);
+		}
 	}
 }
