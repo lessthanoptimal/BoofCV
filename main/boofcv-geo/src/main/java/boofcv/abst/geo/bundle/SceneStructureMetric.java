@@ -273,14 +273,14 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	 *
 	 * @param which Index of rigid object
 	 * @param known If the parameters are known and not optimized or unknown and optimized
-	 * @param worldToObject Initial estimated location of rigid object
+	 * @param objectToWorld Initial estimated location of rigid object
 	 * @param totalPoints Total number of points attached to this rigid object
 	 */
-	public void setRigid( int which, boolean known, Se3_F64 worldToObject, int totalPoints ) {
+	public void setRigid( int which, boolean known, Se3_F64 objectToWorld, int totalPoints ) {
 		Rigid r = rigids.data[which];
 		r.init(totalPoints, pointSize);
 		r.known = known;
-		r.object_to_world.setTo(worldToObject);
+		r.object_to_world.setTo(objectToWorld);
 	}
 
 	/**
