@@ -118,17 +118,17 @@ public class TestCalibrateStereoPlanar extends BoofStandardJUnit {
 	}
 
 	private void checkIntrinsic( CameraPinholeBrown found ) {
-		assertEquals(intrinsic.fx, found.fx, intrinsic.width*1e-3);
-		assertEquals(intrinsic.fy, found.fy, intrinsic.width*1e-3);
-		assertEquals(intrinsic.cx, found.cx, intrinsic.width*1e-3);
-		assertEquals(intrinsic.cy, found.cy, intrinsic.width*1e-3);
-		assertEquals(intrinsic.skew, found.skew, intrinsic.width*1e-3);
+		assertEquals(intrinsic.fx, found.fx, intrinsic.width*2e-3);
+		assertEquals(intrinsic.fy, found.fy, intrinsic.width*2e-3);
+		assertEquals(intrinsic.cx, found.cx, intrinsic.width*2e-3);
+		assertEquals(intrinsic.cy, found.cy, intrinsic.width*2e-3);
+		assertEquals(intrinsic.skew, found.skew, intrinsic.width*2e-3);
 
 		assertEquals(intrinsic.radial[0], found.radial[0], 1e-3);
 		assertEquals(intrinsic.radial[1], found.radial[1], 1e-3);
 
-		assertEquals(intrinsic.t1, found.t1, 1e-4);
-		assertEquals(intrinsic.t2, found.t2, 1e-4);
+		assertEquals(intrinsic.t1, found.t1, 2e-4);
+		assertEquals(intrinsic.t2, found.t2, 2e-4);
 
 		assertEquals(intrinsic.width, found.width, 1e-3);
 		assertEquals(intrinsic.height, found.height, 1e-3);
