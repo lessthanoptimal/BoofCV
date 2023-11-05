@@ -389,12 +389,13 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 
 			if (structure.isHomogenous()) {
 				rigid.getPoint(pointIndex, rigidPt4);
-				SePointOps_F64.transformV(rigid.object_to_world, rigidPt4, worldPt3);
+				SePointOps_F64.transform(rigid.object_to_world, rigidPt4, worldPt4);
+				SePointOps_F64.transformV(world_to_view, worldPt4, cameraPt);
 			} else {
 				rigid.getPoint(pointIndex, rigidPt3);
 				SePointOps_F64.transform(rigid.object_to_world, rigidPt3, worldPt3);
+				SePointOps_F64.transform(world_to_view, worldPt3, cameraPt);
 			}
-			SePointOps_F64.transform(world_to_view, worldPt3, cameraPt);
 
 			jacRowX = observationIndex*2;
 			jacRowY = jacRowX + 1;
@@ -416,7 +417,11 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 			}
 
 			//============ Partial of world to view
-			partialViewSE3(rightView, view, worldPt3.x, worldPt3.y, worldPt3.z, 1);
+			if (structure.isHomogenous()) {
+				partialViewSE3(rightView, view, worldPt4.x, worldPt4.y, worldPt4.z, worldPt4.w);
+			} else {
+				partialViewSE3(rightView, view, worldPt3.x, worldPt3.y, worldPt3.z, 1);
+			}
 
 			//============ Partial of body to world
 			// R2*(R1*X+T1)+T2
