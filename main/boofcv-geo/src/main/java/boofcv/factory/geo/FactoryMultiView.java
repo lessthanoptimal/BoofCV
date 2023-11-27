@@ -49,12 +49,7 @@ import georegression.fitting.MotionTransformPoint;
 import georegression.fitting.se.FitSpecialEuclideanOps_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ddogleg.optimization.FactoryOptimization;
-import org.ddogleg.optimization.FactoryOptimizationSparse;
-import org.ddogleg.optimization.UnconstrainedLeastSquares;
-import org.ddogleg.optimization.UnconstrainedLeastSquaresSchur;
-import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
-import org.ddogleg.optimization.trustregion.ConfigTrustRegion;
+import org.ddogleg.optimization.*;
 import org.ddogleg.solver.PolynomialOps;
 import org.ddogleg.solver.RootFinderType;
 import org.ddogleg.struct.DogArray;
@@ -79,12 +74,14 @@ public class FactoryMultiView {
 		if (config == null)
 			config = new ConfigBundleAdjustment();
 
-		UnconstrainedLeastSquaresSchur<DMatrixSparseCSC> minimizer;
+		UnconstrainedLeastSquaresSchur<DMatrixSparseCSC> minimizer =
+				FactoryOptimizationSparse.leastSquaresSchur(config.configOptimizer);
 
-		if (config.configOptimizer instanceof ConfigTrustRegion)
-			minimizer = FactoryOptimizationSparse.doglegSchur((ConfigTrustRegion)config.configOptimizer);
-		else
-			minimizer = FactoryOptimizationSparse.levenbergMarquardtSchur((ConfigLevenbergMarquardt)config.configOptimizer);
+		// Add a robust minimizer, if configured to do so
+		if (config.loss.isRobust()) {
+			FactoryLossFunctions.Funcs funcs = FactoryLossFunctions.general(config.loss);
+			minimizer.setLoss(funcs.function, funcs.gradient);
+		}
 
 		return new BundleAdjustmentSchur_DSCC<>(minimizer,
 				new BundleAdjustmentMetricResidualFunction(),
@@ -103,12 +100,14 @@ public class FactoryMultiView {
 		if (config == null)
 			config = new ConfigBundleAdjustment();
 
-		UnconstrainedLeastSquaresSchur<DMatrixSparseCSC> minimizer;
+		UnconstrainedLeastSquaresSchur<DMatrixSparseCSC> minimizer =
+				FactoryOptimizationSparse.leastSquaresSchur(config.configOptimizer);
 
-		if (config.configOptimizer instanceof ConfigTrustRegion)
-			minimizer = FactoryOptimizationSparse.doglegSchur((ConfigTrustRegion)config.configOptimizer);
-		else
-			minimizer = FactoryOptimizationSparse.levenbergMarquardtSchur((ConfigLevenbergMarquardt)config.configOptimizer);
+		// Add a robust minimizer, if configured to do so
+		if (config.loss.isRobust()) {
+			FactoryLossFunctions.Funcs funcs = FactoryLossFunctions.general(config.loss);
+			minimizer.setLoss(funcs.function, funcs.gradient);
+		}
 
 		return new BundleAdjustmentSchur_DSCC<>(minimizer,
 				new BundleAdjustmentProjectiveResidualFunction(),
@@ -129,12 +128,14 @@ public class FactoryMultiView {
 		if (config == null)
 			config = new ConfigBundleAdjustment();
 
-		UnconstrainedLeastSquaresSchur<DMatrixRMaj> minimizer;
+		UnconstrainedLeastSquaresSchur<DMatrixRMaj> minimizer =
+				FactoryOptimization.leastSquaresSchur(config.configOptimizer);
 
-		if (config.configOptimizer instanceof ConfigTrustRegion)
-			minimizer = FactoryOptimization.doglegSchur((ConfigTrustRegion)config.configOptimizer, robust);
-		else
-			minimizer = FactoryOptimization.levenbergMarquardtSchur((ConfigLevenbergMarquardt)config.configOptimizer, robust);
+		// Add a robust minimizer, if configured to do so
+		if (config.loss.isRobust()) {
+			FactoryLossFunctions.Funcs funcs = FactoryLossFunctions.general(config.loss);
+			minimizer.setLoss(funcs.function, funcs.gradient);
+		}
 
 		return new BundleAdjustmentSchur_DDRM<>(minimizer,
 				new BundleAdjustmentMetricResidualFunction(),
@@ -155,12 +156,14 @@ public class FactoryMultiView {
 		if (config == null)
 			config = new ConfigBundleAdjustment();
 
-		UnconstrainedLeastSquaresSchur<DMatrixRMaj> minimizer;
+		UnconstrainedLeastSquaresSchur<DMatrixRMaj> minimizer =
+				FactoryOptimization.leastSquaresSchur(config.configOptimizer);
 
-		if (config.configOptimizer instanceof ConfigTrustRegion)
-			minimizer = FactoryOptimization.doglegSchur((ConfigTrustRegion)config.configOptimizer, robust);
-		else
-			minimizer = FactoryOptimization.levenbergMarquardtSchur((ConfigLevenbergMarquardt)config.configOptimizer, robust);
+		// Add a robust minimizer, if configured to do so
+		if (config.loss.isRobust()) {
+			FactoryLossFunctions.Funcs funcs = FactoryLossFunctions.general(config.loss);
+			minimizer.setLoss(funcs.function, funcs.gradient);
+		}
 
 		return new BundleAdjustmentSchur_DDRM<>(minimizer,
 				new BundleAdjustmentProjectiveResidualFunction(),

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,8 @@
 package boofcv.factory.geo;
 
 import boofcv.struct.Configuration;
+import org.ddogleg.optimization.ConfigLoss;
+import org.ddogleg.optimization.ConfigNonLinearLeastSquares;
 import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
 
 /**
@@ -34,7 +36,14 @@ public class ConfigBundleAdjustment implements Configuration {
 	 * @see ConfigLevenbergMarquardt
 	 * @see org.ddogleg.optimization.trustregion.ConfigTrustRegion
 	 */
-	public Object configOptimizer = new ConfigLevenbergMarquardt();
+	public ConfigNonLinearLeastSquares configOptimizer = new ConfigNonLinearLeastSquares();
+
+	/** Robust loss function. Defaults to no loss function */
+	public ConfigLoss loss = new ConfigLoss(ConfigLoss.Type.SQUARED);
+
+	{
+		configOptimizer.type = ConfigNonLinearLeastSquares.Type.LEVENBERG_MARQUARDT;
+	}
 
 	@Override public void checkValidity() {
 
@@ -42,7 +51,8 @@ public class ConfigBundleAdjustment implements Configuration {
 
 	public ConfigBundleAdjustment setTo( ConfigBundleAdjustment src ) {
 		// it should copy / overwrite but that isn't possible/easy. So this is the compromise
-		this.configOptimizer = src.configOptimizer;
+		this.configOptimizer.setTo(src.configOptimizer);
+		this.loss.setTo(src.loss);
 		return this;
 	}
 }

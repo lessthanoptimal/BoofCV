@@ -40,7 +40,7 @@ import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.so.Rodrigues_F64;
 import lombok.Getter;
-import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
+import org.ddogleg.optimization.ConfigNonLinearLeastSquares;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.VerbosePrint;
 import org.ejml.dense.row.CommonOps_DDRM;
@@ -90,7 +90,6 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 	// Make all configurations public for ease of manipulation
 	public ConfigPixelsToMetric configSelfCalib = new ConfigPixelsToMetric();
 	public ConfigRansac configRansac = new ConfigRansac();
-	public ConfigLevenbergMarquardt configLM = new ConfigLevenbergMarquardt();
 	public ConfigBundleAdjustment configSBA = new ConfigBundleAdjustment();
 	public ConfigConverge convergeSBA = new ConfigConverge(1e-6, 1e-6, 100);
 
@@ -139,9 +138,9 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 		configRansac.iterations = 1000;
 		configRansac.inlierThreshold = 4;
 
-		configLM.dampeningInitial = 1e-3;
-		configLM.hessianScaling = false;
-		configSBA.configOptimizer = configLM;
+		configSBA.configOptimizer.type = ConfigNonLinearLeastSquares.Type.LEVENBERG_MARQUARDT;
+		configSBA.configOptimizer.lm.dampeningInitial = 1e-3;
+		configSBA.configOptimizer.lm.hessianScaling = false;
 	}
 
 	/**

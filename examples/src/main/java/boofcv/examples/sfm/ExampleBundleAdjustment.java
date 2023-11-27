@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,7 @@ import georegression.struct.EulerType;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
+import org.ddogleg.optimization.ConfigNonLinearLeastSquares;
 
 import javax.swing.*;
 import java.awt.*;
@@ -80,16 +80,23 @@ public class ExampleBundleAdjustment {
 				" parameters with " + parser.observations.getObservationCount() + " observations\n\n");
 
 		// Configure the sparse Levenberg-Marquardt solver
-		var configLM = new ConfigLevenbergMarquardt();
+		var configSBA = new ConfigBundleAdjustment();
+		configSBA.configOptimizer.type = ConfigNonLinearLeastSquares.Type.LEVENBERG_MARQUARDT;
 		// Important tuning parameter. Won't converge to a good solution if picked improperly. Small changes
 		// to this problem and speed up or slow down convergence and change the final result. This is true for
 		// basically all solvers.
-		configLM.dampeningInitial = 1e-3;
+		configSBA.configOptimizer.lm.dampeningInitial = 1e-3;
 		// Improves Jacobian matrix's condition. Recommended in general but not important in this problem
-		configLM.hessianScaling = true;
+		configSBA.configOptimizer.lm.hessianScaling = true;
 
-		var configSBA = new ConfigBundleAdjustment();
-		configSBA.configOptimizer = configLM;
+		// To mitigate miss matches during association and other sources of noise you can use robust loss fuctions.
+		// There is no general rule which one is best and you will need to adjust the tuning parameter.
+		// Fit score will change depending on the function, so you can't use that to compare results
+		// Instead look at the number of inliers, i.e. observations with less than X pixel error. X will
+		// depend on image size association method.
+
+//		configSBA.loss.type = ConfigLoss.Type.HUBER;
+//		configSBA.loss.parameter = 20;
 
 		// Create and configure the bundle adjustment solver
 		BundleAdjustment<SceneStructureMetric> bundleAdjustment = FactoryMultiView.bundleSparseMetric(configSBA);

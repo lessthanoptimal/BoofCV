@@ -131,7 +131,7 @@ subprojects {
     }
 
     dependencies {
-        api(group: 'org.georegression', name: 'georegression', version: '0.26.3') { exclude group: 'org.ddogleg' }
+        api(group: 'org.georegression', name: 'georegression', version: '0.27.0-SNAPSHOT') { exclude group: 'org.ddogleg' }
         api(group: 'org.ddogleg', name: 'ddogleg', version: '0.23.2-SNAPSHOT')
 
         api group: 'net.sf.trove4j', name: 'trove4j', version: project.trove4j_version
