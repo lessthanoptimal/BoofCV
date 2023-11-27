@@ -49,6 +49,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 import static boofcv.app.calib.AssistedCalibrationMono.IMAGE_DIRECTORY;
@@ -198,7 +199,7 @@ public class CameraCalibrationMono extends BaseStandardInputApp {
 				} else if (arg.compareToIgnoreCase("--JustDetect") == 0) {
 					saveLandmarks = true;
 					justDetect = true;
-				} else if (arg.toLowerCase().startsWith("--output")) {
+				} else if (arg.toLowerCase(Locale.US).startsWith("--output")) {
 					splitFlag(arg);
 					outputFilePath = BoofMiscOps.handlePathTilde(parameters);
 				} else if (!checkCameraFlag(arg)) {
@@ -211,7 +212,7 @@ public class CameraCalibrationMono extends BaseStandardInputApp {
 							modeType = CameraModelType.BROWN;
 						} else if (parameters.compareToIgnoreCase("universal") == 0) {
 							modeType = CameraModelType.UNIVERSAL;
-						} else if (parameters.toLowerCase().startsWith("kannala")) {
+						} else if (parameters.toLowerCase(Locale.US).startsWith("kannala")) {
 							modeType = CameraModelType.KANNALA_BRANDT;
 						} else {
 							throw new RuntimeException("Unknown model type " + parameters);

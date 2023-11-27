@@ -36,7 +36,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
 import lombok.Getter;
 import lombok.Setter;
-import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
+import org.ddogleg.optimization.ConfigNonLinearLeastSquares;
 import org.ddogleg.struct.VerbosePrint;
 import org.ejml.data.DMatrixRMaj;
 import org.jetbrains.annotations.Nullable;
@@ -97,7 +97,7 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 	@Getter public final ConfigConverge configConvergeSBA = new ConfigConverge(1e-20, 1e-20, 200);
 
 	/** Config for Levenberg Marquardt optimizer */
-	@Getter public final ConfigLevenbergMarquardt configLM = new ConfigLevenbergMarquardt();
+	@Getter public final ConfigNonLinearLeastSquares configOptimizer = new ConfigNonLinearLeastSquares();
 
 	// estimation algorithms
 	private final Zhang99ComputeTargetHomography computeHomography;
@@ -115,13 +115,12 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 	/** where calibration points are layout on the target. */
 	private @Setter List<List<Point2D_F64>> layouts;
 
-	/** Use a robust non-linear solver. This can run significantly slower */
-	@Getter @Setter private boolean robust = false;
-
 	private @Nullable PrintStream verbose = null;
 
 	{
-		configLM.hessianScaling = false;
+		configOptimizer.type = ConfigNonLinearLeastSquares.Type.LEVENBERG_MARQUARDT;
+		configOptimizer.lm.hessianScaling = false;
+		configOptimizer.robustSolver = false;
 	}
 
 	/**
@@ -204,11 +203,13 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 	 */
 	public boolean performBundleAdjustment() {
 		var configSBA = new ConfigBundleAdjustment();
-		configSBA.configOptimizer = configLM;
+		configSBA.configOptimizer = configOptimizer;
 
 		BundleAdjustment<SceneStructureMetric> bundleAdjustment;
-		if (robust) {
-			configLM.mixture = 0;
+
+		// A robust solver can only be used with dense matrices
+		if (configSBA.configOptimizer.robustSolver) {
+			configSBA.configOptimizer.lm.mixture = 0;
 			bundleAdjustment = FactoryMultiView.bundleDenseMetric(true, configSBA);
 		} else {
 			bundleAdjustment = FactoryMultiView.bundleSparseMetric(configSBA);

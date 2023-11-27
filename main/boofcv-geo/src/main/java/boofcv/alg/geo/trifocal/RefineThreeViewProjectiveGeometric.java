@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ import boofcv.misc.ConfigConverge;
 import boofcv.struct.geo.AssociatedTriple;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
-import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
+import org.ddogleg.optimization.ConfigNonLinearLeastSquares;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 
@@ -76,11 +76,9 @@ public class RefineThreeViewProjectiveGeometric {
 	public RefineThreeViewProjectiveGeometric() {
 		triangulator = FactoryMultiView.triangulateNViewProj(ConfigTriangulation.GEOMETRIC());
 
-		ConfigLevenbergMarquardt configLM = new ConfigLevenbergMarquardt();
-		configLM.hessianScaling = false; // seems to do better without this. Reconsider later on
-
-		ConfigBundleAdjustment configSBA = new ConfigBundleAdjustment();
-		configSBA.configOptimizer = configLM;
+		var configSBA = new ConfigBundleAdjustment();
+		configSBA.configOptimizer.type = ConfigNonLinearLeastSquares.Type.LEVENBERG_MARQUARDT;
+		configSBA.configOptimizer.lm.hessianScaling = false;
 
 		sba = FactoryMultiView.bundleSparseProjective(configSBA);
 	}

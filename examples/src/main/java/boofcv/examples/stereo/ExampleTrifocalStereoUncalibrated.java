@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -65,7 +65,7 @@ import boofcv.struct.image.Planar;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
+import org.ddogleg.optimization.ConfigNonLinearLeastSquares;
 import org.ddogleg.struct.DogArray;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
@@ -293,11 +293,10 @@ public class ExampleTrifocalStereoUncalibrated {
 		// Initial estimate for point 3D locations
 		triangulatePoints(structure, observations);
 
-		ConfigLevenbergMarquardt configLM = new ConfigLevenbergMarquardt();
-		configLM.dampeningInitial = 1e-3;
-		configLM.hessianScaling = false;
-		ConfigBundleAdjustment configSBA = new ConfigBundleAdjustment();
-		configSBA.configOptimizer = configLM;
+		var configSBA = new ConfigBundleAdjustment();
+		configSBA.configOptimizer.type = ConfigNonLinearLeastSquares.Type.LEVENBERG_MARQUARDT;
+		configSBA.configOptimizer.lm.dampeningInitial = 1e-3;
+		configSBA.configOptimizer.lm.hessianScaling = false;
 
 		// Create and configure the bundle adjustment solver
 		BundleAdjustment<SceneStructureMetric> bundleAdjustment = FactoryMultiView.bundleSparseMetric(configSBA);

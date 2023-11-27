@@ -285,10 +285,6 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 		out.println("Average Mean Error = " + (totalError/results.size()));
 	}
 
-	public void setRobust( boolean robust ) {
-		this.zhang99.setRobust(robust);
-	}
-
 	public <T extends CameraModel> T getIntrinsic() {
 		return (T)foundIntrinsic;
 	}
