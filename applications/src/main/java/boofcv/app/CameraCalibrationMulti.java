@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -103,7 +103,7 @@ public class CameraCalibrationMulti {
 			System.err.println("You must specify which type of pattern you wish to detect");
 			System.exit(1);
 		} else {
-			configTarget.type = CalibrationPatterns.valueOf(targetType.toUpperCase());
+			configTarget.type = CalibrationPatterns.valueOf(targetType.toUpperCase(Locale.US));
 		}
 
 		if (!gridText.isEmpty()) {
@@ -167,14 +167,14 @@ public class CameraCalibrationMulti {
 		System.out.println("unique cameras: " + cameras.size());
 		System.out.println();
 
-		System.out.println(calibrator.computeQualityText());
+		System.out.println(calibrator.computeQualityText(false));
 
 		// Make sure output directory exists
 		UtilIO.mkdirs(new File(outputDirectory));
 
 		// Save quality summary
 		try (var out = new PrintWriter(new File(outputDirectory, "quality.txt"), UTF_8)) {
-			out.println(calibrator.computeQualityText());
+			out.println(calibrator.computeQualityText(false));
 		} catch (IOException e) {
 			System.err.println("Failed to save quality.txt");
 		}

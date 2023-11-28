@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,12 +19,14 @@
 package boofcv.abst.geo.bundle;
 
 import boofcv.abst.geo.TriangulateNViewsMetricH;
+import boofcv.factory.geo.ConfigBundleAdjustment;
 import boofcv.factory.geo.ConfigTriangulation;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.misc.BoofMiscOps;
 import boofcv.misc.ConfigConverge;
 import lombok.Getter;
 import lombok.Setter;
+import org.ddogleg.optimization.ConfigNonLinearLeastSquares;
 import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
 
@@ -48,7 +50,7 @@ public class MetricBundleAdjustmentUtils implements VerbosePrint {
 	/** The estimated scene structure. This the final estimated scene state */
 	public final @Getter SceneStructureMetric structure;
 	public final @Getter SceneObservations observations = new SceneObservations();
-	public @Getter @Setter BundleAdjustment<SceneStructureMetric> sba = FactoryMultiView.bundleSparseMetric(null);
+	public @Getter @Setter BundleAdjustment<SceneStructureMetric> sba;
 	public @Getter @Setter TriangulateNViewsMetricH triangulator;
 	public @Getter ScaleSceneStructure scaler = new ScaleSceneStructure();
 
@@ -57,6 +59,15 @@ public class MetricBundleAdjustmentUtils implements VerbosePrint {
 	public MetricBundleAdjustmentUtils( @Nullable ConfigTriangulation triangulation, boolean homogenous ) {
 		triangulator = FactoryMultiView.triangulateNViewMetricH(triangulation);
 		structure = new SceneStructureMetric(homogenous);
+
+		var configSba = new ConfigBundleAdjustment();
+		configSba.optimizer.type = ConfigNonLinearLeastSquares.Type.LEVENBERG_MARQUARDT;
+
+		// This is a controversial setting. Depending on the dataset setting this to true will drastically
+		// degrade performance or slightly improve it. Lesser evil to keep it false.
+		configSba.optimizer.lm.hessianScaling = false;
+
+		sba = FactoryMultiView.bundleSparseMetric(configSba);
 	}
 
 	public MetricBundleAdjustmentUtils() {

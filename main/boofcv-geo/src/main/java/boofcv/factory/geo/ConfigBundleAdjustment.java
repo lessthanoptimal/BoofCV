@@ -36,13 +36,13 @@ public class ConfigBundleAdjustment implements Configuration {
 	 * @see ConfigLevenbergMarquardt
 	 * @see org.ddogleg.optimization.trustregion.ConfigTrustRegion
 	 */
-	public ConfigNonLinearLeastSquares configOptimizer = new ConfigNonLinearLeastSquares();
+	public ConfigNonLinearLeastSquares optimizer = new ConfigNonLinearLeastSquares();
 
 	/** Robust loss function. Defaults to no loss function */
 	public ConfigLoss loss = new ConfigLoss(ConfigLoss.Type.SQUARED);
 
 	{
-		configOptimizer.type = ConfigNonLinearLeastSquares.Type.LEVENBERG_MARQUARDT;
+		optimizer.type = ConfigNonLinearLeastSquares.Type.LEVENBERG_MARQUARDT;
 	}
 
 	@Override public void checkValidity() {
@@ -51,7 +51,7 @@ public class ConfigBundleAdjustment implements Configuration {
 
 	public ConfigBundleAdjustment setTo( ConfigBundleAdjustment src ) {
 		// it should copy / overwrite but that isn't possible/easy. So this is the compromise
-		this.configOptimizer.setTo(src.configOptimizer);
+		this.optimizer.setTo(src.optimizer);
 		this.loss.setTo(src.loss);
 		return this;
 	}

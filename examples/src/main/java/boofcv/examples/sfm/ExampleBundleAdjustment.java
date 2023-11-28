@@ -82,26 +82,22 @@ public class ExampleBundleAdjustment {
 
 		// Configure the sparse Levenberg-Marquardt solver
 		var configSBA = new ConfigBundleAdjustment();
-		configSBA.configOptimizer.type = ConfigNonLinearLeastSquares.Type.LEVENBERG_MARQUARDT;
+		configSBA.optimizer.type = ConfigNonLinearLeastSquares.Type.LEVENBERG_MARQUARDT;
 		// Important tuning parameter. Won't converge to a good solution if picked improperly. Small changes
 		// to this problem and speed up or slow down convergence and change the final result. This is true for
 		// basically all solvers.
-		configSBA.configOptimizer.lm.dampeningInitial = 1e-3;
-		// Improves Jacobian matrix's condition. Recommended in general but not important in this problem
-		configSBA.configOptimizer.lm.hessianScaling = true;
+		configSBA.optimizer.lm.dampeningInitial = 1e-3;
+		// Controversial parameter. Most of the time if it's true results are much worse, but sometimes better.
+		configSBA.optimizer.lm.hessianScaling = false;
 
-		// To mitigate miss matches during association and other sources of noise you can use robust loss fuctions.
+		// To mitigate miss matches during association and other sources of noise you can use a robust loss function.
 		// There is no general rule which one is best and you will need to adjust the tuning parameter.
 		// Fit score will change depending on the loss function, which is why we use EvaluateBundleScene
 		// which provides performance metrics independent of the loss function used.
 
-		// By selecting another loss function, parameter, and allowing more iterations we got the following
-		// inlier statistics. Higher percentage in each inlier bucket is better.
-		//          |    1.0 |    2.0 |    3.0 |    5.0 |   10.0 |   20.0
-		//  percent |  92.1% |  99.0% |  99.7% |  99.9% | 100.0% | 100.0%
-
-//		configSBA.loss.type = ConfigLoss.Type.HUBER;
-//		configSBA.loss.parameter = 20;
+		// In this particular problem adding a loss function does very little
+//		configSBA.loss.type = ConfigLoss.Type.CAUCHY;
+//		configSBA.loss.parameter = 5;
 
 		// Create and configure the bundle adjustment solver
 		BundleAdjustment<SceneStructureMetric> bundleAdjustment = FactoryMultiView.bundleSparseMetric(configSBA);

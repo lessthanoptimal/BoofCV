@@ -55,6 +55,10 @@ public class ExampleCalibrateMulti {
 
 		// Configure the calibration class for this scenario
 		var calibrator = new CalibrateMultiPlanar();
+
+		// We want to see a histogram with smaller reprojection errors than the default
+		calibrator.setSummaryThresholds(new double[]{0.25, 0.5, 1.0, 1.2, 1.5, 2.0, 2.5, 3.0, 5.0});
+
 		// Tell it what type of camera model to use
 		calibrator.getCalibratorMono().configurePinhole(true, 3, false);
 		calibrator.initialize(/*num cameras*/3, /*num targets*/ detector.getTotalUniqueMarkers());
@@ -86,7 +90,8 @@ public class ExampleCalibrateMulti {
 		calibrator.getBundleUtils().sba.setVerbose(System.out, null);
 		BoofMiscOps.checkTrue(calibrator.process(), "Calibration Failed!");
 
-		System.out.println(calibrator.computeQualityText());
+		System.out.println();
+		System.out.println(calibrator.computeQualityText(false));
 
 		MultiCameraCalibParams params = calibrator.getResults();
 		CalibrationIO.save(params, "multi_camera.yaml");

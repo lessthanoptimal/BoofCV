@@ -28,6 +28,8 @@ import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.geo.calibration.CalibrationObservationSet;
 import boofcv.alg.geo.calibration.ScoreCalibrationFill;
 import boofcv.alg.geo.calibration.SynchronizedCalObs;
+import boofcv.factory.geo.ConfigBundleAdjustment;
+import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.calib.MultiCameraCalibParams;
 import boofcv.struct.geo.PointIndex2D_F64;
@@ -38,6 +40,9 @@ import georegression.transform.se.AverageRotationMatrix_F64;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import lombok.Getter;
+import lombok.Setter;
+import org.ddogleg.optimization.ConfigLoss;
+import org.ddogleg.optimization.ConfigNonLinearLeastSquares;
 import org.ddogleg.stats.StatisticsDogArray;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_F64;
@@ -51,6 +56,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static boofcv.abst.geo.calibration.CalibrateMonoPlanar.computeQuality;
+import static boofcv.abst.geo.calibration.CalibrateMonoPlanar.generateReprojectionErrorHistogram;
 
 /**
  * <p> Multi camera calibration using multiple planar targets. It's assumed that all cameras are rigidly attach and
@@ -105,6 +111,10 @@ public class CalibrateMultiPlanar {
 	// Stores information about each captured data frame
 	final DogArray<FrameState> frames = new DogArray<>(FrameState::new, FrameState::reset);
 
+	/** Reprojection error thresholds for histogram in performance summary */
+	@Getter @Setter protected double[] summaryThresholds = new double[]{
+			0.25, 0.5, 1.0, 2.0, 3.0, 5.0, 7.5, 10.0, 20.0, 50.0};
+
 	/** Must call this function first. Specifies the number of cameras and calibration targets */
 	public void initialize( int numCameras, int numTargets ) {
 		statistics.reset().resize(numCameras);
@@ -117,6 +127,18 @@ public class CalibrateMultiPlanar {
 		}
 
 		frameObs.clear();
+
+		// We will turn on a loss function with a conservative cut off point. For camera calibration
+		// we should be getting sub-pixel precision
+		var configSBA = new ConfigBundleAdjustment();
+		configSBA.optimizer.type = ConfigNonLinearLeastSquares.Type.LEVENBERG_MARQUARDT;
+		configSBA.optimizer.lm.hessianScaling = false;
+		configSBA.optimizer.robustSolver = false;
+		configSBA.loss.type = ConfigLoss.Type.HUBER;
+		configSBA.loss.parameter = 10;
+
+		bundleUtils.sba = FactoryMultiView.bundleSparseMetric(configSBA);
+
 	}
 
 	/** Specifies the shape o images from a specific camera */
@@ -525,9 +547,6 @@ public class CalibrateMultiPlanar {
 
 			// Compute reprojection statistics across all frames with this camera
 			for (int frameIdx = 0; frameIdx < frameObs.size(); frameIdx++) {
-				// Every image will have stats to make to make it easier to process later
-				var imageStats = new ImageResults(errors.size);
-				statistics.get(camIdx).residuals.add(imageStats);
 
 				CalibrationObservationSet camSet = frameObs.get(frameIdx).findCamera(camIdx);
 				if (camSet == null)
@@ -545,6 +564,10 @@ public class CalibrateMultiPlanar {
 				Se3_F64 targetToWorld = structure.getRigid(camObs.target).object_to_world;
 				List<Point2D_F64> layout = layouts.get(camObs.target);
 
+				// Every image will have stats to make to make it easier to process later
+				var imageStats = new ImageResults(camObs.points.size());
+				statistics.get(camIdx).residuals.add(imageStats);
+
 				// Compute reprojection error from landmark observations on the fiducial
 				errors.reset();
 				double sumX = 0.0;
@@ -561,7 +584,13 @@ public class CalibrateMultiPlanar {
 					w2p.transform(worldPt, predictedPixel);
 					double dx = predictedPixel.x - o.p.x;
 					double dy = predictedPixel.y - o.p.y;
-					errors.add(Math.sqrt(dx*dx + dy*dy));
+
+					double reprojectionError = Math.sqrt(dx*dx + dy*dy);
+					imageStats.pointError[obsIdx] = reprojectionError;
+					imageStats.residuals[obsIdx*2] = dx;
+					imageStats.residuals[obsIdx*2 + 1] = dy;
+
+					errors.add(reprojectionError);
 					sumX += dx;
 					sumY += dy;
 				}
@@ -623,22 +652,51 @@ public class CalibrateMultiPlanar {
 
 	/**
 	 * Summarizes calibration quality and residual errors in a human-readable text string
+	 *
+	 * @param showImageStats If true it will print stats for individual images.
 	 */
-	public String computeQualityText() {
+	public String computeQualityText( boolean showImageStats ) {
 		var builder = new StringBuilder();
-		builder.append("Calibration Quality Metrics:\n");
+
+		// Compute a histogram of how many observations have a residual error less than these values
+		var counts = new int[summaryThresholds.length];
+		int totalObservations = 0;
+		for (int camId = 0; camId < statistics.size; camId++) {
+			CameraStatistics cam = statistics.get(camId);
+			for (int imageIdx = 0; imageIdx < cam.residuals.size(); imageIdx++) {
+				ImageResults r = cam.residuals.get(imageIdx);
+				totalObservations += r.pointError.length;
+				for (int obsIdx = 0; obsIdx < r.pointError.length; obsIdx++) {
+					double e = r.pointError[obsIdx];
+					for (int iterThresh = summaryThresholds.length - 1; iterThresh >= 0; iterThresh--) {
+						if (summaryThresholds[iterThresh] < e)
+							break;
+						counts[iterThresh]++;
+					}
+				}
+			}
+		}
+
+		builder.append("Overall Calibration Quality Metrics:\n");
+		generateReprojectionErrorHistogram(summaryThresholds, counts, totalObservations, builder);
+
+		builder.append("Camera Calibration Quality Metrics:\n");
 		for (int camId = 0; camId < statistics.size; camId++) {
 			CameraStatistics cam = statistics.get(camId);
 			builder.append(String.format("  camera[%d] fill_border=%5.3f fill_inner=%5.3f geometric=%5.3f\n",
 					camId, cam.quality.borderFill, cam.quality.innerFill, cam.quality.geometric));
 		}
 		builder.append('\n');
-		builder.append("Summary Residual Metrics:\n");
+		builder.append("Camera Summary Residual Metrics:\n");
 		for (int camId = 0; camId < statistics.size; camId++) {
 			CameraStatistics cam = statistics.get(camId);
 			builder.append(String.format("  camera[%3d] mean=%6.2f max=%6.2f\n", camId, cam.overallMean, cam.overallMax));
 		}
 		builder.append('\n');
+
+		if (!showImageStats)
+			return builder.toString();
+
 		for (int camId = 0; camId < statistics.size; camId++) {
 			builder.append("Residual Errors: Camera ").append(camId).append("\n");
 			CameraStatistics cam = statistics.get(camId);
