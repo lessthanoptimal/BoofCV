@@ -132,6 +132,17 @@ public class BundleAdjustmentMetricResidualFunction
 	}
 
 	/**
+	 * Computes the residuals and skips decoding the current parameters. Useful when you are using this to
+	 * compute the residuals and not optimizing
+	 */
+	public void process( double[] output ) {
+		if (structure.isHomogenous())
+			project4(output);
+		else
+			project3(output);
+	}
+
+	/**
 	 * projection from 3D coordinates
 	 */
 	private void project3( double[] output ) {
