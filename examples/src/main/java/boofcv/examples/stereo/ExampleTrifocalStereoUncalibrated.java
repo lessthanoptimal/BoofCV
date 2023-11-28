@@ -294,9 +294,9 @@ public class ExampleTrifocalStereoUncalibrated {
 		triangulatePoints(structure, observations);
 
 		var configSBA = new ConfigBundleAdjustment();
-		configSBA.configOptimizer.type = ConfigNonLinearLeastSquares.Type.LEVENBERG_MARQUARDT;
-		configSBA.configOptimizer.lm.dampeningInitial = 1e-3;
-		configSBA.configOptimizer.lm.hessianScaling = false;
+		configSBA.optimizer.type = ConfigNonLinearLeastSquares.Type.LEVENBERG_MARQUARDT;
+		configSBA.optimizer.lm.dampeningInitial = 1e-3;
+		configSBA.optimizer.lm.hessianScaling = false;
 
 		// Create and configure the bundle adjustment solver
 		BundleAdjustment<SceneStructureMetric> bundleAdjustment = FactoryMultiView.bundleSparseMetric(configSBA);

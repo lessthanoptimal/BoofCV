@@ -96,8 +96,8 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 	/** Convergence parameters for SBA */
 	@Getter public final ConfigConverge configConvergeSBA = new ConfigConverge(1e-20, 1e-20, 200);
 
-	/** Config for Levenberg Marquardt optimizer */
-	@Getter public final ConfigNonLinearLeastSquares configOptimizer = new ConfigNonLinearLeastSquares();
+	/** Config for bundle adjustment */
+	@Getter public final ConfigBundleAdjustment configSBA = new ConfigBundleAdjustment();
 
 	// estimation algorithms
 	private final Zhang99ComputeTargetHomography computeHomography;
@@ -118,9 +118,10 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 	private @Nullable PrintStream verbose = null;
 
 	{
-		configOptimizer.type = ConfigNonLinearLeastSquares.Type.LEVENBERG_MARQUARDT;
-		configOptimizer.lm.hessianScaling = false;
-		configOptimizer.robustSolver = false;
+		// See comments in MetricBundleAdjustmentUtils for why these values are set this way
+		configSBA.optimizer.type = ConfigNonLinearLeastSquares.Type.LEVENBERG_MARQUARDT;
+		configSBA.optimizer.lm.hessianScaling = false;
+		configSBA.optimizer.robustSolver = false;
 	}
 
 	/**
@@ -202,14 +203,11 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 	 * Use non-linear optimization to improve the parameter estimates
 	 */
 	public boolean performBundleAdjustment() {
-		var configSBA = new ConfigBundleAdjustment();
-		configSBA.configOptimizer = configOptimizer;
-
 		BundleAdjustment<SceneStructureMetric> bundleAdjustment;
 
 		// A robust solver can only be used with dense matrices
-		if (configSBA.configOptimizer.robustSolver) {
-			configSBA.configOptimizer.lm.mixture = 0;
+		if (configSBA.optimizer.robustSolver) {
+			configSBA.optimizer.lm.mixture = 0;
 			bundleAdjustment = FactoryMultiView.bundleDenseMetric(true, configSBA);
 		} else {
 			bundleAdjustment = FactoryMultiView.bundleSparseMetric(configSBA);

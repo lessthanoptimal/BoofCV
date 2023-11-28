@@ -75,7 +75,7 @@ public class FactoryMultiView {
 			config = new ConfigBundleAdjustment();
 
 		UnconstrainedLeastSquaresSchur<DMatrixSparseCSC> minimizer =
-				FactoryOptimizationSparse.leastSquaresSchur(config.configOptimizer);
+				FactoryOptimizationSparse.leastSquaresSchur(config.optimizer);
 
 		// Add a robust minimizer, if configured to do so
 		if (config.loss.isRobust()) {
@@ -101,7 +101,7 @@ public class FactoryMultiView {
 			config = new ConfigBundleAdjustment();
 
 		UnconstrainedLeastSquaresSchur<DMatrixSparseCSC> minimizer =
-				FactoryOptimizationSparse.leastSquaresSchur(config.configOptimizer);
+				FactoryOptimizationSparse.leastSquaresSchur(config.optimizer);
 
 		// Add a robust minimizer, if configured to do so
 		if (config.loss.isRobust()) {
@@ -129,7 +129,7 @@ public class FactoryMultiView {
 			config = new ConfigBundleAdjustment();
 
 		UnconstrainedLeastSquaresSchur<DMatrixRMaj> minimizer =
-				FactoryOptimization.leastSquaresSchur(config.configOptimizer);
+				FactoryOptimization.leastSquaresSchur(config.optimizer);
 
 		// Add a robust minimizer, if configured to do so
 		if (config.loss.isRobust()) {
@@ -157,7 +157,7 @@ public class FactoryMultiView {
 			config = new ConfigBundleAdjustment();
 
 		UnconstrainedLeastSquaresSchur<DMatrixRMaj> minimizer =
-				FactoryOptimization.leastSquaresSchur(config.configOptimizer);
+				FactoryOptimization.leastSquaresSchur(config.optimizer);
 
 		// Add a robust minimizer, if configured to do so
 		if (config.loss.isRobust()) {

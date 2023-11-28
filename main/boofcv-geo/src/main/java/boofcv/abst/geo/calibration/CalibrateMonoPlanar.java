@@ -219,6 +219,23 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 											 CalibrationQuality quality ) {
 		BoofMiscOps.checkEq(errors.size(), imageNames.size());
 
+		// Compute a histogram of how many observations have a residual error less than these values
+		var summaryThresholds = new double[]{0.25, 0.5, 1.0, 2.0, 3.0, 5.0, 10.0, 20.0};
+		var counts = new int[summaryThresholds.length];
+		int totalObservations = 0;
+		for (int i = 0; i < imageNames.size(); i++) {
+			ImageResults r = errors.get(i);
+			totalObservations += r.pointError.length;
+			for (int j = 0; j < r.pointError.length; j++) {
+				double e = r.pointError[j];
+				for (int iterThresh = summaryThresholds.length - 1; iterThresh >= 0; iterThresh--) {
+					if (summaryThresholds[iterThresh] < e)
+						break;
+					counts[iterThresh]++;
+				}
+			}
+		}
+
 		double averageError = 0.0;
 		double maxError = 0.0;
 		for (int i = 0; i < imageNames.size(); i++) {
@@ -233,6 +250,11 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 		text += String.format("quality.geometric    %5.1f%%\n", 100*quality.geometric);
 		text += "\n";
 		text += String.format("Reprojection Errors (px):\nmean=%.3f max=%.3f\n\n", averageError, maxError);
+
+		var builder = new StringBuilder();
+		generateReprojectionErrorHistogram(summaryThresholds, counts, totalObservations, builder);
+		text += builder.toString();
+
 		text += String.format("%-10s | %8s\n", "image", "max (px)");
 		for (int i = 0; i < imageNames.size(); i++) {
 			String image = imageNames.get(i);
@@ -240,6 +262,20 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 			text += String.format("%-12s %8.3f\n", new File(image).getName(), r.maxError);
 		}
 		return text;
+	}
+
+	public static void generateReprojectionErrorHistogram( double[] thresholds, int[] counts,
+														   int totalObservations,
+														   StringBuilder builder ) {
+		builder.append("Percent Reprojection Errors Less than X pixels. N=").append(totalObservations).append("\n");
+		for (int i = 0; i < thresholds.length; i++) {
+			builder.append(String.format(" %6.2f |", thresholds[i]));
+		}
+		builder.append("\n");
+		for (int i = 0; i < counts.length; i++) {
+			builder.append(String.format(" %5.1f%% |", 100.0*counts[i]/totalObservations));
+		}
+		builder.append("\n\n");
 	}
 
 	/**

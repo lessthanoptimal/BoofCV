@@ -77,8 +77,8 @@ public class RefineThreeViewProjectiveGeometric {
 		triangulator = FactoryMultiView.triangulateNViewProj(ConfigTriangulation.GEOMETRIC());
 
 		var configSBA = new ConfigBundleAdjustment();
-		configSBA.configOptimizer.type = ConfigNonLinearLeastSquares.Type.LEVENBERG_MARQUARDT;
-		configSBA.configOptimizer.lm.hessianScaling = false;
+		configSBA.optimizer.type = ConfigNonLinearLeastSquares.Type.LEVENBERG_MARQUARDT;
+		configSBA.optimizer.lm.hessianScaling = false;
 
 		sba = FactoryMultiView.bundleSparseProjective(configSBA);
 	}
