@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -132,9 +132,9 @@ public class FactoryMultiView {
 		UnconstrainedLeastSquaresSchur<DMatrixRMaj> minimizer;
 
 		if (config.configOptimizer instanceof ConfigTrustRegion)
-			minimizer = FactoryOptimization.doglegSchur(robust, (ConfigTrustRegion)config.configOptimizer);
+			minimizer = FactoryOptimization.doglegSchur((ConfigTrustRegion)config.configOptimizer, robust);
 		else
-			minimizer = FactoryOptimization.levenbergMarquardtSchur(robust, (ConfigLevenbergMarquardt)config.configOptimizer);
+			minimizer = FactoryOptimization.levenbergMarquardtSchur((ConfigLevenbergMarquardt)config.configOptimizer, robust);
 
 		return new BundleAdjustmentSchur_DDRM<>(minimizer,
 				new BundleAdjustmentMetricResidualFunction(),
@@ -158,9 +158,9 @@ public class FactoryMultiView {
 		UnconstrainedLeastSquaresSchur<DMatrixRMaj> minimizer;
 
 		if (config.configOptimizer instanceof ConfigTrustRegion)
-			minimizer = FactoryOptimization.doglegSchur(robust, (ConfigTrustRegion)config.configOptimizer);
+			minimizer = FactoryOptimization.doglegSchur((ConfigTrustRegion)config.configOptimizer, robust);
 		else
-			minimizer = FactoryOptimization.levenbergMarquardtSchur(robust, (ConfigLevenbergMarquardt)config.configOptimizer);
+			minimizer = FactoryOptimization.levenbergMarquardtSchur((ConfigLevenbergMarquardt)config.configOptimizer, robust);
 
 		return new BundleAdjustmentSchur_DDRM<>(minimizer,
 				new BundleAdjustmentProjectiveResidualFunction(),
