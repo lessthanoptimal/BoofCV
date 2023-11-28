@@ -22,6 +22,7 @@ import boofcv.abst.geo.bundle.BundleAdjustment;
 import boofcv.abst.geo.bundle.ScaleSceneStructure;
 import boofcv.abst.geo.bundle.SceneStructureCommon;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
+import boofcv.alg.geo.bundle.EvaluateBundleScene;
 import boofcv.factory.geo.ConfigBundleAdjustment;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.gui.image.ShowImages;
@@ -91,9 +92,13 @@ public class ExampleBundleAdjustment {
 
 		// To mitigate miss matches during association and other sources of noise you can use robust loss fuctions.
 		// There is no general rule which one is best and you will need to adjust the tuning parameter.
-		// Fit score will change depending on the function, so you can't use that to compare results
-		// Instead look at the number of inliers, i.e. observations with less than X pixel error. X will
-		// depend on image size association method.
+		// Fit score will change depending on the loss function, which is why we use EvaluateBundleScene
+		// which provides performance metrics independent of the loss function used.
+
+		// By selecting another loss function, parameter, and allowing more iterations we got the following
+		// inlier statistics. Higher percentage in each inlier bucket is better.
+		//          |    1.0 |    2.0 |    3.0 |    5.0 |   10.0 |   20.0
+		//  percent |  92.1% |  99.0% |  99.7% |  99.9% | 100.0% | 100.0%
 
 //		configSBA.loss.type = ConfigLoss.Type.HUBER;
 //		configSBA.loss.parameter = 20;
@@ -104,6 +109,13 @@ public class ExampleBundleAdjustment {
 		bundleAdjustment.setVerbose(System.out, null);
 		// Specifies convergence criteria
 		bundleAdjustment.configure(1e-6, 1e-6, 50);
+
+		// Print out accuracy measures before so you can see how much it improved later
+		var evaluator = new EvaluateBundleScene();
+		evaluator.addInliers(1.0, 2.0, 3.0, 5.0, 10.0, 20.0);
+		evaluator.evaluate(parser.scene, parser.observations);
+		evaluator.printSummary(System.out);
+		System.out.println();
 
 		// Scaling each variable type so that it takes on a similar numerical value. This aids in optimization
 		// Not important for this problem but is for others
@@ -118,7 +130,12 @@ public class ExampleBundleAdjustment {
 			throw new RuntimeException("Bundle adjustment failed?!?");
 		}
 
-		// Print out how much it improved the model
+		// Print out performance after improving
+		evaluator.evaluate(parser.scene, parser.observations);
+		evaluator.printSummary(System.out);
+		System.out.println();
+
+		// Print out the reducing in residual error
 		System.out.println();
 		System.out.printf("Error reduced by %.1f%%\n", (100.0*(errorBefore/bundleAdjustment.getFitScore() - 1.0)));
 		System.out.println(BoofMiscOps.milliToHuman(System.currentTimeMillis() - startTime));
