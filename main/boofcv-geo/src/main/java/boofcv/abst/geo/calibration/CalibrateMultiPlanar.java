@@ -507,9 +507,8 @@ public class CalibrateMultiPlanar {
 	void computeReprojectionErrors() {
 		final SceneStructureMetric structure = bundleUtils.getStructure();
 
-		List<Point2D_F64> layout = layouts.get(0);
-
 		var w2p = new WorldToCameraToPixel();
+		var targetPt = new Point3D_F64();
 		var worldPt = new Point3D_F64();
 		var predictedPixel = new Point2D_F64();
 		var errors = new DogArray_F64();
@@ -542,6 +541,10 @@ public class CalibrateMultiPlanar {
 				Se3_F64 worldToCamera = worldToSensor.concat(cameraToSensor.invert(null), null);
 				w2p.configure(intrinsics, worldToCamera);
 
+				// Get information about the target in this frame
+				Se3_F64 targetToWorld = structure.getRigid(camObs.target).object_to_world;
+				List<Point2D_F64> layout = layouts.get(camObs.target);
+
 				// Compute reprojection error from landmark observations on the fiducial
 				errors.reset();
 				double sumX = 0.0;
@@ -550,8 +553,10 @@ public class CalibrateMultiPlanar {
 					PointIndex2D_F64 o = camObs.points.get(obsIdx);
 					Point2D_F64 landmarkX = layout.get(o.index);
 
-					worldPt.x = landmarkX.x;
-					worldPt.y = landmarkX.y;
+					targetPt.x = landmarkX.x;
+					targetPt.y = landmarkX.y;
+
+					targetToWorld.transform(targetPt, worldPt);
 
 					w2p.transform(worldPt, predictedPixel);
 					double dx = predictedPixel.x - o.p.x;
