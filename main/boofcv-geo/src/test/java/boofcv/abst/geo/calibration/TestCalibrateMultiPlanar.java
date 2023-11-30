@@ -98,6 +98,22 @@ public class TestCalibrateMultiPlanar extends BoofStandardJUnit {
 			Se3_F64 f = alg.results.getCameraToSensor(i);
 			assertTrue(SpecialEuclideanOps_F64.isIdentical(e, f, 0.01, 0.02));
 		}
+
+		alg.getStatistics().forEach(stat->{
+			// Should be very accurate
+			assertEquals(0.0, stat.overallMax, 1e-3);
+			assertEquals(0.0, stat.overallMean, 1e-3);
+
+			// sanity check to make sure it's not just returning the default of 0.0
+			assertNotEquals(0.0, stat.overallMax);
+			assertNotEquals(0.0, stat.overallMean);
+
+			stat.residuals.forEach((r->{
+				assertEquals(0.0, r.maxError, 1e-3);
+				assertEquals(0.0, r.meanError, 1e-3);
+
+			}));
+		});
 	}
 
 	/**
