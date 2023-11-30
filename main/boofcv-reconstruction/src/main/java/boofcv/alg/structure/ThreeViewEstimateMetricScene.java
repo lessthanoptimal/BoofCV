@@ -141,6 +141,12 @@ public class ThreeViewEstimateMetricScene implements VerbosePrint {
 		configSBA.optimizer.type = ConfigNonLinearLeastSquares.Type.LEVENBERG_MARQUARDT;
 		configSBA.optimizer.lm.dampeningInitial = 1e-3;
 		configSBA.optimizer.lm.hessianScaling = false;
+
+		// Using loss function wasn't found to improve results in regression tests
+		// in 3-view regression it was a wash. No runtime improvement either by removing second SBA cycle.
+		// In full-blown reconstructions it degraded a few scenarios.
+//		configSBA.loss.type = ConfigLoss.Type.HUBER;
+//		configSBA.loss.parameter = 1.0;
 	}
 
 	/**
