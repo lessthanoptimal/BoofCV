@@ -168,6 +168,7 @@ public class PlyCodec {
 
 		var indexes = new int[100];
 		bytes = ByteBuffer.allocate(1 + indexes.length*4);
+		bytes.order(order);
 		for (int i = 0; i < data.getPolygonCount(); i++) {
 			int size = data.getIndexes(i, indexes);
 			bytes.position(0);
@@ -467,6 +468,7 @@ public class PlyCodec {
 
 		final var polygonLine = new byte[4*10];
 		final ByteBuffer polygonBB = ByteBuffer.wrap(polygonLine);
+		polygonBB.order(order);
 		int[] indexes = new int[100];
 		for (int i = 0; i < triangleCount; i++) {
 			if (1 != reader.read(line, 0, 1))
@@ -482,7 +484,10 @@ public class PlyCodec {
 				throw new IOException("Read unexpected number of bytes. " + found + " vs " + lineLength);
 
 			for (int wordIndex = 0; wordIndex < count; wordIndex++) {
-				indexes[wordIndex] = polygonBB.getInt(wordIndex*4);
+				int foundIndex = polygonBB.getInt(wordIndex*4);
+				if (foundIndex < 0 || foundIndex > vertexCount)
+					throw new IOException("Negative index. word: " + wordIndex + " value: " + foundIndex + " count: " + vertexCount);
+				indexes[wordIndex] = foundIndex;
 			}
 
 			output.addPolygon(indexes, 0, count);
