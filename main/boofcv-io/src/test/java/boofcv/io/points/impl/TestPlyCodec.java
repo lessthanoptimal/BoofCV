@@ -140,11 +140,14 @@ class TestPlyCodec extends BoofStandardJUnit {
 		for (var endian : new ByteOrder[]{ByteOrder.LITTLE_ENDIAN, ByteOrder.BIG_ENDIAN}) {
 			var mesh = new VertexMesh();
 			mesh.offsets.add(0);
-			for (int i = 0; i < 10; i++) {
+			int numVertexes = 10;
+			for (int i = 0; i < numVertexes; i++) {
 				mesh.vertexes.append(i, 2, 3);
-				mesh.indexes.add(i*3);
-				mesh.indexes.add(i*3 + 1);
-				mesh.indexes.add(i*3 + 2);
+
+				// bound indexes to ensure they are in the valid range
+				mesh.indexes.add((i*3)%numVertexes);
+				mesh.indexes.add((i*3 + 1)%numVertexes);
+				mesh.indexes.add((i*3 + 2)%numVertexes);
 				mesh.offsets.add(mesh.indexes.size);
 			}
 			var colors = new DogArray_I32();
