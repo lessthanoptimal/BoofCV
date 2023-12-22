@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,4 +43,7 @@ public interface JacobianSo3 {
 	DMatrixRMaj getRotationMatrix();
 
 	DMatrixRMaj getPartial( int param );
+
+	/** Creates a new instance which is equivalent to 'this'. State is not copied. */
+	JacobianSo3 newInstance();
 }

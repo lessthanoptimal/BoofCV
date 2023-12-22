@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -154,5 +154,9 @@ public class JacobianSo3Quaternions implements JacobianSo3 {
 	@Override
 	public DMatrixRMaj getPartial( int param ) {
 		return jacR[param];
+	}
+
+	@Override public JacobianSo3 newInstance() {
+		return new JacobianSo3Quaternions();
 	}
 }

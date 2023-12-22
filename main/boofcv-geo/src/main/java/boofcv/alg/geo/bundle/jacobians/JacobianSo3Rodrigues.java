@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -63,6 +63,10 @@ public class JacobianSo3Rodrigues implements JacobianSo3 {
 			case 2 -> jac.Rz;
 			default -> throw new RuntimeException("Out of bounds parameter!");
 		};
+	}
+
+	@Override public JacobianSo3 newInstance() {
+		return new JacobianSo3Rodrigues();
 	}
 
 	@Override public int getParameterLength() {return 3;}

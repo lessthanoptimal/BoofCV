@@ -88,5 +88,9 @@ public class TestJacobianSo3Numerical extends BoofStandardJUnit {
 		public int getParameterLength() {
 			return 2;
 		}
+
+		@Override public JacobianSo3 newInstance() {
+			return new SimpleSo3();
+		}
 	}
 }

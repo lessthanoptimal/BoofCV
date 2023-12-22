@@ -153,7 +153,7 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 		rigidParameterIndexes = new int[jacRigidS03.length];
 		for (int i = 0, index = 0; i < jacRigidS03.length; i++) {
 			rigidParameterIndexes[i] = index;
-			jacRigidS03[i] = new JacobianSo3Rodrigues();
+			jacRigidS03[i] = jacSO3.newInstance();
 			if (!structure.rigids.get(i).known) {
 				index += lengthSE3;
 			}
