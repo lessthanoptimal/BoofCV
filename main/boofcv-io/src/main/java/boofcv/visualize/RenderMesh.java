@@ -196,7 +196,7 @@ public class RenderMesh implements VerbosePrint {
 		//      convex intersection or computing the depth at that pixel on this surface
 
 		// The entire surface will have one color
-		int color = surfaceColor.surfaceRgb(shapeIdx);
+		int color = surfaceColor.surfaceRgb(vertexIndex);
 
 		// Go through all pixels and see if the points are inside the polygon. If so
 		for (int pixelY = aabb.y0; pixelY < aabb.y1; pixelY++) {
