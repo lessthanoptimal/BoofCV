@@ -63,7 +63,7 @@ dependencies {
 
     compileOnly "org.jetbrains:annotations:$project.jetnull_version" // @Nullable
 
-    compileOnly 'com.android.support:support-annotations:28.0.0'
+    implementation "androidx.annotation:annotation:1.7.1"
 
     annotationProcessor("com.github.bsideup.jabel:jabel-javac-plugin:${project.jabel_version}")
 }
