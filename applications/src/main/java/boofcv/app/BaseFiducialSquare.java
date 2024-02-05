@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,6 +28,7 @@ import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
 import java.io.IOException;
+import java.util.Locale;
 
 /**
  * <p>
@@ -163,7 +164,7 @@ public abstract class BaseFiducialSquare {
 			fileType = "pdf";
 			fileName += ".pdf";
 		}
-		fileType = fileType.toLowerCase();
+		fileType = fileType.toLowerCase(Locale.ENGLISH);
 	}
 
 	private static void failExit( String message ) {

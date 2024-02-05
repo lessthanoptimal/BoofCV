@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Generates the fiducial PDF Document
@@ -272,7 +273,7 @@ public abstract class CreateFiducialDocumentPDF {
 
 	public void saveToDisk( String documentName ) throws IOException {
 		// ensure that it has the correct suffix
-		if (!documentName.toLowerCase().endsWith(".pdf")) {
+		if (!documentName.toLowerCase(Locale.ENGLISH).endsWith(".pdf")) {
 			documentName += ".pdf";
 		}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,6 +31,7 @@ import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Locale;
 
 /**
  * Very simple app for opening and viewing a 3D mesh
@@ -46,7 +47,7 @@ public class MeshViewerApp {
 		// Load the mesh
 		var mesh = new VertexMesh();
 		var colors = new DogArray_I32();
-		String extension = FilenameUtils.getExtension(file.getName()).toLowerCase();
+		String extension = FilenameUtils.getExtension(file.getName()).toLowerCase(Locale.ENGLISH);
 		var type = switch (extension) {
 			case "ply" -> PointCloudIO.Format.PLY;
 			case "stl" -> PointCloudIO.Format.STL;

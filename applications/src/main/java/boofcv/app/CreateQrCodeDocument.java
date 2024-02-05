@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,6 +36,7 @@ import org.kohsuke.args4j.Option;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -201,7 +202,7 @@ public class CreateQrCodeDocument extends BaseMarkerDocument {
 			fileType = "pdf";
 			fileName += ".pdf";
 		}
-		fileType = fileType.toLowerCase();
+		fileType = fileType.toLowerCase(Locale.ENGLISH);
 	}
 
 	public static void main( String[] args ) {
