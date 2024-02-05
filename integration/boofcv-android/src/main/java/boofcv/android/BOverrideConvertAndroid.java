@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.android;
 
 import android.graphics.Bitmap;
 import android.media.Image;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import boofcv.alg.color.ColorFormat;
 import boofcv.override.BOverrideClass;
 import boofcv.override.BOverrideManager;
