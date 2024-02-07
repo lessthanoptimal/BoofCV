@@ -20,5 +20,11 @@ include 'examples','demonstrations','applications',
         'integration:boofcv-all',
         'integration:boofcv-javacv',"integration:boofcv-WebcamCapture",
         'integration:boofcv-jcodec','integration:boofcv-swing',
-        'integration:boofcv-ffmpeg','integration:boofcv-pdf','integration:boofcv-kotlin',
-        'integration:boofcv-android'
+        'integration:boofcv-ffmpeg','integration:boofcv-pdf','integration:boofcv-kotlin'
+
+// The Android build system requires ANDROID_HOME to be specific and point to the Android SDK
+if (System.getenv()['ANDROID_HOME']) {
+    include 'integration:boofcv-android'
+} else {
+    logger.warn('Skipping integration/android because ANDROID_HOME has not been set!')
+}
