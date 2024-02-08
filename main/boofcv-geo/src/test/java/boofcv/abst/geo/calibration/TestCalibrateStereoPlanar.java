@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,14 +30,14 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.se.SpecialEuclideanOps_F64;
 import georegression.transform.se.SePointOps_F64;
+import org.ejml.UtilEjml;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestCalibrateStereoPlanar extends BoofStandardJUnit {
 	CameraPinholeBrown intrinsic = new CameraPinholeBrown(250, 260, 0, 320, 240, 640, 480).
@@ -89,6 +89,16 @@ public class TestCalibrateStereoPlanar extends BoofStandardJUnit {
 
 		assertEquals(0, expected.getT().distance(rightToLeft.T), Math.abs(rightToLeft.T.x)*0.01);
 		assertTrue(MatrixFeatures_DDRM.isIdentity(rightToLeft.getR(), 2e-3));
+
+		// See if it blew up
+		List<ImageResults> errors = alg.computeErrors();
+		for (var e : errors) {
+			assertTrue(e.maxError < 1e-3);
+			assertFalse(UtilEjml.isUncountable(e.maxError));
+			assertFalse(UtilEjml.isUncountable(e.meanError));
+			assertFalse(UtilEjml.isUncountable(e.biasX));
+			assertFalse(UtilEjml.isUncountable(e.biasY));
+		}
 	}
 
 	/**

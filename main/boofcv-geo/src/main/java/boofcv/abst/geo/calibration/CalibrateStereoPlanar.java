@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -83,7 +83,7 @@ public class CalibrateStereoPlanar implements VerbosePrint {
 
 	List<List<Point2D_F64>> layouts;
 
-	MetricBundleAdjustmentUtils bundleUtils = new MetricBundleAdjustmentUtils();
+	MetricBundleAdjustmentUtils bundleUtils = new MetricBundleAdjustmentUtils(null, false);
 
 	@Nullable PrintStream verbose;
 
@@ -287,8 +287,10 @@ public class CalibrateStereoPlanar implements VerbosePrint {
 		}
 
 		if (verbose != null) verbose.println("Joint bundle adjustment");
-		if (!bundleUtils.process())
+		if (!bundleUtils.process()) {
+			if (verbose != null) verbose.println("Bundle adjustment failed");
 			return;
+		}
 
 		// save the output
 		structure.motions.get(left_to_right_idx).parent_to_view.invert(parameters.right_to_left);
@@ -322,6 +324,15 @@ public class CalibrateStereoPlanar implements VerbosePrint {
 											 List<ImageResults> errors,
 											 CalibrationQuality qualityLeft,
 											 CalibrationQuality qualityRight ) {
+		// Determine the longest name to make formatting nice
+		int nameLength = 0;
+		for (int imageIdx = 0, i = 0; imageIdx < namesLeft.size(); imageIdx++) {
+			if (used != null && !used.get(imageIdx))
+				continue;
+			nameLength = Math.max(nameLength, namesLeft.get(imageIdx).length());
+		}
+		nameLength += 1;
+
 		double averageError = 0.0;
 		double maxError = 0.0;
 		for (int i = 0; i < errors.size(); i++) {
@@ -340,16 +351,19 @@ public class CalibrateStereoPlanar implements VerbosePrint {
 				100*qualityRight.geometric);
 		text += "\n";
 		text += String.format("Reprojection Errors (px):\nmean=%.3f max=%.3f\n\n", averageError, maxError);
-		text += String.format("%-10s | %8s\n", "image", "max (px)");
+		text += String.format("%-"+nameLength+"s | %8s\n", "image", "max (px)");
+
+		String format = "%-"+nameLength+"s %8.3f\n";
+
 		for (int imageIdx = 0, i = 0; imageIdx < namesLeft.size(); imageIdx++) {
 			if (used != null && !used.get(imageIdx))
 				continue;
 			String imageName = namesLeft.get(imageIdx);
 			ImageResults r = errors.get(i);
-			text += String.format("%-12s %8.3f\n", imageName, r.maxError);
+			text += String.format(format, imageName, r.maxError);
 			// print right image now
 			r = errors.get(i + 1);
-			text += String.format("%-12s %8.3f\n", "", r.maxError);
+			text += String.format(format, "", r.maxError);
 			i += 2;
 		}
 
@@ -361,12 +375,12 @@ public class CalibrateStereoPlanar implements VerbosePrint {
 		final SceneObservations observations = bundleUtils.getObservations();
 		List<ImageResults> errors = new ArrayList<>();
 
-		double[] parameters = new double[structure.getParameterCount()];
-		double[] residuals = new double[observations.getObservationCount()*2];
-		CodecSceneStructureMetric codec = new CodecSceneStructureMetric();
+		var parameters = new double[structure.getParameterCount()];
+		var residuals = new double[observations.getObservationCount()*2];
+		var codec = new CodecSceneStructureMetric();
 		codec.encode(structure, parameters);
 
-		BundleAdjustmentMetricResidualFunction function = new BundleAdjustmentMetricResidualFunction();
+		var function = new BundleAdjustmentMetricResidualFunction();
 		function.configure(structure, observations);
 		function.process(parameters, residuals);
 
