@@ -11,6 +11,8 @@ Date    : 2024/Feb/
 Version : 1.1.3
 
 - CalibrateStereoPlanar provides valid results once again
+- Android
+  * Switched to using andndroidx.annotation for @Nullable
 
 ---------------------------------------------
 Date    : 2023/Nov/05
