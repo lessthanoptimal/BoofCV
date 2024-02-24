@@ -7,7 +7,7 @@ Version Meaning: <compatible>.<feature>.<bug fix>
 - Last digit always indicates a bug fix and other minor changes
 
 ---------------------------------------------
-Date    : 2024/Feb/
+Date    : 2024/Feb/24
 Version : 1.1.3
 
 - CalibrateStereoPlanar provides valid results once again

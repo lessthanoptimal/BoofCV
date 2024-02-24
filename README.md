@@ -62,7 +62,7 @@ BoofCV is on [Maven Central](http://search.maven.org/) and can be easily added t
 For Gradle projects:
 ```
 dependencies {
-    api(group: 'org.boofcv', name: 'boofcv-core', version: '1.1.2')
+    api(group: 'org.boofcv', name: 'boofcv-core', version: '1.1.3')
 }
 ```
 
