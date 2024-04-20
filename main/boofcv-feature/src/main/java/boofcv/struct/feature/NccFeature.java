@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -73,6 +73,24 @@ public class NccFeature implements TupleDesc<NccFeature> {
 
 	@Override public /**/double /**/getDouble( int index ) {
 		return data[index];
+	}
+
+	@Override public boolean isEquals( NccFeature tuple ) {
+		if (size() != tuple.size()) {
+			return false;
+		}
+
+		if (mean != tuple.mean)
+			return false;
+
+		if (sigma != tuple.sigma)
+			return false;
+
+		for (int i = 0; i < size(); i++) {
+			if (data[i] != tuple.data[i])
+				return false;
+		}
+		return true;
 	}
 
 	@Override public int size() {
