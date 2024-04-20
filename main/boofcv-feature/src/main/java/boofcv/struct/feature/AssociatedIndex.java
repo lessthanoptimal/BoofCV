@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,21 +18,21 @@
 
 package boofcv.struct.feature;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 /**
  * Indexes of two associated features and the fit score..
  *
  * @author Peter Abeles
  */
+@Data
 public class AssociatedIndex {
 	/** index of the feature in the source image */
-	public @Getter @Setter int src;
+	public int src;
 	/** index of the feature in the destination image */
-	public @Getter @Setter int dst;
+	public int dst;
 	/** The association score. Meaning will very depending on implementation */
-	public @Getter @Setter double fitScore;
+	public double fitScore;
 
 	public AssociatedIndex( AssociatedIndex original ) {
 		setTo(original);
@@ -68,6 +68,10 @@ public class AssociatedIndex {
 		src = a.src;
 		dst = a.dst;
 		fitScore = a.fitScore;
+	}
+
+	public boolean isIdentical( AssociatedIndex o ) {
+		return src == o.src && dst == o.dst && fitScore == o.fitScore;
 	}
 
 	public AssociatedIndex copy() {
