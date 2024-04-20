@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,6 @@
 package boofcv.struct.feature;
 
 import boofcv.misc.BoofLambdas;
-import boofcv.struct.PackedArray;
 import org.ddogleg.struct.BigDogArray_I8;
 import org.ddogleg.struct.BigDogGrowth;
 
@@ -30,7 +29,7 @@ import org.ddogleg.struct.BigDogGrowth;
  *
  * @author Peter Abeles
  */
-public class PackedTupleBigArray_S8 implements PackedArray<TupleDesc_S8> {
+public class PackedTupleBigArray_S8 implements PackedTupleArray<TupleDesc_S8> {
 	// degree-of-freedom, number of elements in the tuple
 	public final int dof;
 	// Stores tuple in a single continuous array
@@ -91,5 +90,9 @@ public class PackedTupleBigArray_S8 implements PackedArray<TupleDesc_S8> {
 				op.process(pointIndex++, temp);
 			}
 		});
+	}
+
+	@Override public int getDOF() {
+		return dof;
 	}
 }

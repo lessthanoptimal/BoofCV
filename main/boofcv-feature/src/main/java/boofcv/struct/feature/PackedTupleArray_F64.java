@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,6 @@
 package boofcv.struct.feature;
 
 import boofcv.misc.BoofLambdas;
-import boofcv.struct.PackedArray;
 import org.ddogleg.struct.DogArray_F64;
 
 /**
@@ -29,7 +28,7 @@ import org.ddogleg.struct.DogArray_F64;
  *
  * @author Peter Abeles
  */
-public class PackedTupleArray_F64 implements PackedArray<TupleDesc_F64> {
+public class PackedTupleArray_F64 implements PackedTupleArray<TupleDesc_F64> {
 	// degree-of-freedom, number of elements in the tuple
 	public final int dof;
 	// Stores tuple in a single continuous array
@@ -90,5 +89,9 @@ public class PackedTupleArray_F64 implements PackedArray<TupleDesc_F64> {
 			System.arraycopy(array.data, i, temp.data, 0, dof);
 			op.process(pointIndex++, temp);
 		}
+	}
+
+	@Override public int getDOF() {
+		return dof;
 	}
 }

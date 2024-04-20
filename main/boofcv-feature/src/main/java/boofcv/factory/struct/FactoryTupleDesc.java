@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,15 +47,15 @@ public class FactoryTupleDesc {
 		return createPacked(dof, info.getDescriptionType());
 	}
 
-	public static <TD extends TupleDesc<TD>> PackedArray<TD> createPacked( int dof, Class<TD> type ) {
+	public static <TD extends TupleDesc<TD>> PackedTupleArray<TD> createPacked( int dof, Class<TD> type ) {
 		if (type == TupleDesc_F64.class)
-			return (PackedArray<TD>)new PackedTupleArray_F64(dof);
+			return (PackedTupleArray<TD>)new PackedTupleArray_F64(dof);
 		else if (type == TupleDesc_F32.class)
-			return (PackedArray<TD>)new PackedTupleArray_F32(dof);
+			return (PackedTupleArray<TD>)new PackedTupleArray_F32(dof);
 		else if (type == TupleDesc_U8.class)
-			return (PackedArray<TD>)new PackedTupleArray_U8(dof);
+			return (PackedTupleArray<TD>)new PackedTupleArray_U8(dof);
 		else if (type == TupleDesc_B.class)
-			return (PackedArray<TD>)new PackedTupleArray_B(dof);
+			return (PackedTupleArray<TD>)new PackedTupleArray_B(dof);
 		else
 			throw new IllegalArgumentException("Unknown type " + type);
 	}
@@ -65,15 +65,15 @@ public class FactoryTupleDesc {
 		return createPackedBig(dof, info.getDescriptionType());
 	}
 
-	public static <TD extends TupleDesc<TD>> PackedArray<TD> createPackedBig( int dof, Class<TD> type ) {
+	public static <TD extends TupleDesc<TD>> PackedTupleArray<TD> createPackedBig( int dof, Class<TD> type ) {
 		if (type == TupleDesc_F64.class)
-			return (PackedArray<TD>)new PackedTupleBigArray_F64(dof);
+			return (PackedTupleArray<TD>)new PackedTupleBigArray_F64(dof);
 		else if (type == TupleDesc_F32.class)
-			return (PackedArray<TD>)new PackedTupleBigArray_F32(dof);
+			return (PackedTupleArray<TD>)new PackedTupleBigArray_F32(dof);
 		else if (type == TupleDesc_U8.class)
-			return (PackedArray<TD>)new PackedTupleBigArray_U8(dof);
+			return (PackedTupleArray<TD>)new PackedTupleBigArray_U8(dof);
 		else if (type == TupleDesc_B.class)
-			return (PackedArray<TD>)new PackedTupleBigArray_B(dof);
+			return (PackedTupleArray<TD>)new PackedTupleBigArray_B(dof);
 		else
 			throw new IllegalArgumentException("Unknown type " + type);
 	}

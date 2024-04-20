@@ -12,6 +12,7 @@ Version : 1.1.4
 
 - TupleDesc
   * Added isEquals()
+- Added PackedTupleArray interface
 
 ---------------------------------------------
 Date    : 2024/Feb/24
