@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,24 +38,19 @@ import org.jetbrains.annotations.Nullable;
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class FactoryAssociation {
-
-	public static <D> AssociateDescription<D> generic( ConfigAssociate config, DescriptorInfo info ) {
+	public static <D extends TupleDesc<D>> AssociateDescription<D> generic( ConfigAssociate config, DescriptorInfo<D> info ) {
 		int DOF = info.createDescription().size();
 
-		switch (config.type) {
-			case GREEDY: {
+		return switch (config.type) {
+			case GREEDY -> {
 				ScoreAssociation<D> scorer = FactoryAssociation.defaultScore(info.getDescriptionType());
-				return FactoryAssociation.greedy(config.greedy, scorer);
+				yield FactoryAssociation.greedy(config.greedy, scorer);
 			}
-			case KD_TREE:
-				return (AssociateDescription)FactoryAssociation.kdtree(config.nearestNeighbor, DOF);
-
-			case RANDOM_FOREST:
-				return (AssociateDescription)FactoryAssociation.kdRandomForest(
-						config.nearestNeighbor, DOF, 10, 5, 1233445565);
-			default:
-				throw new IllegalArgumentException("Unknown association: " + config.type);
-		}
+			case KD_TREE -> (AssociateDescription)FactoryAssociation.kdtree(config.nearestNeighbor, DOF);
+			case RANDOM_FOREST -> (AssociateDescription)FactoryAssociation.kdRandomForest(
+					config.nearestNeighbor, DOF, 10, 5, 1233445565);
+			default -> throw new IllegalArgumentException("Unknown association: " + config.type);
+		};
 	}
 
 	/**
@@ -76,7 +71,7 @@ public class FactoryAssociation {
 	}
 
 	/**
-	 * Checks and if neccisary wraps the association to ensure that it returns only unique associations
+	 * Checks and if necessary wraps the association to ensure that it returns only unique associations
 	 */
 	public static <D> AssociateDescription<D> ensureUnique( AssociateDescription<D> associate ) {
 		if (!associate.uniqueDestination() || !associate.uniqueSource()) {
@@ -87,7 +82,7 @@ public class FactoryAssociation {
 	}
 
 	/**
-	 * Checks and if neccisary wraps the association to ensure that it returns only unique associations
+	 * Checks and if necessary wraps the association to ensure that it returns only unique associations
 	 */
 	public static <D> AssociateDescription2D<D> ensureUnique( AssociateDescription2D<D> associate ) {
 		if (!associate.uniqueDestination() || !associate.uniqueSource()) {
@@ -237,8 +232,7 @@ public class FactoryAssociation {
 	 * @param tupleType Class type which extends {@link boofcv.struct.feature.TupleDesc}
 	 * @return A class which can score two potential associations
 	 */
-	public static <D>
-	ScoreAssociation<D> defaultScore( Class<D> tupleType ) {
+	public static <D> ScoreAssociation<D> defaultScore( Class<D> tupleType ) {
 		if (NccFeature.class.isAssignableFrom(tupleType)) {
 			return (ScoreAssociation)new ScoreAssociateNccFeature();
 		} else if (TupleDesc_F64.class.isAssignableFrom(tupleType)) {
@@ -292,8 +286,7 @@ public class FactoryAssociation {
 	 * @param squared IF true the distance squared is returned. Usually true
 	 * @return Euclidean distance measure
 	 */
-	public static <D>
-	ScoreAssociation<D> scoreEuclidean( Class<D> tupleType, boolean squared ) {
+	public static <D> ScoreAssociation<D> scoreEuclidean( Class<D> tupleType, boolean squared ) {
 		if (TupleDesc_F64.class.isAssignableFrom(tupleType)) {
 			if (squared)
 				return (ScoreAssociation)new ScoreAssociateEuclideanSq.F64();
@@ -313,8 +306,7 @@ public class FactoryAssociation {
 	 * @param tupleType Type of descriptor being scored
 	 * @return Hamming distance measure
 	 */
-	public static <D>
-	ScoreAssociation<D> scoreHamming( Class<D> tupleType ) {
+	public static <D> ScoreAssociation<D> scoreHamming( Class<D> tupleType ) {
 		if (tupleType == TupleDesc_B.class) {
 			return (ScoreAssociation)new ScoreAssociateHamming_B();
 		}
