@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,6 +60,14 @@ public class PackedArrayPoint4D_F64 implements PackedArray<Point4D_F64> {
 		array.add(element.w);
 
 		numElements++;
+	}
+
+	@Override public void set( int index, Point4D_F64 element ) {
+		index *= 4;
+		array.data[index++] = element.x;
+		array.data[index++] = element.y;
+		array.data[index++] = element.z;
+		array.data[index] = element.w;
 	}
 
 	@Override public Point4D_F64 getTemp( int index ) {

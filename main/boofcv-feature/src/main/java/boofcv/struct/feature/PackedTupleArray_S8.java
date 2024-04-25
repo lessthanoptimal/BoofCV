@@ -60,6 +60,10 @@ public class PackedTupleArray_S8 implements PackedTupleArray<TupleDesc_S8> {
 		numElements++;
 	}
 
+	@Override public void set( int index, TupleDesc_S8 element ) {
+		System.arraycopy(element.data, 0, array.data, index*dof, dof);
+	}
+
 	@Override public TupleDesc_S8 getTemp( int index ) {
 		System.arraycopy(array.data, index*dof, temp.data, 0, dof);
 		return temp;

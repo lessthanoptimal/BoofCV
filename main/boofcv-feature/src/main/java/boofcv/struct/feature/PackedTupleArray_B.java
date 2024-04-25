@@ -64,6 +64,10 @@ public class PackedTupleArray_B implements PackedTupleArray<TupleDesc_B> {
 		numElements++;
 	}
 
+	@Override public void set( int index, TupleDesc_B element ) {
+		System.arraycopy(element.data, 0, array.data, index*numInts, numInts);
+	}
+
 	@Override public TupleDesc_B getTemp( int index ) {
 		System.arraycopy(array.data, index*numInts, temp.data, 0, numInts);
 		return temp;

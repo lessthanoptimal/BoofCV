@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -147,5 +147,18 @@ public abstract class GenericPackedArrayChecks<T> extends BoofStandardJUnit {
 			assertEquals(i+2, indexes.get(i));
 			checkEquals(array.getTemp(i+2), found.get(i));
 		}
+	}
+
+	@Test void set_index() {
+		PackedArray<T> alg = createAlg();
+
+		alg.append(createRandomPoint());
+		alg.append(createRandomPoint());
+		alg.append(createRandomPoint());
+
+		var p = createRandomPoint();
+		alg.set(1, p);
+		T found = alg.getTemp(1);
+		checkEquals(p, found);
 	}
 }

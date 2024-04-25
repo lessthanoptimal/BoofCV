@@ -61,6 +61,10 @@ public class PackedTupleBigArray_F64 implements PackedTupleArray<TupleDesc_F64> 
 		numElements++;
 	}
 
+	@Override public void set( int index, TupleDesc_F64 element ) {
+		array.setArray((long)index*dof, element.data, 0, dof);
+	}
+
 	@Override public TupleDesc_F64 getTemp( int index ) {
 		array.getArray(index*dof, temp.data, 0, dof);
 		return temp;

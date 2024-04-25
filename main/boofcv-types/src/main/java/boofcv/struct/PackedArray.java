@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,6 +47,11 @@ public interface PackedArray<T> extends LArrayAccessor<T> {
 	 * @param element (Input) The element which is copied then added
 	 */
 	void append( T element );
+
+	/**
+	 * Sets an element's value
+	 */
+	void set( int index, T element );
 
 	/**
 	 * Passes in each object and index within the specified range. Modifications to the passed in objcet

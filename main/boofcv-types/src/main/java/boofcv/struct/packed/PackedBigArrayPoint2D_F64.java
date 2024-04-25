@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -85,6 +85,14 @@ public class PackedBigArrayPoint2D_F64 implements PackedArray<Point2D_F64> {
 		dog.add(element.y);
 
 		numPoints++;
+	}
+
+	@Override public void set( int index, Point2D_F64 element ) {
+		index *= DOF;
+		double[] block = dog.getBlocks().get(index/dog.getBlockSize());
+		int where = index%dog.getBlockSize();
+		element.x = block[where];
+		element.y = block[where + 1];
 	}
 
 	@Override public Point2D_F64 getTemp( int index ) {

@@ -61,6 +61,10 @@ public class PackedTupleBigArray_S8 implements PackedTupleArray<TupleDesc_S8> {
 		numElements++;
 	}
 
+	@Override public void set( int index, TupleDesc_S8 element ) {
+		array.setArray((long)index*dof, element.data, 0, dof);
+	}
+
 	@Override public TupleDesc_S8 getTemp( int index ) {
 		array.getArray(index*dof, temp.data, 0, dof);
 		return temp;
