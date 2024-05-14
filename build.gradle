@@ -13,7 +13,7 @@ allprojects {
     apply plugin: 'com.peterabeles.gversion'
 
     group = 'org.boofcv'
-    version = '1.1.4-SNAPSHOT'
+    version = '1.1.4'
 
     createVersionFile.enabled = false // run only once. enabled in types
 }
@@ -27,7 +27,7 @@ project.ext.args4j_version = '2.33'
 project.ext.junit_version = '5.10.0'
 project.ext.errorprone_version = '2.21.1'
 project.ext.nullaway_version = '0.10.11'
-project.ext.auto64to32_version = '3.2.1'
+project.ext.auto64to32_version = '3.2.2'
 project.ext.snakeyaml_version = '2.2'
 project.ext.jmh_version = '1.36'
 project.ext.jetnull_version = '23.0.0'
@@ -131,7 +131,7 @@ subprojects {
     }
 
     dependencies {
-        api(group: 'org.georegression', name: 'georegression', version: '0.27.0') { exclude group: 'org.ddogleg' }
+        api(group: 'org.georegression', name: 'georegression', version: '0.27.1') { exclude group: 'org.ddogleg' }
         api(group: 'org.ddogleg', name: 'ddogleg', version: '0.23.2')
 
         api group: 'net.sf.trove4j', name: 'trove4j', version: project.trove4j_version

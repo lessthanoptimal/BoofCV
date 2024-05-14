@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -124,7 +124,7 @@ public class SceneReconstruction {
 	@Option(name = "--DisparityMin", usage = "Minimum disparity. Points less than this are filtered. Can be used to remove noisy distant points.")
 	double disparityMin = 0.0;
 
-	@Option(name = "--DisparityRange", usage = "Number of disparity values considered. Can't exceed 255.")
+	@Option(name = "--DisparityRange", usage = "Number of disparity values considered.")
 	int disparityRange = 0;
 
 	@Option(name = "--Ordered", usage = "Images are assumed to be in sequential order and a feature tracker can be used")
@@ -213,9 +213,6 @@ public class SceneReconstruction {
 			System.err.println("No inputs found. Bad path or pattern? " + inputPattern);
 			System.exit(-1);
 		}
-
-		if (disparityRange > 255)
-			throw new RuntimeException("Disparity range can't be larger than 255. disparityRange=" + disparityRange);
 
 		// See if the user overrode the number of threads
 		if (numThreads > 0) {

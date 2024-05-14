@@ -7,12 +7,14 @@ Version Meaning: <compatible>.<feature>.<bug fix>
 - Last digit always indicates a bug fix and other minor changes
 
 ---------------------
-Date    : 2024
+Date    : 2024/May/14
 Version : 1.1.4
 
 - TupleDesc
   * Added isEquals()
 - Added PackedTupleArray interface
+- Updated: AssociatedIndex, NccFeature
+- Bug Fix: RecognitionVocabularyTreeNister2006
 
 ---------------------------------------------
 Date    : 2024/Feb/24
