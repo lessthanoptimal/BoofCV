@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,6 +31,7 @@ import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
+import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.UtilVector3D_F64;
 import georegression.metric.Area2D_F64;
 import georegression.metric.UtilAngle;
@@ -1156,5 +1157,50 @@ public class PerspectiveOps {
 		dst.y = R.data[1]*x + R.data[4]*y + R.data[7]*z;
 		dst.z = R.data[2]*x + R.data[5]*y + R.data[8]*z;
 		dst.w = src.w;
+	}
+
+	/**
+	 * Computes rotation matrix so that the camera will be pointed at the specified point.
+	 *
+	 * @param x point's x-coordinate
+	 * @param y point's y-coordinate
+	 * @param z point's z-coordinate
+	 * @param R (optional) Storage for rotation matrix.
+	 * @return Rotation matrix
+	 */
+	public static DMatrixRMaj pointAt( double x, double y, double z, @Nullable DMatrixRMaj R ) {
+		var axisX = new Point3D_F64(1, 0, 0);
+		var axisY = new Point3D_F64(0, 1, 0);
+		var axisZ = new Point3D_F64(x, y, z); // Direction it's point at
+
+		axisZ.divideIP(axisZ.norm());
+
+		// There's a pathological case. Pick the option which if farthest from it
+		if (Math.abs(GeometryMath_F64.dot(axisX, axisZ)) < Math.abs(GeometryMath_F64.dot(axisY, axisZ))) {
+			GeometryMath_F64.cross(axisX, axisZ, axisY);
+			axisY.divideIP(axisY.norm());
+			GeometryMath_F64.cross(axisY, axisZ, axisX);
+			axisX.divideIP(axisX.norm());
+		} else {
+			GeometryMath_F64.cross(axisY, axisZ, axisX);
+			axisX.divideIP(axisX.norm());
+			GeometryMath_F64.cross(axisX, axisZ, axisY);
+			axisY.divideIP(axisY.norm());
+		}
+
+		if (R == null)
+			R = new DMatrixRMaj(3,3);
+		
+		R.set(0, 0, axisX.x);
+		R.set(1, 0, axisX.y);
+		R.set(2, 0, axisX.z);
+		R.set(0, 1, axisY.x);
+		R.set(1, 1, axisY.y);
+		R.set(2, 1, axisY.z);
+		R.set(0, 2, axisZ.x);
+		R.set(1, 2, axisZ.y);
+		R.set(2, 2, axisZ.z);
+
+		return R;
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -811,11 +811,11 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 	@Test void rotateH() {
 		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 1, -0.5, 0.7, null);
 
-		var p3 = new Point3D_F64(1,2,3);
-		var p4 = new Point4D_F64(1,2,3, 0.5);
+		var p3 = new Point3D_F64(1, 2, 3);
+		var p4 = new Point4D_F64(1, 2, 3, 0.5);
 
 		GeometryMath_F64.mult(R, p3, p3);
-		PerspectiveOps.rotateH(R,p4, p4);
+		PerspectiveOps.rotateH(R, p4, p4);
 
 		assertEquals(p3.x, p4.x, UtilEjml.TEST_F64);
 		assertEquals(p3.y, p4.y, UtilEjml.TEST_F64);
@@ -825,13 +825,40 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 	@Test void rotateTranH() {
 		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 1, -0.5, 0.7, null);
 
-		var p4 = new Point4D_F64(1,2,3, 0.5);
+		var p4 = new Point4D_F64(1, 2, 3, 0.5);
 
-		PerspectiveOps.rotateH(R,p4, p4);
-		PerspectiveOps.rotateInvH(R,p4, p4);
+		PerspectiveOps.rotateH(R, p4, p4);
+		PerspectiveOps.rotateInvH(R, p4, p4);
 
 		assertEquals(1, p4.x, UtilEjml.TEST_F64);
 		assertEquals(2, p4.y, UtilEjml.TEST_F64);
 		assertEquals(3, p4.z, UtilEjml.TEST_F64);
+	}
+
+	@Test void pointAt() {
+		var points = new ArrayList<Point3D_F64>();
+		// arbitrary point
+		points.add(new Point3D_F64(1, -0.5, 2));
+		points.add(new Point3D_F64(-1, 0.5, -2));
+
+		// Pathological cases
+		points.add(new Point3D_F64(0, 0, 2));
+		points.add(new Point3D_F64(0, 2, 0));
+		points.add(new Point3D_F64(2, 0, 0));
+		points.add(new Point3D_F64(0, 0, -2));
+		points.add(new Point3D_F64(0, -2, 0));
+		points.add(new Point3D_F64(-2, 0, 0));
+
+		var R = new DMatrixRMaj(3, 3);
+
+		for (var point : points) {
+			PerspectiveOps.pointAt(point.x, point.y, point.z, R);
+
+			// when put into the camera's coordinate system the point should be dead center and in front of the camera
+			GeometryMath_F64.multTran(R, point, point);
+			assertEquals(0.0, point.x, UtilEjml.TEST_F64);
+			assertEquals(0.0, point.y, UtilEjml.TEST_F64);
+			assertTrue(point.z > 0);
+		}
 	}
 }
