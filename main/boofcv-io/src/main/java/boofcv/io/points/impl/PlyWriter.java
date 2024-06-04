@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,4 +44,12 @@ public interface PlyWriter {
 	 * Get the indexes of each vertex in the polygon. Returns the number of vertexes.
 	 */
 	int getIndexes( int which, int[] indexes );
+
+	/**
+	 * Writes interleaved coordinates of texture location
+	 * @param which Which polygon is being referenced
+	 * @param coors Where the coordinates are written to. Must be large enough.
+	 * @return Number of vertexes in this polygon. coors must be 2x this number.
+	 */
+	int getTexture( int which, float[] coors );
 }

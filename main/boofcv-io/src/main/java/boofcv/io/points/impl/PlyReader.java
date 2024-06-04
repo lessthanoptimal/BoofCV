@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,9 +24,17 @@ package boofcv.io.points.impl;
  * @author Peter Abeles
  */
 public interface PlyReader {
-	void initialize(int vertexes, int triangles, boolean color);
+	void initialize( int vertexes, int triangles, boolean color );
 
 	void addVertex( double x, double y, double z, int rgb );
 
 	void addPolygon( int[] indexes, int offset, int length );
+
+	/**
+	 * Adds coordinates for texture in the ply file
+	 *
+	 * @param count Number of 2D points in the coordinates
+	 * @param coor Array storing the 2D coordinates
+	 */
+	void addTexture( int count, float[] coor );
 }

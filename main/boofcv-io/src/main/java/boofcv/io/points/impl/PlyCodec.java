@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,6 +34,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * For reading PLY point files.
@@ -200,9 +201,11 @@ public class PlyCodec {
 						"property " + dataType + " z\n").getBytes(format));
 		if (hasColor) {
 			outputWriter.write(
-					("property uchar red\n" +
-							"property uchar green\n" +
-							"property uchar blue\n").getBytes(format));
+					("""
+							property uchar red
+							property uchar green
+							property uchar blue
+							""").getBytes(format));
 		}
 		if (triangleCount > 0) {
 			outputWriter.write(("element face " + triangleCount + "\n" +
@@ -213,7 +216,7 @@ public class PlyCodec {
 
 	private static String readNextPly( InputStream reader, boolean failIfNull, StringBuilder buffer ) throws IOException {
 		String line = UtilIO.readLine(reader, buffer);
-		while (line.length() != 0) {
+		while (!line.isEmpty()) {
 			if (line.startsWith("comment"))
 				line = UtilIO.readLine(reader, buffer);
 			else {
@@ -229,12 +232,13 @@ public class PlyCodec {
 		var buffer = new StringBuilder();
 
 		String line = UtilIO.readLine(input, buffer);
-		if (line.length() == 0) throw new IOException("Missing first line");
+		if (line.isEmpty()) throw new IOException("Missing first line");
 		if (line.compareToIgnoreCase("ply") != 0) throw new IOException("Expected PLY at start of file");
 
 		line = readNextPly(input, true, buffer);
 		boolean previousVertex = false;
-		while (line.length() != 0) {
+		while (!line.isEmpty()) {
+			System.out.println(line);
 			if (line.equals("end_header"))
 				break;
 			String[] words = line.split("\\s+");
@@ -288,7 +292,15 @@ public class PlyCodec {
 				}
 				header.dataWords.add(new DataWord(v, d));
 			} else if (words[0].equals("property") && words[1].equals("list")) {
-				// just ignore it. Previous line specified number of elements
+				if (words.length != 5) {
+					throw new IOException("Unexpected number of words in properties. Unsupported file format? count=" + words.length);
+				}
+
+				// Parse the data type info
+				var countType = DataType.valueOf(words[2].toUpperCase(Locale.US));
+				var valueType = DataType.valueOf(words[3].toUpperCase(Locale.US));
+
+				header.properties.add(new PropertyList(words[4], countType, valueType));
 			} else {
 				throw new IOException("Unknown header element: '" + line + "'");
 			}
@@ -307,6 +319,8 @@ public class PlyCodec {
 			}
 
 			@Override public void addPolygon( int[] indexes, int offset, int length ) {}
+
+			@Override public void addTexture( int count, float[] coor ) {}
 		});
 	}
 
@@ -328,6 +342,8 @@ public class PlyCodec {
 				mesh.offsets.add(mesh.indexes.size + length);
 				mesh.indexes.addAll(indexes, offset, offset + length);
 			}
+
+			@Override public void addTexture( int count, float[] coor ) {}
 		});
 	}
 
@@ -345,10 +361,7 @@ public class PlyCodec {
 		switch (header.format) {
 			case ASCII -> readAscii(output, input, header.dataWords, header.vertexCount,
 					header.rgb, header.triangleCount);
-			case BINARY_LITTLE -> readCloudBinary(output, input, header.dataWords,
-					ByteOrder.LITTLE_ENDIAN, header.vertexCount, header.rgb, header.triangleCount);
-			case BINARY_BIG -> readCloudBinary(output, input, header.dataWords,
-					ByteOrder.BIG_ENDIAN, header.vertexCount, header.rgb, header.triangleCount);
+			case BINARY_LITTLE, BINARY_BIG -> readCloudBinary(output, input, header);
 			default -> throw new RuntimeException("BUG!");
 		}
 	}
@@ -409,16 +422,25 @@ public class PlyCodec {
 		}
 	}
 
-	private static void readCloudBinary( PlyReader output, InputStream reader, List<DataWord> dataWords,
-										 ByteOrder order,
-										 int vertexCount, boolean rgb, int triangleCount ) throws IOException {
-
-		int totalBytes = 0;
-		for (int i = 0; i < dataWords.size(); i++) {
-			totalBytes += dataWords.get(i).data.size;
+	private static void readCloudBinary( PlyReader output, InputStream reader, Header header ) throws IOException {
+		int countVertexBytes = 0;
+		for (int i = 0; i < header.dataWords.size(); i++) {
+			countVertexBytes += header.dataWords.get(i).data.size;
 		}
 
-		final byte[] line = new byte[totalBytes];
+		// Guess the number of vertexes in a polygon so we can estimate array size
+		int maxPolygonOrder = 10;
+
+		// Go through all the properties and see what the maximum size will be for those
+		int countBytes = countVertexBytes;
+		for (int i = 0; i < header.properties.size(); i++) {
+			int countPropBytes = header.properties.get(i).valueType.size*maxPolygonOrder;
+			countBytes = Math.max(countBytes, countPropBytes);
+		}
+
+		ByteOrder order = header.format == Format.BINARY_LITTLE ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN;
+
+		final byte[] line = new byte[countBytes];
 		final ByteBuffer bb = ByteBuffer.wrap(line);
 		bb.order(order);
 
@@ -430,15 +452,15 @@ public class PlyCodec {
 		int r = -1, g = -1, b = -1;
 		double x = -1, y = -1, z = -1;
 
-		for (int i = 0; i < vertexCount; i++) {
-			int found = reader.read(line);
-			if (line.length != found)
-				throw new IOException("Read unexpected number of bytes. " + found + " vs " + line.length);
+		for (int i = 0; i < header.vertexCount; i++) {
+			int found = reader.read(line, 0, countVertexBytes);
+			if (countVertexBytes != found)
+				throw new IOException("Read unexpected number of bytes. " + found + " vs " + countVertexBytes);
 
 			int location = 0;
 
-			for (int j = 0; j < dataWords.size(); j++) {
-				DataWord d = dataWords.get(j);
+			for (int j = 0; j < header.dataWords.size(); j++) {
+				DataWord d = header.dataWords.get(j);
 				switch (d.data) {
 					case FLOAT -> F64 = bb.getFloat(location);
 					case DOUBLE -> F64 = bb.getDouble(location);
@@ -464,34 +486,77 @@ public class PlyCodec {
 			}
 
 			output.addVertex(x, y, z, r << 16 | g << 8 | b);
+			//System.out.printf("vertex: %.1e %.1e %.1e | %2x %2x %2x\n", x, y, z, r, g, b);
 		}
 
-		final var polygonLine = new byte[4*10];
-		final ByteBuffer polygonBB = ByteBuffer.wrap(polygonLine);
-		polygonBB.order(order);
-		int[] indexes = new int[100];
-		for (int i = 0; i < triangleCount; i++) {
-			if (1 != reader.read(line, 0, 1))
-				throw new RuntimeException("Couldn't read count byte");
-
-			int count = line[0] & 0xFF;
-			int lineLength = count*4;
-			if (polygonLine.length < lineLength)
-				throw new RuntimeException("polygonLine is too small. vertexes=" + count);
-
-			int found = reader.read(polygonLine, 0, lineLength);
-			if (found != lineLength)
-				throw new IOException("Read unexpected number of bytes. " + found + " vs " + lineLength);
-
-			for (int wordIndex = 0; wordIndex < count; wordIndex++) {
-				int foundIndex = polygonBB.getInt(wordIndex*4);
-				if (foundIndex < 0 || foundIndex > vertexCount)
-					throw new IOException("Negative index. word: " + wordIndex + " value: " + foundIndex + " count: " + vertexCount);
-				indexes[wordIndex] = foundIndex;
+		var arrayI = new int[100];
+		var arrayF = new float[100];
+		for (int i = 0; i < header.triangleCount; i++) {
+			for (int idxProperty = 0; idxProperty < header.properties.size(); idxProperty++) {
+				PropertyList prop = header.properties.get(idxProperty);
+				if (prop.countType != DataType.UCHAR) {
+					throw new IOException("Expected unsigned byte for count type, not " + prop.countType);
+				}
+				switch (prop.label) {
+					case "vertex_indices" -> readPolygon(reader, bb, line, arrayI, header.vertexCount, output);
+					case "texcoord" -> readTextureCoor(reader, prop.valueType, bb, line, arrayF, output);
+					default -> System.err.println("Unknown property type " + prop.label);
+				}
 			}
-
-			output.addPolygon(indexes, 0, count);
 		}
+	}
+
+	private static void readPolygon( InputStream reader, ByteBuffer bb, byte[] lineBytes, int[] indexes, int vertexCount,
+									 PlyReader output ) throws IOException {
+		if (1 != reader.read(lineBytes, 0, 1))
+			throw new RuntimeException("Couldn't read count byte");
+
+		int count = lineBytes[0] & 0xFF;
+		int bytesInLine = count*4;
+		if (lineBytes.length < bytesInLine)
+			throw new RuntimeException("polygonLine is too small. allocated=" + lineBytes.length + " required=" + bytesInLine + " degree=" + count);
+
+		int found = reader.read(lineBytes, 0, bytesInLine);
+		if (found != bytesInLine)
+			throw new IOException("Read unexpected number of bytes. " + found + " vs " + bytesInLine);
+
+		for (int wordIndex = 0; wordIndex < count; wordIndex++) {
+			int foundIndex = bb.getInt(wordIndex*4);
+			if (foundIndex < 0 || foundIndex > vertexCount)
+				throw new IOException("Negative index. word: " + wordIndex + " value: " + foundIndex + " count: " + vertexCount);
+			indexes[wordIndex] = foundIndex;
+		}
+
+		output.addPolygon(indexes, 0, count);
+	}
+
+	private static void readTextureCoor( InputStream reader, DataType valueType, ByteBuffer bb, byte[] workBytes,
+										 float[] tempF, PlyReader output ) throws IOException {
+		if (1 != reader.read(workBytes, 0, 1))
+			throw new RuntimeException("Couldn't read count byte");
+
+		// Number of bytes in the array
+		int count = workBytes[0] & 0xFF;
+
+		// Length of array given the specified data type
+		int bytesToRead = count*valueType.size;
+
+		if (workBytes.length < bytesToRead)
+			throw new RuntimeException("workspace too small to read in array of " + valueType.name() + " count=" + count);
+
+		int found = reader.read(workBytes, 0, bytesToRead);
+		if (found != bytesToRead)
+			throw new IOException("Read unexpected number of bytes. " + found + " vs " + bytesToRead);
+
+		for (int wordIndex = 0; wordIndex < count; wordIndex++) {
+			switch (valueType) {
+				case FLOAT -> tempF[wordIndex] = bb.getFloat(wordIndex*valueType.size);
+
+				default -> throw new RuntimeException("Unexpected type");
+			}
+			output.addTexture(count, tempF);
+		}
+		System.out.println();
 	}
 
 	private static PlyWriter wrapMeshForWriting( VertexMesh mesh, @Nullable DogArray_I32 colorRGB ) {
@@ -517,6 +582,8 @@ public class PlyCodec {
 
 				return idx1 - idx0;
 			}
+
+			@Override public int getTexture( int which, float[] coors ) {return 0;}
 		};
 	}
 
@@ -533,6 +600,8 @@ public class PlyCodec {
 			@Override public int getColor( int which ) {return cloud.getRGB(which);}
 
 			@Override public int getIndexes( int which, int[] indexes ) {return 0;}
+
+			@Override public int getTexture( int which, float[] coors ) {return 0;}
 		};
 	}
 
@@ -541,7 +610,25 @@ public class PlyCodec {
 		int vertexCount = -1;
 		int triangleCount = -1;
 		boolean rgb = false;
+		List<PropertyList> properties = new ArrayList<>();
 		Format format = Format.ASCII;
+	}
+
+	private static class PropertyList {
+		/** Propery name */
+		String label;
+
+		/** What the number of elements is stored in */
+		DataType countType;
+
+		/** Array value data type */
+		DataType valueType;
+
+		public PropertyList( String label, DataType countType, DataType valueType ) {
+			this.label = label;
+			this.countType = countType;
+			this.valueType = valueType;
+		}
 	}
 
 	private static class DataWord {

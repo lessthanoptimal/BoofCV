@@ -18,6 +18,7 @@
 
 package boofcv.struct.mesh;
 
+import boofcv.struct.packed.PackedBigArrayPoint2D_F32;
 import boofcv.struct.packed.PackedBigArrayPoint3D_F64;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.DogArray;
@@ -40,6 +41,9 @@ public class VertexMesh {
 
 	/** Start index of each shape + the last index */
 	public final DogArray_I32 offsets = new DogArray_I32();
+
+	/** 2D coordinate of textures. units = fraction of width / height */
+	public final PackedBigArrayPoint2D_F32 texture = new PackedBigArrayPoint2D_F32();
 
 	{
 		offsets.add(0);
