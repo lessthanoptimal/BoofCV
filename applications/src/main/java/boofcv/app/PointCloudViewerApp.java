@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.app;
 
 import boofcv.alg.cloud.PointCloudWriter;
+import boofcv.alg.geo.PerspectiveOps;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.PointCloudViewerPanel;
 import boofcv.gui.image.ShowImages;
@@ -100,7 +101,7 @@ public class PointCloudViewerApp {
 			y /= N;
 			z /= N;
 
-			DogArray_F32 distances = new DogArray_F32();
+			var distances = new DogArray_F32();
 			distances.resize(N);
 			for (int i = 0; i < N; i++) {
 				float X = cloud.cloudXyz.data[i*3];
@@ -110,17 +111,24 @@ public class PointCloudViewerApp {
 				distances.data[i] = UtilPoint3D_F32.distance(x, y, z, X, Y, Z);
 			}
 
+			double hfov = UtilAngle.radian(100);
+
+			// Used to compute how far away the camera needs to be to fil the view
+			double radius = distances.getFraction(0.95);
+
 			Se3_F64 worldToCamera = new Se3_F64();
-			worldToCamera.T.setTo(x, y, z);
+			worldToCamera.T.setTo(0, 0, -radius/Math.tan(hfov/2.0));
+			PerspectiveOps.pointAt(x, y, z, worldToCamera.R);
 
 			// TODO pick a better method for selecting the initial step size
 			distances.sort();
+
 			double baseline = distances.getFraction(0.001);
 			System.out.println("baseline = " + baseline);
 
 			viewer.periodBaseline = baseline*10;
 			viewer.translateBaseline = baseline;
-			viewer.getViewer().setCameraHFov(UtilAngle.radian(100));
+			viewer.getViewer().setCameraHFov(hfov);
 
 			SwingUtilities.invokeLater(() -> {
 				viewer.handleControlChange();

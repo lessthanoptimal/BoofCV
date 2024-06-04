@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -58,6 +58,13 @@ public class VertexMesh {
 			output = new Point3D_F64();
 		vertexes.getCopy(indexes.get(which), output);
 		return output;
+	}
+
+	/**
+	 * Number of elements in a specific shapes
+	 */
+	public int getShapeSize( int which ) {
+		return offsets.get(which + 1) - offsets.get(which);
 	}
 
 	/**

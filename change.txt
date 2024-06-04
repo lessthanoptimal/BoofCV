@@ -7,6 +7,13 @@ Version Meaning: <compatible>.<feature>.<bug fix>
 - Last digit always indicates a bug fix and other minor changes
 
 ---------------------
+Date    : 2024/XXX/XX
+Version : 1.1.5
+
+- PerspectiveOps
+  * Added pointAt()
+
+---------------------
 Date    : 2024/May/14
 Version : 1.1.4
 

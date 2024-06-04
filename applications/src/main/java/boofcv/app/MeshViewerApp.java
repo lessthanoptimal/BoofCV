@@ -64,6 +64,10 @@ public class MeshViewerApp {
 			System.exit(1);
 		}
 
+		if (mesh.size() == 0) {
+			System.err.println("No shapes to render! Is this a point cloud?");
+		}
+
 		SwingUtilities.invokeLater(() -> {
 			var panel = new MeshViewerPanel();
 			panel.setMesh(mesh, false);
