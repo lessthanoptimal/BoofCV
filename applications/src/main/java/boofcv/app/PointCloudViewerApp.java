@@ -114,14 +114,12 @@ public class PointCloudViewerApp {
 			double hfov = UtilAngle.radian(100);
 
 			// Used to compute how far away the camera needs to be to fil the view
+			distances.sort();
 			double radius = distances.getFraction(0.95);
 
-			Se3_F64 worldToCamera = new Se3_F64();
+			var worldToCamera = new Se3_F64();
 			worldToCamera.T.setTo(0, 0, -radius/Math.tan(hfov/2.0));
 			PerspectiveOps.pointAt(x, y, z, worldToCamera.R);
-
-			// TODO pick a better method for selecting the initial step size
-			distances.sort();
 
 			double baseline = distances.getFraction(0.001);
 			System.out.println("baseline = " + baseline);

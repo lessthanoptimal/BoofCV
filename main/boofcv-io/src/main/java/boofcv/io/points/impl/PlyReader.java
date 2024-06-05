@@ -34,7 +34,7 @@ public interface PlyReader {
 	 * Adds coordinates for texture in the ply file
 	 *
 	 * @param count Number of 2D points in the coordinates
-	 * @param coor Array storing the 2D coordinates
+	 * @param coor Array storing the 2D coordinates, interleaved (x,y)
 	 */
 	void addTexture( int count, float[] coor );
 }

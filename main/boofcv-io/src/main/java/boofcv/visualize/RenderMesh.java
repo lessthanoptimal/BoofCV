@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -196,7 +196,7 @@ public class RenderMesh implements VerbosePrint {
 		//      convex intersection or computing the depth at that pixel on this surface
 
 		// The entire surface will have one color
-		int color = surfaceColor.surfaceRgb(vertexIndex);
+		int color = surfaceColor.surfaceRgb(shapeIdx);
 
 		// Go through all pixels and see if the points are inside the polygon. If so
 		for (int pixelY = aabb.y0; pixelY < aabb.y1; pixelY++) {

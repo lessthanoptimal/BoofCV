@@ -33,6 +33,9 @@ public interface PlyWriter {
 	/** True if a vertex has color information or not */
 	boolean isColor();
 
+	/** True if a vertex has a texture coordinate */
+	boolean isTextured();
+
 	void getVertex( int which, Point3D_F64 vertex );
 
 	/**
@@ -46,10 +49,10 @@ public interface PlyWriter {
 	int getIndexes( int which, int[] indexes );
 
 	/**
-	 * Writes interleaved coordinates of texture location
-	 * @param which Which polygon is being referenced
-	 * @param coors Where the coordinates are written to. Must be large enough.
-	 * @return Number of vertexes in this polygon. coors must be 2x this number.
+	 * Reads the texture coordinate for the specified shape. Returns the number of vertexes for that shape.
+	 *
+	 * @param which Which shape
+	 * @param coordinates Texture coordinate of the specified vertex
 	 */
-	int getTexture( int which, float[] coors );
+	int getTextureCoors( int which, float[] coordinates );
 }

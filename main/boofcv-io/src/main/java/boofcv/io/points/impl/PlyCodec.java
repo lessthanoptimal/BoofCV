@@ -21,7 +21,9 @@ package boofcv.io.points.impl;
 import boofcv.alg.cloud.PointCloudReader;
 import boofcv.alg.cloud.PointCloudWriter;
 import boofcv.io.UtilIO;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.mesh.VertexMesh;
+import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.DogArray_I32;
 import org.jetbrains.annotations.Nullable;
@@ -43,11 +45,12 @@ import java.util.Locale;
  */
 public class PlyCodec {
 	public static void saveAscii( PlyWriter data, Writer outputWriter ) throws IOException {
-		writeAsciiHeader(data.getVertexCount(), data.getPolygonCount(), data.isColor(), outputWriter);
+		writeAsciiHeader(data.getVertexCount(), data.getPolygonCount(), data.isColor(), data.isTextured(),
+				outputWriter);
 
 		boolean color = data.isColor();
 
-		Point3D_F64 p = new Point3D_F64();
+		var p = new Point3D_F64();
 		for (int i = 0; i < data.getVertexCount(); i++) {
 			data.getVertex(i, p);
 			if (color) {
@@ -60,12 +63,24 @@ public class PlyCodec {
 				outputWriter.write(String.format("%f %f %f\n", p.x, p.y, p.z));
 			}
 		}
-		int[] indexes = new int[100];
+		var arrayI = new int[100];
+		var arrayF = new float[100];
+
 		for (int i = 0; i < data.getPolygonCount(); i++) {
-			int size = data.getIndexes(i, indexes);
+			int size = data.getIndexes(i, arrayI);
 			outputWriter.write(size);
-			for (int idxidx = 0; idxidx < size; idxidx++) {
-				outputWriter.write(" " + indexes[idxidx]);
+			for (int idx = 0; idx < size; idx++) {
+				outputWriter.write(" " + arrayI[idx]);
+			}
+			outputWriter.write('\n');
+
+			if (!data.isTextured())
+				continue;
+
+			BoofMiscOps.checkEq(size, data.getTextureCoors(i, arrayF));
+			outputWriter.write(size);
+			for (int idx = 0; idx < size*2; idx++) {
+				outputWriter.write(" " + arrayF[idx]);
 			}
 			outputWriter.write('\n');
 		}
@@ -80,7 +95,8 @@ public class PlyCodec {
 		saveAscii(wrapCloudForWriting(cloud, saveRgb), outputWriter);
 	}
 
-	private static void writeAsciiHeader( int vertexCount, int triangleCount, boolean hasColor, Writer outputWriter )
+	private static void writeAsciiHeader( int vertexCount, int triangleCount, boolean hasColor, boolean hasTexture,
+										  Writer outputWriter )
 			throws IOException {
 		outputWriter.write("ply\n");
 		outputWriter.write("format ascii 1.0\n");
@@ -99,6 +115,10 @@ public class PlyCodec {
 		if (triangleCount > 0) {
 			outputWriter.write("element face " + triangleCount + "\n" +
 					"property list uchar int vertex_indices\n");
+
+			if (hasTexture) {
+				outputWriter.write("property list uchar float texcoord\n");
+			}
 		}
 		outputWriter.write("end_header\n");
 	}
@@ -135,7 +155,9 @@ public class PlyCodec {
 			throws IOException {
 		String format = "UTF-8";
 		int dataLength = saveAsFloat ? 4 : 8;
-		writeBinaryHeader(data.getVertexCount(), data.getPolygonCount(), order, data.isColor(), saveAsFloat, format, outputWriter);
+		writeBinaryHeader(data.getVertexCount(), data.getPolygonCount(), order, data.isColor(),
+				data.isTextured(),
+				saveAsFloat, format, outputWriter);
 
 		boolean color = data.isColor();
 
@@ -167,23 +189,35 @@ public class PlyCodec {
 			outputWriter.write(bytes.array());
 		}
 
-		var indexes = new int[100];
-		bytes = ByteBuffer.allocate(1 + indexes.length*4);
+		var arrayI = new int[100];
+		var arrayF = new float[100];
+		bytes = ByteBuffer.allocate(1 + arrayI.length*4);
 		bytes.order(order);
 		for (int i = 0; i < data.getPolygonCount(); i++) {
-			int size = data.getIndexes(i, indexes);
+			int size = data.getIndexes(i, arrayI);
 			bytes.position(0);
 			bytes.put((byte)size);
-			for (int idx = 0; idx < indexes.length; idx++) {
-				bytes.putInt(indexes[idx]);
+			for (int idx = 0; idx < size; idx++) {
+				bytes.putInt(arrayI[idx]);
 			}
 			outputWriter.write(bytes.array(), 0, 1 + 4*size);
+
+			if (!data.isTextured())
+				continue;
+
+			bytes.position(0);
+			BoofMiscOps.checkEq(size, data.getTextureCoors(i, arrayF));
+			bytes.put((byte)(2*size));
+			for (int idx = 0; idx < size*2; idx++) {
+				bytes.putFloat(arrayF[idx]);
+			}
+			outputWriter.write(bytes.array(), 0, 1 + 2*4*size);
 		}
 		outputWriter.flush();
 	}
 
 	private static void writeBinaryHeader( int vertexCount, int triangleCount, ByteOrder order, boolean hasColor,
-										   boolean saveAsFloat, String format, OutputStream outputWriter )
+										   boolean hasTexture, boolean saveAsFloat, String format, OutputStream outputWriter )
 			throws IOException {
 		String dataType = saveAsFloat ? "float" : "double";
 		outputWriter.write("ply\n".getBytes(format));
@@ -210,6 +244,9 @@ public class PlyCodec {
 		if (triangleCount > 0) {
 			outputWriter.write(("element face " + triangleCount + "\n" +
 					"property list uchar int vertex_indices\n").getBytes(format));
+			if (hasTexture) {
+				outputWriter.write(("property list uchar float texcoord\n").getBytes(format));
+			}
 		}
 		outputWriter.write("end_header\n".getBytes(format));
 	}
@@ -238,7 +275,6 @@ public class PlyCodec {
 		line = readNextPly(input, true, buffer);
 		boolean previousVertex = false;
 		while (!line.isEmpty()) {
-			System.out.println(line);
 			if (line.equals("end_header"))
 				break;
 			String[] words = line.split("\\s+");
@@ -556,7 +592,6 @@ public class PlyCodec {
 			}
 			output.addTexture(count, tempF);
 		}
-		System.out.println();
 	}
 
 	private static PlyWriter wrapMeshForWriting( VertexMesh mesh, @Nullable DogArray_I32 colorRGB ) {
@@ -566,6 +601,10 @@ public class PlyCodec {
 			@Override public int getPolygonCount() {return mesh.offsets.size - 1;}
 
 			@Override public boolean isColor() {return colorRGB != null;}
+
+			@Override public boolean isTextured() {
+				return mesh.texture.size() > 0;
+			}
 
 			@Override public void getVertex( int which, Point3D_F64 vertex ) {mesh.vertexes.getCopy(which, vertex);}
 
@@ -583,7 +622,19 @@ public class PlyCodec {
 				return idx1 - idx0;
 			}
 
-			@Override public int getTexture( int which, float[] coors ) {return 0;}
+			@Override public int getTextureCoors( int which, float[] coordinates ) {
+				int idx0 = mesh.offsets.get(which);
+				int idx1 = mesh.offsets.get(which + 1);
+
+				int idxArray = 0;
+				for (int i = idx0; i < idx1; i++) {
+					Point2D_F32 p = mesh.texture.getTemp(i);
+					coordinates[idxArray++] = p.x;
+					coordinates[idxArray++] = p.y;
+				}
+
+				return idx1 - idx0;
+			}
 		};
 	}
 
@@ -595,13 +646,15 @@ public class PlyCodec {
 
 			@Override public boolean isColor() {return saveRgb;}
 
+			@Override public boolean isTextured() {return false;}
+
 			@Override public void getVertex( int which, Point3D_F64 vertex ) {cloud.get(which, vertex);}
 
 			@Override public int getColor( int which ) {return cloud.getRGB(which);}
 
 			@Override public int getIndexes( int which, int[] indexes ) {return 0;}
 
-			@Override public int getTexture( int which, float[] coors ) {return 0;}
+			@Override public int getTextureCoors( int which, float[] coordinates ) {return 0;}
 		};
 	}
 

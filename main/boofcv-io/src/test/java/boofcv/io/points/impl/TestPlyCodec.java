@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -149,6 +149,10 @@ class TestPlyCodec extends BoofStandardJUnit {
 				mesh.indexes.add((i*3 + 1)%numVertexes);
 				mesh.indexes.add((i*3 + 2)%numVertexes);
 				mesh.offsets.add(mesh.indexes.size);
+
+				for (int idxPoly = 0; idxPoly < 3; idxPoly++) {
+					mesh.texture.append(1, idxPoly);
+				}
 			}
 			var colors = new DogArray_I32();
 			for (int i = 0; i < mesh.vertexes.size(); i++) {
@@ -165,6 +169,7 @@ class TestPlyCodec extends BoofStandardJUnit {
 			PlyCodec.readMesh(input, foundMesh, foundColors);
 
 			assertEquals(mesh.vertexes.size(), mesh.vertexes.size());
+			assertEquals(mesh.texture.size(), mesh.texture.size());
 			assertTrue(mesh.indexes.isEquals(foundMesh.indexes));
 			assertTrue(mesh.offsets.isEquals(foundMesh.offsets));
 			assertTrue(colors.isEquals(foundColors));
@@ -177,6 +182,10 @@ class TestPlyCodec extends BoofStandardJUnit {
 
 			for (int i = 0; i < mesh.vertexes.size(); i++) {
 				assertEquals(mesh.indexes.get(i), foundMesh.indexes.get(i));
+			}
+
+			for (int i = 0; i < mesh.texture.size(); i++) {
+				assertEquals(0.0f, mesh.texture.getTemp(i).distance(mesh.texture.getTemp(i)), UtilEjml.TEST_F32);
 			}
 		}
 	}

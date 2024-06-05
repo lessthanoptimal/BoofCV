@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class TestVertexMesh extends BoofStandardJUnit {
 	@Test void setTo() {checkSetTo(VertexMesh.class, true);}
@@ -50,6 +51,10 @@ public class TestVertexMesh extends BoofStandardJUnit {
 		assertIdentical(shapeA, found.toList());
 		alg.getShape(1, found);
 		assertIdentical(shapeB, found.toList());
+	}
+
+	@Test void getTexture() {
+		fail("implement");
 	}
 
 	private List<Point3D_F64> createRandomShape( int count ) {

@@ -20,6 +20,7 @@ package boofcv.struct.mesh;
 
 import boofcv.struct.packed.PackedBigArrayPoint2D_F32;
 import boofcv.struct.packed.PackedBigArrayPoint3D_F64;
+import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
@@ -72,6 +73,35 @@ public class VertexMesh {
 	}
 
 	/**
+	 * Copies texture coordinates from a polygon
+	 *
+	 * @param which Which shape to copy
+	 * @param output Output storage for the shape
+	 */
+	public void getTexture( int which, DogArray<Point2D_F32> output ) {
+		int idx0 = offsets.get(which);
+		int idx1 = offsets.get(which + 1);
+
+		output.reset().resize(idx1 - idx0);
+		for (int i = idx0; i < idx1; i++) {
+			texture.getCopy(indexes.get(i), output.get(i - idx0));
+		}
+	}
+
+	/**
+	 * Appends the texture coordinates onto the end of the array. NOTE: This will not update
+	 * the offsets, which are assumed to be the same as with the vertexes
+	 *
+	 * @param count Number of points in the coordinates
+	 * @param coordinates Array containing interleaved coordinates [x0,y0, x1,y1, ... , x[n], y[n]]
+	 */
+	public void addTexture( int count, float[] coordinates ) {
+		for (int i = 0; i < count; i++) {
+			texture.append(coordinates[i*2], coordinates[i*2 + 1]);
+		}
+	}
+
+	/**
 	 * Copies the entire shape into the output array
 	 *
 	 * @param which Which shape to copy
@@ -105,6 +135,7 @@ public class VertexMesh {
 		this.vertexes.setTo(src.vertexes);
 		this.indexes.setTo(src.indexes);
 		this.offsets.setTo(src.offsets);
+		this.texture.setTo(src.texture);
 		return this;
 	}
 
@@ -112,6 +143,7 @@ public class VertexMesh {
 		vertexes.reset();
 		indexes.reset();
 		offsets.reset();
+		texture.reset();
 		offsets.add(0);
 	}
 
