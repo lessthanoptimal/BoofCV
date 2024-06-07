@@ -21,7 +21,10 @@ package boofcv.app;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.mesh.MeshViewerPanel;
+import boofcv.io.image.UtilImageIO;
 import boofcv.io.points.PointCloudIO;
+import boofcv.struct.image.ImageType;
+import boofcv.struct.image.InterleavedU8;
 import boofcv.struct.mesh.VertexMesh;
 import org.apache.commons.io.FilenameUtils;
 import org.ddogleg.struct.DogArray_I32;
@@ -68,11 +71,24 @@ public class MeshViewerApp {
 			System.err.println("No shapes to render! Is this a point cloud?");
 		}
 
+		// See if there should be a texture mapped file
+		InterleavedU8 rgb = null;
+		if (mesh.texture.size() > 0) {
+			System.out.println("Loading texture image");
+			String name = FilenameUtils.getBaseName(file.getName());
+			File textureFile = new File(file.getParentFile(), name + ".jpg");
+			rgb = UtilImageIO.loadImage(textureFile, true, ImageType.IL_U8);
+			if (rgb == null)
+				System.err.println("Failed to load texture image");
+		}
+		InterleavedU8 _rgb = rgb;
 		SwingUtilities.invokeLater(() -> {
 			var panel = new MeshViewerPanel();
 			panel.setMesh(mesh, false);
 			if (colors.size > 0)
 				panel.setVertexColors("RGB", colors.data);
+			if (_rgb != null)
+				panel.setTextureImage(_rgb);
 			panel.setPreferredSize(new Dimension(500, 500));
 			ShowImages.showWindow(panel, "Mesh Viewer", true);
 		});

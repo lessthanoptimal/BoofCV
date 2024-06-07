@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,8 +26,7 @@ import georegression.struct.shapes.Rectangle2D_I32;
 import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestRenderMesh extends BoofStandardJUnit {
 	/**
@@ -90,7 +89,7 @@ public class TestRenderMesh extends BoofStandardJUnit {
 	 * Tests the projection by having it fill in a known rectangle. The AABB is larger than needed. One pixel
 	 * is given a depth closer than the polygon and isn't filled in.
 	 */
-	@Test void projectSurfaceOntoImage() {
+	@Test void projectSurfaceColor() {
 		var alg = new RenderMesh();
 		alg.intrinsics.fsetShape(100, 120);
 		alg.initializeImages();
@@ -113,7 +112,7 @@ public class TestRenderMesh extends BoofStandardJUnit {
 		alg.depthImage.set(15, 25, 1);
 
 		// Perform the projection
-		alg.projectSurfaceOntoImage(mesh, polygon, 0);
+		alg.projectSurfaceColor(mesh, polygon, 0);
 
 		// Verify by counting the number of projected points
 		int countDepth = 0;
@@ -129,5 +128,9 @@ public class TestRenderMesh extends BoofStandardJUnit {
 
 		assertEquals(599, countDepth);
 		assertEquals(599, countRgb);
+	}
+
+	@Test void projectSurfaceTexture() {
+		fail("implement");
 	}
 }

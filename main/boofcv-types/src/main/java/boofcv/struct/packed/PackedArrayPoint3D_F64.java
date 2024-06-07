@@ -55,6 +55,12 @@ public class PackedArrayPoint3D_F64 implements PackedArray<Point3D_F64> {
 		array.add(element.z);
 	}
 
+	public void append( double x, double y, double z) {
+		array.add(x);
+		array.add(y);
+		array.add(z);
+	}
+
 	@Override public void set( int index, Point3D_F64 element ) {
 		index *= 3;
 		array.data[index++] = element.x;

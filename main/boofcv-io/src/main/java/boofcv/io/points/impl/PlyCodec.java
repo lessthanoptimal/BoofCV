@@ -379,7 +379,9 @@ public class PlyCodec {
 				mesh.indexes.addAll(indexes, offset, offset + length);
 			}
 
-			@Override public void addTexture( int count, float[] coor ) {}
+			@Override public void addTexture( int count, float[] coor ) {
+				mesh.addTexture(count, coor);
+			}
 		});
 	}
 
@@ -590,8 +592,9 @@ public class PlyCodec {
 
 				default -> throw new RuntimeException("Unexpected type");
 			}
-			output.addTexture(count, tempF);
 		}
+		output.addTexture(count/2, tempF);
+
 	}
 
 	private static PlyWriter wrapMeshForWriting( VertexMesh mesh, @Nullable DogArray_I32 colorRGB ) {

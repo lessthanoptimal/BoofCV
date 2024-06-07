@@ -57,6 +57,10 @@ public class TestVertexMesh extends BoofStandardJUnit {
 		fail("implement");
 	}
 
+	@Test void computeNormals() {
+		fail("implement");
+	}
+
 	private List<Point3D_F64> createRandomShape( int count ) {
 		var shape = new ArrayList<Point3D_F64>();
 		for (int i = 0; i < count; i++) {

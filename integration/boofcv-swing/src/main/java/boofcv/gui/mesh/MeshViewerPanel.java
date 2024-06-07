@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -493,5 +493,9 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 		}
 		coolDownTime = System.currentTimeMillis() + 200L;
 		return false;
+	}
+
+	public void setTextureImage( InterleavedU8 rgb ) {
+		renderer.setTextureImage(rgb);
 	}
 }

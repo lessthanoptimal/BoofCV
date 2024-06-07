@@ -18,10 +18,13 @@
 
 package boofcv.struct.mesh;
 
+import boofcv.struct.packed.PackedArrayPoint3D_F64;
 import boofcv.struct.packed.PackedBigArrayPoint2D_F32;
 import boofcv.struct.packed.PackedBigArrayPoint3D_F64;
+import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Vector3D_F64;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
 import org.jetbrains.annotations.Nullable;
@@ -45,6 +48,9 @@ public class VertexMesh {
 
 	/** 2D coordinate of textures. units = fraction of width / height */
 	public final PackedBigArrayPoint2D_F32 texture = new PackedBigArrayPoint2D_F32();
+
+	/** Optional precomputed surface normals for each shape */
+	public final PackedArrayPoint3D_F64 normals = new PackedArrayPoint3D_F64();
 
 	{
 		offsets.add(0);
@@ -84,7 +90,7 @@ public class VertexMesh {
 
 		output.reset().resize(idx1 - idx0);
 		for (int i = idx0; i < idx1; i++) {
-			texture.getCopy(indexes.get(i), output.get(i - idx0));
+			texture.getCopy(i, output.get(i - idx0));
 		}
 	}
 
@@ -129,6 +135,40 @@ public class VertexMesh {
 
 		offsets.add(idx0 + shape.size());
 		vertexes.appendAll(shape);
+	}
+
+	/**
+	 * Computes normal vectors from shapes
+	 */
+	public void computeNormals() {
+		var vector1 = new Vector3D_F64();
+		var vector2 = new Vector3D_F64();
+		var norm = new Vector3D_F64();
+
+		for (int idxShape = 1; idxShape < offsets.size; idxShape++) {
+			int idx0 = offsets.get(idxShape - 1);
+
+			// Use cross product to find the normal in the correct orientation
+			pointsToVector(idx0, idx0 + 1, vector1);
+			pointsToVector(idx0 + 1, idx0 + 2, vector2);
+
+			GeometryMath_F64.cross(vector1, vector2, norm);
+			norm.normalize();
+			normals.append(norm.x, norm.y, norm.z);
+		}
+	}
+
+	private void pointsToVector( int idxA, int idxB, Vector3D_F64 out ) {
+		Point3D_F64 p = vertexes.getTemp(indexes.get(idxA));
+
+		double x0 = p.x;
+		double y0 = p.y;
+		double z0 = p.z;
+
+		p = vertexes.getTemp(indexes.get(idxB));
+		out.x = p.x - x0;
+		out.y = p.y - y0;
+		out.z = p.z - z0;
 	}
 
 	public VertexMesh setTo( VertexMesh src ) {

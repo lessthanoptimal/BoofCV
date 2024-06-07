@@ -18,21 +18,28 @@
 
 package boofcv.visualize;
 
+import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.misc.BoofMiscOps;
+import boofcv.struct.border.BorderType;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.InterleavedU8;
 import boofcv.struct.mesh.VertexMesh;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.metric.Intersection2D_F64;
+import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
+import georegression.struct.shapes.Polygon2D_F32;
 import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.Rectangle2D_I32;
 import lombok.Getter;
 import lombok.Setter;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.VerbosePrint;
 import org.jetbrains.annotations.Nullable;
 
@@ -71,13 +78,36 @@ public class RenderMesh implements VerbosePrint {
 	/** Transform from world (what the mesh is in) to the camera view */
 	public @Getter final Se3_F64 worldToView = new Se3_F64();
 
-	// Workspace variables
+	/** If true then a polygon will only be rendered if the surface normal is pointed towards the camera */
+	public @Getter @Setter boolean checkSurfaceNormal = true;
+
+	// Image for texture mapping
+	private InterleavedU8 textureImage = new InterleavedU8(1, 1, 3);
+	private InterpolatePixelMB<InterleavedU8> textureInterp = FactoryInterpolation.bilinearPixelMB(textureImage, BorderType.EXTENDED);
+	private float[] textureValues = new float[3];
+
+	//---------- Workspace variables
 	private final Point3D_F64 camera = new Point3D_F64();
 	private final Point2D_F64 point = new Point2D_F64();
-	private final Polygon2D_F64 polygon = new Polygon2D_F64();
+
+	// mesh in camera reference frame
+	private final DogArray<Point3D_F64> meshCam = new DogArray<>(Point3D_F64::new);
+	// Mesh projected onto the image
+	private final Polygon2D_F64 polygonProj = new Polygon2D_F64();
+	// Vertex of polygon in the texture image
+	private final Polygon2D_F32 polygonTex = new Polygon2D_F32();
+	// Axis aligned bonding box
 	final Rectangle2D_I32 aabb = new Rectangle2D_I32();
+	// Workspace for a sub-triangle in the polygon
+	private final Polygon2D_F64 workTri = new Polygon2D_F64(3);
 
 	@Nullable PrintStream verbose = null;
+
+	public void setTextureImage( InterleavedU8 textureImage ) {
+		this.textureImage = textureImage;
+		textureInterp.setImage(textureImage);
+		textureValues = new float[textureImage.numBands];
+	}
 
 	/**
 	 * Renders the mesh onto an image. Produces an RGB image and depth image. Must have configured
@@ -89,6 +119,10 @@ public class RenderMesh implements VerbosePrint {
 		// Sanity check to see if intrinsics has been configured
 		BoofMiscOps.checkTrue(intrinsics.width > 0 && intrinsics.height > 0, "Intrinsics not set");
 
+		// Make sure there are normals if it's configured to use them
+		if (checkSurfaceNormal && mesh.normals.size() == 0)
+			mesh.computeNormals();
+
 		// Initialize output images
 		initializeImages();
 
@@ -99,7 +133,11 @@ public class RenderMesh implements VerbosePrint {
 		final double cx = intrinsics.cx;
 		final double cy = intrinsics.cy;
 
+		// Keep track of how many meshes were rendered
 		int shapesRenderedCount = 0;
+
+		var worldCamera = new Point3D_F64();
+		worldToView.transformReverse(worldCamera, worldCamera);
 
 		for (int shapeIdx = 1; shapeIdx < mesh.offsets.size; shapeIdx++) {
 			// First and last point in the polygon
@@ -111,7 +149,18 @@ public class RenderMesh implements VerbosePrint {
 				continue;
 
 			// Project points on the shape onto the image and store in polygon
-			polygon.vertexes.reset().reserve(idx1 - idx0);
+			polygonProj.vertexes.reset().reserve(idx1 - idx0);
+			meshCam.reset().reserve(idx1 - idx0);
+
+			if (mesh.texture.size() > 0) {
+				mesh.getTexture(shapeIdx - 1, polygonTex.vertexes);
+			}
+
+			// Prune using normal vector
+			if (mesh.normals.size() > 0 && checkSurfaceNormal) {
+				if (!isFrontVisible(mesh, shapeIdx, idx0, worldCamera)) continue;
+			}
+
 			boolean behindCamera = false;
 			for (int i = idx0; i < idx1; i++) {
 				Point3D_F64 world = mesh.vertexes.getTemp(mesh.indexes.get(i));
@@ -132,22 +181,46 @@ public class RenderMesh implements VerbosePrint {
 				double pixelX = normX*fx + cx;
 				double pixelY = normY*fy + cy;
 
-				polygon.vertexes.grow().setTo(pixelX, pixelY);
+				polygonProj.vertexes.grow().setTo(pixelX, pixelY);
+				meshCam.grow().setTo(camera);
 			}
 
 			// Skip if not visible
 			if (behindCamera)
 				continue;
 
-			// Compute the pixels which might be able to see polygon
-			computeBoundingBox(width, height, polygon, aabb);
-
-			projectSurfaceOntoImage(mesh, polygon, shapeIdx-1);
+			if (mesh.texture.size() == 0) {
+				projectSurfaceColor(mesh, polygonProj, shapeIdx - 1);
+			} else {
+				projectSurfaceTexture(meshCam, polygonProj, polygonTex);
+			}
 
 			shapesRenderedCount++;
 		}
 
-		if (verbose != null ) verbose.println("total shapes rendered: " + shapesRenderedCount);
+		if (verbose != null) verbose.println("total shapes rendered: " + shapesRenderedCount);
+	}
+
+	/**
+	 * Use the normal vector to see if the front of the mesh is visible. If it's not visible we can skip it
+	 *
+	 * @return true if visible
+	 */
+	private static boolean isFrontVisible( VertexMesh mesh, int shapeIdx, int idx0, Point3D_F64 worldCamera ) {
+		// Get normal in world coordinates
+		Point3D_F64 normal = mesh.normals.getTemp(shapeIdx - 1);
+
+		// vector from the camera to a vertex
+		Point3D_F64 v1 = mesh.vertexes.getTemp(mesh.indexes.get(idx0));
+		v1.x -= worldCamera.x;
+		v1.y -= worldCamera.y;
+		v1.z -= worldCamera.z;
+
+		// compute the dot product
+		double dot = v1.x*normal.x + v1.y*normal.y + v1.z*normal.z;
+
+		// Don't render if we are viewing it from behind
+		return dot < 0.0;
 	}
 
 	void initializeImages() {
@@ -180,7 +253,7 @@ public class RenderMesh implements VerbosePrint {
 	 * is searched exhaustively. If the projected 2D polygon contains a pixels and the polygon is closer than
 	 * the current depth of the pixel it is rendered there and the depth image is updated.
 	 */
-	void projectSurfaceOntoImage( VertexMesh mesh, Polygon2D_F64 polygon, int shapeIdx ) {
+	void projectSurfaceColor( VertexMesh mesh, Polygon2D_F64 polyProj, int shapeIdx ) {
 		// TODO temp hack. Best way is to find the distance to the 3D polygon at this point. Instead we will
 		// use the depth of the first point.
 		//
@@ -190,6 +263,7 @@ public class RenderMesh implements VerbosePrint {
 		Point3D_F64 world = mesh.vertexes.getTemp(vertexIndex);
 		worldToView.transform(world, camera);
 
+		// TODO compute the depth at each pixel
 		float depth = (float)camera.z;
 
 		// TODO look at vertexes and get min/max depth. Use that to quickly reject pixels based on depth without
@@ -197,6 +271,8 @@ public class RenderMesh implements VerbosePrint {
 
 		// The entire surface will have one color
 		int color = surfaceColor.surfaceRgb(shapeIdx);
+
+		computeBoundingBox(intrinsics.width, intrinsics.height, polygonProj, aabb);
 
 		// Go through all pixels and see if the points are inside the polygon. If so
 		for (int pixelY = aabb.y0; pixelY < aabb.y1; pixelY++) {
@@ -208,7 +284,7 @@ public class RenderMesh implements VerbosePrint {
 				}
 
 				point.setTo(pixelX, pixelY);
-				if (!Intersection2D_F64.containsConvex(polygon, point))
+				if (!Intersection2D_F64.containsConvex(polyProj, point))
 					continue;
 
 				// Update depth and image
@@ -217,6 +293,113 @@ public class RenderMesh implements VerbosePrint {
 				rgbImage.set24(pixelX, pixelY, color);
 			}
 		}
+	}
+
+	/**
+	 * Projection with texture mapping. Breaks the polygon up into triangles and uses Barycentric coordinates to
+	 * map pixels to textured mapped coordinates.
+	 *
+	 * @param mesh 3D location of vertexes in the mesh
+	 * @param polyProj Projected pixels of mesh
+	 * @param polyText Texture coordinates of the mesh
+	 */
+	void projectSurfaceTexture( FastAccess<Point3D_F64> mesh, Polygon2D_F64 polyProj, Polygon2D_F32 polyText ) {
+		// If the mesh has more than 3 sides, break it up into triangles using the first vertex as a pivot
+		// This works because the mesh has to be convex
+		for (int vertC = 2; vertC < polyProj.size(); vertC++) {
+			int vertA = 0;
+			int vertB = vertC - 1;
+
+			float Z0 = (float)mesh.get(vertA).z;
+			float Z1 = (float)mesh.get(vertB).z;
+			float Z2 = (float)mesh.get(vertC).z;
+
+			Point2D_F64 r0 = polyProj.get(vertA);
+			Point2D_F64 r1 = polyProj.get(vertB);
+			Point2D_F64 r2 = polyProj.get(vertC);
+
+			// Pre-compute part of Barycentric Coordinates
+			double x0 = r2.x - r0.x;
+			double y0 = r2.y - r0.y;
+			double x1 = r1.x - r0.x;
+			double y1 = r1.y - r0.y;
+
+			double d00 = x0*x0 + y0*y0;
+			double d01 = x0*x1 + y0*y1;
+			double d11 = x1*x1 + y1*y1;
+
+			double denom = d00*d11 - d01*d01;
+
+			// Compute coordinate on texture image
+			Point2D_F32 t0 = polyText.get(vertC);
+			Point2D_F32 t1 = polyText.get(vertB);
+			Point2D_F32 t2 = polyText.get(vertA);
+
+			// Do the polygon intersection with the triangle in question only
+			workTri.get(0).setTo(polyProj.get(vertA));
+			workTri.get(1).setTo(polyProj.get(vertB));
+			workTri.get(2).setTo(polyProj.get(vertC));
+
+			// TODO look at vertexes and get min/max depth. Use that to quickly reject pixels based on depth without
+			//      convex intersection or computing the depth at that pixel on this surface
+
+			computeBoundingBox(intrinsics.width, intrinsics.height, workTri, aabb);
+
+			// Go through all pixels and see if the points are inside the polygon. If so
+			for (int pixelY = aabb.y0; pixelY < aabb.y1; pixelY++) {
+				double y2 = pixelY - r0.y;
+
+				for (int pixelX = aabb.x0; pixelX < aabb.x1; pixelX++) {
+
+					point.setTo(pixelX, pixelY);
+					if (!Intersection2D_F64.containsConvex(workTri, point))
+						continue;
+
+					// See if this is the closest point appearing at this pixel
+					float pixelDepth = depthImage.unsafe_get(pixelX, pixelY);
+
+					// Compute rest of Barycentric
+					double x2 = pixelX - r0.x;
+					double d20 = x2*x0 + y2*y0;
+					double d21 = x2*x1 + y2*y1;
+
+					float alpha = (float)((d11*d20 - d01*d21)/denom);
+					float beta = (float)((d00*d21 - d01*d20)/denom);
+					float gamma = 1.0f - alpha - beta;
+
+					// depth of the mesh at this point
+					float depth = alpha*Z0 + beta*Z1 + gamma*Z2;
+
+					if (!Float.isNaN(pixelDepth) && depth >= pixelDepth) {
+						continue;
+					}
+
+					float u = alpha*t0.x + beta*t1.x + gamma*t2.x;
+					float v = alpha*t0.y + beta*t1.y + gamma*t2.y;
+
+					float pixTexX = u*(textureImage.width - 1);
+					float pixTexY = (1.0f - v)*(textureImage.height - 1);
+
+					int color = interpolateTextureRgb(pixTexX, pixTexY);
+
+					// Update depth and image
+					// Make sure the alpha channel is set to 100% in RGBA format
+					depthImage.unsafe_set(pixelX, pixelY, depth);
+					rgbImage.set24(pixelX, pixelY, color);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Gets the RGB color using interpolation at the specified pixel coordinate in the texture image
+	 */
+	private int interpolateTextureRgb( float px, float py ) {
+		textureInterp.get(px, py, textureValues);
+		int r = (int)(textureValues[0] + 0.5f);
+		int g = (int)(textureValues[1] + 0.5f);
+		int b = (int)(textureValues[2] + 0.5f);
+		return (r << 16) | (g << 8) | b;
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
