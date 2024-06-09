@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.struct.packed;
 
 import boofcv.struct.PackedArray;
 import georegression.struct.point.Point2D_I16;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -43,5 +44,17 @@ public class TestPackedArrayPoint2D_I16 extends GenericPackedArrayChecks<Point2D
 
 	@Override protected void checkNotEquals( Point2D_I16 a, Point2D_I16 b ) {
 		assertNotEquals(0.0, a.distance(b));
+	}
+
+	@Test void appendValues() {
+		var alg = new PackedArrayPoint2D_I16();
+		assertEquals(0, alg.size());
+		alg.append(1,2);
+
+		assertEquals(1, alg.size());
+
+		var p = alg.getTemp(0);
+		assertEquals(1, p.x);
+		assertEquals(2, p.y);
 	}
 }

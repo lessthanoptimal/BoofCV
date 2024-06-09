@@ -38,9 +38,6 @@ public class PackedBigArrayPoint2D_F64 implements PackedArray<Point2D_F64> {
 	// tuple that the result is temporarily written to
 	public final Point2D_F64 temp = new Point2D_F64();
 
-	// Number of points stored in the array
-	protected int size;
-
 	/**
 	 * Constructor where the default is used for all parameters.
 	 */
@@ -72,14 +69,13 @@ public class PackedBigArrayPoint2D_F64 implements PackedArray<Point2D_F64> {
 	 */
 	public PackedBigArrayPoint2D_F64 setTo( PackedBigArrayPoint2D_F64 src ) {
 		reset();
-		reserve(src.size);
-		src.forIdx(0, src.size, ( idx, p ) -> append(p.x, p.y));
+		reserve(src.size());
+		src.forIdx(0, src.size(), ( idx, p ) -> append(p.x, p.y));
 		return this;
 	}
 
 	@Override public void reset() {
 		dog.reset();
-		size = 0;
 	}
 
 	@Override public void reserve( int numPoints ) {
@@ -89,15 +85,11 @@ public class PackedBigArrayPoint2D_F64 implements PackedArray<Point2D_F64> {
 	public void append( double x, double y ) {
 		dog.add(x);
 		dog.add(y);
-
-		size++;
 	}
 
 	@Override public void append( Point2D_F64 element ) {
 		dog.add(element.x);
 		dog.add(element.y);
-
-		size++;
 	}
 
 	@Override public void set( int index, Point2D_F64 element ) {
@@ -131,7 +123,7 @@ public class PackedBigArrayPoint2D_F64 implements PackedArray<Point2D_F64> {
 	}
 
 	@Override public int size() {
-		return size;
+		return dog.size/2;
 	}
 
 	@Override public Class<Point2D_F64> getElementType() {

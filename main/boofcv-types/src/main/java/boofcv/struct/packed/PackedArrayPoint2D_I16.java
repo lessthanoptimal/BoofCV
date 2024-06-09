@@ -36,16 +36,12 @@ public class PackedArrayPoint2D_I16 implements PackedArray<Point2D_I16> {
 	// tuple that the result is temporarily written to
 	public final Point2D_I16 temp = new Point2D_I16();
 
-	// Number of tuples stored in the array
-	protected int numElements;
-
 	public PackedArrayPoint2D_I16() {
 		array = new DogArray_I16();
 		array.resize(0);
 	}
 
 	@Override public void reset() {
-		numElements = 0;
 		array.reset();
 	}
 
@@ -56,8 +52,6 @@ public class PackedArrayPoint2D_I16 implements PackedArray<Point2D_I16> {
 	public final void append( int x, int y ) {
 		array.add(x);
 		array.add(y);
-
-		numElements++;
 	}
 
 	@Override public void append( Point2D_I16 element ) {
@@ -87,7 +81,7 @@ public class PackedArrayPoint2D_I16 implements PackedArray<Point2D_I16> {
 	}
 
 	@Override public int size() {
-		return numElements;
+		return array.size/2;
 	}
 
 	@Override public Class<Point2D_I16> getElementType() {

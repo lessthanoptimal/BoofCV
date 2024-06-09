@@ -36,16 +36,12 @@ public class PackedArrayPoint2D_F64 implements PackedArray<Point2D_F64> {
 	// tuple that the result is temporarily written to
 	public final Point2D_F64 temp = new Point2D_F64();
 
-	// Number of tuples stored in the array
-	protected int numElements;
-
 	public PackedArrayPoint2D_F64() {
 		array = new DogArray_F64();
 		array.resize(0);
 	}
 
 	@Override public void reset() {
-		numElements = 0;
 		array.reset();
 	}
 
@@ -56,8 +52,6 @@ public class PackedArrayPoint2D_F64 implements PackedArray<Point2D_F64> {
 	public final void append( double x, double y ) {
 		array.add(x);
 		array.add(y);
-
-		numElements++;
 	}
 
 	@Override public void append( Point2D_F64 element ) {
@@ -87,7 +81,7 @@ public class PackedArrayPoint2D_F64 implements PackedArray<Point2D_F64> {
 	}
 
 	@Override public int size() {
-		return numElements;
+		return array.size/2;
 	}
 
 	@Override public Class<Point2D_F64> getElementType() {

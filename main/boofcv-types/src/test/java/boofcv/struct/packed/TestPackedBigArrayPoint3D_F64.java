@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,10 +60,23 @@ public class TestPackedBigArrayPoint3D_F64 extends GenericPackedArrayChecks<Poin
 		var alg = new PackedBigArrayPoint3D_F64();
 		alg.appendAll(points);
 
-		assertEquals(points.size(), alg.size);
+		assertEquals(points.size(), alg.size());
 
 		for (int i = 0; i < points.size(); i++) {
 			assertEquals(0.0, points.get(i).distance(alg.getTemp(i)));
 		}
+	}
+
+	@Test void appendValues() {
+		var alg = new PackedBigArrayPoint3D_F64();
+		assertEquals(0, alg.size());
+		alg.append(1,2,3);
+
+		assertEquals(1, alg.size());
+
+		var p = alg.getTemp(0);
+		assertEquals(1.0, p.x);
+		assertEquals(2.0, p.y);
+		assertEquals(3.0, p.z);
 	}
 }

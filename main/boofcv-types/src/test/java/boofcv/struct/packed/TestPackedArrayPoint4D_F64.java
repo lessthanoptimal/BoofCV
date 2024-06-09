@@ -21,6 +21,7 @@ package boofcv.struct.packed;
 import boofcv.struct.PackedArray;
 import georegression.struct.point.Point4D_F64;
 import org.ejml.UtilEjml;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -46,5 +47,19 @@ public class TestPackedArrayPoint4D_F64 extends GenericPackedArrayChecks<Point4D
 
 	@Override protected void checkNotEquals( Point4D_F64 a, Point4D_F64 b ) {
 		assertNotEquals(0.0, a.distance(b), UtilEjml.TEST_F64);
+	}
+
+	@Test void appendValues() {
+		var alg = new PackedArrayPoint4D_F64();
+		assertEquals(0, alg.size());
+		alg.append(1,2,3,4);
+
+		assertEquals(1, alg.size());
+
+		var p = alg.getTemp(0);
+		assertEquals(1.0, p.x);
+		assertEquals(2.0, p.y);
+		assertEquals(3.0, p.z);
+		assertEquals(4.0, p.w);
 	}
 }

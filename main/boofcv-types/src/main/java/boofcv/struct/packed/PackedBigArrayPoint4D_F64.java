@@ -38,9 +38,6 @@ public class PackedBigArrayPoint4D_F64 implements PackedArray<Point4D_F64> {
 	// tuple that the result is temporarily written to
 	public final Point4D_F64 temp = new Point4D_F64();
 
-	// Number of points stored in the array
-	protected int numPoints;
-
 	/**
 	 * Constructor where the default is used for all parameters.
 	 */
@@ -68,7 +65,6 @@ public class PackedBigArrayPoint4D_F64 implements PackedArray<Point4D_F64> {
 
 	@Override public void reset() {
 		dog.reset();
-		numPoints = 0;
 	}
 
 	@Override public void reserve( int numPoints ) {
@@ -80,8 +76,6 @@ public class PackedBigArrayPoint4D_F64 implements PackedArray<Point4D_F64> {
 		dog.add(y);
 		dog.add(z);
 		dog.add(w);
-
-		numPoints++;
 	}
 
 	@Override public void append( Point4D_F64 element ) {
@@ -89,8 +83,6 @@ public class PackedBigArrayPoint4D_F64 implements PackedArray<Point4D_F64> {
 		dog.add(element.y);
 		dog.add(element.z);
 		dog.add(element.w);
-
-		numPoints++;
 	}
 
 	@Override public void set( int index, Point4D_F64 element ) {
@@ -130,7 +122,7 @@ public class PackedBigArrayPoint4D_F64 implements PackedArray<Point4D_F64> {
 	}
 
 	@Override public int size() {
-		return numPoints;
+		return dog.size/4;
 	}
 
 	@Override public Class<Point4D_F64> getElementType() {

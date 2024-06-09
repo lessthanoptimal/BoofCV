@@ -41,9 +41,6 @@ public class PackedBigArrayPoint3D_F64 implements PackedArray<Point3D_F64> {
 	// Storage for the raw data in an array
 	private final BigDogArray_F64 dog;
 
-	// Number of points stored in the array
-	protected int size;
-
 	/**
 	 * Constructor where the default is used for all parameters.
 	 */
@@ -77,14 +74,13 @@ public class PackedBigArrayPoint3D_F64 implements PackedArray<Point3D_F64> {
 	 */
 	public PackedBigArrayPoint3D_F64 setTo( PackedBigArrayPoint3D_F64 src ) {
 		reset();
-		reserve(src.size);
-		src.forIdx(0, src.size, ( idx, p ) -> append(p.x, p.y, p.z));
+		reserve(src.size());
+		src.forIdx(0, src.size(), ( idx, p ) -> append(p.x, p.y, p.z));
 		return this;
 	}
 
 	@Override public void reset() {
 		dog.reset();
-		size = 0;
 	}
 
 	@Override public void reserve( int numPoints ) {
@@ -95,8 +91,6 @@ public class PackedBigArrayPoint3D_F64 implements PackedArray<Point3D_F64> {
 		dog.add(x);
 		dog.add(y);
 		dog.add(z);
-
-		size++;
 	}
 
 	public void append( GeoTuple3D_F64<?> element ) {
@@ -129,8 +123,6 @@ public class PackedBigArrayPoint3D_F64 implements PackedArray<Point3D_F64> {
 		dog.add(element.x);
 		dog.add(element.y);
 		dog.add(element.z);
-
-		size++;
 	}
 
 	@Override public Point3D_F64 getTemp( int index ) {
@@ -162,7 +154,7 @@ public class PackedBigArrayPoint3D_F64 implements PackedArray<Point3D_F64> {
 	}
 
 	@Override public int size() {
-		return size;
+		return dog.size/3;
 	}
 
 	@Override public Class<Point3D_F64> getElementType() {

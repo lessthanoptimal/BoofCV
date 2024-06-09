@@ -36,16 +36,12 @@ public class PackedArrayPoint4D_F64 implements PackedArray<Point4D_F64> {
 	// tuple that the result is temporarily written to
 	public final Point4D_F64 temp = new Point4D_F64();
 
-	// Number of tuples stored in the array
-	protected int numElements;
-
 	public PackedArrayPoint4D_F64() {
 		array = new DogArray_F64();
 		array.resize(0);
 	}
 
 	@Override public void reset() {
-		numElements = 0;
 		array.reset();
 	}
 
@@ -58,8 +54,13 @@ public class PackedArrayPoint4D_F64 implements PackedArray<Point4D_F64> {
 		array.add(element.y);
 		array.add(element.z);
 		array.add(element.w);
+	}
 
-		numElements++;
+	public void append( double x, double y, double z, double w ) {
+		array.add(x);
+		array.add(y);
+		array.add(z);
+		array.add(w);
 	}
 
 	@Override public void set( int index, Point4D_F64 element ) {
@@ -93,7 +94,7 @@ public class PackedArrayPoint4D_F64 implements PackedArray<Point4D_F64> {
 	}
 
 	@Override public int size() {
-		return numElements;
+		return array.size/4;
 	}
 
 	@Override public Class<Point4D_F64> getElementType() {

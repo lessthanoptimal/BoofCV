@@ -36,16 +36,12 @@ public class PackedArrayPoint3D_F64 implements PackedArray<Point3D_F64> {
 	// tuple that the result is temporarily written to
 	public final Point3D_F64 temp = new Point3D_F64();
 
-	// Number of tuples stored in the array
-	protected int numElements;
-
 	public PackedArrayPoint3D_F64() {
 		array = new DogArray_F64();
 		array.resize(0);
 	}
 
 	@Override public void reset() {
-		numElements = 0;
 		array.reset();
 	}
 
@@ -57,8 +53,6 @@ public class PackedArrayPoint3D_F64 implements PackedArray<Point3D_F64> {
 		array.add(element.x);
 		array.add(element.y);
 		array.add(element.z);
-
-		numElements++;
 	}
 
 	@Override public void set( int index, Point3D_F64 element ) {
@@ -89,7 +83,7 @@ public class PackedArrayPoint3D_F64 implements PackedArray<Point3D_F64> {
 	}
 
 	@Override public int size() {
-		return numElements;
+		return array.size/3;
 	}
 
 	@Override public Class<Point3D_F64> getElementType() {
