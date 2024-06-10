@@ -50,7 +50,7 @@ public class TestRenderMesh extends BoofStandardJUnit {
 		var alg = new RenderMesh();
 
 		// turn off checking with normals to simply this test
-		alg.setCheckSurfaceNormal(false);
+		alg.setCheckFaceNormal(false);
 		PerspectiveOps.createIntrinsic(300, 200, 90, -1, alg.intrinsics);
 
 		// Render
@@ -198,7 +198,7 @@ public class TestRenderMesh extends BoofStandardJUnit {
 			// This should pass
 			mesh.reset();
 			mesh.indexes.add(0);
-			mesh.normals.append(-c, -s, 0);
+			mesh.faceNormals.append((float)-c, (float)-s, 0);
 			mesh.vertexes.append(r*c, 2 + r*s, 2);
 
 			assertTrue(RenderMesh.isFrontVisible(mesh, 0, 0, pointCam));
@@ -206,7 +206,7 @@ public class TestRenderMesh extends BoofStandardJUnit {
 			// This should fail
 			mesh.reset();
 			mesh.indexes.add(0);
-			mesh.normals.append(c, s, 0);
+			mesh.faceNormals.append((float)c, (float)s, 0);
 			mesh.vertexes.append(r*c, 2 + r*s, 2);
 
 			assertFalse(RenderMesh.isFrontVisible(mesh, 0, 0, pointCam));

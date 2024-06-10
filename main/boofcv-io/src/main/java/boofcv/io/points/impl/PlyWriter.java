@@ -18,6 +18,7 @@
 
 package boofcv.io.points.impl;
 
+import georegression.struct.GeoTuple3D_F64;
 import georegression.struct.point.Point3D_F64;
 
 /**
@@ -33,10 +34,15 @@ public interface PlyWriter {
 	/** True if a vertex has color information or not */
 	boolean isColor();
 
-	/** True if a vertex has a texture coordinate */
+	/** True if a polygon has a texture coordinate */
 	boolean isTextured();
 
+	/** True if vertexes have normal vectors */
+	boolean isVertexNormals();
+
 	void getVertex( int which, Point3D_F64 vertex );
+
+	void getVertexNormal( int which, GeoTuple3D_F64<?> normal );
 
 	/**
 	 * Color of a vertex

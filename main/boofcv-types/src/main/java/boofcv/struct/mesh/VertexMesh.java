@@ -18,7 +18,7 @@
 
 package boofcv.struct.mesh;
 
-import boofcv.struct.packed.PackedArrayPoint3D_F64;
+import boofcv.struct.packed.PackedArrayPoint3D_F32;
 import boofcv.struct.packed.PackedBigArrayPoint2D_F32;
 import boofcv.struct.packed.PackedBigArrayPoint3D_F64;
 import georegression.geometry.GeometryMath_F64;
@@ -40,17 +40,20 @@ public class VertexMesh {
 	/** 3D location of each vertex */
 	public final PackedBigArrayPoint3D_F64 vertexes = new PackedBigArrayPoint3D_F64(10);
 
-	/** Which indexes correspond to each vertex in a shape */
+	/** Which indexes correspond to each vertex in a face */
 	public final DogArray_I32 indexes = new DogArray_I32();
 
-	/** Start index of each shape + the last index */
+	/** Start index of each face + the last index */
 	public final DogArray_I32 offsets = new DogArray_I32();
 
 	/** 2D coordinate of textures. units = fraction of width / height */
 	public final PackedBigArrayPoint2D_F32 texture = new PackedBigArrayPoint2D_F32();
 
-	/** Optional precomputed surface normals for each shape */
-	public final PackedArrayPoint3D_F64 normals = new PackedArrayPoint3D_F64();
+	/** Optional precomputed normals for each vertex */
+	public final PackedArrayPoint3D_F32 vertexNormals = new PackedArrayPoint3D_F32();
+
+	/** Optional precomputed normal for each face */
+	public final PackedArrayPoint3D_F32 faceNormals = new PackedArrayPoint3D_F32();
 
 	{
 		offsets.add(0);
@@ -140,11 +143,13 @@ public class VertexMesh {
 	/**
 	 * Computes normal vectors from shapes
 	 */
-	public void computeNormals() {
+	public void computeFaceNormals() {
 		var vector1 = new Vector3D_F64();
 		var vector2 = new Vector3D_F64();
 		var norm = new Vector3D_F64();
 
+		faceNormals.reset();
+		faceNormals.reserve(offsets.size() - 1);
 		for (int idxShape = 1; idxShape < offsets.size; idxShape++) {
 			int idx0 = offsets.get(idxShape - 1);
 
@@ -154,7 +159,7 @@ public class VertexMesh {
 
 			GeometryMath_F64.cross(vector1, vector2, norm);
 			norm.normalize();
-			normals.append(norm.x, norm.y, norm.z);
+			faceNormals.append((float)norm.x, (float)norm.y, (float)norm.z);
 		}
 	}
 
@@ -176,6 +181,8 @@ public class VertexMesh {
 		this.indexes.setTo(src.indexes);
 		this.offsets.setTo(src.offsets);
 		this.texture.setTo(src.texture);
+		this.vertexNormals.setTo(src.vertexNormals);
+		this.faceNormals.setTo(src.faceNormals);
 		return this;
 	}
 
@@ -184,7 +191,8 @@ public class VertexMesh {
 		indexes.reset();
 		offsets.reset();
 		texture.reset();
-		normals.reset();
+		vertexNormals.reset();
+		faceNormals.reset();
 		offsets.add(0);
 	}
 
@@ -205,5 +213,9 @@ public class VertexMesh {
 
 	public boolean isTextured() {
 		return texture.size() > 0;
+	}
+
+	public boolean isNormals() {
+		return vertexNormals.size() > 0;
 	}
 }

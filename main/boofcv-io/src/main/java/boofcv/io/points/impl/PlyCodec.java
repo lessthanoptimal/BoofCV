@@ -23,7 +23,9 @@ import boofcv.alg.cloud.PointCloudWriter;
 import boofcv.io.UtilIO;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.mesh.VertexMesh;
+import georegression.struct.GeoTuple3D_F64;
 import georegression.struct.point.Point2D_F32;
+import georegression.struct.point.Point3D_F32;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.DogArray_I32;
 import org.jetbrains.annotations.Nullable;
@@ -46,22 +48,27 @@ import java.util.Locale;
 public class PlyCodec {
 	public static void saveAscii( PlyWriter data, Writer outputWriter ) throws IOException {
 		writeAsciiHeader(data.getVertexCount(), data.getPolygonCount(), data.isColor(), data.isTextured(),
-				outputWriter);
+				data.isVertexNormals(), outputWriter);
 
 		boolean color = data.isColor();
 
 		var p = new Point3D_F64();
+		var v = new Point3D_F64();
 		for (int i = 0; i < data.getVertexCount(); i++) {
 			data.getVertex(i, p);
+			outputWriter.write(String.format("%f %f %f", p.x, p.y, p.z));
+			if (data.isVertexNormals()) {
+				data.getVertexNormal(i, v);
+				outputWriter.write(String.format(" %f %f %f", v.x, v.y, v.z));
+			}
 			if (color) {
 				int rgb = data.getColor(i);
-				int r = (rgb >> 16) & 0xFF;
-				int g = (rgb >> 8) & 0xFF;
+				int r = rgb >> 16 & 0xFF;
+				int g = rgb >> 8 & 0xFF;
 				int b = rgb & 0xFF;
-				outputWriter.write(String.format("%f %f %f %d %d %d\n", p.x, p.y, p.z, r, g, b));
-			} else {
-				outputWriter.write(String.format("%f %f %f\n", p.x, p.y, p.z));
+				outputWriter.write(String.format(" %d %d %d", r, g, b));
 			}
+			outputWriter.write('\n');
 		}
 		var arrayI = new int[100];
 		var arrayF = new float[100];
@@ -96,7 +103,7 @@ public class PlyCodec {
 	}
 
 	private static void writeAsciiHeader( int vertexCount, int triangleCount, boolean hasColor, boolean hasTexture,
-										  Writer outputWriter )
+										  boolean hasNormals, Writer outputWriter )
 			throws IOException {
 		outputWriter.write("ply\n");
 		outputWriter.write("format ascii 1.0\n");
@@ -105,6 +112,13 @@ public class PlyCodec {
 				"property float x\n" +
 				"property float y\n" +
 				"property float z\n");
+		if (hasNormals) {
+			outputWriter.write("""
+					property float nx
+					property float ny
+					property float nz
+					""");
+		}
 		if (hasColor) {
 			outputWriter.write("""
 					property uchar red
@@ -156,15 +170,19 @@ public class PlyCodec {
 		String format = "UTF-8";
 		int dataLength = saveAsFloat ? 4 : 8;
 		writeBinaryHeader(data.getVertexCount(), data.getPolygonCount(), order, data.isColor(),
-				data.isTextured(),
+				data.isTextured(), data.isVertexNormals(),
 				saveAsFloat, format, outputWriter);
 
 		boolean color = data.isColor();
 
-		int end = dataLength*3;
-		var bytes = ByteBuffer.allocate(dataLength*3 + (color ? 3 : 0));
+		int locNorm = dataLength*3;
+		int locColor = locNorm + (data.isVertexNormals() ? dataLength*3 : 0);
+
+		var bytes = ByteBuffer.allocate(locColor + (color ? 3 : 0));
 		bytes.order(order);
 		var p = new Point3D_F64();
+		var n = new Point3D_F64();
+
 		for (int i = 0; i < data.getVertexCount(); i++) {
 			data.getVertex(i, p);
 			if (saveAsFloat) {
@@ -177,14 +195,27 @@ public class PlyCodec {
 				bytes.putDouble(16, p.z);
 			}
 
+			if (data.isVertexNormals()) {
+				data.getVertexNormal(i, n);
+				if (saveAsFloat) {
+					bytes.putFloat(locNorm, (float)n.x);
+					bytes.putFloat(locNorm + 4, (float)n.y);
+					bytes.putFloat(locNorm + 8, (float)n.z);
+				} else {
+					bytes.putDouble(locNorm, n.x);
+					bytes.putDouble(locNorm + 8, n.y);
+					bytes.putDouble(locNorm + 16, n.z);
+				}
+			}
+
 			if (color) {
 				int rgb = data.getColor(i);
-				int r = (rgb >> 16) & 0xFF;
-				int g = (rgb >> 8) & 0xFF;
+				int r = rgb >> 16 & 0xFF;
+				int g = rgb >> 8 & 0xFF;
 				int b = rgb & 0xFF;
-				bytes.put(end, (byte)r);
-				bytes.put(end + 1, (byte)g);
-				bytes.put(end + 2, (byte)b);
+				bytes.put(locColor, (byte)r);
+				bytes.put(locColor + 1, (byte)g);
+				bytes.put(locColor + 2, (byte)b);
 			}
 			outputWriter.write(bytes.array());
 		}
@@ -217,7 +248,8 @@ public class PlyCodec {
 	}
 
 	private static void writeBinaryHeader( int vertexCount, int triangleCount, ByteOrder order, boolean hasColor,
-										   boolean hasTexture, boolean saveAsFloat, String format, OutputStream outputWriter )
+										   boolean hasTexture, boolean hasVertexNormals,
+										   boolean saveAsFloat, String format, OutputStream outputWriter )
 			throws IOException {
 		String dataType = saveAsFloat ? "float" : "double";
 		outputWriter.write("ply\n".getBytes(format));
@@ -233,19 +265,26 @@ public class PlyCodec {
 				"property " + dataType + " x\n" +
 						"property " + dataType + " y\n" +
 						"property " + dataType + " z\n").getBytes(format));
+
+		if (hasVertexNormals) {
+			outputWriter.write((
+					"property " + dataType + " nx\n" +
+							"property " + dataType + " ny\n" +
+							"property " + dataType + " nz\n").getBytes(format));
+		}
 		if (hasColor) {
 			outputWriter.write(
-					("""
+					"""
 							property uchar red
 							property uchar green
 							property uchar blue
-							""").getBytes(format));
+							""".getBytes(format));
 		}
 		if (triangleCount > 0) {
 			outputWriter.write(("element face " + triangleCount + "\n" +
 					"property list uchar int vertex_indices\n").getBytes(format));
 			if (hasTexture) {
-				outputWriter.write(("property list uchar float texcoord\n").getBytes(format));
+				outputWriter.write("property list uchar float texcoord\n".getBytes(format));
 			}
 		}
 		outputWriter.write("end_header\n".getBytes(format));
@@ -296,7 +335,7 @@ public class PlyCodec {
 					header.triangleCount = Integer.parseInt(words[2]);
 				}
 			} else if (words[0].equals("property") && previousVertex) {
-				DataType d = switch (words[1].toLowerCase()) {
+				DataType d = switch (words[1].toLowerCase(Locale.US)) {
 					case "float" -> DataType.FLOAT;
 					case "double" -> DataType.DOUBLE;
 					case "char" -> DataType.CHAR;
@@ -308,22 +347,16 @@ public class PlyCodec {
 					default -> throw new RuntimeException("Add support for " + words[1]);
 				};
 				VarType v;
-				switch (words[2].toLowerCase()) {
+				switch (words[2].toLowerCase(Locale.US)) {
 					case "x" -> v = VarType.X;
 					case "y" -> v = VarType.Y;
 					case "z" -> v = VarType.Z;
-					case "red" -> {
-						v = VarType.R;
-						header.rgb = true;
-					}
-					case "green" -> {
-						v = VarType.G;
-						header.rgb = true;
-					}
-					case "blue" -> {
-						v = VarType.B;
-						header.rgb = true;
-					}
+					case "nx" -> v = VarType.NX;
+					case "ny" -> v = VarType.NY;
+					case "nz" -> v = VarType.NZ;
+					case "red" -> v = VarType.R;
+					case "green" -> v = VarType.G;
+					case "blue" -> v = VarType.B;
 					default -> v = VarType.UNKNOWN;
 				}
 				header.dataWords.add(new DataWord(v, d));
@@ -342,6 +375,17 @@ public class PlyCodec {
 			}
 			line = readNextPly(input, true, buffer);
 		}
+
+		// See what type of data is contained
+		for (int i = 0; i < header.dataWords.size(); i++) {
+			PlyCodec.DataWord w = header.dataWords.get(i);
+			switch (w.var) {
+				case R, G, B -> header.rgb = true;
+				case NX, NY, NZ -> header.normals = true;
+				default -> {
+				}
+			}
+		}
 	}
 
 	public static void readCloud( InputStream input, PointCloudWriter output ) throws IOException {
@@ -353,6 +397,8 @@ public class PlyCodec {
 			@Override public void addVertex( double x, double y, double z, int rgb ) {
 				output.add(x, y, z, rgb);
 			}
+
+			@Override public void addVertexNormal( double nx, double ny, double nz ) {}
 
 			@Override public void addPolygon( int[] indexes, int offset, int length ) {}
 
@@ -372,6 +418,10 @@ public class PlyCodec {
 			@Override public void addVertex( double x, double y, double z, int rgb ) {
 				mesh.vertexes.append(x, y, z);
 				colorRGB.add(rgb);
+			}
+
+			@Override public void addVertexNormal( double nx, double ny, double nz ) {
+				mesh.vertexNormals.append((float)nx, (float)ny, (float)nz);
 			}
 
 			@Override public void addPolygon( int[] indexes, int offset, int length ) {
@@ -397,15 +447,13 @@ public class PlyCodec {
 		output.initialize(header.vertexCount, header.triangleCount, header.rgb);
 
 		switch (header.format) {
-			case ASCII -> readAscii(output, input, header.dataWords, header.vertexCount,
-					header.rgb, header.triangleCount);
+			case ASCII -> readAscii(output, input, header);
 			case BINARY_LITTLE, BINARY_BIG -> readCloudBinary(output, input, header);
 			default -> throw new RuntimeException("BUG!");
 		}
 	}
 
-	private static void readAscii( PlyReader output, InputStream reader, List<DataWord> dataWords,
-								   int vertexCount, boolean rgb, int triangleCount ) throws IOException {
+	private static void readAscii( PlyReader output, InputStream reader, Header header ) throws IOException {
 		var buffer = new StringBuilder();
 
 		// storage for read in values
@@ -415,15 +463,16 @@ public class PlyCodec {
 		// values that are writen to that we care about
 		int r = 0, g = 0, b = 0;
 		double x = -1, y = -1, z = -1;
+		double nx = -1, ny = -1, nz = -1;
 
-		for (int i = 0; i < vertexCount; i++) {
+		for (int i = 0; i < header.vertexCount; i++) {
 			String line = readNextPly(reader, true, buffer);
 			String[] words = line.split("\\s+");
-			if (words.length != dataWords.size())
+			if (words.length != header.dataWords.size())
 				throw new IOException("unexpected number of words. " + line);
 
-			for (int j = 0; j < dataWords.size(); j++) {
-				DataWord d = dataWords.get(j);
+			for (int j = 0; j < header.dataWords.size(); j++) {
+				DataWord d = header.dataWords.get(j);
 				String word = words[j];
 				switch (d.data) {
 					case FLOAT, DOUBLE -> F64 = Double.parseDouble(word);
@@ -434,6 +483,9 @@ public class PlyCodec {
 					case X -> x = F64;
 					case Y -> y = F64;
 					case Z -> z = F64;
+					case NX -> nx = F64;
+					case NY -> ny = F64;
+					case NZ -> nz = F64;
 					case R -> r = I32;
 					case G -> g = I32;
 					case B -> b = I32;
@@ -442,10 +494,14 @@ public class PlyCodec {
 				}
 			}
 			output.addVertex(x, y, z, r << 16 | g << 8 | b);
+
+			if (header.normals) {
+				output.addVertexNormal(nx, ny, nz);
+			}
 		}
 
 		int[] indexes = new int[100];
-		for (int i = 0; i < triangleCount; i++) {
+		for (int i = 0; i < header.triangleCount; i++) {
 			String line = readNextPly(reader, true, buffer);
 			String[] words = line.split("\\s+");
 			int n = Integer.parseInt(words[0]);
@@ -489,6 +545,7 @@ public class PlyCodec {
 		// values that are writen to that we care about
 		int r = -1, g = -1, b = -1;
 		double x = -1, y = -1, z = -1;
+		double nx = -1, ny = -1, nz = -1;
 
 		for (int i = 0; i < header.vertexCount; i++) {
 			int found = reader.read(line, 0, countVertexBytes);
@@ -515,6 +572,9 @@ public class PlyCodec {
 					case X -> x = F64;
 					case Y -> y = F64;
 					case Z -> z = F64;
+					case NX -> nx = F64;
+					case NY -> ny = F64;
+					case NZ -> nz = F64;
 					case R -> r = I32;
 					case G -> g = I32;
 					case B -> b = I32;
@@ -524,6 +584,10 @@ public class PlyCodec {
 			}
 
 			output.addVertex(x, y, z, r << 16 | g << 8 | b);
+			if (header.normals) {
+				output.addVertexNormal(nx, ny, nz);
+			}
+
 			//System.out.printf("vertex: %.1e %.1e %.1e | %2x %2x %2x\n", x, y, z, r, g, b);
 		}
 
@@ -594,7 +658,6 @@ public class PlyCodec {
 			}
 		}
 		output.addTexture(count/2, tempF);
-
 	}
 
 	private static PlyWriter wrapMeshForWriting( VertexMesh mesh, @Nullable DogArray_I32 colorRGB ) {
@@ -609,7 +672,16 @@ public class PlyCodec {
 				return mesh.texture.size() > 0;
 			}
 
+			@Override public boolean isVertexNormals() {
+				return mesh.vertexNormals.size() >= 0;
+			}
+
 			@Override public void getVertex( int which, Point3D_F64 vertex ) {mesh.vertexes.getCopy(which, vertex);}
+
+			@Override public void getVertexNormal( int which, GeoTuple3D_F64<?> normal ) {
+				Point3D_F32 tmp = mesh.vertexNormals.getTemp(which);
+				normal.setTo(tmp.x, tmp.y, tmp.z);
+			}
 
 			@SuppressWarnings("NullAway")
 			@Override public int getColor( int which ) {return colorRGB.get(which);}
@@ -651,7 +723,11 @@ public class PlyCodec {
 
 			@Override public boolean isTextured() {return false;}
 
+			@Override public boolean isVertexNormals() {return false;}
+
 			@Override public void getVertex( int which, Point3D_F64 vertex ) {cloud.get(which, vertex);}
+
+			@Override public void getVertexNormal( int which, GeoTuple3D_F64<?> normal ) {}
 
 			@Override public int getColor( int which ) {return cloud.getRGB(which);}
 
@@ -665,7 +741,10 @@ public class PlyCodec {
 		List<DataWord> dataWords = new ArrayList<>();
 		int vertexCount = -1;
 		int triangleCount = -1;
+		// true of rgb colors for each vertex is encoded
 		boolean rgb = false;
+		// true if normals for each shape is encoded
+		boolean normals = false;
 		List<PropertyList> properties = new ArrayList<>();
 		Format format = Format.ASCII;
 	}
@@ -698,7 +777,7 @@ public class PlyCodec {
 	}
 
 	private enum VarType {
-		X, Y, Z, R, G, B, UNKNOWN
+		X, Y, Z, R, G, B, NX, NY, NZ, UNKNOWN
 	}
 
 	private enum DataType {

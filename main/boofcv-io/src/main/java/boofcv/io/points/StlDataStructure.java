@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -63,6 +63,9 @@ public class StlDataStructure {
 	/** What's the name of this Solid */
 	public String name = "";
 
+	// Internal workspace
+	Point3D_F64 temp = new Point3D_F64();
+
 	public void reset() {
 		vertexes.reset();
 		normals.reset();
@@ -124,15 +127,14 @@ public class StlDataStructure {
 		double by = v3.y - v1.y;
 		double bz = v3.z - v1.z;
 
-		Point3D_F64 t = vertexes.temp;
-		GeometryMath_F64.cross(ax, ay, az, bx, by, bz, t);
+		GeometryMath_F64.cross(ax, ay, az, bx, by, bz, temp);
 
 		// Ensure the norm is 1
-		double n = t.norm();
-		t.divideIP(n);
+		double n = temp.norm();
+		temp.divideIP(n);
 
 		// Save the results
-		normals.append(t.x, t.y, t.z);
+		normals.append(temp.x, temp.y, temp.z);
 	}
 
 	/**

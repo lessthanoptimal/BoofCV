@@ -31,6 +31,7 @@ import georegression.geometry.UtilPolygons2D_F64;
 import georegression.metric.Intersection2D_F64;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point3D_F32;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.shapes.Polygon2D_F32;
@@ -79,7 +80,7 @@ public class RenderMesh implements VerbosePrint {
 	public @Getter final Se3_F64 worldToView = new Se3_F64();
 
 	/** If true then a polygon will only be rendered if the surface normal is pointed towards the camera */
-	public @Getter @Setter boolean checkSurfaceNormal = false;
+	public @Getter @Setter boolean checkFaceNormal = false;
 
 	/** If true it will always use the colorizer, even if there is texture information */
 	public @Getter @Setter boolean forceColorizer = false;
@@ -123,8 +124,8 @@ public class RenderMesh implements VerbosePrint {
 		BoofMiscOps.checkTrue(intrinsics.width > 0 && intrinsics.height > 0, "Intrinsics not set");
 
 		// Make sure there are normals if it's configured to use them
-		if (checkSurfaceNormal && mesh.normals.size() == 0)
-			mesh.computeNormals();
+		if (checkFaceNormal && mesh.faceNormals.size() == 0)
+			mesh.computeFaceNormals();
 
 		// Initialize output images
 		initializeImages();
@@ -161,7 +162,7 @@ public class RenderMesh implements VerbosePrint {
 			}
 
 			// Prune using normal vector
-			if (mesh.normals.size() > 0 && checkSurfaceNormal) {
+			if (checkFaceNormal) {
 				if (!isFrontVisible(mesh, shapeIdx - 1, idx0, worldCamera)) continue;
 			}
 
@@ -213,7 +214,7 @@ public class RenderMesh implements VerbosePrint {
 	 */
 	static boolean isFrontVisible( VertexMesh mesh, int shapeIdx, int idx0, Point3D_F64 worldCamera ) {
 		// Get normal in world coordinates
-		Point3D_F64 normal = mesh.normals.getTemp(shapeIdx);
+		Point3D_F32 normal = mesh.faceNormals.getTemp(shapeIdx);
 
 		// vector from the camera to a vertex
 		Point3D_F64 v1 = mesh.vertexes.getTemp(mesh.indexes.get(idx0));

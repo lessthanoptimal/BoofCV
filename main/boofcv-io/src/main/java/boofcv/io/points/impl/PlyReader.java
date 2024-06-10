@@ -28,6 +28,8 @@ public interface PlyReader {
 
 	void addVertex( double x, double y, double z, int rgb );
 
+	void addVertexNormal( double nx, double ny, double nz );
+
 	void addPolygon( int[] indexes, int offset, int length );
 
 	/**

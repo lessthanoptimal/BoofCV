@@ -43,12 +43,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TestPlyCodec extends BoofStandardJUnit {
 	@Test void encode_decode_3D_ascii() throws IOException {
-		List<Point3D_F64> expected = new ArrayList<>();
+		var expected = new ArrayList<Point3D_F64>();
 		for (int i = 0; i < 10; i++) {
 			expected.add(new Point3D_F64(i*123.45, i - 1.01, i + 2.34));
 		}
 
-		DogArray<Point3D_F64> found = new DogArray<>(Point3D_F64::new);
+		var found = new DogArray<>(Point3D_F64::new);
 
 		var output = new StringWriter();
 		PlyCodec.saveCloudAscii(PointCloudReader.wrapF64(expected), false, output);
@@ -143,6 +143,7 @@ class TestPlyCodec extends BoofStandardJUnit {
 			int numVertexes = 10;
 			for (int i = 0; i < numVertexes; i++) {
 				mesh.vertexes.append(i, 2, 3);
+				mesh.vertexNormals.append(i, 2, 3);
 
 				// bound indexes to ensure they are in the valid range
 				mesh.indexes.add((i*3)%numVertexes);
@@ -169,6 +170,7 @@ class TestPlyCodec extends BoofStandardJUnit {
 			PlyCodec.readMesh(input, foundMesh, foundColors);
 
 			assertEquals(mesh.vertexes.size(), mesh.vertexes.size());
+			assertEquals(mesh.vertexNormals.size(), mesh.vertexNormals.size());
 			assertEquals(mesh.texture.size(), mesh.texture.size());
 			assertTrue(mesh.indexes.isEquals(foundMesh.indexes));
 			assertTrue(mesh.offsets.isEquals(foundMesh.offsets));
@@ -178,6 +180,7 @@ class TestPlyCodec extends BoofStandardJUnit {
 				Point3D_F64 expected = mesh.vertexes.getTemp(i);
 				Point3D_F64 found = foundMesh.vertexes.getTemp(i);
 				assertEquals(0.0, expected.distance(found));
+				assertTrue(mesh.vertexNormals.getTemp(i).isIdentical(foundMesh.vertexNormals.getTemp(i), 1e-4f));
 			}
 
 			for (int i = 0; i < mesh.vertexes.size(); i++) {
