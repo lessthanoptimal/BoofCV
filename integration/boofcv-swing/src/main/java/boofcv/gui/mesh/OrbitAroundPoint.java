@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,16 +21,12 @@ package boofcv.gui.mesh;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.calib.CameraPinhole;
 import georegression.geometry.ConvertRotation3D_F64;
-import georegression.geometry.GeometryMath_F64;
 import georegression.metric.UtilAngle;
 import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
-import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import lombok.Getter;
-import org.ejml.data.DMatrixRMaj;
-import org.ejml.dense.row.CommonOps_DDRM;
 
 /**
  * Contains the mathematics for controlling a camera by orbiting around a point in 3D space
@@ -44,54 +40,73 @@ public class OrbitAroundPoint {
 	/** Transform from world to camera view reference frames */
 	Se3_F64 worldToView = new Se3_F64();
 
-	DMatrixRMaj localRotation = new DMatrixRMaj(3, 3);
-	DMatrixRMaj rotationAroundTarget = new DMatrixRMaj(3, 3);
-	DMatrixRMaj tmp = new DMatrixRMaj(3, 3);
-
-	// Translation applied after the orbit has been done
-	Vector3D_F64 translateWorld = new Vector3D_F64();
-
-	// Point it's orbiting around
-	Point3D_F64 targetPoint = new Point3D_F64();
-
-	// Adjustment applied to distance from target point in final transform
-	double radiusScale = 1.0;
-
-	Point3D_F64 cameraLoc = new Point3D_F64();
+	// Point it's orbiting around in world coordinates
+	private Point3D_F64 targetWorld = new Point3D_F64();
 
 	// Storage for normalized image coordinates
 	Point2D_F64 norm1 = new Point2D_F64();
 	Point2D_F64 norm2 = new Point2D_F64();
 
+	Point3D_F64 targetInView = new Point3D_F64();
+	Point3D_F64 targetInOld = new Point3D_F64();
+	Se3_F64 viewToPoint = new Se3_F64();
+	Se3_F64 viewToPoint2 = new Se3_F64();
+	Se3_F64 worldToPoint = new Se3_F64();
+	Se3_F64 pointToRot = new Se3_F64();
+	Se3_F64 oldToNew = new Se3_F64();
+
 	public OrbitAroundPoint() {
 		resetView();
 	}
 
-	public void resetView() {
-		radiusScale = 1.0;
-		translateWorld.zero();
-		CommonOps_DDRM.setIdentity(rotationAroundTarget);
+	public void setTarget( double x, double y, double z ) {
+		targetWorld.setTo(x, y, z);
+
+		updateAfterExternalChange();
 	}
 
-	public void updateTransform() {
-		// Compute location of camera principle point with no rotation in target point reference frame
-		cameraLoc.x = -targetPoint.x*radiusScale;
-		cameraLoc.y = -targetPoint.y*radiusScale;
-		cameraLoc.z = -targetPoint.z*radiusScale;
+	public void resetView() {
+		worldToView.reset();
 
-		// Apply rotation
-		GeometryMath_F64.mult(rotationAroundTarget, cameraLoc, cameraLoc);
+		// See if the principle point and the target are on top of each other
+		updateAfterExternalChange();
+	}
 
-		// Compute the full transform
-		worldToView.T.setTo(
-				cameraLoc.x + targetPoint.x + translateWorld.x,
-				cameraLoc.y + targetPoint.y + translateWorld.y,
-				cameraLoc.z + targetPoint.z + translateWorld.z);
-		worldToView.R.setTo(rotationAroundTarget);
+	/**
+	 * After an external change to the transform or target, make sure it's pointed at the target and a reasonable
+	 * distance.
+	 */
+	private void updateAfterExternalChange() {
+		// See if the principle point and the target are on top of each other
+		if (Math.abs(worldToView.T.distance(targetWorld)) < 1e-16) {
+			// back the camera off a little bit
+			worldToView.T.z += 0.1;
+		}
+
+		pointAtTarget();
+	}
+
+	/**
+	 * Points the camera at the target point
+	 */
+	private void pointAtTarget() {
+		oldToNew.reset();
+
+		worldToView.transform(targetWorld, targetInView);
+		PerspectiveOps.pointAt(targetInView.x, targetInView.y, targetInView.z, oldToNew.R);
+
+		Se3_F64 tmp = pointToRot;
+		worldToView.concatInvert(oldToNew, tmp);
+		worldToView.setTo(tmp);
 	}
 
 	public void mouseWheel( double ticks, double scale ) {
-		radiusScale = Math.max(0.005, radiusScale*(1.0 + 0.02*ticks*scale));
+		worldToView.transform(targetWorld, targetInView);
+
+		// How much it will move towards or away from the target
+		worldToView.T.z += targetInView.norm()*0.02*ticks*scale;
+
+		// Because it's moving towards the point it won't need to adjust its angle
 	}
 
 	public void mouseDragRotate( double x0, double y0, double x1, double y1 ) {
@@ -107,31 +122,29 @@ public class OrbitAroundPoint {
 		double rotX = UtilAngle.minus(Math.atan(norm1.x), Math.atan(norm2.x));
 		double rotY = UtilAngle.minus(Math.atan(norm1.y), Math.atan(norm2.y));
 
-		// Set the local rotation
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, -rotY, rotX, 0, localRotation);
-
-		// Update the global rotation
-		CommonOps_DDRM.mult(localRotation, rotationAroundTarget, tmp);
-		rotationAroundTarget.setTo(tmp);
+		applyLocalEuler(rotX, -rotY, 0.0);
 	}
 
 	/**
-	 * Uses mouse drag motion to translate the view
+	 * Applies a X Y Z Euler rotation in the point's reference frame so that it will appear to be rotating
+	 * around that point
 	 */
-	public void mouseDragTranslate( double x0, double y0, double x1, double y1 ) {
-		// do nothing if the camera isn't configured yet
-		if (camera.fx == 0.0 || camera.fy == 0.0)
-			return;
+	private void applyLocalEuler( double rotX, double rotY, double rotZ ) {
+		pointToRot.reset();
 
-		// convert into normalize image coordinates
-		PerspectiveOps.convertPixelToNorm(camera, x0, y0, norm1);
-		PerspectiveOps.convertPixelToNorm(camera, x1, y1, norm2);
+		worldToView.transform(targetWorld, targetInOld);
 
-		// Figure out the distance along the projection at the plane at the distance of the target point
-		double z = targetPoint.plus(translateWorld).norm()*radiusScale;
+		viewToPoint.T.setTo(-targetInOld.x, -targetInOld.y, -targetInOld.z);
 
-		translateWorld.x += (norm2.x - norm1.x)*z;
-		translateWorld.y += (norm2.y - norm1.y)*z;
+		worldToView.concat(viewToPoint, worldToPoint);
+
+		// Set the local rotation
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, rotY, rotX, rotZ, pointToRot.R);
+
+		viewToPoint.concat(pointToRot, viewToPoint2);
+		worldToPoint.concatInvert(viewToPoint2, worldToView);
+
+		pointAtTarget();
 	}
 
 	/**
@@ -147,14 +160,11 @@ public class OrbitAroundPoint {
 		PerspectiveOps.convertPixelToNorm(camera, x1, y1, norm2);
 
 		// Zoom in and out using the mouse
-		double z = targetPoint.plus(translateWorld).norm()*radiusScale;
-		translateWorld.z += (norm2.y - norm1.y)*z;
+		worldToView.transform(targetWorld, targetInView);
+		worldToView.T.z += (norm2.y - norm1.y)*targetInView.norm();
 
-		// Perform roll around the z-axis
+		// Roll the camera
 		double rotX = UtilAngle.minus(Math.atan(norm1.x), Math.atan(norm2.x));
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0, 0, -rotX, localRotation);
-		CommonOps_DDRM.mult(localRotation, rotationAroundTarget, tmp);
-		rotationAroundTarget.setTo(tmp);
-
+		applyLocalEuler(0, 0, rotX);
 	}
 }

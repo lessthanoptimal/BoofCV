@@ -861,4 +861,28 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 			assertTrue(point.z > 0);
 		}
 	}
+
+	/**
+	 * In these scenarios the rotation matrix should have all positive elements along the diagonal since there
+	 * should be no flipping
+	 */
+	@Test void pointAt_positive_diagonal() {
+		var points = new ArrayList<Point3D_F64>();
+
+		points.add(new Point3D_F64(-1.3877787807814457E-17, 1.3877787807814457E-17, 3.344561447900182));
+		points.add(new Point3D_F64(-1.3877787807814457E-17, 0.0, 3.344561447900182));
+		points.add(new Point3D_F64(9.540979117872439E-17, -3.469446951953614E-18, 3.3445614479001797));
+		points.add(new Point3D_F64(0.0, 5.551115123125783E-17, 3.3445614479001833));
+		points.add(new Point3D_F64(0.0, -2.7755575615628914E-17, 3.3445614479001833));
+
+		var R = new DMatrixRMaj(3, 3);
+
+		for (var point : points) {
+			PerspectiveOps.pointAt(point.x, point.y, point.z, R);
+
+			for (int i = 0; i < 3; i++) {
+				assertTrue(R.get(i,i) > 0);
+			}
+		}
+	}
 }

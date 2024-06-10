@@ -79,7 +79,10 @@ public class RenderMesh implements VerbosePrint {
 	public @Getter final Se3_F64 worldToView = new Se3_F64();
 
 	/** If true then a polygon will only be rendered if the surface normal is pointed towards the camera */
-	public @Getter @Setter boolean checkSurfaceNormal = true;
+	public @Getter @Setter boolean checkSurfaceNormal = false;
+
+	/** If true it will always use the colorizer, even if there is texture information */
+	public @Getter @Setter boolean forceColorizer = false;
 
 	// Image for texture mapping
 	private InterleavedU8 textureImage = new InterleavedU8(1, 1, 3);
@@ -126,8 +129,6 @@ public class RenderMesh implements VerbosePrint {
 		// Initialize output images
 		initializeImages();
 
-		final int width = intrinsics.width;
-		final int height = intrinsics.height;
 		final double fx = intrinsics.fx;
 		final double fy = intrinsics.fy;
 		final double cx = intrinsics.cx;
@@ -138,6 +139,9 @@ public class RenderMesh implements VerbosePrint {
 
 		var worldCamera = new Point3D_F64();
 		worldToView.transformReverse(worldCamera, worldCamera);
+
+		// Decide if it should texture map or user a per shape color
+		final boolean useColorizer = forceColorizer || mesh.texture.size() == 0;
 
 		for (int shapeIdx = 1; shapeIdx < mesh.offsets.size; shapeIdx++) {
 			// First and last point in the polygon
@@ -152,13 +156,13 @@ public class RenderMesh implements VerbosePrint {
 			polygonProj.vertexes.reset().reserve(idx1 - idx0);
 			meshCam.reset().reserve(idx1 - idx0);
 
-			if (mesh.texture.size() > 0) {
+			if (!useColorizer) {
 				mesh.getTexture(shapeIdx - 1, polygonTex.vertexes);
 			}
 
 			// Prune using normal vector
 			if (mesh.normals.size() > 0 && checkSurfaceNormal) {
-				if (!isFrontVisible(mesh, shapeIdx, idx0, worldCamera)) continue;
+				if (!isFrontVisible(mesh, shapeIdx - 1, idx0, worldCamera)) continue;
 			}
 
 			boolean behindCamera = false;
@@ -189,8 +193,8 @@ public class RenderMesh implements VerbosePrint {
 			if (behindCamera)
 				continue;
 
-			if (mesh.texture.size() == 0) {
-				projectSurfaceColor(mesh, polygonProj, shapeIdx - 1);
+			if (useColorizer) {
+				projectSurfaceColor(meshCam, polygonProj, shapeIdx - 1);
 			} else {
 				projectSurfaceTexture(meshCam, polygonProj, polygonTex);
 			}
@@ -204,11 +208,12 @@ public class RenderMesh implements VerbosePrint {
 	/**
 	 * Use the normal vector to see if the front of the mesh is visible. If it's not visible we can skip it
 	 *
+	 * @param worldCamera Location of the camera in current view in world coordinates
 	 * @return true if visible
 	 */
-	private static boolean isFrontVisible( VertexMesh mesh, int shapeIdx, int idx0, Point3D_F64 worldCamera ) {
+	static boolean isFrontVisible( VertexMesh mesh, int shapeIdx, int idx0, Point3D_F64 worldCamera ) {
 		// Get normal in world coordinates
-		Point3D_F64 normal = mesh.normals.getTemp(shapeIdx - 1);
+		Point3D_F64 normal = mesh.normals.getTemp(shapeIdx);
 
 		// vector from the camera to a vertex
 		Point3D_F64 v1 = mesh.vertexes.getTemp(mesh.indexes.get(idx0));
@@ -253,18 +258,9 @@ public class RenderMesh implements VerbosePrint {
 	 * is searched exhaustively. If the projected 2D polygon contains a pixels and the polygon is closer than
 	 * the current depth of the pixel it is rendered there and the depth image is updated.
 	 */
-	void projectSurfaceColor( VertexMesh mesh, Polygon2D_F64 polyProj, int shapeIdx ) {
-		// TODO temp hack. Best way is to find the distance to the 3D polygon at this point. Instead we will
-		// use the depth of the first point.
-		//
-		// IDEA: Use a homography to map location on 2D polygon to 3D polygon, then rotate just the Z to get
-		//       local depth on the surface.
-		int vertexIndex = mesh.indexes.get(mesh.offsets.data[shapeIdx]);
-		Point3D_F64 world = mesh.vertexes.getTemp(vertexIndex);
-		worldToView.transform(world, camera);
-
+	void projectSurfaceColor( FastAccess<Point3D_F64> mesh, Polygon2D_F64 polyProj, int shapeIdx ) {
 		// TODO compute the depth at each pixel
-		float depth = (float)camera.z;
+		float depth = (float)mesh.get(0).z;
 
 		// TODO look at vertexes and get min/max depth. Use that to quickly reject pixels based on depth without
 		//      convex intersection or computing the depth at that pixel on this surface
@@ -272,7 +268,7 @@ public class RenderMesh implements VerbosePrint {
 		// The entire surface will have one color
 		int color = surfaceColor.surfaceRgb(shapeIdx);
 
-		computeBoundingBox(intrinsics.width, intrinsics.height, polygonProj, aabb);
+		computeBoundingBox(intrinsics.width, intrinsics.height, polyProj, aabb);
 
 		// Go through all pixels and see if the points are inside the polygon. If so
 		for (int pixelY = aabb.y0; pixelY < aabb.y1; pixelY++) {
@@ -299,7 +295,7 @@ public class RenderMesh implements VerbosePrint {
 	 * Projection with texture mapping. Breaks the polygon up into triangles and uses Barycentric coordinates to
 	 * map pixels to textured mapped coordinates.
 	 *
-	 * @param mesh 3D location of vertexes in the mesh
+	 * @param mesh 3D location of vertexes in the mesh in the view's coordinate system
 	 * @param polyProj Projected pixels of mesh
 	 * @param polyText Texture coordinates of the mesh
 	 */
@@ -394,7 +390,7 @@ public class RenderMesh implements VerbosePrint {
 	/**
 	 * Gets the RGB color using interpolation at the specified pixel coordinate in the texture image
 	 */
-	private int interpolateTextureRgb( float px, float py ) {
+	int interpolateTextureRgb( float px, float py ) {
 		textureInterp.get(px, py, textureValues);
 		int r = (int)(textureValues[0] + 0.5f);
 		int g = (int)(textureValues[1] + 0.5f);

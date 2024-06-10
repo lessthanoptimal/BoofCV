@@ -184,6 +184,7 @@ public class VertexMesh {
 		indexes.reset();
 		offsets.reset();
 		texture.reset();
+		normals.reset();
 		offsets.add(0);
 	}
 
@@ -200,5 +201,9 @@ public class VertexMesh {
 				VertexMesh.this.getShape(which, vertexes);
 			}
 		};
+	}
+
+	public boolean isTextured() {
+		return texture.size() > 0;
 	}
 }

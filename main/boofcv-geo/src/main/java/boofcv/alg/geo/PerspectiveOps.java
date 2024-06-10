@@ -1178,19 +1178,27 @@ public class PerspectiveOps {
 		// There's a pathological case. Pick the option which if farthest from it
 		if (Math.abs(GeometryMath_F64.dot(axisX, axisZ)) < Math.abs(GeometryMath_F64.dot(axisY, axisZ))) {
 			GeometryMath_F64.cross(axisX, axisZ, axisY);
+			// There are two options here, pick the one that will result in the smallest rotation
+			if (dot(axisY,0,1,0) < 0)
+				axisY.scale(-1);
+
 			axisY.divideIP(axisY.norm());
 			GeometryMath_F64.cross(axisY, axisZ, axisX);
 			axisX.divideIP(axisX.norm());
 		} else {
 			GeometryMath_F64.cross(axisY, axisZ, axisX);
 			axisX.divideIP(axisX.norm());
-			GeometryMath_F64.cross(axisX, axisZ, axisY);
+			if (dot(axisX,1,0,0) < 0)
+				axisX.scale(-1);
+
+			GeometryMath_F64.cross(axisZ, axisX, axisY);
 			axisY.divideIP(axisY.norm());
 		}
 
+
 		if (R == null)
-			R = new DMatrixRMaj(3,3);
-		
+			R = new DMatrixRMaj(3, 3);
+
 		R.set(0, 0, axisX.x);
 		R.set(1, 0, axisX.y);
 		R.set(2, 0, axisX.z);
@@ -1202,5 +1210,9 @@ public class PerspectiveOps {
 		R.set(2, 2, axisZ.z);
 
 		return R;
+	}
+
+	private static double dot(Point3D_F64 p, double x, double y , double z) {
+		return p.x*x + p.y*y + p.z*z;
 	}
 }

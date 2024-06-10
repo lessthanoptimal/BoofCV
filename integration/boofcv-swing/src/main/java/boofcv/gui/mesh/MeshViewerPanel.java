@@ -281,7 +281,7 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 			}
 
 			// Stop it from sucking up all the CPU
-			Thread.yield();
+			BoofMiscOps.sleep(10);
 
 			// Can't sleep or wait here. That requires interrupting the thread to wake it up, unfortunately
 			// that conflicts with the concurrency code and interrupts that too
@@ -374,17 +374,31 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 	 * Each time this is called it will change the colorizer being used, if more than one has been specified
 	 */
 	public void cycleColorizer() {
+		int totalColors = colorizers.size();
+		if (mesh.isTextured()) {
+			totalColors++;
+		}
+
 		synchronized (colorizers) {
 			var list = new ArrayList<>(colorizers.keySet());
 
 			// go to the next one and make sure it's valid
 			activeColorizer++;
-			if (activeColorizer >= list.size()) {
+			if (activeColorizer >= totalColors) {
 				activeColorizer = 0;
 			}
 
-			// Change the colorizer
-			renderer.surfaceColor = Objects.requireNonNull(colorizers.get(list.get(activeColorizer)));
+			// If it has texture then that is the first possible colorizer
+			if (mesh.isTextured()) {
+				if (activeColorizer == 0) {
+					renderer.forceColorizer = false;
+				} else {
+					renderer.forceColorizer = true;
+					renderer.surfaceColor = Objects.requireNonNull(colorizers.get(list.get(activeColorizer - 1)));
+				}
+			} else {
+				renderer.surfaceColor = Objects.requireNonNull(colorizers.get(list.get(activeColorizer)));
+			}
 
 			// Re-render the image
 			requestRender();

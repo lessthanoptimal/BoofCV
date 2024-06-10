@@ -19,15 +19,17 @@
 package boofcv.struct.mesh;
 
 import boofcv.testing.BoofStandardJUnit;
+import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.DogArray;
+import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestVertexMesh extends BoofStandardJUnit {
 	@Test void setTo() {checkSetTo(VertexMesh.class, true);}
@@ -54,11 +56,55 @@ public class TestVertexMesh extends BoofStandardJUnit {
 	}
 
 	@Test void getTexture() {
-		fail("implement");
+		var shape = new DogArray<>(Point3D_F64::new);
+
+		var alg = new VertexMesh();
+		alg.addShape(shape.resize(3).toList());
+		alg.addShape(shape.resize(4).toList());
+		alg.addShape(shape.resize(5).toList());
+
+		alg.addTexture(3, new float[]{1,2,3,4,5,6,7,8,9,10});
+		alg.addTexture(4, new float[12]);
+		alg.addTexture(5, new float[10]);
+
+		var found = new DogArray<>(Point2D_F32::new);
+		alg.getTexture(0, found);
+		assertEquals(3, found.size);
+		assertTrue(found.get(0).isIdentical(1,2));
+		assertTrue(found.get(1).isIdentical(3,4));
+		assertTrue(found.get(2).isIdentical(5,6));
+		alg.getTexture(1, found);
+		assertEquals(4, found.size);
+		alg.getTexture(2, found);
+		assertEquals(5, found.size);
 	}
 
 	@Test void computeNormals() {
-		fail("implement");
+		var shape = new DogArray<>(Point3D_F64::new);
+
+		shape.grow().setTo(0,0,0);
+		shape.grow().setTo(0,1,0);
+		shape.grow().setTo(1,1,0);
+
+		// create triangles that will have normals +1 and -1
+		var alg = new VertexMesh();
+		alg.addShape(shape.toList());
+		shape.reverse();
+		alg.addShape(shape.toList());
+
+		alg.computeNormals();
+		assertEquals(0.0, alg.normals.getTemp(0).distance(0,0,-1), UtilEjml.TEST_F64);
+		assertEquals(0.0, alg.normals.getTemp(1).distance(0,0,1), UtilEjml.TEST_F64);
+
+		// try it with a non-triangle
+		shape.reset();
+		shape.grow().setTo(0,0,0);
+		shape.grow().setTo(0,2,0);
+		shape.grow().setTo(2,2,0);
+		shape.grow().setTo(2,9,0);
+		alg.reset();
+		alg.addShape(shape.toList());
+		assertEquals(0.0, alg.normals.getTemp(0).distance(0,0,-1), UtilEjml.TEST_F64);
 	}
 
 	private List<Point3D_F64> createRandomShape( int count ) {

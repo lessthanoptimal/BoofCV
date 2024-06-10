@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -76,7 +76,7 @@ public class OrbitAroundPointControl extends MouseAdapter implements Swing3dCame
 
 		// Give tell it to look in front of the camera if there is nothing to look at
 		if (N == 0) {
-			orbit.targetPoint.setTo(0, 0, 1);
+			orbit.setTarget(0, 0, 1);
 			return;
 		}
 
@@ -94,12 +94,14 @@ public class OrbitAroundPointControl extends MouseAdapter implements Swing3dCame
 		values.resize(sampled.size);
 
 		synchronized (orbit) {
+			var target = new Point3D_F64();
 			for (int axis = 0; axis < 3; axis++) {
 				int _axis = axis;
 				sampled.forIdx(( idx, v ) -> values.set(idx, v.getIdx(_axis)));
 				values.sort();
-				orbit.targetPoint.setIdx(axis, values.getFraction(0.5));
+				target.setIdx(axis, values.getFraction(0.5));
 			}
+			orbit.setTarget(target.x, target.y, target.z);
 		}
 	}
 
@@ -111,7 +113,6 @@ public class OrbitAroundPointControl extends MouseAdapter implements Swing3dCame
 
 	@Override public Se3_F64 getWorldToCamera() {
 		synchronized (orbit) {
-			orbit.updateTransform();
 			return orbit.worldToView.copy();
 		}
 	}
@@ -134,9 +135,7 @@ public class OrbitAroundPointControl extends MouseAdapter implements Swing3dCame
 
 	@Override public void mouseDragged( MouseEvent e ) {
 		synchronized (orbit) {
-			if (e.isShiftDown() || SwingUtilities.isMiddleMouseButton(e))
-				orbit.mouseDragTranslate(prevX, prevY, e.getX(), e.getY());
-			else if (e.isControlDown() || SwingUtilities.isRightMouseButton(e))
+			if (e.isControlDown() || SwingUtilities.isRightMouseButton(e))
 				orbit.mouseDragZoomRoll(prevX, prevY, e.getX(), e.getY());
 			else
 				orbit.mouseDragRotate(prevX, prevY, e.getX(), e.getY());

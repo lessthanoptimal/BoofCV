@@ -72,23 +72,39 @@ public class MeshViewerApp {
 		}
 
 		// See if there should be a texture mapped file
-		InterleavedU8 rgb = null;
-		if (mesh.texture.size() > 0) {
+		InterleavedU8 textureImage = null;
+		escape:if (mesh.texture.size() > 0) {
 			System.out.println("Loading texture image");
 			String name = FilenameUtils.getBaseName(file.getName());
-			File textureFile = new File(file.getParentFile(), name + ".jpg");
-			rgb = UtilImageIO.loadImage(textureFile, true, ImageType.IL_U8);
-			if (rgb == null)
-				System.err.println("Failed to load texture image");
+			// try to load an image with the same basename
+			File[] children = file.getParentFile().listFiles();
+			if (children == null) {
+				break escape;
+			}
+
+			for (File child : children) {
+				// see if this file starts with the same name as the mesh file
+				if (!child.getName().startsWith(name))
+					continue;
+
+				// skip if it's not an image
+				if (!UtilImageIO.isImage(child))
+					continue;
+
+				textureImage = UtilImageIO.loadImage(child, true, ImageType.IL_U8);
+				if (textureImage != null)
+					break;
+			}
 		}
-		InterleavedU8 _rgb = rgb;
+
+		InterleavedU8 _image = textureImage;
 		SwingUtilities.invokeLater(() -> {
 			var panel = new MeshViewerPanel();
 			panel.setMesh(mesh, false);
 			if (colors.size > 0)
 				panel.setVertexColors("RGB", colors.data);
-			if (_rgb != null)
-				panel.setTextureImage(_rgb);
+			if (_image != null)
+				panel.setTextureImage(_image);
 			panel.setPreferredSize(new Dimension(500, 500));
 			ShowImages.showWindow(panel, "Mesh Viewer", true);
 		});

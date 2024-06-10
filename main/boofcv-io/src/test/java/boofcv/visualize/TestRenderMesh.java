@@ -21,8 +21,12 @@ package boofcv.visualize;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.mesh.VertexMesh;
 import boofcv.testing.BoofStandardJUnit;
+import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point3D_F64;
+import georegression.struct.shapes.Polygon2D_F32;
 import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.Rectangle2D_I32;
+import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
 
@@ -44,6 +48,9 @@ public class TestRenderMesh extends BoofStandardJUnit {
 
 		// Configure
 		var alg = new RenderMesh();
+
+		// turn off checking with normals to simply this test
+		alg.setCheckSurfaceNormal(false);
 		PerspectiveOps.createIntrinsic(300, 200, 90, -1, alg.intrinsics);
 
 		// Render
@@ -53,7 +60,7 @@ public class TestRenderMesh extends BoofStandardJUnit {
 		int count = 0;
 		for (int y = 0; y < alg.intrinsics.height; y++) {
 			for (int x = 0; x < alg.intrinsics.width; x++) {
-				if (alg.rgbImage.get24(x,y) != 0xFFFFFF)
+				if (alg.rgbImage.get24(x, y) != 0xFFFFFF)
 					count++;
 			}
 		}
@@ -86,14 +93,12 @@ public class TestRenderMesh extends BoofStandardJUnit {
 	}
 
 	/**
-	 * Tests the projection by having it fill in a known rectangle. The AABB is larger than needed. One pixel
-	 * is given a depth closer than the polygon and isn't filled in.
+	 * Tests the projection by having it fill in a known rectangle.
 	 */
 	@Test void projectSurfaceColor() {
 		var alg = new RenderMesh();
 		alg.intrinsics.fsetShape(100, 120);
 		alg.initializeImages();
-		alg.aabb.setTo(10, 15, 50, 60);
 
 		// Polygon of projected shape on to the image. Make is an AABB, but smaller than the one above
 		var polygon = new Polygon2D_F64();
@@ -102,35 +107,109 @@ public class TestRenderMesh extends BoofStandardJUnit {
 		polygon.vertexes.grow().setTo(40, 35);
 		polygon.vertexes.grow().setTo(10, 35);
 
-		// The mesh is used to get the depth of the shape being examined
-		var mesh = new VertexMesh();
-		mesh.vertexes.append(0, 0, 10);
-		mesh.indexes.add(0);
-		mesh.offsets.add(1);
-
-		// Set one pixel inside the projected region to be closer than the mesh
-		alg.depthImage.set(15, 25, 1);
+		var shapeInCamera = new DogArray<>(Point3D_F64::new);
+		shapeInCamera.resize(polygon.size());
+		shapeInCamera.get(0).setTo(0, 0, 10); // the depth will be 10 for the shape
 
 		// Perform the projection
-		alg.projectSurfaceColor(mesh, polygon, 0);
+		alg.projectSurfaceColor(shapeInCamera, polygon, 0);
 
 		// Verify by counting the number of projected points
 		int countDepth = 0;
 		int countRgb = 0;
 		for (int y = 0; y < alg.intrinsics.height; y++) {
 			for (int x = 0; x < alg.intrinsics.width; x++) {
-				if (alg.depthImage.get(x,y) == 10)
+				if (alg.depthImage.get(x, y) == 10)
 					countDepth++;
-				if (alg.rgbImage.get24(x,y) != 0xFFFFFF)
+				if (alg.rgbImage.get24(x, y) != 0xFFFFFF)
 					countRgb++;
 			}
 		}
 
-		assertEquals(599, countDepth);
-		assertEquals(599, countRgb);
+		assertEquals(600, countDepth);
+		assertEquals(600, countRgb);
 	}
 
 	@Test void projectSurfaceTexture() {
-		fail("implement");
+		var alg = new RenderMesh() {
+			@Override int interpolateTextureRgb( float px, float py ) {
+				// return some arbitrary color
+				return 1;
+			}
+		};
+		alg.intrinsics.fsetShape(100, 120);
+		alg.initializeImages();
+
+		// Polygon of projected shape on to the image. Make is an AABB, but smaller than the one above
+		var polygon = new Polygon2D_F64();
+		polygon.vertexes.grow().setTo(10, 15);
+		polygon.vertexes.grow().setTo(40, 15);
+		polygon.vertexes.grow().setTo(40, 35);
+		polygon.vertexes.grow().setTo(10, 35);
+
+		var shapeInCamera = new DogArray<>(Point3D_F64::new);
+		shapeInCamera.resize(polygon.size(), ( p ) -> p.setTo(0, 0, 10));
+		// All points will have a depth of 10
+
+		// Create texture with reasonable coordinates. Doesn't really matter what they are
+		var polyTexture = new Polygon2D_F32();
+		for (int i = 0; i < polygon.size(); i++) {
+			Point2D_F64 p = polygon.get(i);
+			polyTexture.vertexes.grow().setTo((float)p.x/50, (float)p.y/50);
+		}
+
+		// Perform the projection
+		alg.projectSurfaceTexture(shapeInCamera, polygon, polyTexture);
+
+		// Verify by counting the number of projected points
+		int countDepth = 0;
+		int countRgb = 0;
+		for (int y = 0; y < alg.intrinsics.height; y++) {
+			for (int x = 0; x < alg.intrinsics.width; x++) {
+				if (!Float.isNaN(alg.depthImage.get(x, y))) {
+					countDepth++;
+				}
+				if (alg.rgbImage.get24(x, y) != 0xFFFFFF)
+					countRgb++;
+			}
+		}
+
+		assertEquals(600, countDepth);
+		assertEquals(600, countRgb);
+	}
+
+	/**
+	 * Rotate in a circle and check two handcrafted scenarios
+	 */
+	@Test void isFrontVisible() {
+		var mesh = new VertexMesh();
+
+		double r = 5;
+
+		var pointCam = new Point3D_F64(0, 2, 2);
+
+		// Should pass all of these
+		for (int i = 0; i < 30; i++) {
+			double yaw = Math.PI*i/15;
+
+			double c = Math.cos(yaw);
+			double s = Math.sin(yaw);
+
+			// This should pass
+			mesh.reset();
+			mesh.indexes.add(0);
+			mesh.normals.append(-c, -s, 0);
+			mesh.vertexes.append(r*c, 2 + r*s, 2);
+
+			assertTrue(RenderMesh.isFrontVisible(mesh, 0, 0, pointCam));
+
+			// This should fail
+			mesh.reset();
+			mesh.indexes.add(0);
+			mesh.normals.append(c, s, 0);
+			mesh.vertexes.append(r*c, 2 + r*s, 2);
+
+			assertFalse(RenderMesh.isFrontVisible(mesh, 0, 0, pointCam));
+		}
 	}
 }
