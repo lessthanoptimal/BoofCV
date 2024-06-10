@@ -100,4 +100,17 @@ public class PackedArrayPoint2D_I16 implements PackedArray<Point2D_I16> {
 			array.data[i + 1] = temp.y;
 		}
 	}
+
+	/**
+	 * Makes this array have a value identical to 'src'
+	 *
+	 * @param src original array being copies
+	 * @return Reference to 'this'
+	 */
+	public PackedArrayPoint2D_I16 setTo( PackedArrayPoint2D_I16 src ) {
+		reset();
+		reserve(src.size());
+		src.forIdx(0, src.size(), ( idx, p ) -> append(p.x, p.y));
+		return this;
+	}
 }

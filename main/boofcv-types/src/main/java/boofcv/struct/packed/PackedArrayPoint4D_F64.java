@@ -117,4 +117,17 @@ public class PackedArrayPoint4D_F64 implements PackedArray<Point4D_F64> {
 			array.data[i + 3] = temp.w;
 		}
 	}
+
+	/**
+	 * Makes this array have a value identical to 'src'
+	 *
+	 * @param src original array being copies
+	 * @return Reference to 'this'
+	 */
+	public PackedArrayPoint4D_F64 setTo( PackedArrayPoint4D_F64 src ) {
+		reset();
+		reserve(src.size());
+		src.forIdx(0, src.size(), ( idx, p ) -> append(p.x, p.y, p.z, p.w));
+		return this;
+	}
 }

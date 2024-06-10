@@ -110,4 +110,17 @@ public class PackedArrayPoint3D_F64 implements PackedArray<Point3D_F64> {
 			array.data[i + 2] = temp.z;
 		}
 	}
+
+	/**
+	 * Makes this array have a value identical to 'src'
+	 *
+	 * @param src original array being copies
+	 * @return Reference to 'this'
+	 */
+	public PackedArrayPoint3D_F64 setTo( PackedArrayPoint3D_F64 src ) {
+		reset();
+		reserve(src.size());
+		src.forIdx(0, src.size(), ( idx, p ) -> append(p.x, p.y, p.z));
+		return this;
+	}
 }
