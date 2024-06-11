@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.BoofTesting;
 import boofcv.struct.Configuration;
 import org.ddogleg.struct.DogArrayPrimitive;
 import org.ddogleg.struct.FastAccess;
+import org.ddogleg.struct.LArrayAccessor;
 import org.ejml.data.DMatrix;
 import org.ejml.data.FMatrix;
 import org.ejml.ops.MatrixFeatures_D;
@@ -280,8 +281,8 @@ public class BoofStandardJUnit {
 				if (onlyOneOption)
 					assertEquals(f.get(src), f.get(dst), "Field Name: '" + f.getName() + "'");
 				else if (f.getType().isAssignableFrom(List.class)) {
-					List listSrc = (List)f.get(src);
-					List listDst = (List)f.get(dst);
+					var listSrc = (List)f.get(src);
+					var listDst = (List)f.get(dst);
 
 					// if the original list is empty there's nothing that can be tested.
 					if (listSrc.isEmpty()) {
@@ -321,8 +322,15 @@ public class BoofStandardJUnit {
 			if (f.getType().isEnum() || f.getType().isPrimitive() || f.get(src) == null)
 				assertEquals(f.get(src), f.get(dst), "Field Name: '" + f.getName() + "' in " + src.getClass().getSimpleName());
 			else if (f.getType().isAssignableFrom(FastAccess.class)) {
-				FastAccess listSrc = (FastAccess)f.get(src);
-				FastAccess listDst = (FastAccess)f.get(dst);
+				var listSrc = (FastAccess)f.get(src);
+				var listDst = (FastAccess)f.get(dst);
+				assertEquals(listSrc.size(), listDst.size());
+				for (int i = 0; i < listSrc.size(); i++) {
+					throw new RuntimeException("Implement!");
+				}
+			} else if (f.getType().isAssignableFrom(LArrayAccessor.class)) {
+				var listSrc = (LArrayAccessor)f.get(src);
+				var listDst = (LArrayAccessor)f.get(dst);
 				assertEquals(listSrc.size(), listDst.size());
 				for (int i = 0; i < listSrc.size(); i++) {
 					throw new RuntimeException("Implement!");

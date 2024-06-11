@@ -36,7 +36,7 @@ public class PackedBigArrayPoint2D_F64 implements PackedArray<Point2D_F64> {
 	private final BigDogArray_F64 dog;
 
 	// tuple that the result is temporarily written to
-	public final Point2D_F64 temp = new Point2D_F64();
+	private final Point2D_F64 temp = new Point2D_F64();
 
 	/**
 	 * Constructor where the default is used for all parameters.

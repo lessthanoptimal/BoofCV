@@ -34,10 +34,10 @@ public class TestPackedArrayPoint4D_F64 extends GenericPackedArrayChecks<Point4D
 
 	@Override protected Point4D_F64 createRandomPoint() {
 		var point = new Point4D_F64();
-		point.x = (double) rand.nextGaussian();
-		point.y = (double) rand.nextGaussian();
-		point.z = (double) rand.nextGaussian();
-		point.w = (double) rand.nextGaussian();
+		point.x = (double)rand.nextGaussian();
+		point.y = (double)rand.nextGaussian();
+		point.z = (double)rand.nextGaussian();
+		point.w = (double)rand.nextGaussian();
 		return point;
 	}
 
@@ -52,7 +52,7 @@ public class TestPackedArrayPoint4D_F64 extends GenericPackedArrayChecks<Point4D
 	@Test void appendValues() {
 		var alg = new PackedArrayPoint4D_F64();
 		assertEquals(0, alg.size());
-		alg.append(1,2,3,4);
+		alg.append(1, 2, 3, 4);
 
 		assertEquals(1, alg.size());
 
@@ -61,5 +61,18 @@ public class TestPackedArrayPoint4D_F64 extends GenericPackedArrayChecks<Point4D
 		assertEquals(2.0, p.y);
 		assertEquals(3.0, p.z);
 		assertEquals(4.0, p.w);
+	}
+
+	@Test void setTo() {
+		var src = new PackedArrayPoint4D_F64();
+		src.append(1, 2, 3, 4);
+		src.append(2, 3, 4, 5);
+
+		var dst = new PackedArrayPoint4D_F64();
+		dst.append(4, 5, 6, 7);
+
+		dst.setTo(src);
+		assertEquals(2, dst.size());
+		src.forIdx(0, 2, ( idx, a ) -> assertEquals(0.0, a.distance(dst.getTemp(idx))));
 	}
 }

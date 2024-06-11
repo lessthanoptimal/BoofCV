@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.struct.feature;
 import boofcv.struct.PackedArray;
 import boofcv.struct.packed.GenericPackedArrayChecks;
 import org.ejml.UtilEjml;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -51,4 +52,7 @@ class TestPackedTupleBigArray_F64 extends GenericPackedArrayChecks<TupleDesc_F64
 		}
 		fail("The tuples are identical");
 	}
+
+	// not implemented yet
+	@Test void setTo_Standard(){}
 }

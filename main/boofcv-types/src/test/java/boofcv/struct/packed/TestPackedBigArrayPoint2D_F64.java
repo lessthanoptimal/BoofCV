@@ -35,8 +35,8 @@ public class TestPackedBigArrayPoint2D_F64 extends GenericPackedArrayChecks<Poin
 
 	@Override protected Point2D_F64 createRandomPoint() {
 		var point = new Point2D_F64();
-		point.x = (double) rand.nextGaussian();
-		point.y = (double) rand.nextGaussian();
+		point.x = (double)rand.nextGaussian();
+		point.y = (double)rand.nextGaussian();
 		return point;
 	}
 
@@ -51,12 +51,25 @@ public class TestPackedBigArrayPoint2D_F64 extends GenericPackedArrayChecks<Poin
 	@Test void appendValues() {
 		var alg = new PackedBigArrayPoint2D_F64();
 		assertEquals(0, alg.size());
-		alg.append(1,2);
+		alg.append(1, 2);
 
 		assertEquals(1, alg.size());
 
 		var p = alg.getTemp(0);
 		assertEquals(1.0, p.x);
 		assertEquals(2.0, p.y);
+	}
+
+	@Test void setTo() {
+		var src = new PackedBigArrayPoint2D_F64();
+		src.append(1, 2);
+		src.append(2, 3);
+
+		var dst = new PackedBigArrayPoint2D_F64();
+		dst.append(4, 5);
+
+		dst.setTo(src);
+		assertEquals(2, dst.size());
+		src.forIdx(0, 2, ( idx, a ) -> assertEquals(0.0, a.distance(dst.getTemp(idx))));
 	}
 }

@@ -36,7 +36,7 @@ public class PackedBigArrayPoint3D_F64 implements PackedArray<Point3D_F64> {
 	private static final int DOF = 3;
 
 	// tuple that the result is temporarily written to
-	public final Point3D_F64 temp = new Point3D_F64();
+	private final Point3D_F64 temp = new Point3D_F64();
 
 	// Storage for the raw data in an array
 	private final BigDogArray_F64 dog;

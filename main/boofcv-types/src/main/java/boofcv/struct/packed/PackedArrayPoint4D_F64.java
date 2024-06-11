@@ -21,6 +21,7 @@ package boofcv.struct.packed;
 import boofcv.misc.BoofLambdas;
 import boofcv.struct.PackedArray;
 import georegression.struct.point.Point4D_F64;
+import lombok.Getter;
 import org.ddogleg.struct.DogArray_F64;
 
 /**
@@ -31,10 +32,11 @@ import org.ddogleg.struct.DogArray_F64;
 public class PackedArrayPoint4D_F64 implements PackedArray<Point4D_F64> {
 	private static final int DOF = 4;
 
-	// Stores tuple in a single continuous array
-	public final DogArray_F64 array;
+	/** Stores tuple in a single continuous array */
+	@Getter private final DogArray_F64 array;
+
 	// tuple that the result is temporarily written to
-	public final Point4D_F64 temp = new Point4D_F64();
+	private final Point4D_F64 temp = new Point4D_F64();
 
 	public PackedArrayPoint4D_F64() {
 		array = new DogArray_F64();
@@ -125,9 +127,7 @@ public class PackedArrayPoint4D_F64 implements PackedArray<Point4D_F64> {
 	 * @return Reference to 'this'
 	 */
 	public PackedArrayPoint4D_F64 setTo( PackedArrayPoint4D_F64 src ) {
-		reset();
-		reserve(src.size());
-		src.forIdx(0, src.size(), ( idx, p ) -> append(p.x, p.y, p.z, p.w));
+		array.setTo(src.array);
 		return this;
 	}
 }

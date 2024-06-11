@@ -36,7 +36,7 @@ public class PackedBigArrayPoint4D_F64 implements PackedArray<Point4D_F64> {
 	private final BigDogArray_F64 dog;
 
 	// tuple that the result is temporarily written to
-	public final Point4D_F64 temp = new Point4D_F64();
+	private final Point4D_F64 temp = new Point4D_F64();
 
 	/**
 	 * Constructor where the default is used for all parameters.
@@ -61,6 +61,19 @@ public class PackedBigArrayPoint4D_F64 implements PackedArray<Point4D_F64> {
 	 */
 	public PackedBigArrayPoint4D_F64( int reservedPoints, int blockSize, BigDogGrowth growth ) {
 		dog = new BigDogArray_F64(reservedPoints*DOF, blockSize*DOF, growth);
+	}
+
+	/**
+	 * Makes this array have a value identical to 'src'
+	 *
+	 * @param src original array being copies
+	 * @return Reference to 'this'
+	 */
+	public PackedBigArrayPoint4D_F64 setTo( PackedBigArrayPoint4D_F64 src ) {
+		reset();
+		reserve(src.size());
+		src.forIdx(0, src.size(), ( idx, p ) -> append(p.x, p.y, p.z, p.w));
+		return this;
 	}
 
 	@Override public void reset() {

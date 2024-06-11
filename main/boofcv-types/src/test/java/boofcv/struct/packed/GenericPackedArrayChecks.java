@@ -161,4 +161,6 @@ public abstract class GenericPackedArrayChecks<T> extends BoofStandardJUnit {
 		T found = alg.getTemp(1);
 		checkEquals(p, found);
 	}
+
+	@Test void setTo_Standard() {checkSetTo(createAlg().getClass(), true);}
 }
