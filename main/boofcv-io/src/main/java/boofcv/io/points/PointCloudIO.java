@@ -150,21 +150,18 @@ public class PointCloudIO {
 	 *
 	 * @param file Which file it should load
 	 * @param mesh (Output) storage for the mesh
-	 * @param colors (Output) Storage for vertex colors
 	 */
-	public static void load( File file, VertexMesh mesh, DogArray_I32 colors ) throws IOException {
+	public static void load( File file, VertexMesh mesh ) throws IOException {
 		String extension = FilenameUtils.getExtension(file.getName()).toLowerCase(Locale.ENGLISH);
 		var type = switch (extension) {
 			case "ply" -> PointCloudIO.Format.PLY;
 			case "stl" -> PointCloudIO.Format.STL;
 			case "obj" -> PointCloudIO.Format.OBJ;
-			default -> {
-				throw new RuntimeException("Unknown file type: " + extension);
-			}
+			default -> throw new RuntimeException("Unknown file type: " + extension);
 		};
 
 		try (var input = new FileInputStream(file)) {
-			PointCloudIO.load(type, input, mesh, colors);
+			PointCloudIO.load(type, input, mesh);
 		}
 	}
 
@@ -174,11 +171,10 @@ public class PointCloudIO {
 	 * @param format Storage format
 	 * @param input Input stream
 	 * @param mesh (Output) 3D mesh
-	 * @param vertexRgb (Output) color of each vertex
 	 */
-	public static void load( Format format, InputStream input, VertexMesh mesh, DogArray_I32 vertexRgb ) throws IOException {
+	public static void load( Format format, InputStream input, VertexMesh mesh ) throws IOException {
 		switch (format) {
-			case PLY -> PlyCodec.readMesh(input, mesh, vertexRgb);
+			case PLY -> PlyCodec.readMesh(input, mesh);
 			case OBJ -> ObjFileCodec.load(input, mesh);
 			case STL -> {
 				var stlMesh = new StlDataStructure();
@@ -197,10 +193,23 @@ public class PointCloudIO {
 	 */
 	public static void load( Format format, InputStream input, FunctionalWriter output ) throws IOException {
 		PointCloudWriter pcw = new PointCloudWriter() {
+			Point3D_F64 location = new Point3D_F64();
+			int color = 0;
+
 			@Override public void initialize( int size, boolean hasColor ) {}
 
-			@Override public void add( double x, double y, double z, int rgb ) {
-				output.add(x, y, z, rgb);
+			@Override public void startPoint() {}
+
+			@Override public void stopPoint() {
+				output.add(location.x, location.y, location.z, color);
+			}
+
+			@Override public void location( double x, double y, double z ) {
+				this.location.setTo(x, y, z);
+			}
+
+			@Override public void color( int rgb ) {
+				this.color = rgb;
 			}
 		};
 		load(format, input, pcw);

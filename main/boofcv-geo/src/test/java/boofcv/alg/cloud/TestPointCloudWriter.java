@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,32 +35,41 @@ class TestPointCloudWriter extends BoofStandardJUnit {
 
 	static abstract class PcwTests {
 		boolean supportsColor = true;
+
 		public abstract PointCloudWriter create();
+
 		public abstract int size( PointCloudWriter data );
-		public abstract Point3D_F64 getPoint(PointCloudWriter data , int i );
-		public abstract int getColor(PointCloudWriter data , int i);
+
+		public abstract Point3D_F64 getPoint( PointCloudWriter data, int i );
+
+		public abstract int getColor( PointCloudWriter data, int i );
 
 		@Test
 		void simpleXyzColor() {
 			PointCloudWriter alg = create();
 
-			assertEquals(0,size(alg));
-			alg.add(0,1,2, 345);
-			assertEquals(1,size(alg));
-			alg.add(2,1,3,3434);
-			assertEquals(2,size(alg));
+			assertEquals(0, size(alg));
+			alg.startPoint();
+			alg.location(0, 1, 2);
+			alg.color(345);
+			alg.stopPoint();
+			assertEquals(1, size(alg));
+			alg.startPoint();
+			alg.location(2, 1, 3);
+			alg.color(3434);
+			alg.stopPoint();
+			assertEquals(2, size(alg));
 
-			if( supportsColor ) {
+			if (supportsColor) {
 				assertEquals(345, getColor(alg, 0));
 				assertEquals(3434, getColor(alg, 1));
 			}
 
-			Point3D_F64 found = getPoint(alg,1);
-			assertEquals(2,found.x, UtilEjml.TEST_F64);
-			assertEquals(1,found.y, UtilEjml.TEST_F64);
-			assertEquals(3,found.z, UtilEjml.TEST_F64);
+			Point3D_F64 found = getPoint(alg, 1);
+			assertEquals(2, found.x, UtilEjml.TEST_F64);
+			assertEquals(1, found.y, UtilEjml.TEST_F64);
+			assertEquals(3, found.z, UtilEjml.TEST_F64);
 		}
-
 	}
 
 	@Nested
@@ -72,18 +81,18 @@ class TestPointCloudWriter extends BoofStandardJUnit {
 		}
 
 		@Override
-		public int size(PointCloudWriter data) {
+		public int size( PointCloudWriter data ) {
 			return ((CloudArraysF32)data).cloudXyz.size/3;
 		}
 
 		@Override
-		public Point3D_F64 getPoint(PointCloudWriter data, int i) {
+		public Point3D_F64 getPoint( PointCloudWriter data, int i ) {
 			var list = ((CloudArraysF32)data).cloudXyz;
-			return new Point3D_F64( list.get(i*3), list.get(i*3+1), list.get(i*3+2));
+			return new Point3D_F64(list.get(i*3), list.get(i*3 + 1), list.get(i*3 + 2));
 		}
 
 		@Override
-		public int getColor(PointCloudWriter data, int i) {
+		public int getColor( PointCloudWriter data, int i ) {
 			var list = ((CloudArraysF32)data).cloudRgb;
 			return list.get(i);
 		}
@@ -102,18 +111,18 @@ class TestPointCloudWriter extends BoofStandardJUnit {
 		}
 
 		@Override
-		public int size(PointCloudWriter data) {
+		public int size( PointCloudWriter data ) {
 			return cloud.size;
 		}
 
 		@Override
-		public Point3D_F64 getPoint(PointCloudWriter data, int i) {
+		public Point3D_F64 getPoint( PointCloudWriter data, int i ) {
 			Point3D_F32 c = cloud.get(i);
-			return new Point3D_F64( c.x, c.y, c.z);
+			return new Point3D_F64(c.x, c.y, c.z);
 		}
 
 		@Override
-		public int getColor(PointCloudWriter data, int i) {
+		public int getColor( PointCloudWriter data, int i ) {
 			throw new RuntimeException("Not supported");
 		}
 	}
@@ -131,17 +140,17 @@ class TestPointCloudWriter extends BoofStandardJUnit {
 		}
 
 		@Override
-		public int size(PointCloudWriter data) {
+		public int size( PointCloudWriter data ) {
 			return cloud.size;
 		}
 
 		@Override
-		public Point3D_F64 getPoint(PointCloudWriter data, int i) {
+		public Point3D_F64 getPoint( PointCloudWriter data, int i ) {
 			return cloud.get(i);
 		}
 
 		@Override
-		public int getColor(PointCloudWriter data, int i) {
+		public int getColor( PointCloudWriter data, int i ) {
 			throw new RuntimeException("Not supported");
 		}
 	}
@@ -158,18 +167,18 @@ class TestPointCloudWriter extends BoofStandardJUnit {
 		}
 
 		@Override
-		public int size(PointCloudWriter data) {
+		public int size( PointCloudWriter data ) {
 			return cloud.size;
 		}
 
 		@Override
-		public Point3D_F64 getPoint(PointCloudWriter data, int i) {
+		public Point3D_F64 getPoint( PointCloudWriter data, int i ) {
 			Point3D_F32 c = cloud.get(i);
-			return new Point3D_F64( c.x, c.y, c.z);
+			return new Point3D_F64(c.x, c.y, c.z);
 		}
 
 		@Override
-		public int getColor(PointCloudWriter data, int i) {
+		public int getColor( PointCloudWriter data, int i ) {
 			return cloud.get(i).rgb;
 		}
 	}
@@ -186,19 +195,18 @@ class TestPointCloudWriter extends BoofStandardJUnit {
 		}
 
 		@Override
-		public int size(PointCloudWriter data) {
+		public int size( PointCloudWriter data ) {
 			return cloud.size;
 		}
 
 		@Override
-		public Point3D_F64 getPoint(PointCloudWriter data, int i) {
+		public Point3D_F64 getPoint( PointCloudWriter data, int i ) {
 			return cloud.get(i);
 		}
 
 		@Override
-		public int getColor(PointCloudWriter data, int i) {
+		public int getColor( PointCloudWriter data, int i ) {
 			return cloud.get(i).rgb;
 		}
 	}
-
 }

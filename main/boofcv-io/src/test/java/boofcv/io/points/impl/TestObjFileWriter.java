@@ -39,7 +39,7 @@ public class TestObjFileWriter extends BoofStandardJUnit {
 		var alg = new ObjFileWriter(output);
 		alg.addVertex(1, 0, 0);
 		alg.addVertex(0, 1, 0);
-		alg.addVertex(0, 0, 1);
+		alg.addVertex(0, 0, 1, 0.1, 0.2, 0.3);
 		alg.addTextureVertex(1, 0);
 		alg.addTextureVertex(0, 1);
 		alg.addTextureVertex(1, 1);
@@ -56,6 +56,7 @@ public class TestObjFileWriter extends BoofStandardJUnit {
 		String text = output.toString();
 		var reader = new TestObjFileReader.DummyReader() {
 			int countVertex = 0;
+			int countVertexColor = 0;
 			int countTexture = 0;
 			int countFaces = 0;
 
@@ -69,6 +70,15 @@ public class TestObjFileWriter extends BoofStandardJUnit {
 				};
 				assertEquals(expected, found);
 				countVertex++;
+			}
+
+			@Override
+			protected void addVertexWithColor( double x, double y, double z, double red, double green, double blue ) {
+				addVertex(x, y, z);
+				assertEquals(0.1, red );
+				assertEquals(0.2, green );
+				assertEquals(0.3, blue );
+				countVertexColor++;
 			}
 
 			@Override protected void addVertexNormal( double x, double y, double z ) {}
@@ -95,6 +105,7 @@ public class TestObjFileWriter extends BoofStandardJUnit {
 		};
 		reader.parse(new BufferedReader(new StringReader(text)));
 		assertEquals(6, reader.countVertex);
+		assertEquals(1, reader.countVertexColor);
 		assertEquals(2, reader.countFaces);
 	}
 }

@@ -52,6 +52,11 @@ public class TestObjFileReader extends BoofStandardJUnit {
 				vertexes.grow().setTo(x, y, z);
 			}
 
+			@Override
+			protected void addVertexWithColor( double x, double y, double z, double red, double green, double blue ) {
+				throw new RuntimeException("Egads");
+			}
+
 			@Override protected void addVertexNormal( double x, double y, double z ) {}
 
 			@Override protected void addVertexTexture( double x, double y ) {}
@@ -95,6 +100,11 @@ public class TestObjFileReader extends BoofStandardJUnit {
 				vertexes.grow().setTo(x, y, z);
 			}
 
+			@Override
+			protected void addVertexWithColor( double x, double y, double z, double red, double green, double blue ) {
+				vertexes.grow().setTo(x, y, z);
+			}
+
 			@Override protected void addVertexNormal( double x, double y, double z ) {normals.grow().setTo(x, y, z);}
 
 			@Override protected void addVertexTexture( double x, double y ) {textures.grow().setTo(x, y);}
@@ -121,6 +131,47 @@ public class TestObjFileReader extends BoofStandardJUnit {
 		assertEquals(0.0, textures.get(2).distance(1.1, 0.1), UtilEjml.TEST_F64);
 	}
 
+	/** test case where vectors also have colors */
+	@Test void vectorColor() throws IOException {
+		String text = """
+				# Simple Wavefront file
+				v 0.0 0.0 0.0 0.2 0.3 0.4
+				v 0.0 1.0 0.0 0.3 0.2 0.1
+				v 1.0 0.0 0.0 0.4 0.3 0.2
+				""";
+
+		var vertexes = new DogArray<>(Point3D_F64::new, Point3D_F64::zero);
+		var colors = new DogArray<>(Point3D_F64::new, Point3D_F64::zero);
+
+		var reader = new DummyReader() {
+			@Override protected void addVertex( double x, double y, double z ) {
+				vertexes.grow().setTo(x, y, z);
+			}
+
+			@Override
+			protected void addVertexWithColor( double x, double y, double z, double red, double green, double blue ) {
+				vertexes.grow().setTo(x, y, z);
+				colors.grow().setTo(red, green, blue);
+			}
+
+			@Override protected void addVertexNormal( double x, double y, double z ) {}
+
+			@Override protected void addVertexTexture( double x, double y ) {}
+
+			@Override protected void addFace( DogArray_I32 vertexes, int vertexCount ) {}
+		};
+		reader.parse(new BufferedReader(new StringReader(text)));
+
+		assertEquals(3, vertexes.size);
+		assertEquals(0.0, vertexes.get(0).distance(0, 0, 0), UtilEjml.TEST_F64);
+		assertEquals(0.0, vertexes.get(1).distance(0, 1, 0), UtilEjml.TEST_F64);
+		assertEquals(0.0, vertexes.get(2).distance(1, 0, 0), UtilEjml.TEST_F64);
+		assertEquals(3, colors.size);
+		assertEquals(0.0, colors.get(0).distance(0.2, 0.3, 0.4), UtilEjml.TEST_F64);
+		assertEquals(0.0, colors.get(1).distance(0.3, 0.2, 0.1), UtilEjml.TEST_F64);
+		assertEquals(0.0, colors.get(2).distance(0.4, 0.3, 0.2), UtilEjml.TEST_F64);
+	}
+
 	/**
 	 * See if negative indexes are handled correct. Add two faces. Negative to be relative to current number
 	 * of read in vertexes
@@ -142,6 +193,9 @@ public class TestObjFileReader extends BoofStandardJUnit {
 			int count = 0;
 
 			@Override protected void addVertex( double x, double y, double z ) {}
+
+			@Override
+			protected void addVertexWithColor( double x, double y, double z, double red, double green, double blue ) {}
 
 			@Override protected void addVertexNormal( double x, double y, double z ) {}
 
@@ -178,6 +232,11 @@ public class TestObjFileReader extends BoofStandardJUnit {
 
 			@Override protected void addVertex( double x, double y, double z ) {vertexCount++;}
 
+			@Override
+			protected void addVertexWithColor( double x, double y, double z, double red, double green, double blue ) {
+				vertexCount++;
+			}
+
 			@Override protected void addVertexNormal( double x, double y, double z ) {}
 
 			@Override protected void addVertexTexture( double x, double y ) {}
@@ -195,6 +254,9 @@ public class TestObjFileReader extends BoofStandardJUnit {
 	@Test void ensureIndex() {
 		var reader = new DummyReader() {
 			@Override protected void addVertex( double x, double y, double z ) {}
+
+			@Override
+			protected void addVertexWithColor( double x, double y, double z, double red, double green, double blue ) {}
 
 			@Override protected void addVertexNormal( double x, double y, double z ) {}
 

@@ -78,7 +78,17 @@ public abstract class ObjFileReader {
 						double x = Double.parseDouble(words[1]);
 						double y = Double.parseDouble(words[2]);
 						double z = Double.parseDouble(words[3]);
-						addVertex(x, y, z);
+
+						// See if it also has the optional RGB values for each vertex
+						if (words.length == 7) {
+							double r = Double.parseDouble(words[4]);
+							double g = Double.parseDouble(words[5]);
+							double b = Double.parseDouble(words[6]);
+							addVertexWithColor(x, y, z, r, g, b);
+						} else {
+							addVertex(x, y, z);
+						}
+
 						vertexCount++;
 					}
 
@@ -152,6 +162,9 @@ public abstract class ObjFileReader {
 	}
 
 	protected abstract void addVertex( double x, double y, double z );
+
+	/** Adds a color for a vertex. RGB is specified in a range of 0 to 1.0 */
+	protected abstract void addVertexWithColor( double x, double y, double z, double red, double green, double blue );
 
 	protected abstract void addVertexNormal( double x, double y, double z );
 

@@ -52,6 +52,17 @@ public class ObjFileWriter {
 		vertexCount++;
 	}
 
+	public void addVertex( double x, double y, double z, double r, double g , double b ) throws IOException {
+		writer.write('v');
+		writer.write(String.format(" " + formatFloat, x));
+		writer.write(String.format(" " + formatFloat, y));
+		writer.write(String.format(" " + formatFloat, z));
+		writer.write(String.format(" " + formatFloat, r));
+		writer.write(String.format(" " + formatFloat, g));
+		writer.write(String.format(" " + formatFloat + "\n", b));
+		vertexCount++;
+	}
+
 	public void addTextureVertex( double x, double y ) throws IOException {
 		writer.write("vt");
 		writer.write(String.format(" " + formatFloat, x));

@@ -100,7 +100,18 @@ public class ObjFileCodec {
 	public static void load( InputStream input, PointCloudWriter output ) throws IOException {
 		var obj = new ObjFileReader() {
 			@Override protected void addVertex( double x, double y, double z ) {
-				output.add(x, y, z, 0);
+				output.startPoint();
+				output.location(x, y, z);
+				output.stopPoint();
+			}
+
+			@Override
+			protected void addVertexWithColor( double x, double y, double z, double red, double green, double blue ) {
+				int rgb = ((int)(255*red)) << 16 | ((int)(255*green)) << 8 | ((int)(255*blue));
+				output.startPoint();
+				output.location(x, y, z);
+				output.color(rgb);
+				output.stopPoint();
 			}
 
 			@Override protected void addVertexNormal( double x, double y, double z ) {}
@@ -121,6 +132,13 @@ public class ObjFileCodec {
 		var obj = new ObjFileReader() {
 			@Override protected void addVertex( double x, double y, double z ) {
 				output.vertexes.append(x, y, z);
+			}
+
+			@Override
+			protected void addVertexWithColor( double x, double y, double z, double red, double green, double blue ) {
+				int rgb = ((int)(255*red)) << 16 | ((int)(255*green)) << 8 | ((int)(255*blue));
+				output.vertexes.append(x, y, z);
+				output.rgb.add(rgb);
 			}
 
 			@Override protected void addVertexNormal( double x, double y, double z ) {

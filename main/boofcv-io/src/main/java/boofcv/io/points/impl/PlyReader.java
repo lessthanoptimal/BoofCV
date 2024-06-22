@@ -26,9 +26,17 @@ package boofcv.io.points.impl;
 public interface PlyReader {
 	void initialize( int vertexes, int triangles, boolean color );
 
-	void addVertex( double x, double y, double z, int rgb );
+	/** Creates a new vertex */
+	void startVertex();
 
-	void addVertexNormal( double nx, double ny, double nz );
+	/** Done adding attributes to the vertex and saves the results */
+	void stopVertex();
+
+	void setVertexLocation( double x, double y, double z );
+
+	void setVertexColor( int r, int g, int b );
+
+	void setVertexNormal( double nx, double ny, double nz );
 
 	void addPolygon( int[] indexes, int offset, int length );
 

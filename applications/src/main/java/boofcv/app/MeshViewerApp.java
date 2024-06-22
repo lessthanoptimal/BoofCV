@@ -27,7 +27,6 @@ import boofcv.struct.image.ImageType;
 import boofcv.struct.image.InterleavedU8;
 import boofcv.struct.mesh.VertexMesh;
 import org.apache.commons.io.FilenameUtils;
-import org.ddogleg.struct.DogArray_I32;
 
 import javax.swing.*;
 import java.awt.*;
@@ -49,7 +48,6 @@ public class MeshViewerApp {
 	private static void loadFile( File file ) {
 		// Load the mesh
 		var mesh = new VertexMesh();
-		var colors = new DogArray_I32();
 		String extension = FilenameUtils.getExtension(file.getName()).toLowerCase(Locale.ENGLISH);
 		var type = switch (extension) {
 			case "ply" -> PointCloudIO.Format.PLY;
@@ -61,7 +59,7 @@ public class MeshViewerApp {
 		};
 
 		try (var input = new FileInputStream(file)) {
-			PointCloudIO.load(type, input, mesh, colors);
+			PointCloudIO.load(type, input, mesh);
 		} catch (IOException e) {
 			e.printStackTrace(System.err);
 			System.exit(1);
@@ -86,8 +84,8 @@ public class MeshViewerApp {
 		SwingUtilities.invokeLater(() -> {
 			var panel = new MeshViewerPanel();
 			panel.setMesh(mesh, false);
-			if (colors.size > 0)
-				panel.setVertexColors("RGB", colors.data);
+			if (mesh.rgb.size > 0)
+				panel.setVertexColors("RGB", mesh.rgb.data);
 			if (_image != null)
 				panel.setTextureImage(_image);
 			panel.setPreferredSize(new Dimension(500, 500));

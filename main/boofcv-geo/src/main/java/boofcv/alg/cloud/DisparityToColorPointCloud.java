@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -175,7 +175,10 @@ public class DisparityToColorPointCloud {
 				// Bring it back into left camera frame
 				GeometryMath_F32.multTran(rectifiedR, p, p);
 
-				output.add(p.x, p.y, p.z, getColor(color, pixelX, pixelY));
+				output.startPoint();
+				output.location(p.x, p.y, p.z);
+				output.color(getColor(color, pixelX, pixelY));
+				output.stopPoint();
 			}
 		}
 	}
@@ -217,7 +220,10 @@ public class DisparityToColorPointCloud {
 				// Bring it back into left camera frame
 				GeometryMath_F32.multTran(rectifiedR, p, p);
 
-				output.add(p.x, p.y, p.z, getColor(color, pixelX, pixelY));
+				output.startPoint();
+				output.location(p.x, p.y, p.z);
+				output.color(getColor(color, pixelX, pixelY));
+				output.stopPoint();
 			}
 		}
 	}

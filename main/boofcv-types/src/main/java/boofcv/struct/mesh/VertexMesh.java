@@ -47,6 +47,9 @@ public class VertexMesh {
 	/** Optional precomputed normals for each vertex */
 	public final PackedArrayPoint3D_F32 normals = new PackedArrayPoint3D_F32();
 
+	/** Optional vertex colors in RGB format */
+	public final DogArray_I32 rgb = new DogArray_I32();
+
 	/** Which indexes correspond to normal for a face */
 	public final DogArray_I32 faceVertexes = new DogArray_I32();
 
@@ -199,6 +202,7 @@ public class VertexMesh {
 		this.vertexes.setTo(src.vertexes);
 		this.texture.setTo(src.texture);
 		this.normals.setTo(src.normals);
+		this.rgb.setTo(src.rgb);
 		this.faceVertexes.setTo(src.faceVertexes);
 		this.faceNormals.setTo(src.faceNormals);
 		this.faceOffsets.setTo(src.faceOffsets);
@@ -211,6 +215,7 @@ public class VertexMesh {
 		vertexes.reset();
 		texture.reset();
 		normals.reset();
+		rgb.reset();
 		faceVertexes.reset();
 		faceNormals.reset();
 		faceOffsets.reset().add(0);

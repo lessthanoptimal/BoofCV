@@ -165,17 +165,16 @@ class TestPlyCodec extends BoofStandardJUnit {
 			PlyCodec.saveMeshBinary(mesh, colors, endian, true, output);
 
 			var foundMesh = new VertexMesh();
-			var foundColors = new DogArray_I32();
 
 			var input = new ByteArrayInputStream(output.toByteArray());
-			PlyCodec.readMesh(input, foundMesh, foundColors);
+			PlyCodec.readMesh(input, foundMesh);
 
 			assertEquals(mesh.vertexes.size(), mesh.vertexes.size());
 			assertEquals(mesh.normals.size(), mesh.normals.size());
 			assertEquals(mesh.texture.size(), mesh.texture.size());
 			assertTrue(mesh.faceVertexes.isEquals(foundMesh.faceVertexes));
 			assertTrue(mesh.faceOffsets.isEquals(foundMesh.faceOffsets));
-			assertTrue(colors.isEquals(foundColors));
+			assertTrue(colors.isEquals(foundMesh.rgb));
 
 			for (int i = 0; i < mesh.vertexes.size(); i++) {
 				Point3D_F64 expected = mesh.vertexes.getTemp(i);
@@ -206,7 +205,7 @@ class TestPlyCodec extends BoofStandardJUnit {
 
 		var input = new ByteArrayInputStream(output.toByteArray());
 		var foundMesh = new VertexMesh();
-		PlyCodec.readMesh(input, foundMesh, new DogArray_I32());
+		PlyCodec.readMesh(input, foundMesh);
 
 		assertEquals("foo", foundMesh.textureName);
 	}

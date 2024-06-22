@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,10 +40,21 @@ public interface PointCloudWriter {
 	 */
 	void initialize( int size, boolean hasColor );
 
+	/** A new point is being added with new attributes to follow */
+	void startPoint();
+
+	/** It's done specifying attributes for the point */
+	void stopPoint();
+
 	/**
-	 * Adds a 3D point with color information
+	 * Set the 3D location of the point
 	 */
-	void add( double x, double y, double z, int rgb );
+	void location( double x, double y, double z );
+
+	/**
+	 * Sets the points color
+	 */
+	void color( int rgb );
 
 	class CloudArraysF32 implements PointCloudWriter {
 		// Storage for point cloud
@@ -57,10 +68,17 @@ public interface PointCloudWriter {
 			cloudXyz.reserve(size*3);
 		}
 
-		@Override public void add( double x, double y, double z, int rgb ) {
+		@Override public void startPoint() {}
+
+		@Override public void stopPoint() {}
+
+		@Override public void location( double x, double y, double z ) {
 			cloudXyz.add((float)x);
 			cloudXyz.add((float)y);
 			cloudXyz.add((float)z);
+		}
+
+		@Override public void color( int rgb ) {
 			cloudRgb.add(rgb);
 		}
 
@@ -79,10 +97,15 @@ public interface PointCloudWriter {
 				cloud.reset();
 			}
 
-			@Override
-			public void add( double x, double y, double z, int rgb ) {
+			@Override public void startPoint() {}
+
+			@Override public void stopPoint() {}
+
+			@Override public void location( double x, double y, double z ) {
 				cloud.grow().setTo((float)x, (float)y, (float)z);
 			}
+
+			@Override public void color( int rgb ) {}
 		};
 	}
 
@@ -93,8 +116,13 @@ public interface PointCloudWriter {
 				cloud.reset();
 			}
 
-			@Override
-			public void add( double x, double y, double z, int rgb ) {
+			@Override public void startPoint() {}
+
+			@Override public void stopPoint() {}
+
+			@Override public void color( int rgb ) {}
+
+			@Override public void location( double x, double y, double z ) {
 				cloud.grow().setTo(x, y, z);
 			}
 		};
@@ -107,9 +135,18 @@ public interface PointCloudWriter {
 				cloud.reset();
 			}
 
-			@Override
-			public void add( double x, double y, double z, int rgb ) {
-				cloud.grow().setTo((float)x, (float)y, (float)z, rgb);
+			@Override public void startPoint() {
+				cloud.grow();
+			}
+
+			@Override public void stopPoint() {}
+
+			@Override public void location( double x, double y, double z ) {
+				cloud.getTail().setTo((float)x, (float)y, (float)z);
+			}
+
+			@Override public void color( int rgb ) {
+				cloud.getTail().rgb = rgb;
 			}
 		};
 	}
@@ -120,9 +157,18 @@ public interface PointCloudWriter {
 				cloud.reset();
 			}
 
-			@Override
-			public void add( double x, double y, double z, int rgb ) {
-				cloud.grow().setTo(x, y, z, rgb);
+			@Override public void startPoint() {
+				cloud.grow();
+			}
+
+			@Override public void stopPoint() {}
+
+			@Override public void location( double x, double y, double z ) {
+				cloud.getTail().setTo(x, y, z);
+			}
+
+			@Override public void color( int rgb ) {
+				cloud.getTail().rgb = rgb;
 			}
 		};
 	}

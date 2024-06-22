@@ -411,11 +411,23 @@ public class PlyCodec {
 				output.initialize(vertexes, color);
 			}
 
-			@Override public void addVertex( double x, double y, double z, int rgb ) {
-				output.add(x, y, z, rgb);
+			@Override public void startVertex() {
+				output.startPoint();
 			}
 
-			@Override public void addVertexNormal( double nx, double ny, double nz ) {}
+			@Override public void stopVertex() {
+				output.stopPoint();
+			}
+
+			@Override public void setVertexLocation( double x, double y, double z ) {
+				output.location(x, y, z);
+			}
+
+			@Override public void setVertexColor( int r, int g, int b ) {
+				output.color(r << 16 | g << 8 | b);
+			}
+
+			@Override public void setVertexNormal( double nx, double ny, double nz ) {}
 
 			@Override public void addPolygon( int[] indexes, int offset, int length ) {}
 
@@ -425,21 +437,27 @@ public class PlyCodec {
 		});
 	}
 
-	public static void readMesh( InputStream input, VertexMesh mesh, DogArray_I32 colorRGB ) throws IOException {
+	public static void readMesh( InputStream input, VertexMesh mesh ) throws IOException {
 		read(input, new PlyReader() {
 			@Override public void initialize( int vertexes, int triangles, boolean color ) {
-				colorRGB.reset();
 				mesh.reset();
 				mesh.vertexes.reserve(vertexes);
 				mesh.faceVertexes.reserve(triangles*3);
 			}
 
-			@Override public void addVertex( double x, double y, double z, int rgb ) {
+			@Override public void startVertex() {}
+
+			@Override public void stopVertex() {}
+
+			@Override public void setVertexLocation( double x, double y, double z ) {
 				mesh.vertexes.append(x, y, z);
-				colorRGB.add(rgb);
 			}
 
-			@Override public void addVertexNormal( double nx, double ny, double nz ) {
+			@Override public void setVertexColor( int r, int g, int b ) {
+				mesh.rgb.add(r << 16 | g << 8 | b);
+			}
+
+			@Override public void setVertexNormal( double nx, double ny, double nz ) {
 				mesh.normals.append((float)nx, (float)ny, (float)nz);
 			}
 
@@ -517,11 +535,16 @@ public class PlyCodec {
 					}
 				}
 			}
-			output.addVertex(x, y, z, r << 16 | g << 8 | b);
 
+			// Creates the vertex and specify its attributes
+			output.startVertex();
+			output.setVertexLocation(x, y, z);
+			if (header.rgb)
+				output.setVertexColor(r, g, b);
 			if (header.normals) {
-				output.addVertexNormal(nx, ny, nz);
+				output.setVertexNormal(nx, ny, nz);
 			}
+			output.stopVertex();
 		}
 
 		int[] indexes = new int[100];
@@ -607,11 +630,15 @@ public class PlyCodec {
 				}
 			}
 
-			output.addVertex(x, y, z, r << 16 | g << 8 | b);
+			// Creates the vertex and specify its attributes
+			output.startVertex();
+			output.setVertexLocation(x, y, z);
+			if (header.rgb)
+				output.setVertexColor(r, g, b);
 			if (header.normals) {
-				output.addVertexNormal(nx, ny, nz);
+				output.setVertexNormal(nx, ny, nz);
 			}
-
+			output.stopVertex();
 			//System.out.printf("vertex: %.1e %.1e %.1e | %2x %2x %2x\n", x, y, z, r, g, b);
 		}
 
