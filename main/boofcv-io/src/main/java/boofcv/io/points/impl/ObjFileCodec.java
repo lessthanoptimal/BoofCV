@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,8 @@ package boofcv.io.points.impl;
 import boofcv.alg.cloud.PointCloudReader;
 import boofcv.alg.cloud.PointCloudWriter;
 import boofcv.struct.mesh.VertexMesh;
+import georegression.struct.point.Point2D_F32;
+import georegression.struct.point.Point3D_F32;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.DogArray_I32;
 
@@ -62,15 +64,36 @@ public class ObjFileCodec {
 			obj.addVertex(p.x, p.y, p.z);
 		}
 
+		// Save vertex normals
+		for (int i = 0; i < mesh.normals.size(); i++) {
+			Point3D_F32 p = mesh.normals.getTemp(i);
+			obj.addVertex(p.x, p.y, p.z);
+		}
+
+		// Save vertex textures
+		for (int i = 0; i < mesh.texture.size(); i++) {
+			Point2D_F32 p = mesh.texture.getTemp(i);
+			obj.addTextureVertex(p.x, p.y);
+		}
+
+		// See how many different types of vertexes need to be saved
+		int count = 0;
+		if (mesh.vertexes.size() > 0)
+			count++;
+		if (mesh.normals.size() > 0)
+			count++;
+		if (mesh.texture.size() > 0)
+			count++;
+
 		// Create the faces
 		var indexes = new DogArray_I32();
-		for (int i = 1; i < mesh.offsets.size; i++) {
-			int idx0 = mesh.offsets.get(i - 1);
-			int idx1 = mesh.offsets.get(i);
+		for (int i = 1; i < mesh.faceOffsets.size; i++) {
+			int idx0 = mesh.faceOffsets.get(i - 1);
+			int idx1 = mesh.faceOffsets.get(i);
 
 			indexes.reset();
-			indexes.addAll(mesh.indexes.data, idx0, idx1);
-			obj.addFace(indexes);
+			indexes.addAll(mesh.faceVertexes.data, idx0, idx1);
+			obj.addFace(indexes, count);
 		}
 	}
 
@@ -79,9 +102,16 @@ public class ObjFileCodec {
 			@Override protected void addVertex( double x, double y, double z ) {
 				output.add(x, y, z, 0);
 			}
+
+			@Override protected void addVertexNormal( double x, double y, double z ) {}
+
+			@Override protected void addVertexTexture( double x, double y ) {}
+
 			@Override protected void addPoint( int vertex ) {}
+
 			@Override protected void addLine( DogArray_I32 vertexes ) {}
-			@Override protected void addFace( DogArray_I32 vertexes ) {}
+
+			@Override protected void addFace( DogArray_I32 indexes, int vertexCount ) {}
 		};
 		obj.parse(new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8)));
 	}
@@ -92,11 +122,30 @@ public class ObjFileCodec {
 			@Override protected void addVertex( double x, double y, double z ) {
 				output.vertexes.append(x, y, z);
 			}
+
+			@Override protected void addVertexNormal( double x, double y, double z ) {
+				output.normals.append((float)x, (float)y, (float)z);
+			}
+
+			@Override protected void addVertexTexture( double x, double y ) {
+				output.texture.append((float)x, (float)y);
+			}
+
 			@Override protected void addPoint( int vertex ) {}
+
 			@Override protected void addLine( DogArray_I32 vertexes ) {}
-			@Override protected void addFace( DogArray_I32 vertexes ) {
-				output.indexes.addAll(vertexes);
-				output.offsets.add(output.indexes.size);
+
+			@Override protected void addFace( DogArray_I32 indexes, int vertexCount ) {
+				int types = indexes.size/vertexCount;
+				for (int idxVert = 0; idxVert < vertexCount; idxVert++) {
+					output.faceVertexes.add(indexes.get(idxVert)/types);
+					for (int i = 1; i < types; i++) {
+						if (indexes.get(i - 1) != indexes.get(i))
+							throw new RuntimeException("Only vertexes types with the same index supported");
+					}
+				}
+
+				output.faceOffsets.add(output.faceVertexes.size);
 			}
 		};
 		obj.parse(new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8)));

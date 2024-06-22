@@ -140,17 +140,17 @@ class TestPlyCodec extends BoofStandardJUnit {
 		for (var endian : new ByteOrder[]{ByteOrder.LITTLE_ENDIAN, ByteOrder.BIG_ENDIAN}) {
 			var mesh = new VertexMesh();
 			mesh.textureName = "foo";
-			mesh.offsets.add(0);
+			mesh.faceOffsets.add(0);
 			int numVertexes = 10;
 			for (int i = 0; i < numVertexes; i++) {
 				mesh.vertexes.append(i, 2, 3);
-				mesh.vertexNormals.append(i, 2, 3);
+				mesh.normals.append(i, 2, 3);
 
 				// bound indexes to ensure they are in the valid range
-				mesh.indexes.add((i*3)%numVertexes);
-				mesh.indexes.add((i*3 + 1)%numVertexes);
-				mesh.indexes.add((i*3 + 2)%numVertexes);
-				mesh.offsets.add(mesh.indexes.size);
+				mesh.faceVertexes.add((i*3)%numVertexes);
+				mesh.faceVertexes.add((i*3 + 1)%numVertexes);
+				mesh.faceVertexes.add((i*3 + 2)%numVertexes);
+				mesh.faceOffsets.add(mesh.faceVertexes.size);
 
 				for (int idxPoly = 0; idxPoly < 3; idxPoly++) {
 					mesh.texture.append(1, idxPoly);
@@ -171,21 +171,21 @@ class TestPlyCodec extends BoofStandardJUnit {
 			PlyCodec.readMesh(input, foundMesh, foundColors);
 
 			assertEquals(mesh.vertexes.size(), mesh.vertexes.size());
-			assertEquals(mesh.vertexNormals.size(), mesh.vertexNormals.size());
+			assertEquals(mesh.normals.size(), mesh.normals.size());
 			assertEquals(mesh.texture.size(), mesh.texture.size());
-			assertTrue(mesh.indexes.isEquals(foundMesh.indexes));
-			assertTrue(mesh.offsets.isEquals(foundMesh.offsets));
+			assertTrue(mesh.faceVertexes.isEquals(foundMesh.faceVertexes));
+			assertTrue(mesh.faceOffsets.isEquals(foundMesh.faceOffsets));
 			assertTrue(colors.isEquals(foundColors));
 
 			for (int i = 0; i < mesh.vertexes.size(); i++) {
 				Point3D_F64 expected = mesh.vertexes.getTemp(i);
 				Point3D_F64 found = foundMesh.vertexes.getTemp(i);
 				assertEquals(0.0, expected.distance(found));
-				assertTrue(mesh.vertexNormals.getTemp(i).isIdentical(foundMesh.vertexNormals.getTemp(i), 1e-4f));
+				assertTrue(mesh.normals.getTemp(i).isIdentical(foundMesh.normals.getTemp(i), 1e-4f));
 			}
 
 			for (int i = 0; i < mesh.vertexes.size(); i++) {
-				assertEquals(mesh.indexes.get(i), foundMesh.indexes.get(i));
+				assertEquals(mesh.faceVertexes.get(i), foundMesh.faceVertexes.get(i));
 			}
 
 			for (int i = 0; i < mesh.texture.size(); i++) {

@@ -36,22 +36,22 @@ public class TestVertexMesh extends BoofStandardJUnit {
 
 	@Test void reset() throws Exception {checkReset(VertexMesh.class, "reset");}
 
-	@Test void addShape() {
+	@Test void addFaceVectors() {
 		List<Point3D_F64> shapeA = createRandomShape(3);
 		List<Point3D_F64> shapeB = createRandomShape(4);
 
 		var alg = new VertexMesh();
-		alg.addShape(shapeA);
-		alg.addShape(shapeB);
+		alg.addFaceVectors(shapeA);
+		alg.addFaceVectors(shapeB);
 
 		assertEquals(2, alg.size());
 		assertEquals(shapeA.size() + shapeB.size(), alg.vertexes.size());
-		assertEquals(alg.vertexes.size(), alg.indexes.size());
+		assertEquals(alg.vertexes.size(), alg.faceVertexes.size());
 
 		var found = new DogArray<>(Point3D_F64::new);
-		alg.getShape(0, found);
+		alg.getFaceVectors(0, found);
 		assertIdentical(shapeA, found.toList());
-		alg.getShape(1, found);
+		alg.getFaceVectors(1, found);
 		assertIdentical(shapeB, found.toList());
 	}
 
@@ -59,9 +59,9 @@ public class TestVertexMesh extends BoofStandardJUnit {
 		var shape = new DogArray<>(Point3D_F64::new);
 
 		var alg = new VertexMesh();
-		alg.addShape(shape.resize(3).toList());
-		alg.addShape(shape.resize(4).toList());
-		alg.addShape(shape.resize(5).toList());
+		alg.addFaceVectors(shape.resize(3).toList());
+		alg.addFaceVectors(shape.resize(4).toList());
+		alg.addFaceVectors(shape.resize(5).toList());
 
 		alg.addTexture(3, new float[]{1,2,3,4,5,6,7,8,9,10});
 		alg.addTexture(4, new float[12]);
@@ -88,13 +88,13 @@ public class TestVertexMesh extends BoofStandardJUnit {
 
 		// create triangles that will have normals +1 and -1
 		var alg = new VertexMesh();
-		alg.addShape(shape.toList());
+		alg.addFaceVectors(shape.toList());
 		shape.reverse();
-		alg.addShape(shape.toList());
+		alg.addFaceVectors(shape.toList());
 
 		alg.computeFaceNormals();
-		assertEquals(0.0, alg.faceNormals.getTemp(0).distance(0,0,-1), UtilEjml.TEST_F64);
-		assertEquals(0.0, alg.faceNormals.getTemp(1).distance(0,0,1), UtilEjml.TEST_F64);
+		assertEquals(0.0, alg.getFaceNormalTmp(0).distance(0,0,-1), UtilEjml.TEST_F64);
+		assertEquals(0.0, alg.getFaceNormalTmp(1).distance(0,0,1), UtilEjml.TEST_F64);
 
 		// try it with a non-triangle
 		shape.reset();
@@ -103,8 +103,9 @@ public class TestVertexMesh extends BoofStandardJUnit {
 		shape.grow().setTo(2,2,0);
 		shape.grow().setTo(2,9,0);
 		alg.reset();
-		alg.addShape(shape.toList());
-		assertEquals(0.0, alg.faceNormals.getTemp(0).distance(0,0,-1), UtilEjml.TEST_F64);
+		alg.addFaceVectors(shape.toList());
+		alg.computeFaceNormals();
+		assertEquals(0.0, alg.getFaceNormalTmp(0).distance(0,0,-1), UtilEjml.TEST_F64);
 	}
 
 	private List<Point3D_F64> createRandomShape( int count ) {

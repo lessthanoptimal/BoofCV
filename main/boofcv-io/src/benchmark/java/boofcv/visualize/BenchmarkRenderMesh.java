@@ -87,7 +87,7 @@ public class BenchmarkRenderMesh {
 			shape.get(2).setTo(x1, y1, z);
 			shape.get(3).setTo(x0, y1, z);
 
-			mesh.addShape(shape.toList());
+			mesh.addFaceVectors(shape.toList());
 		}
 	}
 

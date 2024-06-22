@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -63,9 +63,9 @@ public class TestObjFileCodec extends BoofStandardJUnit {
 			mesh.vertexes.append(i, 2, 3);
 			for (int foo = 0; foo < 3; foo++) {
 				int vertIndex = (i*3 + foo)%10;
-				mesh.indexes.add(vertIndex);
+				mesh.faceVertexes.add(vertIndex);
 			}
-			mesh.offsets.add(mesh.indexes.size);
+			mesh.faceOffsets.add(mesh.faceVertexes.size);
 		}
 		var output = new StringWriter();
 		ObjFileCodec.save(mesh, output);
@@ -76,8 +76,8 @@ public class TestObjFileCodec extends BoofStandardJUnit {
 		ObjFileCodec.load(input, foundMesh);
 
 		assertEquals(mesh.vertexes.size(), mesh.vertexes.size());
-		assertTrue(mesh.indexes.isEquals(foundMesh.indexes));
-		assertTrue(mesh.offsets.isEquals(foundMesh.offsets));
+		assertTrue(mesh.faceVertexes.isEquals(foundMesh.faceVertexes));
+		assertTrue(mesh.faceOffsets.isEquals(foundMesh.faceOffsets));
 
 		for (int i = 0; i < mesh.vertexes.size(); i++) {
 			Point3D_F64 expected = mesh.vertexes.getTemp(i);
@@ -86,7 +86,7 @@ public class TestObjFileCodec extends BoofStandardJUnit {
 		}
 
 		for (int i = 0; i < mesh.vertexes.size(); i++) {
-			assertEquals(mesh.indexes.get(i), foundMesh.indexes.get(i));
+			assertEquals(mesh.faceVertexes.get(i), foundMesh.faceVertexes.get(i));
 		}
 	}
 }

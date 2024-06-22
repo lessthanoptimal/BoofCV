@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,7 +40,7 @@ public class MeshColorizeOps {
 	 * @return SurfaceColor
 	 */
 	public static RenderMesh.SurfaceColor colorizeByVertex( VertexMesh mesh, int[] vertexColor ) {
-		return ( shapeIdx ) -> vertexColor[mesh.indexes.get(mesh.offsets.get(shapeIdx))];
+		return ( shapeIdx ) -> vertexColor[mesh.faceVertexes.get(mesh.faceOffsets.get(shapeIdx))];
 	}
 
 	/**
@@ -57,7 +57,7 @@ public class MeshColorizeOps {
 		var axisZ = new Vector3D_F64(0, 0, 1);
 
 		for (int i = 0; i < mesh.size(); i++) {
-			mesh.getShape(i, facet);
+			mesh.getFaceVectors(i, facet);
 
 			// Handle case of invalid facet gracefully by assigning it to an arbitrary color
 			if (facet.size < 3) {

@@ -44,8 +44,8 @@ public class TestRenderMesh extends BoofStandardJUnit {
 		mesh.vertexes.append(1, -1, 10);
 		mesh.vertexes.append(1, 1, 10);
 		mesh.vertexes.append(-1, 1, 10);
-		mesh.indexes.addAll(DogArray_I32.array(0, 1, 2, 3));
-		mesh.offsets.add(4);
+		mesh.faceVertexes.addAll(DogArray_I32.array(0, 1, 2, 3));
+		mesh.faceOffsets.add(4);
 
 		// Configure
 		var alg = new RenderMesh();
@@ -200,17 +200,19 @@ public class TestRenderMesh extends BoofStandardJUnit {
 
 			// This should pass
 			mesh.reset();
-			mesh.indexes.add(0);
-			mesh.faceNormals.append((float)-c, (float)-s, 0);
+			mesh.faceNormals.add(0);
+			mesh.normals.append((float)-c, (float)-s, 0);
+			mesh.faceVertexes.add(0);
 			mesh.vertexes.append(r*c, 2 + r*s, 2);
 
 			assertTrue(RenderMesh.isFrontVisible(mesh, 0, 0, pointCam));
 
 			// This should fail
 			mesh.reset();
-			mesh.indexes.add(0);
-			mesh.faceNormals.append((float)c, (float)s, 0);
+			mesh.faceVertexes.add(0);
 			mesh.vertexes.append(r*c, 2 + r*s, 2);
+			mesh.faceNormals.add(0);
+			mesh.normals.append((float)c, (float)s, 0);
 
 			assertFalse(RenderMesh.isFrontVisible(mesh, 0, 0, pointCam));
 		}

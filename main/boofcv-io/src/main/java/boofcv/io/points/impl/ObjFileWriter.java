@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -90,7 +90,7 @@ public class ObjFileWriter {
 	 * @param vertexes Index of vertexes in this face. If null then automatic.
 	 */
 	public void addLine( @Nullable DogArray_I32 vertexes ) throws IOException {
-		writeObject('l', vertexes);
+		writeObject('l', vertexes, 1);
 	}
 
 	/**
@@ -99,13 +99,21 @@ public class ObjFileWriter {
 	 *
 	 * <p>NOTE: Vertexes indexes are 0-indexed. Not 1-indexed like they are in OBJ files.</p>
 	 *
+	 *
+	 * @param count Number of different vertex types, i.e. 3D, texture, normal. All are assumed to
+	 * reference a point with the same index.
 	 * @param vertexes Index of vertexes in this face. If null then automatic.
 	 */
-	public void addFace( @Nullable DogArray_I32 vertexes ) throws IOException {
-		writeObject('f', vertexes);
+	public void addFace( @Nullable DogArray_I32 vertexes, int count ) throws IOException {
+		writeObject('f', vertexes, count);
 	}
 
-	private void writeObject( char name, @Nullable DogArray_I32 vertexes ) throws IOException {
+	/**
+	 *
+	 * @param count How many times it should duplicate the index. It's assumed all vertexes reference
+	 * objects with the same index values.
+	 */
+	private void writeObject( char name, @Nullable DogArray_I32 vertexes, int count ) throws IOException {
 		writer.write(name);
 		if (vertexes == null || vertexes.size == 0) {
 			int v = -1;
@@ -125,7 +133,11 @@ public class ObjFileWriter {
 				// Write the index and compensate for the file format being 1-indexed.
 				if (vertIndex >= 0)
 					vertIndex++;
+
 				writer.write(" " + vertIndex);
+				for (int idxCount = 1; idxCount < count; idxCount++) {
+					writer.write("/" + vertIndex);
+				}
 			}
 		}
 		writer.write('\n');

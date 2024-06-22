@@ -431,7 +431,7 @@ public class PlyCodec {
 				colorRGB.reset();
 				mesh.reset();
 				mesh.vertexes.reserve(vertexes);
-				mesh.indexes.reserve(triangles*3);
+				mesh.faceVertexes.reserve(triangles*3);
 			}
 
 			@Override public void addVertex( double x, double y, double z, int rgb ) {
@@ -440,12 +440,12 @@ public class PlyCodec {
 			}
 
 			@Override public void addVertexNormal( double nx, double ny, double nz ) {
-				mesh.vertexNormals.append((float)nx, (float)ny, (float)nz);
+				mesh.normals.append((float)nx, (float)ny, (float)nz);
 			}
 
 			@Override public void addPolygon( int[] indexes, int offset, int length ) {
-				mesh.offsets.add(mesh.indexes.size + length);
-				mesh.indexes.addAll(indexes, offset, offset + length);
+				mesh.faceOffsets.add(mesh.faceVertexes.size + length);
+				mesh.faceVertexes.addAll(indexes, offset, offset + length);
 			}
 
 			@Override public void setTextureName( String textureName ) {
@@ -688,7 +688,7 @@ public class PlyCodec {
 		return new PlyWriter() {
 			@Override public int getVertexCount() {return mesh.vertexes.size();}
 
-			@Override public int getPolygonCount() {return mesh.offsets.size - 1;}
+			@Override public int getPolygonCount() {return mesh.faceOffsets.size - 1;}
 
 			@Override public boolean isColor() {return colorRGB != null;}
 
@@ -697,7 +697,7 @@ public class PlyCodec {
 			}
 
 			@Override public boolean isVertexNormals() {
-				return mesh.vertexNormals.size() > 0;
+				return mesh.normals.size() > 0;
 			}
 
 			@Override public String getTextureName() {
@@ -707,7 +707,7 @@ public class PlyCodec {
 			@Override public void getVertex( int which, Point3D_F64 vertex ) {mesh.vertexes.getCopy(which, vertex);}
 
 			@Override public void getVertexNormal( int which, GeoTuple3D_F64<?> normal ) {
-				Point3D_F32 tmp = mesh.vertexNormals.getTemp(which);
+				Point3D_F32 tmp = mesh.normals.getTemp(which);
 				normal.setTo(tmp.x, tmp.y, tmp.z);
 			}
 
@@ -715,19 +715,19 @@ public class PlyCodec {
 			@Override public int getColor( int which ) {return colorRGB.get(which);}
 
 			@Override public int getIndexes( int which, int[] indexes ) {
-				int idx0 = mesh.offsets.get(which);
-				int idx1 = mesh.offsets.get(which + 1);
+				int idx0 = mesh.faceOffsets.get(which);
+				int idx1 = mesh.faceOffsets.get(which + 1);
 
 				for (int i = idx0; i < idx1; i++) {
-					indexes[i - idx0] = mesh.indexes.get(i);
+					indexes[i - idx0] = mesh.faceVertexes.get(i);
 				}
 
 				return idx1 - idx0;
 			}
 
 			@Override public int getTextureCoors( int which, float[] coordinates ) {
-				int idx0 = mesh.offsets.get(which);
-				int idx1 = mesh.offsets.get(which + 1);
+				int idx0 = mesh.faceOffsets.get(which);
+				int idx1 = mesh.faceOffsets.get(which + 1);
 
 				int idxArray = 0;
 				for (int i = idx0; i < idx1; i++) {

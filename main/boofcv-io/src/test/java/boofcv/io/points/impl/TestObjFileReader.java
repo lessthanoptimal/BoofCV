@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.io.points.impl;
 
 import boofcv.testing.BoofStandardJUnit;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
@@ -51,7 +52,11 @@ public class TestObjFileReader extends BoofStandardJUnit {
 				vertexes.grow().setTo(x, y, z);
 			}
 
-			@Override protected void addFace( DogArray_I32 vertexes ) {
+			@Override protected void addVertexNormal( double x, double y, double z ) {}
+
+			@Override protected void addVertexTexture( double x, double y ) {}
+
+			@Override protected void addFace( DogArray_I32 vertexes, int vertexCount ) {
 				assertEquals(3, vertexes.size);
 				assertTrue(vertexes.isEquals(0, 1, 2));
 			}
@@ -62,6 +67,58 @@ public class TestObjFileReader extends BoofStandardJUnit {
 		assertEquals(0.0, vertexes.get(0).distance(0, 0, 0), UtilEjml.TEST_F64);
 		assertEquals(0.0, vertexes.get(1).distance(0, 1, 0), UtilEjml.TEST_F64);
 		assertEquals(0.0, vertexes.get(2).distance(1, 0, 0), UtilEjml.TEST_F64);
+	}
+
+	/**
+	 * Simple file with vertex, texture, and normals
+	 */
+	@Test void case1() throws IOException {
+		String text = """
+				v 0.0 0.0 0.0
+				v 0.0 1.0 0.0
+				v 1.0 0.0 0.0
+				vt 0.0 0.0
+				vt 0.1 1.0
+				vt 1.1 0.1
+				vn 0.0 0.0 -1.0
+				vn 0.0 -1.0 0.0
+				vn -1.0 0.0 0.0
+				f 1/1/1 2/2/2 3/3/3
+				""";
+
+		var vertexes = new DogArray<>(Point3D_F64::new, Point3D_F64::zero);
+		var normals = new DogArray<>(Point3D_F64::new, Point3D_F64::zero);
+		var textures = new DogArray<>(Point2D_F64::new, Point2D_F64::zero);
+
+		var reader = new DummyReader() {
+			@Override protected void addVertex( double x, double y, double z ) {
+				vertexes.grow().setTo(x, y, z);
+			}
+
+			@Override protected void addVertexNormal( double x, double y, double z ) {normals.grow().setTo(x, y, z);}
+
+			@Override protected void addVertexTexture( double x, double y ) {textures.grow().setTo(x, y);}
+
+			@Override protected void addFace( DogArray_I32 indexes, int vertexCount ) {
+				assertEquals(3, vertexCount);
+				assertEquals(vertexCount*3, indexes.size);
+				assertTrue(indexes.isEquals(0, 0, 0, 1, 1, 1, 2, 2, 2));
+			}
+		};
+		reader.parse(new BufferedReader(new StringReader(text)));
+
+		assertEquals(3, vertexes.size);
+		assertEquals(0.0, vertexes.get(0).distance(0, 0, 0), UtilEjml.TEST_F64);
+		assertEquals(0.0, vertexes.get(1).distance(0, 1, 0), UtilEjml.TEST_F64);
+		assertEquals(0.0, vertexes.get(2).distance(1, 0, 0), UtilEjml.TEST_F64);
+		assertEquals(3, normals.size);
+		assertEquals(0.0, normals.get(0).distance(0, 0, -1), UtilEjml.TEST_F64);
+		assertEquals(0.0, normals.get(1).distance(0, -1, 0), UtilEjml.TEST_F64);
+		assertEquals(0.0, normals.get(2).distance(-1, 0, 0), UtilEjml.TEST_F64);
+		assertEquals(3, textures.size);
+		assertEquals(0.0, textures.get(0).distance(0, 0), UtilEjml.TEST_F64);
+		assertEquals(0.0, textures.get(1).distance(0.1, 1), UtilEjml.TEST_F64);
+		assertEquals(0.0, textures.get(2).distance(1.1, 0.1), UtilEjml.TEST_F64);
 	}
 
 	/**
@@ -86,7 +143,11 @@ public class TestObjFileReader extends BoofStandardJUnit {
 
 			@Override protected void addVertex( double x, double y, double z ) {}
 
-			@Override protected void addFace( DogArray_I32 vertexes ) {
+			@Override protected void addVertexNormal( double x, double y, double z ) {}
+
+			@Override protected void addVertexTexture( double x, double y ) {}
+
+			@Override protected void addFace( DogArray_I32 vertexes, int vertexCount ) {
 				assertEquals(3, vertexes.size);
 				if (count == 0) {
 					assertTrue(vertexes.isEquals(2, 1, 0));
@@ -117,7 +178,11 @@ public class TestObjFileReader extends BoofStandardJUnit {
 
 			@Override protected void addVertex( double x, double y, double z ) {vertexCount++;}
 
-			@Override protected void addFace( DogArray_I32 vertexes ) {
+			@Override protected void addVertexNormal( double x, double y, double z ) {}
+
+			@Override protected void addVertexTexture( double x, double y ) {}
+
+			@Override protected void addFace( DogArray_I32 vertexes, int vertexCount ) {
 				assertEquals(6, vertexes.size);
 				assertTrue(vertexes.isEquals(2, 1, 0, 0, 1, 2));
 			}
@@ -130,6 +195,10 @@ public class TestObjFileReader extends BoofStandardJUnit {
 	@Test void ensureIndex() {
 		var reader = new DummyReader() {
 			@Override protected void addVertex( double x, double y, double z ) {}
+
+			@Override protected void addVertexNormal( double x, double y, double z ) {}
+
+			@Override protected void addVertexTexture( double x, double y ) {}
 		};
 
 		// Vertexes are stored in 1-index but need to make sure it's converted to 0-index
@@ -152,7 +221,7 @@ public class TestObjFileReader extends BoofStandardJUnit {
 			fail("there are no lines");
 		}
 
-		@Override protected void addFace( DogArray_I32 vertexes ) {
+		@Override protected void addFace( DogArray_I32 vertexes, int vertexCount ) {
 			fail("there are no faces");
 		}
 	}

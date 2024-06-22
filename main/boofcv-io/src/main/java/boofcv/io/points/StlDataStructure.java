@@ -186,13 +186,13 @@ public class StlDataStructure {
 			out = new VertexMesh();
 
 		out.vertexes.setTo(vertexes);
-		out.indexes.setTo(facetVertsIdx);
+		out.faceVertexes.setTo(facetVertsIdx);
 
 		// All facets are triangles
-		out.offsets.resize(facetCount() + 1);
-		out.offsets.set(0, 0);
-		for (int i = 1; i < out.offsets.size; i++) {
-			out.offsets.set(i, i*3);
+		out.faceOffsets.resize(facetCount() + 1);
+		out.faceOffsets.set(0, 0);
+		for (int i = 1; i < out.faceOffsets.size; i++) {
+			out.faceOffsets.set(i, i*3);
 		}
 
 		return out;

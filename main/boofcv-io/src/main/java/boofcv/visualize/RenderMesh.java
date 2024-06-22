@@ -189,10 +189,10 @@ public class RenderMesh implements VerbosePrint {
 		// Decide if it should texture map or user a per shape color
 		final boolean useColorizer = forceColorizer || mesh.texture.size() == 0;
 
-		for (int shapeIdx = 1; shapeIdx < mesh.offsets.size; shapeIdx++) {
+		for (int shapeIdx = 1; shapeIdx < mesh.faceOffsets.size; shapeIdx++) {
 			// First and last point in the polygon
-			final int idx0 = mesh.offsets.get(shapeIdx - 1);
-			final int idx1 = mesh.offsets.get(shapeIdx);
+			final int idx0 = mesh.faceOffsets.get(shapeIdx - 1);
+			final int idx1 = mesh.faceOffsets.get(shapeIdx);
 
 			// skip pathological case
 			if (idx0 >= idx1)
@@ -213,7 +213,7 @@ public class RenderMesh implements VerbosePrint {
 
 			boolean behindCamera = false;
 			for (int i = idx0; i < idx1; i++) {
-				Point3D_F64 world = mesh.vertexes.getTemp(mesh.indexes.get(i));
+				Point3D_F64 world = mesh.vertexes.getTemp(mesh.faceVertexes.get(i));
 				worldToView.transform(world, camera);
 
 				// If any part is behind the camera skip it. While not ideal this keeps the code simple,
@@ -256,10 +256,10 @@ public class RenderMesh implements VerbosePrint {
 	 */
 	static boolean isFrontVisible( VertexMesh mesh, int shapeIdx, int idx0, Point3D_F64 worldCamera ) {
 		// Get normal in world coordinates
-		Point3D_F32 normal = mesh.faceNormals.getTemp(shapeIdx);
+		Point3D_F32 normal = mesh.getFaceNormalTmp(shapeIdx);
 
 		// vector from the camera to a vertex
-		Point3D_F64 v1 = mesh.vertexes.getTemp(mesh.indexes.get(idx0));
+		Point3D_F64 v1 = mesh.vertexes.getTemp(mesh.faceVertexes.get(idx0));
 		v1.x -= worldCamera.x;
 		v1.y -= worldCamera.y;
 		v1.z -= worldCamera.z;

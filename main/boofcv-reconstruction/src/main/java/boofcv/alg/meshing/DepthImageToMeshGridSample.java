@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -100,7 +100,7 @@ public class DepthImageToMeshGridSample {
 				if (!checkAddIndexForIDisparity(x1, y, d3, parameters))
 					continue;
 
-				mesh.offsets.add(mesh.indexes.size);
+				mesh.faceOffsets.add(mesh.faceVertexes.size);
 			}
 		}
 	}
@@ -124,7 +124,7 @@ public class DepthImageToMeshGridSample {
 			// save where they came from, used to add color later
 			vertexPixels.grow().setTo(x, y);
 		}
-		mesh.indexes.add(index);
+		mesh.faceVertexes.add(index);
 		return true;
 	}
 
@@ -172,7 +172,7 @@ public class DepthImageToMeshGridSample {
 				checkAddIndexForInverseDepth(x1, y1, d2, pixelToNorm);
 				checkAddIndexForInverseDepth(x1, y, d3, pixelToNorm);
 
-				mesh.offsets.add(mesh.indexes.size);
+				mesh.faceOffsets.add(mesh.faceVertexes.size);
 			}
 		}
 	}
@@ -195,6 +195,6 @@ public class DepthImageToMeshGridSample {
 			// save where they came from, used to add color later
 			vertexPixels.grow().setTo(x, y);
 		}
-		mesh.indexes.add(index);
+		mesh.faceVertexes.add(index);
 	}
 }

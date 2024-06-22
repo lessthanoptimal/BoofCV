@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -127,7 +127,7 @@ class TestStlDataStructure extends BoofStandardJUnit {
 		assertEquals(0.0, mesh.getShapeVertex(5, null).distance(0, 0, 0), UtilEjml.TEST_F64);
 
 		assertEquals(3, mesh.vertexes.size());
-		assertEquals(3, mesh.offsets.get(1));
-		assertEquals(6, mesh.offsets.get(2));
+		assertEquals(3, mesh.faceOffsets.get(1));
+		assertEquals(6, mesh.faceOffsets.get(2));
 	}
 }

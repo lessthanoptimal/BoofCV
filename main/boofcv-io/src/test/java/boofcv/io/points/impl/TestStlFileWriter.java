@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -189,8 +189,8 @@ class TestStlFileWriter extends BoofStandardJUnit {
 		mesh.vertexes.append(1, 0, 0);
 		mesh.vertexes.append(1, 1, 0);
 		mesh.vertexes.append(0, 1, 0);
-		mesh.indexes.addAll(new int[]{0, 1, 2, 3}, 0 , 4);
-		mesh.offsets.add(4);
+		mesh.faceVertexes.addAll(new int[]{0, 1, 2, 3}, 0 , 4);
+		mesh.faceOffsets.add(4);
 
 		return mesh;
 	}

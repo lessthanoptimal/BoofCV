@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -57,8 +57,8 @@ class TestDepthImageToMeshGridSample extends BoofStandardJUnit {
 		VertexMesh found = alg.getMesh();
 
 		assertTrue(found.vertexes.size() >= 4);
-		assertTrue(found.indexes.size() >= 4);
-		assertTrue(found.offsets.size() >= 1);
+		assertTrue(found.faceVertexes.size() >= 4);
+		assertTrue(found.faceOffsets.size() >= 1);
 	}
 
 	private void depthToDisparityImage( CameraPinhole pinhole, DisparityParameters param, GrayF32 depth, GrayF32 disparity ) {
@@ -101,8 +101,8 @@ class TestDepthImageToMeshGridSample extends BoofStandardJUnit {
 		VertexMesh found = alg.getMesh();
 
 		assertTrue(found.vertexes.size() >= 4);
-		assertTrue(found.indexes.size() >= 4);
-		assertTrue(found.offsets.size() >= 1);
+		assertTrue(found.faceVertexes.size() >= 4);
+		assertTrue(found.faceOffsets.size() >= 1);
 	}
 
 	@NotNull private SimulatePlanarWorld renderPlanarWorld() {

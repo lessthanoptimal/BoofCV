@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,16 +40,23 @@ public class TestObjFileWriter extends BoofStandardJUnit {
 		alg.addVertex(1, 0, 0);
 		alg.addVertex(0, 1, 0);
 		alg.addVertex(0, 0, 1);
-		alg.addFace(DogArray_I32.array(0, 1, 2));
+		alg.addTextureVertex(1, 0);
+		alg.addTextureVertex(0, 1);
+		alg.addTextureVertex(1, 1);
+		alg.addFace(DogArray_I32.array(0, 1, 2), 1);
 		alg.addComment("Foo Bar");
 		alg.addVertex(2, 0, 0);
 		alg.addVertex(0, 2, 0);
 		alg.addVertex(0, 0, 2);
-		alg.addFace(null);
+		alg.addTextureVertex(2, 0);
+		alg.addTextureVertex(0, 2);
+		alg.addTextureVertex(2, 2);
+		alg.addFace(null, 0);
 
 		String text = output.toString();
 		var reader = new TestObjFileReader.DummyReader() {
 			int countVertex = 0;
+			int countTexture = 0;
 			int countFaces = 0;
 
 			@Override protected void addVertex( double x, double y, double z ) {
@@ -64,7 +71,21 @@ public class TestObjFileWriter extends BoofStandardJUnit {
 				countVertex++;
 			}
 
-			@Override protected void addFace( DogArray_I32 vertexes ) {
+			@Override protected void addVertexNormal( double x, double y, double z ) {}
+
+			@Override protected void addVertexTexture( double x, double y ) {
+				double expected = countTexture < 3 ? 1.0 : 2.0;
+				double found = switch (countTexture%3) {
+					case 0 -> x;
+					case 1 -> y;
+					case 2 -> expected;
+					default -> throw new RuntimeException();
+				};
+				assertEquals(expected, found);
+				countTexture++;
+			}
+
+			@Override protected void addFace( DogArray_I32 vertexes, int vertexCount ) {
 				switch (countVertex) {
 					case 0 -> assertTrue(vertexes.isEquals(0, 1, 2));
 					case 1 -> assertTrue(vertexes.isEquals(3, 4, 5));
