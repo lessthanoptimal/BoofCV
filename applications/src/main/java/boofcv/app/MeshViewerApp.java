@@ -26,14 +26,11 @@ import boofcv.io.points.PointCloudIO;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.InterleavedU8;
 import boofcv.struct.mesh.VertexMesh;
-import org.apache.commons.io.FilenameUtils;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Locale;
 
 /**
  * Very simple app for opening and viewing a 3D mesh
@@ -48,18 +45,8 @@ public class MeshViewerApp {
 	private static void loadFile( File file ) {
 		// Load the mesh
 		var mesh = new VertexMesh();
-		String extension = FilenameUtils.getExtension(file.getName()).toLowerCase(Locale.ENGLISH);
-		var type = switch (extension) {
-			case "ply" -> PointCloudIO.Format.PLY;
-			case "stl" -> PointCloudIO.Format.STL;
-			case "obj" -> PointCloudIO.Format.OBJ;
-			default -> {
-				throw new RuntimeException("Unknown file type");
-			}
-		};
-
-		try (var input = new FileInputStream(file)) {
-			PointCloudIO.load(type, input, mesh);
+		try {
+			PointCloudIO.load(file, mesh);
 		} catch (IOException e) {
 			e.printStackTrace(System.err);
 			System.exit(1);

@@ -128,6 +128,25 @@ public interface PointCloudWriter {
 		};
 	}
 
+	static PointCloudWriter wrapF64( DogArray<Point3D_F64> cloud, DogArray_I32 colors ) {
+		return new PointCloudWriter() {
+			@Override public void initialize( int size, boolean hasColor ) {
+				cloud.reserve(size);
+				cloud.reset();
+				colors.reserve(size);
+				colors.reset();
+			}
+
+			@Override public void startPoint() {}
+
+			@Override public void stopPoint() {}
+
+			@Override public void color( int rgb ) {colors.add(rgb);}
+
+			@Override public void location( double x, double y, double z ) {cloud.grow().setTo(x, y, z);}
+		};
+	}
+
 	static PointCloudWriter wrapF32RGB( DogArray<Point3dRgbI_F32> cloud ) {
 		return new PointCloudWriter() {
 			@Override public void initialize( int size, boolean hasColor ) {

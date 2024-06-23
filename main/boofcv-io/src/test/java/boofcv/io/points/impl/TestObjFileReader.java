@@ -57,10 +57,6 @@ public class TestObjFileReader extends BoofStandardJUnit {
 				throw new RuntimeException("Egads");
 			}
 
-			@Override protected void addVertexNormal( double x, double y, double z ) {}
-
-			@Override protected void addVertexTexture( double x, double y ) {}
-
 			@Override protected void addFace( DogArray_I32 vertexes, int vertexCount ) {
 				assertEquals(3, vertexes.size);
 				assertTrue(vertexes.isEquals(0, 1, 2));
@@ -154,10 +150,6 @@ public class TestObjFileReader extends BoofStandardJUnit {
 				colors.grow().setTo(red, green, blue);
 			}
 
-			@Override protected void addVertexNormal( double x, double y, double z ) {}
-
-			@Override protected void addVertexTexture( double x, double y ) {}
-
 			@Override protected void addFace( DogArray_I32 vertexes, int vertexCount ) {}
 		};
 		reader.parse(new BufferedReader(new StringReader(text)));
@@ -191,15 +183,6 @@ public class TestObjFileReader extends BoofStandardJUnit {
 
 		var reader = new DummyReader() {
 			int count = 0;
-
-			@Override protected void addVertex( double x, double y, double z ) {}
-
-			@Override
-			protected void addVertexWithColor( double x, double y, double z, double red, double green, double blue ) {}
-
-			@Override protected void addVertexNormal( double x, double y, double z ) {}
-
-			@Override protected void addVertexTexture( double x, double y ) {}
 
 			@Override protected void addFace( DogArray_I32 vertexes, int vertexCount ) {
 				assertEquals(3, vertexes.size);
@@ -237,10 +220,6 @@ public class TestObjFileReader extends BoofStandardJUnit {
 				vertexCount++;
 			}
 
-			@Override protected void addVertexNormal( double x, double y, double z ) {}
-
-			@Override protected void addVertexTexture( double x, double y ) {}
-
 			@Override protected void addFace( DogArray_I32 vertexes, int vertexCount ) {
 				assertEquals(6, vertexes.size);
 				assertTrue(vertexes.isEquals(2, 1, 0, 0, 1, 2));
@@ -252,16 +231,7 @@ public class TestObjFileReader extends BoofStandardJUnit {
 	}
 
 	@Test void ensureIndex() {
-		var reader = new DummyReader() {
-			@Override protected void addVertex( double x, double y, double z ) {}
-
-			@Override
-			protected void addVertexWithColor( double x, double y, double z, double red, double green, double blue ) {}
-
-			@Override protected void addVertexNormal( double x, double y, double z ) {}
-
-			@Override protected void addVertexTexture( double x, double y ) {}
-		};
+		var reader = new DummyReader(){};
 
 		// Vertexes are stored in 1-index but need to make sure it's converted to 0-index
 		assertEquals(0, reader.ensureIndex(1));
@@ -275,6 +245,19 @@ public class TestObjFileReader extends BoofStandardJUnit {
 	}
 
 	static abstract class DummyReader extends ObjFileReader {
+		@Override protected void addLibrary( String name ) {}
+
+		@Override protected void addMaterial( String name ) {}
+
+		@Override protected void addVertex( double x, double y, double z ) {}
+
+		@Override
+		protected void addVertexWithColor( double x, double y, double z, double red, double green, double blue ) {}
+
+		@Override protected void addVertexNormal( double x, double y, double z ) {}
+
+		@Override protected void addVertexTexture( double x, double y ) {}
+
 		@Override protected void addPoint( int vertex ) {
 			fail("there are no points");
 		}

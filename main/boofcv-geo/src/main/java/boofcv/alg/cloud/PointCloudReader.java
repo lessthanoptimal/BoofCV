@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,6 +38,9 @@ public interface PointCloudReader {
 	 */
 	int size();
 
+	/** True if each point has a color */
+	boolean colors();
+
 	/**
 	 * Copies the point
 	 */
@@ -57,6 +60,8 @@ public interface PointCloudReader {
 		return new PointCloudReader() {
 			@Override
 			public int size() {return length;}
+
+			@Override public boolean colors() {return true;}
 
 			@Override
 			public void get( int index, Point3D_F32 point ) {
@@ -85,6 +90,8 @@ public interface PointCloudReader {
 		return new PointCloudReader() {
 			@Override public int size() {return cloud.size();}
 
+			@Override public boolean colors() {return false;}
+
 			@Override public void get( int index, Point3D_F32 point ) {point.setTo(cloud.get(index));}
 
 			@Override public void get( int index, Point3D_F64 point ) {convert(cloud.get(index), point);}
@@ -96,6 +103,8 @@ public interface PointCloudReader {
 	static PointCloudReader wrapF64( List<Point3D_F64> cloud ) {
 		return new PointCloudReader() {
 			@Override public int size() {return cloud.size();}
+
+			@Override public boolean colors() {return false;}
 
 			@Override public void get( int index, Point3D_F32 point ) {convert(cloud.get(index), point);}
 
@@ -109,6 +118,8 @@ public interface PointCloudReader {
 		return new PointCloudReader() {
 			@Override public int size() {return cloud.size();}
 
+			@Override public boolean colors() {return true;}
+
 			@Override public void get( int index, Point3D_F32 point ) {point.setTo(cloud.get(index));}
 
 			@Override public void get( int index, Point3D_F64 point ) {convert(cloud.get(index), point);}
@@ -120,6 +131,8 @@ public interface PointCloudReader {
 	static PointCloudReader wrapF64RGB( List<Point3dRgbI_F64> cloud ) {
 		return new PointCloudReader() {
 			@Override public int size() {return cloud.size();}
+
+			@Override public boolean colors() {return true;}
 
 			@Override public void get( int index, Point3D_F32 point ) {convert(cloud.get(index), point);}
 
@@ -133,6 +146,8 @@ public interface PointCloudReader {
 		return new PointCloudReader() {
 			@Override public int size() {return cloud.size();}
 
+			@Override public boolean colors() {return true;}
+
 			@Override public void get( int index, Point3D_F32 point ) {point.setTo(cloud.get(index));}
 
 			@Override public void get( int index, Point3D_F64 point ) {convert(cloud.get(index), point);}
@@ -144,6 +159,8 @@ public interface PointCloudReader {
 	static PointCloudReader wrapF64( List<Point3D_F64> cloud, int[] rgb ) {
 		return new PointCloudReader() {
 			@Override public int size() {return cloud.size();}
+
+			@Override public boolean colors() {return true;}
 
 			@Override public void get( int index, Point3D_F32 point ) {convert(cloud.get(index), point);}
 
@@ -158,6 +175,8 @@ public interface PointCloudReader {
 			Point3dRgbI_F64 p = new Point3dRgbI_F64();
 
 			@Override public int size() {return size;}
+
+			@Override public boolean colors() {return true;}
 
 			@Override public void get( int index, Point3D_F32 point ) {
 				op.get(index, p);

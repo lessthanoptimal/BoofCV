@@ -50,17 +50,23 @@ public class VertexMesh {
 	/** Optional vertex colors in RGB format */
 	public final DogArray_I32 rgb = new DogArray_I32();
 
-	/** Which indexes correspond to normal for a face */
+	/** Which vertex indexes correspond to normal for a face */
 	public final DogArray_I32 faceVertexes = new DogArray_I32();
 
-	/** Which indexes correspond to each vertex in a face */
+	/**
+	 * Which texture indexes correspond to normal for a face. If this array is empty then we assume that is one
+	 * texture coordinate for each face vector that appears in the same order.
+	 */
+	public final DogArray_I32 faceVertexTextures = new DogArray_I32();
+
+	/** Which indexes correspond to each vertex normal in a face */
+	public final DogArray_I32 faceVertexNormals = new DogArray_I32();
+
+	/** Specifies which normal is the normal for the face's plane */
 	public final DogArray_I32 faceNormals = new DogArray_I32();
 
 	/** Start index of each face + the last index */
 	public final DogArray_I32 faceOffsets = new DogArray_I32();
-
-	/** Which indexes correspond to each vertex normal in a face */
-	public final DogArray_I32 vectorNormal = new DogArray_I32();
 
 	/** Name of the texture file associated with this mesh */
 	public String textureName = "";
@@ -102,8 +108,16 @@ public class VertexMesh {
 		int idx1 = faceOffsets.get(which + 1);
 
 		output.reset().resize(idx1 - idx0);
-		for (int i = idx0; i < idx1; i++) {
-			texture.getCopy(i, output.get(i - idx0));
+
+		// See if custom indexes are specified for a face's texture coordinates
+		if (faceVertexTextures.isEmpty()) {
+			for (int i = idx0; i < idx1; i++) {
+				texture.getCopy(i, output.get(i - idx0));
+			}
+		} else {
+			for (int i = idx0; i < idx1; i++) {
+				texture.getCopy(faceVertexTextures.get(i), output.get(i - idx0));
+			}
 		}
 	}
 
@@ -141,8 +155,14 @@ public class VertexMesh {
 		int idx1 = faceOffsets.get(which + 1);
 
 		output.reset().resize(idx1 - idx0);
-		for (int i = idx0; i < idx1; i++) {
-			vertexes.getCopy(faceVertexes.get(i), output.get(i - idx0));
+		if (faceVertexes.isEmpty()) {
+			for (int i = idx0; i < idx1; i++) {
+				vertexes.getCopy(i, output.get(i - idx0));
+			}
+		} else {
+			for (int i = idx0; i < idx1; i++) {
+				vertexes.getCopy(faceVertexes.get(i), output.get(i - idx0));
+			}
 		}
 	}
 
@@ -204,9 +224,10 @@ public class VertexMesh {
 		this.normals.setTo(src.normals);
 		this.rgb.setTo(src.rgb);
 		this.faceVertexes.setTo(src.faceVertexes);
+		this.faceVertexTextures.setTo(src.faceVertexTextures);
 		this.faceNormals.setTo(src.faceNormals);
 		this.faceOffsets.setTo(src.faceOffsets);
-		this.vectorNormal.setTo(src.vectorNormal);
+		this.faceVertexNormals.setTo(src.faceVertexNormals);
 		this.textureName = src.textureName;
 		return this;
 	}
@@ -217,9 +238,10 @@ public class VertexMesh {
 		normals.reset();
 		rgb.reset();
 		faceVertexes.reset();
+		faceVertexTextures.reset();
 		faceNormals.reset();
 		faceOffsets.reset().add(0);
-		vectorNormal.reset();
+		faceVertexNormals.reset();
 		textureName = "";
 	}
 

@@ -116,8 +116,14 @@ public abstract class ObjFileReader {
 						readFaceIndexes(words);
 						addFace(vertexIndexes, words.length - 1);
 					}
+
+					case "mtllib" -> addLibrary(words[1]);
+					case "usemtl" -> addMaterial(words[1]);
 					default -> handleError(actualLineCount + " Unknown object type. '" + words[0] + "'");
 				}
+			} catch (ObjLoadFromFiles.MultipleMaterials e) {
+				// this exception is thrown as a way to stop reading the file
+				return;
 			} catch (Exception e) {
 				// Skip over locally bad data
 				handleError(actualLineCount + " Bad object description " + words[0] + " '" + e.getMessage() + "'");
@@ -160,6 +166,16 @@ public abstract class ObjFileReader {
 			vertexIndexes.add(ensureIndex(Integer.parseInt(word.substring(idx0))));
 		}
 	}
+
+	/**
+	 * Adds an MTL library that it should load
+	 */
+	protected abstract void addLibrary( String name );
+
+	/**
+	 * Tells it that these vectors belongs the material defined in the MTL library
+	 */
+	protected abstract void addMaterial( String name );
 
 	protected abstract void addVertex( double x, double y, double z );
 

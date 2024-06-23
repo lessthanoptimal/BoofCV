@@ -36,6 +36,7 @@ import java.io.*;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Code for reading different point cloud formats
@@ -95,6 +96,8 @@ public class PointCloudIO {
 
 			@Override public int size() {return size;}
 
+			@Override public boolean colors() {return true;}
+
 			@Override public void get( int index, Point3D_F64 point ) {accessPoint.getPoint(index, point);}
 
 			@Override public int getRGB( int index ) {return accessColor.getRGB(index);}
@@ -148,6 +151,8 @@ public class PointCloudIO {
 	/**
 	 * Loads the mesh from a file. File type is determined by the file's extension.
 	 *
+	 * <p>For OBJ files, if there are multiple shapes defined then only the first one is returned.</p>
+	 *
 	 * @param file Which file it should load
 	 * @param mesh (Output) storage for the mesh
 	 */
@@ -160,9 +165,28 @@ public class PointCloudIO {
 			default -> throw new RuntimeException("Unknown file type: " + extension);
 		};
 
+
+		// OBJ files are special. They need to read in multiple files to get the texture map image and
+		// there can be multiple shapes defined. This will handle all those situations
+		if (type == PointCloudIO.Format.OBJ) {
+			var reader = new ObjLoadFromFiles();
+			reader.load(file, mesh);
+			return;
+		}
+
 		try (var input = new FileInputStream(file)) {
 			PointCloudIO.load(type, input, mesh);
 		}
+	}
+
+	/**
+	 * Loads a set of {@link VertexMesh} from an OBJ file. This can ready any type of OBJ file as it doesn't make
+	 * assumptions about what is contained inside of it
+	 */
+	public static Map<String, VertexMesh> loadObj( File file ) {
+		var reader = new ObjLoadFromFiles();
+		reader.load(file, null);
+		return reader.getShapeToMesh();
 	}
 
 	/**
