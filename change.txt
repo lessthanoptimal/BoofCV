@@ -7,6 +7,13 @@ Version Meaning: <compatible>.<feature>.<bug fix>
 - Last digit always indicates a bug fix and other minor changes
 
 ---------------------
+Date    : 202X/XXX/XX
+Version : 1.1.8
+
+- PackedArray
+  * Added isEquals()
+
+---------------------
 Date    : 2024/Oct/05
 Version : 1.1.7
 

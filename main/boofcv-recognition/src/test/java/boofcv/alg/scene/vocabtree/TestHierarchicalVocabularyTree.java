@@ -145,6 +145,7 @@ public class TestHierarchicalVocabularyTree extends BoofStandardJUnit {
 		@Override public void append( Point2D_F64 element ) {list.add(element.copy());}
 		@Override public void set(int index, Point2D_F64 element) {}
 		@Override public void forIdx( int idx0, int idx1, BoofLambdas.ProcessIndex<Point2D_F64> op ) {}
+		@Override public boolean isEquals(PackedArray<Point2D_F64> other) {return false;}
 		@Override public Point2D_F64 getTemp( int index ) {return list.get(index);}
 		@Override public void getCopy( int index, Point2D_F64 dst ) {dst.setTo(list.get(index));}
 		@Override public void copy( Point2D_F64 src, Point2D_F64 dst ) {dst.setTo(src);}

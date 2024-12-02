@@ -103,6 +103,10 @@ public class PackedArrayPoint2D_I16 implements PackedArray<Point2D_I16> {
 		}
 	}
 
+	@Override public boolean isEquals( PackedArray<Point2D_I16> o ) {
+		return this.array.isEquals(((PackedArrayPoint2D_I16)o).array);
+	}
+
 	/**
 	 * Makes this array have a value identical to 'src'
 	 *

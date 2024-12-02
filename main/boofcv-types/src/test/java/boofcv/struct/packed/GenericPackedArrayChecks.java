@@ -26,8 +26,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Common tests for implementations of {@link PackedArray}.
@@ -135,7 +134,7 @@ public abstract class GenericPackedArrayChecks<T> extends BoofStandardJUnit {
 		List<T> found = new ArrayList<>();
 		DogArray_I32 indexes = new DogArray_I32();
 
-		array.forIdx(2,array.size()-1, (idx, point)->{
+		array.forIdx(2, array.size() - 1, ( idx, point ) -> {
 			T copy = createRandomPoint();
 			array.copy(point, copy);
 			found.add(copy);
@@ -144,8 +143,8 @@ public abstract class GenericPackedArrayChecks<T> extends BoofStandardJUnit {
 
 		assertEquals(23, indexes.size);
 		for (int i = 0; i < indexes.size; i++) {
-			assertEquals(i+2, indexes.get(i));
-			checkEquals(array.getTemp(i+2), found.get(i));
+			assertEquals(i + 2, indexes.get(i));
+			checkEquals(array.getTemp(i + 2), found.get(i));
 		}
 	}
 
@@ -163,4 +162,19 @@ public abstract class GenericPackedArrayChecks<T> extends BoofStandardJUnit {
 	}
 
 	@Test void setTo_Standard() {checkSetTo(createAlg().getClass(), true);}
+
+	@Test void isEquals() {
+		PackedArray<T> a = createAlg();
+		PackedArray<T> b = createAlg();
+
+		assertTrue(a.isEquals(b));
+
+		for (int i = 0; i < 4; i++) {
+			T p = createRandomPoint();
+			a.append(p);
+			assertFalse(a.isEquals(b));
+			b.append(p);
+			assertTrue(a.isEquals(b));
+		}
+	}
 }

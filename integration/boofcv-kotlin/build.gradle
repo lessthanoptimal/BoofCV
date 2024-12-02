@@ -1,12 +1,12 @@
 plugins {
-	id 'org.jetbrains.kotlin.jvm' version '1.6.10'
+	id 'org.jetbrains.kotlin.jvm' version '1.7.22'
 }
 
 configurations.all {
 	resolutionStrategy {
 		force "org.jetbrains:annotations:$project.jetnull_version"
-		force "org.jetbrains.kotlin:kotlin-stdlib:1.6.10"
-		force "org.jetbrains.kotlin:kotlin-stdlib-common:1.6.10"
+		force "org.jetbrains.kotlin:kotlin-stdlib:1.7.22"
+		force "org.jetbrains.kotlin:kotlin-stdlib-common:1.7.22"
 	}
 }
 

@@ -19,6 +19,7 @@
 package boofcv.struct.feature;
 
 import boofcv.misc.BoofLambdas;
+import boofcv.struct.PackedArray;
 import org.ddogleg.struct.BigDogArray_I8;
 import org.ddogleg.struct.BigDogGrowth;
 
@@ -94,6 +95,10 @@ public class PackedTupleBigArray_S8 implements PackedTupleArray<TupleDesc_S8> {
 				op.process(pointIndex++, temp);
 			}
 		});
+	}
+
+	@Override public boolean isEquals( PackedArray<TupleDesc_S8> other ) {
+		return array.isEquivalent(((PackedTupleBigArray_S8)other).array);
 	}
 
 	@Override public int getDOF() {

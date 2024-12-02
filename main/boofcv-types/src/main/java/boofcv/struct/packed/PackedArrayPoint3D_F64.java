@@ -19,36 +19,19 @@
 package boofcv.struct.packed;
 
 import boofcv.misc.BoofLambdas;
-import boofcv.struct.PackedArray;
 import georegression.struct.point.Point3D_F64;
-import lombok.Getter;
-import org.ddogleg.struct.DogArray_F64;
 
 /**
  * Packed array of {@link Point3D_F64}. Internally the point is stored in an interleaved format.
  *
  * @author Peter Abeles
  */
-public class PackedArrayPoint3D_F64 implements PackedArray<Point3D_F64> {
-	private static final int DOF = 3;
-
-	/** Stores tuple in a single continuous array */
-	@Getter private final DogArray_F64 array;
-
+public class PackedArrayPoint3D_F64 extends PackedArray_F64<Point3D_F64> {
 	// tuple that the result is temporarily written to
 	private final Point3D_F64 temp = new Point3D_F64();
 
 	public PackedArrayPoint3D_F64() {
-		array = new DogArray_F64();
-		array.resize(0);
-	}
-
-	@Override public void reset() {
-		array.reset();
-	}
-
-	@Override public void reserve( int numTuples ) {
-		array.reserve(numTuples*2);
+		super(3, 0);
 	}
 
 	@Override public void append( Point3D_F64 element ) {
@@ -88,10 +71,6 @@ public class PackedArrayPoint3D_F64 implements PackedArray<Point3D_F64> {
 
 	@Override public void copy( Point3D_F64 src, Point3D_F64 dst ) {
 		dst.setTo(src);
-	}
-
-	@Override public int size() {
-		return array.size/3;
 	}
 
 	@Override public Class<Point3D_F64> getElementType() {

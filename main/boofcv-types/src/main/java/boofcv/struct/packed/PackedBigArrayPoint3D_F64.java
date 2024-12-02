@@ -19,11 +19,8 @@
 package boofcv.struct.packed;
 
 import boofcv.misc.BoofLambdas;
-import boofcv.struct.PackedArray;
 import georegression.struct.GeoTuple3D_F64;
 import georegression.struct.point.Point3D_F64;
-import lombok.Getter;
-import org.ddogleg.struct.BigDogArray_F64;
 import org.ddogleg.struct.BigDogGrowth;
 
 import java.util.Collection;
@@ -33,14 +30,9 @@ import java.util.Collection;
  *
  * @author Peter Abeles
  */
-public class PackedBigArrayPoint3D_F64 implements PackedArray<Point3D_F64> {
-	private static final int DOF = 3;
-
+public class PackedBigArrayPoint3D_F64 extends PackedBigArray_F64<Point3D_F64> {
 	// tuple that the result is temporarily written to
 	private final Point3D_F64 temp = new Point3D_F64();
-
-	/** Storage for the raw data in an array */
-	@Getter private final BigDogArray_F64 array;
 
 	/**
 	 * Constructor where the default is used for all parameters.
@@ -64,7 +56,7 @@ public class PackedBigArrayPoint3D_F64 implements PackedArray<Point3D_F64> {
 	 * @param growth Growth strategy to use
 	 */
 	public PackedBigArrayPoint3D_F64( int reservedPoints, int blockSize, BigDogGrowth growth ) {
-		array = new BigDogArray_F64(reservedPoints*DOF, blockSize*DOF, growth);
+		super(3, reservedPoints, blockSize, growth);
 	}
 
 	/**
@@ -78,14 +70,6 @@ public class PackedBigArrayPoint3D_F64 implements PackedArray<Point3D_F64> {
 		reserve(src.size());
 		src.forIdx(0, src.size(), ( idx, p ) -> append(p.x, p.y, p.z));
 		return this;
-	}
-
-	@Override public void reset() {
-		array.reset();
-	}
-
-	@Override public void reserve( int numPoints ) {
-		array.reserve(numPoints*DOF);
 	}
 
 	public void append( double x, double y, double z ) {

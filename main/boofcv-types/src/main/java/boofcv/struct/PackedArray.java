@@ -62,4 +62,7 @@ public interface PackedArray<T> extends LArrayAccessor<T> {
 	 * @param op The operation to process each element
 	 */
 	void forIdx( int idx0, int idx1, BoofLambdas.ProcessIndex<T> op );
+
+	/** Checks to see if the two data structures are equal */
+	boolean isEquals( PackedArray<T> other );
 }

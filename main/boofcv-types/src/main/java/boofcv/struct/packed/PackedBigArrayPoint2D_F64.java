@@ -19,10 +19,7 @@
 package boofcv.struct.packed;
 
 import boofcv.misc.BoofLambdas;
-import boofcv.struct.PackedArray;
 import georegression.struct.point.Point2D_F64;
-import lombok.Getter;
-import org.ddogleg.struct.BigDogArray_F64;
 import org.ddogleg.struct.BigDogGrowth;
 
 /**
@@ -30,12 +27,7 @@ import org.ddogleg.struct.BigDogGrowth;
  *
  * @author Peter Abeles
  */
-public class PackedBigArrayPoint2D_F64 implements PackedArray<Point2D_F64> {
-	private static final int DOF = 2;
-
-	/** Storage for the raw data in an array */
-	@Getter private final BigDogArray_F64 array;
-
+public class PackedBigArrayPoint2D_F64 extends PackedBigArray_F64<Point2D_F64> {
 	// tuple that the result is temporarily written to
 	private final Point2D_F64 temp = new Point2D_F64();
 
@@ -59,7 +51,7 @@ public class PackedBigArrayPoint2D_F64 implements PackedArray<Point2D_F64> {
 	 * @param growth Growth strategy to use
 	 */
 	public PackedBigArrayPoint2D_F64( int reservedPoints, int blockSize, BigDogGrowth growth ) {
-		array = new BigDogArray_F64(reservedPoints*DOF, blockSize*DOF, growth);
+		super(2, reservedPoints, blockSize, growth);
 	}
 
 	/**
@@ -73,14 +65,6 @@ public class PackedBigArrayPoint2D_F64 implements PackedArray<Point2D_F64> {
 		reserve(src.size());
 		src.forIdx(0, src.size(), ( idx, p ) -> append(p.x, p.y));
 		return this;
-	}
-
-	@Override public void reset() {
-		array.reset();
-	}
-
-	@Override public void reserve( int numPoints ) {
-		array.reserve(numPoints*DOF);
 	}
 
 	public void append( double x, double y ) {
@@ -123,14 +107,6 @@ public class PackedBigArrayPoint2D_F64 implements PackedArray<Point2D_F64> {
 		dst.setTo(src);
 	}
 
-	@Override public int size() {
-		return array.size/2;
-	}
-
-	@Override public Class<Point2D_F64> getElementType() {
-		return Point2D_F64.class;
-	}
-
 	@Override public void forIdx( int idx0, int idx1, BoofLambdas.ProcessIndex<Point2D_F64> op ) {
 		array.processByBlock(idx0*DOF, idx1*DOF, ( array, arrayIdx0, arrayIdx1, offset ) -> {
 			int pointIndex = idx0 + offset/DOF;
@@ -142,5 +118,9 @@ public class PackedBigArrayPoint2D_F64 implements PackedArray<Point2D_F64> {
 				array[i + 1] = temp.y;
 			}
 		});
+	}
+
+	@Override public Class<Point2D_F64> getElementType() {
+		return Point2D_F64.class;
 	}
 }

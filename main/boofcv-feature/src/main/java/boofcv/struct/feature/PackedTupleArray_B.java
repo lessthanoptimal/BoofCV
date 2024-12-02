@@ -19,6 +19,7 @@
 package boofcv.struct.feature;
 
 import boofcv.misc.BoofLambdas;
+import boofcv.struct.PackedArray;
 import org.ddogleg.struct.DogArray_I32;
 
 /**
@@ -97,6 +98,10 @@ public class PackedTupleArray_B implements PackedTupleArray<TupleDesc_B> {
 			System.arraycopy(array.data, i, temp.data, 0, numInts);
 			op.process(pointIndex++, temp);
 		}
+	}
+
+	@Override public boolean isEquals( PackedArray<TupleDesc_B> other ) {
+		return array.isEquals(((PackedTupleArray_B)other).array);
 	}
 
 	@Override public int getDOF() {

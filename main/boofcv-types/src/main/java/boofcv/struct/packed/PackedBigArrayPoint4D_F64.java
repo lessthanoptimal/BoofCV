@@ -19,10 +19,8 @@
 package boofcv.struct.packed;
 
 import boofcv.misc.BoofLambdas;
-import boofcv.struct.PackedArray;
 import georegression.struct.point.Point4D_F64;
 import lombok.Getter;
-import org.ddogleg.struct.BigDogArray_F64;
 import org.ddogleg.struct.BigDogGrowth;
 
 /**
@@ -30,12 +28,7 @@ import org.ddogleg.struct.BigDogGrowth;
  *
  * @author Peter Abeles
  */
-public class PackedBigArrayPoint4D_F64 implements PackedArray<Point4D_F64> {
-	private static final int DOF = 4;
-
-	// Storage for the raw data in an array
-	private final BigDogArray_F64 array;
-
+public class PackedBigArrayPoint4D_F64 extends PackedBigArray_F64<Point4D_F64> {
 	/** Storage for the raw data in an array */
 	@Getter private final Point4D_F64 temp = new Point4D_F64();
 
@@ -61,7 +54,7 @@ public class PackedBigArrayPoint4D_F64 implements PackedArray<Point4D_F64> {
 	 * @param growth Growth strategy to use
 	 */
 	public PackedBigArrayPoint4D_F64( int reservedPoints, int blockSize, BigDogGrowth growth ) {
-		array = new BigDogArray_F64(reservedPoints*DOF, blockSize*DOF, growth);
+		super(4, reservedPoints, blockSize, growth);
 	}
 
 	/**
@@ -75,14 +68,6 @@ public class PackedBigArrayPoint4D_F64 implements PackedArray<Point4D_F64> {
 		reserve(src.size());
 		src.forIdx(0, src.size(), ( idx, p ) -> append(p.x, p.y, p.z, p.w));
 		return this;
-	}
-
-	@Override public void reset() {
-		array.reset();
-	}
-
-	@Override public void reserve( int numPoints ) {
-		array.reserve(numPoints*DOF);
 	}
 
 	public void append( double x, double y, double z, double w ) {
