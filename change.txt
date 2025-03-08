@@ -7,6 +7,14 @@ Version Meaning: <compatible>.<feature>.<bug fix>
 - Last digit always indicates a bug fix and other minor changes
 
 ---------------------
+Date    : 2025/XXX/YY
+Version : 1.1.9
+
+- VerboseUtils
+  * Moving verbose related utilities into DDogleg
+  * Deprecated functions in BoofCV
+
+---------------------
 Date    : 2025/Mar/06
 Version : 1.1.8
 

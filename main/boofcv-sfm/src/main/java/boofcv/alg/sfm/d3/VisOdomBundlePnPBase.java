@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,6 @@
 
 package boofcv.alg.sfm.d3;
 
-import boofcv.BoofVerbose;
 import boofcv.abst.geo.TriangulateNViewsMetric;
 import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTracker;
@@ -29,7 +28,6 @@ import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BFrame;
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BObservation;
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BTrack;
 import boofcv.alg.sfm.d3.structure.VisOdomKeyFrameManager;
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.distort.Point2Transform2_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -41,6 +39,7 @@ import lombok.Setter;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.VerbosePrint;
+import org.ddogleg.util.VerboseUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
@@ -326,14 +325,14 @@ public abstract class VisOdomBundlePnPBase<Track extends VisOdomBundleAdjustment
 
 	@Override
 	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
-		this.verbose = BoofMiscOps.addPrefix(this, out);
+		this.verbose = VerboseUtils.addPrefix(this, out);
 		this.profileOut = null;
 
 		if (configuration == null) {
 			return;
 		}
 
-		if (configuration.contains(BoofVerbose.RUNTIME)) {
+		if (configuration.contains(VerboseUtils.RUNTIME)) {
 			this.profileOut = verbose;
 		}
 	}

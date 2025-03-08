@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,6 @@ import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.robust.DistanceFundamentalGeometric;
 import boofcv.alg.geo.robust.GenerateHomographyLinear;
 import boofcv.alg.structure.EpipolarScore3D;
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.geo.AssociatedPair;
@@ -34,6 +33,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.struct.DogArray_I32;
+import org.ddogleg.util.VerboseUtils;
 import org.ejml.data.DMatrixRMaj;
 import org.jetbrains.annotations.Nullable;
 
@@ -213,6 +213,6 @@ public class ScoreFundamentalHomographyCompatibility implements EpipolarScore3D 
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> param ) {
-		this.verbose = BoofMiscOps.addPrefix(this, out);
+		this.verbose = VerboseUtils.addPrefix(this, out);
 	}
 }

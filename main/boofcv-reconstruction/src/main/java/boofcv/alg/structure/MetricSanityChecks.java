@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,6 +36,7 @@ import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_B;
 import org.ddogleg.struct.VerbosePrint;
+import org.ddogleg.util.VerboseUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
@@ -294,6 +295,6 @@ public class MetricSanityChecks implements VerbosePrint {
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
-		this.verbose = BoofMiscOps.addPrefix(this, out);
+		this.verbose = VerboseUtils.addPrefix(this, out);
 	}
 }

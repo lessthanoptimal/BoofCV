@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,12 +24,12 @@ import boofcv.alg.fiducial.aztec.AztecDecoderImage;
 import boofcv.alg.fiducial.aztec.AztecFinderPatternDetector;
 import boofcv.alg.fiducial.aztec.AztecPyramid;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import lombok.Getter;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.VerbosePrint;
+import org.ddogleg.util.VerboseUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
@@ -109,7 +109,7 @@ public class AztecCodePreciseDetector<T extends ImageGray<T>> implements AztecCo
 	@Override public Class<T> getImageType() {return imageType;}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
-		this.verbose = BoofMiscOps.addPrefix(this, out);
-		BoofMiscOps.verboseChildren(out, configuration, decoder, detectorPyramids);
+		this.verbose = VerboseUtils.addPrefix(this, out);
+		VerboseUtils.verboseChildren(out, configuration, decoder, detectorPyramids);
 	}
 }

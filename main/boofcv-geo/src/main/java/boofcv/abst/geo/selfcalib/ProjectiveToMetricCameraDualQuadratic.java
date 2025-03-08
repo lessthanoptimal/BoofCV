@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,6 +38,7 @@ import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.VerbosePrint;
+import org.ddogleg.util.VerboseUtils;
 import org.ejml.data.DMatrix3;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
@@ -361,7 +362,7 @@ public class ProjectiveToMetricCameraDualQuadratic implements ProjectiveToMetric
 	@Override public int getMinimumViews() {return selfCalib.getMinimumProjectives();}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
-		this.verbose = BoofMiscOps.addPrefix(this, out);
-		BoofMiscOps.verboseChildren(verbose, configuration, resolveSign, refiner);
+		this.verbose = VerboseUtils.addPrefix(this, out);
+		VerboseUtils.verboseChildren(verbose, configuration, resolveSign, refiner);
 	}
 }

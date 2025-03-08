@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,6 @@ import boofcv.alg.scene.bow.BowMatch;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.struct.FactoryTupleDesc;
 import boofcv.misc.BoofLambdas;
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.PackedArray;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.kmeans.FactoryTupleCluster;
@@ -37,6 +36,7 @@ import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.Factory;
+import org.ddogleg.util.VerboseUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
@@ -246,6 +246,6 @@ public class FeatureSceneRecognitionNearestNeighbor<TD extends TupleDesc<TD>> im
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> config ) {
-		this.verbose = BoofMiscOps.addPrefix(this, out);
+		this.verbose = VerboseUtils.addPrefix(this, out);
 	}
 }

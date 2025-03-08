@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,6 @@ import boofcv.alg.interpolate.InterpolatePixelDistortS;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.misc.BoofMiscOps;
 import boofcv.misc.MovingAverage;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.border.BorderType;
@@ -37,6 +36,7 @@ import georegression.struct.point.Point2D_F32;
 import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.struct.VerbosePrint;
+import org.ddogleg.util.VerboseUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
@@ -142,6 +142,6 @@ public abstract class SquareLocatorPatternDetectorBase<T extends ImageGray<T>> i
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
-		this.verbose = BoofMiscOps.addPrefix(this, out);
+		this.verbose = VerboseUtils.addPrefix(this, out);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.alg.structure.*;
 import boofcv.misc.BoofMiscOps;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.DogArray_I32;
+import org.ddogleg.util.VerboseUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
@@ -257,6 +258,6 @@ public class MetricExpandByOneView extends ExpandByOneView {
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
 		super.setVerbose(out, configuration);
-		BoofMiscOps.verboseChildren(verbose, configuration, expandCalibrated, expandUnknown);
+		VerboseUtils.verboseChildren(verbose, configuration, expandCalibrated, expandUnknown);
 	}
 }

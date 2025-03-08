@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.alg.fiducial.qrcode.PackedBits8;
 import boofcv.misc.BoofMiscOps;
 import lombok.Getter;
 import org.ddogleg.struct.VerbosePrint;
+import org.ddogleg.util.VerboseUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
@@ -306,6 +307,6 @@ public class AztecDecoder extends AztecMessageErrorCorrection implements Verbose
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> set ) {
-		this.verbose = BoofMiscOps.addPrefix(this, out);
+		this.verbose = VerboseUtils.addPrefix(this, out);
 	}
 }

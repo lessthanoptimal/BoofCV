@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,12 +24,12 @@ import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.alg.geo.selfcalib.TwoViewToCalibratingHomography;
 import boofcv.alg.structure.PairwiseGraphUtils;
 import boofcv.alg.structure.SceneWorkingGraph;
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.VerbosePrint;
+import org.ddogleg.util.VerboseUtils;
 import org.ejml.data.DMatrixRMaj;
 import org.jetbrains.annotations.Nullable;
 
@@ -242,7 +242,7 @@ public class EstimateViewSelfCalibrate implements VerbosePrint {
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
-		this.verbose = BoofMiscOps.addPrefix(this, out);
-		BoofMiscOps.verboseChildren(verbose, configuration, estimateUtils.checks);
+		this.verbose = VerboseUtils.addPrefix(this, out);
+		VerboseUtils.verboseChildren(verbose, configuration, estimateUtils.checks);
 	}
 }

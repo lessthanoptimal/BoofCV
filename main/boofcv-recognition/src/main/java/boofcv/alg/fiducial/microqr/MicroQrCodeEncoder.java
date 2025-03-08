@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,12 +22,12 @@ import boofcv.alg.fiducial.qrcode.PackedBits8;
 import boofcv.alg.fiducial.qrcode.QrCode;
 import boofcv.alg.fiducial.qrcode.QrCodeCodecBitsUtils;
 import boofcv.alg.fiducial.qrcode.ReedSolomonCodes_U8;
-import boofcv.misc.BoofMiscOps;
 import georegression.struct.point.Point2D_I32;
 import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.struct.DogArray_I8;
 import org.ddogleg.struct.VerbosePrint;
+import org.ddogleg.util.VerboseUtils;
 import org.ejml.data.BMatrixRMaj;
 import org.jetbrains.annotations.Nullable;
 
@@ -542,6 +542,6 @@ public class MicroQrCodeEncoder implements VerbosePrint {
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
-		this.verbose = BoofMiscOps.addPrefix(this, out);
+		this.verbose = VerboseUtils.addPrefix(this, out);
 	}
 }

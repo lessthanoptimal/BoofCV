@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,6 +39,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.sorting.QuickSelect;
 import org.ddogleg.struct.*;
+import org.ddogleg.util.VerboseUtils;
 import org.ejml.data.DMatrixRMaj;
 import org.jetbrains.annotations.Nullable;
 
@@ -391,8 +392,8 @@ public class SelectFramesForReconstruction3D<T extends ImageBase<T>> implements 
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
-		this.verbose = BoofMiscOps.addPrefix(this, out);
-		BoofMiscOps.verboseChildren(verbose, configuration, scorer);
+		this.verbose = VerboseUtils.addPrefix(this, out);
+		VerboseUtils.verboseChildren(verbose, configuration, scorer);
 	}
 
 	/** Storage for feature and track information for a single image frame */

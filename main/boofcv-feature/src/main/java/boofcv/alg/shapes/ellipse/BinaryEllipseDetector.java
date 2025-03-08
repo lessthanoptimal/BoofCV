@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,6 @@
 package boofcv.alg.shapes.ellipse;
 
 import boofcv.alg.filter.binary.ContourPacked;
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
@@ -28,6 +27,7 @@ import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.VerbosePrint;
+import org.ddogleg.util.VerboseUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
@@ -197,8 +197,8 @@ public class BinaryEllipseDetector<T extends ImageGray<T>> implements VerbosePri
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> config ) {
-		this.verbose = BoofMiscOps.addPrefix(this, out);
-		BoofMiscOps.verboseChildren(out, config, ellipseDetector);
+		this.verbose = VerboseUtils.addPrefix(this, out);
+		VerboseUtils.verboseChildren(out, config, ellipseDetector);
 	}
 
 	@SuppressWarnings({"NullAway.Init"})

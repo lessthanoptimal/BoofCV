@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,6 @@ import boofcv.alg.fiducial.qrcode.PositionPatternNode;
 import boofcv.alg.fiducial.qrcode.SquareLocatorPatternDetectorBase;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.alg.shapes.polygon.DetectPolygonFromContour;
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
@@ -33,6 +32,7 @@ import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
 import org.ddogleg.struct.DogArray;
+import org.ddogleg.util.VerboseUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
@@ -257,7 +257,7 @@ public class AztecFinderPatternDetector<T extends ImageGray<T>> extends SquareLo
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> set ) {
-		this.verbose = BoofMiscOps.addPrefix(this, out);
+		this.verbose = VerboseUtils.addPrefix(this, out);
 	}
 
 	/**

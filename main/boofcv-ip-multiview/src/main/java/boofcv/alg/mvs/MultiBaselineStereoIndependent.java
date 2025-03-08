@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,6 @@ import boofcv.alg.geo.RectifyDistortImageOps;
 import boofcv.alg.geo.rectify.DisparityParameters;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.misc.BoofLambdas;
-import boofcv.misc.BoofMiscOps;
 import boofcv.misc.LookUpImages;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.calib.CameraPinholeBrown;
@@ -40,6 +39,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.VerbosePrint;
+import org.ddogleg.util.VerboseUtils;
 import org.ejml.data.DMatrixRMaj;
 import org.jetbrains.annotations.Nullable;
 
@@ -332,8 +332,8 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
-		this.verbose = BoofMiscOps.addPrefix(this, out);
-		BoofMiscOps.verboseChildren(verbose, configuration, performFusion, disparitySmoother);
+		this.verbose = VerboseUtils.addPrefix(this, out);
+		VerboseUtils.verboseChildren(verbose, configuration, performFusion, disparitySmoother);
 
 		this.verboseProfiling = null;
 		if (configuration != null && configuration.contains(BoofVerbose.RUNTIME)) {

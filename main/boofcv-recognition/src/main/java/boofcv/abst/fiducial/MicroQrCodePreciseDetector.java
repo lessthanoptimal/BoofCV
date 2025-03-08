@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,6 @@
 
 package boofcv.abst.fiducial;
 
-import boofcv.BoofVerbose;
 import boofcv.abst.filter.binary.BinaryContourHelper;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.distort.LensDistortionNarrowFOV;
@@ -28,12 +27,12 @@ import boofcv.alg.fiducial.qrcode.PositionPatternNode;
 import boofcv.alg.fiducial.qrcode.QrCodePositionPatternDetector;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.alg.shapes.polygon.DetectPolygonFromContour;
-import boofcv.misc.BoofMiscOps;
 import boofcv.misc.MovingAverage;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import lombok.Getter;
 import org.ddogleg.struct.VerbosePrint;
+import org.ddogleg.util.VerboseUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
@@ -142,11 +141,11 @@ public class MicroQrCodePreciseDetector<T extends ImageGray<T>> implements Micro
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
-		BoofMiscOps.verboseChildren(out, configuration, decoder, detectPositionPatterns);
+		VerboseUtils.verboseChildren(out, configuration, decoder, detectPositionPatterns);
 
 		if (configuration == null)
 			return;
-		if (configuration.contains(BoofVerbose.RUNTIME))
-			this.profiler = BoofMiscOps.addPrefix(this, out);
+		if (configuration.contains(VerboseUtils.RUNTIME))
+			this.profiler = VerboseUtils.addPrefix(this, out);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,6 @@ import boofcv.abst.filter.binary.BinaryLabelContourFinder;
 import boofcv.alg.filter.binary.ContourOps;
 import boofcv.alg.filter.binary.ContourPacked;
 import boofcv.factory.filter.binary.FactoryBinaryContourFinder;
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.distort.PixelTransform;
@@ -42,6 +41,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.VerbosePrint;
+import org.ddogleg.util.VerboseUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
@@ -344,7 +344,7 @@ public class BinaryEllipseDetectorPixel implements VerbosePrint {
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
-		this.verbose = BoofMiscOps.addPrefix(this, out);
+		this.verbose = VerboseUtils.addPrefix(this, out);
 	}
 
 	@SuppressWarnings({"NullAway.Init"})

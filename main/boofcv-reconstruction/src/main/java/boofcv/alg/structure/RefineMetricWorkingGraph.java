@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,6 +40,7 @@ import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.VerbosePrint;
+import org.ddogleg.util.VerboseUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
@@ -548,8 +549,8 @@ public class RefineMetricWorkingGraph implements VerbosePrint {
 
 	@Override
 	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
-		this.verbose = BoofMiscOps.addPrefix(this, out);
-		BoofMiscOps.verboseChildren(out, configuration, metricSba);
+		this.verbose = VerboseUtils.addPrefix(this, out);
+		VerboseUtils.verboseChildren(out, configuration, metricSba);
 	}
 
 	/**

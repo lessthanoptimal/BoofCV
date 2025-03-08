@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -936,6 +936,7 @@ public class BoofMiscOps {
 	/**
 	 * Function which handles boilerplate for support recursive verbose print
 	 */
+	@Deprecated
 	public static void verboseChildren( @Nullable PrintStream out, @Nullable Set<String> configuration,
 										@Nullable VerbosePrint... children ) {
 		// See how many tabs have already been added
@@ -980,10 +981,12 @@ public class BoofMiscOps {
 		return out + "}";
 	}
 
+	@Deprecated
 	public static @Nullable PrintStream addPrefix( VerbosePrint owner, @Nullable PrintStream out ) {
 		return addPrefix(owner, 1, out);
 	}
 
+	@Deprecated
 	public static @Nullable PrintStream addPrefix( VerbosePrint owner, int numIndents, @Nullable PrintStream out ) {
 		if (out == null || out instanceof PrintStreamInjectIndent)
 			return out;
@@ -998,6 +1001,7 @@ public class BoofMiscOps {
 	/**
 	 * Assumes names are camel case and that the capital letters are important. Same for numbers
 	 */
+	@Deprecated
 	public static String nameToShort( String name, int length ) {
 		String text = "";
 		for (int i = 0; i < name.length() && text.length() < length; i++) {

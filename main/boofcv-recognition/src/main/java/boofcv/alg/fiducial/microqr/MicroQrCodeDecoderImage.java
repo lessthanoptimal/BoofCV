@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,6 @@ package boofcv.alg.fiducial.microqr;
 
 import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.fiducial.qrcode.*;
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageGray;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.point.Point2D_I32;
@@ -29,6 +28,7 @@ import lombok.Getter;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_F32;
 import org.ddogleg.struct.VerbosePrint;
+import org.ddogleg.util.VerboseUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
@@ -314,7 +314,7 @@ public class MicroQrCodeDecoderImage<T extends ImageGray<T>> implements VerboseP
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
-		this.verbose = BoofMiscOps.addPrefix(this, out);
-		BoofMiscOps.verboseChildren(out, configuration, decoder);
+		this.verbose = VerboseUtils.addPrefix(this, out);
+		VerboseUtils.verboseChildren(out, configuration, decoder);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,7 +35,6 @@ import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.geo.EpipolarError;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.distort.*;
@@ -53,6 +52,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.VerbosePrint;
+import org.ddogleg.util.VerboseUtils;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.ops.DConvertMatrixStruct;
@@ -447,7 +447,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> implement
 	protected abstract boolean processSquare( GrayF32 square, Result result, double edgeInside, double edgeOutside );
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
-		verbose = BoofMiscOps.addPrefix(this, out);
+		verbose = VerboseUtils.addPrefix(this, out);
 	}
 
 	public GrayU8 getBinary() {

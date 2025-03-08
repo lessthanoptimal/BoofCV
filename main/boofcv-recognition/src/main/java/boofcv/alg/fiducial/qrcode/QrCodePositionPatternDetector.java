@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,6 @@ package boofcv.alg.fiducial.qrcode;
 import boofcv.alg.fiducial.calib.squares.SquareGraph;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.alg.shapes.polygon.DetectPolygonFromContour;
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageGray;
 import georegression.geometry.UtilLine2D_F64;
 import georegression.geometry.UtilPoint2D_F64;
@@ -30,6 +29,7 @@ import georegression.struct.line.LineSegment2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import lombok.Getter;
 import org.ddogleg.struct.DogArray;
+import org.ddogleg.util.VerboseUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
@@ -214,6 +214,6 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>>  extends Squa
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
-		this.verbose = BoofMiscOps.addPrefix(this, out);
+		this.verbose = VerboseUtils.addPrefix(this, out);
 	}
 }

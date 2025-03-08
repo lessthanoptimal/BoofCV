@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,6 @@ import boofcv.alg.geo.bundle.CodecSceneStructureMetric;
 import boofcv.alg.geo.calibration.cameras.Zhang99Camera;
 import boofcv.factory.geo.ConfigBundleAdjustment;
 import boofcv.factory.geo.FactoryMultiView;
-import boofcv.misc.BoofMiscOps;
 import boofcv.misc.ConfigConverge;
 import boofcv.struct.calib.CameraModel;
 import boofcv.struct.calib.CameraPinholeBrown;
@@ -38,6 +37,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.optimization.ConfigNonLinearLeastSquares;
 import org.ddogleg.struct.VerbosePrint;
+import org.ddogleg.util.VerboseUtils;
 import org.ejml.data.DMatrixRMaj;
 import org.jetbrains.annotations.Nullable;
 
@@ -357,7 +357,7 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 
 	@Override
 	public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
-		this.verbose = BoofMiscOps.addPrefix(this, out);
+		this.verbose = VerboseUtils.addPrefix(this, out);
 	}
 
 	/**

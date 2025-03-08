@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,6 @@
 package boofcv.alg.mvs;
 
 import boofcv.alg.geo.rectify.DisparityParameters;
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.GrayF32;
@@ -30,6 +29,7 @@ import lombok.Getter;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_F32;
 import org.ddogleg.struct.VerbosePrint;
+import org.ddogleg.util.VerboseUtils;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.ops.DConvertMatrixStruct;
@@ -261,7 +261,7 @@ public class MultiBaselineDisparityErrors implements VerbosePrint {
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
-		this.verbose = BoofMiscOps.addPrefix(this, out);
+		this.verbose = VerboseUtils.addPrefix(this, out);
 	}
 
 	/** All the information for a disparity image */

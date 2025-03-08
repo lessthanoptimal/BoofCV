@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,6 @@
 
 package boofcv.alg.fiducial.calib.ecocheck;
 
-import boofcv.BoofVerbose;
 import boofcv.abst.fiducial.calib.ConfigChessboardX;
 import boofcv.alg.feature.detect.chess.ChessboardCorner;
 import boofcv.alg.feature.detect.chess.DetectChessboardCornersXPyramid;
@@ -42,6 +41,7 @@ import georegression.struct.line.LineSegment2D_F64;
 import georegression.struct.point.Point2D_F64;
 import lombok.Getter;
 import org.ddogleg.struct.*;
+import org.ddogleg.util.VerboseUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
@@ -729,13 +729,13 @@ public class ECoCheckDetector<T extends ImageGray<T>> implements VerbosePrint {
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
-		this.verbose = BoofMiscOps.addPrefix(this, out);
-		BoofMiscOps.verboseChildren(out, configuration, clusterFinder, clusterToGrid);
+		this.verbose = VerboseUtils.addPrefix(this, out);
+		VerboseUtils.verboseChildren(out, configuration, clusterFinder, clusterToGrid);
 
 		if (configuration == null)
 			return;
 
-		runtimeProfiling = configuration.contains(BoofVerbose.RUNTIME);
+		runtimeProfiling = configuration.contains(VerboseUtils.RUNTIME);
 	}
 
 	/**

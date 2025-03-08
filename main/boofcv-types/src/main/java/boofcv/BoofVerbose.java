@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ package boofcv;
  *
  * @author Peter Abeles
  */
+@Deprecated
 public final class BoofVerbose {
 	/**
 	 * Pass along these arguments to all fields that support verbose printing too

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,6 +30,7 @@ import org.ddogleg.solver.PolynomialOps;
 import org.ddogleg.solver.PolynomialRoots;
 import org.ddogleg.solver.RootFinderType;
 import org.ddogleg.struct.VerbosePrint;
+import org.ddogleg.util.VerboseUtils;
 import org.ejml.UtilEjml;
 import org.ejml.data.Complex_F64;
 import org.ejml.data.DMatrix2x2;
@@ -270,6 +271,6 @@ public class KannalaBrandtPtoS_F64 implements Point2Transform3_F64, VerbosePrint
 	}
 
 	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
-		verbose = BoofMiscOps.addPrefix(this, out);
+		verbose = VerboseUtils.addPrefix(this, out);
 	}
 }

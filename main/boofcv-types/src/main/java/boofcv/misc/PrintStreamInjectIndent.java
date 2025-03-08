@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,6 +27,7 @@ import java.io.PrintStream;
  *
  * @author Peter Abeles
  */
+@Deprecated
 public class PrintStreamInjectIndent extends PrintStream {
 	public PrintStreamInjectIndent( String prefix, int numIndent, PrintStream out ) {
 		super(new Injector(out, prefix, numIndent*2));
