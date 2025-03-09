@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,6 +48,34 @@ public class PointIndex2D_F64 extends PointIndex<PointIndex2D_F64, Point2D_F64> 
 		this.p.setTo(x, y);
 		this.index = index;
 		return this;
+	}
+
+	public boolean isIdentical( double x, double y, int index ) {
+		if (this.index != index)
+			return false;
+		if (p.x != x)
+			return false;
+		if (p.y != y)
+			return false;
+		return true;
+	}
+
+	public boolean isIdentical( PointIndex2D_F64 o ) {
+		if (index != o.index)
+			return false;
+		if (p.x != o.p.x)
+			return false;
+		if (p.y != o.p.y)
+			return false;
+		return true;
+	}
+
+	public boolean isIdentical( PointIndex2D_F64 o, double tol ) {
+		if (index != o.index)
+			return false;
+		if (Math.abs(p.x - o.p.x) > tol || Math.abs(p.y - o.p.y) > tol)
+			return false;
+		return true;
 	}
 
 	@Override
