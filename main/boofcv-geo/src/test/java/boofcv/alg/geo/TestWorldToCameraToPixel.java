@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,12 +38,13 @@ public class TestWorldToCameraToPixel extends BoofStandardJUnit {
 	Se3_F64 worldToCamera = new Se3_F64();
 
 	Point3D_F64 infront = new Point3D_F64(-0.1, 0.2, 0);
-	Point3D_F64 behind = new Point3D_F64(-0.1, 0.2, -4);
+	Point3D_F64 behind = new Point3D_F64(-0.15, 0.3, -4);
 
 	Point4D_F64 infront4 = new Point4D_F64(-0.2, 0.4, 0, 2.0);
-	Point4D_F64 behind4 = new Point4D_F64(0.2, -0.4, 8, -2.0);
+	Point4D_F64 behind4 = new Point4D_F64(0.3, -0.6, 8, -2.0);
 
 	Point2D_F64 expectedInFront = new Point2D_F64();
+	Point2D_F64 expectedInBehind = new Point2D_F64();
 
 	public TestWorldToCameraToPixel() {
 		worldToCamera.getT().setTo(0, 0, 3);
@@ -51,6 +52,9 @@ public class TestWorldToCameraToPixel extends BoofStandardJUnit {
 		var tmp = new Point3D_F64();
 		SePointOps_F64.transform(worldToCamera, infront, tmp);
 		normToPixel.compute(tmp.x/tmp.z, tmp.y/tmp.z, expectedInFront);
+
+		SePointOps_F64.transform(worldToCamera, behind, tmp);
+		normToPixel.compute(tmp.x/tmp.z, tmp.y/tmp.z, expectedInBehind);
 	}
 
 	@Test void transform_two() {
@@ -62,6 +66,7 @@ public class TestWorldToCameraToPixel extends BoofStandardJUnit {
 		assertTrue(worldToPixel.transform(infront, found));
 		assertTrue(found.distance(expectedInFront) < 1e-8);
 		assertFalse(worldToPixel.transform(behind, found));
+		assertEquals(0.0, found.distance(expectedInBehind), 1e-8);
 	}
 
 	@Test void transform_one() {
@@ -70,9 +75,9 @@ public class TestWorldToCameraToPixel extends BoofStandardJUnit {
 
 		var found = worldToPixel.transform(infront);
 
-		assertTrue(found != null);
+		assertNotNull(found);
 		assertTrue(found.distance(expectedInFront) < 1e-8);
-		assertTrue(null == worldToPixel.transform(behind));
+		assertNull(worldToPixel.transform(behind));
 	}
 
 	@Test void transform4_two() {
@@ -84,5 +89,6 @@ public class TestWorldToCameraToPixel extends BoofStandardJUnit {
 		assertTrue(worldToPixel.transform(infront4, found));
 		assertEquals(0.0, found.distance(expectedInFront), 1e-8);
 		assertFalse(worldToPixel.transform(behind4, found));
+		assertEquals(0.0, found.distance(expectedInBehind), 1e-8);
 	}
 }

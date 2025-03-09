@@ -13,6 +13,10 @@ Version : 1.1.9
 - VerboseUtils
   * Moving verbose related utilities into DDogleg
   * Deprecated functions in BoofCV
+- PointIndex2D_F64
+  * Added isIdentical()
+- WorldToCameraToPixel
+  * Projects the point even if it's behind the camera
 
 ---------------------
 Date    : 2025/Mar/06

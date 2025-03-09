@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,19 +38,19 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings({"NullAway.Init"})
+@Getter @SuppressWarnings({"NullAway.Init"})
 public class WorldToCameraToPixel {
 
 	/** transform from world to camera reference frames */
-	@Getter private Se3_F64 worldToCamera;
+	private Se3_F64 worldToCamera;
 
 	/** storage for point in camera frame */
-	@Getter private Point3D_F64 cameraPt = new Point3D_F64();
+	private final Point3D_F64 cameraPt = new Point3D_F64();
 
-	@Getter private Point4D_F64 cameraPt4 = new Point4D_F64();
+	private final Point4D_F64 cameraPt4 = new Point4D_F64();
 
 	/** transform from normalized image coordinates into pixels */
-	@Getter private Point2Transform2_F64 normToPixel;
+	private Point2Transform2_F64 normToPixel;
 
 	/**
 	 * Specifies intrinsic camera parameters and  the transform from world to camera.
@@ -79,55 +79,50 @@ public class WorldToCameraToPixel {
 	}
 
 	/**
-	 * Computes the observed location of the specified point in world coordinates in the camera pixel. If
-	 * the object can't be viewed because it is behind the camera then false is returned.
+	 * Projects the 3D point onto an image pixel. The point is projected even if it's physically impossible for
+	 * it to be viewed. True is returned if the point is in front of the camera and false otherwise.
 	 *
-	 * @param worldPt Location of point in world frame
-	 * @param pixelPt Pixel observation of point.
+	 * @param worldPt (Input) Location of point in world frame. Homogeneous coordinates.
+	 * @param pixelPt (Output) Pixel observation of point.
 	 * @return True if visible (+z) or false if not visible (-z)
 	 */
 	public boolean transform( Point3D_F64 worldPt, Point2D_F64 pixelPt ) {
 		SePointOps_F64.transform(worldToCamera, worldPt, cameraPt);
-
-		// can't see the point
-		if (cameraPt.z <= 0)
-			return false;
-
 		normToPixel.compute(cameraPt.x/cameraPt.z, cameraPt.y/cameraPt.z, pixelPt);
-		return true;
+		return cameraPt.z > 0;
 	}
 
+	/**
+	 * Projects the 3D point onto an image in normalized image coordinates. The point is projected even if
+	 * it's physically impossible for it to be viewed. True is returned if the point is in front of the camera and false otherwise.
+	 *
+	 * @param worldPt (Input) Location of point in world frame. Homogeneous coordinates.
+	 * @param normPt (Output) Normalized image coordinate.
+	 * @return True if visible (+z) or false if not visible (-z)
+	 */
 	public boolean transform( Point3D_F64 worldPt, Point2D_F64 pixelPt, Point2D_F64 normPt ) {
 		SePointOps_F64.transform(worldToCamera, worldPt, cameraPt);
-
-		// can't see the point
-		if (cameraPt.z <= 0)
-			return false;
 
 		normPt.x = cameraPt.x/cameraPt.z;
 		normPt.y = cameraPt.y/cameraPt.z;
 
 		normToPixel.compute(normPt.x, normPt.y, pixelPt);
-		return true;
+		return cameraPt.z > 0;
 	}
 
 	/**
-	 * Computes the observed location of the specified point in world coordinates in the camera pixel. If
-	 * the object can't be viewed because it is behind the camera then false is returned.
+	 * Projects the 3D point onto an image pixel. The point is projected even if it's physically impossible for
+	 * it to be viewed. True is returned if the point is in front of the camera and false otherwise.
 	 *
-	 * @param worldPt Location of point in world frame. Homogeneous coordinates.
-	 * @param pixelPt Pixel observation of point.
+	 * @param worldPt (Input) Location of point in world frame. Homogeneous coordinates.
+	 * @param pixelPt (Output) Pixel observation of point.
 	 * @return True if visible (+z) or false if not visible (-z)
 	 */
 	public boolean transform( Point4D_F64 worldPt, Point2D_F64 pixelPt ) {
 		SePointOps_F64.transform(worldToCamera, worldPt, cameraPt4);
 
-		// can't see the point
-		if (PerspectiveOps.isBehindCamera(cameraPt4))
-			return false;
-
 		normToPixel.compute(cameraPt4.x/cameraPt4.z, cameraPt4.y/cameraPt4.z, pixelPt);
-		return true;
+		return !PerspectiveOps.isBehindCamera(cameraPt4);
 	}
 
 	/**
