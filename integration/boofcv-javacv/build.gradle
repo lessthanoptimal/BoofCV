@@ -1,21 +1,11 @@
-
-// Hack around gradle including stuff it shouldn't
-configurations {
-	all*.exclude group: 'org.bytedeco', module: 'javacpp-presets'
-}
-
 dependencies {
 	api project(':main:boofcv-ip')
 	api project(':main:boofcv-io')
 	api project(':main:boofcv-geo')
-
+    
 	api project(':integration:boofcv-swing')
 
-	api group: 'org.bytedeco', name: 'javacv', version: '1.4.4'
-
-	native_arch.each {
-		implementation group: 'org.bytedeco.javacpp-presets', name: "opencv", version: '4.0.1-1.4.4', classifier: "${it}"
-	}
+	implementation group: 'org.bytedeco', name: 'opencv-platform', version: '4.10.0-1.5.11'
 }
 
 sourceSets { test { java { srcDir 'src/main/examples' } } }

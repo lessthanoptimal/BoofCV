@@ -269,7 +269,7 @@ subprojects {
     }
 
     spotless {
-        ratchetFrom 'origin/SNAPSHOT'
+//        ratchetFrom 'origin/SNAPSHOT'
 
         format 'misc', {
             // define the files to apply `misc` to

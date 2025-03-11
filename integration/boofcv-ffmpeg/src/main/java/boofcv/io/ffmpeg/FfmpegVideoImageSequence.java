@@ -27,11 +27,11 @@ import org.bytedeco.copiedstuff.FFmpegFrameGrabber;
 import org.bytedeco.copiedstuff.Frame;
 import org.bytedeco.copiedstuff.FrameGrabber;
 import org.bytedeco.copiedstuff.Java2DFrameConverter;
+import org.bytedeco.ffmpeg.global.avutil;
 
 import java.awt.image.BufferedImage;
 
-import static org.bytedeco.javacpp.avutil.AV_LOG_ERROR;
-import static org.bytedeco.javacpp.avutil.av_log_set_level;
+import static org.bytedeco.ffmpeg.global.avutil.av_log_set_level;
 
 /**
  * Uses JavaCV, which uses FFMPEG, to read in a video.
@@ -55,7 +55,9 @@ public class FfmpegVideoImageSequence<T extends ImageBase<T>> implements SimpleI
 
 	public FfmpegVideoImageSequence(String filename, ImageType<T> imageType ) {
 		// Turn off that super annoying error message!
-		av_log_set_level(AV_LOG_ERROR);
+		
+		
+		av_log_set_level(avutil.AV_LOG_ERROR);
 
 		this.filename = filename;
 		this.imageType = imageType;
