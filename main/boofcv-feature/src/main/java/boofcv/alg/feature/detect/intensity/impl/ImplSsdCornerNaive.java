@@ -24,7 +24,7 @@ import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Naive implementation of {@link boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity} which performs computations in a straight

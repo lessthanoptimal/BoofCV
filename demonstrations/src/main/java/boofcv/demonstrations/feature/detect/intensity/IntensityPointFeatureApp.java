@@ -44,7 +44,7 @@ import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.*;
 import georegression.struct.point.Point2D_I16;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;

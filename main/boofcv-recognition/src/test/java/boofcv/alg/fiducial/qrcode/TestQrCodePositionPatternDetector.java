@@ -30,7 +30,7 @@ import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import java.awt.*;

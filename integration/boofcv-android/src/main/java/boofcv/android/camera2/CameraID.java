@@ -18,7 +18,7 @@
 
 package boofcv.android.camera2;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 

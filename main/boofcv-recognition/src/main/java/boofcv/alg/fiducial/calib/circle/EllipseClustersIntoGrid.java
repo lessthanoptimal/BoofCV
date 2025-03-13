@@ -25,7 +25,7 @@ import georegression.struct.point.Point2D_F64;
 import org.ddogleg.sorting.QuickSortComparator;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.FastArray;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;

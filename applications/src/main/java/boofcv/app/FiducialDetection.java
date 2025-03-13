@@ -45,7 +45,7 @@ import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.so.Quaternion_F64;
 import org.ddogleg.struct.DogArray_F64;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

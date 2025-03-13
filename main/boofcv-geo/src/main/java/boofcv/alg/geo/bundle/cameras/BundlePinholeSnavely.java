@@ -19,7 +19,7 @@
 package boofcv.alg.geo.bundle.cameras;
 
 import georegression.struct.point.Point2D_F64;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Bundler and Bundle Adjustment in the Large use a different coordinate system. This

@@ -23,7 +23,7 @@ import boofcv.struct.calib.CameraUniversalOmni;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DMatrix3x3;
 import org.ejml.data.DMatrixRMaj;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;

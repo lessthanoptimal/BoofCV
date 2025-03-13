@@ -21,7 +21,7 @@ package boofcv.abst.feature.detect.intensity;
 import boofcv.alg.feature.detect.intensity.FastCornerDetector;
 import boofcv.struct.ListIntPoint2D;
 import boofcv.struct.image.ImageGray;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Wrapper around {@link FastCornerDetector} for {@link GeneralFeatureIntensity}.

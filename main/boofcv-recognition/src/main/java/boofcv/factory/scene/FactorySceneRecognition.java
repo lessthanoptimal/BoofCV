@@ -37,7 +37,7 @@ import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import org.ddogleg.struct.Factory;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Factory for creating {@link SceneRecognition} and related.

@@ -32,7 +32,7 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.PyramidFloat;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;

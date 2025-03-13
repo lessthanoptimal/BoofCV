@@ -24,7 +24,7 @@ import boofcv.alg.color.ColorFormat;
 import boofcv.core.encoding.ConvertYuv420_888;
 import boofcv.struct.image.ImageBase;
 import org.ddogleg.struct.DogArray_I8;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import pabeles.concurrency.GrowArray;
 
 import java.nio.ByteBuffer;

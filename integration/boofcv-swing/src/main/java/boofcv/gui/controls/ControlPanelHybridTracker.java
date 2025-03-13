@@ -32,7 +32,7 @@ import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.ConfigDiscreteLevels;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;

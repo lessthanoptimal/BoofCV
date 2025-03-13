@@ -28,7 +28,7 @@ import boofcv.factory.feature.detect.selector.ConfigSelectLimit;
 import boofcv.factory.feature.detect.selector.FactorySelectLimit;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_I16;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Creates {@link boofcv.abst.feature.detect.extract.NonMaxSuppression} for finding local maximums in feature intensity images.

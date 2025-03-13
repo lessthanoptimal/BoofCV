@@ -39,7 +39,7 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.PyramidFloat;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;

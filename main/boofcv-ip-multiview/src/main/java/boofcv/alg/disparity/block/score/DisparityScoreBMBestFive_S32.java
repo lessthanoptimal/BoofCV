@@ -26,7 +26,7 @@ import boofcv.concurrency.BoofConcurrency;
 import boofcv.misc.Compare_S32;
 import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.*;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import pabeles.concurrency.GrowArray;
 import pabeles.concurrency.IntRangeObjectConsumer;
 

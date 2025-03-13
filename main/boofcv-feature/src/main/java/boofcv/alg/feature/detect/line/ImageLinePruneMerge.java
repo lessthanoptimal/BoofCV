@@ -25,7 +25,7 @@ import georegression.struct.line.LineParametric2D_F32;
 import georegression.struct.line.LineSegment2D_F32;
 import georegression.struct.point.Point2D_F32;
 import org.ddogleg.struct.DogArray;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;

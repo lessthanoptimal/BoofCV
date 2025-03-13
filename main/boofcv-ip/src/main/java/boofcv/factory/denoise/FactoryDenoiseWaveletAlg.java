@@ -26,7 +26,7 @@ import boofcv.alg.denoise.wavelet.DenoiseVisuShrink_F32;
 import boofcv.alg.denoise.wavelet.ShrinkThresholdSoft_F32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Factory for creating wavelet based image denoising classes.

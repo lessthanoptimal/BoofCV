@@ -28,7 +28,7 @@ import boofcv.struct.image.ImageType;
 import boofcv.struct.image.InterleavedU8;
 import lombok.Getter;
 import lombok.Setter;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.event.AncestorEvent;

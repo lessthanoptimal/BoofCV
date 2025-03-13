@@ -19,7 +19,7 @@
 package boofcv.alg.filter.misc;
 
 import boofcv.struct.image.*;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.annotation.Generated;
 

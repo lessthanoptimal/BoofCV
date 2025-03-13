@@ -27,7 +27,7 @@ import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.homography.Homography2D_F32;
 import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F32;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Factory for creating {@link StitchingTransform} of different motion models.

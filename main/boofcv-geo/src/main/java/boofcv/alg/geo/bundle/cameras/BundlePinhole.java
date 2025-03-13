@@ -21,7 +21,7 @@ package boofcv.alg.geo.bundle.cameras;
 import boofcv.abst.geo.bundle.BundleAdjustmentCamera;
 import boofcv.struct.calib.CameraPinhole;
 import georegression.struct.point.Point2D_F64;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;

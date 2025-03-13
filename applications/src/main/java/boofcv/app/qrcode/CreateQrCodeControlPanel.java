@@ -24,7 +24,7 @@ import boofcv.generate.PaperSize;
 import boofcv.generate.Unit;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.StandardAlgConfigPanel;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;

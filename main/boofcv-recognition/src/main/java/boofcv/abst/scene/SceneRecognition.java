@@ -23,7 +23,7 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.VerbosePrint;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.List;

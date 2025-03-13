@@ -19,7 +19,7 @@
 package boofcv.abst.filter.binary;
 
 import boofcv.struct.image.GrayU8;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 

@@ -25,7 +25,7 @@ import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;

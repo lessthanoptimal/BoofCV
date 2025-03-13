@@ -20,7 +20,7 @@ package boofcv.gui.controls;
 
 import boofcv.gui.BoofSwingUtil;
 import boofcv.struct.pyramid.ConfigDiscreteLevels;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;

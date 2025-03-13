@@ -24,7 +24,7 @@ import boofcv.alg.misc.ImageStatistics;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.ConvertRaster;
 import boofcv.struct.image.*;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.awt.image.*;
 

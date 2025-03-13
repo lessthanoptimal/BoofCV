@@ -23,7 +23,7 @@ import boofcv.alg.segmentation.cc.ConnectedTwoRowSpeckleFiller_F32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import lombok.Getter;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.Set;

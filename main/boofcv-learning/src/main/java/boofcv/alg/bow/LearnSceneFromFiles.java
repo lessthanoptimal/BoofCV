@@ -20,7 +20,7 @@ package boofcv.alg.bow;
 
 import boofcv.struct.learning.ClassificationHistogram;
 import boofcv.struct.learning.Confusion;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.File;
 import java.util.*;

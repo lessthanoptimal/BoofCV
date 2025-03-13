@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleMigrationSettings" migrationVersion="1" />
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="gradleJvm" value="temurin-17" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/applications" />
+            <option value="$PROJECT_DIR$/demonstrations" />
+            <option value="$PROJECT_DIR$/examples" />
+            <option value="$PROJECT_DIR$/integration" />
+            <option value="$PROJECT_DIR$/integration/boofcv-WebcamCapture" />
+            <option value="$PROJECT_DIR$/integration/boofcv-all" />
+            <option value="$PROJECT_DIR$/integration/boofcv-ffmpeg" />
+            <option value="$PROJECT_DIR$/integration/boofcv-javacv" />
+            <option value="$PROJECT_DIR$/integration/boofcv-jcodec" />
+            <option value="$PROJECT_DIR$/integration/boofcv-kotlin" />
+            <option value="$PROJECT_DIR$/integration/boofcv-pdf" />
+            <option value="$PROJECT_DIR$/integration/boofcv-swing" />
+            <option value="$PROJECT_DIR$/main" />
+            <option value="$PROJECT_DIR$/main/autocode" />
+            <option value="$PROJECT_DIR$/main/boofcv-core" />
+            <option value="$PROJECT_DIR$/main/boofcv-feature" />
+            <option value="$PROJECT_DIR$/main/boofcv-geo" />
+            <option value="$PROJECT_DIR$/main/boofcv-io" />
+            <option value="$PROJECT_DIR$/main/boofcv-ip" />
+            <option value="$PROJECT_DIR$/main/boofcv-ip-multiview" />
+            <option value="$PROJECT_DIR$/main/boofcv-learning" />
+            <option value="$PROJECT_DIR$/main/boofcv-recognition" />
+            <option value="$PROJECT_DIR$/main/boofcv-reconstruction" />
+            <option value="$PROJECT_DIR$/main/boofcv-sfm" />
+            <option value="$PROJECT_DIR$/main/boofcv-simulation" />
+            <option value="$PROJECT_DIR$/main/boofcv-types" />
+            <option value="$PROJECT_DIR$/main/checks" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>

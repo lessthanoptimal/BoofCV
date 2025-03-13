@@ -28,7 +28,7 @@ import georegression.struct.point.Point4D_F64;
 import org.ejml.data.DMatrix;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.ReshapeMatrix;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Computes the Jacobian for {@link BundleAdjustmentSchur} for generic matrices.

@@ -28,7 +28,7 @@ import boofcv.struct.border.ImageBorder_F64;
 import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.border.ImageBorder_S64;
 import boofcv.struct.image.*;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.annotation.Generated;
 import java.util.Random;

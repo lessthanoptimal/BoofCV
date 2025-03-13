@@ -24,7 +24,7 @@ import boofcv.misc.BoofMiscOps;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.util.VerboseUtils;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.ArrayList;

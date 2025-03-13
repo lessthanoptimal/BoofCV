@@ -19,7 +19,7 @@
 package boofcv.alg.misc;
 
 import boofcv.struct.image.ImageGray;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Functions related to adjusting input pixels to ensure they have a known and fixed range. Can handle the

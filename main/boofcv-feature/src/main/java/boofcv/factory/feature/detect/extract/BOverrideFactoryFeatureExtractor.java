@@ -22,7 +22,7 @@ import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.override.BOverrideClass;
 import boofcv.override.BOverrideManager;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Location of override functions related to {@link FactoryFeatureExtractor}.

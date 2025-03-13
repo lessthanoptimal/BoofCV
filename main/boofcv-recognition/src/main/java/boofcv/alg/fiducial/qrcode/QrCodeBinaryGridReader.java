@@ -31,7 +31,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import lombok.Getter;
 import org.ddogleg.struct.DogArray_F32;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Reads binary values from the qr code's grid. Top left corner of the qr code is it's origin. +x = right and +y = down

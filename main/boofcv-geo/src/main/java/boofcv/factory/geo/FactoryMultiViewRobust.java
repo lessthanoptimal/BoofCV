@@ -44,7 +44,7 @@ import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.ddogleg.fitting.modelset.ransac.Ransac_MT;
 import org.ddogleg.struct.Factory;
 import org.ejml.data.DMatrixRMaj;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Factory for creating robust false-positive tolerant estimation algorithms in multi-view geometry. These

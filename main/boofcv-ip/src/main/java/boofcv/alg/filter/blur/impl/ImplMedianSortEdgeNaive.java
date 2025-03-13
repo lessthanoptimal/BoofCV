@@ -24,7 +24,7 @@ import boofcv.struct.image.GrayI;
 import org.ddogleg.sorting.QuickSelect;
 import org.ddogleg.struct.DogArray_F32;
 import org.ddogleg.struct.DogArray_I32;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.annotation.Generated;
 

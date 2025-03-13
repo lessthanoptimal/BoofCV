@@ -35,7 +35,7 @@ import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;

@@ -20,7 +20,7 @@ package boofcv.gui.feature;
 
 import boofcv.factory.feature.associate.ConfigAssociateNearestNeighbor;
 import boofcv.gui.StandardAlgConfigPanel;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.swing.*;
 

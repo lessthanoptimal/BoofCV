@@ -25,7 +25,7 @@ import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.Planar;
 import georegression.struct.InvertibleTransform;
 import georegression.struct.point.Point2D_F64;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 

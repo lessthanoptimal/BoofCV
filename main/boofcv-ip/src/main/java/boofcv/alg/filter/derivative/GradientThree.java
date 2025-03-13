@@ -29,7 +29,7 @@ import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.image.*;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * <p>

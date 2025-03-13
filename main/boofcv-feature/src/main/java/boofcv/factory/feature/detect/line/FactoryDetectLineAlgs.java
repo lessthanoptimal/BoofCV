@@ -35,7 +35,7 @@ import georegression.fitting.line.ModelManagerLinePolar2D_F32;
 import georegression.struct.line.LinePolar2D_F32;
 import org.ddogleg.fitting.modelset.ModelMatcherPost;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Factory for creating line and line segment detectors.

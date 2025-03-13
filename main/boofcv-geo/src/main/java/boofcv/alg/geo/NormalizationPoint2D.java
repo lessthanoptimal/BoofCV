@@ -24,7 +24,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import org.ejml.data.DMatrix3x3;
 import org.ejml.data.DMatrixRMaj;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Describes how to normalize a set of points such that they have zero mean and variance. This is equivalent

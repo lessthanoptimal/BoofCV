@@ -20,7 +20,7 @@ package boofcv.alg.distort.brown;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Distortion parameters for radial and tangential model

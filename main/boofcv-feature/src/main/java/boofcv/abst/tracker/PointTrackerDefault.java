@@ -20,7 +20,7 @@ package boofcv.abst.tracker;
 
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;

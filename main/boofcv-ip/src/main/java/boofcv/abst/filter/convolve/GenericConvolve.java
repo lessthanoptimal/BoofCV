@@ -24,7 +24,7 @@ import boofcv.struct.border.ImageBorder;
 import boofcv.struct.convolve.KernelBase;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

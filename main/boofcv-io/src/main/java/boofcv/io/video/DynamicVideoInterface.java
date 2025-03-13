@@ -25,7 +25,7 @@ import boofcv.io.wrapper.images.JpegByteImageSequence;
 import boofcv.io.wrapper.images.LoadFileImageSequence;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;

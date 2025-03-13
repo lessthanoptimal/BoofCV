@@ -26,7 +26,7 @@ import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.feature.ControlPanelPointDetector;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.swing.*;
 

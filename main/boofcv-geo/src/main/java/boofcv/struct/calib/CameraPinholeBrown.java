@@ -21,7 +21,7 @@ package boofcv.struct.calib;
 import lombok.Getter;
 import lombok.Setter;
 import org.ejml.FancyPrint;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.Serializable;
 import java.util.Arrays;

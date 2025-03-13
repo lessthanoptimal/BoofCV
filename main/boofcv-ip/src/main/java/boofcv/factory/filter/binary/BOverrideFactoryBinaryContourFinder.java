@@ -21,7 +21,7 @@ package boofcv.factory.filter.binary;
 import boofcv.abst.filter.binary.BinaryLabelContourFinder;
 import boofcv.override.BOverrideClass;
 import boofcv.override.BOverrideManager;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Override for {@link FactoryBinaryContourFinder}.+

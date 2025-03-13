@@ -26,7 +26,7 @@ import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import pabeles.concurrency.GrowArray;
 import pabeles.concurrency.IntRangeObjectConsumer;
 

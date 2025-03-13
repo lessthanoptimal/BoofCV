@@ -42,7 +42,7 @@ import org.ddogleg.clustering.PointDistance;
 import org.ddogleg.struct.BigDogArray_I32;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.FastAccess;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;

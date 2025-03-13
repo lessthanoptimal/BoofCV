@@ -21,7 +21,7 @@ package boofcv.alg.template;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Class which computes the templates' intensity across the entire image

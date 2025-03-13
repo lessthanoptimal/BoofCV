@@ -24,7 +24,7 @@ import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.DogArray_B;
 import org.ddogleg.struct.DogArray_I32;
 import org.ejml.UtilEjml;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;

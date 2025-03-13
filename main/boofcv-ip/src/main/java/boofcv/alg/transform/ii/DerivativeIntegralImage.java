@@ -20,7 +20,7 @@ package boofcv.alg.transform.ii;
 
 import boofcv.struct.image.GrayF32;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Functions related to image derivatives in integral images.

@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.describe.llah;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Arrays;
 

@@ -41,7 +41,7 @@ import org.ddogleg.sorting.QuickSelect;
 import org.ddogleg.struct.*;
 import org.ddogleg.util.VerboseUtils;
 import org.ejml.data.DMatrixRMaj;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.ArrayList;

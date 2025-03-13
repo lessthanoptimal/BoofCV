@@ -41,12 +41,6 @@ repositories {
     maven { url = "https://oss.sonatype.org/content/repositories/snapshots/" }
 }
 
-configurations.configureEach {
-    resolutionStrategy {
-        force "org.jetbrains:annotations:$project.jetnull_version"
-    }
-}
-
 dependencies {
     api project(':main:boofcv-ip')
     api project(':main:boofcv-feature')
@@ -61,9 +55,10 @@ dependencies {
     implementation "androidx.navigation:navigation-ui-ktx:$fragment_version"
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.2.0'
-
-    compileOnly "org.jetbrains:annotations:$project.jetnull_version" // @Nullable
-
+    
+    // Static analysis annotations
+    api("org.jspecify:jspecify:$project.jspecify_version")
+    
     implementation "androidx.annotation:annotation:1.7.1"
 
     annotationProcessor("com.pkware.jabel:jabel-javac-plugin:${project.jabel_version}")

@@ -20,7 +20,7 @@ package boofcv.alg.distort.brown;
 
 import boofcv.struct.distort.Point2Transform2_F64;
 import georegression.struct.point.Point2D_F64;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Given an undistorted normalized pixel coordinate, compute the distorted normalized coordinate.

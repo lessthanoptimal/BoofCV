@@ -33,7 +33,7 @@ import boofcv.struct.ConnectRule;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Factory for low level segmentation algorithms.

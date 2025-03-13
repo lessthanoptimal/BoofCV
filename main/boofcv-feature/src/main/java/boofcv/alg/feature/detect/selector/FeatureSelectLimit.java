@@ -20,7 +20,7 @@ package boofcv.alg.feature.detect.selector;
 
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Selects a subset of the features inside the image until it hits the requested number.

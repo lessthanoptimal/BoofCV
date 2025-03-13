@@ -32,7 +32,7 @@ import georegression.transform.homography.HomographyPointOps_F64;
 import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.struct.DogArray;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.List;

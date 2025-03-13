@@ -22,7 +22,7 @@ import boofcv.alg.geo.bundle.cameras.BundleDummyCamera;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.UtilEjml;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

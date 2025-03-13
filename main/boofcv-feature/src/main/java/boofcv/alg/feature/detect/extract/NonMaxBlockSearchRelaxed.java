@@ -21,7 +21,7 @@ package boofcv.alg.feature.detect.extract;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_I32;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 

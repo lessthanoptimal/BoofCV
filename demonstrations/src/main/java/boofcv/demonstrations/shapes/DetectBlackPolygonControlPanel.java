@@ -25,7 +25,7 @@ import boofcv.factory.shape.ConfigRefinePolygonLineToImage;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.controls.JConfigLength;
 import boofcv.struct.ConnectRule;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;

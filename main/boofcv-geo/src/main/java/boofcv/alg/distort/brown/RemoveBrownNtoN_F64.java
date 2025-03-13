@@ -21,7 +21,7 @@ package boofcv.alg.distort.brown;
 import boofcv.struct.distort.Point2Transform2_F64;
 import georegression.misc.GrlConstants;
 import georegression.struct.point.Point2D_F64;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Converts the observed distorted normalized image coordinates into undistorted normalized image coordinates.

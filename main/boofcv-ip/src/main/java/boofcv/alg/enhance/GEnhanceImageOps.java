@@ -21,7 +21,7 @@ package boofcv.alg.enhance;
 import boofcv.alg.InputSanityCheck;
 import boofcv.struct.image.*;
 import org.ddogleg.struct.DogArray_I32;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import pabeles.concurrency.GrowArray;
 
 /**

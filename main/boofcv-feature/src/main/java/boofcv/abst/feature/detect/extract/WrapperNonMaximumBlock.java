@@ -22,7 +22,7 @@ import boofcv.alg.feature.detect.extract.NonMaxBlock;
 import boofcv.struct.ListIntPoint2D;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Wrapper around the {@link boofcv.alg.feature.detect.extract.NonMaxBlock} class.

@@ -22,7 +22,7 @@ import boofcv.misc.BoofLambdas;
 import boofcv.struct.feature.AssociatedIndex;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.DogArray;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 

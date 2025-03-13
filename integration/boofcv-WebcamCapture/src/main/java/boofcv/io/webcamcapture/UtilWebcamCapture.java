@@ -19,7 +19,7 @@
 package boofcv.io.webcamcapture;
 
 import com.github.sarxos.webcam.Webcam;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.awt.*;
 import java.util.List;

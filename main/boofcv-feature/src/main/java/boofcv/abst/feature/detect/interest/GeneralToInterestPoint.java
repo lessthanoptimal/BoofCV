@@ -28,7 +28,7 @@ import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I16;
 import org.ddogleg.struct.DogArray;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Wrapper around {@link boofcv.alg.feature.detect.interest.GeneralFeatureDetector} to make it compatible with {@link InterestPointDetector}.

@@ -24,7 +24,7 @@ import boofcv.alg.background.BackgroundModelStationary;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * <p>Implementation of {@link BackgroundAlgorithmGmm} for stationary images.</p>

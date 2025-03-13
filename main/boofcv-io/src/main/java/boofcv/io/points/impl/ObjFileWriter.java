@@ -19,7 +19,7 @@
 package boofcv.io.points.impl;
 
 import org.ddogleg.struct.DogArray_I32;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.Writer;

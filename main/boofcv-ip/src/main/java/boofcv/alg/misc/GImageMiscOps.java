@@ -21,7 +21,7 @@ package boofcv.alg.misc;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.border.*;
 import boofcv.struct.image.*;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Random;
 

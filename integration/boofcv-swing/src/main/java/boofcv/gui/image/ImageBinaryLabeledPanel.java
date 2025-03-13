@@ -21,7 +21,7 @@ package boofcv.gui.image;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.struct.image.GrayS32;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;

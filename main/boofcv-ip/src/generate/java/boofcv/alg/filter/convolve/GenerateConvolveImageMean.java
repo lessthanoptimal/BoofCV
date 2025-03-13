@@ -67,7 +67,7 @@ public class GenerateConvolveImageMean extends CodeGeneratorBase {
 				"import org.ddogleg.struct.DogArray_F32;\n" +
 				"import org.ddogleg.struct.DogArray_F64;\n" +
 				"import org.ddogleg.struct.DogArray_I32;\n" +
-				"import org.jetbrains.annotations.Nullable;\n" +
+				"import org.jspecify.annotations.Nullable;\n" +
 				"\n" +
 				"/**\n" +
 				" * <p>Convolves a mean filter across the image. The mean value of all the pixels are computed inside the kernel.</p>\n" +

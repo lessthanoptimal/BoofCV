@@ -65,7 +65,7 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"import org.ddogleg.struct.DogArray_F32;\n" +
 				"import org.ddogleg.struct.DogArray_F64;\n" +
 				"import org.ddogleg.struct.DogArray_I32;\n" +
-				"import org.jetbrains.annotations.Nullable;\n" +
+				"import org.jspecify.annotations.Nullable;\n" +
 				"import pabeles.concurrency.GrowArray;\n" +
 				"\n" +
 				"import javax.annotation.Generated;\n" +

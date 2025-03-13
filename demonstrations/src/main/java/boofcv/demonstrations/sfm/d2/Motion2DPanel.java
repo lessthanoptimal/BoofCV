@@ -27,7 +27,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
 import georegression.transform.homography.HomographyPointOps_F64;
 import org.ddogleg.struct.DogArray;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

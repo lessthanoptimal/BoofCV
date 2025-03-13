@@ -41,7 +41,7 @@ public class GenerateImplMedianSortEdgeNaive extends CodeGeneratorBase {
 				"import boofcv.struct.image.*;\n" +
 				"import org.ddogleg.sorting.QuickSelect;\n" +
 				"import org.ddogleg.struct.*;\n" +
-				"import org.jetbrains.annotations.Nullable;\n" +
+				"import org.jspecify.annotations.Nullable;\n" +
 				"\n" +
 				"import javax.annotation.Generated;\n" +
 				"\n" +

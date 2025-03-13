@@ -33,7 +33,7 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Factory for creating {@link DescribeImageDense}.

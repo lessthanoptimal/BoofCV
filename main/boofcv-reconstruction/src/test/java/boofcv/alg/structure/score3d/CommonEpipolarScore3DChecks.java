@@ -33,7 +33,7 @@ import org.ddogleg.struct.DogArray_I32;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.NormOps_DDRM;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

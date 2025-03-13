@@ -21,7 +21,7 @@ package boofcv.alg.feature.detect.selector;
 import boofcv.struct.image.GrayF32;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Converts {@link FeatureSelectLimit} into {@link FeatureSelectLimitIntensity}.

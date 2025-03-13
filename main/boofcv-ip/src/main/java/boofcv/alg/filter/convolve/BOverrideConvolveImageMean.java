@@ -21,7 +21,7 @@ package boofcv.alg.filter.convolve;
 import boofcv.override.BOverrideClass;
 import boofcv.override.BOverrideManager;
 import boofcv.struct.image.ImageBase;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Override for {@link ConvolveImageMean}

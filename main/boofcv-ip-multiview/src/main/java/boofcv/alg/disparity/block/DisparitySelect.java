@@ -21,7 +21,7 @@ package boofcv.alg.disparity.block;
 import boofcv.alg.disparity.DisparityBlockMatch;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * <p>

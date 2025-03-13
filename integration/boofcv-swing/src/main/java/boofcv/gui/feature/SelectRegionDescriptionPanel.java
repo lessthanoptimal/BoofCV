@@ -22,7 +22,7 @@ import boofcv.gui.BoofSwingUtil;
 import georegression.geometry.UtilPoint2D_I32;
 import georegression.struct.point.Point2D_I32;
 import lombok.Setter;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;

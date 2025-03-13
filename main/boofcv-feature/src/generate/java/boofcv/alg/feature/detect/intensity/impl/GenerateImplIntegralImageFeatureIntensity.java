@@ -40,7 +40,7 @@ public class GenerateImplIntegralImageFeatureIntensity extends CodeGeneratorBase
 				"import boofcv.alg.transform.ii.IntegralImageOps;\n" +
 				"import boofcv.alg.transform.ii.IntegralKernel;\n" +
 				"import boofcv.struct.image.*;\n" +
-				"import org.jetbrains.annotations.Nullable;\n" +
+				"import org.jspecify.annotations.Nullable;\n" +
 				"import javax.annotation.Generated;\n" +
 				"//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;\n" +
 				"//CONCURRENT_INLINE import static boofcv.alg.feature.detect.intensity.impl.ImplIntegralImageFeatureIntensity.computeHessian;\n" +

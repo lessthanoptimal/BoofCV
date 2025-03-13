@@ -129,7 +129,7 @@ public class GenerateConvolvedUnrolled_SB extends CodeGeneratorBase {
 				"import boofcv.misc.BoofMiscOps;\n" +
 				"import boofcv.struct.convolve.*;\n" +
 				"import pabeles.concurrency.GrowArray;\n" +
-				"import org.jetbrains.annotations.Nullable;\n");
+				"import org.jspecify.annotations.Nullable;\n");
 		if (typeInput.compareTo(typeOutput) != 0)
 			out.print("import boofcv.struct.image." + typeOutput + ";\n");
 		out.print("import boofcv.struct.image." + typeInput + ";\n"+

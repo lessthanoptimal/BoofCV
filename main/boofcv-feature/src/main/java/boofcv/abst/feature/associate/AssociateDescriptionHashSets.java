@@ -22,7 +22,7 @@ import gnu.trove.impl.Constants;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import org.ddogleg.struct.DogArray_I32;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Feature set aware association algorithm for use when there is a large sparse set of unique set ID's. Internally

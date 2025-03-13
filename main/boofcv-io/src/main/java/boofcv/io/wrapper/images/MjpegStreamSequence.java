@@ -23,7 +23,7 @@ import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.video.VideoMjpegCodec;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;

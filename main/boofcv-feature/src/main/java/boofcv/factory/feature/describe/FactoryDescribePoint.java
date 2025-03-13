@@ -29,7 +29,7 @@ import boofcv.factory.feature.orientation.FactoryOrientation;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Factory for creating implementations of {@link DescribePointRadiusAngle}.

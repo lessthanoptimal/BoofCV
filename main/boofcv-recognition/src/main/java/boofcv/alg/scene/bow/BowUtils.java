@@ -21,7 +21,7 @@ package boofcv.alg.scene.bow;
 import boofcv.misc.BoofLambdas;
 import org.ddogleg.sorting.QuickSelect;
 import org.ddogleg.struct.FastAccess;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
 

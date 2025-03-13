@@ -19,7 +19,7 @@
 package boofcv.alg.geo.calibration;
 
 import org.ddogleg.struct.DogArray;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * All observations that were captured at the same instance.

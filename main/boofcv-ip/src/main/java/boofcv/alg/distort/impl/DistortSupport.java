@@ -31,7 +31,7 @@ import georegression.struct.point.Point2D_F32;
 import georegression.struct.se.Se2_F32;
 import georegression.transform.ConvertTransform_F32;
 import georegression.transform.InvertibleTransformSequence;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Provides low level functions that {@link boofcv.abst.distort.FDistort} can call.

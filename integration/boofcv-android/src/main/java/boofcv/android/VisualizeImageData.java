@@ -27,7 +27,7 @@ import boofcv.struct.image.*;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I8;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;

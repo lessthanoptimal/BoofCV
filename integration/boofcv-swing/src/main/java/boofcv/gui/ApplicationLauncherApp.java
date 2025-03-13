@@ -24,7 +24,7 @@ import boofcv.io.UtilIO;
 import boofcv.misc.BoofMiscOps;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;

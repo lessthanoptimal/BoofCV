@@ -19,7 +19,7 @@
 package boofcv.alg.feature.detect.selector;
 
 import boofcv.struct.image.GrayF32;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Samples the intensity at the specified point.

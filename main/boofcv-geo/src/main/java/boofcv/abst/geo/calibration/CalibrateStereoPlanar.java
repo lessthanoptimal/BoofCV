@@ -40,7 +40,7 @@ import lombok.Getter;
 import org.ddogleg.struct.DogArray_B;
 import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.VerbosePrint;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.ArrayList;

@@ -23,7 +23,7 @@ import boofcv.core.image.GConvertImage;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * {@link InputToBinary} which will convert the input image into the specified type prior to processing.

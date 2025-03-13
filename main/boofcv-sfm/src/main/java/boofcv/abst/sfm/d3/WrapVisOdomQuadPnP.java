@@ -35,7 +35,7 @@ import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import lombok.Getter;
 import org.ddogleg.struct.DogArray;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.ArrayList;

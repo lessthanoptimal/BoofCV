@@ -30,7 +30,7 @@ import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.util.VerboseUtils;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.ops.DConvertMatrixStruct;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.List;

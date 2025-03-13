@@ -22,7 +22,7 @@ import android.graphics.Bitmap;
 import boofcv.alg.color.ColorFormat;
 import boofcv.struct.image.*;
 import org.ddogleg.struct.DogArray_I8;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.nio.ByteBuffer;
 

@@ -27,7 +27,7 @@ import boofcv.generate.PaperSize;
 import boofcv.generate.Unit;
 import boofcv.gui.BoofSwingUtil;
 import org.apache.commons.io.FilenameUtils;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;

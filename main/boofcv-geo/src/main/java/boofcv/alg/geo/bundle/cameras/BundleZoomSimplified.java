@@ -22,7 +22,7 @@ import boofcv.abst.geo.bundle.BundleAdjustmentCamera;
 import boofcv.abst.geo.bundle.BundleCameraState;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.FancyPrint;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;

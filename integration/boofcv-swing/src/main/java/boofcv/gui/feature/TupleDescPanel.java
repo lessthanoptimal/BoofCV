@@ -19,7 +19,7 @@
 package boofcv.gui.feature;
 
 import boofcv.struct.feature.TupleDesc;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;

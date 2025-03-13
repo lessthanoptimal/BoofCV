@@ -50,7 +50,7 @@ import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageMultiBand;
 import boofcv.struct.image.ImageType;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Creates instances of {@link DetectDescribePoint} for different feature detectors/describers.

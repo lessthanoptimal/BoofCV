@@ -22,7 +22,7 @@ import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BCamera;
 import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.Set;

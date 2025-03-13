@@ -21,7 +21,7 @@ package boofcv.struct.pyramid;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import lombok.Getter;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * <p>

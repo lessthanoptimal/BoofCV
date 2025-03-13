@@ -18,7 +18,7 @@
 
 package boofcv.io.video;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.*;
 import java.util.ArrayList;

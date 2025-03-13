@@ -26,7 +26,7 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * <p>Data structure used to store 3D objects that is native to the STL file format [1,2]. One deviation is

@@ -23,7 +23,7 @@ import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Looks at the difference in pixel values along the edge of a polygon and decides if its a false positive or not.

@@ -26,7 +26,7 @@ import boofcv.io.video.DynamicVideoInterface;
 import boofcv.io.video.VideoInterface;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

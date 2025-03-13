@@ -18,7 +18,7 @@
 
 package boofcv.struct.image;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * <p>

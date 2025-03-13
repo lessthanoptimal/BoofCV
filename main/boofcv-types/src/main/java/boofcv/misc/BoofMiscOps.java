@@ -30,7 +30,7 @@ import org.ddogleg.struct.*;
 import org.ejml.data.DMatrix2x2;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.FMatrix2x2;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import pabeles.concurrency.ConcurrencyOps;
 import pabeles.concurrency.GrowArray;
 

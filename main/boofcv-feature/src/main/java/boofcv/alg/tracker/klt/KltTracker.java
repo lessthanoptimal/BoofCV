@@ -24,7 +24,7 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import lombok.Getter;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 

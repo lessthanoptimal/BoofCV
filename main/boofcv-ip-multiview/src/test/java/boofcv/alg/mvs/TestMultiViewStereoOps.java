@@ -45,7 +45,7 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.se.SpecialEuclideanOps_F64;
 import org.ejml.dense.row.CommonOps_DDRM;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

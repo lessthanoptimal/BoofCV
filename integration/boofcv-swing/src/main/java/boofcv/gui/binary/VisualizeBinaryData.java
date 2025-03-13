@@ -25,7 +25,7 @@ import boofcv.gui.BoofSwingUtil;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 import georegression.struct.point.Point2D_I32;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.awt.*;
 import java.awt.geom.Line2D;

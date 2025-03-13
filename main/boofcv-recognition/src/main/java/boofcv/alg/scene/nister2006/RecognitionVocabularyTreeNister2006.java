@@ -29,7 +29,7 @@ import boofcv.struct.ConfigLength;
 import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.struct.*;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import pabeles.concurrency.GrowArray;
 
 import java.io.PrintStream;

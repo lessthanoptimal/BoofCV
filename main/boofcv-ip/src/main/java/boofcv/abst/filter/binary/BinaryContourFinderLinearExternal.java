@@ -27,7 +27,7 @@ import boofcv.struct.PackedSetsPoint2D_I32;
 import boofcv.struct.image.GrayU8;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.DogArray;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 

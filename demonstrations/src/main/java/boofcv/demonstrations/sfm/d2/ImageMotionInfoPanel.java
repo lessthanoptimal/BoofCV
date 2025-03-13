@@ -22,7 +22,7 @@ import boofcv.factory.tracker.ConfigPointTracker;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.controls.ControlPanelPointTrackers;
 import lombok.Getter;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;

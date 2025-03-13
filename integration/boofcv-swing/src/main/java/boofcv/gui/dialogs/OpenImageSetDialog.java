@@ -22,7 +22,7 @@ import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.image.ImagePanel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.UtilImageIO;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;

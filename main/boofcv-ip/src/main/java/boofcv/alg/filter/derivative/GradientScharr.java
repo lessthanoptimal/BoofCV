@@ -33,7 +33,7 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Implementation of the standard 3x3 Scharr operator. (1/32)*[-1;0;1]**[3 10 3] = (1/3)*[-3 10 -3;0 0 0;3 10 3].

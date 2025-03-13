@@ -22,7 +22,7 @@ import boofcv.concurrency.BoofConcurrency;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.dialogs.JSpringPanel;
 import com.github.weisj.darklaf.LafManager;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;

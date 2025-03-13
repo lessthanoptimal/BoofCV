@@ -42,7 +42,7 @@ import georegression.struct.point.Point3D_F32;
 import georegression.struct.point.Vector3D_F32;
 import georegression.struct.so.Rodrigues_F32;
 import org.ejml.data.FMatrixRMaj;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;

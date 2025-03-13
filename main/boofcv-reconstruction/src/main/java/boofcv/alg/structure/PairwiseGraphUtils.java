@@ -47,7 +47,7 @@ import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastArray;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.ArrayList;

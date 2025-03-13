@@ -25,7 +25,7 @@ import boofcv.alg.transform.ii.impl.ImplIntegralImageOps;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.*;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * <p>

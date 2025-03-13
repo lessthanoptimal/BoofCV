@@ -68,7 +68,7 @@ import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import boofcv.struct.pyramid.PyramidDiscrete;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Random;
 

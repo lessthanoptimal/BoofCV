@@ -28,7 +28,7 @@ import georegression.struct.shapes.Polygon2D_F64;
 import lombok.Getter;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_F32;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
