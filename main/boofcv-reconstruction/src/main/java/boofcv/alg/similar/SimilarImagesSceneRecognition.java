@@ -40,7 +40,7 @@ import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.VerbosePrint;
 import org.ddogleg.util.VerboseUtils;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.*;
@@ -217,7 +217,7 @@ public class SimilarImagesSceneRecognition<Image extends ImageBase<Image>, TD ex
 	}
 
 	@Override public void findSimilar( String target,
-									   @Nullable BoofLambdas.Filter<String> filter,
+									   BoofLambdas.@Nullable Filter<String> filter,
 									   List<String> similarImages ) {
 		similarImages.clear();
 		int imageIndex = imageToIndex.get(target);

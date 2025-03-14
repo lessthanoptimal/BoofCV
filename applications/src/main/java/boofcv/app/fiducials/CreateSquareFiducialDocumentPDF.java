@@ -24,7 +24,7 @@ import boofcv.generate.Unit;
 import boofcv.pdf.PdfFiducialEngine;
 import boofcv.struct.image.GrayU8;
 import org.ddogleg.struct.DogArray_I64;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 
@@ -42,7 +42,7 @@ public class CreateSquareFiducialDocumentPDF extends CreateFiducialDocumentPDF {
 
 	@Nullable DogArray_I64 binaryPatterns;
 	int gridWidth;
-	@Nullable java.util.List<GrayU8> imagePatterns;
+	java.util.@Nullable List<GrayU8> imagePatterns;
 
 	String markerType = "";
 

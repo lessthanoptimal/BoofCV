@@ -28,7 +28,7 @@ import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.distort.PointToPixelTransform_F32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Operations for manipulating lens distortion which do not have F32 and F64 equivalents.

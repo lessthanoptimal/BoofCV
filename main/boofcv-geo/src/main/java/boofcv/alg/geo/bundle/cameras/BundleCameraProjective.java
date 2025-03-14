@@ -20,7 +20,7 @@ package boofcv.alg.geo.bundle.cameras;
 
 import boofcv.abst.geo.bundle.BundleAdjustmentCamera;
 import georegression.struct.point.Point2D_F64;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -44,7 +44,7 @@ public class BundleCameraProjective implements BundleAdjustmentCamera {
 	}
 
 	@Override
-	public void jacobian( double camX, double camY, double camZ, double[] pointX, double[] pointY, boolean computeIntrinsic, @Nullable double[] calibX, @Nullable double[] calibY ) {
+	public void jacobian( double camX, double camY, double camZ, double[] pointX, double[] pointY, boolean computeIntrinsic, double @Nullable [] calibX, double @Nullable [] calibY ) {
 		pointX[0] = 1/camZ;
 		pointX[1] = 0;
 		pointX[2] = -camX/(camZ*camZ);

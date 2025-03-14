@@ -29,7 +29,7 @@ import boofcv.struct.feature.*;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.alg.KdTreeDistance;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Creates algorithms for associating {@link boofcv.struct.feature.TupleDesc_F64} features.

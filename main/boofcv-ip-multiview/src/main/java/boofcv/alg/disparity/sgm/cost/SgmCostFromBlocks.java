@@ -25,7 +25,7 @@ import boofcv.alg.disparity.block.DisparitySelect;
 import boofcv.alg.disparity.sgm.SgmDisparityCost;
 import boofcv.misc.Compare_S32;
 import boofcv.struct.image.*;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Computes the error for SGM using {@link BlockRowScore block matching}.

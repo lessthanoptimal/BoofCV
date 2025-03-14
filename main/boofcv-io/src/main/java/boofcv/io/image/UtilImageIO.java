@@ -24,7 +24,7 @@ import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.struct.image.*;
 import org.apache.commons.io.FilenameUtils;
 import org.ddogleg.struct.DogArray_I8;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;

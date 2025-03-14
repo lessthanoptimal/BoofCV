@@ -29,7 +29,7 @@ import lombok.Setter;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
 import org.ddogleg.struct.*;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.List;
@@ -200,7 +200,7 @@ public class RecognitionNearestNeighborInvertedFile<Point> implements VerbosePri
 	 * @param limit Maximum number of matches it will return.
 	 * @return The best matching image with score from the database
 	 */
-	public boolean query( List<Point> queryImage, @Nullable BoofLambdas.FilterInt filter, int limit ) {
+	public boolean query( List<Point> queryImage, BoofLambdas.@Nullable FilterInt filter, int limit ) {
 		matches.reset();
 
 		// Can't BowMatch to anything if it's empty

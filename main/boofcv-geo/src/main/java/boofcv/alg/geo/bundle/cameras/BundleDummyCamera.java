@@ -20,7 +20,7 @@ package boofcv.alg.geo.bundle.cameras;
 
 import boofcv.abst.geo.bundle.BundleAdjustmentCamera;
 import georegression.struct.point.Point2D_F64;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Map;
 
@@ -47,7 +47,7 @@ public class BundleDummyCamera implements BundleAdjustmentCamera {
 
 	@Override
 	public void jacobian( double camX, double camY, double camZ, double[] pointX, double[] pointY,
-						  boolean computeIntrinsic, @Nullable double[] calibX, @Nullable double[] calibY ) {
+						  boolean computeIntrinsic, double @Nullable [] calibX, double @Nullable [] calibY ) {
 		throw new RuntimeException("Camera model not initialized correctly");
 	}
 

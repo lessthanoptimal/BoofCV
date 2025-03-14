@@ -19,7 +19,7 @@
 package boofcv.app;
 
 import boofcv.io.webcamcapture.OpenWebcamDialog;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.swing.*;
 

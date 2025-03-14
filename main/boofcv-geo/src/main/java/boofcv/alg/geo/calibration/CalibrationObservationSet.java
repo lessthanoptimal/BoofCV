@@ -19,7 +19,7 @@
 package boofcv.alg.geo.calibration;
 
 import org.ddogleg.struct.DogArray;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Set of observed calibration targets in a single frame from a single camera

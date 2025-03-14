@@ -37,7 +37,7 @@ import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.Factory;
 import org.ddogleg.util.VerboseUtils;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -219,7 +219,7 @@ public class FeatureSceneRecognitionNister2006<TD extends TupleDesc<TD>> impleme
 		return storage;
 	}
 
-	@Override public boolean query( Features<TD> query, @Nullable BoofLambdas.Filter<String> filter,
+	@Override public boolean query( Features<TD> query, BoofLambdas.@Nullable Filter<String> filter,
 									int limit, DogArray<SceneRecognition.Match> matches ) {
 		// Default is no matches
 		matches.resize(0);

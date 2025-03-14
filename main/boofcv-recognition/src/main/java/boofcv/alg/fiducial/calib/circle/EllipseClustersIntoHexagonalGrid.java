@@ -21,7 +21,7 @@ package boofcv.alg.fiducial.calib.circle;
 import boofcv.alg.fiducial.calib.circle.EllipsesIntoClusters.Node;
 import georegression.metric.UtilAngle;
 import georegression.struct.curve.EllipseRotated_F64;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -26,7 +26,7 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageDimension;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlCoef_F32;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Implementation of {@link boofcv.abst.transform.wavelet.WaveletTransform} for {@link GrayF32}.

@@ -23,7 +23,7 @@ import boofcv.misc.BoofLambdas;
 import boofcv.struct.feature.AssociatedIndex;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.DogArray;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 
@@ -106,7 +106,7 @@ public class SimilarImagesData implements LookUpSimilarImages {
 	}
 
 	@Override
-	public void findSimilar( String target, @Nullable BoofLambdas.Filter<String> filter, List<String> similarImages ) {
+	public void findSimilar( String target, BoofLambdas.@Nullable Filter<String> filter, List<String> similarImages ) {
 		similarImages.clear();
 		Info info = Objects.requireNonNull(imageMap.get(target));
 		for (int i = 0; i < info.similarViews.size(); i++) {
@@ -159,7 +159,7 @@ public class SimilarImagesData implements LookUpSimilarImages {
 		public final List<Relationship> relationships = new ArrayList<>();
 		public final DogArray<Point2D_F64> features = new DogArray<>(Point2D_F64::new);
 
-		public @Nullable SimilarImagesData.Relationship findRelated( String id ) {
+		public SimilarImagesData.@Nullable Relationship findRelated( String id ) {
 			for (int i = 0; i < relationships.size(); i++) {
 				if (relationships.get(i).id.equals(id))
 					return relationships.get(i);

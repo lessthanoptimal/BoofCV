@@ -4,7 +4,6 @@ plugins {
 
 configurations.all {
 	resolutionStrategy {
-		force "org.jetbrains:annotations:$project.jetnull_version"
 		force "org.jetbrains.kotlin:kotlin-stdlib:1.7.22"
 		force "org.jetbrains.kotlin:kotlin-stdlib-common:1.7.22"
 	}
@@ -12,7 +11,6 @@ configurations.all {
 
 configurations {
 	[annotationProcessor, testAnnotationProcessor].each {
-		it.resolutionStrategy.force "com.google.code.findbugs:jsr305:$project.jsr305_version"
 		it.resolutionStrategy.force "com.google.errorprone:error_prone_annotations:$project.errorprone_version"
 		it.resolutionStrategy.force "com.google.guava:guava:$project.guava_version"
 		it.resolutionStrategy.force "org.checkerframework:checker-qual:2.10.0"

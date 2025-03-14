@@ -22,7 +22,7 @@ import boofcv.override.BOverrideClass;
 import boofcv.override.BOverrideManager;
 import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.ImageBase;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Override for blur image ops functions

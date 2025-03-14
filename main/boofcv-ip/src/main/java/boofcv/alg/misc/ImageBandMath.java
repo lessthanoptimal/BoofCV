@@ -22,7 +22,7 @@ import boofcv.alg.misc.impl.ImplImageBandMath;
 import boofcv.alg.misc.impl.ImplImageBandMath_MT;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.*;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.annotation.Generated;
 

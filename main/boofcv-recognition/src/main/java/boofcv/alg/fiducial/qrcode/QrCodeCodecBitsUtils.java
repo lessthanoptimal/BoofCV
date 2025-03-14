@@ -21,7 +21,7 @@ package boofcv.alg.fiducial.qrcode;
 import org.ddogleg.struct.DogArray_I8;
 import org.ddogleg.struct.VerbosePrint;
 import org.ddogleg.util.VerboseUtils;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;

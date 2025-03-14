@@ -21,7 +21,7 @@ package boofcv.alg.distort.brown;
 import boofcv.struct.distort.Point2Transform2_F64;
 import georegression.misc.GrlConstants;
 import georegression.struct.point.Point2D_F64;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Converts the observed distorted normalized image coordinates into undistorted normalized image coordinates.
@@ -46,7 +46,7 @@ public class RemoveBrownNtoN_F64 implements Point2Transform2_F64 {
 		this.tol = tol;
 	}
 
-	public RemoveBrownNtoN_F64 setDistortion( @Nullable /**/double[] radial, /**/double t1, /**/double t2 ) {
+	public RemoveBrownNtoN_F64 setDistortion( /**/double @Nullable [] radial, /**/double t1, /**/double t2 ) {
 		params = new RadialTangential_F64(radial, t1, t2);
 		return this;
 	}

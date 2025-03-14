@@ -19,7 +19,7 @@
 package boofcv.alg.misc;
 
 import boofcv.struct.image.*;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Collection of functions that project Bands of Planar images onto

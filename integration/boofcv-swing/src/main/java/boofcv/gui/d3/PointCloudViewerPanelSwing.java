@@ -43,7 +43,7 @@ import lombok.Getter;
 import org.ddogleg.struct.BigDogArray_I32;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_B;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -88,7 +88,7 @@ public class PointCloudViewerPanelSwing extends JPanel
 	// If true then fog is rendered. This makes points fade to background color at a distance
 	boolean fog;
 
-	@Nullable PointCloudViewer.Colorizer colorizer;
+	PointCloudViewer.@Nullable Colorizer colorizer;
 
 	// intrinsic camera parameters
 	float hfov = UtilAngle.radian(50);
@@ -307,7 +307,7 @@ public class PointCloudViewerPanelSwing extends JPanel
 	}
 
 	private void renderCloud( CameraPinhole intrinsic,
-							  final @Nullable PointCloudViewer.Colorizer colorizer,
+							  final PointCloudViewer.@Nullable Colorizer colorizer,
 							  float maxDistanceSq ) {
 		if (!rendering.lock.isLocked())
 			throw new RuntimeException("Must be locked already");

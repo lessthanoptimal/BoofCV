@@ -32,7 +32,7 @@ import org.ddogleg.struct.DogArray_F64;
 import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.DogLinkedList;
 import org.ddogleg.struct.DogLinkedList.Element;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;

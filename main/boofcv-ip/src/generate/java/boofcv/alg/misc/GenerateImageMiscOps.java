@@ -56,7 +56,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"import boofcv.struct.border.ImageBorder_F64;\n" +
 				"import boofcv.struct.border.ImageBorder_S32;\n" +
 				"import boofcv.struct.border.ImageBorder_S64;\n" +
-				"import org.jetbrains.annotations.Nullable;\n" +
+				"import org.jspecify.annotations.Nullable;\n" +
 				"import javax.annotation.Generated;\n" +
 				"\n" +
 				"import java.util.Random;\n" +

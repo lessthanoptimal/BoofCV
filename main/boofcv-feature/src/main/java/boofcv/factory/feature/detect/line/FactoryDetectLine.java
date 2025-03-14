@@ -28,7 +28,7 @@ import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Factory for creating high level implementations of {@link DetectLine} and {@link DetectLineSegment}. For more access

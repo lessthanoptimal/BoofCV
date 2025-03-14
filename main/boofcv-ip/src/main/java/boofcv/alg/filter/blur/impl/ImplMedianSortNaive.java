@@ -26,7 +26,7 @@ import boofcv.struct.image.Planar;
 import org.ddogleg.sorting.QuickSelect;
 import org.ddogleg.struct.DogArray_F32;
 import org.ddogleg.struct.DogArray_I32;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import pabeles.concurrency.GrowArray;
 
 //CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;

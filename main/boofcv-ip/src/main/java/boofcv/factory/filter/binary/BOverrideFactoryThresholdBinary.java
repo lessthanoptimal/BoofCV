@@ -23,7 +23,7 @@ import boofcv.override.BOverrideClass;
 import boofcv.override.BOverrideManager;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.image.ImageGray;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Override functions which allows external code to be called instead of BoofCV for thresholding operations.

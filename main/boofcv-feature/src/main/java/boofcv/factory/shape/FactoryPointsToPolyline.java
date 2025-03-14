@@ -20,7 +20,7 @@ package boofcv.factory.shape;
 
 import boofcv.abst.shapes.polyline.*;
 import boofcv.alg.shapes.polyline.splitmerge.SplitMergeLineFit;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Factory for creating instances of {@link PointsToPolyline}

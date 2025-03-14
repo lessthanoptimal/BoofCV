@@ -31,7 +31,7 @@ import georegression.struct.se.Se3_F32;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.BigDogArray_I32;
 import org.ddogleg.struct.DogArray;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.swing.*;
 import java.util.List;

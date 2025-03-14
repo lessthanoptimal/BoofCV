@@ -19,7 +19,7 @@
 package boofcv.abst.geo.bundle;
 
 import georegression.struct.point.Point2D_F64;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Map;
 
@@ -83,7 +83,7 @@ public interface BundleAdjustmentCamera {
 	void jacobian( double camX, double camY, double camZ,
 				   double[] pointX, double[] pointY,
 				   boolean computeIntrinsic,
-				   @Nullable double[] calibX, @Nullable double[] calibY );
+				   double @Nullable [] calibX, double @Nullable [] calibY );
 
 	/**
 	 * Returns the number of intrinsic parameters for this model. If the camera is known then the number of parameters

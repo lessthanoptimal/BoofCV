@@ -24,7 +24,7 @@ import boofcv.alg.transform.ii.IntegralKernel;
 //CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS32;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.annotation.Generated;
 

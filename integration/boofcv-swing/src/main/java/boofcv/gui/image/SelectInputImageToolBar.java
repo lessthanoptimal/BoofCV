@@ -18,7 +18,7 @@
 
 package boofcv.gui.image;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -64,7 +64,7 @@ public class SelectInputImageToolBar extends JPanel implements ActionListener {
 		SwingUtilities.invokeLater(() -> imageMenu.addItem(menuName));
 	}
 
-	public void setListener( Listener listener ) {
+	public void setListener( @Nullable Listener listener ) {
 		this.listener = listener;
 	}
 

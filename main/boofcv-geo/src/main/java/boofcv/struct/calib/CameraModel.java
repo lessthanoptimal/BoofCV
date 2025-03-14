@@ -20,7 +20,7 @@ package boofcv.struct.calib;
 
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageDimension;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.Serializable;
 

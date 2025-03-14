@@ -19,7 +19,7 @@
 package boofcv.alg.geo.bundle.cameras;
 
 import georegression.struct.point.Point2D_F64;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Bundler and Bundle Adjustment in the Large use a different coordinate system. This
@@ -36,7 +36,7 @@ public class BundlePinholeSnavely extends BundlePinholeSimplified {
 	@Override
 	public void jacobian( double X, double Y, double Z,
 						  double[] inputX, double[] inputY,
-						  boolean computeIntrinsic, @Nullable double[] calibX, @Nullable double[] calibY ) {
+						  boolean computeIntrinsic, double @Nullable [] calibX, double @Nullable [] calibY ) {
 
 		Z = -Z;
 

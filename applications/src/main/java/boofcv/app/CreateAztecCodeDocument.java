@@ -27,7 +27,7 @@ import boofcv.generate.PaperSize;
 import boofcv.generate.Unit;
 import boofcv.gui.BoofSwingUtil;
 import org.apache.commons.io.FilenameUtils;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
@@ -59,7 +59,7 @@ public class CreateAztecCodeDocument extends BaseMarkerDocument {
 	@Option(name = "--Structure", usage =
 			"The marker's structure. COMPACT or FULL")
 	protected String _structure = "FULL";
-	public @Nullable AztecCode.Structure structure = null;
+	public AztecCode.@Nullable Structure structure = null;
 
 	@Option(name = "--SaveCorners", usage = "Save location of marker corners in the document to corners.txt")
 	boolean saveCorners = false;

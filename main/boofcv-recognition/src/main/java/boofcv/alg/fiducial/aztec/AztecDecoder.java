@@ -24,7 +24,7 @@ import boofcv.misc.BoofMiscOps;
 import lombok.Getter;
 import org.ddogleg.struct.VerbosePrint;
 import org.ddogleg.util.VerboseUtils;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.Objects;
@@ -40,7 +40,7 @@ public class AztecDecoder extends AztecMessageErrorCorrection implements Verbose
 	// Specifies the encoding mode for the active character set
 	Mode current = Mode.UPPER;
 	// If not latched (shift mode) then it will switch back to this mode after 1 character
-	@Nullable AztecCode.Mode shiftMode = null;
+	AztecCode.@Nullable Mode shiftMode = null;
 	// if lacked it won't revert to the old mode
 	boolean latched;
 	// Results of decoded

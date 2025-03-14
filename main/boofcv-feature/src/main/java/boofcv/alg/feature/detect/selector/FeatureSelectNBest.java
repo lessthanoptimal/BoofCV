@@ -23,7 +23,7 @@ import boofcv.struct.image.GrayF32;
 import org.ddogleg.sorting.QuickSelect;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Selects and sorts up to the N best features based on their intensity.

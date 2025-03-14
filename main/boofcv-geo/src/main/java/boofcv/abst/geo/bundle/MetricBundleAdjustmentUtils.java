@@ -28,7 +28,7 @@ import lombok.Setter;
 import org.ddogleg.optimization.ConfigNonLinearLeastSquares;
 import org.ddogleg.struct.VerbosePrint;
 import org.ddogleg.util.VerboseUtils;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.Set;

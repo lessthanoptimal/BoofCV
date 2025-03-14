@@ -20,7 +20,7 @@ package boofcv.gui.image;
 
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.image.ImageGray;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.awt.image.BufferedImage;
 

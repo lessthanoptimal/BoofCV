@@ -19,7 +19,7 @@
 package boofcv.gui.dialogs;
 
 import boofcv.gui.BoofSwingUtil;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;

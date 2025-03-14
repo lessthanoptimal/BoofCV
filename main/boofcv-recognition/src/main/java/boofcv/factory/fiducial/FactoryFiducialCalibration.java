@@ -25,7 +25,7 @@ import boofcv.alg.fiducial.calib.ConfigCalibrationTarget;
 import boofcv.alg.fiducial.calib.chess.DetectChessboardBinaryPattern;
 import boofcv.alg.fiducial.calib.ecocheck.ECoCheckDetector;
 import boofcv.struct.image.GrayF32;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Creates detectors of calibration targets. These detectors return found key points in the image and

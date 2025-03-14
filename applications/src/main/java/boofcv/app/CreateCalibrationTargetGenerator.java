@@ -28,7 +28,7 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.printing.PDFPageable;
 import org.apache.pdfbox.util.Matrix;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.awt.*;
 import java.awt.print.PrinterException;
@@ -73,7 +73,7 @@ public class CreateCalibrationTargetGenerator {
 	public float UNIT_TO_POINTS;
 	public static final float CM_TO_POINTS = 72.0f/2.54f;
 
-	public CreateCalibrationTargetGenerator( String documentName, PaperSize paper, int rows, int cols, Unit units ) {
+	public CreateCalibrationTargetGenerator( @Nullable String documentName, PaperSize paper, int rows, int cols, Unit units ) {
 		this.paper = paper;
 		this.rows = rows;
 		this.cols = cols;

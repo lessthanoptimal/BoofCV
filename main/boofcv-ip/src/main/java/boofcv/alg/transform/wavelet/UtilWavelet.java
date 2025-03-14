@@ -25,7 +25,7 @@ import boofcv.struct.border.BorderType;
 import boofcv.struct.image.*;
 import boofcv.struct.wavelet.WlBorderCoef;
 import boofcv.struct.wavelet.WlCoef;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Various functions which are useful when working with or computing wavelet transforms.

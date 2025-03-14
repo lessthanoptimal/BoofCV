@@ -25,7 +25,7 @@ import boofcv.alg.misc.PixelMath;
 import boofcv.alg.transform.fft.DiscreteFourierTransformOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.InterleavedF32;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Correlation based template matching which uses FFT

@@ -19,7 +19,7 @@
 package boofcv.gui.image;
 
 import boofcv.misc.BoofMiscOps;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;

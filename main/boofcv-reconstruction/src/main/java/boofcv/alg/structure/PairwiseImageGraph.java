@@ -21,7 +21,7 @@ package boofcv.alg.structure;
 import boofcv.struct.feature.AssociatedIndex;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.FastArray;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.List;

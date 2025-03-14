@@ -31,7 +31,7 @@ import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Creates algorithms for describing point features.
@@ -42,7 +42,7 @@ import org.jetbrains.annotations.Nullable;
 public class FactoryDescribeAlgs {
 
 	public static <T extends ImageGray<T>>
-	DescribePointSurf<T> surfSpeed( @Nullable ConfigSurfDescribe.Fast config, Class<T> imageType ) {
+	DescribePointSurf<T> surfSpeed( ConfigSurfDescribe.@Nullable Fast config, Class<T> imageType ) {
 		if (config == null)
 			config = new ConfigSurfDescribe.Fast();
 		config.checkValidity();
@@ -53,7 +53,7 @@ public class FactoryDescribeAlgs {
 	}
 
 	public static <T extends ImageGray<T>>
-	DescribePointSurfMod<T> surfStability( @Nullable ConfigSurfDescribe.Stability config, Class<T> imageType ) {
+	DescribePointSurfMod<T> surfStability( ConfigSurfDescribe.@Nullable Stability config, Class<T> imageType ) {
 		if (config == null)
 			config = new ConfigSurfDescribe.Stability();
 		config.checkValidity();

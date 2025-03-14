@@ -24,7 +24,7 @@ import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.convolve.*;
 import boofcv.struct.image.*;
 import org.ddogleg.struct.DogArray_I32;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import pabeles.concurrency.GrowArray;
 
 import javax.annotation.Generated;

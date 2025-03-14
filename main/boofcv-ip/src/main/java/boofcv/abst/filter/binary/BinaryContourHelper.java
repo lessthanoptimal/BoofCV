@@ -19,7 +19,7 @@
 package boofcv.abst.filter.binary;
 
 import boofcv.struct.image.GrayU8;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -32,7 +32,7 @@ import java.util.Objects;
  */
 public class BinaryContourHelper {
 	// if not null then the binary image will be modified by the contour algorithm and will be padded
-	@Nullable BinaryContourInterface.Padded padded;
+	BinaryContourInterface.@Nullable Padded padded;
 	// contains a sub image without padding
 	@Nullable GrayU8 subimage;
 	GrayU8 binary = new GrayU8(1,1);

@@ -25,7 +25,7 @@ import boofcv.struct.image.ImageBase;
 import georegression.struct.InvertibleTransform;
 import org.ddogleg.fitting.modelset.ModelFitter;
 import org.ddogleg.fitting.modelset.ModelMatcher;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;

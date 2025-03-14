@@ -28,7 +28,7 @@ import boofcv.generate.PaperSize;
 import boofcv.generate.Unit;
 import boofcv.gui.BoofSwingUtil;
 import org.apache.commons.io.FilenameUtils;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
@@ -58,7 +58,7 @@ public class CreateQrCodeDocument extends BaseMarkerDocument {
 
 	@Option(name = "-e", aliases = {"--Error"}, usage = "Error correction level. Options: L,M,Q,H. Robustness: 7%, 15%, 25%, 30%, respectively ")
 	protected String _error = "M";
-	public @Nullable QrCode.ErrorLevel error;
+	public QrCode.@Nullable ErrorLevel error;
 
 	@Option(name = "-v", aliases = {"--Version"}, usage =
 			"QR-Code version. Determines size and amount of data. If unspecified it will be automatically selected based on the data. Values 1 to 40.")
@@ -67,7 +67,7 @@ public class CreateQrCodeDocument extends BaseMarkerDocument {
 	@Option(name = "-n", aliases = {"--Encoding"}, usage =
 			"Type of data that can be encoded. Default is auto select. Options: NUMERIC, ALPHANUMERIC, BYTE, KANJI")
 	protected String _encoding = "AUTO";
-	public @Nullable QrCode.Mode encoding;
+	public QrCode.@Nullable Mode encoding;
 
 	private static void printHelpExit( CmdLineParser parser ) {
 		parser.getProperties().withUsageWidth(120);

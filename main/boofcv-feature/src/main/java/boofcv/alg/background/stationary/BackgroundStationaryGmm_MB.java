@@ -23,7 +23,7 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageMultiBand;
 import boofcv.struct.image.ImageType;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 //CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 

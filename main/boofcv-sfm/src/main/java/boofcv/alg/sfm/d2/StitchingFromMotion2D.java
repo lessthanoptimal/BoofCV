@@ -30,7 +30,7 @@ import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.shapes.Quadrilateral_F64;
 import georegression.struct.shapes.RectangleLength2D_I32;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Stitches together sequences of images using {@link ImageMotion2D}, typically used for image stabilization

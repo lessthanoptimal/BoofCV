@@ -25,7 +25,7 @@ import boofcv.generate.PaperSize;
 import boofcv.generate.Unit;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.StandardAlgConfigPanel;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -58,9 +58,9 @@ public class CreateMicroQrControlPanel extends StandardAlgConfigPanel implements
 
 	int version = -1;
 	String message = "Enter Text Here";
-	@Nullable MicroQrCode.ErrorLevel error = null;
+	MicroQrCode.@Nullable ErrorLevel error = null;
 	@Nullable MicroQrCodeMaskPattern mask = null;
-	@Nullable QrCode.Mode mode = null;
+	QrCode.@Nullable Mode mode = null;
 	PaperSize paperSize;
 	boolean fillGrid = false;
 	public boolean drawGrid = false;

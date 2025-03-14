@@ -22,7 +22,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.nn.alg.KdTreeDistance;
 import org.ddogleg.struct.DogArray_B;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Graph representation of square blobs. Each blob can be connected to at most 4 other shapes which are directly

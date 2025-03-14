@@ -22,7 +22,7 @@ import boofcv.misc.BoofLambdas;
 import boofcv.struct.feature.AssociatedIndex;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.DogArray;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
@@ -50,7 +50,7 @@ public interface LookUpSimilarImages {
 	 * @param similarImages (Output) Storage for IDs of similar images. Cleared upon each call
 	 * @throws IllegalArgumentException If the target is not known
 	 */
-	void findSimilar( String target, @Nullable BoofLambdas.Filter<String> filter, List<String> similarImages );
+	void findSimilar( String target, BoofLambdas.@Nullable Filter<String> filter, List<String> similarImages );
 
 	/**
 	 * Looks up pixel observations of features in the specified view.

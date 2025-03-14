@@ -42,7 +42,7 @@ public class GenerateImageLambdaFilters extends CodeGeneratorBase {
 
 	private void printPreamble() {
 		out.print("import boofcv.struct.image.*;\n" +
-				"import org.jetbrains.annotations.Nullable;\n" +
+				"import org.jspecify.annotations.Nullable;\n" +
 				"\n" +
 				"import javax.annotation.Generated;\n" +
 				"\n" +

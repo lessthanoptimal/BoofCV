@@ -20,7 +20,7 @@ package boofcv.alg.tracker.klt;
 
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.ImagePyramid;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * <p>

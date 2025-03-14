@@ -26,7 +26,7 @@ import boofcv.struct.image.ImageBase;
 import georegression.struct.InvertibleTransform;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.DogArray_B;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;

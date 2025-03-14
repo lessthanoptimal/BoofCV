@@ -21,7 +21,7 @@ package boofcv.abst.feature.detect.intensity;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Provides some basic functionality for implementing {@link GeneralFeatureIntensity}.

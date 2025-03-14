@@ -28,7 +28,7 @@ import boofcv.struct.calib.CameraKannalaBrandt;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeBrown;
 import org.ejml.data.DMatrixRMaj;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Operations related to Bundle Adjustment.

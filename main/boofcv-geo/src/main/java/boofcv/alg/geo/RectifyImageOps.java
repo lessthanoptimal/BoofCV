@@ -30,7 +30,7 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageDimension;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.FMatrixRMaj;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * <p>

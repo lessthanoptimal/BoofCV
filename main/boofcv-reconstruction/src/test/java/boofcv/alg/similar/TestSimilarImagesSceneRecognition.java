@@ -34,7 +34,7 @@ import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -178,7 +178,7 @@ public class TestSimilarImagesSceneRecognition extends GenericLookUpSimilarImage
 
 		@Override
 		public boolean query( Features<TupleDesc_F32> query,
-							  @Nullable BoofLambdas.Filter<String> filter,
+							  BoofLambdas.@Nullable Filter<String> filter,
 							  int limit, DogArray<SceneRecognition.Match> matches ) {
 			matches.reset();
 

@@ -22,7 +22,7 @@ import boofcv.alg.transform.ii.IntegralKernel;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.ImageGray;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Functions for computing feature intensity on an image. Image type agnostic.

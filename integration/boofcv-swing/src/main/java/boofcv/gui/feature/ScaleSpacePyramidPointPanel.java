@@ -24,7 +24,7 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.PyramidFloat;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;

@@ -24,7 +24,7 @@ import boofcv.core.encoding.impl.ImplConvertYuv420_888;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.*;
 import org.ddogleg.struct.DogArray_I8;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import pabeles.concurrency.GrowArray;
 
 import java.nio.ByteBuffer;

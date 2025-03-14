@@ -28,7 +28,7 @@ import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.struct.se.Se3_F64;
 import org.apache.commons.io.IOUtils;
 import org.ejml.data.DMatrixRMaj;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;

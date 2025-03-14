@@ -55,7 +55,7 @@ import org.ddogleg.solver.RootFinderType;
 import org.ddogleg.struct.DogArray;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.DMatrixSparseCSC;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Factory for creating abstracted algorithms related to multi-view geometry

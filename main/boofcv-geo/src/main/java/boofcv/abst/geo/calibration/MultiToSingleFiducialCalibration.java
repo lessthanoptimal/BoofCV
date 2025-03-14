@@ -24,7 +24,7 @@ import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
 import lombok.Getter;
 import lombok.Setter;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 

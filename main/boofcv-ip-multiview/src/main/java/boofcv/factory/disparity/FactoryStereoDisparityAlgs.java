@@ -34,7 +34,7 @@ import boofcv.concurrency.BoofConcurrency;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.factory.transform.census.FactoryCensusTransform;
 import boofcv.struct.image.*;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import static boofcv.factory.disparity.FactoryStereoDisparity.*;
 

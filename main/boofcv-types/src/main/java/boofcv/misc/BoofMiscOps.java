@@ -30,7 +30,7 @@ import org.ddogleg.struct.*;
 import org.ejml.data.DMatrix2x2;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.FMatrix2x2;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import pabeles.concurrency.ConcurrencyOps;
 import pabeles.concurrency.GrowArray;
 
@@ -584,7 +584,7 @@ public class BoofMiscOps {
 		System.out.println();
 	}
 
-	public static int[] convertArray( double[] input, @Nullable int[] output ) {
+	public static int[] convertArray( double[] input, int @Nullable [] output ) {
 		if (output == null)
 			output = new int[input.length];
 
@@ -595,7 +595,7 @@ public class BoofMiscOps {
 		return output;
 	}
 
-	public static long[] convertArray( double[] input, @Nullable long[] output ) {
+	public static long[] convertArray( double[] input, long @Nullable [] output ) {
 		if (output == null)
 			output = new long[input.length];
 
@@ -606,7 +606,7 @@ public class BoofMiscOps {
 		return output;
 	}
 
-	public static float[] convertArray( double[] input, @Nullable float[] output ) {
+	public static float[] convertArray( double[] input, float @Nullable [] output ) {
 		if (output == null)
 			output = new float[input.length];
 
@@ -617,7 +617,7 @@ public class BoofMiscOps {
 		return output;
 	}
 
-	public static double[] convertArray( float[] input, @Nullable double[] output ) {
+	public static double[] convertArray( float[] input, double @Nullable [] output ) {
 		if (output == null)
 			output = new double[input.length];
 
@@ -628,7 +628,7 @@ public class BoofMiscOps {
 		return output;
 	}
 
-	public static int[] convertArray( float[] input, @Nullable int[] output ) {
+	public static int[] convertArray( float[] input, int @Nullable [] output ) {
 		if (output == null)
 			output = new int[input.length];
 
@@ -639,7 +639,7 @@ public class BoofMiscOps {
 		return output;
 	}
 
-	public static float[] convertArray( int[] input, @Nullable float[] output ) {
+	public static float[] convertArray( int[] input, float @Nullable [] output ) {
 		if (output == null)
 			output = new float[input.length];
 
@@ -1054,7 +1054,7 @@ public class BoofMiscOps {
 	/**
 	 * Copies src into dst. If dst is not the correct size then a new instance is created and that returned.
 	 */
-	public static double[] copySmart( double[] src, @Nullable double[] dst ) {
+	public static double[] copySmart( double[] src, double @Nullable [] dst ) {
 		if (dst == null || dst.length != src.length) {
 			dst = new double[src.length];
 		}

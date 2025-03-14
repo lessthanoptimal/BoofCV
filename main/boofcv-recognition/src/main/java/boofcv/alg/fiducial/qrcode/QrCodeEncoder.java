@@ -21,7 +21,7 @@ package boofcv.alg.fiducial.qrcode;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.DogArray_I8;
 import org.ejml.ops.CommonOps_BDRM;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -86,7 +86,7 @@ public class QrCodeEncoder {
 		return this;
 	}
 
-	public QrCodeEncoder setError( @Nullable QrCode.ErrorLevel level ) {
+	public QrCodeEncoder setError( QrCode.@Nullable ErrorLevel level ) {
 		autoErrorCorrection = level == null;
 		if (level != null)
 			qr.error = level;
@@ -422,7 +422,7 @@ public class QrCodeEncoder {
 			// the version is set but the error correction level isn't. Pick the one with
 			// the most error correction that can which can store all the data
 			if (autoErrorCorrection) {
-				@Nullable QrCode.ErrorLevel error = null;
+				QrCode.@Nullable ErrorLevel error = null;
 				QrCode.VersionInfo v = QrCode.VERSION_INFO[qr.version];
 				int dataBits = bitsAtVersion(qr.version);
 				int totalBytes = bitsToBytes(dataBits);

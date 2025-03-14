@@ -36,7 +36,7 @@ import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.VerbosePrint;
 import org.ddogleg.util.VerboseUtils;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.*;
@@ -198,7 +198,7 @@ public class SimilarImagesTrackThenMatch<Image extends ImageBase<Image>, TD exte
 	}
 
 	@Override public void findSimilar( String target,
-									   @Nullable BoofLambdas.Filter<String> filter,
+									   BoofLambdas.@Nullable Filter<String> filter,
 									   List<String> similarImages ) {
 		// discard old results
 		viewId_to_pairs.clear();
@@ -264,7 +264,7 @@ public class SimilarImagesTrackThenMatch<Image extends ImageBase<Image>, TD exte
 	 * Creates a filter which will preemptively remove invalid matches so that only distant valid matches are
 	 * considered
 	 */
-	private BoofLambdas.Filter<String> filterQuery( @Nullable BoofLambdas.Filter<String> filter,
+	private BoofLambdas.Filter<String> filterQuery( BoofLambdas.@Nullable Filter<String> filter,
 													int frameIdx, Frame frameTarget ) {
 		return ( id ) -> {
 			int matchedFrameIdx = Integer.parseInt(id);

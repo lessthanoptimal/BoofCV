@@ -20,7 +20,7 @@ package boofcv.gui.image;
 
 import boofcv.io.image.ConvertBufferedImage;
 import georegression.struct.point.Point2D_F64;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;

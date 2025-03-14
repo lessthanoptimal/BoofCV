@@ -27,7 +27,7 @@ import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
 import boofcv.struct.ConnectRule;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Configuration for {@link boofcv.abst.fiducial.MicroQrCodePreciseDetector}

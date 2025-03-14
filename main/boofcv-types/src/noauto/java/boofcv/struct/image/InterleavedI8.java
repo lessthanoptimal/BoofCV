@@ -18,7 +18,7 @@
 
 package boofcv.struct.image;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * <p>
@@ -63,7 +63,7 @@ public abstract class InterleavedI8<T extends InterleavedI8<T>> extends Interlea
 	 * @param storage If not null then the pixel's value is written here. If null a new array is created.
 	 * @return The pixel's value.
 	 */
-	public byte[] get( int x, int y, @Nullable byte[] storage ) {
+	public byte[] get( int x, int y, byte @Nullable [] storage ) {
 		if (!isInBounds(x, y))
 			throw new ImageAccessException("Requested pixel is out of bounds");
 

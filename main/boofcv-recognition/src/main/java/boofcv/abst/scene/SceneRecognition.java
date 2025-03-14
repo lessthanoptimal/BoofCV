@@ -23,7 +23,7 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.VerbosePrint;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.List;
@@ -73,7 +73,7 @@ public interface SceneRecognition<T extends ImageBase<T>> extends VerbosePrint {
 	 * @return true if at least one valid match was found or false if no valid matches could be found. If false
 	 * that means matches is empty. This is strictly a convenience.
 	 */
-	boolean query( T queryImage, @Nullable BoofLambdas.Filter<String> filter, int limit, DogArray<Match> matches );
+	boolean query( T queryImage, BoofLambdas.@Nullable Filter<String> filter, int limit, DogArray<Match> matches );
 
 	/**
 	 * Returns a list of image IDs in the database

@@ -23,7 +23,7 @@ import boofcv.struct.ConfigLength;
 import boofcv.struct.ConnectRule;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.DogArray;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;

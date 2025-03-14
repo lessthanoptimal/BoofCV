@@ -21,7 +21,7 @@ package boofcv.factory.shape;
 import boofcv.alg.shapes.edge.EdgeIntensityPolygon;
 import boofcv.alg.shapes.polygon.DetectPolygonFromContour;
 import boofcv.struct.Configuration;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Configuration for {@link DetectPolygonFromContour} for use in {@link FactoryShapeDetector}.

@@ -32,7 +32,7 @@ import boofcv.alg.feature.orientation.OrientationHistogramSift;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
 import boofcv.struct.image.GrayF32;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Factory for specific implementations of Detect and Describe feature algorithms.

@@ -27,7 +27,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
 import georegression.transform.homography.HomographyPointOps_F64;
 import org.ddogleg.struct.DogArray;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -73,7 +73,7 @@ public abstract class Motion2DPanel extends ImagePanel {
 		inliers.copyAll(list, ( s, d ) -> d.setTo(s));
 	}
 
-	public synchronized void setAllTracks( @Nullable java.util.List<Point2D_F64> list ) {
+	public synchronized void setAllTracks( java.util.@Nullable List<Point2D_F64> list ) {
 		allTracks.reset();
 		allTracks.copyAll(list, ( s, d ) -> d.setTo(s));
 	}

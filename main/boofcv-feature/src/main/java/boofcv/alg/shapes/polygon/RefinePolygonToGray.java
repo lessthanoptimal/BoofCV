@@ -22,7 +22,7 @@ import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.shapes.Polygon2D_F64;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Refines a polygon using the gray scale image. This results in a more accurate fit than just the contour alone

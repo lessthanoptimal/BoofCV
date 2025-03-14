@@ -19,7 +19,7 @@
 package boofcv.alg.transform.ii;
 
 import boofcv.struct.image.*;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Provides a mechanism to call {@link IntegralImageOps} with unknown types at compile time.

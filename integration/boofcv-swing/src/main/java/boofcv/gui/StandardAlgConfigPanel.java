@@ -23,7 +23,7 @@ import boofcv.gui.controls.JConfigLength;
 import boofcv.gui.controls.JSpinnerNumber;
 import boofcv.misc.BoofLambdas;
 import boofcv.struct.ConfigLength;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;

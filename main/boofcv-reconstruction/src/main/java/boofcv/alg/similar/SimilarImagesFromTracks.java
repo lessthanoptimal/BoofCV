@@ -30,7 +30,7 @@ import gnu.trove.map.TLongIntMap;
 import gnu.trove.map.hash.TLongIntHashMap;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.FastAccess;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 
@@ -214,7 +214,7 @@ public class SimilarImagesFromTracks<Track> implements LookUpSimilarImages {
 	}
 
 	@Override
-	public void findSimilar( String target, @Nullable BoofLambdas.Filter<String> filter, List<String> similarImages ) {
+	public void findSimilar( String target, BoofLambdas.@Nullable Filter<String> filter, List<String> similarImages ) {
 		similarImages.clear();
 		Frame f = Objects.requireNonNull(frameMap.get(target), "Unknown image");
 

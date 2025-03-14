@@ -24,7 +24,7 @@ import boofcv.struct.border.ImageBorder;
 import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.convolve.Kernel2D;
 import boofcv.struct.image.ImageBase;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Override for {@link ConvolveImage}.

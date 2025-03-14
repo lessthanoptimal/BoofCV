@@ -27,7 +27,7 @@ import boofcv.alg.shapes.ellipse.SnapToEllipseEdge;
 import boofcv.alg.shapes.polygon.*;
 import boofcv.factory.filter.binary.FactoryBinaryContourFinder;
 import boofcv.struct.image.ImageGray;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Factory for detecting higher level shapes

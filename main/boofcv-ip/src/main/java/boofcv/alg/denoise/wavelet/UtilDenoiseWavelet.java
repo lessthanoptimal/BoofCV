@@ -21,7 +21,7 @@ package boofcv.alg.denoise.wavelet;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import org.ddogleg.sorting.QuickSelect;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Various functions useful for denoising wavelet transforms.
@@ -49,7 +49,7 @@ public class UtilDenoiseWavelet {
 	 * @param storage Used to temporarily store the absolute value of each element in the subband.
 	 * @return estimated noise variance.
 	 */
-	public static float estimateNoiseStdDev( GrayF32 subband, @Nullable float[] storage ) {
+	public static float estimateNoiseStdDev( GrayF32 subband, float @Nullable [] storage ) {
 		storage = subbandAbsVal(subband, storage);
 
 		int N = subband.width*subband.height;
@@ -60,7 +60,7 @@ public class UtilDenoiseWavelet {
 	 * Computes the absolute value of each element in the subband image are places it into
 	 * 'coef'
 	 */
-	public static float[] subbandAbsVal( GrayF32 subband, @Nullable float[] coef ) {
+	public static float[] subbandAbsVal( GrayF32 subband, float @Nullable [] coef ) {
 		if (coef == null) {
 			coef = new float[subband.width*subband.height];
 		}

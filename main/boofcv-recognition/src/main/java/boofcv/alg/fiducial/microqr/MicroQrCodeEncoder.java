@@ -29,7 +29,7 @@ import org.ddogleg.struct.DogArray_I8;
 import org.ddogleg.struct.VerbosePrint;
 import org.ddogleg.util.VerboseUtils;
 import org.ejml.data.BMatrixRMaj;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.nio.charset.Charset;
@@ -98,7 +98,7 @@ public class MicroQrCodeEncoder implements VerbosePrint {
 		return this;
 	}
 
-	public MicroQrCodeEncoder setError( @Nullable MicroQrCode.ErrorLevel level ) {
+	public MicroQrCodeEncoder setError( MicroQrCode.@Nullable ErrorLevel level ) {
 		autoErrorCorrection = level == null;
 		if (level != null)
 			qr.error = level;
@@ -407,7 +407,7 @@ public class MicroQrCodeEncoder implements VerbosePrint {
 			if (qr.version == 1) {
 				qr.error = MicroQrCode.ErrorLevel.DETECT;
 			} else if (autoErrorCorrection) {
-				@Nullable MicroQrCode.ErrorLevel selected = null;
+				MicroQrCode.@Nullable ErrorLevel selected = null;
 				int encodedDataBits = bitsAtVersion(qr.version);
 
 				// ErrorLevel is ordered from most to least correction

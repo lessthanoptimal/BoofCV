@@ -37,7 +37,7 @@ import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.FMatrixRMaj;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.ejml.ops.ConvertMatrixData;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import static boofcv.misc.BoofMiscOps.checkTrue;
 

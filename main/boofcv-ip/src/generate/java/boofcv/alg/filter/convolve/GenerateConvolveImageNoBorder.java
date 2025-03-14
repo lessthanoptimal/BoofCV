@@ -66,7 +66,7 @@ public class GenerateConvolveImageNoBorder extends CodeGeneratorBase {
 				"import boofcv.struct.convolve.*;\n" +
 				"import boofcv.struct.image.*;\n" +
 				"import org.ddogleg.struct.DogArray_I32;\n" +
-				"import org.jetbrains.annotations.Nullable;\n" +
+				"import org.jspecify.annotations.Nullable;\n" +
 				"\n"+
 				"import javax.annotation.Generated;\n");
 

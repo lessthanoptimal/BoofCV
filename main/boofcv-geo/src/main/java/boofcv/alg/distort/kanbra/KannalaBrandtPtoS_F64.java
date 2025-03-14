@@ -36,7 +36,7 @@ import org.ejml.data.Complex_F64;
 import org.ejml.data.DMatrix2x2;
 import org.ejml.dense.fixed.CommonOps_DDF2;
 import org.ejml.dense.fixed.MatrixFeatures_DDF2;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.Arrays;

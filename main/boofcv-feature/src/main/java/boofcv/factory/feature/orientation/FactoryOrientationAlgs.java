@@ -25,7 +25,7 @@ import boofcv.abst.feature.orientation.OrientationIntegral;
 import boofcv.alg.feature.orientation.*;
 import boofcv.alg.feature.orientation.impl.*;
 import boofcv.struct.image.*;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Creates specific implementations of local region orientation estimators.

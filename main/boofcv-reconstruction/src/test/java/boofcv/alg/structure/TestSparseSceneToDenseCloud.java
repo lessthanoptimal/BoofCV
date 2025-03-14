@@ -31,7 +31,7 @@ import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.se.Se3_F64;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import static boofcv.misc.BoofMiscOps.uniform;

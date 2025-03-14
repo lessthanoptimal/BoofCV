@@ -19,7 +19,7 @@
 package boofcv.abst.sfm;
 
 import georegression.struct.point.Point2D_F64;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 

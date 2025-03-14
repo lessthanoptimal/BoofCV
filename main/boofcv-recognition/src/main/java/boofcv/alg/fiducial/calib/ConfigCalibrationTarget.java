@@ -24,7 +24,7 @@ import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.factory.fiducial.ConfigHammingChessboard;
 import boofcv.factory.fiducial.ConfigHammingGrid;
 import boofcv.struct.Configuration;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Describes the calibration target.

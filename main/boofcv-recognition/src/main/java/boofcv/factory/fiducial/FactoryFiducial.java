@@ -46,7 +46,7 @@ import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import georegression.struct.homography.Homography2D_F64;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Factory for creating fiducial detectors which implement {@link FiducialDetector}.

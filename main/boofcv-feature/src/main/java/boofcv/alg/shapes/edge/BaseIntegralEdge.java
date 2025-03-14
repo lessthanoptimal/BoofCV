@@ -28,7 +28,7 @@ import boofcv.struct.border.BorderType;
 import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F32;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Base class for computing line integrals along lines/edges.

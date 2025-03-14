@@ -21,7 +21,7 @@ package boofcv.alg.geo.bundle.cameras;
 import boofcv.abst.geo.bundle.BundleAdjustmentCamera;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.FancyPrint;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -92,7 +92,7 @@ public class BundlePinholeSimplified implements BundleAdjustmentCamera {
 	@Override
 	public void jacobian( double X, double Y, double Z,
 						  double[] inputX, double[] inputY, boolean computeIntrinsic,
-						  @Nullable double[] calibX, @Nullable double[] calibY ) {
+						  double @Nullable [] calibX, double @Nullable [] calibY ) {
 
 		double normX = X/Z;
 		double normY = Y/Z;

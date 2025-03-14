@@ -23,7 +23,7 @@ import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Census {@link GCensusTransform#dense5x5} transform with output in {@link GrayS32} image.

@@ -35,7 +35,7 @@ import boofcv.struct.border.BorderType;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Factory for implementations of {@link TrackerObjectQuad}, a high level interface for tracking user specified

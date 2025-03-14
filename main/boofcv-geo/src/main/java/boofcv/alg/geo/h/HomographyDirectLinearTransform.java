@@ -34,7 +34,7 @@ import org.ejml.dense.fixed.CommonOps_DDF3;
 import org.ejml.dense.row.linsol.svd.SolveNullSpaceSvd_DDRM;
 import org.ejml.interfaces.SolveNullSpace;
 import org.ejml.simple.SimpleMatrix;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;

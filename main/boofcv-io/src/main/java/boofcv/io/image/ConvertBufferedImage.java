@@ -20,7 +20,7 @@ package boofcv.io.image;
 
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.*;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;

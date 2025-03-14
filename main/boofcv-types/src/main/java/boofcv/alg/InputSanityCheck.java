@@ -21,7 +21,7 @@ package boofcv.alg;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.*;
 import boofcv.struct.pyramid.ImagePyramid;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Operations for basic sanity checks on function arguments. Checks if the contract is being obeyed by the caller.

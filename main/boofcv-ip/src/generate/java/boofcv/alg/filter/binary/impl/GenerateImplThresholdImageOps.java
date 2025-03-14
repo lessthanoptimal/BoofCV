@@ -51,7 +51,7 @@ public class GenerateImplThresholdImageOps extends CodeGeneratorBase {
 				"import pabeles.concurrency.GrowArray;\n" +
 				"import org.ddogleg.struct.DogArray_F32;\n" +
 				"import org.ddogleg.struct.DogArray_I32;\n" +
-				"import org.jetbrains.annotations.Nullable;\n" +
+				"import org.jspecify.annotations.Nullable;\n" +
 				"import boofcv.struct.image.*;\n" +
 				"import boofcv.alg.filter.blur.BlurImageOps;\n" +
 				"import boofcv.struct.ConfigLength;\n" +

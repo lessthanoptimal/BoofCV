@@ -21,7 +21,7 @@ package boofcv.abst.feature.detect.intensity;
 import boofcv.struct.ListIntPoint2D;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Extracts corners from a the image and or its gradient. This is a generalized interface and lacks some of the functionality

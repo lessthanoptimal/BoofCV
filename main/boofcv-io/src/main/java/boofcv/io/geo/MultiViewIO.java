@@ -39,7 +39,7 @@ import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
 import org.ejml.data.DMatrixRMaj;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
@@ -339,7 +339,7 @@ public class MultiViewIO {
 	}
 
 	private static SceneStructureCommon.Point decodeScenePoint( Map<String, Object> map,
-																@Nullable SceneStructureCommon.Point p )
+																SceneStructureCommon.@Nullable Point p )
 			throws IOException {
 		List<Double> coordinate = getOrThrow(map, "coordinate");
 		List<Integer> views = getOrThrow(map, "views");
@@ -378,7 +378,7 @@ public class MultiViewIO {
 	}
 
 	private static SceneStructureCommon.Camera decodeSceneCamera( Map<String, Object> map,
-																  @Nullable SceneStructureCommon.Camera c )
+																  SceneStructureCommon.@Nullable Camera c )
 			throws IOException {
 		if (c == null)
 			c = new SceneStructureCommon.Camera();

@@ -41,7 +41,7 @@ import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.VerbosePrint;
 import org.ddogleg.util.VerboseUtils;
 import org.ejml.data.DMatrixRMaj;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.Objects;
@@ -142,7 +142,7 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 	@Nullable PrintStream verbose = null;
 	@Nullable @Getter @Setter PrintStream verboseProfiling = null;
 
-	public MultiBaselineStereoIndependent( LookUpImages lookUpImages, ImageType<Image> imageType ) {
+	public MultiBaselineStereoIndependent( @Nullable LookUpImages lookUpImages, ImageType<Image> imageType ) {
 		this(imageType);
 		this.lookUpImages = lookUpImages;
 	}

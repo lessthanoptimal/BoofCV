@@ -54,7 +54,7 @@ public class GenerateImageBandMath extends CodeGeneratorBase {
 				"import boofcv.concurrency.BoofConcurrency;\n" +
 				"\n" +
 				"import javax.annotation.Generated;\n" +
-				"import org.jetbrains.annotations.Nullable;\n" +
+				"import org.jspecify.annotations.Nullable;\n" +
 				"\n" +
 				"/**\n" +
 				" * Collection of functions that project Bands of Planar images onto\n" +

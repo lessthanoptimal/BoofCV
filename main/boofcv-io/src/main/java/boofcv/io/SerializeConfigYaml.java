@@ -21,7 +21,7 @@ package boofcv.io;
 import boofcv.BoofVersion;
 import boofcv.io.serialize.SerializeFieldsYamlBase;
 import boofcv.struct.Configuration;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;

@@ -42,7 +42,7 @@ import georegression.struct.point.Point2D_F64;
 import lombok.Getter;
 import org.ddogleg.struct.*;
 import org.ddogleg.util.VerboseUtils;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.Collections;

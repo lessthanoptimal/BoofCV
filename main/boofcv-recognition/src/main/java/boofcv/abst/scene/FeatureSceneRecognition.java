@@ -24,7 +24,7 @@ import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.VerbosePrint;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.List;
@@ -77,7 +77,7 @@ public interface FeatureSceneRecognition<TD extends TupleDesc<TD>> extends Verbo
 	 * that means matches is empty. This is strictly a convenience.
 	 */
 	boolean query( Features<TD> query,
-				   @Nullable BoofLambdas.Filter<String> filter,
+				   BoofLambdas.@Nullable Filter<String> filter,
 				   int limit, DogArray<SceneRecognition.Match> matches );
 
 	/**

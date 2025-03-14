@@ -23,7 +23,7 @@ import boofcv.struct.calib.CameraUniversalOmni;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DMatrix3x3;
 import org.ejml.data.DMatrixRMaj;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -213,7 +213,7 @@ public class BundleUniversalOmni implements BundleAdjustmentCamera {
 	public void jacobian( double camX, double camY, double camZ,
 						  double[] inputX, double[] inputY,
 						  boolean computeIntrinsic,
-						  @Nullable double[] calibX, @Nullable double[] calibY ) {
+						  double @Nullable [] calibX, double @Nullable [] calibY ) {
 		// requires unit spherical coordinates
 		double n2 = camX*camX + camY*camY + camZ*camZ;
 		double n = Math.sqrt(n2);
