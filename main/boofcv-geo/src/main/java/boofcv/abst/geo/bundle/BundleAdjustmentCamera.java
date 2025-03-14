@@ -83,7 +83,7 @@ public interface BundleAdjustmentCamera {
 	void jacobian( double camX, double camY, double camZ,
 				   double[] pointX, double[] pointY,
 				   boolean computeIntrinsic,
-				   @Nullable double[] calibX, @Nullable double[] calibY );
+				   double @Nullable [] calibX, double @Nullable [] calibY );
 
 	/**
 	 * Returns the number of intrinsic parameters for this model. If the camera is known then the number of parameters

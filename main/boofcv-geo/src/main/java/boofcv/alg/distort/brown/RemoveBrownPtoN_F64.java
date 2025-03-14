@@ -84,7 +84,7 @@ public class RemoveBrownPtoN_F64 implements Point2Transform2_F64 {
 		return this;
 	}
 
-	public RemoveBrownPtoN_F64 setDistortion( @Nullable /**/double[] radial, /**/double t1, /**/double t2 ) {
+	public RemoveBrownPtoN_F64 setDistortion( /**/double @Nullable [] radial, /**/double t1, /**/double t2 ) {
 		if (params != null && radial != null && params.radial.length == radial.length) {
 			System.arraycopy(radial, 0, params.radial, 0, radial.length);
 			return this;

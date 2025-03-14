@@ -171,7 +171,7 @@ public class FactoryDetectDescribe {
 	 */
 	public static <T extends ImageGray<T>, II extends ImageGray<II>>
 	DetectDescribePoint<T, TupleDesc_F64> surfFast( @Nullable ConfigFastHessian configDetector,
-													@Nullable ConfigSurfDescribe.Fast configDesc,
+													ConfigSurfDescribe.@Nullable Fast configDesc,
 													@Nullable ConfigAverageIntegral configOrientation,
 													Class<T> imageType ) {
 
@@ -205,7 +205,7 @@ public class FactoryDetectDescribe {
 	 */
 	public static <T extends ImageGray<T>, II extends ImageGray<II>>
 	DetectDescribePoint<T, TupleDesc_F64> surfColorFast( @Nullable ConfigFastHessian configDetector,
-														 @Nullable ConfigSurfDescribe.Fast configDesc,
+														 ConfigSurfDescribe.@Nullable Fast configDesc,
 														 @Nullable ConfigAverageIntegral configOrientation,
 														 ImageType<T> imageType ) {
 
@@ -262,7 +262,7 @@ public class FactoryDetectDescribe {
 	 */
 	public static <T extends ImageGray<T>, II extends ImageGray<II>>
 	DetectDescribePoint<T, TupleDesc_F64> surfStable( @Nullable ConfigFastHessian configDetector,
-													  @Nullable ConfigSurfDescribe.Stability configDescribe,
+													  ConfigSurfDescribe.@Nullable Stability configDescribe,
 													  @Nullable ConfigSlidingIntegral configOrientation,
 													  Class<T> imageType ) {
 
@@ -297,7 +297,7 @@ public class FactoryDetectDescribe {
 	 */
 	public static <T extends ImageMultiBand<T>, II extends ImageGray<II>>
 	DetectDescribePoint<T, TupleDesc_F64> surfColorStable( @Nullable ConfigFastHessian configDetector,
-														   @Nullable ConfigSurfDescribe.Stability configDescribe,
+														   ConfigSurfDescribe.@Nullable Stability configDescribe,
 														   @Nullable ConfigSlidingIntegral configOrientation,
 														   ImageType<T> imageType ) {
 

@@ -18,6 +18,8 @@
 
 package boofcv.io;
 
+import org.jspecify.annotations.NonNull;
+
 import java.io.OutputStream;
 import java.io.PrintStream;
 
@@ -32,7 +34,7 @@ public class MirrorStream extends OutputStream {
 	PrintStream outA, outB;
 	public MirrorStream( PrintStream outA, PrintStream outB ) {this.outA = outA; this.outB = outB;}
 	@Override public void write( int b ) {outA.write(b); outB.write(b);}
-	@Override public void write( byte[] b, int off, int len ) {outA.write(b, off, len); outB.write(b, off, len);}
+	@Override public void write( byte@NonNull[] b, int off, int len ) {outA.write(b, off, len); outB.write(b, off, len);}
 	@Override public void flush() {outA.flush(); outB.flush();}
 	@Override public void close() {outA.close(); outB.close();}
 	//@formatter:on

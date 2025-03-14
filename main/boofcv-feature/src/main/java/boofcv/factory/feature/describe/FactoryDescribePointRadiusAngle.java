@@ -100,7 +100,7 @@ public class FactoryDescribePointRadiusAngle {
 	 * @see DescribePointSurf
 	 */
 	public static <T extends ImageGray<T>, II extends ImageGray<II>>
-	DescribePointRadiusAngle<T, TupleDesc_F64> surfFast( @Nullable ConfigSurfDescribe.Fast config, Class<T> imageType ) {
+	DescribePointRadiusAngle<T, TupleDesc_F64> surfFast( ConfigSurfDescribe.@Nullable Fast config, Class<T> imageType ) {
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
 
 		DescribePointSurf<II> alg = FactoryDescribeAlgs.surfSpeed(config, integralType);
@@ -117,7 +117,7 @@ public class FactoryDescribePointRadiusAngle {
 	 * @see DescribePointSurfPlanar
 	 */
 	public static <T extends ImageMultiBand<T>, II extends ImageGray<II>>
-	DescribePointRadiusAngle<T, TupleDesc_F64> surfColorFast( @Nullable ConfigSurfDescribe.Fast config, ImageType<T> imageType ) {
+	DescribePointRadiusAngle<T, TupleDesc_F64> surfColorFast( ConfigSurfDescribe.@Nullable Fast config, ImageType<T> imageType ) {
 
 		Class bandType = imageType.getImageClass();
 		Class<II> integralType = GIntegralImageOps.getIntegralType(bandType);
@@ -146,7 +146,7 @@ public class FactoryDescribePointRadiusAngle {
 	 * @see DescribePointSurf
 	 */
 	public static <T extends ImageGray<T>, II extends ImageGray<II>>
-	DescribePointRadiusAngle<T, TupleDesc_F64> surfStable( @Nullable ConfigSurfDescribe.Stability config, Class<T> imageType ) {
+	DescribePointRadiusAngle<T, TupleDesc_F64> surfStable( ConfigSurfDescribe.@Nullable Stability config, Class<T> imageType ) {
 
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
 
@@ -164,7 +164,7 @@ public class FactoryDescribePointRadiusAngle {
 	 * @see DescribePointSurfPlanar
 	 */
 	public static <T extends ImageBase<T>, II extends ImageGray<II>>
-	DescribePointRadiusAngle<T, TupleDesc_F64> surfColorStable( @Nullable ConfigSurfDescribe.Stability config, ImageType<T> imageType ) {
+	DescribePointRadiusAngle<T, TupleDesc_F64> surfColorStable( ConfigSurfDescribe.@Nullable Stability config, ImageType<T> imageType ) {
 
 		Class bandType = imageType.getImageClass();
 		Class<II> integralType = GIntegralImageOps.getIntegralType(bandType);

@@ -96,7 +96,7 @@ public class BundleZoomSimplified implements BundleAdjustmentCamera {
 	@Override
 	public void jacobian( double X, double Y, double Z,
 						  double[] inputX, double[] inputY, boolean computeIntrinsic,
-						  @Nullable double[] calibX, @Nullable double[] calibY ) {
+						  double @Nullable [] calibX, double @Nullable [] calibY ) {
 		double focalLength = fOff + zoom*fScale;
 		double normX = X/Z;
 		double normY = Y/Z;

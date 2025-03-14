@@ -142,7 +142,7 @@ public class MultiBaselineStereoIndependent<Image extends ImageGray<Image>> impl
 	@Nullable PrintStream verbose = null;
 	@Nullable @Getter @Setter PrintStream verboseProfiling = null;
 
-	public MultiBaselineStereoIndependent( LookUpImages lookUpImages, ImageType<Image> imageType ) {
+	public MultiBaselineStereoIndependent( @Nullable LookUpImages lookUpImages, ImageType<Image> imageType ) {
 		this(imageType);
 		this.lookUpImages = lookUpImages;
 	}

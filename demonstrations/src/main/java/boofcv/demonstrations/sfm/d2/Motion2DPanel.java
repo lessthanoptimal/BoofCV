@@ -73,7 +73,7 @@ public abstract class Motion2DPanel extends ImagePanel {
 		inliers.copyAll(list, ( s, d ) -> d.setTo(s));
 	}
 
-	public synchronized void setAllTracks( @Nullable java.util.List<Point2D_F64> list ) {
+	public synchronized void setAllTracks( java.util.@Nullable List<Point2D_F64> list ) {
 		allTracks.reset();
 		allTracks.copyAll(list, ( s, d ) -> d.setTo(s));
 	}

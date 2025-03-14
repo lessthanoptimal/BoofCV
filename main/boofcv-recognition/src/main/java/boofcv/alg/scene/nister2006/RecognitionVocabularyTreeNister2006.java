@@ -162,7 +162,7 @@ public class RecognitionVocabularyTreeNister2006<Point> implements VerbosePrint 
 	 * @param limit Maximum number of matches it will return.
 	 * @return The best matching image with score from the database
 	 */
-	public boolean query( List<Point> queryImage, @Nullable BoofLambdas.FilterInt filter, int limit ) {
+	public boolean query( List<Point> queryImage, BoofLambdas.@Nullable FilterInt filter, int limit ) {
 		matches.reset();
 
 		// Can't BowMatch to anything if it's empty

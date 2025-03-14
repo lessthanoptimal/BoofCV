@@ -178,7 +178,7 @@ public class BoofSwingUtil {
 		return response;
 	}
 
-	public static @Nullable OpenStereoSequencesChooser.Selected openStereoChooser(
+	public static OpenStereoSequencesChooser.@Nullable Selected openStereoChooser(
 			Window parent, @Nullable Class<?> owner, boolean isSequence, boolean justImages ) {
 		Preferences prefs;
 		if (owner == null) {
@@ -277,7 +277,7 @@ public class BoofSwingUtil {
 											  @Nullable Component parent,
 											  boolean openFile,
 											  String defaultPath,
-											  @Nullable BoofLambdas.MassageString massageName,
+											  BoofLambdas.@Nullable MassageString massageName,
 											  FileTypes... filters ) {
 
 		if (preferenceName == null && parent != null) {

@@ -98,7 +98,7 @@ public class TestBundleCameraNumericJacobian extends BoofStandardJUnit {
 		@Override
 		public void jacobian( double camX, double camY, double camZ,
 							  double[] pointX, double[] pointY, boolean computeIntrinsic,
-							  @Nullable double[] calibX, @Nullable double[] calibY ) {
+							  double @Nullable [] calibX, double @Nullable [] calibY ) {
 			pointX[0] = 1.0/camZ;
 			pointX[1] = 0;
 			pointX[2] = -(camX + a)/(camZ*camZ);

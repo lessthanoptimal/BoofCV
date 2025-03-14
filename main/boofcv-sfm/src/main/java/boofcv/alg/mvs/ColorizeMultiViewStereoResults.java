@@ -112,7 +112,7 @@ public class ColorizeMultiViewStereoResults<T extends ImageBase<T>> {
 			int idx1 = mvs.getDisparityCloud().viewPointIdx.get(centerIdx + 1);
 
 			// State of the camera in this view
-			@Nullable BundleCameraState state = observations != null ? observations.getView(centerIdx).cameraState : null;
+			BundleCameraState state = observations != null ? observations.getView(centerIdx).cameraState : null;
 
 			// Setup the camera projection model using bundle adjustment model directly
 			BundleAdjustmentOps.convert(scene.getViewCamera(center.metric).model, state, image.width, image.height, intrinsic);
@@ -169,7 +169,7 @@ public class ColorizeMultiViewStereoResults<T extends ImageBase<T>> {
 			SceneStructureMetric.View v = scene.views.get(viewIdx);
 
 			// State of the camera in this view
-			@Nullable BundleCameraState state = observations != null ? observations.getView(viewIdx).cameraState : null;
+			BundleCameraState state = observations != null ? observations.getView(viewIdx).cameraState : null;
 
 			// Setup the camera projection model using bundle adjustment model directly
 			BundleAdjustmentOps.convert(scene.getViewCamera(v).model, state, image.width, image.height, intrinsic);

@@ -47,7 +47,7 @@ public class BundleDummyCamera implements BundleAdjustmentCamera {
 
 	@Override
 	public void jacobian( double camX, double camY, double camZ, double[] pointX, double[] pointY,
-						  boolean computeIntrinsic, @Nullable double[] calibX, @Nullable double[] calibY ) {
+						  boolean computeIntrinsic, double @Nullable [] calibX, double @Nullable [] calibY ) {
 		throw new RuntimeException("Camera model not initialized correctly");
 	}
 

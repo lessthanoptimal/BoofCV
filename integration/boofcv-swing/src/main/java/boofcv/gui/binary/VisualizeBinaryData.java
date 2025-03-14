@@ -40,7 +40,7 @@ import java.util.Random;
  */
 public class VisualizeBinaryData {
 	public static BufferedImage renderContours( List<EdgeContour> edges,
-												@Nullable int[] colors,
+												int @Nullable [] colors,
 												int width, int height,
 												@Nullable BufferedImage out ) {
 		if (out == null) {
@@ -114,7 +114,7 @@ public class VisualizeBinaryData {
 	 * @return Rendered contours
 	 */
 	public static BufferedImage renderContours( List<Contour> contours,
-												@Nullable int[] colorExternal, int colorInternal,
+												int @Nullable [] colorExternal, int colorInternal,
 												int width, int height, @Nullable BufferedImage out ) {
 		if (out == null) {
 			out = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
@@ -162,7 +162,7 @@ public class VisualizeBinaryData {
 		}
 	}
 
-	public static int[] checkColors( @Nullable int[] colors, int size ) {
+	public static int[] checkColors( int @Nullable [] colors, int size ) {
 		if (colors == null) {
 			colors = new int[size];
 			Random rand = new Random(123);

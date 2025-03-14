@@ -217,7 +217,7 @@ public class SimilarImagesSceneRecognition<Image extends ImageBase<Image>, TD ex
 	}
 
 	@Override public void findSimilar( String target,
-									   @Nullable BoofLambdas.Filter<String> filter,
+									   BoofLambdas.@Nullable Filter<String> filter,
 									   List<String> similarImages ) {
 		similarImages.clear();
 		int imageIndex = imageToIndex.get(target);

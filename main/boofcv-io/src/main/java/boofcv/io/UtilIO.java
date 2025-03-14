@@ -32,6 +32,7 @@ import georegression.struct.se.Se3_F64;
 import georegression.struct.so.Quaternion_F64;
 import georegression.struct.so.Rodrigues_F64;
 import org.apache.commons.io.FilenameUtils;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.yaml.snakeyaml.Yaml;
 
@@ -578,7 +579,7 @@ public class UtilIO {
 	}
 
 	public static <T> T load( String fileName ) {
-		@Nullable URL url = UtilIO.ensureURL(fileName);
+		URL url = UtilIO.ensureURL(fileName);
 		if (url == null)
 			throw new RuntimeException("Unknown path=" + fileName);
 
@@ -865,14 +866,14 @@ public class UtilIO {
 				PathMatcher pathMatcher = FileSystems.getDefault().getPathMatcher(pathPattern);
 
 				Files.walkFileTree(Paths.get(baseDirectory), new SimpleFileVisitor<>() {
-					@Override public FileVisitResult visitFile( Path path, BasicFileAttributes attrs ) {
+					@Override public @NonNull FileVisitResult visitFile( @NonNull Path path, @NonNull BasicFileAttributes attrs ) {
 						if (pathMatcher.matches(path) && filter.keep(path)) {
 							results.add(path.toString());
 						}
 						return FileVisitResult.CONTINUE;
 					}
 
-					@Override public FileVisitResult visitFileFailed( Path file, IOException exc ) {
+					@Override public @NonNull FileVisitResult visitFileFailed( @NonNull Path file, @NonNull IOException exc ) {
 						return FileVisitResult.CONTINUE;
 					}
 				});

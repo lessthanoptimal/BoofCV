@@ -45,7 +45,7 @@ import java.util.Arrays;
 public class CameraPinholeBrown extends CameraPinhole implements Serializable {
 
 	/** radial distortion parameters */
-	public @Nullable double[] radial;
+	public double @Nullable [] radial;
 	/** tangential distortion parameters */
 	public @Getter @Setter double t1, t2;
 
@@ -86,7 +86,7 @@ public class CameraPinholeBrown extends CameraPinhole implements Serializable {
 		return (CameraPinholeBrown)super.fsetK(fx, fy, skew, cx, cy, width, height);
 	}
 
-	public CameraPinholeBrown fsetRadial( @Nullable double... radial ) {
+	public CameraPinholeBrown fsetRadial( double @Nullable ... radial ) {
 		if (radial == null) {
 			this.radial = null;
 		} else if (this.radial == null || this.radial.length != radial.length)
@@ -156,7 +156,7 @@ public class CameraPinholeBrown extends CameraPinhole implements Serializable {
 		return Math.abs(t1) > tol || Math.abs(t2) > tol;
 	}
 
-	public @Nullable double[] getRadial() {
+	public double @Nullable [] getRadial() {
 		return radial;
 	}
 
@@ -201,7 +201,7 @@ public class CameraPinholeBrown extends CameraPinhole implements Serializable {
 		return txt;
 	}
 
-	public static String toStringArray( FancyPrint fp, String name, @Nullable double[] param ) {
+	public static String toStringArray( FancyPrint fp, String name, double @Nullable [] param ) {
 		if (param == null || param.length == 0)
 			return "";
 		String txt = ",";

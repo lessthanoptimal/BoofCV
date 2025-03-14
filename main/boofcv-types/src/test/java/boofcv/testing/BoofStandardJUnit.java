@@ -27,6 +27,7 @@ import org.ejml.data.DMatrix;
 import org.ejml.data.FMatrix;
 import org.ejml.ops.MatrixFeatures_D;
 import org.ejml.ops.MatrixFeatures_F;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -413,7 +414,7 @@ public class BoofStandardJUnit {
 			out.write(b);
 		}
 
-		@Override public void write( byte[] b, int off, int len ) throws IOException {
+		@Override public void write( byte @NonNull [] b, int off, int len ) throws IOException {
 			used = true;
 			out.write(b, off, len);
 		}

@@ -73,7 +73,7 @@ public class FactoryDescribePoint {
 	}
 
 	public static <T extends ImageGray<T>, II extends ImageGray<II>>
-	DescribeSurf_Point<T, II> surfFast( @Nullable ConfigSurfDescribe.Fast configSurf,
+	DescribeSurf_Point<T, II> surfFast( ConfigSurfDescribe.@Nullable Fast configSurf,
 										ConfigOrientation2 configOrientation,
 										double regionRadius, Class<T> imageType ) {
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
@@ -85,7 +85,7 @@ public class FactoryDescribePoint {
 	}
 
 	public static <T extends ImageGray<T>, II extends ImageGray<II>>
-	DescribeSurf_Point<T, II> surfStable( @Nullable ConfigSurfDescribe.Stability config,
+	DescribeSurf_Point<T, II> surfStable( ConfigSurfDescribe.@Nullable Stability config,
 										  ConfigOrientation2 configOrientation,
 										  double regionRadius, Class<T> imageType ) {
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);

@@ -48,11 +48,11 @@ public class RadialTangential_F64 {
 	public RadialTangential_F64() {
 	}
 
-	public RadialTangential_F64( @Nullable /**/double[] radial, /**/double t1, /**/double t2 ) {
+	public RadialTangential_F64( /**/double @Nullable [] radial, /**/double t1, /**/double t2 ) {
 		this.setTo(radial, t1, t2);
 	}
 
-	public void setTo( @Nullable /**/double[] radial, /**/double t1, /**/double t2 ) {
+	public void setTo( /**/double @Nullable [] radial, /**/double t1, /**/double t2 ) {
 		if (radial == null)
 			this.radial = new double[0];
 		else {

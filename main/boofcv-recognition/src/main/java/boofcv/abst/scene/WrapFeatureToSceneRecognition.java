@@ -89,7 +89,7 @@ public class WrapFeatureToSceneRecognition<Image extends ImageBase<Image>, TD ex
 	}
 
 	@Override
-	public boolean query( Image queryImage, @Nullable BoofLambdas.Filter<String> filter, int limit, DogArray<Match> matches ) {
+	public boolean query( Image queryImage, BoofLambdas.@Nullable Filter<String> filter, int limit, DogArray<Match> matches ) {
 		detector.detect(queryImage);
 		return recognizer.query(wrappedDetector, filter, limit, matches);
 	}

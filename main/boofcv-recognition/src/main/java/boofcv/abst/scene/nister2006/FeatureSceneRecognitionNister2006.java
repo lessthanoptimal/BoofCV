@@ -219,7 +219,7 @@ public class FeatureSceneRecognitionNister2006<TD extends TupleDesc<TD>> impleme
 		return storage;
 	}
 
-	@Override public boolean query( Features<TD> query, @Nullable BoofLambdas.Filter<String> filter,
+	@Override public boolean query( Features<TD> query, BoofLambdas.@Nullable Filter<String> filter,
 									int limit, DogArray<SceneRecognition.Match> matches ) {
 		// Default is no matches
 		matches.resize(0);

@@ -59,7 +59,7 @@ public class CreateAztecCodeDocument extends BaseMarkerDocument {
 	@Option(name = "--Structure", usage =
 			"The marker's structure. COMPACT or FULL")
 	protected String _structure = "FULL";
-	public @Nullable AztecCode.Structure structure = null;
+	public AztecCode.@Nullable Structure structure = null;
 
 	@Option(name = "--SaveCorners", usage = "Save location of marker corners in the document to corners.txt")
 	boolean saveCorners = false;

@@ -29,7 +29,6 @@ import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import georegression.struct.shapes.Rectangle2D_F64;
 import org.ddogleg.struct.DogArray;
-import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.Random;
@@ -338,7 +337,7 @@ public class TldTracker<T extends ImageGray<T>, D extends ImageGray<D>> {
 		double confidenceTarget;
 
 		if (trackingWorked) {
-			@Nullable TldRegion detectedRegion = detection.getBest();
+			TldRegion detectedRegion = detection.getBest();
 
 			// get the scores from tracking and detection
 			double scoreTrack = template.computeConfidence(trackerRegion_I32);

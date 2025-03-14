@@ -632,7 +632,7 @@ public abstract class DemonstrationBase extends JPanel {
 		for (int which = 0; which < filePaths.length; which++) {
 			CacheSequenceStream cache = inputStreams.get(which);
 
-			@Nullable SimpleImageSequence sequence = null;
+			SimpleImageSequence sequence = null;
 
 			if (new File(filePaths[which]).isDirectory()) {
 				// If it's a directly, try loading an image sequence

@@ -64,7 +64,7 @@ public class SelectInputImageToolBar extends JPanel implements ActionListener {
 		SwingUtilities.invokeLater(() -> imageMenu.addItem(menuName));
 	}
 
-	public void setListener( Listener listener ) {
+	public void setListener( @Nullable Listener listener ) {
 		this.listener = listener;
 	}
 

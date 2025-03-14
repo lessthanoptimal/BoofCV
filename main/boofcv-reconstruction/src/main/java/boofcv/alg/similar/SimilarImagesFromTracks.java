@@ -214,7 +214,7 @@ public class SimilarImagesFromTracks<Track> implements LookUpSimilarImages {
 	}
 
 	@Override
-	public void findSimilar( String target, @Nullable BoofLambdas.Filter<String> filter, List<String> similarImages ) {
+	public void findSimilar( String target, BoofLambdas.@Nullable Filter<String> filter, List<String> similarImages ) {
 		similarImages.clear();
 		Frame f = Objects.requireNonNull(frameMap.get(target), "Unknown image");
 

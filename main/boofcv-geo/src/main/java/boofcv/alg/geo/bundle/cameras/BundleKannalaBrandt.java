@@ -184,7 +184,7 @@ public class BundleKannalaBrandt implements BundleAdjustmentCamera {
 	@Override
 	public void jacobian( final double camX, final double camY, final double camZ,
 						  double[] pointX, double[] pointY,
-						  boolean computeIntrinsic, @Nullable double[] calibX, @Nullable double[] calibY ) {
+						  boolean computeIntrinsic, double @Nullable [] calibX, double @Nullable [] calibY ) {
 
 		// Compute intermediate variables used in forward projection model
 		double norm2 = camX*camX + camY*camY + camZ*camZ;

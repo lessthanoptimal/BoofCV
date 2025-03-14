@@ -36,7 +36,7 @@ public class BowUtils {
 	 * Sorting everything was taking 300 to 500 ms before and after it was taking 15 to 45 ms.
 	 */
 	public static void filterAndSortMatches(
-			FastAccess<BowMatch> matches, @Nullable BoofLambdas.FilterInt filter, int limit ) {
+			FastAccess<BowMatch> matches, BoofLambdas.@Nullable FilterInt filter, int limit ) {
 		if (filter !=null) {
 			// Iterate until the limit the best 'limit' matches pass the filter
 			int startIdx = 0;

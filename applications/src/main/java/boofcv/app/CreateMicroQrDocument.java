@@ -58,7 +58,7 @@ public class CreateMicroQrDocument extends BaseMarkerDocument {
 
 	@Option(name = "-e", aliases = {"--Error"}, usage = "Error correction level. Options: L,M,Q. Robustness: 7%, 15%, 25%, respectively ")
 	protected String _error = "";
-	public @Nullable MicroQrCode.ErrorLevel error;
+	public MicroQrCode.@Nullable ErrorLevel error;
 
 	@Option(name = "-v", aliases = {"--Version"}, usage =
 			"Micro QR-Code version. Determines size and amount of data. If unspecified it will be automatically selected based on the data. Values 1 to 4.")
@@ -67,7 +67,7 @@ public class CreateMicroQrDocument extends BaseMarkerDocument {
 	@Option(name = "-n", aliases = {"--Encoding"}, usage =
 			"Type of data that can be encoded. Default is auto select. Options: NUMERIC, ALPHANUMERIC, BYTE, KANJI")
 	protected String _encoding = "AUTO";
-	public @Nullable QrCode.Mode encoding;
+	public QrCode.@Nullable Mode encoding;
 
 	@Option(name = "--SaveCorners", usage = "Save location of marker corners in the document to corners.txt")
 	boolean saveCorners = false;

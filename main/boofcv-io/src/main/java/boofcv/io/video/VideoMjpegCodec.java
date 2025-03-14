@@ -57,7 +57,7 @@ public class VideoMjpegCodec {
 	/**
 	 * Read a single frame at a time
 	 */
-	public @Nullable byte[] readFrame( DataInputStream in ) {
+	public byte @Nullable [] readFrame( DataInputStream in ) {
 		try {
 			if (findMarker(in, SOI) && in.available() > 0) {
 				return readJpegData(in, EOI);

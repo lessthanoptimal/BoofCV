@@ -56,7 +56,7 @@ public class ImagePanel extends JPanel {
 		this(img, ScaleOptions.NONE);
 	}
 
-	public ImagePanel( final BufferedImage img, ScaleOptions scaling ) {
+	public ImagePanel( final @Nullable BufferedImage img, ScaleOptions scaling ) {
 		this(true);
 		this.img = img;
 		this.scaling = scaling;

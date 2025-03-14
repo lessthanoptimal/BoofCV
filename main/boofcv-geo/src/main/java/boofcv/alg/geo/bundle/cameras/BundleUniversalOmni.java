@@ -213,7 +213,7 @@ public class BundleUniversalOmni implements BundleAdjustmentCamera {
 	public void jacobian( double camX, double camY, double camZ,
 						  double[] inputX, double[] inputY,
 						  boolean computeIntrinsic,
-						  @Nullable double[] calibX, @Nullable double[] calibY ) {
+						  double @Nullable [] calibX, double @Nullable [] calibY ) {
 		// requires unit spherical coordinates
 		double n2 = camX*camX + camY*camY + camZ*camZ;
 		double n = Math.sqrt(n2);

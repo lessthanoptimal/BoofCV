@@ -36,7 +36,7 @@ public class BundlePinholeSnavely extends BundlePinholeSimplified {
 	@Override
 	public void jacobian( double X, double Y, double Z,
 						  double[] inputX, double[] inputY,
-						  boolean computeIntrinsic, @Nullable double[] calibX, @Nullable double[] calibY ) {
+						  boolean computeIntrinsic, double @Nullable [] calibX, double @Nullable [] calibY ) {
 
 		Z = -Z;
 

@@ -99,7 +99,7 @@ public class BundlePinhole implements BundleAdjustmentCamera {
 	@Override
 	public void jacobian( double camX, double camY, double camZ,
 						  double[] inputX, double[] inputY, boolean computeIntrinsic,
-						  @Nullable double[] calibX, @Nullable double[] calibY ) {
+						  double @Nullable [] calibX, double @Nullable [] calibY ) {
 		double nx = camX/camZ;
 		double ny = camY/camZ;
 

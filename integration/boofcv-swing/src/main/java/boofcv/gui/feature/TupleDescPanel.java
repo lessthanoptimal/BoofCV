@@ -49,7 +49,7 @@ public class TupleDescPanel extends JPanel {
 
 		Graphics2D g2 = (Graphics2D)g;
 
-		@Nullable TupleDesc desc = this.desc;
+		TupleDesc desc = this.desc;
 		if (desc == null) {
 			g2.setColor(Color.WHITE);
 			g2.fillRect(0, 0, getWidth(), getHeight());

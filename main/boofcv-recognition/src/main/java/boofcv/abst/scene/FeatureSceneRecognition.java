@@ -77,7 +77,7 @@ public interface FeatureSceneRecognition<TD extends TupleDesc<TD>> extends Verbo
 	 * that means matches is empty. This is strictly a convenience.
 	 */
 	boolean query( Features<TD> query,
-				   @Nullable BoofLambdas.Filter<String> filter,
+				   BoofLambdas.@Nullable Filter<String> filter,
 				   int limit, DogArray<SceneRecognition.Match> matches );
 
 	/**

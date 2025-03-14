@@ -178,7 +178,7 @@ public class TestSimilarImagesSceneRecognition extends GenericLookUpSimilarImage
 
 		@Override
 		public boolean query( Features<TupleDesc_F32> query,
-							  @Nullable BoofLambdas.Filter<String> filter,
+							  BoofLambdas.@Nullable Filter<String> filter,
 							  int limit, DogArray<SceneRecognition.Match> matches ) {
 			matches.reset();
 

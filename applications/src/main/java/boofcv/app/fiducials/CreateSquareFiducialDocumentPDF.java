@@ -42,7 +42,7 @@ public class CreateSquareFiducialDocumentPDF extends CreateFiducialDocumentPDF {
 
 	@Nullable DogArray_I64 binaryPatterns;
 	int gridWidth;
-	@Nullable java.util.List<GrayU8> imagePatterns;
+	java.util.@Nullable List<GrayU8> imagePatterns;
 
 	String markerType = "";
 

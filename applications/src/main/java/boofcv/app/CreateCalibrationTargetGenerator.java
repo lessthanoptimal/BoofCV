@@ -73,7 +73,7 @@ public class CreateCalibrationTargetGenerator {
 	public float UNIT_TO_POINTS;
 	public static final float CM_TO_POINTS = 72.0f/2.54f;
 
-	public CreateCalibrationTargetGenerator( String documentName, PaperSize paper, int rows, int cols, Unit units ) {
+	public CreateCalibrationTargetGenerator( @Nullable String documentName, PaperSize paper, int rows, int cols, Unit units ) {
 		this.paper = paper;
 		this.rows = rows;
 		this.cols = cols;

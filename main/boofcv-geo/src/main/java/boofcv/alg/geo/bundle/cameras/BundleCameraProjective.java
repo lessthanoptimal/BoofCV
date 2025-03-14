@@ -44,7 +44,7 @@ public class BundleCameraProjective implements BundleAdjustmentCamera {
 	}
 
 	@Override
-	public void jacobian( double camX, double camY, double camZ, double[] pointX, double[] pointY, boolean computeIntrinsic, @Nullable double[] calibX, @Nullable double[] calibY ) {
+	public void jacobian( double camX, double camY, double camZ, double[] pointX, double[] pointY, boolean computeIntrinsic, double @Nullable [] calibX, double @Nullable [] calibY ) {
 		pointX[0] = 1/camZ;
 		pointX[1] = 0;
 		pointX[2] = -camX/(camZ*camZ);

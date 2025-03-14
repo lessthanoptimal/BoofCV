@@ -57,9 +57,9 @@ public class CreateQrCodeControlPanel extends StandardAlgConfigPanel implements 
 
 	int version = -1;
 	String message = "Enter Text Here";
-	@Nullable QrCode.ErrorLevel error = null;
+	QrCode.@Nullable ErrorLevel error = null;
 	@Nullable QrCodeMaskPattern mask = null;
-	@Nullable QrCode.Mode mode = null;
+	QrCode.@Nullable Mode mode = null;
 	PaperSize paperSize;
 	boolean fillGrid = false;
 	public boolean drawGrid = false;

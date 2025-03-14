@@ -339,7 +339,7 @@ public class MultiViewIO {
 	}
 
 	private static SceneStructureCommon.Point decodeScenePoint( Map<String, Object> map,
-																@Nullable SceneStructureCommon.Point p )
+																SceneStructureCommon.@Nullable Point p )
 			throws IOException {
 		List<Double> coordinate = getOrThrow(map, "coordinate");
 		List<Integer> views = getOrThrow(map, "views");
@@ -378,7 +378,7 @@ public class MultiViewIO {
 	}
 
 	private static SceneStructureCommon.Camera decodeSceneCamera( Map<String, Object> map,
-																  @Nullable SceneStructureCommon.Camera c )
+																  SceneStructureCommon.@Nullable Camera c )
 			throws IOException {
 		if (c == null)
 			c = new SceneStructureCommon.Camera();
