@@ -63,7 +63,7 @@ public abstract class InterleavedI16<T extends InterleavedI16<T>> extends Interl
 	 * @param storage If not null then the pixel's value is written here. If null a new array is created.
 	 * @return The pixel's value.
 	 */
-	public short[] get( int x, int y, @Nullable short[] storage ) {
+	public short[] get( int x, int y, short @Nullable [] storage ) {
 		if (!isInBounds(x, y))
 			throw new ImageAccessException("Requested pixel is out of bounds");
 
