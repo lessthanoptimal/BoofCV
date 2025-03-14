@@ -29,6 +29,6 @@ task runtimeRegression(type: JavaExec) {
 	group = "Execution"
 	description = "Run the mainClass from the output jar in classpath with ExecTask"
 	classpath = sourceSets.main.runtimeClasspath
-	main = "boofcv.regression.BoofCVRuntimeRegressionApp"
+	setMainClass("boofcv.regression.BoofCVRuntimeRegressionApp")
 	args System.getProperty("exec.args", "").split()
 }
