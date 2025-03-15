@@ -1,11 +1,16 @@
-dependencies {
-	api project(':main:boofcv-ip')
-	api project(':main:boofcv-io')
-	api project(':main:boofcv-geo')
-    
-	api project(':integration:boofcv-swing')
+plugins {
+    id 'org.bytedeco.gradle-javacpp-platform' version project.javacv_version
+}
 
-	implementation group: 'org.bytedeco', name: 'opencv-platform', version: '4.10.0-1.5.11'
+dependencies {
+    api project(':main:boofcv-ip')
+    api project(':main:boofcv-io')
+    api project(':main:boofcv-geo')
+
+    api project(':integration:boofcv-swing')
+
+//    implementation group: 'org.bytedeco', name: 'opencv-platform', version: "4.10.0-$project.javacv_version"
+    implementation group: 'org.bytedeco', name: 'javacv-platform', version: project.javacv_version
 }
 
 sourceSets { test { java { srcDir 'src/main/examples' } } }

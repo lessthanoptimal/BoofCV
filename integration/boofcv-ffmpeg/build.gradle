@@ -2,5 +2,5 @@ dependencies {
 	api project(':main:boofcv-ip')
 	api project(':main:boofcv-io')
 
-	implementation group: 'org.bytedeco', name: 'ffmpeg-platform', version: '7.1-1.5.11'
+	implementation group: 'org.bytedeco', name: 'ffmpeg-platform', version: "7.1-$project.javacv_version"  
 }

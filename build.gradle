@@ -34,6 +34,7 @@ project.ext.jetnull_version = '23.0.0'
 project.ext.jsr250_version = '1.0'
 project.ext.jsr305_version = '3.0.2'
 project.ext.trove4j_version = '3.0.3'
+project.ext.javacv_version = '1.5.11'
 
 // Which native platforms are supported can be specified in the command line. Otherwise
 // the default is to support all of them
@@ -271,30 +272,30 @@ subprojects {
         project.tasks.publish.enabled = false
     }
 
-    spotless {
-//        ratchetFrom 'origin/SNAPSHOT'
-
-        format 'misc', {
-            // define the files to apply `misc` to
-            target '*.gradle', '*.md', '.gitignore'
-
-            // define the steps to apply to those files
-            trimTrailingWhitespace()
-            leadingSpacesToTabs()
-            endWithNewline()
-        }
-        java {
-            // There is currently no good way to exclude files that contain "@Generated" or are not versions.
-            // This should catch most of them with a few false positives.
-            target('**/java/boofcv/**/*.java')
-            targetExclude('**/*_MT*.java', '**/*_F32.java', '**/generated/*', '**/java/boofcv/All.java')
-
-            toggleOffOn('formatter:off', 'formatter:on')
-            removeUnusedImports()
-            endWithNewline()
-            licenseHeaderFile("${project.rootDir}/misc/copyright.txt")
-        }
-    }
+//    spotless {
+////        ratchetFrom 'origin/SNAPSHOT'
+//
+//        format 'misc', {
+//            // define the files to apply `misc` to
+//            target '*.gradle', '*.md', '.gitignore'
+//
+//            // define the steps to apply to those files
+//            trimTrailingWhitespace()
+//            leadingSpacesToTabs()
+//            endWithNewline()
+//        }
+//        java {
+//            // There is currently no good way to exclude files that contain "@Generated" or are not versions.
+//            // This should catch most of them with a few false positives.
+//            target('**/java/boofcv/**/*.java')
+//            targetExclude('**/*_MT*.java', '**/*_F32.java', '**/generated/*', '**/java/boofcv/All.java')
+//
+//            toggleOffOn('formatter:off', 'formatter:on')
+//            removeUnusedImports()
+//            endWithNewline()
+////            licenseHeaderFile("${project.rootDir}/misc/copyright.txt")
+//        }
+//    }
 
     if (!project.tasks.publish.enabled)
         return
