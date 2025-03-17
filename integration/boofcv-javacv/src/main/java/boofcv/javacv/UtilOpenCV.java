@@ -22,11 +22,15 @@ import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.calib.CameraPinholeBrown;
 import org.bytedeco.javacpp.IntPointer;
 import org.bytedeco.javacpp.indexer.DoubleRawIndexer;
+import org.bytedeco.opencv.opencv_core.FileStorage;
+import org.bytedeco.opencv.opencv_core.Mat;
 import org.ejml.data.DMatrixRMaj;
 
 import java.io.File;
 
-import static org.bytedeco.javacpp.opencv_core.*;
+import static org.bytedeco.opencv.global.opencv_core.read;
+import static org.bytedeco.opencv.global.opencv_core.write;
+import static org.opencv.core.CvType.CV_64F;
 
 /**
  * Various utility functions for working with OpenCV
@@ -41,18 +45,18 @@ public class UtilOpenCV {
 	 * @return CameraPinholeRadial
 	 */
 	public static CameraPinholeBrown loadPinholeRadial(String fileName ) {
-		FileStorage fs = new FileStorage(
-				new File(fileName).getAbsolutePath(), FileStorage.READ);
-
 		IntPointer width = new IntPointer(1);
 		IntPointer height = new IntPointer(1);
 
-		read(fs.get("image_width"),width,-1);
-		read(fs.get("image_height"),height,-1);
-		Mat K = new Mat();
-		read(fs.get("camera_matrix"),K);
 		Mat distortion = new Mat();
-		read(fs.get("distortion_coefficients"),distortion);
+		Mat K = new Mat();
+
+		try (FileStorage fs = new FileStorage(new File(fileName).getAbsolutePath(), FileStorage.READ)) {
+			read(fs.get("image_width"), width, -1);
+			read(fs.get("image_height"), height, -1);
+			read(fs.get("camera_matrix"), K);
+			read(fs.get("distortion_coefficients"), distortion);
+		}
 
 		CameraPinholeBrown boof = new CameraPinholeBrown();
 		boof.width = width.get();
@@ -67,43 +71,38 @@ public class UtilOpenCV {
 
 		DoubleRawIndexer indexerD = distortion.createIndexer();
 
-		if( distortion.rows() >= 5 )
-			boof.setRadial(indexerD.get(0,0),indexerD.get(1,0),indexerD.get(4,0));
-		else if( distortion.rows() >= 2 )
-			boof.setRadial(indexerD.get(0,0),indexerD.get(1,0));
-		if( distortion.rows() >= 5 )
-			boof.fsetTangential(indexerD.get(2,0),indexerD.get(3,0));
+		if (distortion.rows() >= 5)
+			boof.setRadial(indexerD.get(0, 0), indexerD.get(1, 0), indexerD.get(4, 0));
+		else if (distortion.rows() >= 2)
+			boof.setRadial(indexerD.get(0, 0), indexerD.get(1, 0));
+		if (distortion.rows() >= 5)
+			boof.fsetTangential(indexerD.get(2, 0), indexerD.get(3, 0));
 
 		return boof;
 	}
 
-	public static void save(CameraPinholeBrown model , String fileName ) {
-		FileStorage fs = new FileStorage(
-				new File(fileName).getAbsolutePath(), FileStorage.WRITE);
+	public static void save( CameraPinholeBrown model, String fileName ) {
+		try (FileStorage fs = new FileStorage(new File(fileName).getAbsolutePath(), FileStorage.WRITE)) {
 
-		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(model, (DMatrixRMaj)null);
+			DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(model, (DMatrixRMaj)null);
 
-		write(fs,"image_width", model.width);
-		write(fs,"image_height", model.height);
-		write(fs,"camera_matrix", toMat(K));
+			write(fs, "image_width", model.width);
+			write(fs, "image_height", model.height);
+			write(fs, "camera_matrix", toMat(K));
 
 
-		DMatrixRMaj D = new DMatrixRMaj(2+3,1);
-		if( model.radial != null ) {
-			if( model.radial.length > 0 )
-				D.set(0, 0, model.radial[0]);
-			if( model.radial.length > 1 )
-				D.set(1, 0, model.radial[1]);
-			if( model.radial.length > 2 )
-				D.set(4, 0, model.radial[2]);
+			DMatrixRMaj D = new DMatrixRMaj(2 + 3, 1);
+			if (model.radial != null) {
+				if (model.radial.length > 0) D.set(0, 0, model.radial[0]);
+				if (model.radial.length > 1) D.set(1, 0, model.radial[1]);
+				if (model.radial.length > 2) D.set(4, 0, model.radial[2]);
+			}
+			
+			D.set(2, 0, model.t1);
+			D.set(3, 0, model.t2);
+
+			write(fs, "distortion_coefficients", toMat(D));
 		}
-		D.set(2,0,model.t1);
-		D.set(3,0,model.t2);
-
-		write(fs,"distortion_coefficients", toMat(D));
-
-		try { fs.close(); } catch (Exception ignore) {}
-
 	}
 
 	public static Mat toMat(DMatrixRMaj in ) {
@@ -120,6 +119,8 @@ public class UtilOpenCV {
 		return out;
 	}
 
+	//todo: JH investigate why these aren't working...
+	
 	// can't find library issues
 //	public static List<String> listWebcams() {
 //		List<String> output = new ArrayList<>();

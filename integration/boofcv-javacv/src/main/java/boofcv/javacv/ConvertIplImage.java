@@ -20,11 +20,12 @@ package boofcv.javacv;
 
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.*;
+import org.bytedeco.opencv.opencv_core.IplImage;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.*;
 
-import static org.bytedeco.javacpp.opencv_core.*;
+import static org.bytedeco.opencv.global.opencv_core.*;
 
 /**
  * Functions for converting between JavaCV's IplImage data type and BoofCV image types
@@ -59,7 +60,7 @@ public class ConvertIplImage {
 						+ dataType + " found " + output.getDataType() + " instead");
 			output.reshape(width, height);
 		} else {
-			output = (T)GeneralizedImageOps.createSingleBand(dataType, width, height);
+			output = GeneralizedImageOps.createSingleBand(dataType, width, height);
 		}
 
 		switch (dataType) {
@@ -104,7 +105,7 @@ public class ConvertIplImage {
 			output.numBands = numBands;
 			output.reshape(width, height);
 		} else {
-			output = (T)GeneralizedImageOps.createInterleaved(dataType, width, height, numBands);
+			output = GeneralizedImageOps.createInterleaved(dataType, width, height, numBands);
 		}
 
 		switch (dataType) {
@@ -264,21 +265,14 @@ public class ConvertIplImage {
 	}
 
 	public static ImageDataType depthToBoofType( int depth ) {
-		switch (depth) {
-			case IPL_DEPTH_8U:
-				return ImageDataType.U8;
-			case IPL_DEPTH_8S:
-				return ImageDataType.S8;
-			case IPL_DEPTH_16S:
-				return ImageDataType.S16;
-			case IPL_DEPTH_32S:
-				return ImageDataType.S32;
-			case IPL_DEPTH_32F:
-				return ImageDataType.F32;
-			case IPL_DEPTH_64F:
-				return ImageDataType.F64;
-			default:
-				throw new IllegalArgumentException("Unknown IPL depth " + depth);
-		}
+		return switch (depth) {
+			case IPL_DEPTH_8U -> ImageDataType.U8;
+			case IPL_DEPTH_8S -> ImageDataType.S8;
+			case IPL_DEPTH_16S -> ImageDataType.S16;
+			case IPL_DEPTH_32S -> ImageDataType.S32;
+			case IPL_DEPTH_32F -> ImageDataType.F32;
+			case IPL_DEPTH_64F -> ImageDataType.F64;
+			default -> throw new IllegalArgumentException("Unknown IPL depth " + depth);
+		};
 	}
 }
