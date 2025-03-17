@@ -23,11 +23,12 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import org.bytedeco.copiedstuff.FFmpegFrameGrabber;
-import org.bytedeco.copiedstuff.Frame;
-import org.bytedeco.copiedstuff.FrameGrabber;
-import org.bytedeco.copiedstuff.Java2DFrameConverter;
+
 import org.bytedeco.ffmpeg.global.avutil;
+import org.bytedeco.javacv.FFmpegFrameGrabber;
+import org.bytedeco.javacv.Frame;
+import org.bytedeco.javacv.FrameGrabber;
+import org.bytedeco.javacv.Java2DFrameConverter;
 
 import java.awt.image.BufferedImage;
 
