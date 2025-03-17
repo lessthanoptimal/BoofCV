@@ -17,6 +17,8 @@ Version : 1.1.9
   * Added isIdentical()
 - WorldToCameraToPixel
   * Projects the point even if it's behind the camera
+- CalibrationDetectorMultiECoCheck
+  * Fixed a bug in getLayout() where duplicate was handled incorrectly
 
 ---------------------
 Date    : 2025/Mar/06

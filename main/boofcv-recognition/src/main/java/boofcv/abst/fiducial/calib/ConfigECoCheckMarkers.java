@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,7 @@ public class ConfigECoCheckMarkers implements Configuration {
 	/** Fraction of the length the quite-zone is around data bits */
 	public double dataBorderFraction = 0.15;
 
-	/** Number of times the first marker is duplicated. */
+	/** Number of times the first marker is duplicated. 1 means it will be added once, not twice. Must be 1 or higher */
 	public int firstTargetDuplicated = 1;
 
 	/** Shapes of individual markers. The first marker might be duplicated. */
