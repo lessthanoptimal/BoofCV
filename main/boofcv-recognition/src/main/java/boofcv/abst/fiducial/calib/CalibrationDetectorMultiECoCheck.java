@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -92,7 +92,7 @@ public class CalibrationDetectorMultiECoCheck implements DetectMultiFiducialCali
 
 	@Override public List<Point2D_F64> getLayout( int markerID ) {
 		// Handle special case of first target clones
-		int layoutIndex = Math.max(0, markerID - firstTargetDuplicated);
+		int layoutIndex = Math.max(0, markerID - (firstTargetDuplicated - 1));
 
 		List<Point2D_F64> layout = cacheLayouts.get(layoutIndex);
 		if (layout != null)
