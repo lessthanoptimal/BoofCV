@@ -1,6 +1,11 @@
-dependencies {
-	api project(':main:boofcv-ip')
-	api project(':main:boofcv-io')
+plugins {
+    id 'org.bytedeco.gradle-javacpp-platform' version '1.5.10'
+}
 
-	implementation group: 'org.bytedeco', name: 'ffmpeg-platform', version: "7.1-$project.javacv_version"  
+dependencies {
+    api project(':main:boofcv-ip')
+    api project(':main:boofcv-io')
+   
+    api (group: 'org.bytedeco', name: 'ffmpeg-platform', version: "7.1-$project.javacv_version")
+    api (group: 'org.bytedeco', name: 'javacv-platform', version: project.javacv_version)
 }
