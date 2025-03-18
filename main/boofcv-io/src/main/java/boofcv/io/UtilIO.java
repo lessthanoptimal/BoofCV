@@ -577,6 +577,14 @@ public class UtilIO {
 		}
 	}
 
+	/**
+	 * <b>DO NOT USE THIS METHOD!</b>
+	 * This method uses Java serialisation. If you use it to load untrusted files, a bad actor could craft a file to
+	 * execute arbitrary code within your JVM.
+	 *
+	 * @see Serializable
+	 */
+	@Deprecated(forRemoval = true)
 	public static <T> T load( String fileName ) {
 		@Nullable URL url = UtilIO.ensureURL(fileName);
 		if (url == null)
