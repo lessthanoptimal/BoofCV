@@ -2,7 +2,7 @@ plugins {
 	id 'org.jetbrains.kotlin.jvm' version '1.9.25'
 }
 
-configurations.all {
+configurations.configureEach {
 	resolutionStrategy {
 		force "org.jetbrains:annotations:$project.jetnull_version"
 		force "org.jetbrains.kotlin:kotlin-stdlib:1.9.25"
