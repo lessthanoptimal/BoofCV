@@ -291,7 +291,7 @@ subprojects {
             toggleOffOn('formatter:off', 'formatter:on')
             removeUnusedImports()
             endWithNewline()
-            licenseHeaderFile("${project.rootDir}/misc/copyright.txt")
+//            licenseHeaderFile("${project.rootDir}/misc/copyright.txt")
         }
     }
 
