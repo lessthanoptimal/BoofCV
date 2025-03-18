@@ -20,6 +20,7 @@ package boofcv.javacv;
 
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.struct.calib.CameraPinholeBrown;
+import org.bytedeco.javacv.FrameGrabber;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;

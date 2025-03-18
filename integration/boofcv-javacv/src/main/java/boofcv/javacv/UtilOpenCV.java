@@ -36,6 +36,8 @@ import static org.opencv.core.CvType.CV_64F;
  * Various utility functions for working with OpenCV
  *
  * @author Peter Abeles
+ * @implNote Webcam support can't currently be implemented in a platform-agnostic way as videoLibInput only supports
+ * Windows.
  */
 public class UtilOpenCV {
 	/**
@@ -44,7 +46,7 @@ public class UtilOpenCV {
 	 * @param fileName path to file
 	 * @return CameraPinholeRadial
 	 */
-	public static CameraPinholeBrown loadPinholeRadial(String fileName ) {
+	public static CameraPinholeBrown loadPinholeRadial( String fileName ) {
 		IntPointer width = new IntPointer(1);
 		IntPointer height = new IntPointer(1);
 
@@ -63,11 +65,11 @@ public class UtilOpenCV {
 		boof.height = height.get();
 
 		DoubleRawIndexer indexerK = K.createIndexer();
-		boof.fx = indexerK.get(0,0);
-		boof.skew = indexerK.get(0,1);
-		boof.fy = indexerK.get(1,1);
-		boof.cx = indexerK.get(0,2);
-		boof.cy = indexerK.get(1,2);
+		boof.fx = indexerK.get(0, 0);
+		boof.skew = indexerK.get(0, 1);
+		boof.fy = indexerK.get(1, 1);
+		boof.cx = indexerK.get(0, 2);
+		boof.cy = indexerK.get(1, 2);
 
 		DoubleRawIndexer indexerD = distortion.createIndexer();
 
@@ -97,7 +99,7 @@ public class UtilOpenCV {
 				if (model.radial.length > 1) D.set(1, 0, model.radial[1]);
 				if (model.radial.length > 2) D.set(4, 0, model.radial[2]);
 			}
-			
+
 			D.set(2, 0, model.t1);
 			D.set(3, 0, model.t2);
 
@@ -105,43 +107,17 @@ public class UtilOpenCV {
 		}
 	}
 
-	public static Mat toMat(DMatrixRMaj in ) {
-		Mat out = new Mat(in.numRows,in.numCols,CV_64F);
+	public static Mat toMat( DMatrixRMaj in ) {
+		Mat out = new Mat(in.numRows, in.numCols, CV_64F);
 
 		DoubleRawIndexer indexer = out.createIndexer();
 
 		for (int i = 0; i < in.numRows; i++) {
 			for (int j = 0; j < in.numCols; j++) {
-				indexer.put(i,j, in.get(i,j));
+				indexer.put(i, j, in.get(i, j));
 			}
 		}
 
 		return out;
 	}
-
-	//todo: JH investigate why these aren't working...
-	
-	// can't find library issues
-//	public static List<String> listWebcams() {
-//		List<String> output = new ArrayList<>();
-//
-//		int N = videoInputLib.videoInput.listDevices();
-//		for (int i = 0; i < N; i++) {
-//			String name = videoInputLib.videoInput.getDeviceName(i).getString();
-//			output.add(name);
-//		}
-//
-//		return output;
-//	}
-//
-//	public static OpenCVFrameGrabber findWebcam( String name ) {
-//		int N = videoInputLib.videoInput.listDevices();
-//		for (int i = 0; i < N; i++) {
-//			String device = videoInputLib.videoInput.getDeviceName(i).getString();
-//			if( device.equals(name)) {
-//				return new OpenCVFrameGrabber(i);
-//			}
-//		}
-//		return null;
-//	}
 }
