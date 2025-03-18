@@ -1,9 +1,10 @@
 dependencies {
-    api project(':main:boofcv-types')
-    testImplementation project(':main:boofcv-geo')
+	api project(':main:boofcv-types')
+	testImplementation project(':main:boofcv-geo')
 }
 
-task(autogenerateSource, dependsOn: 'generateClasses', type: JavaExec) {
-    setMainClass('boofcv.GenerateImageProcessing')
-    classpath = sourceSets.generate.runtimeClasspath
+tasks.register('autogenerateSource', JavaExec) {
+	dependsOn 'generateClasses'
+	setMainClass('boofcv.GenerateImageProcessing')
+	classpath = sourceSets.generate.runtimeClasspath
 }
