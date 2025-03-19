@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,15 +44,15 @@ public class TestPositionFromPairLinear2 extends ChecksMotionNPoint {
 	}
 
 	@Override
-	public Se3_F64 compute(List<AssociatedPair> obs, List<Point3D_F64> locations) {
+	public Se3_F64 compute( List<AssociatedPair> obs, List<Point3D_F64> locations ) {
 		List<Point2D_F64> l = new ArrayList<>();
-		
-		for( AssociatedPair p : obs )
+
+		for (AssociatedPair p : obs)
 			l.add(p.p2);
-		
-		
+
+
 		assertTrue(alg.process(motion.getR(), locations, l));
-		
+
 		Se3_F64 found = new Se3_F64();
 		found.R.setTo(motion.R);
 		found.T.setTo(alg.getT());

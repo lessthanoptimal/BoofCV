@@ -71,9 +71,9 @@ public class TestCalibrationDetectorMultiECoCheck extends GenericDetectMultiFidu
 	@Test void getLayout_duplicate() {
 		configMarkers.markerShapes.reset();
 		configMarkers.firstTargetDuplicated = 1;
-		configMarkers.markerShapes.add(new ConfigECoCheckMarkers.MarkerShape(3,3,1));
-		configMarkers.markerShapes.add(new ConfigECoCheckMarkers.MarkerShape(3,3,2));
-		configMarkers.markerShapes.add(new ConfigECoCheckMarkers.MarkerShape(3,3,4));
+		configMarkers.markerShapes.add(new ConfigECoCheckMarkers.MarkerShape(4,4,1));
+		configMarkers.markerShapes.add(new ConfigECoCheckMarkers.MarkerShape(4,4,2));
+		configMarkers.markerShapes.add(new ConfigECoCheckMarkers.MarkerShape(4,4,4));
 		configMarkers.checkValidity();
 
 		DetectMultiFiducialCalibration alg = createDetector();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class TestPnPRodriguesCodec extends BoofStandardJUnit {
 
 	@Test void decode_encode() {
-		double[] param = new double[]{0.1,-0.3,4,1,2,3};
+		double[] param = new double[]{0.1, -0.3, 4, 1, 2, 3};
 
 		PnPRodriguesCodec alg = new PnPRodriguesCodec();
 
@@ -39,32 +39,32 @@ public class TestPnPRodriguesCodec extends BoofStandardJUnit {
 		Se3_F64 storage2 = new Se3_F64();
 
 		alg.decode(param, storage);
-		alg.encode(storage,found);
-		alg.decode(found,storage2);
+		alg.encode(storage, found);
+		alg.decode(found, storage2);
 
 		// multiple parameterization can represent the same model, so test using the model
-		assertTrue(storage.T.isIdentical(storage2.T,1e-8));
-		assertTrue(MatrixFeatures_DDRM.isIdentical(storage.R,storage2.R,1e-8));
+		assertTrue(storage.T.isIdentical(storage2.T, 1e-8));
+		assertTrue(MatrixFeatures_DDRM.isIdentical(storage.R, storage2.R, 1e-8));
 	}
 
 	@Test void testCase0() {
 		Se3_F64 a = new Se3_F64();
 
 		a.R = UtilEjml.parse_DDRM(
-						"1.000000e+00        -5.423439e-14        -3.165003e-13 \n" +
+				"1.000000e+00        -5.423439e-14        -3.165003e-13 \n" +
 						"5.420664e-14         1.000000e+00         2.461642e-13 \n" +
-						"3.162678e-13        -2.464418e-13         1.000000e+00",3);
+						"3.162678e-13        -2.464418e-13         1.000000e+00", 3);
 
 		PnPRodriguesCodec alg = new PnPRodriguesCodec();
 
 		double[] param = new double[6];
-		alg.encode(a,param);
+		alg.encode(a, param);
 
 		Se3_F64 found = new Se3_F64();
-		alg.decode(param,found);
+		alg.decode(param, found);
 
-		assertTrue(a.T.isIdentical(found.T,1e-8));
-		assertTrue(MatrixFeatures_DDRM.isIdentical(a.R,found.R,1e-8));
+		assertTrue(a.T.isIdentical(found.T, 1e-8));
+		assertTrue(MatrixFeatures_DDRM.isIdentical(a.R, found.R, 1e-8));
 	}
 
 	/**
@@ -72,18 +72,18 @@ public class TestPnPRodriguesCodec extends BoofStandardJUnit {
 	 */
 	@Test void testCase1() {
 		Se3_F64 input = new Se3_F64();
-		CommonOps_DDRM.diag(input.getR(),3,1,-1,-1);
+		CommonOps_DDRM.diag(input.getR(), 3, 1, -1, -1);
 
 		Se3_F64 output = new Se3_F64();
 		PnPRodriguesCodec alg = new PnPRodriguesCodec();
 
 		double[] param = new double[6];
-		alg.encode(input,param);
+		alg.encode(input, param);
 		alg.decode(param, output);
 
 //		output.print();
 
 		assertTrue(input.T.isIdentical(output.T, 1e-8));
-		assertTrue(MatrixFeatures_DDRM.isIdentical(input.R,output.R,1e-8));
+		assertTrue(MatrixFeatures_DDRM.isIdentical(input.R, output.R, 1e-8));
 	}
 }

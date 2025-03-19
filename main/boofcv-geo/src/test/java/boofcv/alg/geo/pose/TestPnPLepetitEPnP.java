@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -55,35 +55,35 @@ public class TestPnPLepetitEPnP extends BoofStandardJUnit {
 	private void standardTest( final int numIterations ) {
 		ChecksMotionNPoint test = new ChecksMotionNPoint() {
 			@Override
-			public Se3_F64 compute(List<AssociatedPair> obs, List<Point3D_F64> locations) {
+			public Se3_F64 compute( List<AssociatedPair> obs, List<Point3D_F64> locations ) {
 
 				PnPLepetitEPnP alg = new PnPLepetitEPnP();
 
 				List<Point2D_F64> currObs = new ArrayList<>();
-				for( AssociatedPair a : obs ) {
+				for (AssociatedPair a : obs) {
 					currObs.add(a.p2);
 				}
 
 				Se3_F64 solution = new Se3_F64();
 
 				alg.setNumIterations(numIterations);
-				alg.process(locations,currObs,solution);
+				alg.process(locations, currObs, solution);
 
 				return solution;
 			}
 		};
 
-		for( int i = 0; i < 20; i++ ) {
+		for (int i = 0; i < 20; i++) {
 			// the minimal case is not tested here since its too unstable
-			for( int N = 5; N < 10; N++ ) {
+			for (int N = 5; N < 10; N++) {
 				test.testNoMotion(N);
 				test.standardTest(N);
-				test.planarTest(N-1);
+				test.planarTest(N - 1);
 			}
 //			System.out.println();
 		}
 	}
-	
+
 	@Test void selectWorldControlPoints_planar() {
 
 		List<Point3D_F64> worldPts = CommonHomographyChecks.createRandomPlane(rand, 3, 30);
@@ -93,13 +93,13 @@ public class TestPnPLepetitEPnP extends BoofStandardJUnit {
 
 		alg.selectWorldControlPoints(worldPts, controlPts);
 
-		assertEquals(3,alg.numControl);
+		assertEquals(3, alg.numControl);
 
 		// check that each row is unique
-		for( int i = 0; i < 3; i++ ) {
+		for (int i = 0; i < 3; i++) {
 			Point3D_F64 ci = controlPts.get(i);
 
-			for( int j = i+1; j < 3; j++ ) {
+			for (int j = i + 1; j < 3; j++) {
 				Point3D_F64 cj = controlPts.get(j);
 
 				double dx = ci.x - cj.x;
@@ -108,7 +108,7 @@ public class TestPnPLepetitEPnP extends BoofStandardJUnit {
 
 				double sum = Math.abs(dx) + Math.abs(dy) + Math.abs(dz);
 
-				assertTrue(sum > 0.00001 );
+				assertTrue(sum > 0.00001);
 			}
 		}
 	}
@@ -123,10 +123,10 @@ public class TestPnPLepetitEPnP extends BoofStandardJUnit {
 		alg.selectWorldControlPoints(worldPts, controlPts);
 
 		// check that each row is unique
-		for( int i = 0; i < 4; i++ ) {
+		for (int i = 0; i < 4; i++) {
 			Point3D_F64 ci = controlPts.get(i);
 
-			for( int j = i+1; j < 4; j++ ) {
+			for (int j = i + 1; j < 4; j++) {
 				Point3D_F64 cj = controlPts.get(j);
 
 				double dx = ci.x - cj.x;
@@ -135,7 +135,7 @@ public class TestPnPLepetitEPnP extends BoofStandardJUnit {
 
 				double sum = Math.abs(dx) + Math.abs(dy) + Math.abs(dz);
 
-				assertTrue(sum > 0.00001 );
+				assertTrue(sum > 0.00001);
 			}
 		}
 	}
@@ -148,19 +148,19 @@ public class TestPnPLepetitEPnP extends BoofStandardJUnit {
 
 		alg.selectWorldControlPoints(worldPoints, worldControlPts);
 
-		DMatrixRMaj alpha = new DMatrixRMaj(1,1);
+		DMatrixRMaj alpha = new DMatrixRMaj(1, 1);
 
 		alg.computeBarycentricCoordinates(worldControlPts, alpha, worldPoints);
 
 		// make sure it sums up to one and it should add up to the original point
-		for( int i = 0; i < worldPoints.size(); i++ ) {
-			double x=0,y=0,z=0;
+		for (int i = 0; i < worldPoints.size(); i++) {
+			double x = 0, y = 0, z = 0;
 
 			double sum = 0;
-			for( int j = 0; j < 4; j++ ) {
+			for (int j = 0; j < 4; j++) {
 				Point3D_F64 cj = worldControlPts.get(j);
 
-				double a = alpha.get(i,j);
+				double a = alpha.get(i, j);
 				sum += a;
 				x += a*cj.x;
 				y += a*cj.y;
@@ -168,25 +168,25 @@ public class TestPnPLepetitEPnP extends BoofStandardJUnit {
 			}
 			Point3D_F64 p = worldPoints.get(i);
 
-			assertEquals(1,sum,1e-8);
-			assertEquals(p.x,x,1e-8);
-			assertEquals(p.y,y,1e-8);
-			assertEquals(p.z,z,1e-8);
+			assertEquals(1, sum, 1e-8);
+			assertEquals(p.x, x, 1e-8);
+			assertEquals(p.y, y, 1e-8);
+			assertEquals(p.z, z, 1e-8);
 		}
 	}
 
 	@Test void constructM() {
 		List<Point2D_F64> obsPts = GeoTestingOps.randomPoints_F64(-1, 2, -5, 20, 30, rand);
-		DMatrixRMaj M = RandomMatrices_DDRM.rectangle(2 * obsPts.size(), 12,rand);
-		DMatrixRMaj alpha = RandomMatrices_DDRM.rectangle(obsPts.size(),4,rand);
+		DMatrixRMaj M = RandomMatrices_DDRM.rectangle(2*obsPts.size(), 12, rand);
+		DMatrixRMaj alpha = RandomMatrices_DDRM.rectangle(obsPts.size(), 4, rand);
 
 		PnPLepetitEPnP.constructM(obsPts, alpha, M);
 
 		// check for zeros in the expected locations
-		for( int row = 0; row < obsPts.size()*2; row += 2 ) {
-			for( int i = 0; i < 4; i++ ) {
-				assertEquals(0,M.get(i*3+1,row),1e-8);
-				assertEquals(0,M.get(i*3,row+1),1e-8);
+		for (int row = 0; row < obsPts.size()*2; row += 2) {
+			for (int i = 0; i < 4; i++) {
+				assertEquals(0, M.get(i*3 + 1, row), 1e-8);
+				assertEquals(0, M.get(i*3, row + 1), 1e-8);
 			}
 		}
 	}
@@ -202,12 +202,12 @@ public class TestPnPLepetitEPnP extends BoofStandardJUnit {
 		// see if the first set of null points is the null space pf M*M
 		List<Point3D_F64> l = alg.nullPts[0];
 
-		SimpleMatrix v = new SimpleMatrix(12,1);
-		for( int i = 0; i < 4; i++ ) {
+		SimpleMatrix v = new SimpleMatrix(12, 1);
+		for (int i = 0; i < 4; i++) {
 			Point3D_F64 p = l.get(i);
-			v.set(3*i+0,p.x);
-			v.set(3*i+1,p.y);
-			v.set(3*i+2,p.z);
+			v.set(3*i + 0, p.x);
+			v.set(3*i + 1, p.y);
+			v.set(3*i + 2, p.z);
 		}
 
 		SimpleMatrix MM = M.mult(M.transpose());
@@ -216,7 +216,7 @@ public class TestPnPLepetitEPnP extends BoofStandardJUnit {
 
 		double mag = x.normF();
 
-		assertEquals(0,mag,1e-8);
+		assertEquals(0, mag, 1e-8);
 	}
 
 	/**
@@ -227,10 +227,10 @@ public class TestPnPLepetitEPnP extends BoofStandardJUnit {
 
 		// skip the adjust step
 		alg.numControl = 4;
-		alg.alphas = new DMatrixRMaj(0,0);
-		alg.nullPts[0] = GeoTestingOps.randomPoints_F64(5,10,-1, 2, -5, 20, 4, rand);
+		alg.alphas = new DMatrixRMaj(0, 0);
+		alg.nullPts[0] = GeoTestingOps.randomPoints_F64(5, 10, -1, 2, -5, 20, 4, rand);
 		double beta = 10;
-		for( int i = 0; i < alg.numControl; i++ ) {
+		for (int i = 0; i < alg.numControl; i++) {
 			Point3D_F64 p = alg.nullPts[0].get(i);
 			Point3D_F64 c = alg.controlWorldPts.grow();
 			c.x = p.x*beta;
@@ -238,11 +238,11 @@ public class TestPnPLepetitEPnP extends BoofStandardJUnit {
 			c.z = p.z*beta;
 		}
 
-		double betas[] = new double[]{1,2,3,4};
+		double betas[] = new double[]{1, 2, 3, 4};
 		alg.estimateCase1(betas);
-		assertEquals(beta,betas[0],1e-8);
-		assertEquals(0,betas[1],1e-8);
-		assertEquals(0,betas[2],1e-8);
-		assertEquals(0,betas[3],1e-8);
+		assertEquals(beta, betas[0], 1e-8);
+		assertEquals(0, betas[1], 1e-8);
+		assertEquals(0, betas[2], 1e-8);
+		assertEquals(0, betas[3], 1e-8);
 	}
 }

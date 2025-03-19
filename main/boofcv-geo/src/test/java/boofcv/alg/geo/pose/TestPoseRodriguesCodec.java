@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,21 +27,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class TestPoseRodriguesCodec extends BoofStandardJUnit {
 
 	@Test void encode_decode() {
-		
-		double []orig = new double[]{.1,.2,.3,4,5,6};
-		double []found = new double[6];
-		
+
+		double[] orig = new double[]{.1, .2, .3, 4, 5, 6};
+		double[] found = new double[6];
+
 		Se3_F64 encoded = new Se3_F64();
-		
+
 		PnPRodriguesCodec codec = new PnPRodriguesCodec();
-		
-		assertEquals(6,codec.getParamLength());
-		
-		codec.decode(orig,encoded);
-		codec.encode(encoded,found);
-		
-		for( int i = 0; i < 6; i++ ) {
-			assertEquals(orig[i],found[i],1e-6);
+
+		assertEquals(6, codec.getParamLength());
+
+		codec.decode(orig, encoded);
+		codec.encode(encoded, found);
+
+		for (int i = 0; i < 6; i++) {
+			assertEquals(orig[i], found[i], 1e-6);
 		}
 	}
 }
