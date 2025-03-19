@@ -111,14 +111,17 @@ public class TestUtilImageIO extends BoofStandardJUnit {
 		File temp = File.createTempFile("temp", ".jpg");
 		UtilImageIO.saveJpeg(buff, temp.getPath(), 0.95);
 		double sizeA = temp.length();
-		UtilImageIO.saveJpeg(buff, temp.getPath(), 0.2);
-		double sizeB = temp.length();
+
+		File temp2 = File.createTempFile("temp2", ".jpg");
+		UtilImageIO.saveJpeg(buff, temp2.getPath(), 0.2);
+		double sizeB = temp2.length();
 
 		// Make sure quality did something
 		assertTrue(sizeB < sizeA);
 
 		// clean up
-		temp.delete();
+		assertTrue(temp.delete());
+		assertTrue(temp2.delete());
 	}
 
 	/**
