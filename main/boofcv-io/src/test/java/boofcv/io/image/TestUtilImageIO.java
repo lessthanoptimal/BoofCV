@@ -102,7 +102,9 @@ public class TestUtilImageIO extends BoofStandardJUnit {
 		temp.delete();// no assertTrue() here because in windows it will fail
 	}
 
-	@Test void saveJpeg() throws IOException {
+	@SuppressWarnings("ResultOfMethodCallIgnored")
+	@Test
+	void saveJpeg() throws IOException {
 		var orig = new GrayU8(width, height);
 		GImageMiscOps.fillUniform(orig, rand, 0, 256);
 		var buff = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
@@ -120,8 +122,8 @@ public class TestUtilImageIO extends BoofStandardJUnit {
 		assertTrue(sizeB < sizeA);
 
 		// clean up
-		assertTrue(temp.delete());
-		assertTrue(temp2.delete());
+		temp.delete();
+		temp2.delete();
 	}
 
 	/**
