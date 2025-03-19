@@ -12,9 +12,9 @@ Then it will print something like:
 ```bash
 Trying to run a command-line application?  Here are your options!
 
-CreateFiducialSquareImage
-CreateFiducialSquareBinary
-CreateFiducialRandomDot
+  CreateFiducialSquareImage
+  CreateFiducialSquareBinary
+  CreateFiducialRandomDot
 ...
 ```
 Next you will need to select which tool / application from the list that you want to run. Then more help will be
