@@ -8,7 +8,7 @@ Version Meaning: <compatible>.<feature>.<bug fix>
 
 ---------------------
 Date    : 2025/XXX/YY
-Version : 1.1.9
+Version : 1.2.0
 
 - VerboseUtils
   * Moving verbose related utilities into DDogleg
@@ -19,6 +19,8 @@ Version : 1.1.9
   * Projects the point even if it's behind the camera
 - CalibrationDetectorMultiECoCheck
   * Fixed a bug in getLayout() where duplicate was handled incorrectly
+- PnPRefineWithPixels3D / 4D
+  * Added to make refining PnP optimally easier
 
 ---------------------
 Date    : 2025/Mar/06
