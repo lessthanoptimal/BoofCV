@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -127,6 +127,11 @@ public class ECoCheckCodec {
 	 * @param numUniqueCells Maximum number of unique cell IDs in a marker required
 	 */
 	public void configure( int numUniqueMarkers, int numUniqueCells ) {
+		if (numUniqueMarkers <= 0)
+			throw new IllegalArgumentException("At least one unique marker is required");
+		if (numUniqueCells <= 0)
+			throw new IllegalArgumentException("At least one unique cell is required");
+
 		BoofMiscOps.checkTrue(checksumBitCount >= 0 && checksumBitCount <= MAX_CHECKSUM_BITS);
 		BoofMiscOps.checkTrue(errorCorrectionLevel >= 0 && errorCorrectionLevel <= MAX_ECC_LEVEL);
 
