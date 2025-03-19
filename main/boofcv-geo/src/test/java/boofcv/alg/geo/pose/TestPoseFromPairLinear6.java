@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,15 +52,15 @@ class TestPoseFromPairLinear6 extends BoofStandardJUnit {
 		}
 
 		@Override
-		public Se3_F64 compute(List<AssociatedPair> obs, List<Point3D_F64> locations) {
+		public Se3_F64 compute( List<AssociatedPair> obs, List<Point3D_F64> locations ) {
 			PoseFromPairLinear6 alg = new PoseFromPairLinear6();
 
-			alg.process(obs,locations);
+			alg.process(obs, locations);
 
 			Se3_F64 se = new Se3_F64();
 
 			DMatrixRMaj P = alg.getProjective();
-			PerspectiveOps.projectionSplit(P,se.R,se.T);
+			PerspectiveOps.projectionSplit(P, se.R, se.T);
 
 			// Need to do this so that it gives the best fit SE(3)
 			SpecialEuclideanOps_F64.bestFit(se);
@@ -69,13 +69,12 @@ class TestPoseFromPairLinear6 extends BoofStandardJUnit {
 	}
 
 	@Nested
-	class Projective extends ChecksMotionNPointHomogeneous
-	{
+	class Projective extends ChecksMotionNPointHomogeneous {
 		@Override
-		public DMatrixRMaj compute(List<AssociatedPair> obs, List<Point4D_F64> locations) {
+		public DMatrixRMaj compute( List<AssociatedPair> obs, List<Point4D_F64> locations ) {
 			PoseFromPairLinear6 alg = new PoseFromPairLinear6();
 
-			alg.processHomogeneous(obs,locations);
+			alg.processHomogeneous(obs, locations);
 
 			return alg.getProjective();
 		}

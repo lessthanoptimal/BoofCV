@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,29 +47,29 @@ public class CommonMotionNPointHomogeneous extends BoofStandardJUnit {
 	protected List<AssociatedPair> assocPairs;
 	protected List<Point2D_F64> pixelsView2 = new ArrayList<>();
 
-	protected void generateScene(int N, DMatrixRMaj P, boolean planar) {
+	protected void generateScene( int N, DMatrixRMaj P, boolean planar ) {
 		this.projection = P;
 
 		// randomly generate points in space
-		if( planar ) {
+		if (planar) {
 			worldPts = CommonHomographyChecks.createRandomPlaneH(rand, 3, N);
 		} else {
 			worldPts = GeoTestingOps.randomPointsH_F64(-1, 1, N, rand);
 		}
 
-		DMatrixRMaj P0 = new DMatrixRMaj(3,4);
+		DMatrixRMaj P0 = new DMatrixRMaj(3, 4);
 		CommonOps_DDRM.setIdentity(P0);
 
 		// transform points into second camera's reference frame
 		assocPairs = new ArrayList<>();
 		pixelsView2 = new ArrayList<>();
-		for(Point4D_F64 X : worldPts ) {
+		for (Point4D_F64 X : worldPts) {
 			Point2D_F64 p1 = PerspectiveOps.renderPixel(P0, X, (Point2D_F64)null);
 			Point2D_F64 p2 = PerspectiveOps.renderPixel(P, X, (Point2D_F64)null);
 
 			AssociatedPair pair = new AssociatedPair();
-			pair.p1.setTo(p1.x,p1.y);
-			pair.p2.setTo(p2.x,p2.y);
+			pair.p1.setTo(p1.x, p1.y);
+			pair.p2.setTo(p2.x, p2.y);
 			assocPairs.add(pair);
 			pixelsView2.add(p2);
 		}

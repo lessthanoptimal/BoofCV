@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,30 +48,29 @@ public class TestPnPInfinitesimalPlanePoseEstimation extends BoofStandardJUnit {
 
 		for (int i = 0; i < 100; i++) {
 			ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,
-					0.2+rand.nextGaussian()*0.05,
-					0.1+rand.nextGaussian()*0.05,
-					0.05+rand.nextGaussian()*0.001,actual.R);
-			actual.T.setTo(rand.nextGaussian(),1+rand.nextGaussian(),20+rand.nextGaussian()*2);
+					0.2 + rand.nextGaussian()*0.05,
+					0.1 + rand.nextGaussian()*0.05,
+					0.05 + rand.nextGaussian()*0.001, actual.R);
+			actual.T.setTo(rand.nextGaussian(), 1 + rand.nextGaussian(), 20 + rand.nextGaussian()*2);
 
-			List<AssociatedPair> observation = createRandomInputs(20,actual);
+			List<AssociatedPair> observation = createRandomInputs(20, actual);
 
 			PnPInfinitesimalPlanePoseEstimation alg = new PnPInfinitesimalPlanePoseEstimation();
 
 			assertTrue(alg.process(observation));
 
-			assertTrue(alg.getError0()<alg.getError1());
+			assertTrue(alg.getError0() < alg.getError1());
 
-			double error0 = computeModelError(alg.getWorldToCamera0(),actual);
-			double error1 = computeModelError(alg.getWorldToCamera1(),actual);
+			double error0 = computeModelError(alg.getWorldToCamera0(), actual);
+			double error1 = computeModelError(alg.getWorldToCamera1(), actual);
 
-			assertTrue(error0<error1);
+			assertTrue(error0 < error1);
 			assertTrue(error0 < 0.006);
 		}
-
 	}
 
-	public double computeModelError( Se3_F64 found , Se3_F64 expected ) {
-		Se3_F64 d = found.concat(expected.invert(null),null);
+	public double computeModelError( Se3_F64 found, Se3_F64 expected ) {
+		Se3_F64 d = found.concat(expected.invert(null), null);
 
 		// it should be identity
 		d.R.data[0] -= 1;
@@ -83,20 +82,20 @@ public class TestPnPInfinitesimalPlanePoseEstimation extends BoofStandardJUnit {
 
 	@Test void estimateTranslation() {
 		Se3_F64 actual = new Se3_F64();
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1,0.05,0,actual.R);
-		actual.T.setTo(0.1,0,3);
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.1, 0.05, 0, actual.R);
+		actual.T.setTo(0.1, 0, 3);
 
-		List<AssociatedPair> observation = createRandomInputs(20,actual);
+		List<AssociatedPair> observation = createRandomInputs(20, actual);
 
 		PnPInfinitesimalPlanePoseEstimation alg = new PnPInfinitesimalPlanePoseEstimation();
 
 		Vector3D_F64 found = new Vector3D_F64();
-		alg.estimateTranslation(actual.R,observation,found);
+		alg.estimateTranslation(actual.R, observation, found);
 
-		assertTrue(actual.T.isIdentical(found,UtilEjml.TEST_F64));
+		assertTrue(actual.T.isIdentical(found, UtilEjml.TEST_F64));
 	}
 
-	private List<AssociatedPair> createRandomInputs( int N , Se3_F64 worldToCamera ) {
+	private List<AssociatedPair> createRandomInputs( int N, Se3_F64 worldToCamera ) {
 		List<AssociatedPair> list = new ArrayList<>();
 
 		for (int i = 0; i < N; i++) {
@@ -106,13 +105,13 @@ public class TestPnPInfinitesimalPlanePoseEstimation extends BoofStandardJUnit {
 			world.z = 0;
 
 			Point3D_F64 camera = new Point3D_F64();
-			SePointOps_F64.transform(worldToCamera,world,camera);
+			SePointOps_F64.transform(worldToCamera, world, camera);
 
 			AssociatedPair pair = new AssociatedPair();
-			pair.p1.setTo(world.x,world.y);
-			pair.p2.setTo(camera.x/camera.z,camera.y/camera.z);
+			pair.p1.setTo(world.x, world.y);
+			pair.p2.setTo(camera.x/camera.z, camera.y/camera.z);
 
-			list.add( pair );
+			list.add(pair);
 		}
 		return list;
 	}
@@ -128,17 +127,17 @@ public class TestPnPInfinitesimalPlanePoseEstimation extends BoofStandardJUnit {
 		eq.process("R1=R_v*[R22 c;b' a]");
 		eq.process("R2=R_v*[R22, -c;-b', a]");
 
-		DMatrixRMaj found = new DMatrixRMaj(3,3);
+		DMatrixRMaj found = new DMatrixRMaj(3, 3);
 		DMatrixRMaj R_v = eq.lookupDDRM("R_v");
 		DMatrix2x2 R22 = new DMatrix2x2();
-		DConvertMatrixStruct.convert(eq.lookupDDRM("R22"),R22);
-		Vector3D_F64 ca = new Vector3D_F64(1.1,2.1,3.1);
+		DConvertMatrixStruct.convert(eq.lookupDDRM("R22"), R22);
+		Vector3D_F64 ca = new Vector3D_F64(1.1, 2.1, 3.1);
 
-		PnPInfinitesimalPlanePoseEstimation.constructR(found,R_v,R22,-0.4,0.2,ca,1,new DMatrixRMaj(3,3));
-		assertTrue(MatrixFeatures_DDRM.isIdentical(eq.lookupDDRM("R1"),found,UtilEjml.TEST_F64));
+		PnPInfinitesimalPlanePoseEstimation.constructR(found, R_v, R22, -0.4, 0.2, ca, 1, new DMatrixRMaj(3, 3));
+		assertTrue(MatrixFeatures_DDRM.isIdentical(eq.lookupDDRM("R1"), found, UtilEjml.TEST_F64));
 
-		PnPInfinitesimalPlanePoseEstimation.constructR(found,R_v,R22,-0.4,0.2,ca,-1,new DMatrixRMaj(3,3));
-		assertTrue(MatrixFeatures_DDRM.isIdentical(eq.lookupDDRM("R2"),found,UtilEjml.TEST_F64));
+		PnPInfinitesimalPlanePoseEstimation.constructR(found, R_v, R22, -0.4, 0.2, ca, -1, new DMatrixRMaj(3, 3));
+		assertTrue(MatrixFeatures_DDRM.isIdentical(eq.lookupDDRM("R2"), found, UtilEjml.TEST_F64));
 	}
 
 	@Test void compute_B() {
@@ -155,24 +154,24 @@ public class TestPnPInfinitesimalPlanePoseEstimation extends BoofStandardJUnit {
 		double v2 = v.get(1);
 		DMatrix2x2 B = new DMatrix2x2();
 
-		PnPInfinitesimalPlanePoseEstimation.compute_B(B,R_v,v1,v2);
-		assertEquals(expected.get(0,0),B.a11, UtilEjml.TEST_F64);
-		assertEquals(expected.get(0,1),B.a12, UtilEjml.TEST_F64);
-		assertEquals(expected.get(1,0),B.a21, UtilEjml.TEST_F64);
-		assertEquals(expected.get(1,1),B.a22, UtilEjml.TEST_F64);
+		PnPInfinitesimalPlanePoseEstimation.compute_B(B, R_v, v1, v2);
+		assertEquals(expected.get(0, 0), B.a11, UtilEjml.TEST_F64);
+		assertEquals(expected.get(0, 1), B.a12, UtilEjml.TEST_F64);
+		assertEquals(expected.get(1, 0), B.a21, UtilEjml.TEST_F64);
+		assertEquals(expected.get(1, 1), B.a22, UtilEjml.TEST_F64);
 	}
 
 	@Test void largestSingularValue2x2() {
-		DMatrix2x2 M = new DMatrix2x2(1,-1.5,0.5,1.8);
+		DMatrix2x2 M = new DMatrix2x2(1, -1.5, 0.5, 1.8);
 
-		SimpleMatrix A = new SimpleMatrix(new double[][]{{M.a11,M.a12},{M.a21,M.a22}});
+		SimpleMatrix A = new SimpleMatrix(new double[][]{{M.a11, M.a12}, {M.a21, M.a22}});
 
 		double[] s = A.svd().getSingularValues();
 
 		PnPInfinitesimalPlanePoseEstimation alg = new PnPInfinitesimalPlanePoseEstimation();
 
 		double found = alg.largestSingularValue2x2(M);
-		assertEquals(s[0],found,UtilEjml.TEST_F64);
+		assertEquals(s[0], found, UtilEjml.TEST_F64);
 	}
 
 	@Test void compute_Rv() {
@@ -193,6 +192,6 @@ public class TestPnPInfinitesimalPlanePoseEstimation extends BoofStandardJUnit {
 
 		DMatrixRMaj expected_R_v = eq.lookupDDRM("R_v");
 
-		assertTrue(MatrixFeatures_DDRM.isEquals(expected_R_v,alg.R_v, UtilEjml.TEST_F64));
+		assertTrue(MatrixFeatures_DDRM.isEquals(expected_R_v, alg.R_v, UtilEjml.TEST_F64));
 	}
 }

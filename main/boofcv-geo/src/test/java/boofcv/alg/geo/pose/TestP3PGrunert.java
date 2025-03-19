@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,12 +31,11 @@ public class TestP3PGrunert extends CommonP3PSideChecks {
 	P3PGrunert alg = new P3PGrunert(PolynomialOps.createRootFinder(4, RootFinderType.EVD));
 
 	@Override
-	public List<PointDistance3> computeSolutions(Point2D_F64 p1, Point2D_F64 p2, Point2D_F64 p3,
-												 double length23, double length13, double length12,
-												 boolean shouldSucceed) {
-		assertTrue(alg.process(p1,p2,p3,length23,length13,length12)==shouldSucceed);
+	public List<PointDistance3> computeSolutions( Point2D_F64 p1, Point2D_F64 p2, Point2D_F64 p3,
+												  double length23, double length13, double length12,
+												  boolean shouldSucceed ) {
+		assertTrue(alg.process(p1, p2, p3, length23, length13, length12) == shouldSucceed);
 
 		return alg.getSolutions().toList();
 	}
-
 }

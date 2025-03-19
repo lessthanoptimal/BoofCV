@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,7 +38,7 @@ public class TestPnPJacobianRodrigues extends BoofStandardJUnit {
 	int numPoints = 3;
 
 	PnPRodriguesCodec codec = new PnPRodriguesCodec();
-	ResidualsCodecToMatrix<Se3_F64,Point2D3D> func =
+	ResidualsCodecToMatrix<Se3_F64, Point2D3D> func =
 			new ResidualsCodecToMatrix<>(codec, new PnPResidualReprojection(), new Se3_F64());
 
 	/**
@@ -49,18 +49,18 @@ public class TestPnPJacobianRodrigues extends BoofStandardJUnit {
 		compareToNumerical(0.1);
 	}
 
-	private void compareToNumerical(double noise) {
+	private void compareToNumerical( double noise ) {
 
 		Se3_F64 worldToCamera = new Se3_F64();
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1, 1, -0.2, worldToCamera.getR());
-		worldToCamera.getT().setTo(-0.3,0.4,1);
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.1, 1, -0.2, worldToCamera.getR());
+		worldToCamera.getT().setTo(-0.3, 0.4, 1);
 
 		List<Point2D3D> observations = new ArrayList<>();
 
-		for( int i = 0; i < numPoints; i++ ) {
+		for (int i = 0; i < numPoints; i++) {
 			Point2D3D p = new Point2D3D();
 
-			p.location.setTo( rand.nextGaussian()*0.1, rand.nextGaussian()*0.2 , 3 + rand.nextGaussian() );
+			p.location.setTo(rand.nextGaussian()*0.1, rand.nextGaussian()*0.2, 3 + rand.nextGaussian());
 
 			p.observation = PerspectiveOps.renderPixel(worldToCamera, p.location, null);
 
@@ -74,9 +74,9 @@ public class TestPnPJacobianRodrigues extends BoofStandardJUnit {
 		alg.setObservations(observations);
 		func.setObservations(observations);
 
-		double []param = new double[ codec.getParamLength() ];
+		double[] param = new double[codec.getParamLength()];
 
-		codec.encode(worldToCamera,param);
+		codec.encode(worldToCamera, param);
 
 //		DerivativeChecker.jacobianPrint(func, alg, param, 1e-6);
 		assertTrue(DerivativeChecker.jacobian(func, alg, param, 1e-6));

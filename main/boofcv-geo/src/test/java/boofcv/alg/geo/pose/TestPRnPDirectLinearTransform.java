@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,56 +35,54 @@ class TestPRnPDirectLinearTransform extends CommonMotionNPointHomogeneous {
 	/**
 	 * No noise minimal case. General structure
 	 */
-	@Test
-	void minimal_perfect() {
-		Se3_F64 m = SpecialEuclideanOps_F64.eulerXyz(0.01,0.1,1,0.01,-0.02,0.015,null);
+	@Test void minimal_perfect() {
+		Se3_F64 m = SpecialEuclideanOps_F64.eulerXyz(0.01, 0.1, 1, 0.01, -0.02, 0.015, null);
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(
-				new CameraPinhole(500,500,0,250,250,1000,1000),(DMatrixRMaj)null);
+				new CameraPinhole(500, 500, 0, 250, 250, 1000, 1000), (DMatrixRMaj)null);
 
 		PRnPDirectLinearTransform alg = new PRnPDirectLinearTransform();
 
-		DMatrixRMaj P = PerspectiveOps.createCameraMatrix(m.R,m.T,K,null);
+		DMatrixRMaj P = PerspectiveOps.createCameraMatrix(m.R, m.T, K, null);
 
-		generateScene(alg.getMinimumPoints(),P,false);
+		generateScene(alg.getMinimumPoints(), P, false);
 
-		DMatrixRMaj found = new DMatrixRMaj(3,4);
-		assertTrue(alg.process(worldPts,pixelsView2,found));
+		DMatrixRMaj found = new DMatrixRMaj(3, 4);
+		assertTrue(alg.process(worldPts, pixelsView2, found));
 
 		CommonOps_DDRM.divide(P, NormOps_DDRM.normF(P));
 		CommonOps_DDRM.divide(found, NormOps_DDRM.normF(found));
-		if( Math.signum(P.get(0,0)) != Math.signum(found.get(0,0))) {
-			CommonOps_DDRM.scale(-1,found);
+		if (Math.signum(P.get(0, 0)) != Math.signum(found.get(0, 0))) {
+			CommonOps_DDRM.scale(-1, found);
 		}
 
-		assertTrue(MatrixFeatures_DDRM.isIdentical(P,found, UtilEjml.TEST_F64));
+		assertTrue(MatrixFeatures_DDRM.isIdentical(P, found, UtilEjml.TEST_F64));
 	}
 
 	/**
 	 * No noise. Redundant data
 	 */
-	@Test
-	void many_perfect() {
-		Se3_F64 m = SpecialEuclideanOps_F64.eulerXyz(0.01,0.1,1,0.01,-0.02,0.015,null);
+	@Test void many_perfect() {
+		Se3_F64 m = SpecialEuclideanOps_F64.eulerXyz(0.01, 0.1, 1, 0.01, -0.02, 0.015, null);
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(
-				new CameraPinhole(500,500,0,250,250,1000,1000),(DMatrixRMaj)null);
+				new CameraPinhole(500, 500, 0, 250, 250, 1000, 1000), (DMatrixRMaj)null);
 
 		PRnPDirectLinearTransform alg = new PRnPDirectLinearTransform();
 
-		DMatrixRMaj P = PerspectiveOps.createCameraMatrix(m.R,m.T,K,null);
+		DMatrixRMaj P = PerspectiveOps.createCameraMatrix(m.R, m.T, K, null);
 
 		for (int trial = 0; trial < 5; trial++) {
-			generateScene(40-trial,P,false);
+			generateScene(40 - trial, P, false);
 
-			DMatrixRMaj found = new DMatrixRMaj(3,4);
-			assertTrue(alg.process(worldPts,pixelsView2,found));
+			DMatrixRMaj found = new DMatrixRMaj(3, 4);
+			assertTrue(alg.process(worldPts, pixelsView2, found));
 
 			CommonOps_DDRM.divide(P, NormOps_DDRM.normF(P));
 			CommonOps_DDRM.divide(found, NormOps_DDRM.normF(found));
-			if( Math.signum(P.get(0,0)) != Math.signum(found.get(0,0))) {
-				CommonOps_DDRM.scale(-1,found);
+			if (Math.signum(P.get(0, 0)) != Math.signum(found.get(0, 0))) {
+				CommonOps_DDRM.scale(-1, found);
 			}
 
-			assertTrue(MatrixFeatures_DDRM.isIdentical(P,found, UtilEjml.TEST_F64));
+			assertTrue(MatrixFeatures_DDRM.isIdentical(P, found, UtilEjml.TEST_F64));
 		}
 	}
 }

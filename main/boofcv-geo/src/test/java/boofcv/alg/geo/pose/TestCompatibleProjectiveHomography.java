@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,8 +47,7 @@ public class TestCompatibleProjectiveHomography extends CommonThreeViewHomogeneo
 	List<DMatrixRMaj> camerasB;
 	List<Point4D_F64> sceneB;
 
-	@Override
-	public void createScene( int numFeatures, boolean planar ) {
+	@Override public void createScene( int numFeatures, boolean planar ) {
 		super.createScene(numFeatures, planar);
 
 		// Triangulate 3D points in another projective
@@ -82,8 +81,7 @@ public class TestCompatibleProjectiveHomography extends CommonThreeViewHomogeneo
 		}
 	}
 
-	@Test
-	void fitPoints() {
+	@Test void fitPoints() {
 		// minimum number of points
 		fitPoints(5);
 		// extra points
@@ -102,8 +100,7 @@ public class TestCompatibleProjectiveHomography extends CommonThreeViewHomogeneo
 		checkWorldPointsH(H, 1e-7);
 	}
 
-	@Test
-	void fitCameras() {
+	@Test void fitCameras() {
 		// planar not makes no difference since points are not considered
 		createScene(0, true);
 
@@ -129,8 +126,7 @@ public class TestCompatibleProjectiveHomography extends CommonThreeViewHomogeneo
 	/**
 	 * A known issue is when there are two views and one of them has a zeros column
 	 */
-	@Test
-	void fitCameras_zeroColumn() {
+	@Test void fitCameras_zeroColumn() {
 		createScene(0, true);
 
 		// view 0 will have a camera with the edge case. both A and B will have zeros in right most column, col=3
@@ -153,8 +149,7 @@ public class TestCompatibleProjectiveHomography extends CommonThreeViewHomogeneo
 	/**
 	 * Feed in the same set of camera matrices and see if an identity matrix is returned
 	 */
-	@Test
-	void fitCameras_identity() {
+	@Test void fitCameras_identity() {
 		createScene(0, true);
 
 		CompatibleProjectiveHomography alg = new CompatibleProjectiveHomography();
@@ -177,8 +172,7 @@ public class TestCompatibleProjectiveHomography extends CommonThreeViewHomogeneo
 	 * Checks to see if the columns in H are the null space and that independent scales of the camera matrices
 	 * do not matter.
 	 */
-	@Test
-	void cameraCrossProductMatrix() {
+	@Test void cameraCrossProductMatrix() {
 		DMatrixRMaj H = RandomMatrices_DDRM.rectangle(4, 4, rand);
 		DMatrixRMaj A1 = RandomMatrices_DDRM.rectangle(3, 4, rand);
 		DMatrixRMaj A2 = RandomMatrices_DDRM.rectangle(3, 4, rand);
@@ -212,8 +206,7 @@ public class TestCompatibleProjectiveHomography extends CommonThreeViewHomogeneo
 	/**
 	 * Test more situations with random matrices
 	 */
-	@Test
-	void fitCameras_RandomH() {
+	@Test void fitCameras_RandomH() {
 		createScene(0, false);
 
 		DMatrixRMaj H = RandomMatrices_DDRM.rectangle(4, 4, rand);
@@ -241,8 +234,7 @@ public class TestCompatibleProjectiveHomography extends CommonThreeViewHomogeneo
 		}
 	}
 
-	@Test
-	void fitCameraPoints() {
+	@Test void fitCameraPoints() {
 //		fitCameraPoints(2); // two should be the minimum but isn't working
 		fitCameraPoints(4);
 		fitCameraPoints(20);
@@ -260,8 +252,7 @@ public class TestCompatibleProjectiveHomography extends CommonThreeViewHomogeneo
 		}
 	}
 
-	@Test
-	void refineWorld() {
+	@Test void refineWorld() {
 		createScene(20, false);
 
 		// Find the homography
@@ -293,8 +284,7 @@ public class TestCompatibleProjectiveHomography extends CommonThreeViewHomogeneo
 		checkCamerasH(H, 1e-5);
 	}
 
-	@Test
-	void refineReprojection() {
+	@Test void refineReprojection() {
 		createScene(20, false);
 
 		// Find the homography
