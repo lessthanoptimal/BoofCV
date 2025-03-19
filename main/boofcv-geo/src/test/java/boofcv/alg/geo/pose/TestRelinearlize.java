@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,13 +34,13 @@ import java.util.Random;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
-* So these tests really fail, but the error margin was made to be very large so that they
-* passed. Not sure if there is a bug in the implementation or if this is its inherit
-* accuracy. The matlab code provided by the author exhibited large amounts of error
-* in the minimal case and their paper did not show results for that case...
-*
-* @author Peter Abeles
-*/
+ * So these tests really fail, but the error margin was made to be very large so that they
+ * passed. Not sure if there is a bug in the implementation or if this is its inherit
+ * accuracy. The matlab code provided by the author exhibited large amounts of error
+ * in the minimal case and their paper did not show results for that case...
+ *
+ * @author Peter Abeles
+ */
 public class TestRelinearlize extends BoofStandardJUnit {
 
 	Random rand = new Random(234);
@@ -56,21 +56,21 @@ public class TestRelinearlize extends BoofStandardJUnit {
 		checkNumControl(3);
 	}
 
-	private void checkNumControl(int numControl ) {
+	private void checkNumControl( int numControl ) {
 		createInputs(numControl);
 		Relinearlize alg = new Relinearlize();
 		alg.setNumberControl(numControl);
 
 		// variables being estimated
 		double foundBeta[] = new double[numControl];
-		alg.process(L_full,y,foundBeta);
+		alg.process(L_full, y, foundBeta);
 
 		// check to see if its a valid solution
-		DMatrixRMaj x = new DMatrixRMaj(L_full.numCols,1);
-		DMatrixRMaj foundDistance = new DMatrixRMaj(L_full.numRows,1);
+		DMatrixRMaj x = new DMatrixRMaj(L_full.numCols, 1);
+		DMatrixRMaj foundDistance = new DMatrixRMaj(L_full.numRows, 1);
 		int index = 0;
-		for( int i = 0; i < numControl; i++ ) {
-			for( int j = i; j < numControl; j++ ) {
+		for (int i = 0; i < numControl; i++) {
+			for (int j = i; j < numControl; j++) {
 				x.data[index++] = foundBeta[i]*foundBeta[j];
 			}
 		}
@@ -87,40 +87,39 @@ public class TestRelinearlize extends BoofStandardJUnit {
 	}
 
 	private void createInputs( int numControl ) {
-		if( numControl == 4 ) {
-			L_full = new DMatrixRMaj(6,10);
-			y = new DMatrixRMaj(6,1);
+		if (numControl == 4) {
+			L_full = new DMatrixRMaj(6, 10);
+			y = new DMatrixRMaj(6, 1);
 		} else {
-			L_full = new DMatrixRMaj(3,6);
-			y = new DMatrixRMaj(3,1);
+			L_full = new DMatrixRMaj(3, 6);
+			y = new DMatrixRMaj(3, 1);
 		}
 
 		// randomly select null points,
 		List<Point3D_F64> nullPts[] = new ArrayList[numControl];
-		for( int i = 0; i < numControl-1; i++ ) {
-			nullPts[i] = GeoTestingOps.randomPoints_F64(-1,1,-1,1,-1,1,numControl,rand);
+		for (int i = 0; i < numControl - 1; i++) {
+			nullPts[i] = GeoTestingOps.randomPoints_F64(-1, 1, -1, 1, -1, 1, numControl, rand);
 		}
 
-		nullPts[numControl-1] = new ArrayList<>();
-		nullPts[numControl-1].add( new Point3D_F64(1,0,0));
-		nullPts[numControl-1].add( new Point3D_F64(0,1,0));
-		nullPts[numControl-1].add( new Point3D_F64(0,0,1));
-		if( numControl == 4 )
-			nullPts[numControl-1].add( new Point3D_F64(0,0,0));
+		nullPts[numControl - 1] = new ArrayList<>();
+		nullPts[numControl - 1].add(new Point3D_F64(1, 0, 0));
+		nullPts[numControl - 1].add(new Point3D_F64(0, 1, 0));
+		nullPts[numControl - 1].add(new Point3D_F64(0, 0, 1));
+		if (numControl == 4)
+			nullPts[numControl - 1].add(new Point3D_F64(0, 0, 0));
 
 		// using the provided beta compute the world points
 		// this way the constraint matrix will be consistent
 		DogArray<Point3D_F64> worldPts = new DogArray<>(4, Point3D_F64::new);
-		worldPts.grow().setTo(1,0,0);
-		worldPts.grow().setTo(0,1,0);
-		worldPts.grow().setTo(0,0,1);
-		if( numControl == 4 )
+		worldPts.grow().setTo(1, 0, 0);
+		worldPts.grow().setTo(0, 1, 0);
+		worldPts.grow().setTo(0, 0, 1);
+		if (numControl == 4)
 			worldPts.grow().setTo(0, 0, 0);
 
-		if( numControl == 4 )
-			UtilLepetitEPnP.constraintMatrix6x10(L_full,y,worldPts,nullPts);
+		if (numControl == 4)
+			UtilLepetitEPnP.constraintMatrix6x10(L_full, y, worldPts, nullPts);
 		else
 			UtilLepetitEPnP.constraintMatrix3x6(L_full, y, worldPts, nullPts);
 	}
-
 }

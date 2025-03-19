@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,34 +32,34 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestPnPResidualReprojection extends BoofStandardJUnit {
-	
+
 	@Test void basicTest() {
 		Se3_F64 motion = new Se3_F64();
-		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1,1,-0.2,motion.getR());
-		motion.getT().setTo(-0.3,0.4,1);
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.1, 1, -0.2, motion.getR());
+		motion.getT().setTo(-0.3, 0.4, 1);
 
-		Point3D_F64 world = new Point3D_F64(0.5,-0.5,3);
+		Point3D_F64 world = new Point3D_F64(0.5, -0.5, 3);
 		Point2D_F64 obs = new Point2D_F64();
-		
-		Point3D_F64 temp = SePointOps_F64.transform(motion,world,null);
+
+		Point3D_F64 temp = SePointOps_F64.transform(motion, world, null);
 		obs.x = temp.x/temp.z;
 		obs.y = temp.y/temp.z;
 
 		PnPResidualReprojection alg = new PnPResidualReprojection();
-		
+
 		// compute errors with perfect model
-		double[] error = new double[ alg.getN() ];
+		double[] error = new double[alg.getN()];
 		alg.setModel(motion);
-		int index = alg.computeResiduals(new Point2D3D(obs,world),error,0);
+		int index = alg.computeResiduals(new Point2D3D(obs, world), error, 0);
 		assertEquals(alg.getN(), index);
-		
-		assertEquals(0,error[0],1e-8);
-		assertEquals(0,error[1],1e-8);
-		
+
+		assertEquals(0, error[0], 1e-8);
+		assertEquals(0, error[1], 1e-8);
+
 		// compute errors with an incorrect model
-		motion.getR().set(2,1,2);
+		motion.getR().set(2, 1, 2);
 		alg.setModel(motion);
-		index = alg.computeResiduals(new Point2D3D(obs,world),error,0);
+		index = alg.computeResiduals(new Point2D3D(obs, world), error, 0);
 		assertEquals(alg.getN(), index);
 
 		assertTrue(Math.abs(error[0]) > 1e-8);

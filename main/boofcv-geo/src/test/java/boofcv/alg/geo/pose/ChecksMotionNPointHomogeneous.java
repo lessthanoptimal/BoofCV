@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -56,7 +56,7 @@ public abstract class ChecksMotionNPointHomogeneous extends CommonMotionNPointHo
 	}
 
 	/**
-	 * Standard test with an over determined system
+	 * Standard test with an over determined system with all points on a plane
 	 */
 	@Test void overdeterminedPlanar() {
 		planarTest(20);

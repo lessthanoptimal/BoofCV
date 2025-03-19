@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,11 +29,9 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestUtilLepetitEPnP extends BoofStandardJUnit {
-
 	@Test void jacobian4() {
-
 		DMatrixRMaj L_full = RandomMatrices_DDRM.rectangle(6, 10, rand);
-		DMatrixRMaj y = RandomMatrices_DDRM.rectangle(6,1,rand);
+		DMatrixRMaj y = RandomMatrices_DDRM.rectangle(6, 1, rand);
 
 		JacobianEPnP jacobian = new JacobianEPnP();
 		ResidualsEPnP residuals = new ResidualsEPnP();
@@ -46,9 +44,8 @@ public class TestUtilLepetitEPnP extends BoofStandardJUnit {
 	}
 
 	@Test void jacobian3() {
-
-		DMatrixRMaj L_full = RandomMatrices_DDRM.rectangle(3,6,rand);
-		DMatrixRMaj y = RandomMatrices_DDRM.rectangle(3,1,rand);
+		DMatrixRMaj L_full = RandomMatrices_DDRM.rectangle(3, 6, rand);
+		DMatrixRMaj y = RandomMatrices_DDRM.rectangle(3, 1, rand);
 
 		JacobianEPnP jacobian = new JacobianEPnP();
 		ResidualsEPnP residuals = new ResidualsEPnP();
@@ -56,7 +53,7 @@ public class TestUtilLepetitEPnP extends BoofStandardJUnit {
 		residuals.setParameters(L_full, y);
 		jacobian.setParameters(L_full);
 
-		boolean worked = DerivativeChecker.jacobian(residuals,jacobian,new double[]{1,2,3},1e-6);
+		boolean worked = DerivativeChecker.jacobian(residuals, jacobian, new double[]{1, 2, 3}, 1e-6);
 		assertTrue(worked);
 	}
 
@@ -72,7 +69,7 @@ public class TestUtilLepetitEPnP extends BoofStandardJUnit {
 		protected DMatrixRMaj L_full;
 
 		public void setParameters( DMatrixRMaj L_full ) {
-			if( L_full.numRows == 6 )
+			if (L_full.numRows == 6)
 				numControl = 4;
 			else
 				numControl = 3;
@@ -80,28 +77,23 @@ public class TestUtilLepetitEPnP extends BoofStandardJUnit {
 			this.L_full = L_full;
 		}
 
-		@Override
-		public int getNumOfInputsN() {
+		@Override public int getNumOfInputsN() {
 			return numControl;
 		}
 
-		@Override
-		public int getNumOfOutputsM() {
+		@Override public int getNumOfOutputsM() {
 			return L_full.numRows;
 		}
 
-		@Override
-		public void process(double[] input, DMatrixRMaj J) {
-
-			if( numControl == 3)
+		@Override public void process( double[] input, DMatrixRMaj J ) {
+			if (numControl == 3)
 				UtilLepetitEPnP.jacobian_Control3(L_full, input, J);
 			else
 				UtilLepetitEPnP.jacobian_Control4(L_full, input, J);
 		}
 
-		@Override
-		public DMatrixRMaj declareMatrixMxN() {
-			return new DMatrixRMaj(getNumOfOutputsM(),getNumOfInputsN());
+		@Override public DMatrixRMaj declareMatrixMxN() {
+			return new DMatrixRMaj(getNumOfOutputsM(), getNumOfInputsN());
 		}
 	}
 
@@ -118,8 +110,8 @@ public class TestUtilLepetitEPnP extends BoofStandardJUnit {
 		// distance between control points
 		protected DMatrixRMaj y;
 
-		public void setParameters( DMatrixRMaj L_full , DMatrixRMaj y ) {
-			if( L_full.numRows == 6 )
+		public void setParameters( DMatrixRMaj L_full, DMatrixRMaj y ) {
+			if (L_full.numRows == 6)
 				numControl = 4;
 			else
 				numControl = 3;
@@ -128,21 +120,17 @@ public class TestUtilLepetitEPnP extends BoofStandardJUnit {
 			this.y = y;
 		}
 
-		@Override
-		public int getNumOfInputsN() {
+		@Override public int getNumOfInputsN() {
 			return numControl;
 		}
 
-		@Override
-		public int getNumOfOutputsM() {
+		@Override public int getNumOfOutputsM() {
 			return L_full.numRows;
 		}
 
-		@Override
-		public void process(double[] input, double[] output) {
-
-			if( numControl == 3)
-				UtilLepetitEPnP.residuals_Control3(L_full,y,input,output);
+		@Override public void process( double[] input, double[] output ) {
+			if (numControl == 3)
+				UtilLepetitEPnP.residuals_Control3(L_full, y, input, output);
 			else
 				UtilLepetitEPnP.residuals_Control4(L_full, y, input, output);
 		}
