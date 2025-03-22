@@ -4,7 +4,7 @@ dependencies {
 	api project(':main:boofcv-io')
 	api project(':integration:boofcv-swing')
 
-	api group: 'com.github.sarxos', name: 'webcam-capture', version: '0.3.12'
+	api("com.github.sarxos:webcam-capture:0.3.12") { exclude group: 'org.slf4j' }
 
 	testImplementation project(':main:boofcv-geo')
 	testImplementation project(':main:boofcv-feature')
