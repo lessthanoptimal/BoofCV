@@ -11,6 +11,7 @@ dependencies {
 	implementation project(':integration:boofcv-ffmpeg')
 	implementation project(':integration:boofcv-jcodec')
 	implementation project(':integration:boofcv-WebcamCapture')
+	implementation project(':integration:boofcv-deepboof')
 
 	implementation("commons-io:commons-io:$commons_io_version")
 

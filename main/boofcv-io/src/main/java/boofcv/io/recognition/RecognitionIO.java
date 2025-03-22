@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,7 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.kmeans.TuplePointDistanceEuclideanSq;
 import boofcv.struct.kmeans.TuplePointDistanceHamming;
-import deepboof.io.DeepBoofDataBaseOps;
+import org.apache.commons.io.IOUtils;
 import org.ddogleg.clustering.PointDistance;
 import org.ddogleg.struct.BigDogArray_I32;
 import org.ddogleg.struct.DogArray;
@@ -45,10 +45,15 @@ import org.ddogleg.struct.FastAccess;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Objects;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 /**
  * Reading and writing data structures related to recognition.
@@ -83,8 +88,8 @@ public class RecognitionIO {
 
 		File modelDir = new File(destination, "scene_recognition");
 		if (!modelDir.exists())
-			DeepBoofDataBaseOps.downloadModel(
-					"http://boofcv.org/notwiki/largefiles/scene_recognition_default38_inria_holidays.zip", destination);
+			downloadModel("http://boofcv.org/notwiki/largefiles/scene_recognition_default38_inria_holidays.zip",
+					destination);
 
 		return loadFeatureToScene(modelDir, imageType);
 	}
@@ -794,5 +799,188 @@ public class RecognitionIO {
 		String line = input.readUTF();
 		if (!line.equals(expected))
 			throw new IOException("Expected '" + expected + "' not '" + line + "'");
+	}
+
+	public static File downloadModel( String address, File destination ) {
+		List<String> addresses = new ArrayList<>();
+		addresses.add(address);
+		return downloadModel(addresses, destination);
+	}
+
+	/**
+	 * Attempts to download a model from the list of addresses.  If one fails it will try
+	 * the next in the list.  After downloading the model it will then unzip it and return
+	 * the path to the unzipped directory.  It is assumed the unzipped directory's name is
+	 * the same as the file it's compressed in.
+	 *
+	 * @param addresses List of address that it can be downloaded from
+	 * @param destination Directory that the file should be downloaded to and decompressed in
+	 * @return The directory containing the decompressed model
+	 */
+	public static File downloadModel( List<String> addresses, File destination ) {
+		if (addresses.isEmpty())
+			throw new IllegalArgumentException("addresses is empty");
+
+		if (!destination.exists())
+			if (!destination.mkdirs()) {
+				throw new RuntimeException("Can't create destination directories");
+			}
+
+		// see if the decompressed directory already exists.  If it does skip downloading
+		String fileName = new File(addresses.get(0)).getName();
+		File pathDirectory = new File(destination, fileName.substring(0, fileName.length() - 4));
+		if (pathDirectory.exists()) {
+			return pathDirectory;
+		}
+
+		// download the file
+		int which = download(addresses, new File(destination, fileName));
+		if (which >= 0) {
+			decompressZip(new File(destination, fileName), destination, true);
+			return pathDirectory;
+		} else {
+			throw new RuntimeException("Failed to download model");
+		}
+	}
+
+	private static void decompressZip( File src, File dst, boolean delete ) {
+		try (java.util.zip.ZipFile zipFile = new ZipFile(src)) {
+			Enumeration<? extends ZipEntry> entries = zipFile.entries();
+			while (entries.hasMoreElements()) {
+				ZipEntry entry = entries.nextElement();
+				File entryDestination = new File(dst, entry.getName());
+				if (entry.isDirectory()) {
+					entryDestination.mkdirs();
+				} else {
+					entryDestination.getParentFile().mkdirs();
+					try (InputStream in = zipFile.getInputStream(entry);
+						 OutputStream out = new FileOutputStream(entryDestination)) {
+						IOUtils.copy(in, out);
+					}
+				}
+			}
+
+			if (delete) {
+				src.delete();
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * Will attempt to download the file from the list of URLs.  If one failes it will go to the next in the
+	 * list after printing why it failed
+	 *
+	 * @param urls Sources for the file
+	 * @param output Where to save the file to
+	 * @return Index of url it downloaded or -1 if it failed
+	 */
+	public static int download( List<String> urls, File output ) {
+		for (int i = 0; i < urls.size(); i++) {
+			String location = urls.get(i);
+			try {
+				download(location, output);
+				return i;
+			} catch (IOException o) {
+				System.err.println("Failed because of " + o.getClass().getSimpleName());
+				System.err.println(o.getMessage());
+				System.err.println();
+			}
+		}
+		return -1;
+	}
+
+	/**
+	 * Downloads the specified URL.  Throws an IOException if it fails for any reason.  Prints out
+	 * information and status to console
+	 *
+	 * @param location Location of file
+	 * @param output Where it will save the downloaded file to
+	 * @throws IOException Thrown if anything goes wrong
+	 */
+	public static void download( String location, File output ) throws IOException {
+
+		if (output.isDirectory())
+			throw new IllegalArgumentException("output should be a file not a directory");
+
+		URL url = new URL(location);
+		URLConnection connection = url.openConnection();
+
+		connection.setConnectTimeout(1000);
+		connection.connect();
+
+		long remoteFileSize = connection.getContentLengthLong();
+
+		System.out.println("Content length = " + remoteFileSize/1024/1024 + " MB");
+
+		if (output.exists()) {
+			if (remoteFileSize > 0 && output.length() != remoteFileSize) {
+				System.out.println("File [1] exists, but is not the expected size.  found " +
+						output.length() + " expected " + remoteFileSize);
+				System.out.println("   [1] = " + output.getAbsolutePath());
+				if (!output.delete())
+					throw new IOException("Failed to delete corrupted file");
+			} else {
+				System.out.println("file already downloaded");
+				return;
+			}
+		}
+
+		InputStream is = connection.getInputStream();
+		FileOutputStream fos = new FileOutputStream(output);
+
+		byte buffer[] = new byte[1024*100];
+		long downloadedBytes = 0;
+
+		int ticks = 0;
+		int maxTicks = 60;
+
+		System.out.println("Downloading: " + url);
+		if (remoteFileSize > 0) {
+			System.out.print("|");
+			for (int i = 1; i < maxTicks; i++) {
+				System.out.print("-");
+			}
+			System.out.println("|");
+		} else {
+			System.out.println("   unknown remote file size");
+		}
+		try {
+			escape:
+			while (downloadedBytes < remoteFileSize) {
+				while (is.available() > 0) {
+					int amount = Math.min(buffer.length, is.available());
+					int ret = is.read(buffer, 0, amount);
+					if (ret <= 0) {
+						break escape;
+					}
+					downloadedBytes += ret;
+					fos.write(buffer, 0, ret);
+
+					if (remoteFileSize > 0) {
+						int updatedTicks = (int)(maxTicks*downloadedBytes/remoteFileSize);
+						for (int i = ticks; i < updatedTicks; i++) {
+							System.out.print("*");
+						}
+						ticks = updatedTicks;
+					}
+				}
+			}
+		} finally {
+			is.close();
+			fos.flush();
+			fos.close();
+		}
+		if (remoteFileSize > 0) {
+			int updatedTicks = (int)(maxTicks*downloadedBytes/remoteFileSize);
+			for (int i = ticks; i < updatedTicks; i++) {
+				System.out.print("*");
+			}
+			System.out.println();
+		}
+
+		if (remoteFileSize > 0 && downloadedBytes != remoteFileSize)
+			throw new IOException("Didn't download the entire file.  fraction = " + (downloadedBytes/(double)remoteFileSize));
 	}
 }

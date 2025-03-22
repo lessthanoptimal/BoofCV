@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,6 @@
 
 package boofcv.examples.recognition;
 
-import boofcv.BoofVerbose;
 import boofcv.abst.scene.ConfigFeatureToSceneRecognition;
 import boofcv.abst.scene.SceneRecognition;
 import boofcv.abst.scene.WrapFeatureToSceneRecognition;
@@ -35,6 +34,7 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 import org.apache.commons.io.FilenameUtils;
 import org.ddogleg.struct.DogArray;
+import org.ddogleg.util.VerboseUtils;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -75,11 +75,11 @@ public class ExampleSceneRecognition {
 			// or simply want to skip the learning step
 			System.out.println("Downloading pre-built model");
 			recognizer = RecognitionIO.downloadDefaultSceneRecognition(new File("downloaded_models"), imageType);
-			recognizer.setVerbose(System.out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));
+			recognizer.setVerbose(System.out, BoofMiscOps.hashSet(VerboseUtils.RECURSIVE));
 		} else if (saveDirectory.exists()) {
 			System.out.println("Loading previously generated model");
 			recognizer = RecognitionIO.loadFeatureToScene(saveDirectory, imageType);
-			recognizer.setVerbose(System.out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));
+			recognizer.setVerbose(System.out, BoofMiscOps.hashSet(VerboseUtils.RECURSIVE));
 		} else {
 			// If many applications, learning a new model is a small fraction of the compute time and since its
 			// fit to the images it will be more accurate than a generic pre-built model
@@ -91,7 +91,7 @@ public class ExampleSceneRecognition {
 
 			recognizer = FactorySceneRecognition.createFeatureToScene(config, imageType);
 			// This will print out a lot of debugging information to stdout
-			recognizer.setVerbose(System.out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));
+			recognizer.setVerbose(System.out, BoofMiscOps.hashSet(VerboseUtils.RECURSIVE));
 
 			// Learn the model from the initial set of images
 			recognizer.learnModel(imageIterator);

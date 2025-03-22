@@ -7,6 +7,13 @@ Version Meaning: <compatible>.<feature>.<bug fix>
 - Last digit always indicates a bug fix and other minor changes
 
 ---------------------
+Date    : 2025/???/??
+Version : 1.2.1
+
+- DeepBoof moved out of recognition and into an integration package
+  * That project comes with a lot of baggage and isn't used very much
+
+---------------------
 Date    : 2025/Mar/22
 Version : 1.2.0
 
