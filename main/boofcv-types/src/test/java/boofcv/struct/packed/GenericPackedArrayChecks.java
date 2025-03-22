@@ -43,7 +43,7 @@ public abstract class GenericPackedArrayChecks<T> extends BoofStandardJUnit {
 
 	protected abstract void checkNotEquals( T a, T b );
 
-	@Test void reset() {
+	@Test public void reset() {
 		PackedArray<T> alg = createAlg();
 
 		assertEquals(0, alg.size());
@@ -56,7 +56,7 @@ public abstract class GenericPackedArrayChecks<T> extends BoofStandardJUnit {
 		assertEquals(0, alg.size());
 	}
 
-	@Test void reserve() {
+	@Test public void reserve() {
 		PackedArray<T> alg = createAlg();
 		alg.reserve(12);
 		assertEquals(0, alg.size());
@@ -67,7 +67,7 @@ public abstract class GenericPackedArrayChecks<T> extends BoofStandardJUnit {
 		assertEquals(3, alg.size());
 	}
 
-	@Test void addCopy_getCopy() {
+	@Test public void addCopy_getCopy() {
 		PackedArray<T> alg = createAlg();
 
 		// Create two different points
@@ -85,7 +85,7 @@ public abstract class GenericPackedArrayChecks<T> extends BoofStandardJUnit {
 		checkEquals(a, b);
 	}
 
-	@Test void addCopy_getCopy_multiple() {
+	@Test public void addCopy_getCopy_multiple() {
 		PackedArray<T> alg = createAlg();
 		List<T> expected = new ArrayList<>();
 		for (int i = 0; i < 5; i++) {
@@ -103,7 +103,7 @@ public abstract class GenericPackedArrayChecks<T> extends BoofStandardJUnit {
 		}
 	}
 
-	@Test void getTemp() {
+	@Test public void getTemp() {
 		PackedArray<T> alg = createAlg();
 
 		T a = createRandomPoint();
@@ -116,7 +116,7 @@ public abstract class GenericPackedArrayChecks<T> extends BoofStandardJUnit {
 		checkEquals(a, alg.getTemp(0));
 	}
 
-	@Test void copy() {
+	@Test public void copy() {
 		T a = createRandomPoint();
 		T b = createRandomPoint();
 
@@ -125,7 +125,7 @@ public abstract class GenericPackedArrayChecks<T> extends BoofStandardJUnit {
 		checkEquals(a, b);
 	}
 
-	@Test void forIdx() {
+	@Test public void forIdx() {
 		PackedArray<T> array = createAlg();
 		for (int i = 0; i < 26; i++) {
 			array.append(createRandomPoint());
@@ -148,7 +148,7 @@ public abstract class GenericPackedArrayChecks<T> extends BoofStandardJUnit {
 		}
 	}
 
-	@Test void set_index() {
+	@Test public void set_index() {
 		PackedArray<T> alg = createAlg();
 
 		alg.append(createRandomPoint());
@@ -169,9 +169,9 @@ public abstract class GenericPackedArrayChecks<T> extends BoofStandardJUnit {
 		checkEquals(p, found);
 	}
 
-	@Test void setTo_Standard() {checkSetTo(createAlg().getClass(), true);}
+	@Test public void setTo_Standard() {checkSetTo(createAlg().getClass(), true);}
 
-	@Test void isEquals() {
+	@Test public void isEquals() {
 		PackedArray<T> a = createAlg();
 		PackedArray<T> b = createAlg();
 
