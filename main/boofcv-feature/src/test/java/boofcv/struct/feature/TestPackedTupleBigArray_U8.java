@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,5 +53,5 @@ class TestPackedTupleBigArray_U8 extends GenericPackedArrayChecks<TupleDesc_U8> 
 	}
 
 	// not implemented yet
-	@Test void setTo_Standard(){}
+	@Test public void setTo_Standard(){}
 }
