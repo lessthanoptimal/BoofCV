@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -151,19 +151,39 @@ public abstract class ObjFileReader {
 		}
 	}
 
+	/**
+	 * Read face indices. Examples of what it can read
+	 *
+	 * <pre>
+	 * f v1 v2 v3
+	 * f v1/vt1 v2/vt2
+	 * f v1/vt1/vn1 v2/vt2/vn2
+	 * f v1//vn1 v2//vn2
+	 * </pre>
+	 *
+	 * v = vertex index. vt = vertex texture index. vn = vertex normal index
+	 */
 	private void readFaceIndexes( String[] words ) {
 		vertexIndexes.reset();
 		for (int i = 1; i < words.length; i++) {
 			String word = words[i];
 
-			int idx0 = 0;
 			int idx1 = word.indexOf('/');
-			while (idx1 != -1) {
-				vertexIndexes.add(ensureIndex(Integer.parseInt(word.substring(idx0, idx1))));
-				idx0 = idx1 + 1;
-				idx1 = word.indexOf('/', idx0);
+			if (idx1 == -1) {
+				vertexIndexes.add(ensureIndex(Integer.parseInt(word)));
+				continue;
 			}
-			vertexIndexes.add(ensureIndex(Integer.parseInt(word.substring(idx0))));
+			vertexIndexes.add(ensureIndex(Integer.parseInt(word.substring(0, idx1))));
+			int idx2 = word.indexOf('/', idx1 + 1);
+			if (idx2 == -1) {
+				vertexIndexes.add(ensureIndex(Integer.parseInt(word.substring(idx1 + 1))));
+				continue;
+			}
+			if (idx2 > idx1 + 1) {
+				// avoid the case where you have "//"
+				vertexIndexes.add(ensureIndex(Integer.parseInt(word.substring(idx1 + 1, idx2))));
+			}
+			vertexIndexes.add(ensureIndex(Integer.parseInt(word.substring(idx2 + 1))));
 		}
 	}
 
