@@ -13,13 +13,13 @@ allprojects {
     apply plugin: 'com.peterabeles.gversion'
 
     group = 'org.boofcv'
-    version = '1.2.1-SNAPSHOT'
+    version = '1.2.1'
 
     createVersionFile.enabled = false // run only once. enabled in types
 }
 
 project.ext.ddogleg_version = '0.24.0'
-project.ext.georegression_version = '0.27.5'
+project.ext.georegression_version = '0.27.6'
 project.ext.commons_io_version = '2.16.1'
 project.ext.deepboof_version = '0.5.3'
 project.ext.lombok_version = '1.18.28'
