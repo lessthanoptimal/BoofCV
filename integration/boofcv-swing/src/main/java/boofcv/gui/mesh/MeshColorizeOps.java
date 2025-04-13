@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,11 +20,9 @@ package boofcv.gui.mesh;
 
 import boofcv.struct.mesh.VertexMesh;
 import boofcv.visualize.RenderMesh;
-import georegression.geometry.UtilVector3D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import org.ddogleg.struct.DogArray;
-import org.ejml.UtilEjml;
 
 /**
  * Different functions that compute a synthetic colors for each surface in a mesh.
@@ -68,9 +66,12 @@ public class MeshColorizeOps {
 			va.minus(facet.get(1), facet.get(0));
 			vb.minus(facet.get(2), facet.get(0));
 			normal.crossSetTo(va, vb);
-			double angle = UtilVector3D_F64.acute(normal, axisZ);
 
-			int green = (int)(0xFF*angle/UtilEjml.PI);
+			double dot = normal.dot(axisZ);
+			dot /= normal.norm();
+
+			// square dot to remove the sign and make it more visible
+			int green = (int)(dot*dot*256) % 256;
 			colors[i] = 0xFF000000 | (green << 8);
 		}
 
