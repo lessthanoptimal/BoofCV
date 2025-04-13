@@ -71,10 +71,21 @@ public class MeshColorizeOps {
 			dot /= normal.norm();
 
 			// square dot to remove the sign and make it more visible
-			int green = (int)(dot*dot*256) % 256;
+			int green = (int)(dot*dot*256)%256;
 			colors[i] = 0xFF000000 | (green << 8);
 		}
 
 		return ( index ) -> colors[index];
+	}
+
+	/**
+	 * Colorization scheme designed to emphasize normal angle and x-y orientation.
+	 *
+	 * @param global if true it's computed once for global or if false for each change in view
+	 *
+	 * @see MeshColorYawRBNormalG
+	 */
+	public static RenderMesh.SurfaceColor colorizeYawRBNormG( VertexMesh mesh, boolean global ) {
+		return new MeshColorYawRBNormalG(mesh, global);
 	}
 }

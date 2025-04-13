@@ -44,6 +44,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.PrintStream;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -107,6 +108,8 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 	// Contains all the possible ways to colorize the mesh.
 	// You must synchronize before accessing these two fields since multiple threads can access them
 	final Map<String, RenderMesh.SurfaceColor> colorizers = new HashMap<>();
+	// List of names in the order they were added for consistency
+	final List<String> colorizerNames = new ArrayList<>();
 	// Index of the active colorizer. Used to cycle through all the options
 	int activeColorizer;
 
@@ -231,23 +234,27 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 		this.mesh = mesh;
 
 		colorizers.clear();
+		colorizerNames.clear();
 
 		// Add colorization based on normal angle. This works even if RGB colors are not known
 		synchronized (colorizers) {
-			colorizers.put(COLOR_NORMAL, MeshColorizeOps.colorizeByNormal(mesh));
-			renderer.surfaceColor = colorizers.get(COLOR_NORMAL);
+			setSurfaceColor(COLOR_NORMAL, MeshColorizeOps.colorizeByNormal(mesh));
+			setSurfaceColor("Global YawRB-NormG", MeshColorizeOps.colorizeYawRBNormG(mesh, true));
+			setSurfaceColor("Local YawRB-NormG", MeshColorizeOps.colorizeYawRBNormG(mesh, false));
+			renderer.surfaceColor = Objects.requireNonNull(colorizers.get(COLOR_NORMAL));
 			activeColorizer = 0;
 		}
 	}
 
 	/**
-	 * Let's ou specify the RGB color for each vertex in the mesh.
+	 * Lets you specify the RGB color for each vertex in the mesh. It's added to the list and made active.
 	 *
 	 * @param name Name given to this colorization approach
 	 */
 	public void setSurfaceColor( String name, RenderMesh.SurfaceColor colorizer ) {
 		synchronized (colorizers) {
 			colorizers.put(name, colorizer);
+			colorizerNames.add(name);
 			renderer.surfaceColor = colorizers.get(name);
 			activeColorizer = colorizers.size();
 		}
@@ -387,13 +394,8 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 		}
 
 		synchronized (colorizers) {
-			var list = new ArrayList<>(colorizers.keySet());
-
 			// go to the next one and make sure it's valid
-			activeColorizer++;
-			if (activeColorizer >= totalColors) {
-				activeColorizer = 0;
-			}
+			activeColorizer = (activeColorizer + 1) % totalColors;
 
 			// If it has texture then that is the first possible colorizer
 			if (mesh.isTextured()) {
@@ -401,10 +403,10 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 					renderer.forceColorizer = false;
 				} else {
 					renderer.forceColorizer = true;
-					renderer.surfaceColor = Objects.requireNonNull(colorizers.get(list.get(activeColorizer - 1)));
+					renderer.surfaceColor = Objects.requireNonNull(colorizers.get(colorizerNames.get(activeColorizer - 1)));
 				}
 			} else {
-				renderer.surfaceColor = Objects.requireNonNull(colorizers.get(list.get(activeColorizer)));
+				renderer.surfaceColor = Objects.requireNonNull(colorizers.get(colorizerNames.get(activeColorizer)));
 			}
 
 			// Re-render the image
