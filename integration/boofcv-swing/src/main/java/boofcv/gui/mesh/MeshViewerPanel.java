@@ -20,6 +20,7 @@ package boofcv.gui.mesh;
 
 import boofcv.alg.distort.pinhole.LensDistortionPinhole;
 import boofcv.alg.geo.PerspectiveOps;
+import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.image.SaveImageOnClick;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.image.ConvertBufferedImage;
@@ -30,6 +31,9 @@ import boofcv.struct.image.ImageDimension;
 import boofcv.struct.image.InterleavedU8;
 import boofcv.struct.mesh.VertexMesh;
 import boofcv.visualize.RenderMesh;
+import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point3D_F64;
+import georegression.struct.se.Se3_F64;
 import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.struct.VerbosePrint;
@@ -68,7 +72,7 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 	public int buttonSize = 60;
 	public Font helpButtonFont = new Font("Serif", Font.BOLD, 45);
 	/** If the help button exists */
-	public boolean helpButtonActive = true;
+	@Getter @Setter public boolean helpButtonActive = true;
 
 	/** Renders the mesh into a projected image */
 	@Getter RenderMesh renderer = new RenderMesh();
@@ -88,6 +92,9 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 	// if true a request to render another frame has been made
 	boolean renderRequested = false;
 
+	// Has the camera been initialized? This is done lazily because we need to know the camera intrinsics
+	boolean cameraInitialized = false;
+
 	// The thread which performs the rendering
 	Thread renderThread = new Thread(this::renderLoop, "MeshRender");
 
@@ -100,10 +107,15 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 	// If true it will show the depth buffer instead of the regular rendered image
 	@Getter @Setter boolean showDepth = false;
 
-	// controls and activeControls are synchronized against controls
+	// Variables below are synchronized against 'controls'
 	/** Map of all camera controls */
 	final Map<String, Swing3dCameraControl> controls = new HashMap<>();
-	Swing3dCameraControl activeControl;
+	/** Name of the most recently active control */
+	@Getter String lastControlName = "";
+	// Most recent world to view. This is passed into a camera control when changed.
+	Se3_F64 recentWorldToView = new Se3_F64();
+	@Nullable Swing3dCameraControl activeControl;
+	//----------------- END synchronized by 'controls'
 
 	// Contains all the possible ways to colorize the mesh.
 	// You must synchronize before accessing these two fields since multiple threads can access them
@@ -121,6 +133,10 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 
 	@Nullable PrintStream verbose = null;
 
+	@Getter @Setter CustomPaint customPaint = ( g2 ) -> {};
+	@Getter @Setter CameraChanged cameraChanged = ( cam ) -> {};
+
+	// Intrinsic camera parameters
 	CameraPinhole intrinsics = new CameraPinhole();
 
 	/**
@@ -147,6 +163,7 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 					dimension.width = getWidth();
 					dimension.height = getHeight();
 					requestRender();
+					cameraChanged.cameraChanged(getIntrinsicsCopy());
 				}
 			}
 		});
@@ -170,6 +187,7 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 		// If the user clicks in the top-left corner open the help screen
 		addMouseListener(new MouseAdapter() {
 			@Override public void mouseClicked( MouseEvent e ) {
+				requestFocus();
 				if (!helpButtonActive || e.getX() >= buttonSize || e.getY() >= buttonSize)
 					return;
 				if (helpWindow == null)
@@ -184,19 +202,115 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 		setPreferredSize(new Dimension(500, 500));
 	}
 
+	public float imagePixelToDepthZ( int pixelX, int pixelY ) {
+		// Note: We are ignoring background rendering
+		GrayF32 depth = renderer.depthImage;
+
+		if (!depth.isInBounds(pixelX, pixelY))
+			return Float.NaN;
+
+		return depth.unsafe_get(pixelX, pixelY);
+	}
+
+	/**
+	 * Given an image pixel, look up the 3D coordinate of the point. If the pixel doesn't intersect the mesh then
+	 * false is returned.
+	 *
+	 * @param pixelX (Input) x-coordinate of the pixel
+	 * @param pixelY (Input) y-coordinate of the pixel
+	 * @param norm (Output) normalized image coordinate of pixel
+	 * @param p3 (Output) 3D location of point in camera frame
+	 */
+	public boolean imagePixelToCamera3D( int pixelX, int pixelY, Point2D_F64 norm, Point3D_F64 p3 ) {
+		// Note: We are ignoring background rendering
+		GrayF32 depth = renderer.depthImage;
+
+		if (!depth.isInBounds(pixelX, pixelY))
+			return false;
+
+		float d = depth.unsafe_get(pixelX, pixelY);
+		if (Float.isNaN(d) || d <= 0.0f)
+			return false;
+
+		PerspectiveOps.convertPixelToNorm(intrinsics, pixelX, pixelY, norm);
+		p3.z = d;
+		p3.x = norm.x*p3.z;
+		p3.y = norm.y*p3.z;
+
+		return true;
+	}
+
+	public boolean imagePixelToWorld3D( int pixelX, int pixelY, Point2D_F64 norm, Point3D_F64 p3 ) {
+		if (!imagePixelToCamera3D(pixelX, pixelY, norm, p3))
+			return false;
+
+		var worldToCamera = new Se3_F64();
+		synchronized (controls) {
+			worldToCamera.setTo(recentWorldToView);
+		}
+
+		worldToCamera.transformReverse(p3, p3);
+		return true;
+	}
+
+	/// The camera will no longer control the UI
+	public void detachCameraFromUI() {
+		synchronized (controls) {
+			if (activeControl == null)
+				return;
+			activeControl.detachControls(this);
+		}
+	}
+
+	/// The camera will now receive UI events
+	public void attachCameraToUI() {
+		synchronized (controls) {
+			if (activeControl == null)
+				return;
+			activeControl.attachControls(this);
+		}
+	}
+
 	/**
 	 * Changes the active camera control
 	 */
 	public void setActiveControl( String name ) {
+		lastControlName = name;
 		synchronized (controls) {
-			if (activeControl != null)
+			// true if the current control is attached. If there is no activeControl then attach the new one
+//			boolean currentAttached = true;
+
+			// Save the current view so it can select a similar view when changing cameras
+			Se3_F64 currentWorldToView = new Se3_F64();
+			if (activeControl != null) {
+				currentWorldToView.setTo(activeControl.getWorldToCamera());
+//				currentAttached = activeControl.isControlAttached();
+//				if (currentAttached)
 				activeControl.detachControls(this);
+			}
 
 			activeControl = Objects.requireNonNull(controls.get(name));
 			activeControl.setChangeHandler(this::requestRender);
+
+			// Only attach the new control if the previous one was also attached. To keep behavior consistent
+//			if (currentAttached)
 			activeControl.attachControls(this);
-			if (mesh != null)
+			if (mesh != null) {
 				activeControl.selectInitialParameters(mesh);
+				recentWorldToView.setTo(activeControl.getWorldToCamera());
+				requestRender();
+			}
+		}
+	}
+
+	/**
+	 * Removes the active control
+	 */
+	public void removeActiveControl() {
+		synchronized (controls) {
+			if (activeControl != null)
+				activeControl.detachControls(this);
+			activeControl = null;
 		}
 	}
 
@@ -230,7 +344,7 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 		if (copy) {
 			mesh = new VertexMesh().setTo(mesh);
 		}
-		activeControl.selectInitialParameters(mesh);
+		cameraInitialized = false;
 		this.mesh = mesh;
 
 		colorizers.clear();
@@ -253,10 +367,10 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 	 */
 	public void setSurfaceColor( String name, RenderMesh.SurfaceColor colorizer ) {
 		synchronized (colorizers) {
+			activeColorizer = colorizers.size();
 			colorizers.put(name, colorizer);
 			colorizerNames.add(name);
 			renderer.surfaceColor = colorizers.get(name);
-			activeColorizer = colorizers.size();
 		}
 	}
 
@@ -273,7 +387,7 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 	}
 
 	/**
-	 * Requests that a new image is rendered. Typically this is done when a configuration has changed. It will render
+	 * Requests that a new image is rendered. Typically, this is done when a configuration has changed. It will render
 	 * when the rendering thread has a chance.
 	 */
 	public void requestRender() {
@@ -321,8 +435,17 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 		}
 
 		synchronized (controls) {
-			activeControl.setCamera(intrinsics);
-			renderer.setWorldToView(activeControl.getWorldToCamera());
+			if (activeControl != null) {
+				activeControl.setCamera(intrinsics);
+
+				// Now that we know the intrinsics, initialize the camera
+				if (!cameraInitialized) {
+					cameraInitialized = true;
+					activeControl.selectInitialParameters(mesh);
+				}
+				renderer.setWorldToView(activeControl.getWorldToCamera());
+				renderer.getWorldToView(recentWorldToView);
+			}
 		}
 
 		// Render the mesh
@@ -395,7 +518,7 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 
 		synchronized (colorizers) {
 			// go to the next one and make sure it's valid
-			activeColorizer = (activeColorizer + 1) % totalColors;
+			activeColorizer = (activeColorizer + 1)%totalColors;
 
 			// If it has texture then that is the first possible colorizer
 			if (mesh.isTextured()) {
@@ -414,10 +537,8 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 		}
 	}
 
-	@Override
-	public void paintComponent( Graphics g ) {
+	@Override public void paintComponent( Graphics g ) {
 		super.paintComponent(g);
-
 		// Start the render thread if it hasn't already started
 		try {
 			if (!renderThread.isAlive())
@@ -426,6 +547,7 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 		}
 
 		var g2 = (Graphics2D)g;
+		BoofSwingUtil.antialiasing(g);
 
 		// Lock here to ensure the render thread doesn't swap buffers then update it while we are drawing it here
 		lockSwap.lock();
@@ -437,6 +559,8 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 
 		if (helpButtonActive)
 			drawHelpButton(g2);
+
+		customPaint.paint(g2);
 	}
 
 	private void drawHelpButton( Graphics2D g2 ) {
@@ -457,7 +581,7 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 	}
 
 	/**
-	 * Opens a window which provides help about keys and let's the user modify control settings
+	 * Opens a window which provides help about keys and lets the user modify control settings
 	 */
 	public void showHelpWindow() {
 		// See if the window is already visible
@@ -504,7 +628,9 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 
 		// H = Home and resets the view
 		if (e.getKeyCode() == KeyEvent.VK_H) {
-			activeControl.reset();
+			if (activeControl != null)
+				activeControl.reset();
+			cameraInitialized = false;
 			requestRender();
 		} else if (e.getKeyCode() == KeyEvent.VK_J) {
 			cycleColorizer();
@@ -520,5 +646,22 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 
 	public void setTextureImage( InterleavedU8 rgb ) {
 		renderer.setTextureImage(rgb);
+	}
+
+	/** Returns a copy of the intrinsics */
+	public CameraPinhole getIntrinsicsCopy() {
+		// We don't copy intrinsics since that is only updated when rendered
+		var camera = new CameraPinhole();
+		PerspectiveOps.createIntrinsic(dimension.width, dimension.height, hfov, -1, camera);
+		return camera;
+	}
+
+	public interface CustomPaint {
+		void paint( Graphics2D g2 );
+	}
+
+	/** Used to listen in when the camera model has changed */
+	public interface CameraChanged {
+		void cameraChanged( CameraPinhole intrinsics );
 	}
 }
