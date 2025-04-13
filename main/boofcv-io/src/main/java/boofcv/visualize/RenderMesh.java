@@ -74,7 +74,7 @@ public class RenderMesh implements VerbosePrint {
 	public @Getter @Setter int defaultColorRgba = 0xFFFFFF;
 
 	/** Used to change what color a surface is. By default, it's red. */
-	public @Getter @Setter SurfaceColor surfaceColor = ( surface ) -> 0xFF0000;
+	public @Getter @Setter SurfaceColor surfaceColor = new DefaultColor();
 
 	/** Rendered depth image. Values with no depth information are set to NaN. */
 	public @Getter final GrayF32 depthImage = new GrayF32(1, 1);
@@ -83,7 +83,7 @@ public class RenderMesh implements VerbosePrint {
 	public @Getter final InterleavedU8 rgbImage = new InterleavedU8(1, 1, 3);
 
 	/** Transform from world (what the mesh is in) to the camera view */
-	public @Getter final Se3_F64 worldToView = new Se3_F64();
+	private final Se3_F64 worldToView = new Se3_F64();
 
 	/** If true then a polygon will only be rendered if the surface normal is pointed towards the camera */
 	public @Getter @Setter boolean checkFaceNormal = false;
@@ -117,6 +117,20 @@ public class RenderMesh implements VerbosePrint {
 	private final Polygon2D_F64 workTri = new Polygon2D_F64(3);
 
 	@Nullable PrintStream verbose = null;
+
+	/** Used to retrieve a copy of the current world-to-view transform */
+	public Se3_F64 getWorldToView( @Nullable Se3_F64 output ) {
+		if (output == null)
+			output = new Se3_F64();
+		output.setTo(worldToView);
+		return output;
+	}
+
+	/** Changes the world to view transform */
+	public void setWorldToView( Se3_F64 worldToView ) {
+		this.worldToView.setTo(worldToView);
+		this.surfaceColor.setWorldToView(worldToView);
+	}
 
 	public void setTextureImage( InterleavedU8 textureImage ) {
 		this.textureImage = textureImage;
@@ -452,11 +466,16 @@ public class RenderMesh implements VerbosePrint {
 		verbose = VerboseUtils.addPrefix(this, out);
 	}
 
-	@FunctionalInterface
+	/** Results red as the default color until another method is provided */
+	public static class DefaultColor implements SurfaceColor {
+		@Override public int surfaceRgb( int which ) {return 0xFF0000;}
+	}
+
 	public interface SurfaceColor {
-		/**
-		 * Returns RGB color of the specified surface
-		 */
+		/** Called whenever the camera moves */
+		default void setWorldToView( Se3_F64 worldToCamera ) {}
+
+		/** Returns RGB color of the specified surface */
 		int surfaceRgb( int which );
 	}
 }

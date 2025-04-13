@@ -315,7 +315,7 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 
 		synchronized (controls) {
 			activeControl.setCamera(intrinsics);
-			renderer.worldToView.setTo(activeControl.getWorldToCamera());
+			renderer.setWorldToView(activeControl.getWorldToCamera());
 		}
 
 		// Render the mesh

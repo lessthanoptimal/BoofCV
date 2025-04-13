@@ -7,6 +7,13 @@ Version Meaning: <compatible>.<feature>.<bug fix>
 - Last digit always indicates a bug fix and other minor changes
 
 ---------------------
+Date    : 2025/XXX/YY
+Version : 1.2.2
+
+RenderMesh
+- Color can now be view dependent
+
+---------------------
 Date    : 2025/Apr/10
 Version : 1.2.1
 
