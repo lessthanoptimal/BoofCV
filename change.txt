@@ -7,9 +7,11 @@ Version Meaning: <compatible>.<feature>.<bug fix>
 - Last digit always indicates a bug fix and other minor changes
 
 ---------------------
-Date    : 2025/XXX/YY
+Date    : 2025/Apr/24
 Version : 1.2.2
 
+MeshViewer
+- Several improvements that enable more customizing
 RenderMesh
 - Color can now be view dependent
 
