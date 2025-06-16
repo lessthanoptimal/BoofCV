@@ -56,7 +56,7 @@ public class PlyCodec {
 		var v = new Point3D_F64();
 		for (int i = 0; i < data.getVertexCount(); i++) {
 			data.getVertex(i, p);
-			outputWriter.write(String.format("%f %f %f", p.x, p.y, p.z));
+			outputWriter.write(String.format("%.6f %.6f %.6f", p.x, p.y, p.z));
 			if (data.isVertexNormals()) {
 				data.getVertexNormal(i, v);
 				outputWriter.write(String.format(" %f %f %f", v.x, v.y, v.z));
@@ -88,7 +88,7 @@ public class PlyCodec {
 				BoofMiscOps.checkEq(size, data.getTextureCoors(i, arrayF));
 				outputWriter.write(" " + (size*2));
 				for (int idx = 0; idx < size*2; idx++) {
-					outputWriter.write(" " + arrayF[idx]);
+					outputWriter.write(String.format(" %.6f", arrayF[idx]));
 				}
 			}
 
@@ -554,19 +554,39 @@ public class PlyCodec {
 			output.stopVertex();
 		}
 
-		int[] indexes = new int[100];
-		for (int i = 0; i < header.triangleCount; i++) {
+		var indexes = new int[100];
+		var texture = new float[100];
+		for (int idxTriangle = 0; idxTriangle < header.triangleCount; idxTriangle++) {
 			String line = readNextPly(reader, true, buffer);
 			String[] words = line.split("\\s+");
-			int n = Integer.parseInt(words[0]);
-			if (words.length != n + 1) {
-				throw new RuntimeException("Unexpected number of words.");
-			}
-			for (int wordIdx = 1; wordIdx <= n; wordIdx++) {
-				indexes[wordIdx - 1] = Integer.parseInt(words[i]);
-			}
+			int idxWord = 0;
 
-			output.addPolygon(indexes, 0, n);
+			for (int idxProperty = 0; idxProperty < header.properties.size(); idxProperty++) {
+				PropertyList prop = header.properties.get(idxProperty);
+				int n = Integer.parseInt(words[idxWord++]);
+				if (words.length < n + idxWord) {
+					throw new RuntimeException("Unexpected number of words. " + words.length + " vs " + (n + 1));
+				}
+
+				switch (prop.label) {
+					case "vertex_indices" -> {
+						for (int i = 0; i < n; i++) {
+							indexes[i] = Integer.parseInt(words[idxWord++]);
+						}
+						output.addPolygon(indexes, 0, n);
+					}
+					case "texcoord" -> {
+						for (int i = 0; i < n; i++) {
+							texture[i] = Float.parseFloat(words[idxWord++]);
+						}
+						output.addTexture(n/2, texture);
+					}
+					default -> {
+						idxWord += n;
+						System.err.println("Unknown property type " + prop.label);
+					}
+				}
+			}
 		}
 	}
 
@@ -646,7 +666,6 @@ public class PlyCodec {
 				output.setVertexNormal(nx, ny, nz);
 			}
 			output.stopVertex();
-			//System.out.printf("vertex: %.1e %.1e %.1e | %2x %2x %2x\n", x, y, z, r, g, b);
 		}
 
 		var arrayI = new int[100];
