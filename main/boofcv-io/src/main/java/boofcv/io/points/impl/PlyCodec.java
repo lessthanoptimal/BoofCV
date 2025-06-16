@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -75,20 +75,23 @@ public class PlyCodec {
 
 		for (int i = 0; i < data.getPolygonCount(); i++) {
 			int size = data.getIndexes(i, arrayI);
-			outputWriter.write(size);
+			if (size == 0) {
+				System.err.println("Warning: Face is malformed and has a size of zero. i=" + i);
+				continue;
+			}
+			outputWriter.write(Integer.toString(size));
 			for (int idx = 0; idx < size; idx++) {
 				outputWriter.write(" " + arrayI[idx]);
 			}
-			outputWriter.write('\n');
 
-			if (!data.isTextured())
-				continue;
-
-			BoofMiscOps.checkEq(size, data.getTextureCoors(i, arrayF));
-			outputWriter.write(size);
-			for (int idx = 0; idx < size*2; idx++) {
-				outputWriter.write(" " + arrayF[idx]);
+			if (data.isTextured()) {
+				BoofMiscOps.checkEq(size, data.getTextureCoors(i, arrayF));
+				outputWriter.write(" " + (size*2));
+				for (int idx = 0; idx < size*2; idx++) {
+					outputWriter.write(" " + arrayF[idx]);
+				}
 			}
+
 			outputWriter.write('\n');
 		}
 		outputWriter.flush();
@@ -248,9 +251,13 @@ public class PlyCodec {
 			BoofMiscOps.checkEq(size, data.getTextureCoors(i, arrayF));
 			bytes.put((byte)(2*size));
 			for (int idx = 0; idx < size*2; idx++) {
-				bytes.putFloat(arrayF[idx]);
+				if (saveAsFloat) {
+					bytes.putFloat(arrayF[idx]);
+				} else {
+					bytes.putDouble(arrayF[idx]);
+				}
 			}
-			outputWriter.write(bytes.array(), 0, 1 + 2*4*size);
+			outputWriter.write(bytes.array(), 0, 1 + 2*dataLength*size);
 		}
 		outputWriter.flush();
 	}
@@ -756,11 +763,21 @@ public class PlyCodec {
 				int idx0 = mesh.faceOffsets.get(which);
 				int idx1 = mesh.faceOffsets.get(which + 1);
 
-				int idxArray = 0;
-				for (int i = idx0; i < idx1; i++) {
-					Point2D_F32 p = mesh.texture.getTemp(i);
-					coordinates[idxArray++] = p.x;
-					coordinates[idxArray++] = p.y;
+				if (mesh.faceVertexTextures.isEmpty()) {
+					int idxArray = 0;
+					for (int i = idx0; i < idx1; i++) {
+						Point2D_F32 p = mesh.texture.getTemp(i);
+						coordinates[idxArray++] = p.x;
+						coordinates[idxArray++] = p.y;
+					}
+				} else {
+					int idxArray = 0;
+					for (int i = idx0; i < idx1; i++) {
+						int idxTexture = mesh.faceVertexTextures.get(i);
+						Point2D_F32 p = mesh.texture.getTemp(idxTexture);
+						coordinates[idxArray++] = p.x;
+						coordinates[idxArray++] = p.y;
+					}
 				}
 
 				return idx1 - idx0;
