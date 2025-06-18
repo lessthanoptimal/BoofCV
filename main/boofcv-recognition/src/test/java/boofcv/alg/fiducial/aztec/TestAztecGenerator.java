@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,8 @@
 
 package boofcv.alg.fiducial.aztec;
 
-import boofcv.struct.packed.PackedArrayPoint2D_I16;
 import boofcv.testing.BoofStandardJUnit;
+import georegression.struct.packed.PackedArrayPoint2D_I16;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.alg.drawing.FiducialRenderEngine;
 import boofcv.alg.fiducial.qrcode.PackedBits8;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.GrayU8;
-import boofcv.struct.packed.PackedArrayPoint2D_I16;
+import georegression.struct.packed.PackedArrayPoint2D_I16;
 import georegression.struct.point.Point2D_I16;
 import georegression.struct.shapes.Polygon2D_F64;
 import lombok.Getter;

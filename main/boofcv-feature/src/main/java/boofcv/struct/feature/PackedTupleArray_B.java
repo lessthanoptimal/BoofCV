@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,7 @@
 
 package boofcv.struct.feature;
 
-import boofcv.misc.BoofLambdas;
-import boofcv.struct.PackedArray;
+import georegression.struct.packed.PackedArray;
 import org.ddogleg.struct.DogArray_I32;
 
 /**
@@ -90,7 +89,7 @@ public class PackedTupleArray_B implements PackedTupleArray<TupleDesc_B> {
 		return TupleDesc_B.class;
 	}
 
-	@Override public void forIdx( int idx0, int idx1, BoofLambdas.ProcessIndex<TupleDesc_B> op ) {
+	@Override public void forIdx( int idx0, int idx1, ProcessIndex<TupleDesc_B> op ) {
 		int pointIndex = idx0;
 		idx0 *= numInts;
 		idx1 *= numInts;

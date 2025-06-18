@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.scene.vocabtree;
 
 import boofcv.misc.BoofLambdas;
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.PackedArray;
+import georegression.struct.packed.PackedArray;
 import org.ddogleg.clustering.PointDistance;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,8 @@ package boofcv.io.points;
 
 import boofcv.struct.mesh.MeshPolygonAccess;
 import boofcv.struct.mesh.VertexMesh;
-import boofcv.struct.packed.PackedBigArrayPoint3D_F64;
 import georegression.geometry.GeometryMath_F64;
+import georegression.struct.packed.PackedBigArrayPoint3D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import org.ddogleg.struct.DogArray;

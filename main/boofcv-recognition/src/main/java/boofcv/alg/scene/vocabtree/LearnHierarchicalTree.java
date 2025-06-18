@@ -22,7 +22,7 @@ import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree.Node;
 import boofcv.misc.BoofLambdas;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ConfigLength;
-import boofcv.struct.PackedArray;
+import georegression.struct.packed.PackedArray;
 import org.ddogleg.clustering.kmeans.StandardKMeans;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_F64;

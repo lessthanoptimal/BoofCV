@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,8 @@ package boofcv.examples.pointclouds;
 
 import boofcv.alg.cloud.PointCloudReader;
 import boofcv.io.points.PointCloudIO;
-import boofcv.struct.PackedArray;
-import boofcv.struct.packed.PackedBigArrayPoint3D_F64;
+import georegression.struct.packed.PackedArray;
+import georegression.struct.packed.PackedBigArrayPoint3D_F64;
 import georegression.struct.point.Point3D_F64;
 
 import java.io.File;

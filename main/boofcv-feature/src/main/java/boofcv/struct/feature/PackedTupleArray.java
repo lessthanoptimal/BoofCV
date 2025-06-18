@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.struct.feature;
 
-import boofcv.struct.PackedArray;
+import georegression.struct.packed.PackedArray;
 
 /**
  * Interface for all Packed Tuple arrays

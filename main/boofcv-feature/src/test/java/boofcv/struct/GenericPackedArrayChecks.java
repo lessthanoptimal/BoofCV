@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.struct.packed;
+package boofcv.struct;
 
-import boofcv.struct.PackedArray;
 import boofcv.testing.BoofStandardJUnit;
+import georegression.struct.packed.PackedArray;
 import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
 

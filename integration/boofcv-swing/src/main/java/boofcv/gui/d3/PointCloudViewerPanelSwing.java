@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,17 +22,16 @@ import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.gui.image.SaveImageOnClick;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.misc.BoofLambdas;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS32;
-import boofcv.struct.packed.PackedBigArrayPoint3D_F32;
 import boofcv.visualize.PointCloudViewer;
 import georegression.geometry.ConvertRotation3D_F32;
 import georegression.metric.UtilAngle;
 import georegression.struct.ConvertFloatType;
 import georegression.struct.EulerType;
+import georegression.struct.packed.PackedBigArrayPoint3D_F32;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point3D_F32;
 import georegression.struct.point.Point3D_F64;
@@ -323,7 +322,7 @@ public class PointCloudViewerPanelSwing extends JPanel
 		final float cy = (float)intrinsic.cy;
 		// NOTE: To make this concurrent there needs to be a way to write the points and not run into race conditions
 		//       Each thread writing to its own image seems too expensive for large images and combining the results
-		cloudXyz.forIdx(0, cloudXyz.size(), (BoofLambdas.ProcessIndex<Point3D_F32>)( idx, worldPt ) -> {
+		cloudXyz.forIdx(0, cloudXyz.size(), ( idx, worldPt ) -> {
 			SePointOps_F32.transform(worldToCamera, worldPt, cameraPt);
 
 			// can't render if it's behind the camera

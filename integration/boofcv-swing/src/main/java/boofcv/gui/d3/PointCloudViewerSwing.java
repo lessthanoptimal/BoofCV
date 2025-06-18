@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,10 +21,10 @@ package boofcv.gui.d3;
 import boofcv.alg.cloud.AccessColorIndex;
 import boofcv.alg.cloud.AccessPointIndex;
 import boofcv.gui.BoofSwingUtil;
-import boofcv.struct.PackedArray;
 import boofcv.struct.Point3dRgbI_F64;
 import boofcv.visualize.PointCloudViewer;
 import georegression.struct.ConvertFloatType;
+import georegression.struct.packed.PackedArray;
 import georegression.struct.point.Point3D_F32;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F32;
