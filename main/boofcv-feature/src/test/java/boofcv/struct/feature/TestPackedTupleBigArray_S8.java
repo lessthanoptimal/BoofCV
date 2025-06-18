@@ -18,8 +18,8 @@
 
 package boofcv.struct.feature;
 
-import boofcv.struct.PackedArray;
-import boofcv.struct.packed.GenericPackedArrayChecks;
+import boofcv.struct.GenericPackedArrayChecks;
+import georegression.struct.packed.PackedArray;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

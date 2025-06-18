@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,9 +19,8 @@
 package boofcv.alg.scene.vocabtree;
 
 import boofcv.alg.scene.vocabtree.HierarchicalVocabularyTree.Node;
-import boofcv.misc.BoofLambdas;
-import boofcv.struct.PackedArray;
 import boofcv.testing.BoofStandardJUnit;
+import georegression.struct.packed.PackedArray;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.clustering.PointDistance;
 import org.ejml.UtilEjml;
@@ -144,7 +143,7 @@ public class TestHierarchicalVocabularyTree extends BoofStandardJUnit {
 		@Override public void reserve( int numElements ) {}
 		@Override public void append( Point2D_F64 element ) {list.add(element.copy());}
 		@Override public void set(int index, Point2D_F64 element) {}
-		@Override public void forIdx( int idx0, int idx1, BoofLambdas.ProcessIndex<Point2D_F64> op ) {}
+		@Override public void forIdx( int idx0, int idx1, ProcessIndex<Point2D_F64> op ) {}
 		@Override public boolean isEquals(PackedArray<Point2D_F64> other) {return false;}
 		@Override public Point2D_F64 getTemp( int index ) {return list.get(index);}
 		@Override public void getCopy( int index, Point2D_F64 dst ) {dst.setTo(list.get(index));}

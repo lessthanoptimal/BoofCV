@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,10 +18,10 @@
 
 package boofcv.struct.mesh;
 
-import boofcv.struct.packed.PackedArrayPoint3D_F32;
-import boofcv.struct.packed.PackedBigArrayPoint2D_F32;
-import boofcv.struct.packed.PackedBigArrayPoint3D_F64;
 import georegression.geometry.GeometryMath_F64;
+import georegression.struct.packed.PackedArrayPoint3D_F32;
+import georegression.struct.packed.PackedBigArrayPoint2D_F32;
+import georegression.struct.packed.PackedBigArrayPoint3D_F64;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point3D_F32;
 import georegression.struct.point.Point3D_F64;

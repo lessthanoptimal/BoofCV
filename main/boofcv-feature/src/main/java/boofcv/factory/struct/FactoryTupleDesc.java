@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,8 @@
 package boofcv.factory.struct;
 
 import boofcv.abst.feature.describe.DescriptorInfo;
-import boofcv.struct.PackedArray;
 import boofcv.struct.feature.*;
+import georegression.struct.packed.PackedArray;
 
 /**
  * Factory for creating {@link TupleDesc} and related structures abstractly.

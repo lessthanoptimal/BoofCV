@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,10 +40,10 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
-import boofcv.struct.packed.PackedArrayPoint2D_I16;
 import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.metric.Intersection2D_F64;
+import georegression.struct.packed.PackedArrayPoint2D_I16;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I16;
 import georegression.struct.shapes.Polygon2D_F64;

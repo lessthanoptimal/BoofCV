@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,9 @@
 
 package boofcv.struct.kmeans;
 
-import boofcv.struct.PackedArray;
 import boofcv.struct.feature.PackedTupleArray_B;
 import boofcv.struct.feature.TupleDesc_B;
+import georegression.struct.packed.PackedArray;
 import org.ddogleg.clustering.ComputeMeanClusters;
 import org.ddogleg.struct.DogArray_F64;
 
