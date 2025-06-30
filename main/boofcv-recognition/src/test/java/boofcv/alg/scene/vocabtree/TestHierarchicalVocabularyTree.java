@@ -139,8 +139,9 @@ public class TestHierarchicalVocabularyTree extends BoofStandardJUnit {
 
 	public static class Packed2D implements PackedArray<Point2D_F64> {
 		public final List<Point2D_F64> list = new ArrayList<>();
-		@Override public void reset() {list.clear();}
-		@Override public void reserve( int numElements ) {}
+		@Override public Packed2D reset() {list.clear();return this;}
+		@Override public void removeSwap(int i) {}
+		@Override public Packed2D reserve( int numElements ) {return this;}
 		@Override public void append( Point2D_F64 element ) {list.add(element.copy());}
 		@Override public void set(int index, Point2D_F64 element) {}
 		@Override public void forIdx( int idx0, int idx1, ProcessIndex<Point2D_F64> op ) {}
