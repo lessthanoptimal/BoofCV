@@ -50,13 +50,22 @@ public class PackedTupleArray_B implements PackedTupleArray<TupleDesc_B> {
 		array.resize(0);
 	}
 
-	@Override public void reset() {
-		numElements = 0;
-		array.reset();
+	@Override public void removeSwap( int index ) {
+		int where = (index + 1)*dof - 1;
+		for (int i = 0; i < dof; i++) {
+			array.removeSwap(where--);
+		}
 	}
 
-	@Override public void reserve( int numTuples ) {
+	@Override public PackedTupleArray_B reset() {
+		numElements = 0;
+		array.reset();
+		return this;
+	}
+
+	@Override public PackedTupleArray_B reserve( int numTuples ) {
 		array.reserve(numTuples*numInts);
+		return this;
 	}
 
 	@Override public void append( TupleDesc_B element ) {

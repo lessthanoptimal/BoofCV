@@ -46,13 +46,22 @@ public class PackedTupleArray_F64 implements PackedTupleArray<TupleDesc_F64> {
 		array.resize(0);
 	}
 
-	@Override public void reset() {
-		numElements = 0;
-		array.reset();
+	@Override public void removeSwap( int index ) {
+		int where = (index + 1)*dof - 1;
+		for (int i = 0; i < dof; i++) {
+			array.removeSwap(where--);
+		}
 	}
 
-	@Override public void reserve( int numTuples ) {
+	@Override public PackedTupleArray_F64 reset() {
+		numElements = 0;
+		array.reset();
+		return this;
+	}
+
+	@Override public PackedTupleArray_F64 reserve( int numTuples ) {
 		array.reserve(numTuples*dof);
+		return this;
 	}
 
 	@Override public void append( TupleDesc_F64 element ) {
