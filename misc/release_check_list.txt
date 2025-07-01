@@ -46,5 +46,5 @@ Update prebuilt applications and demonstrations using https://github.com/lesstha
 - Publish Stable Release:
 
 git clean -fd main && ./gradlew autogenerate && ./gradlew assemble
-./gradlew publishToSonatype && ./gradlew findSonatypeStagingRepository closeSonatypeStagingRepository && ./gradlew findSonatypeStagingRepository releaseSonatypeStagingRepository
+./gradlew publishToSonatype -Dorg.gradle.parallel=false && ./gradlew findSonatypeStagingRepository closeSonatypeStagingRepository && ./gradlew findSonatypeStagingRepository releaseSonatypeStagingRepository
 
