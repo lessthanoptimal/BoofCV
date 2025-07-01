@@ -38,7 +38,7 @@ repositories {
     google()
     mavenCentral()
     mavenLocal()
-    maven { url = "https://oss.sonatype.org/content/repositories/snapshots/" }
+    maven { url = "https://central.sonatype.com/repository/maven-snapshots/" }
 }
 
 configurations.configureEach {
@@ -115,8 +115,8 @@ afterEvaluate {
             }
             repositories {
                 maven {
-                    def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-                    def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
+                    def releasesRepoUrl = "https://central.sonatype.com/api/v1/publish/"
+                    def snapshotsRepoUrl = "https://central.sonatype.com/repository/maven-snapshots/"
                     url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
                     credentials {
                         username ossrhUsername
