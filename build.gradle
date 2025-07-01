@@ -19,7 +19,7 @@ allprojects {
 }
 
 project.ext.ddogleg_version = '0.24.0'
-project.ext.georegression_version = '0.27.7-SNAPSHOT'
+project.ext.georegression_version = '0.28.0'
 project.ext.commons_io_version = '2.16.1'
 project.ext.deepboof_version = '0.5.3'
 project.ext.lombok_version = '1.18.28'
