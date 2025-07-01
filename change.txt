@@ -7,6 +7,13 @@ Version Meaning: <compatible>.<feature>.<bug fix>
 - Last digit always indicates a bug fix and other minor changes
 
 ---------------------
+Date    : 2025/Jul/01
+Version : 1.2.3
+
+- Moved PackedArray into GeoRegression
+- Fixed PlyCodec
+
+---------------------
 Date    : 2025/Apr/24
 Version : 1.2.2
 
