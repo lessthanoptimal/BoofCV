@@ -126,7 +126,7 @@ afterEvaluate {
             }
         }
 
-        if (ext.ossrhPassword != "dummy") {
+        if (project.hasProperty('ossrhUsername')) {
             signing { sign publishing.publications }
         }
     }

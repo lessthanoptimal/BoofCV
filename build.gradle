@@ -38,6 +38,11 @@ project.ext.jsr250_version = '1.0'
 project.ext.jsr305_version = '3.0.2'
 project.ext.trove4j_version = '3.0.3'
 
+if (!project.hasProperty('ossrhUsername')) {
+    ext.ossrhUsername = "dummy"
+    ext.ossrhPassword = "dummy"
+}
+
 nexusPublishing {
     repositories {
         sonatype {
@@ -316,12 +321,6 @@ subprojects {
     if (!project.tasks.publish.enabled)
         return
 
-    // if Maven central isn't setup in ~/.gradle/gradle.properties fill in these variables to make it happy
-    if (!project.hasProperty('ossrhUsername')) {
-        ext.ossrhUsername = "dummy"
-        ext.ossrhPassword = "dummy"
-    }
-
     publishing {
         publications {
             mavenJava(MavenPublication) {
@@ -364,7 +363,7 @@ subprojects {
         }
     }
 
-    if (ext.ossrhPassword != "dummy") {
+    if (project.hasProperty('ossrhUsername')) {
         signing { sign publishing.publications.mavenJava }
     }
 }
