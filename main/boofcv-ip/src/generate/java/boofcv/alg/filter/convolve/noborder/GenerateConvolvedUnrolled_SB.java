@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -160,8 +160,11 @@ public class GenerateConvolvedUnrolled_SB extends CodeGeneratorBase {
 	void createMaster(String opName, int kernelDOF , boolean hasDivisor ) {
 		String kernel = "Kernel"+kernelDOF+"D_"+typeKernel;
 
-		String workParam = hasDivisor && (opName.equals("convolve")||opName.equals("vertical")) ? ", GrowArray<"+workType+"> work" : "";
-		String workVar = hasDivisor && (opName.equals("convolve")||opName.equals("vertical")) ? ", work" : "";
+		String workParam = "", workVar = "";
+		if (hasDivisor && (opName.equals("convolve") || opName.equals("vertical"))) {
+			workParam = ", GrowArray<" + workType + "> work";
+			workVar = ", work";
+		}
 
 		out.print("\tpublic static boolean " + opName + "( " + kernel + " kernel,\n" +
 				"\t\t\t\t\t\t\t\t   " + typeInput + " image, " + typeOutput + " dest");
