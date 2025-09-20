@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,6 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageDimension;
-import org.apache.pdfbox.util.Charsets;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
@@ -50,6 +49,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -324,7 +324,7 @@ public class CameraCalibrationStereo {
 			System.out.println(metricText);
 
 		if (saveMetrics) {
-			try (var out = new PrintWriter(new File(outputDir, "calibration_metrics.txt"), Charsets.UTF_8)) {
+			try (var out = new PrintWriter(new File(outputDir, "calibration_metrics.txt"), StandardCharsets.UTF_8)) {
 				out.println(metricText);
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
