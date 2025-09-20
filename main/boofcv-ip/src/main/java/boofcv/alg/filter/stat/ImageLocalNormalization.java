@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -74,7 +74,7 @@ public class ImageLocalNormalization<T extends GrayF<T>> {
 		localPow2 = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
 	}
 
-	/*
+	/**
 	 * <p>Normalizes the input image such that local weighted statics are a zero mean and with standard deviation
 	 * of 1. The image border is handled by truncating the kernel and renormalizing it so that it's sum is
 	 * still one.</p>
@@ -117,7 +117,7 @@ public class ImageLocalNormalization<T extends GrayF<T>> {
 			computeOutput((GrayF64)input, delta, (GrayF64)output, (GrayF64)adjusted);
 	}
 
-	/*
+	/**
 	 * <p>Normalizes the input image such that local statics are a zero mean and with standard deviation
 	 * of 1. The image border is handled by truncating the kernel and renormalizing it so that it's sum is
 	 * still one.</p>

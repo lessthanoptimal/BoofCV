@@ -1114,8 +1114,8 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements Ve
 	}
 
 	private static class PairIdx {
-		public int idx0;
-		public int idx1;
-		public double score;
+		int idx0;
+		int idx1;
+		double score;
 	}
 }

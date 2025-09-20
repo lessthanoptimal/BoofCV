@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -167,7 +167,7 @@ public class DetectLineApp<T extends ImageGray<T>, D extends ImageGray<D>>
 		int maxLines = 10;
 		int blurRadius = 2;
 
-		public ControlPanel() {
+		private ControlPanel() {
 
 			comboAlg = combo(whichAlg, "Hough Polar", "Hough Foot", "Hough Foot Sub Image", "Grid Line");
 			spinnerMaxLines = spinner(maxLines, 1, 100, 1);

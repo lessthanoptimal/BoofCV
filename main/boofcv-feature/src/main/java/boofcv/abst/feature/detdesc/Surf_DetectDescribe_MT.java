@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -72,7 +72,7 @@ public class Surf_DetectDescribe_MT<T extends ImageGray<T>, II extends ImageGray
 		OrientationIntegral<II> orientation;
 		DescribePointSurf<II> describe;
 
-		public ThreadData( OrientationIntegral<II> orientation, DescribePointSurf<II> describe ) {
+		ThreadData( OrientationIntegral<II> orientation, DescribePointSurf<II> describe ) {
 			this.orientation = orientation;
 			this.describe = describe;
 		}

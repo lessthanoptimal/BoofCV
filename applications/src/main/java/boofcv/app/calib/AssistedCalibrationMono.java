@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -636,21 +636,21 @@ public class AssistedCalibrationMono {
 
 		boolean close = false;
 
-		public Magnet( double x, double y, boolean corner ) {
+		Magnet( double x, double y, boolean corner ) {
 			location.setTo(x, y);
 			this.corner = corner;
 		}
 
-		public boolean handlePictureTaken() {
+		boolean handlePictureTaken() {
 			return findClosest() <= MAGNET_RADIUS*2;
 		}
 
-		public boolean handleDetection() {
+		boolean handleDetection() {
 			close = findClosest() <= MAGNET_RADIUS*2;
 			return close;
 		}
 
-		public void drawArrows() {
+		void drawArrows() {
 			double distance = findClosest();
 
 			if (distance <= MAGNET_RADIUS*10) {
@@ -661,7 +661,7 @@ public class AssistedCalibrationMono {
 			}
 		}
 
-		public void handleNoDetection() {
+		void handleNoDetection() {
 			close = false;
 		}
 
@@ -675,7 +675,7 @@ public class AssistedCalibrationMono {
 			return distance;
 		}
 
-		public void render() {
+		void render() {
 			if (close) {
 				g2.setColor(Color.RED);
 			} else {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -105,6 +105,7 @@ public class CameraPinholeBrown extends CameraPinhole implements Serializable {
 		return this;
 	}
 
+	@SuppressWarnings("NullAway") // false positive on fsetRadial
 	public CameraPinholeBrown setTo( CameraPinholeBrown param ) {
 		CameraPinholeBrown p = (CameraPinholeBrown)param;
 

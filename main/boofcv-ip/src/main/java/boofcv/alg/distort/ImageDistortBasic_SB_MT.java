@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -114,7 +114,7 @@ public class ImageDistortBasic_SB_MT<Input extends ImageGray<Input>, Output exte
 		PixelTransform<Point2D_F32> dstToSrc;
 		InterpolatePixelS<Input> interp = ImageDistortBasic_SB_MT.this.interp.copy();
 
-		public void init() {
+		void init() {
 			this.dstToSrc = ImageDistortBasic_SB_MT.this.dstToSrc.copyConcurrent();
 			interp.setImage(srcImg);
 		}

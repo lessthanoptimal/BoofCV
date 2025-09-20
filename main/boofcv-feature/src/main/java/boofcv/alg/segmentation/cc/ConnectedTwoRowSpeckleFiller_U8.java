@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -230,7 +230,7 @@ public class ConnectedTwoRowSpeckleFiller_U8 extends ConnectedTwoRowSpeckleFille
 		int y;
 		int value; // value of the pixel before it got filled in
 
-		public void setTo( int x, int y, int value ) {
+		void setTo( int x, int y, int value ) {
 			this.x = x;
 			this.y = y;
 			this.value = value;

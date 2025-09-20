@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -199,7 +199,7 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel {
 	private class ChessPanel extends StandardAlgConfigPanel implements ChangeListener {
 		JSpinner sRows, sCols, sWidth;
 
-		public ChessPanel() {
+		ChessPanel() {
 			setBorder(BorderFactory.createEmptyBorder());
 
 			sRows = spinner(configChessboard.numRows, 1, 1000, 1);
@@ -229,7 +229,7 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel {
 		JComboBox<String> comboErrorLevel, comboChecksum;
 		JLabel textShorthand = new JLabel("XXXXXXXXXXXX");
 
-		public EcoCheckPanel() {
+		EcoCheckPanel() {
 			setBorder(BorderFactory.createEmptyBorder());
 
 			ConfigECoCheckMarkers.MarkerShape shape = configECoCheck.markerShapes.get(0);
@@ -280,7 +280,7 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel {
 		JSpinner sRows, sCols;
 		JSpinner sWidth, sSpace;
 
-		public SquareGridPanel() {
+		SquareGridPanel() {
 			setBorder(BorderFactory.createEmptyBorder());
 
 			sRows = spinner(configSquare.numRows, 1, 1000, 1);
@@ -314,7 +314,7 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel {
 		JSpinner sRows, sCols;
 		JSpinner sDiam, sDist;
 
-		public CircleGridPanel() {
+		CircleGridPanel() {
 			setBorder(BorderFactory.createEmptyBorder());
 
 			sRows = spinner(configCircle.numRows, 1, 1000, 1);
@@ -348,7 +348,7 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel {
 		JSpinner sRows, sCols;
 		JSpinner sDiam, sDist;
 
-		public CircleHexPanel() {
+		CircleHexPanel() {
 			setBorder(BorderFactory.createEmptyBorder());
 
 			sRows = spinner(configCircleHex.numRows, 1, 1000, 1);
@@ -386,7 +386,7 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel {
 		JSpinnerNumber sOffset = spinnerWrap(configHammingChess.markerOffset, 0, 200, 1);
 		JCheckBoxValue cEven = checkboxWrap("Even pattern", configHammingChess.chessboardEven);
 
-		public HammingChessPanel() {
+		HammingChessPanel() {
 			setBorder(BorderFactory.createEmptyBorder());
 
 			sScale.spinner.setPreferredSize(sRows.spinner.getPreferredSize());
@@ -436,7 +436,7 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel {
 		JComboBox<?> cDict = combo(configHammingGrid.markers.dictionary.ordinal() - 1, (Object[])HammingDictionary.allPredefined());
 		JSpinnerNumber sOffset = spinnerWrap(configHammingGrid.markerOffset, 0, 200, 1);
 
-		public HammingGridPanel() {
+		HammingGridPanel() {
 			setBorder(BorderFactory.createEmptyBorder());
 
 			sSpace.spinner.setPreferredSize(sRows.spinner.getPreferredSize());

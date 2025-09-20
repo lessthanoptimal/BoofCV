@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -268,7 +268,7 @@ public class VisualizeHoughGradient<I extends ImageGray<I>, D extends ImageGray<
 			}
 		}
 
-		public void handleViewChange( int newView ) {
+		private void handleViewChange( int newView ) {
 			boolean centerAndRescale = false;
 			switch (newView) {
 				case 0 -> {
@@ -332,7 +332,7 @@ public class VisualizeHoughGradient<I extends ImageGray<I>, D extends ImageGray<
 		JSpinner spinnerResRange = spinner(configPolar.resolutionRange, 0.1, 50, 0.5);
 		JSpinner spinnerBinsAngle = spinner(configPolar.numBinsAngle, 10, 1000, 1);
 
-		public ControlPanel() {
+		private ControlPanel() {
 			super(BoofSwingUtil.MIN_ZOOM, BoofSwingUtil.MAX_ZOOM, 0.5, false);
 
 			controlEdgeThreshold.setBorder(BorderFactory.createTitledBorder("Edge Threshold"));

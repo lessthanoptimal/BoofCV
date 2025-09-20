@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -121,7 +121,7 @@ public class ImageDistortBasic_IL_MT
 		InterpolatePixelMB<Input> interp = ImageDistortBasic_IL_MT.this.interp.copy();
 		float[] values = new float[getNumberOfBands()];
 
-		public void init() {
+		void init() {
 			dstToSrc = ImageDistortBasic_IL_MT.this.dstToSrc.copyConcurrent();
 			interp.setImage(srcImg);
 		}

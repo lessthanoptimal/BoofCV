@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,7 @@ import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.ViewedImageInfoPanel;
 import boofcv.struct.ConnectRule;
+import lombok.Getter;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -50,10 +51,10 @@ public class SegmentConfigPanel extends ViewedImageInfoPanel implements ActionLi
 
 	JButton recompute = new JButton("Recompute");
 
-	ConfigFh04 configFh = new ConfigFh04();
-	ConfigSlic configSlic = new ConfigSlic(800);
-	ConfigSegmentMeanShift configMeanShift = new ConfigSegmentMeanShift();
-	ConfigWatershed configWatershed = new ConfigWatershed();
+	@Getter ConfigFh04 configFh = new ConfigFh04();
+	@Getter ConfigSlic configSlic = new ConfigSlic(800);
+	@Getter ConfigSegmentMeanShift configMeanShift = new ConfigSegmentMeanShift();
+	@Getter ConfigWatershed configWatershed = new ConfigWatershed();
 
 	JPanel panelConfig = new JPanel();
 	PanelConfigFH panelFh = new PanelConfigFH();
@@ -127,13 +128,13 @@ public class SegmentConfigPanel extends ViewedImageInfoPanel implements ActionLi
 
 	private class PanelConfigFH extends StandardAlgConfigPanel implements ActionListener, ChangeListener {
 
-		JComboBox selectConnect;
+		JComboBox<String> selectConnect;
 		JSpinner spinnerSize;
 		JSpinner spinnerK;
 		JCheckBox checkApproximate = checkbox("Approx. Sort",configFh.approximateSortBins!=0);
 
-		public PanelConfigFH() {
-			selectConnect = new JComboBox(new String[]{"4-Connect","8-Connect"});
+		private PanelConfigFH() {
+			selectConnect = new JComboBox<>(new String[]{"4-Connect","8-Connect"});
 			selectConnect.addActionListener(this);
 			selectConnect.setMaximumSize(selectConnect.getPreferredSize());
 
@@ -192,12 +193,12 @@ public class SegmentConfigPanel extends ViewedImageInfoPanel implements ActionLi
 
 	private class PanelConfigSlic extends StandardAlgConfigPanel implements ActionListener, ChangeListener {
 
-		JComboBox selectConnect;
+		JComboBox<String> selectConnect;
 		JSpinner spinnerTotal;
 		JSpinner spinnerWeight;
 
-		public PanelConfigSlic() {
-			selectConnect = new JComboBox(new String[]{"4-Connect","8-Connect"});
+		private PanelConfigSlic() {
+			selectConnect = new JComboBox<>(new String[]{"4-Connect","8-Connect"});
 			selectConnect.addActionListener(this);
 			selectConnect.setMaximumSize(selectConnect.getPreferredSize());
 
@@ -249,14 +250,14 @@ public class SegmentConfigPanel extends ViewedImageInfoPanel implements ActionLi
 
 	private class PanelConfigMeanShift extends StandardAlgConfigPanel implements ActionListener, ChangeListener {
 
-		JComboBox selectConnect;
+		JComboBox<String> selectConnect;
 		JSpinner spinnerSize;
 		JSpinner spinnerSpacial;
 		JSpinner spinnerColor;
 		JCheckBox toggleFast;
 
-		public PanelConfigMeanShift() {
-			selectConnect = new JComboBox(new String[]{"4-Connect","8-Connect"});
+		private PanelConfigMeanShift() {
+			selectConnect = new JComboBox<>(new String[]{"4-Connect","8-Connect"});
 			selectConnect.addActionListener(this);
 			selectConnect.setMaximumSize(selectConnect.getPreferredSize());
 
@@ -324,11 +325,11 @@ public class SegmentConfigPanel extends ViewedImageInfoPanel implements ActionLi
 
 	private class PanelConfigWatershed extends StandardAlgConfigPanel implements ActionListener, ChangeListener {
 
-		JComboBox selectConnect;
+		JComboBox<String> selectConnect;
 		JSpinner spinnerSize;
 
-		PanelConfigWatershed() {
-			selectConnect = new JComboBox(new String[]{"4-Connect","8-Connect"});
+		private PanelConfigWatershed() {
+			selectConnect = new JComboBox<>(new String[]{"4-Connect","8-Connect"});
 			selectConnect.addActionListener(this);
 			selectConnect.setMaximumSize(selectConnect.getPreferredSize());
 
@@ -368,21 +369,5 @@ public class SegmentConfigPanel extends ViewedImageInfoPanel implements ActionLi
 				configWatershed.minimumRegionSize = ((Number) spinnerSize.getValue()).intValue();
 			}
 		}
-	}
-
-	public ConfigFh04 getConfigFh() {
-		return configFh;
-	}
-
-	public ConfigSlic getConfigSlic() {
-		return configSlic;
-	}
-
-	public ConfigSegmentMeanShift getConfigMeanShift() {
-		return configMeanShift;
-	}
-
-	public ConfigWatershed getConfigWatershed() {
-		return configWatershed;
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,8 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.Planar;
+import lombok.Getter;
+import lombok.Setter;
 import org.ddogleg.struct.DogArray;
 import pabeles.concurrency.GrowArray;
 import pabeles.concurrency.IntRangeObjectConsumer;
@@ -71,7 +73,7 @@ public class SgmCostAggregation {
 
 	// Contains aggregated cost. The image is being used to store a tensor.
 	// band = y-axis, x=x-axis, y=depth
-	Planar<GrayU16> aggregated = new Planar<>(GrayU16.class, 1, 1, 2);
+	@Getter Planar<GrayU16> aggregated = new Planar<>(GrayU16.class, 1, 1, 2);
 
 	Planar<GrayU16> costYXD;
 	// Length of original image. x = col, y = rows, d = disparity range
@@ -84,10 +86,11 @@ public class SgmCostAggregation {
 	/**
 	 * Number of paths to consider. 1 to 16 is valid
 	 */
-	int pathsConsidered = 8;
+	@Setter @Getter int pathsConsidered = 8;
 
 	// Cost applied to small and large changes in the neighborhood
-	int penalty1 = 200, penalty2 = 2000;
+	@Setter @Getter int penalty1 = 200;
+	@Setter @Getter int penalty2 = 2000;
 
 	// Book keeping for concurrency
 	DogArray<Trajectory> trajectories = new DogArray<>(Trajectory.class, Trajectory::new);
@@ -448,47 +451,17 @@ public class SgmCostAggregation {
 		}
 	}
 
-	/**
-	 * Defines the starting coordinate and direction a trajectory takes.
-	 * (x0,y0) is the initial coordinate
-	 * (dx,dy) is the direction
-	 */
+	/// Defines the starting coordinate and direction a trajectory takes.
+	/// (x0,y0) is the initial coordinate
+	/// (dx,dy) is the direction
 	private static class Trajectory {
-		public int x0, y0, dx, dy;
+		int x0, y0, dx, dy;
 
-		public void set( int x0, int y0, int dx, int dy ) {
+		void set( int x0, int y0, int dx, int dy ) {
 			this.x0 = x0;
 			this.y0 = y0;
 			this.dx = dx;
 			this.dy = dy;
 		}
-	}
-
-	public Planar<GrayU16> getAggregated() {
-		return aggregated;
-	}
-
-	public int getPenalty1() {
-		return penalty1;
-	}
-
-	public void setPenalty1( int penalty1 ) {
-		this.penalty1 = penalty1;
-	}
-
-	public int getPenalty2() {
-		return penalty2;
-	}
-
-	public void setPenalty2( int penalty2 ) {
-		this.penalty2 = penalty2;
-	}
-
-	public int getPathsConsidered() {
-		return pathsConsidered;
-	}
-
-	public void setPathsConsidered( int pathsConsidered ) {
-		this.pathsConsidered = pathsConsidered;
 	}
 }

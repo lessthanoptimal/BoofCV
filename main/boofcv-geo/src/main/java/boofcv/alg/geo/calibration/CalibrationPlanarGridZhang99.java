@@ -232,7 +232,7 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 											List<CalibrationObservation> observations ) {
 
 		structure = new SceneStructureMetric(false);
-		structure.initialize(1, motions.size(), -1, 0, layouts.size());
+		structure.initialize(1, motions.size(), 0, 0, layouts.size());
 
 		this.observations = new SceneObservations();
 		this.observations.initialize(motions.size(), true);
