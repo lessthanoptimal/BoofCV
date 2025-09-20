@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -145,9 +145,9 @@ public class UtilImageIO {
 		try {
 			InputStream stream = url.openStream();
 			String path = url.toString();
-			if (path.toLowerCase().endsWith("ppm")) {
+			if (path.toLowerCase(Locale.US).endsWith("ppm")) {
 				return loadPPM(stream, null);
-			} else if (path.toLowerCase().endsWith("pgm")) {
+			} else if (path.toLowerCase(Locale.US).endsWith("pgm")) {
 				return loadPGM(stream, null);
 			}
 			stream.close();
@@ -648,7 +648,7 @@ public class UtilImageIO {
 			String mimeType = Files.probeContentType(file.toPath());
 			if (mimeType == null) {
 				// In some OS there is a bug where it always returns null/
-				String extension = FilenameUtils.getExtension(file.getName()).toLowerCase();
+				String extension = FilenameUtils.getExtension(file.getName()).toLowerCase(Locale.US);
 				if (isKnownSuffix(extension))
 					return true;
 			} else {

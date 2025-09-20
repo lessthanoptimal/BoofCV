@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -61,8 +61,8 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 
 import static boofcv.abst.geo.calibration.CalibrateStereoPlanar.computeQualityText;
 import static boofcv.demonstrations.calibration.CalibrateMonocularPlanarApp.saveCalibrationTarget;
@@ -999,26 +999,26 @@ public class CalibrateStereoPlanarApp extends JPanel {
 	}
 
 	private static class AlgorithmsLocked extends VariableLockSet {
-		protected DetectSingleFiducialCalibration detector;
-		protected CalibrateStereoPlanar calibrator;
-		protected boolean calibrationSuccess;
-		protected StereoParameters parameters;
-		protected ImageDimension shapeLeft = new ImageDimension();
-		protected ImageDimension shapeRight = new ImageDimension();
+		private DetectSingleFiducialCalibration detector;
+		private CalibrateStereoPlanar calibrator;
+		private boolean calibrationSuccess;
+		private StereoParameters parameters;
+		private final ImageDimension shapeLeft = new ImageDimension();
+		private final ImageDimension shapeRight = new ImageDimension();
 	}
 
 	private static class ResultsLocked extends VariableLockSet {
 		// List of all image names. Left view, but this is these are the names used to identify the pairs
-		protected final List<String> namesLeft = new ArrayList<>();
+		private final List<String> namesLeft = new ArrayList<>();
 		// Names of right images
-		protected final List<String> namesRight = new ArrayList<>();
+		private final List<String> namesRight = new ArrayList<>();
 		// List of images in use
-		protected final DogArray_B used = new DogArray_B();
+		private final DogArray_B used = new DogArray_B();
 
-		protected final ViewResults left = new ViewResults();
-		protected final ViewResults right = new ViewResults();
+		private final ViewResults left = new ViewResults();
+		private final ViewResults right = new ViewResults();
 
-		public void reset() {
+		private void reset() {
 			safe(() -> {
 				used.reset();
 				left.reset();
@@ -1029,31 +1029,31 @@ public class CalibrateStereoPlanarApp extends JPanel {
 	}
 
 	private static class ViewResults {
-		protected final Map<String, ImageResults> errors = new HashMap<>();
+		final Map<String, ImageResults> errors = new HashMap<>();
 		// Active list of observations
-		protected final Map<String, CalibrationObservation> observations = new HashMap<>();
+		final Map<String, CalibrationObservation> observations = new HashMap<>();
 		// Copy of original observation before any edits
-		protected final DogArray<CalibrationObservation> original = new DogArray<>(CalibrationObservation::new);
+		final DogArray<CalibrationObservation> original = new DogArray<>(CalibrationObservation::new);
 		// Quality of observations and results
-		protected final CalibrationQuality quality = new CalibrationQuality();
+		final CalibrationQuality quality = new CalibrationQuality();
 		// Computes fill score and used to visualize unfilled regions
-		protected final ScoreCalibrationFill fillScorer = new ScoreCalibrationFill();
+		final ScoreCalibrationFill fillScorer = new ScoreCalibrationFill();
 
-		public ImageResults getError( String key ) {
+		ImageResults getError( String key ) {
 			return Objects.requireNonNull(errors.get(key));
 		}
 
-		public CalibrationObservation getObservation( String key ) {
+		CalibrationObservation getObservation( String key ) {
 			return Objects.requireNonNull(observations.get(key));
 		}
 
-		public boolean add( String path, CalibrationObservation o ) {
+		boolean add( String path, CalibrationObservation o ) {
 			observations.put(path, o);
 			original.grow().setTo(o);
 			return o.size() >= 4;
 		}
 
-		public void reset() {
+		void reset() {
 			errors.clear();
 			observations.clear();
 			original.reset();

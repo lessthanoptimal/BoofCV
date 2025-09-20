@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -177,7 +177,7 @@ public class OpenImageSetDialog extends JPanel {
 	}
 
 	private class SelectPanel extends JSpringPanel {
-		public SelectPanel() {
+		SelectPanel() {
 			JButton bAdd = BoofSwingUtil.button("Add", e -> handleAdd());
 
 			constrainWestNorthEast(browser, null, 0, 0);
@@ -198,7 +198,7 @@ public class OpenImageSetDialog extends JPanel {
 		DefaultListModel listModel = new DefaultListModel();
 		java.util.List<String> paths = new ArrayList<>();
 
-		public SelectedList() {
+		SelectedList() {
 			selectedList = new JList(listModel);
 			selectedList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			selectedList.setLayoutOrientation(JList.VERTICAL);
@@ -223,7 +223,7 @@ public class OpenImageSetDialog extends JPanel {
 			layout.putConstraint(SpringLayout.SOUTH, bRemove, -5, SpringLayout.SOUTH, this);
 		}
 
-		public void addPath( File path ) {
+		void addPath( File path ) {
 			BoofSwingUtil.invokeNowOrLater(() -> {
 				// ignore if it has reached its limit already
 				if ((modeSelect == Mode.EXACTLY || modeSelect == Mode.AT_MOST) && paths.size() == requiredSelect)
@@ -273,12 +273,11 @@ public class OpenImageSetDialog extends JPanel {
 	 * Loads a images, scales them down, and puts them in the image preview.
 	 */
 	private class PreviewThread extends Thread {
-		public PreviewThread() {
+		PreviewThread() {
 			super("Image Preview");
 		}
 
-		@Override
-		public void run() {
+		@Override public void run() {
 			while (true) {
 				// see if there are any pending preview requests. If not exit and mark the thread as dead
 				String path;

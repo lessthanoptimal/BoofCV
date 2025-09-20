@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -133,7 +133,7 @@ public class ImageDistortCache_SB_MT<Input extends ImageGray<Input>, Output exte
 	private class BlockDistort {
 		InterpolatePixelS<Input> interp = ImageDistortCache_SB_MT.this.interp.copy();
 
-		public void init() {
+		void init() {
 			interp.setImage(srcImg);
 		}
 

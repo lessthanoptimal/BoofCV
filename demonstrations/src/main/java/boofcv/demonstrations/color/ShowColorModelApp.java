@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -202,7 +202,7 @@ public class ShowColorModelApp
 
 	private class MyMonitor extends ProgressMonitorThread {
 
-		protected MyMonitor( Component comp, String message ) {
+		private MyMonitor( Component comp, String message ) {
 			super(new ProgressMonitor(comp,
 					"Converting color space",
 					message, 0, input.getNumBands()));

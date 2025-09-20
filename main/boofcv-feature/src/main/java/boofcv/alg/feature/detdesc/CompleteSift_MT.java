@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -137,21 +137,21 @@ public class CompleteSift_MT extends CompleteSift {
 	 * Contains data needed for each thread to run independently
 	 */
 	private class ThreadHelper {
-		public final OrientationHistogramSift<GrayF32> orientation;
-		public final DescribePointSift<GrayF32> describe;
+		final OrientationHistogramSift<GrayF32> orientation;
+		final DescribePointSift<GrayF32> describe;
 
 		// Results for each detection
 		DogArray<TupleDesc_F64> features = new DogArray<>(() -> new TupleDesc_F64(dof));
 		FastArray<ScalePoint> locations = new FastArray<>(ScalePoint.class);
 		DogArray_F64 orientations = new DogArray_F64();
 
-		public ThreadHelper( OrientationHistogramSift<GrayF32> orientation,
+		ThreadHelper( OrientationHistogramSift<GrayF32> orientation,
 							 DescribePointSift<GrayF32> describe ) {
 			this.orientation = orientation;
 			this.describe = describe;
 		}
 
-		public void reset() {
+		void reset() {
 			features.reset();
 			locations.reset();
 			orientations.reset();

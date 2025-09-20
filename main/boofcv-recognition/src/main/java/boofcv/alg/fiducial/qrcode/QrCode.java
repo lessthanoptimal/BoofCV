@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -619,7 +619,7 @@ public class QrCode implements Cloneable {
 		}
 
 		public static @Nullable Mode lookup( String name ) {
-			name = name.toUpperCase();
+			name = name.toUpperCase(Locale.US);
 			Mode[] modes = values();
 			for (int modeIdx = 0; modeIdx < modes.length; modeIdx++) {
 				Mode m = modes[modeIdx];

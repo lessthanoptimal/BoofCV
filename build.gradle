@@ -19,17 +19,17 @@ allprojects {
     createVersionFile.enabled = false // run only once. enabled in types
 }
 
-project.ext.ddogleg_version = '0.24.0'
-project.ext.georegression_version = '0.28.0'
+project.ext.ddogleg_version = '0.24.1'
+project.ext.georegression_version = '0.28.1'
 project.ext.commons_io_version = '2.16.1'
 project.ext.deepboof_version = '0.5.3'
-project.ext.lombok_version = '1.18.28'
+project.ext.lombok_version = '1.18.42'
 project.ext.jabel_version = '1.0.1-1'
 project.ext.guava_version = '33.2.0-jre'
 project.ext.args4j_version = '2.33'
 project.ext.junit_version = '5.11.4'
-project.ext.errorprone_version = '2.35.1'
-project.ext.nullaway_version = '0.10.11'
+project.ext.errorprone_version = '2.41.0'
+project.ext.nullaway_version = '0.12.10'
 project.ext.auto64to32_version = '3.2.2'
 project.ext.snakeyaml_version = '2.3'
 project.ext.jmh_version = '1.36'
@@ -77,15 +77,21 @@ subprojects {
     java {
         withJavadocJar()
         withSourcesJar()
-        toolchain { languageVersion = JavaLanguageVersion.of(17) }
+        toolchain { languageVersion = JavaLanguageVersion.of(25) }
     }
 
     // Prevents tons of errors if someone is using ASCII
     tasks.withType(JavaCompile).configureEach { options.encoding = "UTF-8" }
-    // Creates Java 11 byte code but Java 17 syntax
+    // Creates Java 11 byte code but Java 25 syntax
     tasks.withType(JavaCompile).configureEach {
-        sourceCompatibility = 17
+        sourceCompatibility = 25
         options.release = 11
+    }
+
+    // Needed by ErrorProne
+    tasks.withType(JavaCompile).configureEach {
+        options.compilerArgs.removeAll { it.startsWith('--should-stop=ifError') }
+        options.compilerArgs << '--should-stop=ifError=FLOW'
     }
 
     // Enable incremental compile. Should make single file changes faster
@@ -101,8 +107,12 @@ subprojects {
             force "com.google.guava:guava:$project.guava_version"
             force "com.google.errorprone:error_prone_annotations:$project.errorprone_version"
             force "com.google.code.findbugs:jsr305:$project.jsr305_version"
-            force 'org.checkerframework:checker-qual:2.10.0'
-            force 'org.apache.commons:commons-lang3:3.14.0'
+            force "org.checkerframework:checker-qual:2.10.0"
+            force "org.apache.commons:commons-lang3:3.14.0"
+
+            // Needed when updated to Java 25 and used by jabel
+            force "net.bytebuddy:byte-buddy:1.17.7"
+            force "net.bytebuddy:byte-buddy-agent:1.17.7"
         }
     }
 
@@ -187,7 +197,7 @@ subprojects {
         benchmarkImplementation "org.openjdk.jmh:jmh-core:$jmh_version"
         benchmarkAnnotationProcessor "org.openjdk.jmh:jmh-generator-annprocess:$jmh_version"
 
-        // needed to use Java 11+ syntax with Java 1.8 byte code
+        // needed to use Java 25 syntax with Java 11 byte code
         annotationProcessor "com.pkware.jabel:jabel-javac-plugin:${project.jabel_version}"
         noautoAnnotationProcessor "com.pkware.jabel:jabel-javac-plugin:${project.jabel_version}"
         testAnnotationProcessor "com.pkware.jabel:jabel-javac-plugin:${project.jabel_version}"
@@ -231,6 +241,8 @@ subprojects {
                 "NarrowCalculation", // too many false positives where integer math is done intentionally
                 "EmptyBlockTag", // E.g. "@param name" is not defined. This should be cleaned up
                 "AlreadyChecked", // This inspection appears to be broken/too simplistic. False positives galore
+                "EnumOrdinal", // This is used a LOT in GUI code
+                "AssignmentExpression", // This pattern is used a fair amount and I'm not sure it's hard to read
         )
         options.errorprone.error("MissingOverride", "MissingCasesInEnumSwitch", "BadInstanceof",
                 "NarrowingCompoundAssignment", "JdkObsolete", "MissingSummary")

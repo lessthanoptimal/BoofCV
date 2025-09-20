@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -123,7 +123,7 @@ public class ShowImageBlurApp<T extends ImageGray<T>> extends DemonstrationBase 
 
 	private static class MyMonitor extends ProgressMonitorThread {
 
-		protected MyMonitor( Component comp, String message ) {
+		private MyMonitor( Component comp, String message ) {
 			super(new ProgressMonitor(comp,
 					"Blurring the Image",
 					message, 0, 1));

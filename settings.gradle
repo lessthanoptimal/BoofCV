@@ -10,17 +10,7 @@ pluginManagement {
 // END Added for Android
 
 plugins {
-    id("org.gradle.toolchains.foojay-resolver") version "0.8.0"
-}
-
-toolchainManagement {
-    jvm {
-        javaRepositories {
-            repository("foojay") {
-                resolverClass = org.gradle.toolchains.foojay.FoojayToolchainResolver
-            }
-        }
-    }
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
 include 'examples','demonstrations','applications',

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -147,7 +147,7 @@ public class TrifocalAlgebraicPoint7 extends TrifocalLinearPoint7 {
 
 		DMatrixRMaj errors = new DMatrixRMaj(1, 1);
 
-		public void init() {
+		void init() {
 			errors.numRows = A.numRows;
 			errors.numCols = 1;
 		}

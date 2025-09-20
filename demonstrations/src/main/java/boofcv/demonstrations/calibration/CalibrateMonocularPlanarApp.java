@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -67,8 +67,8 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 
 import static boofcv.gui.BoofSwingUtil.MAX_ZOOM;
 import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
@@ -907,9 +907,9 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 	}
 
 	private static class DetectorLocked extends VariableLockSet {
-		protected DetectSingleFiducialCalibration detector;
-		protected CalibrateMonoPlanar calibrator;
-		protected boolean calibrationSuccess;
+		DetectSingleFiducialCalibration detector;
+		CalibrateMonoPlanar calibrator;
+		boolean calibrationSuccess;
 	}
 
 	private static class ResultsLocked extends VariableLockSet {
@@ -917,33 +917,33 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 		boolean invalid;
 
 		// Path to all input images
-		protected final List<String> imagePaths = new ArrayList<>();
+		private final List<String> imagePaths = new ArrayList<>();
 		// List of found observations and results
-		protected final Map<String, CalibrationObservation> imageObservations = new HashMap<>();
-		protected final Map<String, ImageResults> imageResults = new HashMap<>();
+		private final Map<String, CalibrationObservation> imageObservations = new HashMap<>();
+		private final Map<String, ImageResults> imageResults = new HashMap<>();
 		// All observations with at least 4 points
-		protected final List<CalibrationObservation> allUsedObservations = new ArrayList<>();
+		private final List<CalibrationObservation> allUsedObservations = new ArrayList<>();
 		// Index of images used when calibrating
-		protected final DogArray_I32 usedImages = new DogArray_I32();
+		private final DogArray_I32 usedImages = new DogArray_I32();
 		// Copy of original observation before any edits
-		protected final DogArray<CalibrationObservation> originalObservations = new DogArray<>(CalibrationObservation::new);
+		private final DogArray<CalibrationObservation> originalObservations = new DogArray<>(CalibrationObservation::new);
 		// Quality of observations and results
-		protected final CalibrationQuality quality = new CalibrationQuality();
-		protected final ScoreCalibrationFill fillScorer = new ScoreCalibrationFill();
+		private final CalibrationQuality quality = new CalibrationQuality();
+		private final ScoreCalibrationFill fillScorer = new ScoreCalibrationFill();
 
-		public CalibrationObservation getObservation( String key ) {
+		private CalibrationObservation getObservation( String key ) {
 			return Objects.requireNonNull(imageObservations.get(key));
 		}
 
-		public ImageResults getResults( String key ) {
+		private ImageResults getResults( String key ) {
 			return Objects.requireNonNull(imageResults.get(key));
 		}
 
-		public @Nullable ImageResults getResultsNull( String key ) {
+		private @Nullable ImageResults getResultsNull( String key ) {
 			return imageResults.get(key);
 		}
 
-		public void reset() {
+		private void reset() {
 			invalid = true;
 			safe(() -> {
 				imagePaths.clear();

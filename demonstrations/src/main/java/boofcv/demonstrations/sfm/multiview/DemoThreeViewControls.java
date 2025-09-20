@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -221,7 +221,7 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 
 	private class ControlPanelCustomDDA extends ControlPanelDdaComboTabs {
 
-		public ControlPanelCustomDDA() {
+		private ControlPanelCustomDDA() {
 			super(() -> {
 				featuresChanged = true;
 				bCompute.setEnabled(true);

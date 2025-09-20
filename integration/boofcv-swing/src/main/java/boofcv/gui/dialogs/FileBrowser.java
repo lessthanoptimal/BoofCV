@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,8 +33,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 
 import static javax.swing.text.DefaultCaret.ALWAYS_UPDATE;
 
@@ -410,7 +410,7 @@ public class FileBrowser extends JSpringPanel {
 
 		FileBrowser browser;
 
-		public FileSelectionListener( FileBrowser browser ) {
+		FileSelectionListener( FileBrowser browser ) {
 			this.browser = browser;
 		}
 

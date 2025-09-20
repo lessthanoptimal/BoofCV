@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -203,7 +203,7 @@ public class FirstPersonCameraControl extends MouseAdapter implements Swing3dCam
 	private class KeyPressHandler implements KeyEventDispatcher {
 		boolean downW, downA, downS, downD, downQ, downE;
 
-		public void reset() {
+		void reset() {
 			downW = downA = downS = downD = downQ = downE = false;
 		}
 
@@ -243,7 +243,7 @@ public class FirstPersonCameraControl extends MouseAdapter implements Swing3dCam
 		/**
 		 * See which keys are held down and apply the action that they stimulate.
 		 */
-		public void applyKeyAction() {
+		void applyKeyAction() {
 			int dx = 0, dy = 0, dz = 0;
 
 			if (downW) dz = -1;

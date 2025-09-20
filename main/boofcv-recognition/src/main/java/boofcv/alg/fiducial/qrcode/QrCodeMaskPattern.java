@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings({"UnnecessaryParentheses"})
+@SuppressWarnings({"UnnecessaryParentheses", "ClassInitializationDeadlock"})
 public abstract class QrCodeMaskPattern {
 
 	public static final QrCodeMaskPattern M000 = new M000();

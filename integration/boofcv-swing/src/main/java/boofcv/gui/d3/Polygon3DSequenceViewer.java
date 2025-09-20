@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -284,9 +284,9 @@ public class Polygon3DSequenceViewer extends JPanel
 		Point3D_F64[] pts;
 		Color color;
 
-		public Poly() {}
+		Poly() {}
 
-		public Poly( int length, Color color ) {
+		Poly( int length, Color color ) {
 			this.pts = new Point3D_F64[length];
 			this.color = color;
 		}

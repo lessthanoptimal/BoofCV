@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,6 +44,7 @@ import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static boofcv.io.calibration.CalibrationIO.*;
@@ -283,7 +284,7 @@ public class MultiViewIO {
 	}
 
 	public static void save( SceneObservations scene, File destination ) {
-		try (var writer = new FileWriter(destination)) {
+		try (var writer = new FileWriter(destination, StandardCharsets.UTF_8)) {
 			save(scene, writer);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
