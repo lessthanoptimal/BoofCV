@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -326,7 +326,7 @@ public class CalibrateStereoPlanar implements VerbosePrint {
 											 CalibrationQuality qualityRight ) {
 		// Determine the longest name to make formatting nice
 		int nameLength = 0;
-		for (int imageIdx = 0, i = 0; imageIdx < namesLeft.size(); imageIdx++) {
+		for (int imageIdx = 0; imageIdx < namesLeft.size(); imageIdx++) {
 			if (used != null && !used.get(imageIdx))
 				continue;
 			nameLength = Math.max(nameLength, namesLeft.get(imageIdx).length());

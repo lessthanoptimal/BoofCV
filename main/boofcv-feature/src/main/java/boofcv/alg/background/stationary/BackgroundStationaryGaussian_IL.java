@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -198,7 +198,7 @@ public class BackgroundStationaryGaussian_IL<T extends ImageInterleaved<T>> exte
 		final float[] inputPixel;
 		final float[] bgPixel;
 
-		public Work( int numBands ) {
+		Work( int numBands ) {
 			inputPixel = new float[numBands];
 			bgPixel = new float[numBands*2];
 		}

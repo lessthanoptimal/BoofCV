@@ -320,6 +320,9 @@ public class PlyCodec {
 	}
 
 	private static void readHeader( InputStream input, Header header ) throws IOException {
+		// Assume no triangles by default
+		header.triangleCount = 0;
+
 		var buffer = new StringBuilder();
 
 		String line = UtilIO.readLine(input, buffer);
@@ -484,11 +487,13 @@ public class PlyCodec {
 	}
 
 	public static void read( InputStream input, PlyReader output ) throws IOException {
-		Header header = new Header();
+		var header = new Header();
 		readHeader(input, header);
 
 		if (header.vertexCount == -1)
 			throw new IOException("File is missing vertex count");
+		if (header.triangleCount == -1)
+			throw new IOException("Triangle count was not properly initialized");
 		if (header.format == null)
 			throw new IOException("Format is never specified");
 
@@ -853,7 +858,7 @@ public class PlyCodec {
 		/** Array value data type */
 		DataType valueType;
 
-		public PropertyList( String label, DataType countType, DataType valueType ) {
+		PropertyList( String label, DataType countType, DataType valueType ) {
 			this.label = label;
 			this.countType = countType;
 			this.valueType = valueType;
@@ -864,7 +869,7 @@ public class PlyCodec {
 		VarType var;
 		DataType data;
 
-		public DataWord( VarType var, DataType data ) {
+		DataWord( VarType var, DataType data ) {
 			this.var = var;
 			this.data = data;
 		}

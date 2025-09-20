@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -177,7 +177,6 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 			return;
 
 		Objects.requireNonNull(inputFilePath);
-		URL url = UtilIO.ensureUrlNotNull(inputFilePath);
 
 		String inputParent = new File(inputFilePath).getParent();
 		// When dealing with jars it can lop off part of the prefix;

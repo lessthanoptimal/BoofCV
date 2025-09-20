@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -88,7 +88,7 @@ public class AnimatePanel extends JPanel {
 
 	private class Timer extends Thread {
 
-		public volatile boolean running = true;
+		volatile boolean running = true;
 
 		@Override
 		public void run() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -923,7 +923,7 @@ public class DemoThreeViewStereoApp<TD extends TupleDesc<TD>> extends Demonstrat
 	private static class ProcessThread extends ProgressMonitorThread {
 		int state = 0;
 
-		public ProcessThread( JComponent owner ) {
+		private ProcessThread( JComponent owner ) {
 			super(new ProgressMonitor(owner, "Recovering Structure", "Cancel Does Nothing", 0, 100));
 		}
 

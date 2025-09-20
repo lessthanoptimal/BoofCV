@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -171,7 +171,7 @@ public class DenseFlowApp extends DemonstrationBase {
 
 			VisualizeOpticalFlow.colorized(flow, 10, visualized);
 			gui.repaint();
-			SwingUtilities.invokeLater(() -> controls.setTime(time1 - time0));
+			SwingUtilities.invokeLater(() -> controls.setTime((double)(time1 - time0)));
 		}
 	}
 

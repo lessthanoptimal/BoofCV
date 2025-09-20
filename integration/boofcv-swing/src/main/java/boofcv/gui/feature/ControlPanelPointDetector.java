@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -107,7 +107,7 @@ public class ControlPanelPointDetector extends StandardAlgConfigPanel {
 		private final JSpinner spinnerKernel;
 		private final JCheckBox checkWeighted;
 
-		public DefaultControls() {
+		DefaultControls() {
 			setBorder(BorderFactory.createEmptyBorder());
 			spinnerKernel = spinner(1, 1, 1000, 1);
 			checkWeighted = checkbox("Weighted", false, "Gaussian weighted or block");

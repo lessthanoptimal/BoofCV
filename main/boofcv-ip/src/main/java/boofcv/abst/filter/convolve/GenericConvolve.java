@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -65,16 +65,9 @@ public class GenericConvolve<Input extends ImageBase<Input>, Output extends Imag
 	@Override
 	public void process(Input input, Output output) {
 		try {
-			if( kernel.getDimension() == 1 ) {
-				switch (type) {
-					case SKIP, NORMALIZED -> m.invoke(null, kernel, input, output);
-					default -> m.invoke(null, kernel, input, output, Objects.requireNonNull(borderRule));
-				}
-			} else {
-				switch (type) {
-					case SKIP, NORMALIZED -> m.invoke(null, kernel, input, output);
-					default -> m.invoke(null, kernel, input, output, Objects.requireNonNull(borderRule));
-				}
+			switch (type) {
+				case SKIP, NORMALIZED -> m.invoke(null, kernel, input, output);
+				default -> m.invoke(null, kernel, input, output, Objects.requireNonNull(borderRule));
 			}
 		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -293,7 +293,7 @@ public class FisheyePinholeApp<T extends ImageBase<T>> extends DemonstrationBase
 		Line2D.Double line0 = new Line2D.Double();
 		Ellipse2D.Double circle = new Ellipse2D.Double();
 
-		public OmniPanel() {
+		private OmniPanel() {
 			for (int i = 0; i < corners.length; i++) {
 				corners[i] = new Point2D_F32();
 			}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,8 +43,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.URI;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 
 /**
  * Application which lists most of the demonstration application in a GUI and allows the user to double click
@@ -303,7 +303,7 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 					DefaultMutableTreeNode candidate = (DefaultMutableTreeNode)e.nextElement();
 					if (candidate.getUserObject() instanceof AppInfo) {
 						AppInfo candidateInfo = (AppInfo)candidate.getUserObject();
-						if (candidateInfo.app.getSimpleName().toLowerCase().contains(text)) {
+						if (candidateInfo.app.getSimpleName().toLowerCase(Locale.US).contains(text)) {
 							return new TreePath(candidate.getPath());
 						}
 					}

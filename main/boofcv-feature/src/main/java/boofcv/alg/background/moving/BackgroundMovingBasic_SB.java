@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -113,14 +113,14 @@ public class BackgroundMovingBasic_SB<T extends ImageGray<T>, Motion extends Inv
 		final private InterpolatePixelS<T> interpolationInput;
 		final private InterpolatePixelS<GrayF32> interpolationBG;
 
-		public Helper() {
+		Helper() {
 			transform = (Point2Transform2Model_F32<Motion>)_transform.copyConcurrent();
 			interpolationInput = _interpolationInput.copy();
 			interpolationBG = _interpolationBG.copy();
 			interpolationBG.setImage(background);
 		}
 
-		public void updateBackground( int x0, int y0, int x1, int y1, T frame ) {
+		void updateBackground( int x0, int y0, int x1, int y1, T frame ) {
 			interpolationInput.setImage(frame);
 
 			final float minusLearn = 1.0f - learnRate;
@@ -145,7 +145,7 @@ public class BackgroundMovingBasic_SB<T extends ImageGray<T>, Motion extends Inv
 			}
 		}
 
-		protected void segment( int y0, int y1, Motion currentToWorld, T frame, GrayU8 segmented ) {
+		void segment( int y0, int y1, Motion currentToWorld, T frame, GrayU8 segmented ) {
 			final float thresholdSq = threshold*threshold;
 
 			transform.setModel(currentToWorld);

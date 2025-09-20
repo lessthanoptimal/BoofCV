@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -285,7 +285,7 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 		Line2D.Double line0 = new Line2D.Double();
 		Point2D_F32 distored = new Point2D_F32();
 
-		public EquiViewPanel() {
+		private EquiViewPanel() {
 			for (int i = 0; i < corners.length; i++) {
 				corners[i] = new Point2D_F32();
 			}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -210,7 +210,7 @@ public class PointTrackerKltPyramid_MT<I extends ImageGray<I>, D extends ImageGr
 		PyramidKltTracker<I, D> tracker = PointTrackerKltPyramid_MT.this.tracker.copyConcurrent();
 		DogArray_I32 failed = new DogArray_I32();
 
-		public void reset() {
+		void reset() {
 			failed.reset();
 		}
 	}

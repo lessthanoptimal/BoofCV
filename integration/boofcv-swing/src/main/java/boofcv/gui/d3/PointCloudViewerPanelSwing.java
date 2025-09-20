@@ -39,6 +39,7 @@ import georegression.struct.point.Vector3D_F32;
 import georegression.struct.se.Se3_F32;
 import georegression.transform.se.SePointOps_F32;
 import lombok.Getter;
+import lombok.Setter;
 import org.ddogleg.struct.BigDogArray_I32;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_B;
@@ -95,7 +96,7 @@ public class PointCloudViewerPanelSwing extends JPanel
 	// work space for rendering. Must be locked
 	private final RenderingWork rendering = new RenderingWork();
 
-	private int dotRadius = 2; // radius of square dot
+	@Setter @Getter private int dotRadius = 2; // radius of square dot
 	int backgroundColor = 0; // RGB 32-bit format
 
 	// pass in coordinates in world frame when selecting their color
@@ -109,7 +110,7 @@ public class PointCloudViewerPanelSwing extends JPanel
 	@Nullable ScheduledExecutorService pressedTask = null;
 
 	// how far it moves in the world frame for each key press
-	volatile float stepSize;
+	@Setter @Getter volatile float stepSize;
 
 	private static class RenderingWork {
 		// Lock which must be enforced when rendering
@@ -657,25 +658,9 @@ public class PointCloudViewerPanelSwing extends JPanel
 	@Override
 	public void mouseMoved( MouseEvent e ) {}
 
-	public float getStepSize() {
-		return stepSize;
-	}
-
-	public void setStepSize( float size ) {
-		stepSize = size;
-	}
-
-	public int getDotRadius() {
-		return dotRadius;
-	}
-
-	public void setDotRadius( int dotRadius ) {
-		this.dotRadius = dotRadius;
-	}
-
 	private static class Wireframe {
-		public final DogArray<Point3D_F32> vertexes = new DogArray<>(Point3D_F32::new);
-		public int radiusPixels = 1;
-		public int rgb;
+		private final DogArray<Point3D_F32> vertexes = new DogArray<>(Point3D_F32::new);
+		private int radiusPixels = 1;
+		private int rgb;
 	}
 }

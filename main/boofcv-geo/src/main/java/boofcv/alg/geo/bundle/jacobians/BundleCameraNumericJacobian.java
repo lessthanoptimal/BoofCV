@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -125,7 +125,7 @@ public class BundleCameraNumericJacobian {
 	 */
 	private class FunctionOfPoint implements FunctionNtoM {
 
-		public void setParameters( double[] parameters ) {
+		void setParameters( double[] parameters ) {
 			model.setIntrinsic(parameters, 0);
 		}
 

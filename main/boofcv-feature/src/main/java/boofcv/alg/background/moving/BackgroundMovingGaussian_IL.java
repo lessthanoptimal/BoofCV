@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -127,7 +127,7 @@ public class BackgroundMovingGaussian_IL<T extends ImageInterleaved<T>, Motion e
 		final private InterpolatePixelMB<T> interpolationInput;
 		final private InterpolatePixelMB<InterleavedF32> interpolationBG;
 
-		public Helper( int numBands ) {
+		Helper( int numBands ) {
 			valueInput = new float[numBands];
 			valueBG = new float[2*numBands];
 			transform = (Point2Transform2Model_F32<Motion>)_transform.copyConcurrent();
@@ -136,7 +136,7 @@ public class BackgroundMovingGaussian_IL<T extends ImageInterleaved<T>, Motion e
 			interpolationBG.setImage(background);
 		}
 
-		public void updateBackground( int x0, int y0, int x1, int y1, T frame ) {
+		void updateBackground( int x0, int y0, int x1, int y1, T frame ) {
 			interpolationInput.setImage(frame);
 
 			final float minusLearn = 1.0f - learnRate;
@@ -174,7 +174,7 @@ public class BackgroundMovingGaussian_IL<T extends ImageInterleaved<T>, Motion e
 			}
 		}
 
-		protected void segment( int y0, int y1, Motion currentToWorld, T frame, GrayU8 segmented ) {
+		void segment( int y0, int y1, Motion currentToWorld, T frame, GrayU8 segmented ) {
 			final int numBands = background.getNumBands()/2;
 			final float adjustedMinimumDifference = minimumDifference*numBands;
 

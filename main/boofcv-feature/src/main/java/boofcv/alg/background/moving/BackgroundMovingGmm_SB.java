@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -70,11 +70,11 @@ public class BackgroundMovingGmm_SB<T extends ImageGray<T>, Motion extends Inver
 		final private Point2D_F32 pixel = new Point2D_F32();
 		final private Point2Transform2Model_F32<Motion> transform;
 
-		public Helper() {
+		Helper() {
 			transform = (Point2Transform2Model_F32<Motion>)_transform.copyConcurrent();
 		}
 
-		public void updateBackground( int x0, int y0, int x1, int y1, T frame ) {
+		void updateBackground( int x0, int y0, int x1, int y1, T frame ) {
 			transform.setModel(worldToCurrent);
 			for (int y = y0; y < y1; y++) {
 				float[] modelRow = common.model.data[y];
@@ -93,7 +93,7 @@ public class BackgroundMovingGmm_SB<T extends ImageGray<T>, Motion extends Inver
 			}
 		}
 
-		protected void segment( int y0, int y1, Motion currentToWorld, T frame, GrayU8 segmented ) {
+		void segment( int y0, int y1, Motion currentToWorld, T frame, GrayU8 segmented ) {
 			transform.setModel(currentToWorld);
 			for (int y = y0; y < y1; y++) {
 				int indexOut = segmented.startIndex + y*segmented.stride;

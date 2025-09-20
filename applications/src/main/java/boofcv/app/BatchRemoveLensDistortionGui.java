@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -130,7 +130,7 @@ public class BatchRemoveLensDistortionGui extends JPanel implements BatchRemoveL
 		JTextField textIntrinsic = new JTextField();
 		JComboBox<String> comboResize = new JComboBox<>(new String[]{"None", "Expand", "Full View"});
 
-		public ControlPanel() {
+		ControlPanel() {
 			int textWidth = 200;
 			int textHeight = 30;
 
