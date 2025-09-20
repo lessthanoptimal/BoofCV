@@ -37,6 +37,7 @@ project.ext.jetnull_version = '23.0.0'
 project.ext.jsr250_version = '1.0'
 project.ext.jsr305_version = '3.0.2'
 project.ext.trove4j_version = '3.0.3'
+project.ext.pdfbox_version = '2.0.34'
 
 if (!project.hasProperty('ossrhUsername')) {
     ext.ossrhUsername = "dummy"

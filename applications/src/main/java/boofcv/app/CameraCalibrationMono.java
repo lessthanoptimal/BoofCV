@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,11 +42,11 @@ import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.GrayF32;
 import com.github.sarxos.webcam.Webcam;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.pdfbox.util.Charsets;
 
 import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -571,7 +571,7 @@ public class CameraCalibrationMono extends BaseStandardInputApp {
 
 			// Save calibration statistics to disk
 			if (outputDirectory != null) {
-				try (var out = new PrintWriter(new File(outputDirectory, "calibration_metrics.txt"), Charsets.UTF_8)) {
+				try (var out = new PrintWriter(new File(outputDirectory, "calibration_metrics.txt"), StandardCharsets.UTF_8)) {
 					out.println(metricText);
 				} catch (IOException e) {
 					throw new UncheckedIOException(e);
