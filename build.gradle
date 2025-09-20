@@ -78,7 +78,11 @@ subprojects {
     java {
         withJavadocJar()
         withSourcesJar()
-        toolchain { languageVersion = JavaLanguageVersion.of(25) }
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(25)
+            // Specify vendor to get around a Github Java 25 issue
+            vendor.set(JvmVendorSpec.AZUL)
+        }
     }
 
     // Prevents tons of errors if someone is using ASCII
