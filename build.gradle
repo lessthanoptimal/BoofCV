@@ -4,7 +4,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 plugins {
     id "com.peterabeles.gversion" version "1.10.3" apply false
     id "net.ltgt.errorprone" version "4.0.1" apply false
-    id "com.diffplug.spotless" version "6.9.1" apply false
+    id "com.diffplug.spotless" version "7.2.1" apply false
     id "io.github.gradle-nexus.publish-plugin" version "2.0.0"
 }
 
@@ -314,7 +314,7 @@ subprojects {
 
             // define the steps to apply to those files
             trimTrailingWhitespace()
-            indentWithTabs()
+            leadingSpacesToTabs()
             endWithNewline()
         }
         java {
@@ -324,7 +324,7 @@ subprojects {
             targetExclude('**/*_MT*.java', '**/*_F32.java', '**/generated/*')
 
             toggleOffOn('formatter:off', 'formatter:on')
-            removeUnusedImports()
+            // removeUnusedImports() <-- turned off due to a Java 25 issue
             endWithNewline()
 
             licenseHeaderFile "${project.rootDir}/misc/copyright.txt"
