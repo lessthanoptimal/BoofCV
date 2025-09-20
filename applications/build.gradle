@@ -13,7 +13,7 @@ dependencies {
 
 	api "args4j:args4j:$args4j_version"
 	implementation("commons-io:commons-io:$commons_io_version")
-    implementation("org.apache.pdfbox:pdfbox:$pdfbox_version")
+	implementation("org.apache.pdfbox:pdfbox:$pdfbox_version")
 }
 
 // Create a jar which contains all the applications
