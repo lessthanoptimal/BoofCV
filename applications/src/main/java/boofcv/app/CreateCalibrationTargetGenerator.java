@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,7 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.apache.pdfbox.printing.PDFPageable;
 import org.apache.pdfbox.util.Matrix;
 import org.jetbrains.annotations.Nullable;
@@ -208,9 +209,11 @@ public class CreateCalibrationTargetGenerator {
 			float offX = Math.max(CM_TO_POINTS, (pageWidth - patternWidth)/4);
 			float offY = Math.max(CM_TO_POINTS, (pageHeight - patternHeight)/4);
 
+			var timeRoman = new PDType1Font(Standard14Fonts.FontName.TIMES_ROMAN);
+
 			pcs.beginText();
 			pcs.setNonStrokingColor(Color.DARK_GRAY);
-			pcs.setFont(PDType1Font.TIMES_ROMAN, 7);
+			pcs.setFont(timeRoman, 7);
 			pcs.newLineAtOffset(-offX, -offY);
 			pcs.showText(String.format("BoofCV: %s", documentTitle));
 			pcs.endText();

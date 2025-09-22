@@ -23,6 +23,7 @@ project.ext.ddogleg_version = '0.24.1'
 project.ext.georegression_version = '0.28.1'
 project.ext.commons_io_version = '2.16.1'
 project.ext.deepboof_version = '0.5.3'
+project.ext.kotlin_version = '2.2.20'
 project.ext.lombok_version = '1.18.42'
 project.ext.jabel_version = '1.0.1-1'
 project.ext.guava_version = '33.2.0-jre'
@@ -37,7 +38,7 @@ project.ext.jetnull_version = '23.0.0'
 project.ext.jsr250_version = '1.0'
 project.ext.jsr305_version = '3.0.2'
 project.ext.trove4j_version = '3.0.3'
-project.ext.pdfbox_version = '2.0.34'
+project.ext.pdfbox_version = '3.0.4'
 
 if (!project.hasProperty('ossrhUsername')) {
     ext.ossrhUsername = "dummy"

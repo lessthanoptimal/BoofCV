@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.GrayF32;
 import boofcv.testing.BoofStandardJUnit;
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
@@ -42,32 +43,29 @@ public class CommonFiducialPdfChecks extends BoofStandardJUnit {
 		File f = new File(document_name + ".pdf");
 		opened.add(f);
 
-		PDDocument document = PDDocument.load(f);
-		PDFRenderer pdfRenderer = new PDFRenderer(document);
-		if (document.getNumberOfPages() != 1)
-			throw new RuntimeException("Egads");
-		BufferedImage output = pdfRenderer.renderImageWithDPI(0, 150, ImageType.RGB);
-		document.close();
-
-		return output;
+		try (PDDocument document = Loader.loadPDF(f)) {
+			if (document.getNumberOfPages() != 1)
+				throw new RuntimeException("Egads");
+			return new PDFRenderer(document).renderImageWithDPI(0, 150, ImageType.RGB);
+		}
 	}
 
 	public GrayF32 loadPdfAsGray() throws IOException {
 		BufferedImage image = loadPDF();
-		GrayF32 gray = new GrayF32(image.getWidth(), image.getHeight());
+		var gray = new GrayF32(image.getWidth(), image.getHeight());
 		ConvertBufferedImage.convertFrom(image, gray);
 		return gray;
 	}
 
 	public GrayF32 loadPngAsGray( String name ) {
 		BufferedImage image = loadImage(name);
-		GrayF32 gray = new GrayF32(image.getWidth(), image.getHeight());
+		var gray = new GrayF32(image.getWidth(), image.getHeight());
 		ConvertBufferedImage.convertFrom(image, gray);
 		return gray;
 	}
 
 	public BufferedImage loadImage( String name ) {
-		File f = new File(name);
+		var f = new File(name);
 		opened.add(f);
 		return UtilImageIO.loadImage(f.getAbsolutePath());
 	}

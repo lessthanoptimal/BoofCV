@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,6 +29,7 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.apache.pdfbox.printing.PDFPageable;
 
 import java.awt.*;
@@ -71,6 +72,8 @@ public abstract class CreateFiducialDocumentPDF {
 	float pageWidth, pageHeight;
 
 	protected int totalMarkers;
+
+	PDType1Font timeRoman = new PDType1Font(Standard14Fonts.FontName.TIMES_ROMAN);
 
 	// name of each pattern
 	protected java.util.List<String> names;
@@ -146,10 +149,10 @@ public abstract class CreateFiducialDocumentPDF {
 
 				int fontSize = 7;
 				String text = String.format("%sCreated by BoofCV", getMarkerType());
-				float textWidth = PDType1Font.TIMES_ROMAN.getStringWidth(text)/1000*fontSize;
+				float textWidth = timeRoman.getStringWidth(text)/1000*fontSize;
 
 				pcs.beginText();
-				pcs.setFont(PDType1Font.TIMES_ROMAN, fontSize);
+				pcs.setFont(timeRoman, fontSize);
 				pcs.newLineAtOffset(pageWidth - textWidth - offX, offY);
 				pcs.showText(text);
 				pcs.endText();
@@ -175,7 +178,7 @@ public abstract class CreateFiducialDocumentPDF {
 
 						pcs.beginText();
 						pcs.setNonStrokingColor(Color.GRAY);
-						pcs.setFont(PDType1Font.TIMES_ROMAN, 7);
+						pcs.setFont(timeRoman, 7);
 						pcs.newLineAtOffset((float)r.offsetX, (float)r.offsetY - offset);
 						pcs.showText(message);
 						pcs.endText();
@@ -218,7 +221,7 @@ public abstract class CreateFiducialDocumentPDF {
 		float pageHeight = (float)paper.convertHeight(units)*UNIT_TO_POINTS;
 
 //		pcs.setLineCapStyle(1);
-		pcs.setStrokingColor(0.75);
+		pcs.setStrokingColor(0.75f);
 
 		for (int i = 0; i <= numCols; i++) {
 			float x = offsetX + i*sizeBoxX;

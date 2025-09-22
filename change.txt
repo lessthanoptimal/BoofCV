@@ -12,6 +12,7 @@ Version : 1.2.4
 
 - Build update for Java 25 (Java 11 byte code)
 - Updated dependencies
+  * PDFBox 2 -> 3
 
 ---------------------
 Date    : 2025/Jul/01
