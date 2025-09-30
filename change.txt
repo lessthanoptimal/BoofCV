@@ -7,7 +7,7 @@ Version Meaning: <compatible>.<feature>.<bug fix>
 - Last digit always indicates a bug fix and other minor changes
 
 ---------------------
-Date    : 2025/XX/YY
+Date    : 2025/Sep/30
 Version : 1.2.4
 
 - Build update for Java 25 (Java 11 byte code)
