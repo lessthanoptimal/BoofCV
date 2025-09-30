@@ -40,21 +40,22 @@ project.ext.jsr305_version = '3.0.2'
 project.ext.trove4j_version = '3.0.3'
 project.ext.pdfbox_version = '3.0.4'
 
-if (!project.hasProperty('ossrhUsername')) {
-    ext.ossrhUsername = "dummy"
-    ext.ossrhPassword = "dummy"
-}
+// if Maven central isn't setup in ~/.gradle/gradle.properties fill in these variables to make it happy
+if (project.hasProperty('ossrhUsername')) {
+    nexusPublishing {
+        repositories {
+            sonatype {
+                nexusUrl.set(uri("https://ossrh-staging-api.central.sonatype.com/service/local/"))
+                snapshotRepositoryUrl.set(uri("https://central.sonatype.com/repository/maven-snapshots/"))
 
-nexusPublishing {
-    repositories {
-        sonatype {
-            nexusUrl.set(uri("https://ossrh-staging-api.central.sonatype.com/service/local/"))
-            snapshotRepositoryUrl.set(uri("https://central.sonatype.com/repository/maven-snapshots/"))
-
-            username = ossrhUsername
-            password = ossrhPassword
+                username = ossrhUsername
+                password = ossrhPassword
+            }
         }
     }
+} else {
+    ext.ossrhUsername = "dummy"
+    ext.ossrhPassword = "dummy"
 }
 
 // Which native platforms are supported can be specified in the command line. Otherwise
@@ -381,7 +382,7 @@ subprojects {
         }
     }
 
-    if (project.hasProperty('ossrhUsername')) {
+    if (rootProject.ext.ossrhUsername != 'dummy') {
         signing { sign publishing.publications.mavenJava }
     }
 }
