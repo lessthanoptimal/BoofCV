@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -68,11 +68,11 @@ public class TestAverageDownSampleOps extends BoofStandardJUnit {
 
 			GImageMiscOps.fillUniform(in, rand, 0, 100);
 
-			Method horizontal = ImplAverageDownSample.class.getDeclaredMethod("horizontal", input[i], middle[i]);
-			Method vertical = BoofTesting.findMethod(ImplAverageDownSample.class, "vertical", middle[i], input[i]);
+			Method horizontal = ImplAverageDownSample.class.getDeclaredMethod("horizontal", input[i], boolean.class, middle[i]);
+			Method vertical = BoofTesting.findMethod(ImplAverageDownSample.class, "vertical", middle[i], boolean.class, input[i]);
 
-			horizontal.invoke(null, in, mid);
-			vertical.invoke(null, mid, expected);
+			horizontal.invoke(null, in, false, mid);
+			vertical.invoke(null, mid, false, expected);
 
 			AverageDownSampleOps.down(in, found);
 

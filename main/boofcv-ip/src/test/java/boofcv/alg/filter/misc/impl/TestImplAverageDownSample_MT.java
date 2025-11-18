@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,10 +28,9 @@ import java.lang.reflect.Method;
 import java.util.Random;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
-class TestImplAverageDownSample_MT extends CompareIdenticalFunctions
-{
+class TestImplAverageDownSample_MT extends CompareIdenticalFunctions {
 	Random rand = new Random(234);
-	int width = 640,height=480;
+	int width = 640, height = 480;
 
 	protected TestImplAverageDownSample_MT() {
 		super(ImplAverageDownSample_MT.class, ImplAverageDownSample.class);
@@ -42,21 +41,31 @@ class TestImplAverageDownSample_MT extends CompareIdenticalFunctions
 		super.performTests(8);
 	}
 
+	@Override protected boolean isTestMethod( Method m ) {
+		return switch (m.getName()) {
+			case "horizontal", "vertical" -> m.getParameterTypes().length == 3;
+			default -> false;
+		};
+	}
+
 	@Override
-	protected Object[][] createInputParam(Method candidate, Method validation) {
+	protected Object[][] createInputParam( Method candidate, Method validation ) {
 		Class[] inputTypes = candidate.getParameterTypes();
 
-		ImageBase input = GeneralizedImageOps.createImage(inputTypes[0],width,height,1);
+		ImageBase input = GeneralizedImageOps.createImage(inputTypes[0], width, height, 1);
 		ImageBase output;
 
-		if( candidate.getName().contains("horizontal"))
-			output = GeneralizedImageOps.createImage(inputTypes[1],width/3,height,1);
+		if (candidate.getName().contains("horizontal"))
+			output = GeneralizedImageOps.createImage(inputTypes[2], width/3, height, 1);
 		else
-			output = GeneralizedImageOps.createImage(inputTypes[1],width,height/2,1);
+			output = GeneralizedImageOps.createImage(inputTypes[2], width, height/2, 1);
 
-		GImageMiscOps.fillUniform(input,rand,0,255);
-		GImageMiscOps.fillUniform(output,rand,0,100);
+		GImageMiscOps.fillUniform(input, rand, 0, 255);
+		GImageMiscOps.fillUniform(output, rand, 0, 100);
 
-		return new Object[][]{{input, output}};
+		if (candidate.getParameterTypes().length == 3)
+			return new Object[][]{{input, false, output}};
+		else
+			return new Object[][]{{input, false, output, null}};
 	}
 }
