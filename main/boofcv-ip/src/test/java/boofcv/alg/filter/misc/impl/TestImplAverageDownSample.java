@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,9 @@
 
 package boofcv.alg.filter.misc.impl;
 
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.image.GrayF64;
 import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
@@ -26,210 +28,174 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class TestImplAverageDownSample extends BoofStandardJUnit {
 
 	public static List<Method> find( String name ) {
-		List<Method> ret = new ArrayList<>();
+		var ret = new ArrayList<Method>();
 
 		Method[] methods = ImplAverageDownSample.class.getMethods();
 
-		for( Method m : methods ) {
-			if( m.getName().equals(name) ) {
+		for (Method m : methods) {
+			if (m.getName().equals(name)) {
 				ret.add(m);
 			}
 		}
 
+		// Ensure the order is constant. Debug and run modes were returning different results
+		Collections.sort(ret, Comparator.comparing(Method::toString));
+
 		return ret;
 	}
 
-	/**
-	 * easy case, should be a perfect copy
-	 */
-	@Test void horizontal_1_to_1() throws InvocationTargetException, IllegalAccessException {
-
+	// Compares to the naive implementation
+	@Test void horizontal_naive() throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
 		List<Method> methods = find("horizontal");
+		assertFalse(methods.isEmpty());
 
-		for( Method m : methods ) {
+		for (Method m : methods) {
 			Class typeSrc = m.getParameterTypes()[0];
-			Class typeDst = m.getParameterTypes()[1];
+			Class typeDst = m.getParameterTypes()[2];
 
-			ImageGray src = GeneralizedImageOps.createSingleBand(typeSrc,6,3);
-			ImageGray dst = GeneralizedImageOps.createSingleBand(typeDst,6,3);
+			Method mTest = ImplAverageDownSample.class.getDeclaredMethod("naivePixelHorizontal", typeSrc,
+					float.class, float.class, int.class, int.class);
 
-			fillHorizontal(src);
-			m.invoke(null,src,dst);
+			for (int i = 0; i < 25; i++) {
+				// Randomize the width of the source image
+				ImageGray src = GeneralizedImageOps.createSingleBand(typeSrc, 20 + rand.nextInt(3), 5);
 
-			for (int y = 0; y < src.height; y++) {
-				for (int x = 0; x < src.width; x++) {
-					double found = GeneralizedImageOps.get(dst,x,y);
-					assertEquals(x,found,1e-4f);
+				// randomly scale the width for output image
+				int width = (int)(src.width/(1.2 + rand.nextDouble()) - 0.5);
+				ImageGray dst = GeneralizedImageOps.createSingleBand(typeDst, width, src.height);
+
+				// Fill source image with random values
+				GImageMiscOps.fillUniform(src, rand, 0, 200);
+
+				for (boolean centered : new boolean[]{true, false}) {
+					m.invoke(null, src, centered, dst);
+
+					float scale = src.width/(float)dst.width;
+					float offset = centered ? -(scale - 1.0f)/2.0f : 0.0f;
+
+					for (int y = 0; y < dst.height; y++) {
+						for (int x = 0; x < dst.width; x++) {
+							var expected = (Number)mTest.invoke(null, src, offset, scale, x, y);
+							var found = GeneralizedImageOps.get(dst, x, y);
+							assertEquals(expected.doubleValue(), found, 1e-3, "pixel: " + x + " " + y);
+						}
+					}
 				}
 			}
 		}
 
-		assertEquals(4,methods.size());
+		assertEquals(4, methods.size());
 	}
 
-	/**
-	 * Two pixels should be averaged together at a time
-	 */
-	@Test void horizontal_2_to_1() throws InvocationTargetException, IllegalAccessException {
-		List<Method> methods = find("horizontal");
-
-		for( Method m : methods ) {
-			Class typeSrc = m.getParameterTypes()[0];
-			Class typeDst = m.getParameterTypes()[1];
-
-			ImageGray src = GeneralizedImageOps.createSingleBand(typeSrc,6,3);
-			ImageGray dst = GeneralizedImageOps.createSingleBand(typeDst,3,3);
-
-			fillHorizontal(src);
-			m.invoke(null,src,dst);
-
-			for (int y = 0; y < src.height; y++) {
-				assertEquals(0.5f,GeneralizedImageOps.get(dst,0,y),1e-4f);
-				assertEquals(2.5f,GeneralizedImageOps.get(dst,1,y),1e-4f);
-				assertEquals(4.5f,GeneralizedImageOps.get(dst,2,y),1e-4f);
-			}
-		}
-
-		assertEquals(4,methods.size());
-	}
-
-	/**
-	 * The division will not be along pixels and symmetries are avoided
-	 */
-	@Test void horizontal_3_to_2() throws InvocationTargetException, IllegalAccessException {
-		List<Method> methods = find("horizontal");
-
-		for( Method m : methods ) {
-			Class typeSrc = m.getParameterTypes()[0];
-			Class typeDst = m.getParameterTypes()[1];
-
-//			System.out.println(typeSrc+"   "+typeDst);
-
-			ImageGray src = GeneralizedImageOps.createSingleBand(typeSrc,9,3);
-			ImageGray dst = GeneralizedImageOps.createSingleBand(typeDst,4,3);
-
-			fillHorizontal(src);
-			m.invoke(null,src,dst);
-
-			for (int y = 0; y < src.height; y++) {
-				assertEquals(0.6666667f,GeneralizedImageOps.get(dst,0,y),1e-4f);
-				assertEquals(2.8888889f,GeneralizedImageOps.get(dst,1,y),1e-4f);
-				assertEquals(5.1111111f,GeneralizedImageOps.get(dst,2,y),1e-4f);
-				assertEquals(7.3333333f,GeneralizedImageOps.get(dst,3,y),1e-4f);
-			}
-		}
-
-		assertEquals(4,methods.size());
-	}
-
-	private void fillHorizontal(ImageGray src) {
-		for (int y = 0; y < src.height; y++) {
-			for (int x = 0; x < src.width; x++) {
-				GeneralizedImageOps.set(src,x,y,x);
-			}
-		}
-	}
-
-	@Test void vertical_1_to_1() throws InvocationTargetException, IllegalAccessException {
+	// Compares to the naive implementation
+	@Test void vertical_naive() throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
 		List<Method> methods = find("vertical");
+		assertFalse(methods.isEmpty());
 
-		for( Method m : methods ) {
+		for (Method m : methods) {
+			// Skip over ones where the workspace is provided
+			if (m.getParameterTypes().length != 3)
+				continue;
 			Class typeSrc = m.getParameterTypes()[0];
-			Class typeDst = m.getParameterTypes()[1];
+			Class typeDst = m.getParameterTypes()[2];
 
-			ImageGray src = GeneralizedImageOps.createSingleBand(typeSrc,3,6);
-			ImageGray dst = GeneralizedImageOps.createSingleBand(typeDst,3,6);
+			Method mTest = ImplAverageDownSample.class.getDeclaredMethod("naivePixelVertical", typeSrc,
+					float.class, float.class, int.class, int.class);
 
-			fillVertical(src);
-			m.invoke(null,src,dst);
+			for (int i = 0; i < 25; i++) {
+				// Randomize the width of the source image
+				ImageGray src = GeneralizedImageOps.createSingleBand(typeSrc, 5, 20 + rand.nextInt(3));
 
-			for (int y = 0; y < src.height; y++) {
-				for (int x = 0; x < src.width; x++) {
-					assertEquals(y,GeneralizedImageOps.get(dst,x,y),1e-4);
+				// randomly scale the width for output image
+				int height = (int)(src.height/(1.2 + rand.nextDouble()) - 0.5);
+				ImageGray dst = GeneralizedImageOps.createSingleBand(typeDst, src.width, height);
+
+				// Fill source image with random values
+				GImageMiscOps.fillUniform(src, rand, 0, 200);
+
+				for (boolean centered : new boolean[]{true, false}) {
+					m.invoke(null, src, centered, dst);
+
+					float scale = src.height/(float)dst.height;
+					float offset = centered ? -(scale - 1.0f)/2.0f : 0.0f;
+
+					for (int y = 0; y < dst.height; y++) {
+						for (int x = 0; x < dst.width; x++) {
+							var expected = (Number)mTest.invoke(null, src, offset, scale, x, y);
+							var found = GeneralizedImageOps.get(dst, x, y);
+							if (dst.getDataType().isInteger()) {
+								assertEquals(Math.round(expected.doubleValue()), found, 1e-3, "pixel: " + x + " " + y);
+							} else {
+								assertEquals(expected.doubleValue(), found, 1e-3, "pixel: " + x + " " + y);
+							}
+						}
+					}
 				}
 			}
 		}
-
-		assertEquals(4,methods.size());
 	}
 
-	@Test void vertical_2_to_1() throws InvocationTargetException, IllegalAccessException {
-		List<Method> methods = find("vertical");
+	@Test void naivePixelHorizontal() throws InvocationTargetException, IllegalAccessException {
+		List<Method> methods = find("naivePixelHorizontal");
+		assertFalse(methods.isEmpty());
 
-		for( Method m : methods ) {
+		for (Method m : methods) {
 			Class typeSrc = m.getParameterTypes()[0];
-			Class typeDst = m.getParameterTypes()[1];
 
-//			System.out.println(typeSrc+"   "+typeDst);
+			// skip double because it has a different header
+			if (typeSrc.isAssignableFrom(GrayF64.class))
+				continue;
 
-			ImageGray src = GeneralizedImageOps.createSingleBand(typeSrc,3,6);
-			ImageGray dst = GeneralizedImageOps.createSingleBand(typeDst,3,3);
+			ImageGray src = GeneralizedImageOps.createSingleBand(typeSrc, 4, 5);
 
-			fillVertical(src);
-			m.invoke(null,src,dst);
-
-			double[] expected;
-			if( dst.getDataType().isInteger() ) {
-				expected = new double[]{1,3,5};
-			} else {
-				expected = new double[]{0.5,2.5,4.5};
-			}
-
-			for (int x = 0; x < src.width; x++) {
-				for (int y = 0; y < dst.height; y++) {
-					assertEquals(expected[y],GeneralizedImageOps.get(dst,x,y),1e-4);
+			for (int row = 0; row < src.height; row++) {
+				for (int col = 0; col < src.width; col++) {
+					GeneralizedImageOps.set(src, col, row, col + row);
 				}
 			}
-		}
 
-		assertEquals(4,methods.size());
+			assertEquals(0.4737f, (float)m.invoke(null, src, -0.1f, 2.0f, 0, 0), 1e-3f);
+			assertEquals(4.4000f, (float)m.invoke(null, src, -0.1f, 2.0f, 1, 2), 1e-3f);
+			assertEquals(5.0f, (float)m.invoke(null, src, -0.1f, 2.0f, 2, 2), 1e-3f);
+			assertEquals(0.5f, (float)m.invoke(null, src, 0.0f, 2.0f, 0, 0), 1e-3f);
+			assertEquals(4.5f, (float)m.invoke(null, src, 0.0f, 2.0f, 1, 2), 1e-3f);
+		}
 	}
 
-	@Test void vertical_3_to_2() throws InvocationTargetException, IllegalAccessException {
-		List<Method> methods = find("vertical");
+	@Test void naivePixelVertical() throws InvocationTargetException, IllegalAccessException {
+		List<Method> methods = find("naivePixelVertical");
+		assertFalse(methods.isEmpty());
 
-		for( Method m : methods ) {
+		for (Method m : methods) {
 			Class typeSrc = m.getParameterTypes()[0];
-			Class typeDst = m.getParameterTypes()[1];
+			ImageGray src = GeneralizedImageOps.createSingleBand(typeSrc, 4, 5);
 
-//			System.out.println(typeSrc+"   "+typeDst);
+			// skip double because it has a different header
+			if (typeSrc.isAssignableFrom(GrayF64.class))
+				continue;
 
-			ImageGray src = GeneralizedImageOps.createSingleBand(typeSrc,3,9);
-			ImageGray dst = GeneralizedImageOps.createSingleBand(typeDst,3,4);
-
-			fillVertical(src);
-			m.invoke(null,src,dst);
-
-			double[] expected;
-			if( dst.getDataType().isInteger() ) {
-				expected = new double[]{1,3,5,7};
-			} else {
-				expected = new double[]{0.6666667f,2.8888889f,5.1111111f,7.3333333f};
-			}
-
-			for (int x = 0; x < src.width; x++) {
-				for (int y = 0; y < dst.height; y++) {
-					assertEquals(expected[y],GeneralizedImageOps.get(dst,x,y),1e-4);
+			for (int row = 0; row < src.height; row++) {
+				for (int col = 0; col < src.width; col++) {
+					GeneralizedImageOps.set(src, col, row, col + row);
 				}
 			}
-		}
 
-		assertEquals(4,methods.size());
-	}
-
-	private void fillVertical(ImageGray src) {
-		for (int x = 0; x < src.width; x++) {
-			for (int y = 0; y < src.height; y++) {
-				GeneralizedImageOps.set(src,x,y,y);
-			}
+			assertEquals(0.4737f, (float)m.invoke(null, src, -0.1f, 2.0f, 0, 0), 1e-3f);
+			assertEquals(3.4f, (float)m.invoke(null, src, -0.1f, 2.0f, 1, 1), 1e-3f);
+			assertEquals(4.4f, (float)m.invoke(null, src, -0.1f, 2.0f, 2, 1), 1e-3f);
+			assertEquals(0.5f, (float)m.invoke(null, src, 0.0f, 2.0f, 0, 0), 1e-3f);
+			assertEquals(4.5f, (float)m.invoke(null, src, 0.0f, 2.0f, 2, 1), 1e-3f);
 		}
 	}
 }
