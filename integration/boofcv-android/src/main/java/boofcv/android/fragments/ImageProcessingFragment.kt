@@ -88,6 +88,12 @@ abstract class ImageProcessingFragment : CameraProcessFragment() {
     private var imagesPro = LockImages()
     private var frameCount = 0L
 
+    /**
+     * If >= 0, it will call the warm up camera config when it has processed exactly this
+     * many frames
+     */
+    protected var warmupFrameCount = -1L
+
     // external image processing logic
     protected var imageProcessing: AndroidImageProcessing? = null
 
@@ -121,6 +127,33 @@ abstract class ImageProcessingFragment : CameraProcessFragment() {
     }
 
     /**
+     * If a warmup is required this image processor is called which does nothing but wait until
+     * the warm up period has passed.
+     */
+    open fun processImageWarmUp(cameraID: CameraID, dataframe: Image) {
+
+        // Do nothing until the warm up frame count has been hit
+        frameCount++
+        if (frameCount != warmupFrameCount)
+            return
+
+        Log.i(TAG, "Camera has finished warming up. Reconfiguring")
+
+        // Configure the cameras post warmup
+        val camera = cameraDevices[cameraID]!!
+        val builder = camera.device.createCaptureRequest(captureRequestTemplateType)
+        for (surface in camera.surfaces) {
+            builder.addTarget(surface)
+        }
+        customConfigurePostWarmup(cameraID, builder)
+        camera.session!!.setRepeatingRequest(
+            builder.build(),
+            createCaptureRequestListener(camera),
+            cameraHandler
+        )
+    }
+
+    /**
      * Handles the most recent [Image] from the camera. Keeps track of the number of threads.
      * If it's still processing the previous image it will return. Otherwise it will convert
      * the image into a usable format by BoofCV then tell the processing thread that another
@@ -128,6 +161,7 @@ abstract class ImageProcessingFragment : CameraProcessFragment() {
      */
     open fun processImage(dataFrame: Image) {
         frameCount++
+
         val image = imagesCam
         if (!image.requestProcess())
             return
@@ -148,7 +182,7 @@ abstract class ImageProcessingFragment : CameraProcessFragment() {
             } else {
                 Log.e(TAG, "Exception", e)
             }
-        } catch (e:Exception) {
+        } catch (e: Exception) {
             // Catch other random exceptions and log them so they don't blow up android
             Log.e(TAG, "Exception", e)
         } finally {
@@ -206,7 +240,13 @@ abstract class ImageProcessingFragment : CameraProcessFragment() {
                 cameraID,
                 requestedResolution.width,
                 requestedResolution.height
-            ) { image -> processImage(image) }
+            ) { image ->
+                if (warmupFrameCount < 0 || frameCount > warmupFrameCount) {
+                    processImage(image)
+                } else {
+                    processImageWarmUp(cameraID, image)
+                }
+            }
 
             // Save actual resolution of frame grabber.
             cameraResolution = Size(reader.width, reader.height)
@@ -231,6 +271,20 @@ abstract class ImageProcessingFragment : CameraProcessFragment() {
      * @param builder (Input/Output) Used to configure the camera
      */
     abstract fun customConfigure(cameraID: CameraID, builder: CaptureRequest.Builder)
+
+    /**
+     * If there is a non-zero warm up time then this will be called when the warm up is done.
+     * The idea is to give the camera time to stabilizing.
+     *
+     * @param cameraID The camera being configured
+     * @param builder (Input/Output) Used to configure the camera
+     */
+    protected open fun customConfigurePostWarmup(
+        cameraID: CameraID,
+        builder: CaptureRequest.Builder
+    ) {
+        throw RuntimeException("Warm up specified but custom configure not set")
+    }
 
     /**
      * Initializes the camera for capture and relevant transforms for visualization
