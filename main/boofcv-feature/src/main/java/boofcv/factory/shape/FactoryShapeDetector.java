@@ -102,7 +102,9 @@ public class FactoryShapeDetector {
 	}
 
 	public static <T extends ImageGray<T>>
-	DetectPolygonFromContour<T> polygonContour( ConfigPolygonFromContour config, Class<T> imageType ) {
+	DetectPolygonFromContour<T> polygonContour( @Nullable ConfigPolygonFromContour config, Class<T> imageType ) {
+		if (config == null)
+			config = new ConfigPolygonFromContour();
 		config.checkValidity();
 
 		PointsToPolyline contourToPolygon =
@@ -119,7 +121,11 @@ public class FactoryShapeDetector {
 	}
 
 	public static <T extends ImageGray<T>>
-	RefinePolygonToGray<T> refinePolygon( ConfigRefinePolygonLineToImage config, Class<T> imageType ) {
+	RefinePolygonToGray<T> refinePolygon( @Nullable ConfigRefinePolygonLineToImage config, Class<T> imageType ) {
+		if (config == null)
+			config = new ConfigRefinePolygonLineToImage();
+		config.checkValidity();
+
 		return new RefinePolygonToGrayLine<>(
 				config.cornerOffset, config.lineSamples,
 				config.sampleRadius, config.maxIterations,
