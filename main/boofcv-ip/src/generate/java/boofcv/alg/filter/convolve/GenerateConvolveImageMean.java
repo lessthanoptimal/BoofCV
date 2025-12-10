@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -61,6 +61,7 @@ public class GenerateConvolveImageMean extends CodeGeneratorBase {
 				"import boofcv.struct.border.*;\n" +
 				"import boofcv.struct.convolve.*;\n" +
 				"import boofcv.struct.image.*;\n" +
+				"import pabeles.concurrency.GrowArray;\n" +
 				"\n" +
 				"import javax.annotation.Generated;\n" +
 				"\n" +
@@ -93,14 +94,15 @@ public class GenerateConvolveImageMean extends CodeGeneratorBase {
 				"\t\tif (BOverrideConvolveImageMean.invokeNativeHorizontal(input, output, offset, length))\n" +
 				"\t\t\treturn;\n" +
 				"\n" +
-				"\t\tKernel1D_"+suffix+" kernel = FactoryKernel.table1D_"+suffix+"(offset, length"+normalized+");\n" +
 				"\t\tif (length > input.width) {\n" +
+				"\t\t\tKernel1D_"+suffix+" kernel = FactoryKernel.table1D_"+suffix+"(offset, length"+normalized+");\n" +
 				"\t\t\tConvolveImageNormalized.horizontal(kernel, input, output);\n" +
 				"\t\t} else {\n" +
-				"\t\t\tConvolveNormalized_JustBorder_SB.horizontal(kernel, input, output);\n" +
 				"\t\t\tif (BoofConcurrency.USE_CONCURRENT) {\n" +
+				"\t\t\t\tImplConvolveMean_MT.horizontalBorder(input, output, offset, length);\n" +
 				"\t\t\t\tImplConvolveMean_MT.horizontal(input, output, offset, length);\n" +
 				"\t\t\t} else {\n" +
+				"\t\t\t\tImplConvolveMean.horizontalBorder(input, output, offset, length);\n" +
 				"\t\t\t\tImplConvolveMean.horizontal(input, output, offset, length);\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
@@ -127,14 +129,15 @@ public class GenerateConvolveImageMean extends CodeGeneratorBase {
 				"\t\tif (BOverrideConvolveImageMean.invokeNativeVertical(input, output, offset, length))\n" +
 				"\t\t\treturn;\n" +
 				"\n" +
-				"\t\tKernel1D_"+suffix+" kernel = FactoryKernel.table1D_"+suffix+"(offset, length"+normalized+");\n" +
 				"\t\tif (length > input.height) {\n" +
+				"\t\t\tKernel1D_"+suffix+" kernel = FactoryKernel.table1D_"+suffix+"(offset, length"+normalized+");\n" +
 				"\t\t\tConvolveImageNormalized.vertical(kernel, input, output);\n" +
 				"\t\t} else {\n" +
-				"\t\t\tConvolveNormalized_JustBorder_SB.vertical(kernel, input, output);\n" +
 				"\t\t\tif (BoofConcurrency.USE_CONCURRENT) {\n" +
+				"\t\t\t\tImplConvolveMean_MT.verticalBorder(input, output, offset, length, workspaces);\n" +
 				"\t\t\t\tImplConvolveMean_MT.vertical(input, output, offset, length, workspaces);\n" +
 				"\t\t\t} else {\n" +
+				"\t\t\t\tImplConvolveMean.verticalBorder(input, output, offset, length, workspaces);\n" +
 				"\t\t\t\tImplConvolveMean.vertical(input, output, offset, length, workspaces);\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
