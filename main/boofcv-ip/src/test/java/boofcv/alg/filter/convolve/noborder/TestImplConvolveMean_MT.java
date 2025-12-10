@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,35 +32,32 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class TestImplConvolveMean_MT extends BoofStandardJUnit {
-	int width = 100,height=90;
+	int width = 100, height = 90;
 
-	/**
-	 * Compares results to single threaded
-	 */
-	@Test
-	void compareToSingle() {
+	/// Compares results to single threaded
+	@Test void compareToSingle() {
 		int count = 0;
 		Method[] methods = ImplConvolveMean_MT.class.getMethods();
-		for( Method m : methods ) {
+		for (Method m : methods) {
 			String name = m.getName();
-			if( !(name.equals("horizontal") || name.equals("vertical")) )
+			if (!(name.startsWith("horizontal") || name.startsWith("vertical")))
 				continue;
 
 			// look up the test method
 			Class[] params = m.getParameterTypes();
-			Method testM = BoofTesting.findMethod(ImplConvolveMean.class,name,params);
+			Method testM = BoofTesting.findMethod(ImplConvolveMean.class, name, params);
 
 
-			ImageBase input = GeneralizedImageOps.createImage(params[0],width,height,2);
-			ImageBase expected = GeneralizedImageOps.createImage(params[1],width,height,2);
-			ImageBase found = GeneralizedImageOps.createImage(params[1],width,height,2);
+			ImageBase input = GeneralizedImageOps.createImage(params[0], width, height, 2);
+			ImageBase expected = GeneralizedImageOps.createImage(params[1], width, height, 2);
+			ImageBase found = GeneralizedImageOps.createImage(params[1], width, height, 2);
 
 //			System.out.println("Method "+name+" "+input.getImageType());
 
-			GImageMiscOps.fillUniform(input,rand,0,200);
+			GImageMiscOps.fillUniform(input, rand, 0, 200);
 
 			try {
-				if( name.equals("horizontal")) {
+				if (name.startsWith("horizontal")) {
 					testM.invoke(null, input, expected, 4, 8);
 					m.invoke(null, input, found, 4, 8);
 				} else {
@@ -68,14 +65,14 @@ public class TestImplConvolveMean_MT extends BoofStandardJUnit {
 					testM.invoke(null, input, expected, 4, 8, workspaces);
 					m.invoke(null, input, found, 4, 8, workspaces);
 				}
-			} catch( Exception e ) {
+			} catch (Exception e) {
 				e.printStackTrace();
 				fail("Exception");
 			}
 
-			BoofTesting.assertEquals(expected,found,1);
+			BoofTesting.assertEquals(expected, found, 1);
 			count++;
 		}
-		assertEquals(10,count);
+		assertEquals(20, count);
 	}
 }

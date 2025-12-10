@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ class TestConvolveImageNormalized extends BoofStandardJUnit {
 	@Test
 	void compareToNaive() {
 		int numFunctions = 54;
-		CompareToStandardConvolutionNormalized test = new CompareToStandardConvolutionNormalized(ConvolveImageNormalized.class);
+		var test = new CompareToStandardConvolutionNormalized(ConvolveImageNormalized.class);
 
 		for( int i = 0; i < 2; i++ ) {
 			test.setImageDimension(15+i,20+i);

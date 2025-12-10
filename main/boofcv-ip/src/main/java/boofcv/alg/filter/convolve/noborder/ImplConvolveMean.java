@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,12 +43,51 @@ import javax.annotation.Generated;
 @SuppressWarnings({"ForLoopReplaceableByForEach","Duplicates"})
 public class ImplConvolveMean {
 
-	public static void horizontal( GrayU8 input ,GrayI8 output, int offset, int length ) {
+	public static void horizontalBorder( GrayU8 input, GrayI8 output, int offset, int length ) {
+		final byte[] dataSrc = input.data;
+		final byte[] dataDst = output.data;
+
+		final int offsetR = length - offset - 1;
+
+		final int width = input.getWidth();
+		final int height = input.getHeight();
+
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
+		for (int y = 0; y < input.height; y++) {
+			int indexDest = output.startIndex + y*output.stride;
+			int j = input.startIndex + y*input.stride;
+
+			for (int i = 0; i < offset; i++) {
+				int jEnd = j + i + length - offset;
+				int total = 0;
+				for (int indexSrc = j; indexSrc < jEnd; indexSrc++) {
+					total += dataSrc[indexSrc]& 0xFF;
+				}
+				int count = jEnd - j;
+				dataDst[indexDest++] = (byte)((total + count/2)/count);
+			}
+
+			int jEnd = j + width;
+			j += width - (offset + offsetR);
+			indexDest += width - (offset + offsetR);
+			for (int i = 0; i < offsetR; i++) {
+				int total = 0;
+				for (int indexSrc = j + i; indexSrc < jEnd; indexSrc++) {
+					total += dataSrc[indexSrc]& 0xFF;
+				}
+				int count = jEnd - j - i;
+				dataDst[indexDest++] = (byte)((total + count/2)/count);
+			}
+		}
+		//CONCURRENT_ABOVE });
+	}
+
+	public static void horizontal( GrayU8 input,GrayI8 output, int offset, int length ) {
 		final int divisor = length;
 		final int halfDivisor = divisor/2;
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
-		for( int y = 0; y < input.height; y++ ) {
+		for (int y = 0; y < input.height; y++) {
 			int indexIn = input.startIndex + input.stride*y;
 			int indexOut = output.startIndex + output.stride*y + offset;
 
@@ -72,6 +111,69 @@ public class ImplConvolveMean {
 		//CONCURRENT_ABOVE });
 	}
 
+	public static void verticalBorder( GrayU8 input, GrayI8 output, int offset, int length, @Nullable GrowArray<DogArray_I32> workspaces ) {
+		workspaces = BoofMiscOps.checkDeclare(workspaces, DogArray_I32::new);
+		final DogArray_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
+		final byte[] dataSrc = input.data;
+		final byte[] dataDst = output.data;
+
+		final int offsetR = length - offset - 1;
+
+		final int width = input.getWidth();
+		final int height = input.getHeight();
+
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, input.width, length, workspaces, (work, x0, x1)->{
+		final int x0 = 0, x1 = input.width;
+		int[] totals = BoofMiscOps.checkDeclare(work, x1 - x0, false);
+
+		// Image Top
+		for (int count = length - offset; count < length; count++) {
+			{
+				int indexIn = input.startIndex + x0;
+
+				for (int x = x0; x < x1; x++) {
+					totals[x - x0] = dataSrc[indexIn++]& 0xFF;
+				}
+			}
+			for (int y = 1; y < count; y++) {
+				int indexIn = input.startIndex + x0 + y*input.stride;
+
+				for (int x = x0; x < x1; x++) {
+					totals[x - x0] += dataSrc[indexIn++]& 0xFF;
+				}
+			}
+			int indexOut = output.startIndex + (count - (length - offset))*output.stride;
+			for (int x = x0; x < x1; x++) {
+				dataDst[indexOut + x] = (byte)((totals[x - x0] + count/2)/count);
+			}
+		}
+		// Image Bottom
+		for (int yStart = height - length + 1; yStart < height - offset; yStart++) {
+			{
+				int indexIn = input.startIndex + x0 + yStart*input.stride;
+
+				for (int x = x0; x < x1; x++) {
+					totals[x - x0] = dataSrc[indexIn++]& 0xFF;
+				}
+			}
+
+			for (int y = yStart + 1; y < height; y++) {
+				int indexIn = input.startIndex + x0 + y*input.stride;
+
+				for (int x = x0; x < x1; x++) {
+					totals[x - x0] += dataSrc[indexIn++]& 0xFF;
+				}
+			}
+
+			int count = height - yStart;
+			int indexOut = output.startIndex + (yStart + offset)*output.stride;
+			for (int x = x0; x < x1; x++) {
+				dataDst[indexOut + x] = (byte)((totals[x - x0] + count/2)/count);
+			}
+		}
+		//CONCURRENT_INLINE });
+	}
+
 	public static void vertical( GrayU8 input, GrayI8 output, int offset, int length, @Nullable GrowArray<DogArray_I32> workspaces ) {
 		workspaces = BoofMiscOps.checkDeclare(workspaces, DogArray_I32::new);
 		final DogArray_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
@@ -85,7 +187,7 @@ public class ImplConvolveMean {
 		// more natural for a vertical convolution. For parallel processes this requires building
 		// a book keeping array for each thread.
 
-		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(offset, output.height - offsetEnd, length, workspaces, (work, y0,y1)->{
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(offset, output.height - offsetEnd, length, workspaces, (work, y0, y1)->{
 		final int y0 = offset, y1 = output.height - offsetEnd;
 		int[] totals = BoofMiscOps.checkDeclare(work, input.width, false);
 		for (int x = 0; x < input.width; x++) {
@@ -116,12 +218,51 @@ public class ImplConvolveMean {
 		//CONCURRENT_INLINE });
 	}
 
-	public static void horizontal( GrayS16 input ,GrayI16 output, int offset, int length ) {
+	public static void horizontalBorder( GrayS16 input, GrayI16 output, int offset, int length ) {
+		final short[] dataSrc = input.data;
+		final short[] dataDst = output.data;
+
+		final int offsetR = length - offset - 1;
+
+		final int width = input.getWidth();
+		final int height = input.getHeight();
+
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
+		for (int y = 0; y < input.height; y++) {
+			int indexDest = output.startIndex + y*output.stride;
+			int j = input.startIndex + y*input.stride;
+
+			for (int i = 0; i < offset; i++) {
+				int jEnd = j + i + length - offset;
+				int total = 0;
+				for (int indexSrc = j; indexSrc < jEnd; indexSrc++) {
+					total += dataSrc[indexSrc];
+				}
+				int count = jEnd - j;
+				dataDst[indexDest++] = (short)((total + count/2)/count);
+			}
+
+			int jEnd = j + width;
+			j += width - (offset + offsetR);
+			indexDest += width - (offset + offsetR);
+			for (int i = 0; i < offsetR; i++) {
+				int total = 0;
+				for (int indexSrc = j + i; indexSrc < jEnd; indexSrc++) {
+					total += dataSrc[indexSrc];
+				}
+				int count = jEnd - j - i;
+				dataDst[indexDest++] = (short)((total + count/2)/count);
+			}
+		}
+		//CONCURRENT_ABOVE });
+	}
+
+	public static void horizontal( GrayS16 input,GrayI16 output, int offset, int length ) {
 		final int divisor = length;
 		final int halfDivisor = divisor/2;
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
-		for( int y = 0; y < input.height; y++ ) {
+		for (int y = 0; y < input.height; y++) {
 			int indexIn = input.startIndex + input.stride*y;
 			int indexOut = output.startIndex + output.stride*y + offset;
 
@@ -145,6 +286,69 @@ public class ImplConvolveMean {
 		//CONCURRENT_ABOVE });
 	}
 
+	public static void verticalBorder( GrayS16 input, GrayI16 output, int offset, int length, @Nullable GrowArray<DogArray_I32> workspaces ) {
+		workspaces = BoofMiscOps.checkDeclare(workspaces, DogArray_I32::new);
+		final DogArray_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
+		final short[] dataSrc = input.data;
+		final short[] dataDst = output.data;
+
+		final int offsetR = length - offset - 1;
+
+		final int width = input.getWidth();
+		final int height = input.getHeight();
+
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, input.width, length, workspaces, (work, x0, x1)->{
+		final int x0 = 0, x1 = input.width;
+		int[] totals = BoofMiscOps.checkDeclare(work, x1 - x0, false);
+
+		// Image Top
+		for (int count = length - offset; count < length; count++) {
+			{
+				int indexIn = input.startIndex + x0;
+
+				for (int x = x0; x < x1; x++) {
+					totals[x - x0] = dataSrc[indexIn++];
+				}
+			}
+			for (int y = 1; y < count; y++) {
+				int indexIn = input.startIndex + x0 + y*input.stride;
+
+				for (int x = x0; x < x1; x++) {
+					totals[x - x0] += dataSrc[indexIn++];
+				}
+			}
+			int indexOut = output.startIndex + (count - (length - offset))*output.stride;
+			for (int x = x0; x < x1; x++) {
+				dataDst[indexOut + x] = (short)((totals[x - x0] + count/2)/count);
+			}
+		}
+		// Image Bottom
+		for (int yStart = height - length + 1; yStart < height - offset; yStart++) {
+			{
+				int indexIn = input.startIndex + x0 + yStart*input.stride;
+
+				for (int x = x0; x < x1; x++) {
+					totals[x - x0] = dataSrc[indexIn++];
+				}
+			}
+
+			for (int y = yStart + 1; y < height; y++) {
+				int indexIn = input.startIndex + x0 + y*input.stride;
+
+				for (int x = x0; x < x1; x++) {
+					totals[x - x0] += dataSrc[indexIn++];
+				}
+			}
+
+			int count = height - yStart;
+			int indexOut = output.startIndex + (yStart + offset)*output.stride;
+			for (int x = x0; x < x1; x++) {
+				dataDst[indexOut + x] = (short)((totals[x - x0] + count/2)/count);
+			}
+		}
+		//CONCURRENT_INLINE });
+	}
+
 	public static void vertical( GrayS16 input, GrayI16 output, int offset, int length, @Nullable GrowArray<DogArray_I32> workspaces ) {
 		workspaces = BoofMiscOps.checkDeclare(workspaces, DogArray_I32::new);
 		final DogArray_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
@@ -158,7 +362,7 @@ public class ImplConvolveMean {
 		// more natural for a vertical convolution. For parallel processes this requires building
 		// a book keeping array for each thread.
 
-		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(offset, output.height - offsetEnd, length, workspaces, (work, y0,y1)->{
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(offset, output.height - offsetEnd, length, workspaces, (work, y0, y1)->{
 		final int y0 = offset, y1 = output.height - offsetEnd;
 		int[] totals = BoofMiscOps.checkDeclare(work, input.width, false);
 		for (int x = 0; x < input.width; x++) {
@@ -189,12 +393,51 @@ public class ImplConvolveMean {
 		//CONCURRENT_INLINE });
 	}
 
-	public static void horizontal( GrayU16 input ,GrayI16 output, int offset, int length ) {
+	public static void horizontalBorder( GrayU16 input, GrayI16 output, int offset, int length ) {
+		final short[] dataSrc = input.data;
+		final short[] dataDst = output.data;
+
+		final int offsetR = length - offset - 1;
+
+		final int width = input.getWidth();
+		final int height = input.getHeight();
+
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
+		for (int y = 0; y < input.height; y++) {
+			int indexDest = output.startIndex + y*output.stride;
+			int j = input.startIndex + y*input.stride;
+
+			for (int i = 0; i < offset; i++) {
+				int jEnd = j + i + length - offset;
+				int total = 0;
+				for (int indexSrc = j; indexSrc < jEnd; indexSrc++) {
+					total += dataSrc[indexSrc]& 0xFFFF;
+				}
+				int count = jEnd - j;
+				dataDst[indexDest++] = (short)((total + count/2)/count);
+			}
+
+			int jEnd = j + width;
+			j += width - (offset + offsetR);
+			indexDest += width - (offset + offsetR);
+			for (int i = 0; i < offsetR; i++) {
+				int total = 0;
+				for (int indexSrc = j + i; indexSrc < jEnd; indexSrc++) {
+					total += dataSrc[indexSrc]& 0xFFFF;
+				}
+				int count = jEnd - j - i;
+				dataDst[indexDest++] = (short)((total + count/2)/count);
+			}
+		}
+		//CONCURRENT_ABOVE });
+	}
+
+	public static void horizontal( GrayU16 input,GrayI16 output, int offset, int length ) {
 		final int divisor = length;
 		final int halfDivisor = divisor/2;
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
-		for( int y = 0; y < input.height; y++ ) {
+		for (int y = 0; y < input.height; y++) {
 			int indexIn = input.startIndex + input.stride*y;
 			int indexOut = output.startIndex + output.stride*y + offset;
 
@@ -218,6 +461,69 @@ public class ImplConvolveMean {
 		//CONCURRENT_ABOVE });
 	}
 
+	public static void verticalBorder( GrayU16 input, GrayI16 output, int offset, int length, @Nullable GrowArray<DogArray_I32> workspaces ) {
+		workspaces = BoofMiscOps.checkDeclare(workspaces, DogArray_I32::new);
+		final DogArray_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
+		final short[] dataSrc = input.data;
+		final short[] dataDst = output.data;
+
+		final int offsetR = length - offset - 1;
+
+		final int width = input.getWidth();
+		final int height = input.getHeight();
+
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, input.width, length, workspaces, (work, x0, x1)->{
+		final int x0 = 0, x1 = input.width;
+		int[] totals = BoofMiscOps.checkDeclare(work, x1 - x0, false);
+
+		// Image Top
+		for (int count = length - offset; count < length; count++) {
+			{
+				int indexIn = input.startIndex + x0;
+
+				for (int x = x0; x < x1; x++) {
+					totals[x - x0] = dataSrc[indexIn++]& 0xFFFF;
+				}
+			}
+			for (int y = 1; y < count; y++) {
+				int indexIn = input.startIndex + x0 + y*input.stride;
+
+				for (int x = x0; x < x1; x++) {
+					totals[x - x0] += dataSrc[indexIn++]& 0xFFFF;
+				}
+			}
+			int indexOut = output.startIndex + (count - (length - offset))*output.stride;
+			for (int x = x0; x < x1; x++) {
+				dataDst[indexOut + x] = (short)((totals[x - x0] + count/2)/count);
+			}
+		}
+		// Image Bottom
+		for (int yStart = height - length + 1; yStart < height - offset; yStart++) {
+			{
+				int indexIn = input.startIndex + x0 + yStart*input.stride;
+
+				for (int x = x0; x < x1; x++) {
+					totals[x - x0] = dataSrc[indexIn++]& 0xFFFF;
+				}
+			}
+
+			for (int y = yStart + 1; y < height; y++) {
+				int indexIn = input.startIndex + x0 + y*input.stride;
+
+				for (int x = x0; x < x1; x++) {
+					totals[x - x0] += dataSrc[indexIn++]& 0xFFFF;
+				}
+			}
+
+			int count = height - yStart;
+			int indexOut = output.startIndex + (yStart + offset)*output.stride;
+			for (int x = x0; x < x1; x++) {
+				dataDst[indexOut + x] = (short)((totals[x - x0] + count/2)/count);
+			}
+		}
+		//CONCURRENT_INLINE });
+	}
+
 	public static void vertical( GrayU16 input, GrayI16 output, int offset, int length, @Nullable GrowArray<DogArray_I32> workspaces ) {
 		workspaces = BoofMiscOps.checkDeclare(workspaces, DogArray_I32::new);
 		final DogArray_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
@@ -231,7 +537,7 @@ public class ImplConvolveMean {
 		// more natural for a vertical convolution. For parallel processes this requires building
 		// a book keeping array for each thread.
 
-		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(offset, output.height - offsetEnd, length, workspaces, (work, y0,y1)->{
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(offset, output.height - offsetEnd, length, workspaces, (work, y0, y1)->{
 		final int y0 = offset, y1 = output.height - offsetEnd;
 		int[] totals = BoofMiscOps.checkDeclare(work, input.width, false);
 		for (int x = 0; x < input.width; x++) {
@@ -262,11 +568,50 @@ public class ImplConvolveMean {
 		//CONCURRENT_INLINE });
 	}
 
-	public static void horizontal( GrayF32 input ,GrayF32 output, int offset, int length ) {
+	public static void horizontalBorder( GrayF32 input, GrayF32 output, int offset, int length ) {
+		final float[] dataSrc = input.data;
+		final float[] dataDst = output.data;
+
+		final int offsetR = length - offset - 1;
+
+		final int width = input.getWidth();
+		final int height = input.getHeight();
+
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
+		for (int y = 0; y < input.height; y++) {
+			int indexDest = output.startIndex + y*output.stride;
+			int j = input.startIndex + y*input.stride;
+
+			for (int i = 0; i < offset; i++) {
+				int jEnd = j + i + length - offset;
+				float total = 0;
+				for (int indexSrc = j; indexSrc < jEnd; indexSrc++) {
+					total += dataSrc[indexSrc];
+				}
+				int count = jEnd - j;
+				dataDst[indexDest++] = total/count;
+			}
+
+			int jEnd = j + width;
+			j += width - (offset + offsetR);
+			indexDest += width - (offset + offsetR);
+			for (int i = 0; i < offsetR; i++) {
+				float total = 0;
+				for (int indexSrc = j + i; indexSrc < jEnd; indexSrc++) {
+					total += dataSrc[indexSrc];
+				}
+				int count = jEnd - j - i;
+				dataDst[indexDest++] = total/count;
+			}
+		}
+		//CONCURRENT_ABOVE });
+	}
+
+	public static void horizontal( GrayF32 input,GrayF32 output, int offset, int length ) {
 		final float divisor = length;
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
-		for( int y = 0; y < input.height; y++ ) {
+		for (int y = 0; y < input.height; y++) {
 			int indexIn = input.startIndex + input.stride*y;
 			int indexOut = output.startIndex + output.stride*y + offset;
 
@@ -290,6 +635,69 @@ public class ImplConvolveMean {
 		//CONCURRENT_ABOVE });
 	}
 
+	public static void verticalBorder( GrayF32 input, GrayF32 output, int offset, int length, @Nullable GrowArray<DogArray_F32> workspaces ) {
+		workspaces = BoofMiscOps.checkDeclare(workspaces, DogArray_F32::new);
+		final DogArray_F32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
+		final float[] dataSrc = input.data;
+		final float[] dataDst = output.data;
+
+		final int offsetR = length - offset - 1;
+
+		final int width = input.getWidth();
+		final int height = input.getHeight();
+
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, input.width, length, workspaces, (work, x0, x1)->{
+		final int x0 = 0, x1 = input.width;
+		float[] totals = BoofMiscOps.checkDeclare(work, x1 - x0, false);
+
+		// Image Top
+		for (int count = length - offset; count < length; count++) {
+			{
+				int indexIn = input.startIndex + x0;
+
+				for (int x = x0; x < x1; x++) {
+					totals[x - x0] = dataSrc[indexIn++];
+				}
+			}
+			for (int y = 1; y < count; y++) {
+				int indexIn = input.startIndex + x0 + y*input.stride;
+
+				for (int x = x0; x < x1; x++) {
+					totals[x - x0] += dataSrc[indexIn++];
+				}
+			}
+			int indexOut = output.startIndex + (count - (length - offset))*output.stride;
+			for (int x = x0; x < x1; x++) {
+				dataDst[indexOut + x] = totals[x - x0]/count;
+			}
+		}
+		// Image Bottom
+		for (int yStart = height - length + 1; yStart < height - offset; yStart++) {
+			{
+				int indexIn = input.startIndex + x0 + yStart*input.stride;
+
+				for (int x = x0; x < x1; x++) {
+					totals[x - x0] = dataSrc[indexIn++];
+				}
+			}
+
+			for (int y = yStart + 1; y < height; y++) {
+				int indexIn = input.startIndex + x0 + y*input.stride;
+
+				for (int x = x0; x < x1; x++) {
+					totals[x - x0] += dataSrc[indexIn++];
+				}
+			}
+
+			int count = height - yStart;
+			int indexOut = output.startIndex + (yStart + offset)*output.stride;
+			for (int x = x0; x < x1; x++) {
+				dataDst[indexOut + x] = totals[x - x0]/count;
+			}
+		}
+		//CONCURRENT_INLINE });
+	}
+
 	public static void vertical( GrayF32 input, GrayF32 output, int offset, int length, @Nullable GrowArray<DogArray_F32> workspaces ) {
 		workspaces = BoofMiscOps.checkDeclare(workspaces, DogArray_F32::new);
 		final DogArray_F32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
@@ -302,7 +710,7 @@ public class ImplConvolveMean {
 		// more natural for a vertical convolution. For parallel processes this requires building
 		// a book keeping array for each thread.
 
-		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(offset, output.height - offsetEnd, length, workspaces, (work, y0,y1)->{
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(offset, output.height - offsetEnd, length, workspaces, (work, y0, y1)->{
 		final int y0 = offset, y1 = output.height - offsetEnd;
 		float[] totals = BoofMiscOps.checkDeclare(work, input.width, false);
 		for (int x = 0; x < input.width; x++) {
@@ -333,11 +741,50 @@ public class ImplConvolveMean {
 		//CONCURRENT_INLINE });
 	}
 
-	public static void horizontal( GrayF64 input ,GrayF64 output, int offset, int length ) {
+	public static void horizontalBorder( GrayF64 input, GrayF64 output, int offset, int length ) {
+		final double[] dataSrc = input.data;
+		final double[] dataDst = output.data;
+
+		final int offsetR = length - offset - 1;
+
+		final int width = input.getWidth();
+		final int height = input.getHeight();
+
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
+		for (int y = 0; y < input.height; y++) {
+			int indexDest = output.startIndex + y*output.stride;
+			int j = input.startIndex + y*input.stride;
+
+			for (int i = 0; i < offset; i++) {
+				int jEnd = j + i + length - offset;
+				double total = 0;
+				for (int indexSrc = j; indexSrc < jEnd; indexSrc++) {
+					total += dataSrc[indexSrc];
+				}
+				int count = jEnd - j;
+				dataDst[indexDest++] = total/count;
+			}
+
+			int jEnd = j + width;
+			j += width - (offset + offsetR);
+			indexDest += width - (offset + offsetR);
+			for (int i = 0; i < offsetR; i++) {
+				double total = 0;
+				for (int indexSrc = j + i; indexSrc < jEnd; indexSrc++) {
+					total += dataSrc[indexSrc];
+				}
+				int count = jEnd - j - i;
+				dataDst[indexDest++] = total/count;
+			}
+		}
+		//CONCURRENT_ABOVE });
+	}
+
+	public static void horizontal( GrayF64 input,GrayF64 output, int offset, int length ) {
 		final double divisor = length;
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
-		for( int y = 0; y < input.height; y++ ) {
+		for (int y = 0; y < input.height; y++) {
 			int indexIn = input.startIndex + input.stride*y;
 			int indexOut = output.startIndex + output.stride*y + offset;
 
@@ -361,6 +808,69 @@ public class ImplConvolveMean {
 		//CONCURRENT_ABOVE });
 	}
 
+	public static void verticalBorder( GrayF64 input, GrayF64 output, int offset, int length, @Nullable GrowArray<DogArray_F64> workspaces ) {
+		workspaces = BoofMiscOps.checkDeclare(workspaces, DogArray_F64::new);
+		final DogArray_F64 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
+		final double[] dataSrc = input.data;
+		final double[] dataDst = output.data;
+
+		final int offsetR = length - offset - 1;
+
+		final int width = input.getWidth();
+		final int height = input.getHeight();
+
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, input.width, length, workspaces, (work, x0, x1)->{
+		final int x0 = 0, x1 = input.width;
+		double[] totals = BoofMiscOps.checkDeclare(work, x1 - x0, false);
+
+		// Image Top
+		for (int count = length - offset; count < length; count++) {
+			{
+				int indexIn = input.startIndex + x0;
+
+				for (int x = x0; x < x1; x++) {
+					totals[x - x0] = dataSrc[indexIn++];
+				}
+			}
+			for (int y = 1; y < count; y++) {
+				int indexIn = input.startIndex + x0 + y*input.stride;
+
+				for (int x = x0; x < x1; x++) {
+					totals[x - x0] += dataSrc[indexIn++];
+				}
+			}
+			int indexOut = output.startIndex + (count - (length - offset))*output.stride;
+			for (int x = x0; x < x1; x++) {
+				dataDst[indexOut + x] = totals[x - x0]/count;
+			}
+		}
+		// Image Bottom
+		for (int yStart = height - length + 1; yStart < height - offset; yStart++) {
+			{
+				int indexIn = input.startIndex + x0 + yStart*input.stride;
+
+				for (int x = x0; x < x1; x++) {
+					totals[x - x0] = dataSrc[indexIn++];
+				}
+			}
+
+			for (int y = yStart + 1; y < height; y++) {
+				int indexIn = input.startIndex + x0 + y*input.stride;
+
+				for (int x = x0; x < x1; x++) {
+					totals[x - x0] += dataSrc[indexIn++];
+				}
+			}
+
+			int count = height - yStart;
+			int indexOut = output.startIndex + (yStart + offset)*output.stride;
+			for (int x = x0; x < x1; x++) {
+				dataDst[indexOut + x] = totals[x - x0]/count;
+			}
+		}
+		//CONCURRENT_INLINE });
+	}
+
 	public static void vertical( GrayF64 input, GrayF64 output, int offset, int length, @Nullable GrowArray<DogArray_F64> workspaces ) {
 		workspaces = BoofMiscOps.checkDeclare(workspaces, DogArray_F64::new);
 		final DogArray_F64 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
@@ -373,7 +883,7 @@ public class ImplConvolveMean {
 		// more natural for a vertical convolution. For parallel processes this requires building
 		// a book keeping array for each thread.
 
-		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(offset, output.height - offsetEnd, length, workspaces, (work, y0,y1)->{
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(offset, output.height - offsetEnd, length, workspaces, (work, y0, y1)->{
 		final int y0 = offset, y1 = output.height - offsetEnd;
 		double[] totals = BoofMiscOps.checkDeclare(work, input.width, false);
 		for (int x = 0; x < input.width; x++) {

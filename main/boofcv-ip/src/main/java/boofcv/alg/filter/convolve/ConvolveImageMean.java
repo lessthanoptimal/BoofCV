@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,6 @@ package boofcv.alg.filter.convolve;
 import boofcv.alg.filter.convolve.border.ConvolveJustBorder_General_SB;
 import boofcv.alg.filter.convolve.noborder.ImplConvolveMean;
 import boofcv.alg.filter.convolve.noborder.ImplConvolveMean_MT;
-import boofcv.alg.filter.convolve.normalized.ConvolveNormalized_JustBorder_SB;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.border.ImageBorder_F32;
@@ -63,14 +62,15 @@ public class ConvolveImageMean {
 		if (BOverrideConvolveImageMean.invokeNativeHorizontal(input, output, offset, length))
 			return;
 
-		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(offset, length);
 		if (length > input.width) {
+			Kernel1D_S32 kernel = FactoryKernel.table1D_S32(offset, length);
 			ConvolveImageNormalized.horizontal(kernel, input, output);
 		} else {
-			ConvolveNormalized_JustBorder_SB.horizontal(kernel, input, output);
 			if (BoofConcurrency.USE_CONCURRENT) {
+				ImplConvolveMean_MT.horizontalBorder(input, output, offset, length);
 				ImplConvolveMean_MT.horizontal(input, output, offset, length);
 			} else {
+				ImplConvolveMean.horizontalBorder(input, output, offset, length);
 				ImplConvolveMean.horizontal(input, output, offset, length);
 			}
 		}
@@ -91,14 +91,15 @@ public class ConvolveImageMean {
 		if (BOverrideConvolveImageMean.invokeNativeVertical(input, output, offset, length))
 			return;
 
-		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(offset, length);
 		if (length > input.height) {
+			Kernel1D_S32 kernel = FactoryKernel.table1D_S32(offset, length);
 			ConvolveImageNormalized.vertical(kernel, input, output);
 		} else {
-			ConvolveNormalized_JustBorder_SB.vertical(kernel, input, output);
 			if (BoofConcurrency.USE_CONCURRENT) {
+				ImplConvolveMean_MT.verticalBorder(input, output, offset, length, workspaces);
 				ImplConvolveMean_MT.vertical(input, output, offset, length, workspaces);
 			} else {
+				ImplConvolveMean.verticalBorder(input, output, offset, length, workspaces);
 				ImplConvolveMean.vertical(input, output, offset, length, workspaces);
 			}
 		}
@@ -170,14 +171,15 @@ public class ConvolveImageMean {
 		if (BOverrideConvolveImageMean.invokeNativeHorizontal(input, output, offset, length))
 			return;
 
-		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(offset, length);
 		if (length > input.width) {
+			Kernel1D_S32 kernel = FactoryKernel.table1D_S32(offset, length);
 			ConvolveImageNormalized.horizontal(kernel, input, output);
 		} else {
-			ConvolveNormalized_JustBorder_SB.horizontal(kernel, input, output);
 			if (BoofConcurrency.USE_CONCURRENT) {
+				ImplConvolveMean_MT.horizontalBorder(input, output, offset, length);
 				ImplConvolveMean_MT.horizontal(input, output, offset, length);
 			} else {
+				ImplConvolveMean.horizontalBorder(input, output, offset, length);
 				ImplConvolveMean.horizontal(input, output, offset, length);
 			}
 		}
@@ -198,14 +200,15 @@ public class ConvolveImageMean {
 		if (BOverrideConvolveImageMean.invokeNativeVertical(input, output, offset, length))
 			return;
 
-		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(offset, length);
 		if (length > input.height) {
+			Kernel1D_S32 kernel = FactoryKernel.table1D_S32(offset, length);
 			ConvolveImageNormalized.vertical(kernel, input, output);
 		} else {
-			ConvolveNormalized_JustBorder_SB.vertical(kernel, input, output);
 			if (BoofConcurrency.USE_CONCURRENT) {
+				ImplConvolveMean_MT.verticalBorder(input, output, offset, length, workspaces);
 				ImplConvolveMean_MT.vertical(input, output, offset, length, workspaces);
 			} else {
+				ImplConvolveMean.verticalBorder(input, output, offset, length, workspaces);
 				ImplConvolveMean.vertical(input, output, offset, length, workspaces);
 			}
 		}
@@ -277,14 +280,15 @@ public class ConvolveImageMean {
 		if (BOverrideConvolveImageMean.invokeNativeHorizontal(input, output, offset, length))
 			return;
 
-		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(offset, length);
 		if (length > input.width) {
+			Kernel1D_S32 kernel = FactoryKernel.table1D_S32(offset, length);
 			ConvolveImageNormalized.horizontal(kernel, input, output);
 		} else {
-			ConvolveNormalized_JustBorder_SB.horizontal(kernel, input, output);
 			if (BoofConcurrency.USE_CONCURRENT) {
+				ImplConvolveMean_MT.horizontalBorder(input, output, offset, length);
 				ImplConvolveMean_MT.horizontal(input, output, offset, length);
 			} else {
+				ImplConvolveMean.horizontalBorder(input, output, offset, length);
 				ImplConvolveMean.horizontal(input, output, offset, length);
 			}
 		}
@@ -305,14 +309,15 @@ public class ConvolveImageMean {
 		if (BOverrideConvolveImageMean.invokeNativeVertical(input, output, offset, length))
 			return;
 
-		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(offset, length);
 		if (length > input.height) {
+			Kernel1D_S32 kernel = FactoryKernel.table1D_S32(offset, length);
 			ConvolveImageNormalized.vertical(kernel, input, output);
 		} else {
-			ConvolveNormalized_JustBorder_SB.vertical(kernel, input, output);
 			if (BoofConcurrency.USE_CONCURRENT) {
+				ImplConvolveMean_MT.verticalBorder(input, output, offset, length, workspaces);
 				ImplConvolveMean_MT.vertical(input, output, offset, length, workspaces);
 			} else {
+				ImplConvolveMean.verticalBorder(input, output, offset, length, workspaces);
 				ImplConvolveMean.vertical(input, output, offset, length, workspaces);
 			}
 		}
@@ -384,14 +389,15 @@ public class ConvolveImageMean {
 		if (BOverrideConvolveImageMean.invokeNativeHorizontal(input, output, offset, length))
 			return;
 
-		Kernel1D_F32 kernel = FactoryKernel.table1D_F32(offset, length , true);
 		if (length > input.width) {
+			Kernel1D_F32 kernel = FactoryKernel.table1D_F32(offset, length , true);
 			ConvolveImageNormalized.horizontal(kernel, input, output);
 		} else {
-			ConvolveNormalized_JustBorder_SB.horizontal(kernel, input, output);
 			if (BoofConcurrency.USE_CONCURRENT) {
+				ImplConvolveMean_MT.horizontalBorder(input, output, offset, length);
 				ImplConvolveMean_MT.horizontal(input, output, offset, length);
 			} else {
+				ImplConvolveMean.horizontalBorder(input, output, offset, length);
 				ImplConvolveMean.horizontal(input, output, offset, length);
 			}
 		}
@@ -412,14 +418,15 @@ public class ConvolveImageMean {
 		if (BOverrideConvolveImageMean.invokeNativeVertical(input, output, offset, length))
 			return;
 
-		Kernel1D_F32 kernel = FactoryKernel.table1D_F32(offset, length , true);
 		if (length > input.height) {
+			Kernel1D_F32 kernel = FactoryKernel.table1D_F32(offset, length , true);
 			ConvolveImageNormalized.vertical(kernel, input, output);
 		} else {
-			ConvolveNormalized_JustBorder_SB.vertical(kernel, input, output);
 			if (BoofConcurrency.USE_CONCURRENT) {
+				ImplConvolveMean_MT.verticalBorder(input, output, offset, length, workspaces);
 				ImplConvolveMean_MT.vertical(input, output, offset, length, workspaces);
 			} else {
+				ImplConvolveMean.verticalBorder(input, output, offset, length, workspaces);
 				ImplConvolveMean.vertical(input, output, offset, length, workspaces);
 			}
 		}
@@ -491,14 +498,15 @@ public class ConvolveImageMean {
 		if (BOverrideConvolveImageMean.invokeNativeHorizontal(input, output, offset, length))
 			return;
 
-		Kernel1D_F64 kernel = FactoryKernel.table1D_F64(offset, length , true);
 		if (length > input.width) {
+			Kernel1D_F64 kernel = FactoryKernel.table1D_F64(offset, length , true);
 			ConvolveImageNormalized.horizontal(kernel, input, output);
 		} else {
-			ConvolveNormalized_JustBorder_SB.horizontal(kernel, input, output);
 			if (BoofConcurrency.USE_CONCURRENT) {
+				ImplConvolveMean_MT.horizontalBorder(input, output, offset, length);
 				ImplConvolveMean_MT.horizontal(input, output, offset, length);
 			} else {
+				ImplConvolveMean.horizontalBorder(input, output, offset, length);
 				ImplConvolveMean.horizontal(input, output, offset, length);
 			}
 		}
@@ -519,14 +527,15 @@ public class ConvolveImageMean {
 		if (BOverrideConvolveImageMean.invokeNativeVertical(input, output, offset, length))
 			return;
 
-		Kernel1D_F64 kernel = FactoryKernel.table1D_F64(offset, length , true);
 		if (length > input.height) {
+			Kernel1D_F64 kernel = FactoryKernel.table1D_F64(offset, length , true);
 			ConvolveImageNormalized.vertical(kernel, input, output);
 		} else {
-			ConvolveNormalized_JustBorder_SB.vertical(kernel, input, output);
 			if (BoofConcurrency.USE_CONCURRENT) {
+				ImplConvolveMean_MT.verticalBorder(input, output, offset, length, workspaces);
 				ImplConvolveMean_MT.vertical(input, output, offset, length, workspaces);
 			} else {
+				ImplConvolveMean.verticalBorder(input, output, offset, length, workspaces);
 				ImplConvolveMean.vertical(input, output, offset, length, workspaces);
 			}
 		}

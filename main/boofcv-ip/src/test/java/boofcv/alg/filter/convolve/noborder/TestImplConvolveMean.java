@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,17 +19,23 @@
 package boofcv.alg.filter.convolve.noborder;
 
 import boofcv.BoofTesting;
+import boofcv.alg.filter.convolve.normalized.ConvolveNormalized_JustBorder_SB;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_F64;
 import boofcv.struct.convolve.Kernel1D_S32;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.testing.CompareEquivalentFunctions;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class TestImplConvolveMean extends CompareEquivalentFunctions {
@@ -140,5 +146,98 @@ public class TestImplConvolveMean extends CompareEquivalentFunctions {
 			throw new RuntimeException("Unknown kernel type");
 		}
 		return kernel;
+	}
+
+	@Test void horizontalBorder() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+		int count = 0;
+		Method[] methods = ImplConvolveMean.class.getMethods();
+		for (int i = 0; i < methods.length; i++) {
+			Method m = methods[i];
+			if (!m.getName().equals("horizontalBorder"))
+				continue;
+
+			Class<?>[] params = m.getParameterTypes();
+
+			ImageBase input = GeneralizedImageOps.createImage((Class)params[0], width, height, 1);
+			ImageBase expected = GeneralizedImageOps.createImage((Class)params[1], width, height, 1);
+			ImageBase found = GeneralizedImageOps.createImage((Class)params[1], width, height, 1);
+
+			GImageMiscOps.fillUniform(input, rand, 0, 50);
+
+			Method testMethod = null;
+			Class<?>[] testParams = null;
+			for (Method method : ConvolveNormalized_JustBorder_SB.class.getMethods()) {
+				if (!method.getName().equals("horizontal")) {
+					continue;
+				}
+				testParams = method.getParameterTypes();
+				if (testParams[1] == input.getClass()) {
+					testMethod = method;
+					break;
+				}
+			}
+			assertNotNull(testMethod);
+
+			int length = 4;
+			for (int offset = 0; offset < length; offset++) {
+				Object kernel = createTableKernel(testParams[0], offset, length);
+
+				testMethod.invoke(null, kernel, input, expected);
+				m.invoke(null, input, found, offset, length);
+
+				BoofTesting.assertEqualsBorder(expected, found, 1e-4, length, offset);
+			}
+			count++;
+		}
+
+		assertEquals(5, count);
+	}
+
+	@Test void verticalBorder() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+		int count = 0;
+		Method[] methods = ImplConvolveMean.class.getMethods();
+		for (int i = 0; i < methods.length; i++) {
+			Method m = methods[i];
+			if (!m.getName().equals("verticalBorder"))
+				continue;
+
+			Class<?>[] params = m.getParameterTypes();
+
+			ImageBase input = GeneralizedImageOps.createImage((Class)params[0], width, height, 1);
+			ImageBase expected = GeneralizedImageOps.createImage((Class)params[1], width, height, 1);
+			ImageBase found = GeneralizedImageOps.createImage((Class)params[1], width, height, 1);
+
+			GImageMiscOps.fillUniform(input, rand, 0, 50);
+
+			Method testMethod = null;
+			Class<?>[] testParams = null;
+			for (Method method : ConvolveNormalized_JustBorder_SB.class.getMethods()) {
+				if (!method.getName().equals("vertical")) {
+					continue;
+				}
+				testParams = method.getParameterTypes();
+				if (testParams[1] == input.getClass()) {
+					testMethod = method;
+					break;
+				}
+			}
+			assertNotNull(testMethod);
+
+			int length = 4;
+			for (int offset = 0; offset < length; offset++) {
+				GImageMiscOps.fill(expected, 0);
+				GImageMiscOps.fill(found, 0);
+
+				Object kernel = createTableKernel(testParams[0], offset, length);
+
+				testMethod.invoke(null, kernel, input, expected);
+				m.invoke(null, input, found, offset, length, null);
+
+				BoofTesting.assertEqualsBorder(expected, found, 1e-4, length, offset);
+			}
+			count++;
+		}
+
+		assertEquals(5, count);
 	}
 }

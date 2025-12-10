@@ -12,6 +12,8 @@ Version : 1.2.5
 
 - ImageProcessingFragment
   * Support for warmup frames
+- Mean Blur
+  * Custom and concurrent function for the image border. Much faster on large images.
 
 ---------------------
 Date    : 2025/Sep/30
