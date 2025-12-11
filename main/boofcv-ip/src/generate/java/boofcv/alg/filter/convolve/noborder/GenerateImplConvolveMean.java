@@ -260,7 +260,7 @@ public class GenerateImplConvolveMean extends CodeGeneratorBase {
 		String bitWise = imageIn.getBitWise();
 
 		String declareHalf = imageIn.isInteger() ? "\t\tfinal " + sumType + " halfDivisor = divisor/2;\n" : "";
-		String divide = imageIn.isInteger() ? "(total + halfDivisor)/divisor" : "total/divisor";
+		String divide = imageIn.isInteger() ? typeCast + "((total + halfDivisor)/divisor)" : "total/divisor";
 
 		String workType = ("DogArray_" + imageIn.getKernelType()).replace("S32", "I32");
 
@@ -268,46 +268,52 @@ public class GenerateImplConvolveMean extends CodeGeneratorBase {
 				imageOut.getSingleBandName() + " output, int offset, int length, @Nullable GrowArray<" + workType + "> workspaces ) {\n" +
 				"\t\tworkspaces = BoofMiscOps.checkDeclare(workspaces, " + workType + "::new);\n" +
 				"\t\tfinal " + workType + " work = workspaces.grow(); //CONCURRENT_REMOVE_LINE\n" +
-				"\t\tfinal int backStep = length*input.stride;\n" +
-				"\t\tfinal int offsetEnd = length - offset - 1;\n" +
 				"\n" +
 				"\t\tfinal " + sumType + " divisor = length;\n" +
 				declareHalf +
-				"\n" +
-				"\t\t// To reduce cache misses it is processed along rows instead of going down columns, which is\n" +
-				"\t\t// more natural for a vertical convolution. For parallel processes this requires building\n" +
-				"\t\t// a book keeping array for each thread.\n");
+				"\t\tfinal int regionStepY = length*input.stride;\n");
 
 		String body = "";
 
-		body += "\t\t" + sumType + "[] totals = BoofMiscOps.checkDeclare(work, input.width, false);\n" +
-				"\t\tfor (int x = 0; x < input.width; x++) {\n" +
-				"\t\t\tint indexIn = input.startIndex + (y0 - offset)*input.stride + x;\n" +
-				"\t\t\tint indexOut = output.startIndex + output.stride*y0 + x;\n" +
+		body += "\t\t" + sumType + "[] totals = BoofMiscOps.checkDeclare(work, x1 - x0, false);\n" +
 				"\n" +
-				"\t\t\t" + sumType + " total = 0;\n" +
-				"\t\t\tint indexEnd = indexIn + input.stride*length;\n" +
-				"\t\t\tfor (; indexIn < indexEnd; indexIn += input.stride) {\n" +
-				"\t\t\t\ttotal += input.data[indexIn] " + bitWise + ";\n" +
+				"\t\t// Sum up along x-axis to avoid cache misses when reading from input image\n" +
+				"\t\t// Initialize recursion by summing up the first kernels along the x-axis\n" +
+				"\t\t{\n" +
+				"\t\t\tint indexIn = input.startIndex + x0;\n" +
+				"\n" +
+				"\t\t\tfor (int x = x0; x < x1; x++) {\n" +
+				"\t\t\t\ttotals[x - x0] = input.data[indexIn++]" + bitWise + ";\n" +
 				"\t\t\t}\n" +
-				"\t\t\ttotals[x] = total;\n" +
-				"\t\t\toutput.data[indexOut] = " + typeCast + "(" + divide + ");\n" +
+				"\t\t}\n" +
+				"\t\tfor (int y = 1; y < length; y++) {\n" +
+				"\t\t\tint indexIn = input.startIndex + y*input.stride + x0;\n" +
+				"\t\t\tint indexInEnd = indexIn + x1 - x0;\n" +
+				"\t\t\tfor (int i = indexIn; i < indexInEnd; i++) {\n" +
+				"\t\t\t\ttotals[i - indexIn] += input.data[i]" + bitWise + ";\n" +
+				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\n" +
-				"\t\t// change the order it is processed in to reduce cache misses\n" +
-				"\t\tfor (int y = y0 + 1; y < y1; y++) {\n" +
-				"\t\t\tint indexIn = input.startIndex + (y + offsetEnd)*input.stride;\n" +
-				"\t\t\tint indexOut = output.startIndex + y*output.stride;\n" +
+				"\t\tint indexOut = output.startIndex + output.stride*offset + x0;\n" +
+				"\t\tfor (int x = x0; x < x1; x++, indexOut++) {\n" +
+				"\t\t\tfinal " + sumType + " total = totals[x - x0];\n" +
+				"\t\t\toutput.data[indexOut] = " + divide + ";\n" +
+				"\t\t}\n" +
 				"\n" +
-				"\t\t\tfor (int x = 0; x < input.width; x++, indexIn++, indexOut++) {\n" +
-				"\t\t\t\t" + sumType + " total = totals[x] - (input.data[indexIn - backStep]" + bitWise + ");\n" +
-				"\t\t\t\ttotals[x] = total += input.data[indexIn]" + bitWise + ";\n" +
-				"\n" +
-				"\t\t\t\toutput.data[indexOut] = " + typeCast + "(" + divide + ");\n" +
+				"\t\t// For the reminder we only need to add and remove the first and last elements to update the solution\n" +
+				"\t\tfor (int y = 0; y < input.height - length; y++) {\n" +
+				"\t\t\tindexOut = output.startIndex + output.stride*(offset + y + 1) + x0;\n" +
+				"\t\t\tint indexIn = input.startIndex + y*input.stride + x0;\n" +
+				"\t\t\tint indexInEnd = indexIn + x1 - x0;\n" +
+				"\t\t\tfor (int i = indexIn; i < indexInEnd; i++, indexOut++) {\n" +
+				"\t\t\t\t" + sumType + " total = totals[i - indexIn] - (input.data[i]" + bitWise + ");\n" +
+				"\t\t\t\ttotal += input.data[i + regionStepY]" + bitWise + ";\n" +
+				"\t\t\t\toutput.data[indexOut] = " + divide + ";\n" +
+				"\t\t\t\ttotals[i - indexIn] = total;\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n";
 
-		printParallelBlock("y0", "y1", "offset", "output.height - offsetEnd", "length", body);
+		printParallelBlock("x0", "x1", "0", "input.width", "20", body);
 
 		out.print("\t}\n\n");
 	}

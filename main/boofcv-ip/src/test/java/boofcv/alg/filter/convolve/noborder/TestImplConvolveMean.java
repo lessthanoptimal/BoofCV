@@ -93,18 +93,27 @@ public class TestImplConvolveMean extends CompareEquivalentFunctions {
 		ImageGray input = GeneralizedImageOps.createSingleBand(candidateParam[0], width, height);
 		ImageGray output = GeneralizedImageOps.createSingleBand(candidateParam[1], width, height);
 
-		GImageMiscOps.fillUniform(input, rand, 0, 50);
+		// Make sure the bitwise operators do something. If the value is too small it won't change the value
+		double maxValue = 100.0;
+		if (input.getDataType().isInteger()) {
+			maxValue = input.getDataType().getMaxValue();
+		}
+		GImageMiscOps.fillUniform(input, rand, 0, maxValue);
 
-		Object[][] ret = new Object[3][];
+		Object[][] ret = new Object[5][];
 		if (candidateParam.length == 4) {
 			ret[0] = new Object[]{input, output, kernelOffset, kernelLength};
 			ret[1] = new Object[]{input, output, kernelOffset + 1, kernelLength};
 			ret[2] = new Object[]{input, output, kernelOffset, kernelLength - 1};
+			ret[3] = new Object[]{input, output, 0, kernelLength};
+			ret[4] = new Object[]{input, output,  kernelLength - 1, kernelLength};
 		} else {
 			// vertical has one more argument
 			ret[0] = new Object[]{input, output, kernelOffset, kernelLength, null};
 			ret[1] = new Object[]{input, output, kernelOffset + 1, kernelLength, null};
 			ret[2] = new Object[]{input, output, kernelOffset, kernelLength - 1, null};
+			ret[3] = new Object[]{input, output, 0, kernelLength, null};
+			ret[4] = new Object[]{input, output, kernelLength - 1, kernelLength, null};
 		}
 
 		return ret;
@@ -131,7 +140,14 @@ public class TestImplConvolveMean extends CompareEquivalentFunctions {
 		ImageGray expected = (ImageGray)validationParam[2];
 		ImageGray found = (ImageGray)targetParam[1];
 
-		BoofTesting.assertEquals(expected, found, 1e-4);
+		try {
+			BoofTesting.assertEquals(expected, found, 1e-4);
+		} catch( RuntimeException e ) {
+			expected.print();
+			System.out.println("-------");
+			found.print();
+			throw e;
+		}
 	}
 
 	public static Object createTableKernel( Class<?> kernelType, int offset, int length ) {

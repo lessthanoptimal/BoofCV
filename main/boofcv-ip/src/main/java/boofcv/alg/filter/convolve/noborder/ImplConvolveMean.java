@@ -202,42 +202,48 @@ public class ImplConvolveMean {
 	public static void vertical( GrayU8 input, GrayI8 output, int offset, int length, @Nullable GrowArray<DogArray_I32> workspaces ) {
 		workspaces = BoofMiscOps.checkDeclare(workspaces, DogArray_I32::new);
 		final DogArray_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
-		final int backStep = length*input.stride;
-		final int offsetEnd = length - offset - 1;
 
 		final int divisor = length;
 		final int halfDivisor = divisor/2;
+		final int regionStepY = length*input.stride;
 
-		// To reduce cache misses it is processed along rows instead of going down columns, which is
-		// more natural for a vertical convolution. For parallel processes this requires building
-		// a book keeping array for each thread.
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, input.width, 20, workspaces, (work, x0, x1)->{
+		final int x0 = 0, x1 = input.width;
+		int[] totals = BoofMiscOps.checkDeclare(work, x1 - x0, false);
 
-		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(offset, output.height - offsetEnd, length, workspaces, (work, y0, y1)->{
-		final int y0 = offset, y1 = output.height - offsetEnd;
-		int[] totals = BoofMiscOps.checkDeclare(work, input.width, false);
-		for (int x = 0; x < input.width; x++) {
-			int indexIn = input.startIndex + (y0 - offset)*input.stride + x;
-			int indexOut = output.startIndex + output.stride*y0 + x;
+		// Sum up along x-axis to avoid cache misses when reading from input image
+		// Initialize recursion by summing up the first kernels along the x-axis
+		{
+			int indexIn = input.startIndex + x0;
 
-			int total = 0;
-			int indexEnd = indexIn + input.stride*length;
-			for (; indexIn < indexEnd; indexIn += input.stride) {
-				total += input.data[indexIn] & 0xFF;
+			for (int x = x0; x < x1; x++) {
+				totals[x - x0] = input.data[indexIn++]& 0xFF;
 			}
-			totals[x] = total;
+		}
+		for (int y = 1; y < length; y++) {
+			int indexIn = input.startIndex + y*input.stride + x0;
+			int indexInEnd = indexIn + x1 - x0;
+			for (int i = indexIn; i < indexInEnd; i++) {
+				totals[i - indexIn] += input.data[i]& 0xFF;
+			}
+		}
+
+		int indexOut = output.startIndex + output.stride*offset + x0;
+		for (int x = x0; x < x1; x++, indexOut++) {
+			final int total = totals[x - x0];
 			output.data[indexOut] = (byte)((total + halfDivisor)/divisor);
 		}
 
-		// change the order it is processed in to reduce cache misses
-		for (int y = y0 + 1; y < y1; y++) {
-			int indexIn = input.startIndex + (y + offsetEnd)*input.stride;
-			int indexOut = output.startIndex + y*output.stride;
-
-			for (int x = 0; x < input.width; x++, indexIn++, indexOut++) {
-				int total = totals[x] - (input.data[indexIn - backStep]& 0xFF);
-				totals[x] = total += input.data[indexIn]& 0xFF;
-
+		// For the reminder we only need to add and remove the first and last elements to update the solution
+		for (int y = 0; y < input.height - length; y++) {
+			indexOut = output.startIndex + output.stride*(offset + y + 1) + x0;
+			int indexIn = input.startIndex + y*input.stride + x0;
+			int indexInEnd = indexIn + x1 - x0;
+			for (int i = indexIn; i < indexInEnd; i++, indexOut++) {
+				int total = totals[i - indexIn] - (input.data[i]& 0xFF);
+				total += input.data[i + regionStepY]& 0xFF;
 				output.data[indexOut] = (byte)((total + halfDivisor)/divisor);
+				totals[i - indexIn] = total;
 			}
 		}
 		//CONCURRENT_INLINE });
@@ -402,42 +408,48 @@ public class ImplConvolveMean {
 	public static void vertical( GrayS16 input, GrayI16 output, int offset, int length, @Nullable GrowArray<DogArray_I32> workspaces ) {
 		workspaces = BoofMiscOps.checkDeclare(workspaces, DogArray_I32::new);
 		final DogArray_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
-		final int backStep = length*input.stride;
-		final int offsetEnd = length - offset - 1;
 
 		final int divisor = length;
 		final int halfDivisor = divisor/2;
+		final int regionStepY = length*input.stride;
 
-		// To reduce cache misses it is processed along rows instead of going down columns, which is
-		// more natural for a vertical convolution. For parallel processes this requires building
-		// a book keeping array for each thread.
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, input.width, 20, workspaces, (work, x0, x1)->{
+		final int x0 = 0, x1 = input.width;
+		int[] totals = BoofMiscOps.checkDeclare(work, x1 - x0, false);
 
-		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(offset, output.height - offsetEnd, length, workspaces, (work, y0, y1)->{
-		final int y0 = offset, y1 = output.height - offsetEnd;
-		int[] totals = BoofMiscOps.checkDeclare(work, input.width, false);
-		for (int x = 0; x < input.width; x++) {
-			int indexIn = input.startIndex + (y0 - offset)*input.stride + x;
-			int indexOut = output.startIndex + output.stride*y0 + x;
+		// Sum up along x-axis to avoid cache misses when reading from input image
+		// Initialize recursion by summing up the first kernels along the x-axis
+		{
+			int indexIn = input.startIndex + x0;
 
-			int total = 0;
-			int indexEnd = indexIn + input.stride*length;
-			for (; indexIn < indexEnd; indexIn += input.stride) {
-				total += input.data[indexIn] ;
+			for (int x = x0; x < x1; x++) {
+				totals[x - x0] = input.data[indexIn++];
 			}
-			totals[x] = total;
+		}
+		for (int y = 1; y < length; y++) {
+			int indexIn = input.startIndex + y*input.stride + x0;
+			int indexInEnd = indexIn + x1 - x0;
+			for (int i = indexIn; i < indexInEnd; i++) {
+				totals[i - indexIn] += input.data[i];
+			}
+		}
+
+		int indexOut = output.startIndex + output.stride*offset + x0;
+		for (int x = x0; x < x1; x++, indexOut++) {
+			final int total = totals[x - x0];
 			output.data[indexOut] = (short)((total + halfDivisor)/divisor);
 		}
 
-		// change the order it is processed in to reduce cache misses
-		for (int y = y0 + 1; y < y1; y++) {
-			int indexIn = input.startIndex + (y + offsetEnd)*input.stride;
-			int indexOut = output.startIndex + y*output.stride;
-
-			for (int x = 0; x < input.width; x++, indexIn++, indexOut++) {
-				int total = totals[x] - (input.data[indexIn - backStep]);
-				totals[x] = total += input.data[indexIn];
-
+		// For the reminder we only need to add and remove the first and last elements to update the solution
+		for (int y = 0; y < input.height - length; y++) {
+			indexOut = output.startIndex + output.stride*(offset + y + 1) + x0;
+			int indexIn = input.startIndex + y*input.stride + x0;
+			int indexInEnd = indexIn + x1 - x0;
+			for (int i = indexIn; i < indexInEnd; i++, indexOut++) {
+				int total = totals[i - indexIn] - (input.data[i]);
+				total += input.data[i + regionStepY];
 				output.data[indexOut] = (short)((total + halfDivisor)/divisor);
+				totals[i - indexIn] = total;
 			}
 		}
 		//CONCURRENT_INLINE });
@@ -602,42 +614,48 @@ public class ImplConvolveMean {
 	public static void vertical( GrayU16 input, GrayI16 output, int offset, int length, @Nullable GrowArray<DogArray_I32> workspaces ) {
 		workspaces = BoofMiscOps.checkDeclare(workspaces, DogArray_I32::new);
 		final DogArray_I32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
-		final int backStep = length*input.stride;
-		final int offsetEnd = length - offset - 1;
 
 		final int divisor = length;
 		final int halfDivisor = divisor/2;
+		final int regionStepY = length*input.stride;
 
-		// To reduce cache misses it is processed along rows instead of going down columns, which is
-		// more natural for a vertical convolution. For parallel processes this requires building
-		// a book keeping array for each thread.
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, input.width, 20, workspaces, (work, x0, x1)->{
+		final int x0 = 0, x1 = input.width;
+		int[] totals = BoofMiscOps.checkDeclare(work, x1 - x0, false);
 
-		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(offset, output.height - offsetEnd, length, workspaces, (work, y0, y1)->{
-		final int y0 = offset, y1 = output.height - offsetEnd;
-		int[] totals = BoofMiscOps.checkDeclare(work, input.width, false);
-		for (int x = 0; x < input.width; x++) {
-			int indexIn = input.startIndex + (y0 - offset)*input.stride + x;
-			int indexOut = output.startIndex + output.stride*y0 + x;
+		// Sum up along x-axis to avoid cache misses when reading from input image
+		// Initialize recursion by summing up the first kernels along the x-axis
+		{
+			int indexIn = input.startIndex + x0;
 
-			int total = 0;
-			int indexEnd = indexIn + input.stride*length;
-			for (; indexIn < indexEnd; indexIn += input.stride) {
-				total += input.data[indexIn] & 0xFFFF;
+			for (int x = x0; x < x1; x++) {
+				totals[x - x0] = input.data[indexIn++]& 0xFFFF;
 			}
-			totals[x] = total;
+		}
+		for (int y = 1; y < length; y++) {
+			int indexIn = input.startIndex + y*input.stride + x0;
+			int indexInEnd = indexIn + x1 - x0;
+			for (int i = indexIn; i < indexInEnd; i++) {
+				totals[i - indexIn] += input.data[i]& 0xFFFF;
+			}
+		}
+
+		int indexOut = output.startIndex + output.stride*offset + x0;
+		for (int x = x0; x < x1; x++, indexOut++) {
+			final int total = totals[x - x0];
 			output.data[indexOut] = (short)((total + halfDivisor)/divisor);
 		}
 
-		// change the order it is processed in to reduce cache misses
-		for (int y = y0 + 1; y < y1; y++) {
-			int indexIn = input.startIndex + (y + offsetEnd)*input.stride;
-			int indexOut = output.startIndex + y*output.stride;
-
-			for (int x = 0; x < input.width; x++, indexIn++, indexOut++) {
-				int total = totals[x] - (input.data[indexIn - backStep]& 0xFFFF);
-				totals[x] = total += input.data[indexIn]& 0xFFFF;
-
+		// For the reminder we only need to add and remove the first and last elements to update the solution
+		for (int y = 0; y < input.height - length; y++) {
+			indexOut = output.startIndex + output.stride*(offset + y + 1) + x0;
+			int indexIn = input.startIndex + y*input.stride + x0;
+			int indexInEnd = indexIn + x1 - x0;
+			for (int i = indexIn; i < indexInEnd; i++, indexOut++) {
+				int total = totals[i - indexIn] - (input.data[i]& 0xFFFF);
+				total += input.data[i + regionStepY]& 0xFFFF;
 				output.data[indexOut] = (short)((total + halfDivisor)/divisor);
+				totals[i - indexIn] = total;
 			}
 		}
 		//CONCURRENT_INLINE });
@@ -801,41 +819,47 @@ public class ImplConvolveMean {
 	public static void vertical( GrayF32 input, GrayF32 output, int offset, int length, @Nullable GrowArray<DogArray_F32> workspaces ) {
 		workspaces = BoofMiscOps.checkDeclare(workspaces, DogArray_F32::new);
 		final DogArray_F32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
-		final int backStep = length*input.stride;
-		final int offsetEnd = length - offset - 1;
 
 		final float divisor = length;
+		final int regionStepY = length*input.stride;
 
-		// To reduce cache misses it is processed along rows instead of going down columns, which is
-		// more natural for a vertical convolution. For parallel processes this requires building
-		// a book keeping array for each thread.
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, input.width, 20, workspaces, (work, x0, x1)->{
+		final int x0 = 0, x1 = input.width;
+		float[] totals = BoofMiscOps.checkDeclare(work, x1 - x0, false);
 
-		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(offset, output.height - offsetEnd, length, workspaces, (work, y0, y1)->{
-		final int y0 = offset, y1 = output.height - offsetEnd;
-		float[] totals = BoofMiscOps.checkDeclare(work, input.width, false);
-		for (int x = 0; x < input.width; x++) {
-			int indexIn = input.startIndex + (y0 - offset)*input.stride + x;
-			int indexOut = output.startIndex + output.stride*y0 + x;
+		// Sum up along x-axis to avoid cache misses when reading from input image
+		// Initialize recursion by summing up the first kernels along the x-axis
+		{
+			int indexIn = input.startIndex + x0;
 
-			float total = 0;
-			int indexEnd = indexIn + input.stride*length;
-			for (; indexIn < indexEnd; indexIn += input.stride) {
-				total += input.data[indexIn] ;
+			for (int x = x0; x < x1; x++) {
+				totals[x - x0] = input.data[indexIn++];
 			}
-			totals[x] = total;
-			output.data[indexOut] = (total/divisor);
+		}
+		for (int y = 1; y < length; y++) {
+			int indexIn = input.startIndex + y*input.stride + x0;
+			int indexInEnd = indexIn + x1 - x0;
+			for (int i = indexIn; i < indexInEnd; i++) {
+				totals[i - indexIn] += input.data[i];
+			}
 		}
 
-		// change the order it is processed in to reduce cache misses
-		for (int y = y0 + 1; y < y1; y++) {
-			int indexIn = input.startIndex + (y + offsetEnd)*input.stride;
-			int indexOut = output.startIndex + y*output.stride;
+		int indexOut = output.startIndex + output.stride*offset + x0;
+		for (int x = x0; x < x1; x++, indexOut++) {
+			final float total = totals[x - x0];
+			output.data[indexOut] = total/divisor;
+		}
 
-			for (int x = 0; x < input.width; x++, indexIn++, indexOut++) {
-				float total = totals[x] - (input.data[indexIn - backStep]);
-				totals[x] = total += input.data[indexIn];
-
-				output.data[indexOut] = (total/divisor);
+		// For the reminder we only need to add and remove the first and last elements to update the solution
+		for (int y = 0; y < input.height - length; y++) {
+			indexOut = output.startIndex + output.stride*(offset + y + 1) + x0;
+			int indexIn = input.startIndex + y*input.stride + x0;
+			int indexInEnd = indexIn + x1 - x0;
+			for (int i = indexIn; i < indexInEnd; i++, indexOut++) {
+				float total = totals[i - indexIn] - (input.data[i]);
+				total += input.data[i + regionStepY];
+				output.data[indexOut] = total/divisor;
+				totals[i - indexIn] = total;
 			}
 		}
 		//CONCURRENT_INLINE });
@@ -999,41 +1023,47 @@ public class ImplConvolveMean {
 	public static void vertical( GrayF64 input, GrayF64 output, int offset, int length, @Nullable GrowArray<DogArray_F64> workspaces ) {
 		workspaces = BoofMiscOps.checkDeclare(workspaces, DogArray_F64::new);
 		final DogArray_F64 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
-		final int backStep = length*input.stride;
-		final int offsetEnd = length - offset - 1;
 
 		final double divisor = length;
+		final int regionStepY = length*input.stride;
 
-		// To reduce cache misses it is processed along rows instead of going down columns, which is
-		// more natural for a vertical convolution. For parallel processes this requires building
-		// a book keeping array for each thread.
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, input.width, 20, workspaces, (work, x0, x1)->{
+		final int x0 = 0, x1 = input.width;
+		double[] totals = BoofMiscOps.checkDeclare(work, x1 - x0, false);
 
-		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(offset, output.height - offsetEnd, length, workspaces, (work, y0, y1)->{
-		final int y0 = offset, y1 = output.height - offsetEnd;
-		double[] totals = BoofMiscOps.checkDeclare(work, input.width, false);
-		for (int x = 0; x < input.width; x++) {
-			int indexIn = input.startIndex + (y0 - offset)*input.stride + x;
-			int indexOut = output.startIndex + output.stride*y0 + x;
+		// Sum up along x-axis to avoid cache misses when reading from input image
+		// Initialize recursion by summing up the first kernels along the x-axis
+		{
+			int indexIn = input.startIndex + x0;
 
-			double total = 0;
-			int indexEnd = indexIn + input.stride*length;
-			for (; indexIn < indexEnd; indexIn += input.stride) {
-				total += input.data[indexIn] ;
+			for (int x = x0; x < x1; x++) {
+				totals[x - x0] = input.data[indexIn++];
 			}
-			totals[x] = total;
-			output.data[indexOut] = (total/divisor);
+		}
+		for (int y = 1; y < length; y++) {
+			int indexIn = input.startIndex + y*input.stride + x0;
+			int indexInEnd = indexIn + x1 - x0;
+			for (int i = indexIn; i < indexInEnd; i++) {
+				totals[i - indexIn] += input.data[i];
+			}
 		}
 
-		// change the order it is processed in to reduce cache misses
-		for (int y = y0 + 1; y < y1; y++) {
-			int indexIn = input.startIndex + (y + offsetEnd)*input.stride;
-			int indexOut = output.startIndex + y*output.stride;
+		int indexOut = output.startIndex + output.stride*offset + x0;
+		for (int x = x0; x < x1; x++, indexOut++) {
+			final double total = totals[x - x0];
+			output.data[indexOut] = total/divisor;
+		}
 
-			for (int x = 0; x < input.width; x++, indexIn++, indexOut++) {
-				double total = totals[x] - (input.data[indexIn - backStep]);
-				totals[x] = total += input.data[indexIn];
-
-				output.data[indexOut] = (total/divisor);
+		// For the reminder we only need to add and remove the first and last elements to update the solution
+		for (int y = 0; y < input.height - length; y++) {
+			indexOut = output.startIndex + output.stride*(offset + y + 1) + x0;
+			int indexIn = input.startIndex + y*input.stride + x0;
+			int indexInEnd = indexIn + x1 - x0;
+			for (int i = indexIn; i < indexInEnd; i++, indexOut++) {
+				double total = totals[i - indexIn] - (input.data[i]);
+				total += input.data[i + regionStepY];
+				output.data[indexOut] = total/divisor;
+				totals[i - indexIn] = total;
 			}
 		}
 		//CONCURRENT_INLINE });
