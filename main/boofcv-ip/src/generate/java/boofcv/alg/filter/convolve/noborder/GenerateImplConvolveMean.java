@@ -92,25 +92,34 @@ public class GenerateImplConvolveMean extends CodeGeneratorBase {
 		String body = "\t\t\tint indexDest = output.startIndex + y*output.stride;\n" +
 				"\t\t\tint j = input.startIndex + y*input.stride;\n" +
 				"\n" +
-				"\t\t\tfor (int i = 0; i < offset; i++) {\n" +
-				"\t\t\t\tint jEnd = j + i + length - offset;\n" +
-				"\t\t\t\t" + sumType + " total = 0;\n" +
+				"\t\t\t" + sumType + " total = 0;\n" +
+				"\t\t\tint count = length - offset;\n" +
+				"\t\t\tint jEnd = j + count;\n" +
+				"\t\t\tif (offset > 0) {\n" +
 				"\t\t\t\tfor (int indexSrc = j; indexSrc < jEnd; indexSrc++) {\n" +
 				"\t\t\t\t\ttotal += dataSrc[indexSrc]" + bitWise + ";\n" +
 				"\t\t\t\t}\n" +
-				"\t\t\t\tint count = jEnd - j;\n" +
 				"\t\t\t\tdataDst[indexDest++] = " + divide + ";\n" +
 				"\t\t\t}\n" +
 				"\n" +
-				"\t\t\tint jEnd = j + width;\n" +
-				"\t\t\tj += width - (offset + offsetR);\n" +
-				"\t\t\tindexDest += width - (offset + offsetR);\n" +
-				"\t\t\tfor (int i = 0; i < offsetR; i++) {\n" +
-				"\t\t\t\t" + sumType + " total = 0;\n" +
-				"\t\t\t\tfor (int indexSrc = j + i; indexSrc < jEnd; indexSrc++) {\n" +
+				"\t\t\twhile (++count < length) {\n" +
+				"\t\t\t\ttotal += dataSrc[jEnd++]" + bitWise + ";\n" +
+				"\t\t\t\tdataDst[indexDest++] = " + divide + ";\n" +
+				"\t\t\t}\n" +
+				"\n" +
+				"\t\t\tjEnd = j + width;\n" +
+				"\t\t\tcount = offset + offsetR;\n" +
+				"\t\t\tj += width - count;\n" +
+				"\t\t\tindexDest += width - count;\n" +
+				"\t\t\ttotal = 0;\n" +
+				"\t\t\tif (offsetR > 0) {\n" +
+				"\t\t\t\tfor (int indexSrc = j; indexSrc < jEnd; indexSrc++) {\n" +
 				"\t\t\t\t\ttotal += dataSrc[indexSrc]" + bitWise + ";\n" +
 				"\t\t\t\t}\n" +
-				"\t\t\t\tint count = jEnd - j - i;\n" +
+				"\t\t\t\tdataDst[indexDest++] = " + divide + ";\n" +
+				"\t\t\t}\n" +
+				"\t\t\twhile (--count > offset) {\n" +
+				"\t\t\t\ttotal -= dataSrc[j++]" + bitWise + ";\n" +
 				"\t\t\t\tdataDst[indexDest++] = " + divide + ";\n" +
 				"\t\t\t}\n";
 
@@ -125,7 +134,7 @@ public class GenerateImplConvolveMean extends CodeGeneratorBase {
 		String bitWise = imageIn.getBitWise();
 
 		String declareHalf = imageIn.isInteger() ? "\t\tfinal " + sumType + " halfDivisor = divisor/2;\n" : "";
-		String divide = imageIn.isInteger() ? "(total+halfDivisor)/divisor" : "total/divisor";
+		String divide = imageIn.isInteger() ? "(total + halfDivisor)/divisor" : "total/divisor";
 
 		out.print("\tpublic static void horizontal( " + imageIn.getSingleBandName() + " input," + imageOut.getSingleBandName() + " output, int offset, int length ) {\n" +
 				"\t\tfinal " + sumType + " divisor = length;\n" +
@@ -181,18 +190,26 @@ public class GenerateImplConvolveMean extends CodeGeneratorBase {
 				"\n" +
 				"\t\t// Image Top\n" +
 				"\t\tfor (int count = length - offset; count < length; count++) {\n" +
-				"\t\t\t{\n" +
-				"\t\t\t\tint indexIn = input.startIndex + x0;\n" +
+				"\t\t\tfinal int indexInRow = input.startIndex + x0;\n" +
+				"\t\t\tif (count == length - offset) {\n" +
+				"\t\t\t\tint indexIn = indexInRow;\n" +
 				"\n" +
 				"\t\t\t\tfor (int x = x0; x < x1; x++) {\n" +
 				"\t\t\t\t\ttotals[x - x0] = dataSrc[indexIn++]" + bitWise + ";\n" +
 				"\t\t\t\t}\n" +
-				"\t\t\t}\n" +
-				"\t\t\tfor (int y = 1; y < count; y++) {\n" +
-				"\t\t\t\tint indexIn = input.startIndex + x0 + y*input.stride;\n" +
 				"\n" +
-				"\t\t\t\tfor (int x = x0; x < x1; x++) {\n" +
-				"\t\t\t\t\ttotals[x - x0] += dataSrc[indexIn++]" + bitWise + ";\n" +
+				"\t\t\t\tfor (int y = 1; y < count; y++) {\n" +
+				"\t\t\t\t\tindexIn = indexInRow + y*input.stride;\n" +
+				"\n" +
+				"\t\t\t\t\tfor (int x = x0; x < x1; x++) {\n" +
+				"\t\t\t\t\t\ttotals[x - x0] += dataSrc[indexIn++]" + bitWise + ";\n" +
+				"\t\t\t\t\t}\n" +
+				"\t\t\t\t}\n" +
+				"\t\t\t} else {\n" +
+				"\t\t\t\tint indexIn0 = indexInRow + (count - 1)*input.stride;\n" +
+				"\t\t\t\tint end = indexIn0 + x1 - x0;\n" +
+				"\t\t\t\tfor (int i = indexIn0; i < end; i++) {\n" +
+				"\t\t\t\t\ttotals[i - indexIn0] += dataSrc[i]" + bitWise + ";\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t}\n" +
 				"\t\t\tint indexOut = output.startIndex + (count - (length - offset))*output.stride;\n" +
@@ -202,19 +219,27 @@ public class GenerateImplConvolveMean extends CodeGeneratorBase {
 				"\t\t}\n" +
 				"\t\t// Image Bottom\n" +
 				"\t\tfor (int yStart = height - length + 1; yStart < height - offset; yStart++) {\n" +
-				"\t\t\t{\n" +
-				"\t\t\t\tint indexIn = input.startIndex + x0 + yStart*input.stride;\n" +
+				"\t\t\tfinal int indexInRow = input.startIndex + x0;\n" +
+				"\t\t\tif (yStart == height - length + 1) {\n" +
+				"\t\t\t\tint indexIn = indexInRow + yStart*input.stride;\n" +
 				"\n" +
 				"\t\t\t\tfor (int x = x0; x < x1; x++) {\n" +
 				"\t\t\t\t\ttotals[x - x0] = dataSrc[indexIn++]" + bitWise + ";\n" +
 				"\t\t\t\t}\n" +
-				"\t\t\t}\n" +
 				"\n" +
-				"\t\t\tfor (int y = yStart + 1; y < height; y++) {\n" +
-				"\t\t\t\tint indexIn = input.startIndex + x0 + y*input.stride;\n" +
+				"\t\t\t\tfor (int y = yStart + 1; y < height; y++) {\n" +
+				"\t\t\t\t\tindexIn = indexInRow + y*input.stride;\n" +
 				"\n" +
-				"\t\t\t\tfor (int x = x0; x < x1; x++) {\n" +
-				"\t\t\t\t\ttotals[x - x0] += dataSrc[indexIn++]" + bitWise + ";\n" +
+				"\t\t\t\t\tfor (int x = x0; x < x1; x++) {\n" +
+				"\t\t\t\t\t\ttotals[x - x0] += dataSrc[indexIn++]" + bitWise + ";\n" +
+				"\t\t\t\t\t}\n" +
+				"\t\t\t\t}\n" +
+				"\t\t\t} else {\n" +
+				"\t\t\t\tint indexIn0 = indexInRow + (yStart - 1)*input.stride;\n" +
+				"\t\t\t\tint indexIn1 = indexIn0 + x1 - x0;\n" +
+				"\n" +
+				"\t\t\t\tfor (int i = indexIn0; i < indexIn1; i++) {\n" +
+				"\t\t\t\t\ttotals[i - indexIn0] -= dataSrc[i]" + bitWise + ";\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t}\n" +
 				"\n" +

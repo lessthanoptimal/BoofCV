@@ -148,7 +148,7 @@ public class TestImplConvolveMean extends CompareEquivalentFunctions {
 		return kernel;
 	}
 
-	@Test void horizontalBorder() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+	@Test void horizontalBorder() throws InvocationTargetException, IllegalAccessException {
 		int count = 0;
 		Method[] methods = ImplConvolveMean.class.getMethods();
 		for (int i = 0; i < methods.length; i++) {
@@ -163,6 +163,9 @@ public class TestImplConvolveMean extends CompareEquivalentFunctions {
 			ImageBase found = GeneralizedImageOps.createImage((Class)params[1], width, height, 1);
 
 			GImageMiscOps.fillUniform(input, rand, 0, 50);
+
+//			if (input.getClass() != GrayU8.class)
+//				continue;
 
 			Method testMethod = null;
 			Class<?>[] testParams = null;
@@ -185,6 +188,11 @@ public class TestImplConvolveMean extends CompareEquivalentFunctions {
 				testMethod.invoke(null, kernel, input, expected);
 				m.invoke(null, input, found, offset, length);
 
+//				System.out.println("------");
+//				((GrayU8)expected).print();
+//				System.out.println();
+//				((GrayU8)found).print();
+
 				BoofTesting.assertEqualsBorder(expected, found, 1e-4, length, offset);
 			}
 			count++;
@@ -193,7 +201,7 @@ public class TestImplConvolveMean extends CompareEquivalentFunctions {
 		assertEquals(5, count);
 	}
 
-	@Test void verticalBorder() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+	@Test void verticalBorder() throws InvocationTargetException, IllegalAccessException {
 		int count = 0;
 		Method[] methods = ImplConvolveMean.class.getMethods();
 		for (int i = 0; i < methods.length; i++) {
@@ -206,6 +214,9 @@ public class TestImplConvolveMean extends CompareEquivalentFunctions {
 			ImageBase input = GeneralizedImageOps.createImage((Class)params[0], width, height, 1);
 			ImageBase expected = GeneralizedImageOps.createImage((Class)params[1], width, height, 1);
 			ImageBase found = GeneralizedImageOps.createImage((Class)params[1], width, height, 1);
+
+//			if (input.getClass() != GrayU8.class)
+//				continue;
 
 			GImageMiscOps.fillUniform(input, rand, 0, 50);
 
@@ -232,6 +243,11 @@ public class TestImplConvolveMean extends CompareEquivalentFunctions {
 
 				testMethod.invoke(null, kernel, input, expected);
 				m.invoke(null, input, found, offset, length, null);
+
+//				System.out.println("------");
+//				((GrayU8)expected).print();
+//				System.out.println();
+//				((GrayU8)found).print();
 
 				BoofTesting.assertEqualsBorder(expected, found, 1e-4, length, offset);
 			}
