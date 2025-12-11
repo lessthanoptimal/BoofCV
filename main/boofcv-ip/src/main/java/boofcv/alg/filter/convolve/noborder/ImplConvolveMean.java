@@ -57,25 +57,34 @@ public class ImplConvolveMean {
 			int indexDest = output.startIndex + y*output.stride;
 			int j = input.startIndex + y*input.stride;
 
-			for (int i = 0; i < offset; i++) {
-				int jEnd = j + i + length - offset;
-				int total = 0;
+			int total = 0;
+			int count = length - offset;
+			int jEnd = j + count;
+			if (offset > 0) {
 				for (int indexSrc = j; indexSrc < jEnd; indexSrc++) {
 					total += dataSrc[indexSrc]& 0xFF;
 				}
-				int count = jEnd - j;
 				dataDst[indexDest++] = (byte)((total + count/2)/count);
 			}
 
-			int jEnd = j + width;
-			j += width - (offset + offsetR);
-			indexDest += width - (offset + offsetR);
-			for (int i = 0; i < offsetR; i++) {
-				int total = 0;
-				for (int indexSrc = j + i; indexSrc < jEnd; indexSrc++) {
+			while (++count < length) {
+				total += dataSrc[jEnd++]& 0xFF;
+				dataDst[indexDest++] = (byte)((total + count/2)/count);
+			}
+
+			jEnd = j + width;
+			count = offset + offsetR;
+			j += width - count;
+			indexDest += width - count;
+			total = 0;
+			if (offsetR > 0) {
+				for (int indexSrc = j; indexSrc < jEnd; indexSrc++) {
 					total += dataSrc[indexSrc]& 0xFF;
 				}
-				int count = jEnd - j - i;
+				dataDst[indexDest++] = (byte)((total + count/2)/count);
+			}
+			while (--count > offset) {
+				total -= dataSrc[j++]& 0xFF;
 				dataDst[indexDest++] = (byte)((total + count/2)/count);
 			}
 		}
@@ -98,14 +107,14 @@ public class ImplConvolveMean {
 			for (; indexIn < indexEnd; indexIn++) {
 				total += input.data[indexIn] & 0xFF;
 			}
-			output.data[indexOut++] = (byte)((total+halfDivisor)/divisor);
+			output.data[indexOut++] = (byte)((total + halfDivisor)/divisor);
 
 			indexEnd = indexIn + input.width - length;
 			for (; indexIn < indexEnd; indexIn++) {
 				total -= input.data[indexIn - length] & 0xFF;
 				total += input.data[indexIn] & 0xFF;
 
-				output.data[indexOut++] = (byte)((total+halfDivisor)/divisor);
+				output.data[indexOut++] = (byte)((total + halfDivisor)/divisor);
 			}
 		}
 		//CONCURRENT_ABOVE });
@@ -128,18 +137,26 @@ public class ImplConvolveMean {
 
 		// Image Top
 		for (int count = length - offset; count < length; count++) {
-			{
-				int indexIn = input.startIndex + x0;
+			final int indexInRow = input.startIndex + x0;
+			if (count == length - offset) {
+				int indexIn = indexInRow;
 
 				for (int x = x0; x < x1; x++) {
 					totals[x - x0] = dataSrc[indexIn++]& 0xFF;
 				}
-			}
-			for (int y = 1; y < count; y++) {
-				int indexIn = input.startIndex + x0 + y*input.stride;
 
-				for (int x = x0; x < x1; x++) {
-					totals[x - x0] += dataSrc[indexIn++]& 0xFF;
+				for (int y = 1; y < count; y++) {
+					indexIn = indexInRow + y*input.stride;
+
+					for (int x = x0; x < x1; x++) {
+						totals[x - x0] += dataSrc[indexIn++]& 0xFF;
+					}
+				}
+			} else {
+				int indexIn0 = indexInRow + (count - 1)*input.stride;
+				int end = indexIn0 + x1 - x0;
+				for (int i = indexIn0; i < end; i++) {
+					totals[i - indexIn0] += dataSrc[i]& 0xFF;
 				}
 			}
 			int indexOut = output.startIndex + (count - (length - offset))*output.stride;
@@ -149,19 +166,27 @@ public class ImplConvolveMean {
 		}
 		// Image Bottom
 		for (int yStart = height - length + 1; yStart < height - offset; yStart++) {
-			{
-				int indexIn = input.startIndex + x0 + yStart*input.stride;
+			final int indexInRow = input.startIndex + x0;
+			if (yStart == height - length + 1) {
+				int indexIn = indexInRow + yStart*input.stride;
 
 				for (int x = x0; x < x1; x++) {
 					totals[x - x0] = dataSrc[indexIn++]& 0xFF;
 				}
-			}
 
-			for (int y = yStart + 1; y < height; y++) {
-				int indexIn = input.startIndex + x0 + y*input.stride;
+				for (int y = yStart + 1; y < height; y++) {
+					indexIn = indexInRow + y*input.stride;
 
-				for (int x = x0; x < x1; x++) {
-					totals[x - x0] += dataSrc[indexIn++]& 0xFF;
+					for (int x = x0; x < x1; x++) {
+						totals[x - x0] += dataSrc[indexIn++]& 0xFF;
+					}
+				}
+			} else {
+				int indexIn0 = indexInRow + (yStart - 1)*input.stride;
+				int indexIn1 = indexIn0 + x1 - x0;
+
+				for (int i = indexIn0; i < indexIn1; i++) {
+					totals[i - indexIn0] -= dataSrc[i]& 0xFF;
 				}
 			}
 
@@ -232,25 +257,34 @@ public class ImplConvolveMean {
 			int indexDest = output.startIndex + y*output.stride;
 			int j = input.startIndex + y*input.stride;
 
-			for (int i = 0; i < offset; i++) {
-				int jEnd = j + i + length - offset;
-				int total = 0;
+			int total = 0;
+			int count = length - offset;
+			int jEnd = j + count;
+			if (offset > 0) {
 				for (int indexSrc = j; indexSrc < jEnd; indexSrc++) {
 					total += dataSrc[indexSrc];
 				}
-				int count = jEnd - j;
 				dataDst[indexDest++] = (short)((total + count/2)/count);
 			}
 
-			int jEnd = j + width;
-			j += width - (offset + offsetR);
-			indexDest += width - (offset + offsetR);
-			for (int i = 0; i < offsetR; i++) {
-				int total = 0;
-				for (int indexSrc = j + i; indexSrc < jEnd; indexSrc++) {
+			while (++count < length) {
+				total += dataSrc[jEnd++];
+				dataDst[indexDest++] = (short)((total + count/2)/count);
+			}
+
+			jEnd = j + width;
+			count = offset + offsetR;
+			j += width - count;
+			indexDest += width - count;
+			total = 0;
+			if (offsetR > 0) {
+				for (int indexSrc = j; indexSrc < jEnd; indexSrc++) {
 					total += dataSrc[indexSrc];
 				}
-				int count = jEnd - j - i;
+				dataDst[indexDest++] = (short)((total + count/2)/count);
+			}
+			while (--count > offset) {
+				total -= dataSrc[j++];
 				dataDst[indexDest++] = (short)((total + count/2)/count);
 			}
 		}
@@ -273,14 +307,14 @@ public class ImplConvolveMean {
 			for (; indexIn < indexEnd; indexIn++) {
 				total += input.data[indexIn] ;
 			}
-			output.data[indexOut++] = (short)((total+halfDivisor)/divisor);
+			output.data[indexOut++] = (short)((total + halfDivisor)/divisor);
 
 			indexEnd = indexIn + input.width - length;
 			for (; indexIn < indexEnd; indexIn++) {
 				total -= input.data[indexIn - length] ;
 				total += input.data[indexIn] ;
 
-				output.data[indexOut++] = (short)((total+halfDivisor)/divisor);
+				output.data[indexOut++] = (short)((total + halfDivisor)/divisor);
 			}
 		}
 		//CONCURRENT_ABOVE });
@@ -303,18 +337,26 @@ public class ImplConvolveMean {
 
 		// Image Top
 		for (int count = length - offset; count < length; count++) {
-			{
-				int indexIn = input.startIndex + x0;
+			final int indexInRow = input.startIndex + x0;
+			if (count == length - offset) {
+				int indexIn = indexInRow;
 
 				for (int x = x0; x < x1; x++) {
 					totals[x - x0] = dataSrc[indexIn++];
 				}
-			}
-			for (int y = 1; y < count; y++) {
-				int indexIn = input.startIndex + x0 + y*input.stride;
 
-				for (int x = x0; x < x1; x++) {
-					totals[x - x0] += dataSrc[indexIn++];
+				for (int y = 1; y < count; y++) {
+					indexIn = indexInRow + y*input.stride;
+
+					for (int x = x0; x < x1; x++) {
+						totals[x - x0] += dataSrc[indexIn++];
+					}
+				}
+			} else {
+				int indexIn0 = indexInRow + (count - 1)*input.stride;
+				int end = indexIn0 + x1 - x0;
+				for (int i = indexIn0; i < end; i++) {
+					totals[i - indexIn0] += dataSrc[i];
 				}
 			}
 			int indexOut = output.startIndex + (count - (length - offset))*output.stride;
@@ -324,19 +366,27 @@ public class ImplConvolveMean {
 		}
 		// Image Bottom
 		for (int yStart = height - length + 1; yStart < height - offset; yStart++) {
-			{
-				int indexIn = input.startIndex + x0 + yStart*input.stride;
+			final int indexInRow = input.startIndex + x0;
+			if (yStart == height - length + 1) {
+				int indexIn = indexInRow + yStart*input.stride;
 
 				for (int x = x0; x < x1; x++) {
 					totals[x - x0] = dataSrc[indexIn++];
 				}
-			}
 
-			for (int y = yStart + 1; y < height; y++) {
-				int indexIn = input.startIndex + x0 + y*input.stride;
+				for (int y = yStart + 1; y < height; y++) {
+					indexIn = indexInRow + y*input.stride;
 
-				for (int x = x0; x < x1; x++) {
-					totals[x - x0] += dataSrc[indexIn++];
+					for (int x = x0; x < x1; x++) {
+						totals[x - x0] += dataSrc[indexIn++];
+					}
+				}
+			} else {
+				int indexIn0 = indexInRow + (yStart - 1)*input.stride;
+				int indexIn1 = indexIn0 + x1 - x0;
+
+				for (int i = indexIn0; i < indexIn1; i++) {
+					totals[i - indexIn0] -= dataSrc[i];
 				}
 			}
 
@@ -407,25 +457,34 @@ public class ImplConvolveMean {
 			int indexDest = output.startIndex + y*output.stride;
 			int j = input.startIndex + y*input.stride;
 
-			for (int i = 0; i < offset; i++) {
-				int jEnd = j + i + length - offset;
-				int total = 0;
+			int total = 0;
+			int count = length - offset;
+			int jEnd = j + count;
+			if (offset > 0) {
 				for (int indexSrc = j; indexSrc < jEnd; indexSrc++) {
 					total += dataSrc[indexSrc]& 0xFFFF;
 				}
-				int count = jEnd - j;
 				dataDst[indexDest++] = (short)((total + count/2)/count);
 			}
 
-			int jEnd = j + width;
-			j += width - (offset + offsetR);
-			indexDest += width - (offset + offsetR);
-			for (int i = 0; i < offsetR; i++) {
-				int total = 0;
-				for (int indexSrc = j + i; indexSrc < jEnd; indexSrc++) {
+			while (++count < length) {
+				total += dataSrc[jEnd++]& 0xFFFF;
+				dataDst[indexDest++] = (short)((total + count/2)/count);
+			}
+
+			jEnd = j + width;
+			count = offset + offsetR;
+			j += width - count;
+			indexDest += width - count;
+			total = 0;
+			if (offsetR > 0) {
+				for (int indexSrc = j; indexSrc < jEnd; indexSrc++) {
 					total += dataSrc[indexSrc]& 0xFFFF;
 				}
-				int count = jEnd - j - i;
+				dataDst[indexDest++] = (short)((total + count/2)/count);
+			}
+			while (--count > offset) {
+				total -= dataSrc[j++]& 0xFFFF;
 				dataDst[indexDest++] = (short)((total + count/2)/count);
 			}
 		}
@@ -448,14 +507,14 @@ public class ImplConvolveMean {
 			for (; indexIn < indexEnd; indexIn++) {
 				total += input.data[indexIn] & 0xFFFF;
 			}
-			output.data[indexOut++] = (short)((total+halfDivisor)/divisor);
+			output.data[indexOut++] = (short)((total + halfDivisor)/divisor);
 
 			indexEnd = indexIn + input.width - length;
 			for (; indexIn < indexEnd; indexIn++) {
 				total -= input.data[indexIn - length] & 0xFFFF;
 				total += input.data[indexIn] & 0xFFFF;
 
-				output.data[indexOut++] = (short)((total+halfDivisor)/divisor);
+				output.data[indexOut++] = (short)((total + halfDivisor)/divisor);
 			}
 		}
 		//CONCURRENT_ABOVE });
@@ -478,18 +537,26 @@ public class ImplConvolveMean {
 
 		// Image Top
 		for (int count = length - offset; count < length; count++) {
-			{
-				int indexIn = input.startIndex + x0;
+			final int indexInRow = input.startIndex + x0;
+			if (count == length - offset) {
+				int indexIn = indexInRow;
 
 				for (int x = x0; x < x1; x++) {
 					totals[x - x0] = dataSrc[indexIn++]& 0xFFFF;
 				}
-			}
-			for (int y = 1; y < count; y++) {
-				int indexIn = input.startIndex + x0 + y*input.stride;
 
-				for (int x = x0; x < x1; x++) {
-					totals[x - x0] += dataSrc[indexIn++]& 0xFFFF;
+				for (int y = 1; y < count; y++) {
+					indexIn = indexInRow + y*input.stride;
+
+					for (int x = x0; x < x1; x++) {
+						totals[x - x0] += dataSrc[indexIn++]& 0xFFFF;
+					}
+				}
+			} else {
+				int indexIn0 = indexInRow + (count - 1)*input.stride;
+				int end = indexIn0 + x1 - x0;
+				for (int i = indexIn0; i < end; i++) {
+					totals[i - indexIn0] += dataSrc[i]& 0xFFFF;
 				}
 			}
 			int indexOut = output.startIndex + (count - (length - offset))*output.stride;
@@ -499,19 +566,27 @@ public class ImplConvolveMean {
 		}
 		// Image Bottom
 		for (int yStart = height - length + 1; yStart < height - offset; yStart++) {
-			{
-				int indexIn = input.startIndex + x0 + yStart*input.stride;
+			final int indexInRow = input.startIndex + x0;
+			if (yStart == height - length + 1) {
+				int indexIn = indexInRow + yStart*input.stride;
 
 				for (int x = x0; x < x1; x++) {
 					totals[x - x0] = dataSrc[indexIn++]& 0xFFFF;
 				}
-			}
 
-			for (int y = yStart + 1; y < height; y++) {
-				int indexIn = input.startIndex + x0 + y*input.stride;
+				for (int y = yStart + 1; y < height; y++) {
+					indexIn = indexInRow + y*input.stride;
 
-				for (int x = x0; x < x1; x++) {
-					totals[x - x0] += dataSrc[indexIn++]& 0xFFFF;
+					for (int x = x0; x < x1; x++) {
+						totals[x - x0] += dataSrc[indexIn++]& 0xFFFF;
+					}
+				}
+			} else {
+				int indexIn0 = indexInRow + (yStart - 1)*input.stride;
+				int indexIn1 = indexIn0 + x1 - x0;
+
+				for (int i = indexIn0; i < indexIn1; i++) {
+					totals[i - indexIn0] -= dataSrc[i]& 0xFFFF;
 				}
 			}
 
@@ -582,25 +657,34 @@ public class ImplConvolveMean {
 			int indexDest = output.startIndex + y*output.stride;
 			int j = input.startIndex + y*input.stride;
 
-			for (int i = 0; i < offset; i++) {
-				int jEnd = j + i + length - offset;
-				float total = 0;
+			float total = 0;
+			int count = length - offset;
+			int jEnd = j + count;
+			if (offset > 0) {
 				for (int indexSrc = j; indexSrc < jEnd; indexSrc++) {
 					total += dataSrc[indexSrc];
 				}
-				int count = jEnd - j;
 				dataDst[indexDest++] = total/count;
 			}
 
-			int jEnd = j + width;
-			j += width - (offset + offsetR);
-			indexDest += width - (offset + offsetR);
-			for (int i = 0; i < offsetR; i++) {
-				float total = 0;
-				for (int indexSrc = j + i; indexSrc < jEnd; indexSrc++) {
+			while (++count < length) {
+				total += dataSrc[jEnd++];
+				dataDst[indexDest++] = total/count;
+			}
+
+			jEnd = j + width;
+			count = offset + offsetR;
+			j += width - count;
+			indexDest += width - count;
+			total = 0;
+			if (offsetR > 0) {
+				for (int indexSrc = j; indexSrc < jEnd; indexSrc++) {
 					total += dataSrc[indexSrc];
 				}
-				int count = jEnd - j - i;
+				dataDst[indexDest++] = total/count;
+			}
+			while (--count > offset) {
+				total -= dataSrc[j++];
 				dataDst[indexDest++] = total/count;
 			}
 		}
@@ -652,18 +736,26 @@ public class ImplConvolveMean {
 
 		// Image Top
 		for (int count = length - offset; count < length; count++) {
-			{
-				int indexIn = input.startIndex + x0;
+			final int indexInRow = input.startIndex + x0;
+			if (count == length - offset) {
+				int indexIn = indexInRow;
 
 				for (int x = x0; x < x1; x++) {
 					totals[x - x0] = dataSrc[indexIn++];
 				}
-			}
-			for (int y = 1; y < count; y++) {
-				int indexIn = input.startIndex + x0 + y*input.stride;
 
-				for (int x = x0; x < x1; x++) {
-					totals[x - x0] += dataSrc[indexIn++];
+				for (int y = 1; y < count; y++) {
+					indexIn = indexInRow + y*input.stride;
+
+					for (int x = x0; x < x1; x++) {
+						totals[x - x0] += dataSrc[indexIn++];
+					}
+				}
+			} else {
+				int indexIn0 = indexInRow + (count - 1)*input.stride;
+				int end = indexIn0 + x1 - x0;
+				for (int i = indexIn0; i < end; i++) {
+					totals[i - indexIn0] += dataSrc[i];
 				}
 			}
 			int indexOut = output.startIndex + (count - (length - offset))*output.stride;
@@ -673,19 +765,27 @@ public class ImplConvolveMean {
 		}
 		// Image Bottom
 		for (int yStart = height - length + 1; yStart < height - offset; yStart++) {
-			{
-				int indexIn = input.startIndex + x0 + yStart*input.stride;
+			final int indexInRow = input.startIndex + x0;
+			if (yStart == height - length + 1) {
+				int indexIn = indexInRow + yStart*input.stride;
 
 				for (int x = x0; x < x1; x++) {
 					totals[x - x0] = dataSrc[indexIn++];
 				}
-			}
 
-			for (int y = yStart + 1; y < height; y++) {
-				int indexIn = input.startIndex + x0 + y*input.stride;
+				for (int y = yStart + 1; y < height; y++) {
+					indexIn = indexInRow + y*input.stride;
 
-				for (int x = x0; x < x1; x++) {
-					totals[x - x0] += dataSrc[indexIn++];
+					for (int x = x0; x < x1; x++) {
+						totals[x - x0] += dataSrc[indexIn++];
+					}
+				}
+			} else {
+				int indexIn0 = indexInRow + (yStart - 1)*input.stride;
+				int indexIn1 = indexIn0 + x1 - x0;
+
+				for (int i = indexIn0; i < indexIn1; i++) {
+					totals[i - indexIn0] -= dataSrc[i];
 				}
 			}
 
@@ -755,25 +855,34 @@ public class ImplConvolveMean {
 			int indexDest = output.startIndex + y*output.stride;
 			int j = input.startIndex + y*input.stride;
 
-			for (int i = 0; i < offset; i++) {
-				int jEnd = j + i + length - offset;
-				double total = 0;
+			double total = 0;
+			int count = length - offset;
+			int jEnd = j + count;
+			if (offset > 0) {
 				for (int indexSrc = j; indexSrc < jEnd; indexSrc++) {
 					total += dataSrc[indexSrc];
 				}
-				int count = jEnd - j;
 				dataDst[indexDest++] = total/count;
 			}
 
-			int jEnd = j + width;
-			j += width - (offset + offsetR);
-			indexDest += width - (offset + offsetR);
-			for (int i = 0; i < offsetR; i++) {
-				double total = 0;
-				for (int indexSrc = j + i; indexSrc < jEnd; indexSrc++) {
+			while (++count < length) {
+				total += dataSrc[jEnd++];
+				dataDst[indexDest++] = total/count;
+			}
+
+			jEnd = j + width;
+			count = offset + offsetR;
+			j += width - count;
+			indexDest += width - count;
+			total = 0;
+			if (offsetR > 0) {
+				for (int indexSrc = j; indexSrc < jEnd; indexSrc++) {
 					total += dataSrc[indexSrc];
 				}
-				int count = jEnd - j - i;
+				dataDst[indexDest++] = total/count;
+			}
+			while (--count > offset) {
+				total -= dataSrc[j++];
 				dataDst[indexDest++] = total/count;
 			}
 		}
@@ -825,18 +934,26 @@ public class ImplConvolveMean {
 
 		// Image Top
 		for (int count = length - offset; count < length; count++) {
-			{
-				int indexIn = input.startIndex + x0;
+			final int indexInRow = input.startIndex + x0;
+			if (count == length - offset) {
+				int indexIn = indexInRow;
 
 				for (int x = x0; x < x1; x++) {
 					totals[x - x0] = dataSrc[indexIn++];
 				}
-			}
-			for (int y = 1; y < count; y++) {
-				int indexIn = input.startIndex + x0 + y*input.stride;
 
-				for (int x = x0; x < x1; x++) {
-					totals[x - x0] += dataSrc[indexIn++];
+				for (int y = 1; y < count; y++) {
+					indexIn = indexInRow + y*input.stride;
+
+					for (int x = x0; x < x1; x++) {
+						totals[x - x0] += dataSrc[indexIn++];
+					}
+				}
+			} else {
+				int indexIn0 = indexInRow + (count - 1)*input.stride;
+				int end = indexIn0 + x1 - x0;
+				for (int i = indexIn0; i < end; i++) {
+					totals[i - indexIn0] += dataSrc[i];
 				}
 			}
 			int indexOut = output.startIndex + (count - (length - offset))*output.stride;
@@ -846,19 +963,27 @@ public class ImplConvolveMean {
 		}
 		// Image Bottom
 		for (int yStart = height - length + 1; yStart < height - offset; yStart++) {
-			{
-				int indexIn = input.startIndex + x0 + yStart*input.stride;
+			final int indexInRow = input.startIndex + x0;
+			if (yStart == height - length + 1) {
+				int indexIn = indexInRow + yStart*input.stride;
 
 				for (int x = x0; x < x1; x++) {
 					totals[x - x0] = dataSrc[indexIn++];
 				}
-			}
 
-			for (int y = yStart + 1; y < height; y++) {
-				int indexIn = input.startIndex + x0 + y*input.stride;
+				for (int y = yStart + 1; y < height; y++) {
+					indexIn = indexInRow + y*input.stride;
 
-				for (int x = x0; x < x1; x++) {
-					totals[x - x0] += dataSrc[indexIn++];
+					for (int x = x0; x < x1; x++) {
+						totals[x - x0] += dataSrc[indexIn++];
+					}
+				}
+			} else {
+				int indexIn0 = indexInRow + (yStart - 1)*input.stride;
+				int indexIn1 = indexIn0 + x1 - x0;
+
+				for (int i = indexIn0; i < indexIn1; i++) {
+					totals[i - indexIn0] -= dataSrc[i];
 				}
 			}
 
