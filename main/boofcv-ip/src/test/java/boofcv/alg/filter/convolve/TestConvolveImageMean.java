@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,34 +53,34 @@ public class TestConvolveImageMean extends CompareEquivalentFunctions {
 	}
 
 	@Override
-	protected boolean isTestMethod(Method m) {
+	protected boolean isTestMethod( Method m ) {
 		Class<?> params[] = m.getParameterTypes();
 
-		if( params.length < 4 || params.length > 6)
+		if (params.length < 4 || params.length > 6)
 			return false;
 
 		return ImageGray.class.isAssignableFrom(params[0]);
 	}
 
 	@Override
-	protected boolean isEquivalent(Method validation, Method target) {
+	protected boolean isEquivalent( Method validation, Method target ) {
 
 		Class<?>[] v = validation.getParameterTypes();
 		Class<?>[] c = target.getParameterTypes();
 
-		if( !target.getName().equals(validation.getName()))
+		if (!target.getName().equals(validation.getName()))
 			return false;
 
-		if( c[0] != v[1] || c[1] != v[2])
+		if (c[0] != v[1] || c[1] != v[2])
 			return false;
 
-		if( target.getName().equals("vertical")) {
-			if( ImageBorder.class.isAssignableFrom(c[4]) ) {
+		if (target.getName().equals("vertical")) {
+			if (ImageBorder.class.isAssignableFrom(c[4])) {
 				return v.length >= 4 && ImageBorder.class.isAssignableFrom(v[3]);
-			} else if( v.length != 3 ){
+			} else if (v.length != 3) {
 				return false;
 			}
-		} else if( (c.length == 4) ^ (v.length == 3)) {
+		} else if ((c.length == 4) ^ (v.length == 3)) {
 			return false;
 		}
 
@@ -88,7 +88,7 @@ public class TestConvolveImageMean extends CompareEquivalentFunctions {
 	}
 
 	@Override
-	protected Object[][] createInputParam(Method candidate, Method validation) {
+	protected Object[][] createInputParam( Method candidate, Method validation ) {
 
 		Class[] c = candidate.getParameterTypes();
 
@@ -97,16 +97,16 @@ public class TestConvolveImageMean extends CompareEquivalentFunctions {
 
 		GImageMiscOps.fillUniform(input, rand, 0, 100);
 
-		ImageBorder border = FactoryImageBorder.generic(BorderType.REFLECT,input.getImageType());
+		ImageBorder border = FactoryImageBorder.generic(BorderType.REFLECT, input.getImageType());
 
 		Object[][] ret = new Object[2][];
-		if( c.length == 4 ) {
+		if (c.length == 4) {
 			ret[0] = new Object[]{input, output, offset1, length1};
 			ret[1] = new Object[]{input, output, offset2, length2};
-		} else if( c.length == 5 ) {
+		} else if (c.length == 5) {
 			ret[0] = new Object[]{input, output, offset1, length1, null};
 			ret[1] = new Object[]{input, output, offset2, length2, null};
-			if( ImageBorder.class.isAssignableFrom(c[4]) ) {
+			if (ImageBorder.class.isAssignableFrom(c[4])) {
 				ret[0][4] = border;
 				ret[1][4] = border;
 			}
@@ -119,13 +119,13 @@ public class TestConvolveImageMean extends CompareEquivalentFunctions {
 	}
 
 	@Override
-	protected Object[] reformatForValidation(Method m, Object[] targetParam) {
+	protected Object[] reformatForValidation( Method m, Object[] targetParam ) {
 		Class<?>[] params = m.getParameterTypes();
-		Object kernel = createTableKernel(params[0],(Integer)targetParam[2],(Integer)targetParam[3]);
+		Object kernel = createTableKernel(params[0], (Integer)targetParam[2], (Integer)targetParam[3]);
 
 		ImageGray output = (ImageGray)((ImageGray)targetParam[1]).clone();
 
-		if( ImageBorder.class.isAssignableFrom(params[params.length-1])) {
+		if (ImageBorder.class.isAssignableFrom(params[params.length - 1])) {
 			return new Object[]{kernel, targetParam[0], output, targetParam[4]};
 		} else {
 			return new Object[]{kernel, targetParam[0], output};
@@ -133,18 +133,20 @@ public class TestConvolveImageMean extends CompareEquivalentFunctions {
 	}
 
 	@Override
-	protected void compareResults(Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam) {
-
-		if (validationParam.length == 3) {
-			ImageGray expected = (ImageGray) validationParam[2];
-			ImageGray found = (ImageGray) targetParam[1];
-
-			BoofTesting.assertEquals(expected, found, 1e-4);
-		} else {
-			ImageGray expected = (ImageGray) validationParam[2];
-			ImageGray found = (ImageGray) targetParam[1];
-
-			BoofTesting.assertEquals(expected, found, 1e-4);
+	protected void compareResults( Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam ) {
+		ImageGray expected = (ImageGray)validationParam[2];
+		ImageGray found = (ImageGray)targetParam[1];
+		try {
+			if (validationParam.length == 3) {
+				BoofTesting.assertEquals(expected, found, 1e-4);
+			} else {
+				BoofTesting.assertEquals(expected, found, 1e-4);
+			}
+		} catch (Exception e) {
+			expected.print();
+			System.out.println("----");
+			found.print();
+			throw e;
 		}
 	}
 }
