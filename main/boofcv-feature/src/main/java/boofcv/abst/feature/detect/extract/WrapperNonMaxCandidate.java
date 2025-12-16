@@ -24,11 +24,7 @@ import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * Wrapper around the {@link boofcv.alg.feature.detect.extract.NonMaxCandidate} class.
- *
- * @author Peter Abeles
- */
+/// Wrapper around the [boofcv.alg.feature.detect.extract.NonMaxCandidate] class.
 public class WrapperNonMaxCandidate implements NonMaxSuppression {
 	NonMaxCandidate extractor;
 	boolean minimums, maximums;
@@ -45,65 +41,53 @@ public class WrapperNonMaxCandidate implements NonMaxSuppression {
 		this.maximums = maximums;
 	}
 
-	@Override
-	public float getThresholdMinimum() {
+	@Override public float getThresholdMinimum() {
 		return extractor.getThresholdMin();
 	}
 
-	@Override
-	public float getThresholdMaximum() {
+	@Override public float getThresholdMaximum() {
 		return extractor.getThresholdMax();
 	}
 
-	@Override
-	public void setThresholdMinimum( float threshold ) {
+	@Override public void setThresholdMinimum( float threshold ) {
 		extractor.setThresholdMin(threshold);
 	}
 
-	@Override
-	public void setThresholdMaximum( float threshold ) {
+	@Override public void setThresholdMaximum( float threshold ) {
 		extractor.setThresholdMax(threshold);
 	}
 
-	@Override
-	public void setIgnoreBorder( int border ) {
+	@Override public void setIgnoreBorder( int border ) {
 		extractor.setBorder(border);
 	}
 
-	@Override
-	public int getIgnoreBorder() {
+	@Override public int getIgnoreBorder() {
 		return extractor.getBorder();
 	}
 
-	@Override
-	public void process( GrayF32 intensity,
+	@Override public void process( GrayF32 intensity,
 						 @Nullable ListIntPoint2D candidateMin, @Nullable ListIntPoint2D candidateMax,
 						 @Nullable QueueCorner foundMin, @Nullable QueueCorner foundMax ) {
 		extractor.process(intensity, candidateMin, candidateMax, foundMin, foundMax);
 	}
 
-	@Override
-	public boolean getUsesCandidates() {
+	@Override public boolean getUsesCandidates() {
 		return true;
 	}
 
-	@Override
-	public void setSearchRadius( int radius ) {
+	@Override public void setSearchRadius( int radius ) {
 		extractor.setSearchRadius(radius);
 	}
 
-	@Override
-	public int getSearchRadius() {
+	@Override public int getSearchRadius() {
 		return extractor.getSearchRadius();
 	}
 
-	@Override
-	public boolean canDetectMinimums() {
+	@Override public boolean canDetectMinimums() {
 		return minimums;
 	}
 
-	@Override
-	public boolean canDetectMaximums() {
+	@Override public boolean canDetectMaximums() {
 		return maximums;
 	}
 }

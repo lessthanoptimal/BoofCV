@@ -20,39 +20,23 @@ package boofcv.abst.feature.detect.extract;
 
 import boofcv.struct.Configuration;
 
-/**
- * General configuration for {@link NonMaxSuppression}.
- *
- * @author Peter Abeles
- */
+/// General configuration for [NonMaxSuppression].
 public class ConfigExtract implements Configuration {
-	/**
-	 * Search radius of the non-maximum region. Most common value is 1 for a 3x3 region. Default is 1.
-	 */
+	/// Search radius of the non-maximum region. Most common value is 1 for a 3x3 region. Default is 1.
 	public int radius = 1;
-	/**
-	 * Minimum feature intensity it will consider when detecting a maximum. For local minimums
-	 * it will use a value of -threshold. Defaults to 0.
-	 */
+	/// Minimum feature intensity it will consider when detecting a maximum. For local minimums
+	/// it will use a value of -threshold. Defaults to 0.
 	public float threshold = 0;
-	/**
-	 * Size of border around the image in which pixels are not considered. Default is 0.
-	 */
+	/// Size of border around the image in which pixels are not considered. Default is 0.
 	public int ignoreBorder = 0;
-	/**
-	 * Is a strict test used to test for local maximums. If strict the local maximum must be greater than
-	 * all its neighbors, otherwise it just needs to be greater than or equal to its neighbors. Default is true.
-	 */
+	/// Is a strict test used to test for local maximums. If strict the local maximum must be greater than
+	/// all its neighbors, otherwise it just needs to be greater than or equal to its neighbors. Default is true.
 	public boolean useStrictRule = true;
 
-	/**
-	 * If false then local maximums will be found
-	 */
+	/// If false then local maximums will be found
 	public boolean detectMinimums = false;
 
-	/**
-	 * If true then local maximums will be found
-	 */
+	/// If true then local maximums will be found
 	public boolean detectMaximums = true;
 
 	public static ConfigExtract max( int radius, float threshold, int ignoreBorder, boolean useStrictRule ) {
@@ -86,9 +70,7 @@ public class ConfigExtract implements Configuration {
 		this.useStrictRule = useStrictRule;
 	}
 
-	/**
-	 * Constructor which defaults to an ignore border of 0 and to using a strict rule
-	 */
+	/// Constructor which defaults to an ignore border of 0 and to using a strict rule
 	public ConfigExtract( int radius, float threshold ) {
 		this(radius, threshold, 0, true);
 	}
@@ -105,8 +87,7 @@ public class ConfigExtract implements Configuration {
 		return this;
 	}
 
-	@Override
-	public void checkValidity() {
+	@Override public void checkValidity() {
 		if (radius <= 0)
 			throw new IllegalArgumentException("Search radius must be >= 1");
 		if (ignoreBorder < 0)
