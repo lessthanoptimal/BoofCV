@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,28 +19,25 @@
 package boofcv.abst.feature.detect.extract;
 
 import boofcv.alg.feature.detect.extract.NonMaxExtractorNaive;
+import boofcv.struct.QueueCorner;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 public class TestWrapperNonMaximumNaive extends BoofStandardJUnit {
 
 	@Test void checkStrict() {
-		GeneralNonMaxSuppressionChecks checks = new GeneralNonMaxSuppressionChecks() {
-
-			@Override
-			public NonMaxSuppression createAlg() {
-				return new WrapperNonMaximumNaive(new NonMaxExtractorNaive(true));
+		var checks = new GeneralNonMaxSuppressionChecks() {
+			@Override public NonMaxSuppression<QueueCorner> createAlg() {
+				return new WrapperNonMaximumNaive<>(new NonMaxExtractorNaive<QueueCorner>(true));
 			}
 		};
 		checks.testAll();
 	}
 
 	@Test void checkRelaxed() {
-		GeneralNonMaxSuppressionChecks checks = new GeneralNonMaxSuppressionChecks() {
-
-			@Override
-			public NonMaxSuppression createAlg() {
-				return new WrapperNonMaximumNaive(new NonMaxExtractorNaive(false));
+		var checks = new GeneralNonMaxSuppressionChecks() {
+			@Override public NonMaxSuppression<QueueCorner> createAlg() {
+				return new WrapperNonMaximumNaive<>(new NonMaxExtractorNaive<QueueCorner>(false));
 			}
 		};
 		checks.testAll();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,8 @@ package boofcv.abst.feature.detect.extract;
 
 import boofcv.alg.feature.detect.selector.FeatureSelectLimitIntensity;
 import boofcv.alg.feature.detect.selector.SampleIntensity;
-import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
+import georegression.struct.packed.PackedArrayPoint2D_I16;
 import georegression.struct.point.Point2D_I16;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,14 +34,14 @@ import org.jetbrains.annotations.Nullable;
 /// points will be sorted by feature intensity. If maximums and minimums are found then the total
 /// number refers to the total combined number of features. The intensity that it sorts by is the absolute value.
 public class NonMaxLimiter {
-	@Getter NonMaxSuppression nonmax;
+	@Getter NonMaxSuppression<PackedArrayPoint2D_I16> nonmax;
 
 	/// Maximum number of features it can return. If %le; 0 then there will be no limit
 	@Getter @Setter int maxTotalFeatures;
 
 	// Detected minimums and maximums
-	QueueCorner originalMin = new QueueCorner();
-	QueueCorner originalMax = new QueueCorner();
+	PackedArrayPoint2D_I16 originalMin = new PackedArrayPoint2D_I16();
+	PackedArrayPoint2D_I16 originalMax = new PackedArrayPoint2D_I16();
 
 	// Selects features when too many are detected
 	FeatureSelectLimitIntensity<LocalExtreme> selector;
@@ -52,7 +52,7 @@ public class NonMaxLimiter {
 
 	/// Configures the limiter
 	///
-	/// @param nonmax Non-maximum suppression algorithm
+	/// @param nonmax Non-maximum suppression algorithm. Generic type does not matter.
 	/// @param maxTotalFeatures The total number of allowed features it can return. Set to a value &le; 0 to disable.
 	public NonMaxLimiter( NonMaxSuppression nonmax,
 						  FeatureSelectLimitIntensity<LocalExtreme> selector,
@@ -60,6 +60,7 @@ public class NonMaxLimiter {
 		this.nonmax = nonmax;
 		this.selector = selector;
 		this.maxTotalFeatures = maxTotalFeatures;
+		this.nonmax.storageAccess(PackedArrayPoint2D_I16::append, PackedArrayPoint2D_I16::reset);
 
 		selector.setSampler(new SampleIntensity<>() {
 			@Override
@@ -81,16 +82,16 @@ public class NonMaxLimiter {
 		nonmax.process(intensity, null, null, originalMin, originalMax);
 
 		foundAll.reset();
-		for (int i = 0; i < originalMin.size; i++) {
-			Point2D_I16 p = originalMin.get(i);
+		for (int i = 0; i < originalMin.size(); i++) {
+			Point2D_I16 p = originalMin.getTemp(i);
 			float val = intensity.unsafe_get(p.x, p.y);
-			foundAll.grow().set(-val, false, p);
+			foundAll.grow().set(-val, false, p.x, p.y);
 		}
 
-		for (int i = 0; i < originalMax.size; i++) {
-			Point2D_I16 p = originalMax.get(i);
+		for (int i = 0; i < originalMax.size(); i++) {
+			Point2D_I16 p = originalMax.getTemp(i);
 			float val = intensity.unsafe_get(p.x, p.y);
-			foundAll.grow().set(val, true, p);
+			foundAll.grow().set(val, true, p.x, p.y);
 		}
 
 		if (maxTotalFeatures > 0) {
@@ -112,12 +113,12 @@ public class NonMaxLimiter {
 		public float intensity;
 		/// true if it was a maximum (positive) or minimum (negative intensity)
 		public boolean max;
-		public Point2D_I16 location;
+		public final Point2D_I16 location = new Point2D_I16();
 
-		public LocalExtreme set( float intensity, boolean max, Point2D_I16 location ) {
+		public LocalExtreme set( float intensity, boolean max, int x, int y ) {
 			this.intensity = intensity;
 			this.max = max;
-			this.location = location;
+			this.location.setTo(x, y);
 			return this;
 		}
 

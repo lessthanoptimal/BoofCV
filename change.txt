@@ -8,8 +8,11 @@ Version Meaning: <compatible>.<feature>.<bug fix>
 
 ---------------------
 Date    : 2025/XX/YY
-Version : 1.2.5
+Version : 1.3.0
 
+- NonMaxSuppression
+  * Small but breaking API change
+  * Local maximums can now be stored in different data structures
 - ImageProcessingFragment
   * Support for warmup frames
 - Mean Blur

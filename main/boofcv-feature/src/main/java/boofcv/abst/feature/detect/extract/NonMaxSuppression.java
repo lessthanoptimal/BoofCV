@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,6 @@
 package boofcv.abst.feature.detect.extract;
 
 import boofcv.struct.ListIntPoint2D;
-import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,7 +44,10 @@ import org.jetbrains.annotations.Nullable;
 /// outside this border can influence if a pixel is a maximum inside, if the local search radius extends that far.
 /// This is specified by the border parameter and the valid region is defined as follows:
 /// border &le; x &lt; width-border AND border &le; y &lt; height-border
-public interface NonMaxSuppression {
+public interface NonMaxSuppression<Storage> {
+
+	/// Specifies how to manipulate the passed in storage objects
+	void storageAccess( Add<Storage> opAdd, Reset<Storage> opReset );
 
 	/// Process a feature intensity image to extract the point features. If a pixel has an intensity
 	/// value == -Float.MAX_VALUE  or Float.MAX_VALUE it will not be considered for a local min or max, respectively.
@@ -59,7 +61,7 @@ public interface NonMaxSuppression {
 	/// @param foundMax (Output) Storage for found maximums. Can be null if not used.
 	void process( GrayF32 intensity,
 				  @Nullable ListIntPoint2D candidateMin, @Nullable ListIntPoint2D candidateMax,
-				  @Nullable QueueCorner foundMin, @Nullable QueueCorner foundMax );
+				  @Nullable Storage foundMin, @Nullable Storage foundMax );
 
 	/// Returns true if the algorithm requires a candidate list of corners.
 	///
@@ -113,4 +115,14 @@ public interface NonMaxSuppression {
 
 	/// True if it can detect local minimums.
 	boolean canDetectMinimums();
+
+	/// Adds a point to the storage
+	@FunctionalInterface interface Add<Storage> {
+		void add( Storage found, int x, int y );
+	}
+
+	/// Clears and resets the storage
+	@FunctionalInterface interface Reset<Storage> {
+		void reset( Storage found );
+	}
 }

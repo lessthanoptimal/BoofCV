@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,18 +30,20 @@ public abstract class GenericNonMaxCandidateTests extends GenericNonMaxTests {
 	ListIntPoint2D candidatesMin = new ListIntPoint2D();
 	ListIntPoint2D candidatesMax = new ListIntPoint2D();
 
-	NonMaxCandidate nonmax;
+	NonMaxCandidate<QueueCorner> nonmax;
 
 	protected GenericNonMaxCandidateTests(boolean strict, boolean canDetectMin, boolean canDetectMax,
 										  NonMaxCandidate.Search search) {
 		super(strict, canDetectMin, canDetectMax);
-		this.nonmax = new NonMaxCandidate(search);
+		this.nonmax = new NonMaxCandidate<QueueCorner>(search);
+		this.nonmax.storageAccess(QueueCorner::append, QueueCorner::reset);
 	}
 
 	protected GenericNonMaxCandidateTests(boolean strict, boolean canDetectMin, boolean canDetectMax,
 										  NonMaxCandidate.Search search , boolean concurrent ) {
 		super(strict, canDetectMin, canDetectMax);
-		this.nonmax = concurrent ? new NonMaxCandidate_MT(search) : new NonMaxCandidate(search);
+		this.nonmax = concurrent ? new NonMaxCandidate_MT<>(search) : new NonMaxCandidate<>(search);
+		this.nonmax.storageAccess(QueueCorner::append, QueueCorner::reset);
 	}
 
 	@Override
@@ -79,13 +81,13 @@ public abstract class GenericNonMaxCandidateTests extends GenericNonMaxTests {
 	@Override
 	public void allStandard() {
 		super.allStandard();
-		testNullCandidate();
+		nullCandidate();
 	}
 
 	/**
 	 * See if null candidates are correctly handled and don't blow up
 	 */
-	@Test void testNullCandidate() {
+	@Test void nullCandidate() {
 		reset();
 
 		intensity.set(3, 5, 30);

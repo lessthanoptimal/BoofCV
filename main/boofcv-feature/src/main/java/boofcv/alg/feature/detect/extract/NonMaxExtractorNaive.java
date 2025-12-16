@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,11 @@
 
 package boofcv.alg.feature.detect.extract;
 
-import boofcv.struct.QueueCorner;
+import boofcv.abst.feature.detect.extract.NonMaxSuppression.Add;
+import boofcv.abst.feature.detect.extract.NonMaxSuppression.Reset;
 import boofcv.struct.image.GrayF32;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * <p/>
@@ -28,7 +31,7 @@ import boofcv.struct.image.GrayF32;
  *
  * @author Peter Abeles
  */
-public class NonMaxExtractorNaive {
+public class NonMaxExtractorNaive<Storage> {
 
 	// size of the search area
 	protected int radius;
@@ -36,13 +39,25 @@ public class NonMaxExtractorNaive {
 	protected float thresh;
 
 	// border around the image in which pixels will not be considered
-	protected int border;
+	@Getter @Setter protected int border;
 
 	// should it use a strict rule for defining the local max?
 	protected boolean useStrictRule;
 
+	Add<Storage> opAdd = ( a, b, c ) -> {throw new RuntimeException("Must specified storage access");};
+	Reset<Storage> opReset = ( a ) -> {throw new RuntimeException("Must specified storage access");};
+
 	public NonMaxExtractorNaive( boolean useStrictRule ) {
 		this.useStrictRule = useStrictRule;
+	}
+
+	public void storageAccess( Add<Storage> opAdd, Reset<Storage> opReset ) {
+		this.opAdd = opAdd;
+		this.opReset = opReset;
+	}
+
+	public int getSearchRadius() {
+		return radius;
 	}
 
 	public void setSearchRadius( int radius ) {
@@ -57,19 +72,11 @@ public class NonMaxExtractorNaive {
 		this.thresh = thresh;
 	}
 
-	public void setBorder( int border ) {
-		this.border = border;
-	}
-
-	public int getBorder() {
-		return border;
-	}
-
 	public boolean isStrict() {
 		return useStrictRule;
 	}
 
-	public void process( GrayF32 intensityImage, QueueCorner peaks ) {
+	public void process( GrayF32 intensityImage, Storage peaks ) {
 
 		if (useStrictRule)
 			strictRule(intensityImage, peaks);
@@ -77,7 +84,7 @@ public class NonMaxExtractorNaive {
 			notStrictRule(intensityImage, peaks);
 	}
 
-	private void strictRule( GrayF32 intensityImage, QueueCorner corners ) {
+	private void strictRule( GrayF32 intensityImage, Storage corners ) {
 		final int imgWidth = intensityImage.getWidth();
 		final int imgHeight = intensityImage.getHeight();
 
@@ -119,13 +126,13 @@ public class NonMaxExtractorNaive {
 
 				// add points which are local maximums and are not already contained in the corners list
 				if (max && val != Float.MAX_VALUE) {
-					corners.append(x, y);
+					opAdd.add(corners, x, y);
 				}
 			}
 		}
 	}
 
-	private void notStrictRule( GrayF32 intensityImage, QueueCorner corners ) {
+	private void notStrictRule( GrayF32 intensityImage, Storage corners ) {
 		final int imgWidth = intensityImage.getWidth();
 		final int imgHeight = intensityImage.getHeight();
 
@@ -164,13 +171,9 @@ public class NonMaxExtractorNaive {
 
 				// add points which are local maximums and are not already contained in the corners list
 				if (max && val != Float.MAX_VALUE) {
-					corners.append(x, y);
+					opAdd.add(corners, x, y);
 				}
 			}
 		}
-	}
-
-	public int getSearchRadius() {
-		return radius;
 	}
 }

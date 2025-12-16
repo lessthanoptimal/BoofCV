@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,33 +44,30 @@ public abstract class GenericNonMaxTests extends BoofStandardJUnit {
 	protected QueueCorner foundMaximum = new QueueCorner(100);
 	protected GrayF32 intensity = new GrayF32(width, height);
 
-
 	boolean canDetectMin;
 	boolean canDetectMax;
 
 	boolean strict;
 
-	protected GenericNonMaxTests(boolean strict, boolean canDetectMin, boolean canDetectMax ) {
+	protected GenericNonMaxTests( boolean strict, boolean canDetectMin, boolean canDetectMax ) {
 		this.strict = strict;
 		this.canDetectMin = canDetectMin;
 		this.canDetectMax = canDetectMax;
 	}
 
-	public void setImageShape( int width , int height ) {
+	public void setImageShape( int width, int height ) {
 		this.width = width;
 		this.height = height;
 	}
 
-
-	private void findLocalPeaks(GrayF32 intensity, float threshold, int radius, int border) {
+	private void findLocalPeaks( GrayF32 intensity, float threshold, int radius, int border ) {
 		foundMinimum.reset();
 		foundMaximum.reset();
 		findPeaks(intensity, threshold, radius, border, foundMinimum, foundMaximum);
 	}
 
-	public abstract void findPeaks(GrayF32 intensity, float threshold, int radius, int border,
-								   QueueCorner foundMinimum, QueueCorner foundMaximum );
-
+	public abstract void findPeaks( GrayF32 intensity, float threshold, int radius, int border,
+									QueueCorner foundMinimum, QueueCorner foundMaximum );
 
 	public void reset() {
 		ImageMiscOps.fill(intensity, 0);
@@ -89,7 +86,7 @@ public abstract class GenericNonMaxTests extends BoofStandardJUnit {
 	@Test void checkBorderMaximum() {
 		if (canDetectMax)
 			checkBorderMaximum(1);
-		if( canDetectMin)
+		if (canDetectMin)
 			checkBorderMaximum(-1);
 	}
 
@@ -100,7 +97,7 @@ public abstract class GenericNonMaxTests extends BoofStandardJUnit {
 
 		// with no border (0,1) should be a peak
 		findLocalPeaks(intensity, 5, 1, 0);
-		if( sign > 0 ) {
+		if (sign > 0) {
 			assertEquals(0, foundMinimum.size);
 			assertEquals(1, foundMaximum.size);
 		} else {
@@ -120,20 +117,20 @@ public abstract class GenericNonMaxTests extends BoofStandardJUnit {
 	@Test void checkCanDetectAlongImageBorder() {
 		if (canDetectMax)
 			checkCanDetectAlongImageBorder(1);
-		if( canDetectMin)
+		if (canDetectMin)
 			checkCanDetectAlongImageBorder(-1);
 	}
 
 	public void checkCanDetectAlongImageBorder( float sign ) {
 		reset();
 		intensity.set(width/2, 0, sign*90);
-		intensity.set(width/2, height-1, sign*90);
+		intensity.set(width/2, height - 1, sign*90);
 		intensity.set(0, height/2, sign*90);
-		intensity.set(width-1, height/2, sign*90);
+		intensity.set(width - 1, height/2, sign*90);
 
 		findLocalPeaks(intensity, 5, 2, 0);
 
-		if( sign > 0 ) {
+		if (sign > 0) {
 			assertEquals(0, foundMinimum.size);
 			assertEquals(4, foundMaximum.size);
 		} else {
@@ -144,12 +141,12 @@ public abstract class GenericNonMaxTests extends BoofStandardJUnit {
 
 	@Test void checkDetectionRule() {
 		if (strict)
-			testStrictRule();
+			strictRule();
 		else
-			testNotStrictRule();
+			notStrictRule();
 	}
 
-	public void testStrictRule() {
+	public void strictRule() {
 		reset();
 
 		intensity.set(3, 5, 30);
@@ -166,7 +163,7 @@ public abstract class GenericNonMaxTests extends BoofStandardJUnit {
 		assertEquals(0, foundMaximum.size);
 	}
 
-	public void testNotStrictRule() {
+	public void notStrictRule() {
 		reset();
 
 		intensity.set(3, 5, 30);
@@ -180,9 +177,9 @@ public abstract class GenericNonMaxTests extends BoofStandardJUnit {
 
 		// none of these points are a strict maximum and all should be returned
 		findLocalPeaks(intensity, 5, 2, 0);
-		if( canDetectMin)
+		if (canDetectMin)
 			assertEquals(3, foundMinimum.size);
-		if( canDetectMax)
+		if (canDetectMax)
 			assertEquals(3, foundMaximum.size);
 	}
 
@@ -190,10 +187,10 @@ public abstract class GenericNonMaxTests extends BoofStandardJUnit {
 	 * Compares output against naive algorithm. Checks for compliance with sub-images
 	 */
 	@Test void compareToNaive() {
-		GrayF32 inten = new GrayF32(width, height);
+		var inten = new GrayF32(width, height);
 
-		QueueCorner naiveMin = new QueueCorner(inten.getWidth() * inten.getHeight());
-		QueueCorner naiveMax = new QueueCorner(inten.getWidth() * inten.getHeight());
+		var naiveMin = new QueueCorner(inten.getWidth()*inten.getHeight());
+		var naiveMax = new QueueCorner(inten.getWidth()*inten.getHeight());
 
 		for (int useSubImage = 0; useSubImage <= 1; useSubImage++) {
 			// make sure it handles sub images correctly
@@ -203,39 +200,40 @@ public abstract class GenericNonMaxTests extends BoofStandardJUnit {
 			}
 
 			for (int nonMaxWidth = 3; nonMaxWidth <= 9; nonMaxWidth += 2) {
-				int radius = nonMaxWidth / 2;
-				NonMaxExtractorNaive reg = new NonMaxExtractorNaive(strict);
+				int radius = nonMaxWidth/2;
+				var reg = new NonMaxExtractorNaive<QueueCorner>(strict);
+				reg.storageAccess(QueueCorner::append, QueueCorner::reset);
 				reg.setSearchRadius(radius);
 				reg.setThreshold(0.6f);
 
 				for (int i = 0; i < 10; i++) {
 					ImageMiscOps.fillGaussian(inten, rand, 0, 3, -100, 100);
 
-
 					// detect the corners
 					findLocalPeaks(inten, 0.6f, radius, 0);
-					naiveMin.reset();naiveMax.reset();
+					naiveMin.reset();
+					naiveMax.reset();
 					reg.process(inten, naiveMax);
 					PixelMath.negative(inten, inten);
 					reg.process(inten, naiveMin);
 
 					// check the number of corners
-					if( canDetectMin ) {
+					if (canDetectMin) {
 						assertTrue(foundMinimum.size() > 0);
 						assertEquals(naiveMin.size(), foundMinimum.size());
-						checkSamePoints(naiveMin,foundMinimum);
+						checkSamePoints(naiveMin, foundMinimum);
 					}
-					if( canDetectMax ) {
+					if (canDetectMax) {
 						assertTrue(foundMaximum.size() > 0);
 						assertEquals(naiveMax.size(), foundMaximum.size());
-						checkSamePoints(naiveMax,foundMaximum);
+						checkSamePoints(naiveMax, foundMaximum);
 					}
 				}
 			}
 		}
 	}
 
-	private void checkSamePoints( QueueCorner list0 , QueueCorner list1 ) {
+	private void checkSamePoints( QueueCorner list0, QueueCorner list1 ) {
 		for (int j = 0; j < list0.size(); j++) {
 			Point2D_I16 b = list0.get(j);
 

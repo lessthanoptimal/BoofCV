@@ -19,8 +19,9 @@
 package boofcv.alg.feature.detect.extract;
 
 import boofcv.concurrency.BoofConcurrency;
-import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
+import georegression.struct.packed.PackedArrayPoint2D_I16;
+import georegression.struct.point.Point2D_I16;
 import org.jetbrains.annotations.Nullable;
 import pabeles.concurrency.GrowArray;
 
@@ -32,13 +33,16 @@ import pabeles.concurrency.GrowArray;
  *
  * @author Peter Abeles
  */
-public class NonMaxBlock_MT extends NonMaxBlock {
+public class NonMaxBlock_MT<Storage> extends NonMaxBlock<Storage> {
 
 	// lock for variables below - which are lists used to store work space for individual threads
-	final GrowArray<SearchData> searches = new GrowArray<>(this::createSearchData);
+	final GrowArray<SearchData> searches;
 
-	public NonMaxBlock_MT( Search search ) {
+	public NonMaxBlock_MT( Search<Storage> search ) {
 		super(search);
+
+		// Each thread will collect result using specific data type to store the points
+		searches = new GrowArray<>(this::createSearchData);
 	}
 
 	/**
@@ -48,12 +52,12 @@ public class NonMaxBlock_MT extends NonMaxBlock {
 	 * @param localMin (Output) storage for found local minimums.
 	 * @param localMax (Output) storage for found local maximums.
 	 */
-	@Override
-	public void process( GrayF32 intensityImage, @Nullable QueueCorner localMin, @Nullable QueueCorner localMax ) {
+	@Override public void process( GrayF32 intensityImage,
+								   @Nullable Storage localMin, @Nullable Storage localMax ) {
 		if (localMin != null)
-			localMin.reset();
+			opReset.reset(localMin);
 		if (localMax != null)
-			localMax.reset();
+			opReset.reset(localMax);
 
 		// the defines the region that can be processed
 		int endX = intensityImage.width - border;
@@ -72,11 +76,11 @@ public class NonMaxBlock_MT extends NonMaxBlock {
 		// The previous version required locks. In a benchmark in Java 11 this lock free version and the previous
 		// had identical performance.
 		BoofConcurrency.loopBlocks(0, N, searches, ( blockInfo, iter0, iter1 ) -> {
-			final Search search = blockInfo.search;
+			final Search<PackedArrayPoint2D_I16> search = blockInfo.search;
 			blockInfo.cornersMin.reset();
 			blockInfo.cornersMax.reset();
-			QueueCorner threadMin = localMin != null ? blockInfo.cornersMin : null;
-			QueueCorner threadMax = localMax != null ? blockInfo.cornersMax : null;
+			PackedArrayPoint2D_I16 threadMin = localMin != null ? blockInfo.cornersMin : null;
+			PackedArrayPoint2D_I16 threadMax = localMax != null ? blockInfo.cornersMax : null;
 
 			search.initialize(configuration, intensityImage, threadMin, threadMax);
 
@@ -99,23 +103,32 @@ public class NonMaxBlock_MT extends NonMaxBlock {
 		for (int i = 0; i < searches.size(); i++) {
 			SearchData data = searches.get(i);
 
-			if (localMin != null)
-				localMin.appendAll(data.cornersMin);
-			if (localMax != null)
-				localMax.appendAll(data.cornersMax);
+			addAll(data.cornersMin, localMin);
+			addAll(data.cornersMax, localMax);
+		}
+	}
+
+	/// Adds all points stored in src into dst. Checks to see if dst is null
+	final void addAll( PackedArrayPoint2D_I16 src, @Nullable Storage dst ) {
+		if (dst == null)
+			return;
+
+		for (int i = 0; i < src.size(); i++) {
+			Point2D_I16 p = src.getTemp(i);
+			opAdd.add(dst, p.x, p.y);
 		}
 	}
 
 	public SearchData createSearchData() {
-		return new SearchData(search.newInstance());
+		return new SearchData(search.newInstance(PackedArrayPoint2D_I16::append));
 	}
 
-	protected static class SearchData {
-		public final Search search;
-		public final QueueCorner cornersMin = new QueueCorner();
-		public final QueueCorner cornersMax = new QueueCorner();
+	public static class SearchData {
+		public final Search<PackedArrayPoint2D_I16> search;
+		public final PackedArrayPoint2D_I16 cornersMin = new PackedArrayPoint2D_I16();
+		public final PackedArrayPoint2D_I16 cornersMax = new PackedArrayPoint2D_I16();
 
-		public SearchData( Search search ) {
+		public SearchData( Search<PackedArrayPoint2D_I16> search ) {
 			this.search = search;
 		}
 	}

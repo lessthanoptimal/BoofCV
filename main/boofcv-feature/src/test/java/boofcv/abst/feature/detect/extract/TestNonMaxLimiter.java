@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.alg.feature.detect.selector.FeatureSelectLimitIntensity;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.selector.ConfigSelectLimit;
 import boofcv.factory.feature.detect.selector.FactorySelectLimit;
+import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 import boofcv.testing.BoofStandardJUnit;
 import org.ddogleg.struct.FastAccess;
@@ -31,27 +32,27 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestNonMaxLimiter extends BoofStandardJUnit {
 	@Test void checkNoLimit() {
-		GrayF32 intensity = new GrayF32(30,25);
-		intensity.set(10,15,20);
-		intensity.set(12,20,25);
+		var intensity = new GrayF32(30, 25);
+		intensity.set(10, 15, 20);
+		intensity.set(12, 20, 25);
 
-		intensity.set(1,15,-20);
-		intensity.set(1,20,-25);
+		intensity.set(1, 15, -20);
+		intensity.set(1, 20, -25);
 
-		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(1,0,0,true,true,true));
+		NonMaxSuppression<QueueCorner> extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 0, 0, true, true, true));
 		FeatureSelectLimitIntensity<NonMaxLimiter.LocalExtreme> selector =
 				FactorySelectLimit.intensity(ConfigSelectLimit.selectBestN());
-		NonMaxLimiter limiter = new NonMaxLimiter(extractor,selector,20);
+		var limiter = new NonMaxLimiter(extractor, selector, 20);
 
 		limiter.process(intensity);
 
 		FastAccess<NonMaxLimiter.LocalExtreme> found = limiter.getFeatures();
-		assertEquals(4,found.size());
+		assertEquals(4, found.size());
 
 		for (int i = 0; i < found.size(); i++) {
 			NonMaxLimiter.LocalExtreme a = found.get(i);
-			assertEquals(a.getIntensitySigned(),intensity.get(a.location.x,a.location.y));
-			assertEquals( a.getIntensitySigned() > 0 , a.max);
+			assertEquals(a.getIntensitySigned(), intensity.get(a.location.x, a.location.y));
+			assertEquals(a.getIntensitySigned() > 0, a.max);
 		}
 	}
 
@@ -59,29 +60,28 @@ public class TestNonMaxLimiter extends BoofStandardJUnit {
 	 * 4 features, but a max of 2 is requested.
 	 */
 	@Test void checkLimit() {
-		GrayF32 intensity = new GrayF32(30,25);
-		intensity.set(10,15,20);
-		intensity.set(12,20,25);
+		GrayF32 intensity = new GrayF32(30, 25);
+		intensity.set(10, 15, 20);
+		intensity.set(12, 20, 25);
 
-		intensity.set(1,15,-20);
-		intensity.set(1,20,-25);
+		intensity.set(1, 15, -20);
+		intensity.set(1, 20, -25);
 
-		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(1,0,0,true,true,true));
+		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 0, 0, true, true, true));
 		FeatureSelectLimitIntensity<NonMaxLimiter.LocalExtreme> selector =
 				FactorySelectLimit.intensity(ConfigSelectLimit.selectBestN());
-		NonMaxLimiter limiter = new NonMaxLimiter(extractor,selector,2);
+		NonMaxLimiter limiter = new NonMaxLimiter(extractor, selector, 2);
 
 		limiter.process(intensity);
 
 		FastAccess<NonMaxLimiter.LocalExtreme> found = limiter.getFeatures();
-		assertEquals(2,found.size());
+		assertEquals(2, found.size());
 
 		for (int i = 0; i < found.size(); i++) {
 			NonMaxLimiter.LocalExtreme a = found.get(i);
-			assertEquals(a.getIntensitySigned(),intensity.get(a.location.x,a.location.y));
-			assertEquals( a.getIntensitySigned() > 0 , a.max);
-			assertEquals(25,a.intensity,1e-8);
-
+			assertEquals(a.getIntensitySigned(), intensity.get(a.location.x, a.location.y));
+			assertEquals(a.getIntensitySigned() > 0, a.max);
+			assertEquals(25, a.intensity, 1e-8);
 		}
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,10 +27,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Objects;
 
 /// Wrapper around the [boofcv.alg.feature.detect.extract.NonMaxExtractorNaive] class.
-public class WrapperNonMaximumNaive implements NonMaxSuppression {
-	NonMaxExtractorNaive alg;
+public class WrapperNonMaximumNaive<Storage> implements NonMaxSuppression<Storage> {
+	NonMaxExtractorNaive<Storage> alg;
 
-	public WrapperNonMaximumNaive( NonMaxExtractorNaive alg ) {
+	public WrapperNonMaximumNaive( NonMaxExtractorNaive<Storage> alg ) {
 		this.alg = alg;
 	}
 
@@ -42,9 +42,13 @@ public class WrapperNonMaximumNaive implements NonMaxSuppression {
 		alg.setBorder(border);
 	}
 
+	@Override public void storageAccess( Add<Storage> opAdd, Reset<Storage> opReset ) {
+		alg.storageAccess(opAdd, opReset);
+	}
+
 	@Override public void process( GrayF32 intensity,
 								   @Nullable ListIntPoint2D candidateMin, @Nullable ListIntPoint2D candidateMax,
-								   @Nullable QueueCorner foundMin, @Nullable QueueCorner foundMax ) {
+								   @Nullable Storage foundMin, @Nullable Storage foundMax ) {
 		Objects.requireNonNull(foundMax);
 		alg.process(intensity, foundMax);
 	}
