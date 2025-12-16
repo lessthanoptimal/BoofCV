@@ -26,13 +26,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
-/**
- * Wrapper around the {@link boofcv.alg.feature.detect.extract.NonMaxExtractorNaive} class.
- *
- * @author Peter Abeles
- */
+/// Wrapper around the [boofcv.alg.feature.detect.extract.NonMaxExtractorNaive] class.
 public class WrapperNonMaximumNaive implements NonMaxSuppression {
-
 	NonMaxExtractorNaive alg;
 
 	public WrapperNonMaximumNaive( NonMaxExtractorNaive alg ) {
@@ -56,27 +51,17 @@ public class WrapperNonMaximumNaive implements NonMaxSuppression {
 
 	@Override public boolean getUsesCandidates() {return false;}
 
-	@Override public float getThresholdMinimum() {
-		return Float.NaN;
-	}
+	@Override public float getThresholdMinimum() {return Float.NaN;}
 
-	@Override public float getThresholdMaximum() {
-		return alg.getThreshold();
-	}
+	@Override public float getThresholdMaximum() {return alg.getThreshold();}
 
 	@Override public void setThresholdMinimum( float threshold ) {}
 
-	@Override public void setThresholdMaximum( float threshold ) {
-		alg.setThreshold(threshold);
-	}
+	@Override public void setThresholdMaximum( float threshold ) {alg.setThreshold(threshold);}
 
-	@Override public void setSearchRadius( int radius ) {
-		alg.setSearchRadius(radius);
-	}
+	@Override public void setSearchRadius( int radius ) {alg.setSearchRadius(radius);}
 
-	@Override public int getSearchRadius() {
-		return alg.getSearchRadius();
-	}
+	@Override public int getSearchRadius() {return alg.getSearchRadius();}
 
 	@Override public boolean canDetectMaximums() {return true;}
 

@@ -24,11 +24,9 @@ import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * Wrapper around the {@link boofcv.alg.feature.detect.extract.NonMaxBlock} class.
- *
- * @author Peter Abeles
- */
+/// Wrapper around the [boofcv.alg.feature.detect.extract.NonMaxBlock] class.
+///
+/// @author Peter Abeles
 public class WrapperNonMaximumBlock implements NonMaxSuppression {
 
 	// specific implementation
@@ -38,65 +36,31 @@ public class WrapperNonMaximumBlock implements NonMaxSuppression {
 		this.alg = alg;
 	}
 
-	@Override
-	public void process( GrayF32 intensity,
-						 @Nullable ListIntPoint2D candidateMin, @Nullable ListIntPoint2D candidateMax,
-						 @Nullable QueueCorner foundMin, @Nullable QueueCorner foundMax ) {
+	@Override public void process( GrayF32 intensity,
+								   @Nullable ListIntPoint2D candidateMin, @Nullable ListIntPoint2D candidateMax,
+								   @Nullable QueueCorner foundMin, @Nullable QueueCorner foundMax ) {
 		alg.process(intensity, foundMin, foundMax);
 	}
 
-	@Override
-	public float getThresholdMinimum() {
-		return alg.getThresholdMin();
-	}
+	@Override public float getThresholdMinimum() {return alg.getThresholdMin();}
 
-	@Override
-	public float getThresholdMaximum() {
-		return alg.getThresholdMax();
-	}
+	@Override public float getThresholdMaximum() {return alg.getThresholdMax();}
 
-	@Override
-	public void setThresholdMinimum( float threshold ) {
-		alg.setThresholdMin(threshold);
-	}
+	@Override public void setThresholdMinimum( float threshold ) {alg.setThresholdMin(threshold);}
 
-	@Override
-	public void setThresholdMaximum( float threshold ) {
-		alg.setThresholdMax(threshold);
-	}
+	@Override public void setThresholdMaximum( float threshold ) {alg.setThresholdMax(threshold);}
 
-	@Override
-	public int getIgnoreBorder() {
-		return alg.getBorder();
-	}
+	@Override public int getIgnoreBorder() {return alg.getBorder();}
 
-	@Override
-	public void setIgnoreBorder( int border ) {
-		alg.setBorder(border);
-	}
+	@Override public void setIgnoreBorder( int border ) {alg.setBorder(border);}
 
-	@Override
-	public boolean getUsesCandidates() {
-		return false;
-	}
+	@Override public boolean getUsesCandidates() {return false;}
 
-	@Override
-	public void setSearchRadius( int radius ) {
-		alg.setSearchRadius(radius);
-	}
+	@Override public void setSearchRadius( int radius ) {alg.setSearchRadius(radius);}
 
-	@Override
-	public int getSearchRadius() {
-		return alg.getSearchRadius();
-	}
+	@Override public int getSearchRadius() {return alg.getSearchRadius();}
 
-	@Override
-	public boolean canDetectMaximums() {
-		return alg.getSearch().isDetectMaximums();
-	}
+	@Override public boolean canDetectMaximums() {return alg.getSearch().isDetectMaximums();}
 
-	@Override
-	public boolean canDetectMinimums() {
-		return alg.getSearch().isDetectMinimums();
-	}
+	@Override public boolean canDetectMinimums() {return alg.getSearch().isDetectMinimums();}
 }
