@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,25 +21,27 @@ package boofcv.alg.feature.detect.extract;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 
+@SuppressWarnings({"rawtypes", "unchecked"})
 public abstract class GenericNonMaxBlockTests extends GenericNonMaxTests {
-	NonMaxBlock nonmax;
+	NonMaxBlock<QueueCorner> nonmax;
 
 	protected GenericNonMaxBlockTests( boolean strict, NonMaxBlock.Search search ) {
 		super(strict, search.isDetectMinimums(), search.isDetectMaximums());
-		nonmax = new NonMaxBlock(search);
+		nonmax = new NonMaxBlock<>(search);
 	}
 
 	protected GenericNonMaxBlockTests( boolean strict, NonMaxBlock.Search search, boolean concurrent ) {
 		super(strict, search.isDetectMinimums(), search.isDetectMaximums());
 		if (concurrent)
-			nonmax = new NonMaxBlock_MT(search);
+			nonmax = new NonMaxBlock_MT<>(search);
 		else
-			nonmax = new NonMaxBlock(search);
+			nonmax = new NonMaxBlock<>(search);
 	}
 
 	@Override
 	public void findPeaks( GrayF32 intensity, float threshold, int radius, int border,
 						   QueueCorner foundMinimum, QueueCorner foundMaximum ) {
+		nonmax.storageAccess(QueueCorner::append, QueueCorner::reset);
 		nonmax.setSearchRadius(radius);
 		nonmax.setBorder(border);
 		nonmax.setThresholdMin(-threshold);

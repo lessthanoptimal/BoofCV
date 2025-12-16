@@ -23,7 +23,6 @@ import boofcv.struct.ListIntPoint2D;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_I16;
-import org.ddogleg.struct.DogArray;
 import pabeles.concurrency.GrowArray;
 
 /**
@@ -31,7 +30,7 @@ import pabeles.concurrency.GrowArray;
  *
  * @author Peter Abeles
  */
-public class NonMaxCandidate_MT extends NonMaxCandidate {
+public class NonMaxCandidate_MT<Storage> extends NonMaxCandidate<Storage> {
 
 	final GrowArray<SearchData> searches = new GrowArray<>(this::createSearchData);
 
@@ -40,8 +39,8 @@ public class NonMaxCandidate_MT extends NonMaxCandidate {
 	}
 
 	@Override
-	protected void examineMinimum( GrayF32 intensityImage, ListIntPoint2D candidates, DogArray<Point2D_I16> found ) {
-		found.reset();
+	protected void examineMinimum( GrayF32 intensityImage, ListIntPoint2D candidates, Storage found ) {
+		opReset.reset(found);
 		final int stride = intensityImage.stride;
 		final float[] inten = intensityImage.data;
 
@@ -78,13 +77,13 @@ public class NonMaxCandidate_MT extends NonMaxCandidate {
 		// by doing the last step outside we ensure the corners are in a deterministic order and that no locking
 		// is required inside each thread
 		for (int i = 0; i < searches.size(); i++) {
-			found.copyAll(searches.get(i).corners.toList(), ( src, dst ) -> dst.setTo(src));
+			searches.get(i).corners.forEach(( a ) -> opAdd.add(found, a.x, a.y));
 		}
 	}
 
 	@Override
-	protected void examineMaximum( GrayF32 intensityImage, ListIntPoint2D candidates, DogArray<Point2D_I16> found ) {
-		found.reset();
+	protected void examineMaximum( GrayF32 intensityImage, ListIntPoint2D candidates, Storage found ) {
+		opReset.reset(found);
 		final int stride = intensityImage.stride;
 		final float[] inten = intensityImage.data;
 
@@ -121,7 +120,7 @@ public class NonMaxCandidate_MT extends NonMaxCandidate {
 		// by doing the last step outside we ensure the corners are in a deterministic order and that no locking
 		// is required inside each thread
 		for (int i = 0; i < searches.size(); i++) {
-			found.copyAll(searches.get(i).corners.toList(), ( src, dst ) -> dst.setTo(src));
+			searches.get(i).corners.forEach(( a ) -> opAdd.add(found, a.x, a.y));
 		}
 	}
 

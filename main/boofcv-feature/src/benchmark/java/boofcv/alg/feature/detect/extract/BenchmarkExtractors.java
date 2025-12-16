@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,26 +49,25 @@ public class BenchmarkExtractors {
 	//	@Param({"500","5000"})
 	public int width = 1000;
 
-//	@Param({"2", "5", "20"})
+	//	@Param({"2", "5", "20"})
 	@Param({"2", "20"})
 	public int radius;
 
 	GrayF32 intensity = new GrayF32(1, 1);
 	QueueCorner corners;
 
-	NonMaxSuppression blockStrictMax;
+	NonMaxSuppression<QueueCorner> blockStrictMax;
 
-	@Setup
-	public void setup() {
+	@Setup public void setup() {
 		BoofConcurrency.USE_CONCURRENT = concurrent;
 
 		intensity.reshape(width, width);
 		corners = new QueueCorner();
 
-		Random rand = new Random(234);
+		var rand = new Random(234);
 		ImageMiscOps.fillUniform(intensity, rand, 0, 200);
 
-		ConfigExtract config = new ConfigExtract();
+		var config = new ConfigExtract();
 		config.radius = radius;
 		config.detectMaximums = true;
 		config.detectMinimums = false;
@@ -77,50 +76,46 @@ public class BenchmarkExtractors {
 		blockStrictMax = FactoryFeatureExtractor.nonmax(config);
 	}
 
-	@Benchmark
-	public void blockStrictMax() {
+	@Benchmark public void blockStrictMax() {
 		blockStrictMax.process(intensity, null, null, corners, corners);
 	}
 
-	@Benchmark
-	public void blockStrictMinMax() {
-		ConfigExtract config = new ConfigExtract();
+	@Benchmark public void blockStrictMinMax() {
+		var config = new ConfigExtract();
 		config.radius = radius;
 		config.detectMaximums = true;
 		config.detectMinimums = true;
 		config.threshold = threshold;
 		config.useStrictRule = true;
-		NonMaxSuppression alg = FactoryFeatureExtractor.nonmax(config);
+		NonMaxSuppression<QueueCorner> alg = FactoryFeatureExtractor.nonmax(config);
 		alg.process(intensity, null, null, corners, corners);
 	}
 
-	@Benchmark
-	public void blockRelaxedMax() {
-		ConfigExtract config = new ConfigExtract();
+	@Benchmark public void blockRelaxedMax() {
+		var config = new ConfigExtract();
 		config.radius = radius;
 		config.detectMaximums = true;
 		config.detectMinimums = false;
 		config.threshold = threshold;
 		config.useStrictRule = false;
-		NonMaxSuppression alg = FactoryFeatureExtractor.nonmax(config);
+		NonMaxSuppression<QueueCorner> alg = FactoryFeatureExtractor.nonmax(config);
 		alg.process(intensity, null, null, corners, corners);
 	}
 
-	@Benchmark
-	public void blockRelaxedMinMax() {
-		ConfigExtract config = new ConfigExtract();
+	@Benchmark public void blockRelaxedMinMax() {
+		var config = new ConfigExtract();
 		config.radius = radius;
 		config.detectMaximums = true;
 		config.detectMinimums = true;
 		config.threshold = threshold;
 		config.useStrictRule = false;
-		NonMaxSuppression alg = FactoryFeatureExtractor.nonmax(config);
+		NonMaxSuppression<QueueCorner> alg = FactoryFeatureExtractor.nonmax(config);
 		alg.process(intensity, null, null, corners, corners);
 	}
 
-	@Benchmark
-	public void naiveStrictMax() {
-		NonMaxExtractorNaive alg = new NonMaxExtractorNaive(true);
+	@Benchmark public void naiveStrictMax() {
+		var alg = new NonMaxExtractorNaive<QueueCorner>(true);
+		alg.storageAccess(QueueCorner::append, QueueCorner::reset);
 		alg.radius = radius;
 		alg.thresh = threshold;
 		alg.process(intensity, corners);

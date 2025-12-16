@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,28 +18,25 @@
 
 package boofcv.alg.feature.detect.extract;
 
+import boofcv.abst.feature.detect.extract.NonMaxSuppression.Add;
+import boofcv.abst.feature.detect.extract.NonMaxSuppression.Reset;
 import boofcv.struct.ListIntPoint2D;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_I16;
-import org.ddogleg.struct.DogArray;
+import lombok.Getter;
+import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
-/**
- * <p/>
- * Performs a sparse search for local minimums/maximums by only examine around candidates.
- * <p/>
- *
- * @author Peter Abeles
- */
+/// Performs a sparse search for local minimums/maximums by only examine around candidates.
 @SuppressWarnings({"NullAway.Init"})
-public class NonMaxCandidate {
+public class NonMaxCandidate<Storage> {
 	// size of the search area
 	protected int radius;
 	// threshold for intensity values when detecting minimums and maximums
-	protected float thresholdMin;
-	protected float thresholdMax;
+	@Setter @Getter protected float thresholdMin;
+	@Setter @Getter protected float thresholdMax;
 	// does not process pixels this close to the image border
 	protected int ignoreBorder;
 
@@ -54,18 +51,24 @@ public class NonMaxCandidate {
 	// work space variables
 	protected Point2D_I16 pt = new Point2D_I16();
 
+	Add<Storage> opAdd = ( a, b, c ) -> {throw new RuntimeException("Must specified storage access");};
+	Reset<Storage> opReset = ( a ) -> {throw new RuntimeException("Must specified storage access");};
+
 	public NonMaxCandidate( Search search ) {
 		this.search = search;
 	}
 
-	/**
-	 * Checks to see if the specified candidates are local minimums or maximums. If a candidate list is
-	 * null then that test is skipped.
-	 */
+	public void storageAccess( Add<Storage> opAdd, Reset<Storage> opReset ) {
+		this.opAdd = opAdd;
+		this.opReset = opReset;
+	}
+
+	/// Checks to see if the specified candidates are local minimums or maximums. If a candidate list is
+	/// null then that test is skipped.
 	public void process( GrayF32 intensityImage,
 						 @Nullable ListIntPoint2D candidatesMin,
 						 @Nullable ListIntPoint2D candidatesMax,
-						 @Nullable DogArray<Point2D_I16> foundMin, @Nullable DogArray<Point2D_I16> foundMax ) {
+						 @Nullable Storage foundMin, @Nullable Storage foundMax ) {
 
 		this.input = intensityImage;
 
@@ -76,16 +79,16 @@ public class NonMaxCandidate {
 		search.initialize(intensityImage);
 
 		if (candidatesMin != null) {
-			Objects.requireNonNull(foundMin).reset();
+			opReset.reset(Objects.requireNonNull(foundMin));
 			examineMinimum(intensityImage, candidatesMin, foundMin);
 		}
 		if (candidatesMax != null) {
-			Objects.requireNonNull(foundMax).reset();
+			opReset.reset(Objects.requireNonNull(foundMax));
 			examineMaximum(intensityImage, candidatesMax, foundMax);
 		}
 	}
 
-	protected void examineMinimum( GrayF32 intensityImage, ListIntPoint2D candidates, DogArray<Point2D_I16> found ) {
+	protected void examineMinimum( GrayF32 intensityImage, ListIntPoint2D candidates, Storage found ) {
 		final int stride = intensityImage.stride;
 		final float[] inten = intensityImage.data;
 
@@ -107,11 +110,11 @@ public class NonMaxCandidate {
 			int y1 = Math.min(intensityImage.height, pt.y + radius + 1);
 
 			if (search.searchMin(x0, y0, x1, y1, center, val))
-				found.grow().setTo(pt.x, pt.y);
+				opAdd.add(found, pt.x, pt.y);
 		}
 	}
 
-	protected void examineMaximum( GrayF32 intensityImage, ListIntPoint2D candidates, DogArray<Point2D_I16> found ) {
+	protected void examineMaximum( GrayF32 intensityImage, ListIntPoint2D candidates, Storage found ) {
 		final int stride = intensityImage.stride;
 		final float[] inten = intensityImage.data;
 
@@ -133,7 +136,7 @@ public class NonMaxCandidate {
 			int y1 = Math.min(intensityImage.height, pt.y + radius + 1);
 
 			if (search.searchMax(x0, y0, x1, y1, center, val))
-				found.grow().setTo(pt.x, pt.y);
+				opAdd.add(found, pt.x, pt.y);
 		}
 	}
 
@@ -145,22 +148,6 @@ public class NonMaxCandidate {
 		return radius;
 	}
 
-	public float getThresholdMin() {
-		return thresholdMin;
-	}
-
-	public void setThresholdMin( float thresholdMin ) {
-		this.thresholdMin = thresholdMin;
-	}
-
-	public float getThresholdMax() {
-		return thresholdMax;
-	}
-
-	public void setThresholdMax( float thresholdMax ) {
-		this.thresholdMax = thresholdMax;
-	}
-
 	public void setBorder( int border ) {
 		this.ignoreBorder = border;
 	}
@@ -169,47 +156,37 @@ public class NonMaxCandidate {
 		return ignoreBorder;
 	}
 
-	/**
-	 * Interface for local search algorithm around the candidates
-	 */
+	/// Interface for local search algorithm around the candidates
 	public interface Search {
 		void initialize( GrayF32 intensity );
 
-		/**
-		 * Verifies that the candidate is a local minimum
-		 *
-		 * @param x0 lower extent X. Inclusive
-		 * @param y0 lower extent Y. Inclusive
-		 * @param x1 upper extent X. Exclusive
-		 * @param y1 upper extent Y. Exclusive
-		 * @param centerIdx index of candidate pixel in the image
-		 * @param val value at the candidate pixel
-		 * @return true if it's a local min
-		 */
+		/// Verifies that the candidate is a local minimum
+		///
+		/// @param x0 lower extent X. Inclusive
+		/// @param y0 lower extent Y. Inclusive
+		/// @param x1 upper extent X. Exclusive
+		/// @param y1 upper extent Y. Exclusive
+		/// @param centerIdx index of candidate pixel in the image
+		/// @param val value at the candidate pixel
+		/// @return true if it's a local min
 		boolean searchMin( int x0, int y0, int x1, int y1, int centerIdx, float val );
 
 		boolean searchMax( int x0, int y0, int x1, int y1, int centerIdx, float val );
 
-		/**
-		 * Create a new instance of this search algorithm. Useful for concurrent implementations
-		 */
+		/// Create a new instance of this search algorithm. Useful for concurrent implementations
 		Search newInstance();
 	}
 
-	/**
-	 * Search with a relaxes rule. &le;
-	 */
+	/// Search with a relaxes rule. &le;
 	@SuppressWarnings({"NullAway.Init"})
 	public static class Relaxed implements NonMaxCandidate.Search {
 		GrayF32 intensity;
 
-		@Override
-		public void initialize( GrayF32 intensity ) {
+		@Override public void initialize( GrayF32 intensity ) {
 			this.intensity = intensity;
 		}
 
-		@Override
-		public boolean searchMin( int x0, int y0, int x1, int y1, int centerIdx, float val ) {
+		@Override public boolean searchMin( int x0, int y0, int x1, int y1, int centerIdx, float val ) {
 			for (int i = y0; i < y1; i++) {
 				int index = intensity.startIndex + i*intensity.stride + x0;
 				for (int j = x0; j < x1; j++, index++) {
@@ -221,8 +198,7 @@ public class NonMaxCandidate {
 			return true;
 		}
 
-		@Override
-		public boolean searchMax( int x0, int y0, int x1, int y1, int centerIdx, float val ) {
+		@Override public boolean searchMax( int x0, int y0, int x1, int y1, int centerIdx, float val ) {
 			for (int i = y0; i < y1; i++) {
 				int index = intensity.startIndex + i*intensity.stride + x0;
 				for (int j = x0; j < x1; j++, index++) {
@@ -234,26 +210,21 @@ public class NonMaxCandidate {
 			return true;
 		}
 
-		@Override
-		public Search newInstance() {
+		@Override public Search newInstance() {
 			return new Relaxed();
 		}
 	}
 
-	/**
-	 * Search with a strict rule &lt;
-	 */
+	/// Search with a strict rule &lt;
 	@SuppressWarnings({"NullAway.Init"})
 	public static class Strict implements NonMaxCandidate.Search {
 		GrayF32 intensity;
 
-		@Override
-		public void initialize( GrayF32 intensity ) {
+		@Override public void initialize( GrayF32 intensity ) {
 			this.intensity = intensity;
 		}
 
-		@Override
-		public boolean searchMin( int x0, int y0, int x1, int y1, int centerIdx, float val ) {
+		@Override public boolean searchMin( int x0, int y0, int x1, int y1, int centerIdx, float val ) {
 			for (int i = y0; i < y1; i++) {
 				int index = intensity.startIndex + i*intensity.stride + x0;
 				for (int j = x0; j < x1; j++, index++) {
@@ -269,8 +240,7 @@ public class NonMaxCandidate {
 			return true;
 		}
 
-		@Override
-		public boolean searchMax( int x0, int y0, int x1, int y1, int centerIdx, float val ) {
+		@Override public boolean searchMax( int x0, int y0, int x1, int y1, int centerIdx, float val ) {
 			for (int i = y0; i < y1; i++) {
 				int index = intensity.startIndex + i*intensity.stride + x0;
 				for (int j = x0; j < x1; j++, index++) {
@@ -286,8 +256,7 @@ public class NonMaxCandidate {
 			return true;
 		}
 
-		@Override
-		public Search newInstance() {
+		@Override public Search newInstance() {
 			return new Strict();
 		}
 	}

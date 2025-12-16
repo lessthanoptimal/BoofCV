@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,34 +18,36 @@
 
 package boofcv.alg.feature.detect.extract;
 
-import boofcv.struct.QueueCorner;
+import boofcv.abst.feature.detect.extract.NonMaxSuppression.Add;
+import boofcv.alg.feature.detect.extract.NonMaxBlock.Search;
 import boofcv.struct.image.GrayF32;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
-/**
- * <p>
- * Implementation of {@link NonMaxBlock} which implements a strict maximum rule.
- * </p>
- *
- * @author Peter Abeles
- */
+/// Implementation of [NonMaxBlock] which implements a strict maximum rule.
 @SuppressWarnings({"NullAway.Init"})
-public abstract class NonMaxBlockSearchStrict implements NonMaxBlock.Search {
+public abstract class NonMaxBlockSearchStrict<Storage> implements Search<Storage> {
 
 	// threshold for intensity values when detecting minimums and maximums
 	float thresholdMin;
 	float thresholdMax;
 	int radius;
 
-	private QueueCorner localMin, localMax;
+	private Storage localMin, localMax;
 	GrayF32 img;
+
+	Add<Storage> opAdd = ( a, b, c ) -> {throw new RuntimeException("Must specified storage access");};
+
+	@Override public void storageAccess( Add<Storage> opAdd ) {
+		this.opAdd = opAdd;
+	}
 
 	@SuppressWarnings({"NullAway"})
 	@Override
-	public void initialize( NonMaxBlock.Configuration configuration,
-							GrayF32 image, @Nullable QueueCorner localMin, @Nullable QueueCorner localMax ) {
+	public void initialize( NonMaxBlock.Configuration configuration, GrayF32 image,
+							@Nullable Storage localMin,
+							@Nullable Storage localMax ) {
 
 		this.thresholdMin = configuration.thresholdMin;
 		this.thresholdMax = configuration.thresholdMax;
@@ -64,10 +66,15 @@ public abstract class NonMaxBlockSearchStrict implements NonMaxBlock.Search {
 			Objects.requireNonNull(localMax);
 	}
 
-	public static class Max extends NonMaxBlockSearchStrict {
-		@Override
-		public void searchBlock( int x0, int y0, int x1, int y1 ) {
+	public static class Max<Storage> extends NonMaxBlockSearchStrict<Storage> {
 
+		public Max( Add<Storage> opAdd ) {
+			storageAccess(opAdd);
+		}
+
+		public Max() {}
+
+		@Override public void searchBlock( int x0, int y0, int x1, int y1 ) {
 			int peakX = 0;
 			int peakY = 0;
 
@@ -91,26 +98,27 @@ public abstract class NonMaxBlockSearchStrict implements NonMaxBlock.Search {
 			}
 		}
 
-		@Override
-		public boolean isDetectMinimums() {
+		@Override public boolean isDetectMinimums() {
 			return false;
 		}
 
-		@Override
-		public boolean isDetectMaximums() {
+		@Override public boolean isDetectMaximums() {
 			return true;
 		}
 
-		@Override
-		public NonMaxBlock.Search newInstance() {
-			return new Max();
+		@Override public <S> Search<S> newInstance( Add<S> opAdd ) {
+			return new Max<>(opAdd);
 		}
 	}
 
-	public static class Min extends NonMaxBlockSearchStrict {
+	public static class Min<Storage> extends NonMaxBlockSearchStrict<Storage> {
+		public Min( Add<Storage> opAdd ) {
+			storageAccess(opAdd);
+		}
 
-		@Override
-		public void searchBlock( int x0, int y0, int x1, int y1 ) {
+		public Min() {}
+
+		@Override public void searchBlock( int x0, int y0, int x1, int y1 ) {
 
 			int peakX = 0;
 			int peakY = 0;
@@ -135,26 +143,21 @@ public abstract class NonMaxBlockSearchStrict implements NonMaxBlock.Search {
 			}
 		}
 
-		@Override
-		public boolean isDetectMinimums() {
-			return true;
-		}
+		@Override public boolean isDetectMinimums() {return true;}
 
-		@Override
-		public boolean isDetectMaximums() {
-			return false;
-		}
+		@Override public boolean isDetectMaximums() {return false;}
 
-		@Override
-		public NonMaxBlock.Search newInstance() {
-			return new Min();
-		}
+		@Override public <S> Search<S> newInstance( Add<S> opAdd ) {return new Min<>(opAdd);}
 	}
 
-	public static class MinMax extends NonMaxBlockSearchStrict {
+	public static class MinMax<Storage> extends NonMaxBlockSearchStrict<Storage> {
+		public MinMax( Add<Storage> opAdd ) {
+			storageAccess(opAdd);
+		}
 
-		@Override
-		public void searchBlock( int x0, int y0, int x1, int y1 ) {
+		public MinMax() {}
+
+		@Override public void searchBlock( int x0, int y0, int x1, int y1 ) {
 
 			int maxX = 0;
 			int maxY = 0;
@@ -190,20 +193,11 @@ public abstract class NonMaxBlockSearchStrict implements NonMaxBlock.Search {
 			}
 		}
 
-		@Override
-		public boolean isDetectMinimums() {
-			return true;
-		}
+		@Override public boolean isDetectMinimums() {return true;}
 
-		@Override
-		public boolean isDetectMaximums() {
-			return true;
-		}
+		@Override public boolean isDetectMaximums() {return true;}
 
-		@Override
-		public NonMaxBlock.Search newInstance() {
-			return new MinMax();
-		}
+		@Override public <S> Search<S> newInstance( Add<S> opAdd ) {return new MinMax<>(opAdd);}
 	}
 
 	protected void checkLocalMax( int x_c, int y_c, float peakVal, GrayF32 img ) {
@@ -230,7 +224,7 @@ public abstract class NonMaxBlockSearchStrict implements NonMaxBlock.Search {
 		}
 
 		// save location of local max
-		localMax.append(x_c, y_c);
+		opAdd.add(localMax, x_c, y_c);
 	}
 
 	protected void checkLocalMin( int x_c, int y_c, float peakVal, GrayF32 img ) {
@@ -257,6 +251,6 @@ public abstract class NonMaxBlockSearchStrict implements NonMaxBlock.Search {
 		}
 
 		// save location of local min
-		localMin.append(x_c, y_c);
+		opAdd.add(localMin, x_c, y_c);
 	}
 }

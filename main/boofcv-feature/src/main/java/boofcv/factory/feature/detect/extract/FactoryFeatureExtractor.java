@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,8 +26,11 @@ import boofcv.alg.feature.detect.selector.FeatureSelectLimitIntensity;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.factory.feature.detect.selector.ConfigSelectLimit;
 import boofcv.factory.feature.detect.selector.FactorySelectLimit;
+import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageGray;
+import georegression.struct.packed.PackedArrayPoint2D_I16;
 import georegression.struct.point.Point2D_I16;
+import org.ddogleg.struct.DogArray;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -54,7 +57,7 @@ public class FactoryFeatureExtractor {
 										  @Nullable NonMaxSuppression extractorMax,
 										  FeatureSelectLimitIntensity<Point2D_I16> selector,
 										  int maxFeatures ) {
-		GeneralFeatureDetector<I, D> det = new GeneralFeatureDetector<>(intensity, extractorMin, extractorMax, selector);
+		var det = new GeneralFeatureDetector<I, D>(intensity, extractorMin, extractorMax, selector);
 		det.setFeatureLimit(maxFeatures);
 
 		return det;
@@ -66,7 +69,17 @@ public class FactoryFeatureExtractor {
 	 * @param config Configuration for extractor
 	 * @return A feature extractor.
 	 */
-	public static NonMaxSuppression nonmax( @Nullable ConfigExtract config ) {
+	public static NonMaxSuppression<QueueCorner> nonmax( @Nullable ConfigExtract config ) {
+		return nonmax(config, QueueCorner::append, QueueCorner::reset);
+	}
+
+	public static NonMaxSuppression<PackedArrayPoint2D_I16> nonmaxPack16( @Nullable ConfigExtract config ) {
+		return nonmax(config, PackedArrayPoint2D_I16::append, PackedArrayPoint2D_I16::reset);
+	}
+
+	public static <Storage> NonMaxSuppression<Storage>
+	nonmax( @Nullable ConfigExtract config,
+			NonMaxSuppression.Add<Storage> opAdd, NonMaxSuppression.Reset<Storage> opReset ) {
 
 		if (config == null)
 			config = new ConfigExtract();
@@ -76,35 +89,38 @@ public class FactoryFeatureExtractor {
 			return BOverrideFactoryFeatureExtractor.nonmax.process(config);
 		}
 
-		NonMaxBlock.Search search;
+		NonMaxBlock.Search<Storage> search;
 		if (config.useStrictRule) {
 			if (config.detectMaximums)
 				if (config.detectMinimums)
-					search = new NonMaxBlockSearchStrict.MinMax();
+					search = new NonMaxBlockSearchStrict.MinMax<>();
 				else
-					search = new NonMaxBlockSearchStrict.Max();
+					search = new NonMaxBlockSearchStrict.Max<>();
 			else
-				search = new NonMaxBlockSearchStrict.Min();
+				search = new NonMaxBlockSearchStrict.Min<>();
 		} else {
 			if (config.detectMaximums)
 				if (config.detectMinimums)
-					search = new NonMaxBlockSearchRelaxed.MinMax();
+					search = new NonMaxBlockSearchRelaxed.MinMax<>();
 				else
-					search = new NonMaxBlockSearchRelaxed.Max();
+					search = new NonMaxBlockSearchRelaxed.Max<>();
 			else
-				search = new NonMaxBlockSearchRelaxed.Min();
+				search = new NonMaxBlockSearchRelaxed.Min<>();
 		}
 
-		// See if the user wants to use threaded code or not
-		NonMaxBlock alg = BoofConcurrency.USE_CONCURRENT ?
-				new NonMaxBlock_MT(search) : new NonMaxBlock(search);
+		search.storageAccess(opAdd);
 
+		// See if the user wants to use threaded code or not
+		NonMaxBlock<Storage> alg = BoofConcurrency.USE_CONCURRENT ?
+				new NonMaxBlock_MT<>(search) : new NonMaxBlock<>(search);
+
+		alg.storageAccess(opAdd, opReset);
 		alg.setSearchRadius(config.radius);
 		alg.setThresholdMax(config.threshold);
 		alg.setThresholdMin(-config.threshold);
 		alg.setBorder(config.ignoreBorder);
 
-		return new WrapperNonMaximumBlock(alg);
+		return new WrapperNonMaximumBlock<>(alg);
 	}
 
 	/**
@@ -113,7 +129,7 @@ public class FactoryFeatureExtractor {
 	 * @param config Configuration for extractor
 	 * @return A feature extractor.
 	 */
-	public static NonMaxSuppression nonmaxCandidate( @Nullable ConfigExtract config ) {
+	public static NonMaxSuppression<QueueCorner> nonmaxCandidate( @Nullable ConfigExtract config ) {
 
 		if (config == null)
 			config = new ConfigExtract();
@@ -133,11 +149,12 @@ public class FactoryFeatureExtractor {
 		}
 
 		// See if the user wants to use threaded code or not
-		NonMaxCandidate extractor = BoofConcurrency.USE_CONCURRENT ?
-				new NonMaxCandidate_MT(search) : new NonMaxCandidate(search);
+		NonMaxCandidate<QueueCorner> extractor = BoofConcurrency.USE_CONCURRENT ?
+				new NonMaxCandidate_MT<>(search) : new NonMaxCandidate<>(search);
 
-		WrapperNonMaxCandidate ret = new WrapperNonMaxCandidate(extractor, false, true);
+		var ret = new WrapperNonMaxCandidate<QueueCorner>(extractor, false, true);
 
+		ret.storageAccess(QueueCorner::append, DogArray::reset);
 		ret.setSearchRadius(config.radius);
 		ret.setIgnoreBorder(config.ignoreBorder);
 		ret.setThresholdMaximum(config.threshold);
@@ -153,7 +170,7 @@ public class FactoryFeatureExtractor {
 	 * @return The NonMaxLimiter
 	 */
 	public static NonMaxLimiter nonmaxLimiter( @Nullable ConfigExtract configExtract, ConfigSelectLimit configSelect, int maxFeatures ) {
-		NonMaxSuppression nonmax = nonmax(configExtract);
+		NonMaxSuppression<PackedArrayPoint2D_I16> nonmax = nonmaxPack16(configExtract);
 		FeatureSelectLimitIntensity<NonMaxLimiter.LocalExtreme> selector = FactorySelectLimit.intensity(configSelect);
 		return new NonMaxLimiter(nonmax, selector, maxFeatures);
 	}

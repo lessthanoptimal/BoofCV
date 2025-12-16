@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,18 +27,22 @@ import org.jetbrains.annotations.Nullable;
 /// Wrapper around the [boofcv.alg.feature.detect.extract.NonMaxBlock] class.
 ///
 /// @author Peter Abeles
-public class WrapperNonMaximumBlock implements NonMaxSuppression {
+public class WrapperNonMaximumBlock<Storage> implements NonMaxSuppression<Storage> {
 
 	// specific implementation
-	NonMaxBlock alg;
+	NonMaxBlock<Storage> alg;
 
-	public WrapperNonMaximumBlock( NonMaxBlock alg ) {
+	public WrapperNonMaximumBlock( NonMaxBlock<Storage> alg ) {
 		this.alg = alg;
+	}
+
+	@Override public void storageAccess( Add<Storage> opAdd, Reset<Storage> opReset ) {
+		this.alg.storageAccess(opAdd, opReset);
 	}
 
 	@Override public void process( GrayF32 intensity,
 								   @Nullable ListIntPoint2D candidateMin, @Nullable ListIntPoint2D candidateMax,
-								   @Nullable QueueCorner foundMin, @Nullable QueueCorner foundMax ) {
+								   @Nullable Storage foundMin, @Nullable Storage foundMax ) {
 		alg.process(intensity, foundMin, foundMax);
 	}
 

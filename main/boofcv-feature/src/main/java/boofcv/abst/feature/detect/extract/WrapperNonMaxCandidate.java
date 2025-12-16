@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,25 +20,28 @@ package boofcv.abst.feature.detect.extract;
 
 import boofcv.alg.feature.detect.extract.NonMaxCandidate;
 import boofcv.struct.ListIntPoint2D;
-import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 import org.jetbrains.annotations.Nullable;
 
 /// Wrapper around the [boofcv.alg.feature.detect.extract.NonMaxCandidate] class.
-public class WrapperNonMaxCandidate implements NonMaxSuppression {
-	NonMaxCandidate extractor;
+public class WrapperNonMaxCandidate<Storage> implements NonMaxSuppression<Storage> {
+	NonMaxCandidate<Storage> extractor;
 	boolean minimums, maximums;
 
 	public WrapperNonMaxCandidate( NonMaxCandidate.Search search, boolean minimums, boolean maximums ) {
-		this.extractor = new NonMaxCandidate(search);
+		this.extractor = new NonMaxCandidate<>(search);
 		this.minimums = minimums;
 		this.maximums = maximums;
 	}
 
-	public WrapperNonMaxCandidate( NonMaxCandidate extractor, boolean minimums, boolean maximums ) {
+	public WrapperNonMaxCandidate( NonMaxCandidate<Storage> extractor, boolean minimums, boolean maximums ) {
 		this.extractor = extractor;
 		this.minimums = minimums;
 		this.maximums = maximums;
+	}
+
+	@Override public void storageAccess( Add<Storage> opAdd, Reset<Storage> opReset ) {
+		this.extractor.storageAccess(opAdd, opReset);
 	}
 
 	@Override public float getThresholdMinimum() {
@@ -66,8 +69,8 @@ public class WrapperNonMaxCandidate implements NonMaxSuppression {
 	}
 
 	@Override public void process( GrayF32 intensity,
-						 @Nullable ListIntPoint2D candidateMin, @Nullable ListIntPoint2D candidateMax,
-						 @Nullable QueueCorner foundMin, @Nullable QueueCorner foundMax ) {
+								   @Nullable ListIntPoint2D candidateMin, @Nullable ListIntPoint2D candidateMax,
+								   @Nullable Storage foundMin, @Nullable Storage foundMax ) {
 		extractor.process(intensity, candidateMin, candidateMax, foundMin, foundMax);
 	}
 

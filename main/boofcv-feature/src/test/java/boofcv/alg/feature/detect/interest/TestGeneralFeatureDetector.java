@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,22 +34,18 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
 class TestGeneralFeatureDetector extends BoofStandardJUnit {
 
 	int width = 10;
 	int height = 12;
 	FeatureSelectLimitIntensity<Point2D_I16> selector = new FeatureSelectNBest<>(new SampleIntensityImage.I16());
 
-	/**
-	 * Several basic detection tests
-	 */
-	@Test
-	void basics() {
+	/// Several basic detection tests
+	@Test void basics() {
 		// use a real extractor
-		NonMaxSuppression extractorMin,extractorMax;
+		NonMaxSuppression<QueueCorner> extractorMin, extractorMax;
 
-		HelperIntensity intensity = new HelperIntensity(false, false, false);
+		var intensity = new HelperIntensity(false, false, false);
 
 		// add several features while avoiding the image border
 		intensity.img.set(1, 1, 10);
@@ -67,7 +63,7 @@ class TestGeneralFeatureDetector extends BoofStandardJUnit {
 		intensity.minimums = false;
 		extractorMax = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 0.001f, 1, true, false, true));
 		GeneralFeatureDetector<GrayF32, GrayF32> detector =
-				new GeneralFeatureDetector<>(intensity, null,extractorMax, selector);
+				new GeneralFeatureDetector<>(intensity, null, extractorMax, selector);
 		detector.process(new GrayF32(width, height), null, null, null, null, null);
 		assertEquals(6, detector.getMaximums().size());
 		assertEquals(0, detector.getMinimums().size());
@@ -86,11 +82,8 @@ class TestGeneralFeatureDetector extends BoofStandardJUnit {
 		assertEquals(2, detector.getMinimums().size());
 	}
 
-	/**
-	 * If the intensity image has an ignore border is that border request actually followed?
-	 */
-	@Test
-	void ignoreBorder() {
+	/// If the intensity image has an ignore border is that border request actually followed?
+	@Test void ignoreBorder() {
 		HelperIntensity intensity = new HelperIntensity(false, false, false);
 		intensity.ignoreBorder = 2;
 		intensity.minimums = true;
@@ -105,17 +98,16 @@ class TestGeneralFeatureDetector extends BoofStandardJUnit {
 		// add some along the border
 		intensity.img.set(5, 1, 10);
 		intensity.img.set(5, 11, 10);
-		intensity.img.set(0,5 , 10);
-		intensity.img.set(1,1 , 10);
-		intensity.img.set(9,5 , 10);
-		intensity.img.set(9,4 , -10);
+		intensity.img.set(0, 5, 10);
+		intensity.img.set(1, 1, 10);
+		intensity.img.set(9, 5, 10);
+		intensity.img.set(9, 4, -10);
 
 		// use a real extractor
-		NonMaxSuppression extractorMin = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 0.001f, 1, true,true,false));
-		NonMaxSuppression extractorMax = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 0.001f, 1, true,false,true));
+		NonMaxSuppression<QueueCorner> extractorMin = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 0.001f, 1, true, true, false));
+		NonMaxSuppression<QueueCorner> extractorMax = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 0.001f, 1, true, false, true));
 
-		GeneralFeatureDetector<GrayF32, GrayF32> detector =
-				new GeneralFeatureDetector<>(intensity, extractorMin, extractorMax, selector);
+		var detector = new GeneralFeatureDetector<GrayF32, GrayF32>(intensity, extractorMin, extractorMax, selector);
 		detector.process(new GrayF32(width, height), null, null, null, null, null);
 
 		// only features inside the image should be found
@@ -123,13 +115,11 @@ class TestGeneralFeatureDetector extends BoofStandardJUnit {
 		assertEquals(2, detector.getMinimums().size());
 	}
 
-	@Test
-	void testPositiveNoCandidates() {
-		HelperExtractor extractor = new HelperExtractor(false, true);
-		HelperIntensity intensity = new HelperIntensity(false, false, false);
+	@Test void positiveNoCandidates() {
+		var extractor = new HelperExtractor(false, true);
+		var intensity = new HelperIntensity(false, false, false);
 
-		GeneralFeatureDetector<GrayF32, GrayF32> detector =
-				new GeneralFeatureDetector<>(intensity, null,extractor, selector);
+		var detector = new GeneralFeatureDetector<GrayF32, GrayF32>(intensity, null, extractor, selector);
 
 		detector.process(new GrayF32(width, height), null, null, null, null, null);
 
@@ -139,65 +129,59 @@ class TestGeneralFeatureDetector extends BoofStandardJUnit {
 		assertEquals(1, extractor.numTimesProcessed);
 	}
 
-	@Test void testPositiveCandidates() {
-		testPositiveCandidates(true,false);
-		testPositiveCandidates(false,true);
-		testPositiveCandidates(true,true);
+	@Test void positiveCandidates() {
+		positiveCandidates(true, false);
+		positiveCandidates(false, true);
+		positiveCandidates(true, true);
 	}
 
-	public void testPositiveCandidates( boolean min , boolean max ) {
-		HelperIntensity intensity = new HelperIntensity(false, false, true);
+	public void positiveCandidates( boolean min, boolean max ) {
+		var intensity = new HelperIntensity(false, false, true);
 		intensity.minimums = min;
 		intensity.maximums = max;
 		HelperExtractor extractorMin = null;
-		if( min ) {
+		if (min) {
 			extractorMin = new HelperExtractor(true, true);
 			extractorMin.minimums = true;
 			extractorMin.maximums = false;
 		}
 		HelperExtractor extractorMax = null;
-		if( max ) {
+		if (max) {
 			extractorMax = new HelperExtractor(true, true);
 			extractorMax.minimums = false;
 			extractorMax.maximums = true;
 		}
-		GeneralFeatureDetector<GrayF32, GrayF32> detector =
-				new GeneralFeatureDetector<>(intensity, extractorMin, extractorMax, selector);
+		var detector = new GeneralFeatureDetector<GrayF32, GrayF32>(intensity, extractorMin, extractorMax, selector);
 
 		detector.process(new GrayF32(width, height), null, null, null, null, null);
 
 		//  since candidates returns null if not supported it is still ok for it to be invoked
-		if( min )
+		if (min)
 			assertEquals(1, intensity.candidatesMinCalled);
-		if( max )
+		if (max)
 			assertEquals(1, intensity.candidatesMaxCalled);
 		assertEquals(1, intensity.processCalled);
-		if( min )
+		if (min)
 			assertEquals(1, extractorMin.numTimesProcessed);
-		if( max )
+		if (max)
 			assertEquals(1, extractorMax.numTimesProcessed);
 	}
 
-	/**
-	 * If an extractor requires candidates the intensity image needs to provide them.
-	 */
+	/// If an extractor requires candidates the intensity image needs to provide them.
 	@Test void candidatesMissMatch() {
-		HelperIntensity intensity = new HelperIntensity(false, false, false);
-		HelperExtractor extractor = new HelperExtractor(true, true);
+		var intensity = new HelperIntensity(false, false, false);
+		var extractor = new HelperExtractor(true, true);
 
 		assertThrows(IllegalArgumentException.class,
-				()->new GeneralFeatureDetector<>(intensity, null,extractor, selector));
+				() -> new GeneralFeatureDetector<>(intensity, null, extractor, selector));
 	}
 
-	/**
-	 * If n-best is not used then the corner list from the extractor should be returned.
-	 */
-	@Test void testNoNBestSelect() {
-		HelperIntensity intensity = new HelperIntensity(false, false, true);
-		HelperExtractor extractor = new HelperExtractor(true, true);
+	/// If n-best is not used then the corner list from the extractor should be returned.
+	@Test void noNBestSelect() {
+		var intensity = new HelperIntensity(false, false, true);
+		var extractor = new HelperExtractor(true, true);
 
-		GeneralFeatureDetector<GrayF32, GrayF32> detector =
-				new GeneralFeatureDetector<>(intensity, null,extractor, selector);
+		var detector = new GeneralFeatureDetector<GrayF32, GrayF32>(intensity, null, extractor, selector);
 
 		detector.process(new GrayF32(width, height), null, null, null, null, null);
 
@@ -205,15 +189,12 @@ class TestGeneralFeatureDetector extends BoofStandardJUnit {
 		assertEquals(2, detector.getMaximums().size());
 	}
 
-	/**
-	 * See if n-best is used to prune features.
-	 */
-	@Test void testWithNBestSelect() {
-		HelperIntensity intensity = new HelperIntensity(false, false, true);
-		HelperExtractor extractor = new HelperExtractor(true, true);
+	/// See if n-best is used to prune features.
+	@Test void withNBestSelect() {
+		var intensity = new HelperIntensity(false, false, true);
+		var extractor = new HelperExtractor(true, true);
 
-		GeneralFeatureDetector<GrayF32, GrayF32> detector =
-				new GeneralFeatureDetector<>(intensity, null,extractor, selector);
+		var detector = new GeneralFeatureDetector<>(intensity, null, extractor, selector);
 		detector.setFeatureLimit(1);
 
 		detector.process(new GrayF32(width, height), null, null, null, null, null);
@@ -222,15 +203,12 @@ class TestGeneralFeatureDetector extends BoofStandardJUnit {
 		assertEquals(1, detector.getMaximums().size());
 	}
 
-	/**
-	 * If n-best wasn't initially being used it should now be used
-	 */
+	/// If n-best wasn't initially being used it should now be used
 	@Test void setBestNumber() {
-		HelperIntensity intensity = new HelperIntensity(false, false, true);
-		HelperExtractor extractor = new HelperExtractor(true, true);
+		var intensity = new HelperIntensity(false, false, true);
+		var extractor = new HelperExtractor(true, true);
 
-		GeneralFeatureDetector<GrayF32, GrayF32> detector =
-				new GeneralFeatureDetector<>(intensity,null, extractor, selector);
+		var detector = new GeneralFeatureDetector<GrayF32, GrayF32>(intensity, null, extractor, selector);
 
 		detector.process(new GrayF32(width, height), null, null, null, null, null);
 
@@ -246,23 +224,20 @@ class TestGeneralFeatureDetector extends BoofStandardJUnit {
 		assertEquals(2, detector.getMaximums().size());
 	}
 
-	/**
-	 * Makes sure flags that indicate the presence of local minimums and maximums are handled correctly
-	 */
+	/// Makes sure flags that indicate the presence of local minimums and maximums are handled correctly
 	@Test void handleLocalMinMaxFlags() {
-		HelperIntensity intensity = new HelperIntensity(false, false, true);
-		HelperExtractor extractorMin = new HelperExtractor(true, true);
+		var intensity = new HelperIntensity(false, false, true);
+		var extractorMin = new HelperExtractor(true, true);
 		extractorMin.minimums = true;
 		extractorMin.maximums = false;
-		HelperExtractor extractorMax = new HelperExtractor(true, true);
+		var extractorMax = new HelperExtractor(true, true);
 		extractorMax.minimums = false;
 		extractorMax.maximums = true;
 
 		intensity.minimums = false;
 		intensity.maximums = false;
 
-		GeneralFeatureDetector<GrayF32, GrayF32> detector =
-				new GeneralFeatureDetector<>(intensity, extractorMin, extractorMax, selector);
+		var detector = new GeneralFeatureDetector<GrayF32, GrayF32>(intensity, extractorMin, extractorMax, selector);
 
 		assertFalse(detector.isDetectMinimums());
 		assertFalse(detector.isDetectMaximums());
@@ -284,8 +259,7 @@ class TestGeneralFeatureDetector extends BoofStandardJUnit {
 		assertTrue(detector.isDetectMaximums());
 	}
 
-	public static class HelperExtractor implements NonMaxSuppression {
-
+	public static class HelperExtractor implements NonMaxSuppression<QueueCorner> {
 		boolean usesCandidates;
 		boolean acceptsRequests;
 
@@ -294,77 +268,49 @@ class TestGeneralFeatureDetector extends BoofStandardJUnit {
 		public boolean minimums = false;
 		public boolean maximums = true;
 
-		public HelperExtractor(boolean usesCandidates, boolean acceptsRequests) {
+		public HelperExtractor( boolean usesCandidates, boolean acceptsRequests ) {
 			this.usesCandidates = usesCandidates;
 			this.acceptsRequests = acceptsRequests;
 		}
 
-		@Override
-		public void process(GrayF32 intensity,
-							ListIntPoint2D candidateMin, ListIntPoint2D candidateMax,
-							QueueCorner foundMin, QueueCorner foundMax) {
+		@Override public void storageAccess( Add<QueueCorner> opAdd, Reset<QueueCorner> opReset ) {}
+
+		@Override public void process( GrayF32 intensity,
+									   ListIntPoint2D candidateMin, ListIntPoint2D candidateMax,
+									   QueueCorner foundMin, QueueCorner foundMax ) {
 			numTimesProcessed++;
 
-			if( foundMin != null ) {
+			if (foundMin != null) {
 				foundMin.append(1, 1);
 				foundMin.append(2, 2);
 			}
-			if( foundMax != null ) {
+			if (foundMax != null) {
 				foundMax.append(1, 1);
 				foundMax.append(2, 2);
 			}
 		}
 
-		@Override
-		public boolean getUsesCandidates() {
-			return usesCandidates;
-		}
+		@Override public boolean getUsesCandidates() {return usesCandidates;}
 
-		@Override
-		public float getThresholdMinimum() {
-			return 0;
-		}
+		@Override public float getThresholdMinimum() {return 0;}
 
-		@Override
-		public float getThresholdMaximum() {
-			return 0;
-		}
+		@Override public float getThresholdMaximum() {return 0;}
 
-		@Override
-		public void setThresholdMinimum(float threshold) {
-		}
+		@Override public void setThresholdMinimum( float threshold ) {}
 
-		@Override
-		public void setThresholdMaximum(float threshold) {
-		}
+		@Override public void setThresholdMaximum( float threshold ) {}
 
-		@Override
-		public int getIgnoreBorder() {
-			return 0;
-		}
+		@Override public int getIgnoreBorder() {return 0;}
 
-		@Override
-		public void setIgnoreBorder(int border) {
-		}
+		@Override public void setIgnoreBorder( int border ) {}
 
-		@Override
-		public void setSearchRadius(int radius) {
-		}
+		@Override public void setSearchRadius( int radius ) {}
 
-		@Override
-		public int getSearchRadius() {
-			return 0;
-		}
+		@Override public int getSearchRadius() {return 0;}
 
-		@Override
-		public boolean canDetectMinimums() {
-			return minimums;
-		}
+		@Override public boolean canDetectMinimums() {return minimums;}
 
-		@Override
-		public boolean canDetectMaximums() {
-			return maximums;
-		}
+		@Override public boolean canDetectMaximums() {return maximums;}
 	}
 
 	public class HelperIntensity implements GeneralFeatureIntensity<GrayF32, GrayF32> {
@@ -382,72 +328,43 @@ class TestGeneralFeatureDetector extends BoofStandardJUnit {
 
 		public GrayF32 img = new GrayF32(width, height);
 
-		public HelperIntensity(boolean requiresGradient, boolean requiresHessian, boolean hasCandidates) {
+		public HelperIntensity( boolean requiresGradient, boolean requiresHessian, boolean hasCandidates ) {
 			this.requiresGradient = requiresGradient;
 			this.requiresHessian = requiresHessian;
 			this.hasCandidates = hasCandidates;
 		}
 
 		@Override
-		public void process(GrayF32 image, GrayF32 derivX, GrayF32 derivY, GrayF32 derivXX, GrayF32 derivYY, GrayF32 derivXY) {
+		public void process( GrayF32 image, GrayF32 derivX, GrayF32 derivY, GrayF32 derivXX, GrayF32 derivYY, GrayF32 derivXY ) {
 			processCalled++;
 		}
 
-		@Override
-		public GrayF32 getIntensity() {
-			return img;
-		}
+		@Override public GrayF32 getIntensity() {return img;}
 
-		@Override
-		public ListIntPoint2D getCandidatesMin() {
+		@Override public ListIntPoint2D getCandidatesMin() {
 			candidatesMinCalled++;
 			return candidates;
 		}
 
-		@Override
-		public ListIntPoint2D getCandidatesMax() {
+		@Override public ListIntPoint2D getCandidatesMax() {
 			candidatesMaxCalled++;
 			return candidates;
 		}
 
-		@Override
-		public boolean getRequiresGradient() {
-			return requiresGradient;
-		}
+		@Override public boolean getRequiresGradient() {return requiresGradient;}
 
-		@Override
-		public boolean getRequiresHessian() {
-			return requiresHessian;
-		}
+		@Override public boolean getRequiresHessian() {return requiresHessian;}
 
-		@Override
-		public boolean hasCandidates() {
-			return hasCandidates;
-		}
+		@Override public boolean hasCandidates() {return hasCandidates;}
 
-		@Override
-		public int getIgnoreBorder() {
-			return ignoreBorder;
-		}
+		@Override public int getIgnoreBorder() {return ignoreBorder;}
 
-		@Override
-		public boolean localMaximums() {
-			return maximums;
-		}
+		@Override public boolean localMaximums() {return maximums;}
 
-		@Override
-		public Class<GrayF32> getImageType() {
-			return GrayF32.class;
-		}
+		@Override public Class<GrayF32> getImageType() {return GrayF32.class;}
 
-		@Override
-		public Class<GrayF32> getDerivType() {
-			return GrayF32.class;
-		}
+		@Override public Class<GrayF32> getDerivType() {return GrayF32.class;}
 
-		@Override
-		public boolean localMinimums() {
-			return minimums;
-		}
+		@Override public boolean localMinimums() {return minimums;}
 	}
 }

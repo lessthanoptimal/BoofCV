@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,44 +21,39 @@ package boofcv.alg.feature.detect.extract;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
+@SuppressWarnings({"rawtypes"})
 class TestNonMaxBlockSearchStrict extends BoofStandardJUnit {
 
-	@Test
-	void checkMax() {
-		GenericNonMaxBlockTests checks = new GenericNonMaxBlockTests(true,new NonMaxBlockSearchStrict.Max()){};
+	@Test void checkMax() {
+		var checks = new GenericNonMaxBlockTests(true,new NonMaxBlockSearchStrict.Max()){};
 		checks.allStandard();
 	}
 
-	@Test
-	void checkMin() {
-		GenericNonMaxBlockTests checks = new GenericNonMaxBlockTests(true,new NonMaxBlockSearchStrict.Min()){};
+	@Test void checkMin() {
+		var checks = new GenericNonMaxBlockTests(true,new NonMaxBlockSearchStrict.Min()){};
 		checks.allStandard();
 	}
 
-	@Test
-	void checkMinMax() {
-		GenericNonMaxBlockTests checks = new GenericNonMaxBlockTests(true,new NonMaxBlockSearchStrict.MinMax()){};
+	@Test void checkMinMax() {
+		var checks = new GenericNonMaxBlockTests(true,new NonMaxBlockSearchStrict.MinMax()){};
 		checks.allStandard();
 	}
 
-	@Test
-	void checkMax_MT() {
-		GenericNonMaxBlockTests checks = new GenericNonMaxBlockTests(true,new NonMaxBlockSearchStrict.Max(),true){};
+	@Test void checkMax_MT() {
+		var checks = new GenericNonMaxBlockTests(true,new NonMaxBlockSearchStrict.Max(),true){};
 		// increase image size to stress threads more and make it more likely to be processed out of order
 		checks.setImageShape(100,120);
 		checks.allStandard();
 	}
 
-	@Test
-	void checkMin_MT() {
+	@Test void checkMin_MT() {
 		GenericNonMaxBlockTests checks = new GenericNonMaxBlockTests(true,new NonMaxBlockSearchStrict.Min(),true){};
 		// increase image size to stress threads more and make it more likely to be processed out of order
 		checks.setImageShape(100,120);
 		checks.allStandard();
 	}
 
-	@Test
-	void checkMinMax_MT() {
+	@Test void checkMinMax_MT() {
 		GenericNonMaxBlockTests checks = new GenericNonMaxBlockTests(true,new NonMaxBlockSearchStrict.MinMax(),true){};
 		// increase image size to stress threads more and make it more likely to be processed out of order
 		checks.setImageShape(100,120);

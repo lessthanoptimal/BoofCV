@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,7 +35,7 @@ public abstract class GeneralNonMaxSuppressionChecks extends BoofStandardJUnit {
 	int width = 20;
 	int height = 25;
 
-	NonMaxSuppression alg;
+	NonMaxSuppression<QueueCorner> alg;
 
 	GrayF32 image = new GrayF32(width,height);
 	ListIntPoint2D candidatesMin = new ListIntPoint2D();
@@ -44,7 +44,7 @@ public abstract class GeneralNonMaxSuppressionChecks extends BoofStandardJUnit {
 	QueueCorner foundMax = new QueueCorner(10);
 	QueueCorner foundMin = new QueueCorner(10);
 
-	public abstract NonMaxSuppression createAlg();
+	public abstract NonMaxSuppression<QueueCorner> createAlg();
 
 	public void testAll() {
 		getUsesCandidates();
@@ -59,6 +59,7 @@ public abstract class GeneralNonMaxSuppressionChecks extends BoofStandardJUnit {
 	public void init() {
 		alg = createAlg();
 
+		alg.storageAccess(QueueCorner::append, QueueCorner::reset);
 		alg.setIgnoreBorder(0);
 		alg.setSearchRadius(1);
 		alg.setThresholdMinimum(-5);
