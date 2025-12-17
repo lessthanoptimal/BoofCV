@@ -183,7 +183,7 @@ public class AverageDownSampleOps {
 	}
 
 	/// Downsample the horizontal axis only. Output must be [GrayF32] or [GrayF64], depending on image type.
-	public static void horizontal( ImageGray input, boolean centered, ImageGray output ) {
+	public static void horizontal( ImageBase<?> input, boolean centered, ImageBase<?> output ) {
 		if (ImageGray.class.isAssignableFrom(input.getClass())) {
 			if (BoofConcurrency.USE_CONCURRENT) {
 				if (input instanceof GrayU8) {
@@ -211,13 +211,23 @@ public class AverageDownSampleOps {
 				}
 			}
 		} else if (Planar.class.isAssignableFrom(input.getClass())) {
+			Planar pinput = (Planar)input;
+			Planar poutput = (Planar)output;
+
+			// Make sure the number of bands are the same
+			poutput.reshape(poutput.width, poutput.height, pinput.getNumBands());
+
+			for (int idxBand = 0; idxBand < pinput.getNumBands(); idxBand++) {
+				horizontal(pinput.getBand(idxBand), centered, poutput.getBand(idxBand));
+			}
+		} else {
 			throw new IllegalArgumentException("Image type not supported yet");
 		}
 	}
 
 	/// Downsample vertical axis only. Input must be [GrayF32] or [GrayF64]. The workspace is only
 	/// used with integer output image types
-	public static void vertical( ImageBase input, boolean centered, ImageBase output,
+	public static void vertical( ImageBase<?> input, boolean centered, ImageBase<?> output,
 								 @Nullable GrowArray<DogArray_F32> workspaces ) {
 		if (workspaces == null && output.getImageType().getDataType().isInteger()) {
 			workspaces = new GrowArray<>(DogArray_F32::new);
@@ -250,6 +260,16 @@ public class AverageDownSampleOps {
 				}
 			}
 		} else if (Planar.class.isAssignableFrom(input.getClass())) {
+			Planar pinput = (Planar)input;
+			Planar poutput = (Planar)output;
+
+			// Make sure the number of bands are the same
+			poutput.reshape(poutput.width, poutput.height, pinput.getNumBands());
+
+			for (int idxBand = 0; idxBand < pinput.getNumBands(); idxBand++) {
+				vertical(pinput.getBand(idxBand), centered, poutput.getBand(idxBand), workspaces);
+			}
+		} else {
 			throw new IllegalArgumentException("Image type not supported yet");
 		}
 	}
