@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.filter.convolve;
 
 import boofcv.alg.filter.convolve.normalized.ConvolveNormalizedNaive_SB;
+import boofcv.concurrency.BoofConcurrency;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
@@ -36,11 +37,38 @@ import java.util.concurrent.TimeUnit;
 @Fork(value = 1)
 @SuppressWarnings({"UnusedDeclaration"})
 public class BenchmarkConvolveNormalize extends CommonBenchmarkConvolve_SB {
-//	@Param({"1", "4"})
-	@Param({"5"})
+	// One unrolled size and one arbitrary size
+	@Param({"3", "50"})
 	public int radius;
 
-	@Setup public void setup() {setup(radius);}
+	@Param({"true", "false"})
+	boolean concurrent;
+
+	@Setup public void setup() {
+		// larger images so that results are measurable
+		width = 3000;
+		height = 2000;
+		BoofConcurrency.USE_CONCURRENT = concurrent;
+		setup(radius);
+	}
+
+	// Need to use smaller images for 2D kernels
+	@State(Scope.Thread)
+	public static class State2D {
+		@Param({"3", "20"})
+		public int radius;
+
+		@Param({"true", "false"})
+		boolean concurrent;
+
+		@Setup(Level.Trial)
+		public void setup() {
+			CommonBenchmarkConvolve_SB.width = 800;
+			CommonBenchmarkConvolve_SB.height = 600;
+			BoofConcurrency.USE_CONCURRENT = concurrent;
+			CommonBenchmarkConvolve_SB.setup(radius);
+		}
+	}
 
 	@Benchmark public void Horizontal_Naive_F32() {
 		ConvolveNormalizedNaive_SB.horizontal(kernelF32, input_F32, out_F32);
@@ -68,6 +96,14 @@ public class BenchmarkConvolveNormalize extends CommonBenchmarkConvolve_SB {
 
 	@Benchmark public void Vertical_I16() {
 		ConvolveImageNormalized.vertical(kernelI32,input_U16,out_S16);
+	}
+
+	@Benchmark public void Convolve2D_F32(State2D s) {
+		ConvolveImageNormalized.convolve(kernel2D_F32, input_F32, out_F32);
+	}
+
+	@Benchmark public void Convolve2D_I8(State2D s) {
+		ConvolveImageNormalized.convolve(kernel2D_I32, input_U8, out_U8);
 	}
 
 	public static void main( String[] args ) throws RunnerException {
