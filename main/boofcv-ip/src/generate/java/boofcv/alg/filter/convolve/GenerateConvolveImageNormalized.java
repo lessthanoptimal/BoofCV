@@ -60,7 +60,11 @@ public class GenerateConvolveImageNormalized extends CodeGeneratorBase {
 				"import boofcv.struct.border.*;\n" +
 				"import boofcv.struct.image.*;\n" +
 				"import boofcv.alg.filter.convolve.normalized.*;\n" +
-				"import boofcv.alg.filter.kernel.KernelMath;\n");
+				"import boofcv.alg.filter.kernel.KernelMath;\n" +
+				"import org.ddogleg.struct.DogArray_I32;\n" +
+				"import org.ddogleg.struct.DogArray_F32;\n" +
+				"import org.ddogleg.struct.DogArray_F64;\n" +
+				"import pabeles.concurrency.GrowArray;\n");
 		out.println();
 		out.print("/**\n" +
 				" * <p>\n" +
@@ -71,7 +75,7 @@ public class GenerateConvolveImageNormalized extends CodeGeneratorBase {
 				" *\n" +
 				" * @author Peter Abeles\n" +
 				" */\n" +
-				"@SuppressWarnings({\"ForLoopReplaceableByForEach\", \"unchecked\"})\n" +
+				"@SuppressWarnings({\"ForLoopReplaceableByForEach\", \"rawtypes\"})\n" +
 				"public class " + className + " {\n\n");
 	}
 
@@ -113,11 +117,20 @@ public class GenerateConvolveImageNormalized extends CodeGeneratorBase {
 
 		String kernelTypeName = "Kernel" + dimen + "_" + kernelType;
 
+		boolean reqArrWork = name.equals("vertical") && singleBand;
+
+		String declareWorkspace = reqArrWork ?
+				"\t\t\tvar workspace = new GrowArray<>(DogArray_" + (kernelType.replace("S", "I")) + "::new);\n"
+				: "";
+
 		String overrideName = name.equals("convolve") ? "Convolve" : name.equals("horizontal") ? "Horizontal" : "Vertical";
-		String workArray = (name.equals("convolve") || (name.equals("vertical") && isInteger)) && singleBand ? ", null" : "";
+		String workArray = switch (name) {
+			case "convolve" -> singleBand ? ", null" : "";
+			case "vertical" -> singleBand ? ", workspace" : "";
+			default -> "";
+		};
 
 		String borderArgument = border ? borderType + " bsrc" : "";
-
 		String commentsOverride = border ? "//" : "";
 
 		String justBorder;
@@ -127,7 +140,7 @@ public class GenerateConvolveImageNormalized extends CodeGeneratorBase {
 			else
 				justBorder = "\t\t\tConvolveJustBorder_General_SB." + name + "(kernel, bsrc, dst);\n";
 		} else {
-			String workspace = name.equals("vertical") ? ", null" : "";
+			String workspace = reqArrWork ? ", workspace" : "";
 			if (singleBand) {
 				justBorder = "\t\t\tif (BoofConcurrency.USE_CONCURRENT) {\n" +
 						"\t\t\t\tConvolveNormalized_JustBorder_SB_MT." + name + "(kernel, src, dst" + workspace + ");\n" +
@@ -172,6 +185,7 @@ public class GenerateConvolveImageNormalized extends CodeGeneratorBase {
 			out.print("\t\tif (" + insideTest + ") {\n" +
 					"\t\t\tConvolveNormalizedNaive_" + suffice + "." + name + "(kernel, src, dst" + bsrc + ");\n" +
 					"\t\t} else {\n" +
+					declareWorkspace +
 					"\t\t\tConvolveImageNoBorder." + name + "(kernel, src, dst, kernel.computeSum()" + workArray + ");\n" +
 					justBorder +
 					"\t\t}\n");
@@ -185,6 +199,7 @@ public class GenerateConvolveImageNormalized extends CodeGeneratorBase {
 					"\t\t\t\tkernel = k;\n" +
 					"\t\t\t}\n" +
 					"\t\t\tConvolveImageNoBorder." + name + "(kernel, src, dst);\n" +
+					declareWorkspace +
 					justBorder +
 					"\t\t}\n");
 		}

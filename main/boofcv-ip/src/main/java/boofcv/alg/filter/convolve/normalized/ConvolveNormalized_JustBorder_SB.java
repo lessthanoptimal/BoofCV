@@ -127,27 +127,29 @@ public class ConvolveNormalized_JustBorder_SB {
 
 		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, input.width, 20, workspaces, (work, x0, x1) -> {
 		final int x0 = 0, x1 = input.width;
+		final int countX = x1 - x0;
 		float[] totals = BoofMiscOps.checkDeclare(work, x1 - x0, false);
+		// NOTE: for floating point images this workspace isn't needed. Output image can be used instead
 
 		for (int y = 0; y < offsetL; y++) {
 			int indexInRow = input.startIndex + x0;
 			final int kStart = offsetL - y;
 			float w = dataKer[kStart];
 			float weight = w;
-			for (int x = x0, indexIn = indexInRow; x < x1; x++) {
-				totals[x - x0] = (dataSrc[indexIn++])*w;
+			for (int x = 0, indexIn = indexInRow; x < countX; x++) {
+				totals[x] = (dataSrc[indexIn++])*w;
 			}
 			for (int k = kStart + 1; k < kernelWidth; k++) {
 				indexInRow += input.stride;
 				w = dataKer[k];
 				weight += w;
-				for (int x = x0, indexIn = indexInRow; x < x1; x++) {
-					totals[x - x0] += (dataSrc[indexIn++])*w;
+				for (int x = 0, indexIn = indexInRow; x < countX; x++) {
+					totals[x] += (dataSrc[indexIn++])*w;
 				}
 			}
 			int indexOut = output.startIndex + x0 + y*output.stride;
-			for (int x = x0; x < x1; x++) {
-				dataDst[indexOut++] = (totals[x - x0]/weight);
+			for (int x = 0; x < countX; x++) {
+				dataDst[indexOut++] = (totals[x]/weight);
 			}
 		}
 
@@ -156,20 +158,20 @@ public class ConvolveNormalized_JustBorder_SB {
 			final int kEnd = imgHeight - (y - offsetL);
 			float w = dataKer[0];
 			float weight = w;
-			for (int x = x0, indexIn = indexInRow; x < x1; x++) {
-				totals[x - x0] = (dataSrc[indexIn++])*w;
+			for (int x = 0, indexIn = indexInRow; x < countX; x++) {
+				totals[x] = (dataSrc[indexIn++])*w;
 			}
 			for (int k = 1; k < kEnd; k++) {
 				indexInRow += input.stride;
 				w = dataKer[k];
 				weight += w;
-				for (int x = x0, indexIn = indexInRow; x < x1; x++) {
-					totals[x - x0] += (dataSrc[indexIn++])*w;
+				for (int x = 0, indexIn = indexInRow; x < countX; x++) {
+					totals[x] += (dataSrc[indexIn++])*w;
 				}
 			}
 			int indexOut = output.startIndex + x0 + y*output.stride;
-			for (int x = x0; x < x1; x++) {
-				dataDst[indexOut++] = (totals[x - x0]/weight);
+			for (int x = 0; x < countX; x++) {
+				dataDst[indexOut++] = (totals[x]/weight);
 			}
 		}
 		//CONCURRENT_INLINE });
@@ -192,7 +194,7 @@ public class ConvolveNormalized_JustBorder_SB {
 		for (int y = 0; y < height; y++) {
 
 			int minI = y >= offsetL ? -offsetL : -y;
-			int maxI = y < height - offsetR ?  offsetR : height - y - 1;
+			int maxI = y < height - offsetR ? offsetR : height - y - 1;
 
 			int indexDst = output.startIndex + y*output.stride;
 
@@ -215,7 +217,7 @@ public class ConvolveNormalized_JustBorder_SB {
 				dataDst[indexDst++] = (total/weight);
 			}
 
-			indexDst = output.startIndex + y* output.stride + width-offsetR;
+			indexDst = output.startIndex + y* output.stride + width - offsetR;
 			for (int x = width - offsetR; x < width; x++) {
 
 				int maxJ = width - x - 1;
@@ -245,13 +247,13 @@ public class ConvolveNormalized_JustBorder_SB {
 
 			int indexDst = output.startIndex + y*output.stride + offsetL;
 
-			for( int x = offsetL; x < width - offsetR; x++ ) {
+			for (int x = offsetL; x < width - offsetR; x++) {
 
 				float total = 0;
 				float weight = 0;
 
 				for (int i = -y; i <= offsetR; i++) {
-					int indexSrc = input.startIndex + (y + i)* input.stride + x;
+					int indexSrc = input.startIndex + (y + i)*input.stride + x;
 					int indexKer = (i + offsetL)*kernelWidth;
 
 					for (int j = -offsetL; j <= offsetR; j++) {
@@ -273,12 +275,11 @@ public class ConvolveNormalized_JustBorder_SB {
 			int indexDst = output.startIndex + y*output.stride + offsetL;
 
 			for (int x = offsetL; x < width - offsetR; x++) {
-
 				float total = 0;
 				float weight = 0;
 
 				for (int i = -offsetL; i <= maxI; i++) {
-					int indexSrc = input.startIndex + (y + i)*input.stride+x;
+					int indexSrc = input.startIndex + (y + i)*input.stride + x;
 					int indexKer = (i + offsetL)*kernelWidth;
 
 					for (int j = -offsetL; j <= offsetR; j++) {
@@ -374,27 +375,29 @@ public class ConvolveNormalized_JustBorder_SB {
 
 		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, input.width, 20, workspaces, (work, x0, x1) -> {
 		final int x0 = 0, x1 = input.width;
+		final int countX = x1 - x0;
 		double[] totals = BoofMiscOps.checkDeclare(work, x1 - x0, false);
+		// NOTE: for floating point images this workspace isn't needed. Output image can be used instead
 
 		for (int y = 0; y < offsetL; y++) {
 			int indexInRow = input.startIndex + x0;
 			final int kStart = offsetL - y;
 			double w = dataKer[kStart];
 			double weight = w;
-			for (int x = x0, indexIn = indexInRow; x < x1; x++) {
-				totals[x - x0] = (dataSrc[indexIn++])*w;
+			for (int x = 0, indexIn = indexInRow; x < countX; x++) {
+				totals[x] = (dataSrc[indexIn++])*w;
 			}
 			for (int k = kStart + 1; k < kernelWidth; k++) {
 				indexInRow += input.stride;
 				w = dataKer[k];
 				weight += w;
-				for (int x = x0, indexIn = indexInRow; x < x1; x++) {
-					totals[x - x0] += (dataSrc[indexIn++])*w;
+				for (int x = 0, indexIn = indexInRow; x < countX; x++) {
+					totals[x] += (dataSrc[indexIn++])*w;
 				}
 			}
 			int indexOut = output.startIndex + x0 + y*output.stride;
-			for (int x = x0; x < x1; x++) {
-				dataDst[indexOut++] = (totals[x - x0]/weight);
+			for (int x = 0; x < countX; x++) {
+				dataDst[indexOut++] = (totals[x]/weight);
 			}
 		}
 
@@ -403,20 +406,20 @@ public class ConvolveNormalized_JustBorder_SB {
 			final int kEnd = imgHeight - (y - offsetL);
 			double w = dataKer[0];
 			double weight = w;
-			for (int x = x0, indexIn = indexInRow; x < x1; x++) {
-				totals[x - x0] = (dataSrc[indexIn++])*w;
+			for (int x = 0, indexIn = indexInRow; x < countX; x++) {
+				totals[x] = (dataSrc[indexIn++])*w;
 			}
 			for (int k = 1; k < kEnd; k++) {
 				indexInRow += input.stride;
 				w = dataKer[k];
 				weight += w;
-				for (int x = x0, indexIn = indexInRow; x < x1; x++) {
-					totals[x - x0] += (dataSrc[indexIn++])*w;
+				for (int x = 0, indexIn = indexInRow; x < countX; x++) {
+					totals[x] += (dataSrc[indexIn++])*w;
 				}
 			}
 			int indexOut = output.startIndex + x0 + y*output.stride;
-			for (int x = x0; x < x1; x++) {
-				dataDst[indexOut++] = (totals[x - x0]/weight);
+			for (int x = 0; x < countX; x++) {
+				dataDst[indexOut++] = (totals[x]/weight);
 			}
 		}
 		//CONCURRENT_INLINE });
@@ -439,7 +442,7 @@ public class ConvolveNormalized_JustBorder_SB {
 		for (int y = 0; y < height; y++) {
 
 			int minI = y >= offsetL ? -offsetL : -y;
-			int maxI = y < height - offsetR ?  offsetR : height - y - 1;
+			int maxI = y < height - offsetR ? offsetR : height - y - 1;
 
 			int indexDst = output.startIndex + y*output.stride;
 
@@ -462,7 +465,7 @@ public class ConvolveNormalized_JustBorder_SB {
 				dataDst[indexDst++] = (total/weight);
 			}
 
-			indexDst = output.startIndex + y* output.stride + width-offsetR;
+			indexDst = output.startIndex + y* output.stride + width - offsetR;
 			for (int x = width - offsetR; x < width; x++) {
 
 				int maxJ = width - x - 1;
@@ -492,13 +495,13 @@ public class ConvolveNormalized_JustBorder_SB {
 
 			int indexDst = output.startIndex + y*output.stride + offsetL;
 
-			for( int x = offsetL; x < width - offsetR; x++ ) {
+			for (int x = offsetL; x < width - offsetR; x++) {
 
 				double total = 0;
 				double weight = 0;
 
 				for (int i = -y; i <= offsetR; i++) {
-					int indexSrc = input.startIndex + (y + i)* input.stride + x;
+					int indexSrc = input.startIndex + (y + i)*input.stride + x;
 					int indexKer = (i + offsetL)*kernelWidth;
 
 					for (int j = -offsetL; j <= offsetR; j++) {
@@ -520,12 +523,11 @@ public class ConvolveNormalized_JustBorder_SB {
 			int indexDst = output.startIndex + y*output.stride + offsetL;
 
 			for (int x = offsetL; x < width - offsetR; x++) {
-
 				double total = 0;
 				double weight = 0;
 
 				for (int i = -offsetL; i <= maxI; i++) {
-					int indexSrc = input.startIndex + (y + i)*input.stride+x;
+					int indexSrc = input.startIndex + (y + i)*input.stride + x;
 					int indexKer = (i + offsetL)*kernelWidth;
 
 					for (int j = -offsetL; j <= offsetR; j++) {
@@ -571,7 +573,7 @@ public class ConvolveNormalized_JustBorder_SB {
 				int kernelIdx0 = kernelWidth - (offsetR + 1 + j - jStart);
 				weight += dataKer[kernelIdx0];
 				for (int k = kernelIdx0; k < kernelWidth; k++) {
-					total += (dataSrc[indexSrc++]& 0xFF)*dataKer[k];
+					total += (dataSrc[indexSrc++] & 0xFF)*dataKer[k];
 				}
 				dataDst[indexDest++] = (byte)((total + weight/2)/weight);
 			}
@@ -594,7 +596,7 @@ public class ConvolveNormalized_JustBorder_SB {
 				final int kEnd = jEnd - indexSrc;
 
 				for (int k = 0; k < kEnd; k++) {
-					total += (dataSrc[indexSrc++]& 0xFF)*dataKer[k];
+					total += (dataSrc[indexSrc++] & 0xFF)*dataKer[k];
 				}
 				weight -= dataKer[kEnd];
 				dataDst[indexDest++] = (byte)((total + weight/2)/weight);
@@ -621,27 +623,29 @@ public class ConvolveNormalized_JustBorder_SB {
 
 		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, input.width, 20, workspaces, (work, x0, x1) -> {
 		final int x0 = 0, x1 = input.width;
+		final int countX = x1 - x0;
 		int[] totals = BoofMiscOps.checkDeclare(work, x1 - x0, false);
+		// NOTE: for floating point images this workspace isn't needed. Output image can be used instead
 
 		for (int y = 0; y < offsetL; y++) {
 			int indexInRow = input.startIndex + x0;
 			final int kStart = offsetL - y;
 			int w = dataKer[kStart];
 			int weight = w;
-			for (int x = x0, indexIn = indexInRow; x < x1; x++) {
-				totals[x - x0] = (dataSrc[indexIn++]& 0xFF)*w;
+			for (int x = 0, indexIn = indexInRow; x < countX; x++) {
+				totals[x] = (dataSrc[indexIn++] & 0xFF)*w;
 			}
 			for (int k = kStart + 1; k < kernelWidth; k++) {
 				indexInRow += input.stride;
 				w = dataKer[k];
 				weight += w;
-				for (int x = x0, indexIn = indexInRow; x < x1; x++) {
-					totals[x - x0] += (dataSrc[indexIn++]& 0xFF)*w;
+				for (int x = 0, indexIn = indexInRow; x < countX; x++) {
+					totals[x] += (dataSrc[indexIn++] & 0xFF)*w;
 				}
 			}
 			int indexOut = output.startIndex + x0 + y*output.stride;
-			for (int x = x0; x < x1; x++) {
-				dataDst[indexOut++] = (byte)((totals[x - x0] + weight/2)/weight);
+			for (int x = 0; x < countX; x++) {
+				dataDst[indexOut++] = (byte)((totals[x] + weight/2)/weight);
 			}
 		}
 
@@ -650,20 +654,20 @@ public class ConvolveNormalized_JustBorder_SB {
 			final int kEnd = imgHeight - (y - offsetL);
 			int w = dataKer[0];
 			int weight = w;
-			for (int x = x0, indexIn = indexInRow; x < x1; x++) {
-				totals[x - x0] = (dataSrc[indexIn++]& 0xFF)*w;
+			for (int x = 0, indexIn = indexInRow; x < countX; x++) {
+				totals[x] = (dataSrc[indexIn++] & 0xFF)*w;
 			}
 			for (int k = 1; k < kEnd; k++) {
 				indexInRow += input.stride;
 				w = dataKer[k];
 				weight += w;
-				for (int x = x0, indexIn = indexInRow; x < x1; x++) {
-					totals[x - x0] += (dataSrc[indexIn++]& 0xFF)*w;
+				for (int x = 0, indexIn = indexInRow; x < countX; x++) {
+					totals[x] += (dataSrc[indexIn++] & 0xFF)*w;
 				}
 			}
 			int indexOut = output.startIndex + x0 + y*output.stride;
-			for (int x = x0; x < x1; x++) {
-				dataDst[indexOut++] = (byte)((totals[x - x0] + weight/2)/weight);
+			for (int x = 0; x < countX; x++) {
+				dataDst[indexOut++] = (byte)((totals[x] + weight/2)/weight);
 			}
 		}
 		//CONCURRENT_INLINE });
@@ -686,7 +690,7 @@ public class ConvolveNormalized_JustBorder_SB {
 		for (int y = 0; y < height; y++) {
 
 			int minI = y >= offsetL ? -offsetL : -y;
-			int maxI = y < height - offsetR ?  offsetR : height - y - 1;
+			int maxI = y < height - offsetR ? offsetR : height - y - 1;
 
 			int indexDst = output.startIndex + y*output.stride;
 
@@ -702,14 +706,14 @@ public class ConvolveNormalized_JustBorder_SB {
 					for (int j = -x; j <= offsetR; j++) {
 						int w = dataKer[indexKer + j + offsetL];
 						weight += w;
-						total += (dataSrc[indexSrc + j]& 0xFF)*w;
+						total += (dataSrc[indexSrc + j] & 0xFF)*w;
 					}
 				}
 
 				dataDst[indexDst++] = (byte)((total + weight/2)/weight);
 			}
 
-			indexDst = output.startIndex + y* output.stride + width-offsetR;
+			indexDst = output.startIndex + y* output.stride + width - offsetR;
 			for (int x = width - offsetR; x < width; x++) {
 
 				int maxJ = width - x - 1;
@@ -724,7 +728,7 @@ public class ConvolveNormalized_JustBorder_SB {
 					for (int j = -offsetL; j <= maxJ; j++) {
 						int w = dataKer[indexKer + j + offsetL];
 						weight += w;
-						total += (dataSrc[indexSrc + j]& 0xFF)*w;
+						total += (dataSrc[indexSrc + j] & 0xFF)*w;
 					}
 				}
 
@@ -739,19 +743,19 @@ public class ConvolveNormalized_JustBorder_SB {
 
 			int indexDst = output.startIndex + y*output.stride + offsetL;
 
-			for( int x = offsetL; x < width - offsetR; x++ ) {
+			for (int x = offsetL; x < width - offsetR; x++) {
 
 				int total = 0;
 				int weight = 0;
 
 				for (int i = -y; i <= offsetR; i++) {
-					int indexSrc = input.startIndex + (y + i)* input.stride + x;
+					int indexSrc = input.startIndex + (y + i)*input.stride + x;
 					int indexKer = (i + offsetL)*kernelWidth;
 
 					for (int j = -offsetL; j <= offsetR; j++) {
 						int w = dataKer[indexKer + j + offsetL];
 						weight += w;
-						total += (dataSrc[indexSrc + j]& 0xFF)*w;
+						total += (dataSrc[indexSrc + j] & 0xFF)*w;
 					}
 				}
 				dataDst[indexDst++] = (byte)((total + weight/2)/weight);
@@ -767,18 +771,17 @@ public class ConvolveNormalized_JustBorder_SB {
 			int indexDst = output.startIndex + y*output.stride + offsetL;
 
 			for (int x = offsetL; x < width - offsetR; x++) {
-
 				int total = 0;
 				int weight = 0;
 
 				for (int i = -offsetL; i <= maxI; i++) {
-					int indexSrc = input.startIndex + (y + i)*input.stride+x;
+					int indexSrc = input.startIndex + (y + i)*input.stride + x;
 					int indexKer = (i + offsetL)*kernelWidth;
 
 					for (int j = -offsetL; j <= offsetR; j++) {
 						int w = dataKer[indexKer + j + offsetL];
 						weight += w;
-						total += (dataSrc[indexSrc + j]& 0xFF)*w;
+						total += (dataSrc[indexSrc + j] & 0xFF)*w;
 					}
 				}
 				dataDst[indexDst++] = (byte)((total + weight/2)/weight);
@@ -868,27 +871,29 @@ public class ConvolveNormalized_JustBorder_SB {
 
 		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, input.width, 20, workspaces, (work, x0, x1) -> {
 		final int x0 = 0, x1 = input.width;
+		final int countX = x1 - x0;
 		int[] totals = BoofMiscOps.checkDeclare(work, x1 - x0, false);
+		// NOTE: for floating point images this workspace isn't needed. Output image can be used instead
 
 		for (int y = 0; y < offsetL; y++) {
 			int indexInRow = input.startIndex + x0;
 			final int kStart = offsetL - y;
 			int w = dataKer[kStart];
 			int weight = w;
-			for (int x = x0, indexIn = indexInRow; x < x1; x++) {
-				totals[x - x0] = (dataSrc[indexIn++])*w;
+			for (int x = 0, indexIn = indexInRow; x < countX; x++) {
+				totals[x] = (dataSrc[indexIn++])*w;
 			}
 			for (int k = kStart + 1; k < kernelWidth; k++) {
 				indexInRow += input.stride;
 				w = dataKer[k];
 				weight += w;
-				for (int x = x0, indexIn = indexInRow; x < x1; x++) {
-					totals[x - x0] += (dataSrc[indexIn++])*w;
+				for (int x = 0, indexIn = indexInRow; x < countX; x++) {
+					totals[x] += (dataSrc[indexIn++])*w;
 				}
 			}
 			int indexOut = output.startIndex + x0 + y*output.stride;
-			for (int x = x0; x < x1; x++) {
-				dataDst[indexOut++] = (short)((totals[x - x0] + weight/2)/weight);
+			for (int x = 0; x < countX; x++) {
+				dataDst[indexOut++] = (short)((totals[x] + weight/2)/weight);
 			}
 		}
 
@@ -897,20 +902,20 @@ public class ConvolveNormalized_JustBorder_SB {
 			final int kEnd = imgHeight - (y - offsetL);
 			int w = dataKer[0];
 			int weight = w;
-			for (int x = x0, indexIn = indexInRow; x < x1; x++) {
-				totals[x - x0] = (dataSrc[indexIn++])*w;
+			for (int x = 0, indexIn = indexInRow; x < countX; x++) {
+				totals[x] = (dataSrc[indexIn++])*w;
 			}
 			for (int k = 1; k < kEnd; k++) {
 				indexInRow += input.stride;
 				w = dataKer[k];
 				weight += w;
-				for (int x = x0, indexIn = indexInRow; x < x1; x++) {
-					totals[x - x0] += (dataSrc[indexIn++])*w;
+				for (int x = 0, indexIn = indexInRow; x < countX; x++) {
+					totals[x] += (dataSrc[indexIn++])*w;
 				}
 			}
 			int indexOut = output.startIndex + x0 + y*output.stride;
-			for (int x = x0; x < x1; x++) {
-				dataDst[indexOut++] = (short)((totals[x - x0] + weight/2)/weight);
+			for (int x = 0; x < countX; x++) {
+				dataDst[indexOut++] = (short)((totals[x] + weight/2)/weight);
 			}
 		}
 		//CONCURRENT_INLINE });
@@ -933,7 +938,7 @@ public class ConvolveNormalized_JustBorder_SB {
 		for (int y = 0; y < height; y++) {
 
 			int minI = y >= offsetL ? -offsetL : -y;
-			int maxI = y < height - offsetR ?  offsetR : height - y - 1;
+			int maxI = y < height - offsetR ? offsetR : height - y - 1;
 
 			int indexDst = output.startIndex + y*output.stride;
 
@@ -956,7 +961,7 @@ public class ConvolveNormalized_JustBorder_SB {
 				dataDst[indexDst++] = (short)((total + weight/2)/weight);
 			}
 
-			indexDst = output.startIndex + y* output.stride + width-offsetR;
+			indexDst = output.startIndex + y* output.stride + width - offsetR;
 			for (int x = width - offsetR; x < width; x++) {
 
 				int maxJ = width - x - 1;
@@ -986,13 +991,13 @@ public class ConvolveNormalized_JustBorder_SB {
 
 			int indexDst = output.startIndex + y*output.stride + offsetL;
 
-			for( int x = offsetL; x < width - offsetR; x++ ) {
+			for (int x = offsetL; x < width - offsetR; x++) {
 
 				int total = 0;
 				int weight = 0;
 
 				for (int i = -y; i <= offsetR; i++) {
-					int indexSrc = input.startIndex + (y + i)* input.stride + x;
+					int indexSrc = input.startIndex + (y + i)*input.stride + x;
 					int indexKer = (i + offsetL)*kernelWidth;
 
 					for (int j = -offsetL; j <= offsetR; j++) {
@@ -1014,12 +1019,11 @@ public class ConvolveNormalized_JustBorder_SB {
 			int indexDst = output.startIndex + y*output.stride + offsetL;
 
 			for (int x = offsetL; x < width - offsetR; x++) {
-
 				int total = 0;
 				int weight = 0;
 
 				for (int i = -offsetL; i <= maxI; i++) {
-					int indexSrc = input.startIndex + (y + i)*input.stride+x;
+					int indexSrc = input.startIndex + (y + i)*input.stride + x;
 					int indexKer = (i + offsetL)*kernelWidth;
 
 					for (int j = -offsetL; j <= offsetR; j++) {
@@ -1065,7 +1069,7 @@ public class ConvolveNormalized_JustBorder_SB {
 				int kernelIdx0 = kernelWidth - (offsetR + 1 + j - jStart);
 				weight += dataKer[kernelIdx0];
 				for (int k = kernelIdx0; k < kernelWidth; k++) {
-					total += (dataSrc[indexSrc++]& 0xFFFF)*dataKer[k];
+					total += (dataSrc[indexSrc++] & 0xFFFF)*dataKer[k];
 				}
 				dataDst[indexDest++] = (short)((total + weight/2)/weight);
 			}
@@ -1088,7 +1092,7 @@ public class ConvolveNormalized_JustBorder_SB {
 				final int kEnd = jEnd - indexSrc;
 
 				for (int k = 0; k < kEnd; k++) {
-					total += (dataSrc[indexSrc++]& 0xFFFF)*dataKer[k];
+					total += (dataSrc[indexSrc++] & 0xFFFF)*dataKer[k];
 				}
 				weight -= dataKer[kEnd];
 				dataDst[indexDest++] = (short)((total + weight/2)/weight);
@@ -1115,27 +1119,29 @@ public class ConvolveNormalized_JustBorder_SB {
 
 		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, input.width, 20, workspaces, (work, x0, x1) -> {
 		final int x0 = 0, x1 = input.width;
+		final int countX = x1 - x0;
 		int[] totals = BoofMiscOps.checkDeclare(work, x1 - x0, false);
+		// NOTE: for floating point images this workspace isn't needed. Output image can be used instead
 
 		for (int y = 0; y < offsetL; y++) {
 			int indexInRow = input.startIndex + x0;
 			final int kStart = offsetL - y;
 			int w = dataKer[kStart];
 			int weight = w;
-			for (int x = x0, indexIn = indexInRow; x < x1; x++) {
-				totals[x - x0] = (dataSrc[indexIn++]& 0xFFFF)*w;
+			for (int x = 0, indexIn = indexInRow; x < countX; x++) {
+				totals[x] = (dataSrc[indexIn++] & 0xFFFF)*w;
 			}
 			for (int k = kStart + 1; k < kernelWidth; k++) {
 				indexInRow += input.stride;
 				w = dataKer[k];
 				weight += w;
-				for (int x = x0, indexIn = indexInRow; x < x1; x++) {
-					totals[x - x0] += (dataSrc[indexIn++]& 0xFFFF)*w;
+				for (int x = 0, indexIn = indexInRow; x < countX; x++) {
+					totals[x] += (dataSrc[indexIn++] & 0xFFFF)*w;
 				}
 			}
 			int indexOut = output.startIndex + x0 + y*output.stride;
-			for (int x = x0; x < x1; x++) {
-				dataDst[indexOut++] = (short)((totals[x - x0] + weight/2)/weight);
+			for (int x = 0; x < countX; x++) {
+				dataDst[indexOut++] = (short)((totals[x] + weight/2)/weight);
 			}
 		}
 
@@ -1144,20 +1150,20 @@ public class ConvolveNormalized_JustBorder_SB {
 			final int kEnd = imgHeight - (y - offsetL);
 			int w = dataKer[0];
 			int weight = w;
-			for (int x = x0, indexIn = indexInRow; x < x1; x++) {
-				totals[x - x0] = (dataSrc[indexIn++]& 0xFFFF)*w;
+			for (int x = 0, indexIn = indexInRow; x < countX; x++) {
+				totals[x] = (dataSrc[indexIn++] & 0xFFFF)*w;
 			}
 			for (int k = 1; k < kEnd; k++) {
 				indexInRow += input.stride;
 				w = dataKer[k];
 				weight += w;
-				for (int x = x0, indexIn = indexInRow; x < x1; x++) {
-					totals[x - x0] += (dataSrc[indexIn++]& 0xFFFF)*w;
+				for (int x = 0, indexIn = indexInRow; x < countX; x++) {
+					totals[x] += (dataSrc[indexIn++] & 0xFFFF)*w;
 				}
 			}
 			int indexOut = output.startIndex + x0 + y*output.stride;
-			for (int x = x0; x < x1; x++) {
-				dataDst[indexOut++] = (short)((totals[x - x0] + weight/2)/weight);
+			for (int x = 0; x < countX; x++) {
+				dataDst[indexOut++] = (short)((totals[x] + weight/2)/weight);
 			}
 		}
 		//CONCURRENT_INLINE });
@@ -1180,7 +1186,7 @@ public class ConvolveNormalized_JustBorder_SB {
 		for (int y = 0; y < height; y++) {
 
 			int minI = y >= offsetL ? -offsetL : -y;
-			int maxI = y < height - offsetR ?  offsetR : height - y - 1;
+			int maxI = y < height - offsetR ? offsetR : height - y - 1;
 
 			int indexDst = output.startIndex + y*output.stride;
 
@@ -1196,14 +1202,14 @@ public class ConvolveNormalized_JustBorder_SB {
 					for (int j = -x; j <= offsetR; j++) {
 						int w = dataKer[indexKer + j + offsetL];
 						weight += w;
-						total += (dataSrc[indexSrc + j]& 0xFFFF)*w;
+						total += (dataSrc[indexSrc + j] & 0xFFFF)*w;
 					}
 				}
 
 				dataDst[indexDst++] = (short)((total + weight/2)/weight);
 			}
 
-			indexDst = output.startIndex + y* output.stride + width-offsetR;
+			indexDst = output.startIndex + y* output.stride + width - offsetR;
 			for (int x = width - offsetR; x < width; x++) {
 
 				int maxJ = width - x - 1;
@@ -1218,7 +1224,7 @@ public class ConvolveNormalized_JustBorder_SB {
 					for (int j = -offsetL; j <= maxJ; j++) {
 						int w = dataKer[indexKer + j + offsetL];
 						weight += w;
-						total += (dataSrc[indexSrc + j]& 0xFFFF)*w;
+						total += (dataSrc[indexSrc + j] & 0xFFFF)*w;
 					}
 				}
 
@@ -1233,19 +1239,19 @@ public class ConvolveNormalized_JustBorder_SB {
 
 			int indexDst = output.startIndex + y*output.stride + offsetL;
 
-			for( int x = offsetL; x < width - offsetR; x++ ) {
+			for (int x = offsetL; x < width - offsetR; x++) {
 
 				int total = 0;
 				int weight = 0;
 
 				for (int i = -y; i <= offsetR; i++) {
-					int indexSrc = input.startIndex + (y + i)* input.stride + x;
+					int indexSrc = input.startIndex + (y + i)*input.stride + x;
 					int indexKer = (i + offsetL)*kernelWidth;
 
 					for (int j = -offsetL; j <= offsetR; j++) {
 						int w = dataKer[indexKer + j + offsetL];
 						weight += w;
-						total += (dataSrc[indexSrc + j]& 0xFFFF)*w;
+						total += (dataSrc[indexSrc + j] & 0xFFFF)*w;
 					}
 				}
 				dataDst[indexDst++] = (short)((total + weight/2)/weight);
@@ -1261,18 +1267,17 @@ public class ConvolveNormalized_JustBorder_SB {
 			int indexDst = output.startIndex + y*output.stride + offsetL;
 
 			for (int x = offsetL; x < width - offsetR; x++) {
-
 				int total = 0;
 				int weight = 0;
 
 				for (int i = -offsetL; i <= maxI; i++) {
-					int indexSrc = input.startIndex + (y + i)*input.stride+x;
+					int indexSrc = input.startIndex + (y + i)*input.stride + x;
 					int indexKer = (i + offsetL)*kernelWidth;
 
 					for (int j = -offsetL; j <= offsetR; j++) {
 						int w = dataKer[indexKer + j + offsetL];
 						weight += w;
-						total += (dataSrc[indexSrc + j]& 0xFFFF)*w;
+						total += (dataSrc[indexSrc + j] & 0xFFFF)*w;
 					}
 				}
 				dataDst[indexDst++] = (short)((total + weight/2)/weight);
@@ -1362,27 +1367,29 @@ public class ConvolveNormalized_JustBorder_SB {
 
 		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, input.width, 20, workspaces, (work, x0, x1) -> {
 		final int x0 = 0, x1 = input.width;
+		final int countX = x1 - x0;
 		int[] totals = BoofMiscOps.checkDeclare(work, x1 - x0, false);
+		// NOTE: for floating point images this workspace isn't needed. Output image can be used instead
 
 		for (int y = 0; y < offsetL; y++) {
 			int indexInRow = input.startIndex + x0;
 			final int kStart = offsetL - y;
 			int w = dataKer[kStart];
 			int weight = w;
-			for (int x = x0, indexIn = indexInRow; x < x1; x++) {
-				totals[x - x0] = (dataSrc[indexIn++])*w;
+			for (int x = 0, indexIn = indexInRow; x < countX; x++) {
+				totals[x] = (dataSrc[indexIn++])*w;
 			}
 			for (int k = kStart + 1; k < kernelWidth; k++) {
 				indexInRow += input.stride;
 				w = dataKer[k];
 				weight += w;
-				for (int x = x0, indexIn = indexInRow; x < x1; x++) {
-					totals[x - x0] += (dataSrc[indexIn++])*w;
+				for (int x = 0, indexIn = indexInRow; x < countX; x++) {
+					totals[x] += (dataSrc[indexIn++])*w;
 				}
 			}
 			int indexOut = output.startIndex + x0 + y*output.stride;
-			for (int x = x0; x < x1; x++) {
-				dataDst[indexOut++] = ((totals[x - x0] + weight/2)/weight);
+			for (int x = 0; x < countX; x++) {
+				dataDst[indexOut++] = ((totals[x] + weight/2)/weight);
 			}
 		}
 
@@ -1391,20 +1398,20 @@ public class ConvolveNormalized_JustBorder_SB {
 			final int kEnd = imgHeight - (y - offsetL);
 			int w = dataKer[0];
 			int weight = w;
-			for (int x = x0, indexIn = indexInRow; x < x1; x++) {
-				totals[x - x0] = (dataSrc[indexIn++])*w;
+			for (int x = 0, indexIn = indexInRow; x < countX; x++) {
+				totals[x] = (dataSrc[indexIn++])*w;
 			}
 			for (int k = 1; k < kEnd; k++) {
 				indexInRow += input.stride;
 				w = dataKer[k];
 				weight += w;
-				for (int x = x0, indexIn = indexInRow; x < x1; x++) {
-					totals[x - x0] += (dataSrc[indexIn++])*w;
+				for (int x = 0, indexIn = indexInRow; x < countX; x++) {
+					totals[x] += (dataSrc[indexIn++])*w;
 				}
 			}
 			int indexOut = output.startIndex + x0 + y*output.stride;
-			for (int x = x0; x < x1; x++) {
-				dataDst[indexOut++] = ((totals[x - x0] + weight/2)/weight);
+			for (int x = 0; x < countX; x++) {
+				dataDst[indexOut++] = ((totals[x] + weight/2)/weight);
 			}
 		}
 		//CONCURRENT_INLINE });
@@ -1427,7 +1434,7 @@ public class ConvolveNormalized_JustBorder_SB {
 		for (int y = 0; y < height; y++) {
 
 			int minI = y >= offsetL ? -offsetL : -y;
-			int maxI = y < height - offsetR ?  offsetR : height - y - 1;
+			int maxI = y < height - offsetR ? offsetR : height - y - 1;
 
 			int indexDst = output.startIndex + y*output.stride;
 
@@ -1450,7 +1457,7 @@ public class ConvolveNormalized_JustBorder_SB {
 				dataDst[indexDst++] = ((total + weight/2)/weight);
 			}
 
-			indexDst = output.startIndex + y* output.stride + width-offsetR;
+			indexDst = output.startIndex + y* output.stride + width - offsetR;
 			for (int x = width - offsetR; x < width; x++) {
 
 				int maxJ = width - x - 1;
@@ -1480,13 +1487,13 @@ public class ConvolveNormalized_JustBorder_SB {
 
 			int indexDst = output.startIndex + y*output.stride + offsetL;
 
-			for( int x = offsetL; x < width - offsetR; x++ ) {
+			for (int x = offsetL; x < width - offsetR; x++) {
 
 				int total = 0;
 				int weight = 0;
 
 				for (int i = -y; i <= offsetR; i++) {
-					int indexSrc = input.startIndex + (y + i)* input.stride + x;
+					int indexSrc = input.startIndex + (y + i)*input.stride + x;
 					int indexKer = (i + offsetL)*kernelWidth;
 
 					for (int j = -offsetL; j <= offsetR; j++) {
@@ -1508,12 +1515,11 @@ public class ConvolveNormalized_JustBorder_SB {
 			int indexDst = output.startIndex + y*output.stride + offsetL;
 
 			for (int x = offsetL; x < width - offsetR; x++) {
-
 				int total = 0;
 				int weight = 0;
 
 				for (int i = -offsetL; i <= maxI; i++) {
-					int indexSrc = input.startIndex + (y + i)*input.stride+x;
+					int indexSrc = input.startIndex + (y + i)*input.stride + x;
 					int indexKer = (i + offsetL)*kernelWidth;
 
 					for (int j = -offsetL; j <= offsetR; j++) {
@@ -1544,16 +1550,18 @@ public class ConvolveNormalized_JustBorder_SB {
 		final int imgWidth = output.getWidth();
 		final int imgHeight = output.getHeight();
 
-		final int yEnd = imgHeight - (kernelWidthY-offsetY-1);
+		final int yEnd = imgHeight - (kernelWidthY - offsetY - 1);
 
-		int startWeightX = 0;
+		int tmpSumX = 0;
 		for (int k = offsetX; k < kernelWidthX; k++) {
-			startWeightX += kernelX.data[k];
+			tmpSumX += kernelX.data[k];
 		}
+		final int startWeightX = tmpSumX;
 
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, offsetY, y -> {
 		for (int y = 0; y < offsetY; y++) {
-			int indexDst = output.startIndex + y * output.stride;
-			int i = input.startIndex + y * input.stride;
+			int indexDst = output.startIndex + y*output.stride;
+			int i = input.startIndex + y*input.stride;
 			final int iEnd = i + imgWidth;
 
 			int kStart = offsetY - y;
@@ -1567,9 +1575,9 @@ public class ConvolveNormalized_JustBorder_SB {
 			for ( int x = 0; i < iEnd; i++, x++ ) {
 				int weight = weightX*weightY;
 				int total = 0;
-				int indexSrc = i - y * input.stride;
+				int indexSrc = i - y*input.stride;
 				for (int k = kStart; k < kernelWidthY; k++, indexSrc += input.stride) {
-					total += (dataSrc[indexSrc]& 0xFFFF) * dataKer[k];
+					total += (dataSrc[indexSrc]& 0xFFFF)*dataKer[k];
 				}
 				dataDst[indexDst++] = (byte)((total+weight/2)/weight);
 				if( x < offsetX ) {
@@ -1579,10 +1587,12 @@ public class ConvolveNormalized_JustBorder_SB {
 				}
 			}
 		}
+		//CONCURRENT_ABOVE });
 
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(yEnd, imgHeight, y -> {
 		for (int y = yEnd; y < imgHeight; y++) {
-			int indexDst = output.startIndex + y * output.stride;
-			int i = input.startIndex + y * input.stride;
+			int indexDst = output.startIndex + y*output.stride;
+			int i = input.startIndex + y*input.stride;
 			final int iEnd = i + imgWidth;
 
 			int kEnd = imgHeight - (y - offsetY);
@@ -1593,58 +1603,61 @@ public class ConvolveNormalized_JustBorder_SB {
 			}
 			int weightX = startWeightX;
 
-			for ( int x = 0; i < iEnd; i++, x++ ) {
+			for (int x = 0; i < iEnd; i++, x++) {
 				int weight = weightX*weightY;
 				int total = 0;
-				int indexSrc = i - offsetY * input.stride;
+				int indexSrc = i - offsetY*input.stride;
 				for (int k = 0; k < kEnd; k++, indexSrc += input.stride) {
-					total += (dataSrc[indexSrc]& 0xFFFF) * dataKer[k];
+					total += (dataSrc[indexSrc]& 0xFFFF)*dataKer[k];
 				}
 				dataDst[indexDst++] = (byte)((total+weight/2)/weight);
 				if( x < offsetX ) {
-					weightX += kernelX.data[offsetX-x-1];
-				} else if( x >= input.width-(kernelWidthX-offsetX) ) {
+					weightX += kernelX.data[offsetX - x - 1];
+				} else if (x >= input.width - (kernelWidthX - offsetX)) {
 					weightX -= kernelX.data[input.width-x+offsetX-1];
 				}
 			}
 		}
+		//CONCURRENT_ABOVE });
 
 		// left and right border
-		int weightY = kernelY.computeSum();
+		final int weightY = kernelY.computeSum();
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(offsetY, yEnd, y -> {
 		for (int y = offsetY; y < yEnd; y++) {
-			int indexDst = output.startIndex + y * output.stride;
-			int i = input.startIndex + y * input.stride;
+			int indexDst = output.startIndex + y*output.stride;
+			int i = input.startIndex + y*input.stride;
 
 			// left side
 			int iEnd = i + offsetY;
 			int weightX = startWeightX;
-			for ( int x = 0; i < iEnd; i++, x++ ) {
+			for (int x = 0; i < iEnd; i++, x++) {
 				int weight = weightX*weightY;
 				int total = 0;
-				int indexSrc = i - offsetY * input.stride;
+				int indexSrc = i - offsetY*input.stride;
 				for (int k = 0; k < kernelWidthY; k++, indexSrc += input.stride) {
-					total += (dataSrc[indexSrc]& 0xFFFF) * dataKer[k];
+					total += (dataSrc[indexSrc]& 0xFFFF)*dataKer[k];
 				}
 				dataDst[indexDst++] = (byte)((total+weight/2)/weight);
-				weightX += kernelX.data[offsetX-x-1];
+				weightX += kernelX.data[offsetX - x - 1];
 			}
 
 			// right side
-			int startX = input.width-offsetX1;
-			indexDst = output.startIndex + y * output.stride + startX;
-			i = input.startIndex + y * input.stride + startX;
-			iEnd = input.startIndex + y * input.stride + input.width;
-			for ( int x = startX; i < iEnd; i++, x++ ) {
-				weightX -= kernelX.data[input.width-x+offsetX];
+			int startX = input.width - offsetX1;
+			indexDst = output.startIndex + y*output.stride + startX;
+			i = input.startIndex + y*input.stride + startX;
+			iEnd = input.startIndex + y*input.stride + input.width;
+			for (int x = startX; i < iEnd; i++, x++) {
+				weightX -= kernelX.data[input.width - x + offsetX];
 				int weight = weightX*weightY;
 				int total = 0;
-				int indexSrc = i - offsetY * input.stride;
+				int indexSrc = i - offsetY*input.stride;
 				for (int k = 0; k < kernelWidthY; k++, indexSrc += input.stride) {
-					total += (dataSrc[indexSrc]& 0xFFFF) * dataKer[k];
+					total += (dataSrc[indexSrc]& 0xFFFF)*dataKer[k];
 				}
 				dataDst[indexDst++] = (byte)((total+weight/2)/weight);
 			}
 		}
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void vertical(Kernel1D_S32 kernelX, Kernel1D_S32 kernelY,
@@ -1663,16 +1676,18 @@ public class ConvolveNormalized_JustBorder_SB {
 		final int imgWidth = output.getWidth();
 		final int imgHeight = output.getHeight();
 
-		final int yEnd = imgHeight - (kernelWidthY-offsetY-1);
+		final int yEnd = imgHeight - (kernelWidthY - offsetY - 1);
 
-		int startWeightX = 0;
+		int tmpSumX = 0;
 		for (int k = offsetX; k < kernelWidthX; k++) {
-			startWeightX += kernelX.data[k];
+			tmpSumX += kernelX.data[k];
 		}
+		final int startWeightX = tmpSumX;
 
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, offsetY, y -> {
 		for (int y = 0; y < offsetY; y++) {
-			int indexDst = output.startIndex + y * output.stride;
-			int i = input.startIndex + y * input.stride;
+			int indexDst = output.startIndex + y*output.stride;
+			int i = input.startIndex + y*input.stride;
 			final int iEnd = i + imgWidth;
 
 			int kStart = offsetY - y;
@@ -1686,9 +1701,9 @@ public class ConvolveNormalized_JustBorder_SB {
 			for ( int x = 0; i < iEnd; i++, x++ ) {
 				int weight = weightX*weightY;
 				int total = 0;
-				int indexSrc = i - y * input.stride;
+				int indexSrc = i - y*input.stride;
 				for (int k = kStart; k < kernelWidthY; k++, indexSrc += input.stride) {
-					total += (dataSrc[indexSrc]) * dataKer[k];
+					total += (dataSrc[indexSrc])*dataKer[k];
 				}
 				dataDst[indexDst++] = (short)((total+weight/2)/weight);
 				if( x < offsetX ) {
@@ -1698,10 +1713,12 @@ public class ConvolveNormalized_JustBorder_SB {
 				}
 			}
 		}
+		//CONCURRENT_ABOVE });
 
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(yEnd, imgHeight, y -> {
 		for (int y = yEnd; y < imgHeight; y++) {
-			int indexDst = output.startIndex + y * output.stride;
-			int i = input.startIndex + y * input.stride;
+			int indexDst = output.startIndex + y*output.stride;
+			int i = input.startIndex + y*input.stride;
 			final int iEnd = i + imgWidth;
 
 			int kEnd = imgHeight - (y - offsetY);
@@ -1712,58 +1729,61 @@ public class ConvolveNormalized_JustBorder_SB {
 			}
 			int weightX = startWeightX;
 
-			for ( int x = 0; i < iEnd; i++, x++ ) {
+			for (int x = 0; i < iEnd; i++, x++) {
 				int weight = weightX*weightY;
 				int total = 0;
-				int indexSrc = i - offsetY * input.stride;
+				int indexSrc = i - offsetY*input.stride;
 				for (int k = 0; k < kEnd; k++, indexSrc += input.stride) {
-					total += (dataSrc[indexSrc]) * dataKer[k];
+					total += (dataSrc[indexSrc])*dataKer[k];
 				}
 				dataDst[indexDst++] = (short)((total+weight/2)/weight);
 				if( x < offsetX ) {
-					weightX += kernelX.data[offsetX-x-1];
-				} else if( x >= input.width-(kernelWidthX-offsetX) ) {
+					weightX += kernelX.data[offsetX - x - 1];
+				} else if (x >= input.width - (kernelWidthX - offsetX)) {
 					weightX -= kernelX.data[input.width-x+offsetX-1];
 				}
 			}
 		}
+		//CONCURRENT_ABOVE });
 
 		// left and right border
-		int weightY = kernelY.computeSum();
+		final int weightY = kernelY.computeSum();
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(offsetY, yEnd, y -> {
 		for (int y = offsetY; y < yEnd; y++) {
-			int indexDst = output.startIndex + y * output.stride;
-			int i = input.startIndex + y * input.stride;
+			int indexDst = output.startIndex + y*output.stride;
+			int i = input.startIndex + y*input.stride;
 
 			// left side
 			int iEnd = i + offsetY;
 			int weightX = startWeightX;
-			for ( int x = 0; i < iEnd; i++, x++ ) {
+			for (int x = 0; i < iEnd; i++, x++) {
 				int weight = weightX*weightY;
 				int total = 0;
-				int indexSrc = i - offsetY * input.stride;
+				int indexSrc = i - offsetY*input.stride;
 				for (int k = 0; k < kernelWidthY; k++, indexSrc += input.stride) {
-					total += (dataSrc[indexSrc]) * dataKer[k];
+					total += (dataSrc[indexSrc])*dataKer[k];
 				}
 				dataDst[indexDst++] = (short)((total+weight/2)/weight);
-				weightX += kernelX.data[offsetX-x-1];
+				weightX += kernelX.data[offsetX - x - 1];
 			}
 
 			// right side
-			int startX = input.width-offsetX1;
-			indexDst = output.startIndex + y * output.stride + startX;
-			i = input.startIndex + y * input.stride + startX;
-			iEnd = input.startIndex + y * input.stride + input.width;
-			for ( int x = startX; i < iEnd; i++, x++ ) {
-				weightX -= kernelX.data[input.width-x+offsetX];
+			int startX = input.width - offsetX1;
+			indexDst = output.startIndex + y*output.stride + startX;
+			i = input.startIndex + y*input.stride + startX;
+			iEnd = input.startIndex + y*input.stride + input.width;
+			for (int x = startX; i < iEnd; i++, x++) {
+				weightX -= kernelX.data[input.width - x + offsetX];
 				int weight = weightX*weightY;
 				int total = 0;
-				int indexSrc = i - offsetY * input.stride;
+				int indexSrc = i - offsetY*input.stride;
 				for (int k = 0; k < kernelWidthY; k++, indexSrc += input.stride) {
-					total += (dataSrc[indexSrc]) * dataKer[k];
+					total += (dataSrc[indexSrc])*dataKer[k];
 				}
 				dataDst[indexDst++] = (short)((total+weight/2)/weight);
 			}
 		}
+		//CONCURRENT_ABOVE });
 	}
 
 }

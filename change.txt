@@ -17,6 +17,8 @@ Version : 1.3.0
   * Support for warmup frames
 - Mean Blur
   * Custom and concurrent function for the image border. Much faster on large images.
+- ConvolveImageNormalized
+  * Border is concurrent now also fewer cache misses. Oddly, fewer cache misses does nothing.
 
 ---------------------
 Date    : 2025/Sep/30
