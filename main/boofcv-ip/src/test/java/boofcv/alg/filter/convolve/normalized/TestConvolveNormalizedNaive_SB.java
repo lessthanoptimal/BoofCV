@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,32 +36,31 @@ public class TestConvolveNormalizedNaive_SB extends BoofStandardJUnit {
 	 * Check it against one specific type to see if the core algorithm is correct
 	 */
 	@Test void horizontal() {
-		Kernel1D_S32 kernel = new Kernel1D_S32(new int[]{1,2,3,4,5,6}, 6, 4);
+		Kernel1D_S32 kernel = new Kernel1D_S32(new int[]{1, 2, 3, 4, 5, 6}, 6, 4);
 
-		GrayU8 input = new GrayU8(15,16);
+		GrayU8 input = new GrayU8(15, 16);
 		ImageMiscOps.fillUniform(input, rand, 0, 50);
-		GrayU8 output = new GrayU8(15,16);
+		GrayU8 output = new GrayU8(15, 16);
 
-		ConvolveNormalizedNaive_SB.horizontal(kernel,input,output);
+		ConvolveNormalizedNaive_SB.horizontal(kernel, input, output);
 
 		for (int y = 0; y < output.height; y++) {
 			for (int x = 0; x < output.width; x++) {
-				int expected = horizontal(x,y,kernel,input);
-				int found = output.get(x,y);
-				assertEquals(expected,found);
+				int expected = horizontal(x, y, kernel, input);
+				int found = output.get(x, y);
+				assertEquals(expected, found);
 			}
 		}
 	}
 
-	private int horizontal(int x , int y , Kernel1D_S32 kernel , GrayU8 image )
-	{
+	private int horizontal( int x, int y, Kernel1D_S32 kernel, GrayU8 image ) {
 		int total = 0;
 		int weight = 0;
 
 		for (int i = 0; i < kernel.width; i++) {
-			if( image.isInBounds(x+i-kernel.offset,y)) {
+			if (image.isInBounds(x + i - kernel.offset, y)) {
 				int w = kernel.get(i);
-				int v = image.get(x+i-kernel.offset,y);
+				int v = image.get(x + i - kernel.offset, y);
 
 				total += w*v;
 				weight += w;
@@ -75,32 +74,31 @@ public class TestConvolveNormalizedNaive_SB extends BoofStandardJUnit {
 	 * Check it against one specific type to see if the core algorithm is correct
 	 */
 	@Test void vertical() {
-		Kernel1D_S32 kernel = new Kernel1D_S32(new int[]{1,2,3,4,5,6}, 6, 4);
+		Kernel1D_S32 kernel = new Kernel1D_S32(new int[]{1, 2, 3, 4, 5, 6}, 6, 4);
 
-		GrayU8 input = new GrayU8(15,16);
+		GrayU8 input = new GrayU8(15, 16);
 		ImageMiscOps.fillUniform(input, rand, 0, 50);
-		GrayU8 output = new GrayU8(15,16);
+		GrayU8 output = new GrayU8(15, 16);
 
 		ConvolveNormalizedNaive_SB.vertical(kernel, input, output);
 
 		for (int y = 0; y < output.height; y++) {
 			for (int x = 0; x < output.width; x++) {
 				int expected = vertical(x, y, kernel, input);
-				int found = output.get(x,y);
-				assertEquals(expected,found);
+				int found = output.get(x, y);
+				assertEquals(expected, found);
 			}
 		}
 	}
 
-	private int vertical(int x , int y , Kernel1D_S32 kernel , GrayU8 image )
-	{
+	private int vertical( int x, int y, Kernel1D_S32 kernel, GrayU8 image ) {
 		int total = 0;
 		int weight = 0;
 
 		for (int i = 0; i < kernel.width; i++) {
-			if( image.isInBounds(x,y+i-kernel.offset)) {
+			if (image.isInBounds(x, y + i - kernel.offset)) {
 				int w = kernel.get(i);
-				int v = image.get(x,y+i-kernel.offset);
+				int v = image.get(x, y + i - kernel.offset);
 
 				total += w*v;
 				weight += w;
@@ -114,38 +112,37 @@ public class TestConvolveNormalizedNaive_SB extends BoofStandardJUnit {
 	 * Check it against one specific type to see if the core algorithm is correct
 	 */
 	@Test void vertical2_U16_U8() {
-		Kernel1D_S32 kernelY = new Kernel1D_S32(new int[]{1,2,3,4,5,6}, 6, 4);
-		Kernel1D_S32 kernelX = new Kernel1D_S32(new int[]{4,2,1,4,3,6}, 5, 2);
+		Kernel1D_S32 kernelY = new Kernel1D_S32(new int[]{1, 2, 3, 4, 5, 6}, 6, 4);
+		Kernel1D_S32 kernelX = new Kernel1D_S32(new int[]{4, 2, 1, 4, 3, 6}, 5, 2);
 
-		GrayU16 input = new GrayU16(15,16);
+		GrayU16 input = new GrayU16(15, 16);
 		ImageMiscOps.fillUniform(input, rand, 0, 80);
-		GrayU8 output = new GrayU8(15,16);
+		GrayU8 output = new GrayU8(15, 16);
 
-		ConvolveNormalizedNaive_SB.vertical(kernelX,kernelY, input, output);
+		ConvolveNormalizedNaive_SB.vertical(kernelX, kernelY, input, output);
 
-		GrayU8 alt = new GrayU8(15,16);
-		ConvolveImageNoBorder.vertical(kernelY, input, alt, kernelX.computeSum() * kernelY.computeSum(), null);
+		GrayU8 alt = new GrayU8(15, 16);
+		ConvolveImageNoBorder.vertical(kernelY, input, alt, kernelX.computeSum()*kernelY.computeSum(), null);
 
 		for (int y = 0; y < output.height; y++) {
 			for (int x = 0; x < output.width; x++) {
 				int expected = vertical2(x, y, kernelX, kernelY, input);
-				int found = output.get(x,y);
-				assertEquals(expected,found);
+				int found = output.get(x, y);
+				assertEquals(expected, found);
 			}
 		}
 	}
 
-	private int vertical2(int x, int y,
-						  Kernel1D_S32 kernelX, Kernel1D_S32 kernelY,
-						  GrayU16 image)
-	{
+	private int vertical2( int x, int y,
+						   Kernel1D_S32 kernelX, Kernel1D_S32 kernelY,
+						   GrayU16 image ) {
 		int total = 0;
 		int weightY = 0;
 
 		for (int i = 0; i < kernelY.width; i++) {
-			if( image.isInBounds(x,y+i-kernelY.offset)) {
+			if (image.isInBounds(x, y + i - kernelY.offset)) {
 				int w = kernelY.get(i);
-				int v = image.get(x,y+i-kernelY.offset);
+				int v = image.get(x, y + i - kernelY.offset);
 
 				total += w*v;
 				weightY += w;
@@ -154,7 +151,7 @@ public class TestConvolveNormalizedNaive_SB extends BoofStandardJUnit {
 
 		int weightX = 0;
 		for (int i = 0; i < kernelX.width; i++) {
-			if( image.isInBounds(x+i-kernelX.offset,y)) {
+			if (image.isInBounds(x + i - kernelX.offset, y)) {
 				int w = kernelX.get(i);
 
 				weightX += w;
@@ -169,37 +166,36 @@ public class TestConvolveNormalizedNaive_SB extends BoofStandardJUnit {
 	 * Check it against one specific type to see if the core algorithm is correct
 	 */
 	@Test void convolve() {
-		Kernel2D_S32 kernel = FactoryKernel.random2D_I32(7,3,0,20,rand);
+		Kernel2D_S32 kernel = FactoryKernel.random2D_I32(7, 3, 0, 20, rand);
 		kernel.offset = 1;
 
-		GrayU8 input = new GrayU8(15,16);
+		GrayU8 input = new GrayU8(15, 16);
 		ImageMiscOps.fillUniform(input, rand, 0, 50);
-		GrayU8 output = new GrayU8(15,16);
+		GrayU8 output = new GrayU8(15, 16);
 
 		ConvolveNormalizedNaive_SB.convolve(kernel, input, output);
 
 		for (int y = 0; y < output.height; y++) {
 			for (int x = 0; x < output.width; x++) {
 				int expected = convolve(x, y, kernel, input);
-				int found = output.get(x,y);
-				assertEquals(expected,found);
+				int found = output.get(x, y);
+				assertEquals(expected, found);
 			}
 		}
 	}
 
-	private int convolve(int cx , int cy , Kernel2D_S32 kernel , GrayU8 image )
-	{
+	private int convolve( int cx, int cy, Kernel2D_S32 kernel, GrayU8 image ) {
 		int total = 0;
 		int weight = 0;
 
 		for (int i = 0; i < kernel.width; i++) {
-			int y = cy+i-kernel.offset;
+			int y = cy + i - kernel.offset;
 			for (int j = 0; j < kernel.width; j++) {
-				int x = cx+j-kernel.offset;
+				int x = cx + j - kernel.offset;
 
-				if( image.isInBounds(x,y)) {
-					int w = kernel.get(j,i);
-					int v = image.get(x,y);
+				if (image.isInBounds(x, y)) {
+					int w = kernel.get(j, i);
+					int v = image.get(x, y);
 					weight += w;
 					total += w*v;
 				}
