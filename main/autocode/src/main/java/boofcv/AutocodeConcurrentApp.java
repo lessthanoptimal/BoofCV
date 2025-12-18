@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,6 +35,7 @@ public class AutocodeConcurrentApp {
 				"main/boofcv-ip/src/main/java/boofcv/alg/filter/derivative/impl/",
 				"main/boofcv-ip/src/main/java/boofcv/alg/filter/blur/impl/",
 				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/",
+
 				"main/boofcv-ip/src/main/java/boofcv/alg/filter/binary/impl",
 				"main/boofcv-ip/src/main/java/boofcv/alg/filter/binary",
 				"main/boofcv-ip/src/main/java/boofcv/alg/filter/misc/impl/",
@@ -55,8 +56,8 @@ public class AutocodeConcurrentApp {
 				"main/boofcv-io/src/main/java/boofcv/io/image/impl",
 		};
 
-		var files = new String[] {
-//				"main/boofcv-ip/src/main/java/boofcv/alg/enhance/impl/ImplEnhanceHistogram.java"
+		var files = new String[]{
+				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/normalized/ConvolveNormalized_JustBorder_SB.java",
 		};
 
 		File rootDir = AutocodeMasterApp.findPathToProjectRoot();
