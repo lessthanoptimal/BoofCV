@@ -48,20 +48,20 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void horizontal( Kernel1D_F32 kernel, GrayF32 src, GrayF32 dst ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		if( BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst) )
+		if (BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel, src, dst))
 			return;
 
-		if( kernel.width >= src.width ) {
+		if (kernel.width >= src.width) {
 			ConvolveNormalizedNaive_SB.horizontal(kernel, src, dst);
 		} else {
-			if( Math.abs(kernel.computeSum() - 1.0f) > 1e-4f ) {
+			if (Math.abs(kernel.computeSum() - 1.0f) > 1e-4f) {
 				Kernel1D_F32 k = kernel.copy();
 				KernelMath.normalizeSumToOne(k);
 				kernel = k;
 			}
-			ConvolveImageNoBorder.horizontal(kernel,src,dst);
+			ConvolveImageNoBorder.horizontal(kernel, src, dst);
 			if (BoofConcurrency.USE_CONCURRENT) {
 				ConvolveNormalized_JustBorder_SB_MT.horizontal(kernel, src, dst);
 			} else {
@@ -78,24 +78,24 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void vertical( Kernel1D_F32 kernel, GrayF32 src, GrayF32 dst ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		if( BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst) )
+		if (BOverrideConvolveImageNormalized.invokeNativeVertical(kernel, src, dst))
 			return;
 
-		if( kernel.width >= src.height ) {
+		if (kernel.width >= src.height) {
 			ConvolveNormalizedNaive_SB.vertical(kernel, src, dst);
 		} else {
-			if( Math.abs(kernel.computeSum() - 1.0f) > 1e-4f ) {
+			if (Math.abs(kernel.computeSum() - 1.0f) > 1e-4f) {
 				Kernel1D_F32 k = kernel.copy();
 				KernelMath.normalizeSumToOne(k);
 				kernel = k;
 			}
-			ConvolveImageNoBorder.vertical(kernel,src,dst);
+			ConvolveImageNoBorder.vertical(kernel, src, dst);
 			if (BoofConcurrency.USE_CONCURRENT) {
-				ConvolveNormalized_JustBorder_SB_MT.vertical(kernel, src, dst);
+				ConvolveNormalized_JustBorder_SB_MT.vertical(kernel, src, dst, null);
 			} else {
-				ConvolveNormalized_JustBorder_SB.vertical(kernel, src, dst);
+				ConvolveNormalized_JustBorder_SB.vertical(kernel, src, dst, null);
 			}
 		}
 	}
@@ -108,20 +108,20 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void convolve( Kernel2D_F32 kernel, GrayF32 src, GrayF32 dst ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		if( BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst) )
+		if (BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel, src, dst))
 			return;
 
-		if( kernel.width >= src.width || kernel.width >= src.height ) {
+		if (kernel.width >= src.width || kernel.width >= src.height) {
 			ConvolveNormalizedNaive_SB.convolve(kernel, src, dst);
 		} else {
-			if( Math.abs(kernel.computeSum() - 1.0f) > 1e-4f ) {
+			if (Math.abs(kernel.computeSum() - 1.0f) > 1e-4f) {
 				Kernel2D_F32 k = kernel.copy();
 				KernelMath.normalizeSumToOne(k);
 				kernel = k;
 			}
-			ConvolveImageNoBorder.convolve(kernel,src,dst);
+			ConvolveImageNoBorder.convolve(kernel, src, dst);
 			if (BoofConcurrency.USE_CONCURRENT) {
 				ConvolveNormalized_JustBorder_SB_MT.convolve(kernel, src, dst);
 			} else {
@@ -138,22 +138,22 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void horizontal( Kernel1D_F32 kernel, GrayF32 src, GrayF32 dst, ImageBorder_F32 bsrc ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		//if( BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst) )
+		//if (BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel, src, dst))
 		//	return;
 
 		bsrc.setImage(src);
 
-		if( kernel.width >= src.width ) {
+		if (kernel.width >= src.width) {
 			ConvolveNormalizedNaive_SB.horizontal(kernel, src, dst, bsrc);
 		} else {
-			if( Math.abs(kernel.computeSum() - 1.0f) > 1e-4f ) {
+			if (Math.abs(kernel.computeSum() - 1.0f) > 1e-4f) {
 				Kernel1D_F32 k = kernel.copy();
 				KernelMath.normalizeSumToOne(k);
 				kernel = k;
 			}
-			ConvolveImageNoBorder.horizontal(kernel,src,dst);
+			ConvolveImageNoBorder.horizontal(kernel, src, dst);
 			ConvolveJustBorder_General_SB.horizontal(kernel, bsrc, dst);
 		}
 	}
@@ -166,22 +166,22 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void vertical( Kernel1D_F32 kernel, GrayF32 src, GrayF32 dst, ImageBorder_F32 bsrc ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		//if( BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst) )
+		//if (BOverrideConvolveImageNormalized.invokeNativeVertical(kernel, src, dst))
 		//	return;
 
 		bsrc.setImage(src);
 
-		if( kernel.width >= src.height ) {
+		if (kernel.width >= src.height) {
 			ConvolveNormalizedNaive_SB.vertical(kernel, src, dst, bsrc);
 		} else {
-			if( Math.abs(kernel.computeSum() - 1.0f) > 1e-4f ) {
+			if (Math.abs(kernel.computeSum() - 1.0f) > 1e-4f) {
 				Kernel1D_F32 k = kernel.copy();
 				KernelMath.normalizeSumToOne(k);
 				kernel = k;
 			}
-			ConvolveImageNoBorder.vertical(kernel,src,dst);
+			ConvolveImageNoBorder.vertical(kernel, src, dst);
 			ConvolveJustBorder_General_SB.vertical(kernel, bsrc, dst);
 		}
 	}
@@ -194,22 +194,22 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void convolve( Kernel2D_F32 kernel, GrayF32 src, GrayF32 dst, ImageBorder_F32 bsrc ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		//if( BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst) )
+		//if (BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel, src, dst))
 		//	return;
 
 		bsrc.setImage(src);
 
-		if( kernel.width >= src.width || kernel.width >= src.height ) {
+		if (kernel.width >= src.width || kernel.width >= src.height) {
 			ConvolveNormalizedNaive_SB.convolve(kernel, src, dst, bsrc);
 		} else {
-			if( Math.abs(kernel.computeSum() - 1.0f) > 1e-4f ) {
+			if (Math.abs(kernel.computeSum() - 1.0f) > 1e-4f) {
 				Kernel2D_F32 k = kernel.copy();
 				KernelMath.normalizeSumToOne(k);
 				kernel = k;
 			}
-			ConvolveImageNoBorder.convolve(kernel,src,dst);
+			ConvolveImageNoBorder.convolve(kernel, src, dst);
 			ConvolveJustBorder_General_SB.convolve(kernel, bsrc, dst);
 		}
 	}
@@ -222,20 +222,20 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void horizontal( Kernel1D_F32 kernel, InterleavedF32 src, InterleavedF32 dst ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		if( BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst) )
+		if (BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel, src, dst))
 			return;
 
-		if( kernel.width >= src.width ) {
+		if (kernel.width >= src.width) {
 			ConvolveNormalizedNaive_IL.horizontal(kernel, src, dst);
 		} else {
-			if( Math.abs(kernel.computeSum() - 1.0f) > 1e-4f ) {
+			if (Math.abs(kernel.computeSum() - 1.0f) > 1e-4f) {
 				Kernel1D_F32 k = kernel.copy();
 				KernelMath.normalizeSumToOne(k);
 				kernel = k;
 			}
-			ConvolveImageNoBorder.horizontal(kernel,src,dst);
+			ConvolveImageNoBorder.horizontal(kernel, src, dst);
 			ConvolveNormalized_JustBorder_IL.horizontal(kernel, src, dst);
 		}
 	}
@@ -248,20 +248,20 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void vertical( Kernel1D_F32 kernel, InterleavedF32 src, InterleavedF32 dst ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		if( BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst) )
+		if (BOverrideConvolveImageNormalized.invokeNativeVertical(kernel, src, dst))
 			return;
 
-		if( kernel.width >= src.height ) {
+		if (kernel.width >= src.height) {
 			ConvolveNormalizedNaive_IL.vertical(kernel, src, dst);
 		} else {
-			if( Math.abs(kernel.computeSum() - 1.0f) > 1e-4f ) {
+			if (Math.abs(kernel.computeSum() - 1.0f) > 1e-4f) {
 				Kernel1D_F32 k = kernel.copy();
 				KernelMath.normalizeSumToOne(k);
 				kernel = k;
 			}
-			ConvolveImageNoBorder.vertical(kernel,src,dst);
+			ConvolveImageNoBorder.vertical(kernel, src, dst);
 			ConvolveNormalized_JustBorder_IL.vertical(kernel, src, dst);
 		}
 	}
@@ -274,20 +274,20 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void convolve( Kernel2D_F32 kernel, InterleavedF32 src, InterleavedF32 dst ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		if( BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst) )
+		if (BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel, src, dst))
 			return;
 
-		if( kernel.width >= src.width || kernel.width >= src.height ) {
+		if (kernel.width >= src.width || kernel.width >= src.height) {
 			ConvolveNormalizedNaive_IL.convolve(kernel, src, dst);
 		} else {
-			if( Math.abs(kernel.computeSum() - 1.0f) > 1e-4f ) {
+			if (Math.abs(kernel.computeSum() - 1.0f) > 1e-4f) {
 				Kernel2D_F32 k = kernel.copy();
 				KernelMath.normalizeSumToOne(k);
 				kernel = k;
 			}
-			ConvolveImageNoBorder.convolve(kernel,src,dst);
+			ConvolveImageNoBorder.convolve(kernel, src, dst);
 			ConvolveNormalized_JustBorder_IL.convolve(kernel, src, dst);
 		}
 	}
@@ -300,20 +300,20 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void horizontal( Kernel1D_F64 kernel, GrayF64 src, GrayF64 dst ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		if( BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst) )
+		if (BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel, src, dst))
 			return;
 
-		if( kernel.width >= src.width ) {
+		if (kernel.width >= src.width) {
 			ConvolveNormalizedNaive_SB.horizontal(kernel, src, dst);
 		} else {
-			if( Math.abs(kernel.computeSum() - 1.0f) > 1e-4f ) {
+			if (Math.abs(kernel.computeSum() - 1.0f) > 1e-4f) {
 				Kernel1D_F64 k = kernel.copy();
 				KernelMath.normalizeSumToOne(k);
 				kernel = k;
 			}
-			ConvolveImageNoBorder.horizontal(kernel,src,dst);
+			ConvolveImageNoBorder.horizontal(kernel, src, dst);
 			if (BoofConcurrency.USE_CONCURRENT) {
 				ConvolveNormalized_JustBorder_SB_MT.horizontal(kernel, src, dst);
 			} else {
@@ -330,24 +330,24 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void vertical( Kernel1D_F64 kernel, GrayF64 src, GrayF64 dst ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		if( BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst) )
+		if (BOverrideConvolveImageNormalized.invokeNativeVertical(kernel, src, dst))
 			return;
 
-		if( kernel.width >= src.height ) {
+		if (kernel.width >= src.height) {
 			ConvolveNormalizedNaive_SB.vertical(kernel, src, dst);
 		} else {
-			if( Math.abs(kernel.computeSum() - 1.0f) > 1e-4f ) {
+			if (Math.abs(kernel.computeSum() - 1.0f) > 1e-4f) {
 				Kernel1D_F64 k = kernel.copy();
 				KernelMath.normalizeSumToOne(k);
 				kernel = k;
 			}
-			ConvolveImageNoBorder.vertical(kernel,src,dst);
+			ConvolveImageNoBorder.vertical(kernel, src, dst);
 			if (BoofConcurrency.USE_CONCURRENT) {
-				ConvolveNormalized_JustBorder_SB_MT.vertical(kernel, src, dst);
+				ConvolveNormalized_JustBorder_SB_MT.vertical(kernel, src, dst, null);
 			} else {
-				ConvolveNormalized_JustBorder_SB.vertical(kernel, src, dst);
+				ConvolveNormalized_JustBorder_SB.vertical(kernel, src, dst, null);
 			}
 		}
 	}
@@ -360,20 +360,20 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void convolve( Kernel2D_F64 kernel, GrayF64 src, GrayF64 dst ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		if( BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst) )
+		if (BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel, src, dst))
 			return;
 
-		if( kernel.width >= src.width || kernel.width >= src.height ) {
+		if (kernel.width >= src.width || kernel.width >= src.height) {
 			ConvolveNormalizedNaive_SB.convolve(kernel, src, dst);
 		} else {
-			if( Math.abs(kernel.computeSum() - 1.0f) > 1e-4f ) {
+			if (Math.abs(kernel.computeSum() - 1.0f) > 1e-4f) {
 				Kernel2D_F64 k = kernel.copy();
 				KernelMath.normalizeSumToOne(k);
 				kernel = k;
 			}
-			ConvolveImageNoBorder.convolve(kernel,src,dst);
+			ConvolveImageNoBorder.convolve(kernel, src, dst);
 			if (BoofConcurrency.USE_CONCURRENT) {
 				ConvolveNormalized_JustBorder_SB_MT.convolve(kernel, src, dst);
 			} else {
@@ -390,22 +390,22 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void horizontal( Kernel1D_F64 kernel, GrayF64 src, GrayF64 dst, ImageBorder_F64 bsrc ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		//if( BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst) )
+		//if (BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel, src, dst))
 		//	return;
 
 		bsrc.setImage(src);
 
-		if( kernel.width >= src.width ) {
+		if (kernel.width >= src.width) {
 			ConvolveNormalizedNaive_SB.horizontal(kernel, src, dst, bsrc);
 		} else {
-			if( Math.abs(kernel.computeSum() - 1.0f) > 1e-4f ) {
+			if (Math.abs(kernel.computeSum() - 1.0f) > 1e-4f) {
 				Kernel1D_F64 k = kernel.copy();
 				KernelMath.normalizeSumToOne(k);
 				kernel = k;
 			}
-			ConvolveImageNoBorder.horizontal(kernel,src,dst);
+			ConvolveImageNoBorder.horizontal(kernel, src, dst);
 			ConvolveJustBorder_General_SB.horizontal(kernel, bsrc, dst);
 		}
 	}
@@ -418,22 +418,22 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void vertical( Kernel1D_F64 kernel, GrayF64 src, GrayF64 dst, ImageBorder_F64 bsrc ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		//if( BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst) )
+		//if (BOverrideConvolveImageNormalized.invokeNativeVertical(kernel, src, dst))
 		//	return;
 
 		bsrc.setImage(src);
 
-		if( kernel.width >= src.height ) {
+		if (kernel.width >= src.height) {
 			ConvolveNormalizedNaive_SB.vertical(kernel, src, dst, bsrc);
 		} else {
-			if( Math.abs(kernel.computeSum() - 1.0f) > 1e-4f ) {
+			if (Math.abs(kernel.computeSum() - 1.0f) > 1e-4f) {
 				Kernel1D_F64 k = kernel.copy();
 				KernelMath.normalizeSumToOne(k);
 				kernel = k;
 			}
-			ConvolveImageNoBorder.vertical(kernel,src,dst);
+			ConvolveImageNoBorder.vertical(kernel, src, dst);
 			ConvolveJustBorder_General_SB.vertical(kernel, bsrc, dst);
 		}
 	}
@@ -446,22 +446,22 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void convolve( Kernel2D_F64 kernel, GrayF64 src, GrayF64 dst, ImageBorder_F64 bsrc ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		//if( BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst) )
+		//if (BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel, src, dst))
 		//	return;
 
 		bsrc.setImage(src);
 
-		if( kernel.width >= src.width || kernel.width >= src.height ) {
+		if (kernel.width >= src.width || kernel.width >= src.height) {
 			ConvolveNormalizedNaive_SB.convolve(kernel, src, dst, bsrc);
 		} else {
-			if( Math.abs(kernel.computeSum() - 1.0f) > 1e-4f ) {
+			if (Math.abs(kernel.computeSum() - 1.0f) > 1e-4f) {
 				Kernel2D_F64 k = kernel.copy();
 				KernelMath.normalizeSumToOne(k);
 				kernel = k;
 			}
-			ConvolveImageNoBorder.convolve(kernel,src,dst);
+			ConvolveImageNoBorder.convolve(kernel, src, dst);
 			ConvolveJustBorder_General_SB.convolve(kernel, bsrc, dst);
 		}
 	}
@@ -474,20 +474,20 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void horizontal( Kernel1D_F64 kernel, InterleavedF64 src, InterleavedF64 dst ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		if( BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst) )
+		if (BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel, src, dst))
 			return;
 
-		if( kernel.width >= src.width ) {
+		if (kernel.width >= src.width) {
 			ConvolveNormalizedNaive_IL.horizontal(kernel, src, dst);
 		} else {
-			if( Math.abs(kernel.computeSum() - 1.0f) > 1e-4f ) {
+			if (Math.abs(kernel.computeSum() - 1.0f) > 1e-4f) {
 				Kernel1D_F64 k = kernel.copy();
 				KernelMath.normalizeSumToOne(k);
 				kernel = k;
 			}
-			ConvolveImageNoBorder.horizontal(kernel,src,dst);
+			ConvolveImageNoBorder.horizontal(kernel, src, dst);
 			ConvolveNormalized_JustBorder_IL.horizontal(kernel, src, dst);
 		}
 	}
@@ -500,20 +500,20 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void vertical( Kernel1D_F64 kernel, InterleavedF64 src, InterleavedF64 dst ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		if( BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst) )
+		if (BOverrideConvolveImageNormalized.invokeNativeVertical(kernel, src, dst))
 			return;
 
-		if( kernel.width >= src.height ) {
+		if (kernel.width >= src.height) {
 			ConvolveNormalizedNaive_IL.vertical(kernel, src, dst);
 		} else {
-			if( Math.abs(kernel.computeSum() - 1.0f) > 1e-4f ) {
+			if (Math.abs(kernel.computeSum() - 1.0f) > 1e-4f) {
 				Kernel1D_F64 k = kernel.copy();
 				KernelMath.normalizeSumToOne(k);
 				kernel = k;
 			}
-			ConvolveImageNoBorder.vertical(kernel,src,dst);
+			ConvolveImageNoBorder.vertical(kernel, src, dst);
 			ConvolveNormalized_JustBorder_IL.vertical(kernel, src, dst);
 		}
 	}
@@ -526,20 +526,20 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void convolve( Kernel2D_F64 kernel, InterleavedF64 src, InterleavedF64 dst ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		if( BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst) )
+		if (BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel, src, dst))
 			return;
 
-		if( kernel.width >= src.width || kernel.width >= src.height ) {
+		if (kernel.width >= src.width || kernel.width >= src.height) {
 			ConvolveNormalizedNaive_IL.convolve(kernel, src, dst);
 		} else {
-			if( Math.abs(kernel.computeSum() - 1.0f) > 1e-4f ) {
+			if (Math.abs(kernel.computeSum() - 1.0f) > 1e-4f) {
 				Kernel2D_F64 k = kernel.copy();
 				KernelMath.normalizeSumToOne(k);
 				kernel = k;
 			}
-			ConvolveImageNoBorder.convolve(kernel,src,dst);
+			ConvolveImageNoBorder.convolve(kernel, src, dst);
 			ConvolveNormalized_JustBorder_IL.convolve(kernel, src, dst);
 		}
 	}
@@ -552,12 +552,12 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void horizontal( Kernel1D_S32 kernel, GrayU8 src, GrayI8 dst ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		if( BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst) )
+		if (BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel, src, dst))
 			return;
 
-		if( kernel.width >= src.width ) {
+		if (kernel.width >= src.width) {
 			ConvolveNormalizedNaive_SB.horizontal(kernel, src, dst);
 		} else {
 			ConvolveImageNoBorder.horizontal(kernel, src, dst, kernel.computeSum());
@@ -577,19 +577,19 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void vertical( Kernel1D_S32 kernel, GrayU8 src, GrayI8 dst ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		if( BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst) )
+		if (BOverrideConvolveImageNormalized.invokeNativeVertical(kernel, src, dst))
 			return;
 
-		if( kernel.width >= src.height ) {
+		if (kernel.width >= src.height) {
 			ConvolveNormalizedNaive_SB.vertical(kernel, src, dst);
 		} else {
 			ConvolveImageNoBorder.vertical(kernel, src, dst, kernel.computeSum(), null);
 			if (BoofConcurrency.USE_CONCURRENT) {
-				ConvolveNormalized_JustBorder_SB_MT.vertical(kernel, src, dst);
+				ConvolveNormalized_JustBorder_SB_MT.vertical(kernel, src, dst, null);
 			} else {
-				ConvolveNormalized_JustBorder_SB.vertical(kernel, src, dst);
+				ConvolveNormalized_JustBorder_SB.vertical(kernel, src, dst, null);
 			}
 		}
 	}
@@ -602,12 +602,12 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void convolve( Kernel2D_S32 kernel, GrayU8 src, GrayI8 dst ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		if( BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst) )
+		if (BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel, src, dst))
 			return;
 
-		if( kernel.width >= src.width || kernel.width >= src.height ) {
+		if (kernel.width >= src.width || kernel.width >= src.height) {
 			ConvolveNormalizedNaive_SB.convolve(kernel, src, dst);
 		} else {
 			ConvolveImageNoBorder.convolve(kernel, src, dst, kernel.computeSum(), null);
@@ -627,14 +627,14 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void horizontal( Kernel1D_S32 kernel, GrayU8 src, GrayI8 dst, ImageBorder_S32<GrayU8> bsrc ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		//if( BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst) )
+		//if (BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel, src, dst))
 		//	return;
 
 		bsrc.setImage(src);
 
-		if( kernel.width >= src.width ) {
+		if (kernel.width >= src.width) {
 			ConvolveNormalizedNaive_SB.horizontal(kernel, src, dst, bsrc);
 		} else {
 			ConvolveImageNoBorder.horizontal(kernel, src, dst, kernel.computeSum());
@@ -650,14 +650,14 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void vertical( Kernel1D_S32 kernel, GrayU8 src, GrayI8 dst, ImageBorder_S32<GrayU8> bsrc ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		//if( BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst) )
+		//if (BOverrideConvolveImageNormalized.invokeNativeVertical(kernel, src, dst))
 		//	return;
 
 		bsrc.setImage(src);
 
-		if( kernel.width >= src.height ) {
+		if (kernel.width >= src.height) {
 			ConvolveNormalizedNaive_SB.vertical(kernel, src, dst, bsrc);
 		} else {
 			ConvolveImageNoBorder.vertical(kernel, src, dst, kernel.computeSum(), null);
@@ -673,14 +673,14 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void convolve( Kernel2D_S32 kernel, GrayU8 src, GrayI8 dst, ImageBorder_S32<GrayU8> bsrc ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		//if( BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst) )
+		//if (BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel, src, dst))
 		//	return;
 
 		bsrc.setImage(src);
 
-		if( kernel.width >= src.width || kernel.width >= src.height ) {
+		if (kernel.width >= src.width || kernel.width >= src.height) {
 			ConvolveNormalizedNaive_SB.convolve(kernel, src, dst, bsrc);
 		} else {
 			ConvolveImageNoBorder.convolve(kernel, src, dst, kernel.computeSum(), null);
@@ -696,12 +696,12 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void horizontal( Kernel1D_S32 kernel, InterleavedU8 src, InterleavedI8 dst ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		if( BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst) )
+		if (BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel, src, dst))
 			return;
 
-		if( kernel.width >= src.width ) {
+		if (kernel.width >= src.width) {
 			ConvolveNormalizedNaive_IL.horizontal(kernel, src, dst);
 		} else {
 			ConvolveImageNoBorder.horizontal(kernel, src, dst, kernel.computeSum());
@@ -717,12 +717,12 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void vertical( Kernel1D_S32 kernel, InterleavedU8 src, InterleavedI8 dst ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		if( BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst) )
+		if (BOverrideConvolveImageNormalized.invokeNativeVertical(kernel, src, dst))
 			return;
 
-		if( kernel.width >= src.height ) {
+		if (kernel.width >= src.height) {
 			ConvolveNormalizedNaive_IL.vertical(kernel, src, dst);
 		} else {
 			ConvolveImageNoBorder.vertical(kernel, src, dst, kernel.computeSum());
@@ -738,12 +738,12 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void convolve( Kernel2D_S32 kernel, InterleavedU8 src, InterleavedI8 dst ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		if( BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst) )
+		if (BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel, src, dst))
 			return;
 
-		if( kernel.width >= src.width || kernel.width >= src.height ) {
+		if (kernel.width >= src.width || kernel.width >= src.height) {
 			ConvolveNormalizedNaive_IL.convolve(kernel, src, dst);
 		} else {
 			ConvolveImageNoBorder.convolve(kernel, src, dst, kernel.computeSum());
@@ -759,12 +759,12 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void horizontal( Kernel1D_S32 kernel, GrayS16 src, GrayI16 dst ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		if( BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst) )
+		if (BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel, src, dst))
 			return;
 
-		if( kernel.width >= src.width ) {
+		if (kernel.width >= src.width) {
 			ConvolveNormalizedNaive_SB.horizontal(kernel, src, dst);
 		} else {
 			ConvolveImageNoBorder.horizontal(kernel, src, dst, kernel.computeSum());
@@ -784,19 +784,19 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void vertical( Kernel1D_S32 kernel, GrayS16 src, GrayI16 dst ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		if( BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst) )
+		if (BOverrideConvolveImageNormalized.invokeNativeVertical(kernel, src, dst))
 			return;
 
-		if( kernel.width >= src.height ) {
+		if (kernel.width >= src.height) {
 			ConvolveNormalizedNaive_SB.vertical(kernel, src, dst);
 		} else {
 			ConvolveImageNoBorder.vertical(kernel, src, dst, kernel.computeSum(), null);
 			if (BoofConcurrency.USE_CONCURRENT) {
-				ConvolveNormalized_JustBorder_SB_MT.vertical(kernel, src, dst);
+				ConvolveNormalized_JustBorder_SB_MT.vertical(kernel, src, dst, null);
 			} else {
-				ConvolveNormalized_JustBorder_SB.vertical(kernel, src, dst);
+				ConvolveNormalized_JustBorder_SB.vertical(kernel, src, dst, null);
 			}
 		}
 	}
@@ -809,12 +809,12 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void convolve( Kernel2D_S32 kernel, GrayS16 src, GrayI16 dst ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		if( BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst) )
+		if (BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel, src, dst))
 			return;
 
-		if( kernel.width >= src.width || kernel.width >= src.height ) {
+		if (kernel.width >= src.width || kernel.width >= src.height) {
 			ConvolveNormalizedNaive_SB.convolve(kernel, src, dst);
 		} else {
 			ConvolveImageNoBorder.convolve(kernel, src, dst, kernel.computeSum(), null);
@@ -834,14 +834,14 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void horizontal( Kernel1D_S32 kernel, GrayS16 src, GrayI16 dst, ImageBorder_S32<GrayS16> bsrc ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		//if( BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst) )
+		//if (BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel, src, dst))
 		//	return;
 
 		bsrc.setImage(src);
 
-		if( kernel.width >= src.width ) {
+		if (kernel.width >= src.width) {
 			ConvolveNormalizedNaive_SB.horizontal(kernel, src, dst, bsrc);
 		} else {
 			ConvolveImageNoBorder.horizontal(kernel, src, dst, kernel.computeSum());
@@ -857,14 +857,14 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void vertical( Kernel1D_S32 kernel, GrayS16 src, GrayI16 dst, ImageBorder_S32<GrayS16> bsrc ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		//if( BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst) )
+		//if (BOverrideConvolveImageNormalized.invokeNativeVertical(kernel, src, dst))
 		//	return;
 
 		bsrc.setImage(src);
 
-		if( kernel.width >= src.height ) {
+		if (kernel.width >= src.height) {
 			ConvolveNormalizedNaive_SB.vertical(kernel, src, dst, bsrc);
 		} else {
 			ConvolveImageNoBorder.vertical(kernel, src, dst, kernel.computeSum(), null);
@@ -880,14 +880,14 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void convolve( Kernel2D_S32 kernel, GrayS16 src, GrayI16 dst, ImageBorder_S32<GrayS16> bsrc ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		//if( BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst) )
+		//if (BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel, src, dst))
 		//	return;
 
 		bsrc.setImage(src);
 
-		if( kernel.width >= src.width || kernel.width >= src.height ) {
+		if (kernel.width >= src.width || kernel.width >= src.height) {
 			ConvolveNormalizedNaive_SB.convolve(kernel, src, dst, bsrc);
 		} else {
 			ConvolveImageNoBorder.convolve(kernel, src, dst, kernel.computeSum(), null);
@@ -903,12 +903,12 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void horizontal( Kernel1D_S32 kernel, InterleavedS16 src, InterleavedI16 dst ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		if( BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst) )
+		if (BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel, src, dst))
 			return;
 
-		if( kernel.width >= src.width ) {
+		if (kernel.width >= src.width) {
 			ConvolveNormalizedNaive_IL.horizontal(kernel, src, dst);
 		} else {
 			ConvolveImageNoBorder.horizontal(kernel, src, dst, kernel.computeSum());
@@ -924,12 +924,12 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void vertical( Kernel1D_S32 kernel, InterleavedS16 src, InterleavedI16 dst ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		if( BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst) )
+		if (BOverrideConvolveImageNormalized.invokeNativeVertical(kernel, src, dst))
 			return;
 
-		if( kernel.width >= src.height ) {
+		if (kernel.width >= src.height) {
 			ConvolveNormalizedNaive_IL.vertical(kernel, src, dst);
 		} else {
 			ConvolveImageNoBorder.vertical(kernel, src, dst, kernel.computeSum());
@@ -945,12 +945,12 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void convolve( Kernel2D_S32 kernel, InterleavedS16 src, InterleavedI16 dst ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		if( BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst) )
+		if (BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel, src, dst))
 			return;
 
-		if( kernel.width >= src.width || kernel.width >= src.height ) {
+		if (kernel.width >= src.width || kernel.width >= src.height) {
 			ConvolveNormalizedNaive_IL.convolve(kernel, src, dst);
 		} else {
 			ConvolveImageNoBorder.convolve(kernel, src, dst, kernel.computeSum());
@@ -966,12 +966,12 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void horizontal( Kernel1D_S32 kernel, GrayU16 src, GrayI16 dst ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		if( BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst) )
+		if (BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel, src, dst))
 			return;
 
-		if( kernel.width >= src.width ) {
+		if (kernel.width >= src.width) {
 			ConvolveNormalizedNaive_SB.horizontal(kernel, src, dst);
 		} else {
 			ConvolveImageNoBorder.horizontal(kernel, src, dst, kernel.computeSum());
@@ -991,19 +991,19 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void vertical( Kernel1D_S32 kernel, GrayU16 src, GrayI16 dst ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		if( BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst) )
+		if (BOverrideConvolveImageNormalized.invokeNativeVertical(kernel, src, dst))
 			return;
 
-		if( kernel.width >= src.height ) {
+		if (kernel.width >= src.height) {
 			ConvolveNormalizedNaive_SB.vertical(kernel, src, dst);
 		} else {
 			ConvolveImageNoBorder.vertical(kernel, src, dst, kernel.computeSum(), null);
 			if (BoofConcurrency.USE_CONCURRENT) {
-				ConvolveNormalized_JustBorder_SB_MT.vertical(kernel, src, dst);
+				ConvolveNormalized_JustBorder_SB_MT.vertical(kernel, src, dst, null);
 			} else {
-				ConvolveNormalized_JustBorder_SB.vertical(kernel, src, dst);
+				ConvolveNormalized_JustBorder_SB.vertical(kernel, src, dst, null);
 			}
 		}
 	}
@@ -1016,12 +1016,12 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void convolve( Kernel2D_S32 kernel, GrayU16 src, GrayI16 dst ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		if( BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst) )
+		if (BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel, src, dst))
 			return;
 
-		if( kernel.width >= src.width || kernel.width >= src.height ) {
+		if (kernel.width >= src.width || kernel.width >= src.height) {
 			ConvolveNormalizedNaive_SB.convolve(kernel, src, dst);
 		} else {
 			ConvolveImageNoBorder.convolve(kernel, src, dst, kernel.computeSum(), null);
@@ -1041,14 +1041,14 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void horizontal( Kernel1D_S32 kernel, GrayU16 src, GrayI16 dst, ImageBorder_S32<GrayU16> bsrc ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		//if( BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst) )
+		//if (BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel, src, dst))
 		//	return;
 
 		bsrc.setImage(src);
 
-		if( kernel.width >= src.width ) {
+		if (kernel.width >= src.width) {
 			ConvolveNormalizedNaive_SB.horizontal(kernel, src, dst, bsrc);
 		} else {
 			ConvolveImageNoBorder.horizontal(kernel, src, dst, kernel.computeSum());
@@ -1064,14 +1064,14 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void vertical( Kernel1D_S32 kernel, GrayU16 src, GrayI16 dst, ImageBorder_S32<GrayU16> bsrc ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		//if( BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst) )
+		//if (BOverrideConvolveImageNormalized.invokeNativeVertical(kernel, src, dst))
 		//	return;
 
 		bsrc.setImage(src);
 
-		if( kernel.width >= src.height ) {
+		if (kernel.width >= src.height) {
 			ConvolveNormalizedNaive_SB.vertical(kernel, src, dst, bsrc);
 		} else {
 			ConvolveImageNoBorder.vertical(kernel, src, dst, kernel.computeSum(), null);
@@ -1087,14 +1087,14 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void convolve( Kernel2D_S32 kernel, GrayU16 src, GrayI16 dst, ImageBorder_S32<GrayU16> bsrc ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		//if( BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst) )
+		//if (BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel, src, dst))
 		//	return;
 
 		bsrc.setImage(src);
 
-		if( kernel.width >= src.width || kernel.width >= src.height ) {
+		if (kernel.width >= src.width || kernel.width >= src.height) {
 			ConvolveNormalizedNaive_SB.convolve(kernel, src, dst, bsrc);
 		} else {
 			ConvolveImageNoBorder.convolve(kernel, src, dst, kernel.computeSum(), null);
@@ -1110,12 +1110,12 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void horizontal( Kernel1D_S32 kernel, InterleavedU16 src, InterleavedI16 dst ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		if( BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst) )
+		if (BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel, src, dst))
 			return;
 
-		if( kernel.width >= src.width ) {
+		if (kernel.width >= src.width) {
 			ConvolveNormalizedNaive_IL.horizontal(kernel, src, dst);
 		} else {
 			ConvolveImageNoBorder.horizontal(kernel, src, dst, kernel.computeSum());
@@ -1131,12 +1131,12 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void vertical( Kernel1D_S32 kernel, InterleavedU16 src, InterleavedI16 dst ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		if( BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst) )
+		if (BOverrideConvolveImageNormalized.invokeNativeVertical(kernel, src, dst))
 			return;
 
-		if( kernel.width >= src.height ) {
+		if (kernel.width >= src.height) {
 			ConvolveNormalizedNaive_IL.vertical(kernel, src, dst);
 		} else {
 			ConvolveImageNoBorder.vertical(kernel, src, dst, kernel.computeSum());
@@ -1152,12 +1152,12 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void convolve( Kernel2D_S32 kernel, InterleavedU16 src, InterleavedI16 dst ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		if( BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst) )
+		if (BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel, src, dst))
 			return;
 
-		if( kernel.width >= src.width || kernel.width >= src.height ) {
+		if (kernel.width >= src.width || kernel.width >= src.height) {
 			ConvolveNormalizedNaive_IL.convolve(kernel, src, dst);
 		} else {
 			ConvolveImageNoBorder.convolve(kernel, src, dst, kernel.computeSum());
@@ -1173,12 +1173,12 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void horizontal( Kernel1D_S32 kernel, GrayS32 src, GrayS32 dst ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		if( BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst) )
+		if (BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel, src, dst))
 			return;
 
-		if( kernel.width >= src.width ) {
+		if (kernel.width >= src.width) {
 			ConvolveNormalizedNaive_SB.horizontal(kernel, src, dst);
 		} else {
 			ConvolveImageNoBorder.horizontal(kernel, src, dst, kernel.computeSum());
@@ -1198,19 +1198,19 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void vertical( Kernel1D_S32 kernel, GrayS32 src, GrayS32 dst ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		if( BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst) )
+		if (BOverrideConvolveImageNormalized.invokeNativeVertical(kernel, src, dst))
 			return;
 
-		if( kernel.width >= src.height ) {
+		if (kernel.width >= src.height) {
 			ConvolveNormalizedNaive_SB.vertical(kernel, src, dst);
 		} else {
 			ConvolveImageNoBorder.vertical(kernel, src, dst, kernel.computeSum(), null);
 			if (BoofConcurrency.USE_CONCURRENT) {
-				ConvolveNormalized_JustBorder_SB_MT.vertical(kernel, src, dst);
+				ConvolveNormalized_JustBorder_SB_MT.vertical(kernel, src, dst, null);
 			} else {
-				ConvolveNormalized_JustBorder_SB.vertical(kernel, src, dst);
+				ConvolveNormalized_JustBorder_SB.vertical(kernel, src, dst, null);
 			}
 		}
 	}
@@ -1223,12 +1223,12 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void convolve( Kernel2D_S32 kernel, GrayS32 src, GrayS32 dst ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		if( BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst) )
+		if (BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel, src, dst))
 			return;
 
-		if( kernel.width >= src.width || kernel.width >= src.height ) {
+		if (kernel.width >= src.width || kernel.width >= src.height) {
 			ConvolveNormalizedNaive_SB.convolve(kernel, src, dst);
 		} else {
 			ConvolveImageNoBorder.convolve(kernel, src, dst, kernel.computeSum(), null);
@@ -1248,14 +1248,14 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void horizontal( Kernel1D_S32 kernel, GrayS32 src, GrayS32 dst, ImageBorder_S32<GrayS32> bsrc ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		//if( BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst) )
+		//if (BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel, src, dst))
 		//	return;
 
 		bsrc.setImage(src);
 
-		if( kernel.width >= src.width ) {
+		if (kernel.width >= src.width) {
 			ConvolveNormalizedNaive_SB.horizontal(kernel, src, dst, bsrc);
 		} else {
 			ConvolveImageNoBorder.horizontal(kernel, src, dst, kernel.computeSum());
@@ -1271,14 +1271,14 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void vertical( Kernel1D_S32 kernel, GrayS32 src, GrayS32 dst, ImageBorder_S32<GrayS32> bsrc ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		//if( BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst) )
+		//if (BOverrideConvolveImageNormalized.invokeNativeVertical(kernel, src, dst))
 		//	return;
 
 		bsrc.setImage(src);
 
-		if( kernel.width >= src.height ) {
+		if (kernel.width >= src.height) {
 			ConvolveNormalizedNaive_SB.vertical(kernel, src, dst, bsrc);
 		} else {
 			ConvolveImageNoBorder.vertical(kernel, src, dst, kernel.computeSum(), null);
@@ -1294,14 +1294,14 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void convolve( Kernel2D_S32 kernel, GrayS32 src, GrayS32 dst, ImageBorder_S32<GrayS32> bsrc ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		//if( BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst) )
+		//if (BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel, src, dst))
 		//	return;
 
 		bsrc.setImage(src);
 
-		if( kernel.width >= src.width || kernel.width >= src.height ) {
+		if (kernel.width >= src.width || kernel.width >= src.height) {
 			ConvolveNormalizedNaive_SB.convolve(kernel, src, dst, bsrc);
 		} else {
 			ConvolveImageNoBorder.convolve(kernel, src, dst, kernel.computeSum(), null);
@@ -1317,12 +1317,12 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void horizontal( Kernel1D_S32 kernel, InterleavedS32 src, InterleavedS32 dst ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		if( BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst) )
+		if (BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel, src, dst))
 			return;
 
-		if( kernel.width >= src.width ) {
+		if (kernel.width >= src.width) {
 			ConvolveNormalizedNaive_IL.horizontal(kernel, src, dst);
 		} else {
 			ConvolveImageNoBorder.horizontal(kernel, src, dst, kernel.computeSum());
@@ -1338,12 +1338,12 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void vertical( Kernel1D_S32 kernel, InterleavedS32 src, InterleavedS32 dst ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		if( BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst) )
+		if (BOverrideConvolveImageNormalized.invokeNativeVertical(kernel, src, dst))
 			return;
 
-		if( kernel.width >= src.height ) {
+		if (kernel.width >= src.height) {
 			ConvolveNormalizedNaive_IL.vertical(kernel, src, dst);
 		} else {
 			ConvolveImageNoBorder.vertical(kernel, src, dst, kernel.computeSum());
@@ -1359,17 +1359,16 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void convolve( Kernel2D_S32 kernel, InterleavedS32 src, InterleavedS32 dst ) {
-		dst.reshape(src.width,src.height);
+		dst.reshape(src.width, src.height);
 
-		if( BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst) )
+		if (BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel, src, dst))
 			return;
 
-		if( kernel.width >= src.width || kernel.width >= src.height ) {
+		if (kernel.width >= src.width || kernel.width >= src.height) {
 			ConvolveNormalizedNaive_IL.convolve(kernel, src, dst);
 		} else {
 			ConvolveImageNoBorder.convolve(kernel, src, dst, kernel.computeSum());
 			ConvolveNormalized_JustBorder_IL.convolve(kernel, src, dst);
 		}
 	}
-
 }

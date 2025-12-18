@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,8 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageGray;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Comparator;
 
 /**
  * Provides a formalism for comparing two sets of functions which should produce identical results.
@@ -51,6 +53,9 @@ public abstract class CompareEquivalentFunctions extends BoofStandardJUnit {
 	public void performTests( int numMethods ) {
 		Method[] methods = testClass.getMethods();
 
+		// Ensure the order is the same
+		Arrays.sort(methods, Comparator.comparing(Method::getName));
+
 		// sanity check to make sure the functions are being found
 		int numFound = 0;
 		for (Method m : methods) {
@@ -64,11 +69,15 @@ public abstract class CompareEquivalentFunctions extends BoofStandardJUnit {
 			for (Class<?> vc : validationClasses) {
 				// check for equivalence for each match
 				Method[] candidates = vc.getMethods();
-				for (Method c : candidates) {
-					if (isEquivalent(c, m)) {
+
+				// Ensure the order is the same
+				Arrays.sort(candidates, Comparator.comparing(Method::getName));
+
+				for (Method validM : candidates) {
+					if (isEquivalent(validM, m)) {
 //						System.out.println("Examining: "+m.getName()+" param "+c.getParameterCount()+" vs "+m.getParameterCount());
 						foundMatch = true;
-						compareMethods(m, c);
+						compareMethods(m, validM);
 						break escape;
 					}
 				}

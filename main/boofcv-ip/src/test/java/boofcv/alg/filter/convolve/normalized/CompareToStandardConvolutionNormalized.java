@@ -27,6 +27,7 @@ import boofcv.struct.border.ImageBorder;
 import boofcv.struct.convolve.KernelBase;
 import boofcv.struct.image.ImageBase;
 import boofcv.testing.CompareIdenticalFunctions;
+import pabeles.concurrency.GrowArray;
 
 import java.lang.reflect.Method;
 
@@ -61,28 +62,53 @@ public class CompareToStandardConvolutionNormalized extends CompareIdenticalFunc
 	}
 
 	@Override
+	protected Object[] reformatForValidation( Method m, Object[] targetParam ) {
+		// validation wont have workspace parameters
+		int count = m.getParameterCount();
+		Object[] ret = new Object[count];
+
+		for (int i = 0; i < count; i++) {
+			if (targetParam[i] == null)
+				continue;
+			if (ImageBase.class.isAssignableFrom(targetParam[i].getClass())) {
+				ret[i] = ((ImageBase)targetParam[i]).clone();
+			} else {
+				ret[i] = targetParam[i];
+			}
+		}
+
+		return ret;
+	}
+
+	@Override
 	protected Object[][] createInputParam( Method candidate, Method validation ) {
-		Class<?>[] paramTypes = candidate.getParameterTypes();
+		Class<?>[] candidateTypes = candidate.getParameterTypes();
+		Class<?>[] validTypes = validation.getParameterTypes();
 
-		Object[][] ret = new Object[1][paramTypes.length];
+		boolean hasWorkspace = candidateTypes[candidateTypes.length - 1].isAssignableFrom(GrowArray.class);
 
-		ret[0][0] = FactoryKernel.random((Class)paramTypes[0], kernelRadius, 1, 10, rand);
+		Object[][] ret = new Object[1][candidateTypes.length];
+
+		ret[0][0] = FactoryKernel.random((Class)candidateTypes[0], kernelRadius, 1, 10, rand);
 		((KernelBase)ret[0][0]).offset = offset;
 
 		int index = 1;
-		if (KernelBase.class.isAssignableFrom(paramTypes[1])) {
-			ret[0][index] = FactoryKernel.random((Class)paramTypes[1], kernelRadius, 1, 10, rand);
+		if (KernelBase.class.isAssignableFrom(candidateTypes[1])) {
+			ret[0][index] = FactoryKernel.random((Class)candidateTypes[1], kernelRadius, 1, 10, rand);
 			((KernelBase)ret[0][index]).offset = offset;
 			index++;
 		}
 
-		ImageBase src = ConvolutionTestHelper.createImage(paramTypes[index], width, height);
+		ImageBase src = ConvolutionTestHelper.createImage(candidateTypes[index], width, height);
 		ret[0][index++] = src;
-		GImageMiscOps.fillUniform(src, rand, 0, 120);
-		ImageBase dst = ConvolutionTestHelper.createImage(paramTypes[index], width, height);
+
+		double maxValue = Math.min(10_000, src.getImageType().getDataType().getMaxValue()/5);
+		GImageMiscOps.fillUniform(src, rand, 0, maxValue);
+
+		ImageBase dst = ConvolutionTestHelper.createImage(candidateTypes[index], width, height);
 		ret[0][index] = dst;
 
-		if (paramTypes.length == 4 && ImageBorder.class.isAssignableFrom(paramTypes[3])) {
+		if (validTypes.length == 4 && ImageBorder.class.isAssignableFrom(candidateTypes[3]) && !hasWorkspace) {
 			ret[0][3] = FactoryImageBorder.generic(BorderType.REFLECT, src.getImageType());
 		}
 

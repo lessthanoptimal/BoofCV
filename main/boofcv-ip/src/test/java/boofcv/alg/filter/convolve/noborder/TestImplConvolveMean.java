@@ -257,7 +257,7 @@ public class TestImplConvolveMean extends CompareEquivalentFunctions {
 
 				Object kernel = createTableKernel(testParams[0], offset, length);
 
-				testMethod.invoke(null, kernel, input, expected);
+				testMethod.invoke(null, kernel, input, expected, null);
 				m.invoke(null, input, found, offset, length, null);
 
 //				System.out.println("------");
