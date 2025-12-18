@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,24 +38,36 @@ public class CommonBenchmarkConvolve_SB {
 	protected static Kernel1D_F64 kernelF64;
 	protected static Kernel1D_S32 kernelI32;
 	protected static Kernel2D_S32 kernel2D_I32;
-	protected static GrayF32 input_F32 = new GrayF32(width, height);
-	protected static GrayF64 input_F64 = new GrayF64(width, height);
-	protected static GrayF32 out_F32 = new GrayF32(width, height);
-	protected static GrayF64 out_F64 = new GrayF64(width, height);
-	protected static GrayU8 input_U8 = new GrayU8(width, height);
-	protected static GrayS16 input_S16 = new GrayS16(width, height);
-	protected static GrayS16 input_U16 = new GrayS16(width, height);
-	protected static GrayS32 input_S32 = new GrayS32(width, height);
-	protected static GrayU8 out_U8 = new GrayU8(width, height);
-	protected static GrayS16 out_S16 = new GrayS16(width, height);
-	protected static GrayS32 out_S32 = new GrayS32(width, height);
+	protected static GrayF32 input_F32 = new GrayF32(1, 1);
+	protected static GrayF64 input_F64 = new GrayF64(1, 1);
+	protected static GrayF32 out_F32 = new GrayF32(1, 1);
+	protected static GrayF64 out_F64 = new GrayF64(1, 1);
+	protected static GrayU8 input_U8 = new GrayU8(1, 1);
+	protected static GrayS16 input_S16 = new GrayS16(1, 1);
+	protected static GrayS16 input_U16 = new GrayS16(1, 1);
+	protected static GrayS32 input_S32 = new GrayS32(1, 1);
+	protected static GrayU8 out_U8 = new GrayU8(1, 1);
+	protected static GrayS16 out_S16 = new GrayS16(1, 1);
+	protected static GrayS32 out_S32 = new GrayS32(1, 1);
 
 	protected GrowArray<DogArray_I32> work_I32 = new GrowArray<>(DogArray_I32::new);
 	protected GrowArray<DogArray_F32> work_F32 = new GrowArray<>(DogArray_F32::new);
 	protected GrowArray<DogArray_F64> work_F64 = new GrowArray<>(DogArray_F64::new);
 
-	public void setup( int radius ) {
-		Random rand = new Random(234);
+	public static void setup( int radius ) {
+		var rand = new Random(234);
+
+		input_F32.reshape(width, height);
+		input_F64.reshape(width, height);
+		out_F32.reshape(width, height);
+		out_F64.reshape(width, height);
+		input_U8.reshape(width, height);
+		input_S16.reshape(width, height);
+		input_U16.reshape(width, height);
+		input_S32.reshape(width, height);
+		out_U8.reshape(width, height);
+		out_S16.reshape(width, height);
+		out_S32.reshape(width, height);
 
 		ImageMiscOps.fillUniform(input_U8, rand, 0, 20);
 		ImageMiscOps.fillUniform(input_S16, rand, 0, 20);
