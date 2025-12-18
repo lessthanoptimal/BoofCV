@@ -20,15 +20,19 @@ package boofcv.alg.filter.convolve.normalized;
 
 import boofcv.core.image.FactoryGImageGray;
 import boofcv.core.image.GImageGray;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
+import pabeles.concurrency.GrowArray;
+
+import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestConvolveNormalized_JustBorder_SB extends BoofStandardJUnit {
 	@Test void compareToNaive() {
-		CompareToNaive test = new CompareToNaive();
+		var test = new CompareToNaive();
 		int numFunctions = 20;
 
 		for (int i = 0; i < 2; i++) {
@@ -60,6 +64,27 @@ public class TestConvolveNormalized_JustBorder_SB extends BoofStandardJUnit {
 			super(ConvolveNormalized_JustBorder_SB.class);
 		}
 
+		@Override protected boolean isEquivalent( Method candidate, Method evaluation ) {
+			if (!evaluation.getName().equals("vertical"))
+				return super.isEquivalent(candidate, evaluation);
+
+			if (!candidate.getName().equals(evaluation.getName()))
+				return false;
+
+			Class<?>[] e = evaluation.getParameterTypes();
+			Class<?>[] c = candidate.getParameterTypes();
+
+			boolean hasWorkspace = e[e.length - 1].isAssignableFrom(GrowArray.class);
+			if (!hasWorkspace)
+				return super.isEquivalent(candidate, evaluation);
+
+			for (int i = 0; i < c.length; i++) {
+				if (e[i] != c[i])
+					return false;
+			}
+			return true;
+		}
+
 		/**
 		 * Just compares the image border against each other.
 		 */
@@ -82,7 +107,7 @@ public class TestConvolveNormalized_JustBorder_SB extends BoofStandardJUnit {
 				borderX0 = offset;
 				borderX1 = kernelRadius*2 - offset;
 			} else if (methodTest.getName().contentEquals("vertical")) {
-				if (methodTest.getParameterTypes().length == 3) {
+				if (validationParam.length == 3) { // validation has no workspace, which makes this easier
 					t = FactoryGImageGray.wrap((ImageGray)targetParam[2]);
 					v = FactoryGImageGray.wrap((ImageGray)validationParam[2]);
 					borderY0 = offset;
@@ -97,8 +122,17 @@ public class TestConvolveNormalized_JustBorder_SB extends BoofStandardJUnit {
 				throw new RuntimeException("Unknown");
 			}
 
+//			System.out.println("-----------------------");
+//			((ImageGray)t.getImage()).print();
+//			System.out.println();
+//			((ImageGray)v.getImage()).print();
+
 			final int width = t.getWidth();
 			final int height = t.getHeight();
+
+			// Adjust the equality tolerance depending on the data type
+			ImageDataType dt = t.getImage().getDataType();
+			double tolRatio = dt.isInteger() ? 0 : dt.getNumBits() == 32 ? 1e-4 : 1e-8;
 
 			for (int y = 0; y < height; y++) {
 				for (int x = 0; x < width; x++) {
@@ -106,7 +140,9 @@ public class TestConvolveNormalized_JustBorder_SB extends BoofStandardJUnit {
 						Number numT = t.get(x, y);
 						Number numV = v.get(x, y);
 
-						assertEquals(numV.doubleValue(), numT.doubleValue(), 1e-4);
+						double tol = Math.max(numV.doubleValue(), numT.doubleValue())*tolRatio;
+
+						assertEquals(numV.doubleValue(), numT.doubleValue(), tol);
 					}
 				}
 			}

@@ -26,6 +26,7 @@ import boofcv.struct.convolve.KernelBase;
 import boofcv.struct.image.ImageBase;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
+import pabeles.concurrency.GrowArray;
 
 import java.lang.reflect.Method;
 
@@ -48,10 +49,12 @@ class TestConvolveNormalized_JustBorder_SB_MT extends BoofStandardJUnit {
 			Class[] params = m.getParameterTypes();
 			Method testM = BoofTesting.findMethod(ConvolveNormalized_JustBorder_SB.class, name, params);
 
+			boolean hasWorkspace = params[params.length - 1].isAssignableFrom(GrowArray.class);
+
 			try {
 				KernelBase kernel1, kernel2 = null;
 				ImageBase input, expected, found;
-				if (params.length == 3) {
+				if (params.length == 3 || hasWorkspace) {
 					kernel1 = FactoryKernel.random((Class)params[0], 2, 1, 10, rand);
 					input = GeneralizedImageOps.createImage(params[1], width, height, 2);
 					expected = GeneralizedImageOps.createImage(params[2], width, height, 2);
@@ -69,6 +72,9 @@ class TestConvolveNormalized_JustBorder_SB_MT extends BoofStandardJUnit {
 				if (params.length == 3) {
 					testM.invoke(null, kernel1, input, expected);
 					m.invoke(null, kernel1, input, found);
+				} else if (hasWorkspace) {
+					testM.invoke(null, kernel1, input, expected, null);
+					m.invoke(null, kernel1, input, found, null);
 				} else {
 					testM.invoke(null, kernel1, kernel2, input, expected);
 					m.invoke(null, kernel1, kernel2, input, found);

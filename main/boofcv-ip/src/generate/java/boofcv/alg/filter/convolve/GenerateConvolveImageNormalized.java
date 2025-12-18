@@ -127,11 +127,12 @@ public class GenerateConvolveImageNormalized extends CodeGeneratorBase {
 			else
 				justBorder = "\t\t\tConvolveJustBorder_General_SB." + name + "(kernel, bsrc, dst);\n";
 		} else {
+			String workspace = name.equals("vertical") ? ", null" : "";
 			if (singleBand) {
 				justBorder = "\t\t\tif (BoofConcurrency.USE_CONCURRENT) {\n" +
-						"\t\t\t\tConvolveNormalized_JustBorder_SB_MT." + name + "(kernel, src, dst);\n" +
+						"\t\t\t\tConvolveNormalized_JustBorder_SB_MT." + name + "(kernel, src, dst" + workspace + ");\n" +
 						"\t\t\t} else {\n" +
-						"\t\t\t\tConvolveNormalized_JustBorder_SB." + name + "(kernel, src, dst);\n" +
+						"\t\t\t\tConvolveNormalized_JustBorder_SB." + name + "(kernel, src, dst" + workspace + ");\n" +
 						"\t\t\t}\n";
 			} else {
 				justBorder = "\t\t\tConvolveNormalized_JustBorder_" + suffice + "." + name + "(kernel, src, dst);\n";
@@ -149,9 +150,9 @@ public class GenerateConvolveImageNormalized extends CodeGeneratorBase {
 						"\t */\n");
 
 		out.print(functionSignature(1, "public static void", name, kernelTypeName + " kernel", inputName + " src", outputName + " dst", borderArgument));
-		out.print("\t\tdst.reshape(src.width,src.height);\n" +
+		out.print("\t\tdst.reshape(src.width, src.height);\n" +
 				"\n" +
-				"\t\t" + commentsOverride + "if( BOverrideConvolveImageNormalized.invokeNative" + overrideName + "(kernel,src,dst) )\n" +
+				"\t\t" + commentsOverride + "if (BOverrideConvolveImageNormalized.invokeNative" + overrideName + "(kernel, src, dst))\n" +
 				"\t\t" + commentsOverride + "\treturn;\n\n");
 
 		if (border) {
@@ -168,22 +169,22 @@ public class GenerateConvolveImageNormalized extends CodeGeneratorBase {
 		}
 
 		if (isInteger) {
-			out.print("\t\tif( " + insideTest + " ) {\n" +
+			out.print("\t\tif (" + insideTest + ") {\n" +
 					"\t\t\tConvolveNormalizedNaive_" + suffice + "." + name + "(kernel, src, dst" + bsrc + ");\n" +
 					"\t\t} else {\n" +
 					"\t\t\tConvolveImageNoBorder." + name + "(kernel, src, dst, kernel.computeSum()" + workArray + ");\n" +
 					justBorder +
 					"\t\t}\n");
 		} else {
-			out.print("\t\tif( " + insideTest + " ) {\n" +
+			out.print("\t\tif (" + insideTest + ") {\n" +
 					"\t\t\tConvolveNormalizedNaive_" + suffice + "." + name + "(kernel, src, dst" + bsrc + ");\n" +
 					"\t\t} else {\n" +
-					"\t\t\tif( Math.abs(kernel.computeSum() - 1.0f) > 1e-4f ) {\n" +
+					"\t\t\tif (Math.abs(kernel.computeSum() - 1.0f) > 1e-4f) {\n" +
 					"\t\t\t\t" + kernelTypeName + " k = kernel.copy();\n" +
 					"\t\t\t\tKernelMath.normalizeSumToOne(k);\n" +
 					"\t\t\t\tkernel = k;\n" +
 					"\t\t\t}\n" +
-					"\t\t\tConvolveImageNoBorder." + name + "(kernel,src,dst);\n" +
+					"\t\t\tConvolveImageNoBorder." + name + "(kernel, src, dst);\n" +
 					justBorder +
 					"\t\t}\n");
 		}
