@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,11 +19,9 @@
 package boofcv.alg.filter.convolve;
 
 import boofcv.alg.filter.convolve.border.ConvolveJustBorder_General_SB;
-import boofcv.alg.filter.convolve.normalized.ConvolveNormalizedNaive_IL;
-import boofcv.alg.filter.convolve.normalized.ConvolveNormalizedNaive_SB;
-import boofcv.alg.filter.convolve.normalized.ConvolveNormalized_JustBorder_IL;
-import boofcv.alg.filter.convolve.normalized.ConvolveNormalized_JustBorder_SB;
+import boofcv.alg.filter.convolve.normalized.*;
 import boofcv.alg.filter.kernel.KernelMath;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.border.ImageBorder_F32;
 import boofcv.struct.border.ImageBorder_F64;
 import boofcv.struct.border.ImageBorder_S32;
@@ -64,7 +62,11 @@ public class ConvolveImageNormalized {
 				kernel = k;
 			}
 			ConvolveImageNoBorder.horizontal(kernel,src,dst);
-			ConvolveNormalized_JustBorder_SB.horizontal(kernel, src, dst);
+			if (BoofConcurrency.USE_CONCURRENT) {
+				ConvolveNormalized_JustBorder_SB_MT.horizontal(kernel, src, dst);
+			} else {
+				ConvolveNormalized_JustBorder_SB.horizontal(kernel, src, dst);
+			}
 		}
 	}
 
@@ -90,7 +92,11 @@ public class ConvolveImageNormalized {
 				kernel = k;
 			}
 			ConvolveImageNoBorder.vertical(kernel,src,dst);
-			ConvolveNormalized_JustBorder_SB.vertical(kernel, src, dst);
+			if (BoofConcurrency.USE_CONCURRENT) {
+				ConvolveNormalized_JustBorder_SB_MT.vertical(kernel, src, dst);
+			} else {
+				ConvolveNormalized_JustBorder_SB.vertical(kernel, src, dst);
+			}
 		}
 	}
 
@@ -116,7 +122,11 @@ public class ConvolveImageNormalized {
 				kernel = k;
 			}
 			ConvolveImageNoBorder.convolve(kernel,src,dst);
-			ConvolveNormalized_JustBorder_SB.convolve(kernel, src, dst);
+			if (BoofConcurrency.USE_CONCURRENT) {
+				ConvolveNormalized_JustBorder_SB_MT.convolve(kernel, src, dst);
+			} else {
+				ConvolveNormalized_JustBorder_SB.convolve(kernel, src, dst);
+			}
 		}
 	}
 
@@ -304,7 +314,11 @@ public class ConvolveImageNormalized {
 				kernel = k;
 			}
 			ConvolveImageNoBorder.horizontal(kernel,src,dst);
-			ConvolveNormalized_JustBorder_SB.horizontal(kernel, src, dst);
+			if (BoofConcurrency.USE_CONCURRENT) {
+				ConvolveNormalized_JustBorder_SB_MT.horizontal(kernel, src, dst);
+			} else {
+				ConvolveNormalized_JustBorder_SB.horizontal(kernel, src, dst);
+			}
 		}
 	}
 
@@ -330,7 +344,11 @@ public class ConvolveImageNormalized {
 				kernel = k;
 			}
 			ConvolveImageNoBorder.vertical(kernel,src,dst);
-			ConvolveNormalized_JustBorder_SB.vertical(kernel, src, dst);
+			if (BoofConcurrency.USE_CONCURRENT) {
+				ConvolveNormalized_JustBorder_SB_MT.vertical(kernel, src, dst);
+			} else {
+				ConvolveNormalized_JustBorder_SB.vertical(kernel, src, dst);
+			}
 		}
 	}
 
@@ -356,7 +374,11 @@ public class ConvolveImageNormalized {
 				kernel = k;
 			}
 			ConvolveImageNoBorder.convolve(kernel,src,dst);
-			ConvolveNormalized_JustBorder_SB.convolve(kernel, src, dst);
+			if (BoofConcurrency.USE_CONCURRENT) {
+				ConvolveNormalized_JustBorder_SB_MT.convolve(kernel, src, dst);
+			} else {
+				ConvolveNormalized_JustBorder_SB.convolve(kernel, src, dst);
+			}
 		}
 	}
 
@@ -539,7 +561,11 @@ public class ConvolveImageNormalized {
 			ConvolveNormalizedNaive_SB.horizontal(kernel, src, dst);
 		} else {
 			ConvolveImageNoBorder.horizontal(kernel, src, dst, kernel.computeSum());
-			ConvolveNormalized_JustBorder_SB.horizontal(kernel, src, dst);
+			if (BoofConcurrency.USE_CONCURRENT) {
+				ConvolveNormalized_JustBorder_SB_MT.horizontal(kernel, src, dst);
+			} else {
+				ConvolveNormalized_JustBorder_SB.horizontal(kernel, src, dst);
+			}
 		}
 	}
 
@@ -560,7 +586,11 @@ public class ConvolveImageNormalized {
 			ConvolveNormalizedNaive_SB.vertical(kernel, src, dst);
 		} else {
 			ConvolveImageNoBorder.vertical(kernel, src, dst, kernel.computeSum(), null);
-			ConvolveNormalized_JustBorder_SB.vertical(kernel, src, dst);
+			if (BoofConcurrency.USE_CONCURRENT) {
+				ConvolveNormalized_JustBorder_SB_MT.vertical(kernel, src, dst);
+			} else {
+				ConvolveNormalized_JustBorder_SB.vertical(kernel, src, dst);
+			}
 		}
 	}
 
@@ -581,7 +611,11 @@ public class ConvolveImageNormalized {
 			ConvolveNormalizedNaive_SB.convolve(kernel, src, dst);
 		} else {
 			ConvolveImageNoBorder.convolve(kernel, src, dst, kernel.computeSum(), null);
-			ConvolveNormalized_JustBorder_SB.convolve(kernel, src, dst);
+			if (BoofConcurrency.USE_CONCURRENT) {
+				ConvolveNormalized_JustBorder_SB_MT.convolve(kernel, src, dst);
+			} else {
+				ConvolveNormalized_JustBorder_SB.convolve(kernel, src, dst);
+			}
 		}
 	}
 
@@ -734,7 +768,11 @@ public class ConvolveImageNormalized {
 			ConvolveNormalizedNaive_SB.horizontal(kernel, src, dst);
 		} else {
 			ConvolveImageNoBorder.horizontal(kernel, src, dst, kernel.computeSum());
-			ConvolveNormalized_JustBorder_SB.horizontal(kernel, src, dst);
+			if (BoofConcurrency.USE_CONCURRENT) {
+				ConvolveNormalized_JustBorder_SB_MT.horizontal(kernel, src, dst);
+			} else {
+				ConvolveNormalized_JustBorder_SB.horizontal(kernel, src, dst);
+			}
 		}
 	}
 
@@ -755,7 +793,11 @@ public class ConvolveImageNormalized {
 			ConvolveNormalizedNaive_SB.vertical(kernel, src, dst);
 		} else {
 			ConvolveImageNoBorder.vertical(kernel, src, dst, kernel.computeSum(), null);
-			ConvolveNormalized_JustBorder_SB.vertical(kernel, src, dst);
+			if (BoofConcurrency.USE_CONCURRENT) {
+				ConvolveNormalized_JustBorder_SB_MT.vertical(kernel, src, dst);
+			} else {
+				ConvolveNormalized_JustBorder_SB.vertical(kernel, src, dst);
+			}
 		}
 	}
 
@@ -776,7 +818,11 @@ public class ConvolveImageNormalized {
 			ConvolveNormalizedNaive_SB.convolve(kernel, src, dst);
 		} else {
 			ConvolveImageNoBorder.convolve(kernel, src, dst, kernel.computeSum(), null);
-			ConvolveNormalized_JustBorder_SB.convolve(kernel, src, dst);
+			if (BoofConcurrency.USE_CONCURRENT) {
+				ConvolveNormalized_JustBorder_SB_MT.convolve(kernel, src, dst);
+			} else {
+				ConvolveNormalized_JustBorder_SB.convolve(kernel, src, dst);
+			}
 		}
 	}
 
@@ -929,7 +975,11 @@ public class ConvolveImageNormalized {
 			ConvolveNormalizedNaive_SB.horizontal(kernel, src, dst);
 		} else {
 			ConvolveImageNoBorder.horizontal(kernel, src, dst, kernel.computeSum());
-			ConvolveNormalized_JustBorder_SB.horizontal(kernel, src, dst);
+			if (BoofConcurrency.USE_CONCURRENT) {
+				ConvolveNormalized_JustBorder_SB_MT.horizontal(kernel, src, dst);
+			} else {
+				ConvolveNormalized_JustBorder_SB.horizontal(kernel, src, dst);
+			}
 		}
 	}
 
@@ -950,7 +1000,11 @@ public class ConvolveImageNormalized {
 			ConvolveNormalizedNaive_SB.vertical(kernel, src, dst);
 		} else {
 			ConvolveImageNoBorder.vertical(kernel, src, dst, kernel.computeSum(), null);
-			ConvolveNormalized_JustBorder_SB.vertical(kernel, src, dst);
+			if (BoofConcurrency.USE_CONCURRENT) {
+				ConvolveNormalized_JustBorder_SB_MT.vertical(kernel, src, dst);
+			} else {
+				ConvolveNormalized_JustBorder_SB.vertical(kernel, src, dst);
+			}
 		}
 	}
 
@@ -971,7 +1025,11 @@ public class ConvolveImageNormalized {
 			ConvolveNormalizedNaive_SB.convolve(kernel, src, dst);
 		} else {
 			ConvolveImageNoBorder.convolve(kernel, src, dst, kernel.computeSum(), null);
-			ConvolveNormalized_JustBorder_SB.convolve(kernel, src, dst);
+			if (BoofConcurrency.USE_CONCURRENT) {
+				ConvolveNormalized_JustBorder_SB_MT.convolve(kernel, src, dst);
+			} else {
+				ConvolveNormalized_JustBorder_SB.convolve(kernel, src, dst);
+			}
 		}
 	}
 
@@ -1124,7 +1182,11 @@ public class ConvolveImageNormalized {
 			ConvolveNormalizedNaive_SB.horizontal(kernel, src, dst);
 		} else {
 			ConvolveImageNoBorder.horizontal(kernel, src, dst, kernel.computeSum());
-			ConvolveNormalized_JustBorder_SB.horizontal(kernel, src, dst);
+			if (BoofConcurrency.USE_CONCURRENT) {
+				ConvolveNormalized_JustBorder_SB_MT.horizontal(kernel, src, dst);
+			} else {
+				ConvolveNormalized_JustBorder_SB.horizontal(kernel, src, dst);
+			}
 		}
 	}
 
@@ -1145,7 +1207,11 @@ public class ConvolveImageNormalized {
 			ConvolveNormalizedNaive_SB.vertical(kernel, src, dst);
 		} else {
 			ConvolveImageNoBorder.vertical(kernel, src, dst, kernel.computeSum(), null);
-			ConvolveNormalized_JustBorder_SB.vertical(kernel, src, dst);
+			if (BoofConcurrency.USE_CONCURRENT) {
+				ConvolveNormalized_JustBorder_SB_MT.vertical(kernel, src, dst);
+			} else {
+				ConvolveNormalized_JustBorder_SB.vertical(kernel, src, dst);
+			}
 		}
 	}
 
@@ -1166,7 +1232,11 @@ public class ConvolveImageNormalized {
 			ConvolveNormalizedNaive_SB.convolve(kernel, src, dst);
 		} else {
 			ConvolveImageNoBorder.convolve(kernel, src, dst, kernel.computeSum(), null);
-			ConvolveNormalized_JustBorder_SB.convolve(kernel, src, dst);
+			if (BoofConcurrency.USE_CONCURRENT) {
+				ConvolveNormalized_JustBorder_SB_MT.convolve(kernel, src, dst);
+			} else {
+				ConvolveNormalized_JustBorder_SB.convolve(kernel, src, dst);
+			}
 		}
 	}
 
