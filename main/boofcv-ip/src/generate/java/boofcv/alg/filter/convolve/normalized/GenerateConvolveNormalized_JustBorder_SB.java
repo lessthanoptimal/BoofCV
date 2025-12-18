@@ -93,6 +93,9 @@ public class GenerateConvolveNormalized_JustBorder_SB extends CodeGeneratorBase 
 		outputData = output.getDataType();
 		sumType = input.getSumType();
 		bitWiseOp = input.getBitWise();
+		// add a space to conform to standard formatting
+		if (!bitWiseOp.isEmpty())
+			bitWiseOp = " " + bitWiseOp;
 
 		divide = isInteger ? "(total + weight/2)/weight" : "total/weight";
 
@@ -187,7 +190,7 @@ public class GenerateConvolveNormalized_JustBorder_SB extends CodeGeneratorBase 
 	private void printVertical( boolean isInteger ) {
 
 		String typeCast = outputData.compareTo(sumType) == 0 ? "" : "(" + outputData + ")";
-		String divide = isInteger ? "(totals[x - x0] + weight/2)/weight" : "totals[x - x0]/weight";
+		String divide = isInteger ? "(totals[x] + weight/2)/weight" : "totals[x]/weight";
 		String workType = ("DogArray_" + kernelType).replace("S32", "I32");
 
 		out.print("\tpublic static void vertical( Kernel1D_" + kernelType + " kernel, " + inputType + " input, " + outputType + " output, " +
@@ -209,26 +212,28 @@ public class GenerateConvolveNormalized_JustBorder_SB extends CodeGeneratorBase 
 				"\n" +
 				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, input.width, 20, workspaces, (work, x0, x1) -> {\n" +
 				"\t\tfinal int x0 = 0, x1 = input.width;\n" +
+				"\t\tfinal int countX = x1 - x0;\n" +
 				"\t\t" + kernelData + "[] totals = BoofMiscOps.checkDeclare(work, x1 - x0, false);\n" +
+				"\t\t// NOTE: for floating point images this workspace isn't needed. Output image can be used instead\n" +
 				"\n" +
 				"\t\tfor (int y = 0; y < offsetL; y++) {\n" +
 				"\t\t\tint indexInRow = input.startIndex + x0;\n" +
 				"\t\t\tfinal int kStart = offsetL - y;\n" +
 				"\t\t\t" + kernelData + " w = dataKer[kStart];\n" +
 				"\t\t\t" + sumType + " weight = w;\n" +
-				"\t\t\tfor (int x = x0, indexIn = indexInRow; x < x1; x++) {\n" +
-				"\t\t\t\ttotals[x - x0] = (dataSrc[indexIn++]" + bitWiseOp + ")*w;\n" +
+				"\t\t\tfor (int x = 0, indexIn = indexInRow; x < countX; x++) {\n" +
+				"\t\t\t\ttotals[x] = (dataSrc[indexIn++]" + bitWiseOp + ")*w;\n" +
 				"\t\t\t}\n" +
 				"\t\t\tfor (int k = kStart + 1; k < kernelWidth; k++) {\n" +
 				"\t\t\t\tindexInRow += input.stride;\n" +
 				"\t\t\t\tw = dataKer[k];\n" +
 				"\t\t\t\tweight += w;\n" +
-				"\t\t\t\tfor (int x = x0, indexIn = indexInRow; x < x1; x++) {\n" +
-				"\t\t\t\t\ttotals[x - x0] += (dataSrc[indexIn++]" + bitWiseOp + ")*w;\n" +
+				"\t\t\t\tfor (int x = 0, indexIn = indexInRow; x < countX; x++) {\n" +
+				"\t\t\t\t\ttotals[x] += (dataSrc[indexIn++]" + bitWiseOp + ")*w;\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t}\n" +
 				"\t\t\tint indexOut = output.startIndex + x0 + y*output.stride;\n" +
-				"\t\t\tfor (int x = x0; x < x1; x++) {\n" +
+				"\t\t\tfor (int x = 0; x < countX; x++) {\n" +
 				"\t\t\t\tdataDst[indexOut++] = " + typeCast + "(" + divide + ");\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
@@ -238,19 +243,19 @@ public class GenerateConvolveNormalized_JustBorder_SB extends CodeGeneratorBase 
 				"\t\t\tfinal int kEnd = imgHeight - (y - offsetL);\n" +
 				"\t\t\t" + kernelData + " w = dataKer[0];\n" +
 				"\t\t\t" + sumType + " weight = w;\n" +
-				"\t\t\tfor (int x = x0, indexIn = indexInRow; x < x1; x++) {\n" +
-				"\t\t\t\ttotals[x - x0] = (dataSrc[indexIn++]" + bitWiseOp + ")*w;\n" +
+				"\t\t\tfor (int x = 0, indexIn = indexInRow; x < countX; x++) {\n" +
+				"\t\t\t\ttotals[x] = (dataSrc[indexIn++]" + bitWiseOp + ")*w;\n" +
 				"\t\t\t}\n" +
 				"\t\t\tfor (int k = 1; k < kEnd; k++) {\n" +
 				"\t\t\t\tindexInRow += input.stride;\n" +
 				"\t\t\t\tw = dataKer[k];\n" +
 				"\t\t\t\tweight += w;\n" +
-				"\t\t\t\tfor (int x = x0, indexIn = indexInRow; x < x1; x++) {\n" +
-				"\t\t\t\t\ttotals[x - x0] += (dataSrc[indexIn++]" + bitWiseOp + ")*w;\n" +
+				"\t\t\t\tfor (int x = 0, indexIn = indexInRow; x < countX; x++) {\n" +
+				"\t\t\t\t\ttotals[x] += (dataSrc[indexIn++]" + bitWiseOp + ")*w;\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t}\n" +
 				"\t\t\tint indexOut = output.startIndex + x0 + y*output.stride;\n" +
-				"\t\t\tfor (int x = x0; x < x1; x++) {\n" +
+				"\t\t\tfor (int x = 0; x < countX; x++) {\n" +
 				"\t\t\t\tdataDst[indexOut++] = " + typeCast + "(" + divide + ");\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
@@ -278,16 +283,18 @@ public class GenerateConvolveNormalized_JustBorder_SB extends CodeGeneratorBase 
 				"\t\tfinal int imgWidth = output.getWidth();\n" +
 				"\t\tfinal int imgHeight = output.getHeight();\n" +
 				"\n" +
-				"\t\tfinal int yEnd = imgHeight - (kernelWidthY-offsetY-1);\n" +
+				"\t\tfinal int yEnd = imgHeight - (kernelWidthY - offsetY - 1);\n" +
 				"\n" +
-				"\t\tint startWeightX = 0;\n" +
+				"\t\t" + sumType + " tmpSumX = 0;\n" +
 				"\t\tfor (int k = offsetX; k < kernelWidthX; k++) {\n" +
-				"\t\t\tstartWeightX += kernelX.data[k];\n" +
+				"\t\t\ttmpSumX += kernelX.data[k];\n" +
 				"\t\t}\n" +
+				"\t\tfinal " + sumType + " startWeightX = tmpSumX;\n" +
 				"\n" +
+				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0, offsetY, y -> {\n" +
 				"\t\tfor (int y = 0; y < offsetY; y++) {\n" +
-				"\t\t\tint indexDst = output.startIndex + y * output.stride;\n" +
-				"\t\t\tint i = input.startIndex + y * input.stride;\n" +
+				"\t\t\tint indexDst = output.startIndex + y*output.stride;\n" +
+				"\t\t\tint i = input.startIndex + y*input.stride;\n" +
 				"\t\t\tfinal int iEnd = i + imgWidth;\n" +
 				"\n" +
 				"\t\t\tint kStart = offsetY - y;\n" +
@@ -301,9 +308,9 @@ public class GenerateConvolveNormalized_JustBorder_SB extends CodeGeneratorBase 
 				"\t\t\tfor ( int x = 0; i < iEnd; i++, x++ ) {\n" +
 				"\t\t\t\tint weight = weightX*weightY;\n" +
 				"\t\t\t\tint total = 0;\n" +
-				"\t\t\t\tint indexSrc = i - y * input.stride;\n" +
+				"\t\t\t\tint indexSrc = i - y*input.stride;\n" +
 				"\t\t\t\tfor (int k = kStart; k < kernelWidthY; k++, indexSrc += input.stride) {\n" +
-				"\t\t\t\t\ttotal += (dataSrc[indexSrc]" + bitWiseOp + ") * dataKer[k];\n" +
+				"\t\t\t\t\ttotal += (dataSrc[indexSrc]" + bitWiseOp + ")*dataKer[k];\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t\tdataDst[indexDst++] = " + typeCast + "(" + divide + ");\n" +
 				"\t\t\t\tif( x < offsetX ) {\n" +
@@ -313,10 +320,12 @@ public class GenerateConvolveNormalized_JustBorder_SB extends CodeGeneratorBase 
 				"\t\t\t\t}\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
+				"\t\t//CONCURRENT_ABOVE });\n" +
 				"\n" +
+				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(yEnd, imgHeight, y -> {\n" +
 				"\t\tfor (int y = yEnd; y < imgHeight; y++) {\n" +
-				"\t\t\tint indexDst = output.startIndex + y * output.stride;\n" +
-				"\t\t\tint i = input.startIndex + y * input.stride;\n" +
+				"\t\t\tint indexDst = output.startIndex + y*output.stride;\n" +
+				"\t\t\tint i = input.startIndex + y*input.stride;\n" +
 				"\t\t\tfinal int iEnd = i + imgWidth;\n" +
 				"\n" +
 				"\t\t\tint kEnd = imgHeight - (y - offsetY);\n" +
@@ -327,58 +336,61 @@ public class GenerateConvolveNormalized_JustBorder_SB extends CodeGeneratorBase 
 				"\t\t\t}\n" +
 				"\t\t\tint weightX = startWeightX;\n" +
 				"\n" +
-				"\t\t\tfor ( int x = 0; i < iEnd; i++, x++ ) {\n" +
+				"\t\t\tfor (int x = 0; i < iEnd; i++, x++) {\n" +
 				"\t\t\t\tint weight = weightX*weightY;\n" +
 				"\t\t\t\tint total = 0;\n" +
-				"\t\t\t\tint indexSrc = i - offsetY * input.stride;\n" +
+				"\t\t\t\tint indexSrc = i - offsetY*input.stride;\n" +
 				"\t\t\t\tfor (int k = 0; k < kEnd; k++, indexSrc += input.stride) {\n" +
-				"\t\t\t\t\ttotal += (dataSrc[indexSrc]" + bitWiseOp + ") * dataKer[k];\n" +
+				"\t\t\t\t\ttotal += (dataSrc[indexSrc]" + bitWiseOp + ")*dataKer[k];\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t\tdataDst[indexDst++] = " + typeCast + "(" + divide + ");\n" +
 				"\t\t\t\tif( x < offsetX ) {\n" +
-				"\t\t\t\t\tweightX += kernelX.data[offsetX-x-1];\n" +
-				"\t\t\t\t} else if( x >= input.width-(kernelWidthX-offsetX) ) {\n" +
+				"\t\t\t\t\tweightX += kernelX.data[offsetX - x - 1];\n" +
+				"\t\t\t\t} else if (x >= input.width - (kernelWidthX - offsetX)) {\n" +
 				"\t\t\t\t\tweightX -= kernelX.data[input.width-x+offsetX-1];\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
+				"\t\t//CONCURRENT_ABOVE });\n" +
 				"\n" +
 				"\t\t// left and right border\n" +
-				"\t\tint weightY = kernelY.computeSum();\n" +
+				"\t\tfinal int weightY = kernelY.computeSum();\n" +
+				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(offsetY, yEnd, y -> {\n" +
 				"\t\tfor (int y = offsetY; y < yEnd; y++) {\n" +
-				"\t\t\tint indexDst = output.startIndex + y * output.stride;\n" +
-				"\t\t\tint i = input.startIndex + y * input.stride;\n" +
+				"\t\t\tint indexDst = output.startIndex + y*output.stride;\n" +
+				"\t\t\tint i = input.startIndex + y*input.stride;\n" +
 				"\n" +
 				"\t\t\t// left side\n" +
 				"\t\t\tint iEnd = i + offsetY;\n" +
 				"\t\t\tint weightX = startWeightX;\n" +
-				"\t\t\tfor ( int x = 0; i < iEnd; i++, x++ ) {\n" +
+				"\t\t\tfor (int x = 0; i < iEnd; i++, x++) {\n" +
 				"\t\t\t\tint weight = weightX*weightY;\n" +
 				"\t\t\t\tint total = 0;\n" +
-				"\t\t\t\tint indexSrc = i - offsetY * input.stride;\n" +
+				"\t\t\t\tint indexSrc = i - offsetY*input.stride;\n" +
 				"\t\t\t\tfor (int k = 0; k < kernelWidthY; k++, indexSrc += input.stride) {\n" +
-				"\t\t\t\t\ttotal += (dataSrc[indexSrc]" + bitWiseOp + ") * dataKer[k];\n" +
+				"\t\t\t\t\ttotal += (dataSrc[indexSrc]" + bitWiseOp + ")*dataKer[k];\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t\tdataDst[indexDst++] = " + typeCast + "(" + divide + ");\n" +
-				"\t\t\t\tweightX += kernelX.data[offsetX-x-1];\n" +
+				"\t\t\t\tweightX += kernelX.data[offsetX - x - 1];\n" +
 				"\t\t\t}\n" +
 				"\n" +
 				"\t\t\t// right side\n" +
-				"\t\t\tint startX = input.width-offsetX1;\n" +
-				"\t\t\tindexDst = output.startIndex + y * output.stride + startX;\n" +
-				"\t\t\ti = input.startIndex + y * input.stride + startX;\n" +
-				"\t\t\tiEnd = input.startIndex + y * input.stride + input.width;\n" +
-				"\t\t\tfor ( int x = startX; i < iEnd; i++, x++ ) {\n" +
-				"\t\t\t\tweightX -= kernelX.data[input.width-x+offsetX];\n" +
+				"\t\t\tint startX = input.width - offsetX1;\n" +
+				"\t\t\tindexDst = output.startIndex + y*output.stride + startX;\n" +
+				"\t\t\ti = input.startIndex + y*input.stride + startX;\n" +
+				"\t\t\tiEnd = input.startIndex + y*input.stride + input.width;\n" +
+				"\t\t\tfor (int x = startX; i < iEnd; i++, x++) {\n" +
+				"\t\t\t\tweightX -= kernelX.data[input.width - x + offsetX];\n" +
 				"\t\t\t\tint weight = weightX*weightY;\n" +
 				"\t\t\t\tint total = 0;\n" +
-				"\t\t\t\tint indexSrc = i - offsetY * input.stride;\n" +
+				"\t\t\t\tint indexSrc = i - offsetY*input.stride;\n" +
 				"\t\t\t\tfor (int k = 0; k < kernelWidthY; k++, indexSrc += input.stride) {\n" +
-				"\t\t\t\t\ttotal += (dataSrc[indexSrc]" + bitWiseOp + ") * dataKer[k];\n" +
+				"\t\t\t\t\ttotal += (dataSrc[indexSrc]" + bitWiseOp + ")*dataKer[k];\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t\tdataDst[indexDst++] = " + typeCast + "(" + divide + ");\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
+				"\t\t//CONCURRENT_ABOVE });\n" +
 				"\t}\n\n");
 	}
 
@@ -403,7 +415,7 @@ public class GenerateConvolveNormalized_JustBorder_SB extends CodeGeneratorBase 
 				"\t\tfor (int y = 0; y < height; y++) {\n" +
 				"\n" +
 				"\t\t\tint minI = y >= offsetL ? -offsetL : -y;\n" +
-				"\t\t\tint maxI = y < height - offsetR ?  offsetR : height - y - 1;\n" +
+				"\t\t\tint maxI = y < height - offsetR ? offsetR : height - y - 1;\n" +
 				"\n" +
 				"\t\t\tint indexDst = output.startIndex + y*output.stride;\n" +
 				"\n" +
@@ -426,7 +438,7 @@ public class GenerateConvolveNormalized_JustBorder_SB extends CodeGeneratorBase 
 				"\t\t\t\tdataDst[indexDst++] = " + typeCast + "(" + divide + ");\n" +
 				"\t\t\t}\n" +
 				"\n" +
-				"\t\t\tindexDst = output.startIndex + y* output.stride + width-offsetR;\n" +
+				"\t\t\tindexDst = output.startIndex + y* output.stride + width - offsetR;\n" +
 				"\t\t\tfor (int x = width - offsetR; x < width; x++) {\n" +
 				"\n" +
 				"\t\t\t\tint maxJ = width - x - 1;\n" +
@@ -456,13 +468,13 @@ public class GenerateConvolveNormalized_JustBorder_SB extends CodeGeneratorBase 
 				"\n" +
 				"\t\t\tint indexDst = output.startIndex + y*output.stride + offsetL;\n" +
 				"\n" +
-				"\t\t\tfor( int x = offsetL; x < width - offsetR; x++ ) {\n" +
+				"\t\t\tfor (int x = offsetL; x < width - offsetR; x++) {\n" +
 				"\n" +
 				"\t\t\t\t" + sumType + " total = 0;\n" +
 				"\t\t\t\t" + sumType + " weight = 0;\n" +
 				"\n" +
 				"\t\t\t\tfor (int i = -y; i <= offsetR; i++) {\n" +
-				"\t\t\t\t\tint indexSrc = input.startIndex + (y + i)* input.stride + x;\n" +
+				"\t\t\t\t\tint indexSrc = input.startIndex + (y + i)*input.stride + x;\n" +
 				"\t\t\t\t\tint indexKer = (i + offsetL)*kernelWidth;\n" +
 				"\n" +
 				"\t\t\t\t\tfor (int j = -offsetL; j <= offsetR; j++) {\n" +
@@ -488,7 +500,7 @@ public class GenerateConvolveNormalized_JustBorder_SB extends CodeGeneratorBase 
 				"\t\t\t\t" + sumType + " weight = 0;\n" +
 				"\n" +
 				"\t\t\t\tfor (int i = -offsetL; i <= maxI; i++) {\n" +
-				"\t\t\t\t\tint indexSrc = input.startIndex + (y + i)*input.stride+x;\n" +
+				"\t\t\t\t\tint indexSrc = input.startIndex + (y + i)*input.stride + x;\n" +
 				"\t\t\t\t\tint indexKer = (i + offsetL)*kernelWidth;\n" +
 				"\n" +
 				"\t\t\t\t\tfor (int j = -offsetL; j <= offsetR; j++) {\n" +
