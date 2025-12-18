@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,8 +35,7 @@ import java.lang.reflect.Method;
  *
  * @author Peter Abeles
  */
-public class CompareToStandardConvolutionNormalized extends CompareIdenticalFunctions
-{
+public class CompareToStandardConvolutionNormalized extends CompareIdenticalFunctions {
 	protected int width = 7;
 	protected int height = 8;
 	protected int kernelRadius = 1;
@@ -46,33 +45,33 @@ public class CompareToStandardConvolutionNormalized extends CompareIdenticalFunc
 		super(targetClass, ConvolveNormalizedNaive_SB.class, ConvolveNormalizedNaive_IL.class);
 	}
 
-	public void setImageDimension( int width , int height ) {
+	public void setImageDimension( int width, int height ) {
 		this.width = width;
 		this.height = height;
 	}
 
-	public void setKernelRadius(int kernelRadius , int offset) {
+	public void setKernelRadius( int kernelRadius, int offset ) {
 		this.kernelRadius = kernelRadius;
 		this.offset = offset;
 	}
 
-	public void compareMethod( Method target , String validationName , int radius ) {
+	public void compareMethod( Method target, String validationName, int radius ) {
 		this.kernelRadius = radius;
-		super.compareMethod(target,validationName);
+		super.compareMethod(target, validationName);
 	}
 
 	@Override
-	protected Object[][] createInputParam(Method candidate, Method validation) {
+	protected Object[][] createInputParam( Method candidate, Method validation ) {
 		Class<?>[] paramTypes = candidate.getParameterTypes();
 
 		Object[][] ret = new Object[1][paramTypes.length];
 
-		ret[0][0]= FactoryKernel.random((Class) paramTypes[0], kernelRadius,1,10,rand);
+		ret[0][0] = FactoryKernel.random((Class)paramTypes[0], kernelRadius, 1, 10, rand);
 		((KernelBase)ret[0][0]).offset = offset;
 
 		int index = 1;
-		if( KernelBase.class.isAssignableFrom(paramTypes[1]) ) {
-			ret[0][index] = FactoryKernel.random((Class) paramTypes[1], kernelRadius, 1, 10, rand);
+		if (KernelBase.class.isAssignableFrom(paramTypes[1])) {
+			ret[0][index] = FactoryKernel.random((Class)paramTypes[1], kernelRadius, 1, 10, rand);
 			((KernelBase)ret[0][index]).offset = offset;
 			index++;
 		}
@@ -83,8 +82,8 @@ public class CompareToStandardConvolutionNormalized extends CompareIdenticalFunc
 		ImageBase dst = ConvolutionTestHelper.createImage(paramTypes[index], width, height);
 		ret[0][index] = dst;
 
-		if( paramTypes.length == 4 && ImageBorder.class.isAssignableFrom(paramTypes[3])) {
-			ret[0][3] = FactoryImageBorder.generic(BorderType.REFLECT,src.getImageType());
+		if (paramTypes.length == 4 && ImageBorder.class.isAssignableFrom(paramTypes[3])) {
+			ret[0][3] = FactoryImageBorder.generic(BorderType.REFLECT, src.getImageType());
 		}
 
 		return ret;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,27 +40,26 @@ public class TestConvolveNormalizedNaive_IL extends BoofStandardJUnit {
 	 * Check it against one specific type to see if the core algorithm is correct
 	 */
 	@Test void horizontal() {
-		Kernel1D_S32 kernel = new Kernel1D_S32(new int[]{1,2,3,4,5,6}, 6, 4);
+		Kernel1D_S32 kernel = new Kernel1D_S32(new int[]{1, 2, 3, 4, 5, 6}, 6, 4);
 
-		InterleavedU8 input = new InterleavedU8(width,height, numBands);
+		InterleavedU8 input = new InterleavedU8(width, height, numBands);
 		ImageMiscOps.fillUniform(input, rand, 0, 50);
-		InterleavedU8 output = new InterleavedU8(width,height, numBands);
+		InterleavedU8 output = new InterleavedU8(width, height, numBands);
 
-		ConvolveNormalizedNaive_IL.horizontal(kernel,input,output);
+		ConvolveNormalizedNaive_IL.horizontal(kernel, input, output);
 
 		for (int y = 0; y < output.height; y++) {
 			for (int x = 0; x < output.width; x++) {
 				for (int band = 0; band < numBands; band++) {
-					int expected = horizontal(x,y,band,kernel,input);
-					int found = output.getBand(x,y,band);
-					assertEquals(expected,found);
+					int expected = horizontal(x, y, band, kernel, input);
+					int found = output.getBand(x, y, band);
+					assertEquals(expected, found);
 				}
 			}
 		}
 	}
 
-	private int horizontal(int x , int y , int band , Kernel1D_S32 kernel , InterleavedU8 image )
-	{
+	private int horizontal( int x, int y, int band, Kernel1D_S32 kernel, InterleavedU8 image ) {
 		int total = 0;
 		int weight = 0;
 
@@ -69,7 +68,7 @@ public class TestConvolveNormalizedNaive_IL extends BoofStandardJUnit {
 				int w = kernel.get(i);
 				int v = image.getBand(x + i - kernel.offset, y, band);
 
-				total += w * v;
+				total += w*v;
 				weight += w;
 			}
 		}
@@ -81,34 +80,33 @@ public class TestConvolveNormalizedNaive_IL extends BoofStandardJUnit {
 	 * Check it against one specific type to see if the core algorithm is correct
 	 */
 	@Test void vertical() {
-		Kernel1D_S32 kernel = new Kernel1D_S32(new int[]{1,2,3,4,5,6}, 6, 4);
+		Kernel1D_S32 kernel = new Kernel1D_S32(new int[]{1, 2, 3, 4, 5, 6}, 6, 4);
 
-		InterleavedU8 input = new InterleavedU8(width,height, numBands);
+		InterleavedU8 input = new InterleavedU8(width, height, numBands);
 		ImageMiscOps.fillUniform(input, rand, 0, 50);
-		InterleavedU8 output = new InterleavedU8(width,height, numBands);
+		InterleavedU8 output = new InterleavedU8(width, height, numBands);
 
 		ConvolveNormalizedNaive_IL.vertical(kernel, input, output);
 
 		for (int y = 0; y < output.height; y++) {
 			for (int x = 0; x < output.width; x++) {
 				for (int band = 0; band < numBands; band++) {
-					int expected = vertical(x, y,band, kernel, input);
-					int found = output.getBand(x,y, band);
-					assertEquals(expected,found);
+					int expected = vertical(x, y, band, kernel, input);
+					int found = output.getBand(x, y, band);
+					assertEquals(expected, found);
 				}
 			}
 		}
 	}
 
-	private int vertical(int x , int y , int band, Kernel1D_S32 kernel , InterleavedU8 image )
-	{
+	private int vertical( int x, int y, int band, Kernel1D_S32 kernel, InterleavedU8 image ) {
 		int total = 0;
 		int weight = 0;
 
 		for (int i = 0; i < kernel.width; i++) {
-			if( image.isInBounds(x,y+i-kernel.offset)) {
+			if (image.isInBounds(x, y + i - kernel.offset)) {
 				int w = kernel.get(i);
-				int v = image.getBand(x,y+i-kernel.offset, band);
+				int v = image.getBand(x, y + i - kernel.offset, band);
 
 				total += w*v;
 				weight += w;
@@ -122,40 +120,39 @@ public class TestConvolveNormalizedNaive_IL extends BoofStandardJUnit {
 	 * Check it against one specific type to see if the core algorithm is correct
 	 */
 	@Test void vertical2_U16_U8() {
-		Kernel1D_S32 kernelY = new Kernel1D_S32(new int[]{1,2,3,4,5,6}, 6, 4);
-		Kernel1D_S32 kernelX = new Kernel1D_S32(new int[]{4,2,1,4,3,6}, 5, 2);
+		Kernel1D_S32 kernelY = new Kernel1D_S32(new int[]{1, 2, 3, 4, 5, 6}, 6, 4);
+		Kernel1D_S32 kernelX = new Kernel1D_S32(new int[]{4, 2, 1, 4, 3, 6}, 5, 2);
 
-		InterleavedU16 input = new InterleavedU16(width,height, numBands);
+		InterleavedU16 input = new InterleavedU16(width, height, numBands);
 		ImageMiscOps.fillUniform(input, rand, 0, 80);
-		InterleavedU8 output = new InterleavedU8(width,height, numBands);
+		InterleavedU8 output = new InterleavedU8(width, height, numBands);
 
-		ConvolveNormalizedNaive_IL.vertical(kernelX,kernelY, input, output);
+		ConvolveNormalizedNaive_IL.vertical(kernelX, kernelY, input, output);
 
-		InterleavedU8 alt = new InterleavedU8(width,height, numBands);
-		ConvolveImageNoBorder.vertical(kernelY, input, alt, kernelX.computeSum() * kernelY.computeSum());
+		InterleavedU8 alt = new InterleavedU8(width, height, numBands);
+		ConvolveImageNoBorder.vertical(kernelY, input, alt, kernelX.computeSum()*kernelY.computeSum());
 
 		for (int y = 0; y < output.height; y++) {
 			for (int x = 0; x < output.width; x++) {
 				for (int band = 0; band < numBands; band++) {
 					int expected = vertical2(x, y, band, kernelX, kernelY, input);
-					int found = output.getBand(x,y, band);
-					assertEquals(expected,found);
+					int found = output.getBand(x, y, band);
+					assertEquals(expected, found);
 				}
 			}
 		}
 	}
 
-	private int vertical2(int x, int y, int band,
-						  Kernel1D_S32 kernelX, Kernel1D_S32 kernelY,
-						  InterleavedU16 image)
-	{
+	private int vertical2( int x, int y, int band,
+						   Kernel1D_S32 kernelX, Kernel1D_S32 kernelY,
+						   InterleavedU16 image ) {
 		int total = 0;
 		int weightY = 0;
 
 		for (int i = 0; i < kernelY.width; i++) {
-			if( image.isInBounds(x,y+i-kernelY.offset)) {
+			if (image.isInBounds(x, y + i - kernelY.offset)) {
 				int w = kernelY.get(i);
-				int v = image.getBand(x,y+i-kernelY.offset,band);
+				int v = image.getBand(x, y + i - kernelY.offset, band);
 
 				total += w*v;
 				weightY += w;
@@ -164,7 +161,7 @@ public class TestConvolveNormalizedNaive_IL extends BoofStandardJUnit {
 
 		int weightX = 0;
 		for (int i = 0; i < kernelX.width; i++) {
-			if( image.isInBounds(x+i-kernelX.offset,y)) {
+			if (image.isInBounds(x + i - kernelX.offset, y)) {
 				int w = kernelX.get(i);
 
 				weightX += w;
@@ -179,12 +176,12 @@ public class TestConvolveNormalizedNaive_IL extends BoofStandardJUnit {
 	 * Check it against one specific type to see if the core algorithm is correct
 	 */
 	@Test void convolve() {
-		Kernel2D_S32 kernel = FactoryKernel.random2D_I32(7,3,0,20,rand);
+		Kernel2D_S32 kernel = FactoryKernel.random2D_I32(7, 3, 0, 20, rand);
 		kernel.offset = 1;
 
-		InterleavedU8 input = new InterleavedU8(width,height, numBands);
+		InterleavedU8 input = new InterleavedU8(width, height, numBands);
 		ImageMiscOps.fillUniform(input, rand, 0, 50);
-		InterleavedU8 output = new InterleavedU8(width,height, numBands);
+		InterleavedU8 output = new InterleavedU8(width, height, numBands);
 
 		ConvolveNormalizedNaive_IL.convolve(kernel, input, output);
 
@@ -192,26 +189,25 @@ public class TestConvolveNormalizedNaive_IL extends BoofStandardJUnit {
 			for (int x = 0; x < output.width; x++) {
 				for (int band = 0; band < numBands; band++) {
 					int expected = convolve(x, y, band, kernel, input);
-					int found = output.getBand(x,y,band);
-					assertEquals(expected,found);
+					int found = output.getBand(x, y, band);
+					assertEquals(expected, found);
 				}
 			}
 		}
 	}
 
-	private int convolve(int cx , int cy , int band, Kernel2D_S32 kernel , InterleavedU8 image )
-	{
+	private int convolve( int cx, int cy, int band, Kernel2D_S32 kernel, InterleavedU8 image ) {
 		int total = 0;
 		int weight = 0;
 
 		for (int i = 0; i < kernel.width; i++) {
-			int y = cy+i-kernel.offset;
+			int y = cy + i - kernel.offset;
 			for (int j = 0; j < kernel.width; j++) {
-				int x = cx+j-kernel.offset;
+				int x = cx + j - kernel.offset;
 
-				if( image.isInBounds(x,y)) {
-					int w = kernel.get(j,i);
-					int v = image.getBand(x,y,band);
+				if (image.isInBounds(x, y)) {
+					int w = kernel.get(j, i);
+					int v = image.getBand(x, y, band);
 					weight += w;
 					total += w*v;
 				}
