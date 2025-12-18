@@ -175,56 +175,6 @@ public class GenerateConvolveNormalized_JustBorder_SB extends CodeGeneratorBase 
 				"\t\t}\n" +
 				"\t\t//CONCURRENT_ABOVE });\n" +
 				"\t}\n\n");
-
-//		out.print("\tpublic static void horizontal(Kernel1D_" + kernelType + " kernel, " + inputType + " input, " + outputType + " output ) {\n" +
-//				"\t\tfinal " + inputData + "[] dataSrc = input.data;\n" +
-//				"\t\tfinal " + outputData + "[] dataDst = output.data;\n" +
-//				"\t\tfinal " + kernelData + "[] dataKer = kernel.data;\n" +
-//				"\n" +
-//				"\t\tfinal int kernelWidth = kernel.getWidth();\n" +
-//				"\t\tfinal int offsetL = kernel.getOffset();\n" +
-//				"\t\tfinal int offsetR = kernelWidth-offsetL-1;\n" +
-//				"\n" +
-//				"\t\tfinal int width = input.getWidth();\n" +
-//				"\t\tfinal int height = input.getHeight();\n" +
-//				"\n" +
-//				"\t\tfor (int i = 0; i < height; i++) {\n" +
-//				"\t\t\tint indexDest = output.startIndex + i * output.stride;\n" +
-//				"\t\t\tint j = input.startIndex + i * input.stride;\n" +
-//				"\t\t\tfinal int jStart = j;\n" +
-//				"\t\t\tint jEnd = j + offsetL;\n" +
-//				"\n" +
-//				"\t\t\tfor (; j < jEnd; j++) {\n" +
-//				"\t\t\t\t" + sumType + " total = 0;\n" +
-//				"\t\t\t\t" + sumType + " weight = 0;\n" +
-//				"\t\t\t\tint indexSrc = jStart;\n" +
-//				"\t\t\t\tfor (int k = kernelWidth - (offsetR + 1 + j - jStart); k < kernelWidth; k++) {\n" +
-//				"\t\t\t\t\t" + kernelData + " w = dataKer[k];\n" +
-//				"\t\t\t\t\tweight += w;\n" +
-//				"\t\t\t\t\ttotal += (dataSrc[indexSrc++]" + bitWiseOp + ") * w;\n" +
-//				"\t\t\t\t}\n" +
-//				"\t\t\t\tdataDst[indexDest++] = " + typeCast + "(" + divide + ");\n" +
-//				"\t\t\t}\n" +
-//				"\n" +
-//				"\t\t\tj += width - (offsetL+offsetR);\n" +
-//				"\t\t\tindexDest += width - (offsetL+offsetR);\n" +
-//				"\n" +
-//				"\t\t\tjEnd = jStart + width;\n" +
-//				"\t\t\tfor (; j < jEnd; j++) {\n" +
-//				"\t\t\t\t" + sumType + " total = 0;\n" +
-//				"\t\t\t\t" + sumType + " weight = 0;\n" +
-//				"\t\t\t\tint indexSrc = j - offsetL;\n" +
-//				"\t\t\t\tfinal int kEnd = jEnd - indexSrc;\n" +
-//				"\n" +
-//				"\t\t\t\tfor (int k = 0; k < kEnd; k++) {\n" +
-//				"\t\t\t\t\t" + kernelData + " w = dataKer[k];\n" +
-//				"\t\t\t\t\tweight += w;\n" +
-//				"\t\t\t\t\ttotal += (dataSrc[indexSrc++]" + bitWiseOp + ") * w;\n" +
-//				"\t\t\t\t}\n" +
-//				"\t\t\t\tdataDst[indexDest++] = " + typeCast + "(" + divide + ");\n" +
-//				"\t\t\t}\n" +
-//				"\t\t}\n" +
-//				"\t}\n\n");
 	}
 
 	private void printVertical() {
@@ -426,18 +376,19 @@ public class GenerateConvolveNormalized_JustBorder_SB extends CodeGeneratorBase 
 				"\n" +
 				"\t\tfinal int kernelWidth = kernel.getWidth();\n" +
 				"\t\tfinal int offsetL = kernel.getOffset();\n" +
-				"\t\tfinal int offsetR = kernelWidth-offsetL-1;\n" +
+				"\t\tfinal int offsetR = kernelWidth - offsetL - 1;\n" +
 				"\n" +
 				"\t\tfinal int width = input.getWidth();\n" +
 				"\t\tfinal int height = input.getHeight();\n" +
 				"\n" +
 				"\t\t// convolve across the left and right borders\n" +
+				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0, height, y -> {\n" +
 				"\t\tfor (int y = 0; y < height; y++) {\n" +
 				"\n" +
 				"\t\t\tint minI = y >= offsetL ? -offsetL : -y;\n" +
 				"\t\t\tint maxI = y < height - offsetR ?  offsetR : height - y - 1;\n" +
 				"\n" +
-				"\t\t\tint indexDst = output.startIndex + y* output.stride;\n" +
+				"\t\t\tint indexDst = output.startIndex + y*output.stride;\n" +
 				"\n" +
 				"\t\t\tfor( int x = 0; x < offsetL; x++ ) {\n" +
 				"\n" +
@@ -445,13 +396,13 @@ public class GenerateConvolveNormalized_JustBorder_SB extends CodeGeneratorBase 
 				"\t\t\t\t" + sumType + " weight = 0;\n" +
 				"\n" +
 				"\t\t\t\tfor( int i = minI; i <= maxI; i++ ) {\n" +
-				"\t\t\t\t\tint indexSrc = input.startIndex + (y+i)* input.stride+x;\n" +
-				"\t\t\t\t\tint indexKer = (i+offsetL)*kernelWidth;\n" +
+				"\t\t\t\t\tint indexSrc = input.startIndex + (y + i)*input.stride + x;\n" +
+				"\t\t\t\t\tint indexKer = (i + offsetL)*kernelWidth;\n" +
 				"\n" +
 				"\t\t\t\t\tfor( int j = -x; j <= offsetR; j++ ) {\n" +
-				"\t\t\t\t\t\t" + kernelData + " w = dataKer[indexKer+j+offsetL];\n" +
+				"\t\t\t\t\t\t" + kernelData + " w = dataKer[indexKer + j + offsetL];\n" +
 				"\t\t\t\t\t\tweight += w;\n" +
-				"\t\t\t\t\t\ttotal += (dataSrc[indexSrc+j]" + bitWiseOp + ") * w;\n" +
+				"\t\t\t\t\t\ttotal += (dataSrc[indexSrc + j]" + bitWiseOp + ")*w;\n" +
 				"\t\t\t\t\t}\n" +
 				"\t\t\t\t}\n" +
 				"\n" +
@@ -459,76 +410,81 @@ public class GenerateConvolveNormalized_JustBorder_SB extends CodeGeneratorBase 
 				"\t\t\t}\n" +
 				"\n" +
 				"\t\t\tindexDst = output.startIndex + y* output.stride + width-offsetR;\n" +
-				"\t\t\tfor( int x = width-offsetR; x < width; x++ ) {\n" +
+				"\t\t\tfor( int x = width - offsetR; x < width; x++ ) {\n" +
 				"\n" +
-				"\t\t\t\tint maxJ = width-x-1;\n" +
+				"\t\t\t\tint maxJ = width - x - 1;\n" +
 				"\n" +
 				"\t\t\t\t" + sumType + " total = 0;\n" +
 				"\t\t\t\t" + sumType + " weight = 0;\n" +
 				"\n" +
 				"\t\t\t\tfor( int i = minI; i <= maxI; i++ ) {\n" +
-				"\t\t\t\t\tint indexSrc = input.startIndex + (y+i)* input.stride+x;\n" +
-				"\t\t\t\t\tint indexKer = (i+offsetL)*kernelWidth;\n" +
+				"\t\t\t\t\tint indexSrc = input.startIndex + (y + i)*input.stride + x;\n" +
+				"\t\t\t\t\tint indexKer = (i + offsetL)*kernelWidth;\n" +
 				"\n" +
 				"\t\t\t\t\tfor( int j = -offsetL; j <= maxJ; j++ ) {\n" +
-				"\t\t\t\t\t\t" + kernelData + " w = dataKer[indexKer+j+offsetL];\n" +
+				"\t\t\t\t\t\t" + kernelData + " w = dataKer[indexKer + j + offsetL];\n" +
 				"\t\t\t\t\t\tweight += w;\n" +
-				"\t\t\t\t\t\ttotal += (dataSrc[indexSrc+j]" + bitWiseOp + ") * w;\n" +
+				"\t\t\t\t\t\ttotal += (dataSrc[indexSrc + j]" + bitWiseOp + ")*w;\n" +
 				"\t\t\t\t\t}\n" +
 				"\t\t\t\t}\n" +
 				"\n" +
 				"\t\t\t\tdataDst[indexDst++] = " + typeCast + "(" + divide + ");\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
+				"\t\t//CONCURRENT_ABOVE });\n" +
 				"\n" +
 				"\t\t// convolve across the top border while avoiding convolving the corners again\n" +
+				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0, offsetL, y -> {\n" +
 				"\t\tfor (int y = 0; y < offsetL; y++) {\n" +
 				"\n" +
-				"\t\t\tint indexDst = output.startIndex + y* output.stride+offsetL;\n" +
+				"\t\t\tint indexDst = output.startIndex + y*output.stride + offsetL;\n" +
 				"\n" +
-				"\t\t\tfor( int x = offsetL; x < width-offsetR; x++ ) {\n" +
+				"\t\t\tfor( int x = offsetL; x < width - offsetR; x++ ) {\n" +
 				"\n" +
 				"\t\t\t\t" + sumType + " total = 0;\n" +
 				"\t\t\t\t" + sumType + " weight = 0;\n" +
 				"\n" +
 				"\t\t\t\tfor( int i = -y; i <= offsetR; i++ ) {\n" +
-				"\t\t\t\t\tint indexSrc = input.startIndex + (y+i)* input.stride+x;\n" +
-				"\t\t\t\t\tint indexKer = (i+offsetL)*kernelWidth;\n" +
+				"\t\t\t\t\tint indexSrc = input.startIndex + (y + i)* input.stride + x;\n" +
+				"\t\t\t\t\tint indexKer = (i + offsetL)*kernelWidth;\n" +
 				"\n" +
 				"\t\t\t\t\tfor( int j = -offsetL; j <= offsetR; j++ ) {\n" +
-				"\t\t\t\t\t\t" + kernelData + " w = dataKer[indexKer+j+offsetL];\n" +
+				"\t\t\t\t\t\t" + kernelData + " w = dataKer[indexKer + j + offsetL];\n" +
 				"\t\t\t\t\t\tweight += w;\n" +
-				"\t\t\t\t\t\ttotal += (dataSrc[indexSrc+j]" + bitWiseOp + ") * w;\n" +
+				"\t\t\t\t\t\ttotal += (dataSrc[indexSrc + j]" + bitWiseOp + ")*w;\n" +
 				"\t\t\t\t\t}\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t\tdataDst[indexDst++] = " + typeCast + "(" + divide + ");\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
+				"\t\t//CONCURRENT_ABOVE });\n" +
 				"\n" +
 				"\t\t// convolve across the bottom border\n" +
-				"\t\tfor (int y = height-offsetR; y < height; y++) {\n" +
+				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(height - offsetR, height, y -> {\n" +
+				"\t\tfor (int y = height - offsetR; y < height; y++) {\n" +
 				"\n" +
 				"\t\t\tint maxI = height - y - 1;\n" +
-				"\t\t\tint indexDst = output.startIndex + y* output.stride+offsetL;\n" +
+				"\t\t\tint indexDst = output.startIndex + y*output.stride + offsetL;\n" +
 				"\n" +
-				"\t\t\tfor( int x = offsetL; x < width-offsetR; x++ ) {\n" +
+				"\t\t\tfor( int x = offsetL; x < width - offsetR; x++ ) {\n" +
 				"\n" +
 				"\t\t\t\t" + sumType + " total = 0;\n" +
 				"\t\t\t\t" + sumType + " weight = 0;\n" +
 				"\n" +
 				"\t\t\t\tfor( int i = -offsetL; i <= maxI; i++ ) {\n" +
-				"\t\t\t\t\tint indexSrc = input.startIndex + (y+i)* input.stride+x;\n" +
-				"\t\t\t\t\tint indexKer = (i+offsetL)*kernelWidth;\n" +
+				"\t\t\t\t\tint indexSrc = input.startIndex + (y + i)*input.stride+x;\n" +
+				"\t\t\t\t\tint indexKer = (i + offsetL)*kernelWidth;\n" +
 				"\n" +
 				"\t\t\t\t\tfor( int j = -offsetL; j <= offsetR; j++ ) {\n" +
-				"\t\t\t\t\t\t" + kernelData + " w = dataKer[indexKer+j+offsetL];\n" +
+				"\t\t\t\t\t\t" + kernelData + " w = dataKer[indexKer + j + offsetL];\n" +
 				"\t\t\t\t\t\tweight += w;\n" +
-				"\t\t\t\t\t\ttotal += (dataSrc[indexSrc+j]" + bitWiseOp + ") * w;\n" +
+				"\t\t\t\t\t\ttotal += (dataSrc[indexSrc + j]" + bitWiseOp + ")*w;\n" +
 				"\t\t\t\t\t}\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t\tdataDst[indexDst++] = " + typeCast + "(" + divide + ");\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
+				"\t\t//CONCURRENT_ABOVE });\n" +
 				"\t}\n\n");
 	}
 
