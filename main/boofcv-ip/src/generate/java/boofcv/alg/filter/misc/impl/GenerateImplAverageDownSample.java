@@ -255,13 +255,12 @@ public class GenerateImplAverageDownSample extends CodeGeneratorBase {
 				"\t\t\t\tint isrcY1 = (int)y1;\n" +
 				"\n" +
 				"\t\t\t\tint srcIndex = src.getIndex(0, isrcY0);\n" +
-				"\t\t\t\tfloat area = isrcY0 + 1 - y0;\n" +
+				"\t\t\t\tfloat weight0 = 1 - (y0 - isrcY0);\n" +
 				"\t\t\t\tfor (int x = 0; x < dst.width; x++) {\n" +
-				"\t\t\t\t\tworkArray[x] = area*src.data[srcIndex++];\n" +
+				"\t\t\t\t\tworkArray[x] = weight0*src.data[srcIndex++];\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t\tisrcY0++;\n" +
 				"\n" +
-				"\t\t\t\tarea += isrcY1 - isrcY0;\n" +
 				"\t\t\t\tfor (int innerY = isrcY0; innerY < isrcY1; innerY++) {\n" +
 				"\t\t\t\t\tsrcIndex = src.getIndex(0, innerY);\n" +
 				"\t\t\t\t\tfor (int x = 0; x < dst.width; x++) {\n" +
@@ -270,16 +269,15 @@ public class GenerateImplAverageDownSample extends CodeGeneratorBase {
 				"\t\t\t\t}\n" +
 				"\n" +
 				"\t\t\t\tif (isrcY1 < y1) {\n" +
-				"\t\t\t\t\tfloat intersection = y1 - isrcY1;\n" +
-				"\t\t\t\t\tarea += intersection;\n" +
+				"\t\t\t\t\tfloat weight1 = y1%1;\n" +
 				"\t\t\t\t\tsrcIndex = src.getIndex(0, isrcY1);\n" +
 				"\t\t\t\t\tfor (int x = 0; x < dst.width; x++) {\n" +
-				"\t\t\t\t\t\tworkArray[x] += intersection*src.data[srcIndex++];\n" +
+				"\t\t\t\t\t\tworkArray[x] += weight1*src.data[srcIndex++];\n" +
 				"\t\t\t\t\t}\n" +
 				"\t\t\t\t}\n" +
 				"\n" +
 				"\t\t\t\tfor (int x = 0; x < dst.width; x++) {\n" +
-				"\t\t\t\t\tworkArray[x] /= area;\n" +
+				"\t\t\t\t\tworkArray[x] /= scale;\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t}\n" +
 				"\n" +
@@ -330,13 +328,12 @@ public class GenerateImplAverageDownSample extends CodeGeneratorBase {
 				"\t\t\t\tint isrcY1 = (int)y1;\n" +
 				"\n" +
 				"\t\t\t\tint srcIndex = src.getIndex(0, isrcY0);\n" +
-				"\t\t\t\tfloat area = isrcY0 + 1 - y0;\n" +
+				"\t\t\t\tfloat weight0 = 1 - (y0 - isrcY0);\n" +
 				"\t\t\t\tfor (int x = 0; x < dst.width; x++) {\n" +
-				"\t\t\t\t\tdst.data[dstIndex + x] = area*src.data[srcIndex++];\n" +
+				"\t\t\t\t\tdst.data[dstIndex + x] = weight0*src.data[srcIndex++];\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t\tisrcY0++;\n" +
 				"\n" +
-				"\t\t\t\tarea += isrcY1 - isrcY0;\n" +
 				"\t\t\t\tfor (int innerY = isrcY0; innerY < isrcY1; innerY++) {\n" +
 				"\t\t\t\t\tsrcIndex = src.getIndex(0, innerY);\n" +
 				"\t\t\t\t\tfor (int x = 0; x < dst.width; x++) {\n" +
@@ -345,16 +342,15 @@ public class GenerateImplAverageDownSample extends CodeGeneratorBase {
 				"\t\t\t\t}\n" +
 				"\n" +
 				"\t\t\t\tif (isrcY1 < y1) {\n" +
-				"\t\t\t\t\tfloat intersection = y1 - isrcY1;\n" +
-				"\t\t\t\t\tarea += intersection;\n" +
+				"\t\t\t\t\tfloat weight1 = y1%1;\n" +
 				"\t\t\t\t\tsrcIndex = src.getIndex(0, isrcY1);\n" +
 				"\t\t\t\t\tfor (int x = 0; x < dst.width; x++) {\n" +
-				"\t\t\t\t\t\tdst.data[dstIndex + x] += intersection*src.data[srcIndex++];\n" +
+				"\t\t\t\t\t\tdst.data[dstIndex + x] += weight1*src.data[srcIndex++];\n" +
 				"\t\t\t\t\t}\n" +
 				"\t\t\t\t}\n" +
 				"\n" +
 				"\t\t\t\tfor (int x = 0; x < dst.width; x++) {\n" +
-				"\t\t\t\t\tdst.data[dstIndex + x] /= area;\n" +
+				"\t\t\t\t\tdst.data[dstIndex + x] /= scale;\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +

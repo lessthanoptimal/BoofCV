@@ -377,13 +377,12 @@ public class ImplAverageDownSample {
 				int isrcY1 = (int)y1;
 
 				int srcIndex = src.getIndex(0, isrcY0);
-				float area = isrcY0 + 1 - y0;
+				float weight0 = 1 - (y0 - isrcY0);
 				for (int x = 0; x < dst.width; x++) {
-					workArray[x] = area*src.data[srcIndex++];
+					workArray[x] = weight0*src.data[srcIndex++];
 				}
 				isrcY0++;
 
-				area += isrcY1 - isrcY0;
 				for (int innerY = isrcY0; innerY < isrcY1; innerY++) {
 					srcIndex = src.getIndex(0, innerY);
 					for (int x = 0; x < dst.width; x++) {
@@ -392,16 +391,15 @@ public class ImplAverageDownSample {
 				}
 
 				if (isrcY1 < y1) {
-					float intersection = y1 - isrcY1;
-					area += intersection;
+					float weight1 = y1%1;
 					srcIndex = src.getIndex(0, isrcY1);
 					for (int x = 0; x < dst.width; x++) {
-						workArray[x] += intersection*src.data[srcIndex++];
+						workArray[x] += weight1*src.data[srcIndex++];
 					}
 				}
 
 				for (int x = 0; x < dst.width; x++) {
-					workArray[x] /= area;
+					workArray[x] /= scale;
 				}
 			}
 
@@ -520,13 +518,12 @@ public class ImplAverageDownSample {
 				int isrcY1 = (int)y1;
 
 				int srcIndex = src.getIndex(0, isrcY0);
-				float area = isrcY0 + 1 - y0;
+				float weight0 = 1 - (y0 - isrcY0);
 				for (int x = 0; x < dst.width; x++) {
-					workArray[x] = area*src.data[srcIndex++];
+					workArray[x] = weight0*src.data[srcIndex++];
 				}
 				isrcY0++;
 
-				area += isrcY1 - isrcY0;
 				for (int innerY = isrcY0; innerY < isrcY1; innerY++) {
 					srcIndex = src.getIndex(0, innerY);
 					for (int x = 0; x < dst.width; x++) {
@@ -535,16 +532,15 @@ public class ImplAverageDownSample {
 				}
 
 				if (isrcY1 < y1) {
-					float intersection = y1 - isrcY1;
-					area += intersection;
+					float weight1 = y1%1;
 					srcIndex = src.getIndex(0, isrcY1);
 					for (int x = 0; x < dst.width; x++) {
-						workArray[x] += intersection*src.data[srcIndex++];
+						workArray[x] += weight1*src.data[srcIndex++];
 					}
 				}
 
 				for (int x = 0; x < dst.width; x++) {
-					workArray[x] /= area;
+					workArray[x] /= scale;
 				}
 			}
 
@@ -648,13 +644,12 @@ public class ImplAverageDownSample {
 				int isrcY1 = (int)y1;
 
 				int srcIndex = src.getIndex(0, isrcY0);
-				float area = isrcY0 + 1 - y0;
+				float weight0 = 1 - (y0 - isrcY0);
 				for (int x = 0; x < dst.width; x++) {
-					dst.data[dstIndex + x] = area*src.data[srcIndex++];
+					dst.data[dstIndex + x] = weight0*src.data[srcIndex++];
 				}
 				isrcY0++;
 
-				area += isrcY1 - isrcY0;
 				for (int innerY = isrcY0; innerY < isrcY1; innerY++) {
 					srcIndex = src.getIndex(0, innerY);
 					for (int x = 0; x < dst.width; x++) {
@@ -663,16 +658,15 @@ public class ImplAverageDownSample {
 				}
 
 				if (isrcY1 < y1) {
-					float intersection = y1 - isrcY1;
-					area += intersection;
+					float weight1 = y1%1;
 					srcIndex = src.getIndex(0, isrcY1);
 					for (int x = 0; x < dst.width; x++) {
-						dst.data[dstIndex + x] += intersection*src.data[srcIndex++];
+						dst.data[dstIndex + x] += weight1*src.data[srcIndex++];
 					}
 				}
 
 				for (int x = 0; x < dst.width; x++) {
-					dst.data[dstIndex + x] /= area;
+					dst.data[dstIndex + x] /= scale;
 				}
 			}
 		}
@@ -771,13 +765,12 @@ public class ImplAverageDownSample {
 				int isrcY1 = (int)y1;
 
 				int srcIndex = src.getIndex(0, isrcY0);
-				float area = isrcY0 + 1 - y0;
+				float weight0 = 1 - (y0 - isrcY0);
 				for (int x = 0; x < dst.width; x++) {
-					dst.data[dstIndex + x] = area*src.data[srcIndex++];
+					dst.data[dstIndex + x] = weight0*src.data[srcIndex++];
 				}
 				isrcY0++;
 
-				area += isrcY1 - isrcY0;
 				for (int innerY = isrcY0; innerY < isrcY1; innerY++) {
 					srcIndex = src.getIndex(0, innerY);
 					for (int x = 0; x < dst.width; x++) {
@@ -786,16 +779,15 @@ public class ImplAverageDownSample {
 				}
 
 				if (isrcY1 < y1) {
-					float intersection = y1 - isrcY1;
-					area += intersection;
+					float weight1 = y1%1;
 					srcIndex = src.getIndex(0, isrcY1);
 					for (int x = 0; x < dst.width; x++) {
-						dst.data[dstIndex + x] += intersection*src.data[srcIndex++];
+						dst.data[dstIndex + x] += weight1*src.data[srcIndex++];
 					}
 				}
 
 				for (int x = 0; x < dst.width; x++) {
-					dst.data[dstIndex + x] /= area;
+					dst.data[dstIndex + x] /= scale;
 				}
 			}
 		}
