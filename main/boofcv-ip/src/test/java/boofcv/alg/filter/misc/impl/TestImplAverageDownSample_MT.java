@@ -25,12 +25,10 @@ import boofcv.testing.CompareIdenticalFunctions;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
-import java.util.Random;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 class TestImplAverageDownSample_MT extends CompareIdenticalFunctions {
-	Random rand = new Random(234);
-	int width = 640, height = 480;
+	int width = 2000, height = 1501;
 
 	protected TestImplAverageDownSample_MT() {
 		super(ImplAverageDownSample_MT.class, ImplAverageDownSample.class);
