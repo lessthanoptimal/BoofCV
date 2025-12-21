@@ -100,7 +100,10 @@ public class GenerateConvolveNormalized_JustBorder_SB extends CodeGeneratorBase 
 		divide = isInteger ? "(total + weight/2)/weight" : "total/weight";
 
 		printHorizontal();
-		printVertical(isInteger);
+		if (isInteger)
+			printVerticalInt();
+		else
+			printVerticalFloat();
 		printConvolve();
 	}
 
@@ -187,10 +190,9 @@ public class GenerateConvolveNormalized_JustBorder_SB extends CodeGeneratorBase 
 				"\t}\n\n");
 	}
 
-	private void printVertical( boolean isInteger ) {
-
+	private void printVerticalInt() {
 		String typeCast = outputData.compareTo(sumType) == 0 ? "" : "(" + outputData + ")";
-		String divide = isInteger ? "(totals[x] + weight/2)/weight" : "totals[x]/weight";
+		String divide = "(totals[x] + weight/2)/weight";
 		String workType = ("DogArray_" + kernelType).replace("S32", "I32");
 
 		out.print("\tpublic static void vertical( Kernel1D_" + kernelType + " kernel, " + inputType + " input, " + outputType + " output, " +
@@ -261,6 +263,69 @@ public class GenerateConvolveNormalized_JustBorder_SB extends CodeGeneratorBase 
 				"\t\t}\n" +
 				"\t\t//CONCURRENT_INLINE });\n" +
 				"\t}\n\n");
+	}
+
+	private void printVerticalFloat() {
+		String arrayData = inputData;
+		out.print("\tpublic static void vertical( Kernel1D_" + kernelType + " kernel, " + inputType + " input, " + outputType + " output ) {\n" +
+				"\t\tfinal " + arrayData + "[] dataSrc = input.data;\n" +
+				"\t\tfinal " + arrayData + "[] dataDst = output.data;\n" +
+				"\t\tfinal " + arrayData + "[] dataKer = kernel.data;\n" +
+				"\n" +
+				"\t\tfinal int kernelWidth = kernel.getWidth();\n" +
+				"\t\tfinal int offsetL = kernel.getOffset();\n" +
+				"\t\tfinal int offsetR = kernelWidth - offsetL - 1;\n" +
+				"\n" +
+				"\t\tfinal int imgWidth = output.getWidth();\n" +
+				"\t\tfinal int imgHeight = output.getHeight();\n" +
+				"\n" +
+				"\t\tfinal int yEnd = imgHeight - offsetR;\n" +
+				"\n" +
+				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, input.width, 20, (x0, x1) -> {\n" +
+				"\t\tfinal int x0 = 0, x1 = input.width;\n" +
+				"\t\tfinal int countX = x1 - x0;\n" +
+				"\n" +
+				"\t\tfor (int y = 0; y < offsetL; y++) {\n" +
+				"\t\t\tint indexInRow = input.startIndex + x0;\n" +
+				"\t\t\tfinal int kStart = offsetL - y;\n" +
+				"\t\t\tfinal int indexOut0 = output.startIndex + x0 + y*output.stride;\n" +
+				"\t\t\tfinal int indexOut1 = indexOut0 + countX;\n" +
+				"\n" +
+				"\t\t\tverticalInner(dataSrc, dataDst, dataKer, indexInRow, input.stride, indexOut0, indexOut1, kStart, kernelWidth);\n" +
+				"\t\t}\n" +
+				"\n" +
+				"\t\tfor (int y = yEnd; y < imgHeight; y++) {\n" +
+				"\t\t\tint indexInRow = input.startIndex + x0 + (y - offsetL)*input.stride;\n" +
+				"\t\t\tfinal int kEnd = imgHeight - (y - offsetL);\n" +
+				"\t\t\tfinal int indexOut0 = output.startIndex + x0 + y*output.stride;\n" +
+				"\t\t\tfinal int indexOut1 = indexOut0 + countX;\n" +
+				"\n" +
+				"\t\t\tverticalInner(dataSrc, dataDst, dataKer, indexInRow, input.stride, indexOut0, indexOut1, 0, kEnd);\n" +
+				"\t\t}\n" +
+				"\t\t//CONCURRENT_INLINE });\n" +
+				"\t}\n" +
+				"\n" +
+				"\tprivate static void verticalInner( " + arrayData + "[] dataSrc, " + arrayData + "[] dataDst, " + arrayData + "[] dataKer,\n" +
+				"\t\t\t\t\t\t\t\t\t   int indexSrc0, int strideSrc,\n" +
+				"\t\t\t\t\t\t\t\t\t   int indexDst0, int indexDst1, int k0, int k1 ) {\n" +
+				"\t\t" + arrayData + " w = dataKer[k0];\n" +
+				"\t\t" + arrayData + " weight = w;\n" +
+				"\t\tfor (int x = indexDst0, indexSrc = indexSrc0; x < indexDst1; x++) {\n" +
+				"\t\t\tdataDst[x] = dataSrc[indexSrc++]*w;\n" +
+				"\t\t}\n" +
+				"\t\tfor (int k = k0 + 1; k < k1; k++) {\n" +
+				"\t\t\tindexSrc0 += strideSrc;\n" +
+				"\t\t\tw = dataKer[k];\n" +
+				"\t\t\tweight += w;\n" +
+				"\t\t\tfor (int x = indexDst0, indexSrc = indexSrc0; x < indexDst1; x++) {\n" +
+				"\t\t\t\tdataDst[x] += dataSrc[indexSrc++]*w;\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t\tfor (int x = indexDst0; x < indexDst1; x++) {\n" +
+				"\t\t\tdataDst[x] = dataDst[x]/weight;\n" +
+				"\t\t}\n" +
+				"\t}\n\n"
+		);
 	}
 
 	private void printVertical2() {

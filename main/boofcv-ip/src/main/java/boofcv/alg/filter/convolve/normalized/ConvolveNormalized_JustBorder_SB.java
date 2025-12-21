@@ -21,8 +21,6 @@ package boofcv.alg.filter.convolve.normalized;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.convolve.*;
 import boofcv.struct.image.*;
-import org.ddogleg.struct.DogArray_F32;
-import org.ddogleg.struct.DogArray_F64;
 import org.ddogleg.struct.DogArray_I32;
 import org.jetbrains.annotations.Nullable;
 import pabeles.concurrency.GrowArray;
@@ -109,9 +107,7 @@ public class ConvolveNormalized_JustBorder_SB {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void vertical( Kernel1D_F32 kernel, GrayF32 input, GrayF32 output, @Nullable GrowArray<DogArray_F32> workspaces ) {
-		workspaces = BoofMiscOps.checkDeclare(workspaces, DogArray_F32::new);
-		final DogArray_F32 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
+	public static void vertical( Kernel1D_F32 kernel, GrayF32 input, GrayF32 output ) {
 		final float[] dataSrc = input.data;
 		final float[] dataDst = output.data;
 		final float[] dataKer = kernel.data;
@@ -125,56 +121,49 @@ public class ConvolveNormalized_JustBorder_SB {
 
 		final int yEnd = imgHeight - offsetR;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, input.width, 20, workspaces, (work, x0, x1) -> {
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, input.width, 20, (x0, x1) -> {
 		final int x0 = 0, x1 = input.width;
 		final int countX = x1 - x0;
-		float[] totals = BoofMiscOps.checkDeclare(work, x1 - x0, false);
-		// NOTE: for floating point images this workspace isn't needed. Output image can be used instead
 
 		for (int y = 0; y < offsetL; y++) {
 			int indexInRow = input.startIndex + x0;
 			final int kStart = offsetL - y;
-			float w = dataKer[kStart];
-			float weight = w;
-			for (int x = 0, indexIn = indexInRow; x < countX; x++) {
-				totals[x] = (dataSrc[indexIn++])*w;
-			}
-			for (int k = kStart + 1; k < kernelWidth; k++) {
-				indexInRow += input.stride;
-				w = dataKer[k];
-				weight += w;
-				for (int x = 0, indexIn = indexInRow; x < countX; x++) {
-					totals[x] += (dataSrc[indexIn++])*w;
-				}
-			}
-			int indexOut = output.startIndex + x0 + y*output.stride;
-			for (int x = 0; x < countX; x++) {
-				dataDst[indexOut++] = (totals[x]/weight);
-			}
+			final int indexOut0 = output.startIndex + x0 + y*output.stride;
+			final int indexOut1 = indexOut0 + countX;
+
+			verticalInner(dataSrc, dataDst, dataKer, indexInRow, input.stride, indexOut0, indexOut1, kStart, kernelWidth);
 		}
 
 		for (int y = yEnd; y < imgHeight; y++) {
 			int indexInRow = input.startIndex + x0 + (y - offsetL)*input.stride;
 			final int kEnd = imgHeight - (y - offsetL);
-			float w = dataKer[0];
-			float weight = w;
-			for (int x = 0, indexIn = indexInRow; x < countX; x++) {
-				totals[x] = (dataSrc[indexIn++])*w;
-			}
-			for (int k = 1; k < kEnd; k++) {
-				indexInRow += input.stride;
-				w = dataKer[k];
-				weight += w;
-				for (int x = 0, indexIn = indexInRow; x < countX; x++) {
-					totals[x] += (dataSrc[indexIn++])*w;
-				}
-			}
-			int indexOut = output.startIndex + x0 + y*output.stride;
-			for (int x = 0; x < countX; x++) {
-				dataDst[indexOut++] = (totals[x]/weight);
-			}
+			final int indexOut0 = output.startIndex + x0 + y*output.stride;
+			final int indexOut1 = indexOut0 + countX;
+
+			verticalInner(dataSrc, dataDst, dataKer, indexInRow, input.stride, indexOut0, indexOut1, 0, kEnd);
 		}
 		//CONCURRENT_INLINE });
+	}
+
+	private static void verticalInner( float[] dataSrc, float[] dataDst, float[] dataKer,
+									   int indexSrc0, int strideSrc,
+									   int indexDst0, int indexDst1, int k0, int k1 ) {
+		float w = dataKer[k0];
+		float weight = w;
+		for (int x = indexDst0, indexSrc = indexSrc0; x < indexDst1; x++) {
+			dataDst[x] = dataSrc[indexSrc++]*w;
+		}
+		for (int k = k0 + 1; k < k1; k++) {
+			indexSrc0 += strideSrc;
+			w = dataKer[k];
+			weight += w;
+			for (int x = indexDst0, indexSrc = indexSrc0; x < indexDst1; x++) {
+				dataDst[x] += dataSrc[indexSrc++]*w;
+			}
+		}
+		for (int x = indexDst0; x < indexDst1; x++) {
+			dataDst[x] = dataDst[x]/weight;
+		}
 	}
 
 	public static void convolve( Kernel2D_F32 kernel, GrayF32 input, GrayF32 output ) {
@@ -357,9 +346,7 @@ public class ConvolveNormalized_JustBorder_SB {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void vertical( Kernel1D_F64 kernel, GrayF64 input, GrayF64 output, @Nullable GrowArray<DogArray_F64> workspaces ) {
-		workspaces = BoofMiscOps.checkDeclare(workspaces, DogArray_F64::new);
-		final DogArray_F64 work = workspaces.grow(); //CONCURRENT_REMOVE_LINE
+	public static void vertical( Kernel1D_F64 kernel, GrayF64 input, GrayF64 output ) {
 		final double[] dataSrc = input.data;
 		final double[] dataDst = output.data;
 		final double[] dataKer = kernel.data;
@@ -373,56 +360,49 @@ public class ConvolveNormalized_JustBorder_SB {
 
 		final int yEnd = imgHeight - offsetR;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, input.width, 20, workspaces, (work, x0, x1) -> {
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0, input.width, 20, (x0, x1) -> {
 		final int x0 = 0, x1 = input.width;
 		final int countX = x1 - x0;
-		double[] totals = BoofMiscOps.checkDeclare(work, x1 - x0, false);
-		// NOTE: for floating point images this workspace isn't needed. Output image can be used instead
 
 		for (int y = 0; y < offsetL; y++) {
 			int indexInRow = input.startIndex + x0;
 			final int kStart = offsetL - y;
-			double w = dataKer[kStart];
-			double weight = w;
-			for (int x = 0, indexIn = indexInRow; x < countX; x++) {
-				totals[x] = (dataSrc[indexIn++])*w;
-			}
-			for (int k = kStart + 1; k < kernelWidth; k++) {
-				indexInRow += input.stride;
-				w = dataKer[k];
-				weight += w;
-				for (int x = 0, indexIn = indexInRow; x < countX; x++) {
-					totals[x] += (dataSrc[indexIn++])*w;
-				}
-			}
-			int indexOut = output.startIndex + x0 + y*output.stride;
-			for (int x = 0; x < countX; x++) {
-				dataDst[indexOut++] = (totals[x]/weight);
-			}
+			final int indexOut0 = output.startIndex + x0 + y*output.stride;
+			final int indexOut1 = indexOut0 + countX;
+
+			verticalInner(dataSrc, dataDst, dataKer, indexInRow, input.stride, indexOut0, indexOut1, kStart, kernelWidth);
 		}
 
 		for (int y = yEnd; y < imgHeight; y++) {
 			int indexInRow = input.startIndex + x0 + (y - offsetL)*input.stride;
 			final int kEnd = imgHeight - (y - offsetL);
-			double w = dataKer[0];
-			double weight = w;
-			for (int x = 0, indexIn = indexInRow; x < countX; x++) {
-				totals[x] = (dataSrc[indexIn++])*w;
-			}
-			for (int k = 1; k < kEnd; k++) {
-				indexInRow += input.stride;
-				w = dataKer[k];
-				weight += w;
-				for (int x = 0, indexIn = indexInRow; x < countX; x++) {
-					totals[x] += (dataSrc[indexIn++])*w;
-				}
-			}
-			int indexOut = output.startIndex + x0 + y*output.stride;
-			for (int x = 0; x < countX; x++) {
-				dataDst[indexOut++] = (totals[x]/weight);
-			}
+			final int indexOut0 = output.startIndex + x0 + y*output.stride;
+			final int indexOut1 = indexOut0 + countX;
+
+			verticalInner(dataSrc, dataDst, dataKer, indexInRow, input.stride, indexOut0, indexOut1, 0, kEnd);
 		}
 		//CONCURRENT_INLINE });
+	}
+
+	private static void verticalInner( double[] dataSrc, double[] dataDst, double[] dataKer,
+									   int indexSrc0, int strideSrc,
+									   int indexDst0, int indexDst1, int k0, int k1 ) {
+		double w = dataKer[k0];
+		double weight = w;
+		for (int x = indexDst0, indexSrc = indexSrc0; x < indexDst1; x++) {
+			dataDst[x] = dataSrc[indexSrc++]*w;
+		}
+		for (int k = k0 + 1; k < k1; k++) {
+			indexSrc0 += strideSrc;
+			w = dataKer[k];
+			weight += w;
+			for (int x = indexDst0, indexSrc = indexSrc0; x < indexDst1; x++) {
+				dataDst[x] += dataSrc[indexSrc++]*w;
+			}
+		}
+		for (int x = indexDst0; x < indexDst1; x++) {
+			dataDst[x] = dataDst[x]/weight;
+		}
 	}
 
 	public static void convolve( Kernel2D_F64 kernel, GrayF64 input, GrayF64 output ) {

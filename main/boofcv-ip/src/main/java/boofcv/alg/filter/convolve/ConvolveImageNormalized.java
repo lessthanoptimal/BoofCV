@@ -27,8 +27,6 @@ import boofcv.struct.border.ImageBorder_F64;
 import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.convolve.*;
 import boofcv.struct.image.*;
-import org.ddogleg.struct.DogArray_F32;
-import org.ddogleg.struct.DogArray_F64;
 import org.ddogleg.struct.DogArray_I32;
 import pabeles.concurrency.GrowArray;
 
@@ -96,11 +94,10 @@ public class ConvolveImageNormalized {
 				kernel = k;
 			}
 			ConvolveImageNoBorder.vertical(kernel, src, dst);
-			var workspace = new GrowArray<>(DogArray_F32::new);
 			if (BoofConcurrency.USE_CONCURRENT) {
-				ConvolveNormalized_JustBorder_SB_MT.vertical(kernel, src, dst, workspace);
+				ConvolveNormalized_JustBorder_SB_MT.vertical(kernel, src, dst);
 			} else {
-				ConvolveNormalized_JustBorder_SB.vertical(kernel, src, dst, workspace);
+				ConvolveNormalized_JustBorder_SB.vertical(kernel, src, dst);
 			}
 		}
 	}
@@ -187,7 +184,6 @@ public class ConvolveImageNormalized {
 				kernel = k;
 			}
 			ConvolveImageNoBorder.vertical(kernel, src, dst);
-			var workspace = new GrowArray<>(DogArray_F32::new);
 			ConvolveJustBorder_General_SB.vertical(kernel, bsrc, dst);
 		}
 	}
@@ -350,11 +346,10 @@ public class ConvolveImageNormalized {
 				kernel = k;
 			}
 			ConvolveImageNoBorder.vertical(kernel, src, dst);
-			var workspace = new GrowArray<>(DogArray_F64::new);
 			if (BoofConcurrency.USE_CONCURRENT) {
-				ConvolveNormalized_JustBorder_SB_MT.vertical(kernel, src, dst, workspace);
+				ConvolveNormalized_JustBorder_SB_MT.vertical(kernel, src, dst);
 			} else {
-				ConvolveNormalized_JustBorder_SB.vertical(kernel, src, dst, workspace);
+				ConvolveNormalized_JustBorder_SB.vertical(kernel, src, dst);
 			}
 		}
 	}
@@ -441,7 +436,6 @@ public class ConvolveImageNormalized {
 				kernel = k;
 			}
 			ConvolveImageNoBorder.vertical(kernel, src, dst);
-			var workspace = new GrowArray<>(DogArray_F64::new);
 			ConvolveJustBorder_General_SB.vertical(kernel, bsrc, dst);
 		}
 	}
@@ -1387,4 +1381,5 @@ public class ConvolveImageNormalized {
 			ConvolveNormalized_JustBorder_IL.convolve(kernel, src, dst);
 		}
 	}
+
 }

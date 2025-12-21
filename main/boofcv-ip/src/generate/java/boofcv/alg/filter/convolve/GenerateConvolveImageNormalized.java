@@ -117,7 +117,7 @@ public class GenerateConvolveImageNormalized extends CodeGeneratorBase {
 
 		String kernelTypeName = "Kernel" + dimen + "_" + kernelType;
 
-		boolean reqArrWork = name.equals("vertical") && singleBand;
+		boolean reqArrWork = name.equals("vertical") && singleBand && isInteger;
 
 		String declareWorkspace = reqArrWork ?
 				"\t\t\tvar workspace = new GrowArray<>(DogArray_" + (kernelType.replace("S", "I")) + "::new);\n"
@@ -126,7 +126,7 @@ public class GenerateConvolveImageNormalized extends CodeGeneratorBase {
 		String overrideName = name.equals("convolve") ? "Convolve" : name.equals("horizontal") ? "Horizontal" : "Vertical";
 		String workArray = switch (name) {
 			case "convolve" -> singleBand ? ", null" : "";
-			case "vertical" -> singleBand ? ", workspace" : "";
+			case "vertical" -> singleBand && isInteger? ", workspace" : "";
 			default -> "";
 		};
 
