@@ -78,7 +78,8 @@ public abstract class NonMaxBlockSearchStrict<Storage> implements Search<Storage
 			int peakX = 0;
 			int peakY = 0;
 
-			float peakVal = -Float.MAX_VALUE;
+			// Only consider candidates which are acceptable
+			float peakVal = Math.nextDown(thresholdMax);
 
 			for (int y = y0; y < y1; y++) {
 				int index = img.startIndex + y*img.stride + x0;
@@ -123,7 +124,8 @@ public abstract class NonMaxBlockSearchStrict<Storage> implements Search<Storage
 			int peakX = 0;
 			int peakY = 0;
 
-			float peakVal = Float.MAX_VALUE;
+			// Only consider candidates which are acceptable
+			float peakVal = Math.nextUp(thresholdMin);
 
 			for (int y = y0; y < y1; y++) {
 				int index = img.startIndex + y*img.stride + x0;
@@ -164,8 +166,9 @@ public abstract class NonMaxBlockSearchStrict<Storage> implements Search<Storage
 			int minX = 0;
 			int minY = 0;
 
-			float maxVal = -Float.MAX_VALUE;
-			float minVal = Float.MAX_VALUE;
+			// Only consider candidates which are acceptable
+			float maxVal = Math.nextDown(thresholdMax);
+			float minVal = Math.nextUp(thresholdMin);
 
 			for (int y = y0; y < y1; y++) {
 				int index = img.startIndex + y*img.stride + x0;
