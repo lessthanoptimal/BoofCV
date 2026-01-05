@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,6 +42,14 @@ public class GrayS32 extends GrayI<GrayS32> {
 
 	/** Creates an image with no data declared and the width/height set to zero. */
 	public GrayS32() {data = new int[0];}
+
+	@Override public int elementGet( int index ) {
+		return data[index];
+	}
+
+	@Override public void elementSet( int index, int value ) {
+		data[index] = value;
+	}
 
 	@Override
 	public void unsafe_set( int x, int y, int value ) {

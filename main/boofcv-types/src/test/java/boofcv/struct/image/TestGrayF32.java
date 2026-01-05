@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,10 +43,15 @@ public class TestGrayF32 extends StandardSingleBandTests<GrayF32> {
 		var image = new GrayF32(10, 15);
 		setRandom(image);
 
-		image.forEachPixel(( x, y, v ) -> {
-			assertEquals(image.get(x, y), v);
-			image.set(x, y, y*image.width + x);
-		});
+		image.forEachPixel(( x, y, v ) -> assertEquals(image.get(x, y), v));
+	}
+
+
+	@Test void applyEachPixel() {
+		var image = new GrayF32(10, 15);
+		setRandom(image);
+
+		image.applyEachPixel(( x, y, v ) -> y*image.width + x);
 
 		for (int y = 0; y < image.height; y++) {
 			for (int x = 0; x < image.width; x++) {
@@ -54,4 +59,5 @@ public class TestGrayF32 extends StandardSingleBandTests<GrayF32> {
 			}
 		}
 	}
+
 }

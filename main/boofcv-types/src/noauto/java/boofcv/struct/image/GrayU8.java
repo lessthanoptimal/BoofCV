@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,6 +41,10 @@ public class GrayU8 extends GrayI8<GrayU8> {
 
 	public GrayU8( byte[][] input ) {
 		super(input);
+	}
+
+	@Override public int elementGet( int index ) {
+		return data[index] & 0xFF;
 	}
 
 	@Override

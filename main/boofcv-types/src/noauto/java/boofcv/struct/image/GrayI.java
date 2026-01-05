@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -86,6 +86,12 @@ public abstract class GrayI<T extends GrayI<T>> extends ImageGray<T> {
 	 */
 	public abstract int unsafe_get( int x, int y );
 
+	/// Sets an element in the image's array
+	public abstract void elementSet( int index, int value );
+
+	/// Gets the value of an element in the image's array
+	public abstract int elementGet( int index );
+
 	/**
 	 * Passes in the coordinate and value of each pixel in the image.
 	 *
@@ -95,6 +101,16 @@ public abstract class GrayI<T extends GrayI<T>> extends ImageGray<T> {
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
 				function.process(x, y, unsafe_get(x, y));
+			}
+		}
+	}
+
+	/// Applies the returned value to each pixel
+	public void applyEachPixel( ApplyPixel function ) {
+		for (int y = 0; y < height; y++) {
+			int index = startIndex + y*stride;
+			for (int x = 0; x < width; x++, index++) {
+				elementSet(index, function.process(x, y, elementGet(index)));
 			}
 		}
 	}
@@ -135,5 +151,9 @@ public abstract class GrayI<T extends GrayI<T>> extends ImageGray<T> {
 
 	@FunctionalInterface public interface EachPixel {
 		void process( int x, int y, int value );
+	}
+
+	@FunctionalInterface public interface ApplyPixel {
+		int process( int x, int y, int value );
 	}
 }

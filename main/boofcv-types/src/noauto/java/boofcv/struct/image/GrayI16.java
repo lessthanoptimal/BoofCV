@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,6 +35,11 @@ public abstract class GrayI16<T extends GrayI16<T>> extends GrayI<T> {
 	}
 
 	protected GrayI16() {data = new short[0];}
+
+	@Override public void elementSet( int index, int value ) {
+		data[index] = (short)value;
+	}
+
 
 	/**
 	 * Sets the value of the specified pixel.
