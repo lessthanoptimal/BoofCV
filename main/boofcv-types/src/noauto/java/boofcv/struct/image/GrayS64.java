@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -93,6 +93,16 @@ public class GrayS64 extends ImageGray<GrayS64> {
 		}
 	}
 
+	/// Applies the returned value to each pixel
+	public void applyEachPixel( ApplyPixel function ) {
+		for (int y = 0; y < height; y++) {
+			int index = startIndex + y*stride;
+			for (int x = 0; x < width; x++, index++) {
+				data[index] = function.process(x, y, data[index]);
+			}
+		}
+	}
+
 	@Override
 	public ImageDataType getDataType() {
 		return ImageDataType.S64;
@@ -147,4 +157,9 @@ public class GrayS64 extends ImageGray<GrayS64> {
 	@FunctionalInterface interface EachPixel {
 		void process( int x, int y, long value );
 	}
+
+	@FunctionalInterface public interface ApplyPixel {
+		long process( int x, int y, long value );
+	}
+
 }

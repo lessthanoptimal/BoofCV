@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -93,6 +93,16 @@ public class GrayF32 extends GrayF<GrayF32> {
 		}
 	}
 
+	/// Applies the returned value to each pixel
+	public void applyEachPixel( ApplyPixel function ) {
+		for (int y = 0; y < height; y++) {
+			int index = startIndex + y*stride;
+			for (int x = 0; x < width; x++, index++) {
+				data[index] = function.process(x, y, data[index]);
+			}
+		}
+	}
+
 	@Override
 	public void print() {
 		for (int y = 0; y < height; y++) {
@@ -164,5 +174,9 @@ public class GrayF32 extends GrayF<GrayF32> {
 
 	@FunctionalInterface public interface EachPixel {
 		void process( int x, int y, float value );
+	}
+
+	@FunctionalInterface public interface ApplyPixel {
+		float process( int x, int y, float value );
 	}
 }

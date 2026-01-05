@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,6 @@ package boofcv.struct.image;
  */
 @SuppressWarnings({"NullAway.Init"})
 public abstract class GrayI8<T extends GrayI8<T>> extends GrayI<T> {
-
 	public byte[] data;
 
 	/**
@@ -60,6 +59,10 @@ public abstract class GrayI8<T extends GrayI8<T>> extends GrayI<T> {
 				throw new IllegalArgumentException("rows must have constant length");
 			System.arraycopy(input[y], 0, data, y*width, width);
 		}
+	}
+
+	@Override public void elementSet( int index, int value ) {
+		data[index] = (byte)value;
 	}
 
 	/**

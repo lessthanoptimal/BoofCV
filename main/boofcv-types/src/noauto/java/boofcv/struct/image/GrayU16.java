@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,6 +38,10 @@ public class GrayU16 extends GrayI16<GrayU16> {
 	}
 
 	public GrayU16() {}
+
+	@Override public int elementGet( int index ) {
+		return data[index] & 0xFFFF;
+	}
 
 	@Override
 	public int unsafe_get( int x, int y ) {

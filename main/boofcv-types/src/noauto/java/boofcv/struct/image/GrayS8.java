@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,6 +41,10 @@ public class GrayS8 extends GrayI8<GrayS8> {
 	@Override
 	public int unsafe_get( int x, int y ) {
 		return data[getIndex(x, y)];
+	}
+
+	@Override public int elementGet( int index ) {
+		return data[index];
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,24 +18,45 @@
 
 package boofcv.struct.image;
 
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class TestGrayU16 extends StandardImageIntegerTests<GrayU16> {
 
 	public TestGrayU16() {
 		super(false);
 	}
 
-	@Override
-	public GrayU16 createImage(int width, int height) {
+	@Override public GrayU16 createImage( int width, int height ) {
 		return new GrayU16(width, height);
 	}
 
-	@Override
-	public GrayU16 createImage() {
+	@Override public GrayU16 createImage() {
 		return new GrayU16();
 	}
 
-	@Override
-	public Number randomNumber() {
-		return (short) rand.nextInt(Short.MAX_VALUE);
+	@Override public Number randomNumber() {
+		return (short)rand.nextInt(Short.MAX_VALUE);
+	}
+
+	@Test void forEachPixel() {
+		var image = new GrayU16(10, 15);
+		setRandom(image);
+
+		image.forEachPixel(( x, y, v ) -> assertEquals(image.get(x, y), v));
+	}
+
+	@Test void applyEachPixel() {
+		var image = new GrayU16(10, 15);
+		setRandom(image);
+
+		image.applyEachPixel(( x, y, v ) -> y*image.width + x);
+
+		for (int y = 0; y < image.height; y++) {
+			for (int x = 0; x < image.width; x++) {
+				assertEquals(y*image.width + x, image.get(x, y));
+			}
+		}
 	}
 }

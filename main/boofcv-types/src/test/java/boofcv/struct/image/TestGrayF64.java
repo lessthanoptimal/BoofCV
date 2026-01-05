@@ -22,28 +22,25 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TestGrayS8 extends StandardImageIntegerTests<GrayS8> {
-	public TestGrayS8() {
-		super(true);
+public class TestGrayF64 extends StandardSingleBandTests<GrayF64> {
+
+	@Override
+	public GrayF64 createImage( int width, int height ) {
+		return new GrayF64(width, height);
 	}
 
 	@Override
-	public GrayS8 createImage( int width, int height ) {
-		return new GrayS8(width, height);
-	}
-
-	@Override
-	public GrayS8 createImage() {
-		return new GrayS8();
+	public GrayF64 createImage() {
+		return new GrayF64();
 	}
 
 	@Override
 	public Number randomNumber() {
-		return (byte)(rand.nextInt(255) - 126);
+		return rand.nextFloat();
 	}
 
 	@Test void forEachPixel() {
-		var image = new GrayS8(10, 15);
+		var image = new GrayF64(10, 15);
 		setRandom(image);
 
 		image.forEachPixel(( x, y, v ) -> assertEquals(image.get(x, y), v));
@@ -51,16 +48,15 @@ public class TestGrayS8 extends StandardImageIntegerTests<GrayS8> {
 
 
 	@Test void applyEachPixel() {
-		var image = new GrayS8(10, 15);
+		var image = new GrayF64(10, 15);
 		setRandom(image);
 
 		image.applyEachPixel(( x, y, v ) -> y*image.width + x);
 
 		for (int y = 0; y < image.height; y++) {
 			for (int x = 0; x < image.width; x++) {
-				assertEquals((byte)(y*image.width + x), image.get(x, y));
+				assertEquals(y*image.width + x, image.get(x, y));
 			}
 		}
 	}
-
 }
