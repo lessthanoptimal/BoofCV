@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -62,6 +62,11 @@ public class PackedTupleBigArray_B implements PackedTupleArray<TupleDesc_B> {
 		numElements = 0;
 		array.reset();
 		return this;
+	}
+
+	@Override public void resize( int size ) {
+		array.resize(size*dof);
+		numElements = size;
 	}
 
 	@Override public PackedTupleBigArray_B reserve( int numTuples ) {

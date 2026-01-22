@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -140,6 +140,7 @@ public class TestHierarchicalVocabularyTree extends BoofStandardJUnit {
 	public static class Packed2D implements PackedArray<Point2D_F64> {
 		public final List<Point2D_F64> list = new ArrayList<>();
 		@Override public Packed2D reset() {list.clear();return this;}
+		@Override public void resize(int i) {}
 		@Override public void removeSwap(int i) {}
 		@Override public Packed2D reserve( int numElements ) {return this;}
 		@Override public void append( Point2D_F64 element ) {list.add(element.copy());}
