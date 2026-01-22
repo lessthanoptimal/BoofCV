@@ -28,7 +28,7 @@ dependencies {
 	api project(':main:boofcv-recognition')
 	api project(':integration:boofcv-swing')
 
-	testApi project(':integration:boofcv-WebcamCapture')
+	testImplementation project(':integration:boofcv-WebcamCapture')
 }
 
 sourceSets {
