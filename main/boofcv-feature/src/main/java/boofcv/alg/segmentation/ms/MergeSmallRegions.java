@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,7 +43,7 @@ public class MergeSmallRegions<T extends ImageBase<T>> extends RegionMergeTree {
 	// Computes the color of each region
 	protected ComputeRegionMeanColor<T> computeColor;
 
-	// List which indicates ia segment is to be pruned based on its ID
+	// List which indicates if a segment is to be pruned based on its ID
 	protected DogArray_B segmentPruneFlag = new DogArray_B();
 
 	// Conversion between segment ID and prune ID
