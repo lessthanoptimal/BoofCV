@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -397,6 +397,27 @@ public class UtilIO {
 		}
 	}
 
+	/**
+	 * Reads a single line from an input stream and uses buffered as workspace. If the line exceeds the maximum
+	 * length then an IOException is thrown. If the end of the file is reached before a new line it will return
+	 * the string as is.
+	 *
+	 * @return The read in string
+	 */
+	public static String readLine( InputStream input, StringBuilder buffer, int maxLength ) throws IOException {
+		buffer.setLength(0);
+		while (maxLength <= 0 || buffer.length() < maxLength) {
+			int v = input.read();
+			if (v == -1 || v == '\n')
+				return buffer.toString();
+			// handle windows \r\n new line
+			if (v == '\r')
+				continue;
+			buffer.append((char)v);
+		}
+		throw new IOException("Line exceeds maximum length");
+	}
+
 	public static int readInt( InputStream input ) throws IOException {
 		int v0 = checkEOF(input);
 		int v1 = checkEOF(input);
@@ -433,13 +454,13 @@ public class UtilIO {
 		return ensureTrailingSlash(path, pathExampleURL(path).toString());
 	}
 
-	private static String ensureTrailingSlash(String original, String result) {
+	private static String ensureTrailingSlash( String original, String result ) {
 		// See if it originally had a slash
-		if (original.charAt(original.length()-1) != '/')
+		if (original.charAt(original.length() - 1) != '/')
 			return result;
 
 		// See if it already has a slash
-		if (result.charAt(result.length()-1) == '/')
+		if (result.charAt(result.length() - 1) == '/')
 			return result;
 
 		return result + '/';
