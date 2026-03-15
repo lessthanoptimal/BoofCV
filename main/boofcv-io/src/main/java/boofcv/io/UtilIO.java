@@ -399,23 +399,27 @@ public class UtilIO {
 
 	/**
 	 * Reads a single line from an input stream and uses buffered as workspace. If the line exceeds the maximum
-	 * length then an IOException is thrown. If the end of the file is reached before a new line it will return
-	 * the string as is.
+	 * length then an UncheckedIOException is thrown. If the end of the file is reached before a new line it
+	 * will return the string as is.
 	 *
 	 * @return The read in string
 	 */
-	public static String readLine( InputStream input, StringBuilder buffer, int maxLength ) throws IOException {
+	public static String readLine( InputStream input, StringBuilder buffer, int maxLength ) {
 		buffer.setLength(0);
-		while (maxLength <= 0 || buffer.length() < maxLength) {
-			int v = input.read();
-			if (v == -1 || v == '\n')
-				return buffer.toString();
-			// handle windows \r\n new line
-			if (v == '\r')
-				continue;
-			buffer.append((char)v);
+		try {
+			while (maxLength <= 0 || buffer.length() < maxLength) {
+				int v = input.read();
+				if (v == -1 || v == '\n')
+					return buffer.toString();
+				// handle windows \r\n new line
+				if (v == '\r')
+					continue;
+				buffer.append((char)v);
+			}
+			throw new IOException("Line exceeds maximum length");
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
 		}
-		throw new IOException("Line exceeds maximum length");
 	}
 
 	public static int readInt( InputStream input ) throws IOException {
