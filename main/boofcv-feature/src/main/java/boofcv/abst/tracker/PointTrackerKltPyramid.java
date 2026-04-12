@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,12 +40,8 @@ import java.util.List;
 
 import static boofcv.abst.tracker.PointTrackerUtils.declareTrackStorage;
 
-/**
- * Wrapper around {@link boofcv.alg.tracker.klt.PyramidKltTracker} for {@link PointTracker}. Every track
- * will have the same size and shaped descriptor. If any fault is encountered the track will be dropped.
- *
- * @author Peter Abeles
- */
+/// Wrapper around [boofcv.alg.tracker.klt.PyramidKltTracker] for [PointTracker]. Every track
+/// will have the same size and shaped descriptor. If any fault is encountered the track will be dropped.
 @SuppressWarnings({"NullAway.Init"})
 public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<D>>
 		implements PointTracker<I> {
@@ -100,20 +96,18 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 	PruneCloseTracks<PyramidKltFeature> pruneClose;
 	List<PyramidKltFeature> closeDropped = new ArrayList<>();
 
-	/**
-	 * Constructor which specified the KLT track manager and how the image pyramids are computed.
-	 *
-	 * @param config KLT tracker configuration
-	 * @param toleranceFB Tolerance in pixels for right to left validation. Disable with a value less than 0.
-	 * @param templateRadius Radius of square templates that are tracked
-	 * @param performPruneClose If true it will prune tracks that are within the detection radius
-	 * @param pyramid The image pyramid which KLT is tracking inside of
-	 * @param detector Feature detector. If null then no feature detector will be available and spawn won't work.
-	 * @param gradient Computes gradient image pyramid.
-	 * @param interpInput Interpolation used on input image
-	 * @param interpDeriv Interpolation used on gradient images
-	 * @param derivType Type of image the gradient is
-	 */
+	/// Constructor which specified the KLT track manager and how the image pyramids are computed.
+	///
+	/// @param config KLT tracker configuration
+	/// @param toleranceFB Tolerance in pixels for right to left validation. Disable with a value less than 0.
+	/// @param templateRadius Radius of square templates that are tracked
+	/// @param performPruneClose If true it will prune tracks that are within the detection radius
+	/// @param pyramid The image pyramid which KLT is tracking inside of
+	/// @param detector Feature detector. If null then no feature detector will be available and spawn won't work.
+	/// @param gradient Computes gradient image pyramid.
+	/// @param interpInput Interpolation used on input image
+	/// @param interpDeriv Interpolation used on gradient images
+	/// @param derivType Type of image the gradient is
 	public PointTrackerKltPyramid( ConfigKlt config,
 								   double toleranceFB,
 								   int templateRadius,
@@ -167,9 +161,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 		}
 	}
 
-	/**
-	 * Declares a new track and puts it into the unused list
-	 */
+	/// Declares a new track and puts it into the unused list
 	private PyramidKltFeature createNewTrack() {
 		int numLayers = currPyr.basePyramid.getNumLayers();
 		var t = new PyramidKltFeature(numLayers, templateRadius);
@@ -179,15 +171,13 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 		return t;
 	}
 
-	/**
-	 * Creates a new feature track at the specified location. Must only be called after
-	 * {@link #process(ImageGray)} has been called. It can fail if there
-	 * is insufficient texture
-	 *
-	 * @param x x-coordinate
-	 * @param y y-coordinate
-	 * @return the new track if successful or null if no new track could be created
-	 */
+	/// Creates a new feature track at the specified location. Must only be called after
+	/// [#process(ImageGray)] has been called. It can fail if there
+	/// is insufficient texture
+	///
+	/// @param x x-coordinate
+	/// @param y y-coordinate
+	/// @return the new track if successful or null if no new track could be created
 	public @Nullable PointTrack addTrack( double x, double y ) {
 		if (!input.isInBounds((int)x, (int)y))
 			return null;
@@ -211,9 +201,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 		return null;
 	}
 
-	/**
-	 * Checks to see if there's an unused track that can be recycled. if not it will create a new one
-	 */
+	/// Checks to see if there's an unused track that can be recycled. if not it will create a new one
 	protected PyramidKltFeature getUnusedTrack() {
 		if (unused.isEmpty())
 			return createNewTrack();
@@ -222,8 +210,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 		return t;
 	}
 
-	@Override
-	public void spawnTracks() {
+	@Override public void spawnTracks() {
 		spawned.clear();
 
 		tracker.setImage(currPyr.basePyramid, currPyr.derivX, currPyr.derivY);
@@ -291,27 +278,22 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 		}
 	}
 
-	/**
-	 * Returns true if a new track can be spawned here. Intended to be overloaded
-	 */
+	/// Returns true if a new track can be spawned here. Intended to be overloaded
 	protected boolean checkValidSpawn( PointTrack p ) {
 		return true;
 	}
 
-	@Override
-	public void dropAllTracks() {
+	@Override public void dropAllTracks() {
 		unused.addAll(active);
 		active.clear();
 		dropped.clear();
 	}
 
-	@Override
-	public int getMaxSpawn() {
+	@Override public int getMaxSpawn() {
 		return actualMaxTracks;
 	}
 
-	@Override
-	public void process( I image ) {
+	@Override public void process( I image ) {
 		this.input = image;
 		this.frameID++;
 
@@ -322,7 +304,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 			prevPyr = tmp;
 		}
 
-		boolean activeTracks = active.size() > 0;
+		boolean activeTracks = !active.isEmpty();
 		spawned.clear();
 		dropped.clear();
 
@@ -347,9 +329,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 		}
 	}
 
-	/**
-	 * Tracks features in the forward direction
-	 */
+	/// Tracks features in the forward direction
 	protected void trackFeatures( I image ) {
 		tracker.setImage(currPyr.basePyramid, currPyr.derivX, currPyr.derivY);
 		for (int i = active.size() - 1; i >= 0; i--) {
@@ -376,9 +356,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 		}
 	}
 
-	/**
-	 * Prune tracks which are too close and adds them to the dropped list
-	 */
+	/// Prune tracks which are too close and adds them to the dropped list
 	protected void pruneCloseTracks() {
 		pruneClose.init(input.width, input.height);
 		pruneClose.process(active, closeDropped);
@@ -386,10 +364,8 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 		dropped.addAll(closeDropped);
 	}
 
-	/**
-	 * Track back to the previous frame and see if the original coordinate is found again. This assumes that all
-	 * tracks in active list existed in the previous frame and were not spawned.
-	 */
+	/// Track back to the previous frame and see if the original coordinate is found again. This assumes that all
+	/// tracks in active list existed in the previous frame and were not spawned.
 	protected void backwardsTrackValidate() {
 		double tol2 = toleranceFB*toleranceFB;
 
@@ -414,8 +390,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 		}
 	}
 
-	@Override
-	public boolean dropTrack( PointTrack track ) {
+	@Override public boolean dropTrack( PointTrack track ) {
 		if (active.remove((PyramidKltFeature)track.getDescription())) {
 			// only recycle the description if it is in the active list. This avoids the problem of adding the
 			// same description multiple times
@@ -425,8 +400,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 		return false;
 	}
 
-	@Override
-	public void dropTracks( Dropper dropper ) {
+	@Override public void dropTracks( Dropper dropper ) {
 		for (int i = active.size() - 1; i >= 0; i--) {
 			PointTrack t = (PointTrack)active.get(i).cookie;
 			if (dropper.shouldDropTrack(t)) {
@@ -436,8 +410,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 		}
 	}
 
-	@Override
-	public List<PointTrack> getActiveTracks( @Nullable List<PointTrack> list ) {
+	@Override public List<PointTrack> getActiveTracks( @Nullable List<PointTrack> list ) {
 		list = declareTrackStorage(list);
 
 		addToList(active, list);
@@ -445,16 +418,12 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 		return list;
 	}
 
-	/**
-	 * KLT does not have inactive tracks since all tracks are dropped if a problem occurs.
-	 */
-	@Override
-	public List<PointTrack> getInactiveTracks( @Nullable List<PointTrack> list ) {
+	/// KLT does not have inactive tracks since all tracks are dropped if a problem occurs.
+	@Override public List<PointTrack> getInactiveTracks( @Nullable List<PointTrack> list ) {
 		return declareTrackStorage(list);
 	}
 
-	@Override
-	public List<PointTrack> getDroppedTracks( @Nullable List<PointTrack> list ) {
+	@Override public List<PointTrack> getDroppedTracks( @Nullable List<PointTrack> list ) {
 		list = declareTrackStorage(list);
 
 		addToList(dropped, list);
@@ -462,8 +431,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 		return list;
 	}
 
-	@Override
-	public List<PointTrack> getNewTracks( @Nullable List<PointTrack> list ) {
+	@Override public List<PointTrack> getNewTracks( @Nullable List<PointTrack> list ) {
 		list = declareTrackStorage(list);
 
 		addToList(spawned, list);
@@ -471,8 +439,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 		return list;
 	}
 
-	@Override
-	public List<PointTrack> getAllTracks( @Nullable List<PointTrack> list ) {
+	@Override public List<PointTrack> getAllTracks( @Nullable List<PointTrack> list ) {
 		return getActiveTracks(list);
 	}
 
@@ -482,25 +449,17 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 		}
 	}
 
-	@Override
-	public void reset() {
+	@Override public void reset() {
 		dropAllTracks();
 		totalFeatures = 0;
 		frameID = -1;
 	}
 
-	@Override
-	public long getFrameID() {
-		return frameID;
-	}
+	@Override public long getFrameID() { return frameID; }
 
-	@Override
-	public int getTotalActive() {
-		return active.size();
-	}
+	@Override public int getTotalActive() { return active.size(); }
 
-	@Override
-	public int getTotalInactive() {
+	@Override public int getTotalInactive() {
 		// there are no inactive tracks with KLT. If a match isn't found it is immediately dropped
 		return 0;
 	}
@@ -510,18 +469,14 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 		public final Point2D_F64 prev = new Point2D_F64();
 	}
 
-	/**
-	 * Contains the image pyramid
-	 */
+	/// Contains the image pyramid
 	@SuppressWarnings({"NullAway.Init"})
 	class ImageStruct {
 		public PyramidDiscrete<I> basePyramid;
 		public D[] derivX;
 		public D[] derivY;
 
-		public ImageStruct( PyramidDiscrete<I> o ) {
-			basePyramid = o.copyStructure();
-		}
+		public ImageStruct( PyramidDiscrete<I> o ) { basePyramid = o.copyStructure(); }
 
 		public void update( I image ) {
 			basePyramid.process(image);
