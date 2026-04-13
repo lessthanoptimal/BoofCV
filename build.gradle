@@ -19,8 +19,8 @@ allprojects {
     createVersionFile.enabled = false // run only once. enabled in types
 }
 
-project.ext.ddogleg_version = '0.24.2'
-project.ext.georegression_version = '0.28.2'
+project.ext.ddogleg_version = '0.24.3-SNAPSHOT'
+project.ext.georegression_version = '0.28.3-SNAPSHOT'
 project.ext.commons_io_version = '2.16.1'
 project.ext.deepboof_version = '0.5.3'
 project.ext.kotlin_version = '2.3.0'
