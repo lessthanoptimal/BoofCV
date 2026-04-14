@@ -23,7 +23,7 @@ import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.tracker.PruneCloseTracks;
 import boofcv.alg.tracker.klt.*;
-import boofcv.alg.transform.pyramid.PyramidOps;
+import boofcv.core.image.PyramidGradient;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageGray;
@@ -63,8 +63,8 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 	protected double toleranceFB;
 
 	// storage for image pyramid
-	protected ImageStruct currPyr;
-	protected ImageStruct prevPyr;
+	protected PyramidGradient<I, D> currPyr;
+	protected PyramidGradient<I, D> prevPyr;
 	protected ImageType<D> derivType;
 
 	// configuration for the KLT tracker
@@ -109,24 +109,24 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 	/// @param interpDeriv Interpolation used on gradient images
 	/// @param derivType Type of image the gradient is
 	public PointTrackerKltPyramid( ConfigKlt config,
-								   double toleranceFB,
-								   int templateRadius,
-								   boolean performPruneClose,
-								   PyramidDiscrete<I> pyramid,
-								   GeneralFeatureDetector<I, D> detector,
-								   ImageGradient<I, D> gradient,
-								   InterpolateRectangle<I> interpInput,
-								   InterpolateRectangle<D> interpDeriv,
-								   Class<D> derivType ) {
+	                               double toleranceFB,
+	                               int templateRadius,
+	                               boolean performPruneClose,
+	                               PyramidDiscrete<I> pyramid,
+	                               GeneralFeatureDetector<I, D> detector,
+	                               ImageGradient<I, D> gradient,
+	                               InterpolateRectangle<I> interpInput,
+	                               InterpolateRectangle<D> interpDeriv,
+	                               Class<D> derivType ) {
 
 		this.config = config;
 		this.toleranceFB = toleranceFB;
 		this.templateRadius = templateRadius;
 		this.gradient = gradient;
 		this.derivType = ImageType.single(derivType);
-		this.currPyr = new ImageStruct(pyramid);
+		this.currPyr = new PyramidGradient<>(pyramid, gradient);
 		if (toleranceFB >= 0) {
-			this.prevPyr = new ImageStruct(pyramid);
+			this.prevPyr = new PyramidGradient<>(pyramid, gradient);
 			// don't save the reference because the input image might be the same instance each time and change
 			// between frames
 			this.prevPyr.basePyramid.setSaveOriginalReference(false);
@@ -299,7 +299,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 
 		// swap currPyr to prevPyr so that the previous is now the previous
 		if (toleranceFB >= 0) {
-			ImageStruct tmp = currPyr;
+			PyramidGradient<I, D> tmp = currPyr;
 			currPyr = prevPyr;
 			prevPyr = tmp;
 		}
@@ -455,9 +455,9 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 		frameID = -1;
 	}
 
-	@Override public long getFrameID() { return frameID; }
+	@Override public long getFrameID() {return frameID;}
 
-	@Override public int getTotalActive() { return active.size(); }
+	@Override public int getTotalActive() {return active.size();}
 
 	@Override public int getTotalInactive() {
 		// there are no inactive tracks with KLT. If a match isn't found it is immediately dropped
@@ -467,30 +467,5 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 	static class PointTrackMod extends PointTrack {
 		// previous location of the track
 		public final Point2D_F64 prev = new Point2D_F64();
-	}
-
-	/// Contains the image pyramid
-	@SuppressWarnings({"NullAway.Init"})
-	class ImageStruct {
-		public PyramidDiscrete<I> basePyramid;
-		public D[] derivX;
-		public D[] derivY;
-
-		public ImageStruct( PyramidDiscrete<I> o ) { basePyramid = o.copyStructure(); }
-
-		public void update( I image ) {
-			basePyramid.process(image);
-			if (derivX == null || derivX.length != basePyramid.layers.length) {
-				derivX = PyramidOps.declareOutput(basePyramid, derivType);
-				derivY = PyramidOps.declareOutput(basePyramid, derivType);
-			}
-
-			if (derivX[0].width != basePyramid.getLayer(0).width ||
-					derivX[0].height != basePyramid.getLayer(0).height) {
-				PyramidOps.reshapeOutput(basePyramid, derivX);
-				PyramidOps.reshapeOutput(basePyramid, derivY);
-			}
-			PyramidOps.gradient(basePyramid, gradient, derivX, derivY);
-		}
 	}
 }

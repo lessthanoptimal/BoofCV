@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,30 +18,29 @@
 
 package boofcv.alg.tracker.klt;
 
-/**
- * Different types of faults that can cause a KLT track to be dropped.
- *
- * @author Peter Abeles
- */
+/// Different types of faults that can cause a KLT track to be dropped.
+///
+/// Note: That some of the failure mode states require an external algorithm to detect but have been placed
+/// here to avoid having multiple enums.
 public enum KltTrackFault {
-	/**
-	 * The feature was successfully tracked
-	 */
+	/// Unknown status. Can be used as an initial value
+	UNKNOWN,
+	/// The feature was successfully tracked
 	SUCCESS,
-	/**
-	 * The feature has moved farther than it could possibly be tracked
-	 */
+	/// The feature has moved farther than it could possibly be tracked
 	DRIFTED,
-	/**
-	 * The tracked move out of the image bounds.
-	 */
+	/// The tracked move out of the image bounds.
 	OUT_OF_BOUNDS,
-	/**
-	 * Miscellaneous track failure
-	 */
+	/// Miscellaneous track failure
 	FAILED,
-	/**
-	 * The feature's error was too large
-	 */
-	LARGE_ERROR
+	/// The feature's error was too large
+	LARGE_ERROR,
+	/// Failed a backwards validation test
+	BACKWARDS,
+	/// A request to update its description failed
+	DESCRIBE,
+	/// Two tracks became too close to each other
+	CLOSE,
+	/// The track became too old
+	AGE,
 }

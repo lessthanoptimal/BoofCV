@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,39 +23,27 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
 
-/**
- * Abstract interface for computing image derivatives. The default mechanism for handling image borders is
- * {@link BorderType#EXTENDED}.
- *
- * @author Peter Abeles
- */
+/// Abstract interface for computing image derivatives. The default mechanism for handling image borders is
+/// [BorderType#EXTENDED].
 public interface ImageDerivative<T extends ImageBase<T>, D extends ImageBase<D>> {
 
-	/**
-	 * Overrides using {@link BorderType#EXTENDED} along the image border. Don't change this behavior unless
-	 * you know what you're doing.
-	 *
-	 * @param type Specify image border behavior
-	 */
-	public void setBorderType( BorderType type );
+	/// Overrides using [BorderType#EXTENDED] along the image border. Don't change this behavior unless
+	/// you know what you're doing.
+	///
+	/// @param type Specify image border behavior
+	void setBorderType( BorderType type );
 
-	/**
-	 * Returns how the image borders are handled.
-	 *
-	 * @return Image border type.
-	 */
-	public BorderType getBorderType();
+	/// Returns how the image borders are handled.
+	///
+	/// @return Image border type.
+	BorderType getBorderType();
 
-	/**
-	 * How many pixels wide is the region that is not processed along the outside
-	 * border of the image.
-	 *
-	 * @return number of pixels.
-	 */
-	public int getBorder();
+	/// How many pixels wide is the region that is not processed along the outside
+	/// border of the image.
+	///
+	/// @return number of pixels.
+	int getBorder();
 
-	/**
-	 * Image type for derivative output
-	 */
-	public ImageType<D> getDerivativeType();
+	/// Image type for derivative output
+	ImageType<D> getDerivativeType();
 }

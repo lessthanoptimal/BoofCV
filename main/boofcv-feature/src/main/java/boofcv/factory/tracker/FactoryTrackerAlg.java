@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,18 +20,20 @@ package boofcv.factory.tracker;
 
 import boofcv.abst.feature.associate.AssociateDescription2D;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
+import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.abst.tracker.ConfigTrackerHybrid;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.tracker.hybrid.HybridTrackerScalePoint;
 import boofcv.alg.tracker.hybrid.PyramidKltForHybrid;
-import boofcv.alg.tracker.klt.ConfigKlt;
-import boofcv.alg.tracker.klt.ConfigPKlt;
-import boofcv.alg.tracker.klt.KltTracker;
-import boofcv.alg.tracker.klt.PyramidKltTracker;
+import boofcv.alg.tracker.klt.*;
+import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.interpolate.FactoryInterpolation;
+import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
+import boofcv.struct.pyramid.PyramidDiscrete;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -80,8 +82,8 @@ public class FactoryTrackerAlg {
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	PyramidKltTracker<I, D> kltPyramid( @Nullable ConfigKlt config,
-										Class<I> imageType,
-										Class<D> derivType ) {
+	                                    Class<I> imageType,
+	                                    Class<D> derivType ) {
 		if (config == null)
 			config = new ConfigKlt();
 		if (derivType == null)
@@ -92,6 +94,26 @@ public class FactoryTrackerAlg {
 
 		KltTracker<I, D> klt = new KltTracker<>(interpInput, interpDeriv, config);
 		return new PyramidKltTracker<>(klt);
+	}
+
+	public static <I extends ImageGray<I>, D extends ImageGray<D>>
+	EasyPyramidKlt<I, D> kltEasy( @Nullable ConfigEasyKlt config,
+	                              Class<I> imageType,
+	                              Class<D> derivType ) {
+		if (config == null)
+			config = new ConfigEasyKlt();
+		if (derivType == null)
+			derivType = GImageDerivativeOps.getDerivativeType(imageType);
+
+		ImageGradient<I, D> gradient = FactoryDerivative.sobel(imageType, derivType);
+		PyramidDiscrete<I> pyramid = FactoryPyramid.discreteGaussian(
+				config.pyramidLevels, -1, 2, true, ImageType.single(imageType));
+
+		var easy = new EasyPyramidKlt<>(pyramid, gradient, config.klt);
+		easy.setTemplateRadius(config.templateRadius);
+		easy.setToleranceFB(config.toleranceFB);
+		easy.setConcurrentMinimumTracks(config.concurrentMinimumTracks);
+		return easy;
 	}
 
 	/**
@@ -105,12 +127,12 @@ public class FactoryTrackerAlg {
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>, Desc extends TupleDesc<Desc>>
 	HybridTrackerScalePoint<I, D, Desc> hybrid( DetectDescribePoint<I, Desc> detector,
-												AssociateDescription2D<Desc> associate,
-												int tooCloseRadius,
-												@Nullable ConfigPKlt kltConfig,
-												@Nullable ConfigTrackerHybrid configHybrid,
-												Class<I> imageType,
-												@Nullable Class<D> derivType ) {
+	                                            AssociateDescription2D<Desc> associate,
+	                                            int tooCloseRadius,
+	                                            @Nullable ConfigPKlt kltConfig,
+	                                            @Nullable ConfigTrackerHybrid configHybrid,
+	                                            Class<I> imageType,
+	                                            @Nullable Class<D> derivType ) {
 		if (configHybrid == null)
 			configHybrid = new ConfigTrackerHybrid();
 		if (kltConfig == null)
