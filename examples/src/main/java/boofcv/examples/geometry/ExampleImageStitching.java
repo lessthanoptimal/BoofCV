@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -203,7 +203,7 @@ public class ExampleImageStitching {
 
 		// draw lines around the distorted image to make it easier to see
 		Homography2D_F64 fromBtoWork = fromWorkToB.invert(null);
-		Point2D_I32 corners[] = new Point2D_I32[4];
+		Point2D_I32[] corners = new Point2D_I32[4];
 		corners[0] = renderPoint(0, 0, fromBtoWork);
 		corners[1] = renderPoint(colorB.width, 0, fromBtoWork);
 		corners[2] = renderPoint(colorB.width, colorB.height, fromBtoWork);
