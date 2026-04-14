@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,25 +29,19 @@ import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import boofcv.testing.BoofStandardJUnit;
 
-
-/**
- * Base class for unit tests of Pyramidal KLT
- *
- * @author Peter Abeles
- */
+/// Base class for unit tests of Pyramidal KLT
 @SuppressWarnings({"unchecked"})
 public class PyramidKltTestBase extends BoofStandardJUnit {
-
 	int width = 50;
 	int height = 60;
 
 	int featureReadius = 2;
 
-	GrayF32 image = new GrayF32(width,height);
+	GrayF32 image = new GrayF32(width, height);
 	PyramidDiscrete<GrayF32> pyramid;
 	GrayF32[] derivX;
 	GrayF32[] derivY;
-	PyramidKltTracker<GrayF32,GrayF32> tracker = createDefaultTracker();
+	PyramidKltTracker<GrayF32, GrayF32> tracker = createDefaultTracker();
 
 	int cornerX = 20;
 	int cornerY = 22;
@@ -59,20 +53,19 @@ public class PyramidKltTestBase extends BoofStandardJUnit {
 	public void setup( int numLevels ) {
 
 		ConfigDiscreteLevels configLevels = ConfigDiscreteLevels.levels(numLevels);
-		pyramid = FactoryPyramid.discreteGaussian(configLevels,-1,2,false, ImageType.single(GrayF32.class));
-		ImageMiscOps.fillUniform(image,rand,0,10);
-		ImageMiscOps.fillRectangle(image,100,cornerX,cornerY,20,20);
+		pyramid = FactoryPyramid.discreteGaussian(configLevels, -1, 2, false, ImageType.single(GrayF32.class));
+		ImageMiscOps.fillUniform(image, rand, 0, 10);
+		ImageMiscOps.fillRectangle(image, 100, cornerX, cornerY, 20, 20);
 		pyramid.process(image);
 
-		derivX = PyramidOps.declareOutput(pyramid,ImageType.SB_F32);
-		derivY = PyramidOps.declareOutput(pyramid,ImageType.SB_F32);
+		derivX = PyramidOps.declareOutput(pyramid, ImageType.SB_F32);
+		derivY = PyramidOps.declareOutput(pyramid, ImageType.SB_F32);
 
-		ImageGradient<GrayF32,GrayF32> gradient = FactoryDerivative.sobel(GrayF32.class,GrayF32.class);
-		PyramidOps.gradient(pyramid,gradient,derivX,derivY);
+		ImageGradient<GrayF32, GrayF32> gradient = FactoryDerivative.sobel(GrayF32.class, GrayF32.class);
+		PyramidOps.gradient(pyramid, gradient, derivX, derivY);
 	}
 
-
-	private PyramidKltTracker<GrayF32,GrayF32> createDefaultTracker() {
+	private PyramidKltTracker<GrayF32, GrayF32> createDefaultTracker() {
 		KltTracker<GrayF32, GrayF32> klt = TestKltTracker.createDefaultTracker();
 
 		return new PyramidKltTracker<>(klt);

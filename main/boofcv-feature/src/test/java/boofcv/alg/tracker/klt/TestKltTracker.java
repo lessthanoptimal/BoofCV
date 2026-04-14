@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,10 +40,8 @@ public class TestKltTracker extends BoofStandardJUnit {
 	GrayF32 derivX = new GrayF32(imageWidth, imageHeight);
 	GrayF32 derivY = new GrayF32(imageWidth, imageHeight);
 
-	/**
-	 * Process the same features in two different sets of image. only difference is that one is a sub image
-	 * results should be identical
-	 */
+	/// Process the same features in two different sets of image. only difference is that one is a sub image
+	/// results should be identical
 	@Test void testSubImages() {
 		ImageMiscOps.fillUniform(image, rand, 0, 100);
 		GradientSobel.process(image, derivX, derivY, new ImageBorder1D_F32(BorderIndex1D_Extend::new));
@@ -87,10 +85,8 @@ public class TestKltTracker extends BoofStandardJUnit {
 		}
 	}
 
-	/**
-	 * Create a description of a feature next to the border then place the feature just outside of the image
-	 * and see if it can track to its original position.
-	 */
+	/// Create a description of a feature next to the border then place the feature just outside of the image
+	/// and see if it can track to its original position.
 	@Test void testTracking_border1() {
 
 		ImageMiscOps.fillUniform(image, rand, 0, 100);
@@ -99,7 +95,7 @@ public class TestKltTracker extends BoofStandardJUnit {
 		KltTracker<GrayF32, GrayF32> tracker = createDefaultTracker();
 		tracker.setImage(image, derivX, derivY);
 		int r = 4;
-		KltFeature feature = new KltFeature(r);
+		var feature = new KltFeature(r);
 
 		// lower right border, but fully inside the image
 		feature.setPosition(imageWidth - r - 1, imageHeight - r - 1);
@@ -124,9 +120,7 @@ public class TestKltTracker extends BoofStandardJUnit {
 		assertEquals(r, feature.y, 0.01);
 	}
 
-	/**
-	 * Place a feature on the border then put it inside the image. See if it moves towards the border
-	 */
+	/// Place a feature on the border then put it inside the image. See if it moves towards the border
 	@Test void testTracking_border2() {
 		ImageMiscOps.fillUniform(image, rand, 1, 100);
 		GradientSobel.process(image, derivX, derivY, new ImageBorder1D_F32(BorderIndex1D_Extend::new));
@@ -135,7 +129,7 @@ public class TestKltTracker extends BoofStandardJUnit {
 		tracker.setImage(image, derivX, derivY);
 
 		int r = 3;
-		KltFeature feature = new KltFeature(r);
+		var feature = new KltFeature(r);
 
 		// just outside the image
 		feature.setPosition(imageWidth - r - 1 + 1, imageHeight - r - 1 + 1);
@@ -160,21 +154,17 @@ public class TestKltTracker extends BoofStandardJUnit {
 		assertEquals(1, feature.y, 0.01);
 	}
 
-	/**
-	 * Set description should fail if a feature is entirely outside the image
-	 */
+	/// Set description should fail if a feature is entirely outside the image
 	@Test void setDescription_outsideFail() {
 		KltTracker<GrayF32, GrayF32> tracker = createDefaultTracker();
 		tracker.setImage(image, derivX, derivY);
-		KltFeature feature = new KltFeature(3);
+		var feature = new KltFeature(3);
 		feature.setPosition(-100, 200);
 
 		assertFalse(tracker.setDescription(feature));
 	}
 
-	/**
-	 * Compares the border algorithm to the inner algorithm
-	 */
+	/// Compares the border algorithm to the inner algorithm
 	@Test void setDescription_compare() {
 
 		ImageMiscOps.fillUniform(image, rand, 0, 100);
@@ -183,8 +173,8 @@ public class TestKltTracker extends BoofStandardJUnit {
 		KltTracker<GrayF32, GrayF32> tracker = createDefaultTracker();
 		tracker.setImage(image, derivX, derivY);
 
-		KltFeature featureA = new KltFeature(3);
-		KltFeature featureB = new KltFeature(3);
+		var featureA = new KltFeature(3);
+		var featureB = new KltFeature(3);
 
 		featureA.setPosition(20.6f, 25.1f);
 		featureB.setPosition(20.6f, 25.1f);
@@ -200,14 +190,12 @@ public class TestKltTracker extends BoofStandardJUnit {
 		}
 	}
 
-	/**
-	 * When placed outside the image pixels should be NaN
-	 */
+	/// When placed outside the image pixels should be NaN
 	@Test void setDescription_borderNaN() {
 		KltTracker<GrayF32, GrayF32> tracker = createDefaultTracker();
 		tracker.setImage(image, derivX, derivY);
 
-		KltFeature feature = new KltFeature(3);
+		var feature = new KltFeature(3);
 		feature.setPosition(2, 1);
 		tracker.setDescription(feature);
 
@@ -221,13 +209,11 @@ public class TestKltTracker extends BoofStandardJUnit {
 		assertEquals(19, numNaN);
 	}
 
-	/**
-	 * Pass in a feature with a small determinant and see if it returns a fault.
-	 */
+	/// Pass in a feature with a small determinant and see if it returns a fault.
 	@Test void detectBadFeature() {
 		KltTracker<GrayF32, GrayF32> tracker = createDefaultTracker();
 		tracker.setImage(image, derivX, derivY);
-		KltFeature feature = new KltFeature(2);
+		var feature = new KltFeature(2);
 
 		// put a feature right on the corner
 		feature.setPosition(20, 20);
@@ -244,7 +230,7 @@ public class TestKltTracker extends BoofStandardJUnit {
 
 		KltTracker<GrayF32, GrayF32> tracker = createDefaultTracker();
 		tracker.setImage(image, derivX, derivY);
-		KltFeature feature = new KltFeature(2);
+		var feature = new KltFeature(2);
 
 		feature.setPosition(20, 22);
 		tracker.setDescription(feature);
@@ -275,7 +261,7 @@ public class TestKltTracker extends BoofStandardJUnit {
 	@Test void isDescriptionComplete() {
 		KltTracker<GrayF32, GrayF32> tracker = createDefaultTracker();
 
-		KltFeature f = new KltFeature(2);
+		var f = new KltFeature(2);
 		tracker.lengthFeature = 25;
 
 		assertTrue(tracker.isDescriptionComplete(f));
@@ -291,7 +277,7 @@ public class TestKltTracker extends BoofStandardJUnit {
 	@Test void isFullyInside() {
 		KltTracker<GrayF32, GrayF32> tracker = createDefaultTracker();
 
-		KltFeature f = new KltFeature(2);
+		var f = new KltFeature(2);
 
 		tracker.image = new GrayF32(imageWidth, imageHeight);
 		tracker.setAllowedBounds(f);
@@ -315,7 +301,7 @@ public class TestKltTracker extends BoofStandardJUnit {
 		KltTracker<GrayF32, GrayF32> tracker = createDefaultTracker();
 
 		int r = 2;
-		KltFeature f = new KltFeature(r);
+		var f = new KltFeature(r);
 
 		tracker.image = new GrayF32(imageWidth, imageHeight);
 		tracker.setAllowedBounds(f);
@@ -333,7 +319,7 @@ public class TestKltTracker extends BoofStandardJUnit {
 	}
 
 	public static KltTracker<GrayF32, GrayF32> createDefaultTracker() {
-		ConfigKlt config = new ConfigKlt();
+		var config = new ConfigKlt();
 		config.maxPerPixelError = 10;
 		config.maxIterations = 30;
 		config.minDeterminant = 0.01f;

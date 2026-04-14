@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,159 +35,141 @@ public class TestPyramidKltTracker extends PyramidKltTestBase {
 		super.setup();
 	}
 
-	private void setTargetLocation( int x , int y ) {
-		ImageMiscOps.fillUniform(image,rand,0,1);
-		ImageMiscOps.fillRectangle(image,100,x,y,20,20);
+	private void setTargetLocation( int x, int y ) {
+		ImageMiscOps.fillUniform(image, rand, 0, 1);
+		ImageMiscOps.fillRectangle(image, 100, x, y, 20, 20);
 		pyramid.process(image);
 
-		for( int i = 0; i < pyramid.getNumLayers(); i++ ) {
-			GradientSobel.process(pyramid.getLayer(i),derivX[i],derivY[i],new ImageBorder1D_F32(BorderIndex1D_Extend::new));
+		for (int i = 0; i < pyramid.getNumLayers(); i++) {
+			GradientSobel.process(pyramid.getLayer(i), derivX[i], derivY[i], new ImageBorder1D_F32(BorderIndex1D_Extend::new));
 		}
 	}
 
-	/**
-	 * Test set description when the image is fully inside the image for all the pyramid layers
-	 */
+	/// Test set description when the image is fully inside the image for all the pyramid layers
 	@Test void setDescription() {
 		// tell it to generate a feature inside directly on a pixel
-		PyramidKltFeature feature = new PyramidKltFeature(pyramid.getNumLayers(),featureReadius);
-		feature.setPosition(25,20);
-		tracker.setImage(pyramid,derivX,derivY);
+		var feature = new PyramidKltFeature(pyramid.getNumLayers(), featureReadius);
+		feature.setPosition(25, 20);
+		tracker.setImage(pyramid, derivX, derivY);
 		assertTrue(tracker.setDescription(feature));
 
 		// all the layers should have been set
-		for( int i = 0; i < pyramid.getNumLayers(); i++ ) {
-			assertTrue( feature.desc[i].Gxx != 0 );
+		for (int i = 0; i < pyramid.getNumLayers(); i++) {
+			assertTrue(feature.desc[i].Gxx != 0);
 		}
 	}
 
-	/**
-	 * Test set description when a feature partially inside and outside of the image at all levels
-	 */
+	/// Test set description when a feature partially inside and outside of the image at all levels
 	@Test void setDescription_border() {
 		// now tell it to set a description near the edge
 		// only the first layer should be set
-		PyramidKltFeature feature = new PyramidKltFeature(pyramid.getNumLayers(),featureReadius);
-		feature.setPosition(featureReadius-1,featureReadius-1);
-		tracker.setImage(pyramid,derivX,derivY);
+		var feature = new PyramidKltFeature(pyramid.getNumLayers(), featureReadius);
+		feature.setPosition(featureReadius - 1, featureReadius - 1);
+		tracker.setImage(pyramid, derivX, derivY);
 		assertTrue(tracker.setDescription(feature));
-		for( int i = 0; i < pyramid.getNumLayers(); i++ ) {
-			assertTrue( feature.desc[i].x != 0 );
-			assertTrue( feature.desc[i].y != 0 );
-			assertTrue( feature.desc[i].Gxx != 0.0f );
+		for (int i = 0; i < pyramid.getNumLayers(); i++) {
+			assertTrue(feature.desc[i].x != 0);
+			assertTrue(feature.desc[i].y != 0);
+			assertTrue(feature.desc[i].Gxx != 0.0f);
 		}
 	}
 
-	/**
-	 * Test set description when a feature is completely outside the image
-	 */
+	/// Test set description when a feature is completely outside the image
 	@Test void setDescription_outside() {
 		// now tell it to set a description near the edge
 		// only the first layer should be set
-		PyramidKltFeature feature = new PyramidKltFeature(pyramid.getNumLayers(),featureReadius);
-		feature.setPosition(-featureReadius-1,-featureReadius-1);
-		tracker.setImage(pyramid,derivX,derivY);
+		var feature = new PyramidKltFeature(pyramid.getNumLayers(), featureReadius);
+		feature.setPosition(-featureReadius - 1, -featureReadius - 1);
+		tracker.setImage(pyramid, derivX, derivY);
 		assertFalse(tracker.setDescription(feature));
 	}
 
-	/**
-	 * Test positive examples of tracking when there should be no fault at any point.
-	 *
-	 * Only a small offset easily done with a single layer tracker
-	 */
+	/// Test positive examples of tracking when there should be no fault at any point.
+	/// Only a small offset easily done with a single layer tracker
 	@Test void track_smallOffset() {
 		// set the feature right on the corner
-		PyramidKltFeature feature = new PyramidKltFeature(pyramid.getNumLayers(),featureReadius);
-		feature.setPosition(cornerX,cornerY);
-		tracker.setImage(pyramid,derivX,derivY);
+		var feature = new PyramidKltFeature(pyramid.getNumLayers(), featureReadius);
+		feature.setPosition(cornerX, cornerY);
+		tracker.setImage(pyramid, derivX, derivY);
 		tracker.setDescription(feature);
 
 		// now move the corner away from the feature
-		feature.setPosition(cornerX-1.3f,cornerY+1.2f);
+		feature.setPosition(cornerX - 1.3f, cornerY + 1.2f);
 
 		// see if it moves back
-		assertTrue( tracker.track(feature) == KltTrackFault.SUCCESS);
+		assertSame(KltTrackFault.SUCCESS, tracker.track(feature));
 
-		assertEquals(cornerX,feature.x,0.2);
-		assertEquals(cornerY,feature.y,0.2);
+		assertEquals(cornerX, feature.x, 0.2);
+		assertEquals(cornerY, feature.y, 0.2);
 	}
 
-	/**
-	 * Test positive examples of tracking when there should be no fault at any point.
-	 *
-	 * Larger offset which will require the pyramid approach
-	 */
+	/// Test positive examples of tracking when there should be no fault at any point.
+	/// Larger offset which will require the pyramid approach
 	@Test void track_largeOffset() {
 		// set the feature right on the corner
-		PyramidKltFeature feature = new PyramidKltFeature(pyramid.getNumLayers(),featureReadius);
-		feature.setPosition(cornerX,cornerY);
-		tracker.setImage(pyramid,derivX,derivY);
+		var feature = new PyramidKltFeature(pyramid.getNumLayers(), featureReadius);
+		feature.setPosition(cornerX, cornerY);
+		tracker.setImage(pyramid, derivX, derivY);
 		tracker.setDescription(feature);
 
 		// now move the corner away from the feature
-		feature.setPosition(cornerX-5.4f,cornerY+5.3f);
+		feature.setPosition(cornerX - 5.4f, cornerY + 5.3f);
 
 		// see if it moves back
-		assertTrue( tracker.track(feature) == KltTrackFault.SUCCESS);
+		assertSame(KltTrackFault.SUCCESS, tracker.track(feature));
 
-		assertEquals(cornerX,feature.x,0.2);
-		assertEquals(cornerY,feature.y,0.2);
+		assertEquals(cornerX, feature.x, 0.2);
+		assertEquals(cornerY, feature.y, 0.2);
 	}
 
-	/**
-	 *
-	 */
+	///
 	@Test void track_border() {
-		float targetX = width-featureReadius;
-		float targetY = height-featureReadius-3;
+		float targetX = width - featureReadius;
+		float targetY = height - featureReadius - 3;
 
 		// set the feature right on the corner
-		PyramidKltFeature feature = new PyramidKltFeature(pyramid.getNumLayers(),featureReadius);
-		feature.setPosition(targetX,targetY);
-		tracker.setImage(pyramid,derivX,derivY);
+		var feature = new PyramidKltFeature(pyramid.getNumLayers(), featureReadius);
+		feature.setPosition(targetX, targetY);
+		tracker.setImage(pyramid, derivX, derivY);
 		tracker.setDescription(feature);
 
 		// start it outside the image, but still near its true position
-		feature.setPosition(width-featureReadius+2,height-featureReadius-1);
-		assertTrue( tracker.track(feature) == KltTrackFault.SUCCESS);
+		feature.setPosition(width - featureReadius + 2, height - featureReadius - 1);
+		assertSame(KltTrackFault.SUCCESS, tracker.track(feature));
 
-		assertEquals(targetX,feature.x,0.2);
-		assertEquals(targetY,feature.y,0.2);
+		assertEquals(targetX, feature.x, 0.2);
+		assertEquals(targetY, feature.y, 0.2);
 	}
 
-	/**
-	 * See if a track out of bounds error is returned
-	 */
+	/// See if a track out of bounds error is returned
 	@Test void track_OOB() {
-		setTargetLocation(5*4+1,22);
+		setTargetLocation(5*4 + 1, 22);
 
 		// set the feature right on the corner
-		PyramidKltFeature feature = new PyramidKltFeature(pyramid.getNumLayers(),4);
-		feature.setPosition(21,22);
-		tracker.setImage(pyramid,derivX,derivY);
+		var feature = new PyramidKltFeature(pyramid.getNumLayers(), 4);
+		feature.setPosition(21, 22);
+		tracker.setImage(pyramid, derivX, derivY);
 		tracker.setDescription(feature);
 
 		// put the feature out of bounds
-		feature.setPosition(-20,-20);
+		feature.setPosition(-20, -20);
 
-		assertTrue( tracker.track(feature) == KltTrackFault.OUT_OF_BOUNDS);
+		assertSame(KltTrackFault.OUT_OF_BOUNDS, tracker.track(feature));
 	}
 
-	/**
-	 * See if a track out of bounds error is returned
-	 */
+	/// See if a track out of bounds error is returned
 	@Test void track_LargeError() {
-		setTargetLocation(5*4+1,22);
+		setTargetLocation(5*4 + 1, 22);
 
 		// set the feature right on the corner
-		PyramidKltFeature feature = new PyramidKltFeature(pyramid.getNumLayers(),4);
-		feature.setPosition(21,22);
-		tracker.setImage(pyramid,derivX,derivY);
+		var feature = new PyramidKltFeature(pyramid.getNumLayers(), 4);
+		feature.setPosition(21, 22);
+		tracker.setImage(pyramid, derivX, derivY);
 		tracker.setDescription(feature);
 
 		// mess up the description so that it will produce a large error
-		feature.desc[0].desc.set(0,0,1000);
+		feature.desc[0].desc.set(0, 0, 1000);
 
-		assertTrue( tracker.track(feature) == KltTrackFault.LARGE_ERROR);
+		assertSame(KltTrackFault.LARGE_ERROR, tracker.track(feature));
 	}
 }
