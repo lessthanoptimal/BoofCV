@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,18 +20,14 @@ package boofcv.factory.geo;
 
 import boofcv.struct.Configuration;
 
-/**
- * Configuration parameters for estimating a homography
- *
- * @author Peter Abeles
- */
+/// Configuration parameters for estimating a homography
 public class ConfigHomography implements Configuration {
 
-	/**
-	 * If the input is in pixel coordinates then this should be true. If in normalized image coordinates
-	 * then it can be false.
-	 */
+	/// If the input is in pixel coordinates then this should be true. If in normalized image coordinates
+	/// then it can be false.
 	public boolean normalize = true;
+
+	public ErrorModel error = ErrorModel.GEOMETRIC_SQ_LEFT;
 
 	public ConfigHomography( boolean normalize ) {
 		this.normalize = normalize;
@@ -41,8 +37,16 @@ public class ConfigHomography implements Configuration {
 
 	public ConfigHomography setTo( ConfigHomography src ) {
 		this.normalize = src.normalize;
+		this.error = src.error;
 		return this;
 	}
 
 	@Override public void checkValidity() {}
+
+	public enum ErrorModel {
+		/// Distance squared of left project into right image.
+		GEOMETRIC_SQ_LEFT,
+		/// Average of geometric error squared in left and right images
+		GEOMETRIC_SQ_SYMMETRIC
+	}
 }

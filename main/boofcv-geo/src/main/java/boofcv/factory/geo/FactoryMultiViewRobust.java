@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -71,7 +71,7 @@ public class FactoryMultiViewRobust {
 	 * @return Robust Se3_F64 estimator
 	 */
 	public static ModelMatcherMultiview<Se3_F64, Point2D3D> pnpLMedS( @Nullable ConfigPnP configPnP,
-																	  ConfigLMedS configLMedS ) {
+	                                                                  ConfigLMedS configLMedS ) {
 		if (configPnP == null)
 			configPnP = new ConfigPnP();
 		configPnP.checkValidity();
@@ -105,7 +105,7 @@ public class FactoryMultiViewRobust {
 	 * @see Estimate1ofPnP
 	 */
 	public static RansacCalibrated<Se3_F64, Point2D3D> pnpRansac( @Nullable ConfigPnP configPnP,
-																  ConfigRansac configRansac ) {
+	                                                              ConfigRansac configRansac ) {
 		if (configPnP == null)
 			configPnP = new ConfigPnP();
 		configPnP.checkValidity();
@@ -115,7 +115,7 @@ public class FactoryMultiViewRobust {
 		double threshold = configRansac.inlierThreshold*configRansac.inlierThreshold;
 
 		var ransac = new RansacCalibrated<>(createRansac(
-				configRansac, threshold,  new ModelManagerSe3_F64(), Point2D3D.class));
+				configRansac, threshold, new ModelManagerSe3_F64(), Point2D3D.class));
 
 		ConfigPnP _configPnP = configPnP;
 		ransac.setModel(() -> {
@@ -370,7 +370,10 @@ public class FactoryMultiViewRobust {
 
 		lmeds.setModel(
 				() -> new GenerateHomographyLinear(_configHomography.normalize),
-				DistanceHomographySq::new);
+				() -> switch (_configHomography.error) {
+					case GEOMETRIC_SQ_LEFT -> new DistanceHomographySq();
+					case GEOMETRIC_SQ_SYMMETRIC -> new DistanceHomographySymSq();
+				});
 		return lmeds;
 	}
 
@@ -405,7 +408,10 @@ public class FactoryMultiViewRobust {
 				createRansac(configRansac, ransacTol, manager, AssociatedPair.class);
 		ransac.setModel(
 				() -> new GenerateHomographyLinear(_configHomography.normalize),
-				DistanceHomographySq::new);
+				() -> switch (_configHomography.error) {
+					case GEOMETRIC_SQ_LEFT -> new DistanceHomographySq();
+					case GEOMETRIC_SQ_SYMMETRIC -> new DistanceHomographySymSq();
+				});
 		return ransac;
 	}
 
@@ -442,8 +448,8 @@ public class FactoryMultiViewRobust {
 	 */
 	public static Ransac<TrifocalTensor, AssociatedTriple>
 	trifocalRansac( @Nullable ConfigTrifocal configTrifocal,
-					@Nullable ConfigTrifocalError configError,
-					ConfigRansac configRansac ) {
+	                @Nullable ConfigTrifocalError configError,
+	                ConfigRansac configRansac ) {
 		if (configTrifocal == null)
 			configTrifocal = new ConfigTrifocal();
 		if (configError == null)
@@ -497,7 +503,7 @@ public class FactoryMultiViewRobust {
 	 */
 	public static RansacProjective<MetricCameraTriple, AssociatedTriple>
 	metricThreeViewRansac( @Nullable ConfigPixelsToMetric configSelfcalib,
-						   ConfigRansac configRansac ) {
+	                       ConfigRansac configRansac ) {
 		configRansac.checkValidity();
 
 		// Pixel error squared in two views
@@ -514,7 +520,7 @@ public class FactoryMultiViewRobust {
 
 	public static LeastMedianOfSquaresProjective<MetricCameraTriple, AssociatedTriple>
 	metricThreeViewLmeds( @Nullable ConfigPixelsToMetric configSelfcalib,
-						  ConfigLMedS configLMedS ) {
+	                      ConfigLMedS configLMedS ) {
 		configLMedS.checkValidity();
 
 		// lint:forbidden ignore_below 1

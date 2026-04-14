@@ -23,10 +23,11 @@ import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.transform.homography.HomographyPointOps_F64;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
+import org.ejml.dense.fixed.CommonOps_DDF3;
 
-public class TestDistanceHomographySq extends StandardDistanceTest<Homography2D_F64, AssociatedPair> {
+public class TestDistanceHomographySymSq extends StandardDistanceTest<Homography2D_F64, AssociatedPair> {
 	@Override public DistanceFromModel<Homography2D_F64, AssociatedPair> create() {
-		return new DistanceHomographySq();
+		return new DistanceHomographySymSq();
 	}
 
 	@Override public Homography2D_F64 createRandomModel() {
@@ -53,9 +54,17 @@ public class TestDistanceHomographySq extends StandardDistanceTest<Homography2D_
 	}
 
 	@Override public double distance( Homography2D_F64 h, AssociatedPair associatedPair ) {
+		var inv = new Homography2D_F64();
+		CommonOps_DDF3.invert(h, inv);
 		var result = new Point2D_F64();
 
+		double distance = 0;
 		HomographyPointOps_F64.transform(h, associatedPair.p1, result);
-		return result.distance2(associatedPair.p2);
+		distance += result.distance2(associatedPair.p2);
+
+		HomographyPointOps_F64.transform(inv, associatedPair.p2, result);
+		distance += result.distance2(associatedPair.p1);
+
+		return distance/2.0;
 	}
 }
