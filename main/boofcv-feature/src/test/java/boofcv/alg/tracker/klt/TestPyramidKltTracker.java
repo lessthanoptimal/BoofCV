@@ -48,7 +48,7 @@ public class TestPyramidKltTracker extends PyramidKltTestBase {
 	/// Test set description when the image is fully inside the image for all the pyramid layers
 	@Test void setDescription() {
 		// tell it to generate a feature inside directly on a pixel
-		var feature = new PyramidKltFeature(pyramid.getNumLayers(), featureReadius);
+		var feature = new PyramidKltFeature(pyramid.getNumLayers(), featureRadius);
 		feature.setPosition(25, 20);
 		tracker.setImage(pyramid, derivX, derivY);
 		assertTrue(tracker.setDescription(feature));
@@ -63,8 +63,8 @@ public class TestPyramidKltTracker extends PyramidKltTestBase {
 	@Test void setDescription_border() {
 		// now tell it to set a description near the edge
 		// only the first layer should be set
-		var feature = new PyramidKltFeature(pyramid.getNumLayers(), featureReadius);
-		feature.setPosition(featureReadius - 1, featureReadius - 1);
+		var feature = new PyramidKltFeature(pyramid.getNumLayers(), featureRadius);
+		feature.setPosition(featureRadius - 1, featureRadius - 1);
 		tracker.setImage(pyramid, derivX, derivY);
 		assertTrue(tracker.setDescription(feature));
 		for (int i = 0; i < pyramid.getNumLayers(); i++) {
@@ -78,8 +78,8 @@ public class TestPyramidKltTracker extends PyramidKltTestBase {
 	@Test void setDescription_outside() {
 		// now tell it to set a description near the edge
 		// only the first layer should be set
-		var feature = new PyramidKltFeature(pyramid.getNumLayers(), featureReadius);
-		feature.setPosition(-featureReadius - 1, -featureReadius - 1);
+		var feature = new PyramidKltFeature(pyramid.getNumLayers(), featureRadius);
+		feature.setPosition(-featureRadius - 1, -featureRadius - 1);
 		tracker.setImage(pyramid, derivX, derivY);
 		assertFalse(tracker.setDescription(feature));
 	}
@@ -88,7 +88,7 @@ public class TestPyramidKltTracker extends PyramidKltTestBase {
 	/// Only a small offset easily done with a single layer tracker
 	@Test void track_smallOffset() {
 		// set the feature right on the corner
-		var feature = new PyramidKltFeature(pyramid.getNumLayers(), featureReadius);
+		var feature = new PyramidKltFeature(pyramid.getNumLayers(), featureRadius);
 		feature.setPosition(cornerX, cornerY);
 		tracker.setImage(pyramid, derivX, derivY);
 		tracker.setDescription(feature);
@@ -107,7 +107,7 @@ public class TestPyramidKltTracker extends PyramidKltTestBase {
 	/// Larger offset which will require the pyramid approach
 	@Test void track_largeOffset() {
 		// set the feature right on the corner
-		var feature = new PyramidKltFeature(pyramid.getNumLayers(), featureReadius);
+		var feature = new PyramidKltFeature(pyramid.getNumLayers(), featureRadius);
 		feature.setPosition(cornerX, cornerY);
 		tracker.setImage(pyramid, derivX, derivY);
 		tracker.setDescription(feature);
@@ -124,17 +124,17 @@ public class TestPyramidKltTracker extends PyramidKltTestBase {
 
 	///
 	@Test void track_border() {
-		float targetX = width - featureReadius;
-		float targetY = height - featureReadius - 3;
+		float targetX = width - featureRadius;
+		float targetY = height - featureRadius - 3;
 
 		// set the feature right on the corner
-		var feature = new PyramidKltFeature(pyramid.getNumLayers(), featureReadius);
+		var feature = new PyramidKltFeature(pyramid.getNumLayers(), featureRadius);
 		feature.setPosition(targetX, targetY);
 		tracker.setImage(pyramid, derivX, derivY);
 		tracker.setDescription(feature);
 
 		// start it outside the image, but still near its true position
-		feature.setPosition(width - featureReadius + 2, height - featureReadius - 1);
+		feature.setPosition(width - featureRadius + 2, height - featureRadius - 1);
 		assertSame(KltTrackFault.SUCCESS, tracker.track(feature));
 
 		assertEquals(targetX, feature.x, 0.2);

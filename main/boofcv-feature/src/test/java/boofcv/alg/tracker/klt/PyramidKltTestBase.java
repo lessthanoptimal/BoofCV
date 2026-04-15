@@ -35,7 +35,7 @@ public class PyramidKltTestBase extends BoofStandardJUnit {
 	int width = 50;
 	int height = 60;
 
-	int featureReadius = 2;
+	int featureRadius = 2;
 
 	GrayF32 image = new GrayF32(width, height);
 	PyramidDiscrete<GrayF32> pyramid;
