@@ -22,6 +22,7 @@ import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.core.image.PyramidGradient;
 import boofcv.factory.tracker.FactoryTrackerAlg;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.PyramidDiscrete;
@@ -34,7 +35,7 @@ import pabeles.concurrency.GrowArray;
 /// High level interface for using [PyramidKltTracker] that lets you tweak its behavior in ways the more abstract
 /// [boofcv.abst.tracker.PointTracker] interface will not let you, but without all the drudger of using
 /// [PyramidKltTracker]. It performs forward-backwards validation and allows the user to easily and remove
-/// tracks.
+/// tracks. All images in the sequence must be the same size.
 ///
 /// Typical Usage:
 ///
@@ -55,6 +56,7 @@ import pabeles.concurrency.GrowArray;
 /// 5) Repeat stop 2 for N images.
 ///
 /// Note that you only call [#finishFrame()] when you plan on using that image as the seed for the frame
+@SuppressWarnings({"NullAway.Init"})
 public class EasyPyramidKlt<Image extends ImageGray<Image>, Derivative extends ImageGray<Derivative>> {
 
 	/// Pyramidal tracker that this is a wrapper around
@@ -95,13 +97,6 @@ public class EasyPyramidKlt<Image extends ImageGray<Image>, Derivative extends I
 	public EasyPyramidKlt( PyramidDiscrete<Image> pyramid,
 	                       ImageGradient<Image, Derivative> gradient,
 	                       ConfigKlt config ) {
-		tracks = new DogArray<>(this::createNewTrack, ( t ) -> {
-			t.x = Float.NaN;
-			t.y = Float.NaN;
-		});
-
-		workspace = new GrowArray<>(() -> EasyPyramidKlt.this.tracker.copyConcurrent());
-
 		this.currPyr = new PyramidGradient<>(pyramid, gradient);
 		this.prevPyr = new PyramidGradient<>(pyramid, gradient);
 
@@ -124,8 +119,23 @@ public class EasyPyramidKlt<Image extends ImageGray<Image>, Derivative extends I
 
 	/// Call first when a new image has arrived
 	public void startFrame( Image image ) {
-		this.imageWidth = image.width;
-		this.imageHeight = image.height;
+		if (tracks != null) {
+			if (imageWidth != image.width || imageHeight != image.height)
+				throw new IllegalArgumentException("Once the image size has been set it can't change");
+		} else {
+			// Lazy initialization now that the iamge size is known.
+			currPyr.basePyramid.initialize(image.width, image.height);
+			prevPyr.basePyramid.initialize(image.width, image.height);
+
+			tracks = new DogArray<>(this::createNewTrack, ( t ) -> {
+				t.x = Float.NaN;
+				t.y = Float.NaN;
+			});
+			workspace = new GrowArray<>(() -> EasyPyramidKlt.this.tracker.copyConcurrent());
+
+			this.imageWidth = image.width;
+			this.imageHeight = image.height;
+		}
 		currPyr.update(image);
 	}
 
@@ -139,10 +149,16 @@ public class EasyPyramidKlt<Image extends ImageGray<Image>, Derivative extends I
 	/// Adds a new track at he specified location. After you are done adding new tracks call [#describe()]
 	/// to compute the description of all the new tracks
 	public void addTrack( double x, double y ) {
+		if (!BoofMiscOps.isInside(imageWidth, imageHeight, x, y))
+			throw new IllegalArgumentException("Can't create a feature outside the image");
+
 		PyramidKltFeature t = tracks.grow();
 		t.x = (float)x;
 		t.y = (float)y;
-		metadata.grow();
+
+		TrackMeta meta = metadata.grow();
+		meta.id = nextTrackID++;
+		meta.status = KltTrackFault.SUCCESS;
 	}
 
 	/// For each look that passes in each track and matching metadata
@@ -259,7 +275,10 @@ public class EasyPyramidKlt<Image extends ImageGray<Image>, Derivative extends I
 
 	/// Removes all tracks which are not being tracked due to a failure. Location of tracks in the internal
 	/// array can be swapped. Runtime O(N)
-	public void removeFailed() {
+	///
+	/// @return Number of tracks it removed
+	public int removeFailed() {
+		int sizeBefore = tracks.size;
 		for (int i = tracks.size() - 1; i >= 0; i--) {
 			TrackMeta meta = metadata.get(i);
 			if (meta.status == KltTrackFault.SUCCESS)
@@ -267,6 +286,7 @@ public class EasyPyramidKlt<Image extends ImageGray<Image>, Derivative extends I
 
 			removeFeatureFast(i);
 		}
+		return sizeBefore - tracks.size;
 	}
 
 	/// Reactivates all tracks by setting their status to [KltTrackFault#SUCCESS]
