@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,18 +19,16 @@
 package boofcv.struct.geo;
 
 import georegression.struct.point.Point2D_F64;
+import org.ejml.MapFormattable;
+import org.ejml.MapPrintFormat;
 
-/**
- * Contains a set of three observations of the same point feature in three different views.
- *
- * @author Peter Abeles
- */
-public class AssociatedTriple {
-	/** Observation in View 1 */
+/// Contains a set of three observations of the same point feature in three different views.
+public class AssociatedTriple implements MapFormattable {
+	/// Observation in View 1
 	public Point2D_F64 p1;
-	/** Observation in View 2 */
+	/// Observation in View 2
 	public Point2D_F64 p2;
-	/** Observation in View 3 */
+	/// Observation in View 3
 	public Point2D_F64 p3;
 
 	public AssociatedTriple( Point2D_F64 p1, Point2D_F64 p2, Point2D_F64 p3 ) {
@@ -114,7 +112,17 @@ public class AssociatedTriple {
 		return tol >= o.p3.distance(p3);
 	}
 
+	@Override public String formatMap( MapPrintFormat format ) {
+		return format.itemPrefix +
+				format.pair("p1", p1.formatMap(format), true) +
+				format.pair("p2", p2.formatMap(format), true) +
+				format.pair("p3", p3.formatMap(format), false) +
+				format.itemSuffix;
+	}
+
+	@Override public String toString() {return MapPrintFormat.DEFAULT.toString(this);}
+
 	public void print() {
-		System.out.println("AssociatedTriple( " + p1 + " , " + p2 + " , " + p3 + " )");
+		System.out.println(this);
 	}
 }

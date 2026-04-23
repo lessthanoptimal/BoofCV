@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.struct.calib;
 import lombok.Getter;
 import lombok.Setter;
 import org.ejml.FancyPrint;
+import org.ejml.MapPrintFormat;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
@@ -182,24 +183,15 @@ public class CameraPinholeBrown extends CameraPinhole implements Serializable {
 		}
 	}
 
-	@Override
-	public String toString() {
-		var fp = new FancyPrint();
-		String txt = "CameraPinholeRadial{" +
-				"fx=" + fx +
-				", fy=" + fy +
-				", skew=" + skew +
-				", cx=" + cx +
-				", cy=" + cy +
-				", width=" + width +
-				", height=" + height;
-		txt += toStringArray(fp, "r", radial);
-
-		if (t1 != 0 || t2 != 0) {
-			txt += ", t1=" + fp.s(t1) + " t2=" + fp.s(t2);
-		}
-		txt += '}';
-		return txt;
+	@Override public String formatMap( MapPrintFormat format ) {
+		var builder = new StringBuilder();
+		builder.append(format.itemPrefix);
+		formatPinhole(format, builder, true);
+		format.pair(builder, "radial", radial, true);
+		format.pair(builder, "t1", t1, true);
+		format.pair(builder, "t2", t2, false);
+		builder.append(format.itemSuffix);
+		return builder.toString();
 	}
 
 	public static String toStringArray( FancyPrint fp, String name, @Nullable double[] param ) {

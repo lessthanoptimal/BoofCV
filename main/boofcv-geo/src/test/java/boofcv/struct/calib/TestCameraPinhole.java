@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.struct.calib;
 
+import org.ejml.MapPrintFormat;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -25,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 
 public class TestCameraPinhole extends CommonCameraChecks {
 	@Test void constructor_K() {
-		CameraPinhole p = new CameraPinhole(200,210,1,320,240,640,380);
+		var p = new CameraPinhole(200,210,1,320,240,640,380);
 
 		assertEquals(200,p.fx,1e-8);
 		assertEquals(210,p.fy,1e-8);
@@ -37,7 +38,7 @@ public class TestCameraPinhole extends CommonCameraChecks {
 	}
 
 	@Test void fsetK() {
-		CameraPinhole p = new CameraPinhole(200,210,1,320,240,640,380);
+		var p = new CameraPinhole(200,210,1,320,240,640,380);
 
 		assertSame(p, p.fsetK(201, 211, 2, 321, 241, 641, 381));
 
@@ -48,5 +49,11 @@ public class TestCameraPinhole extends CommonCameraChecks {
 		assertEquals(241,p.cy,1e-8);
 		assertEquals(641,p.width,1e-8);
 		assertEquals(381,p.height,1e-8);
+	}
+
+	@Test void formatMap() {
+		var p = new CameraPinhole(200,210,1.1234,320,240,640,380);
+		String found = p.formatMap(new MapPrintFormat().withPrecision(2));
+		assertEquals("{fx: 200, fy: 210, skew: 1.12, cx: 320, cy: 240, width: 640, height: 380}", found);
 	}
 }

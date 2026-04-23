@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.struct.calib;
 
+import org.ejml.MapPrintFormat;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -25,20 +26,20 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestCameraPinholeBrown extends CommonCameraChecks {
 
 	@Test void set_radial() {
-		CameraPinholeBrown p = new CameraPinholeBrown(200,210,1,320,240,640,380);
+		var p = new CameraPinholeBrown(200,210,1,320,240,640,380);
 		p.fsetRadial(1,2);
 		p.fsetTangential(2,3);
 
-		CameraPinholeBrown f = new CameraPinholeBrown();
+		var f = new CameraPinholeBrown();
 		f.setTo(p);
 
 		equalsR(p,f);
 	}
 
 	@Test void set_pinhole() {
-		CameraPinhole p = new CameraPinhole(2020,2210,2,2,56,5,234);
+		var p = new CameraPinhole(2020,2210,2,2,56,5,234);
 
-		CameraPinholeBrown f = new CameraPinholeBrown(200,210,1,320,240,640,380);
+		var f = new CameraPinholeBrown(200,210,1,320,240,640,380);
 		f.fsetRadial(1,2);
 		f.fsetTangential(2,3);
 
@@ -73,7 +74,7 @@ public class TestCameraPinholeBrown extends CommonCameraChecks {
 	}
 
 	@Test void fsetRadial() {
-		CameraPinholeBrown p = new CameraPinholeBrown(200,210,1,320,240,640,380);
+		var p = new CameraPinholeBrown(200,210,1,320,240,640,380);
 
 		assertSame(p, p.fsetRadial(1.1, 2.2, 3.3));
 
@@ -94,7 +95,7 @@ public class TestCameraPinholeBrown extends CommonCameraChecks {
 	}
 
 	@Test void fsetTangential() {
-		CameraPinholeBrown p = new CameraPinholeBrown(200,210,1,320,240,640,380);
+		var p = new CameraPinholeBrown(200,210,1,320,240,640,380);
 
 		assertSame(p, p.fsetTangential(1.1, 2.2));
 
@@ -112,12 +113,24 @@ public class TestCameraPinholeBrown extends CommonCameraChecks {
 	}
 
 	@Test void isDistorted() {
-		CameraPinholeBrown p = new CameraPinholeBrown(200,210,0,320,240,640,380);
+		var p = new CameraPinholeBrown(200,210,0,320,240,640,380);
 
 		assertFalse(p.isDistorted());
 		assertFalse(p.fsetRadial(0,0).isDistorted());
 		assertTrue(p.fsetRadial(1,0).isDistorted());
 		assertFalse(p.fsetRadial(0,0).isDistorted());
 		assertTrue(p.fsetTangential(0, 0.1).isDistorted());
+	}
+
+	@Test void formatMap() {
+		var p = new CameraPinholeBrown(200,210,1.1234,320,240,640,380).
+				fsetRadial(0.123, 4).fsetTangential(0.3, 0.4);
+		String found = p.formatMap(new MapPrintFormat().withPrecision(2));
+		assertEquals("{fx: 200, fy: 210, skew: 1.12, cx: 320, cy: 240, width: 640, height: 380, radial: {0.12, 4}, t1: 0.3, t2: 0.4}", found);
+
+		// Now will null radial
+		p.radial = null;
+		found = p.formatMap(new MapPrintFormat().withPrecision(2));
+		assertEquals("{fx: 200, fy: 210, skew: 1.12, cx: 320, cy: 240, width: 640, height: 380, radial: {}, t1: 0.3, t2: 0.4}", found);
 	}
 }

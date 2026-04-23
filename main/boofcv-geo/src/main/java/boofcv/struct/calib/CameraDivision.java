@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.struct.calib;
 
 import lombok.Getter;
-import org.ejml.FancyPrint;
+import org.ejml.MapPrintFormat;
 
 import java.io.Serializable;
 
@@ -81,18 +81,12 @@ public class CameraDivision extends CameraPinhole implements Serializable {
 		System.out.printf("radial=%6.2e%n\n", radial);
 	}
 
-	@Override public String toString() {
-		FancyPrint fp = new FancyPrint();
-		String txt = "CameraDivision{" +
-				"fx=" + fx +
-				", fy=" + fy +
-				", skew=" + skew +
-				", cx=" + cx +
-				", cy=" + cy +
-				", width=" + width +
-				", height=" + height +
-				", radial="+fp.s(radial);
-		txt += '}';
-		return txt;
+	@Override public String formatMap( MapPrintFormat format ) {
+		var builder = new StringBuilder();
+		builder.append(format.itemPrefix);
+		formatPinhole(format, builder, true);
+		format.pair(builder, "radial", radial, true);
+		builder.append(format.itemSuffix);
+		return builder.toString();
 	}
 }

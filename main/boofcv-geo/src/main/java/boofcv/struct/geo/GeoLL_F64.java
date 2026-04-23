@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,41 +18,48 @@
 
 package boofcv.struct.geo;
 
-/**
- * Geographic coordinate consisting of latitude (north-south coordinate) and longitude (west-east) .
- *
- * <center>
- * <img src="doc-files/sphere_lat_lon.png"/>
- * </center>
- */
-public class GeoLL_F64 {
-	/**
-	 * latitude
-	 */
-	public double lat;
-	/**
-	 * longitude
-	 */
-	public double lon;
+import lombok.Getter;
+import lombok.Setter;
+import org.ejml.MapFormattable;
+import org.ejml.MapPrintFormat;
 
-	public void setTo( GeoLL_F64 src ) {
-		this.lat = src.lat;
-		this.lon = src.lon;
-	}
+/// Geographic coordinate consisting of latitude (north-south coordinate) and longitude (west-east) .
+/// <center>
+/// <img src="doc-files/sphere_lat_lon.png">
+/// </center>
+public class GeoLL_F64 implements MapFormattable {
+	/// latitude
+	@Getter @Setter public double lat;
+	/// longitude
+	@Getter @Setter public double lon;
 
-	public double getLat() {
-		return lat;
-	}
-
-	public void setLat( double lat ) {
+	public GeoLL_F64( double lat, double lon ) {
 		this.lat = lat;
-	}
-
-	public double getLon() {
-		return lon;
-	}
-
-	public void setLon( double lon ) {
 		this.lon = lon;
 	}
+
+	public GeoLL_F64() {}
+
+	public GeoLL_F64 setTo( GeoLL_F64 src ) {
+		this.lat = src.lat;
+		this.lon = src.lon;
+		return this;
+	}
+
+	public GeoLL_F64 setTo( double lat, double lon ) {
+		this.lat = lat;
+		this.lon = lon;
+		return this;
+	}
+
+	@Override public String formatMap( MapPrintFormat format ) {
+		var builder = new StringBuilder();
+		builder.append(format.itemPrefix);
+		format.pair(builder, "lat", lat, true);
+		format.pair(builder, "lon", lon, false);
+		builder.append(format.itemSuffix);
+		return builder.toString();
+	}
+
+	@Override public String toString() {return MapPrintFormat.DEFAULT.toString(this);}
 }

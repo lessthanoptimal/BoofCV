@@ -18,8 +18,16 @@
 
 package boofcv.struct.geo;
 
-import boofcv.struct.StandardStructChecks;
+import boofcv.testing.BoofStandardJUnit;
+import org.ejml.MapPrintFormat;
+import org.junit.jupiter.api.Test;
 
-public class TestPairLineNorm extends StandardStructChecks {
-	{this.resetName = "zero";}
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class TestPointIndex3D_F64 extends BoofStandardJUnit {
+	@Test void formatMap() {
+		var a = new PointIndex3D_F64(1.2345, 2, 34, 120);
+		String found = a.formatMap(new MapPrintFormat().withPrecision(2));
+		assertEquals("{p: {x: 1.23, y: 2, z: 34}, index: 120}", found);
+	}
 }

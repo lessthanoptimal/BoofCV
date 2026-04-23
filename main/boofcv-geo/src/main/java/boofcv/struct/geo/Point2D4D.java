@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,20 +22,14 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
 import lombok.Getter;
 import lombok.Setter;
+import org.ejml.MapFormattable;
+import org.ejml.MapPrintFormat;
 
-/**
- * Observed point feature location on the image plane and its 3D homogeneous position.
- *
- * @author Peter Abeles
- */
-public class Point2D4D {
-	/**
-	 * Observed location of the feature on the image plane
-	 */
+/// Observed point feature location on the image plane and its 3D homogeneous position.
+public class Point2D4D implements MapFormattable {
+	/// Observed location of the feature on the image plane
 	@Getter @Setter public Point2D_F64 observation;
-	/**
-	 * 3D location of the feature in homogeneous world coordinates
-	 */
+	/// 3D location of the feature in homogeneous world coordinates
 	@Getter @Setter public Point4D_F64 location;
 
 	public Point2D4D() {
@@ -48,9 +42,7 @@ public class Point2D4D {
 		this.location = location;
 	}
 
-	/**
-	 * Sets 'this' to be identical to 'src'.
-	 */
+	/// Sets 'this' to be identical to 'src'.
 	public Point2D4D setTo( Point2D4D src ) {
 		observation.setTo(src.observation);
 		location.setTo(src.location);
@@ -65,4 +57,13 @@ public class Point2D4D {
 	public Point2D4D copy() {
 		return new Point2D4D(observation.copy(), location.copy());
 	}
+
+	@Override public String formatMap( MapPrintFormat format ) {
+		return format.itemPrefix +
+				format.pair("observation", observation.formatMap(format), true) +
+				format.pair("location", location.formatMap(format), true) +
+				format.itemSuffix;
+	}
+
+	@Override public String toString() {return MapPrintFormat.DEFAULT.toString(this);}
 }

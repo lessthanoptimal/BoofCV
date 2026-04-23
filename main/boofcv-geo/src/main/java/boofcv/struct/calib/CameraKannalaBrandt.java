@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,7 @@ package boofcv.struct.calib;
 import boofcv.misc.BoofMiscOps;
 import lombok.Getter;
 import lombok.Setter;
-import org.ejml.FancyPrint;
-
-import static boofcv.struct.calib.CameraPinholeBrown.toStringArray;
+import org.ejml.MapPrintFormat;
 
 /**
  * A camera model for pinhole, wide angle, and fisheye cameras. The full camera model
@@ -75,7 +73,7 @@ public class CameraKannalaBrandt extends CameraPinhole {
 	 * Constructor which allows the order of all distortion coefficients to be specified
 	 *
 	 * @param numSymmetric Number of radially symmetric terms. Standard is 5.
-	 * @param numAsymmetric Number of non symmetric terms. If not zero then trig coefficients will be 4.
+	 * @param numAsymmetric Number of non-symmetric terms. If not zero then trig coefficients will be 4.
 	 * Standard is 4
 	 */
 	public CameraKannalaBrandt( int numSymmetric, int numAsymmetric ) {
@@ -100,7 +98,7 @@ public class CameraKannalaBrandt extends CameraPinhole {
 	 * Configures the number of coefficients for each distortion term.
 	 *
 	 * @param numSymmetric Number of radially symmetric terms. Standard is 5.
-	 * @param numAsymmetric Number of non symmetric terms. If not zero then trig coefficients will be 4.
+	 * @param numAsymmetric Number of non-symmetric terms. If not zero then trig coefficients will be 4.
 	 * Standard is 4
 	 */
 	public void configureCoefficients( int numSymmetric, int numAsymmetric ) {
@@ -114,8 +112,8 @@ public class CameraKannalaBrandt extends CameraPinhole {
 	}
 
 	@Override public CameraKannalaBrandt fsetK( double fx, double fy,
-												double skew,
-												double cx, double cy ) {
+	                                            double skew,
+	                                            double cx, double cy ) {
 		super.fsetK(fx, fy, skew, cx, cy);
 		return this;
 	}
@@ -241,24 +239,17 @@ public class CameraKannalaBrandt extends CameraPinhole {
 		return (T)new CameraKannalaBrandt(symmetric.length, radial.length);
 	}
 
-	@Override
-	public String toString() {
-		FancyPrint fp = new FancyPrint();
-		String txt = "CameraKannalaBrandt{" +
-				"fx=" + fx +
-				", fy=" + fy +
-				", skew=" + skew +
-				", cx=" + cx +
-				", cy=" + cy +
-				", width=" + width +
-				", height=" + height;
-		txt += toStringArray(fp, "s", symmetric);
-		txt += toStringArray(fp, "r", radial);
-		txt += toStringArray(fp, "rt", radialTrig);
-		txt += toStringArray(fp, "t", tangent);
-		txt += toStringArray(fp, "tt", tangentTrig);
-		txt += '}';
-		return txt;
+	@Override public String formatMap( MapPrintFormat format ) {
+		var builder = new StringBuilder();
+		builder.append(format.itemPrefix);
+		formatPinhole(format, builder, true);
+		format.pair(builder, "symmetric", symmetric, true);
+		format.pair(builder, "radial", radial, true);
+		format.pair(builder, "radialTrig", radialTrig, true);
+		format.pair(builder, "tangent", tangent, true);
+		format.pair(builder, "tangentTrig", tangentTrig, false);
+		builder.append(format.itemSuffix);
+		return builder.toString();
 	}
 
 	@Override

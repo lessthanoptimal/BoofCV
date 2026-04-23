@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,13 +19,11 @@
 package boofcv.struct.geo;
 
 import georegression.struct.point.Point2D_F64;
+import org.ejml.MapFormattable;
+import org.ejml.MatrixFormattable;
 
-/**
- * Interface for arbitrary number of matched 2D features
- *
- * @author Peter Abeles
- */
-public interface AssociatedTuple {
+/// Interface for arbitrary number of matched 2D features
+public interface AssociatedTuple extends MapFormattable, MatrixFormattable {
 	double getX( int index );
 
 	double getY( int index );
@@ -38,7 +36,7 @@ public interface AssociatedTuple {
 
 	int size();
 
-	void setTo( AssociatedTuple src );
+	AssociatedTuple setTo( AssociatedTuple src );
 
 	void zero();
 }

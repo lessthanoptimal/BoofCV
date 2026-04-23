@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,5 +19,17 @@
 package boofcv.struct.geo;
 
 import boofcv.struct.StandardStructChecks;
+import org.ejml.MapPrintFormat;
+import org.junit.jupiter.api.Test;
 
-public class TestScaleTranslate2D extends StandardStructChecks {{this.resetName = "zero";}}
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class TestScaleTranslate2D extends StandardStructChecks {
+	{this.resetName = "zero";}
+
+	@Test void formatMap() {
+		var a = new ScaleTranslate2D(1.2345, 2, 34);
+		String found = a.formatMap(new MapPrintFormat().withPrecision(2));
+		assertEquals("{scale: 1.23, transX: 2, transY: 34}", found);
+	}
+}

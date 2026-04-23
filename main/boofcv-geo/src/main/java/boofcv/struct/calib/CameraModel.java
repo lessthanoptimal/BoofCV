@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.struct.calib;
 
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageDimension;
+import org.ejml.MapFormattable;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
@@ -29,7 +30,7 @@ import java.io.Serializable;
  *
  * @author Peter Abeles
  */
-public abstract class CameraModel implements Serializable {
+public abstract class CameraModel implements Serializable, MapFormattable {
 	/** image shape (units: pixels) */
 	public int width, height;
 

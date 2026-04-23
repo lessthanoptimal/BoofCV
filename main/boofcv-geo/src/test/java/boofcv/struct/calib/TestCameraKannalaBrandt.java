@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,24 +18,36 @@
 
 package boofcv.struct.calib;
 
+import org.ejml.MapPrintFormat;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TestCameraKannalaBrandt extends CommonCameraChecks {
 	@Test void fsetSymmetric() {
-		CameraKannalaBrandt cam = new CameraKannalaBrandt().fsetSymmetric(0.1, 0.2);
+		var cam = new CameraKannalaBrandt().fsetSymmetric(0.1, 0.2);
 		assertArrayEquals(new double[]{0.1, 0.2}, cam.symmetric, UtilEjml.TEST_F64);
 	}
 
 	@Test void fsetDistRadial() {
-		CameraKannalaBrandt cam = new CameraKannalaBrandt().fsetRadial(0.1, 0.2);
+		var cam = new CameraKannalaBrandt().fsetRadial(0.1, 0.2);
 		assertArrayEquals(new double[]{0.1, 0.2}, cam.radial, UtilEjml.TEST_F64);
 	}
 
 	@Test void fsetDistTangent() {
-		CameraKannalaBrandt cam = new CameraKannalaBrandt().fsetTangent(0.1, 0.2);
+		var cam = new CameraKannalaBrandt().fsetTangent(0.1, 0.2);
 		assertArrayEquals(new double[]{0.1, 0.2}, cam.tangent, UtilEjml.TEST_F64);
+	}
+
+	@Test void formatMap() {
+		var a = new CameraKannalaBrandt().fsetTangent(0.1, 0.2).fsetRadial(-0.1, -0.2).fsetSymmetric(3,4);
+		a.fsetK(1.1234,2,3,4,5,100,200);
+		String found = a.formatMap(new MapPrintFormat().withPrecision(2));
+		assertEquals("{fx: 1.12, fy: 2, skew: 3, cx: 4, cy: 5, width: 100, height: 200, " +
+				"symmetric: {3, 4}, " +
+				"radial: {-0.1, -0.2}, radialTrig: {}, " +
+				"tangent: {0.1, 0.2}, tangentTrig: {}}", found);
 	}
 }
