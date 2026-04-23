@@ -18,8 +18,16 @@
 
 package boofcv.struct.geo;
 
-import boofcv.struct.StandardStructChecks;
+import boofcv.testing.BoofStandardJUnit;
+import org.ejml.MapPrintFormat;
+import org.junit.jupiter.api.Test;
 
-public class TestPairLineNorm extends StandardStructChecks {
-	{this.resetName = "zero";}
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class TestGeoLL_F64 extends BoofStandardJUnit {
+	@Test void formatMap() {
+		var a = new GeoLL_F64(1.2345, 2);
+		String found = a.formatMap(new MapPrintFormat().withPrecision(2));
+		assertEquals("{lat: 1.23, lon: 2}", found);
+	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,9 @@
 
 package boofcv.struct.geo;
 
+import org.ejml.MapFormattable;
+import org.ejml.MapPrintFormat;
+import org.ejml.MatrixPrintFormat;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.SpecializedOps_DDRM;
@@ -29,24 +32,18 @@ import org.ejml.dense.row.SpecializedOps_DDRM;
  *
  * @author Peter Abeles
  */
-public class TrifocalTensor {
+public class TrifocalTensor implements MapFormattable {
 	public DMatrixRMaj T1 = new DMatrixRMaj(3, 3);
 	public DMatrixRMaj T2 = new DMatrixRMaj(3, 3);
 	public DMatrixRMaj T3 = new DMatrixRMaj(3, 3);
 
 	public DMatrixRMaj getT( int index ) {
-		switch (index) {
-			case 0:
-				return T1;
-
-			case 1:
-				return T2;
-
-			case 2:
-				return T3;
-		}
-
-		throw new IllegalArgumentException("Invalid index");
+		return switch (index) {
+			case 0 -> T1;
+			case 1 -> T2;
+			case 2 -> T3;
+			default -> throw new IllegalArgumentException("Invalid index");
+		};
 	}
 
 	public void setTo( TrifocalTensor a ) {
@@ -131,10 +128,17 @@ public class TrifocalTensor {
 		CommonOps_DDRM.scale(1.0/n, T3);
 	}
 
-	@Override
-	public String toString() {
-		return "TrifocalTensor {\nT1:\n" + T1 + "\nT2:\n" + T2 + "\nT3:\n" + T3 + "}";
+	@Override public String formatMap( MapPrintFormat format ) {
+		MatrixPrintFormat matrixFormat = format.convertToMatrix();
+
+		return format.itemPrefix +
+				format.pair("T1", T1.format(matrixFormat), true) +
+				format.pair("T2", T2.format(matrixFormat), true) +
+				format.pair("T3", T3.format(matrixFormat), false) +
+				format.itemSuffix;
 	}
+
+	@Override public String toString() {return MapPrintFormat.DEFAULT.toString(this);}
 
 	public void print() {
 		System.out.println(this);

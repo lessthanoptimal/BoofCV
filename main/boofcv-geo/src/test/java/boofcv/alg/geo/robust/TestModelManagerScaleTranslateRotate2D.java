@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,7 +36,7 @@ public class TestModelManagerScaleTranslateRotate2D extends BoofStandardJUnit {
 	@Test void copyModel() {
 		ModelManagerScaleTranslateRotate2D alg = new ModelManagerScaleTranslateRotate2D();
 
-		ScaleTranslateRotate2D model = new ScaleTranslateRotate2D(1, 2, 3, 4);
+		ScaleTranslateRotate2D model = new ScaleTranslateRotate2D(2, 3, 4, 1);
 		ScaleTranslateRotate2D found = new ScaleTranslateRotate2D();
 
 		alg.copyModel(model, found);

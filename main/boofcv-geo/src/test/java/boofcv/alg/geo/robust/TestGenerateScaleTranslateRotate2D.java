@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,7 +36,7 @@ public class TestGenerateScaleTranslateRotate2D extends BoofStandardJUnit {
 			double theta = rand.nextDouble()*Math.PI*2 - Math.PI;
 			double scale = rand.nextDouble()*5 + 0.1;
 
-			ScaleTranslateRotate2D model = new ScaleTranslateRotate2D(theta, scale, -2, 3);
+			ScaleTranslateRotate2D model = new ScaleTranslateRotate2D(scale, -2, 3, theta);
 
 			AssociatedPair a = TestDistanceScaleTranslateRotate2DSq.apply(-5, 4, model);
 			AssociatedPair b = TestDistanceScaleTranslateRotate2DSq.apply(2, 3, model);

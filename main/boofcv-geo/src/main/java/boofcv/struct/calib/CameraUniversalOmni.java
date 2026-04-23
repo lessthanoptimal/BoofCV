@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,7 @@
 
 package boofcv.struct.calib;
 
-import org.ejml.FancyPrint;
-
-import static boofcv.struct.calib.CameraPinholeBrown.toStringArray;
+import org.ejml.MapPrintFormat;
 
 /**
  * <p>Camera model for omnidirectional single viewpoint sensors [1]. Designed to work with parabolic,
@@ -165,23 +163,16 @@ public class CameraUniversalOmni extends CameraPinhole {
 		this.mirrorOffset = mirrorOffset;
 	}
 
-	@Override public String toString() {
-		FancyPrint fp = new FancyPrint();
-		String txt = "CameraUniversalOmni{" +
-				"width=" + width +
-				", height=" + height +
-				", fx=" + fx +
-				", fy=" + fy +
-				", skew=" + skew +
-				", cx=" + cx +
-				", cy=" + cy +
-				", mirrorOffset=" + fp.s(mirrorOffset);
-		txt += toStringArray(fp, "r", radial);
-		if (t1 != 0 || t2 != 0) {
-			txt += ", t1=" + fp.s(t1) + " t2=" + fp.s(t2);
-		}
-		txt += '}';
-		return txt;
+	@Override public String formatMap( MapPrintFormat format ) {
+		var builder = new StringBuilder();
+		builder.append(format.itemPrefix);
+		formatPinhole(format, builder, true);
+		format.pair(builder, "radial", radial, true);
+		format.pair(builder, "t1", t1, true);
+		format.pair(builder, "t2", t2, true);
+		format.pair(builder, "mirrorOffset", mirrorOffset, false);
+		builder.append(format.itemSuffix);
+		return builder.toString();
 	}
 
 	@Override

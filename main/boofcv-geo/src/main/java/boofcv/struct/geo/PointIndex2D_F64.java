@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -81,12 +81,5 @@ public class PointIndex2D_F64 extends PointIndex<PointIndex2D_F64, Point2D_F64> 
 	@Override
 	public PointIndex2D_F64 copy() {
 		return new PointIndex2D_F64(p, index);
-	}
-
-	@Override public String toString() {
-		return "PointIndex2D_F64{" +
-				"index=" + index +
-				", p={ " + p.x + " , " + p.y + " }" +
-				'}';
 	}
 }

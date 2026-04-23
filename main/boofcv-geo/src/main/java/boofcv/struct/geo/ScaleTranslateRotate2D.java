@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,25 +20,22 @@ package boofcv.struct.geo;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.ejml.MapFormattable;
+import org.ejml.MapPrintFormat;
 
-/**
- * Motion model for scale, translation, and rotation:
- *
- * (x',y') = (x,y)*R*scale + (tranX , tranY)
- *
- * R is rotation matrix.
- *
- * @author Peter Abeles
- */
-public class ScaleTranslateRotate2D {
-	/** Scaling */
+/// Motion model for scale, translation, and rotation:
+///
+/// {@code (x',y') = (x,y)\*R\*scale + (tranX , tranY)}
+/// R is rotation matrix.
+public class ScaleTranslateRotate2D implements MapFormattable {
+	/// Scaling
 	public @Getter @Setter double scale;
-	/** Translation along x and y axis */
+	/// Translation along x and y axis
 	public @Getter @Setter double transX, transY;
-	/** Angle of rotation */
+	/// Angle of rotation
 	public @Getter @Setter double theta;
 
-	public ScaleTranslateRotate2D( double theta, double scale, double transX, double transY ) {
+	public ScaleTranslateRotate2D( double scale, double transX, double transY, double theta ) {
 		this.theta = theta;
 		this.scale = scale;
 		this.transX = transX;
@@ -58,4 +55,15 @@ public class ScaleTranslateRotate2D {
 		this.transY = src.transY;
 		return this;
 	}
+
+	@Override public String formatMap( MapPrintFormat format ) {
+		return format.itemPrefix +
+				format.pair("scale", scale, true) +
+				format.pair("transX", transX, true) +
+				format.pair("transY", transY, true) +
+				format.pair("theta", theta, false) +
+				format.itemSuffix;
+	}
+
+	@Override public String toString() {return MapPrintFormat.DEFAULT.toString(this);}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,13 +21,15 @@ package boofcv.struct.geo;
 import georegression.struct.GeoTuple;
 import lombok.Getter;
 import lombok.Setter;
+import org.ejml.MapFormattable;
+import org.ejml.MapPrintFormat;
 
 /**
  * Base class for all PointIndex implementations.
  *
  * @author Peter Abeles
  */
-public abstract class PointIndex<T extends PointIndex<T, P>, P extends GeoTuple<P>> {
+public abstract class PointIndex<T extends PointIndex<T, P>, P extends GeoTuple<P>> implements MapFormattable {
 	public @Getter final P p;
 	public @Getter @Setter int index;
 
@@ -52,4 +54,13 @@ public abstract class PointIndex<T extends PointIndex<T, P>, P extends GeoTuple<
 	}
 
 	public abstract T copy();
+
+	@Override public String formatMap( MapPrintFormat format ) {
+		return format.itemPrefix +
+				format.pair("p", p.formatMap(format), true) +
+				format.pair("index", index, false) +
+				format.itemSuffix;
+	}
+
+	@Override public String toString() {return MapPrintFormat.DEFAULT.toString(this);}
 }

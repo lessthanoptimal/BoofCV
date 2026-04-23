@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -69,12 +69,18 @@ public class BoofStandardJUnit {
 		System.setErr(systemErr);
 	}
 
+	/// Override to create a new instance that doesn't use the default constructor
+	protected Object createNew(Class<?> type ) throws
+			NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+		return type.getConstructor().newInstance();
+	}
+
 	/**
-	 * Creates an instance of the class where all fields are assigned a random valuen
+	 * Creates an instance of the class where all fields are assigned a random value
 	 */
-	public static Object createNotDefault( Class<?> type, Random rand ) {
+	public Object createNotDefault( Class<?> type, Random rand ) {
 		try {
-			Object config = type.getConstructor().newInstance();
+			Object config = createNew(type);
 			Field[] fields = type.getFields();
 			for (Field f : fields) {
 				if (Modifier.isStatic(f.getModifiers()))
@@ -259,7 +265,7 @@ public class BoofStandardJUnit {
 		try {
 			m = findCompatibleSetTo(type);
 
-			Object dst = type.getConstructor().newInstance();
+			Object dst = createNew(type);
 			Object src = createNotDefault(type, rand);
 
 			Field[] fields = type.getFields();

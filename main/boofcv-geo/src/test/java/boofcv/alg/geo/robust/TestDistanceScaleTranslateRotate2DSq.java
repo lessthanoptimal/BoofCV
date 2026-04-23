@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestDistanceScaleTranslateRotate2DSq extends BoofStandardJUnit {
 	@Test void perfect() {
-		var model = new ScaleTranslateRotate2D(0.2, 1.5, -2, 3);
+		var model = new ScaleTranslateRotate2D(1.5, -2, 3, 0.2);
 
 		AssociatedPair a = apply(-5, 4, model);
 
@@ -41,7 +41,7 @@ public class TestDistanceScaleTranslateRotate2DSq extends BoofStandardJUnit {
 	}
 
 	@Test void noisy() {
-		var model = new ScaleTranslateRotate2D(0.2, 1.5, -2, 3);
+		var model = new ScaleTranslateRotate2D(1.5, -2, 3, 0.2);
 
 		AssociatedPair a = apply(-5, 4, model);
 		a.p2.x += 3.5;
@@ -53,7 +53,7 @@ public class TestDistanceScaleTranslateRotate2DSq extends BoofStandardJUnit {
 	}
 
 	@Test void multiple() {
-		var model = new ScaleTranslateRotate2D(0.2, 1.5, -2, 3);
+		var model = new ScaleTranslateRotate2D(1.5, -2, 3, 0.2);
 
 		AssociatedPair a = apply(-5, 4, model);
 		a.p2.x += 3.5;

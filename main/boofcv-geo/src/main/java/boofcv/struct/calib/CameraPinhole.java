@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.struct.calib;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import org.ejml.MapPrintFormat;
 import org.ejml.data.DMatrixRMaj;
 
 /**
@@ -161,18 +162,26 @@ public class CameraPinhole extends CameraModel {
 		return (T)new CameraPinhole();
 	}
 
-	@Override
-	public String toString() {
-		return "CameraPinhole{" +
-				"fx=" + fx +
-				", fy=" + fy +
-				", skew=" + skew +
-				", cx=" + cx +
-				", cy=" + cy +
-				", width=" + width +
-				", height=" + height +
-				'}';
+	@Override public String formatMap( MapPrintFormat format ) {
+		var builder = new StringBuilder();
+		builder.append(format.itemPrefix);
+		formatPinhole(format, builder, false);
+		builder.append(format.itemSuffix);
+		return builder.toString();
 	}
+
+	/// Adds parameters which define a pinhole camera to the serialization
+	protected void formatPinhole( MapPrintFormat format, StringBuilder builder, boolean isMore ) {
+		format.pair(builder, "fx", fx, true);
+		format.pair(builder, "fy", fy, true);
+		format.pair(builder, "skew", skew, true);
+		format.pair(builder, "cx", cx, true);
+		format.pair(builder, "cy", cy, true);
+		format.pair(builder, "width", width, true);
+		format.pair(builder, "height", height, isMore);
+	}
+
+	@Override public String toString() {return MapPrintFormat.DEFAULT.toString(this);}
 
 	public boolean isEquals( CameraPinhole param, double tol ) {
 		if (Math.abs(fx - param.fx) > tol)

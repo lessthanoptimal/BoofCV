@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.struct.geo;
 
 import boofcv.struct.StandardStructChecks;
 import georegression.struct.point.Point2D_F64;
+import org.ejml.MapPrintFormat;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -124,5 +125,11 @@ public class TestAssociatedTriple extends StandardStructChecks {
 		assertTrue(b.p1.isIdentical(a.p1,1e-8));
 		assertTrue(b.p2.isIdentical(a.p2,1e-8));
 		assertTrue(b.p3.isIdentical(a.p3,1e-8));
+	}
+
+	@Test void formatMap() {
+		var a = new AssociatedTriple().setTo(2, -1, 1.2345, 3, 4, 5);
+		String found = a.formatMap(new MapPrintFormat().withPrecision(2));
+		assertEquals("{p1: {x: 2, y: -1}, p2: {x: 1.23, y: 3}, p3: {x: 4, y: 5}}", found);
 	}
 }

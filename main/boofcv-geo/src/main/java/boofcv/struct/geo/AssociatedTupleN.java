@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,8 @@ package boofcv.struct.geo;
 
 import boofcv.misc.BoofMiscOps;
 import georegression.struct.point.Point2D_F64;
+import org.ejml.MapPrintFormat;
+import org.ejml.MatrixPrintFormat;
 
 /**
  * Associated set of {@link Point2D_F64} for an arbitrary number of views that is fixed.
@@ -68,12 +70,14 @@ public class AssociatedTupleN implements AssociatedTuple {
 		return p.length;
 	}
 
-	@Override public void setTo( AssociatedTuple src ) {
+	@Override public AssociatedTuple setTo( AssociatedTuple src ) {
 		BoofMiscOps.checkTrue(src.size() == size());
 
 		for (int i = 0; i < p.length; i++) {
 			p[i].setTo(src.get(i));
 		}
+
+		return this;
 	}
 
 	@Override public void zero() {
@@ -81,4 +85,30 @@ public class AssociatedTupleN implements AssociatedTuple {
 			p[i].zero();
 		}
 	}
+
+	@Override public String format( MatrixPrintFormat format ) {
+		var builder = new StringBuilder();
+		builder.append(format.prefix);
+		for (int i = 0; i < p.length; i++) {
+			builder.append(p[i].format(format));
+			if (i < p.length - 1)
+				builder.append(format.rowSeparator);
+		}
+		builder.append(format.suffix);
+		return builder.toString();
+	}
+
+	@Override public String formatMap( MapPrintFormat format ) {
+		var builder = new StringBuilder();
+		builder.append(format.listPrefix);
+		for (int i = 0; i < p.length; i++) {
+			builder.append(p[i].formatMap(format));
+			if (i < p.length - 1)
+				builder.append(format.itemSeparator);
+		}
+		builder.append(format.listSuffix);
+		return builder.toString();
+	}
+
+	@Override public String toString() {return MapPrintFormat.DEFAULT.toString(this);}
 }
