@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,23 +25,27 @@ import boofcv.alg.geo.triangulate.Triangulate2ViewsGeometricMetric;
 import boofcv.alg.geo.triangulate.TriangulateProjectiveLinearDLT;
 import boofcv.misc.ConfigConverge;
 import boofcv.struct.Configuration;
+import org.ddogleg.optimization.ConfigLoss;
+import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
 
-/**
- * Configuration for triangulation methods.
- *
- * @author Peter Abeles
- */
+/// Configuration for triangulation methods.
 public class ConfigTriangulation implements Configuration {
 
-	/**
-	 * Which algorithm to use
-	 */
+	/// Which algorithm to use
 	public Type type = Type.DLT;
 
-	/**
-	 * If an iterative technique is selected this is the convergence criteria
-	 */
+	/// Iterative only: Convergence criteria
 	public ConfigConverge converge = new ConfigConverge(1e-8, 1e-8, 10);
+
+	/// Iterative only: Configures how the optimizer runs
+	public ConfigLevenbergMarquardt optimizer = new ConfigLevenbergMarquardt();
+
+	/// Iterative only: Loss functions robust to outliers. Default is no loss function.
+	public ConfigLoss loss = new ConfigLoss();
+
+	{
+		loss.type = ConfigLoss.Type.IDENTITY;
+	}
 
 	public ConfigTriangulation() {
 	}
@@ -65,6 +69,8 @@ public class ConfigTriangulation implements Configuration {
 	public ConfigTriangulation setTo( ConfigTriangulation src ) {
 		this.type = src.type;
 		this.converge.setTo(src.converge);
+		this.loss.setTo(src.loss);
+		this.optimizer.setTo(src.optimizer);
 		return this;
 	}
 
@@ -74,25 +80,19 @@ public class ConfigTriangulation implements Configuration {
 	}
 
 	public enum Type {
-		/**
-		 * Discrete lienear transform
-		 *
-		 * @see PixelDepthLinearMetric
-		 * @see TriangulateProjectiveLinearDLT
-		 */
+		/// Discrete lienear transform
+		///
+		/// @see PixelDepthLinearMetric
+		/// @see TriangulateProjectiveLinearDLT
 		DLT,
-		/**
-		 * Optimal solution for algebraic error
-		 *
-		 * @see TriangulateRefineProjectiveLS
-		 */
+		/// Optimal solution for algebraic error
+		///
+		/// @see TriangulateRefineProjectiveLS
 		ALGEBRAIC,
-		/**
-		 * Optimal solution for geometric error. Finds a solution using DLT then refines the geometric error.
-		 *
-		 * @see Triangulate2ViewsGeometricMetric
-		 * @see TriangulateRefineMetricLS
-		 */
+		/// Optimal solution for geometric error. Finds a solution using DLT then refines the geometric error.
+		///
+		/// @see Triangulate2ViewsGeometricMetric
+		/// @see TriangulateRefineMetricLS
 		GEOMETRIC
 	}
 }

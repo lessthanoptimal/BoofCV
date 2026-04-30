@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -597,8 +597,18 @@ public class FactoryMultiView {
 			case DLT -> new WrapNViewsTriangulateMetricDLT();
 
 			case GEOMETRIC -> {
-				TriangulateNViewsMetric estimator = new WrapNViewsTriangulateMetricDLT();
-				TriangulateRefineMetricLS refiner = new TriangulateRefineMetricLS(config.converge.gtol, config.converge.maxIterations);
+				UnconstrainedLeastSquares<DMatrixRMaj> leastSquares =
+						FactoryOptimization.levenbergMarquardt(config.optimizer, false);
+				var estimator = new WrapNViewsTriangulateMetricDLT();
+				var refiner = new TriangulateRefineMetricLS(leastSquares);
+				refiner.getConverge().setTo(config.converge);
+
+				if (config.loss.type != ConfigLoss.Type.IDENTITY) {
+					FactoryLossFunctions.Funcs funcs = FactoryLossFunctions.general(config.loss);
+					refiner.setLoss(funcs.function);
+					refiner.setLossGradient(funcs.gradient);
+				}
+
 				yield new TriangulateThenRefineMetric(estimator, refiner);
 			}
 
@@ -620,8 +630,18 @@ public class FactoryMultiView {
 			case DLT -> new WrapNViewsTriangulateMetricHgDLT();
 
 			case GEOMETRIC -> {
+				UnconstrainedLeastSquares<DMatrixRMaj> leastSquares =
+						FactoryOptimization.levenbergMarquardt(config.optimizer, false);
 				var estimator = new WrapNViewsTriangulateMetricHgDLT();
-				var refiner = new TriangulateRefineMetricHgLS(config.converge.gtol, config.converge.maxIterations);
+				var refiner = new TriangulateRefineMetricHgLS(leastSquares);
+				refiner.getConverge().setTo(config.converge);
+
+				if (config.loss.type != ConfigLoss.Type.IDENTITY) {
+					FactoryLossFunctions.Funcs funcs = FactoryLossFunctions.general(config.loss);
+					refiner.setLoss(funcs.function);
+					refiner.setLossGradient(funcs.gradient);
+				}
+
 				yield new TriangulateThenRefineMetricH(estimator, refiner);
 			}
 
@@ -643,8 +663,17 @@ public class FactoryMultiView {
 			case DLT -> new WrapNViewsTriangulateProjectiveDLT();
 
 			case ALGEBRAIC, GEOMETRIC -> {
+				UnconstrainedLeastSquares<DMatrixRMaj> leastSquares =
+						FactoryOptimization.levenbergMarquardt(config.optimizer, false);
 				var estimator = new WrapNViewsTriangulateProjectiveDLT();
-				var refiner = new TriangulateRefineProjectiveLS(config.converge.gtol, config.converge.maxIterations);
+				var refiner = new TriangulateRefineProjectiveLS(leastSquares);
+				refiner.getConverge().setTo(config.converge);
+
+				if (config.loss.type != ConfigLoss.Type.IDENTITY) {
+					FactoryLossFunctions.Funcs funcs = FactoryLossFunctions.general(config.loss);
+					refiner.setLoss(funcs.function);
+					refiner.setLossGradient(funcs.gradient);
+				}
 				yield new TriangulateThenRefineProjective(estimator, refiner);
 			}
 
@@ -713,7 +742,9 @@ public class FactoryMultiView {
 	 * @see ResidualsTriangulateMetricSimple
 	 */
 	public static RefineTriangulateMetric triangulateRefineMetric( ConfigConverge config ) {
-		return new TriangulateRefineMetricLS(config.gtol, config.maxIterations);
+		var refine = new TriangulateRefineMetricLS();
+		refine.getConverge().setTo(config);
+		return refine;
 	}
 
 	/**
@@ -725,7 +756,9 @@ public class FactoryMultiView {
 	 * @see TriangulateRefineMetricHgLS
 	 */
 	public static RefineTriangulateMetricH triangulateRefineMetricH( ConfigConverge config ) {
-		return new TriangulateRefineMetricHgLS(config.gtol, config.maxIterations);
+		var refine = new TriangulateRefineMetricHgLS();
+		refine.getConverge().setTo(config);
+		return refine;
 	}
 
 	/**
@@ -736,7 +769,9 @@ public class FactoryMultiView {
 	 * @see ResidualsTriangulateProjective
 	 */
 	public static RefineTriangulateProjective triangulateRefineProj( ConfigConverge config ) {
-		return new TriangulateRefineProjectiveLS(config.gtol, config.maxIterations);
+		var refine = new TriangulateRefineProjectiveLS();
+		refine.getConverge().setTo(config);
+		return refine;
 	}
 
 	/**

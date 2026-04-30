@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,11 @@ import java.util.List;
 
 public class TestTriangulateRefineMetricLS extends GeneralCheckTriangulateRefineMetric {
 
-	TriangulateRefineMetricLS alg = new TriangulateRefineMetricLS(1e-8, 200);
+	TriangulateRefineMetricLS alg = new TriangulateRefineMetricLS();
+
+	{
+		alg.getConverge().setTo(0.0, 1e-8, 200);
+	}
 
 	@Override
 	public void triangulate( List<Point2D_F64> obsPts, List<Se3_F64> motion,
