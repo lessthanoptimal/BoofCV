@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -67,7 +67,8 @@ public class DistanceTrifocalReprojectionSq implements DistanceFromModel<Trifoca
 	 */
 	public DistanceTrifocalReprojectionSq( double gtol, int maxIterations ) {
 		this();
-		refiner = new TriangulateRefineProjectiveLS(gtol, maxIterations);
+		refiner = new TriangulateRefineProjectiveLS();
+		refiner.getConverge().setTo(0.0, gtol, maxIterations);
 	}
 
 	public DistanceTrifocalReprojectionSq() {

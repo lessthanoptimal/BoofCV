@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.abst.geo.triangulate;
 import boofcv.abst.geo.RefineTriangulateMetric;
 import boofcv.alg.geo.triangulate.ResidualsTriangulateMetricSimple;
 import boofcv.misc.BoofMiscOps;
+import boofcv.misc.ConfigConverge;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -28,7 +29,10 @@ import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.optimization.FactoryOptimization;
 import org.ddogleg.optimization.UnconstrainedLeastSquares;
+import org.ddogleg.optimization.loss.LossFunction;
+import org.ddogleg.optimization.loss.LossFunctionGradient;
 import org.ejml.data.DMatrixRMaj;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -43,16 +47,19 @@ public class TriangulateRefineMetricLS implements RefineTriangulateMetric {
 
 	final @Getter UnconstrainedLeastSquares<DMatrixRMaj> minimizer;
 
-	final double[] param = new double[3];
-	@Getter @Setter int maxIterations;
-	@Getter @Setter double convergenceTol;
+	@Getter @Setter @Nullable LossFunction loss = null;
+	@Getter @Setter @Nullable LossFunctionGradient lossGradient = null;
 
-	public TriangulateRefineMetricLS( double convergenceTol,
-									  int maxIterations ) {
-		this.convergenceTol = convergenceTol;
-		this.maxIterations = maxIterations;
-		minimizer = FactoryOptimization.levenbergMarquardt(null, false);
+	@Getter @Setter ConfigConverge converge = new ConfigConverge(0.0, 1e-8, 10);
+	final double[] param = new double[3];
+
+	public TriangulateRefineMetricLS( UnconstrainedLeastSquares<DMatrixRMaj> minimizer ) {
+		this.minimizer = minimizer;
 		BoofMiscOps.checkEq(3, func.getNumOfInputsN());
+	}
+
+	public TriangulateRefineMetricLS() {
+		this(FactoryOptimization.levenbergMarquardt(null, false));
 	}
 
 	@Override
@@ -60,14 +67,19 @@ public class TriangulateRefineMetricLS implements RefineTriangulateMetric {
 							Point3D_F64 worldPt, Point3D_F64 refinedPt ) {
 		func.setObservations(observations, listWorldToView);
 		minimizer.setFunction(func, null);
+		if (loss != null && lossGradient != null) {
+			minimizer.setLoss(loss, lossGradient);
+		}
 
 		param[0] = worldPt.x;
 		param[1] = worldPt.y;
 		param[2] = worldPt.z;
 
-		minimizer.initialize(param, 0, convergenceTol*observations.size());
+		double ftol = converge.ftol*observations.size();
+		double gtol = converge.gtol*observations.size();
+		minimizer.initialize(param, ftol, gtol);
 
-		for (int i = 0; i < maxIterations; i++) {
+		for (int i = 0; i < converge.maxIterations; i++) {
 			if (minimizer.iterate())
 				break;
 		}

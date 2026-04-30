@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.abst.geo.RefineTriangulateMetricH;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.triangulate.ResidualsTriangulateProjective;
 import boofcv.misc.BoofMiscOps;
+import boofcv.misc.ConfigConverge;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
@@ -29,8 +30,11 @@ import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.optimization.FactoryOptimization;
 import org.ddogleg.optimization.UnconstrainedLeastSquares;
+import org.ddogleg.optimization.loss.LossFunction;
+import org.ddogleg.optimization.loss.LossFunctionGradient;
 import org.ddogleg.struct.DogArray;
 import org.ejml.data.DMatrixRMaj;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -45,17 +49,21 @@ public class TriangulateRefineMetricHgLS implements RefineTriangulateMetricH {
 
 	final @Getter UnconstrainedLeastSquares<DMatrixRMaj> minimizer;
 
+	@Getter @Setter @Nullable LossFunction loss = null;
+	@Getter @Setter @Nullable LossFunctionGradient lossGradient = null;
+
+	@Getter @Setter ConfigConverge converge = new ConfigConverge(0.0, 1e-8, 10);
+
 	final DogArray<DMatrixRMaj> cameras = new DogArray<>(() -> new DMatrixRMaj(3, 4));
 
 	final double[] param = new double[4];
-	@Getter @Setter int maxIterations;
-	@Getter @Setter double convergenceTol;
 
-	public TriangulateRefineMetricHgLS( double convergenceTol,
-										int maxIterations ) {
-		this.convergenceTol = convergenceTol;
-		this.maxIterations = maxIterations;
-		minimizer = FactoryOptimization.levenbergMarquardt(null, false);
+	public TriangulateRefineMetricHgLS() {
+		this(FactoryOptimization.levenbergMarquardt(null, false));
+	}
+
+	public TriangulateRefineMetricHgLS( UnconstrainedLeastSquares<DMatrixRMaj> minimizer ) {
+		this.minimizer = minimizer;
 		BoofMiscOps.checkEq(4, func.getNumOfInputsN());
 	}
 
@@ -70,15 +78,20 @@ public class TriangulateRefineMetricHgLS implements RefineTriangulateMetricH {
 
 		func.setObservations(observations, cameras.toList());
 		minimizer.setFunction(func, null);
+		if (loss != null && lossGradient != null) {
+			minimizer.setLoss(loss, lossGradient);
+		}
 
 		param[0] = worldPt.x;
 		param[1] = worldPt.y;
 		param[2] = worldPt.z;
 		param[3] = worldPt.w;
 
-		minimizer.initialize(param, 0, convergenceTol*observations.size());
+		double ftol = converge.ftol*observations.size();
+		double gtol = converge.gtol*observations.size();
+		minimizer.initialize(param, ftol, gtol);
 
-		for (int i = 0; i < maxIterations; i++) {
+		for (int i = 0; i < converge.maxIterations; i++) {
 			if (minimizer.iterate())
 				break;
 		}

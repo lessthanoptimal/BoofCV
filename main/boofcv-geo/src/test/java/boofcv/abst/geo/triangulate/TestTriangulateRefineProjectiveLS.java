@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,12 +26,13 @@ import org.ejml.data.DMatrixRMaj;
 import java.util.List;
 
 class TestTriangulateRefineProjectiveLS extends GeneralCheckTriangulateRefineProjective {
-	TriangulateRefineProjectiveLS alg = new TriangulateRefineProjectiveLS(1e-8, 200);
+	TriangulateRefineProjectiveLS alg = new TriangulateRefineProjectiveLS();
 
 	@Override
 	public void triangulate( List<Point2D_F64> obsPts,
 							 List<DMatrixRMaj> cameraMatrices,
 							 Point4D_F64 initial, Point4D_F64 found ) {
+		alg.getConverge().maxIterations = 200;
 		alg.process(obsPts, cameraMatrices, initial, found);
 	}
 }
