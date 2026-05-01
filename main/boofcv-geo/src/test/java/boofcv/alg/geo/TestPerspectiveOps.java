@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -781,6 +781,30 @@ class TestPerspectiveOps extends BoofStandardJUnit {
 		assertTrue(PerspectiveOps.isBehindCamera(new Point4D_F64(2*v, -v, -v, 0)));
 		assertFalse(PerspectiveOps.isBehindCamera(new Point4D_F64(0, 0, v, 0)));
 		assertFalse(PerspectiveOps.isBehindCamera(new Point4D_F64(2*v, -v, v, 0)));
+	}
+
+	@Test void isBehindCamera_arbitrary() {
+		var p = new Point4D_F64(0,0,1,1);
+		p.normalize();
+
+		// trivial case
+		var worldToCamera = new Se3_F64();
+		assertFalse(PerspectiveOps.isBehindCamera(p, worldToCamera));
+		p.scale(-1);
+		assertFalse(PerspectiveOps.isBehindCamera(p, worldToCamera));
+
+		// new view
+		worldToCamera.setTo(1,2,-3,EulerType.XYZ,0.2,-0.1,0.25);
+		worldToCamera.transformReverse(p, p);
+		assertFalse(PerspectiveOps.isBehindCamera(p, worldToCamera));
+		p.scale(-1);
+		assertFalse(PerspectiveOps.isBehindCamera(p, worldToCamera));
+
+		// Put it behind the camera
+		p.z *= -1;
+		assertTrue(PerspectiveOps.isBehindCamera(p, worldToCamera));
+		p.scale(-1);
+		assertTrue(PerspectiveOps.isBehindCamera(p, worldToCamera));
 	}
 
 	void checkBehindSwapSign( Point4D_F64 p, boolean expected ) {

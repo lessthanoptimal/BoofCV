@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -1089,6 +1089,22 @@ public class PerspectiveOps {
 		// Not at infinity. Don't compute the z-coordinate since that requires dividing by p.w, which could be very
 		// small and blow up. Worst case here is that the multiplication becomes zero or infinity
 		return p.z*p.w <= 0.0;
+	}
+
+	/**
+	 * Performs a Cheirality check to see if the homogenous point is behind the specified camera.
+	 *
+	 * @param p Point in world frame
+	 * @param worldToCamera Transform from world to camera
+	 * @return true if point is in front of camera
+	 */
+	public static boolean isBehindCamera( Point4D_F64 p, Se3_F64 worldToCamera ) {
+		// R₃₁·X + R₃₂·Y + R₃₃·Z + t₃·W
+		double R31 = worldToCamera.R.unsafe_get(2,0);
+		double R32 = worldToCamera.R.unsafe_get(2,1);
+		double R33 = worldToCamera.R.unsafe_get(2,2);
+
+		return (R31*p.x + R32*p.y + R33*p.z + worldToCamera.T.z*p.w)*p.w <= 0.0;
 	}
 
 	/**
