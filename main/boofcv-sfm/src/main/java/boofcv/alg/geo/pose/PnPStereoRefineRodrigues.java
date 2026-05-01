@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -56,7 +56,7 @@ public class PnPStereoRefineRodrigues implements RefinePnPStereo {
 	public PnPStereoRefineRodrigues( double convergenceTol, int maxIterations ) {
 		this.maxIterations = maxIterations;
 		this.convergenceTol = convergenceTol;
-		this.minimizer = FactoryOptimization.levenbergMarquardt(null, false);
+		this.minimizer = FactoryOptimization.levenbergMarquardt(null);
 
 		// decodes StereoPose
 		ModelCodec<StereoPose> paramModel = new Se3ToStereoPoseCodec(motionCodec);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -58,18 +58,19 @@ public class FactoryInterestPoint {
 	InterestPointDetector<T> generic( ConfigDetectInterestPoint config,
 									  Class<T> inputType, @Nullable Class<D> derivType ) {
 		switch (config.type) {
-			case FAST_HESSIAN:
+			case FAST_HESSIAN -> {
 				return FactoryInterestPoint.fastHessian(config.fastHessian, inputType);
-			case SIFT:
+			}
+			case SIFT -> {
 				return FactoryInterestPoint.sift(config.scaleSpaceSift, config.sift, inputType);
-			case POINT: {
+			}
+			case POINT -> {
 				if (derivType == null)
 					derivType = GImageDerivativeOps.getDerivativeType(inputType);
 				GeneralFeatureDetector<T, D> alg = FactoryDetectPoint.create(config.point, inputType, derivType);
 				return FactoryInterestPoint.wrapPoint(alg, config.point.scaleRadius, inputType, derivType);
 			}
-			default:
-				throw new IllegalArgumentException("Unknown detector");
+			default -> throw new IllegalArgumentException("Unknown detector");
 		}
 	}
 

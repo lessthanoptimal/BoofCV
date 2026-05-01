@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,18 +53,22 @@ public class FactorySegmentationAlg {
 	ComputeRegionMeanColor<T> regionMeanColor( ImageType<T> imageType ) {
 		if (imageType.getFamily() == ImageType.Family.GRAY) {
 			switch (imageType.getDataType()) {
-				case U8:
+				case U8 -> {
 					return (ComputeRegionMeanColor)new ComputeRegionMeanColor.U8();
-				case F32:
+				}
+				case F32 -> {
 					return (ComputeRegionMeanColor)new ComputeRegionMeanColor.F32();
+				}
 			}
 		} else if (imageType.getFamily() == ImageType.Family.PLANAR) {
 			int N = imageType.getNumBands();
 			switch (imageType.getDataType()) {
-				case U8:
+				case U8 -> {
 					return (ComputeRegionMeanColor)new ComputeRegionMeanColor.PL_U8(N);
-				case F32:
+				}
+				case F32 -> {
 					return (ComputeRegionMeanColor)new ComputeRegionMeanColor.PL_F32(N);
+				}
 			}
 		}
 
@@ -116,39 +120,35 @@ public class FactorySegmentationAlg {
 	FhEdgeWeights<T> weightsFelzenszwalb04( ConnectRule rule, ImageType<T> imageType ) {
 		if (imageType.getFamily() == ImageType.Family.GRAY) {
 			if (rule == ConnectRule.FOUR) {
-				switch (imageType.getDataType()) {
-					case U8:
-						return (FhEdgeWeights)new FhEdgeWeights4_U8();
-					case F32:
-						return (FhEdgeWeights)new FhEdgeWeights4_F32();
-				}
+				return switch (imageType.getDataType()) {
+					case U8 -> (FhEdgeWeights)new FhEdgeWeights4_U8();
+					case F32 -> (FhEdgeWeights)new FhEdgeWeights4_F32();
+					default -> throw new IllegalArgumentException("Unknown imageType");
+				};
 			} else if (rule == ConnectRule.EIGHT) {
-				switch (imageType.getDataType()) {
-					case U8:
-						return (FhEdgeWeights)new FhEdgeWeights8_U8();
-					case F32:
-						return (FhEdgeWeights)new FhEdgeWeights8_F32();
-				}
+				return switch (imageType.getDataType()) {
+					case U8 -> (FhEdgeWeights)new FhEdgeWeights8_U8();
+					case F32 -> (FhEdgeWeights)new FhEdgeWeights8_F32();
+					default -> throw new IllegalArgumentException("Unknown imageType");
+				};
 			}
 		} else if (imageType.getFamily() == ImageType.Family.PLANAR) {
 			if (rule == ConnectRule.FOUR) {
-				switch (imageType.getDataType()) {
-					case U8:
-						return (FhEdgeWeights)new FhEdgeWeights4_PLU8();
-					case F32:
-						return (FhEdgeWeights)new FhEdgeWeights4_PLF32();
-				}
+				return switch (imageType.getDataType()) {
+					case U8 -> (FhEdgeWeights)new FhEdgeWeights4_PLU8();
+					case F32 -> (FhEdgeWeights)new FhEdgeWeights4_PLF32();
+					default -> throw new IllegalArgumentException("Unknown imageType");
+				};
 			} else if (rule == ConnectRule.EIGHT) {
-				switch (imageType.getDataType()) {
-					case U8:
-						return (FhEdgeWeights)new FhEdgeWeights8_PLU8();
-					case F32:
-						return (FhEdgeWeights)new FhEdgeWeights8_PLF32();
-				}
+				return switch (imageType.getDataType()) {
+					case U8 -> (FhEdgeWeights)new FhEdgeWeights8_PLU8();
+					case F32 -> (FhEdgeWeights)new FhEdgeWeights8_PLF32();
+					default -> throw new IllegalArgumentException("Unknown imageType");
+				};
 			}
 		}
 
-		throw new IllegalArgumentException("Unknown imageType or connect rule");
+		throw new IllegalArgumentException("Unknown connect rule");
 	}
 
 	public static <T extends ImageBase<T>>

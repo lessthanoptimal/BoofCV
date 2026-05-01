@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,7 +51,7 @@ public class PnPRefineRodrigues implements RefinePnP {
 	public PnPRefineRodrigues( double convergenceTol, int maxIterations ) {
 		this.maxIterations = maxIterations;
 		this.convergenceTol = convergenceTol;
-		this.minimizer = FactoryOptimization.levenbergMarquardt(null, false);
+		this.minimizer = FactoryOptimization.levenbergMarquardt(null);
 
 		func = new ResidualsCodecToMatrix<>(paramModel, new PnPResidualReprojection(), new Se3_F64());
 

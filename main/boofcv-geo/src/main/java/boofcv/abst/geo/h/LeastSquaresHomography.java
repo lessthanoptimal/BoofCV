@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,7 +48,7 @@ public class LeastSquaresHomography implements RefineEpipolar {
 		this.convergenceTol = convergenceTol;
 		this.func = new ResidualsEpipolarMatrixN(null, residuals);
 
-		minimizer = FactoryOptimization.levenbergMarquardt(null, false);
+		minimizer = FactoryOptimization.levenbergMarquardt(null);
 	}
 
 	@Override

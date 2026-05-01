@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,6 +28,7 @@ import org.ddogleg.optimization.FactoryOptimization;
 import org.ddogleg.optimization.UnconstrainedLeastSquares;
 import org.ddogleg.optimization.derivative.NumericalJacobianForward_DDRM;
 import org.ddogleg.optimization.functions.FunctionNtoM;
+import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.NormOps_DDRM;
@@ -55,7 +56,9 @@ public class FundamentalToProjective {
 	ProjectiveToIdentity p2i = new ProjectiveToIdentity();
 
 	ConfigConverge convergence = new ConfigConverge(1e-8, 1e-8, 25);
-	UnconstrainedLeastSquares<DMatrixRMaj> optimizer = FactoryOptimization.levenbergMarquardt(null, true);
+	ConfigLevenbergMarquardt configLM = new ConfigLevenbergMarquardt();
+//	configLM.solverType = LinearSolverType.SVD;
+	UnconstrainedLeastSquares<DMatrixRMaj> optimizer = FactoryOptimization.levenbergMarquardt(configLM);
 	FundamentalResidual residual = new FundamentalResidual();
 	NumericalJacobianForward_DDRM jacobian = new NumericalJacobianForward_DDRM(residual);
 	private double[] initialV = new double[3];
@@ -101,7 +104,7 @@ public class FundamentalToProjective {
 	 * @param cameraMatrix (Output) resulting projective camera matrix P'. (3 by 4) Known up to a projective transform.
 	 */
 	public void twoView( DMatrixRMaj F, Point3D_F64 e2, Vector3D_F64 v, double lambda,
-						 DMatrixRMaj cameraMatrix ) {
+	                     DMatrixRMaj cameraMatrix ) {
 		GeometryMath_F64.outerProd(e2, v, outer);
 
 		GeometryMath_F64.multCrossA(e2, F, KR);
@@ -141,7 +144,7 @@ public class FundamentalToProjective {
 	 * @param P3 (Output) Camera matrix for view 3
 	 */
 	public boolean threeView( DMatrixRMaj F21, DMatrixRMaj F31, DMatrixRMaj F32,
-							  DMatrixRMaj P2, DMatrixRMaj P3 ) {
+	                          DMatrixRMaj P2, DMatrixRMaj P3 ) {
 		// left epipoles. renamed to make code easier to read
 		Point3D_F64 e21 = e1;
 		Point3D_F64 e31 = e2;

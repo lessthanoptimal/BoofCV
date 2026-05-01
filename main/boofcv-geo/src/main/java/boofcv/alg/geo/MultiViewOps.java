@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -106,7 +106,7 @@ public class MultiViewOps {
 	 * @return The trifocal tensor
 	 */
 	public static TrifocalTensor createTrifocal( DMatrixRMaj P2, DMatrixRMaj P3,
-												 @Nullable TrifocalTensor ret ) {
+	                                             @Nullable TrifocalTensor ret ) {
 		if (ret == null)
 			ret = new TrifocalTensor();
 
@@ -148,7 +148,7 @@ public class MultiViewOps {
 	 * @return The trifocal tensor
 	 */
 	public static TrifocalTensor createTrifocal( DMatrixRMaj P1, DMatrixRMaj P2, DMatrixRMaj P3,
-												 @Nullable TrifocalTensor ret ) {
+	                                             @Nullable TrifocalTensor ret ) {
 		if (ret == null)
 			ret = new TrifocalTensor();
 
@@ -213,7 +213,7 @@ public class MultiViewOps {
 	 * @return The trifocal tensor
 	 */
 	public static TrifocalTensor createTrifocal( Se3_F64 P2, Se3_F64 P3,
-												 @Nullable TrifocalTensor ret ) {
+	                                             @Nullable TrifocalTensor ret ) {
 		if (ret == null)
 			ret = new TrifocalTensor();
 
@@ -253,8 +253,8 @@ public class MultiViewOps {
 	 * @return Result of applying the constraint. With perfect inputs will be zero.
 	 */
 	public static Vector3D_F64 constraint( TrifocalTensor tensor,
-										   Vector3D_F64 l1, Vector3D_F64 l2, Vector3D_F64 l3,
-										   @Nullable Vector3D_F64 ret ) {
+	                                       Vector3D_F64 l1, Vector3D_F64 l2, Vector3D_F64 l3,
+	                                       @Nullable Vector3D_F64 ret ) {
 		if (ret == null)
 			ret = new Vector3D_F64();
 
@@ -280,7 +280,7 @@ public class MultiViewOps {
 	 * @return Result of applying the constraint. With perfect inputs will be zero.
 	 */
 	public static double constraint( TrifocalTensor tensor,
-									 Point2D_F64 p1, Vector3D_F64 l2, Vector3D_F64 l3 ) {
+	                                 Point2D_F64 p1, Vector3D_F64 l2, Vector3D_F64 l3 ) {
 		DMatrixRMaj sum = new DMatrixRMaj(3, 3);
 
 		CommonOps_DDRM.add(p1.x, tensor.T1, sum, sum);
@@ -303,8 +303,8 @@ public class MultiViewOps {
 	 * @return Result of applying the constraint. With perfect inputs will be zero.
 	 */
 	public static Vector3D_F64 constraint( TrifocalTensor tensor,
-										   Point2D_F64 p1, Vector3D_F64 l2, Point2D_F64 p3,
-										   Vector3D_F64 ret ) {
+	                                       Point2D_F64 p1, Vector3D_F64 l2, Point2D_F64 p3,
+	                                       Vector3D_F64 ret ) {
 		if (ret == null)
 			ret = new Vector3D_F64();
 
@@ -335,8 +335,8 @@ public class MultiViewOps {
 	 * @return Result of applying the constraint. With perfect inputs will be zero.
 	 */
 	public static Vector3D_F64 constraint( TrifocalTensor tensor,
-										   Point2D_F64 p1, Point2D_F64 p2, Vector3D_F64 l3,
-										   Vector3D_F64 ret ) {
+	                                       Point2D_F64 p1, Point2D_F64 p2, Vector3D_F64 l3,
+	                                       Vector3D_F64 ret ) {
 		if (ret == null)
 			ret = new Vector3D_F64();
 
@@ -370,8 +370,8 @@ public class MultiViewOps {
 	 * @return Result of applying the constraint. With perfect inputs will be zero.
 	 */
 	public static DMatrixRMaj constraint( TrifocalTensor tensor,
-										  Point2D_F64 p1, Point2D_F64 p2, Point2D_F64 p3,
-										  DMatrixRMaj ret ) {
+	                                      Point2D_F64 p1, Point2D_F64 p2, Point2D_F64 p3,
+	                                      DMatrixRMaj ret ) {
 		if (ret == null)
 			ret = new DMatrixRMaj(3, 3);
 
@@ -442,8 +442,8 @@ public class MultiViewOps {
 	 * @return Homography from view 1 to 3
 	 */
 	public static DMatrixRMaj inducedHomography13( TrifocalTensor tensor,
-												   Vector3D_F64 line2,
-												   DMatrixRMaj output ) {
+	                                               Vector3D_F64 line2,
+	                                               DMatrixRMaj output ) {
 		if (output == null)
 			output = new DMatrixRMaj(3, 3);
 
@@ -490,8 +490,8 @@ public class MultiViewOps {
 	 * @return Homography from view 1 to 2
 	 */
 	public static DMatrixRMaj inducedHomography12( TrifocalTensor tensor,
-												   Vector3D_F64 line3,
-												   DMatrixRMaj output ) {
+	                                               Vector3D_F64 line3,
+	                                               DMatrixRMaj output ) {
 		if (output == null)
 			output = new DMatrixRMaj(3, 3);
 
@@ -540,9 +540,9 @@ public class MultiViewOps {
 	 * @see boofcv.alg.geo.h.HomographyInducedStereo3Pts
 	 */
 	public static @Nullable DMatrixRMaj fundamentalToHomography3Pts( DMatrixRMaj F,
-																	 AssociatedPair p1,
-																	 AssociatedPair p2,
-																	 AssociatedPair p3 ) {
+	                                                                 AssociatedPair p1,
+	                                                                 AssociatedPair p2,
+	                                                                 AssociatedPair p3 ) {
 		HomographyInducedStereo3Pts alg = new HomographyInducedStereo3Pts();
 
 		alg.setFundamental(F, null);
@@ -725,7 +725,7 @@ public class MultiViewOps {
 	 * @return Fundamental matrix
 	 */
 	public static DMatrixRMaj createFundamental( DMatrixRMaj E,
-												 DMatrixRMaj K1, DMatrixRMaj K2 ) {
+	                                             DMatrixRMaj K1, DMatrixRMaj K2 ) {
 		DMatrixRMaj K1_inv = new DMatrixRMaj(3, 3);
 		CommonOps_DDRM.invert(K1, K1_inv);
 		DMatrixRMaj K2_inv = new DMatrixRMaj(3, 3);
@@ -754,7 +754,7 @@ public class MultiViewOps {
 	 * @return Essential matrix
 	 */
 	public static DMatrixRMaj createFundamental( DMatrixRMaj R, Vector3D_F64 T,
-												 DMatrixRMaj K1, DMatrixRMaj K2, @Nullable DMatrixRMaj F ) {
+	                                             DMatrixRMaj K1, DMatrixRMaj K2, @Nullable DMatrixRMaj F ) {
 		if (F == null)
 			F = new DMatrixRMaj(3, 3);
 		else
@@ -781,7 +781,7 @@ public class MultiViewOps {
 	 * @return Calibrated homography matrix
 	 */
 	public static DMatrixRMaj createHomography( DMatrixRMaj R, Vector3D_F64 T,
-												double d, Vector3D_F64 N ) {
+	                                            double d, Vector3D_F64 N ) {
 		DMatrixRMaj H = new DMatrixRMaj(3, 3);
 
 		GeometryMath_F64.outerProd(T, N, H);
@@ -809,8 +809,8 @@ public class MultiViewOps {
 	 * @return Uncalibrated homography matrix
 	 */
 	public static DMatrixRMaj createHomography( DMatrixRMaj R, Vector3D_F64 T,
-												double d, Vector3D_F64 N,
-												DMatrixRMaj K ) {
+	                                            double d, Vector3D_F64 N,
+	                                            DMatrixRMaj K ) {
 		DMatrixRMaj temp = new DMatrixRMaj(3, 3);
 		DMatrixRMaj K_inv = new DMatrixRMaj(3, 3);
 
@@ -997,7 +997,7 @@ public class MultiViewOps {
 	 * @return Essential matrix
 	 */
 	public static DMatrixRMaj fundamentalToEssential( DMatrixRMaj F, DMatrixRMaj K1, DMatrixRMaj K2,
-													  @Nullable DMatrixRMaj outputE ) {
+	                                                  @Nullable DMatrixRMaj outputE ) {
 		if (outputE == null)
 			outputE = new DMatrixRMaj(3, 3);
 
@@ -1045,7 +1045,7 @@ public class MultiViewOps {
 	 * @see FundamentalToProjective#threeView
 	 */
 	public static void fundamentalToProjective( DMatrixRMaj F21, DMatrixRMaj F31, DMatrixRMaj F32,
-												DMatrixRMaj P2, DMatrixRMaj P3 ) {
+	                                            DMatrixRMaj P2, DMatrixRMaj P3 ) {
 		FundamentalToProjective alg = new FundamentalToProjective();
 		alg.threeView(F21, F31, F32, P2, P3);
 	}
@@ -1208,9 +1208,9 @@ public class MultiViewOps {
 	 * @param storage (Output) storage for found errors
 	 */
 	public static void errorsHomographySymm( List<AssociatedPair> observations,
-											 DMatrixRMaj H,
-											 @Nullable DMatrixRMaj H_inv,
-											 DogArray_F64 storage ) {
+	                                         DMatrixRMaj H,
+	                                         @Nullable DMatrixRMaj H_inv,
+	                                         DogArray_F64 storage ) {
 		storage.reset();
 		if (H_inv == null)
 			H_inv = new DMatrixRMaj(3, 3);
@@ -1253,7 +1253,7 @@ public class MultiViewOps {
 	 * @return induced point.
 	 */
 	public static Point3D_F64 transfer_1_to_3( TrifocalTensor T, Point2D_F64 x1, Vector3D_F64 l2,
-											   @Nullable Point3D_F64 x3 ) {
+	                                           @Nullable Point3D_F64 x3 ) {
 		if (x3 == null)
 			x3 = new Point3D_F64();
 
@@ -1300,7 +1300,7 @@ public class MultiViewOps {
 	 * @return induced point.
 	 */
 	public static Point3D_F64 transfer_1_to_3( TrifocalTensor T, Point2D_F64 x1, Point2D_F64 x2,
-											   @Nullable Point3D_F64 x3 ) {
+	                                           @Nullable Point3D_F64 x3 ) {
 		if (x3 == null)
 			x3 = new Point3D_F64();
 
@@ -1322,7 +1322,7 @@ public class MultiViewOps {
 	 * @return induced point.
 	 */
 	public static Point3D_F64 transfer_1_to_2( TrifocalTensor T, Point2D_F64 x1, Vector3D_F64 l3,
-											   @Nullable Point3D_F64 x2 ) {
+	                                           @Nullable Point3D_F64 x2 ) {
 		if (x2 == null)
 			x2 = new Point3D_F64();
 
@@ -1353,7 +1353,7 @@ public class MultiViewOps {
 	 * @return induced point.
 	 */
 	public static Point3D_F64 transfer_1_to_2( TrifocalTensor T, Point2D_F64 x1, Point2D_F64 x3,
-											   @Nullable Point3D_F64 x2 ) {
+	                                           @Nullable Point3D_F64 x2 ) {
 		if (x2 == null)
 			x2 = new Point3D_F64();
 
@@ -1383,7 +1383,7 @@ public class MultiViewOps {
 	 * @see #decomposeMetricCamera(DMatrixRMaj, DMatrixRMaj, Se3_F64)
 	 */
 	public static boolean projectiveToMetric( DMatrixRMaj cameraMatrix, DMatrixRMaj H,
-											  Se3_F64 worldToView, DMatrixRMaj K ) {
+	                                          Se3_F64 worldToView, DMatrixRMaj K ) {
 		return new DecomposeProjectiveToMetric().projectiveToMetric(cameraMatrix, H, worldToView, K);
 	}
 
@@ -1401,8 +1401,8 @@ public class MultiViewOps {
 	 * @param worldToView (Output) transform from world to camera view
 	 */
 	public static boolean projectiveToMetricKnownK( DMatrixRMaj cameraMatrix,
-													DMatrixRMaj H, DMatrixRMaj K,
-													Se3_F64 worldToView ) {
+	                                                DMatrixRMaj H, DMatrixRMaj K,
+	                                                Se3_F64 worldToView ) {
 		return new DecomposeProjectiveToMetric().projectiveToMetricKnownK(cameraMatrix, H, K, worldToView);
 	}
 
@@ -1430,7 +1430,7 @@ public class MultiViewOps {
 	}
 
 	public static boolean enforceAbsoluteQuadraticConstraints( DMatrix4x4 Q, boolean zeroCenter, boolean zeroSkew,
-															   @Nullable DecomposeAbsoluteDualQuadratic alg ) {
+	                                                           @Nullable DecomposeAbsoluteDualQuadratic alg ) {
 
 		if (alg == null)
 			alg = new DecomposeAbsoluteDualQuadratic();
@@ -1567,7 +1567,7 @@ public class MultiViewOps {
 	 * @param intrinsic (output) K extracted from w
 	 */
 	public static void decomposeDiac( double w11, double w12, double w13, double w22, double w23, double w33,
-									  CameraPinhole intrinsic ) {
+	                                  CameraPinhole intrinsic ) {
 		// divide by w33 to ensure that it is equal to one
 		double cx = w13/w33;
 		double cy = w23/w33;
@@ -1608,9 +1608,9 @@ public class MultiViewOps {
 	 * @return The homography
 	 */
 	public static DMatrixRMaj createProjectiveToMetric( DMatrixRMaj K,
-														double v1, double v2, double v3,
-														double lambda,
-														@Nullable DMatrixRMaj H ) {
+	                                                    double v1, double v2, double v3,
+	                                                    double lambda,
+	                                                    @Nullable DMatrixRMaj H ) {
 		if (H == null)
 			H = new DMatrixRMaj(4, 4);
 		else
@@ -1698,14 +1698,11 @@ public class MultiViewOps {
 		for (int i = 0; i < structure.cameras.size; i++) {
 			RemoveBrownPtoN_F64 p2n = new RemoveBrownPtoN_F64();
 			BundleAdjustmentCamera baseModel = Objects.requireNonNull(structure.cameras.data[i].model);
-			if (baseModel instanceof BundlePinholeSimplified) {
-				BundlePinholeSimplified cam = (BundlePinholeSimplified)baseModel;
+			if (baseModel instanceof BundlePinholeSimplified cam) {
 				p2n.setK(cam.f, cam.f, 0, 0, 0).setDistortion(new double[]{cam.k1, cam.k2}, 0, 0);
-			} else if (baseModel instanceof BundlePinhole) {
-				BundlePinhole cam = (BundlePinhole)baseModel;
+			} else if (baseModel instanceof BundlePinhole cam) {
 				p2n.setK(cam.fx, cam.fy, cam.skew, cam.cx, cam.cy).setDistortion(new double[]{0, 0}, 0, 0);
-			} else if (baseModel instanceof BundlePinholeBrown) {
-				BundlePinholeBrown cam = (BundlePinholeBrown)baseModel;
+			} else if (baseModel instanceof BundlePinholeBrown cam) {
 				p2n.setK(cam.fx, cam.fy, cam.skew, cam.cx, cam.cy).setDistortion(cam.radial, cam.t1, cam.t2);
 			} else {
 				throw new RuntimeException("Unknown camera model! " + baseModel.getClass().getSimpleName());
@@ -1854,7 +1851,7 @@ public class MultiViewOps {
 	 * @param dst (Output) Array of AssociatedPair. Array is reset.
 	 */
 	public static void convertTr( List<AssociatedTriple> src, int idx0, int idx1,
-								  DogArray<AssociatedPair> dst ) {
+	                              DogArray<AssociatedPair> dst ) {
 		dst.resize(src.size());
 		if (src.size() == 0)
 			return;
@@ -1874,7 +1871,7 @@ public class MultiViewOps {
 	 * @param dst (Output) Array of AssociatedPair. Array is reset.
 	 */
 	public static void convertTu( List<AssociatedTuple> src, int idx0, int idx1,
-								  DogArray<AssociatedPair> dst ) {
+	                              DogArray<AssociatedPair> dst ) {
 		dst.resize(src.size());
 		if (src.size() == 0)
 			return;
@@ -1914,7 +1911,7 @@ public class MultiViewOps {
 	 * @param function (Output) Called with results (index, 3D camera location, pixel)
 	 */
 	public static void scenePointsToPixels( SceneStructureMetric scene, int viewIdx,
-											BoofLambdas.ProcessIndex2<Point3D_F64, Point2D_F64> function ) {
+	                                        BoofLambdas.ProcessIndex2<Point3D_F64, Point2D_F64> function ) {
 		Se3_F64 world_to_view = new Se3_F64();
 
 		SceneStructureMetric.View view = scene.views.get(viewIdx);
@@ -1948,7 +1945,7 @@ public class MultiViewOps {
 	 * @param func (Output) Results are passed in to this function with their index and 3D point.
 	 */
 	public static void sceneToCloud3( SceneStructureMetric scene, double tol,
-									  BoofLambdas.ProcessIndex<Point3D_F64> func ) {
+	                                  BoofLambdas.ProcessIndex<Point3D_F64> func ) {
 
 		Point3D_F64 out = new Point3D_F64();
 
@@ -2070,7 +2067,7 @@ public class MultiViewOps {
 	 * @return The homography
 	 */
 	public static DMatrixRMaj homographyFromRotation( DMatrixRMaj R21, DMatrixRMaj K1, DMatrixRMaj K2,
-													  @Nullable DMatrixRMaj H21 ) {
+	                                                  @Nullable DMatrixRMaj H21 ) {
 		if (H21 == null)
 			H21 = new DMatrixRMaj(3, 3);
 

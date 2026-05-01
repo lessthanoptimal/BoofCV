@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,13 +40,13 @@ public class BundleAdjustmentOps {
 	 * Functions for converting. Change to support more camera types
 	 */
 	public static ConvertToBrown convertOp = ( src, state, width, height, dst ) -> {
-		if (src instanceof BundlePinhole) {
+		if (src instanceof BundlePinhole _src) {
 			dst.fsetRadial().fsetTangential(0, 0); // remove distortion terms
-			convert((BundlePinhole)src, width, height, (CameraPinhole)dst);
-		} else if (src instanceof BundlePinholeBrown) {
-			convert((BundlePinholeBrown)src,  width, height, dst);
-		} else if (src instanceof BundlePinholeSimplified) {
-			convert((BundlePinholeSimplified)src,  width, height, dst);
+			convert(_src, width, height, (CameraPinhole)dst);
+		} else if (src instanceof BundlePinholeBrown _src) {
+			convert(_src,  width, height, dst);
+		} else if (src instanceof BundlePinholeSimplified _src) {
+			convert(_src,  width, height, dst);
 		} else {
 			throw new RuntimeException("Unknown src type. " + src + " See BundleAdjustmentOps.convertOp for a way" +
 					" to support more cameras.");

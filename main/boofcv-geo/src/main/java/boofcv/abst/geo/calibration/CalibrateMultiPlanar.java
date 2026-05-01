@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -133,7 +133,6 @@ public class CalibrateMultiPlanar {
 		var configSBA = new ConfigBundleAdjustment();
 		configSBA.optimizer.type = ConfigNonLinearLeastSquares.Type.LEVENBERG_MARQUARDT;
 		configSBA.optimizer.lm.hessianScaling = false;
-		configSBA.optimizer.robustSolver = false;
 		configSBA.loss.type = ConfigLoss.Type.HUBER;
 		configSBA.loss.parameter = 10;
 

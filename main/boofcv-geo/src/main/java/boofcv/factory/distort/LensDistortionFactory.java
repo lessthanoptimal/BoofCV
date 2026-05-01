@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,15 +38,13 @@ public class LensDistortionFactory {
 	 * </p>
 	 */
 	public static LensDistortionNarrowFOV narrow( CameraModel param ) {
-		if (param instanceof CameraPinholeBrown) {
-			CameraPinholeBrown c = (CameraPinholeBrown)param;
+		if (param instanceof CameraPinholeBrown c) {
 
 			if (c.isDistorted())
 				return new LensDistortionBrown(c);
 			else
 				return new LensDistortionPinhole(c);
-		} else if (param instanceof CameraPinhole) {
-			CameraPinhole c = (CameraPinhole)param;
+		} else if (param instanceof CameraPinhole c) {
 
 			return new LensDistortionPinhole(c);
 		} else {
@@ -60,10 +58,10 @@ public class LensDistortionFactory {
 	 * </p>
 	 */
 	public static LensDistortionWideFOV wide( CameraModel param ) {
-		if (param instanceof CameraUniversalOmni) {
-			return new LensDistortionUniversalOmni((CameraUniversalOmni)param);
-		} else if (param instanceof CameraKannalaBrandt) {
-			return new LensDistortionKannalaBrandt((CameraKannalaBrandt)param);
+		if (param instanceof CameraUniversalOmni p) {
+			return new LensDistortionUniversalOmni(p);
+		} else if (param instanceof CameraKannalaBrandt p) {
+			return new LensDistortionKannalaBrandt(p);
 		} else {
 			throw new IllegalArgumentException("Unknown camera model " + param.getClass().getSimpleName());
 		}

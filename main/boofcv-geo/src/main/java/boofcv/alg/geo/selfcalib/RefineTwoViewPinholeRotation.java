@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -72,7 +72,7 @@ public class RefineTwoViewPinholeRotation implements VerbosePrint {
 
 	/** Optimization algorithm */
 	public @Getter @Setter
-	UnconstrainedLeastSquares<DMatrixRMaj> minimizer = FactoryOptimization.levenbergMarquardt(null, false);
+	UnconstrainedLeastSquares<DMatrixRMaj> minimizer = FactoryOptimization.levenbergMarquardt(null);
 
 	/** If true then the intrinsic parameters are assumed to be the same for both views */
 	@Getter @Setter boolean assumeSameIntrinsics = false;
