@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,15 +44,16 @@ public class FactoryOrientation {
 	 * @param imageType Type of input image it will process
 	 * @return Wrapped version which can process images as its raw input.
 	 */
+	@SuppressWarnings("unchecked")
 	public static <T extends ImageGray<T>>
 	OrientationImage<T> convertImage( RegionOrientation algorithm, Class<T> imageType ) {
-		if (algorithm instanceof OrientationGradient) {
-			Class derivType = ((OrientationGradient)algorithm).getImageType();
+		if (algorithm instanceof OrientationGradient a) {
+			Class derivType = a.getImageType();
 			ImageGradient gradient = FactoryDerivative.sobel(imageType, derivType);
 			return new OrientationGradientToImage((OrientationGradient)algorithm, gradient, imageType, derivType);
-		} else if (algorithm instanceof OrientationIntegral) {
+		} else if (algorithm instanceof OrientationIntegral a) {
 			Class integralType = GIntegralImageOps.getIntegralType(imageType);
-			return new OrientationIntegralToImage((OrientationIntegral)algorithm, imageType, integralType);
+			return new OrientationIntegralToImage(a, imageType, integralType);
 		} else {
 			throw new IllegalArgumentException("Unknown orientation algorithm type");
 		}

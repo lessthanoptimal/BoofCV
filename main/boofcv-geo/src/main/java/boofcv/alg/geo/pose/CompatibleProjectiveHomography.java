@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -101,8 +101,8 @@ public class CompatibleProjectiveHomography {
 	public final ConfigConverge configConverge = new ConfigConverge(1e-8, 1e-8, 500);
 
 	public CompatibleProjectiveHomography() {
-		ConfigLevenbergMarquardt config = new ConfigLevenbergMarquardt();
-		lm = FactoryOptimization.levenbergMarquardt(config, false);
+		var config = new ConfigLevenbergMarquardt();
+		lm = FactoryOptimization.levenbergMarquardt(config);
 	}
 
 	/**

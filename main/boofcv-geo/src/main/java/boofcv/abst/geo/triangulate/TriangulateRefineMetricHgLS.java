@@ -59,7 +59,7 @@ public class TriangulateRefineMetricHgLS implements RefineTriangulateMetricH {
 	final double[] param = new double[4];
 
 	public TriangulateRefineMetricHgLS() {
-		this(FactoryOptimization.levenbergMarquardt(null, false));
+		this(FactoryOptimization.levenbergMarquardt(null));
 	}
 
 	public TriangulateRefineMetricHgLS( UnconstrainedLeastSquares<DMatrixRMaj> minimizer ) {

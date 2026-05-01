@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -121,7 +121,6 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 		// See comments in MetricBundleAdjustmentUtils for why these values are set this way
 		configSBA.optimizer.type = ConfigNonLinearLeastSquares.Type.LEVENBERG_MARQUARDT;
 		configSBA.optimizer.lm.hessianScaling = false;
-		configSBA.optimizer.robustSolver = false;
 	}
 
 	/**
@@ -205,8 +204,13 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 	public boolean performBundleAdjustment() {
 		BundleAdjustment<SceneStructureMetric> bundleAdjustment;
 
-		// A robust solver can only be used with dense matrices
-		if (configSBA.optimizer.robustSolver) {
+		// Most solvers don't have sparse implementations. Update this as more are added.
+		boolean dense = switch (configSBA.optimizer.getLinearSolverType()) {
+			case CHOLESKY, QR -> false;
+			default -> true;
+		};
+
+		if (dense) {
 			configSBA.optimizer.lm.mixture = 0;
 			bundleAdjustment = FactoryMultiView.bundleDenseMetric(true, configSBA);
 		} else {

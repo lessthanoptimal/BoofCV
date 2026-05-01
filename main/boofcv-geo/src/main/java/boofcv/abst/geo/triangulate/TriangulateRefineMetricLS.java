@@ -59,7 +59,7 @@ public class TriangulateRefineMetricLS implements RefineTriangulateMetric {
 	}
 
 	public TriangulateRefineMetricLS() {
-		this(FactoryOptimization.levenbergMarquardt(null, false));
+		this(FactoryOptimization.levenbergMarquardt(null));
 	}
 
 	@Override

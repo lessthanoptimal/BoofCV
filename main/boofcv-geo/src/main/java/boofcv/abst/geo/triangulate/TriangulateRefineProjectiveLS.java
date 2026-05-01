@@ -58,7 +58,7 @@ public class TriangulateRefineProjectiveLS implements RefineTriangulateProjectiv
 	}
 
 	public TriangulateRefineProjectiveLS() {
-		this(FactoryOptimization.levenbergMarquardt(null, false));
+		this(FactoryOptimization.levenbergMarquardt(null));
 	}
 
 	@Override

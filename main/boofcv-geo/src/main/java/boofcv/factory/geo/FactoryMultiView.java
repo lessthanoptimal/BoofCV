@@ -124,7 +124,7 @@ public class FactoryMultiView {
 	 * @return bundle adjustment
 	 */
 	public static BundleAdjustment<SceneStructureMetric> bundleDenseMetric( boolean robust,
-																			@Nullable ConfigBundleAdjustment config ) {
+	                                                                        @Nullable ConfigBundleAdjustment config ) {
 		if (config == null)
 			config = new ConfigBundleAdjustment();
 
@@ -392,7 +392,7 @@ public class FactoryMultiView {
 
 			case ALGEBRAIC_7 -> {
 				ConfigConverge cc = config.converge;
-				UnconstrainedLeastSquares optimizer = FactoryOptimization.levenbergMarquardt(null, false);
+				UnconstrainedLeastSquares optimizer = FactoryOptimization.levenbergMarquardt(null);
 				TrifocalAlgebraicPoint7 alg = new TrifocalAlgebraicPoint7(optimizer,
 						cc.maxIterations, cc.ftol, cc.gtol);
 
@@ -598,7 +598,7 @@ public class FactoryMultiView {
 
 			case GEOMETRIC -> {
 				UnconstrainedLeastSquares<DMatrixRMaj> leastSquares =
-						FactoryOptimization.levenbergMarquardt(config.optimizer, false);
+						FactoryOptimization.levenbergMarquardt(config.optimizer);
 				var estimator = new WrapNViewsTriangulateMetricDLT();
 				var refiner = new TriangulateRefineMetricLS(leastSquares);
 				refiner.getConverge().setTo(config.converge);
@@ -631,7 +631,7 @@ public class FactoryMultiView {
 
 			case GEOMETRIC -> {
 				UnconstrainedLeastSquares<DMatrixRMaj> leastSquares =
-						FactoryOptimization.levenbergMarquardt(config.optimizer, false);
+						FactoryOptimization.levenbergMarquardt(config.optimizer);
 				var estimator = new WrapNViewsTriangulateMetricHgDLT();
 				var refiner = new TriangulateRefineMetricHgLS(leastSquares);
 				refiner.getConverge().setTo(config.converge);
@@ -664,7 +664,7 @@ public class FactoryMultiView {
 
 			case ALGEBRAIC, GEOMETRIC -> {
 				UnconstrainedLeastSquares<DMatrixRMaj> leastSquares =
-						FactoryOptimization.levenbergMarquardt(config.optimizer, false);
+						FactoryOptimization.levenbergMarquardt(config.optimizer);
 				var estimator = new WrapNViewsTriangulateProjectiveDLT();
 				var refiner = new TriangulateRefineProjectiveLS(leastSquares);
 				refiner.getConverge().setTo(config.converge);

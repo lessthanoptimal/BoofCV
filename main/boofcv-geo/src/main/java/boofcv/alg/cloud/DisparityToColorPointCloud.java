@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -130,10 +130,10 @@ public class DisparityToColorPointCloud {
 	 * @param color Color image of left camera
 	 */
 	public void process( ImageGray<?> disparity, ColorImage color, PointCloudWriter output ) {
-		if (disparity instanceof GrayU8)
-			process((GrayU8)disparity, color, output);
-		else if (disparity instanceof GrayF32)
-			process((GrayF32)disparity, color, output);
+		if (disparity instanceof GrayU8 d)
+			process(d, color, output);
+		else if (disparity instanceof GrayF32 d)
+			process(d, color, output);
 		else
 			throw new IllegalArgumentException("Unsupported image type " + disparity.getClass().getSimpleName());
 	}
