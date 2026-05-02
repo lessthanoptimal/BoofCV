@@ -49,10 +49,10 @@ import pabeles.concurrency.GrowArray;
 ///
 /// If you want to perform tracking from the same image to multiple others you can do the following:
 ///
-/// 1) Save location of all tracks [#getTracks()]
+/// 1) Save location of all tracks [#forEachTrack]
 /// 2) Pass in image 1: [#startFrame]
 /// 3) Update location in image 1: [#track()]
-/// 4) Undo changes in location to tracks then revert their failed status: [#clearFailedStatus()]
+/// 4) Undo changes in location to tracks then revert their failed status: [#markAllSuccess()]
 /// 5) Repeat stop 2 for N images.
 ///
 /// Note that you only call [#finishFrame()] when you plan on using that image as the seed for the frame
@@ -76,15 +76,26 @@ public class EasyPyramidKlt<Image extends ImageGray<Image>, Derivative extends I
 	@Getter @Setter protected int concurrentMinimumTracks = 20;
 
 	/// List of all tracks
-	@Getter protected DogArray<PyramidKltFeature> tracks;
+	protected DogArray<PyramidKltFeature> tracks;
 	/// List of metadata associated with the tracks
-	@Getter protected DogArray<TrackMeta> metadata = new DogArray<>(TrackMeta::new, TrackMeta::reset);
+	protected DogArray<TrackMeta> metadata = new DogArray<>(TrackMeta::new, TrackMeta::reset);
+
+	/// Internal track list. Do not modify directly; use [#addTrack], [#remove], [#removeSwap] instead.
+	/// Kept parallel with [#_getMetadata] to avoid wrapping every track-level call into the lower-level KLT.
+	public DogArray<PyramidKltFeature> _getTracks() {return tracks;}
+
+	/// Internal metadata list. Do not modify directly; use [#addTrack], [#remove], [#removeSwap] instead.
+	/// Kept parallel with [#_getTracks] to avoid wrapping every track-level call into the lower-level KLT.
+	public DogArray<TrackMeta> _getMetadata() {return metadata;}
 
 	/// Workspace for concurrency. Each thread needs to have its own data
 	protected GrowArray<PyramidKltTracker<Image, Derivative>> workspace;
 
 	/// The next ID which will be assigned to a track also the total number of tracks created
 	@Getter private long nextTrackID = 0;
+
+	/// Unique ID assigned to a frame. This is incremented when [#finishFrame] is called.
+	@Getter private long frameID = 0;
 
 	/// Input image shape
 	int imageWidth, imageHeight;
@@ -117,7 +128,8 @@ public class EasyPyramidKlt<Image extends ImageGray<Image>, Derivative extends I
 		metadata.reset();
 	}
 
-	/// Call first when a new image has arrived
+	/// Call first when a new image has arrived. New features will use this feature to create their descriptor from
+	/// and existing features will be tracked into this image.
 	public void startFrame( Image image ) {
 		if (tracks != null) {
 			if (imageWidth != image.width || imageHeight != image.height)
@@ -139,15 +151,21 @@ public class EasyPyramidKlt<Image extends ImageGray<Image>, Derivative extends I
 		currPyr.update(image);
 	}
 
-	/// Call when you're no longer processing an image
-	public void finishFrame() {
+	/// Swaps the internal image pyramids so that what's the current one becomes the previous one.
+	public void swapFrames() {
 		PyramidGradient<Image, Derivative> tmp = currPyr;
 		currPyr = prevPyr;
 		prevPyr = tmp;
 	}
 
+	/// Call when you're no longer processing an image
+	public void finishFrame() {
+		frameID++;
+		swapFrames();
+	}
+
 	/// Adds a new track at he specified location. After you are done adding new tracks call [#describe()]
-	/// to compute the description of all the new tracks
+	/// to compute the description of all the new tracks. Location must be inside the image.
 	public void addTrack( double x, double y ) {
 		if (!BoofMiscOps.isInside(imageWidth, imageHeight, x, y))
 			throw new IllegalArgumentException("Can't create a feature outside the image");
@@ -157,11 +175,13 @@ public class EasyPyramidKlt<Image extends ImageGray<Image>, Derivative extends I
 		t.y = (float)y;
 
 		TrackMeta meta = metadata.grow();
+		meta.frameSpawned = frameID;
 		meta.id = nextTrackID++;
 		meta.status = KltTrackFault.SUCCESS;
 	}
 
-	/// For each look that passes in each track and matching metadata
+	/// For each look that passes in each track and matching metadata. The index is valid only during
+	/// the callback; subsequent removeSwap calls invalidate it.
 	public void forEachTrack( ProcessTrack op ) {
 		for (int i = 0; i < tracks.size; i++) {
 			PyramidKltFeature track = tracks.get(i);
@@ -170,16 +190,29 @@ public class EasyPyramidKlt<Image extends ImageGray<Image>, Derivative extends I
 		}
 	}
 
-	/// Update the track location of image features
+	/// Returns number of tracks
+	public int getTrackCount() {
+		return tracks.size;
+	}
+
+	/// Update the track location of image features. Already-failed tracks are skipped.
 	public void track() {
-		if (isUseConcurrent()) {
-			BoofConcurrency.loopBlocks(0, tracks.size(), workspace, ( helper, idx0, idx1 ) -> {
+		track(0, tracks.size);
+	}
+
+	/// Update the track location of image features within the specified range. Already-failed tracks are skipped.
+	///
+	/// @param idx0 Track index lower extent, inclusive.
+	/// @param idx1 Track index upper extent, exclusive.
+	public void track( int idx0, int idx1 ) {
+		if (isUseConcurrent(idx1 - idx0)) {
+			BoofConcurrency.loopBlocks(idx0, idx1, workspace, ( helper, block0, block1 ) -> {
 				helper.setImage(prevPyr.basePyramid, prevPyr.derivX, prevPyr.derivY);
-				track(idx0, idx1, tracker);
+				track(block0, block1, tracker);
 			});
 		} else {
 			tracker.setImage(currPyr.basePyramid, currPyr.derivX, currPyr.derivY);
-			track(0, tracks.size, tracker);
+			track(idx0, idx1, tracker);
 		}
 	}
 
@@ -196,17 +229,40 @@ public class EasyPyramidKlt<Image extends ImageGray<Image>, Derivative extends I
 		}
 	}
 
+	/// Performs tracking on just an individual feature
+	public KltTrackFault track( int index ) {
+		if (index < 0 || index >= tracks.size)
+			throw new IndexOutOfBoundsException("index=" + index + " size=" + tracks.size);
+		PyramidKltFeature t = tracks.get(index);
+		TrackMeta meta = metadata.get(index);
+
+		// Skip over tracks which have already failed
+		if (meta.status == KltTrackFault.SUCCESS)
+			meta.status = tracker.track(t);
+
+		return meta.status;
+	}
+
 	/// Validate tracks by tracking from the previous to current frame. If the error is too large mark the
-	/// track as failing.
+	/// track as failing. Already-failed tracks are skipped.
 	public void backwardsValidation() {
-		if (isUseConcurrent()) {
-			BoofConcurrency.loopBlocks(0, tracks.size(), workspace, ( helper, idx0, idx1 ) -> {
+		backwardsValidation(0, tracks.size);
+	}
+
+	/// Validate specified tracks by tracking from the previous to current frame. If the error is too large mark the
+	/// track as failing. Already-failed tracks are skipped.
+	///
+	/// @param idx0 Track index lower extent, inclusive.
+	/// @param idx1 Track index upper extent, exclusive.
+	public void backwardsValidation( int idx0, int idx1 ) {
+		if (isUseConcurrent(idx1 - idx0)) {
+			BoofConcurrency.loopBlocks(idx0, idx1, workspace, ( helper, block0, block1 ) -> {
 				helper.setImage(prevPyr.basePyramid, prevPyr.derivX, prevPyr.derivY);
-				backwardsValidation(idx0, idx1, tracker);
+				backwardsValidation(block0, block1, tracker);
 			});
 		} else {
 			tracker.setImage(prevPyr.basePyramid, prevPyr.derivX, prevPyr.derivY);
-			backwardsValidation(0, tracks.size, tracker);
+			backwardsValidation(idx0, idx1, tracker);
 		}
 	}
 
@@ -239,22 +295,32 @@ public class EasyPyramidKlt<Image extends ImageGray<Image>, Derivative extends I
 		}
 	}
 
-	/// Recompute the description for all tracks which are being actively tracked using the current image
+	/// Recompute the description for all tracks which are being actively tracked using the current image.
+	/// Already-failed tracks are skipped.
 	public void describe() {
-		if (isUseConcurrent()) {
-			BoofConcurrency.loopBlocks(0, tracks.size(), workspace, ( helper, idx0, idx1 ) -> {
+		describe(0, tracks.size);
+	}
+
+	/// Recompute the description for tracks within the specified range which are being actively tracked using the current image.
+	/// Already-failed tracks are skipped.
+	///
+	/// @param idx0 Track index lower extent, inclusive.
+	/// @param idx1 Track index upper extent, exclusive.
+	public void describe( int idx0, int idx1 ) {
+		if (isUseConcurrent(idx1 - idx0)) {
+			BoofConcurrency.loopBlocks(idx0, idx1, workspace, ( helper, block0, block1 ) -> {
 				helper.setImage(currPyr.basePyramid, currPyr.derivX, currPyr.derivY);
-				describe(idx0, idx1, tracker);
+				describe(block0, block1, tracker);
 			});
 		} else {
 			tracker.setImage(currPyr.basePyramid, currPyr.derivX, currPyr.derivY);
-			describe(0, tracks.size, tracker);
+			describe(idx0, idx1, tracker);
 		}
 	}
 
 	/// Returns true if it should use a concurrent algorithm
-	private boolean isUseConcurrent() {
-		return BoofConcurrency.isUseConcurrent() && tracks.size >= concurrentMinimumTracks;
+	private boolean isUseConcurrent( int count ) {
+		return BoofConcurrency.isUseConcurrent() && count >= concurrentMinimumTracks;
 	}
 
 	protected void describe( int idx0, int idx1, PyramidKltTracker<Image, Derivative> tracker ) {
@@ -284,26 +350,40 @@ public class EasyPyramidKlt<Image extends ImageGray<Image>, Derivative extends I
 			if (meta.status == KltTrackFault.SUCCESS)
 				continue;
 
-			removeFeatureFast(i);
+			removeSwap(i);
 		}
 		return sizeBefore - tracks.size;
 	}
 
-	/// Reactivates all tracks by setting their status to [KltTrackFault#SUCCESS]
-	public void clearFailedStatus() {
+	/// Reactivates all tracks by setting their status to [KltTrackFault#SUCCESS].
+	public void markAllSuccess() {
 		for (int i = tracks.size() - 1; i >= 0; i--) {
 			metadata.get(i).status = KltTrackFault.SUCCESS;
 		}
 	}
 
+	/// Counts how many tracks pass the test
+	///
+	/// @param op The test
+	public int count( TestTrack op ) {
+		int total = 0;
+		for (int i = 0; i < tracks.size; i++) {
+			PyramidKltFeature t = tracks.get(i);
+			TrackMeta meta = metadata.get(i);
+			if (op.process(meta, t))
+				total++;
+		}
+		return total;
+	}
+
 	/// Removes features using an O(1) operation that does not preserve order
-	public void removeFeatureFast( int index ) {
+	public void removeSwap( int index ) {
 		tracks.removeSwap(index);
 		metadata.removeSwap(index);
 	}
 
 	/// Removes features using an O(N) operations that preserves order
-	public void removeFeatureOrder( int index ) {
+	public void remove( int index ) {
 		tracks.remove(index);
 		metadata.remove(index);
 	}
@@ -316,12 +396,15 @@ public class EasyPyramidKlt<Image extends ImageGray<Image>, Derivative extends I
 
 	/// Metadata associated with a track
 	public static class TrackMeta {
+		/// Frame this track was originally created inside of
+		public long frameSpawned = -1;
 		/// Unique ID assigned to this track
 		public long id = -1;
 		/// If the track is still active and if not why
 		public KltTrackFault status = KltTrackFault.UNKNOWN;
 
 		public void reset() {
+			frameSpawned = -1;
 			id = -1;
 			status = KltTrackFault.UNKNOWN;
 		}
@@ -329,5 +412,9 @@ public class EasyPyramidKlt<Image extends ImageGray<Image>, Derivative extends I
 
 	@FunctionalInterface public interface ProcessTrack {
 		void process( int index, TrackMeta meta, PyramidKltFeature feature );
+	}
+
+	@FunctionalInterface public interface TestTrack {
+		boolean process( TrackMeta meta, PyramidKltFeature feature );
 	}
 }

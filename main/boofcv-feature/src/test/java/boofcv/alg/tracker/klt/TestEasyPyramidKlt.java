@@ -31,8 +31,6 @@ public class TestEasyPyramidKlt extends BoofStandardJUnit {
 	int width = 50;
 	int height = 60;
 
-	int featureRadius = 2;
-
 	GrayF32 image = new GrayF32(width, height);
 	ConfigEasyKlt config = new ConfigEasyKlt();
 	EasyPyramidKlt<GrayF32, GrayF32> tracker = createDefault();
@@ -55,13 +53,19 @@ public class TestEasyPyramidKlt extends BoofStandardJUnit {
 
 	@Test void allTogether() {
 		// Initialize from first track
+		assertEquals(0, tracker.getFrameID());
 		tracker.startFrame(image);
 		tracker.addTrack(cornerX, cornerY);
 		tracker.describe();
 		tracker.finishFrame();
 		assertEquals(1, tracker.tracks.size);
+		tracker.forEachTrack(( idx, meta, feature ) -> {
+			assertEquals(0, meta.frameSpawned);
+			assertEquals(0, meta.id);
+		});
 
 		// track it after moving the image
+		assertEquals(1, tracker.getFrameID());
 		tracker.startFrame(shiftFrame(1, 0));
 		tracker.track();
 		assertEquals(0, tracker.removeFailed());
@@ -69,12 +73,14 @@ public class TestEasyPyramidKlt extends BoofStandardJUnit {
 		tracker.finishFrame();
 		assertEquals(1, tracker.tracks.size);
 		tracker.forEachTrack(( idx, meta, feature ) -> {
+			assertEquals(0, meta.frameSpawned);
 			assertEquals(0, meta.id);
 			assertEquals(cornerX + 1, feature.x, 0.1);
 			assertEquals(cornerY, feature.y, 0.1);
 		});
 
 		// One more iteration
+		assertEquals(2, tracker.getFrameID());
 		tracker.startFrame(shiftFrame(1, 2));
 		tracker.track();
 		assertEquals(0, tracker.removeFailed());
@@ -82,6 +88,7 @@ public class TestEasyPyramidKlt extends BoofStandardJUnit {
 		tracker.finishFrame();
 		assertEquals(1, tracker.tracks.size);
 		tracker.forEachTrack(( idx, meta, feature ) -> {
+			assertEquals(0, meta.frameSpawned);
 			assertEquals(0, meta.id);
 			assertEquals(cornerX + 1, feature.x, 0.1);
 			assertEquals(cornerY + 2, feature.y, 0.1);
@@ -126,11 +133,11 @@ public class TestEasyPyramidKlt extends BoofStandardJUnit {
 		assertEquals(cornerY, tracker.tracks.get(0).y );
 	}
 
-	@Test void clearFailedStatus() {
+	@Test void markAllSuccess() {
 		tracker.startFrame(image);
 
 		// Shouldn't blow up if empty
-		tracker.clearFailedStatus();
+		tracker.markAllSuccess();
 
 		// Add tracks. Everything that's not SUCCESS gets cleared
 		for (int i = 0; i < 4; i++) {
@@ -138,18 +145,18 @@ public class TestEasyPyramidKlt extends BoofStandardJUnit {
 			tracker.metadata.getTail().status = KltTrackFault.FAILED;
 		}
 
-		tracker.clearFailedStatus();
+		tracker.markAllSuccess();
 		tracker.forEachTrack((id, meta, feature) -> {
 			assertEquals(KltTrackFault.SUCCESS, meta.status);
 		});
 	}
 
-	@Test void removeFeatureFast() {
+	@Test void removeSwap() {
 		tracker.startFrame(image);
 		for (int i = 0; i < 5; i++) {
 			tracker.addTrack(0, 0);
 		}
-		tracker.removeFeatureFast(2);
+		tracker.removeSwap(2);
 
 		// See if it has been removed, but don't check the order
 		assertEquals(4, tracker.tracks.size());
@@ -160,12 +167,12 @@ public class TestEasyPyramidKlt extends BoofStandardJUnit {
 
 	}
 
-	@Test void removeFeatureOrder() {
+	@Test void remove() {
 		tracker.startFrame(image);
 		for (int i = 0; i < 5; i++) {
 			tracker.addTrack(0, 0);
 		}
-		tracker.removeFeatureOrder(2);
+		tracker.remove(2);
 
 		// See if it has been removed, but don't check the order
 		assertEquals(4, tracker.tracks.size());
