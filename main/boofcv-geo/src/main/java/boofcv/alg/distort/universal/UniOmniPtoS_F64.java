@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,16 +25,14 @@ import georegression.geometry.GeometryMath_F64;
 import georegression.misc.GrlConstants;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
+import lombok.Getter;
+import lombok.Setter;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 
 import static boofcv.alg.distort.brown.RemoveBrownNtoN_F64.removeRadial;
 
-/**
- * Backwards project from a distorted 2D pixel to 3D unit sphere coordinate using the {@link CameraUniversalOmni} model.
- *
- * @author Peter Abeles
- */
+/// Backwards project from a distorted 2D pixel to 3D unit sphere coordinate using the [CameraUniversalOmni] model.
 public class UniOmniPtoS_F64 implements Point2Transform3_F64 {
 	double mirrorOffset;
 	protected RadialTangential_F64 distortion = new RadialTangential_F64();
@@ -42,7 +40,8 @@ public class UniOmniPtoS_F64 implements Point2Transform3_F64 {
 	// work space for internal calculations
 	private Point2D_F64 p2 = new Point2D_F64();
 
-	private double tol = GrlConstants.DCONV_TOL_A;
+	@Getter @Setter double tol = GrlConstants.DCONV_TOL_A;
+	@Getter @Setter private int maxIterations = 500;
 
 	// inverse of camera calibration matrix
 	protected DMatrixRMaj K_inv = new DMatrixRMaj(3, 3);
@@ -51,15 +50,12 @@ public class UniOmniPtoS_F64 implements Point2Transform3_F64 {
 		this.setModel(model);
 	}
 
-	public UniOmniPtoS_F64() {
-	}
+	public UniOmniPtoS_F64() {}
 
-	public double getTol() {
-		return tol;
-	}
-
-	public void setTol( double tol ) {
-		this.tol = tol;
+	public UniOmniPtoS_F64 fsetConverge( double ftol, int maxIterations ) {
+		this.tol = ftol;
+		this.maxIterations = maxIterations;
+		return this;
 	}
 
 	public void setModel( CameraUniversalOmni model ) {
@@ -86,7 +82,7 @@ public class UniOmniPtoS_F64 implements Point2Transform3_F64 {
 		GeometryMath_F64.mult(K_inv, p2, p2);
 
 		// find the undistorted normalized image coordinate
-		removeRadial(p2.x, p2.y, distortion.radial, distortion.t1, distortion.t2, p2, tol);
+		removeRadial(p2.x, p2.y, distortion.radial, distortion.t1, distortion.t2, p2, tol, maxIterations);
 
 		// put into unit sphere coordinates
 		double u = p2.x;
@@ -115,7 +111,7 @@ public class UniOmniPtoS_F64 implements Point2Transform3_F64 {
 
 	@Override
 	public Point2Transform3_F64 copyConcurrent() {
-		UniOmniPtoS_F64 c = new UniOmniPtoS_F64();
+		var c = new UniOmniPtoS_F64();
 		c.distortion = new RadialTangential_F64(this.distortion);
 		c.mirrorOffset = this.mirrorOffset;
 		c.K_inv.setTo(this.K_inv);

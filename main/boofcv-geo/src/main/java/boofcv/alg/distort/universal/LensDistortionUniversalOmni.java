@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,18 +19,19 @@
 package boofcv.alg.distort.universal;
 
 import boofcv.alg.distort.LensDistortionWideFOV;
+import boofcv.misc.ConfigConverge;
 import boofcv.struct.calib.CameraUniversalOmni;
 import boofcv.struct.distort.Point2Transform3_F32;
 import boofcv.struct.distort.Point2Transform3_F64;
 import boofcv.struct.distort.Point3Transform2_F32;
 import boofcv.struct.distort.Point3Transform2_F64;
+import org.jetbrains.annotations.Nullable;
 
-/**
- * Distortion for {@link CameraUniversalOmni}.
- *
- * @author Peter Abeles
- */
+/// Distortion for [CameraUniversalOmni].
 public class LensDistortionUniversalOmni implements LensDistortionWideFOV {
+	/// Unless specified by this user this will use the default value for each algorithm
+	@Nullable ConfigConverge converge = null;
+
 	CameraUniversalOmni model;
 
 	public LensDistortionUniversalOmni( CameraUniversalOmni model ) {
@@ -49,11 +50,21 @@ public class LensDistortionUniversalOmni implements LensDistortionWideFOV {
 
 	@Override
 	public Point2Transform3_F64 undistortPtoS_F64() {
-		return new UniOmniPtoS_F64(model);
+		var undistort = new UniOmniPtoS_F64(model);
+		if (converge == null)
+			return undistort;
+		return undistort.fsetConverge(converge.ftol, converge.maxIterations);
 	}
 
 	@Override
 	public Point2Transform3_F32 undistortPtoS_F32() {
-		return new UniOmniPtoS_F32(model);
+		var undistort = new UniOmniPtoS_F32(model);
+		if (converge == null)
+			return undistort;
+		return undistort.fsetConverge((float)converge.ftol, converge.maxIterations);
+	}
+
+	@Override public void setConvergence( ConfigConverge converge ) {
+		this.converge = new ConfigConverge().setTo(converge);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,6 +38,11 @@ public class AddDivisionNtoN_F64 implements Point2Transform2_F64 {
 	public int maxIterations = 500;
 
 	public AddDivisionNtoN_F64() {}
+
+	public void setConverge( double tol, int maxIterations ) {
+		this.tol = tol;
+		this.maxIterations = maxIterations;
+	}
 
 	public AddDivisionNtoN_F64 setRadial( double radial ) {
 		this.radial = radial;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,11 @@
 
 package boofcv.alg.distort.brown;
 
+import boofcv.misc.ConfigConverge;
 import boofcv.struct.distort.Point2Transform2_F64;
 import georegression.misc.GrlConstants;
 import georegression.struct.point.Point2D_F64;
+import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -30,20 +32,22 @@ import org.jetbrains.annotations.Nullable;
  */
 @SuppressWarnings({"NullAway.Init"})
 public class RemoveBrownNtoN_F64 implements Point2Transform2_F64 {
+	public static final int DEFAULT_ITERATIONS = 500;
 
 	// distortion parameters
 	protected RadialTangential_F64 params;
 
-	private double tol = GrlConstants.DCONV_TOL_A;
+	/// Convergence criterial. gtol is ignored.
+	@Getter protected ConfigConverge converge = new ConfigConverge(GrlConstants.DCONV_TOL_A, 0, DEFAULT_ITERATIONS);
 
 	public RemoveBrownNtoN_F64() {}
 
 	public RemoveBrownNtoN_F64( double tol ) {
-		this.tol = tol;
+		setConvergence(tol, DEFAULT_ITERATIONS);
 	}
 
-	public void setTolerance( double tol ) {
-		this.tol = tol;
+	public void setConvergence( /**/double ftol, int maxIterations ) {
+		converge.setTo(ftol, 0, maxIterations);
 	}
 
 	public RemoveBrownNtoN_F64 setDistortion( @Nullable /**/double[] radial, /**/double t1, /**/double t2 ) {
@@ -59,12 +63,12 @@ public class RemoveBrownNtoN_F64 implements Point2Transform2_F64 {
 	 * @param out Undistorted normalized coordinate.
 	 */
 	@Override public void compute( double x, double y, Point2D_F64 out ) {
-		removeRadial(x, y, params.radial, params.t1, params.t2, out, tol);
+		removeRadial(x, y, params.radial, params.t1, params.t2, out, (double)converge.ftol, converge.maxIterations);
 	}
 
 	@Override public RemoveBrownNtoN_F64 copyConcurrent() {
 		var ret = new RemoveBrownNtoN_F64();
-		ret.tol = tol;
+		ret.converge.setTo(converge);
 		ret.params = new RadialTangential_F64(this.params);
 		return ret;
 	}
@@ -79,15 +83,16 @@ public class RemoveBrownNtoN_F64 implements Point2Transform2_F64 {
 	 * @param t2 tangential distortion
 	 * @param out Undistorted normalized image coordinate
 	 * @param tol convergence tolerance
+	 * @param maxIterations The maximum number of iterations it will perform before stopping
 	 */
 	public static void removeRadial( double x, double y, double[] radial, double t1, double t2,
-									 Point2D_F64 out, double tol ) {
+									 Point2D_F64 out, final double tol, final int maxIterations ) {
 		double origX = x;
 		double origY = y;
 
 		double prevSum = 0;
 
-		for (int iter = 0; iter < 500; iter++) {
+		for (int iter = 0; iter < maxIterations; iter++) {
 
 			// estimate the radial distance
 			double r2 = x*x + y*y;

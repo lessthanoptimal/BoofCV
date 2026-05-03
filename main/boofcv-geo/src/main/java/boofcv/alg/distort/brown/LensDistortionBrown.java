@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,17 +23,17 @@ import boofcv.alg.distort.Transform2ThenPixel_F32;
 import boofcv.alg.distort.Transform2ThenPixel_F64;
 import boofcv.alg.distort.pinhole.PinholePtoN_F32;
 import boofcv.alg.distort.pinhole.PinholePtoN_F64;
+import boofcv.misc.ConfigConverge;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.distort.Point2Transform2_F64;
+import org.jetbrains.annotations.Nullable;
 
-/**
- * {@link CameraPinholeBrown Brown} lens distortion model point transforms.
- *
- * @author Peter Abeles
- */
+/// [`Brown`][CameraPinholeBrown] lens distortion model point transforms.
 public class LensDistortionBrown implements LensDistortionNarrowFOV {
 
+	/// Unless specified by this user this will use the default value for each algorithm
+	@Nullable ConfigConverge converge = null;
 	CameraPinholeBrown p;
 
 	public LensDistortionBrown( CameraPinholeBrown p ) {
@@ -61,8 +61,10 @@ public class LensDistortionBrown implements LensDistortionNarrowFOV {
 
 	@Override public Point2Transform2_F64 undistort_F64( boolean pixelIn, boolean pixelOut ) {
 		if (pixelIn) {
-			Point2Transform2_F64 p_to_n =
+			RemoveBrownPtoN_F64 p_to_n =
 					new RemoveBrownPtoN_F64().setK(p.fx, p.fy, p.skew, p.cx, p.cy).setDistortion(p.radial, p.t1, p.t2);
+			if (converge != null)
+				p_to_n.setConvergence(converge.ftol, converge.maxIterations);
 			if (pixelOut) {
 				return new Transform2ThenPixel_F64(p_to_n).set(p.fx, p.fy, p.skew, p.cx, p.cy);
 			} else {
@@ -70,6 +72,8 @@ public class LensDistortionBrown implements LensDistortionNarrowFOV {
 			}
 		} else {
 			RemoveBrownNtoN_F64 n_to_n = new RemoveBrownNtoN_F64().setDistortion(p.radial, p.t1, p.t2);
+			if (converge != null)
+				n_to_n.setConvergence(converge.ftol, converge.maxIterations);
 			if (pixelOut) {
 				return new Transform2ThenPixel_F64(n_to_n).set(p.fx, p.fy, p.skew, p.cx, p.cy);
 			} else {
@@ -99,8 +103,10 @@ public class LensDistortionBrown implements LensDistortionNarrowFOV {
 
 	@Override public Point2Transform2_F32 undistort_F32( boolean pixelIn, boolean pixelOut ) {
 		if (pixelIn) {
-			Point2Transform2_F32 p_to_n =
+			RemoveBrownPtoN_F32 p_to_n =
 					new RemoveBrownPtoN_F32().setK(p.fx, p.fy, p.skew, p.cx, p.cy).setDistortion(p.radial, p.t1, p.t2);
+			if (converge != null)
+				p_to_n.setConvergence(converge.ftol, converge.maxIterations);
 			if (pixelOut) {
 				return new Transform2ThenPixel_F32(p_to_n).set(p.fx, p.fy, p.skew, p.cx, p.cy);
 			} else {
@@ -108,6 +114,8 @@ public class LensDistortionBrown implements LensDistortionNarrowFOV {
 			}
 		} else {
 			RemoveBrownNtoN_F32 n_to_n = new RemoveBrownNtoN_F32().setDistortion(p.radial, p.t1, p.t2);
+			if (converge != null)
+				n_to_n.setConvergence(converge.ftol, converge.maxIterations);
 			if (pixelOut) {
 				return new Transform2ThenPixel_F32(n_to_n).set(p.fx, p.fy, p.skew, p.cx, p.cy);
 			} else {
@@ -124,6 +132,10 @@ public class LensDistortionBrown implements LensDistortionNarrowFOV {
 	@Override
 	public Point2Transform2_F64 normalized_F64() {
 		return new PinholePtoN_F64().setK(p.fx, p.fy, p.skew, p.cx, p.cy);
+	}
+
+	@Override public void setConvergence( ConfigConverge converge ) {
+		this.converge = new ConfigConverge().setTo(converge);
 	}
 
 	public CameraPinholeBrown getIntrinsic() {
