@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,18 +23,19 @@ import boofcv.alg.distort.pinhole.PinholeNtoP_F32;
 import boofcv.alg.distort.pinhole.PinholeNtoP_F64;
 import boofcv.alg.distort.pinhole.PinholePtoN_F32;
 import boofcv.alg.distort.pinhole.PinholePtoN_F64;
+import boofcv.misc.ConfigConverge;
 import boofcv.struct.calib.CameraDivision;
 import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.distort.SequencePoint2Transform2_F32;
 import boofcv.struct.distort.SequencePoint2Transform2_F64;
+import org.jetbrains.annotations.Nullable;
 
-/**
- * {@link CameraDivision Division} lens distortion model point transforms.
- *
- * @author Peter Abeles
- */
+/// [`Division`][CameraDivision] lens distortion model point transforms.
 public class LensDistortionDivision implements LensDistortionNarrowFOV {
+
+	/// Unless specified by this user this will use the default value for each algorithm
+	@Nullable ConfigConverge converge = null;
 
 	CameraDivision p;
 
@@ -42,9 +43,10 @@ public class LensDistortionDivision implements LensDistortionNarrowFOV {
 		this.p = p;
 	}
 
-	@Override
-	public Point2Transform2_F64 distort_F64( boolean pixelIn, boolean pixelOut ) {
-		Point2Transform2_F64 n_to_n = new AddDivisionNtoN_F64().setRadial(p.radial);
+	@Override public Point2Transform2_F64 distort_F64( boolean pixelIn, boolean pixelOut ) {
+		AddDivisionNtoN_F64 n_to_n = new AddDivisionNtoN_F64().setRadial(p.radial);
+		if (converge != null)
+			n_to_n.setConverge(converge.ftol, converge.maxIterations);
 		if (pixelIn) {
 			Point2Transform2_F64 p_to_n = new PinholePtoN_F64().setK(p.fx, p.fy, p.skew, p.cx, p.cy);
 			if (pixelOut) {
@@ -63,8 +65,7 @@ public class LensDistortionDivision implements LensDistortionNarrowFOV {
 		}
 	}
 
-	@Override
-	public Point2Transform2_F64 undistort_F64( boolean pixelIn, boolean pixelOut ) {
+	@Override public Point2Transform2_F64 undistort_F64( boolean pixelIn, boolean pixelOut ) {
 		Point2Transform2_F64 n_to_n = new RemoveDivisionNtoN_F64().setRadial(p.radial);
 		if (pixelIn) {
 			Point2Transform2_F64 p_to_n = new PinholePtoN_F64().setK(p.fx, p.fy, p.skew, p.cx, p.cy);
@@ -84,9 +85,11 @@ public class LensDistortionDivision implements LensDistortionNarrowFOV {
 		}
 	}
 
-	@Override
-	public Point2Transform2_F32 distort_F32( boolean pixelIn, boolean pixelOut ) {
-		Point2Transform2_F32 n_to_n = new AddDivisionNtoN_F32().setRadial((float)p.radial);
+	@Override public Point2Transform2_F32 distort_F32( boolean pixelIn, boolean pixelOut ) {
+		AddDivisionNtoN_F32 n_to_n = new AddDivisionNtoN_F32().setRadial((float)p.radial);
+		if (converge != null)
+			n_to_n.setConverge((float)converge.ftol, converge.maxIterations);
+
 		if (pixelIn) {
 			Point2Transform2_F32 p_to_n = new PinholePtoN_F32().setK(p.fx, p.fy, p.skew, p.cx, p.cy);
 			if (pixelOut) {
@@ -105,8 +108,7 @@ public class LensDistortionDivision implements LensDistortionNarrowFOV {
 		}
 	}
 
-	@Override
-	public Point2Transform2_F32 undistort_F32( boolean pixelIn, boolean pixelOut ) {
+	@Override public Point2Transform2_F32 undistort_F32( boolean pixelIn, boolean pixelOut ) {
 		Point2Transform2_F32 n_to_n = new RemoveDivisionNtoN_F32().setRadial((float)p.radial);
 		if (pixelIn) {
 			Point2Transform2_F32 p_to_n = new PinholePtoN_F32().setK(p.fx, p.fy, p.skew, p.cx, p.cy);
@@ -126,17 +128,19 @@ public class LensDistortionDivision implements LensDistortionNarrowFOV {
 		}
 	}
 
-	@Override
-	public Point2Transform2_F32 normalized_F32() {
+	@Override public Point2Transform2_F32 normalized_F32() {
 		return new PinholePtoN_F32().setK(p.fx, p.fy, p.skew, p.cx, p.cy);
 	}
 
-	@Override
-	public Point2Transform2_F64 normalized_F64() {
+	@Override public Point2Transform2_F64 normalized_F64() {
 		return new PinholePtoN_F64().setK(p.fx, p.fy, p.skew, p.cx, p.cy);
 	}
 
 	public CameraDivision getIntrinsic() {
 		return p;
+	}
+
+	@Override public void setConvergence( ConfigConverge converge ) {
+		this.converge = new ConfigConverge().setTo(converge);
 	}
 }

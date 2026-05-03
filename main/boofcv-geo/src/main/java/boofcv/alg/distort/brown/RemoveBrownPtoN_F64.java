@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,12 +18,15 @@
 
 package boofcv.alg.distort.brown;
 
+import boofcv.misc.ConfigConverge;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F64;
 import georegression.misc.GrlConstants;
 import georegression.struct.point.Point2D_F64;
+import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 
+import static boofcv.alg.distort.brown.RemoveBrownNtoN_F64.DEFAULT_ITERATIONS;
 import static boofcv.alg.distort.brown.RemoveBrownNtoN_F64.removeRadial;
 
 /**
@@ -46,18 +49,18 @@ public class RemoveBrownPtoN_F64 implements Point2Transform2_F64 {
 	// These are the upper triangular elements in a 3x3 matrix
 	private double a11, a12, a13, a22, a23;
 
-	private double tol = GrlConstants.DCONV_TOL_A;
+	/// Convergence criterial. gtol is ignored.
+	@Getter protected ConfigConverge converge = new ConfigConverge(GrlConstants.DCONV_TOL_A, 0, DEFAULT_ITERATIONS);
 
 	public RemoveBrownPtoN_F64() {}
 
-	public RemoveBrownPtoN_F64( double tol ) {
-		this.tol = tol;
+	public RemoveBrownPtoN_F64( /**/double tol ) {
+		setConvergence(tol, DEFAULT_ITERATIONS);
 	}
 
-	public void setTolerance( double tol ) {
-		this.tol = tol;
+	public void setConvergence( /**/double ftol, int maxIterations ) {
+		converge.setTo(ftol, 0, maxIterations);
 	}
-
 	/**
 	 * Specify camera calibration parameters
 	 *
@@ -65,7 +68,7 @@ public class RemoveBrownPtoN_F64 implements Point2Transform2_F64 {
 	 * @param fy Focal length y-axis in pixels
 	 * @param skew skew in pixels
 	 * @param cx camera center x-axis in pixels
-	 * @param cy center center y-axis in pixels
+	 * @param cy camera center y-axis in pixels
 	 */
 	public RemoveBrownPtoN_F64 setK( /**/double fx, /**/double fy, /**/double skew, /**/double cx, /**/double cy ) {
 		this.fx = (double)fx;
@@ -120,11 +123,11 @@ public class RemoveBrownPtoN_F64 implements Point2Transform2_F64 {
 		out.x = a11*x + a12*y + a13;
 		out.y = a22*y + a23;
 
-		removeRadial(out.x, out.y, params.radial, params.t1, params.t2, out, tol);
+		removeRadial(out.x, out.y, params.radial, params.t1, params.t2, out, (double)converge.ftol, converge.maxIterations);
 	}
 
 	@Override public RemoveBrownPtoN_F64 copyConcurrent() {
-		var ret = new RemoveBrownPtoN_F64(tol);
+		var ret = new RemoveBrownPtoN_F64();
 		ret.fx = fx; // don't use set since it recomputes it. inputs would be floats not double, so diff solution
 		ret.fy = fy;
 		ret.skew = skew;
@@ -136,6 +139,7 @@ public class RemoveBrownPtoN_F64 implements Point2Transform2_F64 {
 		ret.a22 = a22;
 		ret.a23 = a23;
 		ret.params = new RadialTangential_F64(params);
+		ret.converge.setTo(this.converge);
 		return ret;
 	}
 

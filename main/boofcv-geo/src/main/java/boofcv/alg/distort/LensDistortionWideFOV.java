@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,62 +18,46 @@
 
 package boofcv.alg.distort;
 
+import boofcv.misc.ConfigConverge;
 import boofcv.struct.distort.Point2Transform3_F32;
 import boofcv.struct.distort.Point2Transform3_F64;
 import boofcv.struct.distort.Point3Transform2_F32;
 import boofcv.struct.distort.Point3Transform2_F64;
 
-/**
- * Interface for creating transform between distorted and undistorted pixel/unit sphere
- * coordinates for camera models that supports FOV more than 180 degrees. In this situation
- * the entire undistorted image can't be rendered onto a flat plane. Thus there are no functions
- * for working in undistorted pixels.
- *
- * @author Peter Abeles
- */
+/// Interface for creating transform between distorted and undistorted pixel/unit sphere
+/// coordinates for camera models that supports FOV more than 180 degrees. In this situation
+/// the entire undistorted image can't be rendered onto a flat plane. Thus, there are no functions
+/// for working in undistorted pixels.
 public interface LensDistortionWideFOV {
 
-	/**
-	 * Applies lens distortion.
-	 * <pre>
-	 * (Input) Undistorted unit sphere coordinate
-	 * (Output) Distorted pixel coordinates
-	 * </pre>
-	 *
-	 * @return Transform
-	 */
+	/// Applies lens distortion.
+	/// <pre>
+	/// (Input) Undistorted unit sphere coordinate
+	/// (Output) Distorted pixel coordinates
+	/// </pre>
 	Point3Transform2_F64 distortStoP_F64();
 
-	/**
-	 * Applies lens distortion.
-	 * <pre>
-	 * (Input) Undistorted unit sphere coordinate
-	 * (Output) Distorted pixel coordinates
-	 * </pre>
-	 *
-	 * @return Transform
-	 */
+	/// Applies lens distortion.
+	/// <pre>
+	/// (Input) Undistorted unit sphere coordinate
+	/// (Output) Distorted pixel coordinates
+	/// </pre>
 	Point3Transform2_F32 distortStoP_F32();
 
-	/**
-	 * Removes lens distortion.
-	 * <pre>
-	 * (Input) Distorted pixel coordinate
-	 * (Output) Undistorted unit sphere coordinates
-	 * </pre>
-	 *
-	 * @return Transform
-	 */
+	/// Removes lens distortion.
+	/// <pre>
+	/// (Input) Distorted pixel coordinate
+	/// (Output) Undistorted unit sphere coordinates
+	/// </pre>
 	Point2Transform3_F64 undistortPtoS_F64();
 
-	/**
-	 * Removes lens distortion.
-	 * <pre>
-	 * (Input) Distorted pixel coordinate
-	 * (Output) Undistorted unit sphere coordinates
-	 * </pre>
-	 *
-	 * @return Transform
-	 */
+	/// Removes lens distortion.
+	/// <pre>
+	/// (Input) Distorted pixel coordinate
+	/// (Output) Undistorted unit sphere coordinates
+	/// </pre>
 	Point2Transform3_F32 undistortPtoS_F32();
+
+	/// If an iterative approach is used, this specifies the convergence criteria
+	default void setConvergence( ConfigConverge converge ) {}
 }

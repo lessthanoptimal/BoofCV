@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,7 +46,7 @@ public class AddBrownPtoN_F64 implements Point2Transform2_F64 {
 	 * @param fy Focal length y-axis in pixels
 	 * @param skew skew in pixels
 	 * @param cx camera center x-axis in pixels
-	 * @param cy center center y-axis in pixels
+	 * @param cy camera center y-axis in pixels
 	 */
 	public AddBrownPtoN_F64 setK( /**/double fx, /**/double fy, /**/double skew, /**/double cx, /**/double cy ) {
 
