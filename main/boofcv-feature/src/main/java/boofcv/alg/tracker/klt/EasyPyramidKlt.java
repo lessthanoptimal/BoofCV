@@ -59,12 +59,15 @@ import pabeles.concurrency.GrowArray;
 @SuppressWarnings({"NullAway.Init"})
 public class EasyPyramidKlt<Image extends ImageGray<Image>, Derivative extends ImageGray<Derivative>> {
 
+	/// If true it will check feature's center has tracked outside the image and mark it as failed
+	@Getter @Setter protected boolean filterOutOfBounds = true;
+
 	/// Pyramidal tracker that this is a wrapper around
 	@Getter @Setter protected PyramidKltTracker<Image, Derivative> tracker;
 
 	/// Gradient pyramids
 	@Getter protected PyramidGradient<Image, Derivative> currPyr;
-	protected PyramidGradient<Image, Derivative> prevPyr;
+	@Getter protected PyramidGradient<Image, Derivative> prevPyr;
 
 	/// size of the template/feature description
 	@Getter @Setter protected int templateRadius = 7;
@@ -124,7 +127,8 @@ public class EasyPyramidKlt<Image extends ImageGray<Image>, Derivative extends I
 	/// Clears all tracks
 	public void reset() {
 		nextTrackID = 0;
-		tracks.reset();
+		if (tracks != null)
+			tracks.reset();
 		metadata.reset();
 	}
 
@@ -226,6 +230,12 @@ public class EasyPyramidKlt<Image extends ImageGray<Image>, Derivative extends I
 				continue;
 
 			meta.status = tracker.track(t);
+
+			// Because of the pyramid structure and features are allowed to be partially outside it's possible
+			// for the center to go all the way out, which is often a bad thing.
+			if (filterOutOfBounds && !BoofMiscOps.isInside(imageWidth, imageHeight, t.x, t.y)) {
+				meta.status = KltTrackFault.OUT_OF_BOUNDS;
+			}
 		}
 	}
 
@@ -233,6 +243,8 @@ public class EasyPyramidKlt<Image extends ImageGray<Image>, Derivative extends I
 	public KltTrackFault track( int index ) {
 		if (index < 0 || index >= tracks.size)
 			throw new IndexOutOfBoundsException("index=" + index + " size=" + tracks.size);
+
+		tracker.setImage(currPyr.basePyramid, currPyr.derivX, currPyr.derivY);
 		PyramidKltFeature t = tracks.get(index);
 		TrackMeta meta = metadata.get(index);
 
@@ -281,11 +293,7 @@ public class EasyPyramidKlt<Image extends ImageGray<Image>, Derivative extends I
 			float locY = t.y;
 			if (tracker.track(t) != KltTrackFault.SUCCESS) {
 				meta.status = KltTrackFault.BACKWARDS;
-			}
-
-			// See if it moved too much
-			float distanceSq = UtilPoint2D_F32.distanceSq(locX, locY, t.x, t.y);
-			if (distanceSq > thresholdSq) {
+			} else if (UtilPoint2D_F32.distanceSq(locX, locY, t.x, t.y) > thresholdSq) {
 				meta.status = KltTrackFault.BACKWARDS;
 			}
 
