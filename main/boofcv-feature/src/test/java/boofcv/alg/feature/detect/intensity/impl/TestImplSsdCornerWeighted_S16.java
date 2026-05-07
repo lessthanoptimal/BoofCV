@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,18 +36,18 @@ class TestImplSsdCornerWeighted_S16 extends BoofStandardJUnit {
 	int width = 40;
 	int height = 50;
 
-	int radius=4;
+	int radius = 4;
 
-	Kernel1D_S32 weights = FactoryKernelGaussian.gaussian1D(GrayS16.class,-1,radius);
+	Kernel1D_S32 weights = FactoryKernelGaussian.gaussian1D(GrayS16.class, -1, radius);
 
-	GrayU8 input = new GrayU8(width,height);
+	GrayU8 input = new GrayU8(width, height);
 
-	GrayS16 derivX = new GrayS16(width,height);
-	GrayS16 derivY = new GrayS16(width,height);
+	GrayS16 derivX = new GrayS16(width, height);
+	GrayS16 derivY = new GrayS16(width, height);
 
-	GrayS32 derivXX = new GrayS32(width,height);
-	GrayS32 derivXY = new GrayS32(width,height);
-	GrayS32 derivYY = new GrayS32(width,height);
+	GrayS32 derivXX = new GrayS32(width, height);
+	GrayS32 derivXY = new GrayS32(width, height);
+	GrayS32 derivYY = new GrayS32(width, height);
 
 	/**
 	 * Manually compute intensity values and see if they are the same
@@ -64,9 +64,9 @@ class TestImplSsdCornerWeighted_S16 extends BoofStandardJUnit {
 				int x = derivX.get(j, i);
 				int y = derivY.get(j, i);
 
-				derivXX.set(j, i, x * x);
-				derivXY.set(j, i, x * y);
-				derivYY.set(j, i, y * y);
+				derivXX.set(j, i, x*x);
+				derivXY.set(j, i, x*y);
+				derivYY.set(j, i, y*y);
 			}
 		}
 
@@ -87,19 +87,19 @@ class TestImplSsdCornerWeighted_S16 extends BoofStandardJUnit {
 		}
 	}
 
-	public int sum( int x , int y , GrayS32 img ) {
+	public int sum( int x, int y, GrayS32 img ) {
 		int ret = 0;
 		int totalWeight = 0;
 
-		for( int i = -radius; i <= radius; i++ ) {
+		for (int i = -radius; i <= radius; i++) {
 			int hsum = 0;
 			int wsum = 0;
-			for( int j = -radius; j <= radius; j++ ) {
-				int w = weights.get(j+radius);
-				hsum += img.get(j+x,i+y)*w;
+			for (int j = -radius; j <= radius; j++) {
+				int w = weights.get(j + radius);
+				hsum += img.get(j + x, i + y)*w;
 				wsum += w;
 			}
-			int w = weights.get(i+radius);
+			int w = weights.get(i + radius);
 			ret += w*hsum/wsum;
 			totalWeight += w;
 		}
@@ -107,11 +107,11 @@ class TestImplSsdCornerWeighted_S16 extends BoofStandardJUnit {
 		return ret/totalWeight;
 	}
 
-	private class MockSum implements ImplSsdCornerBase.CornerIntensity_S32
-	{
-		@Override
-		public float compute(int totalXX, int totalXY, int totalYY) {
+	private class MockSum implements ImplSsdCornerBase.CornerIntensity_S32 {
+		@Override public float compute( int totalXX, int totalXY, int totalYY ) {
 			return totalXX + totalXY + totalYY;
 		}
+
+		@Override public float thresholdScaleByDerivative( int divisor ) {return 1.0f;}
 	}
 }

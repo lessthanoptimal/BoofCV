@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,8 +38,8 @@ public class TestGradientThree_Standard extends BoofStandardJUnit {
 		validator.setTarget(GradientThree_Standard.class.getMethod("process",
 				GrayU8.class, GrayS16.class, GrayS16.class ));
 
-		validator.setKernel(0, GradientThree.kernelDeriv_I32,true);
-		validator.setKernel(1, GradientThree.kernelDeriv_I32,false);
+		validator.setKernel(0, GradientThree.kernel_I32,true);
+		validator.setKernel(1, GradientThree.kernel_I32,false);
 
 		GrayU8 input = new GrayU8(width,height);
 		ImageMiscOps.fillUniform(input, rand, 0, 10);
@@ -54,8 +54,8 @@ public class TestGradientThree_Standard extends BoofStandardJUnit {
 		validator.setTarget(GradientThree_Standard.class.getMethod("process",
 				GrayU8.class, GrayS32.class, GrayS32.class ));
 
-		validator.setKernel(0, GradientThree.kernelDeriv_I32,true);
-		validator.setKernel(1, GradientThree.kernelDeriv_I32,false);
+		validator.setKernel(0, GradientThree.kernel_I32,true);
+		validator.setKernel(1, GradientThree.kernel_I32,false);
 
 		GrayU8 input = new GrayU8(width,height);
 		ImageMiscOps.fillUniform(input, rand, 0, 10);
@@ -70,8 +70,8 @@ public class TestGradientThree_Standard extends BoofStandardJUnit {
 		validator.setTarget(GradientThree_Standard.class.getMethod("process",
 				GrayF32.class, GrayF32.class, GrayF32.class ));
 
-		validator.setKernel(0, GradientThree.kernelDeriv_F32,true);
-		validator.setKernel(1, GradientThree.kernelDeriv_F32,false);
+		validator.setKernel(0, GradientThree.kernel_F32,true);
+		validator.setKernel(1, GradientThree.kernel_F32,false);
 
 		GrayF32 input = new GrayF32(width,height);
 		ImageMiscOps.fillUniform(input, rand, 0, 10);

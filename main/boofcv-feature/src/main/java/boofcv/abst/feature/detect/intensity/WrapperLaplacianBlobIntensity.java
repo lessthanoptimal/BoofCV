@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,6 +52,11 @@ public class WrapperLaplacianBlobIntensity<I extends ImageGray<I>, D extends Ima
 		} else {
 			throw new IllegalArgumentException("Unsupported input image type");
 		}
+	}
+
+	/// Takes an image in not the derivative so it shouldn't apply
+	@Override public float thresholdScaleByDerivative( int divisor ) {
+		return 1;
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,11 +43,14 @@ public class PyramidKltForHybrid<I extends ImageGray<I>, D extends ImageGray<D>>
 	// the tracker
 	protected PyramidKltTracker<I, D> tracker;
 
+	int derivDivisor;
+
 	public PyramidKltForHybrid( ConfigKlt config,
 								int featureRadius,
-								Class<I> inputType, Class<D> derivType ) {
+								Class<I> inputType, Class<D> derivType, int derivDivisor ) {
 		this.config = config;
 		this.featureRadius = featureRadius;
+		this.derivDivisor = derivDivisor;
 
 		InterpolateRectangle<I> interpInput = FactoryInterpolation.bilinearRectangle(inputType);
 		InterpolateRectangle<D> interpDeriv = FactoryInterpolation.bilinearRectangle(derivType);
@@ -68,7 +71,7 @@ public class PyramidKltForHybrid<I extends ImageGray<I>, D extends ImageGray<D>>
 			this.numLevels = image.getNumLayers();
 		else if (numLevels != image.getNumLayers())
 			throw new IllegalArgumentException("Number of levels pyramid changed!");
-		tracker.setImage(image, derivX, derivY);
+		tracker.setImage(image, derivX, derivY, derivDivisor);
 	}
 
 	/**

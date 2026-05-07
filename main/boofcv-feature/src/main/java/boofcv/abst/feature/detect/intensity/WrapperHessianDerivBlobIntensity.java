@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.struct.ListIntPoint2D;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
@@ -39,16 +40,20 @@ public class WrapperHessianDerivBlobIntensity<I extends ImageGray<I>, D extends 
 	Method m;
 	boolean minimum;
 
+	DerivativeScale opScale;
+
 	public WrapperHessianDerivBlobIntensity( HessianBlobIntensity.Type type, Class<D> derivType ) {
 		super(null, derivType);
 		this.type = type;
 		try {
 			switch (type) {
 				case DETERMINANT -> {
+					opScale = HessianBlobIntensity::determinantDerivativeScale;
 					minimum = true;
 					m = HessianBlobIntensity.class.getMethod("determinant", GrayF32.class, derivType, derivType, derivType);
 				}
 				case TRACE -> {
+					opScale = HessianBlobIntensity::traceScale;
 					minimum = true;
 					m = HessianBlobIntensity.class.getMethod("trace", GrayF32.class, derivType, derivType);
 				}
@@ -57,11 +62,15 @@ public class WrapperHessianDerivBlobIntensity<I extends ImageGray<I>, D extends 
 		} catch (NoSuchMethodException e) {
 			throw new RuntimeException(e);
 		}
+
+		if (!ImageType.single(derivType).getDataType().isInteger()) {
+			opScale = (divisor)-> 1;
+		}
 	}
 
 	@Override
 	public void process( I image, @Nullable D derivX, @Nullable D derivY,
-						 @Nullable D derivXX, @Nullable D derivYY, @Nullable D derivXY ) {
+	                     @Nullable D derivXX, @Nullable D derivYY, @Nullable D derivXY ) {
 		init(image.width, image.height);
 
 		try {
@@ -72,6 +81,11 @@ public class WrapperHessianDerivBlobIntensity<I extends ImageGray<I>, D extends 
 		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	/// TODO return the correct scale
+	@Override public float thresholdScaleByDerivative( int divisor ) {
+		return opScale.scale(divisor);
 	}
 
 	@Override
@@ -115,5 +129,9 @@ public class WrapperHessianDerivBlobIntensity<I extends ImageGray<I>, D extends 
 	@Override
 	public boolean localMaximums() {
 		return true;
+	}
+
+	@FunctionalInterface interface DerivativeScale {
+		float scale( int divisor );
 	}
 }

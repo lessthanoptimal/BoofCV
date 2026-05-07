@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,7 @@ import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -38,8 +39,8 @@ import java.util.Objects;
 @SuppressWarnings({"NullAway.Init"})
 public class EasyGeneralFeatureDetector<T extends ImageGray<T>, D extends ImageGray<D>> {
 
-	// Feature detector
-	protected GeneralFeatureDetector<T, D> detector;
+	/// Feature detector
+	protected @Getter GeneralFeatureDetector<T, D> detector;
 	// Computes image gradient
 	protected @Nullable ImageGradient<T, D> gradient;
 	// computes hessian
@@ -60,6 +61,7 @@ public class EasyGeneralFeatureDetector<T extends ImageGray<T>, D extends ImageG
 	 * @param derivType If null then the derivative will be selected using the image type.
 	 */
 	public EasyGeneralFeatureDetector( GeneralFeatureDetector<T, D> detector,
+									   @Nullable ImageGradient<T,D> gradient,
 									   @Nullable Class<T> imageType, @Nullable Class<D> derivType ) {
 		this.detector = detector;
 
@@ -77,11 +79,12 @@ public class EasyGeneralFeatureDetector<T extends ImageGray<T>, D extends ImageG
 		}
 
 		if (detector.getRequiresGradient() || detector.getRequiresHessian()) {
-			Class<T> im = Objects.requireNonNull(imageType, "Must specify image type since detector doesn't");
-			gradient = FactoryDerivative.sobel(im, derivType);
+			Objects.requireNonNull(gradient);
+			this.gradient = gradient;
 		}
 		if (detector.getRequiresHessian()) {
-			hessian = FactoryDerivative.hessianSobel(derivType);
+			Objects.requireNonNull(gradient);
+			hessian = FactoryDerivative.hessian(gradient.getClass(), derivType);
 		}
 		declareDerivativeImages(gradient, hessian, derivType);
 	}
@@ -149,10 +152,6 @@ public class EasyGeneralFeatureDetector<T extends ImageGray<T>, D extends ImageG
 			derivYY.reshape(input.width, input.height);
 			derivXY.reshape(input.width, input.height);
 		}
-	}
-
-	public GeneralFeatureDetector<T, D> getDetector() {
-		return detector;
 	}
 
 	public QueueCorner getMaximums() {

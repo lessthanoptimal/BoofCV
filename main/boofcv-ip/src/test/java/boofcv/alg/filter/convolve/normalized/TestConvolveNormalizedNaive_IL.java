@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,7 +40,7 @@ public class TestConvolveNormalizedNaive_IL extends BoofStandardJUnit {
 	 * Check it against one specific type to see if the core algorithm is correct
 	 */
 	@Test void horizontal() {
-		Kernel1D_S32 kernel = new Kernel1D_S32(new int[]{1, 2, 3, 4, 5, 6}, 6, 4);
+		Kernel1D_S32 kernel = new Kernel1D_S32(6, 4, new int[]{1, 2, 3, 4, 5, 6});
 
 		InterleavedU8 input = new InterleavedU8(width, height, numBands);
 		ImageMiscOps.fillUniform(input, rand, 0, 50);
@@ -80,7 +80,7 @@ public class TestConvolveNormalizedNaive_IL extends BoofStandardJUnit {
 	 * Check it against one specific type to see if the core algorithm is correct
 	 */
 	@Test void vertical() {
-		Kernel1D_S32 kernel = new Kernel1D_S32(new int[]{1, 2, 3, 4, 5, 6}, 6, 4);
+		Kernel1D_S32 kernel = new Kernel1D_S32(6, 4, new int[]{1, 2, 3, 4, 5, 6});
 
 		InterleavedU8 input = new InterleavedU8(width, height, numBands);
 		ImageMiscOps.fillUniform(input, rand, 0, 50);
@@ -120,8 +120,8 @@ public class TestConvolveNormalizedNaive_IL extends BoofStandardJUnit {
 	 * Check it against one specific type to see if the core algorithm is correct
 	 */
 	@Test void vertical2_U16_U8() {
-		Kernel1D_S32 kernelY = new Kernel1D_S32(new int[]{1, 2, 3, 4, 5, 6}, 6, 4);
-		Kernel1D_S32 kernelX = new Kernel1D_S32(new int[]{4, 2, 1, 4, 3, 6}, 5, 2);
+		Kernel1D_S32 kernelY = new Kernel1D_S32(6, 4, new int[]{1, 2, 3, 4, 5, 6});
+		Kernel1D_S32 kernelX = new Kernel1D_S32(5, 2, new int[]{4, 2, 1, 4, 3, 6});
 
 		InterleavedU16 input = new InterleavedU16(width, height, numBands);
 		ImageMiscOps.fillUniform(input, rand, 0, 80);

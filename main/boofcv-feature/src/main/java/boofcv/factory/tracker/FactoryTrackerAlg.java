@@ -132,7 +132,7 @@ public class FactoryTrackerAlg {
 	                                            @Nullable ConfigPKlt kltConfig,
 	                                            @Nullable ConfigTrackerHybrid configHybrid,
 	                                            Class<I> imageType,
-	                                            @Nullable Class<D> derivType ) {
+	                                            @Nullable Class<D> derivType, int derivDivisor ) {
 		if (configHybrid == null)
 			configHybrid = new ConfigTrackerHybrid();
 		if (kltConfig == null)
@@ -141,7 +141,7 @@ public class FactoryTrackerAlg {
 			derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
 		PyramidKltForHybrid<I, D> klt = new PyramidKltForHybrid<>(kltConfig.config,
-				kltConfig.templateRadius, imageType, derivType);
+				kltConfig.templateRadius, imageType, derivType, derivDivisor);
 
 		var tracker = new HybridTrackerScalePoint<>(klt, detector, associate, tooCloseRadius);
 		tracker.maxInactiveTracks = configHybrid.maxInactiveTracks;

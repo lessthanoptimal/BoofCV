@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -59,7 +59,7 @@ public class DenseOpticalFlowKlt<I extends ImageGray<I>, D extends ImageGray<D>>
 		this.regionRadius = radius;
 	}
 
-	public void process( ImagePyramid<I> prev, D[] prevDerivX, D[] prevDerivY,
+	public void process( ImagePyramid<I> prev, D[] prevDerivX, D[] prevDerivY, int derivDivisor,
 						 ImagePyramid<I> curr, ImageFlow output ) {
 
 		if (feature == null)
@@ -81,7 +81,7 @@ public class DenseOpticalFlowKlt<I extends ImageGray<I>, D extends ImageGray<D>>
 		for (int y = 0; y < output.height; y++) {
 			for (int x = 0; x < output.width; x++) {
 
-				tracker.setImage(prev, prevDerivX, prevDerivY);
+				tracker.setImage(prev, prevDerivX, prevDerivY, derivDivisor);
 				feature.setPosition(x, y);
 
 				if (tracker.setDescription(feature)) {

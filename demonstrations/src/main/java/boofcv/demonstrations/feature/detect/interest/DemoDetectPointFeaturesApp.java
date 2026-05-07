@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,12 +19,15 @@
 package boofcv.demonstrations.feature.detect.interest;
 
 import boofcv.abst.feature.detect.interest.*;
+import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
+import boofcv.alg.filter.derivative.DerivativeType;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.demonstrations.shapes.ShapeVisualizePanel;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
+import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.StandardAlgConfigPanel;
@@ -67,6 +70,8 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 	VisualizePanel imagePanel = new VisualizePanel();
 	ControlPanel controls = new ControlPanel();
 
+	ImageGradient<T, ?> gradient;
+
 	InterestPointDetector<T> detector;
 	boolean detectorChanged = true;
 
@@ -82,6 +87,8 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 		super(true, true, exampleInputs, ImageType.single(imageClass));
 		this.imageClass = imageClass;
 		this.derivClass = GImageDerivativeOps.getDerivativeType(imageClass);
+
+		gradient = FactoryDerivative.gradientSB(DerivativeType.SOBEL, imageClass, derivClass);
 
 		imagePanel.setPreferredSize(new Dimension(800, 800));
 
@@ -297,14 +304,14 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 		controls.configExtract.detectMinimums = false;
 		controls.adjustControls(true, false);
 		changeDetector(FactoryDetectPoint.createHarris(controls.configExtract,
-				new ConfigHarrisCorner(controls.weighted, controls.configExtract.radius), derivClass));
+				new ConfigHarrisCorner(controls.weighted, controls.configExtract.radius), derivClass, gradient.divisor()));
 	}
 
 	private void createShiTomasi() {
 		controls.configExtract.detectMinimums = false;
 		controls.adjustControls(true, false);
 		changeDetector(FactoryDetectPoint.createShiTomasi(controls.configExtract,
-				new ConfigShiTomasi(controls.weighted, controls.configExtract.radius), derivClass));
+				new ConfigShiTomasi(controls.weighted, controls.configExtract.radius), derivClass, gradient.divisor()));
 	}
 
 	private void createFastIntensity() {
@@ -326,7 +333,7 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 	private void createKitRos() {
 		controls.configExtract.detectMinimums = false;
 		controls.adjustControls(false, false);
-		changeDetector(FactoryDetectPoint.createKitRos(controls.configExtract, derivClass));
+		changeDetector(FactoryDetectPoint.createKitRos(controls.configExtract, derivClass, 1));
 	}
 
 	private void createMedian() {
@@ -350,7 +357,7 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 	}
 
 	private void changeDetector( GeneralFeatureDetector fd ) {
-		detector = new GeneralToInterestPoint(fd, -1, imageClass, derivClass);
+		detector = new GeneralToInterestPoint(fd, gradient, -1, imageClass, derivClass);
 	}
 
 	public static void main( String[] args ) {

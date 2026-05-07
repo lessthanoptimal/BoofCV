@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -191,6 +191,10 @@ public class ImplSsdCorner_F32 extends ImplSsdCornerBox<GrayF32, GrayF32> {
 			}
 		}
 		//CONCURRENT_INLINE });
+	}
+
+	@Override public float thresholdScaleByDerivative( int divisor ) {
+		return 1.0f;
 	}
 
 	private static class WorkSpace {

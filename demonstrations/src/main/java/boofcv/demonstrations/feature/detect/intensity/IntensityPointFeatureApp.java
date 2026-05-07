@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -266,18 +266,18 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 
 				case "Harris":
 					detector = FactoryDetectPoint.createHarris(config,
-							new ConfigHarrisCorner(controlPanel.weighted, controlPanel.radiusCorner), derivType);
+							new ConfigHarrisCorner(controlPanel.weighted, controlPanel.radiusCorner), derivType, deriv.getEdgeDivisor());
 					break;
 				case "Shi Tomasi":
 					detector = FactoryDetectPoint.createShiTomasi(config,
-							new ConfigShiTomasi(controlPanel.weighted, controlPanel.radiusCorner), derivType);
+							new ConfigShiTomasi(controlPanel.weighted, controlPanel.radiusCorner), derivType, deriv.getEdgeDivisor());
 					break;
 				case "FAST":
 					config.detectMinimums = true;
 					detector = FactoryDetectPoint.createFast(config, null, imageType);
 					break;
 				case "KitRos":
-					detector = FactoryDetectPoint.createKitRos(config, derivType);
+					detector = FactoryDetectPoint.createKitRos(config, derivType, deriv.getEdgeDivisor());
 					break;
 				case "Median":
 					detector = FactoryDetectPoint.createMedian(config, imageType);

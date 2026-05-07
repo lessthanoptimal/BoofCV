@@ -56,7 +56,7 @@ public class FactoryInterestPoint {
 
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
 	InterestPointDetector<T> generic( ConfigDetectInterestPoint config,
-									  Class<T> inputType, @Nullable Class<D> derivType ) {
+									  Class<T> inputType, @Nullable Class<D> derivType, int derivDivisor ) {
 		switch (config.type) {
 			case FAST_HESSIAN -> {
 				return FactoryInterestPoint.fastHessian(config.fastHessian, inputType);
@@ -67,7 +67,7 @@ public class FactoryInterestPoint {
 			case POINT -> {
 				if (derivType == null)
 					derivType = GImageDerivativeOps.getDerivativeType(inputType);
-				GeneralFeatureDetector<T, D> alg = FactoryDetectPoint.create(config.point, inputType, derivType);
+				GeneralFeatureDetector<T, D> alg = FactoryDetectPoint.create(config.point, inputType, derivType, derivDivisor);
 				return FactoryInterestPoint.wrapPoint(alg, config.point.scaleRadius, inputType, derivType);
 			}
 			default -> throw new IllegalArgumentException("Unknown detector");
@@ -198,7 +198,7 @@ public class FactoryInterestPoint {
 
 		var ss = new SiftScaleSpace(configSS.firstOctave, configSS.lastOctave, configSS.numScales, configSS.sigma0);
 		NonMaxLimiter nonmax = FactoryFeatureExtractor.nonmaxLimiter(
-				configDet.extract, configDet.selector, configDet.maxFeaturesPerScale);
+				configDet.extract, 1, configDet.selector, configDet.maxFeaturesPerScale);
 		FeatureSelectLimitIntensity<ScalePoint> selectorAll = FactorySelectLimit.intensity(configDet.selector);
 		var detector = new SiftDetector(selectorAll, configDet.edgeR, nonmax);
 		detector.maxFeaturesAll = configDet.maxFeaturesAll;

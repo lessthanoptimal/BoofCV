@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,7 +52,7 @@ public class TestDerivativeLaplacian_Inner extends BoofStandardJUnit {
 
 		ImageBorder_S32<GrayU8> border = (ImageBorder_S32) FactoryImageBorder.single(BorderType.EXTENDED, GrayU8.class);
 		GrayS16 expected = deriv.createSameShape();
-		ConvolveImage.convolve(DerivativeLaplacian.kernel_I32,img,expected,border);
+		ConvolveImage.convolve(DerivativeLaplacian.kernelXY_I32,img,expected,border);
 
 		BoofTesting.assertEqualsInner(expected,deriv,0,1,1,false);
 	}
@@ -87,7 +87,7 @@ public class TestDerivativeLaplacian_Inner extends BoofStandardJUnit {
 
 		ImageBorder_F32 border = (ImageBorder_F32)FactoryImageBorder.single(BorderType.EXTENDED, GrayF32.class);
 		GrayF32 expected = deriv.createSameShape();
-		ConvolveImage.convolve(DerivativeLaplacian.kernel_F32,img,expected,border);
+		ConvolveImage.convolve(DerivativeLaplacian.kernelXY_F32,img,expected,border);
 
 		BoofTesting.assertEqualsInner(expected,deriv, UtilEjml.TEST_F32,1,1,false);
 	}

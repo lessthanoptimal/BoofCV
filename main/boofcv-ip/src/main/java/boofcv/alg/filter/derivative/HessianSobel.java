@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,40 +32,37 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * <p>
- * Computes the second derivative (Hessian) of an image using. This hessian is derived using the {@link GradientSobel}
- * gradient function.
- * </p>
- *
- * <p>
- * WARNING: It is computationally more expensive to compute the Hessian with this operation than applying the Sobel
- * gradient operator multiple times. However, this does not require the creation additional storage to save
- * intermediate results.
- * </p>
- *
- * <p>
- * Kernel for &part; <sup>2</sup>f/&part; y<sup>2</sup>:
- * <table border="1">
- * <tr> <td> 1 </td> <td> 4 </td> <td> 6 </td> <td> 4 </td> <td> 1 </td> </tr>
- * <tr> <td> 0 </td> <td> 0 </td> <td> 0 </td> <td> 0 </td> <td> 0 </td> </tr>
- * <tr> <td> -2 </td> <td> -8 </td> <td> -12 </td> <td> -8 </td> <td> -2 </td> </tr>
- * <tr> <td> 0 </td> <td> 0 </td> <td> 0 </td> <td> 0 </td> <td> 0 </td> </tr>
- * <tr> <td> 1 </td> <td> 4 </td> <td> 6 </td> <td> 4 </td> <td> 1 </td> </tr>
- * </table}
- * [1 0 -2 0 1] and &part;<sup>2</sup>f/&part; x&part;y is:<br>
- * <table border="1">
- * <tr> <td> 1 </td> <td> 2 </td> <td> 0 </td> <td> -2 </td> <td> -1 </td> </tr>
- * <tr> <td> 2 </td> <td> 4 </td> <td> 0 </td> <td> -4 </td> <td> -2 </td> </tr>
- * <tr> <td> 0 </td> <td> 0 </td> <td> 0 </td> <td>  0 </td> <td>  0 </td> </tr>
- * <tr> <td> -2 </td> <td> -4 </td> <td> 0 </td> <td> 4 </td> <td> 2 </td> </tr>
- * <tr> <td> -1 </td> <td> -2 </td> <td> 0 </td> <td> 2 </td> <td> 1 </td> </tr>
- * </table}
- * </p>
- *
- * @author Peter Abeles
- */
+/// Second order (Hessian) Sobel image derivatives. This hessian is derived using the [GradientSobel]
+/// gradient function.
+///
+/// For integer images, divide the result by [#divisor] for proper scaling. Floating
+/// point kernels already include this scaling; without it, output magnitudes are
+/// inflated by that factor.
+///
+/// WARNING: It is computationally more expensive to compute the Hessian with this operation than applying the Sobel
+/// gradient operator multiple times. However, this does not require the creation additional storage to save
+/// intermediate results.
+///
+/// Kernel for ∂²f/∂y²:
+///
+/// |  1 |  4 |   6 |  4 |  1 |
+/// |----|----|-----|----|----|
+/// |  0 |  0 |   0 |  0 |  0 |
+/// | -2 | -8 | -12 | -8 | -2 |
+/// |  0 |  0 |   0 |  0 |  0 |
+/// |  1 |  4 |   6 |  4 |  1 |
+///
+/// `[1 0 -2 0 1]` and ∂²f/∂x∂y is:
+///
+/// |  1 |  2 | 0 | -2 | -1 |
+/// |----|----|---|----|----|
+/// |  2 |  4 | 0 | -4 | -2 |
+/// |  0 |  0 | 0 |  0 |  0 |
+/// | -2 | -4 | 0 |  4 |  2 |
+/// | -1 | -2 | 0 |  2 |  1 |
 public class HessianSobel {
+	/// Integer divisor to ensure brightness does not change
+	public static final int divisor = 64;
 
 	public static Kernel2D_S32 kernelYY_I32 = new Kernel2D_S32(5, new int[]
 			{1, 4, 6, 4, 1,
@@ -86,23 +83,23 @@ public class HessianSobel {
 			-2, -4, 0, 4, 2,
 			-1, -2, 0, 2, 1});
 	public static Kernel2D_F32 kernelYY_F32 = new Kernel2D_F32(5, new float[]
-			{1, 4, 6, 4, 1,
+			{1.0f/64.0f, 4.0f/64.0f, 6.0f/64.0f, 4.0f/64.0f, 1.0f/64.0f,
 			0, 0, 0, 0, 0,
-			-2, -8, -12, -8, -2,
+			-2.0f/64.0f, -8.0f/64.0f, -12.0f/64.0f, -8.0f/64.0f, -2.0f/64.0f,
 			0, 0, 0, 0, 0,
-			1, 4, 6, 4, 1});
+			1.0f/64.0f, 4.0f/64.0f, 6.0f/64.0f, 4.0f/64.0f, 1.0f/64.0f});
 	public static Kernel2D_F32 kernelXX_F32 = new Kernel2D_F32(5, new float[]
-			{1, 0, -2, 0, 1,
-			4, 0, -8, 0, 4,
-			6, 0, -12, 0, 6,
-			4, 0, -8, 0, 4,
-			1, 0, -2, 0, 1});
+			{1.0f/64.0f, 0, -2.0f/64.0f, 0, 1.0f/64.0f,
+			4.0f/64.0f, 0, -8.0f/64.0f, 0, 4.0f/64.0f,
+			6.0f/64.0f, 0, -12.0f/64.0f, 0, 6.0f/64.0f,
+			4.0f/64.0f, 0, -8.0f/64.0f, 0, 4.0f/64.0f,
+			1.0f/64.0f, 0, -2.0f/64.0f, 0, 1.0f/64.0f});
 	public static Kernel2D_F32 kernelXY_F32 = new Kernel2D_F32(5, new float[]
-			{1, 2, 0, -2, -1,
-			2, 4, 0, -4, -2,
+			{1f/64f, 2f/64f, 0, -2f/64f, -1f/64f,
+			2f/64f, 4f/64f, 0, -4f/64f, -2f/64f,
 			0, 0, 0, 0, 0,
-			-2, -4, 0, 4, 2,
-			-1, -2, 0, 2, 1});
+			-2f/64f, -4f/64f, 0, 4f/64f, 2f/64f,
+			-1f/64f, -2f/64f, 0, 2f/64f, 1f/64f});
 
 	public static <I extends ImageGray<I>, D extends ImageGray<D>> void process( I input,
 																				 D derivXX, D derivYY, D derivXY,
@@ -114,15 +111,13 @@ public class HessianSobel {
 		}
 	}
 
-	/**
-	 * Computes the image's second derivatives.
-	 *
-	 * @param orig Which which is to be differentiated. Not Modified.
-	 * @param derivXX Second derivative along the x-axis. Modified.
-	 * @param derivYY Second derivative along the y-axis. Modified.
-	 * @param derivXY Second cross derivative. Modified.
-	 * @param border Specifies how the image border is handled. If null the border is not processed.
-	 */
+	/// Computes the image's second derivatives.
+	///
+	/// @param orig Input image that is differentiated. Not Modified.
+	/// @param derivXX Second derivative along the x-axis. Modified.
+	/// @param derivYY Second derivative along the y-axis. Modified.
+	/// @param derivXY Second cross derivative. Modified.
+	/// @param border Specifies how the image border is handled. If null the border is not processed.
 	public static void process( GrayU8 orig,
 								GrayS16 derivXX, GrayS16 derivYY, GrayS16 derivXY,
 								@Nullable ImageBorder_S32 border ) {
@@ -137,15 +132,13 @@ public class HessianSobel {
 		}
 	}
 
-	/**
-	 * Computes the image's second derivatives.
-	 *
-	 * @param orig Which which is to be differentiated. Not Modified.
-	 * @param derivXX Second derivative along the x-axis. Modified.
-	 * @param derivYY Second derivative along the y-axis. Modified.
-	 * @param derivXY Second cross derivative. Modified.
-	 * @param border Specifies how the image border is handled. If null the border is not processed.
-	 */
+	/// Computes the image's second derivatives.
+	///
+	/// @param orig Input image that is differentiated. Not Modified.
+	/// @param derivXX Second derivative along the x-axis. Modified.
+	/// @param derivYY Second derivative along the y-axis. Modified.
+	/// @param derivXY Second cross derivative. Modified.
+	/// @param border Specifies how the image border is handled. If null the border is not processed.
 	public static void process( GrayF32 orig,
 								GrayF32 derivXX, GrayF32 derivYY, GrayF32 derivXY,
 								@Nullable ImageBorder_F32 border ) {

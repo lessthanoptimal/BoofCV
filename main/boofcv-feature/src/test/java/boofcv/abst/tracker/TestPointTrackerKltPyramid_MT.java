@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.abst.tracker;
 import boofcv.abst.feature.detect.interest.ConfigPointDetector;
 import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.tracker.PointTrackerKltPyramid.PointTrackMod;
+import boofcv.alg.filter.derivative.DerivativeType;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.alg.tracker.klt.PyramidKltFeature;
@@ -57,14 +58,14 @@ public class TestPointTrackerKltPyramid_MT extends GenericChecksPointTracker<Gra
 
 		// make sure threads are turned on
 		BoofConcurrency.USE_CONCURRENT = true;
-		var tracker = FactoryPointTracker.klt(config, configDetector, GrayF32.class, GrayF32.class);
+		var tracker = FactoryPointTracker.klt(config, DerivativeType.SOBEL, configDetector, GrayF32.class, GrayF32.class);
 		if (tracker instanceof PointTrackerKltPyramid_MT)
 			return tracker;
 		throw new RuntimeException("Did not create concurrent implementation");
 	}
 
 	/**
-	 * See if concurrent and single thread version produce identical reuslts
+	 * See if concurrent and single thread version produce identical results
 	 */
 	@Test void compareToSingleThread() {
 		var config = new ConfigPKlt();
@@ -81,9 +82,9 @@ public class TestPointTrackerKltPyramid_MT extends GenericChecksPointTracker<Gra
 
 		// Create the two different versions
 		BoofConcurrency.USE_CONCURRENT = true;
-		var trackerMulti = FactoryPointTracker.klt(config, configDetector, GrayF32.class, GrayF32.class);
+		var trackerMulti = FactoryPointTracker.klt(config, DerivativeType.SOBEL, configDetector, GrayF32.class, GrayF32.class);
 		BoofConcurrency.USE_CONCURRENT = false;
-		var trackerSingle = FactoryPointTracker.klt(config, configDetector, GrayF32.class, GrayF32.class);
+		var trackerSingle = FactoryPointTracker.klt(config, DerivativeType.SOBEL, configDetector, GrayF32.class, GrayF32.class);
 
 		trackerMulti.process(image);
 		trackerSingle.process(image);

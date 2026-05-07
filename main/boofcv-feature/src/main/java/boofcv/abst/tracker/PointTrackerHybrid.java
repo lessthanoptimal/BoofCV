@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,6 @@ import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.tracker.hybrid.HybridTrack;
 import boofcv.alg.tracker.hybrid.HybridTrackerScalePoint;
 import boofcv.alg.transform.pyramid.PyramidOps;
-import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.feature.TupleDesc;
@@ -78,15 +77,15 @@ public class PointTrackerHybrid<I extends ImageGray<I>, D extends ImageGray<D>, 
 	boolean detectCalled;
 
 	public PointTrackerHybrid( HybridTrackerScalePoint<I, D, Desc> tracker,
+	                           ImageGradient<I, D> gradient,
 							   ConfigDiscreteLevels configLevels,
 							   Class<I> imageType, Class<D> derivType ) {
 		this.tracker = tracker;
+		this.gradient = gradient;
 		this.derivType = ImageType.single(derivType);
 		this.inputType = ImageType.single(imageType);
 
 		pyramid = FactoryPyramid.discreteGaussian(configLevels, -1, 2, true, ImageType.single(imageType));
-		gradient = FactoryDerivative.sobel(imageType, derivType);
-
 		reset();
 	}
 

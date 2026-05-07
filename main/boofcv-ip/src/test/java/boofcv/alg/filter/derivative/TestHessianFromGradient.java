@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,8 +36,8 @@ public class TestHessianFromGradient extends BoofStandardJUnit {
 		validator.setTarget(HessianFromGradient.class.getMethod("hessianPrewitt",
 				GrayS16.class,GrayS16.class, GrayS16.class, GrayS16.class, GrayS16.class, ImageBorder_S32.class ));
 
-		validator.setKernel(0,GradientPrewitt.kernelDerivX_I32);
-		validator.setKernel(1,GradientPrewitt.kernelDerivY_I32);
+		validator.setKernel(0,GradientPrewitt.kernelX_I32);
+		validator.setKernel(1,GradientPrewitt.kernelY_I32);
 
 		GrayS16 derivX = new GrayS16(width,height);
 		GrayS16 derivY = new GrayS16(width,height);
@@ -55,8 +55,8 @@ public class TestHessianFromGradient extends BoofStandardJUnit {
 		validator.setTarget(HessianFromGradient.class.getMethod("hessianPrewitt",
 				GrayF32.class,GrayF32.class, GrayF32.class, GrayF32.class, GrayF32.class, ImageBorder_F32.class ));
 
-		validator.setKernel(0,GradientPrewitt.kernelDerivX_F32);
-		validator.setKernel(1,GradientPrewitt.kernelDerivY_F32);
+		validator.setKernel(0,GradientPrewitt.kernelX_F32);
+		validator.setKernel(1,GradientPrewitt.kernelY_F32);
 
 		GrayF32 derivX = new GrayF32(width,height);
 		GrayF32 derivY = new GrayF32(width,height);
@@ -74,8 +74,8 @@ public class TestHessianFromGradient extends BoofStandardJUnit {
 		validator.setTarget(HessianFromGradient.class.getMethod("hessianSobel",
 				GrayS16.class,GrayS16.class, GrayS16.class, GrayS16.class, GrayS16.class,ImageBorder_S32.class ));
 
-		validator.setKernel(0,GradientSobel.kernelDerivX_I32);
-		validator.setKernel(1,GradientSobel.kernelDerivY_I32);
+		validator.setKernel(0,GradientSobel.kernelX_I32);
+		validator.setKernel(1,GradientSobel.kernelY_I32);
 
 		GrayS16 derivX = new GrayS16(width,height);
 		GrayS16 derivY = new GrayS16(width,height);
@@ -93,8 +93,8 @@ public class TestHessianFromGradient extends BoofStandardJUnit {
 		validator.setTarget(HessianFromGradient.class.getMethod("hessianSobel",
 				GrayF32.class,GrayF32.class, GrayF32.class, GrayF32.class, GrayF32.class,ImageBorder_F32.class ));
 
-		validator.setKernel(0,GradientSobel.kernelDerivX_F32);
-		validator.setKernel(1,GradientSobel.kernelDerivY_F32);
+		validator.setKernel(0,GradientSobel.kernelX_F32);
+		validator.setKernel(1,GradientSobel.kernelY_F32);
 
 		GrayF32 derivX = new GrayF32(width,height);
 		GrayF32 derivY = new GrayF32(width,height);
@@ -112,8 +112,8 @@ public class TestHessianFromGradient extends BoofStandardJUnit {
 		validator.setTarget(HessianFromGradient.class.getMethod("hessianThree",
 				GrayS16.class,GrayS16.class, GrayS16.class, GrayS16.class, GrayS16.class,ImageBorder_S32.class ));
 
-		validator.setKernel(0,GradientThree.kernelDeriv_I32,true);
-		validator.setKernel(1,GradientThree.kernelDeriv_I32,false);
+		validator.setKernel(0,GradientThree.kernel_I32,true);
+		validator.setKernel(1,GradientThree.kernel_I32,false);
 
 		GrayS16 derivX = new GrayS16(width,height);
 		GrayS16 derivY = new GrayS16(width,height);
@@ -131,8 +131,8 @@ public class TestHessianFromGradient extends BoofStandardJUnit {
 		validator.setTarget(HessianFromGradient.class.getMethod("hessianThree",
 				GrayF32.class,GrayF32.class, GrayF32.class, GrayF32.class, GrayF32.class,ImageBorder_F32.class ));
 
-		validator.setKernel(0,GradientThree.kernelDeriv_F32,true);
-		validator.setKernel(1,GradientThree.kernelDeriv_F32,false);
+		validator.setKernel(0,GradientThree.kernel_F32,true);
+		validator.setKernel(1,GradientThree.kernel_F32,false);
 
 		GrayF32 derivX = new GrayF32(width,height);
 		GrayF32 derivY = new GrayF32(width,height);

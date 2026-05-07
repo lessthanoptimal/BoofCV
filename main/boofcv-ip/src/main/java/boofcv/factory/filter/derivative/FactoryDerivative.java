@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,8 +52,8 @@ public class FactoryDerivative {
 	 */
 	public static <I extends ImageMultiBand<I>, M extends ImageMultiBand<M>, D extends ImageGray<D>>
 	ImageGradient<I, D> gradientReduce( ImageGradient<I, M> gradient,
-										DerivativeReduceType type,
-										Class<D> outputType ) {
+	                                    DerivativeReduceType type,
+	                                    Class<D> outputType ) {
 
 		String name;
 
@@ -262,11 +262,15 @@ public class FactoryDerivative {
 	private static Method findHessianFromGradient( Class<?> gradientType, @Nullable Class<?> derivType ) {
 		if (derivType == null)
 			derivType = gradientType;
-		String name = gradientType.getSimpleName().substring(8);
+		String className = gradientType.getSimpleName();
+		String typeName = className.endsWith("Sobel") ? "Sobel" :
+				className.endsWith("Prewitt") ? "Prewitt" :
+				className.endsWith("Three") ? "Three" : "Unknown";
+
 		Method m;
 		try {
 			Class<?> borderType = GeneralizedImageOps.isFloatingPoint(derivType) ? ImageBorder_F32.class : ImageBorder_S32.class;
-			m = HessianFromGradient.class.getDeclaredMethod("hessian" + name, derivType, derivType, derivType, derivType, derivType, borderType);
+			m = HessianFromGradient.class.getDeclaredMethod("hessian" + typeName, derivType, derivType, derivType, derivType, derivType, borderType);
 		} catch (NoSuchMethodException e) {
 			throw new RuntimeException("Input and derivative types are probably not compatible", e);
 		}

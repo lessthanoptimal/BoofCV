@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -95,6 +95,10 @@ public class ImplSsdCornerWeighted_S16 extends ImplSsdCornerBase<GrayS16, GrayS3
 			}
 		}
 		//CONCURRENT_ABOVE });
+	}
+
+	@Override public float thresholdScaleByDerivative( int divisor ) {
+		return this.intensity.thresholdScaleByDerivative(divisor);
 	}
 
 	private void blur( GrayS32 image, GrayS32 temp ) {

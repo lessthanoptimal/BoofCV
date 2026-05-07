@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -94,9 +94,9 @@ public class TestHessianThreeDeterminant_Border extends BoofStandardJUnit {
 		GrayS16 Lyy = new GrayS16(img.width,img.height);
 		GrayS16 Lxy = new GrayS16(img.width,img.height);
 
-		ConvolveImage.horizontal(HessianThree.kernelXXYY_I32,img,Lxx,border);
-		ConvolveImage.vertical(HessianThree.kernelXXYY_I32,img,Lyy,border);
-		ConvolveImage.convolve(HessianThree.kernelCross_I32,img,Lxy,border);
+		ConvolveImage.horizontal(HessianThree.kernelXX_I32,img,Lxx,border);
+		ConvolveImage.vertical(HessianThree.kernelXX_I32,img,Lyy,border);
+		ConvolveImage.convolve(HessianThree.kernelXY_I32,img,Lxy,border);
 
 		GrayS16 expected =new GrayS16(img.width,img.height);
 
@@ -114,9 +114,9 @@ public class TestHessianThreeDeterminant_Border extends BoofStandardJUnit {
 		GrayF32 Lyy = new GrayF32(img.width,img.height);
 		GrayF32 Lxy = new GrayF32(img.width,img.height);
 
-		ConvolveImage.horizontal(HessianThree.kernelXXYY_F32,img,Lxx,border);
-		ConvolveImage.vertical(HessianThree.kernelXXYY_F32,img,Lyy,border);
-		ConvolveImage.convolve(HessianThree.kernelCross_F32,img,Lxy,border);
+		ConvolveImage.horizontal(HessianThree.kernelXX_F32,img,Lxx,border);
+		ConvolveImage.vertical(HessianThree.kernelXX_F32,img,Lyy,border);
+		ConvolveImage.convolve(HessianThree.kernelXY_F32,img,Lxy,border);
 
 		GrayF32 expected = new GrayF32(img.width,img.height);
 

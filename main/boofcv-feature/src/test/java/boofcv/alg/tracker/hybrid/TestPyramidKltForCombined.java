@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,6 +34,7 @@ import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TestPyramidKltForCombined extends BoofStandardJUnit {
@@ -47,61 +48,55 @@ class TestPyramidKltForCombined extends BoofStandardJUnit {
 	GrayF32[] derivX;
 	GrayF32[] derivY;
 
-
-	public PyramidKltForHybrid<GrayF32,GrayF32> createAlg()
-	{
+	public PyramidKltForHybrid<GrayF32, GrayF32> createAlg() {
 		ConfigKlt config = new ConfigKlt();
 
-		return new PyramidKltForHybrid<>(config, 5, GrayF32.class, GrayF32.class);
+		return new PyramidKltForHybrid<>(config, 5, GrayF32.class, GrayF32.class, 1);
 	}
 
-	@BeforeEach
-	void init() {
+	@BeforeEach void init() {
+		pyramid = FactoryPyramid.discreteGaussian(configLevels, -1, 2, false, ImageType.single(GrayF32.class));
 
-		pyramid = FactoryPyramid.discreteGaussian(configLevels,-1,2,false, ImageType.single(GrayF32.class));
-
-		GrayF32 input = new GrayF32(width,height);
-		ImageMiscOps.fillUniform(input,rand,0,100);
+		GrayF32 input = new GrayF32(width, height);
+		ImageMiscOps.fillUniform(input, rand, 0, 100);
 
 		// do a real update so that it can track a feature
-		ImageGradient<GrayF32,GrayF32> gradient =
+		ImageGradient<GrayF32, GrayF32> gradient =
 				FactoryDerivative.sobel(GrayF32.class, GrayF32.class);
 
 		pyramid.process(input);
-		derivX = PyramidOps.declareOutput(pyramid,ImageType.SB_F32);
-		derivY = PyramidOps.declareOutput(pyramid,ImageType.SB_F32);
+		derivX = PyramidOps.declareOutput(pyramid, ImageType.SB_F32);
+		derivY = PyramidOps.declareOutput(pyramid, ImageType.SB_F32);
 		PyramidOps.gradient(pyramid, gradient, derivX, derivY);
 	}
 
-	@Test
-	void setDescription() {
-		PyramidKltForHybrid<GrayF32,GrayF32> alg = createAlg();
+	@Test void setDescription() {
+		PyramidKltForHybrid<GrayF32, GrayF32> alg = createAlg();
 
-		alg.setInputs(pyramid,derivX,derivY);
+		alg.setInputs(pyramid, derivX, derivY);
 
 		PyramidKltFeature t = alg.createNewTrack();
 
-		alg.setDescription(30.1f,25,t);
+		alg.setDescription(30.1f, 25, t);
 
-		assertTrue(30.1f == t.x);
-		assertTrue(25f == t.y);
+		assertEquals(30.1f, t.x);
+		assertEquals(25f, t.y);
 
-		for( int i = 0; i < t.desc.length; i++ ) {
+		for (int i = 0; i < t.desc.length; i++) {
 			double v = ImageStatistics.sum(t.desc[i].desc);
 			double dx = ImageStatistics.sum(t.desc[i].derivX);
 			double dy = ImageStatistics.sum(t.desc[i].derivY);
 
-			assertTrue(v!=0);
-			assertTrue(dx!=0);
-			assertTrue(dy!=0);
+			assertTrue(v != 0);
+			assertTrue(dx != 0);
+			assertTrue(dy != 0);
 		}
 	}
 
-	@Test
-	void performTracking() {
-		PyramidKltForHybrid<GrayF32,GrayF32> alg = createAlg();
+	@Test void performTracking() {
+		PyramidKltForHybrid<GrayF32, GrayF32> alg = createAlg();
 
-		alg.setInputs(pyramid,derivX,derivY);
+		alg.setInputs(pyramid, derivX, derivY);
 
 		PyramidKltFeature t = alg.createNewTrack();
 
@@ -114,7 +109,7 @@ class TestPyramidKltForCombined extends BoofStandardJUnit {
 		// see if it moves it back close to the original pose
 		assertTrue(alg.performTracking(t));
 
-		assertTrue(Math.abs(t.x-30.1)<0.1);
-		assertTrue(Math.abs(t.y-25)<0.1);
+		assertTrue(Math.abs(t.x - 30.1) < 0.1);
+		assertTrue(Math.abs(t.y - 25) < 0.1);
 	}
 }

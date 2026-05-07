@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,6 +43,9 @@ import org.jetbrains.annotations.Nullable;
  * @author Peter Abeles
  */
 public class HessianThreeDeterminant {
+	/// Divisor comes from differentiating via (h(x-1) + h(x+1))/2 twice
+	public static final int divisor = 4;
+
 	/**
 	 * Computes the Laplacian of input image.
 	 *

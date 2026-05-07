@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -62,6 +62,8 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 	protected I image;
 	// image gradient
 	protected @Nullable D derivX, derivY;
+	// Integer gradients will be off by a scale factor. This is the inverse of that scale factor.
+	protected float derivScale = Float.NaN;
 
 	// Used to interpolate the image and gradient
 	protected InterpolateRectangle<I> interpInput;
@@ -123,7 +125,7 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 	 * @param derivX Image derivative along the x-axis
 	 * @param derivY Image derivative along the y-axis
 	 */
-	public void setImage( I image, @Nullable D derivX, @Nullable D derivY ) {
+	public void setImage( I image, @Nullable D derivX, @Nullable D derivY, int derivDivisor ) {
 		if (derivX != null && derivY != null)
 			InputSanityCheck.checkSameShape(image, derivX, derivY);
 
@@ -132,6 +134,7 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 
 		this.derivX = derivX;
 		this.derivY = derivY;
+		this.derivScale = 1.0f/derivDivisor;
 	}
 
 	/**
@@ -182,6 +185,11 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 			Gxy += dX*dY;
 		}
 
+		float ss = derivScale*derivScale;
+		Gxx *= ss;
+		Gyy *= ss;
+		Gxy *= ss;
+
 		feature.Gxx = Gxx;
 		feature.Gyy = Gyy;
 		feature.Gxy = Gxy;
@@ -229,6 +237,11 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 			Gyy += dY*dY;
 			Gxy += dX*dY;
 		}
+
+		float ss = derivScale*derivScale;
+		Gxx *= ss;
+		Gyy *= ss;
+		Gxy *= ss;
 
 		// technically don't need to save this...
 		feature.Gxx = Gxx;
@@ -373,6 +386,9 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 			Ex += d*feature.derivX.data[i];
 			Ey += d*feature.derivY.data[i];
 		}
+
+		Ex *= derivScale;
+		Ey *= derivScale;
 	}
 
 	/**
@@ -419,6 +435,14 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 			Gyy += dY*dY;
 			Gxy += dX*dY;
 		}
+
+		float ss = derivScale*derivScale;
+		Gxx *= ss;
+		Gyy *= ss;
+		Gxy *= ss;
+
+		Ex *= derivScale;
+		Ey *= derivScale;
 
 		return total;
 	}

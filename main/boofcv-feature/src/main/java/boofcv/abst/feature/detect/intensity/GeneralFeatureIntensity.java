@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -56,6 +56,10 @@ public interface GeneralFeatureIntensity<I extends ImageGray<I>, D extends Image
 	 * @return Corner intensity image.
 	 */
 	GrayF32 getIntensity();
+
+	/// If the gradient has an integer kernel you need to scale threshold to account for the gradient being scaled
+	/// or else it will vary by image and kernel type
+	float thresholdScaleByDerivative( int divisor );
 
 	/**
 	 * (Optional) Returns a list of candidate for local minimums.

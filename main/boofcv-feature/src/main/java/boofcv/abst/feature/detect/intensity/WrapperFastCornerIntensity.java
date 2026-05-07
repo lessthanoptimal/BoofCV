@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,6 +46,7 @@ public class WrapperFastCornerIntensity<I extends ImageGray<I>, D extends ImageG
 	}
 
 	// @formatter:off
+	@Override public float thresholdScaleByDerivative( int divisor ) { return 1; }
 	@Override public ListIntPoint2D     getCandidatesMin()    { return alg.getCandidatesLow(); }
 	@Override public ListIntPoint2D     getCandidatesMax()    { return alg.getCandidatesHigh(); }
 	@Override public boolean            getRequiresGradient() { return false; }

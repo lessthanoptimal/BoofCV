@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,6 +46,10 @@ public class ImageGradient_PL<T extends ImageGray<T>, D extends ImageGray<D>>
 		for (int i = 0; i < inputImage.getNumBands(); i++) {
 			bandGradient.process(inputImage.getBand(i), derivX.getBand(i), derivY.getBand(i));
 		}
+	}
+
+	@Override public int divisor() {
+		return bandGradient.divisor();
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -71,6 +71,10 @@ public class HessianBlobIntensity {
 		ImplHessianBlobIntensity.determinant(featureIntensity, hessianXX, hessianYY, hessianXY);
 	}
 
+	public static float determinantDerivativeScale( int divisor ) {
+		return divisor*divisor;
+	}
+
 	/**
 	 * Feature intensity using the trace of the Hessian matrix. This is also known as the Laplacian.
 	 *
@@ -82,6 +86,10 @@ public class HessianBlobIntensity {
 		InputSanityCheck.checkSameShape(featureIntensity, hessianXX, hessianYY);
 
 		ImplHessianBlobIntensity.trace(featureIntensity, hessianXX, hessianYY);
+	}
+
+	public static float traceScale( int divisor ) {
+		return divisor;
 	}
 
 	/**

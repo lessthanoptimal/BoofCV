@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,15 @@
 
 package boofcv.abst.filter.derivative;
 
+import boofcv.alg.filter.derivative.*;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofStandardJUnit;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestImageGradient_SB extends BoofStandardJUnit {
 
@@ -35,8 +41,51 @@ public class TestImageGradient_SB extends BoofStandardJUnit {
 		GrayF32 derivX = new GrayF32(width, height);
 		GrayF32 derivY = new GrayF32(width, height);
 
-		ImageGradient_SB<GrayF32, GrayF32> alg = new ImageGradient_SB.Sobel<>(GrayF32.class, GrayF32.class);
+		var alg = new ImageGradient_SB.Sobel<>(GrayF32.class, GrayF32.class);
 
 		alg.process(input, derivX, derivY);
+	}
+
+	@Nested class Sobel {
+		// make sure its set to one when floating point image and the actual divisor for others
+		@Test void gradientDivisor() {
+			assertEquals(1.0f, new ImageGradient_SB.Sobel<>(GrayF32.class, GrayF32.class).divisor());
+			assertEquals(GradientSobel.divisor, new ImageGradient_SB.Sobel<>(GrayU8.class, GrayS16.class).divisor());
+		}
+	}
+
+	@Nested class Prewitt {
+		@Test void gradientDivisor() {
+			assertEquals(1.0f, new ImageGradient_SB.Prewitt<>(GrayF32.class, GrayF32.class).divisor());
+			assertEquals(GradientPrewitt.divisor, new ImageGradient_SB.Prewitt<>(GrayU8.class, GrayS16.class).divisor());
+		}
+	}
+
+	@Nested class Scharr {
+		@Test void gradientDivisor() {
+			assertEquals(1.0f, new ImageGradient_SB.Scharr<>(GrayF32.class, GrayF32.class).divisor());
+			assertEquals(GradientScharr.divisor, new ImageGradient_SB.Scharr<>(GrayU8.class, GrayS16.class).divisor());
+		}
+	}
+
+	@Nested class Three {
+		@Test void gradientDivisor() {
+			assertEquals(1.0f, new ImageGradient_SB.Three<>(GrayF32.class, GrayF32.class).divisor());
+			assertEquals(GradientThree.divisor, new ImageGradient_SB.Three<>(GrayU8.class, GrayS16.class).divisor());
+		}
+	}
+
+	@Nested class Two0 {
+		@Test void gradientDivisor() {
+			assertEquals(1.0f, new ImageGradient_SB.Two0<>(GrayF32.class, GrayF32.class).divisor());
+			assertEquals(GradientTwo0.divisor, new ImageGradient_SB.Two0<>(GrayU8.class, GrayS16.class).divisor());
+		}
+	}
+
+	@Nested class Two1 {
+		@Test void gradientDivisor() {
+			assertEquals(1.0f, new ImageGradient_SB.Two1<>(GrayF32.class, GrayF32.class).divisor());
+			assertEquals(GradientTwo1.divisor, new ImageGradient_SB.Two1<>(GrayU8.class, GrayS16.class).divisor());
+		}
 	}
 }

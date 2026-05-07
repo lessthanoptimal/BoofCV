@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,7 +42,7 @@ import org.jetbrains.annotations.Nullable;
 public class FactoryFeatureExtractor {
 	/**
 	 * Creates a generalized feature detector/extractor that adds n-best capability to {@link boofcv.abst.feature.detect.extract.NonMaxSuppression}
-	 * and performs other house keeping tasks. Handles calling {@link GeneralFeatureIntensity} itself.
+	 * and performs other housekeeping tasks. Handles calling {@link GeneralFeatureIntensity} itself.
 	 *
 	 * @param intensity Feature intensity algorithm
 	 * @param extractorMin Feature extraction algorithm for local minimums
@@ -63,22 +63,27 @@ public class FactoryFeatureExtractor {
 		return det;
 	}
 
-	/**
-	 * Standard non-max feature extractor.
-	 *
-	 * @param config Configuration for extractor
-	 * @return A feature extractor.
-	 */
-	public static NonMaxSuppression<QueueCorner> nonmax( @Nullable ConfigExtract config ) {
-		return nonmax(config, QueueCorner::append, QueueCorner::reset);
+	/// Standard non-max feature extractor.
+	///
+	/// @param config Configuration for extractor
+	/// @param intensityScale How many times more intense is the intensity image vs one with a correctly scaled one.
+	/// Intensity images can have their scale thrown off by integer derivative operators. Set to 1 if you're not sure.
+	/// @return A feature extractor.
+	public static NonMaxSuppression<QueueCorner> nonmax( @Nullable ConfigExtract config, float intensityScale ) {
+		return nonmax(config, intensityScale, QueueCorner::append, QueueCorner::reset);
 	}
 
-	public static NonMaxSuppression<PackedArrayPoint2D_I16> nonmaxPack16( @Nullable ConfigExtract config ) {
-		return nonmax(config, PackedArrayPoint2D_I16::append, PackedArrayPoint2D_I16::reset);
+	public static NonMaxSuppression<PackedArrayPoint2D_I16>
+	nonmaxPack16( @Nullable ConfigExtract config, float intensityScale ) {
+		return nonmax(config, intensityScale, PackedArrayPoint2D_I16::append, PackedArrayPoint2D_I16::reset);
 	}
 
+	/// Factory function for creating a [NonMaxSuppression]
+	///
+	/// @param intensityScale How many times more intense is the intensity image vs one with a correctly scaled one.
+	/// Intensity images can have their scale thrown off by integer derivative operators. Set to 1 if you're not sure.
 	public static <Storage> NonMaxSuppression<Storage>
-	nonmax( @Nullable ConfigExtract config,
+	nonmax( @Nullable ConfigExtract config, float intensityScale,
 			NonMaxSuppression.Add<Storage> opAdd, NonMaxSuppression.Reset<Storage> opReset ) {
 
 		if (config == null)
@@ -116,8 +121,8 @@ public class FactoryFeatureExtractor {
 
 		alg.storageAccess(opAdd, opReset);
 		alg.setSearchRadius(config.radius);
-		alg.setThresholdMax(config.threshold);
-		alg.setThresholdMin(-config.threshold);
+		alg.setThresholdMax(config.threshold/intensityScale);
+		alg.setThresholdMin(-config.threshold/intensityScale);
 		alg.setBorder(config.ignoreBorder);
 
 		return new WrapperNonMaximumBlock<>(alg);
@@ -169,8 +174,9 @@ public class FactoryFeatureExtractor {
 	 * @param maxFeatures maximum allowed features
 	 * @return The NonMaxLimiter
 	 */
-	public static NonMaxLimiter nonmaxLimiter( @Nullable ConfigExtract configExtract, ConfigSelectLimit configSelect, int maxFeatures ) {
-		NonMaxSuppression<PackedArrayPoint2D_I16> nonmax = nonmaxPack16(configExtract);
+	public static NonMaxLimiter nonmaxLimiter( @Nullable ConfigExtract configExtract, float intensityScale,
+											   ConfigSelectLimit configSelect, int maxFeatures ) {
+		NonMaxSuppression<PackedArrayPoint2D_I16> nonmax = nonmaxPack16(configExtract, intensityScale);
 		FeatureSelectLimitIntensity<NonMaxLimiter.LocalExtreme> selector = FactorySelectLimit.intensity(configSelect);
 		return new NonMaxLimiter(nonmax, selector, maxFeatures);
 	}

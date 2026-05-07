@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -94,7 +94,7 @@ public class TestCompleteSift extends BoofStandardJUnit {
 	private CompleteSift createAlg() {
 		SiftScaleSpace ss = new SiftScaleSpace(-1, 4, 3, 1.6);
 
-		NonMaxSuppression nonmax = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 0, 1, true, true, true));
+		NonMaxSuppression nonmax = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 0, 1, true, true, true), 1);
 		NonMaxLimiter limiter = new NonMaxLimiter(
 				nonmax, FactorySelectLimit.intensity(ConfigSelectLimit.selectBestN()), 300);
 		OrientationHistogramSift<GrayF32> ori =

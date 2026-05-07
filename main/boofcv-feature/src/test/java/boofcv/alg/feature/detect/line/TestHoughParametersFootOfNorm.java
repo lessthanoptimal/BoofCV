@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,8 +29,8 @@ class TestHoughParametersFootOfNorm extends BoofStandardJUnit {
 	class Gradient extends CommonHoughGradientChecks {
 		@Override
 		HoughTransformGradient createAlgorithm( Class derivType ) {
-			NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(4, 5, 0, true));
-			HoughTransformParameters hough = new HoughParametersFootOfNorm(5);
+			NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(4, 5, 0, true), 1);
+			var hough = new HoughParametersFootOfNorm(5);
 			return new HoughTransformGradient(extractor,hough,derivType);
 		}
 	}
@@ -39,8 +39,8 @@ class TestHoughParametersFootOfNorm extends BoofStandardJUnit {
 	class Gradient_MT extends CommonHoughGradientChecks {
 		@Override
 		HoughTransformGradient createAlgorithm( Class derivType ) {
-			NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(4, 5, 0, true));
-			HoughTransformParameters hough = new HoughParametersFootOfNorm(5);
+			NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(4, 5, 0, true), 1);
+			var hough = new HoughParametersFootOfNorm(5);
 			return new HoughTransformGradient_MT(extractor,hough,derivType);
 		}
 	}

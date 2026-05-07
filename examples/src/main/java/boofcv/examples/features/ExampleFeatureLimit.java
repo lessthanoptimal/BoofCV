@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -61,7 +61,7 @@ public class ExampleFeatureLimit {
 	public static BufferedImage renderLimit( GrayF32 intensity, SelectLimitTypes type ) {
 		// Configure how it will select features inside the intensity image
 		var limit = new ConfigSelectLimit(type, 0xBEEF);
-		NonMaxLimiter nonmax = FactoryFeatureExtractor.nonmaxLimiter(new ConfigExtract(NON_MAX_RADIUS, 0), limit, MAX_FEATURES);
+		NonMaxLimiter nonmax = FactoryFeatureExtractor.nonmaxLimiter(new ConfigExtract(NON_MAX_RADIUS, 0), 1f,limit, MAX_FEATURES);
 
 		// Detect the features
 		nonmax.process(intensity);

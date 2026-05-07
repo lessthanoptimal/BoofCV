@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,15 +49,16 @@ public class GeneralToInterestPoint<T extends ImageGray<T>, D extends ImageGray<
 	// list of points it found
 	protected DogArray<Point2D_F64> foundPoints = new DogArray<>(10, Point2D_F64::new);
 
-	public GeneralToInterestPoint( GeneralFeatureDetector<T, D> detector, double radius ) {
-		super(detector, detector.getImageType(), detector.getDerivType());
+	public GeneralToInterestPoint( GeneralFeatureDetector<T, D> detector, ImageGradient<T,D> gradient, double radius ) {
+		super(detector, gradient, detector.getImageType(), detector.getDerivType());
 		configure(detector, radius);
 	}
 
 	public GeneralToInterestPoint( GeneralFeatureDetector<T, D> detector,
+	                               @Nullable ImageGradient<T,D> gradient,
 								   double radius,
 								   @Nullable Class<T> imageType, @Nullable Class<D> derivType ) {
-		super(detector, imageType, derivType);
+		super(detector, gradient, imageType, derivType);
 		configure(detector, radius);
 	}
 

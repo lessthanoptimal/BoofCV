@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,8 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TestHarrisCorner_F32 extends BoofStandardJUnit {
 
-	@Test
-	void checkScore() {
+	@Test void checkScore() {
 		float kappa = 0.04f;
 		HarrisCorner_F32 alg = new HarrisCorner_F32(kappa);
 
@@ -38,13 +37,13 @@ class TestHarrisCorner_F32 extends BoofStandardJUnit {
 		float XY = 2.5f;
 		float YY = 3.5f;
 
-		float expected = XX*YY-XY*XY - kappa*(float)Math.pow(XX+YY,2.0);
-		assertEquals(expected,alg.compute(XX,XY,YY), UtilEjml.TEST_F32);
+		float expected = XX*YY - XY*XY - kappa*(float)Math.pow(XX + YY, 2.0);
+		assertEquals(expected, alg.compute(XX, XY, YY), UtilEjml.TEST_F32);
 	}
 
 	@Nested
 	public class SingleThread extends GenericCornerIntensityGradientTests {
-		ImplSsdCorner_F32 detector = new ImplSsdCorner_F32(1,new HarrisCorner_F32(0.04f));
+		ImplSsdCorner_F32 detector = new ImplSsdCorner_F32(1, new HarrisCorner_F32(0.04f));
 
 		@Test
 		void genericTests() {
@@ -53,13 +52,13 @@ class TestHarrisCorner_F32 extends BoofStandardJUnit {
 
 		@Override
 		public void computeIntensity( GrayF32 intensity ) {
-			detector.process(derivX_F32,derivY_F32,intensity);
+			detector.process(derivX_F32, derivY_F32, intensity);
 		}
 	}
 
 	@Nested
 	public class MultiThread extends GenericCornerIntensityGradientTests {
-		ImplSsdCorner_F32_MT detector = new ImplSsdCorner_F32_MT(1,new HarrisCorner_F32(0.04f));
+		ImplSsdCorner_F32_MT detector = new ImplSsdCorner_F32_MT(1, new HarrisCorner_F32(0.04f));
 
 		@Test
 		void genericTests() {
@@ -68,7 +67,7 @@ class TestHarrisCorner_F32 extends BoofStandardJUnit {
 
 		@Override
 		public void computeIntensity( GrayF32 intensity ) {
-			detector.process(derivX_F32,derivY_F32,intensity);
+			detector.process(derivX_F32, derivY_F32, intensity);
 		}
 	}
 }

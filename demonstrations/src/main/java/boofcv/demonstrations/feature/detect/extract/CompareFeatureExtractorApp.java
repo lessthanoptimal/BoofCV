@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -172,12 +172,12 @@ public class CompareFeatureExtractorApp<T extends ImageGray<T>, D extends ImageG
 		if (intensityAlg.localMinimums()) {
 			configExtract.detectMinimums = true;
 			configExtract.detectMaximums = false;
-			extractorMin = FactoryFeatureExtractor.nonmax(configExtract);
+			extractorMin = FactoryFeatureExtractor.nonmax(configExtract, 1);
 		}
 		if (intensityAlg.localMaximums()) {
 			configExtract.detectMinimums = false;
 			configExtract.detectMaximums = true;
-			extractorMax = FactoryFeatureExtractor.nonmax(configExtract);
+			extractorMax = FactoryFeatureExtractor.nonmax(configExtract, 1);
 		}
 
 		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<>(intensityAlg,

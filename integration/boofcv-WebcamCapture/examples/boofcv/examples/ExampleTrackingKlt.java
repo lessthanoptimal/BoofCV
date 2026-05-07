@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.abst.feature.detect.interest.ConfigPointDetector;
 import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTracker;
+import boofcv.alg.filter.derivative.DerivativeType;
 import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.gui.feature.VisualizeFeatures;
@@ -43,38 +44,37 @@ import java.util.List;
  */
 public class ExampleTrackingKlt {
 
-	public static void main(String[] args) {
-
+	public static void main( String[] args ) {
 		// tune the tracker for the image size and visual appearance
-		ConfigPointDetector configDetector = new ConfigPointDetector();
+		var configDetector = new ConfigPointDetector();
 		configDetector.type = PointDetectorTypes.SHI_TOMASI;
 		configDetector.general.radius = 8;
 		configDetector.general.threshold = 1;
 
-		ConfigPKlt configKlt = new ConfigPKlt(3);
+		var configKlt = new ConfigPKlt(3);
 
-		PointTracker<GrayF32> tracker = FactoryPointTracker.klt(configKlt,configDetector,GrayF32.class,null);
+		PointTracker<GrayF32> tracker = FactoryPointTracker.klt(configKlt, DerivativeType.SOBEL, configDetector, GrayF32.class, null);
 
 		// Open a webcam at a resolution close to 640x480
-		Webcam webcam = UtilWebcamCapture.openDefault(640,480);
+		Webcam webcam = UtilWebcamCapture.openDefault(640, 480);
 
 		// Create the panel used to display the image and feature tracks
 		ImagePanel gui = new ImagePanel();
 		gui.setPreferredSize(webcam.getViewSize());
 
-		ShowImages.showWindow(gui,"KLT Tracker",true);
+		ShowImages.showWindow(gui, "KLT Tracker", true);
 
 		int minimumTracks = 100;
-		while( true ) {
+		while (true) {
 			BufferedImage image = webcam.getImage();
-			GrayF32 gray = ConvertBufferedImage.convertFrom(image,(GrayF32)null);
+			GrayF32 gray = ConvertBufferedImage.convertFrom(image, (GrayF32)null);
 
 			tracker.process(gray);
 
 			List<PointTrack> tracks = tracker.getActiveTracks(null);
 
 			// Spawn tracks if there are too few
-			if( tracks.size() < minimumTracks ) {
+			if (tracks.size() < minimumTracks) {
 				tracker.spawnTracks();
 				tracks = tracker.getActiveTracks(null);
 				minimumTracks = tracks.size()/2;
@@ -83,8 +83,8 @@ public class ExampleTrackingKlt {
 			// Draw the tracks
 			Graphics2D g2 = image.createGraphics();
 
-			for( PointTrack t : tracks ) {
-				VisualizeFeatures.drawPoint(g2,(int)t.pixel.x,(int)t.pixel.y,Color.RED);
+			for (PointTrack t : tracks) {
+				VisualizeFeatures.drawPoint(g2, (int)t.pixel.x, (int)t.pixel.y, Color.RED);
 			}
 
 			gui.setImageUI(image);

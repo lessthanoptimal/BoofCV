@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,6 +45,7 @@ public class PyramidKltTracker<InputImage extends ImageGray<InputImage>, Derivat
 	// image pyramid for image gradient
 	protected @Nullable DerivativeImage[] derivX;
 	protected @Nullable DerivativeImage[] derivY;
+	protected int derivDivisor;
 
 	public PyramidKltTracker( KltTracker<InputImage, DerivativeImage> tracker ) {
 		this.tracker = tracker;
@@ -58,13 +59,14 @@ public class PyramidKltTracker<InputImage extends ImageGray<InputImage>, Derivat
 	 * @param derivY Derivative along y-axis.
 	 */
 	public void setImage( ImagePyramid<InputImage> image,
-						  DerivativeImage[] derivX, DerivativeImage[] derivY ) {
+						  DerivativeImage[] derivX, DerivativeImage[] derivY, int derivDivisor ) {
 		if (image.getNumLayers() != derivX.length || image.getNumLayers() != derivY.length)
 			throw new IllegalArgumentException("Number of layers does not match.");
 
 		this.image = image;
 		this.derivX = derivX;
 		this.derivY = derivY;
+		this.derivDivisor = derivDivisor;
 	}
 
 	/**
@@ -82,7 +84,7 @@ public class PyramidKltTracker<InputImage extends ImageGray<InputImage>, Derivat
 	 * Sets the feature's description up. The feature's (x,y) must have already been set
 	 * and {@link #setImage} been called.
 	 *
-	 * @param feature Feature's whose description is being setup.
+	 * @param feature Feature which is being updated.
 	 * @return true if there was sufficient information to create a feature or false if not
 	 */
 	public boolean setDescription( PyramidKltFeature feature ) {
@@ -129,7 +131,7 @@ public class PyramidKltTracker<InputImage extends ImageGray<InputImage>, Derivat
 			y /= scale;
 
 			// tracking never needs the derivative
-			tracker.setImage(image.getLayer(layer), null, null);
+			tracker.setImage(image.getLayer(layer), null, null, derivDivisor);
 
 			KltFeature f = feature.desc[layer];
 			f.setPosition(x, y);
@@ -166,9 +168,9 @@ public class PyramidKltTracker<InputImage extends ImageGray<InputImage>, Derivat
 
 	private void setupKltTracker( int layer ) {
 		if (derivX != null && derivY != null)
-			tracker.setImage(image.getLayer(layer), derivX[layer], derivY[layer]);
+			tracker.setImage(image.getLayer(layer), derivX[layer], derivY[layer], derivDivisor);
 		else
-			tracker.setImage(image.getLayer(layer), null, null);
+			tracker.setImage(image.getLayer(layer), null, null, derivDivisor);
 	}
 
 	/**

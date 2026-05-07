@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -63,15 +63,15 @@ public class FactoryInterestPointAlgs {
 	 */
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
 	FeaturePyramid<T, D> hessianPyramid( int extractRadius,
-										 float detectThreshold,
-										 int maxFeatures,
-										 Class<T> imageType,
-										 Class<D> derivType ) {
+	                                     float detectThreshold,
+	                                     int maxFeatures,
+	                                     Class<T> imageType,
+	                                     Class<D> derivType ) {
 		GeneralFeatureIntensity<T, D> intensity = new WrapperHessianDerivBlobIntensity<>(HessianBlobIntensity.Type.DETERMINANT, derivType);
 		NonMaxSuppression extractorMin = intensity.localMinimums() ? FactoryFeatureExtractor.nonmax(
-				ConfigExtract.min(extractRadius, detectThreshold, extractRadius, true)) : null;
+				ConfigExtract.min(extractRadius, detectThreshold, extractRadius, true), 1) : null;
 		NonMaxSuppression extractorMax = intensity.localMaximums() ? FactoryFeatureExtractor.nonmax(
-				ConfigExtract.max(extractRadius, detectThreshold, extractRadius, true)) : null;
+				ConfigExtract.max(extractRadius, detectThreshold, extractRadius, true), 1) : null;
 		FeatureSelectLimitIntensity<Point2D_I16> selector = new FeatureSelectNBest<>(new SampleIntensityImage.I16());
 		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<>(intensity, extractorMin, extractorMax, selector);
 		detector.setFeatureLimit(maxFeatures);
@@ -93,21 +93,24 @@ public class FactoryInterestPointAlgs {
 	 */
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
 	FeaturePyramid<T, D> harrisPyramid( int extractRadius,
-										float detectThreshold,
-										int maxFeatures,
-										Class<T> imageType,
-										Class<D> derivType ) {
+	                                    float detectThreshold,
+	                                    int maxFeatures,
+	                                    Class<T> imageType,
+	                                    Class<D> derivType ) {
+
+		AnyImageDerivative<T, D> deriv = GImageDerivativeOps.derivativeForScaleSpace(imageType, derivType);
 		GradientCornerIntensity<D> harris = FactoryIntensityPointAlg.harris(extractRadius, 0.04f, false, derivType);
+
+		float intensityScale = harris.thresholdScaleByDerivative(deriv.getEdgeDivisor());
+
 		GeneralFeatureIntensity<T, D> intensity = new WrapperGradientCornerIntensity<>(harris);
 		NonMaxSuppression extractorMin = intensity.localMinimums() ? FactoryFeatureExtractor.nonmax(
-				ConfigExtract.min(extractRadius, detectThreshold, extractRadius, true)) : null;
+				ConfigExtract.min(extractRadius, detectThreshold, extractRadius, true), intensityScale) : null;
 		NonMaxSuppression extractorMax = intensity.localMaximums() ? FactoryFeatureExtractor.nonmax(
-				ConfigExtract.max(extractRadius, detectThreshold, extractRadius, true)) : null;
+				ConfigExtract.max(extractRadius, detectThreshold, extractRadius, true), intensityScale) : null;
 		FeatureSelectLimitIntensity<Point2D_I16> selector = new FeatureSelectNBest<>(new SampleIntensityImage.I16());
 		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<>(intensity, extractorMin, extractorMax, selector);
 		detector.setFeatureLimit(maxFeatures);
-
-		AnyImageDerivative<T, D> deriv = GImageDerivativeOps.derivativeForScaleSpace(imageType, derivType);
 
 		return new FeaturePyramid<>(detector, deriv, 2);
 	}
@@ -124,20 +127,22 @@ public class FactoryInterestPointAlgs {
 	 */
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
 	FeatureLaplacePyramid<T, D> hessianLaplace( int extractRadius,
-												float detectThreshold,
-												int maxFeatures,
-												Class<T> imageType,
-												Class<D> derivType ) {
+	                                            float detectThreshold,
+	                                            int maxFeatures,
+	                                            Class<T> imageType,
+	                                            Class<D> derivType ) {
+		AnyImageDerivative<T, D> deriv = GImageDerivativeOps.derivativeForScaleSpace(imageType, derivType);
 		GeneralFeatureIntensity<T, D> intensity = new WrapperHessianDerivBlobIntensity<>(HessianBlobIntensity.Type.DETERMINANT, derivType);
+
+		float intensityScale = intensity.thresholdScaleByDerivative(deriv.getEdgeDivisor());
+
 		NonMaxSuppression extractorMin = intensity.localMinimums() ? FactoryFeatureExtractor.nonmax(
-				ConfigExtract.min(extractRadius, detectThreshold, extractRadius, true)) : null;
+				ConfigExtract.min(extractRadius, detectThreshold, extractRadius, true), intensityScale) : null;
 		NonMaxSuppression extractorMax = intensity.localMaximums() ? FactoryFeatureExtractor.nonmax(
-				ConfigExtract.max(extractRadius, detectThreshold, extractRadius, true)) : null;
+				ConfigExtract.max(extractRadius, detectThreshold, extractRadius, true), intensityScale) : null;
 		FeatureSelectLimitIntensity<Point2D_I16> selector = new FeatureSelectNBest<>(new SampleIntensityImage.I16());
 		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<>(intensity, extractorMin, extractorMax, selector);
 		detector.setFeatureLimit(maxFeatures);
-
-		AnyImageDerivative<T, D> deriv = GImageDerivativeOps.derivativeForScaleSpace(imageType, derivType);
 
 		ImageFunctionSparse<T> sparseLaplace = FactoryDerivativeSparse.createLaplacian(imageType, null);
 
@@ -156,21 +161,25 @@ public class FactoryInterestPointAlgs {
 	 */
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
 	FeatureLaplacePyramid<T, D> harrisLaplace( int extractRadius,
-											   float detectThreshold,
-											   int maxFeatures,
-											   Class<T> imageType,
-											   Class<D> derivType ) {
+	                                           float detectThreshold,
+	                                           int maxFeatures,
+	                                           Class<T> imageType,
+	                                           Class<D> derivType ) {
+		AnyImageDerivative<T, D> deriv = GImageDerivativeOps.derivativeForScaleSpace(imageType, derivType);
 		GradientCornerIntensity<D> harris = FactoryIntensityPointAlg.harris(extractRadius, 0.04f, false, derivType);
 		GeneralFeatureIntensity<T, D> intensity = new WrapperGradientCornerIntensity<>(harris);
+
+		float intensityScale = intensity.thresholdScaleByDerivative(deriv.getEdgeDivisor());
+
 		NonMaxSuppression extractorMin = intensity.localMinimums() ? FactoryFeatureExtractor.nonmax(
-				ConfigExtract.min(extractRadius, detectThreshold, extractRadius, true)) : null;
+				ConfigExtract.min(extractRadius, detectThreshold, extractRadius, true), intensityScale) : null;
 		NonMaxSuppression extractorMax = intensity.localMaximums() ? FactoryFeatureExtractor.nonmax(
-				ConfigExtract.max(extractRadius, detectThreshold, extractRadius, true)) : null;
+				ConfigExtract.max(extractRadius, detectThreshold, extractRadius, true), intensityScale) : null;
 		FeatureSelectLimitIntensity<Point2D_I16> selector = new FeatureSelectNBest<>(new SampleIntensityImage.I16());
 		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<>(intensity, extractorMin, extractorMax, selector);
 		detector.setFeatureLimit(maxFeatures);
 
-		AnyImageDerivative<T, D> deriv = GImageDerivativeOps.derivativeForScaleSpace(imageType, derivType);
+
 		ImageFunctionSparse<T> sparseLaplace = FactoryDerivativeSparse.createLaplacian(imageType, null);
 
 		return new FeatureLaplacePyramid<>(detector, sparseLaplace, deriv, 2);
@@ -191,7 +200,7 @@ public class FactoryInterestPointAlgs {
 		config.checkValidity();
 
 		// ignore border is overwritten by Fast Hessian at detection time
-		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(config.extract);
+		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(config.extract, 1);
 		FeatureSelectLimitIntensity<Point2D_I16> limitLevels = FactorySelectLimit.intensity(config.selector);
 		FeatureSelectLimitIntensity<ScalePoint> limitAll = FactorySelectLimit.intensity(config.selector);
 
@@ -213,7 +222,7 @@ public class FactoryInterestPointAlgs {
 			configDetector = new ConfigSiftDetector();
 
 		NonMaxLimiter nonmax = FactoryFeatureExtractor.nonmaxLimiter(
-				configDetector.extract, configDetector.selector, configDetector.maxFeaturesPerScale);
+				configDetector.extract, 1, configDetector.selector, configDetector.maxFeaturesPerScale);
 		FeatureSelectLimitIntensity<ScalePoint> selectorAll = FactorySelectLimit.intensity(configDetector.selector);
 		final var alg = new SiftDetector(selectorAll, configDetector.edgeR, nonmax);
 		alg.maxFeaturesAll = configDetector.maxFeaturesAll;

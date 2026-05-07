@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,8 +34,8 @@ public class TestFactoryDetectPoint extends BoofStandardJUnit {
 		var config = new ConfigPointDetector();
 		for (PointDetectorTypes type : PointDetectorTypes.values()) {
 			config.type = type;
-			FactoryDetectPoint.create(config, GrayU8.class, null);
-			FactoryDetectPoint.create(config, GrayF32.class, null);
+			FactoryDetectPoint.create(config, GrayU8.class, null, 1);
+			FactoryDetectPoint.create(config, GrayF32.class, null, 1);
 		}
 	}
 }

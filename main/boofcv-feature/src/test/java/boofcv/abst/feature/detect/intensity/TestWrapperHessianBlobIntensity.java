@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,16 +23,33 @@ import boofcv.factory.feature.detect.intensity.FactoryIntensityPoint;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofStandardJUnit;
+import org.junit.jupiter.api.Nested;
 
 @SuppressWarnings("unchecked")
-public class TestWrapperHessianBlobIntensity extends ChecksGeneralFeatureIntensity{
-	public TestWrapperHessianBlobIntensity() {
-		addTypes(GrayF32.class,GrayF32.class);
-		addTypes(GrayU8.class, GrayS16.class);
+public class TestWrapperHessianBlobIntensity extends BoofStandardJUnit {
+
+	@Nested class DETERMINANT extends ChecksGeneralFeatureIntensity {
+		public DETERMINANT() {
+			addTypes(GrayF32.class, GrayF32.class);
+			addTypes(GrayU8.class, GrayS16.class);
+		}
+
+		@Override
+		public GeneralFeatureIntensity<GrayF32, GrayF32> createAlg( Class imageType, Class derivType ) {
+			return FactoryIntensityPoint.hessian(HessianBlobIntensity.Type.DETERMINANT, derivType);
+		}
 	}
 
-	@Override
-	public GeneralFeatureIntensity<GrayF32, GrayF32> createAlg(Class imageType, Class derivType) {
-		return FactoryIntensityPoint.hessian(HessianBlobIntensity.Type.DETERMINANT, derivType);
+	@Nested class TRACE extends ChecksGeneralFeatureIntensity {
+		public TRACE() {
+			addTypes(GrayF32.class, GrayF32.class);
+			addTypes(GrayU8.class, GrayS16.class);
+		}
+
+		@Override
+		public GeneralFeatureIntensity<GrayF32, GrayF32> createAlg( Class imageType, Class derivType ) {
+			return FactoryIntensityPoint.hessian(HessianBlobIntensity.Type.TRACE, derivType);
+		}
 	}
 }

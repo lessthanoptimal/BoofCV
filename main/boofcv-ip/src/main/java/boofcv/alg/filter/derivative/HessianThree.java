@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,37 +34,33 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * <p>
- * Computes the second derivative (Hessian) of an image using. This hessian is derived by using the same gradient
- * function used in {@link GradientThree}, which uses a kernel of [-1 0 1].
- * </p>
- *
- * <p>
- * WARNING: It is computationally more expensive to compute the Hessian with this operation than applying the
- * gradient operator multiple times. However, this does not require the creation additional storage to save
- * intermediate results.
- * </p>
- *
- * <p>
- * Kernel for &part; <sup>2</sup>f/&part; x<sup>2</sup> and &part;<sup>2</sup>f /&part; y<sup>2</sup> is
- * [1 0 -2 0 1] and &part;<sup>2</sup>f/&part; x&part;y is:<br>
- * <table border="1">
- * <tr> <td> 1 </td> <td> 0 </td> <td> -1 </td> </tr>
- * <tr> <td> 0 </td> <td> 0 </td> <td> 0 </td> </tr>
- * <tr> <td> -1 </td> <td> 0 </td> <td> 1 </td> </tr>
- * </table>
- * </p>
- *
- * @author Peter Abeles
- */
+/// Central-difference second derivative (Hessian). This hessian is derived by using the same gradient
+/// function used in [GradientThree], which uses a kernel of `[-1 0 1]`.
+///
+/// For integer images, divide the result by [#divisor] for proper scaling. Floating
+/// point kernels already include this scaling; without it, output magnitudes are
+/// inflated by that factor.
+///
+/// WARNING: It is computationally more expensive to compute the Hessian with this operation than applying the
+/// gradient operator multiple times. However, this does not require the creation additional storage to save
+/// intermediate results.
+///
+/// Kernel for ∂²f/∂x² and ∂²f/∂y² is `[1 0 -2 0 1]` and ∂²f/∂x∂y is:
+///
+/// |    |    |    |
+/// |----|----|----|
+/// |  1 |  0 | -1 |
+/// |  0 |  0 |  0 |
+/// | -1 |  0 |  1 |
 public class HessianThree {
+	/// Integer divisor to ensure brightness does not change
+	public static final int divisor = 4;
 
-	public static Kernel1D_S32 kernelXXYY_I32 = new Kernel1D_S32(new int[]{1, 0, -2, 0, 1}, 5);
-	public static Kernel2D_S32 kernelCross_I32 = new Kernel2D_S32(3, new int[]{1, 0, -1, 0, 0, 0, -1, 0, 1});
+	public static Kernel1D_S32 kernelXX_I32 = new Kernel1D_S32(5, new int[]{1, 0, -2, 0, 1});
+	public static Kernel2D_S32 kernelXY_I32 = new Kernel2D_S32(3, new int[]{1, 0, -1, 0, 0, 0, -1, 0, 1});
 
-	public static Kernel1D_F32 kernelXXYY_F32 = new Kernel1D_F32(new float[]{0.5f, 0, -1, 0, 0.5f}, 5);
-	public static Kernel2D_F32 kernelCross_F32 = new Kernel2D_F32(3, new float[]{0.5f, 0, -0.5f, 0, 0, 0, -0.5f, 0, 0.5f});
+	public static Kernel1D_F32 kernelXX_F32 = new Kernel1D_F32(5, new float[]{0.5f, 0, -1, 0, 0.5f});
+	public static Kernel2D_F32 kernelXY_F32 = new Kernel2D_F32(3, new float[]{0.5f, 0, -0.5f, 0, 0, 0, -0.5f, 0, 0.5f});
 
 	public static <I extends ImageGray<I>, D extends ImageGray<D>> void process( I input,
 																				 D derivXX, D derivYY, D derivXY,
@@ -76,17 +72,13 @@ public class HessianThree {
 		}
 	}
 
-	/**
-	 * <p>
-	 * Computes the second derivative of an {@link GrayU8} along the x and y axes.
-	 * </p>
-	 *
-	 * @param orig Which which is to be differentiated. Not Modified.
-	 * @param derivXX Second derivative along the x-axis. Modified.
-	 * @param derivYY Second derivative along the y-axis. Modified.
-	 * @param derivXY Second cross derivative. Modified.
-	 * @param border Specifies how the image border is handled. If null the border is not processed.
-	 */
+	/// Computes the second derivative of an [GrayU8] along the x and y axes.
+	///
+	/// @param orig Input image that is differentiated. Not Modified.
+	/// @param derivXX Second derivative along the x-axis. Modified.
+	/// @param derivYY Second derivative along the y-axis. Modified.
+	/// @param derivXY Second cross derivative. Modified.
+	/// @param border Specifies how the image border is handled. If null the border is not processed.
 	public static void process( GrayU8 orig,
 								GrayS16 derivXX, GrayS16 derivYY, GrayS16 derivXY,
 								@Nullable ImageBorder_S32 border ) {
@@ -94,21 +86,19 @@ public class HessianThree {
 		HessianThree_Standard.process(orig, derivXX, derivYY, derivXY);
 
 		if (border != null) {
-			DerivativeHelperFunctions.processBorderHorizontal(orig, derivXX, kernelXXYY_I32, border);
-			DerivativeHelperFunctions.processBorderVertical(orig, derivYY, kernelXXYY_I32, border);
-			ConvolveJustBorder_General_SB.convolve(kernelCross_I32, border, derivXY);
+			DerivativeHelperFunctions.processBorderHorizontal(orig, derivXX, kernelXX_I32, border);
+			DerivativeHelperFunctions.processBorderVertical(orig, derivYY, kernelXX_I32, border);
+			ConvolveJustBorder_General_SB.convolve(kernelXY_I32, border, derivXY);
 		}
 	}
 
-	/**
-	 * Computes the second derivative of an {@link GrayU8} along the x and y axes.
-	 *
-	 * @param orig Which which is to be differentiated. Not Modified.
-	 * @param derivXX Second derivative along the x-axis. Modified.
-	 * @param derivYY Second derivative along the y-axis. Modified.
-	 * @param derivXY Second cross derivative. Modified.
-	 * @param border Specifies how the image border is handled. If null the border is not processed.
-	 */
+	/// Computes the second derivative of an [GrayU8] along the x and y axes.
+	///
+	/// @param orig Input image that is differentiated. Not Modified.
+	/// @param derivXX Second derivative along the x-axis. Modified.
+	/// @param derivYY Second derivative along the y-axis. Modified.
+	/// @param derivXY Second cross derivative. Modified.
+	/// @param border Specifies how the image border is handled. If null the border is not processed.
 	public static void process( GrayF32 orig,
 								GrayF32 derivXX, GrayF32 derivYY, GrayF32 derivXY,
 								@Nullable ImageBorder_F32 border ) {
@@ -116,9 +106,9 @@ public class HessianThree {
 		HessianThree_Standard.process(orig, derivXX, derivYY, derivXY);
 
 		if (border != null) {
-			DerivativeHelperFunctions.processBorderHorizontal(orig, derivXX, kernelXXYY_F32, border);
-			DerivativeHelperFunctions.processBorderVertical(orig, derivYY, kernelXXYY_F32, border);
-			ConvolveJustBorder_General_SB.convolve(kernelCross_F32, border, derivXY);
+			DerivativeHelperFunctions.processBorderHorizontal(orig, derivXX, kernelXX_F32, border);
+			DerivativeHelperFunctions.processBorderVertical(orig, derivYY, kernelXX_F32, border);
+			ConvolveJustBorder_General_SB.convolve(kernelXY_F32, border, derivXY);
 		}
 	}
 }

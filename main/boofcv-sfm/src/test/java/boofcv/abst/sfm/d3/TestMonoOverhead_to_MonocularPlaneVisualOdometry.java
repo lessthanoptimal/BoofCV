@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.abst.sfm.d3;
 import boofcv.abst.feature.detect.interest.ConfigPointDetector;
 import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.tracker.PointTracker;
+import boofcv.alg.filter.derivative.DerivativeType;
 import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.factory.tracker.FactoryPointTracker;
@@ -48,7 +49,7 @@ public class TestMonoOverhead_to_MonocularPlaneVisualOdometry extends CheckVisua
 		configDetector.general.radius = 3;
 		configDetector.general.threshold = 1;
 
-		PointTracker<GrayU8> tracker = FactoryPointTracker.klt(config, configDetector,
+		PointTracker<GrayU8> tracker = FactoryPointTracker.klt(config, DerivativeType.SOBEL, configDetector,
 				GrayU8.class, GrayS16.class);
 
 		double cellSize = 0.015;

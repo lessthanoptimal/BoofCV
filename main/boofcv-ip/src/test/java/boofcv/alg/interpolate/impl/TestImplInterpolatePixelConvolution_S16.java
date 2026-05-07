@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,28 +23,27 @@ import boofcv.struct.convolve.KernelBase;
 import boofcv.struct.convolve.KernelContinuous1D_F32;
 import boofcv.struct.image.GrayS16;
 
-public class TestImplInterpolatePixelConvolution_S16 
-		extends GeneralChecksInterpolationPixelS<GrayS16>
-{
+public class TestImplInterpolatePixelConvolution_S16
+		extends GeneralChecksInterpolationPixelS<GrayS16> {
 	public TestImplInterpolatePixelConvolution_S16() {
 		exceptionOutside = false;
 	}
 
 	@Override
-	protected GrayS16 createImage(int width, int height) {
+	protected GrayS16 createImage( int width, int height ) {
 		return new GrayS16(width, height);
 	}
 
 	@Override
-	protected InterpolatePixelS<GrayS16> wrap(GrayS16 image, int minValue, int maxValue) {
-		InterpolatePixelS<GrayS16> ret = new ImplInterpolatePixelConvolution_S16(new Dummy(),0,255);
+	protected InterpolatePixelS<GrayS16> wrap( GrayS16 image, int minValue, int maxValue ) {
+		InterpolatePixelS<GrayS16> ret = new ImplInterpolatePixelConvolution_S16(new Dummy(), 0, 255);
 		ret.setImage(image);
 
 		return ret;
 	}
 
 	@Override
-	protected float compute(GrayS16 img, float x, float y) {
+	protected float compute( GrayS16 img, float x, float y ) {
 		int xx = (int)x;
 		int yy = (int)y;
 
@@ -53,50 +52,44 @@ public class TestImplInterpolatePixelConvolution_S16
 		int y0 = yy - 2;
 		int y1 = yy + 2;
 
-		if( x0 < 0 ) x0 = 0;
-		if( x1 >= img.width ) x1 = img.width-1;
-		if( y0 < 0 ) y0 = 0;
-		if( y1 >= img.height ) y1 = img.height-1;
+		if (x0 < 0) x0 = 0;
+		if (x1 >= img.width) x1 = img.width - 1;
+		if (y0 < 0) y0 = 0;
+		if (y1 >= img.height) y1 = img.height - 1;
 
 		float total = 0;
-		for( int i = y0; i <= y1; i++ ) {
-			for( int j = x0; j <= x1; j++ ) {
-				total += img.get(j,i);
+		for (int i = y0; i <= y1; i++) {
+			for (int j = x0; j <= x1; j++) {
+				total += img.get(j, i);
 			}
 		}
 
-		total /= (1+x1-x0)*(1+y1-y0);
+		total /= (1 + x1 - x0)*(1 + y1 - y0);
 
 		return total;
 	}
 
-	private static class Dummy extends KernelContinuous1D_F32
-	{
+	private static class Dummy extends KernelContinuous1D_F32 {
 
 		private Dummy() {
 			super(5);
 		}
 
-		@Override
-		public double getDouble(int index) {
+		@Override public double getDouble( int index ) {
 			return 0;
 		}
 
-		@Override
-		public void setD(int index, double value) {}
+		@Override public void setD( int index, double value ) {}
 
-		@Override
-		public boolean isInteger() {
+		@Override public boolean isInteger() {
 			return false;
 		}
 
-		@Override
-		public <T extends KernelBase> T copy() {
+		@Override public <T extends KernelBase> T copy() {
 			return null;
 		}
 
-		@Override
-		public float compute(float x) {
+		@Override public float compute( float x ) {
 			return 1.0f/5.0f;
 		}
 	}

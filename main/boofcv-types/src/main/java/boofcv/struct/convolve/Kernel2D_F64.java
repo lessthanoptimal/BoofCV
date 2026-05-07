@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,9 @@
 
 package boofcv.struct.convolve;
 
+import org.ejml.MatrixFormattable;
+import org.ejml.MatrixPrintFormat;
+
 /**
  * This is a kernel in a 2D convolution. The convolution is performed by
  * convolving this kernel across a 2D array/image. The kernel is square and has
@@ -31,7 +34,7 @@ package boofcv.struct.convolve;
  * @author Peter Abeles
  */
 @SuppressWarnings({"NullAway.Init"})
-public class Kernel2D_F64 extends Kernel2D {
+public class Kernel2D_F64 extends Kernel2D implements MatrixFormattable {
 
 	public double[] data;
 
@@ -132,6 +135,20 @@ public class Kernel2D_F64 extends Kernel2D {
 		System.out.println();
 	}
 
+	@Override public String format( MatrixPrintFormat format ) {
+		var builder = new StringBuilder();
+		builder.append(format.getPrefix());
+		for (int row = 0; row < width; row++) {
+			format.rowPadding(row == 0, builder);
+			int _row = row;
+			format.row(builder, width, ( col ) -> data[_row*width + col]);
+			if (row < width - 1)
+				builder.append(format.getRowSeparator());
+		}
+		builder.append(format.getSuffix());
+		return builder.toString();
+	}
+
 	@Override
 	public Kernel2D_F64 copy() {
 		Kernel2D_F64 ret = new Kernel2D_F64(width);
@@ -143,5 +160,9 @@ public class Kernel2D_F64 extends Kernel2D {
 	@Override
 	public /**/double /**/getDouble( int x, int y ) {
 		return get(x, y);
+	}
+
+	@Override public String toString() {
+		return getClass().getSimpleName() + " width=" + width + " offset=" + offset + "\n" + format();
 	}
 }

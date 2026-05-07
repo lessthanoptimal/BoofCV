@@ -53,6 +53,10 @@ public class PyramidGradient<I extends ImageGray<I>, D extends ImageGray<D>> {
 		PyramidOps.gradient(basePyramid, gradient, derivX, derivY);
 	}
 
+	public int gradientDivisor() {
+		return gradient.divisor();
+	}
+
 	public ImageType<I> getInputType() {
 		return gradient.getInputType();
 	}

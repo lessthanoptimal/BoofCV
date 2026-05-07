@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -55,8 +55,8 @@ public class FactoryDetectLineAlgs {
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	DetectLineSegmentsGridRansac<I, D> lineRansac( @Nullable ConfigLineRansac config,
-												   Class<I> imageType,
-												   Class<D> derivType ) {
+	                                               Class<I> imageType,
+	                                               Class<D> derivType ) {
 
 		if (config == null)
 			config = new ConfigLineRansac();
@@ -100,7 +100,7 @@ public class FactoryDetectLineAlgs {
 	 */
 	public static <D extends ImageGray<D>>
 	DetectLineHoughFootSubimage<D> houghFootSub( @Nullable ConfigHoughFootSubimage config,
-												 Class<D> derivType ) {
+	                                             Class<D> derivType ) {
 
 		if (config == null)
 			config = new ConfigHoughFootSubimage();
@@ -113,10 +113,10 @@ public class FactoryDetectLineAlgs {
 
 	public static <D extends ImageGray<D>>
 	HoughTransformGradient<D> houghLineFoot( ConfigHoughGradient configHough, ConfigParamFoot configParam,
-											 Class<D> derivType ) {
+	                                         Class<D> derivType ) {
 		HoughParametersFootOfNorm param = new HoughParametersFootOfNorm(configParam.minDistanceFromOrigin);
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(
-				new ConfigExtract(configHough.localMaxRadius, configHough.minCounts, 0, true));
+				new ConfigExtract(configHough.localMaxRadius, configHough.minCounts, 0, true), 1);
 
 		HoughTransformGradient<D> hough;
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -135,10 +135,10 @@ public class FactoryDetectLineAlgs {
 
 	public static <D extends ImageGray<D>>
 	HoughTransformGradient<D> houghLinePolar( ConfigHoughGradient configHough, ConfigParamPolar configParam,
-											  Class<D> derivType ) {
+	                                          Class<D> derivType ) {
 		HoughParametersPolar param = new HoughParametersPolar(configParam.resolutionRange, configParam.numBinsAngle);
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(
-				new ConfigExtract(configHough.localMaxRadius, configHough.minCounts, 0, true));
+				new ConfigExtract(configHough.localMaxRadius, configHough.minCounts, 0, true), 1);
 
 		HoughTransformGradient<D> hough;
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -158,7 +158,7 @@ public class FactoryDetectLineAlgs {
 	public static HoughTransformBinary houghLinePolar( ConfigHoughBinary configHough, ConfigParamPolar configParam ) {
 		HoughParametersPolar param = new HoughParametersPolar(configParam.resolutionRange, configParam.numBinsAngle);
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(
-				new ConfigExtract(configHough.localMaxRadius, 0, 0, false));
+				new ConfigExtract(configHough.localMaxRadius, 0, 0, false), 1);
 
 		HoughTransformBinary hough;
 		if (BoofConcurrency.USE_CONCURRENT) {

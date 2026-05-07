@@ -79,7 +79,7 @@ public class BenchmarkKltTracker {
 		GImageMiscOps.addUniform(derivX, rand, 0, 200);
 		GImageMiscOps.addUniform(derivY, rand, 0, 200);
 
-		klt.setImage(image, derivX, derivY);
+		klt.setImage(image, derivX, derivY, 1);
 		feature = new KltFeature(radius);
 	}
 

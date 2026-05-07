@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -109,9 +109,9 @@ public class HybridTrackerScalePoint
 	 * @param tooCloseRadius If tracks are less than or equal to this distance to each other some will be pruned
 	 */
 	public HybridTrackerScalePoint( PyramidKltForHybrid<I, D> trackerKlt,
-									DetectDescribePoint<I, TD> detector,
-									AssociateDescription2D<TD> associate,
-									int tooCloseRadius ) {
+	                                DetectDescribePoint<I, TD> detector,
+	                                AssociateDescription2D<TD> associate,
+	                                int tooCloseRadius ) {
 		if (!associate.uniqueDestination() || !associate.uniqueSource())
 			throw new IllegalArgumentException("Associations must be unique");
 
@@ -161,9 +161,7 @@ public class HybridTrackerScalePoint
 	 * @param derivX Derivative pyramid of input x-axis
 	 * @param derivY Derivative pyramid of input y-axis
 	 */
-	public void updateTracks( PyramidDiscrete<I> pyramid,
-							  D[] derivX,
-							  D[] derivY ) {
+	public void updateTracks( PyramidDiscrete<I> pyramid, D[] derivX, D[] derivY ) {
 		this.imageWidth = pyramid.getInputWidth();
 		this.imageHeight = pyramid.getInputWidth();
 		this.tracksDropped.clear();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.gui.controls;
 
 import boofcv.abst.feature.detect.interest.ConfigPointDetector;
 import boofcv.abst.tracker.PointTracker;
+import boofcv.alg.filter.derivative.DerivativeType;
 import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.gui.StandardAlgConfigPanel;
@@ -101,7 +102,7 @@ public class ControlPanelPointTrackerKlt extends StandardAlgConfigPanel {
 
 	public <T extends ImageBase<T>>
 	PointTracker<T> createTracker(ImageType<T> imageType ) {
-		return FactoryPointTracker.klt(configKlt, configDetect, imageType.getImageClass(), null);
+		return FactoryPointTracker.klt(configKlt, DerivativeType.SOBEL, configDetect, imageType.getImageClass(), null);
 	}
 
 	@Override

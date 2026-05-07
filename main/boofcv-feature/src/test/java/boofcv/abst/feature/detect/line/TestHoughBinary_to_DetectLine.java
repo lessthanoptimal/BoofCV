@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,11 +19,9 @@
 package boofcv.abst.feature.detect.line;
 
 import boofcv.abst.feature.detect.extract.ConfigExtract;
-import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.feature.detect.line.HoughParametersPolar;
 import boofcv.alg.feature.detect.line.HoughTransformBinary;
-import boofcv.alg.feature.detect.line.HoughTransformParameters;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.struct.image.ImageGray;
@@ -31,9 +29,9 @@ import boofcv.struct.image.ImageGray;
 class TestHoughBinary_to_DetectLine extends GeneralDetectLineGradientTests {
 	@Override
 	public <T extends ImageGray<T>> DetectLine<T> createAlg(Class<T> imageType) {
-		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(4, 2, 0, true));
-		HoughTransformParameters polar = new HoughParametersPolar(2,180);
-		HoughTransformBinary hough = new HoughTransformBinary(extractor,polar);
+		var extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(4, 2, 0, true), 1);
+		var polar = new HoughParametersPolar(2,180);
+		var hough = new HoughTransformBinary(extractor,polar);
 
 		InputToBinary<T> thresholder = FactoryThresholdBinary.globalOtsu(0,255,1.0,true,imageType);
 

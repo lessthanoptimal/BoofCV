@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -91,6 +91,8 @@ public abstract class ImplSsdCornerBase<D extends ImageGray<D>, D2 extends Image
 		 * @return corner intensity.
 		 */
 		float compute( int totalXX, int totalXY, int totalYY );
+
+		float thresholdScaleByDerivative( int divisor );
 	}
 
 	public interface CornerIntensity_F32 {

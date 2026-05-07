@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,18 +25,10 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
 
-/**
- * <p>
- * Basic implementation of {@link GradientTwo1} with nothing fancy is done to improve its performance.
- * </p>
- *
- * @author Peter Abeles
- */
+/// Basic implementation of [GradientTwo1] with nothing fancy is done to improve its performance.
 public class GradientTwo1_Standard {
 
-	/**
-	 * Computes the derivative along the x and y axes
-	 */
+	/// Computes the derivative along the x and y axes
 	public static void process( GrayF32 orig, GrayF32 derivX, GrayF32 derivY ) {
 		final float[] data = orig.data;
 		final float[] imgX = derivX.data;
@@ -55,16 +47,14 @@ public class GradientTwo1_Standard {
 
 			for (; indexSrc < endX; indexSrc++) {
 				float val = data[indexSrc];
-				imgX[indexX++] = (val - data[indexSrc - 1]);
-				imgY[indexY++] = (val - data[indexSrc - stride]);
+				imgX[indexX++] = val - data[indexSrc - 1];
+				imgY[indexY++] = val - data[indexSrc - stride];
 			}
 		}
 		//CONCURRENT_ABOVE });
 	}
 
-	/**
-	 * Computes the derivative along the x and y axes
-	 */
+	/// Computes the derivative along the x and y axes
 	public static void process( GrayU8 orig, GrayS16 derivX, GrayS16 derivY ) {
 		final byte[] data = orig.data;
 		final short[] imgX = derivX.data;

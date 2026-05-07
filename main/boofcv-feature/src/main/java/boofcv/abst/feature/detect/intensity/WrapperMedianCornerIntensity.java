@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -70,6 +70,10 @@ public class WrapperMedianCornerIntensity<I extends ImageGray<I>, D extends Imag
 		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	@Override public float thresholdScaleByDerivative( int divisor ) {
+		return 1.0f;
 	}
 
 	@Override

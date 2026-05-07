@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,6 +35,19 @@ import boofcv.struct.image.*;
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class GImageDerivativeOps {
+	/// From OpenCV and seems to match theory, as they state. Designed to produce the
+	/// true derivative of a ramp. 2^(ksize*2 - dx - dy - 2). This is what you need to divide the integer
+	/// kernels by.
+	///
+	/// @param ksize Aperture size (kernel width/height), 1,3,5,7, ..etc
+	/// @param dx order of derivative in x direction. 0=smoothing only, 1=first derivative, 2=second
+	///
+	public static int kernelDivisor( int ksize, int dx, int dy ) {
+		int scaleX = 1 << (ksize - dx - 1);
+		int scaleY = 1 << (ksize - dy - 1);
+		return scaleX * scaleY;
+	}
+
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	void laplace( I input, D output, BorderType borderType ) {
 		ImageBorder<I> border = BorderType.SKIP == borderType ? null : FactoryImageBorder.wrap(borderType, input);

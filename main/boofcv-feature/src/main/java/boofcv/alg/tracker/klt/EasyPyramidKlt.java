@@ -211,11 +211,11 @@ public class EasyPyramidKlt<Image extends ImageGray<Image>, Derivative extends I
 	public void track( int idx0, int idx1 ) {
 		if (isUseConcurrent(idx1 - idx0)) {
 			BoofConcurrency.loopBlocks(idx0, idx1, workspace, ( helper, block0, block1 ) -> {
-				helper.setImage(currPyr.basePyramid, currPyr.derivX, currPyr.derivY);
+				helper.setImage(currPyr.basePyramid, currPyr.derivX, currPyr.derivY, currPyr.gradientDivisor());
 				track(block0, block1, helper);
 			});
 		} else {
-			tracker.setImage(currPyr.basePyramid, currPyr.derivX, currPyr.derivY);
+			tracker.setImage(currPyr.basePyramid, currPyr.derivX, currPyr.derivY, prevPyr.gradientDivisor());
 			track(idx0, idx1, tracker);
 		}
 	}
@@ -244,7 +244,7 @@ public class EasyPyramidKlt<Image extends ImageGray<Image>, Derivative extends I
 		if (index < 0 || index >= tracks.size)
 			throw new IndexOutOfBoundsException("index=" + index + " size=" + tracks.size);
 
-		tracker.setImage(currPyr.basePyramid, currPyr.derivX, currPyr.derivY);
+		tracker.setImage(currPyr.basePyramid, currPyr.derivX, currPyr.derivY, currPyr.gradientDivisor());
 		PyramidKltFeature t = tracks.get(index);
 		TrackMeta meta = metadata.get(index);
 
@@ -269,11 +269,11 @@ public class EasyPyramidKlt<Image extends ImageGray<Image>, Derivative extends I
 	public void backwardsValidation( int idx0, int idx1 ) {
 		if (isUseConcurrent(idx1 - idx0)) {
 			BoofConcurrency.loopBlocks(idx0, idx1, workspace, ( helper, block0, block1 ) -> {
-				helper.setImage(prevPyr.basePyramid, prevPyr.derivX, prevPyr.derivY);
+				helper.setImage(prevPyr.basePyramid, prevPyr.derivX, prevPyr.derivY, prevPyr.gradientDivisor());
 				backwardsValidation(block0, block1, helper);
 			});
 		} else {
-			tracker.setImage(prevPyr.basePyramid, prevPyr.derivX, prevPyr.derivY);
+			tracker.setImage(prevPyr.basePyramid, prevPyr.derivX, prevPyr.derivY, prevPyr.gradientDivisor());
 			backwardsValidation(idx0, idx1, tracker);
 		}
 	}
@@ -317,11 +317,11 @@ public class EasyPyramidKlt<Image extends ImageGray<Image>, Derivative extends I
 	public void describe( int idx0, int idx1 ) {
 		if (isUseConcurrent(idx1 - idx0)) {
 			BoofConcurrency.loopBlocks(idx0, idx1, workspace, ( helper, block0, block1 ) -> {
-				helper.setImage(currPyr.basePyramid, currPyr.derivX, currPyr.derivY);
+				helper.setImage(currPyr.basePyramid, currPyr.derivX, currPyr.derivY, currPyr.gradientDivisor());
 				describe(block0, block1, helper);
 			});
 		} else {
-			tracker.setImage(currPyr.basePyramid, currPyr.derivX, currPyr.derivY);
+			tracker.setImage(currPyr.basePyramid, currPyr.derivX, currPyr.derivY, currPyr.gradientDivisor());
 			describe(idx0, idx1, tracker);
 		}
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -71,11 +71,11 @@ public class GradientSparseSobel_F32 implements SparseImageGradient<GrayF32,Grad
 			a21 = border.get(x  ,y+1);
 			a22 = border.get(x+1,y+1);
 		}
-		gradient.y = -(a00 + 2.0f*a01 + a02)*0.25F;
-		gradient.y += (a20 + 2.0f*a21 + a22)*0.25F;
+		gradient.y = -(a00 + 2.0f*a01 + a02)*0.125F;
+		gradient.y += (a20 + 2.0f*a21 + a22)*0.125F;
 
-		gradient.x = -(a00 + 2.0f*a10 + a20)*0.25F;
-		gradient.x += (a02 + 2.0f*a12 + a22)*0.25F;
+		gradient.x = -(a00 + 2.0f*a10 + a20)*0.125F;
+		gradient.x += (a02 + 2.0f*a12 + a22)*0.125F;
 
 		return gradient;
 	}

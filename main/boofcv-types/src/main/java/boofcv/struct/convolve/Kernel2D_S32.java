@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,9 @@
 
 package boofcv.struct.convolve;
 
+import org.ejml.MatrixFormattable;
+import org.ejml.MatrixPrintFormat;
+
 /**
  * This is a kernel in a 2D convolution. The convolution is performed by
  * convolving this kernel across a 2D array/image. The kernel is square and has
@@ -31,7 +34,7 @@ package boofcv.struct.convolve;
  * @author Peter Abeles
  */
 @SuppressWarnings({"NullAway.Init"})
-public class Kernel2D_S32 extends Kernel2D {
+public class Kernel2D_S32 extends Kernel2D implements MatrixFormattable {
 
 	public int[] data;
 
@@ -132,6 +135,65 @@ public class Kernel2D_S32 extends Kernel2D {
 		System.out.println();
 	}
 
+	/// How deep is the zero border around this kernel
+	public int countZeroBorder() {
+		for (int depth = 0; depth <= width/2; depth++) {
+			for (int i = depth; i < width - depth; i++) {
+				if (get(i, depth) != 0)
+					return depth;
+				if (get(i, width - depth - 1) != 0)
+					return depth;
+				if (get(depth, i) != 0)
+					return depth;
+				if (get(width - depth - 1, i) != 0)
+					return depth;
+			}
+		}
+		// everything is zeros
+		return width/2 + 1;
+	}
+
+	/// Removes the border up to the specified depth
+	public Kernel2D_S32 trimBorder( int border ) {
+		if (border <= 0)
+			return this.copy();
+
+		var out = new Kernel2D_S32(width - 2*border);
+		out.offset = this.offset - border;
+		for (int i = 0; i < out.width; i++) {
+			for (int j = 0; j < out.width; j++) {
+				out.set(j, i, this.get(j + border, i + border));
+			}
+		}
+		return out;
+	}
+
+	@Override public String format( MatrixPrintFormat format ) {
+		var builder = new StringBuilder();
+		builder.append(format.getPrefix());
+		for (int row = 0; row < width; row++) {
+			format.rowPadding(row == 0, builder);
+			int _row = row;
+			format.row(builder, width, ( col ) -> data[_row*width + col]);
+			if (row < width - 1)
+				builder.append(format.getRowSeparator());
+		}
+		builder.append(format.getSuffix());
+		return builder.toString();
+	}
+
+	public boolean isIdentical( Kernel2D_S32 a ) {
+		if (width != a.width || offset != a.offset)
+			return false;
+		final int N = width*width;
+
+		for (int i = 0; i < N; i++) {
+			if (data[i] != a.data[i])
+				return false;
+		}
+		return true;
+	}
+
 	@Override
 	public Kernel2D_S32 copy() {
 		Kernel2D_S32 ret = new Kernel2D_S32(width);
@@ -143,5 +205,9 @@ public class Kernel2D_S32 extends Kernel2D {
 	@Override
 	public double getDouble( int x, int y ) {
 		return get(x, y);
+	}
+
+	@Override public String toString() {
+		return getClass().getSimpleName() + " width=" + width + " offset=" + offset + "\n" + format();
 	}
 }

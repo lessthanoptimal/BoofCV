@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -55,8 +55,8 @@ public class GradientTwo0_Standard {
 
 			for (; indexSrc < endX; indexSrc++) {
 				float val = data[indexSrc];
-				imgX[indexX++] = (data[indexSrc + 1] - val);
-				imgY[indexY++] = (data[indexSrc + stride] - val);
+				imgX[indexX++] = data[indexSrc + 1] - val;
+				imgY[indexY++] = data[indexSrc + stride] - val;
 			}
 		}
 		//CONCURRENT_ABOVE });

@@ -22,17 +22,18 @@ import boofcv.BoofTesting;
 import boofcv.alg.filter.derivative.GradientSobel;
 import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.alg.misc.PixelMath;
 import boofcv.core.image.border.BorderIndex1D_Extend;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.border.ImageBorder1D_F32;
 import boofcv.struct.image.GrayF32;
 import boofcv.testing.BoofStandardJUnit;
+import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestKltTracker extends BoofStandardJUnit {
-
 	int imageWidth = 40;
 	int imageHeight = 50;
 
@@ -42,18 +43,18 @@ public class TestKltTracker extends BoofStandardJUnit {
 
 	/// Process the same features in two different sets of image. only difference is that one is a sub image
 	/// results should be identical
-	@Test void testSubImages() {
+	@Test void subImages() {
 		ImageMiscOps.fillUniform(image, rand, 0, 100);
 		GradientSobel.process(image, derivX, derivY, new ImageBorder1D_F32(BorderIndex1D_Extend::new));
 
 		KltTracker<GrayF32, GrayF32> trackerA = createDefaultTracker();
-		trackerA.setImage(image, derivX, derivY);
+		trackerA.setImage(image, derivX, derivY, 1);
 
 		KltTracker<GrayF32, GrayF32> trackerB = createDefaultTracker();
 		GrayF32 image = BoofTesting.createSubImageOf(this.image);
 		GrayF32 derivX = BoofTesting.createSubImageOf(this.derivX);
 		GrayF32 derivY = BoofTesting.createSubImageOf(this.derivY);
-		trackerB.setImage(image, derivX, derivY);
+		trackerB.setImage(image, derivX, derivY, 1);
 
 		for (int y = 0; y < imageHeight; y += 4) {
 			for (int x = 0; x < imageWidth; x += 4) {
@@ -87,13 +88,13 @@ public class TestKltTracker extends BoofStandardJUnit {
 
 	/// Create a description of a feature next to the border then place the feature just outside of the image
 	/// and see if it can track to its original position.
-	@Test void testTracking_border1() {
+	@Test void tracking_border1() {
 
 		ImageMiscOps.fillUniform(image, rand, 0, 100);
 		GradientSobel.process(image, derivX, derivY, new ImageBorder1D_F32(BorderIndex1D_Extend::new));
 
 		KltTracker<GrayF32, GrayF32> tracker = createDefaultTracker();
-		tracker.setImage(image, derivX, derivY);
+		tracker.setImage(image, derivX, derivY, 1);
 		int r = 4;
 		var feature = new KltFeature(r);
 
@@ -121,12 +122,12 @@ public class TestKltTracker extends BoofStandardJUnit {
 	}
 
 	/// Place a feature on the border then put it inside the image. See if it moves towards the border
-	@Test void testTracking_border2() {
+	@Test void tracking_border2() {
 		ImageMiscOps.fillUniform(image, rand, 1, 100);
 		GradientSobel.process(image, derivX, derivY, new ImageBorder1D_F32(BorderIndex1D_Extend::new));
 
 		KltTracker<GrayF32, GrayF32> tracker = createDefaultTracker();
-		tracker.setImage(image, derivX, derivY);
+		tracker.setImage(image, derivX, derivY, 1);
 
 		int r = 3;
 		var feature = new KltFeature(r);
@@ -157,7 +158,7 @@ public class TestKltTracker extends BoofStandardJUnit {
 	/// Set description should fail if a feature is entirely outside the image
 	@Test void setDescription_outsideFail() {
 		KltTracker<GrayF32, GrayF32> tracker = createDefaultTracker();
-		tracker.setImage(image, derivX, derivY);
+		tracker.setImage(image, derivX, derivY, 1);
 		var feature = new KltFeature(3);
 		feature.setPosition(-100, 200);
 
@@ -171,7 +172,7 @@ public class TestKltTracker extends BoofStandardJUnit {
 		GradientSobel.process(image, derivX, derivY, new ImageBorder1D_F32(BorderIndex1D_Extend::new));
 
 		KltTracker<GrayF32, GrayF32> tracker = createDefaultTracker();
-		tracker.setImage(image, derivX, derivY);
+		tracker.setImage(image, derivX, derivY, 1);
 
 		var featureA = new KltFeature(3);
 		var featureB = new KltFeature(3);
@@ -193,7 +194,7 @@ public class TestKltTracker extends BoofStandardJUnit {
 	/// When placed outside the image pixels should be NaN
 	@Test void setDescription_borderNaN() {
 		KltTracker<GrayF32, GrayF32> tracker = createDefaultTracker();
-		tracker.setImage(image, derivX, derivY);
+		tracker.setImage(image, derivX, derivY, 1);
 
 		var feature = new KltFeature(3);
 		feature.setPosition(2, 1);
@@ -212,7 +213,7 @@ public class TestKltTracker extends BoofStandardJUnit {
 	/// Pass in a feature with a small determinant and see if it returns a fault.
 	@Test void detectBadFeature() {
 		KltTracker<GrayF32, GrayF32> tracker = createDefaultTracker();
-		tracker.setImage(image, derivX, derivY);
+		tracker.setImage(image, derivX, derivY, 1);
 		var feature = new KltFeature(2);
 
 		// put a feature right on the corner
@@ -220,7 +221,7 @@ public class TestKltTracker extends BoofStandardJUnit {
 		// Gxx, Gyy, and Gxy will all be zero, which is bad
 
 		// update the feature's position
-		tracker.setImage(image, derivX, derivY);
+		tracker.setImage(image, derivX, derivY, 1);
 		assertNotSame(tracker.track(feature), KltTrackFault.SUCCESS);
 	}
 
@@ -229,7 +230,7 @@ public class TestKltTracker extends BoofStandardJUnit {
 		GradientSobel.process(image, derivX, derivY, new ImageBorder1D_F32(BorderIndex1D_Extend::new));
 
 		KltTracker<GrayF32, GrayF32> tracker = createDefaultTracker();
-		tracker.setImage(image, derivX, derivY);
+		tracker.setImage(image, derivX, derivY, 1);
 		var feature = new KltFeature(2);
 
 		feature.setPosition(20, 22);
@@ -316,6 +317,80 @@ public class TestKltTracker extends BoofStandardJUnit {
 		assertTrue(tracker.isFullyOutside(-r, -r - 0.001f));
 		assertTrue(tracker.isFullyOutside(imageWidth + r - 0.999f, imageHeight + r - 1));
 		assertTrue(tracker.isFullyOutside(imageWidth + r - 1, imageHeight + r - 0.999f));
+	}
+
+	// Test to see if the divisor is applied correctly at every step
+	@Test void divisorApplication() {
+		var input = new GrayF32(imageWidth, imageHeight);
+		var derivX = new GrayF32(imageWidth, imageHeight);
+		var derivY = new GrayF32(imageWidth, imageHeight);
+		ImageMiscOps.fillUniform(input, rand, 0, 200);
+		ImageMiscOps.fillUniform(derivX, rand, 0, 200);
+		ImageMiscOps.fillUniform(derivY, rand, 0, 200);
+
+		KltTracker<GrayF32, GrayF32> normal = createDefaultTracker();
+		normal.widthFeature = 3;
+		normal.lengthFeature = 9;
+		normal.setImage(input, derivX, derivY, 1);
+
+		// Simulate a kernel scaling the derivative, like you have in integer images
+		int divisor = 10;
+		GrayF32 scaledX = derivX.clone();
+		GrayF32 scaledY = derivY.clone();
+		PixelMath.multiply(derivX, divisor, scaledX);
+		PixelMath.multiply(derivY, divisor, scaledY);
+
+		// Create a separate tracker to process these scaled image
+		KltTracker<GrayF32, GrayF32> scaled = createDefaultTracker();
+		scaled.widthFeature = 3;
+		scaled.lengthFeature = 9;
+		scaled.setImage(input, scaledX, scaledY, divisor);
+
+
+		// Test internalSetDescription. Easier to call setDescribe with a point inside
+		var expected = new KltFeature(3).withPosition(10.1f, 12.2f);
+		var found = new KltFeature(3).withPosition(10.1f, 12.2f);
+		normal.setDescription(expected);
+		scaled.setDescription(found);
+		assertEquals(expected.Gxx, found.Gxx, Math.abs(expected.Gxx)*UtilEjml.TEST_F32);
+		assertEquals(expected.Gyy, found.Gyy, Math.abs(expected.Gyy)*UtilEjml.TEST_F32);
+		assertEquals(expected.Gxy, found.Gxy, Math.abs(expected.Gxy)*UtilEjml.TEST_F32);
+
+		// Test computeE() which assumes the feature is inside the image. If currDesc and track.desc are the same
+		// this becomes a trivial test case with 0
+		assertTrue(expected.derivX.get(0, 0) != 0);
+		normal.currDesc.setTo(expected.desc);
+		ImageMiscOps.fillUniform(expected.desc, rand, 0, 200);
+		normal.computeE(expected, expected.x, expected.y);
+		scaled.currDesc.setTo(found.desc);
+		found.desc.setTo(expected.desc);
+		scaled.computeE(found, found.x, found.y);
+		assertNotEquals(0.0f, normal.Ex);
+		assertEquals(normal.Ex, scaled.Ex, Math.abs(normal.Ex)*UtilEjml.TEST_F32);
+		assertEquals(normal.Ey, scaled.Ey, Math.abs(normal.Ey)*UtilEjml.TEST_F32);
+
+		// Save for internalSetDescriptionBorder. Place these points so they are partially outside
+		expected.withPosition(0.9f, 12.2f);
+		found.withPosition(0.9f, 12.2f);
+		normal.setDescription(expected);
+		scaled.setDescription(found);
+		assertNotEquals(0.0f, expected.Gxx);
+		assertEquals(expected.Gxx, found.Gxx, Math.abs(expected.Gxx)*UtilEjml.TEST_F32);
+		assertEquals(expected.Gyy, found.Gyy, Math.abs(expected.Gyy)*UtilEjml.TEST_F32);
+		assertEquals(expected.Gxy, found.Gxy, Math.abs(expected.Gxy)*UtilEjml.TEST_F32);
+
+		// Avoid trivial case
+		ImageMiscOps.fillUniform(expected.desc, rand, 0, 200);
+		found.desc.setTo(expected.desc);
+
+		normal.computeGandE_border(expected, expected.x, expected.y);
+		scaled.computeGandE_border(found, expected.x, expected.y);
+		assertNotEquals(0.0f, normal.Ex);
+		assertEquals(normal.Ex, scaled.Ex, Math.abs(normal.Ex)*UtilEjml.TEST_F32);
+		assertEquals(normal.Ey, scaled.Ey, Math.abs(normal.Ey)*UtilEjml.TEST_F32);
+		assertEquals(normal.Gxx, scaled.Gxx, Math.abs(normal.Gxx)*UtilEjml.TEST_F32);
+		assertEquals(normal.Gyy, scaled.Gyy, Math.abs(normal.Gyy)*UtilEjml.TEST_F32);
+		assertEquals(normal.Gxy, scaled.Gxy, Math.abs(normal.Gxy)*UtilEjml.TEST_F32);
 	}
 
 	public static KltTracker<GrayF32, GrayF32> createDefaultTracker() {

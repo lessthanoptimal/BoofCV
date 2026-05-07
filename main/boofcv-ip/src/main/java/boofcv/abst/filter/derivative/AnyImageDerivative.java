@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -80,6 +80,12 @@ public class AnyImageDerivative<I extends ImageGray<I>, D extends ImageGray<D>> 
 
 		derivDerivX = FactoryConvolve.convolve(deriv, _derivType, _derivType, borderDeriv, true);
 		derivDerivY = FactoryConvolve.convolve(deriv, _derivType, _derivType, borderDeriv, false);
+	}
+
+	/// Returns the divisor needed to correct the derivatives scale. Integer kernels are off by a scale factor
+	/// TODO put in the actual value and not hard coded one
+	public int getEdgeDivisor() {
+		return 1;
 	}
 
 	/**

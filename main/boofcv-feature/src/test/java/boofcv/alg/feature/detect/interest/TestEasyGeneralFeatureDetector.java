@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,8 @@
 
 package boofcv.alg.feature.detect.interest;
 
+import boofcv.abst.filter.derivative.ImageGradient;
+import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
@@ -32,12 +34,12 @@ public class TestEasyGeneralFeatureDetector extends BoofStandardJUnit {
 	int width = 20;
 	int height = 30;
 
-	GrayU8 image = new GrayU8(width,height);
+	GrayU8 image = new GrayU8(width, height);
 
 	@Test void requiresGradient() {
-		Helper<GrayU8,GrayS16> detector = new Helper<>(true, false);
-		EasyGeneralFeatureDetector<GrayU8,GrayS16> alg =
-				new EasyGeneralFeatureDetector<>(detector, GrayU8.class, GrayS16.class);
+		var detector = new Helper<GrayU8, GrayS16>(true, false);
+		ImageGradient<GrayU8, GrayS16> gradient = FactoryDerivative.sobel(GrayU8.class, GrayS16.class);
+		var alg = new EasyGeneralFeatureDetector<>(detector, gradient, GrayU8.class, GrayS16.class);
 
 		assertNotNull(alg.derivX);
 		assertNotNull(alg.derivY);
@@ -45,16 +47,15 @@ public class TestEasyGeneralFeatureDetector extends BoofStandardJUnit {
 		assertNull(alg.derivXY);
 		assertNull(alg.derivYY);
 
-		alg.detect(image,null);
+		alg.detect(image, null);
 
 		assertTrue(detector.excludeIsNull);
-
 	}
 
 	@Test void requiresHessian() {
-		Helper<GrayU8,GrayS16> detector = new Helper<>(false, true);
-		EasyGeneralFeatureDetector<GrayU8,GrayS16> alg =
-				new EasyGeneralFeatureDetector<>(detector, GrayU8.class, GrayS16.class);
+		var detector = new Helper<GrayU8, GrayS16>(false, true);
+		ImageGradient<GrayU8, GrayS16> gradient = FactoryDerivative.sobel(GrayU8.class, GrayS16.class);
+		var alg = new EasyGeneralFeatureDetector<>(detector, gradient, GrayU8.class, GrayS16.class);
 
 		// It uses the gradient to compute the hessian faster
 		assertNotNull(alg.derivX);
@@ -63,45 +64,45 @@ public class TestEasyGeneralFeatureDetector extends BoofStandardJUnit {
 		assertNotNull(alg.derivXY);
 		assertNotNull(alg.derivYY);
 
-		alg.detect(image,null);
+		alg.detect(image, null);
 
 		assertTrue(detector.excludeIsNull);
 	}
 
 	@Test void checkExclude() {
-		Helper<GrayU8,GrayS16> detector = new Helper<>(true, true);
-		EasyGeneralFeatureDetector<GrayU8,GrayS16> alg =
-				new EasyGeneralFeatureDetector<>(detector, GrayU8.class, GrayS16.class);
+		var detector = new Helper<GrayU8, GrayS16>(true, true);
+		ImageGradient<GrayU8, GrayS16> gradient = FactoryDerivative.sobel(GrayU8.class, GrayS16.class);
+		var alg = new EasyGeneralFeatureDetector<>(detector, gradient, GrayU8.class, GrayS16.class);
 
-		alg.detect(image,new QueueCorner(10));
+		alg.detect(image, new QueueCorner(10));
 
 		assertFalse(detector.excludeIsNull);
 	}
 
 	private static class Helper<I extends ImageGray<I>, D extends ImageGray<D>>
-			extends GeneralFeatureDetector<I,D> {
+			extends GeneralFeatureDetector<I, D> {
 
 		boolean gradient;
 		boolean hessian;
 		boolean excludeIsNull;
 
-		private Helper(boolean gradient, boolean hessian) {
+		private Helper( boolean gradient, boolean hessian ) {
 			this.gradient = gradient;
 			this.hessian = hessian;
 		}
 
 		@Override
-		public void setExclude(QueueCorner exclude) {
-			excludeIsNull = exclude==null;
+		public void setExclude( QueueCorner exclude ) {
+			excludeIsNull = exclude == null;
 		}
 
 		@Override
-		public void process(I image, D derivX, D derivY, D derivXX, D derivYY, D derivXY) {
-			if( gradient ) {
+		public void process( I image, D derivX, D derivY, D derivXX, D derivYY, D derivXY ) {
+			if (gradient) {
 				assertNotNull(derivX);
 				assertNotNull(derivY);
 			}
-			if( hessian ) {
+			if (hessian) {
 				assertNotNull(derivXX);
 				assertNotNull(derivYY);
 				assertNotNull(derivXY);
