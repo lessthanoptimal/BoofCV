@@ -56,7 +56,7 @@ public class FactoryTrackerAlg {
 	 * @return Tracker
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
-	KltTracker<I, D> klt( @Nullable ConfigKlt config, Class<I> imageType, Class<D> derivType ) {
+	KltTracker<I, D> klt( @Nullable ConfigKlt config, Class<I> imageType, @Nullable Class<D> derivType ) {
 		if (config == null)
 			config = new ConfigKlt();
 		if (derivType == null)
@@ -83,7 +83,7 @@ public class FactoryTrackerAlg {
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	PyramidKltTracker<I, D> kltPyramid( @Nullable ConfigKlt config,
 	                                    Class<I> imageType,
-	                                    Class<D> derivType ) {
+	                                    @Nullable Class<D> derivType ) {
 		if (config == null)
 			config = new ConfigKlt();
 		if (derivType == null)
@@ -99,7 +99,7 @@ public class FactoryTrackerAlg {
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	EasyPyramidKlt<I, D> kltEasy( @Nullable ConfigEasyKlt config,
 	                              Class<I> imageType,
-	                              Class<D> derivType ) {
+	                              @Nullable Class<D> derivType ) {
 		if (config == null)
 			config = new ConfigEasyKlt();
 		if (derivType == null)
