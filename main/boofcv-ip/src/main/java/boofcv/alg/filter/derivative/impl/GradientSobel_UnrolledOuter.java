@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -159,11 +159,11 @@ public class GradientSobel_UnrolledOuter {
 				a23 = data[index + 1];
 				a33 = data[index + width + 1];
 
-				float v = (a33 - a11) * 0.25F;
-				float w = (a31 - a13) * 0.25F;
+				float v = (a33 - a11) * 0.125F;
+				float w = (a31 - a13) * 0.125F;
 
-				imgY[index] = (a32 - a12) * 0.5F + v + w;
-				imgX[index] = (a23 - a21) * 0.5F + v - w;
+				imgY[index] = (a32 - a12) * 0.25F + v + w;
+				imgX[index] = (a23 - a21) * 0.25F + v - w;
 
 				index++;
 
@@ -171,11 +171,11 @@ public class GradientSobel_UnrolledOuter {
 				a21 = data[index + 1];
 				a31 = data[index + width + 1];
 
-				v = (a31 - a12) * 0.25F;
-				w = (a32 - a11) * 0.25F;
+				v = (a31 - a12) * 0.125F;
+				w = (a32 - a11) * 0.125F;
 
-				imgY[index] = (a33 - a13) * 0.5F + v + w;
-				imgX[index] = (a21 - a22) * 0.5F + v - w;
+				imgY[index] = (a33 - a13) * 0.25F + v + w;
+				imgX[index] = (a21 - a22) * 0.25F + v - w;
 
 				index++;
 
@@ -183,22 +183,22 @@ public class GradientSobel_UnrolledOuter {
 				a22 = data[index + 1];
 				a32 = data[index + width + 1];
 
-				v = (a32 - a13) * 0.25F;
-				w = (a33 - a12) * 0.25F;
+				v = (a32 - a13) * 0.125F;
+				w = (a33 - a12) * 0.125F;
 
-				imgY[index] = (a31 - a11) * 0.5F + v + w;
-				imgX[index] = (a22 - a23) * 0.5F + v - w;
+				imgY[index] = (a31 - a11) * 0.25F + v + w;
+				imgX[index] = (a22 - a23) * 0.25F + v - w;
 
 				index++;
 			}
 
 			// handle the remaining
 			for (; index < endX; index++) {
-				float v = (data[index + width + 1] - data[index - width - 1]) * 0.25F;
-				float w = (data[index + width - 1] - data[index - width + 1]) * 0.25F;
+				float v = (data[index + width + 1] - data[index - width - 1]) * 0.125F;
+				float w = (data[index + width - 1] - data[index - width + 1]) * 0.125F;
 
-				imgY[index] = (data[index + width] - data[index - width]) * 0.5F + v + w;
-				imgX[index] = (data[index + 1] - data[index - 1]) * 0.5F + v - w;
+				imgY[index] = (data[index + width] - data[index - width]) * 0.25F + v + w;
+				imgX[index] = (data[index + 1] - data[index - 1]) * 0.25F + v - w;
 			}
 		}
 		//CONCURRENT_ABOVE });
@@ -248,11 +248,11 @@ public class GradientSobel_UnrolledOuter {
 				a23 = data[index + 1];
 				a33 = data[index + strideSrc + 1];
 
-				float v = (a33 - a11) * 0.25F;
-				float w = (a31 - a13) * 0.25F;
+				float v = (a33 - a11) * 0.125F;
+				float w = (a31 - a13) * 0.125F;
 
-				imgY[indexY++] = (a32 - a12) * 0.5F + v + w;
-				imgX[indexX++] = (a23 - a21) * 0.5F + v - w;
+				imgY[indexY++] = (a32 - a12) * 0.25F + v + w;
+				imgX[indexX++] = (a23 - a21) * 0.25F + v - w;
 
 				index++;
 
@@ -260,11 +260,11 @@ public class GradientSobel_UnrolledOuter {
 				a21 = data[index + 1];
 				a31 = data[index + strideSrc + 1];
 
-				v = (a31 - a12) * 0.25F;
-				w = (a32 - a11) * 0.25F;
+				v = (a31 - a12) * 0.125F;
+				w = (a32 - a11) * 0.125F;
 
-				imgY[indexY++] = (a33 - a13) * 0.5F + v + w;
-				imgX[indexX++] = (a21 - a22) * 0.5F + v - w;
+				imgY[indexY++] = (a33 - a13) * 0.25F + v + w;
+				imgX[indexX++] = (a21 - a22) * 0.25F + v - w;
 
 				index++;
 
@@ -272,11 +272,11 @@ public class GradientSobel_UnrolledOuter {
 				a22 = data[index + 1];
 				a32 = data[index + strideSrc + 1];
 
-				v = (a32 - a13) * 0.25F;
-				w = (a33 - a12) * 0.25F;
+				v = (a32 - a13) * 0.125F;
+				w = (a33 - a12) * 0.125F;
 
-				imgY[indexY++] = (a31 - a11) * 0.5F + v + w;
-				imgX[indexX++] = (a22 - a23) * 0.5F + v - w;
+				imgY[indexY++] = (a31 - a11) * 0.25F + v + w;
+				imgX[indexX++] = (a22 - a23) * 0.25F + v - w;
 
 				index++;
 
@@ -285,11 +285,11 @@ public class GradientSobel_UnrolledOuter {
 
 			// handle the remaining
 			for (; index < endX; index++) {
-				float v = (data[index + strideSrc + 1] - data[index - strideSrc - 1]) * 0.25F;
-				float w = (data[index + strideSrc - 1] - data[index - strideSrc + 1]) * 0.25F;
+				float v = (data[index + strideSrc + 1] - data[index - strideSrc - 1]) * 0.125F;
+				float w = (data[index + strideSrc - 1] - data[index - strideSrc + 1]) * 0.125F;
 
-				imgY[indexY++] = (data[index + strideSrc] - data[index - strideSrc]) * 0.5F + v + w;
-				imgX[indexX++] = (data[index + 1] - data[index - 1]) * 0.5F + v - w;
+				imgY[indexY++] = (data[index + strideSrc] - data[index - strideSrc]) * 0.25F + v + w;
+				imgX[indexX++] = (data[index + 1] - data[index - 1]) * 0.25F + v - w;
 			}
 		}
 		//CONCURRENT_ABOVE });

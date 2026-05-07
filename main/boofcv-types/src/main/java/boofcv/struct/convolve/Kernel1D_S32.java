@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,9 @@
 
 package boofcv.struct.convolve;
 
+import org.ejml.MatrixFormattable;
+import org.ejml.MatrixPrintFormat;
+
 /**
  * Floating point 1D convolution kernel that extends {@link Kernel1D}.
  *
@@ -28,7 +31,7 @@ package boofcv.struct.convolve;
  * @author Peter Abeles
  */
 @SuppressWarnings({"NullAway.Init"})
-public class Kernel1D_S32 extends Kernel1D {
+public class Kernel1D_S32 extends Kernel1D implements MatrixFormattable {
 
 	public int[] data;
 
@@ -36,21 +39,21 @@ public class Kernel1D_S32 extends Kernel1D {
 	 * Creates a new kernel whose initial values are specified by "data" and length is "width".
 	 * The offset will be set to width/2
 	 *
+	 * @param width The kernel's width.
 	 * @param data The value of the kernel. Not modified. Reference is not saved.
-	 * @param width The kernels width.
 	 */
-	public Kernel1D_S32( int[] data, int width ) {
-		this(data, width, width/2);
+	public Kernel1D_S32( int width, int[] data ) {
+		this(width, width/2, data);
 	}
 
 	/**
 	 * Creates a kernel with elements equal to 'data' and with the specified 'width' plus 'offset'
 	 *
-	 * @param data The value of the kernel. Not modified. Reference is not saved.
-	 * @param width The kernels width.
+	 * @param width The kernel's width.
 	 * @param offset Location of the origin in the array
+	 * @param data The value of the kernel. Not modified. Reference is not saved.
 	 */
-	public Kernel1D_S32( int[] data, int width, int offset ) {
+	public Kernel1D_S32( int width, int offset, int[] data ) {
 		super(width, offset);
 
 		this.data = new int[width];
@@ -133,8 +136,39 @@ public class Kernel1D_S32 extends Kernel1D {
 		return sum;
 	}
 
+	@Override public String format( MatrixPrintFormat format ) {
+		var builder = new StringBuilder();
+		format.row(builder, width, ( col ) -> data[col]);
+		return builder.toString();
+	}
+
 	public int[] getData() {
 		return data;
+	}
+
+	/// How deep is the zero border around this kernel
+	public int countZeroBorder() {
+		for (int depth = 0; depth <= width/2; depth++) {
+			if (get(depth) != 0)
+				return depth;
+			if (get(width - depth - 1) != 0)
+				return depth;
+		}
+		// everything is zeros
+		return width/2 + 1;
+	}
+
+	/// Removes the border up to the specified depth
+	public Kernel1D_S32 trimBorder( int border ) {
+		if (border <= 0)
+			return this.copy();
+
+		var out = new Kernel1D_S32(width - 2*border);
+		out.offset = this.offset - border;
+		for (int i = 0; i < out.width; i++) {
+			out.data[i] = this.data[i + border];
+		}
+		return out;
 	}
 
 	public void print() {
@@ -142,5 +176,19 @@ public class Kernel1D_S32 extends Kernel1D {
 			System.out.printf("%6d ", data[i]);
 		}
 		System.out.println();
+	}
+
+	@Override public String toString() {
+		return getClass().getSimpleName() + " width=" + width + " offset=" + offset + "\n" + format();
+	}
+
+	public boolean isIdentical( Kernel1D_S32 a ) {
+		if (a.width != width || a.offset != offset)
+			return false;
+		for (int i = 0; i < a.width; i++) {
+			if (a.data[i] != data[i])
+				return false;
+		}
+		return true;
 	}
 }

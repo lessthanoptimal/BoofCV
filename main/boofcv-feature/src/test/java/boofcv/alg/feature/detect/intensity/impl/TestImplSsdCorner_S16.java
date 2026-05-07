@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -103,5 +103,7 @@ public class TestImplSsdCorner_S16 extends BoofStandardJUnit {
 		public float compute(int totalXX, int totalXY, int totalYY) {
 			return totalXX + totalXY + totalYY;
 		}
+
+		@Override public float thresholdScaleByDerivative( int divisor ) {return 0;}
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,11 +22,14 @@ import boofcv.abst.feature.detect.interest.ConfigFastCorner;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.feature.detect.interest.ConfigHarrisCorner;
 import boofcv.abst.feature.detect.interest.ConfigShiTomasi;
+import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.alg.feature.detect.interest.EasyGeneralFeatureDetector;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
+import boofcv.alg.filter.derivative.DerivativeType;
 import boofcv.demonstrations.feature.detect.ImageCorruptPanel;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
+import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.feature.FancyInterestPointRender;
 import boofcv.gui.image.ImagePanel;
@@ -81,30 +84,31 @@ public class DetectPointsWithNoiseApp<T extends ImageGray<T>, D extends ImageGra
 		GeneralFeatureDetector<T, D> alg;
 		ConfigGeneralDetector configExtract = new ConfigGeneralDetector(maxFeatures, radius, thresh);
 
+		ImageGradient<T, D> gradient = FactoryDerivative.gradientSB(DerivativeType.SOBEL, imageType, derivType);
 
-		alg = FactoryDetectPoint.createHarris(configExtract, null, derivType);
-		addAlgorithm(0, "Harris", new EasyGeneralFeatureDetector<>(alg, imageType, derivType));
-		alg = FactoryDetectPoint.createHarris(configExtract, new ConfigHarrisCorner(true, radius), derivType);
-		addAlgorithm(0, "Harris Weighted", new EasyGeneralFeatureDetector<>(alg, imageType, derivType));
-		alg = FactoryDetectPoint.createShiTomasi(configExtract, null, derivType);
-		addAlgorithm(0, "Shi-Tomasi", new EasyGeneralFeatureDetector<>(alg, imageType, derivType));
-		alg = FactoryDetectPoint.createShiTomasi(configExtract, new ConfigShiTomasi(true, radius), derivType);
-		addAlgorithm(0, "Shi-Tomasi Weighted", new EasyGeneralFeatureDetector<>(alg, imageType, derivType));
+		alg = FactoryDetectPoint.createHarris(configExtract, null, derivType, gradient.divisor());
+		addAlgorithm(0, "Harris", new EasyGeneralFeatureDetector<>(alg, gradient, imageType, derivType));
+		alg = FactoryDetectPoint.createHarris(configExtract, new ConfigHarrisCorner(true, radius), derivType, gradient.divisor());
+		addAlgorithm(0, "Harris Weighted", new EasyGeneralFeatureDetector<>(alg, gradient, imageType, derivType));
+		alg = FactoryDetectPoint.createShiTomasi(configExtract, null, derivType, gradient.divisor());
+		addAlgorithm(0, "Shi-Tomasi", new EasyGeneralFeatureDetector<>(alg, gradient, imageType, derivType));
+		alg = FactoryDetectPoint.createShiTomasi(configExtract, new ConfigShiTomasi(true, radius), derivType, gradient.divisor());
+		addAlgorithm(0, "Shi-Tomasi Weighted", new EasyGeneralFeatureDetector<>(alg, gradient, imageType, derivType));
 		configExtract.detectMinimums = true;
 		configExtract.threshold = 10;
 		alg = FactoryDetectPoint.createFast(configExtract, new ConfigFastCorner(10, 9), imageType);
 		configExtract.detectMinimums = false;
 		configExtract.threshold = thresh;
-		addAlgorithm(0, "Fast", new EasyGeneralFeatureDetector<>(alg, imageType, derivType));
-		alg = FactoryDetectPoint.createKitRos(configExtract, derivType);
-		addAlgorithm(0, "KitRos", new EasyGeneralFeatureDetector<>(alg, imageType, derivType));
+		addAlgorithm(0, "Fast", new EasyGeneralFeatureDetector<>(alg, gradient, imageType, derivType));
+		alg = FactoryDetectPoint.createKitRos(configExtract, derivType, gradient.divisor());
+		addAlgorithm(0, "KitRos", new EasyGeneralFeatureDetector<>(alg, null, imageType, derivType));
 		alg = FactoryDetectPoint.createMedian(configExtract, imageType);
-		addAlgorithm(0, "Median", new EasyGeneralFeatureDetector<>(alg, imageType, derivType));
+		addAlgorithm(0, "Median", new EasyGeneralFeatureDetector<>(alg, null, imageType, derivType));
 		alg = FactoryDetectPoint.createHessianDeriv(configExtract, HessianBlobIntensity.Type.DETERMINANT, derivType);
-		addAlgorithm(0, "Hessian", new EasyGeneralFeatureDetector<>(alg, imageType, derivType));
+		addAlgorithm(0, "Hessian", new EasyGeneralFeatureDetector<>(alg, null, imageType, derivType));
 		configExtract.detectMinimums = true;
 		alg = FactoryDetectPoint.createHessianDeriv(configExtract, HessianBlobIntensity.Type.TRACE, derivType);
-		addAlgorithm(0, "Laplace", new EasyGeneralFeatureDetector<>(alg, imageType, derivType));
+		addAlgorithm(0, "Laplace", new EasyGeneralFeatureDetector<>(alg, null, imageType, derivType));
 
 		JPanel viewArea = new JPanel(new BorderLayout());
 		corruptPanel = new ImageCorruptPanel();

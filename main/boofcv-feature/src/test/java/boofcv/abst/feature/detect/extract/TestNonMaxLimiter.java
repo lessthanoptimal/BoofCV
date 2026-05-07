@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,6 @@ import boofcv.alg.feature.detect.selector.FeatureSelectLimitIntensity;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.selector.ConfigSelectLimit;
 import boofcv.factory.feature.detect.selector.FactorySelectLimit;
-import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 import boofcv.testing.BoofStandardJUnit;
 import org.ddogleg.struct.FastAccess;
@@ -39,7 +38,7 @@ public class TestNonMaxLimiter extends BoofStandardJUnit {
 		intensity.set(1, 15, -20);
 		intensity.set(1, 20, -25);
 
-		NonMaxSuppression<QueueCorner> extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 0, 0, true, true, true));
+		var extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 0, 0, true, true, true), 1);
 		FeatureSelectLimitIntensity<NonMaxLimiter.LocalExtreme> selector =
 				FactorySelectLimit.intensity(ConfigSelectLimit.selectBestN());
 		var limiter = new NonMaxLimiter(extractor, selector, 20);
@@ -67,7 +66,7 @@ public class TestNonMaxLimiter extends BoofStandardJUnit {
 		intensity.set(1, 15, -20);
 		intensity.set(1, 20, -25);
 
-		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 0, 0, true, true, true));
+		var extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 0, 0, true, true, true), 1);
 		FeatureSelectLimitIntensity<NonMaxLimiter.LocalExtreme> selector =
 				FactorySelectLimit.intensity(ConfigSelectLimit.selectBestN());
 		NonMaxLimiter limiter = new NonMaxLimiter(extractor, selector, 2);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,8 +40,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TestDenseOpticalFlowKlt extends BoofStandardJUnit {
 
-	GrayF32 image0 = new GrayF32(30,40);
-	GrayF32 image1 = new GrayF32(30,40);
+	GrayF32 image0 = new GrayF32(30, 40);
+	GrayF32 image1 = new GrayF32(30, 40);
 
 	ImagePyramid<GrayF32> prev;
 	GrayF32[] prevDerivX;
@@ -63,18 +63,18 @@ class TestDenseOpticalFlowKlt extends BoofStandardJUnit {
 		prev.process(image0);
 		curr.process(image0);
 
-		prevDerivX = PyramidOps.declareOutput(prev,ImageType.SB_F32);
-		prevDerivY = PyramidOps.declareOutput(prev,ImageType.SB_F32);
+		prevDerivX = PyramidOps.declareOutput(prev, ImageType.SB_F32);
+		prevDerivY = PyramidOps.declareOutput(prev, ImageType.SB_F32);
 	}
 
 	private void processInputImage() {
 		prev.process(image0);
 		curr.process(image1);
 
-		PyramidOps.gradient(prev, gradient, prevDerivX,prevDerivY);
+		PyramidOps.gradient(prev, gradient, prevDerivX, prevDerivY);
 	}
 
-	protected DenseOpticalFlowKlt<GrayF32,GrayF32> createAlg() {
+	protected DenseOpticalFlowKlt<GrayF32, GrayF32> createAlg() {
 		PyramidKltTracker<GrayF32, GrayF32> tracker =
 				FactoryTrackerAlg.kltPyramid(config.config, GrayF32.class, GrayF32.class);
 		return new DenseOpticalFlowKlt<>(tracker, 3);
@@ -83,63 +83,59 @@ class TestDenseOpticalFlowKlt extends BoofStandardJUnit {
 	/**
 	 * Very simple positive case
 	 */
-	@Test
-	void positive() {
-
-		ImageMiscOps.fillRectangle(image0,50,10,12,2,2);
-		ImageMiscOps.fillRectangle(image1,50,11,13,2,2);
+	@Test void positive() {
+		ImageMiscOps.fillRectangle(image0, 50, 10, 12, 2, 2);
+		ImageMiscOps.fillRectangle(image1, 50, 11, 13, 2, 2);
 
 		processInputImage();
 
-		DenseOpticalFlowKlt<GrayF32,GrayF32> alg = createAlg();
+		DenseOpticalFlowKlt<GrayF32, GrayF32> alg = createAlg();
 
-		ImageFlow flow = new ImageFlow(image0.width,image0.height);
+		ImageFlow flow = new ImageFlow(image0.width, image0.height);
 		flow.invalidateAll();
 
-		alg.process(prev,prevDerivX,prevDerivY,curr,flow);
+		alg.process(prev, prevDerivX, prevDerivY, gradient.divisor(), curr, flow);
 
 		// no texture in the image so KLT can't do anything
-		check(flow.get(0,0),false,0,0);
-		check(flow.get(29,39),false,0,0);
+		check(flow.get(0, 0), false, 0, 0);
+		check(flow.get(29, 39), false, 0, 0);
 		// there is texture at the target
-		check(flow.get(10,12),true,1,1);
-		check(flow.get(11,12),true,1,1);
-		check(flow.get(10,13),true,1,1);
-		check(flow.get(11,13),true,1,1);
+		check(flow.get(10, 12), true, 1, 1);
+		check(flow.get(11, 12), true, 1, 1);
+		check(flow.get(10, 13), true, 1, 1);
+		check(flow.get(11, 13), true, 1, 1);
 	}
 
-	private void check( ImageFlow.D flow , boolean valid , float x , float y ) {
-		assertEquals(valid,flow.isValid());
-		if( valid ) {
-			assertEquals(x,flow.x,0.05f);
-			assertEquals(y,flow.y,0.05f);
+	private void check( ImageFlow.D flow, boolean valid, float x, float y ) {
+		assertEquals(valid, flow.isValid());
+		if (valid) {
+			assertEquals(x, flow.x, 0.05f);
+			assertEquals(y, flow.y, 0.05f);
 		}
 	}
 
 	/**
 	 * Very simple negative case. The second image is blank so it should fail at tracking
 	 */
-	@Test
-	void negative() {
+	@Test void negative() {
 
 		ImageMiscOps.fillRectangle(image0, 200, 7, 9, 5, 5);
 
 		processInputImage();
 
-		DenseOpticalFlowKlt<GrayF32,GrayF32> alg = createAlg();
+		DenseOpticalFlowKlt<GrayF32, GrayF32> alg = createAlg();
 
-		ImageFlow flow = new ImageFlow(image0.width,image0.height);
+		ImageFlow flow = new ImageFlow(image0.width, image0.height);
 
-		alg.process(prev,prevDerivX,prevDerivY,curr,flow);
+		alg.process(prev, prevDerivX, prevDerivY, gradient.divisor(), curr, flow);
 
 		int totalFail = 0;
 		for (int i = 0; i < flow.data.length; i++) {
-			if( !flow.data[i].isValid() ) {
+			if (!flow.data[i].isValid()) {
 				totalFail++;
 			}
 		}
 
-		assertTrue( totalFail/(double)flow.data.length >= 0.90 );
+		assertTrue(totalFail/(double)flow.data.length >= 0.90);
 	}
-
 }

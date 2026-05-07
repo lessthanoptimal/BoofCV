@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -151,11 +151,11 @@ public class GradientSobel_Outer {
 			int endX = width*y + width - 1;
 
 			for (int index = width*y + 1; index < endX; index++) {
-				float v = (data[index + width + 1] - data[index - width - 1])*0.25F;
-				float w = (data[index + width - 1] - data[index - width + 1])*0.25F;
+				float v = (data[index + width + 1] - data[index - width - 1])*0.125F;
+				float w = (data[index + width - 1] - data[index - width + 1])*0.125F;
 
-				imgY[index] = (data[index + width] - data[index - width])*0.5F + v + w;
-				imgX[index] = (data[index + 1] - data[index - 1])*0.5F + v - w;
+				imgY[index] = (data[index + width] - data[index - width])*0.25F + v + w;
+				imgX[index] = (data[index + 1] - data[index - 1])*0.25F + v - w;
 			}
 		}
 		//CONCURRENT_ABOVE });

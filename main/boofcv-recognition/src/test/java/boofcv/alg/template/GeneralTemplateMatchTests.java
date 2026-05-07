@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,7 +50,7 @@ public abstract class GeneralTemplateMatchTests<T extends ImageGray<T>> extends 
 	// if a perfect match is zero additional tests can be done
 	boolean isPerfectZero;
 
-	protected GeneralTemplateMatchTests(TemplateMatchingIntensity<T> alg, Class<T> imageType) {
+	protected GeneralTemplateMatchTests( TemplateMatchingIntensity<T> alg, Class<T> imageType ) {
 		this.alg = alg;
 
 		image = GeneralizedImageOps.createSingleBand(imageType, 30, 40);
@@ -60,8 +60,8 @@ public abstract class GeneralTemplateMatchTests<T extends ImageGray<T>> extends 
 		GImageMiscOps.fillUniform(template, rand, 50, 60);
 	}
 
-	protected GeneralTemplateMatchTests(TemplateIntensityImage.EvaluatorMethod<T> method, Class<T> imageType) {
-		this(new TemplateIntensityImage<>(method),imageType);
+	protected GeneralTemplateMatchTests( TemplateIntensityImage.EvaluatorMethod<T> method, Class<T> imageType ) {
+		this(new TemplateIntensityImage<>(method), imageType);
 	}
 
 	/**
@@ -72,10 +72,10 @@ public abstract class GeneralTemplateMatchTests<T extends ImageGray<T>> extends 
 		alg.setInputImage(image);
 		alg.process(template);
 
-		assertEquals(template.width/2,alg.getBorderX0());
-		assertEquals(template.height/2,alg.getBorderY0());
-		assertEquals(template.width-template.width/2,alg.getBorderX1());
-		assertEquals(template.height-template.height/2,alg.getBorderY1());
+		assertEquals(template.width/2, alg.getBorderX0());
+		assertEquals(template.height/2, alg.getBorderY0());
+		assertEquals(template.width - template.width/2, alg.getBorderX1());
+		assertEquals(template.height - template.height/2, alg.getBorderY1());
 	}
 
 	@Test
@@ -83,10 +83,10 @@ public abstract class GeneralTemplateMatchTests<T extends ImageGray<T>> extends 
 		alg.setInputImage(image);
 		alg.process(template, mask);
 
-		assertEquals(template.width/2,alg.getBorderX0());
-		assertEquals(template.height/2,alg.getBorderY0());
-		assertEquals(template.width-template.width/2,alg.getBorderX1());
-		assertEquals(template.height-template.height/2,alg.getBorderY1());
+		assertEquals(template.width/2, alg.getBorderX0());
+		assertEquals(template.height/2, alg.getBorderY0());
+		assertEquals(template.width - template.width/2, alg.getBorderX1());
+		assertEquals(template.height - template.height/2, alg.getBorderY1());
 	}
 
 	@Test
@@ -117,10 +117,10 @@ public abstract class GeneralTemplateMatchTests<T extends ImageGray<T>> extends 
 	@Test
 	void negativeCase_Mask() {
 		GImageMiscOps.fillUniform(image, rand, 0, 200);
-		GImageMiscOps.fill(mask,1);
+		GImageMiscOps.fill(mask, 1);
 
 		alg.setInputImage(image);
-		alg.process(template,mask);
+		alg.process(template, mask);
 
 		if (isPerfectZero) {
 			// there should be no perfect matches
@@ -157,25 +157,24 @@ public abstract class GeneralTemplateMatchTests<T extends ImageGray<T>> extends 
 		checkExpected(false, new Point2D_I32(locationX, locationY));
 
 		// uniform mask should produce identical results
-		GImageMiscOps.fill(mask,1);
+		GImageMiscOps.fill(mask, 1);
 		alg.process(template, mask);
 		checkExpected(false, new Point2D_I32(locationX, locationY));
 	}
 
 	@Test
 	void same_size_img_template() {
-		BoofConcurrency.USE_CONCURRENT=false;
+		BoofConcurrency.USE_CONCURRENT = false;
 		GImageMiscOps.fillUniform(image, rand, 0, 200);
 
 		alg.setInputImage(image);
 		alg.process(image);
 		checkExpected(true, new Point2D_I32(0, 0));
 
-		T mask = this.mask.createNew(image.width,image.height);
-		GImageMiscOps.fill(mask,1);
-		alg.process(image,mask);
+		T mask = this.mask.createNew(image.width, image.height);
+		GImageMiscOps.fill(mask, 1);
+		alg.process(image, mask);
 		checkExpected(true, new Point2D_I32(0, 0));
-
 	}
 
 	/**
@@ -186,8 +185,9 @@ public abstract class GeneralTemplateMatchTests<T extends ImageGray<T>> extends 
 		uniformImage(0);
 		uniformImage(30);
 	}
-	void uniformImage(float value) {
-		GImageMiscOps.fill(image,value);
+
+	void uniformImage( float value ) {
+		GImageMiscOps.fill(image, value);
 
 		setTemplate(5, 7);
 
@@ -202,8 +202,8 @@ public abstract class GeneralTemplateMatchTests<T extends ImageGray<T>> extends 
 		}
 
 		// Same test with a mask
-		GImageMiscOps.fill(mask,1);
-		alg.process(template,mask);
+		GImageMiscOps.fill(mask, 1);
+		alg.process(template, mask);
 		intensity = alg.getIntensity();
 		for (int i = 0; i < intensity.totalPixels(); i++) {
 			assertFalse(UtilEjml.isUncountable(intensity.data[i]));
@@ -222,11 +222,11 @@ public abstract class GeneralTemplateMatchTests<T extends ImageGray<T>> extends 
 
 		setTemplate(locationX, locationY);
 
-		GImageMiscOps.fill(mask,0);
-		GImageMiscOps.fill(alg.getIntensity(),0);
+		GImageMiscOps.fill(mask, 0);
+		GImageMiscOps.fill(alg.getIntensity(), 0);
 		alg.setInputImage(image);
 		alg.process(template, mask);
-		assertEquals(0, ImageStatistics.maxAbs(alg.getIntensity()),1e-4f);
+		assertEquals(0, ImageStatistics.maxAbs(alg.getIntensity()), 1e-4f);
 	}
 
 	/**
@@ -247,7 +247,7 @@ public abstract class GeneralTemplateMatchTests<T extends ImageGray<T>> extends 
 		checkExpected(false, a, b);
 
 		// uniform mask should produce identical results
-		GImageMiscOps.fill(mask,1);
+		GImageMiscOps.fill(mask, 1);
 		alg.process(template, mask);
 		checkExpected(false, a, b);
 	}
@@ -259,67 +259,67 @@ public abstract class GeneralTemplateMatchTests<T extends ImageGray<T>> extends 
 	void maskDifferentiate() {
 		GImageMiscOps.fillUniform(image, rand, 0, 200);
 
-		int x=10,y=12,tw=15,th=15;
+		int x = 10, y = 12, tw = 15, th = 15;
 
-		T template = image.createNew(tw,th);
+		T template = image.createNew(tw, th);
 		GImageMiscOps.fillUniform(template, rand, 0, 200);
-		GImageMiscOps.fillBorder(template,150,2);
+		GImageMiscOps.fillBorder(template, 150, 2);
 
-		image.subimage(x-tw/2,y-th/2,x-tw/2+tw,y-th/2+th).setTo(template);
+		image.subimage(x - tw/2, y - th/2, x - tw/2 + tw, y - th/2 + th).setTo(template);
 
 //		ShowImages.showWindow(image,"foo",true);
 //		BoofMiscOps.sleep(10000);
 
-		GImageMiscOps.fillBorder(template,20,2); // change the template's border so that it won't match
-		GImageMiscOps.fillBorder(template,50,1); // change the template's border so that it won't match
+		GImageMiscOps.fillBorder(template, 20, 2); // change the template's border so that it won't match
+		GImageMiscOps.fillBorder(template, 50, 1); // change the template's border so that it won't match
 
 		alg.setInputImage(image);
 		alg.process(template);
 
-		float valueNoMask = fractionBest(alg.isMaximize(),alg.getIntensity(),x,y);
-		float averageNoMask = fractionAverage(alg.isMaximize(),alg.getIntensity(),x,y);
+		float valueNoMask = fractionBest(alg.isMaximize(), alg.getIntensity(), x, y);
+		float averageNoMask = fractionAverage(alg.isMaximize(), alg.getIntensity(), x, y);
 
-		T mask = image.createNew(tw,th);
+		T mask = image.createNew(tw, th);
 		double v = image.getImageType().getDataType().isInteger() ? 100 : 1;
-		GImageMiscOps.fill(mask,v);
-		GImageMiscOps.fillBorder(mask,0,2); // ignore the border
+		GImageMiscOps.fill(mask, v);
+		GImageMiscOps.fillBorder(mask, 0, 2); // ignore the border
 
 		alg.setInputImage(image);
-		alg.process(template,mask);
+		alg.process(template, mask);
 
-		float valueMask = fractionBest(alg.isMaximize(),alg.getIntensity(), x, y);
-		float averageMask = fractionAverage(alg.isMaximize(),alg.getIntensity(), x, y);
+		float valueMask = fractionBest(alg.isMaximize(), alg.getIntensity(), x, y);
+		float averageMask = fractionAverage(alg.isMaximize(), alg.getIntensity(), x, y);
 
 		// this score is designed to reduce the affect of the change in template "size"
 		float scoreNoMask = valueNoMask/averageNoMask;
 		float scoreMask = valueMask/averageMask;
 
-		assertTrue(valueMask >= valueNoMask );
+		assertTrue(valueMask >= valueNoMask);
 		// when masked it should be better at differentiating it from background noise
-		assertTrue(scoreMask*0.9 > scoreNoMask );
+		assertTrue(scoreMask*0.9 > scoreNoMask);
 	}
 
-	float fractionBest(boolean maximize, GrayF32 intensity , int x , int y ) {
+	float fractionBest( boolean maximize, GrayF32 intensity, int x, int y ) {
 		float min = ImageStatistics.min(intensity);
 		float max = ImageStatistics.max(intensity);
 
-		float value = intensity.get(x,y);
+		float value = intensity.get(x, y);
 
-		if( maximize )
-			return (value-min)/(max-min);
+		if (maximize)
+			return (value - min)/(max - min);
 		else
-			return (max-value)/(max-min);
+			return (max - value)/(max - min);
 	}
 
-	float fractionAverage(boolean maximize, GrayF32 intensity , int x , int y ) {
+	float fractionAverage( boolean maximize, GrayF32 intensity, int x, int y ) {
 		float min = ImageStatistics.min(intensity);
 		float max = ImageStatistics.max(intensity);
 		float average = (float)ImageStatistics.mean(intensity);
 
-		if( maximize )
-			return (average-min)/(max-min);
+		if (maximize)
+			return (average - min)/(max - min);
 		else
-			return (max-average)/(max-min);
+			return (max - average)/(max - min);
 	}
 
 	/**
@@ -344,13 +344,13 @@ public abstract class GeneralTemplateMatchTests<T extends ImageGray<T>> extends 
 
 		// uniform mask should produce identical results
 		T subMask = BoofTesting.createSubImageOf(mask);
-		GImageMiscOps.fill(subMask,1);
+		GImageMiscOps.fill(subMask, 1);
 		alg.setInputImage(subImage);
-		alg.process(subTemplate,subMask);
+		alg.process(subTemplate, subMask);
 		checkExpected(false, a, b);
 	}
 
-	private void checkExpected(boolean strict, Point2D_I32... points) {
+	private void checkExpected( boolean strict, Point2D_I32... points ) {
 		// I'm being lazy, update this in the future
 		assertFalse(alg.isBorderProcessed());
 
@@ -363,20 +363,20 @@ public abstract class GeneralTemplateMatchTests<T extends ImageGray<T>> extends 
 		// solutions should be local maximums
 		NonMaxSuppression extractor;
 		ConfigExtract config = new ConfigExtract(2, -Float.MAX_VALUE, 0, true);
-		if( !alg.isMaximize() ) {
+		if (!alg.isMaximize()) {
 			config.detectMaximums = false;
 			config.detectMinimums = true;
 		}
-		extractor = FactoryFeatureExtractor.nonmax(config);
+		extractor = FactoryFeatureExtractor.nonmax(config, 1);
 
-		QueueCorner found = new QueueCorner(10);
+		var found = new QueueCorner(10);
 
-		GrayF32 intensity = alg.getIntensity().subimage(x0,y0,image.width-x1+1,image.height-y1+1);
+		GrayF32 intensity = alg.getIntensity().subimage(x0, y0, image.width - x1 + 1, image.height - y1 + 1);
 
-		if( alg.isMaximize() )
-			extractor.process(intensity, null,null,null, found);
+		if (alg.isMaximize())
+			extractor.process(intensity, null, null, null, found);
 		else
-			extractor.process(intensity, null,null,found, null);
+			extractor.process(intensity, null, null, found, null);
 
 		assertTrue(found.size >= points.length);
 
@@ -385,18 +385,18 @@ public abstract class GeneralTemplateMatchTests<T extends ImageGray<T>> extends 
 			int numMatches = 0;
 
 			for (Point2D_I16 f : found.toList()) {
-				if ( expected.distance(f.x,f.y) == 0.0 )
+				if (expected.distance(f.x, f.y) == 0.0)
 					numMatches++;
 			}
 
 			assertEquals(1, numMatches);
 		}
 
-		if( strict )
-			assertEquals(points.length,found.size);
+		if (strict)
+			assertEquals(points.length, found.size);
 	}
 
-	private void setTemplate(int x, int y) {
+	private void setTemplate( int x, int y ) {
 		image.subimage(x, y, x + template.width, y + template.height, null).setTo(template);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,8 @@ import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.border.ImageBorder_F32;
 import boofcv.struct.border.ImageBorder_S32;
+import boofcv.struct.convolve.Kernel2D_F32;
+import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
@@ -39,6 +41,18 @@ public class TestDerivativeLaplacian extends BoofStandardJUnit {
 	private final int width = 4;
 	private final int height = 5;
 
+	@Test void floatScale() {
+		int divisor = DerivativeLaplacian.divisor;
+		Kernel2D_S32 kernel_I32 = DerivativeLaplacian.kernelXY_I32;
+		Kernel2D_F32 kernel_F32 = DerivativeLaplacian.kernelXY_F32;
+		for (int y = 0; y < kernel_I32.width; y++) {
+			for (int x = 0; x < kernel_I32.width; x++) {
+				float expected = kernel_I32.get(x, y)/(float)divisor;
+				assertEquals(expected, kernel_F32.get(x, y), UtilEjml.TEST_F32);
+			}
+		}
+	}
+
 	@Test void process_U8_S16() {
 		GrayU8 img = new GrayU8(width, height);
 		ImageMiscOps.fillUniform(img, rand, 0, 100);
@@ -47,14 +61,14 @@ public class TestDerivativeLaplacian extends BoofStandardJUnit {
 		BoofTesting.checkSubImage(this, "process_U8_S16", true, img, deriv);
 	}
 
-	public void process_U8_S16(GrayU8 img, GrayS16 deriv) {
+	public void process_U8_S16( GrayU8 img, GrayS16 deriv ) {
 		ImageBorder_S32<GrayU8> border = (ImageBorder_S32)FactoryImageBorder.single(BorderType.EXTENDED, GrayU8.class);
 		DerivativeLaplacian.process(img, deriv, border);
 
 		GrayS16 expected = deriv.createSameShape();
-		ConvolveImage.convolve(DerivativeLaplacian.kernel_I32,img,expected,border);
+		ConvolveImage.convolve(DerivativeLaplacian.kernelXY_I32, img, expected, border);
 
-		BoofTesting.assertEquals(expected,deriv,0);
+		BoofTesting.assertEquals(expected, deriv, 0);
 	}
 
 	@Test void process_I8_F32() {
@@ -65,10 +79,10 @@ public class TestDerivativeLaplacian extends BoofStandardJUnit {
 		BoofTesting.checkSubImage(this, "process_U8_F32", true, img, deriv);
 	}
 
-	public void process_U8_F32(GrayU8 img, GrayF32 deriv) {
+	public void process_U8_F32( GrayU8 img, GrayF32 deriv ) {
 		DerivativeLaplacian.process(img, deriv);
 
-		int expected = -4 * img.get(1, 1) + img.get(0, 1) + img.get(1, 0)
+		int expected = -4*img.get(1, 1) + img.get(0, 1) + img.get(1, 0)
 				+ img.get(2, 1) + img.get(1, 2);
 
 		assertEquals(expected, deriv.get(1, 1), 1e-5);
@@ -82,13 +96,13 @@ public class TestDerivativeLaplacian extends BoofStandardJUnit {
 		BoofTesting.checkSubImage(this, "process_F32", true, img, deriv);
 	}
 
-	public void process_F32(GrayF32 img, GrayF32 deriv) {
+	public void process_F32( GrayF32 img, GrayF32 deriv ) {
 		ImageBorder_F32 border = (ImageBorder_F32)FactoryImageBorder.single(BorderType.EXTENDED, GrayF32.class);
 		DerivativeLaplacian.process(img, deriv, border);
 
 		GrayF32 expected = deriv.createSameShape();
-		ConvolveImage.convolve(DerivativeLaplacian.kernel_F32,img,expected,border);
+		ConvolveImage.convolve(DerivativeLaplacian.kernelXY_F32, img, expected, border);
 
-		BoofTesting.assertEquals(expected,deriv, UtilEjml.TEST_F32);
+		BoofTesting.assertEquals(expected, deriv, UtilEjml.TEST_F32);
 	}
 }

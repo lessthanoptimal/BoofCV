@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -73,7 +73,7 @@ public class ControlPanelPointDetector extends StandardAlgConfigPanel {
 
 	public <T extends ImageGray<T>, D extends ImageGray<D>>
 	GeneralFeatureDetector<T, D> create( Class<T> imageType ) {
-		return FactoryDetectPoint.create(config, imageType, null);
+		return FactoryDetectPoint.create(config, imageType, null, 1);
 	}
 
 	void handleTypeChange() {

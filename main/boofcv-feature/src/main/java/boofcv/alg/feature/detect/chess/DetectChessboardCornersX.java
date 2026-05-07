@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -173,7 +173,7 @@ public class DetectChessboardCornersX {
 			config.detectMaximums = true;
 			config.detectMinimums = false;
 			config.useStrictRule = true;
-			nonmax = FactoryFeatureExtractor.nonmax(config);
+			nonmax = FactoryFeatureExtractor.nonmax(config, 1);
 		}
 
 		blurFilter = FactoryBlurFilter.gaussian(ImageType.SB_F32, -1, blurRadius);

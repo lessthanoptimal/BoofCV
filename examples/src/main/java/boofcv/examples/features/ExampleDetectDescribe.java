@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -78,7 +78,7 @@ public class ExampleDetectDescribe {
 	DetectDescribePoint<T, TD> createFromComponents( Class<T> imageType ) {
 		// create a corner detector
 		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
-		GeneralFeatureDetector corner = FactoryDetectPoint.createShiTomasi(new ConfigGeneralDetector(1000, 5, 1), null, derivType);
+		GeneralFeatureDetector corner = FactoryDetectPoint.createShiTomasi(new ConfigGeneralDetector(1000, 5, 1), null, derivType, 1);
 		InterestPointDetector detector = FactoryInterestPoint.wrapPoint(corner, 1, imageType, derivType);
 
 		// describe points using BRIEF

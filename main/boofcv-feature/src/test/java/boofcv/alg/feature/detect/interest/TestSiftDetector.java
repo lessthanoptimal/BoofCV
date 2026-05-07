@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -207,7 +207,7 @@ public class TestSiftDetector extends BoofStandardJUnit {
 	private SiftDetector createDetector() {
 
 		NonMaxLimiter nonmax = FactoryFeatureExtractor.nonmaxLimiter(
-				new ConfigExtract(1, 0, 1, true, true, true),
+				new ConfigExtract(1, 0, 1, true, true, true), 1,
 				ConfigSelectLimit.selectBestN(), 1000);
 		FeatureSelectLimitIntensity<ScalePoint> selectorAll = FactorySelectLimit.intensity(ConfigSelectLimit.selectBestN());
 		return new SiftDetector(selectorAll, 10, nonmax);

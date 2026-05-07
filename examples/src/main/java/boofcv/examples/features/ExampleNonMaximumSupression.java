@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,7 +52,7 @@ public class ExampleNonMaximumSupression {
 
 	public static BufferedImage renderNonMax( GrayF32 intensity, int radius, float threshold ) {
 		// Create and configure the feature detector
-		NonMaxSuppression<QueueCorner> nonmax = FactoryFeatureExtractor.nonmax(new ConfigExtract(radius, threshold));
+		NonMaxSuppression<QueueCorner> nonmax = FactoryFeatureExtractor.nonmax(new ConfigExtract(radius, threshold), 1);
 
 		// We will only search for the maximums. Other variants will look for minimums or will exclude previous
 		// candidate detections from being detected twice

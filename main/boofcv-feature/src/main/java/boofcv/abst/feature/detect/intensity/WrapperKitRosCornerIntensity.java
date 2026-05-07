@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.alg.feature.detect.intensity.KitRosCornerIntensity;
 import boofcv.struct.ListIntPoint2D;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
@@ -35,9 +36,11 @@ import java.lang.reflect.Method;
 public class WrapperKitRosCornerIntensity<I extends ImageGray<I>, D extends ImageGray<D>>
 		extends BaseGeneralFeatureIntensity<I, D> {
 	Method m;
+	boolean integerValued;
 
 	public WrapperKitRosCornerIntensity( Class<D> derivType ) {
 		super(null, derivType);
+		integerValued = ImageType.single(derivType).getDataType().isInteger();
 		try {
 			m = KitRosCornerIntensity.class.getMethod("process", GrayF32.class, derivType, derivType, derivType, derivType, derivType);
 		} catch (NoSuchMethodException e) {
@@ -55,6 +58,10 @@ public class WrapperKitRosCornerIntensity<I extends ImageGray<I>, D extends Imag
 		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	@Override public float thresholdScaleByDerivative( int divisor ) {
+		return integerValued ? divisor : 1.0f;
 	}
 
 	@Override

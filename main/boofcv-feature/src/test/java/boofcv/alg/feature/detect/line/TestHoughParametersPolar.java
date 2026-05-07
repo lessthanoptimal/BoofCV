@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,8 +30,8 @@ public class TestHoughParametersPolar extends BoofStandardJUnit {
 	class Gradient extends CommonHoughGradientChecks {
 		@Override
 		HoughTransformGradient createAlgorithm( Class derivType ) {
-			NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(4, 5, 0, true));
-			HoughTransformParameters hough = new HoughParametersPolar(0.5,180);
+			NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(4, 5, 0, true), 1);
+			var hough = new HoughParametersPolar(0.5,180);
 			return new HoughTransformGradient(extractor,hough,derivType);
 		}
 	}
@@ -40,8 +40,8 @@ public class TestHoughParametersPolar extends BoofStandardJUnit {
 	class Gradient_MT extends CommonHoughGradientChecks {
 		@Override
 		HoughTransformGradient createAlgorithm( Class derivType ) {
-			NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(4, 5, 0, true));
-			HoughTransformParameters hough = new HoughParametersPolar(0.5,180);
+			NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(4, 5, 0, true), 1);
+			var hough = new HoughParametersPolar(0.5,180);
 			return new HoughTransformGradient_MT(extractor,hough,derivType);
 		}
 	}
@@ -51,7 +51,7 @@ public class TestHoughParametersPolar extends BoofStandardJUnit {
 
 		@Override
 		HoughTransformBinary createAlgorithm() {
-			NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(4, -1, 0, false));
+			NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(4, -1, 0, false), 1);
 			HoughTransformParameters hough = new HoughParametersPolar(0.5,180);
 			HoughTransformBinary alg = new HoughTransformBinary(extractor,hough);
 			alg.setMaxLines(1);
@@ -64,9 +64,9 @@ public class TestHoughParametersPolar extends BoofStandardJUnit {
 
 		@Override
 		HoughTransformBinary createAlgorithm() {
-			NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(4, -1, 0, false));
-			HoughTransformParameters hough = new HoughParametersPolar(0.5,180);
-			HoughTransformBinary alg = new HoughTransformBinary_MT(extractor,hough);
+			NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(4, -1, 0, false), 1);
+			var hough = new HoughParametersPolar(0.5,180);
+			var alg = new HoughTransformBinary_MT(extractor,hough);
 			alg.setMaxLines(1);
 			return alg;
 		}

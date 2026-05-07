@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -78,6 +78,10 @@ public class ImageGradientThenReduce<Input extends ImageMultiBand<Input>,
 
 		gradient.process(inputImage, middleX, middleY);
 		reduce.process(middleX,middleY, derivX,derivY);
+	}
+
+	@Override public int divisor() {
+		return gradient.divisor();
 	}
 
 	@Override

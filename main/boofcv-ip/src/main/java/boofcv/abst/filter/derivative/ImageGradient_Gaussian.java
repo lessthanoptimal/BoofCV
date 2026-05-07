@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -88,6 +88,10 @@ public class ImageGradient_Gaussian<I extends ImageGray<I>, D extends ImageGray<
 		GConvolveImageOps.horizontal(kernelDeriv, storage, derivX, border);
 		GConvolveImageOps.horizontalNormalized(kernelBlur, inputImage, storage);
 		GConvolveImageOps.vertical(kernelDeriv, storage, derivY, border);
+	}
+
+	@Override public int divisor() {
+		throw new RuntimeException("Not implemented");
 	}
 
 	@Override

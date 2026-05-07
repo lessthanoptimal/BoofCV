@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,11 +19,9 @@
 package boofcv.abst.feature.detect.line;
 
 import boofcv.abst.feature.detect.extract.ConfigExtract;
-import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.detect.line.HoughParametersPolar;
 import boofcv.alg.feature.detect.line.HoughTransformGradient;
-import boofcv.alg.feature.detect.line.HoughTransformParameters;
 import boofcv.alg.filter.derivative.DerivativeType;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.filter.derivative.FactoryDerivative;
@@ -33,9 +31,9 @@ import boofcv.struct.image.ImageType;
 public class TestHoughGradient_to_DetectLine extends GeneralDetectLineGradientTests {
 	@Override
 	public <T extends ImageGray<T>> DetectLine<T> createAlg(Class<T> imageType) {
-		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(4, 2, 0, true));
-		HoughTransformParameters polar = new HoughParametersPolar(2,180);
-		HoughTransformGradient hough = new HoughTransformGradient(extractor,polar,imageType);
+		var extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(4, 2, 0, true), 1);
+		var polar = new HoughParametersPolar(2,180);
+		var hough = new HoughTransformGradient(extractor,polar,imageType);
 		ImageGradient gradient = FactoryDerivative.gradient(DerivativeType.SOBEL, ImageType.single(imageType),null);
 
 		return new HoughGradient_to_DetectLine(hough,gradient,imageType);

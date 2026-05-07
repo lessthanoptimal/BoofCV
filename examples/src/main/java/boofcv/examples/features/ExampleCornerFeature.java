@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,9 +54,11 @@ public class ExampleCornerFeature {
 		configCorner.radius = configNonMax.radius; // in general you should use the same radius here
 		configCorner.weighted = true;              // weighted corners will appear at the corners on a chessboard
 
-		// set weighted to false and see what happens to the feature's locations. unweighted is much faster
-		GeneralFeatureDetector<GrayU8, GrayS16> detector = FactoryDetectPoint.createShiTomasi(configNonMax, configCorner, GrayS16.class);
 		ImageGradient<GrayU8, GrayS16> sobel = FactoryDerivative.sobel(GrayU8.class, GrayS16.class);
+
+		// set weighted to false and see what happens to the feature's locations. unweighted is much faster
+		GeneralFeatureDetector<GrayU8, GrayS16> detector = FactoryDetectPoint.createShiTomasi(
+				configNonMax, configCorner, GrayS16.class, sobel.divisor());
 
 		BufferedImage image = UtilImageIO.loadImageNotNull(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess/frame05.jpg"));
 

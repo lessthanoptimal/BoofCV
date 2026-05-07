@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -61,7 +61,7 @@ class TestGeneralFeatureDetector extends BoofStandardJUnit {
 
 		// configure it to only detect positive features
 		intensity.minimums = false;
-		extractorMax = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 0.001f, 1, true, false, true));
+		extractorMax = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 0.001f, 1, true, false, true), 1);
 		GeneralFeatureDetector<GrayF32, GrayF32> detector =
 				new GeneralFeatureDetector<>(intensity, null, extractorMax, selector);
 		detector.process(new GrayF32(width, height), null, null, null, null, null);
@@ -70,7 +70,7 @@ class TestGeneralFeatureDetector extends BoofStandardJUnit {
 
 		// try detecting the negative features too
 		intensity.minimums = true;
-		extractorMin = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 0.001f, 1, true, true, false));
+		extractorMin = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 0.001f, 1, true, true, false), 1);
 		detector = new GeneralFeatureDetector<>(intensity, extractorMin, extractorMax, selector);
 		detector.process(new GrayF32(width, height), null, null, null, null, null);
 		assertEquals(6, detector.getMaximums().size());
@@ -104,8 +104,8 @@ class TestGeneralFeatureDetector extends BoofStandardJUnit {
 		intensity.img.set(9, 4, -10);
 
 		// use a real extractor
-		NonMaxSuppression<QueueCorner> extractorMin = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 0.001f, 1, true, true, false));
-		NonMaxSuppression<QueueCorner> extractorMax = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 0.001f, 1, true, false, true));
+		NonMaxSuppression<QueueCorner> extractorMin = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 0.001f, 1, true, true, false), 1);
+		NonMaxSuppression<QueueCorner> extractorMax = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 0.001f, 1, true, false, true), 1);
 
 		var detector = new GeneralFeatureDetector<GrayF32, GrayF32>(intensity, extractorMin, extractorMax, selector);
 		detector.process(new GrayF32(width, height), null, null, null, null, null);
@@ -276,8 +276,8 @@ class TestGeneralFeatureDetector extends BoofStandardJUnit {
 		@Override public void storageAccess( Add<QueueCorner> opAdd, Reset<QueueCorner> opReset ) {}
 
 		@Override public void process( GrayF32 intensity,
-									   ListIntPoint2D candidateMin, ListIntPoint2D candidateMax,
-									   QueueCorner foundMin, QueueCorner foundMax ) {
+		                               ListIntPoint2D candidateMin, ListIntPoint2D candidateMax,
+		                               QueueCorner foundMin, QueueCorner foundMax ) {
 			numTimesProcessed++;
 
 			if (foundMin != null) {
@@ -340,6 +340,8 @@ class TestGeneralFeatureDetector extends BoofStandardJUnit {
 		}
 
 		@Override public GrayF32 getIntensity() {return img;}
+
+		@Override public float thresholdScaleByDerivative( int divisor ) {return 1;}
 
 		@Override public ListIntPoint2D getCandidatesMin() {
 			candidatesMinCalled++;

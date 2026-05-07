@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -91,7 +91,7 @@ public class FactoryDetectDescribe {
 			case SIFT -> detector =
 					FactoryInterestPoint.sift(config.scaleSpaceSift, config.detectSift, imageType);
 			case POINT -> {
-				GeneralFeatureDetector alg = FactoryDetectPoint.create(config.detectPoint, imageType, null);
+				GeneralFeatureDetector alg = FactoryDetectPoint.create(config.detectPoint, imageType, null, 1);
 				detector = FactoryInterestPoint.wrapPoint(alg, config.detectPoint.scaleRadius, imageType, alg.getDerivType());
 			}
 			default -> throw new IllegalArgumentException("Unknown detector");

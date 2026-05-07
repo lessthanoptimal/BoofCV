@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,22 +18,23 @@
 
 package boofcv.alg.filter.derivative;
 
-/**
- * List of standard kernels used to compute the gradient of an image.
- *
- * @author Peter Abeles
- */
+/// List of standard kernels used to compute the gradient of an image.
+///
+/// The divisor for integer kernel is derived from the smoothing and differentiating which define is. For
+/// Sobel its smoothing kernel is [1 2 1] and differentiated using [-1 0 1]. The smoothing has a sum of 4 and
+/// differentiating has a distance of 2, so a divisor of 8. Three [1 0 1] has a smoothing kernel of [1] and
+/// it is the differentiating kernel, so 1*2 = 2.
 public enum DerivativeType {
-	/** {@link GradientPrewitt} */
+	/// [GradientPrewitt]
 	PREWITT,
-	/** {@link GradientSobel} */
+	/// [GradientSobel]
 	SOBEL,
-	/** {@link GradientScharr} */
+	/// [GradientScharr]
 	SCHARR,
-	/** {@link GradientThree} */
+	/// [GradientThree]
 	THREE,
-	/** {@link GradientTwo0} */
+	/// [GradientTwo0]
 	TWO_0,
-	/** {@link GradientTwo1} */
+	/// [GradientTwo1]
 	TWO_1
 }

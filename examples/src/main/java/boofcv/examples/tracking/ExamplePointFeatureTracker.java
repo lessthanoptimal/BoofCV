@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.abst.feature.detect.interest.ConfigPointDetector;
 import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTracker;
+import boofcv.alg.filter.derivative.DerivativeType;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.factory.tracker.FactoryPointTracker;
@@ -140,7 +141,7 @@ public class ExamplePointFeatureTracker<T extends ImageGray<T>, D extends ImageG
 		configDetector.general.radius = 6;
 		configDetector.general.threshold = 1;
 
-		tracker = FactoryPointTracker.klt(configKlt, configDetector, imageType, derivType);
+		tracker = FactoryPointTracker.klt(configKlt, DerivativeType.SOBEL, configDetector, imageType, derivType);
 	}
 
 	/**

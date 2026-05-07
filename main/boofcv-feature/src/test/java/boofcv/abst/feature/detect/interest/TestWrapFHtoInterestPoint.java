@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,16 +19,12 @@
 package boofcv.abst.feature.detect.interest;
 
 import boofcv.abst.feature.detect.extract.ConfigExtract;
-import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
-import boofcv.alg.feature.detect.selector.FeatureSelectLimitIntensity;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.selector.ConfigSelectLimit;
 import boofcv.factory.feature.detect.selector.FactorySelectLimit;
-import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofStandardJUnit;
-import georegression.struct.point.Point2D_I16;
 import org.junit.jupiter.api.Nested;
 
 @SuppressWarnings("unchecked")
@@ -37,9 +33,9 @@ public class TestWrapFHtoInterestPoint extends BoofStandardJUnit {
 	@Nested
 	public class Standard extends GeneralInterestPointDetectorChecks {
 		public Standard() {
-			NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(2, 1, 5, true));
-			FeatureSelectLimitIntensity<Point2D_I16> limitLevels = FactorySelectLimit.intensity(ConfigSelectLimit.selectBestN());
-			FeatureSelectLimitIntensity<ScalePoint> limitAll = FactorySelectLimit.intensity(ConfigSelectLimit.selectBestN());
+			var extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(2, 1, 5, true), 1);
+			var limitLevels = FactorySelectLimit.intensity(ConfigSelectLimit.selectBestN());
+			var limitAll = FactorySelectLimit.intensity(ConfigSelectLimit.selectBestN());
 			var detector = new FastHessianFeatureDetector(extractor,limitLevels,limitAll,
 					1,9, 4,4, 6);
 			detector.maxFeaturesPerScale = 150;

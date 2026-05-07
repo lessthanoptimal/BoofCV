@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.abst.sfm.d3;
 import boofcv.abst.disparity.StereoDisparitySparse;
 import boofcv.abst.feature.detect.interest.ConfigPointDetector;
 import boofcv.abst.tracker.PointTracker;
+import boofcv.alg.filter.derivative.DerivativeType;
 import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.factory.disparity.ConfigDisparityBM;
 import boofcv.factory.disparity.FactoryStereoDisparity;
@@ -72,14 +73,14 @@ public class TestWrapVisOdomStereoMonoPnP extends BoofStandardJUnit {
 			configKLT.pyramidLevels = ConfigDiscreteLevels.levels(4);
 			configKLT.templateRadius = 3;
 
-			ConfigPointDetector configDetector = new ConfigPointDetector();
+			var configDetector = new ConfigPointDetector();
 			configDetector.general.maxFeatures = 600;
 			configDetector.general.radius = 3;
 			configDetector.general.threshold = 1;
 			configDetector.shiTomasi.radius = 3;
 
 			StereoDisparitySparse<GrayF32> disparity = FactoryStereoDisparity.sparseRectifiedBM(configBM, GrayF32.class);
-			PointTracker<GrayF32> tracker = FactoryPointTracker.klt(configKLT, configDetector,
+			PointTracker<GrayF32> tracker = FactoryPointTracker.klt(configKLT, DerivativeType.SOBEL, configDetector,
 					GrayF32.class, GrayF32.class);
 
 			return FactoryVisualOdometry.stereoMonoPnP(configPnP, disparity, tracker, GrayF32.class);

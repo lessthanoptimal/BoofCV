@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -218,12 +218,12 @@ public class SparseFlowObjectTracker<Image extends ImageGray<Image>, Derivative 
 				track.x = xx;
 				track.y = yy;
 
-				klt.setImage(previousImage, previousDerivX, previousDerivY);
+				klt.setImage(previousImage, previousDerivX, previousDerivY, gradient.divisor());
 				if (!klt.setDescription(track)) {
 					continue;
 				}
 
-				klt.setImage(currentImage, currentDerivX, currentDerivY);
+				klt.setImage(currentImage, currentDerivX, currentDerivY, gradient.divisor());
 				KltTrackFault fault = klt.track(track);
 				if (fault != KltTrackFault.SUCCESS) {
 					continue;
@@ -236,7 +236,7 @@ public class SparseFlowObjectTracker<Image extends ImageGray<Image>, Derivative 
 				if (!klt.setDescription(track)) {
 					continue;
 				}
-				klt.setImage(previousImage, previousDerivX, previousDerivY);
+				klt.setImage(previousImage, previousDerivX, previousDerivY, gradient.divisor());
 				fault = klt.track(track);
 				if (fault != KltTrackFault.SUCCESS) {
 					continue;

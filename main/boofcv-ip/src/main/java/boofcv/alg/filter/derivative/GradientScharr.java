@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,7 @@ import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.border.ImageBorder;
 import boofcv.struct.border.ImageBorder_F32;
 import boofcv.struct.border.ImageBorder_S32;
+import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.convolve.Kernel2D;
 import boofcv.struct.convolve.Kernel2D_F32;
 import boofcv.struct.convolve.Kernel2D_S32;
@@ -35,34 +36,50 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * Implementation of the standard 3x3 Scharr operator. (1/32)*[-1;0;1]**[3 10 3] = (1/3)*[-3 10 -3;0 0 0;3 10 3].
- * This is by far the most widely used kernel, but apparently the original paper described more accurate kernels and
- * kernels up to 5x5. Unfortunately, the thesis is in German [1] and other related papers require you to work
- * through the math, so this implementation is sticking with the standard kernel only.
- *
- * Scharr is supposed to be more accurate then Sobel when dealing with optical flow.
- *
- * [1] Scharr, Hanno, 2000, Dissertation (in German), Optimal Operators in Digital Image Processing .
- *
- * @author Peter Abeles
- */
+/// Scharr image derivative operator. Contains 2D kernels and specialized efficient functions for computing image
+/// gradient.
+///
+/// For integer images, divide the result by [#divisor] for proper scaling. Floating
+/// point kernels already include this scaling; without it, output magnitudes are
+/// inflated by that factor.
+///
+/// `[-1; 0; 1]` ∗∗ `[3 10 3]` =
+///
+/// (1/32) ·
+///
+/// |  -3 |  -10 |  -3 |
+/// |-----|------|-----|
+/// |   0 |    0 |   0 |
+/// |   3 |   10 |   3 |
+///
+/// where `∗∗` denotes 2D convolution and `·` denotes element-wise scalar multiplication.
+///
+/// This is by far the most widely used kernel, but apparently the original paper described
+/// more accurate kernels and kernels up to 5×5. Unfortunately, the thesis is in German \[1\]
+/// and other related papers require you to work through the math, so this implementation is
+/// sticking with the standard kernel only.
+///
+/// Scharr is supposed to be more accurate than Sobel when dealing with optical flow.
+///
+/// \[1\] Scharr, Hanno, 2000, Dissertation (in German), *Optimal Operators in Digital Image Processing*.
 public class GradientScharr {
-	public static Kernel2D_S32 kernelDerivX_I32 = new Kernel2D_S32(3, new int[]{-3, 0, 3, -10, 0, 10, -3, 0, 3});
-	public static Kernel2D_S32 kernelDerivY_I32 = new Kernel2D_S32(3, new int[]{-3, -10, -3, 0, 0, 0, 3, 10, 3});
-	public static Kernel2D_F32 kernelDerivX_F32 = new Kernel2D_F32(
+	/// Integer divisor to ensure brightness does not change
+	public static final int divisor = 32;
+	public static Kernel1D_S32 kernelSmooth = new Kernel1D_S32(3, new int[]{3, 10, 3});
+	public static Kernel1D_S32 kernelDiff = new Kernel1D_S32(3, new int[]{-1, 0, 1});
+	public static Kernel2D_S32 kernelX_I32 = new Kernel2D_S32(3, new int[]{-3, 0, 3, -10, 0, 10, -3, 0, 3});
+	public static Kernel2D_S32 kernelY_I32 = new Kernel2D_S32(3, new int[]{-3, -10, -3, 0, 0, 0, 3, 10, 3});
+	public static Kernel2D_F32 kernelX_F32 = new Kernel2D_F32(
 			3, new float[]{-0.093750f, 0, 0.093750f, -0.31250f, 0, 0.31250f, -0.093750f, 0, 0.093750f});
-	public static Kernel2D_F32 kernelDerivY_F32 = new Kernel2D_F32(
+	public static Kernel2D_F32 kernelY_F32 = new Kernel2D_F32(
 			3, new float[]{-0.093750f, -0.31250f, -0.093750f, 0, 0, 0, 0.093750f, 0.31250f, 0.093750f});
 
-	/**
-	 * Returns the kernel for computing the derivative along the x-axis.
-	 */
+	/// Returns the kernel for computing the derivative along the x-axis.
 	public static Kernel2D getKernelX( boolean isInteger ) {
 		if (isInteger)
-			return kernelDerivX_I32;
+			return kernelX_I32;
 		else
-			return kernelDerivX_F32;
+			return kernelX_F32;
 	}
 
 	public static <I extends ImageGray<I>, D extends ImageGray<D>> void process( I input, D derivX, D derivY,
@@ -75,14 +92,12 @@ public class GradientScharr {
 		}
 	}
 
-	/**
-	 * Computes the derivative in the X and Y direction using an integer Sobel edge detector.
-	 *
-	 * @param orig Input image. Not modified.
-	 * @param derivX Storage for image derivative along the x-axis. Modified.
-	 * @param derivY Storage for image derivative along the y-axis. Modified.
-	 * @param border Specifies how the image border is handled. If null the border is not processed.
-	 */
+	/// Computes the derivative in the X and Y direction using an integer Sobel edge detector.
+	///
+	/// @param orig Input image. Not modified.
+	/// @param derivX Storage for image derivative along the x-axis. Modified.
+	/// @param derivY Storage for image derivative along the y-axis. Modified.
+	/// @param border Specifies how the image border is handled. If null the border is not processed.
 	public static void process( GrayU8 orig, GrayS16 derivX, GrayS16 derivY, @Nullable ImageBorder_S32<GrayU8> border ) {
 		InputSanityCheck.reshapeOneIn(orig, derivX, derivY);
 
@@ -94,19 +109,17 @@ public class GradientScharr {
 
 		if (border != null) {
 			border.setImage(orig);
-			ConvolveJustBorder_General_SB.convolve(kernelDerivX_I32, border, derivX);
-			ConvolveJustBorder_General_SB.convolve(kernelDerivY_I32, border, derivY);
+			ConvolveJustBorder_General_SB.convolve(kernelX_I32, border, derivX);
+			ConvolveJustBorder_General_SB.convolve(kernelY_I32, border, derivY);
 		}
 	}
 
-	/**
-	 * Computes the derivative in the X and Y direction using an integer Sobel edge detector.
-	 *
-	 * @param orig Input image. Not modified.
-	 * @param derivX Storage for image derivative along the x-axis. Modified.
-	 * @param derivY Storage for image derivative along the y-axis. Modified.
-	 * @param border Specifies how the image border is handled. If null the border is not processed.
-	 */
+	/// Computes the derivative in the X and Y direction using an integer Sobel edge detector.
+	///
+	/// @param orig Input image. Not modified.
+	/// @param derivX Storage for image derivative along the x-axis. Modified.
+	/// @param derivY Storage for image derivative along the y-axis. Modified.
+	/// @param border Specifies how the image border is handled. If null the border is not processed.
 	public static void process( GrayS16 orig, GrayS16 derivX, GrayS16 derivY, @Nullable ImageBorder_S32<GrayS16> border ) {
 		InputSanityCheck.reshapeOneIn(orig, derivX, derivY);
 
@@ -118,19 +131,17 @@ public class GradientScharr {
 
 		if (border != null) {
 			border.setImage(orig);
-			ConvolveJustBorder_General_SB.convolve(kernelDerivX_I32, border, derivX);
-			ConvolveJustBorder_General_SB.convolve(kernelDerivY_I32, border, derivY);
+			ConvolveJustBorder_General_SB.convolve(kernelX_I32, border, derivX);
+			ConvolveJustBorder_General_SB.convolve(kernelY_I32, border, derivY);
 		}
 	}
 
-	/**
-	 * Computes the derivative in the X and Y direction using an integer Sobel edge detector.
-	 *
-	 * @param orig Input image. Not modified.
-	 * @param derivX Storage for image derivative along the x-axis. Modified.
-	 * @param derivY Storage for image derivative along the y-axis. Modified.
-	 * @param border Specifies how the image border is handled. If null the border is not processed.
-	 */
+	/// Computes the derivative in the X and Y direction using an integer Sobel edge detector.
+	///
+	/// @param orig Input image. Not modified.
+	/// @param derivX Storage for image derivative along the x-axis. Modified.
+	/// @param derivY Storage for image derivative along the y-axis. Modified.
+	/// @param border Specifies how the image border is handled. If null the border is not processed.
 	public static void process( GrayF32 orig, GrayF32 derivX, GrayF32 derivY, @Nullable ImageBorder_F32 border ) {
 		InputSanityCheck.reshapeOneIn(orig, derivX, derivY);
 
@@ -143,8 +154,8 @@ public class GradientScharr {
 
 		if (border != null) {
 			border.setImage(orig);
-			ConvolveJustBorder_General_SB.convolve(kernelDerivX_F32, border, derivX);
-			ConvolveJustBorder_General_SB.convolve(kernelDerivY_F32, border, derivY);
+			ConvolveJustBorder_General_SB.convolve(kernelX_F32, border, derivX);
+			ConvolveJustBorder_General_SB.convolve(kernelY_F32, border, derivY);
 		}
 	}
 }

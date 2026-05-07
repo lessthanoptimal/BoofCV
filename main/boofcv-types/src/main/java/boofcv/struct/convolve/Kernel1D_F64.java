@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,9 @@
 
 package boofcv.struct.convolve;
 
+import org.ejml.MatrixFormattable;
+import org.ejml.MatrixPrintFormat;
+
 /**
  * Floating point 1D convolution kernel that extends {@link Kernel1D}.
  *
@@ -28,7 +31,7 @@ package boofcv.struct.convolve;
  * @author Peter Abeles
  */
 @SuppressWarnings({"NullAway.Init"})
-public class Kernel1D_F64 extends Kernel1D {
+public class Kernel1D_F64 extends Kernel1D implements MatrixFormattable  {
 
 	public double[] data;
 
@@ -36,21 +39,21 @@ public class Kernel1D_F64 extends Kernel1D {
 	 * Creates a new kernel whose initial values are specified by "data" and length is "width".
 	 * The offset will be set to width/2
 	 *
+	 * @param width The kernel's width.
 	 * @param data The value of the kernel. Not modified. Reference is not saved.
-	 * @param width The kernels width.
 	 */
-	public Kernel1D_F64( double[] data, int width ) {
-		this(data, width, width/2);
+	public Kernel1D_F64( int width, double[] data ) {
+		this(width, width/2, data);
 	}
 
 	/**
 	 * Creates a kernel with elements equal to 'data' and with the specified 'width' plus 'offset'
 	 *
-	 * @param data The value of the kernel. Not modified. Reference is not saved.
-	 * @param width The kernels width.
+	 * @param width The kernel's width.
 	 * @param offset Location of the origin in the array
+	 * @param data The value of the kernel. Not modified. Reference is not saved.
 	 */
-	public Kernel1D_F64( double[] data, int width, int offset ) {
+	public Kernel1D_F64( int width, int offset, double[] data ) {
 		super(width, offset);
 
 		this.data = new double[width];
@@ -80,13 +83,11 @@ public class Kernel1D_F64 extends Kernel1D {
 
 	protected Kernel1D_F64() {}
 
-	@Override
-	public /**/double /**/getDouble( int index ) {
+	@Override public /**/double /**/getDouble( int index ) {
 		return data[index];
 	}
 
-	@Override
-	public void setD( int index, /**/double value ) {
+	@Override public void setD( int index, /**/double value ) {
 		data[index] = (double) value;
 	}
 
@@ -100,26 +101,29 @@ public class Kernel1D_F64 extends Kernel1D {
 	 * @return A new kernel.
 	 */
 	public static Kernel1D_F64 wrap( double[] data, int width, int offset ) {
-		Kernel1D_F64 ret = new Kernel1D_F64();
+		var ret = new Kernel1D_F64();
 		ret.data = data;
 		ret.width = width;
 		ret.offset = offset;
-
 		return ret;
 	}
 
-	@Override
-	public Kernel1D_F64 copy() {
-		Kernel1D_F64 ret = new Kernel1D_F64(width, offset);
+	@Override public Kernel1D_F64 copy() {
+		var ret = new Kernel1D_F64(width, offset);
 		System.arraycopy(data, 0, ret.data, 0, ret.width);
 		return ret;
 	}
 
-	@Override
-	public boolean isInteger() {
+	@Override public boolean isInteger() {
 		return false;
 	}
 
+	@Override public String format( MatrixPrintFormat format ) {
+		var builder = new StringBuilder();
+		format.row(builder, width, ( col ) -> data[col]);
+		return builder.toString();
+	}
+	
 	public double get( int i ) {
 		return data[i];
 	}
@@ -142,5 +146,9 @@ public class Kernel1D_F64 extends Kernel1D {
 			System.out.printf("%6.3f ", data[i]);
 		}
 		System.out.println();
+	}
+
+	@Override public String toString() {
+		return getClass().getSimpleName() + " width=" + width + " offset=" + offset + "\n" + format();
 	}
 }

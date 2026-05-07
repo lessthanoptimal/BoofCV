@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -73,7 +73,7 @@ public class BenchmarkExtractors {
 		config.detectMinimums = false;
 		config.threshold = threshold;
 		config.useStrictRule = true;
-		blockStrictMax = FactoryFeatureExtractor.nonmax(config);
+		blockStrictMax = FactoryFeatureExtractor.nonmax(config, 1);
 	}
 
 	@Benchmark public void blockStrictMax() {
@@ -87,7 +87,7 @@ public class BenchmarkExtractors {
 		config.detectMinimums = true;
 		config.threshold = threshold;
 		config.useStrictRule = true;
-		NonMaxSuppression<QueueCorner> alg = FactoryFeatureExtractor.nonmax(config);
+		NonMaxSuppression<QueueCorner> alg = FactoryFeatureExtractor.nonmax(config, 1);
 		alg.process(intensity, null, null, corners, corners);
 	}
 
@@ -98,7 +98,7 @@ public class BenchmarkExtractors {
 		config.detectMinimums = false;
 		config.threshold = threshold;
 		config.useStrictRule = false;
-		NonMaxSuppression<QueueCorner> alg = FactoryFeatureExtractor.nonmax(config);
+		NonMaxSuppression<QueueCorner> alg = FactoryFeatureExtractor.nonmax(config, 1);
 		alg.process(intensity, null, null, corners, corners);
 	}
 
@@ -109,7 +109,7 @@ public class BenchmarkExtractors {
 		config.detectMinimums = true;
 		config.threshold = threshold;
 		config.useStrictRule = false;
-		NonMaxSuppression<QueueCorner> alg = FactoryFeatureExtractor.nonmax(config);
+		NonMaxSuppression<QueueCorner> alg = FactoryFeatureExtractor.nonmax(config, 1);
 		alg.process(intensity, null, null, corners, corners);
 	}
 

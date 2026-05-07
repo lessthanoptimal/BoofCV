@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -117,7 +117,7 @@ public class KernelMath {
 	public static Kernel1D_S32 convolve1D_I32( Kernel1D_S32 a, Kernel1D_S32 b ) {
 		int w = a.width + b.width - 1;
 
-		Kernel1D_S32 ret = new Kernel1D_S32(w);
+		Kernel1D_S32 ret = new Kernel1D_S32(w, a.offset + b.offset);
 
 		int end = w - (b.getWidth() - 1);
 		int N = b.width - 1;
@@ -167,7 +167,7 @@ public class KernelMath {
 	}
 
 	/**
-	 * Applies a smoothing kernel the the array. The kernel must sum to 1. Array borders are handling by
+	 * Applies a smoothing kernel to the array. The kernel must sum to 1. Array borders are handling by
 	 * normalizing based on the overlap of the kernel with the image at that point
 	 *
 	 * @param kernel Smothing kernel that sums to 1

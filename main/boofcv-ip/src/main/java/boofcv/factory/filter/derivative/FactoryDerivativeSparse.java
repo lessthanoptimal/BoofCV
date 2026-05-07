@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -62,13 +62,13 @@ public class FactoryDerivativeSparse {
 		}
 
 		if (GeneralizedImageOps.isFloatingPoint(imageType)) {
-			ImageConvolveSparse<GrayF32, Kernel2D_F32> r = FactoryConvolveSparse.convolve2D(GrayF32.class, DerivativeLaplacian.kernel_F32);
+			ImageConvolveSparse<GrayF32, Kernel2D_F32> r = FactoryConvolveSparse.convolve2D(GrayF32.class, DerivativeLaplacian.kernelXY_F32);
 
 			r.setImageBorder((ImageBorder_F32)border);
 
 			return (ImageFunctionSparse<T>)r;
 		} else {
-			ImageConvolveSparse r = FactoryConvolveSparse.convolve2D(GrayI.class, DerivativeLaplacian.kernel_I32);
+			ImageConvolveSparse r = FactoryConvolveSparse.convolve2D(GrayI.class, DerivativeLaplacian.kernelXY_I32);
 
 			r.setImageBorder(border);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -70,33 +70,26 @@ public class TestImplInterpolatePixelConvolution_U8
 		return total;
 	}
 
-	private static class Dummy extends KernelContinuous1D_F32
-	{
-
+	private static class Dummy extends KernelContinuous1D_F32 {
 		private Dummy() {
 			super(5);
 		}
 
-		@Override
-		public double getDouble(int index) {
+		@Override public double getDouble(int index) {
 			return 0;
 		}
 
-		@Override
-		public void setD(int index, double value) {}
+		@Override public void setD(int index, double value) {}
 
-		@Override
-		public boolean isInteger() {
+		@Override public boolean isInteger() {
 			return false;
 		}
 
-		@Override
-		public <T extends KernelBase> T copy() {
+		@Override public <T extends KernelBase> T copy() {
 			return null;
 		}
 
-		@Override
-		public float compute(float x) {
+		@Override public float compute(float x) {
 			return 1.0f/5.0f;
 		}
 	}

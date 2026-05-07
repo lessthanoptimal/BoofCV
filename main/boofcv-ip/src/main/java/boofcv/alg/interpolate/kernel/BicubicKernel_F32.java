@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,6 +44,7 @@ public class BicubicKernel_F32 extends KernelContinuous1D_F32 {
 
 	/**
 	 * Values of a =-0.5 and -0.75 are typical
+	 *
 	 * @param a A parameter
 	 */
 	public BicubicKernel_F32( float a ) {
@@ -62,29 +63,29 @@ public class BicubicKernel_F32 extends KernelContinuous1D_F32 {
 	}
 
 	@Override
-	public float compute(float x) {
+	public float compute( float x ) {
 		float absX = x < 0 ? -x : x;
 
-		if( absX <= 1f ) {
+		if (absX <= 1f) {
 			float x2 = absX*absX;
 
-			return (a+2f)*x2*absX - (a+3f)*x2 + 1f;
-		} else if( absX < 2 ) {
+			return (a + 2f)*x2*absX - (a + 3f)*x2 + 1f;
+		} else if (absX < 2) {
 			float x2 = absX*absX;
 
-			return a*x2*absX - 5f*a*x2 + 8f*a*absX -4f*a;
+			return a*x2*absX - 5f*a*x2 + 8f*a*absX - 4f*a;
 		} else {
 			return 0f;
 		}
 	}
 
 	@Override
-	public double getDouble(int index) {
+	public double getDouble( int index ) {
 		throw new RuntimeException("Well this function really shouldn't be required to be implemented");
 	}
 
 	@Override
-	public void setD(int index, double value) {
+	public void setD( int index, double value ) {
 		throw new RuntimeException("Well this function really shouldn't be required to be implemented");
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -77,7 +77,7 @@ public class TemplateMatching<T extends ImageBase<T>> {
 			config = new ConfigExtract(2, -Float.MAX_VALUE, 0, true, true, false);
 		}
 
-		extractor = FactoryFeatureExtractor.nonmax(config);
+		extractor = FactoryFeatureExtractor.nonmax(config, 1);
 	}
 
 	/**

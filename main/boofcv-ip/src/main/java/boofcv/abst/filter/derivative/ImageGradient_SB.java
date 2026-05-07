@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,11 +39,17 @@ public abstract class ImageGradient_SB<Input extends ImageGray<Input>, Output ex
 	ImageBorder<Input> border;
 	Class<Input> inputType;
 	Class<Output> derivType;
+	int derivDivisor = 1;
 
-	protected ImageGradient_SB( Class<Input> inputType, Class<Output> derivType ) {
+	/// @param divisorInt Derivative for integer images. For floating point images, the divisor will be saved as 1.
+	protected ImageGradient_SB( Class<Input> inputType, Class<Output> derivType, int divisorInt ) {
 		this.inputType = inputType;
 		this.derivType = derivType;
 		setBorderType(borderType);
+
+		// the divisor will not be 1 only if it's an integer valued image
+		if (ImageType.single(inputType).getDataType().isInteger())
+			derivDivisor = divisorInt;
 	}
 
 	@Override
@@ -75,8 +81,10 @@ public abstract class ImageGradient_SB<Input extends ImageGray<Input>, Output ex
 		return ImageType.single(derivType);
 	}
 
+	@Override public int divisor() {return derivDivisor;}
+
 	public static class Sobel<T extends ImageGray<T>, D extends ImageGray<D>> extends ImageGradient_SB<T, D> {
-		public Sobel( Class<T> inputType, Class<D> derivType ) {super(inputType, derivType);}
+		public Sobel( Class<T> inputType, Class<D> derivType ) {super(inputType, derivType, GradientSobel.divisor);}
 
 		@Override
 		public void process( T inputImage, D derivX, D derivY ) {
@@ -85,7 +93,7 @@ public abstract class ImageGradient_SB<Input extends ImageGray<Input>, Output ex
 	}
 
 	public static class Prewitt<T extends ImageGray<T>, D extends ImageGray<D>> extends ImageGradient_SB<T, D> {
-		public Prewitt( Class<T> inputType, Class<D> derivType ) {super(inputType, derivType);}
+		public Prewitt( Class<T> inputType, Class<D> derivType ) {super(inputType, derivType, GradientPrewitt.divisor);}
 
 		@Override
 		public void process( T inputImage, D derivX, D derivY ) {
@@ -94,7 +102,7 @@ public abstract class ImageGradient_SB<Input extends ImageGray<Input>, Output ex
 	}
 
 	public static class Scharr<T extends ImageGray<T>, D extends ImageGray<D>> extends ImageGradient_SB<T, D> {
-		public Scharr( Class<T> inputType, Class<D> derivType ) {super(inputType, derivType);}
+		public Scharr( Class<T> inputType, Class<D> derivType ) {super(inputType, derivType, GradientScharr.divisor);}
 
 		@Override
 		public void process( T inputImage, D derivX, D derivY ) {
@@ -103,7 +111,7 @@ public abstract class ImageGradient_SB<Input extends ImageGray<Input>, Output ex
 	}
 
 	public static class Three<T extends ImageGray<T>, D extends ImageGray<D>> extends ImageGradient_SB<T, D> {
-		public Three( Class<T> inputType, Class<D> derivType ) {super(inputType, derivType);}
+		public Three( Class<T> inputType, Class<D> derivType ) {super(inputType, derivType, GradientThree.divisor);}
 
 		@Override
 		public void process( T inputImage, D derivX, D derivY ) {
@@ -112,7 +120,7 @@ public abstract class ImageGradient_SB<Input extends ImageGray<Input>, Output ex
 	}
 
 	public static class Two0<T extends ImageGray<T>, D extends ImageGray<D>> extends ImageGradient_SB<T, D> {
-		public Two0( Class<T> inputType, Class<D> derivType ) {super(inputType, derivType);}
+		public Two0( Class<T> inputType, Class<D> derivType ) {super(inputType, derivType, GradientTwo0.divisor);}
 
 		@Override
 		public void process( T inputImage, D derivX, D derivY ) {
@@ -121,7 +129,7 @@ public abstract class ImageGradient_SB<Input extends ImageGray<Input>, Output ex
 	}
 
 	public static class Two1<T extends ImageGray<T>, D extends ImageGray<D>> extends ImageGradient_SB<T, D> {
-		public Two1( Class<T> inputType, Class<D> derivType ) {super(inputType, derivType);}
+		public Two1( Class<T> inputType, Class<D> derivType ) {super(inputType, derivType, GradientTwo1.divisor);}
 
 		@Override
 		public void process( T inputImage, D derivX, D derivY ) {

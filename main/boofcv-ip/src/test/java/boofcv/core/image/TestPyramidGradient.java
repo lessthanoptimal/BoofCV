@@ -48,6 +48,8 @@ class TestPyramidGradient extends BoofStandardJUnit {
 				count++;
 			}
 
+			@Override public int divisor() {return 2;}
+
 			@Override public ImageType<GrayF32> getInputType() {return ImageType.SB_F32;}
 		};
 

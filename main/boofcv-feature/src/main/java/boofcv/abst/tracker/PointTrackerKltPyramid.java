@@ -213,7 +213,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 	@Override public void spawnTracks() {
 		spawned.clear();
 
-		tracker.setImage(currPyr.basePyramid, currPyr.derivX, currPyr.derivY);
+		tracker.setImage(currPyr.basePyramid, currPyr.derivX, currPyr.derivY, gradient.divisor());
 
 		// used to convert it from the scale of the bottom layer into the original image
 		float scaleBottom = (float)currPyr.basePyramid.getScale(0);
@@ -331,7 +331,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 
 	/// Tracks features in the forward direction
 	protected void trackFeatures( I image ) {
-		tracker.setImage(currPyr.basePyramid, currPyr.derivX, currPyr.derivY);
+		tracker.setImage(currPyr.basePyramid, currPyr.derivX, currPyr.derivY, gradient.divisor());
 		for (int i = active.size() - 1; i >= 0; i--) {
 			PyramidKltFeature t = active.get(i);
 			KltTrackFault ret = tracker.track(t);
@@ -369,7 +369,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>, D extends ImageGray<
 	protected void backwardsTrackValidate() {
 		double tol2 = toleranceFB*toleranceFB;
 
-		tracker.setImage(prevPyr.basePyramid, prevPyr.derivX, prevPyr.derivY);
+		tracker.setImage(prevPyr.basePyramid, prevPyr.derivX, prevPyr.derivY, gradient.divisor());
 		for (int i = active.size() - 1; i >= 0; i--) {
 			PyramidKltFeature t = active.get(i);
 			PointTrackMod p = t.getCookie();

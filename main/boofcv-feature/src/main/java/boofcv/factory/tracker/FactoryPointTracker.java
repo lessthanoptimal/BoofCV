@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,6 +40,7 @@ import boofcv.alg.feature.detect.intensity.FastCornerDetector;
 import boofcv.alg.feature.detect.intensity.GradientCornerIntensity;
 import boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
+import boofcv.alg.filter.derivative.DerivativeType;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.tracker.dda.DetectDescribeAssociateTracker;
@@ -94,8 +95,11 @@ public class FactoryPointTracker {
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	PointTracker<I> tracker( ConfigPointTracker config, Class<I> imageType, @Nullable Class<D> derivType ) {
+		DerivativeType derivKernel = DerivativeType.SOBEL;
+		ImageGradient<I, D> gradient = FactoryDerivative.gradientSB(derivKernel, imageType, derivType);
+
 		if (config.typeTracker == ConfigPointTracker.TrackerType.KLT) {
-			return klt(config.klt, config.detDesc.detectPoint, imageType, derivType);
+			return klt(config.klt, derivKernel, config.detDesc.detectPoint, imageType, derivType);
 		}
 
 		DetectDescribePoint detDesc = FactoryDetectDescribe.generic(config.detDesc, imageType);
@@ -104,7 +108,7 @@ public class FactoryPointTracker {
 		return switch (config.typeTracker) {
 			case DDA -> FactoryPointTracker.dda(detDesc, associate, config.dda);
 			case HYBRID -> FactoryPointTracker.hybrid(
-					detDesc, associate, config.detDesc.findNonMaxRadius(), config.klt, config.hybrid, imageType);
+					detDesc, associate, gradient, config.detDesc.findNonMaxRadius(), config.klt, config.hybrid, imageType);
 			default -> throw new RuntimeException("BUG! KLT all trackers should have been handled already");
 		};
 	}
@@ -122,13 +126,15 @@ public class FactoryPointTracker {
 	 */
 	@Deprecated
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
-	PointTracker<I> klt( int numLevels, @Nullable ConfigPointDetector configDetect, int featureRadius,
-						 Class<I> imageType, Class<D> derivType ) {
-		ConfigPKlt config = new ConfigPKlt();
+	PointTracker<I> klt( int numLevels,
+	                     @Nullable ConfigPointDetector configDetect,
+	                     int featureRadius,
+	                     Class<I> imageType, Class<D> derivType ) {
+		var config = new ConfigPKlt();
 		config.pyramidLevels = ConfigDiscreteLevels.levels(numLevels);
 		config.templateRadius = featureRadius;
 
-		return klt(config, configDetect, imageType, derivType);
+		return klt(config, DerivativeType.SOBEL, configDetect, imageType, derivType);
 	}
 
 	/**
@@ -140,14 +146,19 @@ public class FactoryPointTracker {
 	 * @see boofcv.alg.tracker.klt.PyramidKltTracker
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
-	PointTrackerKltPyramid<I, D> klt( @Nullable ConfigPKlt config, @Nullable ConfigPointDetector configDetect,
-									  Class<I> imageType, @Nullable Class<D> derivType ) {
+	PointTrackerKltPyramid<I, D> klt( @Nullable ConfigPKlt config,
+	                                  @Nullable DerivativeType derivativeType,
+	                                  @Nullable ConfigPointDetector configDetect,
+	                                  Class<I> imageType, @Nullable Class<D> derivType ) {
 
 		if (derivType == null)
 			derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
 		if (config == null) {
 			config = new ConfigPKlt();
+		}
+		if (derivativeType == null) {
+			derivativeType = DerivativeType.SOBEL;
 		}
 		config.checkValidity();
 
@@ -157,12 +168,12 @@ public class FactoryPointTracker {
 		}
 		configDetect.checkValidity();
 
-		GeneralFeatureDetector<I, D> detector = FactoryDetectPoint.create(configDetect, imageType, derivType);
-
 		InterpolateRectangle<I> interpInput = FactoryInterpolation.bilinearRectangle(imageType);
 		InterpolateRectangle<D> interpDeriv = FactoryInterpolation.bilinearRectangle(derivType);
 
-		ImageGradient<I, D> gradient = FactoryDerivative.sobel(imageType, derivType);
+		ImageGradient<I, D> gradient = FactoryDerivative.gradientSB(derivativeType, imageType, derivType);
+
+		GeneralFeatureDetector<I, D> detector = FactoryDetectPoint.create(configDetect, imageType, derivType, gradient.divisor());
 
 		PyramidDiscrete<I> pyramid = FactoryPyramid.discreteGaussian(config.pyramidLevels, -1, 2, true, ImageType.single(imageType));
 
@@ -195,9 +206,9 @@ public class FactoryPointTracker {
 	@Deprecated
 	public static <I extends ImageGray<I>>
 	PointTracker<I> dda_FH_SURF_Fast( ConfigFastHessian configDetector,
-									  ConfigSurfDescribe.Fast configDescribe,
-									  ConfigAverageIntegral configOrientation,
-									  Class<I> imageType ) {
+	                                  ConfigSurfDescribe.Fast configDescribe,
+	                                  ConfigAverageIntegral configOrientation,
+	                                  Class<I> imageType ) {
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
 		AssociateDescription<TupleDesc_F64> assoc =
 				FactoryAssociation.greedy(new ConfigAssociateGreedy(true, 5), score);
@@ -224,9 +235,9 @@ public class FactoryPointTracker {
 	@Deprecated
 	public static <I extends ImageGray<I>>
 	PointTracker<I> dda_FH_SURF_Stable( ConfigFastHessian configDetector,
-										ConfigSurfDescribe.Stability configDescribe,
-										ConfigSlidingIntegral configOrientation,
-										Class<I> imageType ) {
+	                                    ConfigSurfDescribe.Stability configDescribe,
+	                                    ConfigSlidingIntegral configOrientation,
+	                                    Class<I> imageType ) {
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
 		AssociateDescription<TupleDesc_F64> assoc =
 				FactoryAssociation.greedy(new ConfigAssociateGreedy(true, 5), score);
@@ -251,8 +262,9 @@ public class FactoryPointTracker {
 	@Deprecated
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	PointTracker<I> dda_ST_BRIEF( int maxAssociationError,
-								  ConfigGeneralDetector configExtract,
-								  Class<I> imageType, Class<D> derivType ) {
+	                              DerivativeType derivativeType,
+	                              ConfigGeneralDetector configExtract,
+	                              Class<I> imageType, Class<D> derivType ) {
 		if (derivType == null)
 			derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
@@ -261,7 +273,8 @@ public class FactoryPointTracker {
 						FactoryBlurFilter.gaussian(ImageType.single(imageType), 0, 4));
 		DescribePointRadiusAngle describeBrief = new DescribeBrief_RadiusAngle<>(brief, imageType);
 
-		GeneralFeatureDetector<I, D> detectPoint = createShiTomasi(configExtract, derivType);
+		ImageGradient<I, D> gradient = FactoryDerivative.gradientSB(derivativeType, imageType, derivType);
+		GeneralFeatureDetector<I, D> detectPoint = createShiTomasi(configExtract, derivType, gradient.divisor());
 
 		ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
 
@@ -290,9 +303,9 @@ public class FactoryPointTracker {
 	@Deprecated
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	PointTracker<I> dda_FAST_BRIEF( ConfigFastCorner configFast,
-									ConfigGeneralDetector configExtract,
-									int maxAssociationError,
-									Class<I> imageType ) {
+	                                ConfigGeneralDetector configExtract,
+	                                int maxAssociationError,
+	                                Class<I> imageType ) {
 		DescribePointBrief<I> brief = FactoryDescribeAlgs.
 				brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
 						FactoryBlurFilter.gaussian(ImageType.single(imageType), 0, 4));
@@ -324,8 +337,9 @@ public class FactoryPointTracker {
 	 */
 	@Deprecated
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
-	PointTracker<I> dda_ST_NCC( ConfigGeneralDetector configExtract, int describeRadius,
-								Class<I> imageType, @Nullable Class<D> derivType ) {
+	PointTracker<I> dda_ST_NCC( ConfigGeneralDetector configExtract, DerivativeType derivativeType,
+	                            int describeRadius,
+	                            Class<I> imageType, @Nullable Class<D> derivType ) {
 
 		if (derivType == null)
 			derivType = GImageDerivativeOps.getDerivativeType(imageType);
@@ -335,7 +349,9 @@ public class FactoryPointTracker {
 		DescribePointPixelRegionNCC<I> ncc = FactoryDescribeAlgs.pixelRegionNCC(w, w, imageType);
 		DescribePointRadiusAngle describeNCC = new DescribeNCC_RadiusAngle(ncc, imageType);
 
-		GeneralFeatureDetector<I, D> corner = createShiTomasi(configExtract, derivType);
+		ImageGradient<I, D> gradient = FactoryDerivative.gradientSB(derivativeType, imageType, derivType);
+
+		GeneralFeatureDetector<I, D> corner = createShiTomasi(configExtract, derivType, gradient.divisor());
 
 		ScoreAssociateNccFeature score = new ScoreAssociateNccFeature();
 
@@ -363,10 +379,10 @@ public class FactoryPointTracker {
 	 */
 	public static <I extends ImageGray<I>, Desc extends TupleDesc<Desc>>
 	DetectDescribeAssociateTracker<I, Desc> dda( InterestPointDetector<I> detector,
-												 OrientationImage<I> orientation,
-												 DescribePointRadiusAngle<I, Desc> describe,
-												 AssociateDescription2D<Desc> associate,
-												 ConfigTrackerDda config ) {
+	                                             OrientationImage<I> orientation,
+	                                             DescribePointRadiusAngle<I, Desc> describe,
+	                                             AssociateDescription2D<Desc> associate,
+	                                             ConfigTrackerDda config ) {
 
 		DetectDescribeFusion<I, Desc> fused = new DetectDescribeFusion<>(detector, orientation, describe);
 		return new DetectDescribeAssociateTracker<>(fused, associate, config);
@@ -374,8 +390,8 @@ public class FactoryPointTracker {
 
 	public static <I extends ImageGray<I>, Desc extends TupleDesc<Desc>>
 	PointTrackerDda<I, Desc> dda( DetectDescribePoint<I, Desc> detDesc,
-								  AssociateDescription2D<Desc> associate,
-								  ConfigTrackerDda config ) {
+	                              AssociateDescription2D<Desc> associate,
+	                              ConfigTrackerDda config ) {
 		return new PointTrackerDda<>(new DetectDescribeAssociateTracker<>(detDesc, associate, config));
 	}
 
@@ -394,11 +410,15 @@ public class FactoryPointTracker {
 	@Deprecated
 	public static <I extends ImageGray<I>>
 	PointTracker<I> combined_FH_SURF_KLT( ConfigPKlt kltConfig,
-										  ConfigTrackerHybrid configHybrid,
-										  ConfigFastHessian configDetector,
-										  ConfigSurfDescribe.Stability configDescribe,
-										  ConfigSlidingIntegral configOrientation,
-										  Class<I> imageType ) {
+	                                      DerivativeType derivativeType,
+	                                      ConfigTrackerHybrid configHybrid,
+	                                      ConfigFastHessian configDetector,
+	                                      ConfigSurfDescribe.Stability configDescribe,
+	                                      ConfigSlidingIntegral configOrientation,
+	                                      Class<I> imageType ) {
+
+
+		ImageGradient gradient = FactoryDerivative.gradientSB(derivativeType, imageType, null);
 
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.defaultScore(TupleDesc_F64.class);
 		AssociateDescription<TupleDesc_F64> assoc = FactoryAssociation.
@@ -408,7 +428,7 @@ public class FactoryPointTracker {
 		DetectDescribePoint<I, TupleDesc_F64> fused =
 				FactoryDetectDescribe.surfStable(configDetector, configDescribe, configOrientation, imageType);
 
-		return hybrid(fused, associate2D, configDetector.extract.radius, kltConfig, configHybrid, imageType);
+		return hybrid(fused, associate2D, gradient, configDetector.extract.radius, kltConfig, configHybrid, imageType);
 	}
 
 	/**
@@ -427,17 +447,20 @@ public class FactoryPointTracker {
 	@Deprecated
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	PointTracker<I> combined_ST_SURF_KLT( ConfigGeneralDetector configExtract,
-										  ConfigPKlt kltConfig,
-										  ConfigTrackerHybrid configHybrid,
-										  ConfigSurfDescribe.Stability configDescribe,
-										  ConfigSlidingIntegral configOrientation,
-										  Class<I> imageType,
-										  @Nullable Class<D> derivType ) {
+	                                      DerivativeType derivativeType,
+	                                      ConfigPKlt kltConfig,
+	                                      ConfigTrackerHybrid configHybrid,
+	                                      ConfigSurfDescribe.Stability configDescribe,
+	                                      ConfigSlidingIntegral configOrientation,
+	                                      Class<I> imageType,
+	                                      @Nullable Class<D> derivType ) {
 
 		if (derivType == null)
 			derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
-		GeneralFeatureDetector<I, D> corner = createShiTomasi(configExtract, derivType);
+		ImageGradient<I, D> gradient = FactoryDerivative.gradientSB(derivativeType, imageType, derivType);
+
+		GeneralFeatureDetector<I, D> corner = createShiTomasi(configExtract, derivType, gradient.divisor());
 		InterestPointDetector<I> detector = FactoryInterestPoint.wrapPoint(corner, 1, imageType, derivType);
 
 		DescribePointRadiusAngle<I, TupleDesc_F64> regionDesc
@@ -456,7 +479,7 @@ public class FactoryPointTracker {
 			orientation = FactoryOrientation.convertImage(orientationII, imageType);
 		}
 
-		return hybrid(detector, orientation, regionDesc, associate2D, configExtract.radius,
+		return hybrid(detector, gradient, orientation, regionDesc, associate2D, configExtract.radius,
 				kltConfig, configHybrid, imageType);
 	}
 
@@ -471,18 +494,19 @@ public class FactoryPointTracker {
 	 * @param imageType Input image type.   @return Feature tracker
 	 * @see HybridTrackerScalePoint
 	 */
-	public static <I extends ImageGray<I>, Desc extends TupleDesc<Desc>>
+	public static <I extends ImageGray<I>, D extends ImageGray<D>, Desc extends TupleDesc<Desc>>
 	PointTracker<I> hybrid( InterestPointDetector<I> detector,
-							@Nullable OrientationImage<I> orientation,
-							DescribePointRadiusAngle<I, Desc> describe,
-							AssociateDescription2D<Desc> associate,
-							int tooCloseRadius,
-							ConfigPKlt kltConfig,
-							ConfigTrackerHybrid configHybrid,
-							Class<I> imageType ) {
+	                        ImageGradient<I, D> gradient,
+	                        @Nullable OrientationImage<I> orientation,
+	                        DescribePointRadiusAngle<I, Desc> describe,
+	                        AssociateDescription2D<Desc> associate,
+	                        int tooCloseRadius,
+	                        ConfigPKlt kltConfig,
+	                        ConfigTrackerHybrid configHybrid,
+	                        Class<I> imageType ) {
 		DetectDescribeFusion<I, Desc> fused = new DetectDescribeFusion<>(detector, orientation, describe);
 
-		return hybrid(fused, associate, tooCloseRadius, kltConfig, configHybrid, imageType);
+		return hybrid(fused, associate, gradient, tooCloseRadius, kltConfig, configHybrid, imageType);
 	}
 
 	/**
@@ -496,11 +520,12 @@ public class FactoryPointTracker {
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>, Desc extends TupleDesc<Desc>>
 	PointTracker<I> hybrid( DetectDescribePoint<I, Desc> detector,
-							AssociateDescription2D<Desc> associate,
-							int tooCloseRadius,
-							ConfigPKlt kltConfig,
-							ConfigTrackerHybrid configHybrid,
-							Class<I> imageType ) {
+	                        AssociateDescription2D<Desc> associate,
+	                        ImageGradient<I, D> gradient,
+	                        int tooCloseRadius,
+	                        ConfigPKlt kltConfig,
+	                        ConfigTrackerHybrid configHybrid,
+	                        Class<I> imageType ) {
 		Class<D> derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
 		if (kltConfig == null) {
@@ -513,20 +538,20 @@ public class FactoryPointTracker {
 		}
 
 		HybridTrackerScalePoint<I, D, Desc> tracker = FactoryTrackerAlg.
-				hybrid(detector, associate, tooCloseRadius, kltConfig, configHybrid, imageType, derivType);
+				hybrid(detector, associate, tooCloseRadius, kltConfig, configHybrid, imageType, derivType, gradient.divisor());
 		tracker.rand = new Random(configHybrid.seed);
 
-		var pointHybrid = new PointTrackerHybrid<>(tracker, kltConfig.pyramidLevels, imageType, derivType);
+		var pointHybrid = new PointTrackerHybrid<>(tracker, gradient, kltConfig.pyramidLevels, imageType, derivType);
 		pointHybrid.thresholdRespawn.setTo(configHybrid.thresholdRespawn);
 		return pointHybrid;
 	}
 
 	public static <I extends ImageGray<I>, D extends ImageGray<D>, Desc extends TupleDesc<Desc>>
 	PointTracker<I> dda( GeneralFeatureDetector<I, D> detector,
-						 DescribePointRadiusAngle<I, Desc> describe,
-						 AssociateDescription2D<Desc> associate,
-						 double scale,
-						 Class<I> imageType ) {
+	                     DescribePointRadiusAngle<I, Desc> describe,
+	                     AssociateDescription2D<Desc> associate,
+	                     double scale,
+	                     Class<I> imageType ) {
 		InterestPointDetector<I> detectInterest = FactoryInterestPoint.wrapPoint(detector, scale, imageType, null);
 		DetectDescribePoint<I, Desc> fused = FactoryDetectDescribe.fuseTogether(detectInterest, null, describe);
 
@@ -541,9 +566,10 @@ public class FactoryPointTracker {
 	@Deprecated
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	GeneralFeatureDetector<I, D> createShiTomasi( ConfigGeneralDetector config,
-												  Class<D> derivType ) {
+	                                              Class<D> derivType,
+	                                              int derivDivisor ) {
 		GradientCornerIntensity<D> cornerIntensity = FactoryIntensityPointAlg.shiTomasi(1, false, derivType);
 
-		return FactoryDetectPoint.createGeneral(cornerIntensity, config);
+		return FactoryDetectPoint.createGeneral(cornerIntensity, config, derivDivisor);
 	}
 }

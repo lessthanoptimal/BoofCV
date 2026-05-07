@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,9 +40,13 @@ public class WrapperGradientCornerIntensity<I extends ImageGray<I>, D extends Im
 	}
 
 	@Override public void process( I image, @Nullable D derivX, @Nullable D derivY,
-								   @Nullable D derivXX, @Nullable D derivYY, @Nullable D derivXY ) {
+	                               @Nullable D derivXX, @Nullable D derivYY, @Nullable D derivXY ) {
 		init(image.width, image.height);
 		alg.process(Objects.requireNonNull(derivX), Objects.requireNonNull(derivY), intensity);
+	}
+
+	@Override public float thresholdScaleByDerivative( int divisor ) {
+		return alg.thresholdScaleByDerivative(divisor);
 	}
 
 	@Override public @Nullable ListIntPoint2D getCandidatesMin() {

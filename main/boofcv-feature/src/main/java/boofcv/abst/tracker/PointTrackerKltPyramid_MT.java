@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -78,7 +78,7 @@ public class PointTrackerKltPyramid_MT<I extends ImageGray<I>, D extends ImageGr
 
 		// do image processing on each new track
 		BoofConcurrency.loopBlocks(0, workTracks.size(), workspace, ( helper, idx0, idx1 ) -> {
-			helper.tracker.setImage(currPyr.basePyramid, currPyr.derivX, currPyr.derivY);
+			helper.tracker.setImage(currPyr.basePyramid, currPyr.derivX, currPyr.derivY, gradient.divisor());
 			for (int detIdx = idx0; detIdx < idx1; detIdx++) {
 				Point2D_I16 pt = found.get(detIdx);
 				PyramidKltFeature t = workTracks.get(detIdx);
@@ -127,7 +127,7 @@ public class PointTrackerKltPyramid_MT<I extends ImageGray<I>, D extends ImageGr
 
 		// Perform tracking in parallel
 		BoofConcurrency.loopBlocks(0, active.size(), workspace, ( helper, idx0, idx1 ) -> {
-			helper.tracker.setImage(currPyr.basePyramid, currPyr.derivX, currPyr.derivY);
+			helper.tracker.setImage(currPyr.basePyramid, currPyr.derivX, currPyr.derivY, gradient.divisor());
 
 			for (int trackIdx = idx0; trackIdx < idx1; trackIdx++) {
 				PyramidKltFeature t = active.get(trackIdx);
@@ -182,7 +182,7 @@ public class PointTrackerKltPyramid_MT<I extends ImageGray<I>, D extends ImageGr
 
 		// Perform tracking in parallel
 		BoofConcurrency.loopBlocks(0, active.size(), workspace, ( helper, idx0, idx1 ) -> {
-			helper.tracker.setImage(prevPyr.basePyramid, prevPyr.derivX, prevPyr.derivY);
+			helper.tracker.setImage(prevPyr.basePyramid, prevPyr.derivX, prevPyr.derivY, gradient.divisor());
 
 			for (int trackIdx = idx0; trackIdx < idx1; trackIdx++) {
 				PyramidKltFeature t = active.get(trackIdx);

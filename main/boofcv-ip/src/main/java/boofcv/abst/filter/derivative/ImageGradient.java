@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,27 +22,23 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
 
-/**
- * A generic interface for computing first order image derivative along the x and y axes.
- *
- * @author Peter Abeles
- */
+/// A generic interface for computing first order image derivative along the x and y axes.
 public interface ImageGradient<Input extends ImageBase<Input>, Output extends ImageBase<Output>>
 		extends ImageDerivative<Input,Output> {
 
-	/**
-	 * Computes the image gradient from the input image and stores the results into
-	 * 'derivX' and 'derivY'
-	 *
-	 * @param inputImage Original input image. Not modified.
-	 * @param derivX First order image derivative along the x-axis. Modified.
-	 * @param derivY First order image derivative along the y-axis. Modified.
-	 */
+	/// Computes the image gradient from the input image and stores the results into
+	/// 'derivX' and 'derivY'
+	///
+	/// @param inputImage Original input image. Not modified.
+	/// @param derivX First order image derivative along the x-axis. Modified.
+	/// @param derivY First order image derivative along the y-axis. Modified.
 	void process( Input inputImage , Output derivX, Output derivY );
 
-	/**
-	 * Image type of input image
-	 */
+	/// Scale factor that the computed gradient is off by. This is needed for integer valued images. For
+	/// floating point images this will always return 1.
+	int divisor();
+
+	/// Image type of input image
 	ImageType<Input> getInputType();
 
 }

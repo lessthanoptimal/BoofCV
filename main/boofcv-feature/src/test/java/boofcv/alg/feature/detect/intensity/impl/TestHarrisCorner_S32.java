@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,46 +28,49 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestHarrisCorner_S32 extends BoofStandardJUnit {
-	@Test
-	void checkScore() {
+	@Test void checkScore() {
 		float kappa = 0.04f;
-		HarrisCorner_S32 alg = new HarrisCorner_S32(kappa);
+		var alg = new HarrisCorner_S32(kappa);
 
 		int XX = 50;
 		int XY = 70;
 		int YY = 80;
 
-		float expected = XX*YY-XY*XY - kappa*(float)Math.pow(XX+YY,2.0);
-		assertEquals(expected,alg.compute(XX,XY,YY), UtilEjml.TEST_F32);
+		float expected = XX*YY - XY*XY - kappa*(float)Math.pow(XX + YY, 2.0);
+		assertEquals(expected, alg.compute(XX, XY, YY), UtilEjml.TEST_F32);
+
+		// See if it computed the correct scale correction
+		int derivDivisor = 2;
+		XX *= derivDivisor*derivDivisor;
+		XY *= derivDivisor*derivDivisor;
+		YY *= derivDivisor*derivDivisor;
+		float correction = alg.thresholdScaleByDerivative(derivDivisor);
+		assertEquals(expected*correction, alg.compute(XX, XY, YY), UtilEjml.TEST_F32);
 	}
 
 	@Nested
 	public class SingleThread extends GenericCornerIntensityGradientTests {
-		ImplSsdCorner_S16 detector = new ImplSsdCorner_S16(1,new HarrisCorner_S32(0.04f));
+		ImplSsdCorner_S16 detector = new ImplSsdCorner_S16(1, new HarrisCorner_S32(0.04f));
 
-		@Test
-		void genericTests() {
+		@Test void genericTests() {
 			performAllTests();
 		}
 
-		@Override
-		public void computeIntensity( GrayF32 intensity ) {
-			detector.process(derivX_I16,derivY_I16,intensity);
+		@Override public void computeIntensity( GrayF32 intensity ) {
+			detector.process(derivX_I16, derivY_I16, intensity);
 		}
 	}
 
 	@Nested
 	public class MultiThread extends GenericCornerIntensityGradientTests {
-		ImplSsdCorner_S16_MT detector = new ImplSsdCorner_S16_MT(1,new HarrisCorner_S32(0.04f));
+		ImplSsdCorner_S16_MT detector = new ImplSsdCorner_S16_MT(1, new HarrisCorner_S32(0.04f));
 
-		@Test
-		void genericTests() {
+		@Test void genericTests() {
 			performAllTests();
 		}
 
-		@Override
-		public void computeIntensity( GrayF32 intensity ) {
-			detector.process(derivX_I16,derivY_I16,intensity);
+		@Override public void computeIntensity( GrayF32 intensity ) {
+			detector.process(derivX_I16, derivY_I16, intensity);
 		}
 	}
 }

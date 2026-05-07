@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -79,6 +79,10 @@ public class TestImageGradientThenReduce extends BoofStandardJUnit {
 		public void process(Planar<GrayF32> inputImage, Planar<GrayF32> derivX, Planar<GrayF32> derivY) {
 			derivX.getBand(0).set(5,6,1);
 			derivY.getBand(0).set(5,6,2);
+		}
+
+		@Override public int divisor() {
+			return 2;
 		}
 
 		@Override

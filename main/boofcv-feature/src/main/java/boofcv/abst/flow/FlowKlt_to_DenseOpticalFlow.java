@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,10 +50,10 @@ public class FlowKlt_to_DenseOpticalFlow<I extends ImageGray<I>, D extends Image
 	ImageType<I> imageType;
 
 	public FlowKlt_to_DenseOpticalFlow( DenseOpticalFlowKlt<I, D> flowKlt,
-										ImageGradient<I, D> gradient,
-										ImagePyramid<I> pyramidSrc,
-										ImagePyramid<I> pyramidDst,
-										Class<I> inputType, Class<D> derivType ) {
+	                                    ImageGradient<I, D> gradient,
+	                                    ImagePyramid<I> pyramidSrc,
+	                                    ImagePyramid<I> pyramidDst,
+	                                    Class<I> inputType, Class<D> derivType ) {
 		this.flowKlt = flowKlt;
 		this.gradient = gradient;
 		this.pyramidSrc = pyramidSrc;
@@ -87,7 +87,9 @@ public class FlowKlt_to_DenseOpticalFlow<I extends ImageGray<I>, D extends Image
 
 		PyramidOps.gradient(pyramidSrc, gradient, srcDerivX, srcDerivY);
 
-		flowKlt.process(pyramidSrc, srcDerivX, srcDerivY, pyramidDst, flow);
+		flowKlt.process(pyramidSrc,
+				srcDerivX, srcDerivY, gradient.divisor(),
+				pyramidDst, flow);
 	}
 
 	@Override

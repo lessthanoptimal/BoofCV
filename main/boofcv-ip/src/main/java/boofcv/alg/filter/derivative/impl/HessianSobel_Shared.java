@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -98,6 +98,13 @@ public class HessianSobel_Shared {
 		final int height = orig.getHeight() - 2;
 		final int strideSrc = orig.getStride();
 
+		final float c1 = 1.0f/64.0f;
+		final float c2 = 2.0f/64.0f;
+		final float c4 = 4.0f/64.0f;
+		final float c6 = 6.0f/64.0f;
+		final float c8 = 8.0f/64.0f;
+		final float c12 = 12.0f/64.0f;
+
 		for (int y = 2; y < height; y++) {
 			int indexSrc = orig.startIndex + orig.stride * y + 2;
 			final int endX = indexSrc + width-2;
@@ -133,10 +140,9 @@ public class HessianSobel_Shared {
 				float a54 = data[indexSrc + 2*strideSrc + 1];
 				float a55 = data[indexSrc + 2*strideSrc + 2];
 
-
-				imgY[indexY++]   = (a11+a15+a51+a55+4*(a12+a52+a14+a54)+6*(a13+a53)-2*(a31+a35)-8*(a32+a34)-12*a33);
-				imgX[indexX++]   = (a11+a51+a15+a55+4*(a21+a25+a41+a45)+6*(a31+a35)-2*(a13+a53)-8*(a23+a43)-12*a33);
-				imgXY[indexXY++] = (a11+a55-a15-a51+2*(a12+a21+a45+a54-a41-a52-a14-a25) + 4*(a22+a44-a42-a24));
+				imgY[indexY++] = (c1*(a11 + a15 + a51 + a55) + c4*(a12 + a52 + a14 + a54) + c6*(a13 + a53) - c2*(a31 + a35) - c8*(a32 + a34) - c12*a33);
+				imgX[indexX++] = (c1*(a11 + a51 + a15 + a55) + c4*(a21 + a25 + a41 + a45) + c6*(a31 + a35) - c2*(a13 + a53) - c8*(a23 + a43) - c12*a33);
+				imgXY[indexXY++] = (c1*(a11 + a55 - a15 - a51) + c2*(a12 + a21 + a45 + a54 - a41 - a52 - a14 - a25) + c4*(a22 + a44 - a42 - a24));
 			}
 		}
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -175,7 +175,7 @@ public abstract class ControlPanelDetDescAssocBase extends StandardAlgConfigPane
 		c.scaleSpaceSift = configDetDesc.scaleSpaceSift;
 		c.sift = configDetDesc.detectSift;
 
-		return FactoryInterestPoint.generic(c, imageType, null);
+		return FactoryInterestPoint.generic(c, imageType, null, 1);
 	}
 
 	public <T extends ImageGray<T>, TD extends TupleDesc<TD>>

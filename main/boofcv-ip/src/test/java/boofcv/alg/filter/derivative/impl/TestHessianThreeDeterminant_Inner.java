@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,8 +36,7 @@ public class TestHessianThreeDeterminant_Inner extends BoofStandardJUnit {
 	private final int width = 8;
 	private final int height = 9;
 
-	@Test
-	void process_U8_S16() {
+	@Test void process_U8_S16() {
 		GrayU8 img = new GrayU8(width, height);
 		ImageMiscOps.fillUniform(img, rand, 0, 100);
 
@@ -52,8 +51,7 @@ public class TestHessianThreeDeterminant_Inner extends BoofStandardJUnit {
 		BoofTesting.assertEqualsInner(expected, deriv, 0, 2, 2, false);
 	}
 
-	@Test
-	void process_U8_F32() {
+	@Test void process_U8_F32() {
 		GrayU8 img = new GrayU8(width, height);
 		ImageMiscOps.fillUniform(img, rand, 0, 100);
 
@@ -69,8 +67,7 @@ public class TestHessianThreeDeterminant_Inner extends BoofStandardJUnit {
 		BoofTesting.assertEqualsInner(expected, deriv, 1e-4, 2, 2, false);
 	}
 
-	@Test
-	void process_F32() {
+	@Test void process_F32() {
 		GrayF32 img = new GrayF32(width, height);
 		ImageMiscOps.fillUniform(img, rand, 0, 1);
 
@@ -91,9 +88,9 @@ public class TestHessianThreeDeterminant_Inner extends BoofStandardJUnit {
 		GrayS16 Lyy = new GrayS16(img.width, img.height);
 		GrayS16 Lxy = new GrayS16(img.width, img.height);
 
-		ConvolveImage.horizontal(HessianThree.kernelXXYY_I32, img, Lxx, border);
-		ConvolveImage.vertical(HessianThree.kernelXXYY_I32, img, Lyy, border);
-		ConvolveImage.convolve(HessianThree.kernelCross_I32, img, Lxy, border);
+		ConvolveImage.horizontal(HessianThree.kernelXX_I32, img, Lxx, border);
+		ConvolveImage.vertical(HessianThree.kernelXX_I32, img, Lyy, border);
+		ConvolveImage.convolve(HessianThree.kernelXY_I32, img, Lxy, border);
 
 		GrayS16 expected = new GrayS16(img.width, img.height);
 
@@ -111,9 +108,9 @@ public class TestHessianThreeDeterminant_Inner extends BoofStandardJUnit {
 		GrayF32 Lyy = new GrayF32(img.width, img.height);
 		GrayF32 Lxy = new GrayF32(img.width, img.height);
 
-		ConvolveImage.horizontal(HessianThree.kernelXXYY_F32, img, Lxx, border);
-		ConvolveImage.vertical(HessianThree.kernelXXYY_F32, img, Lyy, border);
-		ConvolveImage.convolve(HessianThree.kernelCross_F32, img, Lxy, border);
+		ConvolveImage.horizontal(HessianThree.kernelXX_F32, img, Lxx, border);
+		ConvolveImage.vertical(HessianThree.kernelXX_F32, img, Lyy, border);
+		ConvolveImage.convolve(HessianThree.kernelXY_F32, img, Lxy, border);
 
 		GrayF32 expected = new GrayF32(img.width, img.height);
 

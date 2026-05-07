@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -68,5 +68,11 @@ public class KltFeature {
 	public void setPosition( float x, float y ) {
 		this.x = x;
 		this.y = y;
+	}
+
+	public KltFeature withPosition( float x, float y ) {
+		this.x = x;
+		this.y = y;
+		return this;
 	}
 }

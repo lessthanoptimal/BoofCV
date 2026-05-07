@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -235,7 +235,7 @@ public class TldRegionTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 			float prevY = t.klt.y;
 
 			// track in forwards direction
-			tracker.setImage(currentImage, currentDerivX, currentDerivY);
+			tracker.setImage(currentImage, currentDerivX, currentDerivY, gradient.divisor());
 			KltTrackFault result = tracker.track(t.klt);
 			if (result != KltTrackFault.SUCCESS) {
 				t.active = false;
@@ -247,7 +247,7 @@ public class TldRegionTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 
 			// track in reverse direction
 			tracker.setDescription(t.klt);
-			tracker.setImage(previousImage, previousDerivX, previousDerivY);
+			tracker.setImage(previousImage, previousDerivX, previousDerivY, gradient.divisor());
 			result = tracker.track(t.klt);
 			if (result != KltTrackFault.SUCCESS) {
 				t.active = false;
@@ -299,7 +299,7 @@ public class TldRegionTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 		double spawnHeight = spawnRect.getHeight();
 
 		// try spawning features at evenly spaced points inside the grid
-		tracker.setImage(previousImage, previousDerivX, previousDerivY);
+		tracker.setImage(previousImage, previousDerivX, previousDerivY, gradient.divisor());
 
 		for (int i = 0; i < gridWidth; i++) {
 

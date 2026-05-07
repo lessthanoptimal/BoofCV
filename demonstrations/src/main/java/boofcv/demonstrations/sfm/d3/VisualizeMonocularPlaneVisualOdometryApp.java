@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.sfm.d3.MonocularPlaneVisualOdometry;
 import boofcv.abst.tracker.PointTracker;
+import boofcv.alg.filter.derivative.DerivativeType;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.factory.sfm.ConfigPlanarTrackPnP;
@@ -314,16 +315,16 @@ public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageGray<I>>
 
 			return FactoryVisualOdometry.monoPlaneInfinity(config, imageClass);
 		} else if (whichAlg == 1) {
-			ConfigPKlt configKlt = new ConfigPKlt();
+			var configKlt = new ConfigPKlt();
 			configKlt.pyramidLevels = ConfigDiscreteLevels.levels(4);
 			configKlt.templateRadius = 3;
-			ConfigPointDetector configDetector = new ConfigPointDetector();
+			var configDetector = new ConfigPointDetector();
 			configDetector.type = PointDetectorTypes.SHI_TOMASI;
 			configDetector.general.maxFeatures = 600;
 			configDetector.general.radius = 3;
 			configDetector.general.threshold = 1;
 
-			PointTracker<I> tracker = FactoryPointTracker.klt(configKlt, configDetector, imageClass, derivType);
+			PointTracker<I> tracker = FactoryPointTracker.klt(configKlt, DerivativeType.SOBEL, configDetector, imageClass, derivType);
 
 			double cellSize = 0.06;
 			double inlierGroundTol = 1.5;

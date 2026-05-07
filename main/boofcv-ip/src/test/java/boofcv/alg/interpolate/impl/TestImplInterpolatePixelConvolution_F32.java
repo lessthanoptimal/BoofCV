@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -69,9 +69,7 @@ public class TestImplInterpolatePixelConvolution_F32 extends GeneralChecksInterp
 		return total;
 	}
 
-	private static class Dummy extends KernelContinuous1D_F32
-	{
-
+	private static class Dummy extends KernelContinuous1D_F32 {
 		private Dummy() {
 			super(5);
 		}

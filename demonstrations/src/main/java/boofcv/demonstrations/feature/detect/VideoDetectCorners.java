@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.abst.feature.detect.intensity.WrapperGradientCornerIntensity;
+import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.feature.detect.selector.FeatureSelectLimitIntensity;
 import boofcv.alg.feature.detect.selector.FeatureSelectNBest;
@@ -32,6 +33,7 @@ import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPointAlg;
+import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ProcessImageSequence;
 import boofcv.gui.image.ShowImages;
@@ -62,6 +64,7 @@ public class VideoDetectCorners<T extends ImageGray<T>, D extends ImageGray<D>> 
 	D derivYY;
 	D derivXY;
 
+	ImageGradient<T, D> gradient;
 	Class<D> derivType;
 
 	QueueCorner corners;
@@ -69,12 +72,14 @@ public class VideoDetectCorners<T extends ImageGray<T>, D extends ImageGray<D>> 
 	ImagePanel panel;
 
 	public VideoDetectCorners( SimpleImageSequence<T> sequence,
-							   GeneralFeatureDetector<T, D> detector,
-							   Class<D> derivType ) {
+	                           GeneralFeatureDetector<T, D> detector,
+	                           ImageGradient<T, D> gradient,
+	                           Class<D> derivType ) {
 		super(sequence);
 
 		this.derivType = derivType;
 		this.detector = detector;
+		this.gradient = gradient;
 	}
 
 	@Override
@@ -86,8 +91,7 @@ public class VideoDetectCorners<T extends ImageGray<T>, D extends ImageGray<D>> 
 				derivY = GeneralizedImageOps.createSingleBand(derivType, image.width, image.height);
 			}
 
-			// compute the image gradient
-			GImageDerivativeOps.gradient(DerivativeType.SOBEL, image, derivX, derivY, BoofDefaults.DERIV_BORDER_TYPE);
+			gradient.process(image, derivX, derivY);
 		}
 
 		if (detector.getRequiresHessian()) {
@@ -135,12 +139,16 @@ public class VideoDetectCorners<T extends ImageGray<T>, D extends ImageGray<D>> 
 		int maxCorners = 200;
 		int radius = 2;
 
+		ImageGradient<T, D> gradient = FactoryDerivative.sobel(imageType, derivType);
+
 		GeneralFeatureIntensity<T, D> intensity = new WrapperGradientCornerIntensity<>(FactoryIntensityPointAlg.shiTomasi(radius, false, derivType));
 //		GeneralFeatureIntensity<T, D> intensity =
 //				new WrapperFastCornerIntensity<T, D>(FactoryIntensityPointAlg.createFast12(defaultType, 8 , 12));
 
+		float intensityScale = intensity.thresholdScaleByDerivative(gradient.divisor());
+
 		ConfigExtract config = new ConfigExtract();
-		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(config);
+		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(config, intensityScale);
 //		FeatureExtractor extractor = new WrapperNonMaximumBlock( new NonMaxExtractorNaive(radius+10,10f));
 //		FeatureExtractor extractor = new WrapperNonMaxCandidate(new NonMaxCandidateStrict(radius+10, 10f));
 		extractor.setIgnoreBorder(radius + 10);
@@ -151,7 +159,7 @@ public class VideoDetectCorners<T extends ImageGray<T>, D extends ImageGray<D>> 
 		var detector = new GeneralFeatureDetector<>(intensity, null, extractor, selector);
 		detector.setFeatureLimit(maxCorners);
 
-		VideoDetectCorners<T, D> display = new VideoDetectCorners<>(sequence, detector, derivType);
+		VideoDetectCorners<T, D> display = new VideoDetectCorners<>(sequence, detector, gradient, derivType);
 
 		display.process();
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,8 +37,8 @@ public class TestGradientPrewitt_Shared extends BoofStandardJUnit {
 		validator.setTarget(GradientPrewitt_Shared.class.getMethod("process",
 				GrayU8.class, GrayS16.class, GrayS16.class ));
 
-		validator.setKernel(0, GradientPrewitt.kernelDerivX_I32);
-		validator.setKernel(1,GradientPrewitt.kernelDerivY_I32);
+		validator.setKernel(0, GradientPrewitt.kernelX_I32);
+		validator.setKernel(1,GradientPrewitt.kernelY_I32);
 
 		GrayU8 input = new GrayU8(width,height);
 		ImageMiscOps.fillUniform(input, rand, 0, 10);
@@ -53,8 +53,8 @@ public class TestGradientPrewitt_Shared extends BoofStandardJUnit {
 		validator.setTarget(GradientPrewitt_Shared.class.getMethod("process",
 				GrayS16.class, GrayS16.class, GrayS16.class ));
 
-		validator.setKernel(0, GradientPrewitt.kernelDerivX_I32);
-		validator.setKernel(1,GradientPrewitt.kernelDerivY_I32);
+		validator.setKernel(0, GradientPrewitt.kernelX_I32);
+		validator.setKernel(1,GradientPrewitt.kernelY_I32);
 
 		GrayS16 input = new GrayS16(width,height);
 		ImageMiscOps.fillUniform(input, rand, 0, 10);
@@ -69,8 +69,8 @@ public class TestGradientPrewitt_Shared extends BoofStandardJUnit {
 		validator.setTarget(GradientPrewitt_Shared.class.getMethod("process",
 				GrayF32.class, GrayF32.class, GrayF32.class ));
 
-		validator.setKernel(0, GradientPrewitt.kernelDerivX_F32);
-		validator.setKernel(1,GradientPrewitt.kernelDerivY_F32);
+		validator.setKernel(0, GradientPrewitt.kernelX_F32);
+		validator.setKernel(1,GradientPrewitt.kernelY_F32);
 
 		GrayF32 input = new GrayF32(width,height);
 		ImageMiscOps.fillUniform(input, rand, 0, 10);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -153,7 +153,7 @@ public class SiftDetector {
 	 * Define sparse image derivative operators.
 	 */
 	private void createSparseDerivatives() {
-		Kernel1D_F32 kernelD = new Kernel1D_F32(new float[]{-1, 0, 1}, 3);
+		Kernel1D_F32 kernelD = new Kernel1D_F32(3, new float[]{-1, 0, 1});
 
 		Kernel1D_F32 kernelDD = KernelMath.convolve1D_F32(kernelD, kernelD);
 		Kernel2D_F32 kernelXY = KernelMath.convolve2D(kernelD, kernelD);

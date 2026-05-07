@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,7 +43,7 @@ public class TestFastHessianFeatureDetector extends GenericFeatureDetectorTests 
 
 	@Override
 	protected Object createDetector( int maxFeatures ) {
-		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 1, 5, true));
+		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 1, 5, true), 1);
 		FeatureSelectLimitIntensity<Point2D_I16> limitLevels = FactorySelectLimit.intensity(ConfigSelectLimit.selectBestN());
 		FeatureSelectLimitIntensity<ScalePoint> limitAll = FactorySelectLimit.intensity(ConfigSelectLimit.selectBestN());
 		var alg = new FastHessianFeatureDetector(extractor,limitLevels,limitAll,1, 9,4,4, 6);
