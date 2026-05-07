@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -61,7 +61,7 @@ public class BilinearRectangle_U8 implements InterpolateRectangle<GrayU8> {
 
 	@Override public void region( float tl_x, float tl_y, GrayF32 output ) {
 		if (tl_x < 0 || tl_y < 0 || tl_x + output.width > orig.width || tl_y + output.height > orig.height) {
-			throw new IllegalArgumentException("Region is outside of the image");
+			throw new IllegalArgumentException("Region OOB. image: " + orig.width + " " + orig.height + ", region: " + tl_x + " " + tl_y + " " + (tl_x + output.width) + " " + (tl_y + output.height));
 		}
 		int xt = (int)tl_x;
 		int yt = (int)tl_y;
