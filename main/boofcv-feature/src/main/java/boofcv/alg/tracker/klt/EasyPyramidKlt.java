@@ -211,8 +211,8 @@ public class EasyPyramidKlt<Image extends ImageGray<Image>, Derivative extends I
 	public void track( int idx0, int idx1 ) {
 		if (isUseConcurrent(idx1 - idx0)) {
 			BoofConcurrency.loopBlocks(idx0, idx1, workspace, ( helper, block0, block1 ) -> {
-				helper.setImage(prevPyr.basePyramid, prevPyr.derivX, prevPyr.derivY);
-				track(block0, block1, tracker);
+				helper.setImage(currPyr.basePyramid, currPyr.derivX, currPyr.derivY);
+				track(block0, block1, helper);
 			});
 		} else {
 			tracker.setImage(currPyr.basePyramid, currPyr.derivX, currPyr.derivY);
@@ -270,7 +270,7 @@ public class EasyPyramidKlt<Image extends ImageGray<Image>, Derivative extends I
 		if (isUseConcurrent(idx1 - idx0)) {
 			BoofConcurrency.loopBlocks(idx0, idx1, workspace, ( helper, block0, block1 ) -> {
 				helper.setImage(prevPyr.basePyramid, prevPyr.derivX, prevPyr.derivY);
-				backwardsValidation(block0, block1, tracker);
+				backwardsValidation(block0, block1, helper);
 			});
 		} else {
 			tracker.setImage(prevPyr.basePyramid, prevPyr.derivX, prevPyr.derivY);
@@ -318,7 +318,7 @@ public class EasyPyramidKlt<Image extends ImageGray<Image>, Derivative extends I
 		if (isUseConcurrent(idx1 - idx0)) {
 			BoofConcurrency.loopBlocks(idx0, idx1, workspace, ( helper, block0, block1 ) -> {
 				helper.setImage(currPyr.basePyramid, currPyr.derivX, currPyr.derivY);
-				describe(block0, block1, tracker);
+				describe(block0, block1, helper);
 			});
 		} else {
 			tracker.setImage(currPyr.basePyramid, currPyr.derivX, currPyr.derivY);
