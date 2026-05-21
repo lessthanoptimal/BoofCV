@@ -18,7 +18,7 @@
 
 package boofcv.struct.geo;
 
-import georegression.struct.GeoTuple;
+import georegression.struct.tuples.GeoTuple;
 import lombok.Getter;
 import lombok.Setter;
 import org.ejml.MapFormattable;

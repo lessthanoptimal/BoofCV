@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.mvs;
 
 import boofcv.misc.IteratorReset;
 import boofcv.struct.geo.PointIndex;
-import georegression.struct.GeoTuple;
+import georegression.struct.tuples.GeoTuple;
 
 import java.util.List;
 

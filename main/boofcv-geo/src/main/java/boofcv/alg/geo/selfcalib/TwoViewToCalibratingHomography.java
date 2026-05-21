@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -258,8 +258,8 @@ public class TwoViewToCalibratingHomography {
 					for (int k = 0; k < 3; k++) {
 						if (i == k)
 							continue;
-						double top = AK1.get(i, j)*a.getIdx(k) - AK1.get(k, j)*a.getIdx(i);
-						double bottom = a.getIdx(k)*KiR.get(i, j) - a.getIdx(i)*KiR.get(k, j);
+						double top = AK1.get(i, j)*a.get(k) - AK1.get(k, j)*a.get(i);
+						double bottom = a.get(k)*KiR.get(i, j) - a.get(i)*KiR.get(k, j);
 						double scale = top/bottom;
 
 						if (Math.abs(bottom) > bestBottom) {
@@ -274,7 +274,7 @@ public class TwoViewToCalibratingHomography {
 			// commented out algebraic solution de to the possibility of it blowing up if sum of "a" is zero
 			for (int j = 0, row = 0; j < 3; j++) {
 				for (int i = 0; i < 3; i++, row++) {
-					matA.set(row, j, a.getIdx(i));
+					matA.set(row, j, a.get(i));
 					matB.set(row, 0, KiR.get(i, j)*bestScale - AK1.get(i, j));
 				}
 			}

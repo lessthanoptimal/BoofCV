@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -148,8 +148,8 @@ public class EnforceTrifocalGeometry {
 					int col1 = j*3 + i;
 					int col2 = k*3 + i + 9;
 
-					E.data[row*18 + col1] = e3.getIdx(k);
-					E.data[row*18 + col2] = -e2.getIdx(j);
+					E.data[row*18 + col1] = e3.get(k);
+					E.data[row*18 + col2] = -e2.get(j);
 				}
 			}
 		}

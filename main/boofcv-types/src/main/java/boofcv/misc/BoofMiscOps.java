@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,8 +24,8 @@ import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.*;
-import georegression.struct.GeoTuple;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.tuples.GeoTuple;
 import org.ddogleg.struct.*;
 import org.ejml.data.DMatrix2x2;
 import org.ejml.data.DMatrixRMaj;

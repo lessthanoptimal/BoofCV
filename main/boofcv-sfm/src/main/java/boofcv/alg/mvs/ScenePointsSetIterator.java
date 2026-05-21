@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,9 +22,9 @@ import boofcv.abst.geo.bundle.SceneStructureCommon;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.misc.IteratorReset;
 import boofcv.struct.geo.PointIndex;
-import georegression.struct.GeoTuple;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
+import georegression.struct.tuples.GeoTuple;
 import org.ddogleg.struct.DogArray_I32;
 
 /**

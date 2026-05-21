@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -103,11 +103,11 @@ class TestTrifocalLinearPoint7 extends CommonTrifocalChecks {
 		int idx2 = A.getIndex(row,9*k+j*3+m);
 		int idx3 = A.getIndex(row,9*k+i*3+m);
 
-		double x1k = k < 2 ? p1.getIdx(k) : 1;
-		double x2i = i < 2 ? p2.getIdx(i) : 1;
-		double x2j = j < 2 ? p2.getIdx(j) : 1;
-		double x3l = l < 2 ? p3.getIdx(l) : 1;
-		double x3m = m < 2 ? p3.getIdx(m) : 1;
+		double x1k = k < 2 ? p1.get(k) : 1;
+		double x2i = i < 2 ? p2.get(i) : 1;
+		double x2j = j < 2 ? p2.get(j) : 1;
+		double x3l = l < 2 ? p3.get(l) : 1;
+		double x3m = m < 2 ? p3.get(m) : 1;
 
 		A.data[idx0] = -x1k*x2i*x3m;
 		A.data[idx1] =  x1k*x2j*x3m;

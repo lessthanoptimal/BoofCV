@@ -46,13 +46,13 @@ import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.UtilLine2D_F64;
 import georegression.geometry.UtilPoint3D_F64;
 import georegression.metric.Intersection2D_F64;
-import georegression.struct.GeoTuple3D_F64;
 import georegression.struct.line.LineGeneral2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
+import georegression.struct.tuples.GeoTuple3D_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_F64;
@@ -228,10 +228,10 @@ public class MultiViewOps {
 			int index = 0;
 			for (int i = 0; i < 3; i++) {
 				double a_left = R2.unsafe_get(i, col);
-				double a_right = T2.getIdx(i);
+				double a_right = T2.get(i);
 
 				for (int j = 0; j < 3; j++) {
-					T.data[index++] = a_left*T3.getIdx(j) - a_right*R3.unsafe_get(j, col);
+					T.data[index++] = a_left*T3.get(j) - a_right*R3.unsafe_get(j, col);
 				}
 			}
 		}
@@ -1781,10 +1781,10 @@ public class MultiViewOps {
 	 */
 	public static double findScale( GeoTuple3D_F64<?> a, GeoTuple3D_F64<?> b ) {
 		int which = UtilPoint3D_F64.axisLargestAbs(a);
-		double bottom = a.getIdx(which);
+		double bottom = a.get(which);
 		if (bottom == 0.0)
 			return 0.0;
-		return b.getIdx(which)/bottom;
+		return b.get(which)/bottom;
 	}
 
 	/**

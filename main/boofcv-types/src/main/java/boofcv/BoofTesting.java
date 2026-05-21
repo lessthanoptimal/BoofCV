@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -151,13 +151,13 @@ public class BoofTesting {
 		int largestIdx = -1;
 		double largestMag = 0;
 		for (int i = 0; i < 3; i++) {
-			double mag = Math.abs(expected.T.getIdx(i));
+			double mag = Math.abs(expected.T.get(i));
 			if (mag > largestMag) {
 				largestMag = mag;
 				largestIdx = i;
 			}
 		}
-		if (Math.signum(expected.T.getIdx(largestIdx)) != Math.signum(found.T.getIdx(largestIdx)))
+		if (Math.signum(expected.T.get(largestIdx)) != Math.signum(found.T.get(largestIdx)))
 			normFound *= -1;
 
 		// they will have the same scale and a norm of 1

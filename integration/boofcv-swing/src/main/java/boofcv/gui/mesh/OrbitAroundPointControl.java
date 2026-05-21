@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -97,9 +97,9 @@ public class OrbitAroundPointControl extends MouseAdapter implements Swing3dCame
 			var target = new Point3D_F64();
 			for (int axis = 0; axis < 3; axis++) {
 				int _axis = axis;
-				sampled.forIdx(( idx, v ) -> values.set(idx, v.getIdx(_axis)));
+				sampled.forIdx(( idx, v ) -> values.set(idx, v.get(_axis)));
 				values.sort();
-				target.setIdx(axis, values.getFraction(0.5));
+				target.set(axis, values.getFraction(0.5));
 			}
 			orbit.setTarget(target.x, target.y, target.z);
 		}

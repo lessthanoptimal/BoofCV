@@ -137,7 +137,7 @@ public class CompatibleProjectiveHomography {
 
 			for (int j = 0; j < 3; j++) {
 				int idx = 16*(3*i + j);
-				double va = a.getIdx(j);
+				double va = a.get(j);
 				for (int k = 0; k < 4; k++) {
 					A.data[idx++] = va*b.x;
 					A.data[idx++] = va*b.y;
@@ -397,9 +397,9 @@ public class CompatibleProjectiveHomography {
 
 			for (int k = 0; k < 3; k++) {
 				// b[k] = h[k]*X[4] - h[4]*X[k]
-				double b_k = h.data[k]*x_sum - h_sum*p1.getIdx(k);
+				double b_k = h.data[k]*x_sum - h_sum*p1.get(k);
 				// c[k] = X[k]*a[4] - X[4]*a[k]
-				double c_k = p1.getIdx(k)*a_sum - x_sum*a.getIdx(k);
+				double c_k = p1.get(k)*a_sum - x_sum*a.get(k);
 
 				// b*X'^T*v = c
 				A.data[idxA++] = b_k*p2.x;
@@ -425,7 +425,7 @@ public class CompatibleProjectiveHomography {
 		H.reshape(4, 4);
 		for (int i = 0; i < 4; i++) {
 			for (int j = 0; j < 4; j++) {
-				H.data[i*4 + j] = PinvP.get(i, j) + h.data[i]*a.getIdx(j);
+				H.data[i*4 + j] = PinvP.get(i, j) + h.data[i]*a.get(j);
 			}
 		}
 
