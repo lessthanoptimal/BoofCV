@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,14 +18,14 @@
 
 package boofcv.alg.filter.convolve;
 
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.convolve.noborder.*;
-import boofcv.concurrency.BoofConcurrency;
+import pabeles.concurrency.GrowArray;
 import boofcv.struct.convolve.*;
 import boofcv.struct.image.*;
 import org.ddogleg.struct.DogArray_I32;
 import org.jetbrains.annotations.Nullable;
-import pabeles.concurrency.GrowArray;
 
 import javax.annotation.Generated;
 
@@ -94,9 +94,11 @@ public class ConvolveImageNoBorder {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
-			ConvolveImageStandard_IL_MT.horizontal(kernel, input, output);
+			if (!ConvolveImageUnrolled_IL_MT.horizontal(kernel, input, output))
+				ConvolveImageStandard_IL_MT.horizontal(kernel, input, output);
 		} else {
-			ConvolveImageStandard_IL.horizontal(kernel, input, output);
+			if (!ConvolveImageUnrolled_IL.horizontal(kernel, input, output))
+				ConvolveImageStandard_IL.horizontal(kernel, input, output);
 		}
 	}
 
@@ -104,9 +106,11 @@ public class ConvolveImageNoBorder {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
-			ConvolveImageStandard_IL_MT.vertical(kernel, input, output);
+			if (!ConvolveImageUnrolled_IL_MT.vertical(kernel, input, output))
+				ConvolveImageStandard_IL_MT.vertical(kernel, input, output);
 		} else {
-			ConvolveImageStandard_IL.vertical(kernel, input, output);
+			if (!ConvolveImageUnrolled_IL.vertical(kernel, input, output))
+				ConvolveImageStandard_IL.vertical(kernel, input, output);
 		}
 	}
 
@@ -114,9 +118,11 @@ public class ConvolveImageNoBorder {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
-			ConvolveImageStandard_IL_MT.convolve(kernel, input, output);
+			if (!ConvolveImageUnrolled_IL_MT.convolve(kernel, input, output))
+				ConvolveImageStandard_IL_MT.convolve(kernel, input, output);
 		} else {
-			ConvolveImageStandard_IL.convolve(kernel, input, output);
+			if (!ConvolveImageUnrolled_IL.convolve(kernel, input, output))
+				ConvolveImageStandard_IL.convolve(kernel, input, output);
 		}
 	}
 
@@ -160,9 +166,11 @@ public class ConvolveImageNoBorder {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
-			ConvolveImageStandard_IL_MT.horizontal(kernel, input, output);
+			if (!ConvolveImageUnrolled_IL_MT.horizontal(kernel, input, output))
+				ConvolveImageStandard_IL_MT.horizontal(kernel, input, output);
 		} else {
-			ConvolveImageStandard_IL.horizontal(kernel, input, output);
+			if (!ConvolveImageUnrolled_IL.horizontal(kernel, input, output))
+				ConvolveImageStandard_IL.horizontal(kernel, input, output);
 		}
 	}
 
@@ -170,9 +178,11 @@ public class ConvolveImageNoBorder {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
-			ConvolveImageStandard_IL_MT.vertical(kernel, input, output);
+			if (!ConvolveImageUnrolled_IL_MT.vertical(kernel, input, output))
+				ConvolveImageStandard_IL_MT.vertical(kernel, input, output);
 		} else {
-			ConvolveImageStandard_IL.vertical(kernel, input, output);
+			if (!ConvolveImageUnrolled_IL.vertical(kernel, input, output))
+				ConvolveImageStandard_IL.vertical(kernel, input, output);
 		}
 	}
 
@@ -180,9 +190,11 @@ public class ConvolveImageNoBorder {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
-			ConvolveImageStandard_IL_MT.convolve(kernel, input, output);
+			if (!ConvolveImageUnrolled_IL_MT.convolve(kernel, input, output))
+				ConvolveImageStandard_IL_MT.convolve(kernel, input, output);
 		} else {
-			ConvolveImageStandard_IL.convolve(kernel, input, output);
+			if (!ConvolveImageUnrolled_IL.convolve(kernel, input, output))
+				ConvolveImageStandard_IL.convolve(kernel, input, output);
 		}
 	}
 
@@ -226,9 +238,11 @@ public class ConvolveImageNoBorder {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
-			ConvolveImageStandard_IL_MT.horizontal(kernel, input, output);
+			if (!ConvolveImageUnrolled_IL_MT.horizontal(kernel, input, output))
+				ConvolveImageStandard_IL_MT.horizontal(kernel, input, output);
 		} else {
-			ConvolveImageStandard_IL.horizontal(kernel, input, output);
+			if (!ConvolveImageUnrolled_IL.horizontal(kernel, input, output))
+				ConvolveImageStandard_IL.horizontal(kernel, input, output);
 		}
 	}
 
@@ -236,9 +250,11 @@ public class ConvolveImageNoBorder {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
-			ConvolveImageStandard_IL_MT.vertical(kernel, input, output);
+			if (!ConvolveImageUnrolled_IL_MT.vertical(kernel, input, output))
+				ConvolveImageStandard_IL_MT.vertical(kernel, input, output);
 		} else {
-			ConvolveImageStandard_IL.vertical(kernel, input, output);
+			if (!ConvolveImageUnrolled_IL.vertical(kernel, input, output))
+				ConvolveImageStandard_IL.vertical(kernel, input, output);
 		}
 	}
 
@@ -246,9 +262,11 @@ public class ConvolveImageNoBorder {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
-			ConvolveImageStandard_IL_MT.convolve(kernel, input, output);
+			if (!ConvolveImageUnrolled_IL_MT.convolve(kernel, input, output))
+				ConvolveImageStandard_IL_MT.convolve(kernel, input, output);
 		} else {
-			ConvolveImageStandard_IL.convolve(kernel, input, output);
+			if (!ConvolveImageUnrolled_IL.convolve(kernel, input, output))
+				ConvolveImageStandard_IL.convolve(kernel, input, output);
 		}
 	}
 
@@ -286,9 +304,11 @@ public class ConvolveImageNoBorder {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
-			ConvolveImageStandard_IL_MT.horizontal(kernel, input, output);
+			if (!ConvolveImageUnrolled_IL_MT.horizontal(kernel, input, output))
+				ConvolveImageStandard_IL_MT.horizontal(kernel, input, output);
 		} else {
-			ConvolveImageStandard_IL.horizontal(kernel, input, output);
+			if (!ConvolveImageUnrolled_IL.horizontal(kernel, input, output))
+				ConvolveImageStandard_IL.horizontal(kernel, input, output);
 		}
 	}
 
@@ -296,9 +316,11 @@ public class ConvolveImageNoBorder {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
-			ConvolveImageStandard_IL_MT.vertical(kernel, input, output);
+			if (!ConvolveImageUnrolled_IL_MT.vertical(kernel, input, output))
+				ConvolveImageStandard_IL_MT.vertical(kernel, input, output);
 		} else {
-			ConvolveImageStandard_IL.vertical(kernel, input, output);
+			if (!ConvolveImageUnrolled_IL.vertical(kernel, input, output))
+				ConvolveImageStandard_IL.vertical(kernel, input, output);
 		}
 	}
 
@@ -306,9 +328,11 @@ public class ConvolveImageNoBorder {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
-			ConvolveImageStandard_IL_MT.convolve(kernel, input, output);
+			if (!ConvolveImageUnrolled_IL_MT.convolve(kernel, input, output))
+				ConvolveImageStandard_IL_MT.convolve(kernel, input, output);
 		} else {
-			ConvolveImageStandard_IL.convolve(kernel, input, output);
+			if (!ConvolveImageUnrolled_IL.convolve(kernel, input, output))
+				ConvolveImageStandard_IL.convolve(kernel, input, output);
 		}
 	}
 
@@ -327,9 +351,11 @@ public class ConvolveImageNoBorder {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
-			ConvolveImageStandard_IL_MT.vertical(kernel, input, output, divisor);
+			if (!ConvolveImageUnrolled_IL_MT.vertical(kernel, input, output, divisor))
+				ConvolveImageStandard_IL_MT.vertical(kernel, input, output, divisor);
 		} else {
-			ConvolveImageStandard_IL.vertical(kernel, input, output, divisor);
+			if (!ConvolveImageUnrolled_IL.vertical(kernel, input, output, divisor))
+				ConvolveImageStandard_IL.vertical(kernel, input, output, divisor);
 		}
 	}
 
@@ -373,9 +399,11 @@ public class ConvolveImageNoBorder {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
-			ConvolveImageStandard_IL_MT.horizontal(kernel, input, output);
+			if (!ConvolveImageUnrolled_IL_MT.horizontal(kernel, input, output))
+				ConvolveImageStandard_IL_MT.horizontal(kernel, input, output);
 		} else {
-			ConvolveImageStandard_IL.horizontal(kernel, input, output);
+			if (!ConvolveImageUnrolled_IL.horizontal(kernel, input, output))
+				ConvolveImageStandard_IL.horizontal(kernel, input, output);
 		}
 	}
 
@@ -383,9 +411,11 @@ public class ConvolveImageNoBorder {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
-			ConvolveImageStandard_IL_MT.vertical(kernel, input, output);
+			if (!ConvolveImageUnrolled_IL_MT.vertical(kernel, input, output))
+				ConvolveImageStandard_IL_MT.vertical(kernel, input, output);
 		} else {
-			ConvolveImageStandard_IL.vertical(kernel, input, output);
+			if (!ConvolveImageUnrolled_IL.vertical(kernel, input, output))
+				ConvolveImageStandard_IL.vertical(kernel, input, output);
 		}
 	}
 
@@ -393,9 +423,11 @@ public class ConvolveImageNoBorder {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
-			ConvolveImageStandard_IL_MT.convolve(kernel, input, output);
+			if (!ConvolveImageUnrolled_IL_MT.convolve(kernel, input, output))
+				ConvolveImageStandard_IL_MT.convolve(kernel, input, output);
 		} else {
-			ConvolveImageStandard_IL.convolve(kernel, input, output);
+			if (!ConvolveImageUnrolled_IL.convolve(kernel, input, output))
+				ConvolveImageStandard_IL.convolve(kernel, input, output);
 		}
 	}
 
@@ -441,9 +473,11 @@ public class ConvolveImageNoBorder {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
-			ConvolveImageStandard_IL_MT.horizontal(kernel, input, output, divisor);
+			if (!ConvolveImageUnrolled_IL_MT.horizontal(kernel, input, output, divisor))
+				ConvolveImageStandard_IL_MT.horizontal(kernel, input, output, divisor);
 		} else {
-			ConvolveImageStandard_IL.horizontal(kernel, input, output, divisor);
+			if (!ConvolveImageUnrolled_IL.horizontal(kernel, input, output, divisor))
+				ConvolveImageStandard_IL.horizontal(kernel, input, output, divisor);
 		}
 	}
 
@@ -451,9 +485,11 @@ public class ConvolveImageNoBorder {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
-			ConvolveImageStandard_IL_MT.vertical(kernel, input, output, divisor);
+			if (!ConvolveImageUnrolled_IL_MT.vertical(kernel, input, output, divisor))
+				ConvolveImageStandard_IL_MT.vertical(kernel, input, output, divisor);
 		} else {
-			ConvolveImageStandard_IL.vertical(kernel, input, output, divisor);
+			if (!ConvolveImageUnrolled_IL.vertical(kernel, input, output, divisor))
+				ConvolveImageStandard_IL.vertical(kernel, input, output, divisor);
 		}
 	}
 
@@ -461,9 +497,11 @@ public class ConvolveImageNoBorder {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
-			ConvolveImageStandard_IL_MT.convolve(kernel, input, output, divisor);
+			if (!ConvolveImageUnrolled_IL_MT.convolve(kernel, input, output, divisor))
+				ConvolveImageStandard_IL_MT.convolve(kernel, input, output, divisor);
 		} else {
-			ConvolveImageStandard_IL.convolve(kernel, input, output, divisor);
+			if (!ConvolveImageUnrolled_IL.convolve(kernel, input, output, divisor))
+				ConvolveImageStandard_IL.convolve(kernel, input, output, divisor);
 		}
 	}
 
@@ -509,9 +547,11 @@ public class ConvolveImageNoBorder {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
-			ConvolveImageStandard_IL_MT.horizontal(kernel, input, output, divisor);
+			if (!ConvolveImageUnrolled_IL_MT.horizontal(kernel, input, output, divisor))
+				ConvolveImageStandard_IL_MT.horizontal(kernel, input, output, divisor);
 		} else {
-			ConvolveImageStandard_IL.horizontal(kernel, input, output, divisor);
+			if (!ConvolveImageUnrolled_IL.horizontal(kernel, input, output, divisor))
+				ConvolveImageStandard_IL.horizontal(kernel, input, output, divisor);
 		}
 	}
 
@@ -519,9 +559,11 @@ public class ConvolveImageNoBorder {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
-			ConvolveImageStandard_IL_MT.vertical(kernel, input, output, divisor);
+			if (!ConvolveImageUnrolled_IL_MT.vertical(kernel, input, output, divisor))
+				ConvolveImageStandard_IL_MT.vertical(kernel, input, output, divisor);
 		} else {
-			ConvolveImageStandard_IL.vertical(kernel, input, output, divisor);
+			if (!ConvolveImageUnrolled_IL.vertical(kernel, input, output, divisor))
+				ConvolveImageStandard_IL.vertical(kernel, input, output, divisor);
 		}
 	}
 
@@ -529,9 +571,11 @@ public class ConvolveImageNoBorder {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
-			ConvolveImageStandard_IL_MT.convolve(kernel, input, output, divisor);
+			if (!ConvolveImageUnrolled_IL_MT.convolve(kernel, input, output, divisor))
+				ConvolveImageStandard_IL_MT.convolve(kernel, input, output, divisor);
 		} else {
-			ConvolveImageStandard_IL.convolve(kernel, input, output, divisor);
+			if (!ConvolveImageUnrolled_IL.convolve(kernel, input, output, divisor))
+				ConvolveImageStandard_IL.convolve(kernel, input, output, divisor);
 		}
 	}
 
@@ -577,9 +621,11 @@ public class ConvolveImageNoBorder {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
-			ConvolveImageStandard_IL_MT.horizontal(kernel, input, output, divisor);
+			if (!ConvolveImageUnrolled_IL_MT.horizontal(kernel, input, output, divisor))
+				ConvolveImageStandard_IL_MT.horizontal(kernel, input, output, divisor);
 		} else {
-			ConvolveImageStandard_IL.horizontal(kernel, input, output, divisor);
+			if (!ConvolveImageUnrolled_IL.horizontal(kernel, input, output, divisor))
+				ConvolveImageStandard_IL.horizontal(kernel, input, output, divisor);
 		}
 	}
 
@@ -587,9 +633,11 @@ public class ConvolveImageNoBorder {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
-			ConvolveImageStandard_IL_MT.vertical(kernel, input, output, divisor);
+			if (!ConvolveImageUnrolled_IL_MT.vertical(kernel, input, output, divisor))
+				ConvolveImageStandard_IL_MT.vertical(kernel, input, output, divisor);
 		} else {
-			ConvolveImageStandard_IL.vertical(kernel, input, output, divisor);
+			if (!ConvolveImageUnrolled_IL.vertical(kernel, input, output, divisor))
+				ConvolveImageStandard_IL.vertical(kernel, input, output, divisor);
 		}
 	}
 
@@ -597,9 +645,11 @@ public class ConvolveImageNoBorder {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
-			ConvolveImageStandard_IL_MT.convolve(kernel, input, output, divisor);
+			if (!ConvolveImageUnrolled_IL_MT.convolve(kernel, input, output, divisor))
+				ConvolveImageStandard_IL_MT.convolve(kernel, input, output, divisor);
 		} else {
-			ConvolveImageStandard_IL.convolve(kernel, input, output, divisor);
+			if (!ConvolveImageUnrolled_IL.convolve(kernel, input, output, divisor))
+				ConvolveImageStandard_IL.convolve(kernel, input, output, divisor);
 		}
 	}
 
@@ -618,9 +668,11 @@ public class ConvolveImageNoBorder {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
-			ConvolveImageStandard_IL_MT.vertical(kernel, input, output, divisor);
+			if (!ConvolveImageUnrolled_IL_MT.vertical(kernel, input, output, divisor))
+				ConvolveImageStandard_IL_MT.vertical(kernel, input, output, divisor);
 		} else {
-			ConvolveImageStandard_IL.vertical(kernel, input, output, divisor);
+			if (!ConvolveImageUnrolled_IL.vertical(kernel, input, output, divisor))
+				ConvolveImageStandard_IL.vertical(kernel, input, output, divisor);
 		}
 	}
 
@@ -664,9 +716,11 @@ public class ConvolveImageNoBorder {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
-			ConvolveImageStandard_IL_MT.horizontal(kernel, input, output);
+			if (!ConvolveImageUnrolled_IL_MT.horizontal(kernel, input, output))
+				ConvolveImageStandard_IL_MT.horizontal(kernel, input, output);
 		} else {
-			ConvolveImageStandard_IL.horizontal(kernel, input, output);
+			if (!ConvolveImageUnrolled_IL.horizontal(kernel, input, output))
+				ConvolveImageStandard_IL.horizontal(kernel, input, output);
 		}
 	}
 
@@ -674,9 +728,11 @@ public class ConvolveImageNoBorder {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
-			ConvolveImageStandard_IL_MT.vertical(kernel, input, output);
+			if (!ConvolveImageUnrolled_IL_MT.vertical(kernel, input, output))
+				ConvolveImageStandard_IL_MT.vertical(kernel, input, output);
 		} else {
-			ConvolveImageStandard_IL.vertical(kernel, input, output);
+			if (!ConvolveImageUnrolled_IL.vertical(kernel, input, output))
+				ConvolveImageStandard_IL.vertical(kernel, input, output);
 		}
 	}
 
@@ -684,9 +740,11 @@ public class ConvolveImageNoBorder {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
-			ConvolveImageStandard_IL_MT.convolve(kernel, input, output);
+			if (!ConvolveImageUnrolled_IL_MT.convolve(kernel, input, output))
+				ConvolveImageStandard_IL_MT.convolve(kernel, input, output);
 		} else {
-			ConvolveImageStandard_IL.convolve(kernel, input, output);
+			if (!ConvolveImageUnrolled_IL.convolve(kernel, input, output))
+				ConvolveImageStandard_IL.convolve(kernel, input, output);
 		}
 	}
 
@@ -732,9 +790,11 @@ public class ConvolveImageNoBorder {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
-			ConvolveImageStandard_IL_MT.horizontal(kernel, input, output, divisor);
+			if (!ConvolveImageUnrolled_IL_MT.horizontal(kernel, input, output, divisor))
+				ConvolveImageStandard_IL_MT.horizontal(kernel, input, output, divisor);
 		} else {
-			ConvolveImageStandard_IL.horizontal(kernel, input, output, divisor);
+			if (!ConvolveImageUnrolled_IL.horizontal(kernel, input, output, divisor))
+				ConvolveImageStandard_IL.horizontal(kernel, input, output, divisor);
 		}
 	}
 
@@ -742,9 +802,11 @@ public class ConvolveImageNoBorder {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
-			ConvolveImageStandard_IL_MT.vertical(kernel, input, output, divisor);
+			if (!ConvolveImageUnrolled_IL_MT.vertical(kernel, input, output, divisor))
+				ConvolveImageStandard_IL_MT.vertical(kernel, input, output, divisor);
 		} else {
-			ConvolveImageStandard_IL.vertical(kernel, input, output, divisor);
+			if (!ConvolveImageUnrolled_IL.vertical(kernel, input, output, divisor))
+				ConvolveImageStandard_IL.vertical(kernel, input, output, divisor);
 		}
 	}
 
@@ -752,9 +814,11 @@ public class ConvolveImageNoBorder {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
-			ConvolveImageStandard_IL_MT.convolve(kernel, input, output, divisor);
+			if (!ConvolveImageUnrolled_IL_MT.convolve(kernel, input, output, divisor))
+				ConvolveImageStandard_IL_MT.convolve(kernel, input, output, divisor);
 		} else {
-			ConvolveImageStandard_IL.convolve(kernel, input, output, divisor);
+			if (!ConvolveImageUnrolled_IL.convolve(kernel, input, output, divisor))
+				ConvolveImageStandard_IL.convolve(kernel, input, output, divisor);
 		}
 	}
 
