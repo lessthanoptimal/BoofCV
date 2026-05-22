@@ -187,7 +187,20 @@ public class EasyPyramidKlt<Image extends ImageGray<Image>, Derivative extends I
 	/// For each look that passes in each track and matching metadata. The index is valid only during
 	/// the callback; subsequent removeSwap calls invalidate it.
 	public void forEachTrack( ProcessTrack op ) {
-		for (int i = 0; i < tracks.size; i++) {
+		forEachTrack(0, tracks.size, op);
+	}
+
+	/// For each look that passes in each track and matching metadata. The index is valid only during
+	/// the callback; subsequent removeSwap calls invalidate it.
+	///
+	/// @param idx0 Track index lower extent, inclusive.
+	/// @param idx1 Track index upper extent, exclusive.
+	public void forEachTrack( int idx0, int idx1, ProcessTrack op ) {
+		BoofMiscOps.checkTrue(idx0 <= idx1, "idx0 <= idx1");
+		BoofMiscOps.checkTrue(idx0 >= 0, "idx0 >= 0");
+		BoofMiscOps.checkTrue(idx1 <= tracks.size , "idx1 <= tracks.size");
+
+		for (int i = idx0; i < idx1; i++) {
 			PyramidKltFeature track = tracks.get(i);
 			TrackMeta meta = metadata.get(i);
 			op.process(i, meta, track);
