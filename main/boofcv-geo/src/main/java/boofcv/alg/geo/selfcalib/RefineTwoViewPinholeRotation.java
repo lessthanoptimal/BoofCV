@@ -205,7 +205,7 @@ public class RefineTwoViewPinholeRotation implements VerbosePrint {
 			rotation.unitAxisRotation.z = parameters[index++];
 			rotation.theta = parameters[index];
 
-			// ensure it's norm is 1
+			// ensure its norm is 1
 			rotation.unitAxisRotation.normalize();
 		}
 
