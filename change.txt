@@ -7,6 +7,22 @@ Version Meaning: <compatible>.<feature>.<bug fix>
 - Last digit always indicates a bug fix and other minor changes
 
 ---------------------
+Date    : 2026/May/25
+Version : 1.4.0
+
+- Image Derivative
+  * Correctly scales integer and float variants
+  * Need to specify scaling for integer valued images for many feature detectors, breaking change
+  * This makes tuning parameters consistent across data types for down stream algorithms
+  * Been a known issue from the very beginning in BoofCV. This fixes it.
+- You can specify convergence tolerance for lens distortion
+- Loss function for N-View trianguation
+- Added EasyPyramidKlt
+  * High level API that lets you mess with low level KLT
+  * More powerful than wrapped versions of KLT which limit how you can use it
+- Support for Matrix and Map Format
+
+---------------------
 Date    : 2026/Jan/22
 Version : 1.3.0
 
