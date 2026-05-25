@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -114,7 +114,7 @@ class TestUtilIO extends BoofStandardJUnit {
 	@SuppressWarnings("ConstantConditions")
 	@Test void getGithubLink() throws IOException {
 		// Don't run If this is a snapshot since it will allways fail
-		if(BoofVersion.VERSION.contains("SNAPSHOT"))
+		if(BoofVersion.VERSION.contains("SNAPSHOT") || !BoofVersion.GIT_BRANCH.equals("SNAPSHOT"))
 			return;
 
 		String url = UtilIO.getGithubURL(validDemoPackage, validDemoClass);
