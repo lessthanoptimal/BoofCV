@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,6 +28,7 @@ import boofcv.struct.ConfigLength;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.geo.AssociatedPair;
+import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import lombok.Getter;
@@ -36,7 +37,6 @@ import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.util.VerboseUtils;
 import org.ejml.data.DMatrixRMaj;
-import org.ejml.dense.row.CommonOps_DDRM;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
@@ -83,9 +83,13 @@ public class ScoreFundamentalVsRotation implements EpipolarScore3D {
 	protected final DogArray_I32 inliersRotationIdx = new DogArray_I32();
 	protected final DMatrixRMaj K1 = new DMatrixRMaj(3, 3);     // storage for initial calibration view-1
 	protected final DMatrixRMaj K2 = new DMatrixRMaj(3, 3);     // storage for initial calibration view-2
-	protected final DMatrixRMaj R = new DMatrixRMaj(3, 3);       // storage for initial rotation matrix
+	private final DMatrixRMaj R = new DMatrixRMaj(3, 3);      // storage for initial rotation matrix
 	private final CameraPinhole pinhole1 = new CameraPinhole();
 	private final CameraPinhole pinhole2 = new CameraPinhole();
+
+	protected final DMatrixRMaj bestR = new DMatrixRMaj(3, 3);
+	private final CameraPinhole bestPinhole1 = new CameraPinhole();
+	private final CameraPinhole bestPinhole2 = new CameraPinhole();
 
 	// predicted pixel in view-2
 	final Point2D_F64 predictedPixel = new Point2D_F64();
@@ -196,32 +200,54 @@ public class ScoreFundamentalVsRotation implements EpipolarScore3D {
 	 */
 	private int fitPureRotation( List<AssociatedPair> pairs,
 								 boolean sameCamera ) {
-		// Initialize the algorithm with no rotation
-		CommonOps_DDRM.setIdentity(R);
+		double bestScore = Double.MAX_VALUE;
+		for (int axis = 0; axis < 3; axis++) {
+			// Try multiple slightly different initial conditions to see if any of them converge properly.
+			// This is an adhoc approach after discovering how sensitive it is due to a change in upstream library
+			// more thought should be put into it.
+			switch(axis) {
+				case 0 -> ConvertRotation3D_F64.rotX(1e-3, R);
+				case 1 -> ConvertRotation3D_F64.rotY(1e-3, R);
+				case 2 -> ConvertRotation3D_F64.rotZ(1e-3, R);
+			}
 
-		// Performance can improve significantly if this constraint is enabled. For example, if moving forward
-		// and there are two cameras, then the second view could be zoomed in and there is no translation
-		this.fitRotation.setAssumeSameIntrinsics(sameCamera);
+			// Performance can improve significantly if this constraint is enabled. For example, if moving forward
+			// and there are two cameras, then the second view could be zoomed in and there is no translation
+			this.fitRotation.setAssumeSameIntrinsics(sameCamera);
 
-		// Fit against the inliers only since those two sets of points should be similar
-		// and this will remove some noise
-		if (!this.fitRotation.refine(inliersRansac, R, pinhole1, pinhole2)) {
-			return -1;
+			// Fit against the inliers only since those two sets of points should be similar
+			// and this will remove some noise
+			if (!this.fitRotation.refine(inliersRansac, R, pinhole1, pinhole2)) {
+				continue;
+			}
+
+			if (fitRotation.getErrorAfter() < bestScore) {
+				bestScore = fitRotation.getErrorAfter();
+				bestR.setTo(R);
+				bestPinhole1.setTo(pinhole1);
+				bestPinhole2.setTo(pinhole2);
+			}
 		}
+
+		// See if all failed
+		if (bestScore == Double.MAX_VALUE)
+			return -1;
+
+
 		// Check to see if the self calibration diverged. That's a strong indication that the data
 		// doesn't fit the model
 		boolean badRotation = false;
-		badRotation |= pinhole1.cx < 0 || pinhole1.cy < 0 || pinhole1.cx >= pinhole1.width || pinhole1.cy >= pinhole1.height;
-		badRotation |= pinhole2.cx < 0 || pinhole2.cy < 0 || pinhole2.cx >= pinhole2.width || pinhole2.cy >= pinhole2.height;
+		badRotation |= bestPinhole1.cx < 0 || bestPinhole1.cy < 0 || bestPinhole1.cx >= bestPinhole1.width || bestPinhole1.cy >= bestPinhole1.height;
+		badRotation |= bestPinhole2.cx < 0 || bestPinhole2.cy < 0 || bestPinhole2.cx >= bestPinhole2.width || bestPinhole2.cy >= bestPinhole2.height;
 
 		if (badRotation) {
 			return -2;
 		}
 
 		// Compute a homography from the found rotation and camera intrinsics
-		PerspectiveOps.pinholeToMatrix(pinhole1, K1);
-		PerspectiveOps.pinholeToMatrix(pinhole2, K2);
-		DMatrixRMaj H21 = MultiViewOps.homographyFromRotation(R, K1, K2, null);
+		PerspectiveOps.pinholeToMatrix(bestPinhole1, K1);
+		PerspectiveOps.pinholeToMatrix(bestPinhole2, K2);
+		DMatrixRMaj H21 = MultiViewOps.homographyFromRotation(bestR, K1, K2, null);
 
 		// See how many points match this model
 		return countFitRotation(H21, pairs, inliersRotationIdx);
