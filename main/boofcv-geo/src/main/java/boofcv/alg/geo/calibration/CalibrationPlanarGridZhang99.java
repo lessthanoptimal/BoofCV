@@ -206,7 +206,7 @@ public class CalibrationPlanarGridZhang99 implements VerbosePrint {
 
 		// Most solvers don't have sparse implementations. Update this as more are added.
 		boolean dense = switch (configSBA.optimizer.getLinearSolverType()) {
-			case CHOLESKY, QR -> false;
+			case DEFAULT, CHOLESKY, QR -> false;
 			default -> true;
 		};
 
