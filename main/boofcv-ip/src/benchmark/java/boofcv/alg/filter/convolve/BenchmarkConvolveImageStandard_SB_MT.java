@@ -36,8 +36,7 @@ import java.util.concurrent.TimeUnit;
 @Fork(value = 1)
 @SuppressWarnings({"UnusedDeclaration"})
 public class BenchmarkConvolveImageStandard_SB_MT extends CommonBenchmarkConvolve_SB {
-//	@Param({"1", "10"})
-	@Param({"5"})
+	@Param({"1","3","5"})
 	private int radius;
 
 	@Setup public void setup() {

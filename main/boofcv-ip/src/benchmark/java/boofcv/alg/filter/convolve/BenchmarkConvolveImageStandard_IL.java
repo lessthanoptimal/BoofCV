@@ -36,12 +36,30 @@ import java.util.concurrent.TimeUnit;
 @Fork(value = 1)
 @SuppressWarnings({"UnusedDeclaration"})
 public class BenchmarkConvolveImageStandard_IL extends CommonBenchmarkConvolve_IL {
-//	@Param({"1", "10"})
-	@Param({"5"})
+	@Param({"1", "2", "3"})
 	private int radius;
 
+	@Param({"2", "3", "4"})
+	private int bands;
+
 	@Setup public void setup() {
+		reshape(bands);
 		setup(radius);
+	}
+
+	private void reshape( int bands ) {
+		numBands = bands;
+		input_F32.reshape(width, height, bands);
+		input_F64.reshape(width, height, bands);
+		input_U8.reshape(width, height, bands);
+		input_U16.reshape(width, height, bands);
+		input_S16.reshape(width, height, bands);
+		input_S32.reshape(width, height, bands);
+		out_F32.reshape(width, height, bands);
+		out_F64.reshape(width, height, bands);
+		out_U8.reshape(width, height, bands);
+		out_S16.reshape(width, height, bands);
+		out_S32.reshape(width, height, bands);
 	}
 
 	// @formatter:off
