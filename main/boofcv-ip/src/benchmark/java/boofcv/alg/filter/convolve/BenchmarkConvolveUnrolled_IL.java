@@ -18,7 +18,6 @@
 
 package boofcv.alg.filter.convolve;
 
-import boofcv.alg.filter.convolve.noborder.ConvolveImageStandard_IL;
 import boofcv.alg.filter.convolve.noborder.ConvolveImageUnrolled_IL;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
@@ -64,23 +63,12 @@ public class BenchmarkConvolveUnrolled_IL extends CommonBenchmarkConvolve_IL {
 	}
 
 	// @formatter:off
-	@Benchmark public void horizontal_F32_standard() {ConvolveImageStandard_IL.horizontal(kernelF32, input_F32, out_F32);}
-	@Benchmark public boolean horizontal_F32_unrolled() {return ConvolveImageUnrolled_IL.horizontal(kernelF32, input_F32, out_F32);}
-
-	@Benchmark public void vertical_F32_standard() {ConvolveImageStandard_IL.vertical(kernelF32, input_F32, out_F32);}
-	@Benchmark public boolean vertical_F32_unrolled() {return ConvolveImageUnrolled_IL.vertical(kernelF32, input_F32, out_F32);}
-
-	@Benchmark public void convolve2D_F32_standard() {ConvolveImageStandard_IL.convolve(kernel2D_F32, input_F32, out_F32);}
-	@Benchmark public boolean convolve2D_F32_unrolled() {return ConvolveImageUnrolled_IL.convolve(kernel2D_F32, input_F32, out_F32);}
-
-	@Benchmark public void horizontal_U8_I16_standard() {ConvolveImageStandard_IL.horizontal(kernelI32, input_U8, out_S16);}
-	@Benchmark public boolean horizontal_U8_I16_unrolled() {return ConvolveImageUnrolled_IL.horizontal(kernelI32, input_U8, out_S16);}
-
-	@Benchmark public void vertical_U8_I16_standard() {ConvolveImageStandard_IL.vertical(kernelI32, input_U8, out_S16);}
-	@Benchmark public boolean vertical_U8_I16_unrolled() {return ConvolveImageUnrolled_IL.vertical(kernelI32, input_U8, out_S16);}
-
-	@Benchmark public void convolve2D_U8_I16_standard() {ConvolveImageStandard_IL.convolve(kernel2D_I32, input_U8, out_S16);}
-	@Benchmark public boolean convolve2D_U8_I16_unrolled() {return ConvolveImageUnrolled_IL.convolve(kernel2D_I32, input_U8, out_S16);}
+	@Benchmark public boolean horizontal_F32() {return ConvolveImageUnrolled_IL.horizontal(kernelF32, input_F32, out_F32);}
+	@Benchmark public boolean vertical_F32() {return ConvolveImageUnrolled_IL.vertical(kernelF32, input_F32, out_F32);}
+	@Benchmark public boolean convolve2D_F32() {return ConvolveImageUnrolled_IL.convolve(kernel2D_F32, input_F32, out_F32);}
+	@Benchmark public boolean horizontal_U8_I16() {return ConvolveImageUnrolled_IL.horizontal(kernelI32, input_U8, out_S16);}
+	@Benchmark public boolean vertical_U8_I16() {return ConvolveImageUnrolled_IL.vertical(kernelI32, input_U8, out_S16);}
+	@Benchmark public boolean convolve2D_U8_I16() {return ConvolveImageUnrolled_IL.convolve(kernel2D_I32, input_U8, out_S16);}
 	// @formatter:on
 
 	public static void main( String[] args ) throws RunnerException {

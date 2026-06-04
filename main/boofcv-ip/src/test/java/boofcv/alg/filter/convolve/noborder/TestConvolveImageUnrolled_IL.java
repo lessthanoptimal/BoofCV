@@ -124,19 +124,7 @@ public class TestConvolveImageUnrolled_IL extends BoofStandardJUnit {
 	}
 
 	private KernelBase createKernel( Class<?> paramType, int kernelWidth, int kernelOffset ) {
-		if (Kernel1D_F32.class == paramType)
-			return FactoryKernel.random1D_F32(kernelWidth, kernelOffset, -1, 1, rand);
-		if (Kernel1D_F64.class == paramType)
-			return FactoryKernel.random1D_F64(kernelWidth, kernelOffset, -1, 1, rand);
-		if (Kernel1D_S32.class == paramType)
-			return FactoryKernel.random1D_I32(kernelWidth, kernelOffset, -1, 1, rand);
-		if (Kernel2D_F32.class == paramType)
-			return FactoryKernel.random2D_F32(kernelWidth, kernelOffset, -1, 1, rand);
-		if (Kernel2D_F64.class == paramType)
-			return FactoryKernel.random2D_F64(kernelWidth, kernelOffset, -1, 1, rand);
-		if (Kernel2D_S32.class == paramType)
-			return FactoryKernel.random2D_I32(kernelWidth, kernelOffset, -1, 1, rand);
-		throw new RuntimeException("Unknown kernel type " + paramType.getSimpleName());
+		return FactoryKernel.random(paramType, kernelWidth, kernelOffset, -1, 1, rand);
 	}
 
 	private boolean isTestMethod( Method m ) {

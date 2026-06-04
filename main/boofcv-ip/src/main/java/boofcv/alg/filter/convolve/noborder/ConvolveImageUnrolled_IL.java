@@ -32,7 +32,6 @@ import javax.annotation.Generated;
  *
  * <p>DO NOT MODIFY. Automatically generated code created by GenerateConvolvedUnrolled_IL</p>
  *
- * @author Peter Abeles
  */
 @Generated("boofcv.alg.filter.convolve.noborder.GenerateConvolvedUnrolled_IL")
 @SuppressWarnings({"ForLoopReplaceableByForEach","Duplicates"})

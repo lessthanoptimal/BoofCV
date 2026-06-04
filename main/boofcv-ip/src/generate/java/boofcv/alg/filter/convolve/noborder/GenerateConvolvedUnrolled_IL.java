@@ -74,7 +74,7 @@ public class GenerateConvolvedUnrolled_IL extends CodeGeneratorBase {
 				" * <p>\n" +
 				" * Unrolls convolution kernels for interleaved images with two, three, or four bands.\n" +
 				" * </p>\n" +
-				generateDocString("Peter Abeles") +
+				generateDocString() +
 				"@SuppressWarnings({\"ForLoopReplaceableByForEach\",\"Duplicates\"})\n" +
 				"public class " + className + " {\n");
 	}
