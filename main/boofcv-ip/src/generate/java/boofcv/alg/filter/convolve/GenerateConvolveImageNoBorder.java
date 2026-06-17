@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -161,6 +161,7 @@ public class GenerateConvolveImageNoBorder extends CodeGeneratorBase {
 				out.print("\t\t\tif (!ConvolveImageUnrolled_SB_MT_"+typeIn+"_"+typeOut+divideSuf+"."+name+"(kernel, input, output"+divideInput+workspaceInput+"))\n\t");
 			out.print("\t\t\tConvolveImageStandard_SB_MT."+name+"(kernel, input, output"+divideInput+workspaceInput+");\n");
 		} else {
+			out.print("\t\t\tif (!ConvolveImageUnrolled_IL_MT."+name+"(kernel, input, output"+divideInput+"))\n\t");
 			out.print("\t\t\tConvolveImageStandard_IL_MT."+name+"(kernel, input, output"+divideInput+");\n");
 		}
 		out.print("\t\t} else {\n");
@@ -169,6 +170,7 @@ public class GenerateConvolveImageNoBorder extends CodeGeneratorBase {
 				out.print("\t\t\tif (!ConvolveImageUnrolled_SB_"+typeIn+"_"+typeOut+divideSuf+"."+name+"(kernel, input, output"+divideInput+workspaceInput+"))\n\t");
 			out.print("\t\t\tConvolveImageStandard_SB."+name+"(kernel, input, output"+divideInput+workspaceInput+");\n");
 		} else {
+			out.print("\t\t\tif (!ConvolveImageUnrolled_IL."+name+"(kernel, input, output"+divideInput+"))\n\t");
 			out.print("\t\t\tConvolveImageStandard_IL."+name+"(kernel, input, output"+divideInput+");\n");
 		}
 		out.print("\t\t}\n");
