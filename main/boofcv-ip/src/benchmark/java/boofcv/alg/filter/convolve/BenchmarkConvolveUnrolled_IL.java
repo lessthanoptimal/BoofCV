@@ -28,6 +28,8 @@ import org.openjdk.jmh.runner.options.TimeValue;
 
 import java.util.concurrent.TimeUnit;
 
+import static boofcv.misc.BoofMiscOps.checkTrue;
+
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @Warmup(iterations = 2)
@@ -36,39 +38,25 @@ import java.util.concurrent.TimeUnit;
 @Fork(value = 1)
 @SuppressWarnings({"UnusedDeclaration"})
 public class BenchmarkConvolveUnrolled_IL extends CommonBenchmarkConvolve_IL {
-	@Param({"1", "2", "3"})
+	//	@Param({"1", "2", "3"})
+	@Param({"3"})
 	private int radius;
 
-	@Param({"2", "3", "4"})
+	//	@Param({"2", "3", "4"})
+	@Param({"3"})
 	private int bands;
 
 	@Setup public void setup() {
-		reshape(bands);
-		super.setup(radius);
-	}
-
-	private void reshape( int bands ) {
-		numBands = bands;
-		input_F32.reshape(width, height, bands);
-		input_F64.reshape(width, height, bands);
-		input_U8.reshape(width, height, bands);
-		input_U16.reshape(width, height, bands);
-		input_S16.reshape(width, height, bands);
-		input_S32.reshape(width, height, bands);
-		out_F32.reshape(width, height, bands);
-		out_F64.reshape(width, height, bands);
-		out_U8.reshape(width, height, bands);
-		out_S16.reshape(width, height, bands);
-		out_S32.reshape(width, height, bands);
+		setup(bands, radius);
 	}
 
 	// @formatter:off
-	@Benchmark public boolean horizontal_F32() {return ConvolveImageUnrolled_IL.horizontal(kernelF32, input_F32, out_F32);}
-	@Benchmark public boolean vertical_F32() {return ConvolveImageUnrolled_IL.vertical(kernelF32, input_F32, out_F32);}
-	@Benchmark public boolean convolve2D_F32() {return ConvolveImageUnrolled_IL.convolve(kernel2D_F32, input_F32, out_F32);}
-	@Benchmark public boolean horizontal_U8_I16() {return ConvolveImageUnrolled_IL.horizontal(kernelI32, input_U8, out_S16);}
-	@Benchmark public boolean vertical_U8_I16() {return ConvolveImageUnrolled_IL.vertical(kernelI32, input_U8, out_S16);}
-	@Benchmark public boolean convolve2D_U8_I16() {return ConvolveImageUnrolled_IL.convolve(kernel2D_I32, input_U8, out_S16);}
+	@Benchmark public void horizontal_F32() {checkTrue(ConvolveImageUnrolled_IL.horizontal(kernelF32, input_F32, out_F32));}
+	@Benchmark public void vertical_F32() {checkTrue(ConvolveImageUnrolled_IL.vertical(kernelF32, input_F32, out_F32));}
+	@Benchmark public void convolve2D_F32() {checkTrue(ConvolveImageUnrolled_IL.convolve(kernel2D_F32, input_F32, out_F32));}
+	@Benchmark public void horizontal_U8_I16() {checkTrue(ConvolveImageUnrolled_IL.horizontal(kernelI32, input_U8, out_S16));}
+	@Benchmark public void vertical_U8_I16() {checkTrue(ConvolveImageUnrolled_IL.vertical(kernelI32, input_U8, out_S16));}
+	@Benchmark public void convolve2D_U8_I16() {checkTrue(ConvolveImageUnrolled_IL.convolve(kernel2D_I32, input_U8, out_S16));}
 	// @formatter:on
 
 	public static void main( String[] args ) throws RunnerException {
