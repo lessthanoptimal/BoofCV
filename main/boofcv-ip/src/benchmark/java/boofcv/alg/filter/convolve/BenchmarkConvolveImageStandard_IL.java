@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,30 +36,16 @@ import java.util.concurrent.TimeUnit;
 @Fork(value = 1)
 @SuppressWarnings({"UnusedDeclaration"})
 public class BenchmarkConvolveImageStandard_IL extends CommonBenchmarkConvolve_IL {
-	@Param({"1", "2", "3"})
+	//	@Param({"1", "2", "3", "5"})
+	@Param({"3", "5"})
 	private int radius;
 
-	@Param({"2", "3", "4"})
+	//	@Param({"2", "3", "4"})
+	@Param({"3"})
 	private int bands;
 
 	@Setup public void setup() {
-		reshape(bands);
-		setup(radius);
-	}
-
-	private void reshape( int bands ) {
-		numBands = bands;
-		input_F32.reshape(width, height, bands);
-		input_F64.reshape(width, height, bands);
-		input_U8.reshape(width, height, bands);
-		input_U16.reshape(width, height, bands);
-		input_S16.reshape(width, height, bands);
-		input_S32.reshape(width, height, bands);
-		out_F32.reshape(width, height, bands);
-		out_F64.reshape(width, height, bands);
-		out_U8.reshape(width, height, bands);
-		out_S16.reshape(width, height, bands);
-		out_S32.reshape(width, height, bands);
+		setup(bands, radius);
 	}
 
 	// @formatter:off

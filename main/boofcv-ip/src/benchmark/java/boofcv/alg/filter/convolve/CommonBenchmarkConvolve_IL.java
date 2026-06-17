@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,7 +33,7 @@ import pabeles.concurrency.GrowArray;
 import java.util.Random;
 
 public class CommonBenchmarkConvolve_IL {
-	protected static int width = 800, height = 600, numBands= 2;
+	protected static int width = 800, height = 600, numBands = 2;
 
 	protected static Kernel2D_F32 kernel2D_F32;
 	protected static Kernel1D_F32 kernelF32;
@@ -55,24 +55,37 @@ public class CommonBenchmarkConvolve_IL {
 	protected GrowArray<DogArray_F32> work_F32 = new GrowArray<>(DogArray_F32::new);
 	protected GrowArray<DogArray_F64> work_F64 = new GrowArray<>(DogArray_F64::new);
 
-	public void setup( int radius ) {
-		Random rand = new Random(234);
+	public void setup( int numBands, int radius ) {
+		var rand = new Random(234);
+		this.numBands = numBands;
 
 		ImageMiscOps.fillUniform(input_U8, rand, 0, 20);
 		ImageMiscOps.fillUniform(input_S16, rand, 0, 20);
 		ImageMiscOps.fillUniform(input_S32, rand, 0, 20);
 		ImageMiscOps.fillUniform(input_F32, rand, 0, 20);
 		ImageMiscOps.fillUniform(input_F64, rand, 0, 20);
-		System.arraycopy(input_S16.data,0,input_U16.data,0,input_S16.data.length);
+		System.arraycopy(input_S16.data, 0, input_U16.data, 0, input_S16.data.length);
 
 		kernelF32 = FactoryKernelGaussian.gaussian(Kernel1D_F32.class, -1, radius);
 		kernelI32 = FactoryKernelGaussian.gaussian(Kernel1D_S32.class, -1, radius);
 		kernel2D_F32 = FactoryKernelGaussian.gaussian(Kernel2D_F32.class, -1, radius);
 		kernel2D_I32 = FactoryKernelGaussian.gaussian(Kernel2D_S32.class, -1, radius);
+
+		input_F32.reshape(width, height, numBands);
+		input_F64.reshape(width, height, numBands);
+		input_U8.reshape(width, height, numBands);
+		input_U16.reshape(width, height, numBands);
+		input_S16.reshape(width, height, numBands);
+		input_S32.reshape(width, height, numBands);
+		out_F32.reshape(width, height, numBands);
+		out_F64.reshape(width, height, numBands);
+		out_U8.reshape(width, height, numBands);
+		out_S16.reshape(width, height, numBands);
+		out_S32.reshape(width, height, numBands);
 	}
 
-	public void setupSkip( int radius, int skip ) {
-		setup(radius);
+	public void setupSkip( int numBands, int radius, int skip ) {
+		setup(numBands, radius);
 		out_F32.reshape(width/skip, height/skip);
 		out_U8.reshape(width/skip, height/skip);
 		out_S16.reshape(width/skip, height/skip);

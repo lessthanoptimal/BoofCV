@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,7 +36,8 @@ import java.util.concurrent.TimeUnit;
 @Fork(value = 1)
 @SuppressWarnings({"UnusedDeclaration"})
 public class BenchmarkConvolveImageStandard_SB_MT extends CommonBenchmarkConvolve_SB {
-	@Param({"1","3","5"})
+	//	@Param({"1","2", "3","5"})
+	@Param({"3", "5"})
 	private int radius;
 
 	@Setup public void setup() {
