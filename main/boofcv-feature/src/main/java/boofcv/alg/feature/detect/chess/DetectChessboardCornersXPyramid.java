@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -123,10 +123,11 @@ public class DetectChessboardCornersXPyramid<T extends ImageGray<T>> {
 				double y = cf.y*scale;
 
 				ChessboardCorner cl = featsLevel.corners.get(i);
-				cl.first = true;
 				cl.setTo(x, y, cf.orientation, cf.intensity);
 				cl.contrast = cf.contrast;
 				cl.levelMax = level;
+				cl.edgeIntensity = cf.edgeIntensity;
+				cl.edgeRatio = cf.edgeRatio;
 				cl.level1 = level;
 				cl.level2 = level;
 			}
@@ -151,7 +152,7 @@ public class DetectChessboardCornersXPyramid<T extends ImageGray<T>> {
 			// only add corners if they were first seen in this level
 			for (int i = 0; i < level.corners.size; i++) {
 				ChessboardCorner c = level.corners.get(i);
-				if (c.first) {
+				if (!c.isDiscarded()) {
 					corners.grow().setTo(c);
 //				} else {
 //					dropped++;
@@ -184,7 +185,7 @@ public class DetectChessboardCornersXPyramid<T extends ImageGray<T>> {
 				ChessboardCorner c1 = nnResults.get(candidateIdx).point;
 
 				// Mark all candidates as false since they are "duplicates"
-				c1.first = false;
+				c1.markDiscard();
 
 				// Resolve ambiguity by selecting the corner with the largest response
 				if (c1.intensity > resultsMax.intensity) {
@@ -193,7 +194,7 @@ public class DetectChessboardCornersXPyramid<T extends ImageGray<T>> {
 			}
 
 			// Make sure the lower level corner is a first one, if not there's nothing to update
-			if (!c0.first)
+			if (c0.isDiscarded())
 				continue;
 
 			// Prefer localizing at a level where the corner is more intense, as it will be more stable
@@ -212,7 +213,6 @@ public class DetectChessboardCornersXPyramid<T extends ImageGray<T>> {
 				int tmp = c0.level1;
 				c0.setTo(resultsMax);
 				c0.level1 = tmp;
-				c0.first = true;
 			} else {
 				c0.level2 = resultsMax.level2;
 			}

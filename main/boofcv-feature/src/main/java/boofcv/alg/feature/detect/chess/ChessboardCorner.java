@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,52 +20,42 @@ package boofcv.alg.feature.detect.chess;
 
 import georegression.struct.point.Point2D_F64;
 
-/**
- * Corner in a chessboard. Orientation is estimated unqiuely up to 180 degrees.
- *
- * @author Peter Abeles
- */
+/// Corner in a chessboard. Orientation is estimated uniquely up to 180 degrees.
 public class ChessboardCorner extends Point2D_F64 {
-	/**
-	 * Radian from pi to -pi
-	 */
+	/// Radian from pi to -pi
 	public double orientation;
-	/**
-	 * Used to judge how good of a fit the corner is to an ideal chessboard corner. Higher the value
-	 * the more x-corner like. Computed on a per-feature basis and should be more accurate than
-	 * the x-corner detector intensity.
-	 */
+	/// Used to judge how good of a fit the corner is to an ideal chessboard corner. Higher the value
+	/// the more x-corner like. Computed on a per-feature basis and should be more accurate than
+	/// the x-corner detector intensity.
 	public double intensity;
 
-	/**
-	 * The white region subtracted the black region at the chessboard corner. Can be used later on
-	 * for locally adaptive thresholds
-	 */
+	/// The white region subtracted the black region at the chessboard corner. Can be used later on
+	/// for locally adaptive thresholds
 	public double contrast;
 
-	/**
-	 * Value of smallest Eigen value in edge detector
-	 */
+	/// Value of smallest Eigen value in edge detector
 	public double edgeIntensity;
 
-	/**
-	 * Ratio of smallest and largest Eigen values in edge detector
-	 */
+	/// Ratio of smallest and largest Eigen values in edge detector
 	public double edgeRatio;
 
-	/**
-	 * The first and second level in the pyramid the corner was seen at. level1 <= level2
-	 */
+	/// The first and second level in the pyramid the corner was seen at. level1 <= level2
 	public int level1, level2;
-	/**
-	 * Level with the maximum corner intensity
-	 */
+
+	/// Level with the maximum corner intensity
 	public int levelMax;
 
-	/**
-	 * Internal book keeping. if true then this indicates that this is the first corner seen in this level
-	 */
-	public boolean first;
+	{reset();}
+
+	/// Mark the corner as needing to be discarded
+	public void markDiscard() {
+		level1 = -1;
+	}
+
+	/// Returns true if it has been marked to be discarded
+	public boolean isDiscarded() {
+		return level1 == -1;
+	}
 
 	public void reset() {
 		super.setTo(-1, -1);
@@ -74,24 +64,27 @@ public class ChessboardCorner extends Point2D_F64 {
 		edgeIntensity = -1;
 		edgeRatio = -1;
 		contrast = 0;
-		first = false;
 		level1 = level2 = levelMax = -1;
 	}
 
-	public void setTo( ChessboardCorner c ) {
+	public ChessboardCorner setTo( ChessboardCorner c ) {
 		super.setTo(c);
 		this.orientation = c.orientation;
 		this.intensity = c.intensity;
 		this.contrast = c.contrast;
+		this.edgeIntensity = c.edgeIntensity;
+		this.edgeRatio = c.edgeRatio;
 		this.level1 = c.level1;
 		this.level2 = c.level2;
 		this.levelMax = c.levelMax;
+		return this;
 	}
 
-	public void setTo( double x, double y, double angle, double intensity ) {
+	public ChessboardCorner setTo( double x, double y, double angle, double intensity ) {
 		this.x = x;
 		this.y = y;
 		this.orientation = angle;
 		this.intensity = intensity;
+		return this;
 	}
 }
