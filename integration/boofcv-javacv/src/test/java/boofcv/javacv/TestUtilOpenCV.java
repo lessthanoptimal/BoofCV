@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,7 +64,7 @@ public class TestUtilOpenCV {
 
 		UtilOpenCV.save(expected, "temp.yml");
 
-		CalibrationIO.saveOpencv(expected, "temp.yml");
+		CalibrationIO.saveOpencvYaml(expected, "temp.yml");
 
 		CameraPinholeBrown found = UtilOpenCV.loadPinholeRadial("temp.yml");
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,6 @@ import org.yaml.snakeyaml.representer.Representer;
 
 import java.io.*;
 import java.net.URL;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -647,12 +646,81 @@ public class CalibrationIO {
 		return ret;
 	}
 
-	public static void saveOpencv( CameraPinholeBrown intrinsics, String path ) {
+
+	public static void saveOpencvXml( CameraPinholeBrown intrinsics, String path ) {
 		try (var stream = new FileOutputStream(path)) {
-			saveOpencv(intrinsics, new OutputStreamWriter(stream, UTF_8));
+			saveOpencvXml(intrinsics, new OutputStreamWriter(stream, UTF_8));
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
+	}
+
+	public static void saveOpencvYaml( CameraPinholeBrown intrinsics, String path ) {
+		try (var stream = new FileOutputStream(path)) {
+			saveOpencvYaml(intrinsics, new OutputStreamWriter(stream, UTF_8));
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	public static void saveOpencvXml(CameraPinholeBrown intrinsics, Writer outputWriter) {
+		if (intrinsics.radial != null && intrinsics.radial.length > 3) {
+			throw new IllegalArgumentException("OpenCV's Brown model only supports up to 3 radial coefficients. " +
+					"Found: " + intrinsics.radial.length);
+		}
+
+		PrintWriter out = new PrintWriter(outputWriter);
+
+		try {
+			Date date = Calendar.getInstance().getTime();
+			var dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+
+			out.print("<?xml version=\"1.0\"?>\n");
+			out.print("<opencv_storage>\n");
+			out.print("<calibration_time>\"" + dateFormat.format(date) + "\"</calibration_time>\n");
+			out.print("<image_width>" + intrinsics.width + "</image_width>\n");
+			out.print("<image_height>" + intrinsics.height + "</image_height>\n");
+			out.print("<flags>0</flags>\n");
+
+			// --- Camera Matrix ---
+			out.print("<camera_matrix type_id=\"opencv-matrix\">\n");
+			out.print("  <rows>3</rows>\n");
+			out.print("  <cols>3</cols>\n");
+			out.print("  <dt>d</dt>\n");
+			out.print("  <data>\n");
+			out.printf(Locale.US, "    %.15f %.15f %.15f\n", intrinsics.fx, intrinsics.skew, intrinsics.cx);
+			out.printf(Locale.US, "    0.0 %.15f %.15f\n", intrinsics.fy, intrinsics.cy);
+			out.print("    0.0 0.0 1.0</data></camera_matrix>\n");
+
+			// --- Distortion Coefficients ---
+			var distortion = new double[5];
+			if (intrinsics.radial != null) {
+				if (intrinsics.radial.length > 0) distortion[0] = intrinsics.radial[0]; // k1
+				if (intrinsics.radial.length > 1) distortion[1] = intrinsics.radial[1]; // k2
+				if (intrinsics.radial.length > 2) distortion[4] = intrinsics.radial[2]; // k3
+			}
+			distortion[2] = intrinsics.t1; // p1
+			distortion[3] = intrinsics.t2; // p2
+
+			out.print("<distortion_coefficients type_id=\"opencv-matrix\">\n");
+			out.print("  <rows>5</rows>\n");
+			out.print("  <cols>1</cols>\n");
+			out.print("  <dt>d</dt>\n");
+			out.print("  <data>\n    ");
+
+			for (int i = 0; i < 5; i++) {
+				out.printf(Locale.US, "%.15f", distortion[i]);
+				if (i < 4) out.print(" ");
+			}
+
+			out.print("</data></distortion_coefficients>\n");
+			out.print("</opencv_storage>\n");
+
+		} catch (Exception e) {
+			throw new RuntimeException("Failed to write OpenCV XML calibration file", e);
+		}
+
+		out.flush();
 	}
 
 	/**
@@ -661,41 +729,47 @@ public class CalibrationIO {
 	 * @param intrinsics (Input) Calibration that's to be saved
 	 * @param outputWriter (Output) where to save it to
 	 */
-	public static void saveOpencv( CameraPinholeBrown intrinsics,
-								   Writer outputWriter ) {
-		PrintWriter out = new PrintWriter(outputWriter);
+	public static void saveOpencvYaml( CameraPinholeBrown intrinsics,
+	                                   Writer outputWriter ) {
+		if (intrinsics.radial != null && intrinsics.radial.length > 3) {
+			throw new IllegalArgumentException("OpenCV's Brown model only supports up to 3 radial coefficients. " +
+					"Found: " + intrinsics.radial.length);
+		}
 
-		// Snakeyaml isn't flexible enough. Just dump it manually
+		var out = new PrintWriter(outputWriter);
+
 		try {
 			Date date = Calendar.getInstance().getTime();
-			DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
+			var dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
 
 			outputWriter.write("%YAML:1.0\n");
 			outputWriter.write("calibration_time: \"" + dateFormat.format(date) + "\"\n");
 			outputWriter.write("image_width: " + intrinsics.width + "\n");
 			outputWriter.write("image_height: " + intrinsics.height + "\n");
 			outputWriter.write("flags: 0\n");
+
 			writeOpenCVMatrix(outputWriter, "camera_matrix", 3, 3,
 					intrinsics.fx, intrinsics.skew, intrinsics.cx,
 					0.0, intrinsics.fy, intrinsics.cy,
 					0.0, 0.0, 1.0);
 
-			double[] distortion = new double[5];
+			var distortion = new double[5];
 			if (intrinsics.radial != null) {
 				if (intrinsics.radial.length > 0)
-					distortion[0] = intrinsics.radial[0];
+					distortion[0] = intrinsics.radial[0]; // k1
 				if (intrinsics.radial.length > 1)
-					distortion[1] = intrinsics.radial[01];
+					distortion[1] = intrinsics.radial[1]; // k2
 				if (intrinsics.radial.length > 2)
-					distortion[4] = intrinsics.radial[2];
+					distortion[4] = intrinsics.radial[2]; // k3
 			}
-			distortion[2] = intrinsics.t1;
-			distortion[3] = intrinsics.t2;
+			distortion[2] = intrinsics.t1;              // p1
+			distortion[3] = intrinsics.t2;              // p2
 
 			writeOpenCVMatrix(outputWriter, "distortion_coefficients", 5, 1, distortion);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
+
 		out.flush();
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -59,7 +59,7 @@ public class TestCalibrationIO extends BoofStandardJUnit {
 	/**
 	 * Read an actual OpenCV generated file
 	 */
-	@Test void saveOpenCV() {
+	@Test void saveOpenCVYaml() {
 		var model = new CameraPinholeBrown();
 
 		model.fsetK(1, 2, 3, 4, 0.65, 100, 7);
@@ -67,7 +67,7 @@ public class TestCalibrationIO extends BoofStandardJUnit {
 		model.fsetTangential(0.5, 0.7);
 
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
-		CalibrationIO.saveOpencv(model, new OutputStreamWriter(stream));
+		CalibrationIO.saveOpencvYaml(model, new OutputStreamWriter(stream));
 
 		CameraPinholeBrown found = CalibrationIO.loadOpenCV(new InputStreamReader(
 				new ByteArrayInputStream(stream.toByteArray())));

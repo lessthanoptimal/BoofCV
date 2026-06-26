@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -589,7 +589,7 @@ public class CameraCalibrationMono extends BaseStandardInputApp {
 				CameraPinholeBrown m = (CameraPinholeBrown)intrinsic;
 				switch (formatType) {
 					case BOOFCV -> CalibrationIO.save(m, outputFilePath);
-					case OPENCV -> CalibrationIO.saveOpencv(m, outputFilePath);
+					case OPENCV -> CalibrationIO.saveOpencvYaml(m, outputFilePath);
 					default -> throw new IllegalArgumentException("Unknown format");
 				}
 			} else {
