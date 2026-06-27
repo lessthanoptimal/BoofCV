@@ -63,8 +63,8 @@ public abstract class MeshRender implements VerbosePrint {
 	/// Rendered color image. Pixels are in RGBA format.
 	public @Getter final InterleavedU8 renderedImage = new InterleavedU8(1, 1, 3);
 
-	/// If false (default) faces are visible from both sides.
-	public boolean cullBackFaces = false;
+	/// If false (default) faces are visible from both sides. If true then it will compute and add normals to the mesh.
+	public @Getter @Setter boolean cullBackFaces = false;
 
 	/// If true it will always use the colorizer, even if there is texture information
 	public @Getter @Setter boolean forceColorizer = false;

@@ -23,6 +23,7 @@ import boofcv.struct.distort.Point2Transform3_F64;
 import boofcv.struct.distort.Point3Transform2_F64;
 import boofcv.struct.image.InterleavedU8;
 import boofcv.struct.mesh.VertexMesh;
+import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.jetbrains.annotations.Nullable;
@@ -31,7 +32,7 @@ import org.jetbrains.annotations.Nullable;
 ///
 /// - [#depthImage] is actually a range image. Each pixel is Euclidean distance from camera center to the surface
 ///   along that pixel's ray. Pixels with no intersection are set to NaN.
-@SuppressWarnings("NullAway.Init")
+@SuppressWarnings("NullAway")
 public class MeshRayTracer extends MeshRender {
 	//------------------------------------------------------------------------------- Camera (rays)
 	// Per-pixel unit pointing vectors in the CAMERA frame. Length = width*height.
@@ -41,7 +42,7 @@ public class MeshRayTracer extends MeshRender {
 	private int width, height;
 
 	//---------------------------------------------------------------------------------- Mesh / BVH
-	// Bounding Volume Hierarchy (MHV)
+	// Bounding Volume Hierarchy (BVH)
 	// Triangle geometry, structure-of-arrays. v0 is the pivot vertex; e1=v1-v0, e2=v2-v0.
 	// Triangle index == face index in the source VertexMesh (input is required to be triangles),
 	// so no triangle->face side table is needed.
@@ -51,6 +52,14 @@ public class MeshRayTracer extends MeshRender {
 	// Triangle centroids, used only during BVH construction.
 	private double[] cenX, cenY, cenZ;
 	private int numTri;
+
+	// Per-triangle texture coordinates (corner 0,1,2), only allocated when the mesh is textured.
+	// Parallel to the triangle arrays, so indexed by triangle (== face) index.
+	private boolean meshTextured;
+	private float[] tex0U, tex0V, tex1U, tex1V, tex2U, tex2V;
+
+	// Texture image, sampled with bilinear interpolation. Assumed 3-band RGB.
+	private @Nullable InterleavedU8 textureImage = null;
 
 	// Flattened BVH. An internal node has count==0 and its two children live at
 	// [leftFirst, leftFirst+1]. A leaf has count>0 and owns triIdx[leftFirst .. leftFirst+count).
@@ -106,7 +115,7 @@ public class MeshRayTracer extends MeshRender {
 	}
 
 	@Override public void setTextureImage( InterleavedU8 textureImage ) {
-
+		this.textureImage = textureImage;
 	}
 
 	@Override public Se3_F64 getWorldToView( @Nullable Se3_F64 output ) {
@@ -119,7 +128,6 @@ public class MeshRayTracer extends MeshRender {
 	@Override public void setWorldToView( Se3_F64 worldToView ) {
 		this.worldToView.setTo(worldToView);
 	}
-
 
 	// =====================================================================================
 	//  Mesh ingest + BVH build  (heavy, camera-independent precompute)
@@ -134,10 +142,18 @@ public class MeshRayTracer extends MeshRender {
 		numTri = mesh.size();
 		allocateTriangles(numTri);
 
+		// Precompute texture coordinates per triangle only if the mesh carries them.
+		meshTextured = mesh.isTextured();
+		if (meshTextured)
+			allocateTexCoords(numTri);
+		else
+			freeTexCoords();
+
 		// Faces are exactly 3 corners, so triangle f owns corners [3f, 3f+3) and triangle index == f.
 		// Keep every triangle (including any degenerate ones) so this identity holds; degenerate
 		// triangles are harmless and get rejected at trace time by EPS_DET.
 		var v = new Point3D_F64();
+		var tc = new Point2D_F32();
 		for (int f = 0; f < numTri; f++) {
 			int c = mesh.faceOffsets.get(f); // first corner of this face
 			if (mesh.faceOffsets.get(f + 1) - c != 3)
@@ -162,6 +178,20 @@ public class MeshRayTracer extends MeshRender {
 			cenX[f] = (ax + bx + cx)/3.0;
 			cenY[f] = (ay + by + cy)/3.0;
 			cenZ[f] = (az + bz + cz)/3.0;
+
+			if (meshTextured) {
+				// Texture corners are ordered the same as vertex corners (v0, v1=v0+e1, v2=v0+e2),
+				// so the barycentric weights from the intersection apply directly.
+				mesh.texture.getCopy(texIndex(mesh, c), tc);
+				tex0U[f] = tc.x;
+				tex0V[f] = tc.y;
+				mesh.texture.getCopy(texIndex(mesh, c + 1), tc);
+				tex1U[f] = tc.x;
+				tex1V[f] = tc.y;
+				mesh.texture.getCopy(texIndex(mesh, c + 2), tc);
+				tex2U[f] = tc.x;
+				tex2V[f] = tc.y;
+			}
 		}
 
 		buildBvh();
@@ -170,6 +200,12 @@ public class MeshRayTracer extends MeshRender {
 	// Resolves a corner to its vertex-pool index, honoring the implicit (empty faceVertexes) mode.
 	private static int vertexIndex( VertexMesh mesh, int corner ) {
 		return mesh.faceVertexes.isEmpty() ? corner : mesh.faceVertexes.get(corner);
+	}
+
+	// Resolves a corner to its texture-pool index, honoring the implicit (empty faceVertexTextures)
+	// "parallel" mode where the texture coordinate sits at the corner's own position.
+	private static int texIndex( VertexMesh mesh, int corner ) {
+		return mesh.faceVertexTextures.isEmpty() ? corner : mesh.faceVertexTextures.get(corner);
 	}
 
 	private void allocateTriangles( int n ) {
@@ -197,6 +233,19 @@ public class MeshRayTracer extends MeshRender {
 		bMaxZ = new double[maxNodes];
 		bLeftFirst = new int[maxNodes];
 		bCount = new int[maxNodes];
+	}
+
+	private void allocateTexCoords( int n ) {
+		tex0U = new float[n];
+		tex0V = new float[n];
+		tex1U = new float[n];
+		tex1V = new float[n];
+		tex2U = new float[n];
+		tex2V = new float[n];
+	}
+
+	private void freeTexCoords() {
+		tex0U = tex0V = tex1U = tex1V = tex2U = tex2V = null;
 	}
 
 	private void buildBvh() {
@@ -292,16 +341,17 @@ public class MeshRayTracer extends MeshRender {
 		return axis == 0 ? cenX[tri] : axis == 1 ? cenY[tri] : cenZ[tri];
 	}
 
-	// =====================================================================================
-	//  Render
-	// =====================================================================================
-
 	@Override public void render() {
 		if (numTri == 0) throw new IllegalStateException("Mesh not set");
 		if (width <= 0 || height <= 0) throw new IllegalStateException("Camera not set");
 
 		depthImage.reshape(width, height);
 		renderedImage.reshape(width, height);
+
+		// Decide once whether to texture map or fall back to the per-face colorizer. Mirrors
+		// RenderMesh: use the colorizer if forced, if the mesh has no texture coordinates, or if no
+		// texture image was supplied.
+		final boolean useColorizer = forceColorizer || !meshTextured || textureImage == null;
 
 		// Camera center in world: the point that maps to the view origin.
 		worldToView.transformReverse(new Point3D_F64(0, 0, 0), camCenter);
@@ -317,6 +367,8 @@ public class MeshRayTracer extends MeshRender {
 		r20 = R[6];
 		r21 = R[7];
 		r22 = R[8];
+		// DMatrix3x3; // <-- use this instead of manual r00/ Also consider switching to using Point3D_F64 and
+		// coding up y = R*x and y = R'*x  instead of hand rolling it multiple locations
 
 		final double ox = camCenter.x, oy = camCenter.y, oz = camCenter.z;
 
@@ -339,7 +391,10 @@ public class MeshRayTracer extends MeshRender {
 
 				if (hit.tri >= 0) {
 					depthImage.unsafe_set(x, y, (float)hit.t);
-					renderedImage.set24(x, y, surfaceColor.surfaceRgb(hit.tri)); // tri index == face index
+					int rgb = useColorizer
+							? surfaceColor.surfaceRgb(hit.tri)         // tri index == face index
+							: sampleTexture(hit.tri, hit.u, hit.v);
+					renderedImage.set24(x, y, rgb);
 				} else {
 					depthImage.unsafe_set(x, y, Float.NaN);
 					renderedImage.set24(x, y, defaultColorRgb);
@@ -350,9 +405,9 @@ public class MeshRayTracer extends MeshRender {
 
 	// Closest-hit traversal. Descends the nearer child first and prunes any node whose entry
 	// distance exceeds the best hit found so far.
-	private void trace( double ox, double oy, double oz,
-	                    double dx, double dy, double dz,
-	                    int[] stack, Hit hit ) {
+	void trace( double ox, double oy, double oz,
+	            double dx, double dy, double dz,
+	            int[] stack, Hit hit ) {
 		// Avoid 0*inf NaN in the slab test by nudging exact-zero components.
 		double idx = 1.0/(dx != 0 ? dx : 1e-300);
 		double idy = 1.0/(dy != 0 ? dy : 1e-300);
@@ -387,8 +442,8 @@ public class MeshRayTracer extends MeshRender {
 
 	// Slab test. Returns the entry distance (clamped to >=0) if the ray hits the box within [0,bestT),
 	// otherwise +inf. invD components are precomputed.
-	private double rayBoxEntry( int node, double ox, double oy, double oz,
-	                            double idx, double idy, double idz, double bestT ) {
+	double rayBoxEntry( int node, double ox, double oy, double oz,
+	                    double idx, double idy, double idz, double bestT ) {
 		double t1 = (bMinX[node] - ox)*idx, t2 = (bMaxX[node] - ox)*idx;
 		double tmin = Math.min(t1, t2), tmax = Math.max(t1, t2);
 
@@ -445,14 +500,71 @@ public class MeshRayTracer extends MeshRender {
 		double qy = tz*e1x - tx*e1z;
 		double qz = tx*e1y - ty*e1x;
 
-		double v = (dx*qx + dy*qy + dz*qz)*invDet;
-		if (v < 0.0 || u + v > 1.0) return;
+		double vv = (dx*qx + dy*qy + dz*qz)*invDet;
+		if (vv < 0.0 || u + vv > 1.0) return;
 
 		double t = (e2x*qx + e2y*qy + e2z*qz)*invDet;
 		if (t > EPS_T && t < hit.t) {
 			hit.t = t;
 			hit.tri = tri;
+			// Barycentric weights of the hit: P = (1-u-v)*v0 + u*v1 + v*v2. Computed on the true 3D
+			// triangle, so they are already perspective-correct -- no 1/z weighting needed.
+			hit.u = u;
+			hit.v = vv;
 		}
+	}
+
+	// =====================================================================================
+	//  Texture sampling
+	// =====================================================================================
+
+	// Interpolates the hit's texture coordinate from the triangle's three corners and bilinearly
+	// samples the texture image. Reads only image data into locals, so it is safe to call from the
+	// parallel render loop. Assumes a 3-band RGB texture image.
+	int sampleTexture( int tri, double u, double v ) {
+		double w0 = 1.0 - u - v;
+		float s = (float)(w0*tex0U[tri] + u*tex1U[tri] + v*tex2U[tri]);
+		float t = (float)(w0*tex0V[tri] + u*tex1V[tri] + v*tex2V[tri]);
+
+		final InterleavedU8 img = textureImage;
+		final int W = img.width, H = img.height;
+
+		// Texture coords are fractions in [0,1]; v is flipped because image rows run top-to-bottom.
+		float px = s*(W - 1);
+		float py = (1.0f - t)*(H - 1);
+
+		// Clamp to the image (EXTENDED border behavior).
+		if (px < 0) px = 0;
+		else if (px > W - 1) px = W - 1;
+		if (py < 0) py = 0;
+		else if (py > H - 1) py = H - 1;
+
+		int x0 = (int)px, y0 = (int)py;
+		int x1 = x0 + 1 < W ? x0 + 1 : x0;
+		int y1 = y0 + 1 < H ? y0 + 1 : y0;
+		float fx = px - x0, fy = py - y0;
+
+		byte[] d = img.data;
+		int i00 = img.getIndex(x0, y0, 0);
+		int i10 = img.getIndex(x1, y0, 0);
+		int i01 = img.getIndex(x0, y1, 0);
+		int i11 = img.getIndex(x1, y1, 0);
+
+		int r = bilerp(d, i00, i10, i01, i11, 0, fx, fy);
+		int g = bilerp(d, i00, i10, i01, i11, 1, fx, fy);
+		int b = bilerp(d, i00, i10, i01, i11, 2, fx, fy);
+		return (r << 16) | (g << 8) | b;
+	}
+
+	static int bilerp( byte[] d, int i00, int i10, int i01, int i11, int band, float fx, float fy ) {
+		int v00 = d[i00 + band] & 0xFF;
+		int v10 = d[i10 + band] & 0xFF;
+		int v01 = d[i01 + band] & 0xFF;
+		int v11 = d[i11 + band] & 0xFF;
+		float top = v00 + fx*(v10 - v00);
+		float bot = v01 + fx*(v11 - v01);
+		int val = (int)(top + fy*(bot - top) + 0.5f);
+		return val < 0 ? 0 : (val > 255 ? 255 : val);
 	}
 
 	// =====================================================================================
@@ -492,5 +604,6 @@ public class MeshRayTracer extends MeshRender {
 	private static final class Hit {
 		double t;
 		int tri;
+		double u, v; // barycentric weights at the hit (for texture interpolation)
 	}
 }

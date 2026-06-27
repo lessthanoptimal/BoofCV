@@ -18,13 +18,36 @@
 
 package boofcv.visualize;
 
-import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class TestMeshRayTracer extends BoofStandardJUnit {
-	@Test void implement() {
+public class TestMeshRayTracer extends CommonMeshRenderChecks {
+	@Override public MeshRender create() {
+		return new MeshRayTracer();
+	}
+
+	@Override public boolean isRequireTriangles() {
+		return true;
+	}
+
+	@Test void trace() {
+		fail("implement");
+	}
+
+	@Test void rayBoxEntry() {
+		fail("implement");
+	}
+
+	@Test void intersectTri() {
+		fail("implement");
+	}
+
+	@Test void sampleTexture() {
+		fail("implement");
+	}
+
+	@Test void bilerp() {
 		fail("implement");
 	}
 }

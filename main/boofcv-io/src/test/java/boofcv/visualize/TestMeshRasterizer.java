@@ -18,59 +18,19 @@
 
 package boofcv.visualize;
 
-import boofcv.alg.geo.PerspectiveOps;
-import boofcv.struct.calib.CameraPinholeBrown;
+import boofcv.struct.image.InterleavedU8;
 import boofcv.struct.mesh.VertexMesh;
-import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.shapes.Polygon2D_F32;
 import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.Rectangle2D_I32;
 import org.ddogleg.struct.DogArray;
-import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestRenderMesh extends BoofStandardJUnit {
-	/**
-	 * Render a simple shape. This effectively makes sure it doesn't crash and that it modified the image.
-	 */
-	@Test void allTogether() {
-		// Manually define a simple mesh
-		var mesh = new VertexMesh();
-		mesh.vertexes.append(-1, -1, 10);
-		mesh.vertexes.append(1, -1, 10);
-		mesh.vertexes.append(1, 1, 10);
-		mesh.vertexes.append(-1, 1, 10);
-		mesh.faceVertexes.addAll(DogArray_I32.array(0, 1, 2, 3));
-		mesh.faceOffsets.add(4);
-
-		// Configure
-		var alg = new MeshRasterizer();
-
-		// turn off checking with normals to simply this test
-		alg.setCheckFaceNormal(false);
-		var intrinsics = new CameraPinholeBrown();
-		PerspectiveOps.createIntrinsic(300, 200, 90, -1, intrinsics);
-		alg.setCamera(intrinsics);
-
-		// Render
-		alg.render(mesh);
-
-		// See if it did anything
-		int count = 0;
-		for (int y = 0; y < alg.resolution.height; y++) {
-			for (int x = 0; x < alg.resolution.width; x++) {
-				if (alg.rgbImage.get24(x, y) != 0xFFFFFF)
-					count++;
-			}
-		}
-
-		assertTrue(count != 0);
-	}
-
+public class TestMeshRasterizer extends CommonMeshRenderChecks {
 	@Test void computeBoundingBox() {
 		var polygon = new Polygon2D_F64();
 		polygon.vertexes.grow().setTo(-5, -1);
@@ -95,9 +55,7 @@ public class TestRenderMesh extends BoofStandardJUnit {
 		assertEquals(101, aabb.y1);
 	}
 
-	/**
-	 * Tests the projection by having it fill in a known rectangle.
-	 */
+	/// Tests the projection by having it fill in a known rectangle.
 	@Test void projectSurfaceColor() {
 		var alg = new MeshRasterizer();
 		alg.resolution.setTo(100, 120);
@@ -118,13 +76,14 @@ public class TestRenderMesh extends BoofStandardJUnit {
 		alg.projectSurfaceColor(shapeInCamera, polygon, 0);
 
 		// Verify by counting the number of projected points
+		InterleavedU8 renderedImage = alg.getRenderedImage();
 		int countDepth = 0;
 		int countRgb = 0;
 		for (int y = 0; y < alg.resolution.height; y++) {
 			for (int x = 0; x < alg.resolution.width; x++) {
 				if (alg.depthImage.get(x, y) == 10)
 					countDepth++;
-				if (alg.rgbImage.get24(x, y) != 0xFFFFFF)
+				if (renderedImage.get24(x, y) != 0xFFFFFF)
 					countRgb++;
 			}
 		}
@@ -165,6 +124,7 @@ public class TestRenderMesh extends BoofStandardJUnit {
 		alg.projectSurfaceTexture(shapeInCamera, polygon, polyTexture);
 
 		// Verify by counting the number of projected points
+		InterleavedU8 renderedImage = alg.getRenderedImage();
 		int countDepth = 0;
 		int countRgb = 0;
 		for (int y = 0; y < alg.resolution.height; y++) {
@@ -172,7 +132,7 @@ public class TestRenderMesh extends BoofStandardJUnit {
 				if (!Float.isNaN(alg.depthImage.get(x, y))) {
 					countDepth++;
 				}
-				if (alg.rgbImage.get24(x, y) != 0xFFFFFF)
+				if (renderedImage.get24(x, y) != 0xFFFFFF)
 					countRgb++;
 			}
 		}
@@ -181,9 +141,7 @@ public class TestRenderMesh extends BoofStandardJUnit {
 		assertEquals(600, countRgb);
 	}
 
-	/**
-	 * Rotate in a circle and check two handcrafted scenarios
-	 */
+	/// Rotate in a circle and check two handcrafted scenarios
 	@Test void isFrontVisible() {
 		var mesh = new VertexMesh();
 
@@ -216,5 +174,13 @@ public class TestRenderMesh extends BoofStandardJUnit {
 
 			assertFalse(MeshRasterizer.isFrontVisible(mesh, 0, 0, pointCam));
 		}
+	}
+
+	@Override public MeshRender create() {
+		return new MeshRasterizer();
+	}
+
+	@Override public boolean isRequireTriangles() {
+		return false;
 	}
 }
