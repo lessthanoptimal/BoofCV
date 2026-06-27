@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,8 +28,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestVertexMesh extends BoofStandardJUnit {
 	@Test void setTo() {checkSetTo(VertexMesh.class, true);}
@@ -121,5 +120,13 @@ public class TestVertexMesh extends BoofStandardJUnit {
 		for (int i = 0; i < a.size(); i++) {
 			assertEquals(0.0, a.get(i).distance(b.get(i)));
 		}
+	}
+
+	@Test void isTriangle() {
+		fail("implement");
+	}
+
+	@Test void toTriangles() {
+		fail("implement");
 	}
 }
