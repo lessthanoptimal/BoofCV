@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,7 @@ import java.util.concurrent.TimeUnit;
 public class BenchmarkRenderMesh {
 	VertexMesh mesh = new VertexMesh();
 
-	RenderMesh renderer = new RenderMesh();
+	MeshRasterizer renderer = new MeshRasterizer();
 
 	@Setup public void setup() {
 		var intrinsics = new CameraPinhole();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,19 +18,16 @@
 
 package boofcv.visualize;
 
-import boofcv.alg.distort.LensDistortionNarrowFOV;
-import boofcv.alg.distort.brown.LensDistortionBrown;
-import boofcv.alg.distort.pinhole.LensDistortionPinhole;
-import boofcv.alg.geo.PerspectiveOps;
+import boofcv.alg.distort.NormToPixelUsingSphere_F64;
+import boofcv.alg.distort.PixelToNormUsingSphere_F64;
 import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.border.BorderType;
-import boofcv.struct.calib.CameraPinhole;
-import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F64;
-import boofcv.struct.image.GrayF32;
+import boofcv.struct.distort.Point2Transform3_F64;
+import boofcv.struct.distort.Point3Transform2_F64;
 import boofcv.struct.image.ImageDimension;
 import boofcv.struct.image.InterleavedU8;
 import boofcv.struct.mesh.VertexMesh;
@@ -44,52 +41,24 @@ import georegression.struct.se.Se3_F64;
 import georegression.struct.shapes.Polygon2D_F32;
 import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.Rectangle2D_I32;
-import lombok.Getter;
-import lombok.Setter;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.VerbosePrint;
-import org.ddogleg.util.VerboseUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
-import java.util.Set;
 
-/**
- * Simple algorithm that renders a 3D mesh and computes a depth image. This rendering engine is fairly basic and makes
- * the following assumptions: each shape has a single color and all colors are opaque. What's configurable:
- *
- * <ul>
- *     <li>{@link #defaultColorRgba} Specifies what color the background is.</li>
- *     <li>{@link #surfaceColor} Function which returns the color of a shape. The shape's index is passed.</li>
- *     <li>{@link #setCamera(CameraPinholeBrown)} This must be set before use.</li>
- *     <li>{@link #worldToView} Transform from work to the current view.</li>
- * </ul>
- *
- * @author Peter Abeles
- */
+/// Simple algorithm that renders a 3D mesh and computes a depth image, but only works for pinhole camera models.
+/// To keep the code simple and fast it makes the following assumptions: each shape has a single color and
+/// all colors are opaque.
+///
+/// - [#depthImage] is a depth along z-axis image. Pixels with no intersection are set to NaN.
 @SuppressWarnings({"NullAway.Init"})
-public class RenderMesh implements VerbosePrint {
-	/** What color background pixels are set to by default in RGBA. Default value is white */
-	public @Getter @Setter int defaultColorRgba = 0xFFFFFF;
-
-	/** Used to change what color a surface is. By default, it's red. */
-	public @Getter @Setter SurfaceColor surfaceColor = new DefaultColor();
-
-	/** Rendered depth image. Values with no depth information are set to NaN. */
-	public @Getter final GrayF32 depthImage = new GrayF32(1, 1);
-
-	/** Rendered color image. Pixels are in RGBA format. */
-	public @Getter final InterleavedU8 rgbImage = new InterleavedU8(1, 1, 3);
-
-	/** Transform from world (what the mesh is in) to the camera view */
+public class MeshRasterizer extends MeshRender {
+	/// Transform from world (what the mesh is in) to the camera view
 	private final Se3_F64 worldToView = new Se3_F64();
 
-	/** If true then a polygon will only be rendered if the surface normal is pointed towards the camera */
-	public @Getter @Setter boolean checkFaceNormal = false;
-
-	/** If true it will always use the colorizer, even if there is texture information */
-	public @Getter @Setter boolean forceColorizer = false;
+	// The mesh being rendered
+	private VertexMesh mesh;
 
 	// Image for texture mapping
 	private InterleavedU8 textureImage = new InterleavedU8(1, 1, 3);
@@ -118,79 +87,43 @@ public class RenderMesh implements VerbosePrint {
 
 	@Nullable PrintStream verbose = null;
 
-	/** Used to retrieve a copy of the current world-to-view transform */
-	public Se3_F64 getWorldToView( @Nullable Se3_F64 output ) {
+	/// Used to retrieve a copy of the current world-to-view transform
+	@Override public Se3_F64 getWorldToView( @Nullable Se3_F64 output ) {
 		if (output == null)
 			output = new Se3_F64();
 		output.setTo(worldToView);
 		return output;
 	}
 
-	/** Changes the world to view transform */
-	public void setWorldToView( Se3_F64 worldToView ) {
+	/// Changes the world to view transform
+	@Override public void setWorldToView( Se3_F64 worldToView ) {
 		this.worldToView.setTo(worldToView);
 		this.surfaceColor.setWorldToView(worldToView);
 	}
 
-	public void setTextureImage( InterleavedU8 textureImage ) {
+	@Override public void setTextureImage( InterleavedU8 textureImage ) {
 		this.textureImage = textureImage;
 		textureInterp.setImage(textureImage);
 		textureValues = new float[textureImage.numBands];
 	}
 
-	/**
-	 * Specifies a pinhole camera from its fov and image shape.
-	 *
-	 * @param hfov Horizontal field of view. Degrees.
-	 */
-	public void setCamera( double hfov, int width, int height ) {
-		var model = new CameraPinhole();
-		PerspectiveOps.createIntrinsic(width, height, hfov, -1, model);
-		var factory = new LensDistortionPinhole(model);
-		setCamera(factory, model.width, model.height);
-	}
-
-	/**
-	 * Specifies the intrinsic camera model
-	 */
-	public void setCamera( CameraPinholeBrown model ) {
-		var factory = new LensDistortionBrown(model);
-		setCamera(factory, model.width, model.height);
-	}
-
-	/**
-	 * Specifies the intrinsic camera model
-	 */
-	public void setCamera( LensDistortionNarrowFOV factory, int width, int height ) {
-		setCamera(factory.undistort_F64(true, false),
-				factory.distort_F64(false, true),
-				width, height);
-	}
-
-	/**
-	 * Specifies the intrinsic camera model
-	 */
-	public void setCamera( Point2Transform2_F64 pixelToNorm,
-						   Point2Transform2_F64 normToPixel,
-						   int width, int height ) {
-		this.pixelToNorm = pixelToNorm;
-		this.normToPixel = normToPixel;
+	@Override public void setCamera( Point2Transform3_F64 pixelToPointing,
+	                                 Point3Transform2_F64 pointingToPixel, int width, int height ) {
+		this.pixelToNorm = new PixelToNormUsingSphere_F64(pixelToPointing);
+		this.normToPixel = new NormToPixelUsingSphere_F64(pointingToPixel);
 		this.resolution.setTo(width, height);
 	}
 
-	/**
-	 * Renders the mesh onto an image. Produces an RGB image and depth image. Must have configured
-	 * {@link #setCamera(CameraPinholeBrown)} already and set {@link #worldToView}.
-	 *
-	 * @param mesh The mesh that's going to be rendered.
-	 */
-	public void render( VertexMesh mesh ) {
+	@Override public void setMesh( VertexMesh mesh ) {
+		// Make sure there are normals if it's configured to use them
+		if (cullBackFaces && mesh.faceNormals.size() == 0)
+			mesh.computeFaceNormals();
+		this.mesh = mesh;
+	}
+
+	@Override public void render() {
 		// Sanity check to see if intrinsics has been configured
 		BoofMiscOps.checkTrue(resolution.width > 0 && resolution.height > 0, "Intrinsics not set");
-
-		// Make sure there are normals if it's configured to use them
-		if (checkFaceNormal && mesh.faceNormals.size() == 0)
-			mesh.computeFaceNormals();
 
 		// Initialize output images
 		initializeImages();
@@ -222,7 +155,7 @@ public class RenderMesh implements VerbosePrint {
 			}
 
 			// Prune using normal vector
-			if (checkFaceNormal) {
+			if (cullBackFaces) {
 				if (!isFrontVisible(mesh, shapeIdx - 1, idx0, worldCamera)) continue;
 			}
 
@@ -263,12 +196,10 @@ public class RenderMesh implements VerbosePrint {
 		if (verbose != null) verbose.println("total shapes rendered: " + shapesRenderedCount);
 	}
 
-	/**
-	 * Use the normal vector to see if the front of the mesh is visible. If it's not visible we can skip it
-	 *
-	 * @param worldCamera Location of the camera in current view in world coordinates
-	 * @return true if visible
-	 */
+	/// Use the normal vector to see if the front of the mesh is visible. If it's not visible we can skip it
+	///
+	/// @param worldCamera Location of the camera in current view in world coordinates
+	/// @return true if visible
 	static boolean isFrontVisible( VertexMesh mesh, int shapeIdx, int idx0, Point3D_F64 worldCamera ) {
 		// Get normal in world coordinates
 		Point3D_F32 normal = mesh.getFaceNormalTmp(shapeIdx);
@@ -288,19 +219,17 @@ public class RenderMesh implements VerbosePrint {
 
 	void initializeImages() {
 		depthImage.reshape(resolution.width, resolution.height);
-		rgbImage.reshape(resolution.width, resolution.height);
-		ImageMiscOps.fill(rgbImage, defaultColorRgba);
+		renderedImage.reshape(resolution.width, resolution.height);
+		ImageMiscOps.fill(renderedImage, defaultColorRgb);
 		ImageMiscOps.fill(depthImage, Float.NaN);
 	}
 
-	/**
-	 * Computes the AABB for the polygon inside the image.
-	 *
-	 * @param width (Input) image width
-	 * @param height (Input) image height
-	 * @param polygon (Input) projected polygon onto image
-	 * @param aabb (Output) Found AABB clipped to be inside the image.
-	 */
+	/// Computes the AABB for the polygon inside the image.
+	///
+	/// @param width (Input) image width
+	/// @param height (Input) image height
+	/// @param polygon (Input) projected polygon onto image
+	/// @param aabb (Output) Found AABB clipped to be inside the image.
 	static void computeBoundingBox( int width, int height, Polygon2D_F64 polygon, Rectangle2D_I32 aabb ) {
 		UtilPolygons2D_F64.bounding(polygon, aabb);
 
@@ -311,11 +240,9 @@ public class RenderMesh implements VerbosePrint {
 		aabb.y1 = Math.min(height, aabb.y1);
 	}
 
-	/**
-	 * Renders the polygon onto the image as a single color. The AABB that the polygon is contained inside
-	 * is searched exhaustively. If the projected 2D polygon contains a pixels and the polygon is closer than
-	 * the current depth of the pixel it is rendered there and the depth image is updated.
-	 */
+	/// Renders the polygon onto the image as a single color. The AABB that the polygon is contained inside
+	/// is searched exhaustively. If the projected 2D polygon contains a pixels and the polygon is closer than
+	/// the current depth of the pixel it is rendered there and the depth image is updated.
 	void projectSurfaceColor( FastAccess<Point3D_F64> mesh, Polygon2D_F64 polyProj, int shapeIdx ) {
 		// TODO compute the depth at each pixel
 		float depth = (float)mesh.get(0).z;
@@ -344,19 +271,17 @@ public class RenderMesh implements VerbosePrint {
 				// Update depth and image
 				// Make sure the alpha channel is set to 100% in RGBA format
 				depthImage.unsafe_set(pixelX, pixelY, depth);
-				rgbImage.set24(pixelX, pixelY, color);
+				renderedImage.set24(pixelX, pixelY, color);
 			}
 		}
 	}
 
-	/**
-	 * Projection with texture mapping. Breaks the polygon up into triangles and uses Barycentric coordinates to
-	 * map pixels to textured mapped coordinates.
-	 *
-	 * @param mesh 3D location of vertexes in the mesh in the view's coordinate system
-	 * @param polyProj Projected pixels of mesh
-	 * @param polyText Texture coordinates of the mesh
-	 */
+	/// Projection with texture mapping. Breaks the polygon up into triangles and uses Barycentric coordinates to
+	/// map pixels to textured mapped coordinates.
+	///
+	/// @param mesh 3D location of vertexes in the mesh in the view's coordinate system
+	/// @param polyProj Projected pixels of mesh
+	/// @param polyText Texture coordinates of the mesh
 	void projectSurfaceTexture( FastAccess<Point3D_F64> mesh, Polygon2D_F64 polyProj, Polygon2D_F32 polyText ) {
 
 		// Scale factor to normalize image pixels from 0 to 1.0
@@ -441,7 +366,7 @@ public class RenderMesh implements VerbosePrint {
 					// Update depth and image
 					// Make sure the alpha channel is set to 100% in RGBA format
 					depthImage.unsafe_set(pixelX, pixelY, depth);
-					rgbImage.set24(pixelX, pixelY, color);
+					renderedImage.set24(pixelX, pixelY, color);
 				}
 			}
 		}
@@ -451,31 +376,12 @@ public class RenderMesh implements VerbosePrint {
 		return (x2 - x0)*(y1 - y0) - (y2 - y0)*(x1 - x0);
 	}
 
-	/**
-	 * Gets the RGB color using interpolation at the specified pixel coordinate in the texture image
-	 */
+	/// Gets the RGB color using interpolation at the specified pixel coordinate in the texture image
 	int interpolateTextureRgb( float px, float py ) {
 		textureInterp.get(px, py, textureValues);
 		int r = (int)(textureValues[0] + 0.5f);
 		int g = (int)(textureValues[1] + 0.5f);
 		int b = (int)(textureValues[2] + 0.5f);
 		return (r << 16) | (g << 8) | b;
-	}
-
-	@Override public void setVerbose( @Nullable PrintStream out, @Nullable Set<String> configuration ) {
-		verbose = VerboseUtils.addPrefix(this, out);
-	}
-
-	/** Results red as the default color until another method is provided */
-	public static class DefaultColor implements SurfaceColor {
-		@Override public int surfaceRgb( int which ) {return 0xFF0000;}
-	}
-
-	public interface SurfaceColor {
-		/** Called whenever the camera moves */
-		default void setWorldToView( Se3_F64 worldToCamera ) {}
-
-		/** Returns RGB color of the specified surface */
-		int surfaceRgb( int which );
 	}
 }

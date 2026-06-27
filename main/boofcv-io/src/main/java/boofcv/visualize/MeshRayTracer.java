@@ -19,35 +19,20 @@
 package boofcv.visualize;
 
 import boofcv.concurrency.BoofConcurrency;
-import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.distort.Point2Transform3_F64;
-import boofcv.struct.image.GrayF32;
+import boofcv.struct.distort.Point3Transform2_F64;
 import boofcv.struct.image.InterleavedU8;
 import boofcv.struct.mesh.VertexMesh;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
+import org.jetbrains.annotations.Nullable;
 
+/// Supports any camera model because it uses ray-tracing.
+///
+/// - [#depthImage] is actually a range image. Each pixel is Euclidean distance from camera center to the surface
+///   along that pixel's ray. Pixels with no intersection are set to NaN.
 @SuppressWarnings("NullAway.Init")
-public class MeshRayTracer {
-
-	//--------------------------------------------------------------------------------------- Output
-	/// Rendered range image. Each pixel is Euclidean distance from camera center to the surface
-	/// along that pixel's ray. Pixels with no intersection are set to NaN.
-	public final GrayF32 depthImage = new GrayF32(1, 1);
-
-	/// Rendered color image, 3-band RGB.
-	public final InterleavedU8 rgbImage = new InterleavedU8(1, 1, 3);
-
-	//------------------------------------------------------------------------------------ Appearance
-	/// Background color (0xRRGGBB) written to pixels with no intersection.
-	public int defaultColorRgb = 0xFFFFFF;
-
-	/// Returns the color of a face given its index in the original VertexMesh.
-	public RenderMesh.SurfaceColor surfaceColor = which -> 0xFF0000;
-
-	/// If false (default) triangles are visible from both sides.
-	public boolean cullBackFaces = false;
-
+public class MeshRayTracer extends MeshRender {
 	//------------------------------------------------------------------------------- Camera (rays)
 	// Per-pixel unit pointing vectors in the CAMERA frame. Length = width*height.
 	private double[] dirCamX = new double[0];
@@ -87,12 +72,8 @@ public class MeshRayTracer {
 	private static final double EPS_T = 1e-9;     // reject hits at/behind the origin
 	private static final int STACK_SIZE = 64;     // BVH depth bound; median split stays ~log2(N)
 
-	// =====================================================================================
-	//  Camera configuration
-	// =====================================================================================
-
-	/// General camera model that supports > 180 FOV
-	public void setCamera( Point2Transform3_F64 pixelToPointing, int width, int height ) {
+	@Override public void setCamera( Point2Transform3_F64 pixelToPointing,
+	                                 Point3Transform2_F64 pointingToPixel, int width, int height ) {
 		allocateRays(width, height);
 		var p = new Point3D_F64();
 		int i = 0;
@@ -100,19 +81,6 @@ public class MeshRayTracer {
 			for (int x = 0; x < width; x++, i++) {
 				pixelToPointing.compute(x, y, p);
 				store(i, p.x, p.y, p.z);
-			}
-		}
-	}
-
-	/// Convenience for narrow-FOV models that expose pixel -> normalized image coordinates
-	public void setCameraNarrow( Point2Transform2_F64 pixelToNorm, int width, int height ) {
-		allocateRays(width, height);
-		var n = new georegression.struct.point.Point2D_F64();
-		int i = 0;
-		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < width; x++, i++) {
-				pixelToNorm.compute(x, y, n);
-				store(i, n.x, n.y, 1.0);
 			}
 		}
 	}
@@ -137,13 +105,21 @@ public class MeshRayTracer {
 		dirCamZ[i] = z/norm;
 	}
 
-	// =====================================================================================
-	//  Pose
-	// =====================================================================================
+	@Override public void setTextureImage( InterleavedU8 textureImage ) {
 
-	public void setWorldToView( Se3_F64 worldToView ) {
+	}
+
+	@Override public Se3_F64 getWorldToView( @Nullable Se3_F64 output ) {
+		if (output == null)
+			output = new Se3_F64();
+		output.setTo(worldToView);
+		return output;
+	}
+
+	@Override public void setWorldToView( Se3_F64 worldToView ) {
 		this.worldToView.setTo(worldToView);
 	}
+
 
 	// =====================================================================================
 	//  Mesh ingest + BVH build  (heavy, camera-independent precompute)
@@ -154,7 +130,7 @@ public class MeshRayTracer {
 	/// mesh. Triangulate beforehand with [VertexMesh#toTriangles()].
 	///
 	/// @throws IllegalArgumentException if any face is not a triangle.
-	public void setMesh( VertexMesh mesh ) {
+	@Override public void setMesh( VertexMesh mesh ) {
 		numTri = mesh.size();
 		allocateTriangles(numTri);
 
@@ -167,13 +143,22 @@ public class MeshRayTracer {
 			if (mesh.faceOffsets.get(f + 1) - c != 3)
 				throw new IllegalArgumentException("All faces must be triangles. Call mesh.toTriangles() first.");
 
-			mesh.vertexes.getCopy(vertexIndex(mesh, c), v);     double ax = v.x, ay = v.y, az = v.z;
-			mesh.vertexes.getCopy(vertexIndex(mesh, c + 1), v); double bx = v.x, by = v.y, bz = v.z;
-			mesh.vertexes.getCopy(vertexIndex(mesh, c + 2), v); double cx = v.x, cy = v.y, cz = v.z;
+			mesh.vertexes.getCopy(vertexIndex(mesh, c), v);
+			double ax = v.x, ay = v.y, az = v.z;
+			mesh.vertexes.getCopy(vertexIndex(mesh, c + 1), v);
+			double bx = v.x, by = v.y, bz = v.z;
+			mesh.vertexes.getCopy(vertexIndex(mesh, c + 2), v);
+			double cx = v.x, cy = v.y, cz = v.z;
 
-			V0X[f] = ax;        V0Y[f] = ay;        V0Z[f] = az;
-			E1X[f] = bx - ax;   E1Y[f] = by - ay;   E1Z[f] = bz - az;
-			E2X[f] = cx - ax;   E2Y[f] = cy - ay;   E2Z[f] = cz - az;
+			V0X[f] = ax;
+			V0Y[f] = ay;
+			V0Z[f] = az;
+			E1X[f] = bx - ax;
+			E1Y[f] = by - ay;
+			E1Z[f] = bz - az;
+			E2X[f] = cx - ax;
+			E2Y[f] = cy - ay;
+			E2Z[f] = cz - az;
 			cenX[f] = (ax + bx + cx)/3.0;
 			cenY[f] = (ay + by + cy)/3.0;
 			cenZ[f] = (az + bz + cz)/3.0;
@@ -188,22 +173,37 @@ public class MeshRayTracer {
 	}
 
 	private void allocateTriangles( int n ) {
-		V0X = new double[n]; V0Y = new double[n]; V0Z = new double[n];
-		E1X = new double[n]; E1Y = new double[n]; E1Z = new double[n];
-		E2X = new double[n]; E2Y = new double[n]; E2Z = new double[n];
-		cenX = new double[n]; cenY = new double[n]; cenZ = new double[n];
+		V0X = new double[n];
+		V0Y = new double[n];
+		V0Z = new double[n];
+		E1X = new double[n];
+		E1Y = new double[n];
+		E1Z = new double[n];
+		E2X = new double[n];
+		E2Y = new double[n];
+		E2Z = new double[n];
+		cenX = new double[n];
+		cenY = new double[n];
+		cenZ = new double[n];
 		triIdx = new int[n];
 		for (int i = 0; i < n; i++) triIdx[i] = i;
 
 		int maxNodes = Math.max(1, 2*n);
-		bMinX = new double[maxNodes]; bMinY = new double[maxNodes]; bMinZ = new double[maxNodes];
-		bMaxX = new double[maxNodes]; bMaxY = new double[maxNodes]; bMaxZ = new double[maxNodes];
+		bMinX = new double[maxNodes];
+		bMinY = new double[maxNodes];
+		bMinZ = new double[maxNodes];
+		bMaxX = new double[maxNodes];
+		bMaxY = new double[maxNodes];
+		bMaxZ = new double[maxNodes];
 		bLeftFirst = new int[maxNodes];
 		bCount = new int[maxNodes];
 	}
 
 	private void buildBvh() {
-		if (numTri == 0) { nodesUsed = 0; return; }
+		if (numTri == 0) {
+			nodesUsed = 0;
+			return;
+		}
 		nodesUsed = 1;          // root is node 0; children allocated contiguously from 1
 		bLeftFirst[0] = 0;
 		bCount[0] = numTri;
@@ -231,9 +231,12 @@ public class MeshRayTracer {
 
 		int left = nodesUsed++;
 		int right = nodesUsed++;
-		bLeftFirst[left] = first;       bCount[left] = leftCount;
-		bLeftFirst[right] = mid;        bCount[right] = count - leftCount;
-		bLeftFirst[node] = left;        bCount[node] = 0; // mark internal
+		bLeftFirst[left] = first;
+		bCount[left] = leftCount;
+		bLeftFirst[right] = mid;
+		bCount[right] = count - leftCount;
+		bLeftFirst[node] = left;
+		bCount[node] = 0; // mark internal
 
 		subdivide(left);
 		subdivide(right);
@@ -247,12 +250,19 @@ public class MeshRayTracer {
 			double ax = V0X[tri], ay = V0Y[tri], az = V0Z[tri];
 			double bx = ax + E1X[tri], by = ay + E1Y[tri], bz = az + E1Z[tri];
 			double cx = ax + E2X[tri], cy = ay + E2Y[tri], cz = az + E2Z[tri];
-			minX = min3(minX, ax, bx, cx); maxX = max3(maxX, ax, bx, cx);
-			minY = min3(minY, ay, by, cy); maxY = max3(maxY, ay, by, cy);
-			minZ = min3(minZ, az, bz, cz); maxZ = max3(maxZ, az, bz, cz);
+			minX = min3(minX, ax, bx, cx);
+			maxX = max3(maxX, ax, bx, cx);
+			minY = min3(minY, ay, by, cy);
+			maxY = max3(maxY, ay, by, cy);
+			minZ = min3(minZ, az, bz, cz);
+			maxZ = max3(maxZ, az, bz, cz);
 		}
-		bMinX[node] = minX; bMinY[node] = minY; bMinZ[node] = minZ;
-		bMaxX[node] = maxX; bMaxY[node] = maxY; bMaxZ[node] = maxZ;
+		bMinX[node] = minX;
+		bMinY[node] = minY;
+		bMinZ[node] = minZ;
+		bMaxX[node] = maxX;
+		bMaxY[node] = maxY;
+		bMaxZ[node] = maxZ;
 	}
 
 	// Hoare-style quickselect: partition triIdx[lo..hi] so position k holds its sorted element and
@@ -264,7 +274,13 @@ public class MeshRayTracer {
 			while (i <= j) {
 				while (centroid(triIdx[i], axis) < pivot) i++;
 				while (centroid(triIdx[j], axis) > pivot) j--;
-				if (i <= j) { int tmp = triIdx[i]; triIdx[i] = triIdx[j]; triIdx[j] = tmp; i++; j--; }
+				if (i <= j) {
+					int tmp = triIdx[i];
+					triIdx[i] = triIdx[j];
+					triIdx[j] = tmp;
+					i++;
+					j--;
+				}
 			}
 			if (k <= j) hi = j;
 			else if (k >= i) lo = i;
@@ -280,21 +296,27 @@ public class MeshRayTracer {
 	//  Render
 	// =====================================================================================
 
-	public void render() {
+	@Override public void render() {
 		if (numTri == 0) throw new IllegalStateException("Mesh not set");
 		if (width <= 0 || height <= 0) throw new IllegalStateException("Camera not set");
 
 		depthImage.reshape(width, height);
-		rgbImage.reshape(width, height);
+		renderedImage.reshape(width, height);
 
 		// Camera center in world: the point that maps to the view origin.
 		worldToView.transformReverse(new Point3D_F64(0, 0, 0), camCenter);
 
 		// Cache R (world->view). World direction of a camera-frame ray is R^T * dirCam.
 		double[] R = worldToView.R.data;
-		r00 = R[0]; r01 = R[1]; r02 = R[2];
-		r10 = R[3]; r11 = R[4]; r12 = R[5];
-		r20 = R[6]; r21 = R[7]; r22 = R[8];
+		r00 = R[0];
+		r01 = R[1];
+		r02 = R[2];
+		r10 = R[3];
+		r11 = R[4];
+		r12 = R[5];
+		r20 = R[6];
+		r21 = R[7];
+		r22 = R[8];
 
 		final double ox = camCenter.x, oy = camCenter.y, oz = camCenter.z;
 
@@ -317,10 +339,10 @@ public class MeshRayTracer {
 
 				if (hit.tri >= 0) {
 					depthImage.unsafe_set(x, y, (float)hit.t);
-					rgbImage.set24(x, y, surfaceColor.surfaceRgb(hit.tri)); // tri index == face index
+					renderedImage.set24(x, y, surfaceColor.surfaceRgb(hit.tri)); // tri index == face index
 				} else {
 					depthImage.unsafe_set(x, y, Float.NaN);
-					rgbImage.set24(x, y, defaultColorRgb);
+					renderedImage.set24(x, y, defaultColorRgb);
 				}
 			}
 		});
@@ -370,11 +392,13 @@ public class MeshRayTracer {
 		double t1 = (bMinX[node] - ox)*idx, t2 = (bMaxX[node] - ox)*idx;
 		double tmin = Math.min(t1, t2), tmax = Math.max(t1, t2);
 
-		t1 = (bMinY[node] - oy)*idy; t2 = (bMaxY[node] - oy)*idy;
+		t1 = (bMinY[node] - oy)*idy;
+		t2 = (bMaxY[node] - oy)*idy;
 		tmin = Math.max(tmin, Math.min(t1, t2));
 		tmax = Math.min(tmax, Math.max(t1, t2));
 
-		t1 = (bMinZ[node] - oz)*idz; t2 = (bMaxZ[node] - oz)*idz;
+		t1 = (bMinZ[node] - oz)*idz;
+		t2 = (bMaxZ[node] - oz)*idz;
 		tmin = Math.max(tmin, Math.min(t1, t2));
 		tmax = Math.min(tmax, Math.max(t1, t2));
 
@@ -459,6 +483,7 @@ public class MeshRayTracer {
 	private static double min3( double a, double b, double c, double d ) {
 		return Math.min(a, Math.min(b, Math.min(c, d)));
 	}
+
 	private static double max3( double a, double b, double c, double d ) {
 		return Math.max(a, Math.max(b, Math.max(c, d)));
 	}

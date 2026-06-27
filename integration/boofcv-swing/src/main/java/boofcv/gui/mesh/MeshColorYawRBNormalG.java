@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.gui.mesh;
 
 import boofcv.struct.mesh.VertexMesh;
-import boofcv.visualize.RenderMesh;
+import boofcv.visualize.MeshRasterizer;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
@@ -31,7 +31,7 @@ import org.ddogleg.struct.DogArray;
  * angle while red and blue colors are based on the x-y vector angle. It can be applied to the global or view
  * coordinate systems.
  */
-public class MeshColorYawRBNormalG implements RenderMesh.SurfaceColor {
+public class MeshColorYawRBNormalG implements MeshRasterizer.SurfaceColor {
 
 	// The mesh
 	protected VertexMesh mesh;

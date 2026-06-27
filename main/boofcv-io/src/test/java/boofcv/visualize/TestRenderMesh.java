@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,7 +48,7 @@ public class TestRenderMesh extends BoofStandardJUnit {
 		mesh.faceOffsets.add(4);
 
 		// Configure
-		var alg = new RenderMesh();
+		var alg = new MeshRasterizer();
 
 		// turn off checking with normals to simply this test
 		alg.setCheckFaceNormal(false);
@@ -80,7 +80,7 @@ public class TestRenderMesh extends BoofStandardJUnit {
 
 		// It should be bounded by the image
 		var aabb = new Rectangle2D_I32();
-		RenderMesh.computeBoundingBox(60, 50, polygon, aabb);
+		MeshRasterizer.computeBoundingBox(60, 50, polygon, aabb);
 		assertEquals(0, aabb.x0);
 		assertEquals(0, aabb.y0);
 		assertEquals(60, aabb.x1);
@@ -88,7 +88,7 @@ public class TestRenderMesh extends BoofStandardJUnit {
 
 		// upper extent shouldn't be bounded by the image
 		// Needs to handle exclusive upper extent properly
-		RenderMesh.computeBoundingBox(200, 200, polygon, aabb);
+		MeshRasterizer.computeBoundingBox(200, 200, polygon, aabb);
 		assertEquals(0, aabb.x0);
 		assertEquals(0, aabb.y0);
 		assertEquals(91, aabb.x1);
@@ -99,7 +99,7 @@ public class TestRenderMesh extends BoofStandardJUnit {
 	 * Tests the projection by having it fill in a known rectangle.
 	 */
 	@Test void projectSurfaceColor() {
-		var alg = new RenderMesh();
+		var alg = new MeshRasterizer();
 		alg.resolution.setTo(100, 120);
 		alg.initializeImages();
 
@@ -134,7 +134,7 @@ public class TestRenderMesh extends BoofStandardJUnit {
 	}
 
 	@Test void projectSurfaceTexture() {
-		var alg = new RenderMesh() {
+		var alg = new MeshRasterizer() {
 			@Override int interpolateTextureRgb( float px, float py ) {
 				// return some arbitrary color
 				return 1;
@@ -205,7 +205,7 @@ public class TestRenderMesh extends BoofStandardJUnit {
 			mesh.faceVertexes.add(0);
 			mesh.vertexes.append(r*c, 2 + r*s, 2);
 
-			assertTrue(RenderMesh.isFrontVisible(mesh, 0, 0, pointCam));
+			assertTrue(MeshRasterizer.isFrontVisible(mesh, 0, 0, pointCam));
 
 			// This should fail
 			mesh.reset();
@@ -214,7 +214,7 @@ public class TestRenderMesh extends BoofStandardJUnit {
 			mesh.faceNormals.add(0);
 			mesh.normals.append((float)c, (float)s, 0);
 
-			assertFalse(RenderMesh.isFrontVisible(mesh, 0, 0, pointCam));
+			assertFalse(MeshRasterizer.isFrontVisible(mesh, 0, 0, pointCam));
 		}
 	}
 }
