@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.gui.mesh;
 
 import boofcv.struct.mesh.VertexMesh;
-import boofcv.visualize.RenderMesh;
+import boofcv.visualize.MeshRasterizer;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import org.ddogleg.struct.DogArray;
@@ -37,7 +37,7 @@ public class MeshColorizeOps {
 	 * @param vertexColor Color for each vertex in the mesh
 	 * @return SurfaceColor
 	 */
-	public static RenderMesh.SurfaceColor colorizeByVertex( VertexMesh mesh, int[] vertexColor ) {
+	public static MeshRasterizer.SurfaceColor colorizeByVertex( VertexMesh mesh, int[] vertexColor ) {
 		return ( shapeIdx ) -> vertexColor[mesh.faceVertexes.get(mesh.faceOffsets.get(shapeIdx))];
 	}
 
@@ -45,7 +45,7 @@ public class MeshColorizeOps {
 	 * Computes the normal angle and varies the color between green and white depending on the acute angle
 	 * relative to the world's z-xis
 	 */
-	public static RenderMesh.SurfaceColor colorizeByNormal( VertexMesh mesh ) {
+	public static MeshRasterizer.SurfaceColor colorizeByNormal( VertexMesh mesh ) {
 		int[] colors = new int[mesh.size()];
 
 		var facet = new DogArray<>(Point3D_F64::new);
@@ -85,7 +85,7 @@ public class MeshColorizeOps {
 	 *
 	 * @see MeshColorYawRBNormalG
 	 */
-	public static RenderMesh.SurfaceColor colorizeYawRBNormG( VertexMesh mesh, boolean global ) {
+	public static MeshRasterizer.SurfaceColor colorizeYawRBNormG( VertexMesh mesh, boolean global ) {
 		return new MeshColorYawRBNormalG(mesh, global);
 	}
 }

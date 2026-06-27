@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,8 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageDimension;
 import boofcv.struct.image.InterleavedU8;
 import boofcv.struct.mesh.VertexMesh;
-import boofcv.visualize.RenderMesh;
+import boofcv.visualize.MeshRasterizer;
+import boofcv.visualize.MeshRender;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -74,8 +75,8 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 	/** If the help button exists */
 	@Getter @Setter public boolean helpButtonActive = true;
 
-	/** Renders the mesh into a projected image */
-	@Getter RenderMesh renderer = new RenderMesh();
+	/** Renders the mesh into a projected image. Default is a rasterizer */
+	@Getter @Setter MeshRender renderer = new MeshRasterizer();
 	VertexMesh mesh = new VertexMesh(); // empty mesh to avoid NPE
 
 	// Lock for swapping the double buffer for rendering. When the active buffer is being drawn this lock is
@@ -119,7 +120,7 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 
 	// Contains all the possible ways to colorize the mesh.
 	// You must synchronize before accessing these two fields since multiple threads can access them
-	final Map<String, RenderMesh.SurfaceColor> colorizers = new HashMap<>();
+	final Map<String, MeshRasterizer.SurfaceColor> colorizers = new HashMap<>();
 	// List of names in the order they were added for consistency
 	final List<String> colorizerNames = new ArrayList<>();
 	// Index of the active colorizer. Used to cycle through all the options
@@ -200,6 +201,10 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 
 		// Give it a reasonable initial size
 		setPreferredSize(new Dimension(500, 500));
+	}
+
+	public void setRendererByType( MeshRender.Type type ) {
+		setRenderer(MeshRender.createType(type));
 	}
 
 	public float imagePixelToDepthZ( int pixelX, int pixelY ) {
@@ -346,6 +351,7 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 		}
 		cameraInitialized = false;
 		this.mesh = mesh;
+		renderer.setMesh(mesh);
 
 		colorizers.clear();
 		colorizerNames.clear();
@@ -365,7 +371,7 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 	 *
 	 * @param name Name given to this colorization approach
 	 */
-	public void setSurfaceColor( String name, RenderMesh.SurfaceColor colorizer ) {
+	public void setSurfaceColor( String name, MeshRasterizer.SurfaceColor colorizer ) {
 		synchronized (colorizers) {
 			activeColorizer = colorizers.size();
 			colorizers.put(name, colorizer);
@@ -450,7 +456,7 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 
 		// Render the mesh
 		long time0 = System.currentTimeMillis();
-		renderer.render(mesh);
+		renderer.render();
 		long time1 = System.currentTimeMillis();
 
 		// Copy the rendered image into the work buffer
@@ -470,7 +476,7 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 				}
 				work = VisualizeImageData.inverseDepth(inverseDepth, work, 0.0f, -1, 0x000000);
 			} else {
-				InterleavedU8 rgb = renderer.getRgbImage();
+				InterleavedU8 rgb = renderer.getRenderedImage();
 				work = ConvertBufferedImage.checkDeclare(rgb.width, rgb.height, work, work.getType());
 				ConvertBufferedImage.convertTo(rgb, work, false);
 			}
@@ -610,11 +616,11 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 	 * Color of background when rendering
 	 */
 	public void setRenderBackgroundColor( int rgba ) {
-		renderer.defaultColorRgba = rgba;
+		renderer.defaultColorRgb = rgba;
 	}
 
 	public int getRenderBackgroundColor() {
-		return renderer.defaultColorRgba;
+		return renderer.defaultColorRgb;
 	}
 
 	long coolDownTime = 0L;
