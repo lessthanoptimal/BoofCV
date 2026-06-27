@@ -95,7 +95,8 @@ public class BenchmarkRenderMesh {
 	 * Simple scenario with planar squares
 	 */
 	@Benchmark public void planarSquares(){
-		renderer.render(mesh);
+		renderer.setMesh(mesh);
+		renderer.render();
 	}
 
 	public static void main( String[] args ) throws RunnerException {
