@@ -464,8 +464,8 @@ public class MeshRayTracer extends MeshRender {
 
 	// Moller-Trumbore. Updates hit if this triangle is a closer valid intersection.
 	// Two-sided unless cullBackFaces is set.
-	private void intersectTri( int tri, double ox, double oy, double oz,
-	                           double dx, double dy, double dz, Hit hit ) {
+	void intersectTri( int tri, double ox, double oy, double oz,
+	                   double dx, double dy, double dz, Hit hit ) {
 		double e1x = E1X[tri], e1y = E1Y[tri], e1z = E1Z[tri];
 		double e2x = E2X[tri], e2y = E2Y[tri], e2z = E2Z[tri];
 
@@ -601,7 +601,7 @@ public class MeshRayTracer extends MeshRender {
 	}
 
 	/// Mutable closest-hit record reused per row to avoid allocation.
-	private static final class Hit {
+	static final class Hit {
 		double t;
 		int tri;
 		double u, v; // barycentric weights at the hit (for texture interpolation)
