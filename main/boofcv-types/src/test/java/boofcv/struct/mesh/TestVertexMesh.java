@@ -123,10 +123,49 @@ public class TestVertexMesh extends BoofStandardJUnit {
 	}
 
 	@Test void isTriangle() {
-		fail("implement");
+		var alg = new VertexMesh();
+		assertTrue(alg.isTriangles());
+
+		var shape = new DogArray<>(Point3D_F64::new);
+
+		// Add a triangle
+		shape.grow().setTo(0,0,0);
+		shape.grow().setTo(0,1,0);
+		shape.grow().setTo(1,1,0);
+		alg.addFaceVectors(shape.toList());
+
+		assertTrue(alg.isTriangles());
+
+		// Add a non-triangle
+		shape.reset();
+		shape.grow().setTo(0,0,0);
+		shape.grow().setTo(0,2,0);
+		shape.grow().setTo(2,2,0);
+		shape.grow().setTo(2,9,0);
+		alg.addFaceVectors(shape.toList());
+
+		assertFalse(alg.isTriangles());
 	}
 
 	@Test void toTriangles() {
-		fail("implement");
+		var original = new VertexMesh();
+
+		// Add a non-triangle
+		var shape = new DogArray<>(Point3D_F64::new);
+		shape.reset();
+		shape.grow().setTo(0,0,0);
+		shape.grow().setTo(0,2,0);
+		shape.grow().setTo(2,2,0);
+		shape.grow().setTo(2,9,0);
+		original.addFaceVectors(shape.toList());
+		assertFalse(original.isTriangles());
+		assertEquals(2, original.faceOffsets.size);
+
+		VertexMesh found = original.toTriangles();
+		assertTrue(found.isTriangles());
+
+		// vertexes should not have vertexes
+		assertTrue(original.vertexes.isEquals(found.vertexes));
+		assertEquals(3, found.faceOffsets.size);
 	}
 }
