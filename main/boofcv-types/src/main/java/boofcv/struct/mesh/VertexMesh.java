@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,57 +32,49 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-/**
- * Specifies a 3D mesh. BigArray types are used since a 3D mesh can have a very large number of points in it.
- *
- * @author Peter Abeles
- */
+/// Specifies a 3D mesh. BigArray types are used since a 3D mesh can have a very large number of points in it.
 public class VertexMesh {
-	/** 3D location of each vertex */
+	/// 3D location of each vertex
 	public final PackedBigArrayPoint3D_F64 vertexes = new PackedBigArrayPoint3D_F64(10);
 
-	/** 2D coordinate of textures. Corresponds to a vector. units = fraction of width / height. 0.0 to 1.0 */
+	/// 2D coordinate of textures. Corresponds to a vector. units = fraction of width / height. 0.0 to 1.0
 	public final PackedBigArrayPoint2D_F32 texture = new PackedBigArrayPoint2D_F32();
 
-	/** Optional precomputed normals for each vertex */
+	/// Optional precomputed normals for each vertex
 	public final PackedArrayPoint3D_F32 normals = new PackedArrayPoint3D_F32();
 
-	/** Optional vertex colors in RGB format */
+	/// Optional vertex colors in RGB format
 	public final DogArray_I32 rgb = new DogArray_I32();
 
-	/** Which vertex indexes correspond to normal for a face */
+	/// Which vertex indexes correspond to normal for a face
 	public final DogArray_I32 faceVertexes = new DogArray_I32();
 
-	/**
-	 * Which texture indexes correspond to normal for a face. If this array is empty then we assume that is one
-	 * texture coordinate for each face vector that appears in the same order.
-	 */
+	/// Which texture indexes correspond to normal for a face. If this array is empty then we assume that is one
+	/// texture coordinate for each face vector that appears in the same order.
 	public final DogArray_I32 faceVertexTextures = new DogArray_I32();
 
-	/** Which indexes correspond to each vertex normal in a face */
+	/// Which indexes correspond to each vertex normal in a face
 	public final DogArray_I32 faceVertexNormals = new DogArray_I32();
 
-	/** Specifies which normal is the normal for the face's plane */
+	/// Specifies which normal is the normal for the face's plane
 	public final DogArray_I32 faceNormals = new DogArray_I32();
 
-	/** Start index of each face + the last index */
+	/// Start index of each face + the last index
 	public final DogArray_I32 faceOffsets = new DogArray_I32();
 
-	/** Name of the texture file associated with this mesh */
+	/// Name of the texture file associated with this mesh
 	public String textureName = "";
 
 	{
 		faceOffsets.add(0);
 	}
 
-	/** Returns number of shapes / polygons in the mesh */
+	/// Returns number of shapes / polygons in the mesh
 	public int size() {
 		return faceOffsets.size - 1;
 	}
 
-	/**
-	 * Copies the shape vertex into the point.
-	 */
+	/// Copies the shape vertex into the point.
 	public Point3D_F64 getShapeVertex( int which, @Nullable Point3D_F64 output ) {
 		if (output == null)
 			output = new Point3D_F64();
@@ -90,19 +82,15 @@ public class VertexMesh {
 		return output;
 	}
 
-	/**
-	 * Number of elements in a specific face
-	 */
+	/// Number of elements in a specific face
 	public int getFaceSize( int which ) {
 		return faceOffsets.get(which + 1) - faceOffsets.get(which);
 	}
 
-	/**
-	 * Copies texture coordinates from a polygon
-	 *
-	 * @param which Which shape to copy
-	 * @param output Output storage for the shape
-	 */
+	/// Copies texture coordinates from a polygon
+	///
+	/// @param which Which shape to copy
+	/// @param output Output storage for the shape
 	public void getTexture( int which, DogArray<Point2D_F32> output ) {
 		int idx0 = faceOffsets.get(which);
 		int idx1 = faceOffsets.get(which + 1);
@@ -121,35 +109,31 @@ public class VertexMesh {
 		}
 	}
 
-	/**
-	 * Appends the texture coordinates onto the end of the array. NOTE: This will not update
-	 * the offsets, which are assumed to be the same as with the vertexes
-	 *
-	 * @param count Number of points in the coordinates
-	 * @param coordinates Array containing interleaved coordinates [x0,y0, x1,y1, ... , x[n], y[n]]
-	 */
+	/// Appends the texture coordinates onto the end of the array. NOTE: This will not update
+	/// the offsets, which are assumed to be the same as with the vertexes
+	///
+	/// @param count Number of points in the coordinates
+	/// @param coordinates Array containing interleaved coordinates [x0,y0, x1,y1, ... , x[n], y[n]]
 	public void addTexture( int count, float[] coordinates ) {
 		for (int i = 0; i < count; i++) {
 			texture.append(coordinates[i*2], coordinates[i*2 + 1]);
 		}
 	}
 
-	/** Copies the normal for the specified face inout 'out' */
+	/// Copies the normal for the specified face inout 'out'
 	public void getFaceNormal( int face, Point3D_F32 out ) {
 		normals.getCopy(faceNormals.get(face), out);
 	}
 
-	/** Returns the shape's normal in a temporary object */
+	/// Returns the shape's normal in a temporary object
 	public Point3D_F32 getFaceNormalTmp( int face ) {
 		return normals.getTemp(faceNormals.get(face));
 	}
 
-	/**
-	 * Copies the entire shape into the output array
-	 *
-	 * @param which Which shape to copy
-	 * @param output Output storage for the shape
-	 */
+	/// Copies the entire shape into the output array
+	///
+	/// @param which Which shape to copy
+	/// @param output Output storage for the shape
 	public void getFaceVectors( int which, DogArray<Point3D_F64> output ) {
 		int idx0 = faceOffsets.get(which);
 		int idx1 = faceOffsets.get(which + 1);
@@ -166,9 +150,7 @@ public class VertexMesh {
 		}
 	}
 
-	/**
-	 * Adds a new shape with the specified vertexes.
-	 */
+	/// Adds a new shape with the specified vertexes.
 	public void addFaceVectors( List<Point3D_F64> shape ) {
 		// All the vertexes for this shape will reference newly added vertexes
 		int idx0 = vertexes.size();
@@ -180,9 +162,7 @@ public class VertexMesh {
 		vertexes.appendAll(shape);
 	}
 
-	/**
-	 * Computes normal vectors from shapes
-	 */
+	/// Computes normal vectors from shapes
 	public void computeFaceNormals() {
 		var vector1 = new Vector3D_F64();
 		var vector2 = new Vector3D_F64();
@@ -245,9 +225,7 @@ public class VertexMesh {
 		textureName = "";
 	}
 
-	/**
-	 * Wraps the data structure inside {@link MeshPolygonAccess}.
-	 */
+	/// Wraps the data structure inside [MeshPolygonAccess].
 	public MeshPolygonAccess toAccess() {
 		return new MeshPolygonAccess() {
 			@Override public int size() {
@@ -266,5 +244,85 @@ public class VertexMesh {
 
 	public boolean isNormals() {
 		return normals.size() > 0;
+	}
+
+	/// Returns true if every face is a triangle (exactly three vertexes). An empty mesh returns true.
+	public boolean isTriangles() {
+		for (int face = 1; face < faceOffsets.size; face++) {
+			if (faceOffsets.get(face) - faceOffsets.get(face - 1) != 3)
+				return false;
+		}
+		return true;
+	}
+
+	/// Convenience: creates a new triangulated mesh. See [#toTriangles(VertexMesh)].
+	public VertexMesh toTriangles() {
+		return toTriangles(null);
+	}
+
+	/// Creates a mesh that describes the same surface as this one but where every face is a triangle. All
+	/// shared data is carried over unchanged.
+	///
+	/// Faces with fewer than three vertexes cannot form a triangle and are dropped.
+	///
+	/// @param output (Optional) Storage for the result. If null a new instance is created. Must not be
+	/// `this`.
+	/// @return The triangulated mesh.
+	public VertexMesh toTriangles( @Nullable VertexMesh output ) {
+		if (output == null)
+			output = new VertexMesh();
+		if (output == this)
+			throw new IllegalArgumentException("output must not be 'this'");
+
+		output.reset();
+
+		// Shared pools are untouched by triangulation.
+		output.vertexes.setTo(vertexes);
+		output.texture.setTo(texture);
+		output.normals.setTo(normals);
+		output.rgb.setTo(rgb);
+		output.textureName = textureName;
+
+		final boolean textured = texture.size() > 0;
+		final boolean cornerNormals = !faceVertexNormals.isEmpty();
+		final boolean facePlaneNormals = !faceNormals.isEmpty();
+
+		final int numFaces = size();
+		for (int face = 0; face < numFaces; face++) {
+			int idx0 = faceOffsets.get(face);
+			int idx1 = faceOffsets.get(face + 1);
+			int n = idx1 - idx0;
+			if (n < 3)
+				continue; // not a polygon; cannot triangulate
+
+			// Fan about corner 0: triangles (0, k-1, k) for k = 2 .. n-1
+			for (int k = 2; k < n; k++) {
+				appendCorner(output, idx0, textured, cornerNormals);          // pivot (local 0)
+				appendCorner(output, idx0 + k - 1, textured, cornerNormals);
+				appendCorner(output, idx0 + k, textured, cornerNormals);
+				output.faceOffsets.add(output.faceVertexes.size);
+
+				// Every fan triangle inherits the parent face's plane normal.
+				if (facePlaneNormals)
+					output.faceNormals.add(faceNormals.get(face));
+			}
+		}
+
+		return output;
+	}
+
+	/// Emits one corner into the output mesh, resolving vertex / texture / normal indexing (whether the
+	/// source used explicit or implicit "parallel" indexing) into explicit indices that reference the
+	/// shared pools.
+	///
+	/// @param corner Absolute corner index in this mesh's per-corner arrays.
+	private void appendCorner( VertexMesh out, int corner, boolean textured, boolean cornerNormals ) {
+		out.faceVertexes.add(faceVertexes.isEmpty() ? corner : faceVertexes.get(corner));
+
+		if (textured)
+			out.faceVertexTextures.add(faceVertexTextures.isEmpty() ? corner : faceVertexTextures.get(corner));
+
+		if (cornerNormals)
+			out.faceVertexNormals.add(faceVertexNormals.get(corner));
 	}
 }
