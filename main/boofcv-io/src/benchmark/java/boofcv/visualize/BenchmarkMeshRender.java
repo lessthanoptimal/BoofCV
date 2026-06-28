@@ -41,10 +41,12 @@ import java.util.concurrent.TimeUnit;
 @Measurement(iterations = 2)
 @State(Scope.Benchmark)
 @Fork(value = 1)
-public class BenchmarkRenderMesh {
+public class BenchmarkMeshRender {
 	VertexMesh mesh = new VertexMesh();
+	VertexMesh meshTri = new VertexMesh();
 
-	MeshRasterizer renderer = new MeshRasterizer();
+	MeshRender rasterize = new MeshRasterizer();
+	MeshRender raytrace = new MeshRayTracer();
 
 	@Setup public void setup() {
 		var intrinsics = new CameraPinhole();
@@ -55,7 +57,8 @@ public class BenchmarkRenderMesh {
 
 		createFlatSquareScene(intrinsics, rand);
 
-		renderer.setCamera(new LensDistortionPinhole(intrinsics), intrinsics.width, intrinsics.height);
+		rasterize.setCamera(new LensDistortionPinhole(intrinsics), intrinsics.width, intrinsics.height);
+		raytrace.setCamera(new LensDistortionPinhole(intrinsics), intrinsics.width, intrinsics.height);
 	}
 
 	private void createFlatSquareScene( CameraPinhole intrinsics, Random rand ) {
@@ -91,17 +94,20 @@ public class BenchmarkRenderMesh {
 		}
 	}
 
-	/**
-	 * Simple scenario with planar squares
-	 */
-	@Benchmark public void planarSquares(){
-		renderer.setMesh(mesh);
-		renderer.render();
+	@Benchmark public void rasterize(){
+		rasterize.setMesh(mesh);
+		rasterize.render();
+	}
+
+	@Benchmark public void raytrace(){
+		mesh.toTriangles(meshTri);
+		raytrace.setMesh(meshTri);
+		raytrace.render();
 	}
 
 	public static void main( String[] args ) throws RunnerException {
 		Options opt = new OptionsBuilder()
-				.include(BenchmarkRenderMesh.class.getSimpleName())
+				.include(BenchmarkMeshRender.class.getSimpleName())
 				.warmupTime(TimeValue.seconds(1))
 				.measurementTime(TimeValue.seconds(1))
 				.build();
