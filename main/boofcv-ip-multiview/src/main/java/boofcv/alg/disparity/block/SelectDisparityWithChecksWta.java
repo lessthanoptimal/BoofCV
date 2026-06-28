@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,31 +22,25 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * <p>
- * Selects the disparity with the smallest error, which is known as the winner takes all (WTA) strategy.
- * Optionally several different techniques can be used to filter out bad disparity values. This is a base class
- * for algorithms which implement this same "standard" algorithm on different data types.
- * </p>
- *
- * <p>
- * Validation Filters:<br>
- * <b>MaxError</b> is the largest error value the selected region can have.<br>
- * <b>right To Left</b> validates the disparity by seeing if the matched region on the right has the same region on
- * the left as its optimal solution, within tolerance.<br>
- * <b>texture</b> Tolerance for how similar the best region is to the second best. Lower values indicate greater
- * tolerance. Reject if textureTol &le; (C2-C1)/C1, where C2 = second best region score and C1 = best region score
- * </p>
- *
- * <p>
- * This implementation is not based off of any individual paper but ideas commonly expressed in several different
- * sources. A good study and summary of similar algorithms can be found in:<br>
- * [1] Wannes van der Mark and Dariu M. Gavrila, "Real-Time Dense Stereo for Intelligent Vehicles"
- * IEEE TRANSACTIONS ON INTELLIGENT TRANSPORTATION SYSTEMS, VOL. 7, NO. 1, MARCH 2006
- * </p>
- *
- * @author Peter Abeles
- */
+/// Selects the disparity with the smallest error, which is known as the winner takes all (WTA) strategy.
+/// Optionally several different techniques can be used to filter out bad disparity values. This is a base class
+/// for algorithms which implement this same "standard" algorithm on different data types.
+///
+/// Validation Filters:
+///
+/// **MaxError** is the largest error value the selected region can have.
+///
+/// **right To Left** validates the disparity by seeing if the matched region on the right has the same region on
+/// the left as its optimal solution, within tolerance.
+///
+/// **texture** Tolerance for how similar the best region is to the second best. Lower values indicate greater
+/// tolerance. Reject if textureTol ≤ (C2-C1)/C1, where C2 = second best region score and C1 = best region score
+///
+/// This implementation is not based off of any individual paper but ideas commonly expressed in several different
+/// sources. A good study and summary of similar algorithms can be found in:
+///
+/// [1] Wannes van der Mark and Dariu M. Gavrila, "Real-Time Dense Stereo for Intelligent Vehicles"
+/// IEEE TRANSACTIONS ON INTELLIGENT TRANSPORTATION SYSTEMS, VOL. 7, NO. 1, MARCH 2006
 @SuppressWarnings({"NullAway.Init"})
 public abstract class SelectDisparityWithChecksWta<Array, DI extends ImageGray<DI>>
 		implements DisparitySelect<Array, DI> {
@@ -64,6 +58,9 @@ public abstract class SelectDisparityWithChecksWta<Array, DI extends ImageGray<D
 	protected int disparityRange;
 	// value that an invalid pixel will be assigned
 	protected int invalidDisparity;
+	// at the current pixel: lowest valid disparity index (inclusive) and past-the-end disparity index,
+	// both relative to disparityMin. localDisparityMin is > 0 only when the right border clamps a negative disparity.
+	protected int localDisparityMin;
 	// max allowed disparity at the current pixel
 	protected int localRange;
 	// radius and width of the region being compared
@@ -80,15 +77,13 @@ public abstract class SelectDisparityWithChecksWta<Array, DI extends ImageGray<D
 
 	protected SaveScore funcSaveScore = ( index, value ) -> {};
 
-	/**
-	 * Configures tolerances
-	 *
-	 * @param maxError The maximum allowed error. Note this is sum error and not per pixel error.
-	 * Try (region width*height)*30.
-	 * @param rightToLeftTolerance Tolerance for how difference the left to right associated values can be. Try 6
-	 * @param texture Tolerance for how similar optimal region is to other region. Disable with a value &le; 0.
-	 * Closer to zero is more tolerant. Try 0.1
-	 */
+	/// Configures tolerances
+	///
+	/// @param maxError The maximum allowed error. Note this is sum error and not per pixel error.
+	/// Try (region width\*height)\*30.
+	/// @param rightToLeftTolerance Tolerance for how difference the left to right associated values can be. Try 6
+	/// @param texture Tolerance for how similar optimal region is to other region. Disable with a value ≤ 0.
+	/// Closer to zero is more tolerant. Try 0.1
 	protected SelectDisparityWithChecksWta( int maxError, int rightToLeftTolerance, double texture, Class<DI> disparityType ) {
 		this.maxError = maxError <= 0 ? Integer.MAX_VALUE : maxError;
 		this.rightToLeftTolerance = rightToLeftTolerance;
@@ -120,28 +115,30 @@ public abstract class SelectDisparityWithChecksWta<Array, DI extends ImageGray<D
 		}
 	}
 
-	/**
-	 * Sets the output to the specified disparity value.
-	 *
-	 * @param index Image pixel that is being set
-	 * @param disparityValue disparity value
-	 * @param bestScore Score of the best disparity value
-	 */
+	/// Sets the output to the specified disparity value.
+	///
+	/// @param index Image pixel that is being set
+	/// @param disparityValue disparity value
+	/// @param bestScore Score of the best disparity value
 	protected abstract void setDisparity( int index, int disparityValue, float bestScore );
 
 	protected abstract void setDisparityInvalid( int index );
 
-	/**
-	 * Returns the maximum allowed disparity for a particular column in left to right direction,
-	 * as limited by the image border.
-	 */
+	/// Returns the maximum allowed disparity for a particular column in left to right direction,
+	/// as limited by the image border (the matched right column `col-d` must be ≥ 0).
 	protected int disparityMaxAtColumnL2R( int col ) {
 		return Math.min(col, disparityMax);
 	}
 
-	/**
-	 * For debugging purposes only
-	 */
+	/// Returns the minimum allowed disparity for a particular column in left to right direction. When
+	/// `disparityMin` is negative the matched right column `col-d` can fall off the right
+	/// image border, so the disparity is clamped to keep it ≤ width-1. For a non-negative
+	/// `disparityMin` this simply returns `disparityMin`.
+	protected int disparityMinAtColumnL2R( int col ) {
+		return Math.max(disparityMin, col - (imageDisparity.width - 1));
+	}
+
+	/// For debugging purposes only
 	public void setLocalDisparityMax( int value ) {
 		localRange = value;
 	}

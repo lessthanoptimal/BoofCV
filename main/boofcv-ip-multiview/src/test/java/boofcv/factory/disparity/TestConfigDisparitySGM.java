@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,5 +19,14 @@
 package boofcv.factory.disparity;
 
 import boofcv.struct.StandardConfigurationChecks;
+import org.junit.jupiter.api.Test;
 
-public class TestConfigDisparitySGM extends StandardConfigurationChecks {}
+public class TestConfigDisparitySGM extends StandardConfigurationChecks {
+	/** A negative minimum disparity is valid, e.g. depth from dual pixels. */
+	@Test void negativeDisparityMinIsAllowed() {
+		var config = new ConfigDisparitySGM();
+		config.disparityMin = -10;
+		config.disparityRange = 20;
+		config.checkValidity();
+	}
+}

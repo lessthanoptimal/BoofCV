@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -56,21 +56,20 @@ public abstract class ChecksSelectDisparityWithChecksWta<ArrayData, D extends Im
 		return createSelector(-1, -1);
 	}
 
-	/**
-	 * Makes sure everything works correctly when larger disparity values are computed and there's an offset.
-	 * Created after a bug was found due to type casting.
-	 */
+	/// Makes sure everything works correctly when larger disparity values are computed and there's an offset.
+	/// Created after a bug was found due to type casting.
 	@Test void largestDisparityWithOffset() {
 		rightToLeftValidation(4, 200);
 	}
 
-	/**
-	 * Similar to simpleTest but takes in account the effects of right to left validation
-	 */
+	/// Similar to simpleTest but takes in account the effects of right to left validation
 	@Test
 	void testRightToLeftValidation() {
 		rightToLeftValidation(0, 10);
 		rightToLeftValidation(4, 10);
+		// ranges that include negative disparities
+		rightToLeftValidation(-5, 5);
+		rightToLeftValidation(-8, -2);
 	}
 
 	private void rightToLeftValidation( int minDisparity, int maxDisparity ) {
@@ -79,46 +78,64 @@ public abstract class ChecksSelectDisparityWithChecksWta<ArrayData, D extends Im
 		int y = 3;
 		int r = 2;
 
-		SelectDisparityWithChecksWta<ArrayData, D> alg = createSelector(1, -1);
-		alg.configure(disparity, null, minDisparity, this.maxDisparity, r);
-
+		// Error is minimized at disparity index 5 in every column
 		int[] scores = new int[w*rangeDisparity];
-
 		for (int d = 0; d < rangeDisparity; d++) {
 			for (int x = 0; x < w; x++) {
 				scores[w*d + x] = convertErrorToScore(Math.abs(d - 5));
 			}
 		}
 
-		alg.process(y, copyToCorrectType(scores));
+		// Compare against a model of the expected result for a couple of tolerances
+		for (int tol : new int[]{1, 0}) {
+			SelectDisparityWithChecksWta<ArrayData, D> alg = createSelector(tol, -1);
+			alg.configure(disparity, null, minDisparity, this.maxDisparity, r);
+			alg.process(y, copyToCorrectType(scores));
 
-		// Less than the minimum disparity should be reject
-		for (int i = 0; i < minDisparity; i++)
-			assertEquals(reject, getDisparity(i + r, y), 1e-8);
-
-		// These should all be zero since other pixels will have lower scores
-		for (int i = minDisparity; i < 4 + minDisparity; i++)
-			assertEquals(reject, getDisparity(i, y), 1e-8);
-
-		// the tolerance is one, so this should be 4
-		assertEquals(4, getDisparity(4 + minDisparity, y), 1e-8);
-		// should be at 5 for the remainder
-		for (int i = minDisparity + 5; i < w; i++)
-			assertEquals(5, getDisparity(i, y), 1e-8);
-
-		// sanity check, I now set the tolerance to zero
-		alg = createSelector(0, -1);
-		alg.configure(disparity, null, minDisparity, this.maxDisparity, 2);
-		alg.process(y, copyToCorrectType(scores));
-		assertEquals(reject, getDisparity(4 + minDisparity, y), 1e-8);
+			for (int x = 0; x < w; x++) {
+				assertEquals(expectedRightToLeft(x, tol), getDisparity(x, y), 1e-8, "tol=" + tol + " col=" + x);
+			}
+		}
 	}
 
-	/**
-	 * Test the confidence in a region with very similar cost score (little texture)
-	 */
+	/// Models the expected disparity for the score above (index 5 is best), including the right-to-left
+	/// consistency check. Returns the disparity index relative to minDisparity, or [#reject].
+	private int expectedRightToLeft( int x, int tolRightToLeft ) {
+		// Left-to-right disparity window (indices relative to minDisparity), clamped to both image borders
+		int lo = Math.max(0, x - (w - 1) - minDisparity);
+		int hi = Math.min(maxDisparity, x) - minDisparity;
+		if (hi < lo)
+			return reject;
+		int bestLtoR = Math.max(lo, Math.min(hi, 5));
+
+		// Right column matched by that disparity, and the right-to-left window there
+		int rightCol = x - (bestLtoR + minDisparity);
+		int loR = Math.max(0, -rightCol - minDisparity);
+		int hiR = Math.min(rangeDisparity, w - rightCol - minDisparity) - 1;
+		int bestRtoL = Math.max(loR, Math.min(hiR, 5));
+
+		return Math.abs(bestRtoL - bestLtoR) <= tolRightToLeft ? bestLtoR : reject;
+	}
+
+	/// Number of valid disparities at column x, clamped against both image borders.
+	private int validCount( int x ) {
+		int hi = Math.min(maxDisparity, x);
+		int lo = Math.max(minDisparity, x - (w - 1));
+		return Math.max(0, hi - lo + 1);
+	}
+
+	/// Test the confidence in a region with very similar cost score (little texture)
 	@Test
 	void confidenceFlatRegion() {
-		init(0, 10);
+		confidenceFlatRegion(0);
+		confidenceFlatRegion(2);
+		// ranges that include negative disparities
+		confidenceFlatRegion(-4);
+		confidenceFlatRegion(-8);
+	}
+
+	private void confidenceFlatRegion( int minDisparity ) {
+		init(minDisparity, 10);
 		int minValue = 5;
 		int y = 3;
 
@@ -139,19 +156,23 @@ public abstract class ChecksSelectDisparityWithChecksWta<ArrayData, D extends Im
 
 		alg.process(y, copyToCorrectType(scores));
 
-		// it should reject the solution
-		assertEquals(reject, getDisparity(4 + 2, y), 1e-8);
+		// The score is flat across disparity, so texture rejects every column with enough disparities to evaluate
+		for (int x = 0; x < w; x++) {
+			if (validCount(x) >= 3)
+				assertEquals(reject, getDisparity(x, y), 1e-8, "col=" + x);
+		}
 	}
 
-	/**
-	 * There are two similar peaks. Repeated pattern
-	 */
+	/// There are two similar peaks. Repeated pattern
 	@Test
 	void confidenceMultiplePeak() {
 		confidenceMultiplePeak(3, 0);
 		confidenceMultiplePeak(0, 0);
 		confidenceMultiplePeak(3, 2);
 		confidenceMultiplePeak(0, 2);
+		// ranges that include negative disparities
+		confidenceMultiplePeak(3, -4);
+		confidenceMultiplePeak(0, -8);
 	}
 
 	private void confidenceMultiplePeak( int minValue, int minDisparity ) {
@@ -172,17 +193,16 @@ public abstract class ChecksSelectDisparityWithChecksWta<ArrayData, D extends Im
 
 		alg.process(y, copyToCorrectType(scores));
 
-		// it should reject the solution
-		for (int i = r + minDisparity + 3; i < w - r; i++)
-			assertEquals(reject, getDisparity(i, y), 1e-8);
+		// Repeated pattern is ambiguous, so texture rejects every column with enough disparities to evaluate
+		for (int x = 0; x < w; x++) {
+			if (validCount(x) >= 6)
+				assertEquals(reject, getDisparity(x, y), 1e-8, "col=" + x);
+		}
 	}
 
-	/**
-	 * Could potentially return a sub-pixel accuracy but tests are only for pixel accuracy.
-	 *
-	 * Will not work in all situations since the movement could be farther than 0.5 from
-	 * the "correct" value
-	 */
+	/// Could potentially return a sub-pixel accuracy but tests are only for pixel accuracy.
+	/// Will not work in all situations since the movement could be farther than 0.5 from
+	/// the "correct" value
 	protected int getDisparity( int x, int y ) {
 		double value = GeneralizedImageOps.get(disparity, x, y);
 		return (int)Math.round(value);

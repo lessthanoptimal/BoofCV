@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,11 +28,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * Basic tests for selecting disparity with a correlation score
- *
- * @author Peter Abeles
- */
+/// Basic tests for selecting disparity with a correlation score
 @SuppressWarnings("WeakerAccess")
 public abstract class ChecksSelectDisparity<ArrayData, D extends ImageGray<D>> extends BoofStandardJUnit {
 
@@ -69,24 +65,25 @@ public abstract class ChecksSelectDisparity<ArrayData, D extends ImageGray<D>> e
 		this.rangeDisparity = maxDisparity - minDisparity + 1;
 	}
 
-	/**
-	 * Give it a handcrafted score with known results for WTA. See if it produces those results
-	 */
-	@Test
-	void simpleTest() {
+	/// Give it a handcrafted score with known results for WTA. See if it produces those results
+	@Test void simpleTest() {
 		simpleTest(0, 10, 2);
 		simpleTest(2, 10, 2);
 		simpleTest(4, 11, 3);
+
+		simpleTest(-2, 10, 2);
+		simpleTest(-4, 11, 3);
+		simpleTest(-7, 3, 2);
+
+		// it only considers negative disparities here
+		simpleTest(-8, -2, 2);
 	}
 
-	/**
-	 * See if it blows up if you feed it a null disparity
-	 */
-	@Test
-	void checkExplodeNullDisparity() {
+	/// See if it blows up if you feed it a null disparity
+	@Test void checkExplodeNullDisparity() {
 		init(2, 10, 2);
 
-		alg.configure(disparity, null, minDisparity, maxDisparity, rangeDisparity);
+		alg.configure(disparity, null, minDisparity, maxDisparity, radius);
 
 		int[] scores = new int[w*rangeDisparity];
 		alg.process(3, copyToCorrectType(scores));
@@ -110,34 +107,47 @@ public abstract class ChecksSelectDisparity<ArrayData, D extends ImageGray<D>> e
 		return (ArrayData)ret;
 	}
 
-	void simpleTest( int minDisparity, int maxDisparity, int radius ) {
-		init(minDisparity, maxDisparity, radius);
+	/// @param disparityLow Lowest disparity it will consider, inclusive
+	/// @param disparityUpp Upper most disparity it will consider, inclusive
+	void simpleTest( int disparityLow, int disparityUpp, int radius ) {
+		init(disparityLow, disparityUpp, radius);
 
 		int y = 3;
 
+		// TODO is radius tested? before range was being passed in instead of radius and everything passed.
 		GImageMiscOps.fill(disparity, 0);
-		alg.configure(disparity, score, minDisparity, maxDisparity, rangeDisparity);
+		alg.configure(disparity, score, disparityLow, disparityUpp, radius);
 
 		int[] scores = new int[w*rangeDisparity];
 
+		// scores are stored at the absolute column within each disparity's row
 		for (int d = 0; d < rangeDisparity; d++) {
-			for (int x = 0; x < w - minDisparity; x++) {
+			for (int x = 0; x < w; x++) {
 				scores[w*d + x] = convertErrorToScore(Math.abs(d - 5));
 			}
 		}
 
 		alg.process(y, copyToCorrectType(scores));
 
-		// When x is less than min disparity it should be zero
-		for (int i = 0; i < minDisparity; i++)
-			assertEquals(rangeDisparity, GeneralizedImageOps.get(disparity, i, y), 1e-8);
+		// Consider each column in the output disparity image
+		for (int leftCol = 0; leftCol < w; leftCol++) {
+			// upper and lowest column in right image it will consider
+			int rightColUp = leftCol - disparityLow;  // inclusive
+			int rightColLo = leftCol - disparityUpp;  // exclusive
 
-		// should ramp up to 5
-		for (int i = minDisparity; i < minDisparity + 5; i++)
-			assertEquals(i - minDisparity, GeneralizedImageOps.get(disparity, i, y), 0.99);
-		// should be at 5 for the remainder
-		for (int i = minDisparity + 5; i < w; i++)
-			assertEquals(5, GeneralizedImageOps.get(disparity, i, y), 0.99);
+			// If it's impossible to compute disparity at this location then it will be marked as invalid
+			if (rightColUp < 0 || rightColLo >= w) {
+				assertEquals(rangeDisparity, GeneralizedImageOps.get(disparity, leftCol, y), 1e-8);
+				continue;
+			}
+
+			// number of disparity values it will consider, ignoring right clamp
+			int ddHi = rightColUp - Math.max(0, rightColLo);
+			int ddLo = Math.max(0, rightColUp - (w - 1));   // right-border clamp
+			int expected = Math.max(ddLo, Math.min(ddHi, 5));       // index 5 clamped into [ddLo, ddHi]
+
+			assertEquals(expected, GeneralizedImageOps.get(disparity, leftCol, y), 1e-8, "col=" + leftCol);
+		}
 	}
 
 	public abstract int convertErrorToScore( int d );

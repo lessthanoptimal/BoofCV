@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,21 +21,17 @@ package boofcv.factory.disparity;
 import boofcv.struct.Configuration;
 import boofcv.struct.KernelRadius2D;
 
-/**
- * Generic configuration for any dense stereo disparity algorithm.
- *
- * @author Peter Abeles
- */
+/// Generic configuration for any dense stereo disparity algorithm.
 public class ConfigDisparity implements Configuration {
 
-	/** Specifies which approach to use */
+	/// Specifies which approach to use
 	public Approach approach = Approach.BLOCK_MATCH;
 
-	/** Configuration for Block Matching approach */
+	/// Configuration for Block Matching approach
 	public final ConfigDisparityBM approachBM = new ConfigDisparityBM();
-	/** Configuration for Block Matching Best-5 approach */
+	/// Configuration for Block Matching Best-5 approach
 	public final ConfigDisparityBMBest5 approachBM5 = new ConfigDisparityBMBest5();
-	/** Configuration for Semi Global Matching (SGM) appraoch */
+	/// Configuration for Semi Global Matching (SGM) approach
 	public final ConfigDisparitySGM approachSGM = new ConfigDisparitySGM();
 
 	public KernelRadius2D getBlockSize() {
@@ -68,9 +64,7 @@ public class ConfigDisparity implements Configuration {
 		};
 	}
 
-	/**
-	 * List of avaliable approaches
-	 */
+	/// List of available approaches
 	public enum Approach {
 		BLOCK_MATCH,
 		BLOCK_MATCH_5,

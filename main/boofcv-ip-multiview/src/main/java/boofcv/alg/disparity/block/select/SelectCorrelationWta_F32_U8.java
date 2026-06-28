@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,14 +25,8 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * <p>
- * Implementation of {@link SelectDisparityBasicWta} for scores of type F32 and correlation. Since it's correlation
- * it pixels the score with the highest value.
- * </p>
- *
- * @author Peter Abeles
- */
+/// Implementation of [SelectDisparityBasicWta] for scores of type F32 and correlation. Since it's correlation
+/// it pixels the score with the highest value.
 public class SelectCorrelationWta_F32_U8 extends SelectDisparityBasicWta<float[], GrayU8>
 		implements Compare_F32 {
 	@Override
@@ -45,30 +39,38 @@ public class SelectCorrelationWta_F32_U8 extends SelectDisparityBasicWta<float[]
 	public void process( int row, float[] blockOfScores ) {
 		int indexDisparity = imageDisparity.startIndex + row*imageDisparity.stride;
 
+		// first and last columns it will consider
+		int col0 = Math.max(0, disparityMin);
+		int col1 = imageWidth + Math.min(0, disparityMax);
+
 		// Mark all pixels as invalid which can't be estimate due to disparityMin
-		for (int col = 0; col < disparityMin; col++) {
+		for (int col = 0; col < col0; col++) {
 			imageDisparity.data[indexDisparity++] = (byte)disparityRange;
 		}
 
-		// Select the best disparity from all the rest
-		for (int col = disparityMin; col < imageWidth; col++) {
-			// make sure the disparity search doesn't go outside the image border
-			int localMaxRange = disparityMaxAtColumnL2R(col) - disparityMin + 1;
+		for (int col = col0; col < col1; col++) {
+			int localDisparityMin = disparityMinAtColumnL2R(col) - disparityMin;
+			int localRange = disparityMaxAtColumnL2R(col) - disparityMin + 1;
+			int indexScore = col + localDisparityMin*imageWidth;
 
 			// Find the disparity with the best score, which is the largest score for correlation
-			int indexScore = col - disparityMin;
-			int maxIndex = 0;
+			int maxIndex = localDisparityMin;
 			float maxValue = blockOfScores[indexScore];
 			indexScore += imageWidth;
-			for (int i = 1; i < localMaxRange; i++, indexScore += imageWidth) {
+			for (int disparity = localDisparityMin + 1; disparity < localRange; disparity++, indexScore += imageWidth) {
 				float v = blockOfScores[indexScore];
 				if (v > maxValue) {
 					maxValue = v;
-					maxIndex = i;
+					maxIndex = disparity;
 				}
 			}
 
 			imageDisparity.data[indexDisparity++] = (byte)maxIndex;
+		}
+
+		// mark pixels on the upper end as invalid if it can't reach them
+		for (int col = col1; col < imageWidth; col++) {
+			imageDisparity.data[indexDisparity++] = (byte)disparityRange;
 		}
 	}
 

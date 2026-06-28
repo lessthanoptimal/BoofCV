@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,15 +24,9 @@ import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
-import java.util.Random;
-
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Provides a series of simple tests that check basic functionality at computing image disparity
- *
- * @author Peter Abeles
- */
+/// Provides a series of simple tests that check basic functionality at computing image disparity
 public abstract class BasicDisparityTests<I extends ImageGray<I>, DI extends ImageGray<DI>> extends BoofStandardJUnit {
 	I left;
 	I right;
@@ -46,8 +40,6 @@ public abstract class BasicDisparityTests<I extends ImageGray<I>, DI extends Ima
 
 	int maxDisparity = 40;
 
-	Random rand = new Random();
-
 	BasicDisparityTests( double minVal, double maxVal, Class<I> imageType ) {
 		this.minVal = minVal;
 		this.maxVal = maxVal;
@@ -55,15 +47,18 @@ public abstract class BasicDisparityTests<I extends ImageGray<I>, DI extends Ima
 		right = GeneralizedImageOps.createSingleBand(imageType, w, h);
 	}
 
-	public abstract void initialize( int minDisparity, int maxDisparity );
+	public abstract void initialize( int minDisparity, int maxDisparity, int radiusX, int radiusY );
 
 	public abstract DI computeDisparity( I left, I right );
 
-	/**
-	 * A random image is generated then it's shifted by a fixed amount into the right image
-	 */
+	/// Returns the effective size of a kernel given the requested size.
+	public int radiusToKernelRadiusX( int radius ) {
+		return radius;
+	}
+
+	/// A random image is generated then it's shifted by a fixed amount into the right image
 	@Test void checkShifted() {
-		initialize(0, maxDisparity);
+		initialize(0, maxDisparity, 2, 3);
 
 		int disparity = 5;
 
@@ -76,13 +71,11 @@ public abstract class BasicDisparityTests<I extends ImageGray<I>, DI extends Ima
 		assertTrue(checkSolution(disparity, 0, output, 0.12));
 	}
 
-	/**
-	 * Set the minimum disparity to a non-zero value and see if it has the expected results
-	 */
+	/// Set the minimum disparity to a non-zero value and see if it has the expected results
 	@Test void checkMinimumDisparity() {
 		int disparity = 4;
 		int minDisparity = disparity + 2;
-		initialize(disparity + 2, maxDisparity);
+		initialize(disparity + 2, maxDisparity, 2, 3);
 
 		GImageMiscOps.fillUniform(left, rand, minVal, maxVal);
 		GImageMiscOps.copy(disparity, 0, 0, 0, left.width - disparity, left.height, left, right);
@@ -114,5 +107,45 @@ public abstract class BasicDisparityTests<I extends ImageGray<I>, DI extends Ima
 //		System.out.println(errors+" vs "+total);
 		// Inputs are random so the match might not be perfect, especially around border regions
 		return (errors/(double)total <= fraction);
+	}
+
+	/// Verifies negative disparities by creating a shifted version of the input and seeing if it gets the same results
+	/// when computed using positive disparities. Only interior region can be compared.
+	@Test void compareNegativeToPositiveDisparity() {
+		// mix of negative and positive disparities
+		compareNegativeToPositiveDisparity(-4, 20);
+		// all negative disparities
+		compareNegativeToPositiveDisparity(-7, 5);
+	}
+
+	void compareNegativeToPositiveDisparity( int min, int max ) {
+		initialize(min, max, 2, 3);
+
+		// Two images with random inputs which will result in a random disparity images
+		GImageMiscOps.fillUniform(left, rand, minVal, maxVal);
+		GImageMiscOps.fillUniform(right, rand, minVal, maxVal);
+
+		DI found = computeDisparity(left, right);
+
+		// Shift input image so that it will compute the same disparity but only using positive values
+		I shiftedLeft = left.createNew(left.width - min, left.height);
+		I shiftedRight = right.createNew(right.width - min, right.height);
+		GImageMiscOps.copy(0,0, -min, 0, left.width, left.height, left, shiftedLeft);
+		GImageMiscOps.copy(0,0, 0, 0, right.width, right.height, right, shiftedRight);
+
+		initialize(0, max - min, 2, 3);
+		DI expected = computeDisparity(shiftedLeft, shiftedRight);
+
+		int effectiveRadiusX = radiusToKernelRadiusX(2);
+
+		for (int y = 0; y < found.height; y++) {
+			// test interior region only. the left and right borders in the shifted images don't match up skewing
+			// the results
+			for (int x = -min; x < found.width + min - effectiveRadiusX; x++) {
+				double f = GeneralizedImageOps.get(found, x, y);
+				double e = GeneralizedImageOps.get(expected, x - min, y);
+				assertEquals(e, f, 1e-8, "(" + x + "," + y + "): " + e + " " + f);
+			}
+		}
 	}
 }

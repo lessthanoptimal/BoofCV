@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,6 @@
 
 package boofcv.alg.disparity;
 
-import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.border.ImageBorder;
@@ -26,11 +25,7 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
-/**
- * Brute force block matching stereo
- *
- * @author Peter Abeles
- */
+/// Brute force block matching stereo
 public abstract class BruteForceBlockMatch<T extends ImageBase<T>> {
 
 	protected int radius;
@@ -60,34 +55,50 @@ public abstract class BruteForceBlockMatch<T extends ImageBase<T>> {
 	public void process( T left, T right, GrayU8 disparity ) {
 		bleft.setImage(left);
 		bright.setImage(right);
-		ImageMiscOps.fill(disparity, rangeDisparity);
-		for (int y = 0; y < left.height; y++) {
-			for (int x = minDisparity; x < left.width; x++) {
-				int localMaxRange = Math.min(x, maxDisparity) - minDisparity + 1;
 
-				for (int d = 0; d < localMaxRange; d++) {
-					scores[d] = computeScore(bleft, bright, x, y, d + minDisparity);
+		// Columns outside [col0, col1) have no disparity whose match stays inside the image (either border).
+		// minDisparity/maxDisparity may be negative.
+		int col0 = Math.max(0, minDisparity);
+		int col1 = left.width + Math.min(0, maxDisparity);
+
+		for (int y = 0; y < left.height; y++) {
+			for (int x = 0; x < col0; x++) {
+				disparity.set(x, y, rangeDisparity);
+			}
+			for (int x = col0; x < col1; x++) {
+				// disparity range at this column, clamped so the matched right column (x-d) stays in the image
+				int disparityLow = Math.max(minDisparity, x - (left.width - 1));
+				int disparityHigh = Math.min(maxDisparity, x);
+
+				int firstRange = disparityLow - minDisparity; // disparity index of the first valid disparity
+				int localCount = disparityHigh - disparityLow + 1;
+
+				for (int d = 0; d < localCount; d++) {
+					scores[d] = computeScore(bleft, bright, x, y, disparityLow + d);
 				}
 
-				int bestRange = 0;
+				int bestRange = firstRange;
 				double bestScore = scores[0];
 
-				for (int d = 1; d < localMaxRange; d++) {
+				for (int d = 1; d < localCount; d++) {
 					double s = scores[d];
 					if (minimize) {
 						if (s < bestScore) {
 							bestScore = s;
-							bestRange = d;
+							bestRange = firstRange + d;
 						}
 					} else {
 						if (s > bestScore) {
 							bestScore = s;
-							bestRange = d;
+							bestRange = firstRange + d;
 						}
 					}
 				}
 
 				disparity.set(x, y, bestRange);
+			}
+			for (int x = col1; x < left.width; x++) {
+				disparity.set(x, y, rangeDisparity);
 			}
 		}
 	}

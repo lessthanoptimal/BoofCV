@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,13 +21,10 @@ package boofcv.factory.disparity;
 import boofcv.alg.disparity.DisparityBlockMatchBestFive;
 import boofcv.struct.KernelRadius2D;
 
-/**
- * A block matching algorithm which improved performance along edges by finding the score for 9 regions but only
- * selecting the 5 best.
- *
- * @author Peter Abeles
- * @see DisparityBlockMatchBestFive
- */
+/// A block matching algorithm which improved performance along edges by finding the score for 9 regions but only
+/// selecting the 5 best.
+///
+/// @see DisparityBlockMatchBestFive
 public class ConfigDisparityBMBest5 extends ConfigDisparityBM {
 
 	public ConfigDisparityBMBest5() {

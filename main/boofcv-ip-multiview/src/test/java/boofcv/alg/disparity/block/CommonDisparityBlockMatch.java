@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -73,7 +73,7 @@ public abstract class CommonDisparityBlockMatch<I extends ImageGray<I>> {
 		this.minDisparity = minDisparity;
 		this.maxDisparity = maxDisparity;
 		this.rangeDisparity = maxDisparity - minDisparity + 1;
-		this.score = new double[maxDisparity + 1];
+		this.score = new double[rangeDisparity]; // indexed by disparity - minDisparity
 		this.radiusX = radiusWidth;
 		this.radiusY = radiusHeight;
 	}
@@ -96,20 +96,29 @@ public abstract class CommonDisparityBlockMatch<I extends ImageGray<I>> {
 		w = left.width;
 		h = left.height;
 
+		// Columns outside [col0, col1) have no disparity whose match stays inside the image (either border).
+		// minDisparity/maxDisparity may be negative.
+		int col0 = Math.max(0, minDisparity);
+		int col1 = w + Math.min(0, maxDisparity);
+
 		// Compute disparity for each pixel
 		for (int y = 0; y < h; y++) {
-			for (int x = 0; x < minDisparity; x++) {
+			for (int x = 0; x < col0; x++) {
 				imageDisparity.set(x, y, (float)rangeDisparity);
 			}
-			for (int x = minDisparity; x < w; x++) {
-				// take in account image border when computing max disparity
-				int localMaxDisparity = Math.min(x, maxDisparity);
+			for (int x = col0; x < col1; x++) {
+				// disparity range at this column, clamped so the matched right column (x-d) stays in the image
+				int disparityLow = Math.max(minDisparity, x - (w - 1));
+				int disparityHigh = Math.min(maxDisparity, x);
 
 				// compute match score across all candidates
-				processPixel(x, y, localMaxDisparity);
+				processPixel(x, y, disparityLow, disparityHigh);
 
 				// select the best disparity
-				imageDisparity.set(x, y, (float)selectBest(localMaxDisparity));
+				imageDisparity.set(x, y, (float)selectBest(disparityLow, disparityHigh));
+			}
+			for (int x = col1; x < w; x++) {
+				imageDisparity.set(x, y, (float)rangeDisparity);
 			}
 		}
 	}
@@ -119,41 +128,45 @@ public abstract class CommonDisparityBlockMatch<I extends ImageGray<I>> {
 	 *
 	 * @param c_x Center of region on left image. x-axis
 	 * @param c_y Center of region on left image. y-axis
-	 * @param localMaxDisparity Max allowed disparity
+	 * @param disparityLow Lowest disparity to consider at this pixel (inclusive)
+	 * @param disparityHigh Highest disparity to consider at this pixel (inclusive)
 	 */
-	private void processPixel( int c_x, int c_y, int localMaxDisparity ) {
-		for (int i = minDisparity; i <= localMaxDisparity; i++) {
-			score[i] = computeScore(c_x, c_x - i, c_y);
+	private void processPixel( int c_x, int c_y, int disparityLow, int disparityHigh ) {
+		for (int d = disparityLow; d <= disparityHigh; d++) {
+			score[d - minDisparity] = computeScore(c_x, c_x - d, c_y);
 		}
 	}
 
 	/**
-	 * Select best disparity using the inner takes all approach
+	 * Select best disparity using the winner takes all approach
 	 *
-	 * @param localMaxDisparity The max allowed disparity at this pixel
-	 * @return The best disparity selected.
+	 * @param disparityLow Lowest disparity at this pixel (inclusive)
+	 * @param disparityHigh Highest disparity at this pixel (inclusive)
+	 * @return The best disparity selected, relative to minDisparity.
 	 */
-	protected double selectBest( int localMaxDisparity ) {
-		int bestIndex = minDisparity;
-		double bestScore = score[bestIndex];
+	protected double selectBest( int disparityLow, int disparityHigh ) {
+		int bestDisparity = disparityLow;
+		double bestScore = score[disparityLow - minDisparity];
 
 		if (errorType.isCorrelation()) {
-			for (int i = minDisparity + 1; i <= localMaxDisparity; i++) {
-				if (score[i] > bestScore) {
-					bestScore = score[i];
-					bestIndex = i;
+			for (int d = disparityLow + 1; d <= disparityHigh; d++) {
+				double s = score[d - minDisparity];
+				if (s > bestScore) {
+					bestScore = s;
+					bestDisparity = d;
 				}
 			}
 		} else {
-			for (int i = minDisparity + 1; i <= localMaxDisparity; i++) {
-				if (score[i] < bestScore) {
-					bestScore = score[i];
-					bestIndex = i;
+			for (int d = disparityLow + 1; d <= disparityHigh; d++) {
+				double s = score[d - minDisparity];
+				if (s < bestScore) {
+					bestScore = s;
+					bestDisparity = d;
 				}
 			}
 		}
 
-		return bestIndex - minDisparity;
+		return bestDisparity - minDisparity;
 	}
 
 	/**
