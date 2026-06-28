@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,26 +25,26 @@ import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.ImageGray;
 import lombok.Getter;
 
-/**
- * Base class for computing sparse stereo disparity scores using a block matching approach given a
- * rectified stereo pair.
- *
- * @author Peter Abeles
- */
+/// Base class for computing sparse stereo disparity scores using a block matching approach given a
+/// rectified stereo pair.
 @SuppressWarnings({"NullAway.Init"})
 public abstract class DisparitySparseRectifiedScoreBM<ArrayData, Input extends ImageGray<Input>> {
-	/** the minimum disparity value (inclusive) */
+	/// the minimum disparity value (inclusive)
 	protected @Getter int disparityMin;
-	/** maximum allowed image disparity (exclusive) */
+	/// maximum allowed image disparity (exclusive)
 	protected @Getter int disparityMax;
-	/** difference between max and min */
+	/// difference between max and min
 	protected @Getter int disparityRange;
-	/** the local disparity range at the current image coordinate in left to right direction */
+	/// (Output) lowest valid disparity at the current pixel, left to right direction
+	protected @Getter int localDisparityMinLtoR;
+	/// (Output) lowest valid disparity at the current pixel, right to left direction
+	protected @Getter int localDisparityMinRtoL;
+	/// (Output) the local disparity range at the current image coordinate in left to right direction
 	protected @Getter int localRangeLtoR;
-	/** the local disparity range at the current image coordinate in right to left direction */
+	/// (Output) the local disparity range at the current image coordinate in right to left direction
 	protected @Getter int localRangeRtoL;
 
-	/** radius of the region along x and y axis */
+	/// radius of the region along x and y axis
 	protected @Getter int radiusX, radiusY;
 	// size of the region: radius*2 + 1
 	protected int blockWidth, blockHeight;
@@ -58,7 +58,7 @@ public abstract class DisparitySparseRectifiedScoreBM<ArrayData, Input extends I
 	// handles border pixels
 	protected ImageBorder<Input> border;
 
-	/** Input image type */
+	/// Input image type
 	protected @Getter Class<Input> inputType;
 
 	// Copies of only the pixels needed to compute the sparse disparity. These local patches are used
@@ -72,12 +72,10 @@ public abstract class DisparitySparseRectifiedScoreBM<ArrayData, Input extends I
 	protected int sampleRadiusX = -1;
 	protected int sampleRadiusY = -1;
 
-	/**
-	 * Configures disparity calculation.
-	 *
-	 * @param radiusX Radius of the rectangular region along x-axis.
-	 * @param radiusY Radius of the rectangular region along y-axis.
-	 */
+	/// Configures disparity calculation.
+	///
+	/// @param radiusX Radius of the rectangular region along x-axis.
+	/// @param radiusY Radius of the rectangular region along y-axis.
 	protected DisparitySparseRectifiedScoreBM( int radiusX, int radiusY, Class<Input> inputType ) {
 		this.radiusX = radiusX;
 		this.radiusY = radiusY;
@@ -89,7 +87,7 @@ public abstract class DisparitySparseRectifiedScoreBM<ArrayData, Input extends I
 		patchCompare = GeneralizedImageOps.createSingleBand(inputType, 1, 1);
 	}
 
-	/** Default constructor primarily for unit tests */
+	/// Default constructor primarily for unit tests
 	protected DisparitySparseRectifiedScoreBM( Class<Input> inputType ) {
 		this.inputType = inputType;
 		patchTemplate = GeneralizedImageOps.createSingleBand(inputType, 1, 1);
@@ -101,22 +99,16 @@ public abstract class DisparitySparseRectifiedScoreBM<ArrayData, Input extends I
 		this.sampleRadiusY = radiusY;
 	}
 
-	/**
-	 * Specifies how the image border is handled
-	 */
+	/// Specifies how the image border is handled
 	public void setBorder( ImageBorder<Input> border ) {
 		this.border = border;
 	}
 
-	/**
-	 * Configures the disparity search
-	 *
-	 * @param disparityMin Minimum disparity that it will check. Must be &ge; 0 and < disparityMax
-	 * @param disparityRange Number of possible disparity values estimated. The max possible disparity is min+range-1.
-	 */
+	/// Configures the disparity search
+	///
+	/// @param disparityMin Minimum disparity that it will check. May be negative.
+	/// @param disparityRange Number of possible disparity values estimated. The max possible disparity is min+range-1.
 	public void configure( int disparityMin, int disparityRange ) {
-		if (disparityMin < 0)
-			throw new IllegalArgumentException("Min disparity must be greater than or equal to zero. max=" + disparityMin);
 		if (disparityRange <= 0)
 			throw new IllegalArgumentException("Disparity range must be more than 0");
 
@@ -133,40 +125,39 @@ public abstract class DisparitySparseRectifiedScoreBM<ArrayData, Input extends I
 		patchTemplate.reshape(sampledWidth, sampledHeight);
 	}
 
-	/**
-	 * Specify inputs for left and right camera images.
-	 *
-	 * @param left Rectified left camera image.
-	 * @param right Rectified right camera image.
-	 */
+	/// Specify inputs for left and right camera images.
+	///
+	/// @param left Rectified left camera image.
+	/// @param right Rectified right camera image.
 	public void setImages( Input left, Input right ) {
 		InputSanityCheck.checkSameShape(left, right);
 		this.left = left;
 		this.right = right;
 	}
 
-	/**
-	 * Compute disparity scores for the specified pixel in left to right direction. Be sure that its not too close to
-	 * the image border.
-	 *
-	 * @param x x-coordinate of point
-	 * @param y y-coordinate of point.
-	 */
+	/// Compute disparity scores for the specified pixel in left to right direction. Be sure that its not too close to
+	/// the image border.
+	///
+	/// @param x x-coordinate of point
+	/// @param y y-coordinate of point.
 	public boolean processLeftToRight( int x, int y ) {
-		// can't estimate disparity if there are no pixels it can estimate disparity from
-		if (x < disparityMin)
+		// valid disparity window at this column, clamped so the matched right column (x-d) stays in the image.
+		// disparityMin may be negative.
+		int disparityHigh = Math.min(x, disparityMax);
+		int disparityLow = Math.max(disparityMin, x - (left.width - 1));
+		if (disparityHigh < disparityLow)
 			return false;
 
-		// adjust disparity range for image border
-		localRangeLtoR = Math.min(x, disparityMax) - disparityMin + 1;
+		localDisparityMinLtoR = disparityLow;
+		localRangeLtoR = disparityHigh - disparityLow + 1;
 
 		patchCompare.reshape(sampledWidth + localRangeLtoR - 1, sampledHeight);
 		// -1 because 'w' includes a range of 1 implicitly
 
-		// Create local copies that include the image border
+		// Create local copies that include the image border. The maximum disparity is at the beginning of the
+		// right patch (smallest right column) and the disparity decreases along the patch.
 		copy(x, y, 1, left, patchTemplate);
-		copy(x - disparityMin - localRangeLtoR + 1, y, localRangeLtoR, right, patchCompare);
-		// Maximum disparity will be at the beginning of the right path and decrease as x increases
+		copy(x - disparityHigh, y, localRangeLtoR, right, patchCompare);
 
 		// Compute scores from the copied local patches
 		scoreDisparity(localRangeLtoR, true);
@@ -174,28 +165,28 @@ public abstract class DisparitySparseRectifiedScoreBM<ArrayData, Input extends I
 		return true;
 	}
 
-	/**
-	 * Compute disparity scores for the specified pixel in right to left direction. Be sure that its not too close to
-	 * the image border.
-	 *
-	 * @param x x-coordinate of point
-	 * @param y y-coordinate of point.
-	 */
+	/// Compute disparity scores for the specified pixel in right to left direction. Be sure that its not too close to
+	/// the image border.
+	///
+	/// @param x x-coordinate of point
+	/// @param y y-coordinate of point.
 	public boolean processRightToLeft( int x, int y ) {
-		// can't estimate disparity if there are no pixels it can estimate disparity from
-		if (x + disparityMin >= left.width)
+		// valid disparity window for this right column, clamped so the matched left column (x+d) stays in the image.
+		// disparityMin may be negative.
+		int disparityHigh = Math.min(disparityMax, left.width - 1 - x);
+		int disparityLow = Math.max(disparityMin, -x);
+		if (disparityHigh < disparityLow)
 			return false;
 
-		// adjust disparity range for image border
-		localRangeRtoL = Math.min(x + disparityMin + disparityRange, left.width) - x - disparityMin;
+		localDisparityMinRtoL = disparityLow;
+		localRangeRtoL = disparityHigh - disparityLow + 1;
 
 		patchCompare.reshape(sampledWidth + localRangeRtoL - 1, sampledHeight);
 		// -1 because 'w' includes a range of 1 implicitly
 
 		// Create local copies that include the image border
 		copy(x, y, 1, right, patchTemplate);
-		copy(x + disparityMin, y, localRangeRtoL, left, patchCompare);
-		// Maximum disparity will be at the beginning of the right path and decrease as x increases
+		copy(x + disparityLow, y, localRangeRtoL, left, patchCompare);
 
 		// Compute scores from the copied local patches
 		scoreDisparity(localRangeRtoL, false);
@@ -203,9 +194,7 @@ public abstract class DisparitySparseRectifiedScoreBM<ArrayData, Input extends I
 		return true;
 	}
 
-	/**
-	 * Copies a local image patch so that the score function doesn't need to deal with image border issues
-	 */
+	/// Copies a local image patch so that the score function doesn't need to deal with image border issues
 	protected final void copy( int startX, int startY, int length, Input src, Input dst ) {
 		int x0 = startX - radiusX - sampleRadiusX;
 		int y0 = startY - radiusY - sampleRadiusY;
@@ -215,25 +204,19 @@ public abstract class DisparitySparseRectifiedScoreBM<ArrayData, Input extends I
 		GImageMiscOps.copy(x0, y0, 0, 0, x1 - x0, y1 - y0, src, border, dst);
 	}
 
-	/**
-	 * Scores the disparity using image patches.
-	 *
-	 * @param disparityRange The local range for disparity
-	 * @param leftToRight If true then the disparity is being from in left to right direction (the typical)
-	 */
+	/// Scores the disparity using image patches.
+	///
+	/// @param disparityRange The local range for disparity
+	/// @param leftToRight If true then the disparity is being from in left to right direction (the typical)
 	protected abstract void scoreDisparity( int disparityRange, boolean leftToRight );
 
-	/**
-	 * Array containing disparity score computed by calling {@link #processLeftToRight}. Each element corresponds
-	 * to the disparity score relative to {@link #disparityMin} and has a max value specified by
-	 * {@link #getLocalRangeLtoR()}
-	 */
+	/// (Output) Array containing disparity score computed by calling [#processLeftToRight]. Each element corresponds
+	/// to the disparity score relative to [#localDisparityMinLtoR] and has a max value specified by
+	/// [#getLocalRangeLtoR()]
 	public abstract ArrayData getScoreLtoR();
 
-	/**
-	 * Array containing disparity score computed by calling {@link #processRightToLeft}. Each element corresponds
-	 * to the disparity score relative to {@link #disparityMin} and has a max value specified by
-	 * {@link #getLocalRangeRtoL()}
-	 */
+	/// (Output) Array containing disparity score computed by calling [#processRightToLeft]. Each element corresponds
+	/// to the disparity score relative to [#localDisparityMinRtoL] and has a max value specified by
+	/// [#getLocalRangeRtoL()]
 	public abstract ArrayData getScoreRtoL();
 }
