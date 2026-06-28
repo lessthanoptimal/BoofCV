@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -117,6 +117,29 @@ public abstract class CompareSparseToDenseDisparityChecks<T extends ImageGray<T>
 		config.regionRadiusX = 2;
 		config.regionRadiusY = 5;
 		compareResults(config);
+	}
+
+	/// Disparity range that includes negative values (e.g. depth from dual pixels).
+	@Test void checkNegativeDisparity() {
+		// straddles zero
+		checkNegativeDisparity(-4, 15);
+		// never crosses zero
+		checkNegativeDisparity(-6, 3);
+	}
+
+	void checkNegativeDisparity( int min, int range ) {
+		ConfigDisparityBM config = createConfig();
+		config.disparityMin = min;
+		config.disparityRange = range;
+
+		// exercise the right-to-left validation (incl. disabled) and sub-pixel with a negative minimum
+		for (int tol : new int[]{-1, 0, 1, 5}) {
+			config.validateRtoL = tol;
+			config.subpixel = true;
+			compareResults(config);
+			config.subpixel = false;
+			compareResults(config);
+		}
 	}
 
 	public <D extends ImageGray<D>>

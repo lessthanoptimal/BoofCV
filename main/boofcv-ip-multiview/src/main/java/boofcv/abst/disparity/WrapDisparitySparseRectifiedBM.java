@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,18 +23,11 @@ import boofcv.alg.disparity.block.score.DisparitySparseRectifiedScoreBM;
 import boofcv.struct.image.ImageGray;
 import lombok.Getter;
 
-/**
- * Wrapper around {@link DisparitySparseRectifiedScoreBM} for {@link StereoDisparitySparse}
- *
- * @author Peter Abeles
- */
+/// Wrapper around [DisparitySparseRectifiedScoreBM] for [StereoDisparitySparse]
 public class WrapDisparitySparseRectifiedBM<ArrayData, T extends ImageGray<T>>
 		implements StereoDisparitySparse<T> {
 	@Getter DisparitySparseRectifiedScoreBM<ArrayData, T> computeScore;
 	@Getter DisparitySparseSelect<ArrayData> select;
-
-	// for an insignificant speed boost save this constant as a floating point number
-	double minDisparityFloat;
 
 	public WrapDisparitySparseRectifiedBM( DisparitySparseRectifiedScoreBM<ArrayData, T> computeScore,
 										   DisparitySparseSelect<ArrayData> select ) {
@@ -45,12 +38,13 @@ public class WrapDisparitySparseRectifiedBM<ArrayData, T extends ImageGray<T>>
 	@Override
 	public void setImages( T imageLeft, T imageRight ) {
 		computeScore.setImages(imageLeft, imageRight);
-		minDisparityFloat = computeScore.getDisparityMin();
 	}
 
 	@Override
 	public double getDisparity() {
-		return minDisparityFloat + select.getDisparity();
+		// the score array is indexed relative to the first valid disparity at this pixel, which equals
+		// disparityMin except where a negative disparity is clamped by the right image border
+		return computeScore.getLocalDisparityMinLtoR() + select.getDisparity();
 	}
 
 	@Override

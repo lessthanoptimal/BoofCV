@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,11 +21,7 @@ package boofcv.alg.disparity.block.select;
 import boofcv.alg.disparity.block.SelectSparseStandardWta;
 import boofcv.alg.disparity.block.score.DisparitySparseRectifiedScoreBM;
 
-/**
- * Selects the best correlation score with sanity checks.
- *
- * @author Peter Abeles
- */
+/// Selects the best correlation score with sanity checks.
 public class SelectSparseCorrelationWithChecksWta_F32 extends SelectSparseStandardWta<float[]> {
 
 	// texture threshold
@@ -89,10 +85,12 @@ public class SelectSparseCorrelationWithChecksWta_F32 extends SelectSparseStanda
 
 		// if requested perform right to left validation. Ideally the two disparities will be identical
 		if (tolRightToLeft >= 0) {
-			if (!scorer.processRightToLeft(x - bestDisparity - scorer.getDisparityMin(), y))
+			int localMinLtoR = scorer.getLocalDisparityMinLtoR();
+			if (!scorer.processRightToLeft(x - bestDisparity - localMinLtoR, y))
 				return false;
 			final float[] scoresRtoL = scorer.getScoreRtoL();
 			final int localRangeRtoL = scorer.getLocalRangeRtoL();
+			int localMinRtoL = scorer.getLocalDisparityMinRtoL();
 			int bestDisparityRtoL = 0;
 			float scoreBestRtoL = scoresRtoL[0];
 
@@ -103,7 +101,8 @@ public class SelectSparseCorrelationWithChecksWta_F32 extends SelectSparseStanda
 					bestDisparityRtoL = i;
 				}
 			}
-			if (Math.abs(bestDisparityRtoL - bestDisparity) > tolRightToLeft)
+			// compare actual disparities; the L2R and R2L windows can start at different disparities
+			if (Math.abs((localMinRtoL + bestDisparityRtoL) - (localMinLtoR + bestDisparity)) > tolRightToLeft)
 				return false;
 		}
 
