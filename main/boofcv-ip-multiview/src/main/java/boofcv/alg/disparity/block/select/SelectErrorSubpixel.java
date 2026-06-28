@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,30 +21,20 @@ package boofcv.alg.disparity.block.select;
 import boofcv.alg.disparity.block.DisparitySelect;
 import boofcv.struct.image.GrayF32;
 
-/**
- * <p>
- * Implementation of {@link SelectErrorWithChecks_S32} that adds sub-pixel accuracy. Using
- * equation (3) from [1]:<br>
- *
- * d_sub = d + (C0 - C2)/(2*(C0 - 2*C1 + C2)<br>
- *
- * where C0,C1,C2 is the cost value, before, at, and after the selected disparity.
- * </p>
- *
- * <p>
- * [1] Wannes van der Mark and Dariu M. Gavrila, "Real-Time Dense Stereo for Intelligent Vehicles"
- * IEEE Trans. Intelligent Transportation Systems, Vol 7., No 1. March 2006.
- * </p>
- *
- * @author Peter Abeles
- */
+/// Implementation of [SelectErrorWithChecks_S32] that adds sub-pixel accuracy. Using
+/// equation (3) from [1]:
+///
+/// d\_sub = d + (C0 - C2)/(2\*(C0 - 2\*C1 + C2)
+///
+/// where C0,C1,C2 is the cost value, before, at, and after the selected disparity.
+///
+/// [1] Wannes van der Mark and Dariu M. Gavrila, "Real-Time Dense Stereo for Intelligent Vehicles"
+/// IEEE Trans. Intelligent Transportation Systems, Vol 7., No 1. March 2006.
 public class SelectErrorSubpixel {
 
-	/**
-	 * For scores of type int[]
-	 */
+	/// For scores of type int[]
 	public static class S32_F32 extends SelectErrorWithChecks_S32<GrayF32> {
-		/** If the error is a squared error. If false then it's assumed to be distance */
+		/// If the error is a squared error. If false then it's assumed to be distance
 		final boolean squaredError;
 
 		public S32_F32( int maxError, int rightToLeftTolerance, double texture, boolean squaredError ) {
@@ -60,7 +50,7 @@ public class SelectErrorSubpixel {
 		@Override
 		protected void setDisparity( int index, int disparityValue, float score ) {
 
-			if (disparityValue <= 0 || disparityValue >= localRange - 1) {
+			if (disparityValue <= localDisparityMin || disparityValue >= localRange - 1) {
 				imageDisparity.data[index] = disparityValue;
 			} else {
 				float c0 = columnScore[disparityValue - 1];
@@ -91,11 +81,9 @@ public class SelectErrorSubpixel {
 		}
 	}
 
-	/**
-	 * For scores of type float[]
-	 */
+	/// For scores of type float[]
 	public static class F32_F32 extends SelectErrorWithChecks_F32<GrayF32> {
-		/** If the error is a squared error. If false then it's assumed to be distance */
+		/// If the error is a squared error. If false then it's assumed to be distance
 		final boolean squaredError;
 
 		public F32_F32( int maxError, int rightToLeftTolerance, double texture, boolean squaredError ) {
@@ -110,7 +98,7 @@ public class SelectErrorSubpixel {
 
 		@Override protected void setDisparity( int index, int disparityValue, float score ) {
 
-			if (disparityValue <= 0 || disparityValue >= localRange - 1) {
+			if (disparityValue <= localDisparityMin || disparityValue >= localRange - 1) {
 				imageDisparity.data[index] = disparityValue;
 			} else {
 				float c0 = columnScore[disparityValue - 1];

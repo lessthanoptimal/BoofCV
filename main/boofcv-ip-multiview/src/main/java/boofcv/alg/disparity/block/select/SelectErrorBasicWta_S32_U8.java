@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,34 +23,32 @@ import boofcv.alg.disparity.block.SelectDisparityBasicWta;
 import boofcv.misc.Compare_S32;
 import boofcv.struct.image.GrayU8;
 
-/**
- * <p>
- * Implementation of {@link SelectDisparityBasicWta} for scores of type S32.
- * </p>
- *
- * @author Peter Abeles
- */
+/// Implementation of [SelectDisparityBasicWta] for scores of type S32.
 public class SelectErrorBasicWta_S32_U8 extends SelectDisparityBasicWta<int[], GrayU8> implements Compare_S32 {
 	@Override
 	public void process( int row, int[] scores ) {
 
 		int indexDisparity = imageDisparity.startIndex + row*imageDisparity.stride;
 
+		// first and last  columns it will consider
+		int col0 = Math.max(0, disparityMin);
+		int col1 = imageWidth + Math.min(0, disparityMax);
+
 		// Mark all pixels as invalid which can't be estimate due to disparityMin
-		for (int col = 0; col < disparityMin; col++) {
+		for (int col = 0; col < col0; col++) {
 			imageDisparity.data[indexDisparity++] = (byte)disparityRange;
 		}
 
-		// Select the best disparity from all the rest
-		for (int col = disparityMin; col < imageWidth; col++) {
+		for (int col = col0; col < col1; col++) {
+			int localDisparityMin = disparityMinAtColumnL2R(col) - disparityMin;
 			int localRange = disparityMaxAtColumnL2R(col) - disparityMin + 1;
-			int indexScore = col - disparityMin;
+			int indexScore = col + localDisparityMin*imageWidth;
 
-			int bestDisparity = 0;
+			int bestDisparity = localDisparityMin;
 			int scoreBest = scores[indexScore];
 			indexScore += imageWidth;
 
-			for (int disparity = 1; disparity < localRange; disparity++, indexScore += imageWidth) {
+			for (int disparity = localDisparityMin + 1; disparity < localRange; disparity++, indexScore += imageWidth) {
 				int s = scores[indexScore];
 				if (s < scoreBest) {
 					scoreBest = s;
@@ -59,6 +57,11 @@ public class SelectErrorBasicWta_S32_U8 extends SelectDisparityBasicWta<int[], G
 			}
 
 			imageDisparity.data[indexDisparity++] = (byte)bestDisparity;
+		}
+
+		// mark pixels on the upper end as invalid if it can't reach them
+		for (int col = col1; col < imageWidth; col++) {
+			imageDisparity.data[indexDisparity++] = (byte)disparityRange;
 		}
 	}
 

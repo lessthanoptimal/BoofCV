@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,14 +30,7 @@ import org.jetbrains.annotations.Nullable;
 import pabeles.concurrency.GrowArray;
 import pabeles.concurrency.IntRangeObjectConsumer;
 
-/**
- * <p>
- * Implementation of {@link boofcv.alg.disparity.DisparityBlockMatchBestFive} for processing
- * images of type {@link GrayU8}.
- * </p>
- *
- * @author Peter Abeles
- */
+/// Implementation of [boofcv.alg.disparity.DisparityBlockMatchBestFive] for processing images of type [GrayU8].
 @SuppressWarnings({"NullAway.Init"})
 public class DisparityScoreBMBestFive_S32<T extends ImageBase<T>, DI extends ImageGray<DI>>
 		extends DisparityBlockMatchBestFive<T, DI> {
@@ -155,10 +148,8 @@ public class DisparityScoreBMBestFive_S32<T extends ImageBase<T>, DI extends Ima
 		}
 	}
 
-	/**
-	 * Initializes disparity calculation by finding the scores for the initial block of horizontal
-	 * rows.
-	 */
+	/// Initializes disparity calculation by finding the scores for the initial block of horizontal
+	/// rows.
 	private void computeFirstRow( final int row0, final WorkSpace ws ) {
 		int disparityMax = Math.min(left.width, this.disparityMax);
 
@@ -188,11 +179,9 @@ public class DisparityScoreBMBestFive_S32<T extends ImageBase<T>, DI extends Ima
 		}
 	}
 
-	/**
-	 * Using previously computed results it efficiently finds the disparity in the remaining rows.
-	 * When a new block is processes the last row/column is subtracted and the new row/column is
-	 * added.
-	 */
+	/// Using previously computed results it efficiently finds the disparity in the remaining rows.
+	/// When a new block is processes the last row/column is subtracted and the new row/column is
+	/// added.
 	private void computeRemainingRows( final int row0, final int row1, final WorkSpace ws ) {
 		int disparityMax = Math.min(left.width, this.disparityMax);
 
@@ -257,32 +246,37 @@ public class DisparityScoreBMBestFive_S32<T extends ImageBase<T>, DI extends Ima
 		}
 	}
 
-	/**
-	 * Compute the final score by sampling the 5 regions. Four regions are sampled around the center
-	 * region. Out of those four only the two with the smallest score are used.
-	 */
+	/// Compute the final score by sampling the 5 regions. Four regions are sampled around the center
+	/// region. Out of those four only the two with the smallest score are used.
 	protected void computeScoreFive( int[] top, int[] middle, int[] bottom, int[] score, int width,
 									 Compare_S32 compare ) {
-		int disparityMax = Math.min(left.width, this.disparityMax);
 		final int WORST_SCORE = Integer.MAX_VALUE*compare.compare(0, 1);
 
-		// disparity as the outer loop to maximize common elements in inner loops, reducing redundant calculations
-		for (int d = disparityMin; d <= disparityMax; d++) {
-			// take in account the different in image border between the sub-regions and the effective region
-			int indexSrc = (d - disparityMin)*width + (d - disparityMin);
-			int indexDst = (d - disparityMin)*width + (d - disparityMin);
+		// Only disparities whose matched column stays inside the image produce a score: |d| <= width-1
+		int dispMin = Math.max(disparityMin, 1 - width);
+		int dispMax = Math.min(this.disparityMax, width - 1);
 
-			for (int i = 0; i < width - d; i++, indexSrc++) {
+		// disparity as the outer loop to maximize common elements in inner loops, reducing redundant calculations
+		for (int d = dispMin; d <= dispMax; d++) {
+			int dispFromMin = d - disparityMin;
+			int numCols = width - Math.abs(d); // number of valid columns at this disparity (always >= 1)
+
+			// scores are stored at the absolute column within each disparity's row
+			int firstCol = Math.max(0, d);
+			int indexSrc = dispFromMin*width + firstCol;
+
+			for (int c = firstCol; c < firstCol + numCols; c++, indexSrc++) {
 				int val0 = WORST_SCORE;
 				int val1 = WORST_SCORE;
 				int val2 = WORST_SCORE;
 				int val3 = WORST_SCORE;
 
-				if (i + d + radiusX < width) { // is the sample in the left image inside
+				// neighboring column samples are only used when they hold a valid score for this disparity
+				if (c + radiusX < firstCol + numCols) {
 					val1 = top[indexSrc + radiusX];
 					val3 = bottom[indexSrc + radiusX];
 				}
-				if (i - radiusX >= 0) { // is the sample in the right image inside
+				if (c - radiusX >= firstCol) {
 					val0 = top[indexSrc - radiusX];
 					val2 = bottom[indexSrc - radiusX];
 				}
@@ -308,7 +302,7 @@ public class DisparityScoreBMBestFive_S32<T extends ImageBase<T>, DI extends Ima
 					s = val0 + val1;
 				}
 
-				score[indexDst++] = s + middle[indexSrc];
+				score[indexSrc] = s + middle[indexSrc];
 			}
 		}
 	}

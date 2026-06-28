@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -114,13 +114,15 @@ public abstract class ChecksDisparityBMBestFive<I extends ImageGray<I>, DI exten
 
 		BasicTests() {super(ChecksDisparityBMBestFive.this.minVal, ChecksDisparityBMBestFive.this.maxVal, imageType);}
 
-		@Override
-		public void initialize( int minDisparity, int maxDisparity ) {
-			alg = createAlg(minDisparity, maxDisparity, 2, 3);
+		@Override public void initialize( int minDisparity, int maxDisparity, int radiusX, int radiusY ) {
+			alg = createAlg(minDisparity, maxDisparity, radiusX, radiusY);
 		}
 
-		@Override
-		public DI computeDisparity( I left, I right ) {
+		@Override public int radiusToKernelRadiusX( int radius ) {
+			return radius*2 + 1;
+		}
+
+		@Override public DI computeDisparity( I left, I right ) {
 			DI ret = GeneralizedImageOps.createSingleBand(disparityType, left.width, left.height);
 			alg.process(left, right, ret, null);
 			return ret;
@@ -146,11 +148,14 @@ public abstract class ChecksDisparityBMBestFive<I extends ImageGray<I>, DI exten
 		// compare to naive with different settings
 		compareToNaive(left, right, 0, 10, radiusX, radiusY);
 		compareToNaive(left, right, 4, 10, radiusX, radiusY);
+		// disparity ranges that include negative values
+		compareToNaive(left, right, -5, 5, radiusX, radiusY);
+		compareToNaive(left, right, -8, -2, radiusX, radiusY);
 	}
 
 	private void compareToNaive( I left, I right,
-								 int minDisparity, int maxDisparity,
-								 int radiusX, int radiusY ) {
+	                             int minDisparity, int maxDisparity,
+	                             int radiusX, int radiusY ) {
 		int w = left.width;
 		int h = left.height;
 
@@ -187,11 +192,14 @@ public abstract class ChecksDisparityBMBestFive<I extends ImageGray<I>, DI exten
 		// compare to naive with different settings
 		checkConcurrent(left, right, 0, 10, radiusX, radiusY);
 		checkConcurrent(left, right, 4, 10, radiusX, radiusY);
+		// disparity ranges that include negative values
+		checkConcurrent(left, right, -5, 5, radiusX, radiusY);
+		checkConcurrent(left, right, -8, -2, radiusX, radiusY);
 	}
 
 	private void checkConcurrent( I left, I right,
-								  int minDisparity, int maxDisparity,
-								  int radiusX, int radiusY ) {
+	                              int minDisparity, int maxDisparity,
+	                              int radiusX, int radiusY ) {
 		int w = left.width;
 		int h = left.height;
 

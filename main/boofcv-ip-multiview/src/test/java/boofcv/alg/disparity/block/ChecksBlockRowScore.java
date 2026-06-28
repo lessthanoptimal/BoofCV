@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -94,17 +94,18 @@ public abstract class ChecksBlockRowScore<T extends ImageBase<T>, ScoreArray, Da
 		bright.setImage(right);
 	}
 
-	/**
-	 * Score the row and compare to a naive implementation
-	 */
-	@Test
-	void scoreRow_naive() {
+	/// Score the row and compare to a naive implementation
+	@Test void scoreRow_naive() {
 		scoreRow_naive(0, 10, 1, 2);
 		scoreRow_naive(0, 10, 5, 6);
 		scoreRow_naive(0, 5, 2, 3);
 		scoreRow_naive(2, 5, 2, 4);
 		scoreRow_naive(2, 5, 2, 0);
 		scoreRow_naive(2, 5, 2, height - 1);
+		// disparity ranges that include negative values
+		scoreRow_naive(-4, 4, 2, 3);
+		scoreRow_naive(-6, -2, 2, 4);
+		scoreRow_naive(-3, 0, 1, 2);
 	}
 
 	private void scoreRow_naive( int minDisparity, int maxDisparity, int radius, int row ) {
@@ -129,8 +130,12 @@ public abstract class ChecksBlockRowScore<T extends ImageBase<T>, ScoreArray, Da
 		alg.scoreRow(row, leftRow, rightRow, scores, minDisparity, maxDisparity, w, elementScore);
 
 		for (int d = minDisparity; d < maxDisparity; d++) {
-			int idx = width*(d - minDisparity) + d - minDisparity;
-			for (int x = d; x < width; x++) {
+			// valid columns for this disparity, clamped to both image borders. Scores are stored at the
+			// absolute column within the row, so disparityMin may be negative.
+			int colLo = Math.max(0, d);
+			int colEnd = width + Math.min(0, d);
+			int idx = width*(d - minDisparity) + colLo;
+			for (int x = colLo; x < colEnd; x++) {
 				double found = get(idx++, scores);
 				double expected = naiveScoreRow(x, row, d, radius);
 				assertEquals(expected, found, 1);
@@ -138,17 +143,19 @@ public abstract class ChecksBlockRowScore<T extends ImageBase<T>, ScoreArray, Da
 		}
 	}
 
-	/**
-	 * Checks the complete score with normalization
-	 */
-	@Test
-	void score_naive() {
+	/// Checks the complete score with normalization
+	@Test void score_naive() {
 		score_naive(0, 10, 1, 2);
 		score_naive(0, 10, 5, 6);
 		score_naive(0, 5, 2, 3);
 		score_naive(2, 5, 2, 4);
 		score_naive(2, 5, 2, 0);
 		score_naive(2, 5, 2, height - 1);
+
+		// disparity ranges that include negative values
+		score_naive(-4, 4, 2, 3);
+		score_naive(-6, -2, 2, 4);
+		score_naive(-3, 0, 1, 2);
 	}
 
 	void score_naive( int minDisparity, int maxDisparity, int radius, int row ) {
@@ -186,8 +193,12 @@ public abstract class ChecksBlockRowScore<T extends ImageBase<T>, ScoreArray, Da
 		}
 
 		for (int d = minDisparity; d < maxDisparity; d++) {
-			int idx = width*(d - minDisparity) + d - minDisparity;
-			for (int x = d; x < width; x++) {
+			// valid columns for this disparity, clamped to both image borders. Scores are stored at the
+			// absolute column within the row, so disparityMin may be negative.
+			int colLo = Math.max(0, d);
+			int colEnd = width + Math.min(0, d);
+			int idx = width*(d - minDisparity) + colLo;
+			for (int x = colLo; x < colEnd; x++) {
 				double expected = naiveScoreRegion(x, row, d, radius);
 				double found = get(idx++, scoresEvaluated);
 //				System.out.printf("%3d  %7.4f e=%8.3f f=%8.3f\n",idx,(expected-found),expected,found);
@@ -200,14 +211,14 @@ public abstract class ChecksBlockRowScore<T extends ImageBase<T>, ScoreArray, Da
 
 	private void addToSum( ScoreArray scores, ScoreArray scoresSum ) {
 		if (scores instanceof int[]) {
-			int[] a = (int[])scores;
-			int[] b = (int[])scoresSum;
+			var a = (int[])scores;
+			var b = (int[])scoresSum;
 			for (int i = 0; i < a.length; i++) {
 				b[i] += a[i];
 			}
 		} else {
-			float[] a = (float[])scores;
-			float[] b = (float[])scoresSum;
+			var a = (float[])scores;
+			var b = (float[])scoresSum;
 			for (int i = 0; i < a.length; i++) {
 				b[i] += a[i];
 			}
@@ -220,15 +231,13 @@ public abstract class ChecksBlockRowScore<T extends ImageBase<T>, ScoreArray, Da
 			super(maxPixelValue, imageType);
 		}
 
-		@Override
-		public int[] createArray( int length ) {
+		@Override public int[] createArray( int length ) {
 			return new int[length];
 		}
 
 		protected abstract int computeError( int a, int b );
 
-		@Override
-		public double naiveScoreRow( int cx, int cy, int disparity, int radius ) {
+		@Override public double naiveScoreRow( int cx, int cy, int disparity, int radius ) {
 			int x0 = cx - radius;
 			int x1 = cx + radius + 1;
 
@@ -241,8 +250,7 @@ public abstract class ChecksBlockRowScore<T extends ImageBase<T>, ScoreArray, Da
 			return total;
 		}
 
-		@Override
-		public double naiveScoreRegion( int cx, int cy, int disparity, int radius ) {
+		@Override public double naiveScoreRegion( int cx, int cy, int disparity, int radius ) {
 			int y0 = cy - radius;
 			int y1 = cy + radius + 1;
 
@@ -253,8 +261,7 @@ public abstract class ChecksBlockRowScore<T extends ImageBase<T>, ScoreArray, Da
 			return total;
 		}
 
-		@Override
-		public double get( int index, int[] array ) {
+		@Override public double get( int index, int[] array ) {
 			return array[index];
 		}
 	}
@@ -265,15 +272,13 @@ public abstract class ChecksBlockRowScore<T extends ImageBase<T>, ScoreArray, Da
 			super(maxPixelValue, ImageType.single(GrayS64.class));
 		}
 
-		@Override
-		public int[] createArray( int length ) {
+		@Override public int[] createArray( int length ) {
 			return new int[length];
 		}
 
 		protected abstract int computeError( long a, long b );
 
-		@Override
-		public double naiveScoreRow( int cx, int cy, int disparity, int radius ) {
+		@Override public double naiveScoreRow( int cx, int cy, int disparity, int radius ) {
 			int x0 = cx - radius;
 			int x1 = cx + radius + 1;
 
@@ -286,8 +291,7 @@ public abstract class ChecksBlockRowScore<T extends ImageBase<T>, ScoreArray, Da
 			return total;
 		}
 
-		@Override
-		public double naiveScoreRegion( int cx, int cy, int disparity, int radius ) {
+		@Override public double naiveScoreRegion( int cx, int cy, int disparity, int radius ) {
 			int y0 = cy - radius;
 			int y1 = cy + radius + 1;
 
@@ -298,8 +302,7 @@ public abstract class ChecksBlockRowScore<T extends ImageBase<T>, ScoreArray, Da
 			return total;
 		}
 
-		@Override
-		public double get( int index, int[] array ) {
+		@Override public double get( int index, int[] array ) {
 			return array[index];
 		}
 	}

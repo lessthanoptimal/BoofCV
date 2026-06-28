@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,23 +31,22 @@ import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * <p>
- * Base class for all dense stereo disparity score algorithms whose score's can be processed by
- * {@link DisparitySelect}. The scores for all possible disparities at each pixel is computed for
- * an entire row at once. Then {@link DisparitySelect} is called to process this score.
- * </p>
- *
- * <p>
- * Score Format:  The index of the score for column i &ge; radiusX + minDisparity at disparity d is: <br>
- * index = imgWidth*(d-minDisparity-radiusX) + i - minDisparity-radiusX<br>
- * Format Comment:<br>
- * This ordering is a bit unnatural when searching for the best disparity, but reduces cache misses
- * when writing. Performance boost is about 20%-30% depending on max disparity and image size.
- * </p>
- *
- * @author Peter Abeles
- */
+/// Base class for all dense stereo disparity score algorithms whose score's can be processed by
+/// [DisparitySelect]. The scores for all possible disparities at each pixel is computed for
+/// an entire row at once. Then [DisparitySelect] is called to process this score.
+///
+/// Score Format: The index of the score for left column i at disparity d is:
+///
+/// index = imgWidth\*(d-disparityMin) + i
+///
+/// which is only defined where the matching right column (i-d) lies inside the image, i.e.
+/// 0 ≤ i-d ≤ width-1. disparityMin may be negative, in which case d and (i-d) are handled
+/// symmetrically and the search is clamped against both the left and right image borders.
+///
+/// Format Comment:
+///
+/// This ordering is a bit unnatural when searching for the best disparity, but reduces cache misses
+/// when writing. Performance boost is about 20%-30% depending on max disparity and image size.
 public abstract class DisparityBlockMatchRowFormat
 		<Input extends ImageBase<Input>, Disparity extends ImageGray<Disparity>> {
 	// the minimum disparity value (inclusive)
@@ -69,29 +68,23 @@ public abstract class DisparityBlockMatchRowFormat
 	protected @Getter GrowBorder<Input, Object> growBorderL;
 	protected @Getter GrowBorder<Input, Object> growBorderR;
 
-	/**
-	 * <p>To speed up computations a rolling sum is performed where it subtracts the old row then adds the new row
-	 * from the score sum. Every time you update the sum noise is added. When disparity values get small then
-	 * this error becomes noticeable and can lead to drastically incorrect answers. This
-	 * is known as catastrophic cancellation. To fix this issue, the sum is recomputed from scratch every N rows.</p>
-	 *
-	 * <p>
-	 * NOTE: Under nominal situations this won't be noticeable. A specialized performance benchmark where a flat
-	 * plane was moved away from the camera is where it was first noticed and only when very far away.
-	 * How bad the errors are also depends on the error distribution. This only affects floating point scores.
-	 * CENSUS has integer scores and is unaffected.
-	 * </p>
-	 *
-	 * <p>The value below was determined empirically in a test scenario. Set to 1 to always run.</p>
-	 */
+	/// To speed up computations a rolling sum is performed where it subtracts the old row then adds the new row
+	/// from the score sum. Every time you update the sum noise is added. When disparity values get small then
+	/// this error becomes noticeable and can lead to drastically incorrect answers. This
+	/// is known as catastrophic cancellation. To fix this issue, the sum is recomputed from scratch every N rows.
+	///
+	/// NOTE: Under nominal situations this won't be noticeable. A specialized performance benchmark where a flat
+	/// plane was moved away from the camera is where it was first noticed and only when very far away.
+	/// How bad the errors are also depends on the error distribution. This only affects floating point scores.
+	/// CENSUS has integer scores and is unaffected.
+	///
+	/// The value below was determined empirically in a test scenario. Set to 1 to always run.
 	public @Setter @Getter int catastrophicReset = 25;
 
-	/**
-	 * Configures disparity calculation.
-	 *
-	 * @param regionRadiusX Radius of the rectangular region along x-axis.
-	 * @param regionRadiusY Radius of the rectangular region along y-axis.
-	 */
+	/// Configures disparity calculation.
+	///
+	/// @param regionRadiusX Radius of the rectangular region along x-axis.
+	/// @param regionRadiusY Radius of the rectangular region along y-axis.
 	protected DisparityBlockMatchRowFormat( int regionRadiusX, int regionRadiusY, ImageType<Input> imageType ) {
 		this.radiusX = regionRadiusX;
 		this.radiusY = regionRadiusY;
@@ -108,15 +101,11 @@ public abstract class DisparityBlockMatchRowFormat
 		growBorderR.setBorder(border.copy());
 	}
 
-	/**
-	 * Configures the disparity search
-	 *
-	 * @param disparityMin Minimum disparity that it will check. Must be &ge; 0 and < maxDisparity
-	 * @param disparityRange Number of possible disparity values estimated. The max possible disparity is min+range-1.
-	 */
+	/// Configures the disparity search
+	///
+	/// @param disparityMin Minimum disparity that it will check. May be negative.
+	/// @param disparityRange Number of possible disparity values estimated. The max possible disparity is min+range-1.
 	public void configure( int disparityMin, int disparityRange ) {
-		if (disparityMin < 0)
-			throw new IllegalArgumentException("Min disparity must be greater than or equal to zero. max=" + disparityMin);
 		if (disparityRange <= 0)
 			throw new IllegalArgumentException("Disparity range must be more than 0");
 
@@ -125,14 +114,12 @@ public abstract class DisparityBlockMatchRowFormat
 		this.disparityMax = disparityMin + disparityRange - 1;
 	}
 
-	/**
-	 * Computes disparity between two stereo images
-	 *
-	 * @param left Left rectified stereo image. Input
-	 * @param right Right rectified stereo image. Input
-	 * @param disparity Disparity between the two images. Output
-	 * @param score Optional storage for best fit score
-	 */
+	/// Computes disparity between two stereo images
+	///
+	/// @param left Left rectified stereo image. Input
+	/// @param right Right rectified stereo image. Input
+	/// @param disparity Disparity between the two images. Output
+	/// @param score Optional storage for best fit score
 	public void process( Input left, Input right, Disparity disparity, @Nullable GrayF32 score ) {
 		// initialize data structures
 		InputSanityCheck.checkSameShape(left, right);
@@ -143,9 +130,7 @@ public abstract class DisparityBlockMatchRowFormat
 		_process(left, right, disparity, score);
 	}
 
-	/**
-	 * Inner function that computes the disparity.
-	 */
+	/// Inner function that computes the disparity.
 	public abstract void _process( Input left, Input right, Disparity disparity, @Nullable GrayF32 score );
 
 	public abstract ImageType<Input> getInputType();
@@ -160,9 +145,7 @@ public abstract class DisparityBlockMatchRowFormat
 		return radiusY;
 	}
 
-	/**
-	 * The maximum possible error for the region
-	 */
+	/// The maximum possible error for the region
 	public int getMaxRegionError() {
 		return regionWidth*regionHeight*getMaxPerPixelError();
 	}

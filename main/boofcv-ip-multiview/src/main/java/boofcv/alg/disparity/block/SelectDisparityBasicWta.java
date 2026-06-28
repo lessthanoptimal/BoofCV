@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,16 +22,10 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * <p>
- * Selects the optimal disparity given a set of scores using a Winner Take All (WTA) strategy
- * without any validation. In other words, it simply selects the region with the smallest
- * error as the disparity. Tends to be significantly faster than when validation is employed
- * but produces many more poor results.
- * </p>
- *
- * @author Peter Abeles
- */
+/// Selects the optimal disparity given a set of scores using a Winner Take All (WTA) strategy
+/// without any validation. In other words, it simply selects the region with the smallest
+/// error as the disparity. Tends to be significantly faster than when validation is employed
+/// but produces many more poor results.
 @SuppressWarnings({"NullAway.Init"})
 public abstract class SelectDisparityBasicWta<Array, Disparity extends ImageGray>
 		implements DisparitySelect<Array, Disparity> {
@@ -70,11 +64,17 @@ public abstract class SelectDisparityBasicWta<Array, Disparity extends ImageGray
 		}
 	}
 
-	/**
-	 * Returns the maximum allowed disparity for a particular column in left to right direction,
-	 * as limited by the image border.
-	 */
+	/// Returns the maximum allowed disparity for a particular column in left to right direction,
+	/// as limited by the image border (the matched right column `col-d` must be ≥ 0).
 	protected int disparityMaxAtColumnL2R( int col ) {
 		return Math.min(col, disparityMax);
+	}
+
+	/// Returns the minimum allowed disparity for a particular column in left to right direction. When
+	/// `disparityMin` is negative the matched right column `col-d` can fall off the right
+	/// image border, so the disparity is clamped to keep it ≤ width-1. For a non-negative
+	/// `disparityMin` this simply returns `disparityMin`.
+	protected int disparityMinAtColumnL2R( int col ) {
+		return Math.max(disparityMin, col - (imageWidth - 1));
 	}
 }

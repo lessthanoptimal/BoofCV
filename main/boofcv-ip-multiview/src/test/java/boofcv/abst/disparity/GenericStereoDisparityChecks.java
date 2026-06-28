@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -74,6 +74,9 @@ public abstract class GenericStereoDisparityChecks<Image extends ImageBase<Image
 
 	public abstract StereoDisparity<Image, Disparity> createAlg( int disparityMin, int disparityRange );
 
+	/** True if the algorithm being tested supports a negative minimum disparity. */
+	protected boolean supportsNegativeDisparity() { return false; }
+
 	/**
 	 * Checks to see if it blows up, sets invalid as invalid, and marks at least some pixels as valid
 	 */
@@ -81,15 +84,26 @@ public abstract class GenericStereoDisparityChecks<Image extends ImageBase<Image
 	void minimalSanityCheck() {
 		for (int disparityMin : new int[]{0, 1, 5}) {
 			for (int range : new int[]{1, 20}) {
-				StereoDisparity<Image, Disparity> alg = createAlg(disparityMin, range);
-				alg.process(left, right);
-				checkDisparity(disparityMin, range, alg.getDisparity());
-
-				assertEquals(disparityMin, alg.getDisparityMin());
-				assertEquals(range, alg.getDisparityRange());
-				assertTrue(range <= alg.getInvalidValue());
+				sanityCheck(disparityMin, range);
 			}
 		}
+
+		if (supportsNegativeDisparity()) {
+			// negative minimum disparity. The range is chosen so the true (+8) disparity stays inside it.
+			for (int disparityMin : new int[]{-3, -8}) {
+				sanityCheck(disparityMin, 20);
+			}
+		}
+	}
+
+	private void sanityCheck( int disparityMin, int range ) {
+		StereoDisparity<Image, Disparity> alg = createAlg(disparityMin, range);
+		alg.process(left, right);
+		checkDisparity(disparityMin, range, alg.getDisparity());
+
+		assertEquals(disparityMin, alg.getDisparityMin());
+		assertEquals(range, alg.getDisparityRange());
+		assertTrue(range <= alg.getInvalidValue());
 	}
 
 	@Test
@@ -113,21 +127,25 @@ public abstract class GenericStereoDisparityChecks<Image extends ImageBase<Image
 	}
 
 	private void checkDisparity( int min, int range, Disparity disparity ) {
+		int max = min + range - 1;
 		int totalValid = 0;
-		int total = height*(width - min);
+		int totalEligible = 0;
 		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < min; x++) {
+			for (int x = 0; x < width; x++) {
+				// columns where no disparity keeps the match inside the image are invalid (either border)
+				int hi = Math.min(max, x);
+				int lo = Math.max(min, x - (width - 1));
 				double v = GeneralizedImageOps.get(disparity, x, y);
-				assertEquals(range, v, 1e-4);
-			}
-			for (int x = min; x < width; x++) {
-				double v = GeneralizedImageOps.get(disparity, x, y);
-				if (v < range) {
-					totalValid++;
+				if (hi < lo) {
+					assertEquals(range, v, 1e-4);
+				} else {
+					totalEligible++;
+					if (v < range)
+						totalValid++;
 				}
 			}
 		}
 
-		assertTrue(totalValid/(double)total >= 0.4);
+		assertTrue(totalValid/(double)totalEligible >= 0.4);
 	}
 }

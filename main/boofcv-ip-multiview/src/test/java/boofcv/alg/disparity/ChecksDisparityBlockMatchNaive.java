@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,11 +31,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-/**
- * Test the entire block matching pipeline against a naive implementation
- *
- * @author Peter Abeles
- */
+/// Test the entire block matching pipeline against a naive implementation
 public abstract class ChecksDisparityBlockMatchNaive<T extends ImageBase<T>> extends BoofStandardJUnit {
 
 	protected static BorderType BORDER_TYPE = BorderType.EXTENDED;
@@ -54,13 +50,25 @@ public abstract class ChecksDisparityBlockMatchNaive<T extends ImageBase<T>> ext
 
 	public abstract StereoDisparity<T, GrayU8> createAlg( int blockRadius, int minDisparity, int maxDisparity );
 
-	@Test
-	void compare() {
+	@Test void compare() {
 //		BoofConcurrency.USE_CONCURRENT=false;
 		compare(40, 35, 2, 0, 10);
 		compare(40, 35, 2, 3, 10);
 		// only one possible disparity value can be considered
 		compare(10, 15, 1, 5, 5);
+	}
+
+	/// Disparity range that includes negative values. The matched pixel can be on either side of the reference
+	/// pixel and the search must be clamped against both image borders.
+	@Test void compare_negativeDisparity() {
+		// range straddling zero
+		compare(40, 35, 2, -5, 5);
+		// range entirely below zero
+		compare(40, 35, 2, -10, -3);
+		// asymmetric range ending at zero
+		compare(40, 35, 2, -4, 0);
+		// only one possible disparity value, and it's negative
+		compare(10, 15, 1, -5, -5);
 	}
 
 	void compare( int width, int height, int radius, int minDisparity, int maxDisparity ) {
@@ -80,9 +88,7 @@ public abstract class ChecksDisparityBlockMatchNaive<T extends ImageBase<T>> ext
 		BoofTesting.assertEquals(expected, alg.getDisparity(), 1e-4);
 	}
 
-	/**
-	 * Depending on the cost function different preconditions will need to be meet
-	 */
+	/// Depending on the cost function different preconditions will need to be meet
 	protected void fillInStereoImages() {
 		GImageMiscOps.fillUniform(left, rand, 0, 255);
 		GImageMiscOps.fillUniform(right, rand, 0, 255);

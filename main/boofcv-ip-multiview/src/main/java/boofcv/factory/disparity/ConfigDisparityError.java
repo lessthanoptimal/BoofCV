@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,15 +22,9 @@ import boofcv.factory.transform.census.CensusVariants;
 import boofcv.struct.Configuration;
 import boofcv.struct.pyramid.ConfigDiscreteLevels;
 
-/**
- * Configurations for different types of disparity error metrics
- *
- * @author Peter Abeles
- */
+/// Configurations for different types of disparity error metrics
 public interface ConfigDisparityError extends Configuration {
-	/**
-	 * Configuration for Census
-	 */
+	/// Configuration for Census
 	class Census implements ConfigDisparityError {
 		public CensusVariants variant = CensusVariants.BLOCK_5_5;
 
@@ -43,22 +37,15 @@ public interface ConfigDisparityError extends Configuration {
 		}
 	}
 
-	/**
-	 * Normalized cross correlation error
-	 */
+	/// Normalized cross correlation error
 	class NCC implements ConfigDisparityError {
-
-		/**
-		 * Used to avoid a divide by zero error when dividing by the standard deviation. Only used with NCC. Smaller
-		 * values are more mathematically accurate but make it more sensitive to floating point error.
-		 * This has been tuned to work with pixel values that have been scaled to -1 to 1.
-		 */
+		/// Used to avoid a divide by zero error when dividing by the standard deviation. Only used with NCC. Smaller
+		/// values are more mathematically accurate but make it more sensitive to floating point error.
+		/// This has been tuned to work with pixel values that have been scaled to -1 to 1.
 		public double eps = 5.5e-6;
 
-		/**
-		 * If true then the input will be normalized so that it has zero mean and a max absolute value of one. Reduces
-		 * numerical issues.
-		 */
+		/// If true then the input will be normalized so that it has zero mean and a max absolute value of one. Reduces
+		/// numerical issues.
 		public boolean normalizeInput = true;
 
 		@Override public void checkValidity() {}
@@ -70,28 +57,18 @@ public interface ConfigDisparityError extends Configuration {
 		}
 	}
 
-	/**
-	 * Configuration for Hierarchical Mutual Information.
-	 */
+	/// Configuration for Hierarchical Mutual Information.
 	class HMI implements ConfigDisparityError {
-		/**
-		 * Number of possible pixel values. MI was designed around 8-bit images and performance will
-		 * degrade for large values.
-		 */
+		/// Number of possible pixel values. MI was designed around 8-bit images and performance will
+		/// degrade for large values.
 		public int totalGrayLevels = 256;
-		/**
-		 * Specifies the smallest layer in pyramid. Used to compute Mutual Information Cost
-		 */
+		/// Specifies the smallest layer in pyramid. Used to compute Mutual Information Cost
 		public ConfigDiscreteLevels pyramidLayers = new ConfigDiscreteLevels(-1, 50, -1);
-		/**
-		 * Radius of Gaussian kernel when applying smoothing during Mutual Information computation.
-		 */
+		/// Radius of Gaussian kernel when applying smoothing during Mutual Information computation.
 		public int smoothingRadius = 3;
 
-		/**
-		 * Number of additional iterations to perform. This should improve the MI estimate, but the cost
-		 * is significant.
-		 */
+		/// Number of additional iterations to perform. This should improve the MI estimate, but the cost
+		/// is significant.
 		public int extraIterations = 0;
 
 		@Override public void checkValidity() {}

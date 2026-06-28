@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -72,8 +72,8 @@ public class SgmCostFromBlocks<T extends ImageBase<T>>
 			int localRangeD = Math.min(disparityRange, x - disparityMin + 1);
 			int dstIdx = (x - disparityMin)*disparityRange;
 			for (int d = 0; d < localRangeD; d++) {
-				// copy the error and range it's range
-				int srcIdx = d*lengthX + x - disparityMin;
+				// copy the error and its range. Block scores are stored at the absolute column within each row.
+				int srcIdx = d*lengthX + x;
 				costXD.data[dstIdx++] = (short)(SgmDisparityCost.MAX_COST*scoresArray[srcIdx]/maxRegionError);
 
 //				if( scoresArray[srcIdx] > maxRegionError || scoresArray[srcIdx] < 0 ) {

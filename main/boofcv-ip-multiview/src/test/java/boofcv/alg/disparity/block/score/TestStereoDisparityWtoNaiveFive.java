@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,16 +35,18 @@ class TestStereoDisparityWtoNaiveFive extends BoofStandardJUnit {
 
 		BasicTests() { super(0, 200, GrayU8.class); }
 
-		@Override
-		public void initialize( int minDisparity, int maxDisparity ) {
+		@Override public void initialize( int minDisparity, int maxDisparity, int radiusX, int radiusY ) {
 			alg = new DisparityBlockMatchBestFiveNaive<>(DisparityError.SAD);
-			alg.configure(minDisparity, maxDisparity, 2, 3);
+			alg.configure(minDisparity, maxDisparity, radiusX, radiusY);
 			alg.setBorder(FactoryImageBorder.
 					generic(DisparityBlockMatchNaive.BORDER_TYPE, ImageType.single(GrayU8.class)));
 		}
 
-		@Override
-		public GrayF32 computeDisparity( GrayU8 left, GrayU8 right ) {
+		@Override public int radiusToKernelRadiusX( int radius ) {
+			return radius*2 + 1;
+		}
+
+		@Override public GrayF32 computeDisparity( GrayU8 left, GrayU8 right ) {
 			GrayF32 ret = new GrayF32(left.width, left.height);
 			alg.process(left, right, ret);
 			return ret;

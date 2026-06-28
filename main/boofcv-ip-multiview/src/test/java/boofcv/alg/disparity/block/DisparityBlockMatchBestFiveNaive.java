@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,11 +24,7 @@ import boofcv.struct.image.ImageGray;
 
 import java.util.Arrays;
 
-/**
- * Naive version of {@link DisparityBlockMatchBestFive}.
- *
- * @author Peter Abeles
- */
+/// Naive version of [DisparityBlockMatchBestFive].
 public class DisparityBlockMatchBestFiveNaive<I extends ImageGray<I>>
 		extends CommonDisparityBlockMatch<I> {
 	// SCores of the four surrounding regions
@@ -38,14 +34,12 @@ public class DisparityBlockMatchBestFiveNaive<I extends ImageGray<I>>
 		super(errorType);
 	}
 
-	/**
-	 * Compute the score for five local regions and just use the center + the two best
-	 *
-	 * @param leftX X-axis center left image
-	 * @param rightX X-axis center left image
-	 * @param centerY Y-axis center for both images
-	 * @return Fit score for both regions.
-	 */
+	/// Compute the score for five local regions and just use the center + the two best
+	///
+	/// @param leftX X-axis center left image
+	/// @param rightX X-axis center left image
+	/// @param centerY Y-axis center for both images
+	/// @return Fit score for both regions.
 	@Override
 	protected double computeScore( int leftX, int rightX, int centerY ) {
 		// Ensure the rows have centers inside the image along Y axis
@@ -66,12 +60,15 @@ public class DisparityBlockMatchBestFiveNaive<I extends ImageGray<I>>
 		four[2] = computeScoreBlock(leftX - radiusX, rightX - radiusX, centerY + radius_U);
 		four[3] = computeScoreBlock(leftX + radiusX, rightX + radiusX, centerY + radius_U);
 
-		// This is a compromise for the border.
-		// Only consider what is inside the border. Not worth it to compute scores from completely imagined pixels
-		if (rightX - radiusX < 0) {
+		// This is a compromise for the border. Only consider neighboring columns that have a valid score for
+		// this disparity, i.e. columns inside [max(0,d), width-1+min(0,d)]. This matches the real implementation,
+		// which can't read scores outside that range. d may be negative.
+		int d = leftX - rightX;
+		if (leftX - radiusX < Math.max(0, d)) {
 			four[0] = sgn*Float.MAX_VALUE;
 			four[2] = sgn*Float.MAX_VALUE;
-		} else if (leftX + radiusX >= left.width) {
+		}
+		if (leftX + radiusX >= left.width + Math.min(0, d)) {
 			four[1] = sgn*Float.MAX_VALUE;
 			four[3] = sgn*Float.MAX_VALUE;
 		}
