@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,8 +37,7 @@ class TestStereoMutualInformation extends CommonSgmChecks<GrayU8> {
 		super(30, 40, ImageType.SB_U8);
 	}
 
-	@Test
-	void cost() {
+	@Test void cost() {
 		// Create two images that are offset by a constant disparity
 		GrayU8 disparity = new GrayU8(width, height);
 
@@ -61,12 +60,11 @@ class TestStereoMutualInformation extends CommonSgmChecks<GrayU8> {
 		float costCorrect = computeCost(left, right, disparity, alg);
 
 		// The cost should be much less with correct disparity
-		// not sure how to quantiyf much less since positive and negative values are allowed
+		// not sure how to quantify much less since positive and negative values are allowed
 		assertTrue(costCorrect < costIncorrect);
 	}
 
-	@Test
-	void costScaled() {
+	@Test void costScaled() {
 		// Create two images that are offset by a constant disparity
 		GrayU8 disparity = new GrayU8(width, height);
 
@@ -100,8 +98,7 @@ class TestStereoMutualInformation extends CommonSgmChecks<GrayU8> {
 	 * Given that it's know that the left and right images have the same histograms, see if the same pixel
 	 * values have the minimum costs
 	 */
-	@Test
-	void cost_minimum() {
+	@Test void cost_minimum() {
 		int invalid = 10;
 		int maxValue = 20;
 
@@ -180,8 +177,7 @@ class TestStereoMutualInformation extends CommonSgmChecks<GrayU8> {
 	/**
 	 * Make sure it properly resets itself
 	 */
-	@Test
-	void multipleCalls() {
+	@Test void multipleCalls() {
 		// Create arbitrary inputs
 		GrayU8 disparity = new GrayU8(width, height);
 
@@ -201,8 +197,7 @@ class TestStereoMutualInformation extends CommonSgmChecks<GrayU8> {
 		assertEquals(cost0, cost1);
 	}
 
-	@Test
-	void computeJointHistogram() {
+	@Test void computeJointHistogram() {
 		GrayU8 disparity = new GrayU8(width, height); // Filled with zero. So each pixel is matched at same coordinate
 
 		ImageMiscOps.fillUniform(left, rand, 10, 100);
@@ -231,8 +226,7 @@ class TestStereoMutualInformation extends CommonSgmChecks<GrayU8> {
 	/**
 	 * Make sure invalid pixels are skipped
 	 */
-	@Test
-	void computeJointHistogram_SkipInvalid() {
+	@Test void computeJointHistogram_SkipInvalid() {
 		GrayU8 disparity = new GrayU8(width, height);
 
 		ImageMiscOps.fillUniform(left, rand, 10, 100);
@@ -250,8 +244,7 @@ class TestStereoMutualInformation extends CommonSgmChecks<GrayU8> {
 		assertEquals(width*height/2, found);
 	}
 
-	@Test
-	void computeProbabilities() {
+	@Test void computeProbabilities() {
 		StereoMutualInformation alg = new StereoMutualInformation();
 		alg.configureHistogram(251);
 		// fill just the right column with the same value. This will have a specific structure
@@ -280,8 +273,7 @@ class TestStereoMutualInformation extends CommonSgmChecks<GrayU8> {
 	/**
 	 * See if zeros are handled well
 	 */
-	@Test
-	void computeEntropy_Zeros() {
+	@Test void computeEntropy_Zeros() {
 		StereoMutualInformation alg = new StereoMutualInformation();
 		alg.configureHistogram(251);
 

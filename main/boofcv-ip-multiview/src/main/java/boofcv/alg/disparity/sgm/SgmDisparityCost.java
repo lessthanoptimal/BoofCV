@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,44 +22,32 @@ import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.Planar;
 
-/**
- * <p>Computes a stack of matching costs for all pixels across all possible disparities for use
- * with {@link SgmCostAggregation}. Pay close attention to the element ordering in the output. Ordering was
- * selected to reduce CPU cache misses when aggregating the costs.</p>
- *
- * <p>The output is really a 3D tensor, but to avoid creating another custom data type planar images are used.
- * The other reason to use a planar image is that it was desirable to have multiple arrays define the tensor.</p>
- *
- * <p>
- * Format of costYXD. YXD indicates the ordering of values in the tensor. The outer most is T, which is the bands.
- * X is the row in a planar image and D the columns. Thus, (y,x,d) = costYXD.getBand(y).get(d,x-disparityMin).
- * </p>
- *
- * @author Peter Abeles
- */
+/// Computes a stack of matching costs for all pixels across all possible disparities for use
+/// with [SgmCostAggregation]. Pay close attention to the element ordering in the output. Ordering was
+/// selected to reduce CPU cache misses when aggregating the costs.
+///
+/// The output is really a 3D tensor, but to avoid creating another custom data type planar images are used.
+/// The other reason to use a planar image is that it was desirable to have multiple arrays define the tensor.
+///
+/// Format of costYXD. YXD indicates the ordering of values in the tensor. The outermost is T, which is the bands.
+/// X is the row in a planar image and D the columns. Thus, (y, x, d) = costYXD.getBand(y).get(d, x-disparityMin).
 public interface SgmDisparityCost<T extends ImageBase<T>> {
 
-	/**
-	 * Maximum allowed cost fo a disparity 11-bits as suggested in the paper
-	 */
+	/// Maximum allowed cost fo a disparity 11-bits as suggested in the paper
 	int MAX_COST = 2048 - 1;
 
-	/**
-	 * Configures the disparity search
-	 *
-	 * @param disparityMin Minimum possible disparity, inclusive
-	 * @param disparityRange Number of possible disparity values estimated. The max possible disparity is min+range-1.
-	 */
+	/// Configures the disparity search
+	///
+	/// @param disparityMin Minimum possible disparity, inclusive
+	/// @param disparityRange Number of possible disparity values estimated. The max possible disparity is min+range-1.
 	void configure( int disparityMin, int disparityRange );
 
-	/**
-	 * Computes the score for all possible disparity values across all pixels. If a disparity value would
-	 * go outside of the image then the cost is set to {@link #MAX_COST}
-	 *
-	 * @param left left image
-	 * @param right right image
-	 * @param costYXD Cost of output scaled to have a range of 0 to {@link SgmDisparityCost#MAX_COST}, inclusive.
-	 * Reshaped to match input and disparity range.
-	 */
+	/// Computes the score for all possible disparity values across all pixels. If a disparity value would
+	/// go outside the image then the cost is set to [#MAX_COST]
+	///
+	/// @param left left image
+	/// @param right right image
+	/// @param costYXD Cost of output scaled to have a range of 0 to [SgmDisparityCost#MAX_COST], inclusive.
+	/// Reshaped to match input and disparity range.
 	void process( T left, T right, Planar<GrayU16> costYXD );
 }

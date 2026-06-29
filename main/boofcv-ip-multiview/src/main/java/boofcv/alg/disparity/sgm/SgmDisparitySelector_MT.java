@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,25 +23,20 @@ import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.Planar;
 
-/**
- * Concurrent version of {@link SgmDisparitySelector}
- *
- * @author Peter Abeles
- */
+/// Concurrent version of [SgmDisparitySelector]
 public class SgmDisparitySelector_MT extends SgmDisparitySelector {
-	@Override
-	public void select( Planar<GrayU16> costYXD, Planar<GrayU16> aggregatedYXD, GrayU8 disparity ) {
+	@Override public void select( Planar<GrayU16> costYXD, Planar<GrayU16> aggregatedYXD, GrayU8 disparity ) {
 		setup(aggregatedYXD);
 		disparity.reshape(lengthX, lengthY);
 
 		BoofConcurrency.loopFor(0, lengthY, 1, ( y ) -> {
 			GrayU16 aggregatedXD = aggregatedYXD.getBand(y);
 
-			// if 'x' is less than minDisparity then that's nothing that it can compare against
-			for (int x = 0; x < disparityMin; x++) {
+			// columns before xOffset have nothing stored in the cost tensor that they can compare against
+			for (int x = 0; x < xOffset; x++) {
 				disparity.unsafe_set(x, y, invalidDisparity);
 			}
-			for (int x = disparityMin; x < lengthX; x++) {
+			for (int x = xOffset; x < lengthX; x++) {
 				disparity.unsafe_set(x, y, findBestDisparity(x, aggregatedXD));
 			}
 		});

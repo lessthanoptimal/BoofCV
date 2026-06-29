@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,15 +20,12 @@ package boofcv.alg.disparity.sgm.cost;
 
 import boofcv.struct.image.GrayU8;
 
-/**
- * Computes the cost using Mutual Information as described in [1].
- *
- * <p>[1] Hirschmuller, Heiko. "Stereo processing by semiglobal matching and mutual information."
- * IEEE Transactions on pattern analysis and machine intelligence 30.2 (2007): 328-341.</p>
- *
- * @author Peter Abeles
- * @see StereoMutualInformation
- */
+/// Computes the cost using Mutual Information as described in \[1\].
+///
+/// 1) Hirschmuller, Heiko. "Stereo processing by semiglobal matching and mutual information."
+/// IEEE Transactions on pattern analysis and machine intelligence 30.2 (2007): 328-341.
+///
+/// @see StereoMutualInformation
 public class SgmMutualInformation_U8 extends SgmCostBase<GrayU8> {
 	StereoMutualInformation mutual;
 

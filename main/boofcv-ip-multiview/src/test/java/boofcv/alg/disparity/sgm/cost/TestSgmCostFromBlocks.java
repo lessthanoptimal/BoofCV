@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,8 +36,7 @@ class TestSgmCostFromBlocks extends BoofStandardJUnit {
 			super(0, 255, ImageType.single(GrayU8.class));
 		}
 
-		@Override
-		SgmDisparityCost<GrayU8> createAlg() {
+		@Override SgmDisparityCost<GrayU8> createAlg() {
 			SgmCostFromBlocks<GrayU8> blockCost = new SgmCostFromBlocks<>();
 			BlockRowScore<GrayU8, int[], byte[]> rowScore = new BlockRowScoreSad.U8();
 			blockCost.blockScore = new DisparityScoreBM_S32(1, 1, rowScore, blockCost, imageType);

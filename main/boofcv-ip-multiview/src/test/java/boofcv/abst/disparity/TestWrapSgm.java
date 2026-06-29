@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,6 +35,8 @@ class TestWrapSgm extends BoofStandardJUnit {
 			super(ImageType.SB_U8, ImageType.SB_U8);
 		}
 
+		@Override protected boolean supportsNegativeDisparity() { return true; }
+
 		@Override
 		public StereoDisparity<GrayU8, GrayU8> createAlg( int disparityMin, int disparityRange ) {
 			ConfigDisparitySGM config = new ConfigDisparitySGM();
@@ -52,6 +54,8 @@ class TestWrapSgm extends BoofStandardJUnit {
 		public SAD_F32() {
 			super(ImageType.SB_U8, ImageType.SB_F32);
 		}
+
+		@Override protected boolean supportsNegativeDisparity() { return true; }
 
 		@Override
 		public StereoDisparity<GrayU8, GrayF32> createAlg( int disparityMin, int disparityRange ) {
