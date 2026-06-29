@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,8 +34,7 @@ class TestSgmCostHamming extends BoofStandardJUnit {
 			super(0, 255, ImageType.single(GrayU8.class));
 		}
 
-		@Override
-		SgmDisparityCost<GrayU8> createAlg() {
+		@Override SgmDisparityCost<GrayU8> createAlg() {
 			return new SgmCostHamming.U8();
 		}
 	}
@@ -46,8 +45,7 @@ class TestSgmCostHamming extends BoofStandardJUnit {
 			super(0, 2000, ImageType.single(GrayS32.class));
 		}
 
-		@Override
-		SgmDisparityCost<GrayS32> createAlg() {
+		@Override SgmDisparityCost<GrayS32> createAlg() {
 			return new SgmCostHamming.S32();
 		}
 	}
@@ -58,8 +56,7 @@ class TestSgmCostHamming extends BoofStandardJUnit {
 			super(0, 40000, ImageType.single(GrayS64.class));
 		}
 
-		@Override
-		SgmDisparityCost<GrayS64> createAlg() {
+		@Override SgmDisparityCost<GrayS64> createAlg() {
 			return new SgmCostHamming.S64();
 		}
 	}

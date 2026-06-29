@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,11 +18,7 @@
 
 package boofcv.alg.disparity.sgm;
 
-/**
- * Various helper functions for computing SGM disparities.
- *
- * @author Peter Abeles
- */
+/// Various helper functions for computing SGM disparities.
 public class SgmHelper {
 	// Image width
 	public int width;
@@ -35,17 +31,19 @@ public class SgmHelper {
 		this.disparityRange = disparityRange;
 	}
 
-	/**
-	 * Number of disparity values that can be considered for this x value along the left side of the image.
-	 * Values greater than this are out of the right image bounds or greater than 'rangeDisparity'
-	 */
+	/// Number of disparity values that can be considered for this x value along the left side of the image.
+	/// Values greater than this are out of the right image bounds or greater than 'rangeDisparity'
 	public final int localDisparityRangeLeft( int x ) {
 		return Math.min(x - disparityMin + 1, disparityRange);
 	}
 
-	/**
-	 * Same as {@link #localDisparityRangeLeft(int)} but for the right image boundary
-	 */
+	/// Smallest disparity index that can be considered at this x value. Indexes below this map to a disparity
+	/// whose matching column lies past the right border of the right image. Always 0 for a non-negative search.
+	public final int localDisparityMinLeft( int x ) {
+		return Math.min(disparityRange, Math.max(0, x - disparityMin - (width - 1)));
+	}
+
+	/// Same as [#localDisparityRangeLeft(int)] but for the right image boundary
 	public final int localDisparityRangeRight( int x ) {
 		return Math.min(width - x - disparityMin, disparityRange);
 	}

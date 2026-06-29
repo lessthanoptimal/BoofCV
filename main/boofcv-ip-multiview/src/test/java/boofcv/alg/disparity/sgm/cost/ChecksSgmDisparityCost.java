@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,11 +33,7 @@ import java.util.Random;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * Common unit tests for implementations of {@link SgmDisparityCost}
- *
- * @author Peter Abeles
- */
+/// Common unit tests for implementations of [SgmDisparityCost]
 abstract class ChecksSgmDisparityCost<T extends ImageGray<T>> extends BoofStandardJUnit {
 
 	Random rand = new Random(2345);
@@ -64,9 +60,7 @@ abstract class ChecksSgmDisparityCost<T extends ImageGray<T>> extends BoofStanda
 
 	abstract SgmDisparityCost<T> createAlg();
 
-	/**
-	 * Give it a simple problem that's composed of a horizontal gradient. See if cost matches expectation
-	 */
+	/// Give it a simple problem that's composed of a horizontal gradient. See if cost matches expectation
 	@Test
 	void disparityBounds() {
 		// see if min and max disparity are both respected
@@ -76,9 +70,19 @@ abstract class ChecksSgmDisparityCost<T extends ImageGray<T>> extends BoofStanda
 		disparityBounds(5, 6, 1, false);
 	}
 
-	/**
-	 * It should output the same answer when called multiple times
-	 */
+	/// Same as [#disparityBounds()] but with a disparity range that includes negative values, which
+	/// exercises clamping against the right border of the right image.
+	@Test
+	void disparityBoundsNegative() {
+		// straddles zero
+		disparityBounds(-3, -8, 15, true);
+		// fully negative
+		disparityBounds(-5, -7, 3, true);
+		// true disparity is outside the requested range
+		disparityBounds(2, -8, 6, false);
+	}
+
+	/// It should output the same answer when called multiple times
 	@Test
 	void multipleCalls() {
 		int disparity = 5;
@@ -108,22 +112,30 @@ abstract class ChecksSgmDisparityCost<T extends ImageGray<T>> extends BoofStanda
 		// Check outside
 		checkInvalidRangeIsMax(minDisparity, disparityRange, costYXD);
 
+		// First stored column in the cost tensor: minDisparity when non-negative, else 0
+		int xOffset = Math.max(0, minDisparity);
+		int disparityTrue = disparity - minDisparity;
+
 		// For each pixel, find the best disparity and see if it matches up with the input image
 		int failure = 0;
 		int total = 0;
 		for (int y = 0; y < height; y++) {
 			GrayU16 costXD = costYXD.getBand(y);
-			for (int x = minDisparity; x < width; x++) {
-				int localRange = Math.min(disparityRange, x - minDisparity + 1);
-
-				// If it can't find the correct solution due to local limitations skip
-				if (shouldSucceed && disparity >= minDisparity + localRange)
+			for (int x = xOffset; x < width; x++) {
+				// Local disparity window clamped against both borders of the right image
+				int loD = Math.min(disparityRange, Math.max(0, x - minDisparity - (width - 1)));
+				int hiD = Math.min(disparityRange, x - minDisparity + 1);
+				if (loD >= hiD)
 					continue;
 
-				int bestD = 0;
-				int bestCost = costXD.get(0, x - minDisparity);
-				for (int d = 1; d < localRange; d++) {
-					int c = costXD.get(d, x - minDisparity);
+				// If it can't find the correct solution due to local limitations skip
+				if (shouldSucceed && (disparityTrue < loD || disparityTrue >= hiD))
+					continue;
+
+				int bestD = loD;
+				int bestCost = costXD.get(loD, x - xOffset);
+				for (int d = loD + 1; d < hiD; d++) {
+					int c = costXD.get(d, x - xOffset);
 					if (bestCost > c) {
 						bestCost = c;
 						bestD = d;
@@ -143,24 +155,30 @@ abstract class ChecksSgmDisparityCost<T extends ImageGray<T>> extends BoofStanda
 			assertTrue(failure/(double)total > 0.90, failure + " vs " + total);
 	}
 
-	/**
-	 * Randomly fills in the left image and copies it by a fixed amount into the right
-	 */
+	/// Randomly fills in the left image and copies it by a fixed amount into the right
 	private void fillRandom( int disparity ) {
 		GImageMiscOps.fillUniform(left, rand, minValue, maxValue);
 		GImageMiscOps.fill(right, 0);
-		GImageMiscOps.copy(disparity, 0, 0, 0, left.width - disparity, left.height, left, right);
+		// right column x matches left column x+disparity, so copy with both offsets clamped to the image.
+		// Handles a negative disparity, where the copied region is shifted to the right instead of the left.
+		int srcX = Math.max(0, disparity);
+		int dstX = Math.max(0, -disparity);
+		GImageMiscOps.copy(srcX, 0, dstX, 0, left.width - Math.abs(disparity), left.height, left, right);
 	}
 
-	/**
-	 * Makes sure that if a range can't be reached it is set to the max possible cost
-	 */
+	/// Makes sure that if a range can't be reached it is set to the max possible cost
 	private void checkInvalidRangeIsMax( int minD, int rangeD, Planar<GrayU16> costYXD ) {
+		int xOffset = Math.max(0, minD);
 		for (int y = 0; y < height; y++) {
-			for (int x = minD; x < width; x++) {
-				int localMaxRange = Math.min(rangeD, x - minD + 1);
-				for (int d = localMaxRange; d < rangeD; d++) {
-					assertEquals(SgmDisparityCost.MAX_COST, lookup(costYXD, x - minD, y, d), y + " " + x + " " + d);
+			for (int x = xOffset; x < width; x++) {
+				// Disparities that fall off either border of the right image must be set to the max cost
+				int loD = Math.min(rangeD, Math.max(0, x - minD - (width - 1)));
+				int hiD = Math.min(rangeD, x - minD + 1);
+				for (int d = 0; d < loD; d++) {
+					assertEquals(SgmDisparityCost.MAX_COST, lookup(costYXD, x - xOffset, y, d), y + " " + x + " " + d);
+				}
+				for (int d = hiD; d < rangeD; d++) {
+					assertEquals(SgmDisparityCost.MAX_COST, lookup(costYXD, x - xOffset, y, d), y + " " + x + " " + d);
 				}
 			}
 		}
@@ -170,9 +188,7 @@ abstract class ChecksSgmDisparityCost<T extends ImageGray<T>> extends BoofStanda
 		return cost.getBand(y).get(d, x);
 	}
 
-	/**
-	 * Does it reshape the output?
-	 */
+	/// Does it reshape the output?
 	@Test
 	void reshape() {
 		SgmDisparityCost<T> alg = createAlg();

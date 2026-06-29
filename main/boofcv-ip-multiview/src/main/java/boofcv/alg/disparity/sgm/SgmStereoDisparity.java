@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,17 +22,13 @@ import boofcv.struct.image.*;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Base class for SGM stereo implementations. It combines the cost computation, cost aggregation, and disparity
- * selector steps. Sub-pixel can be optionally computed afterwards.
- *
- * <p>NOTE: [1] suggests applying a median filter. This is not done by any of this class' children.</p>
- *
- * <p>[1] Hirschmuller, Heiko. "Stereo processing by semiglobal matching and mutual information."
- * IEEE Transactions on pattern analysis and machine intelligence 30.2 (2007): 328-341.</p>
- *
- * @author Peter Abeles
- */
+/// Base class for Semi Global Matching (SGM) stereo implementations. It combines the cost computation,
+/// cost aggregation, and disparity selector steps. Sub-pixel can be optionally computed afterward.
+///
+/// NOTE: \[1\] suggests applying a median filter. This is not done by any of this class' children.
+///
+/// 1) Hirschmuller, Heiko. "Stereo processing by semiglobal matching and mutual information."
+/// IEEE Transactions on pattern analysis and machine intelligence 30.2 (2007): 328-341.
 public abstract class SgmStereoDisparity<T extends ImageBase<T>, C extends ImageBase<C>> {
 	// Defines the disparity search range
 	@Getter @Setter protected int disparityMin = 0;     // minimum disparity considered
@@ -58,12 +54,10 @@ public abstract class SgmStereoDisparity<T extends ImageBase<T>, C extends Image
 		this.selector = selector;
 	}
 
-	/**
-	 * Computes disparity
-	 *
-	 * @param left (Input) left rectified stereo image
-	 * @param right (Input) right rectified stereo image
-	 */
+	/// Computes disparity
+	///
+	/// @param left (Input) left rectified stereo image
+	/// @param right (Input) right rectified stereo image
 	public abstract void process( T left, T right );
 
 	// TODO remove need to compute U8 first
@@ -71,17 +65,20 @@ public abstract class SgmStereoDisparity<T extends ImageBase<T>, C extends Image
 		dst.reshape(src);
 		Planar<GrayU16> aggregatedYXD = aggregation.getAggregated();
 
+		// First stored column in the cost tensor: disparityMin when non-negative, else 0
+		int xOffset = Math.max(0, disparityMin);
+
 		for (int y = 0; y < aggregatedYXD.getNumBands(); y++) {
 			GrayU16 costXD = aggregatedYXD.getBand(y);
-			for (int x = 0; x < disparityMin; x++) {
-				dst.unsafe_set(x, y, disparityRange); // make as invalid
+			for (int x = 0; x < xOffset; x++) {
+				dst.unsafe_set(x, y, disparityRange); // mark as invalid
 			}
-			for (int x = disparityMin; x < costXD.height; x++) {
+			for (int x = xOffset; x < costXD.height; x++) {
 				int localMaxRange = helper.localDisparityRangeLeft(x);
 				int d = src.unsafe_get(x, y);
 				float subpixel;
 				if (d > 0 && d < localMaxRange - 1) {
-					int adjX = x - disparityMin; // see how cost tensor is defined
+					int adjX = x - xOffset; // see how cost tensor is defined
 					int c0 = costXD.unsafe_get(d - 1, adjX);
 					int c1 = costXD.unsafe_get(d, adjX);
 					int c2 = costXD.unsafe_get(d + 1, adjX);
@@ -96,24 +93,25 @@ public abstract class SgmStereoDisparity<T extends ImageBase<T>, C extends Image
 		}
 	}
 
-	/**
-	 * Extracts the score from the cost volumn
-	 */
+	/// Extracts the score from the cost volume
 	public void saveScore() {
 		Planar<GrayU16> aggregatedYXD = aggregation.getAggregated();
 		score.reshape(disparity);
 
+		// First stored column in the cost tensor: disparityMin when non-negative, else 0
+		int xOffset = Math.max(0, disparityMin);
+
 		for (int y = 0; y < aggregatedYXD.getNumBands(); y++) {
 			GrayU16 costXD = aggregatedYXD.getBand(y);
-			for (int x = 0; x < disparityMin; x++) {
-				score.unsafe_set(x, y, Float.NaN); // make as invalid
+			for (int x = 0; x < xOffset; x++) {
+				score.unsafe_set(x, y, Float.NaN); // mark as invalid
 			}
-			for (int x = disparityMin; x < costXD.height; x++) {
+			for (int x = xOffset; x < costXD.height; x++) {
 				int d = disparity.unsafe_get(x, y);
 				if (d >= disparityRange) {
 					score.unsafe_set(x, y, Float.NaN);
 				} else {
-					score.unsafe_set(x, y, costXD.unsafe_get(d, x - disparityMin));
+					score.unsafe_set(x, y, costXD.unsafe_get(d, x - xOffset));
 				}
 			}
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,9 +39,7 @@ public abstract class GenericSgmStereoDisparityChecks<T extends ImageGray<T>, C 
 
 	public abstract SgmStereoDisparity<T, C> createAlgorithm();
 
-	/**
-	 * Input images are identical. Disparity should be zero
-	 */
+	/// Input images are identical. Disparity should be zero
 	@Test void identicalImages() {
 		int rangeD = 10;
 		renderStereoRandom(0, 255, 0, rangeD);
@@ -63,9 +61,7 @@ public abstract class GenericSgmStereoDisparityChecks<T extends ImageGray<T>, C 
 		assertTrue(disparity.isSameShape(alg.getScore()));
 	}
 
-	/**
-	 * Adjust the disparity search and see if it succeeds and fails when it should
-	 */
+	/// Adjust the disparity search and see if it succeeds and fails when it should
 	@Test void disparitySearch() {
 		SgmStereoDisparity<T, C> alg = createAlgorithm();
 		// When you include the diagonal paths it's harder to predict what's going on
@@ -77,6 +73,58 @@ public abstract class GenericSgmStereoDisparityChecks<T extends ImageGray<T>, C 
 		disparitySearch(6, 15, 6, alg);
 		disparitySearch(7, 15, 6, alg);
 		disparitySearch(8, 15, 6, alg);
+	}
+
+	/// Same as [#disparitySearch()] but with a disparity range that includes negative values, which
+	/// exercises clamping against the right border of the right image.
+	@Test void disparitySearchNegative() {
+		SgmStereoDisparity<T, C> alg = createAlgorithm();
+		alg.getAggregation().setPathsConsidered(4);
+		alg.getSelector().setRightToLeftTolerance(-1);
+
+		// straddles zero
+		disparitySearchNegative(-5, 15, -2, alg);
+		disparitySearchNegative(-5, 15, 3, alg);
+		// fully negative
+		disparitySearchNegative(-8, 5, -6, alg);
+	}
+
+	public void disparitySearchNegative( int disparityMin, int disparityRange, int disparityActual, SgmStereoDisparity<T, C> alg ) {
+
+		SgmHelper helper = new SgmHelper();
+		helper.configure(width, disparityMin, disparityRange);
+
+		if (useRandomImage)
+			renderStereoRandom(0, 255, disparityActual, disparityRange);
+		else
+			renderStereoStep(disparityActual, disparityRange);
+
+		alg.setDisparityMin(disparityMin);
+		alg.setDisparityRange(disparityRange);
+
+		alg.process(left, right);
+		GrayU8 found = alg.getDisparity();
+
+		int xOffset = Math.max(0, disparityMin);
+		int disparityIndex = disparityActual - disparityMin;
+
+		int correct = 0;
+		int total = 0;
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				// Only check columns where the true disparity keeps the match inside both images
+				int loD = helper.localDisparityMinLeft(x);
+				int hiD = helper.localDisparityRangeLeft(x);
+				if (x < xOffset || disparityIndex < loD || disparityIndex >= hiD)
+					continue;
+				if (found.get(x, y) + disparityMin == disparityActual)
+					correct++;
+				total++;
+			}
+		}
+
+		double fractionCorrect = correct/(double)(total + 1E-8);
+		assertTrue(fractionCorrect > 1.0 - acceptTol, "diff " + fractionCorrect);
 	}
 
 	public void disparitySearch( int disparityMin, int disparityRange, int disparityActual, SgmStereoDisparity<T, C> alg ) {

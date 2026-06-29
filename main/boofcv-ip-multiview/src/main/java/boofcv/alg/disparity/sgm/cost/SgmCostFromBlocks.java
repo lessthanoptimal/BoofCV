@@ -27,13 +27,9 @@ import boofcv.misc.Compare_S32;
 import boofcv.struct.image.*;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * Computes the error for SGM using {@link BlockRowScore block matching}.
- * It's a little bit of a hack since it grabs the error by implementing {@link DisparitySelect} which is normally
- * used to select a disparity instead here it copies it into the SGM cost tensor.
- *
- * @author Peter Abeles
- */
+/// Computes the error for SGM using [`block matching`][BlockRowScore].
+/// It's a little bit of a hack since it grabs the error by implementing [DisparitySelect] which is normally
+/// used to select a disparity instead here it copies it into the SGM cost tensor.
 @SuppressWarnings({"NullAway.Init"})
 public class SgmCostFromBlocks<T extends ImageBase<T>>
 		implements SgmDisparityCost<T>, DisparitySelect<int[], GrayU8>, Compare_S32 {
@@ -44,15 +40,13 @@ public class SgmCostFromBlocks<T extends ImageBase<T>>
 	private int disparityMin;
 	private int disparityRange;
 
-	@Override
-	public void configure( int disparityMin, int disparityRange ) {
+	@Override public void configure( int disparityMin, int disparityRange ) {
 		blockScore.configure(disparityMin, disparityRange);
 		this.disparityMin = disparityMin;
 		this.disparityRange = disparityRange;
 	}
 
-	@Override
-	public void process( T left, T right, Planar<GrayU16> costYXD ) {
+	@Override public void process( T left, T right, Planar<GrayU16> costYXD ) {
 		InputSanityCheck.checkSameShape(left, right);
 		this.costYXD = costYXD;
 		costYXD.reshape(/* width= */disparityRange, /* height= */left.width, /* numberOfBands= */left.height);
@@ -60,43 +54,50 @@ public class SgmCostFromBlocks<T extends ImageBase<T>>
 		blockScore.process(left, right, dummy, null);
 	}
 
-	@Override
-	public void configure( GrayU8 imageDisparity, @Nullable GrayF32 score, int minDisparity, int maxDisparity, int radiusX ) {}
+	@Override public void configure(
+			GrayU8 imageDisparity, @Nullable GrayF32 score, int minDisparity, int maxDisparity, int radiusX ) {}
 
-	@Override
-	public void process( int row, int[] scoresArray ) {
+	@Override public void process( int row, int[] scoresArray ) {
 		GrayU16 costXD = costYXD.getBand(row);
 		final int lengthX = costXD.height;
 
-		for (int x = disparityMin; x < lengthX; x++) {
-			int localRangeD = Math.min(disparityRange, x - disparityMin + 1);
-			int dstIdx = (x - disparityMin)*disparityRange;
-			for (int d = 0; d < localRangeD; d++) {
+		// first stored column; the cost tensor's x-coordinate is relative to this (disparityMin if non-negative, else 0)
+		int xOffset = Math.max(0, disparityMin);
+
+		for (int x = xOffset; x < lengthX; x++) {
+			// Per-column disparity window.
+			int loD = Math.min(disparityRange, Math.max(0, x - disparityMin - (lengthX - 1)));
+			int hiD = Math.min(disparityRange, x - disparityMin + 1);
+			int dstIdx = (x - xOffset)*disparityRange;
+
+			// Fill disparities that fall off the right border of the right image with max cost
+			for (int d = 0; d < loD; d++) {
+				costXD.data[dstIdx + d] = SgmDisparityCost.MAX_COST;
+			}
+			for (int d = loD; d < hiD; d++) {
 				// copy the error and its range. Block scores are stored at the absolute column within each row.
 				int srcIdx = d*lengthX + x;
-				costXD.data[dstIdx++] = (short)(SgmDisparityCost.MAX_COST*scoresArray[srcIdx]/maxRegionError);
+				costXD.data[dstIdx + d] = (short)(SgmDisparityCost.MAX_COST*scoresArray[srcIdx]/maxRegionError);
 
 //				if( scoresArray[srcIdx] > maxRegionError || scoresArray[srcIdx] < 0 ) {
 //					throw new RuntimeException("score is out of bounds. "+scoresArray[srcIdx]+
 //							" / "+maxRegionError);
 //				}
 			}
-			for (int d = localRangeD; d < disparityRange; d++) {
-				costXD.data[dstIdx++] = SgmDisparityCost.MAX_COST;
+			// Fill disparities that fall off the left border of the right image with max cost
+			for (int d = hiD; d < disparityRange; d++) {
+				costXD.data[dstIdx + d] = SgmDisparityCost.MAX_COST;
 			}
 		}
 	}
 
-	@Override
-	public DisparitySelect<int[], GrayU8> concurrentCopy() {
+	@Override public DisparitySelect<int[], GrayU8> concurrentCopy() {
 		return this;
 	}
 
-	@Override
-	public Class<GrayU8> getDisparityType() {throw new RuntimeException("Not supported");}
+	@Override public Class<GrayU8> getDisparityType() {throw new RuntimeException("Not supported");}
 
-	@Override
-	public int compare( int scoreA, int scoreB ) {
+	@Override public int compare( int scoreA, int scoreB ) {
 		return Integer.compare(scoreA, scoreB);
 	}
 

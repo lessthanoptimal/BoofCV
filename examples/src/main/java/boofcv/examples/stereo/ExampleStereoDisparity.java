@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -62,7 +62,7 @@ import java.io.File;
 public class ExampleStereoDisparity {
 
 	/**
-	 * Computes the dense disparity between between two stereo images. The input images
+	 * Computes the dense disparity between two stereo images. The input images
 	 * must be rectified with lens distortion removed to work!  Floating point images
 	 * are also supported.
 	 *

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,15 +22,10 @@ import boofcv.alg.disparity.sgm.SgmDisparityCost;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 
-/**
- * Computes the cost as the absolute value between two pixels, i.e. cost = |left-right|.
- *
- * @author Peter Abeles
- */
+/// Computes the cost as the absolute value between two pixels, i.e. cost = |left-right|.
 public abstract class SgmCostAbsoluteDifference<T extends ImageBase<T>> extends SgmCostBase<T> {
 	public static class U8 extends SgmCostAbsoluteDifference<GrayU8> {
-		@Override
-		protected void computeDisparityErrors( int idxLeft, int idxRight, int idxOut, int disparityRange ) {
+		@Override protected void computeDisparityErrors( int idxLeft, int idxRight, int idxOut, int disparityRange ) {
 			int valLeft = left.data[idxLeft] & 0xFF;
 			for (int d = 0; d < disparityRange; d++) {
 				int valRight = right.data[idxRight--] & 0xFF;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,37 +28,33 @@ import org.ddogleg.struct.DogArray;
 import pabeles.concurrency.GrowArray;
 import pabeles.concurrency.IntRangeObjectConsumer;
 
-/**
- * <p>
- * Aggregates the cost along different paths to compute the final cost. Cost is summed up inside of a tensor
- * of size H*W*D with 16-bit unsigned elements. At most 16 directions can be considered. In general
- * more paths that are considered the smoother the disparity will be. The cost of a single path is done using
- * a dynamic programming approach. This step is the major step that makes SGM what it is.
- * </p>
- *
- * <p>
- * See [1] for details, but the cost for each element along a path is specified as follows:<br>
- * a = Lr(p-r,d  )<br>
- * b = Lr(p-r,d-1) + penalty1<br>
- * c = Lr(p-r,d+1) + penalty1<br>
- * <br>
- * cost = min(penalty2,b,c) + a<br>
- * </p>
- * <p></p>Lr(p,d) is the cost along the path at 'p' and disparity 'd'. penalty1 in the penalty associated with
- * a small change in disparity and penalty2 is a large change in disparity</p>
- *
- * <p>The equation above has been modified from what is stated in [1]. One of the equations is likely to have a
- * type-o in it because their formula doesn't have the stated properties. A simple modification prevents the cost
- * variables from overflowing.</p>
- *
- * <p>[1] Hirschmuller, Heiko. "Stereo processing by semiglobal matching and mutual information."
- * IEEE Transactions on pattern analysis and machine intelligence 30.2 (2007): 328-341.</p>
- *
- * @author Peter Abeles
- * @see SgmDisparityCost
- * @see SgmDisparitySelector
- * @see SgmStereoDisparity
- */
+/// Aggregates the cost along different paths to compute the final cost. Cost is summed up inside a tensor
+/// of size H\*W\*D with 16-bit unsigned elements. At most 16 directions can be considered. In general
+/// more paths that are considered the smoother the disparity will be. The cost of a single path is done using
+/// a dynamic programming approach. This step is the major step that makes SGM what it is.
+///
+/// See \[1\] for details, but the cost for each element along a path is specified as follows:
+/// ```
+/// a = Lr(p-r,d  )
+/// b = Lr(p-r,d-1) + penalty1
+/// c = Lr(p-r,d+1) + penalty1
+///
+/// cost = min(penalty2,b,c) + a
+/// ```
+///
+/// Lr(p,d) is the cost along the path at 'p' and disparity 'd'. penalty1 in the penalty associated with
+/// a small change in disparity and penalty2 is a large change in disparity
+///
+/// The equation above has been modified from what is stated in \[1\]. One of the equations is likely to have a
+/// type-o in it because their formula doesn't have the stated properties. A simple modification prevents the cost
+/// variables from overflowing.
+///
+/// 1) Hirschmuller, Heiko. "Stereo processing by semiglobal matching and mutual information."
+/// IEEE Transactions on pattern analysis and machine intelligence 30.2 (2007): 328-341.
+///
+/// @see SgmDisparityCost
+/// @see SgmDisparitySelector
+/// @see SgmStereoDisparity
 @SuppressWarnings({"NullAway.Init"})
 public class SgmCostAggregation {
 
@@ -78,14 +74,14 @@ public class SgmCostAggregation {
 	Planar<GrayU16> costYXD;
 	// Length of original image. x = col, y = rows, d = disparity range
 	int lengthX, lengthY, lengthD;
-	// If disparityMin > 0 then the first disparityMin x elements have no score and are skipped
+	// Number of columns stored in the cost tensor. The first xOffset columns have no score and are skipped
 	int effectiveLengthX;
 	// The minimum disparity that will be considered.
 	int disparityMin;
+	// First stored column; the cost tensor's x-coordinate is relative to this (= max(0,disparityMin))
+	int xOffset;
 
-	/**
-	 * Number of paths to consider. 1 to 16 is valid
-	 */
+	/// Number of paths to consider. 1 to 16 is valid
 	@Setter @Getter int pathsConsidered = 8;
 
 	// Cost applied to small and large changes in the neighborhood
@@ -97,22 +93,18 @@ public class SgmCostAggregation {
 	GrowArray<WorkSpace> workspace = new GrowArray<>(WorkSpace::new);
 	ComputeBlock computeBlock = new ComputeBlock();
 
-	/**
-	 * Configures the minimum disparity. The range is specified implicitly by the cost tensor.
-	 *
-	 * @param disparityMin The minimum disparity that will be considered
-	 */
+	/// Configures the minimum disparity. The range is specified implicitly by the cost tensor.
+	///
+	/// @param disparityMin The minimum disparity that will be considered
 	public void configure( int disparityMin ) {
 		this.disparityMin = disparityMin;
 	}
 
-	/**
-	 * Aggregates the cost in the tensor `costYXD`. From the aggregated cost the disparity can be computed.
-	 * The input is a tensor 3D stored in a planar image. The name refers to the order data is stored. (Y,X,D) =
-	 * (band,row,col). D = disparity and is relative to some minimum disparity.
-	 *
-	 * @param costYXD Cost for all possible combinations of x,y,d in input image.
-	 */
+	/// Aggregates the cost in the tensor \`costYXD\`. From the aggregated cost the disparity can be computed.
+	/// The input is a tensor 3D stored in a planar image. The name refers to the order data is stored. (Y,X,D) =
+	/// (band,row,col). D = disparity and is relative to some minimum disparity.
+	///
+	/// @param costYXD Cost for all possible combinations of x,y,d in input image.
 	public void process( Planar<GrayU16> costYXD ) {
 		init(costYXD);
 
@@ -144,9 +136,7 @@ public class SgmCostAggregation {
 		}
 	}
 
-	/**
-	 * Initializes data structures
-	 */
+	/// Initializes data structures
 	void init( Planar<GrayU16> costYXD ) {
 		if (pathsConsidered < 1 || pathsConsidered > 16)
 			throw new IllegalArgumentException("Number of paths must be 1 to 16, inclusive. Not " + pathsConsidered);
@@ -157,18 +147,16 @@ public class SgmCostAggregation {
 		this.lengthX = costYXD.getHeight();
 		this.lengthD = costYXD.getWidth();
 		this.lengthY = costYXD.getNumBands();
-		this.effectiveLengthX = this.lengthX - disparityMin;
+		this.xOffset = Math.max(0, disparityMin);
+		this.effectiveLengthX = this.lengthX - xOffset;
 
 		helper.configure(lengthX, disparityMin, lengthD);
 		workspace.resize(1);
 	}
 
-	/**
-	 * Scores all possible paths for this given direction and add it to the aggregated cost.
-	 *
-	 * Concurrency note: It's safe to write to the aggregated score without synchronization since only one
-	 * path in the block below will touch a pixel.
-	 */
+	/// Scores all possible paths for this given direction and add it to the aggregated cost.
+	/// Concurrency note: It's safe to write to the aggregated score without synchronization since only one
+	/// path in the block below will touch a pixel.
 	void scoreDirection( int dx, int dy ) {
 
 		// Create a list of paths it will score
@@ -222,22 +210,18 @@ public class SgmCostAggregation {
 		}
 	}
 
-	/**
-	 * Computes the score for all points along the path specified by (x0,y0,dx,dy).
-	 *
-	 * There's a change from the paper. In equation 13 it says to subtract min[k] Lr(p-r,k)
-	 * I believe that's a mistake. The upper limit for the cost in the paper
-	 * is only true if you change it to  min[k] Lr(p,k). This is only a serious problem with 16 paths.
-	 *
-	 * It also improve performance when max disparity is less than lengthD. That's because the cost
-	 * grows, giving the cost near the localLengthD an advantage since it hasn't had time to
-	 * grow all the way.
-	 *
-	 * @param x0 start x-axis
-	 * @param y0 start y-axis
-	 * @param dx step x-axis
-	 * @param dy step y-axis
-	 */
+	/// Computes the score for all points along the path specified by (x0,y0,dx,dy).
+	/// There's a change from the paper. In equation 13 it says to subtract min[k] Lr(p-r,k)
+	/// I believe that's a mistake. The upper limit for the cost in the paper
+	/// is only true if you change it to  min[k] Lr(p,k). This is only a serious problem with 16 paths.
+	/// It also improves performance when max disparity is less than lengthD. That's because the cost
+	/// grows, giving the cost near the localLengthD an advantage since it hasn't had time to
+	/// grow all the way.
+	///
+	/// @param x0 start x-axis
+	/// @param y0 start y-axis
+	/// @param dx step x-axis
+	/// @param dy step y-axis
 	void scorePath( int x0, int y0, int dx, int dy, short[] workCostLr ) {
 
 		// there is no previous disparity score so simply fill the cost for d=0
@@ -245,7 +229,7 @@ public class SgmCostAggregation {
 			int minCost = Integer.MAX_VALUE;
 			final GrayU16 costXD = costYXD.getBand(y0);
 			final int idxCost = costXD.getIndex(0, x0);   // C(0,0)
-			final int localRangeD = helper.localDisparityRangeLeft(x0 + disparityMin);
+			final int localRangeD = helper.localDisparityRangeLeft(x0 + xOffset);
 			for (int d = 0; d < localRangeD; d++) {
 				int v = costXD.data[idxCost + d] & 0xFFFF; // Lr(0,d) = C(0,d)
 				workCostLr[d] = (short)v;
@@ -270,8 +254,8 @@ public class SgmCostAggregation {
 			// Index of cost for C(y,p0+i,0)
 			final GrayU16 costXD = costYXD.getBand(y);
 			final int idxCost = costXD.getIndex(0, x);
-			// remember x=0 is really x+disparityMin because the first elements are skipped
-			final int localRangeD = helper.localDisparityRangeLeft(x + disparityMin);
+			// remember x=0 in the cost tensor is really x+xOffset because the first elements are skipped
+			final int localRangeD = helper.localDisparityRangeLeft(x + xOffset);
 
 			// Index for the previous cost in this path
 			int idxLrPrev = (i - 1)*lengthD;
@@ -302,12 +286,10 @@ public class SgmCostAggregation {
 		saveWorkToAggregated(x0, y0, dx, dy, lengthPath, workCostLr);
 	}
 
-	/**
-	 * Adds the work LR onto the aggregated cost Tensor, which is the sum of all paths
-	 */
+	/// Adds the work LR onto the aggregated cost Tensor, which is the sum of all paths
 	void saveWorkToAggregated( int x0, int y0, int dx, int dy, int length, short[] workCostLr ) {
 		for (int i = 0, x = x0, y = y0; i < length; i++, x += dx, y += dy) {
-			final int localLengthD = helper.localDisparityRangeLeft(x + disparityMin);
+			final int localLengthD = helper.localDisparityRangeLeft(x + xOffset);
 			GrayU16 aggrXD = aggregated.getBand(y);
 
 			int idxWork = i*lengthD;                // Lr(i,0)
@@ -320,14 +302,11 @@ public class SgmCostAggregation {
 		}
 	}
 
-	/**
-	 * Computes the cost according to equation (12) in the paper in the inner portion where border checks are not
-	 * needed.
-	 *
-	 * Note: With the modified equation 13 the minimum previous cost is always zero.
-	 *
-	 * @param idxLrPrev index of work at the previous location in the path, i.e. Lr(p-r,0)
-	 */
+	/// Computes the cost according to equation (12) in the paper in the inner portion where border checks are not
+	/// needed.
+	/// Note: With the modified equation 13 the minimum previous cost is always zero.
+	///
+	/// @param idxLrPrev index of work at the previous location in the path, i.e. Lr(p-r,0)
 	void computeCostInnerD( final short[] costXD, final int idxCost, int idxLrPrev, final int lengthLocalD, final short[] workCostLr ) {
 		final int nextRow = this.lengthD - 1; // idxLrPrev is +1
 		final int penalty1 = this.penalty1;
@@ -370,15 +349,13 @@ public class SgmCostAggregation {
 		}
 	}
 
-	/**
-	 * Computes the aggregate cost but with bounds checks to ensure it doesn't sample outside of the
-	 * disparity change.
-	 *
-	 * @param idxCost Index of value in costXD
-	 * @param idxLrPrev Index of value in workCostLr
-	 * @param d disparity value being considered
-	 * @param costXD cost in X-D plane
-	 */
+	/// Computes the aggregate cost but with bounds checks to ensure it doesn't sample outside of the
+	/// disparity change.
+	///
+	/// @param idxCost Index of value in costXD
+	/// @param idxLrPrev Index of value in workCostLr
+	/// @param d disparity value being considered
+	/// @param costXD cost in X-D plane
 	void computeCostBorderD( int idxCost, int idxLrPrev, int d, GrayU16 costXD, int localRangeD, short[] workCostLr ) {
 		int cost = costXD.data[idxCost + d] & 0xFFFF;  // C(p,d)
 
@@ -410,21 +387,17 @@ public class SgmCostAggregation {
 		workCostLr[idxLrPrev + this.lengthD + d] = (short)(cost + a);
 	}
 
-	/**
-	 * Computes the number of image pixel are in the path. The path is defined with an initial
-	 * pixel coordinate (always on the border) and the step in (x,y).
-	 *
-	 * If (x0,y0) is at the right or bottom border then it should be x0=width and/or y0=height,
-	 */
+	/// Computes the number of image pixel are in the path. The path is defined with an initial
+	/// pixel coordinate (always on the border) and the step in (x,y).
+	///
+	/// If (x0,y0) is at the right or bottom border then it should be x0=width and/or y0=height,
 	int computePathLength( int x0, int y0, int dx, int dy ) {
 		int pathX = pathLength(x0, dx, effectiveLengthX);
 		int pathY = pathLength(y0, dy, lengthY);
 		return Math.min(pathX, pathY);
 	}
 
-	/**
-	 * Returns number of steps it takes to reach the end of the path
-	 */
+	/// Returns number of steps it takes to reach the end of the path
 	private int pathLength( int t0, int step, int length ) {
 		if (step > 0)
 			return (length - t0 + step/2)/step;

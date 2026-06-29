@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,34 +35,29 @@ import org.ejml.UtilEjml;
 
 import java.util.Random;
 
-/**
- * <p>Computes the Mutual Information error metric from a rectified stereo pair. Mutual information
- * between two images is defined as: MI(I1,I2) = H<sub>I1</sub> + H<sub>I2</sub> + H<sub>I1,I2</sub>.
- * Where H is an entropy function, e.g. H<sub>I</sub> = -sum_i P<sub>I</sub>(i)log(P<sub>I</sub>(i)),
- * where P<sub>I</sub>(i) is the probability of a pixel in image 'I' having that intensity. See [1]
- * for details.</p>
- *
- * The following steps need to be followed to use this class.
- * <ol>
- *     <li>Specify the maximum number of gray values using {@link #randomHistogram}</li>
- *     <li>Initialize the histogram. If the disparity is known that can be used. Otherwise it's recommended that
- *     {@link #diagonalHistogram} is used instead. Random initialization was suggested in the paper but that has been
- *     found to only work on simple scenes</li>
- *     <li>Call {@link #process} to compute the mutual information scores</li>
- *     <li>Then call {@link #precomputeScaledCost(int)} to compute the scaled cost in a look up table</li>
- *     <li>To get the cost use {@link #costScaled(int, int)}</li>
- * </ol>
- *
- * <p>It was noted in later works that MI does not scale well to gray scales images greater than 8-bits,
- * such as the common 12-bit ones used today. This is because the distribution of values becomes too
- * sparse.</p>
- *
- * <p>[1] Hirschmuller, Heiko. "Stereo processing by semiglobal matching and mutual information."
- * IEEE Transactions on pattern analysis and machine intelligence 30.2 (2007): 328-341.</p>
- *
- * @author Peter Abeles
- * @see SgmStereoDisparityHmi
- */
+/// Computes the Mutual Information error metric from a rectified stereo pair. Mutual information
+/// between two images is defined as: MI(I1,I2) = H<sub>I1</sub> + H<sub>I2</sub> + H<sub>I1,I2</sub>.
+/// Where H is an entropy function, e.g. H<sub>I</sub> = -sum\_i P<sub>I</sub>(i)log(P<sub>I</sub>(i)),
+/// where P<sub>I</sub>(i) is the probability of a pixel in image 'I' having that intensity. See \[1\]
+/// for details.
+///
+/// The following steps need to be followed to use this class.
+///
+///   1. Specify the maximum number of gray values using [#randomHistogram]
+///   2. Initialize the histogram. If the disparity is known that can be used. Otherwise, it's recommended that
+///     [#diagonalHistogram] is used instead. Random initialization was suggested in the paper but that has been
+///     found to only work on simple scenes
+///   3. Call [#process] to compute the mutual information scores
+///   4. Then call [#precomputeScaledCost(int)] to compute the scaled cost in a look-up table
+///   5. To get the cost use [#costScaled(int, int)]
+///
+/// It was noted in later works that MI does not scale well to gray scales images greater than 8-bits,
+/// such as the common 12-bit ones used today. This is because the distribution of values becomes too
+/// sparse.
+///
+/// 1) Hirschmuller, Heiko. "Stereo processing by semiglobal matching and mutual information."
+/// IEEE Transactions on pattern analysis and machine intelligence 30.2 (2007): 328-341.
+/// @see SgmStereoDisparityHmi
 @SuppressWarnings({"NullAway.Init"})
 public class StereoMutualInformation {
 
@@ -96,12 +91,10 @@ public class StereoMutualInformation {
 		configureSmoothing(1);
 	}
 
-	/**
-	 * Configures the histogram and how the input is scaled. For an 8-bit input image just pass in
-	 * 0xFF for both values.
-	 *
-	 * @param totalGrayLevels Number of possible gray scale values. Typically 256 for 8-bit images.
-	 */
+	/// Configures the histogram and how the input is scaled. For an 8-bit input image just pass in
+	/// 0xFF for both values.
+	///
+	/// @param totalGrayLevels Number of possible gray scale values. Typically 256 for 8-bit images.
 	public void configureHistogram( int totalGrayLevels ) {
 		histogramIntensity = new int[totalGrayLevels];
 		histJoint.reshape(totalGrayLevels, totalGrayLevels);
@@ -111,12 +104,10 @@ public class StereoMutualInformation {
 		scaledCost.reshape(histJoint);
 	}
 
-	/**
-	 * Computes random values for the cost between left and right values. Not recommended since it only seems
-	 * to work with simplistic images
-	 *
-	 * @param rand Random number generator
-	 */
+	/// Computes random values for the cost between left and right values. Not recommended since it only seems
+	/// to work with simplistic images
+	///
+	/// @param rand Random number generator
 	public void randomHistogram( Random rand, int maxCost ) {
 		int N = scaledCost.totalPixels();
 		for (int i = 0; i < N; i++) {
@@ -124,14 +115,12 @@ public class StereoMutualInformation {
 		}
 	}
 
-	/**
-	 * Creates a diagonal histogram. This assumes that the pixel values are within a scale factor of each
-	 * other in the left and right images. You can specify the scale factor. Most of the time 1.0 works just fine
-	 * Non diagonal elements are given a higher score.
-	 *
-	 * @param scaleLeftToRight Ratio of pixel intensity values from left to right image
-	 * @param maxCost The worst cost.
-	 */
+	/// Creates a diagonal histogram. This assumes that the pixel values are within a scale factor of each
+	/// other in the left and right images. You can specify the scale factor. Most of the time 1.0 works just fine
+	/// Non diagonal elements are given a higher score.
+	///
+	/// @param scaleLeftToRight Ratio of pixel intensity values from left to right image
+	/// @param maxCost The worst cost.
 	public void diagonalHistogram( double scaleLeftToRight, int maxCost ) {
 		int costLow = maxCost/20;
 		int costHigh = maxCost/3;
@@ -143,24 +132,20 @@ public class StereoMutualInformation {
 		}
 	}
 
-	/**
-	 * Amount of smooth that's applied to the kernels
-	 *
-	 * @param radius A radius of 3 is recommended in the paper
-	 */
+	/// Amount of smooth that's applied to the kernels
+	///
+	/// @param radius A radius of 3 is recommended in the paper
 	public void configureSmoothing( int radius ) {
 		smoothKernel = FactoryKernelGaussian.gaussian(1, true, 32, -1, radius);
 	}
 
-	/**
-	 * Process the images and compute the entropy terms which will be in turn used to compute mutual information
-	 *
-	 * @param left Left rectified image
-	 * @param right Right rectified image
-	 * @param minDisparity The minimum allowed disparity
-	 * @param disparity Disparity from left to right
-	 * @param invalid Value of disparity pixels which are invalid
-	 */
+	/// Process the images and compute the entropy terms which will be in turn used to compute mutual information
+	///
+	/// @param left Left rectified image
+	/// @param right Right rectified image
+	/// @param minDisparity The minimum allowed disparity
+	/// @param disparity Disparity from left to right
+	/// @param invalid Value of disparity pixels which are invalid
 	public void process( GrayU8 left, GrayU8 right, int minDisparity, GrayU8 disparity, int invalid ) {
 		// Check input to make sure it's valid
 		InputSanityCheck.checkSameShape(left, right);
@@ -174,14 +159,12 @@ public class StereoMutualInformation {
 		computeEntropy();
 	}
 
-	/**
-	 * Computes the mutual information cost given pixel values from left and right images. Must call
-	 * {@link #process} first.
-	 *
-	 * @param leftValue Value in left image. I(x,y)
-	 * @param rightValue Value of pixel in right image I(x-d,y)
-	 * @return the mutual information score
-	 */
+	/// Computes the mutual information cost given pixel values from left and right images. Must call
+	/// [#process] first.
+	///
+	/// @param leftValue Value in left image. I(x,y)
+	/// @param rightValue Value of pixel in right image I(x-d,y)
+	/// @return the mutual information score
 	public float cost( int leftValue, int rightValue ) {
 		// Equation 8b and 9a
 		return entropyJoint.unsafe_get(rightValue, leftValue) - entropyLeft.data[leftValue] - entropyRight.data[rightValue];
@@ -191,10 +174,8 @@ public class StereoMutualInformation {
 		return scaledCost.unsafe_get(rightValue, leftValue);
 	}
 
-	/**
-	 * Computes the joint histogram of pixel intensities (2D histogram) while skipping over pixels with
-	 * no correspondences
-	 */
+	/// Computes the joint histogram of pixel intensities (2D histogram) while skipping over pixels with
+	/// no correspondences
 	void computeJointHistogram( GrayU8 left, GrayU8 right, int minDisparity, GrayU8 disparity, int invalid ) {
 		// zero the histogram
 		ImageMiscOps.fill(histJoint, 0);
@@ -226,9 +207,7 @@ public class StereoMutualInformation {
 		}
 	}
 
-	/**
-	 * Computes the joint and image specific probabilities using the joint histogram.
-	 */
+	/// Computes the joint and image specific probabilities using the joint histogram.
 	void computeProbabilities() {
 		// Convert joint histogram into a joint probability
 		float totalPixels = totalDispPixels = ImageStatistics.sum(histJoint);
@@ -251,9 +230,7 @@ public class StereoMutualInformation {
 		}
 	}
 
-	/**
-	 * Compute Entropy from the already computed probabilities
-	 */
+	/// Compute Entropy from the already computed probabilities
 	void computeEntropy() {
 		// Compute Joint Entropy Eq. 5
 		// H = -(1/n)*log(I*G)*G
@@ -277,9 +254,7 @@ public class StereoMutualInformation {
 		PixelMath.divide(entropyRight, -totalDispPixels, entropyRight);
 	}
 
-	/**
-	 * Precompute cost scaled to have a range of 0 to maxCost, inclusive
-	 */
+	/// Precompute cost scaled to have a range of 0 to maxCost, inclusive
 	public void precomputeScaledCost( int maxCost ) {
 		final int N = scaledCost.width;
 

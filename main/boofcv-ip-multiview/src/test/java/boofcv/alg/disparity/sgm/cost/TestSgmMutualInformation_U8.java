@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,7 @@ class TestSgmMutualInformation_U8 extends ChecksSgmDisparityCost<GrayU8> {
 		super(0, maxPixelValue, ImageType.single(GrayU8.class));
 	}
 
-	@Override
-	SgmDisparityCost<GrayU8> createAlg() {
+	@Override SgmDisparityCost<GrayU8> createAlg() {
 		StereoMutualInformation smi = new StereoMutualInformation();
 		smi.configureHistogram(maxPixelValue + 1);
 

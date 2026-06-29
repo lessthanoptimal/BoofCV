@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,7 @@ class TestSgmCostAbsoluteDifference extends BoofStandardJUnit {
 			super(0, 255, ImageType.single(GrayU8.class));
 		}
 
-		@Override
-		SgmDisparityCost<GrayU8> createAlg() {
+		@Override SgmDisparityCost<GrayU8> createAlg() {
 			return new SgmCostAbsoluteDifference.U8();
 		}
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,21 +44,21 @@ public class CommonSgmChecks<T extends ImageGray<T>> extends BoofStandardJUnit {
 		disparityTruth.reshape(width, height);
 	}
 
-	/**
-	 * Randomly fills in the left image and copies it by a fixed amount into the right
-	 */
+	/// Randomly fills in the left image and copies it by a fixed amount into the right
 	protected void renderStereoRandom( int min, int max, int disparity, int invalid ) {
 		GImageMiscOps.fillUniform(left, rand, min, max);
 		GImageMiscOps.fill(right, 0);
-		GImageMiscOps.copy(disparity, 0, 0, 0, left.width - disparity, left.height, left, right);
+		// right column x matches left column x+disparity, so a negative disparity shifts the region right
+		int srcX = Math.max(0, disparity);
+		int dstX = Math.max(0, -disparity);
+		int w = left.width - Math.abs(disparity);
+		GImageMiscOps.copy(srcX, 0, dstX, 0, w, left.height, left, right);
 
 		GImageMiscOps.fill(disparityTruth, invalid);
-		GImageMiscOps.fillRectangle(disparityTruth, disparity, disparity, 0, left.width - disparity, left.height);
+		GImageMiscOps.fillRectangle(disparityTruth, disparity, srcX, 0, w, left.height);
 	}
 
-	/**
-	 * Renders a stereo pair with a step gradient and a fixed constant disparity
-	 */
+	/// Renders a stereo pair with a step gradient and a fixed constant disparity
 	protected void renderStereoStep( int d, int invalid ) {
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
