@@ -7,6 +7,19 @@ Version Meaning: <compatible>.<feature>.<bug fix>
 - Last digit always indicates a bug fix and other minor changes
 
 ---------------------
+Date    : 2026/XXX/YY
+Version : 1.4.1
+
+- Stereo Disparity
+  * Added support for negative disparity
+- MeshRender now supports non-pinhole cameras
+  * Added a raytracer rendering engine
+- Unrolled interleaved convolution kernels. Thanks Peter1169
+- Fixed bug in ChessboardCorner setTo()
+- CalibrationIO - supports OpenCV's XML format
+- More JMH benchmarks
+
+---------------------
 Date    : 2026/May/25
 Version : 1.4.0
 
