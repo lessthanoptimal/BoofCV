@@ -25,7 +25,9 @@ import boofcv.struct.image.InterleavedU8;
 import boofcv.struct.mesh.VertexMesh;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
+import georegression.struct.tuples.GeoTuple3D_F64;
 import org.jetbrains.annotations.Nullable;
 
 /// Supports any camera model because it uses ray-tracing.
@@ -35,7 +37,7 @@ import org.jetbrains.annotations.Nullable;
 @SuppressWarnings("NullAway")
 public class MeshRayTracer extends MeshRender {
 	//------------------------------------------------------------------------------- Camera (rays)
-	// Per-pixel unit pointing vectors in the CAMERA frame. Length = width*height.
+	// Per-pixel unit pointing vectors in the CAMERA frame. Length = width*height. fnorm = 1.0
 	private double[] dirCamX = new double[0];
 	private double[] dirCamY = new double[0];
 	private double[] dirCamZ = new double[0];
@@ -586,6 +588,15 @@ public class MeshRayTracer extends MeshRender {
 		out.y = camCenter.y + range*dy;
 		out.z = camCenter.z + range*dz;
 		return true;
+	}
+
+	/// Returns the pointing vector for the given pixel. Vector has an F-Norm of 1.
+	public <T extends GeoTuple3D_F64<T>> T pixelToPointing( int x, int y, @Nullable T out ) {
+		if (out == null)
+			out = (T)new Vector3D_F64();
+		int pix = y*width + x;
+		out.setTo(dirCamX[pix], dirCamY[pix], dirCamZ[pix]);
+		return out;
 	}
 
 	// =====================================================================================
