@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -180,6 +180,10 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 	 */
 	public boolean isSameShape( ImageBase<?> image ) {
 		return width == image.width && height == image.height;
+	}
+
+	public boolean isSameShape( int width, int height ) {
+		return this.width == width && this.height == height;
 	}
 
 	/**
