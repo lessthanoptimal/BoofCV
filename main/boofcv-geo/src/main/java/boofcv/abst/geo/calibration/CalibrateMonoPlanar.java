@@ -41,44 +41,33 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-/**
- * <p>
- * Performs the full processing loop for calibrating a mono camera from a planar grid. A
- * directory is specified that the images are read in from. Calibration points are detected
- * inside the image and feed into the Zhang99 algorithm for parameter estimation.
- * </p>
- *
- * <p>
- * Internally it supports status updates for a GUI and skips over bad images. Invoke functions
- * in the following order:
- * <ol>
- * <li>{@link #configure}</li>
- * <li>{@link #initialize}</li>
- * <li>{@link #addImage}</li>
- * <li>{@link #process}</li>
- * <li>{@link #getIntrinsic}</li>
- * </ol>
- * </p>
- *
- * <p>
- * <b>Most 3D operations in BoofCV assume that the image coordinate system is right handed and the +Z axis is
- * pointing out of the camera.</b>  In standard image coordinate the origin (0,0) is at the top left corner with +x going
- * to the right and +y going down, then if it is right handed +z will be out of the image. <b>However some times
- * this pseudo standard is not followed and the y-axis needs to be inverted by setting isInverted to true.</b>
- * </p>
- *
- * @author Peter Abeles
- */
+/// Performs the full processing loop for calibrating a mono camera from a planar grid. A
+/// directory is specified that the images are read in from. Calibration points are detected
+/// inside the image and feed into the Zhang99 algorithm for parameter estimation.
+///
+/// Internally it supports status updates for a GUI and skips over bad images. Invoke functions
+/// in the following order:
+///
+///   1. [#configure]
+///   2. [#initialize]
+///   3. [#addImage]
+///   4. [#process]
+///   5. [#getIntrinsic]
+///
+/// **Most 3D operations in BoofCV assume that the image coordinate system is right-handed and the +Z axis is
+/// pointing out of the camera.**  In standard image coordinate the origin (0,0) is in the top left corner with +x going
+/// to the right and +y going down, then if it is right-handed +z will be out of the image. **However sometimes
+/// this pseudo standard is not followed and the y-axis needs to be inverted by setting isInverted to true.**
 @SuppressWarnings({"NullAway.Init"})
 public class CalibrateMonoPlanar implements VerbosePrint {
 
 	// detects calibration points inside of images
 	protected DetectSingleFiducialCalibration detector;
 
-	/** Layout of points on each calibration target */
+	/// Layout of points on each calibration target
 	protected List<List<Point2D_F64>> layouts;
 
-	/** computes calibration parameters */
+	/// computes calibration parameters
 	@Getter protected CalibrationPlanarGridZhang99 zhang99;
 
 	// computed parameters
@@ -95,12 +84,10 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 	private int imageWidth;
 	private int imageHeight;
 
-	/**
-	 * Resets internal data structures. Must call before adding images
-	 *
-	 * @param width Image width
-	 * @param height Image height
-	 */
+	/// Resets internal data structures. Must call before adding images
+	///
+	/// @param width Image width
+	/// @param height Image height
 	public void initialize( int width, int height, List<List<Point2D_F64>> layouts ) {
 		observations = new ArrayList<>();
 		errors = new ArrayList<>();
@@ -109,9 +96,7 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 		this.layouts = layouts;
 	}
 
-	/**
-	 * Specifies the calibration model.
-	 */
+	/// Specifies the calibration model.
 	public void configure( boolean assumeZeroSkew, Zhang99Camera camera ) {
 		zhang99 = new CalibrationPlanarGridZhang99(camera);
 		zhang99.setZeroSkew(assumeZeroSkew);
@@ -125,58 +110,43 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 		zhang99.setZeroSkew(config.zeroSkew);
 	}
 
-	public void configureUniversalOmni( boolean assumeZeroSkew,
-										int numRadialParam,
-										boolean includeTangential ) {
+	public void configureUniversalOmni( @Nullable ConfigCalibrateUniversalOmni config ) {
+		if (config == null)
+			config = new ConfigCalibrateUniversalOmni();
 		zhang99 = new CalibrationPlanarGridZhang99(
-				new Zhang99CameraUniversalOmni(assumeZeroSkew, includeTangential, numRadialParam));
-		zhang99.setZeroSkew(assumeZeroSkew);
+				new Zhang99CameraUniversalOmni(config));
+		zhang99.setZeroSkew(config.zeroSkew);
 	}
 
 	public void configureKannalaBrandt( boolean assumeZeroSkew,
-										int numSymmetric,
-										int numAsymmetric ) {
+	                                    int numSymmetric,
+	                                    int numAsymmetric ) {
 		zhang99 = new CalibrationPlanarGridZhang99(
 				new Zhang99CameraKannalaBrandt(assumeZeroSkew, numSymmetric, numAsymmetric));
 		zhang99.setZeroSkew(assumeZeroSkew);
 	}
 
-	public void configureUniversalOmni( boolean assumeZeroSkew,
-										int numRadialParam,
-										boolean includeTangential,
-										double mirrorOffset ) {
-		zhang99 = new CalibrationPlanarGridZhang99(
-				new Zhang99CameraUniversalOmni(assumeZeroSkew, includeTangential, numRadialParam, mirrorOffset));
-		zhang99.setZeroSkew(assumeZeroSkew);
-	}
-
-	/** Convience function which returns true if the provided shape matches the expected image shape */
+	/// Convenience function which returns true if the provided shape matches the expected image shape
 	public boolean isExpectedShape( int width, int height ) {
 		return width == imageWidth && height == imageHeight;
 	}
 
-	/**
-	 * Adds the observations from a calibration target detector.
-	 *
-	 * <p>Note: If you see two targets in one image then that image is treated as two image, one for each observations. </p>
-	 *
-	 * @param observation Detected calibration points
-	 */
+	/// Adds the observations from a calibration target detector.
+	///
+	/// Note: If you see two targets in one image then that image is treated as two image, one for each observation.
+	///
+	/// @param observation Detected calibration points
 	public void addImage( CalibrationObservation observation ) {
 		observations.add(observation);
 	}
 
-	/**
-	 * Removes the most recently added image
-	 */
+	/// Removes the most recently added image
 	public void removeLatestImage() {
 		observations.remove(observations.size() - 1);
 	}
 
-	/**
-	 * After calibration points have been found this invokes the Zhang99 algorithm to
-	 * estimate calibration parameters. Error statistics are also computed.
-	 */
+	/// After calibration points have been found this invokes the Zhang99 algorithm to
+	/// estimate calibration parameters. Error statistics are also computed.
 	public <T extends CameraModel> T process() {
 		if (imageWidth == 0)
 			throw new RuntimeException("Must call initialize() first");
@@ -199,9 +169,7 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 		return (T)foundIntrinsic;
 	}
 
-	/**
-	 * Returns estimated transform from calibration target to camera view
-	 */
+	/// Returns estimated transform from calibration target to camera view
 	public Se3_F64 getTargetToView( int viewIdx ) {
 		return structure.getParentToView(viewIdx);
 	}
@@ -213,10 +181,10 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 		return computeQualityText(errors, imageNames, quality);
 	}
 
-	/** Creates human-readable text with metrics that indicate calibration quality */
+	/// Creates human-readable text with metrics that indicate calibration quality
 	public static String computeQualityText( List<ImageResults> errors,
-											 List<String> imageNames,
-											 CalibrationQuality quality ) {
+	                                         List<String> imageNames,
+	                                         CalibrationQuality quality ) {
 		BoofMiscOps.checkEq(errors.size(), imageNames.size());
 
 		// Compute a histogram of how many observations have a residual error less than these values
@@ -265,8 +233,8 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 	}
 
 	public static void generateReprojectionErrorHistogram( double[] thresholds, int[] counts,
-														   int totalObservations,
-														   StringBuilder builder ) {
+	                                                       int totalObservations,
+	                                                       StringBuilder builder ) {
 		builder.append("Percent Reprojection Errors Less than X pixels. N=").append(totalObservations).append("\n");
 		for (int i = 0; i < thresholds.length; i++) {
 			builder.append(String.format(" %6.2f |", thresholds[i]));
@@ -278,20 +246,18 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 		builder.append("\n\n");
 	}
 
-	/**
-	 * Computes quality metrics to quantify how good of a job the person calibrating did
-	 *
-	 * @param intrinsic Estimated camera model from calibration
-	 * @param fillScorer Used to compute image fill score
-	 * @param targetLayouts Known location of points in world coordinates
-	 * @param observations Observed calibration points
-	 * @param quality (Output) Metrics used to evaluate how good the calibration is
-	 */
+	/// Computes quality metrics to quantify how good of a job the person calibrating did
+	///
+	/// @param intrinsic Estimated camera model from calibration
+	/// @param fillScorer Used to compute image fill score
+	/// @param targetLayouts Known location of points in world coordinates
+	/// @param observations Observed calibration points
+	/// @param quality (Output) Metrics used to evaluate how good the calibration is
 	public static void computeQuality( CameraModel intrinsic,
-									   ScoreCalibrationFill fillScorer,
-									   List<List<Point2D_F64>> targetLayouts,
-									   List<CalibrationObservation> observations,
-									   CalibrationQuality quality ) {
+	                                   ScoreCalibrationFill fillScorer,
+	                                   List<List<Point2D_F64>> targetLayouts,
+	                                   List<CalibrationObservation> observations,
+	                                   CalibrationQuality quality ) {
 		fillScorer.initialize(intrinsic.width, intrinsic.height);
 		var geoScorer = new ScoreCalibrationGeometricDiversity(true);
 
@@ -307,9 +273,7 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 		quality.geometric = geoScorer.getScore();
 	}
 
-	/**
-	 * Prints out error information to standard out
-	 */
+	/// Prints out error information to standard out
 	public static void printErrors( List<ImageResults> results, PrintStream out ) {
 		double totalError = 0;
 		for (int i = 0; i < results.size(); i++) {

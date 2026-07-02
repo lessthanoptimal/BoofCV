@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.examples.calibration;
 
 import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.abst.geo.calibration.CalibrateMonoPlanar;
+import boofcv.abst.geo.calibration.ConfigCalibrateUniversalOmni;
 import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.io.UtilIO;
@@ -62,7 +63,8 @@ public class ExampleCalibrateFisheye {
 
 		// Specify the camera model to use. Here are a few examples.
 		//
-		calibrator.configureUniversalOmni( /*zeroSkew*/ true, /*radial*/ 2, /*tangential*/ false);
+		calibrator.configureUniversalOmni(
+				new ConfigCalibrateUniversalOmni().zeroSkew(true).numRadial(2).tangential(false));
 		// it's also possible to fix the mirror offset parameter
 		// 0 = pinhole camera. 1 = fisheye
 //		calibrationAlg.configureUniversalOmni( /*zeroSkew*/ true, /*radial*/ 2, /*tangential*/ false, /*offset*/ 1.0);

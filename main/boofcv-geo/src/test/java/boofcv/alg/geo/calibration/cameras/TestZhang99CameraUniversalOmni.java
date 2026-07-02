@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo.calibration.cameras;
 
+import boofcv.abst.geo.calibration.ConfigCalibrateUniversalOmni;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.calibration.GenericCalibrationZhang99;
 import boofcv.struct.calib.CameraUniversalOmni;
@@ -31,17 +32,15 @@ import java.util.Random;
 import static org.ejml.UtilEjml.EPS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-
 public class TestZhang99CameraUniversalOmni extends GenericCalibrationZhang99<CameraUniversalOmni> {
-
-	@Override
-	public List<CameraConfig> createCamera( Random rand ) {
+	@Override public List<CameraConfig> createCamera( Random rand ) {
 		List<OmniConfig> list = new ArrayList<>();
 
-		list.add(createStandard(false, false, 0, 0, rand));
-		list.add(createStandard(true, true, 2, 0, rand));
-		list.add(createStandard(false, true, 2, 0, rand));
-		list.add(createStandard(true, false, 2, 0, rand));
+		list.add(createStandard(false, false, 0, -1, 0, rand));
+		list.add(createStandard(true, true, 2, -1, 0, rand));
+		list.add(createStandard(false, true, 2, -1, 0, rand));
+		list.add(createStandard(true, false, 2, -1, 0, rand));
+		list.add(createStandard(true, false, 2, 1, 0, rand));
 
 		list.add(createFisheye(true));
 		list.add(createFisheye(false));
@@ -49,13 +48,12 @@ public class TestZhang99CameraUniversalOmni extends GenericCalibrationZhang99<Ca
 		return (List)list;
 	}
 
-	@Override
-	public List<CameraConfig> createCameraForLinearTests( Random rand ) {
+	@Override public List<CameraConfig> createCameraForLinearTests( Random rand ) {
 		List<OmniConfig> list = new ArrayList<>();
 
 		// tangent can't be linearly estimated
-		list.add(createStandard(false, false, 0, 0, rand));
-		list.add(createStandard(true, false, 0, 0, rand));
+		list.add(createStandard(false, false, 0, -1, 0, rand));
+		list.add(createStandard(true, false, 0, -1, 0, rand));
 
 		// radial distortion has to be very small for parameters to have a decent estimate
 		// the estimate it does come up with is much better than starting from zero but has
@@ -66,16 +64,20 @@ public class TestZhang99CameraUniversalOmni extends GenericCalibrationZhang99<Ca
 	}
 
 	public OmniConfig createStandard( boolean zeroSkew,
-									  boolean tangent, int numRadial,
-									  double mirror,
-									  Random rand ) {
+	                                  boolean tangent, int numRadial,
+	                                  double aspectRatio,
+	                                  double mirror,
+	                                  Random rand ) {
 
-		OmniConfig p = new OmniConfig(zeroSkew, tangent, numRadial, true);
+		var p = new OmniConfig(zeroSkew, tangent, numRadial, aspectRatio, true);
 
 		p.model.cx = 255;
 		p.model.cy = 260;
 		p.model.fx = 1250;
-		p.model.fy = 900;
+		if (aspectRatio < 0)
+			p.model.fy = 900;
+		else
+			p.model.fy = p.model.fx/aspectRatio;
 
 		if (zeroSkew)
 			p.model.skew = 0;
@@ -97,7 +99,7 @@ public class TestZhang99CameraUniversalOmni extends GenericCalibrationZhang99<Ca
 	}
 
 	public OmniConfig createFisheye( boolean fixedMirror ) {
-		OmniConfig p = new OmniConfig(true, true, 2, fixedMirror);
+		var p = new OmniConfig(true, true, 2, -1, fixedMirror);
 
 		p.model.fx = 562.90;
 		p.model.fy = 563.58;
@@ -113,23 +115,22 @@ public class TestZhang99CameraUniversalOmni extends GenericCalibrationZhang99<Ca
 		return p;
 	}
 
-	@Override
-	public Zhang99Camera createGenerator( CameraConfig config, List<Point2D_F64> layout ) {
-		OmniConfig c = (OmniConfig)config;
-		var a = new Zhang99CameraUniversalOmni(c.assumeZeroSkew, c.includeTangential, c.numRadial);
+	@Override public Zhang99Camera createGenerator( CameraConfig config, List<Point2D_F64> layout ) {
+		var c = (OmniConfig)config;
+		var a = new Zhang99CameraUniversalOmni(
+				new ConfigCalibrateUniversalOmni().zeroSkew(c.assumeZeroSkew)
+						.tangential(c.includeTangential).numRadial(c.numRadial).aspectRatio(c.aspectRatio)
+						.fixedMirror(c.fixedMirror));
 		a.setLayouts(List.of(layout));
-		a.fixedMirror = c.fixedMirror;
 		return a;
 	}
 
-	@Override
-	public DMatrixRMaj cameraToK( CameraConfig config ) {
+	@Override public DMatrixRMaj cameraToK( CameraConfig config ) {
 		return PerspectiveOps.pinholeToMatrix(config.model, (DMatrixRMaj)null);
 	}
 
-	@Override
-	protected void checkIntrinsicOnly( CameraUniversalOmni expected, CameraUniversalOmni found,
-									   double tolK, double tolD, double tolT ) {
+	@Override protected void checkIntrinsicOnly( CameraUniversalOmni expected, CameraUniversalOmni found,
+	                                   double tolK, double tolD, double tolT ) {
 		assertEquals(expected.fx, found.fx, Math.abs(expected.fx)*tolK + EPS);
 		assertEquals(expected.fy, found.fy, Math.abs(expected.fy)*tolK + EPS);
 		assertEquals(expected.skew, found.skew, Math.abs(expected.skew)*tolK + EPS);
@@ -150,13 +151,15 @@ public class TestZhang99CameraUniversalOmni extends GenericCalibrationZhang99<Ca
 		boolean includeTangential;
 		int numRadial;
 		boolean fixedMirror;
+		double aspectRatio;
 
 		public OmniConfig( boolean zeroSkew,
-						   boolean tangent, int numRadial, boolean fixedMirror ) {
+		                   boolean tangent, int numRadial, double aspectRatio, boolean fixedMirror ) {
 			this.assumeZeroSkew = zeroSkew;
 			this.includeTangential = tangent;
 			this.numRadial = numRadial;
 			this.fixedMirror = fixedMirror;
+			this.aspectRatio = aspectRatio;
 			this.model = new CameraUniversalOmni(numRadial);
 		}
 	}

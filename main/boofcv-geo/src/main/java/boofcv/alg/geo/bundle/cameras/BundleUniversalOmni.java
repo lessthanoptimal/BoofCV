@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.geo.bundle.cameras;
 
 import boofcv.abst.geo.bundle.BundleAdjustmentCamera;
+import boofcv.abst.geo.calibration.ConfigCalibrateUniversalOmni;
 import boofcv.struct.calib.CameraUniversalOmni;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.data.DMatrix3x3;
@@ -33,26 +34,24 @@ import java.util.Map;
 import static boofcv.misc.BoofMiscOps.getOrThrow;
 import static boofcv.misc.BoofMiscOps.listToArrayDouble;
 
-/**
- * Implementation of {@link boofcv.struct.calib.CameraUniversalOmni} for bundle adjustment
- *
- * @author Peter Abeles
- */
+/// Implementation of [boofcv.struct.calib.CameraUniversalOmni] for bundle adjustment
 public class BundleUniversalOmni implements BundleAdjustmentCamera {
 
-	/** focal length along x and y axis (units: pixels) */
+	/// focal length along x and y axis (units: pixels)
 	public double fx, fy;
-	/** skew parameter, typically 0 (units: pixels) */
+	/// skew parameter, typically 0 (units: pixels)
 	public double skew;
-	/** image center (units: pixels) */
+	/// image center (units: pixels)
 	public double cx, cy;
-	/** Mirror offset distance. &xi; */
+	/// Mirror offset distance. ξ
 	public double mirrorOffset;
-	/** radial distortion parameters: k<sub>1</sub>,...,k<sub>n</sub> */
+	/// radial distortion parameters: k<sub>1</sub>,...,k<sub>n</sub>
 	public double[] radial;
-	/** tangential distortion parameters */
+	/// tangential distortion parameters
 	public double t1, t2;
 
+	/// Forced aspect ratio. `fx = ratio*fy`, turned off if <= 0
+	public double aspectRatio;
 	// forces skew to be zero
 	public boolean zeroSkew;
 	// should it estimate the tangential terms?
@@ -63,18 +62,26 @@ public class BundleUniversalOmni implements BundleAdjustmentCamera {
 	// Storage for unit spherical Jacobian
 	DMatrix3x3 jacSp = new DMatrix3x3();
 
+	@Deprecated
 	public BundleUniversalOmni( boolean zeroSkew,
-								int numRadial, boolean includeTangential, boolean fixedMirror ) {
+	                            int numRadial, boolean includeTangential, boolean fixedMirror ) {
 		this.radial = new double[numRadial];
 		this.zeroSkew = zeroSkew;
 		this.tangential = includeTangential;
 		this.fixedMirror = fixedMirror;
 	}
 
+	@Deprecated
 	public BundleUniversalOmni( boolean zeroSkew,
-								int numRadial, boolean includeTangential, double mirrorOffset ) {
+	                            int numRadial, boolean includeTangential, double mirrorOffset ) {
 		this(zeroSkew, numRadial, includeTangential, true);
 		this.mirrorOffset = mirrorOffset;
+	}
+
+	public BundleUniversalOmni( ConfigCalibrateUniversalOmni config ) {
+		this(config.zeroSkew, config.numRadial, config.tangential, config.fixedMirror);
+		this.mirrorOffset = config.mirrorOffset;
+		this.aspectRatio = config.aspectRatio;
 	}
 
 	public BundleUniversalOmni() {
@@ -135,7 +142,11 @@ public class BundleUniversalOmni implements BundleAdjustmentCamera {
 	@Override
 	public void setIntrinsic( double[] parameters, int offset ) {
 		fx = parameters[offset++];
-		fy = parameters[offset++];
+		if (aspectRatio <= 0) {
+			fy = parameters[offset++];
+		} else {
+			fy = fx/aspectRatio;
+		}
 		cx = parameters[offset++];
 		cy = parameters[offset++];
 		for (int i = 0; i < radial.length; i++) {
@@ -159,7 +170,8 @@ public class BundleUniversalOmni implements BundleAdjustmentCamera {
 	@Override
 	public void getIntrinsic( double[] parameters, int offset ) {
 		parameters[offset++] = fx;
-		parameters[offset++] = fy;
+		if (aspectRatio <= 0)
+			parameters[offset++] = fy;
 		parameters[offset++] = cx;
 		parameters[offset++] = cy;
 		for (int i = 0; i < radial.length; i++) {
@@ -211,9 +223,9 @@ public class BundleUniversalOmni implements BundleAdjustmentCamera {
 
 	@Override
 	public void jacobian( double camX, double camY, double camZ,
-						  double[] inputX, double[] inputY,
-						  boolean computeIntrinsic,
-						  @Nullable double[] calibX, @Nullable double[] calibY ) {
+	                      double[] inputX, double[] inputY,
+	                      boolean computeIntrinsic,
+	                      @Nullable double[] calibX, @Nullable double[] calibY ) {
 		// requires unit spherical coordinates
 		double n2 = camX*camX + camY*camY + camZ*camZ;
 		double n = Math.sqrt(n2);
@@ -304,24 +316,27 @@ public class BundleUniversalOmni implements BundleAdjustmentCamera {
 		jacobianIntrinsic(calibX, calibY, Z, nx, ny, dx, dy);
 	}
 
-	/**
-	 * @param calibX storage for calibration jacobian
-	 * @param calibY storage for calibration jacobian
-	 * @param nx undistorted normalized image coordinates
-	 * @param ny undistorted normalized image coordinates
-	 * @param dnx distorted normalized image coordinates
-	 * @param dny distorted normalized image coordinates
-	 */
+	/// @param calibX storage for calibration jacobian
+	/// @param calibY storage for calibration jacobian
+	/// @param nx undistorted normalized image coordinates
+	/// @param ny undistorted normalized image coordinates
+	/// @param dnx distorted normalized image coordinates
+	/// @param dny distorted normalized image coordinates
 	private void jacobianIntrinsic( double[] calibX, double[] calibY,
-									double Z,
-									double nx, double ny,
-									double dnx, double dny ) {
+	                                double Z,
+	                                double nx, double ny,
+	                                double dnx, double dny ) {
 		// Intrinsic parameters
 		int index = 0;
-		calibX[index] = dnx;
-		calibY[index++] = 0;   // fx
-		calibX[index] = 0;
-		calibY[index++] = dny; // fy
+		if (aspectRatio <= 0) {
+			calibX[index] = dnx;
+			calibY[index++] = 0;   // fx
+			calibX[index] = 0;
+			calibY[index++] = dny;  // fy
+		} else {
+			calibX[index] = dnx;
+			calibY[index++] = dny/aspectRatio;  // fx
+		}
 		calibX[index] = 1;
 		calibY[index++] = 0;   // cx
 		calibX[index] = 0;
@@ -358,7 +373,6 @@ public class BundleUniversalOmni implements BundleAdjustmentCamera {
 		}
 
 		if (!fixedMirror) {
-
 			double dri2 = -2.0*r2/Z;
 			double dsum = 0;
 			double ri2 = r2;
@@ -385,7 +399,7 @@ public class BundleUniversalOmni implements BundleAdjustmentCamera {
 
 	@Override
 	public int getIntrinsicCount() {
-		int totalIntrinsic = 4 + radial.length;
+		int totalIntrinsic = (aspectRatio > 0 ? 1 : 2) + 2 + radial.length;
 		if (tangential)
 			totalIntrinsic += 2;
 		if (!zeroSkew)
@@ -398,8 +412,15 @@ public class BundleUniversalOmni implements BundleAdjustmentCamera {
 
 	@Override public BundleAdjustmentCamera setTo( Map<String, Object> map ) {
 		try {
+			if (map.containsKey("aspectRatio"))
+				aspectRatio = getOrThrow(map, "aspectRatio");
+
 			fx = getOrThrow(map, "fx");
-			fy = getOrThrow(map, "fy");
+			if (aspectRatio > 0) {
+				fy = fx/aspectRatio;
+			} else {
+				fy = getOrThrow(map, "fy");
+			}
 			cx = getOrThrow(map, "cx");
 			cy = getOrThrow(map, "cy");
 			mirrorOffset = getOrThrow(map, "mirror-offset");
@@ -431,7 +452,10 @@ public class BundleUniversalOmni implements BundleAdjustmentCamera {
 	@Override public Map<String, Object> toMap() {
 		var map = new HashMap<String, Object>();
 		map.put("fx", fx);
-		map.put("fy", fy);
+		if (aspectRatio > 0)
+			map.put("aspectRatio", aspectRatio);
+		else
+			map.put("fy", fy);
 		if (!zeroSkew)
 			map.put("skew", skew);
 		map.put("cx", cx);

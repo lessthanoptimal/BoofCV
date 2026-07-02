@@ -22,6 +22,7 @@ import boofcv.abst.fiducial.calib.CalibrationPatterns;
 import boofcv.abst.fiducial.calib.ConfigECoCheckMarkers;
 import boofcv.abst.geo.calibration.CalibrateMonoPlanar;
 import boofcv.abst.geo.calibration.ConfigCalibratePinhole;
+import boofcv.abst.geo.calibration.ConfigCalibrateUniversalOmni;
 import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
 import boofcv.alg.fiducial.calib.ConfigCalibrationTarget;
 import boofcv.alg.geo.calibration.CalibrationObservation;
@@ -458,7 +459,8 @@ public class CameraCalibrationMono extends BaseStandardInputApp {
 		switch (modeType) {
 			case BROWN -> calibrationAlg.configurePinhole(new ConfigCalibratePinhole().
 					zeroSkew(zeroSkew).numRadial(numRadial).tangential(tangential));
-			case UNIVERSAL -> calibrationAlg.configureUniversalOmni(zeroSkew, numRadial, tangential);
+			case UNIVERSAL -> calibrationAlg.configureUniversalOmni(
+					new ConfigCalibrateUniversalOmni().zeroSkew(zeroSkew).numRadial(numRadial).tangential(tangential));
 			case KANNALA_BRANDT -> calibrationAlg.configureKannalaBrandt(zeroSkew, kbNumSymmetric, kbNumAsymmetric);
 			default -> throw new RuntimeException("Unknown model type: " + modeType);
 		}
