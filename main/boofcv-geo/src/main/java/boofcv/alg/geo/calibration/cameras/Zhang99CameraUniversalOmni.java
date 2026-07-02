@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.geo.calibration.cameras;
 
 import boofcv.abst.geo.bundle.BundleAdjustmentCamera;
+import boofcv.abst.geo.calibration.ConfigCalibrateUniversalOmni;
 import boofcv.alg.geo.bundle.cameras.BundleUniversalOmni;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.geo.calibration.RadialDistortionEstimateLinear;
@@ -35,30 +36,13 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class Zhang99CameraUniversalOmni implements Zhang99Camera {
-	boolean assumeZeroSkew;
-	boolean includeTangential;
-	public boolean fixedMirror;
-	double mirror;
+	ConfigCalibrateUniversalOmni config;
 
 	private final RadialDistortionEstimateLinear computeRadial;
 
-	/**
-	 * Constructor where mirror offset is assumed to be known
-	 */
-	public Zhang99CameraUniversalOmni( boolean assumeZeroSkew, boolean includeTangential, int numRadial, double mirror ) {
-		this(assumeZeroSkew, includeTangential, numRadial);
-		this.fixedMirror = true;
-		this.mirror = mirror;
-	}
-
-	/**
-	 * Constructor where mirror offset is assumed to be unknown
-	 */
-	public Zhang99CameraUniversalOmni( boolean assumeZeroSkew, boolean includeTangential, int numRadial ) {
-		this.assumeZeroSkew = assumeZeroSkew;
-		this.includeTangential = includeTangential;
-		this.fixedMirror = false;
-		computeRadial = new RadialDistortionEstimateLinear(numRadial);
+	public Zhang99CameraUniversalOmni( ConfigCalibrateUniversalOmni config ) {
+		this.config = new ConfigCalibrateUniversalOmni().setTo(config);
+		computeRadial = new RadialDistortionEstimateLinear(config.numRadial);
 	}
 
 	@Override public void setLayouts( List<List<Point2D_F64>> layouts ) {
@@ -70,13 +54,9 @@ public class Zhang99CameraUniversalOmni implements Zhang99Camera {
 		computeRadial.process(K, homographies, observations);
 		double[] radial = computeRadial.getParameters();
 
-		BundleUniversalOmni cam = new BundleUniversalOmni(assumeZeroSkew, radial.length, includeTangential, fixedMirror);
+		BundleUniversalOmni cam = new BundleUniversalOmni(config);
 		System.arraycopy(radial, 0, cam.radial, 0, radial.length);
 		cam.setK(K);
-		if (fixedMirror)
-			cam.mirrorOffset = mirror;
-		else
-			cam.mirrorOffset = 0; // paper recommends 1. Doesn't seem to make a difference
 		cam.t1 = cam.t2 = 0;
 		return cam;
 	}

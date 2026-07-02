@@ -20,6 +20,7 @@ package boofcv.gui.controls;
 
 import boofcv.abst.geo.calibration.CalibrateMonoPlanar;
 import boofcv.abst.geo.calibration.ConfigCalibratePinhole;
+import boofcv.abst.geo.calibration.ConfigCalibrateUniversalOmni;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.struct.calib.CameraModelType;
 
@@ -97,7 +98,9 @@ public class CalibrationModelPanel extends StandardAlgConfigPanel implements Act
 				calibrator.configurePinhole(config);
 			}
 			case UNIVERSAL -> calibrator.configureUniversalOmni(
-					universal.skew.value, universal.numRadial.value.intValue(), universal.tangential.value);
+					new ConfigCalibrateUniversalOmni().zeroSkew(universal.skew.value).
+							numRadial(universal.numRadial.value.intValue()).
+							tangential( universal.tangential.value));
 			case KANNALA_BRANDT -> calibrator.configureKannalaBrandt(kannalaBrandt.skew.value,
 					kannalaBrandt.numSymmetric.vint(), kannalaBrandt.numAsymmetric.vint());
 		}

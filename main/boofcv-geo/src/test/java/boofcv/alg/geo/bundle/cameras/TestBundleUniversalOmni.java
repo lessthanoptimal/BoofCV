@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo.bundle.cameras;
 
+import boofcv.abst.geo.calibration.ConfigCalibrateUniversalOmni;
 import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.struct.calib.CameraUniversalOmni;
 import boofcv.struct.distort.Point3Transform2_F64;
@@ -74,6 +75,14 @@ public class TestBundleUniversalOmni extends BoofStandardJUnit {
 	@Test void withoutSkew() throws Exception {
 		double[][] parameters = new double[][]{{300, 200, 400, 400, 0.01, 0.02, -0.001, 0.002, 0.9}, {400, 600, 1000, 1000, 0.01, 0.02, -0.001, 0.002, 0.9}};
 		new GenericChecksBundleAdjustmentCamera(new BundleUniversalOmni(true, 2, true, false), 0.02) {}
+				.setParameters(parameters)
+				.checkAll();
+	}
+
+	@Test void fixedAspectRatio() throws Exception {
+		double[][] parameters = new double[][]{{300, 400, 400, 0.01, 0.02, -0.001, 0.002, 0.9}, {400, 1000, 1000, 0.01, 0.02, -0.001, 0.002, 0.9}};
+		new GenericChecksBundleAdjustmentCamera(new BundleUniversalOmni(new ConfigCalibrateUniversalOmni()
+				.zeroSkew(true).numRadial(2).tangential(true).fixedMirror(false).aspectRatio(1.0)), 0.02) {}
 				.setParameters(parameters)
 				.checkAll();
 	}
