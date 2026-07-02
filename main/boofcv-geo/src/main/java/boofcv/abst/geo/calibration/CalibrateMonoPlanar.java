@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -117,12 +117,12 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 		zhang99.setZeroSkew(assumeZeroSkew);
 	}
 
-	public void configurePinhole( boolean assumeZeroSkew,
-								  int numRadialParam,
-								  boolean includeTangential ) {
-		var camera = new Zhang99CameraBrown(assumeZeroSkew, includeTangential, numRadialParam);
+	public void configurePinhole( @Nullable ConfigCalibratePinhole config ) {
+		if (config == null)
+			config = new ConfigCalibratePinhole();
+		var camera = new Zhang99CameraBrown(config);
 		zhang99 = new CalibrationPlanarGridZhang99(camera);
-		zhang99.setZeroSkew(assumeZeroSkew);
+		zhang99.setZeroSkew(config.zeroSkew);
 	}
 
 	public void configureUniversalOmni( boolean assumeZeroSkew,

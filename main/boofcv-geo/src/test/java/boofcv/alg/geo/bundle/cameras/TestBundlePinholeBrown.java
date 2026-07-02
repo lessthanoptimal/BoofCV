@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestBundlePinholeBrown extends BoofStandardJUnit {
 	@Test void compareForward() {
-		CameraPinholeBrown cam = new CameraPinholeBrown(1);
+		var cam = new CameraPinholeBrown(1);
 		cam.fx = 300; cam.fy = 200;
 		cam.cx = cam.cy = 400;
 		cam.radial[0] = 0.01;
@@ -54,22 +54,29 @@ public class TestBundlePinholeBrown extends BoofStandardJUnit {
 	}
 
 	@Test void withSkew() throws Exception {
-		double[][] parameters = new double[][]{{300, 200, 400, 400, 0.01, 0.02, -0.001, 0.002, 0.1}, {400, 600, 1000, 1000, 0.01, 0.02, -0.001, 0.002, 2}};
-		new GenericChecksBundleAdjustmentCamera(new BundlePinholeBrown(false, true), 0.02) {}
+		var parameters = new double[][]{{300, 200, 400, 400, 0.01, 0.02, -0.001, 0.002, 0.1}, {400, 600, 1000, 1000, 0.01, 0.02, -0.001, 0.002, 2}};
+		new GenericChecksBundleAdjustmentCamera(new BundlePinholeBrown(false, true, -1), 0.02) {}
 				.setParameters(parameters)
 				.checkAll();
 	}
 
 	@Test void withoutSkew() throws Exception {
-		double[][] parameters = new double[][]{{300, 200, 400, 400, 0.01, 0.02, -0.001, 0.002}, {400, 600, 1000, 1000, 0.01, 0.02, -0.001, 0.002}};
-		new GenericChecksBundleAdjustmentCamera(new BundlePinholeBrown(true, true), 0.02) {}
+		var parameters = new double[][]{{300, 200, 400, 400, 0.01, 0.02, -0.001, 0.002}, {400, 600, 1000, 1000, 0.01, 0.02, -0.001, 0.002}};
+		new GenericChecksBundleAdjustmentCamera(new BundlePinholeBrown(true, true, -1), 0.02) {}
+				.setParameters(parameters)
+				.checkAll();
+	}
+
+	@Test void withFixedAspect() throws Exception {
+		var parameters = new double[][]{{300, 400, 400, 0.01, 0.02, -0.001, 0.002, 0.1}, {400, 1000, 1000, 0.01, 0.02, -0.001, 0.002, 2}};
+		new GenericChecksBundleAdjustmentCamera(new BundlePinholeBrown(false, true, 1), 0.02) {}
 				.setParameters(parameters)
 				.checkAll();
 	}
 
 	@Test void variousRadialLengths() throws Exception {
 		for (int i = 0; i <= 3; i++) {
-			CameraPinholeBrown cam = new CameraPinholeBrown(i);
+			var cam = new CameraPinholeBrown(i);
 			cam.fx = 300; cam.fy = 200;
 			cam.cx = cam.cy = 400;
 			for (int j = 0; j < i; j++) {
@@ -89,14 +96,14 @@ public class TestBundlePinholeBrown extends BoofStandardJUnit {
 	}
 
 	@Test void zeroTangential() throws Exception {
-		CameraPinholeBrown cam = new CameraPinholeBrown(1);
+		var cam = new CameraPinholeBrown(1);
 		cam.fx = 300; cam.fy = 200;
 		cam.cx = cam.cy = 400;
 		cam.radial[0] = 0.02;
 		// since t1 and t2 are zero it will automatically turn off tangential
 
 		BundlePinholeBrown alg = BundleAdjustmentOps.convert(cam, (BundlePinholeBrown)null);
-		double[][] parameters = new double[1][alg.getIntrinsicCount()];
+		var parameters = new double[1][alg.getIntrinsicCount()];
 		alg.getIntrinsic(parameters[0], 0);
 		new GenericChecksBundleAdjustmentCamera(alg, 0.02) {}
 				.setParameters(parameters)

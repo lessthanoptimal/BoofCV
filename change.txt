@@ -17,6 +17,8 @@ Version : 1.4.1
 - Unrolled interleaved convolution kernels. Thanks Peter1169
 - Fixed bug in ChessboardCorner setTo()
 - CalibrationIO - supports OpenCV's XML format
+- Camera Calibration
+  - Supports aspect ratio constraint for Brown
 - More JMH benchmarks
 
 ---------------------

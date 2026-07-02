@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -106,7 +106,7 @@ public class TestBundleAdjustmentOps extends BoofStandardJUnit {
 
 	@Test void convert_brown_to_bundleBrown() {
 		var src = new CameraPinholeBrown().fsetK(1, 2, 3, 4, 5, 6, 7).fsetRadial(-1, -2).fsetTangential(0.1, 0.2);
-		var dst = new BundlePinholeBrown(true, false);
+		var dst = new BundlePinholeBrown(true, false, -1);
 
 		assertSame(dst, BundleAdjustmentOps.convert(src, dst));
 

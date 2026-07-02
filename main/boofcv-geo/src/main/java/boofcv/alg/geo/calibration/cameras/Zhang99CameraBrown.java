@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.geo.calibration.cameras;
 
 import boofcv.abst.geo.bundle.BundleAdjustmentCamera;
+import boofcv.abst.geo.calibration.ConfigCalibratePinhole;
 import boofcv.alg.geo.bundle.BundleAdjustmentOps;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeBrown;
 import boofcv.alg.geo.calibration.CalibrationObservation;
@@ -29,21 +30,15 @@ import org.ejml.data.DMatrixRMaj;
 
 import java.util.List;
 
-/**
- * Camera parameters for model {@link boofcv.struct.calib.CameraPinholeBrown}.
- *
- * @author Peter Abeles
- */
+/// Camera parameters for model [boofcv.struct.calib.CameraPinholeBrown].
 public class Zhang99CameraBrown implements Zhang99Camera {
-	boolean assumeZeroSkew;
-	boolean includeTangential;
+	ConfigCalibratePinhole config;
 
 	private final RadialDistortionEstimateLinear computeRadial;
 
-	public Zhang99CameraBrown( boolean assumeZeroSkew, boolean includeTangential, int numRadial ) {
-		this.assumeZeroSkew = assumeZeroSkew;
-		this.includeTangential = includeTangential;
-		computeRadial = new RadialDistortionEstimateLinear( numRadial);
+	public Zhang99CameraBrown( ConfigCalibratePinhole config ) {
+		this.config = config;
+		computeRadial = new RadialDistortionEstimateLinear(config.numRadial);
 	}
 
 	@Override public void setLayouts( List<List<Point2D_F64>> layouts ) {
@@ -54,7 +49,7 @@ public class Zhang99CameraBrown implements Zhang99Camera {
 			DMatrixRMaj K, List<DMatrixRMaj> homographies, List<CalibrationObservation> observations ) {
 		computeRadial.process(K, homographies, observations);
 
-		var cam = new BundlePinholeBrown(assumeZeroSkew, includeTangential);
+		var cam = new BundlePinholeBrown(config.zeroSkew, config.tangential, config.aspectRatio);
 		cam.radial = computeRadial.getParameters().clone();
 		cam.setK(K);
 		return cam;

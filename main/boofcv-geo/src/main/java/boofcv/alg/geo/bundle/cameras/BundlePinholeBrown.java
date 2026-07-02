@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,26 +34,26 @@ import static boofcv.misc.BoofMiscOps.getOrThrow;
 import static boofcv.misc.BoofMiscOps.listToArrayDouble;
 import static boofcv.struct.calib.CameraPinholeBrown.toStringArray;
 
-/**
- * Formulas for {@link CameraPinholeBrown}.
- *
- * @author Peter Abeles
- */
+/// Formulas for [CameraPinholeBrown].
 @SuppressWarnings({"NullAway.Init"})
 public class BundlePinholeBrown implements BundleAdjustmentCamera {
 	public final static String TYPE_NAME = "PinholeBrown";
 
-	// if true skew is assumed to be zero
+	/// if true skew is assumed to be zero
 	public boolean zeroSkew = true;
-	// if true tangential terms are assumed to be not zero
+	/// if true tangential terms are assumed to be not zero
 	public boolean tangential = true;
+	/// if ratio > 0 then `fx = ratio*fy`
+	public double aspectRatio = -1;
+
 	public double fx, fy, skew, cx, cy;
 	public double[] radial;
 	public double t1, t2;
 
-	public BundlePinholeBrown( boolean zeroSkew, boolean tangential ) {
+	public BundlePinholeBrown( boolean zeroSkew, boolean tangential, double aspectRatio ) {
 		this.zeroSkew = zeroSkew;
 		this.tangential = tangential;
+		this.aspectRatio = aspectRatio;
 		radial = new double[2];
 	}
 
@@ -131,7 +131,11 @@ public class BundlePinholeBrown implements BundleAdjustmentCamera {
 	@Override
 	public void setIntrinsic( double[] parameters, int offset ) {
 		fx = parameters[offset++];
-		fy = parameters[offset++];
+		if (aspectRatio <= 0) {
+			fy = parameters[offset++];
+		} else {
+			fy = fx/aspectRatio;
+		}
 		cx = parameters[offset++];
 		cy = parameters[offset++];
 		for (int i = 0; i < radial.length; i++) {
@@ -154,7 +158,8 @@ public class BundlePinholeBrown implements BundleAdjustmentCamera {
 	@Override
 	public void getIntrinsic( double[] parameters, int offset ) {
 		parameters[offset++] = fx;
-		parameters[offset++] = fy;
+		if (aspectRatio <= 0)
+			parameters[offset++] = fy;
 		parameters[offset++] = cx;
 		parameters[offset++] = cy;
 		for (int i = 0; i < radial.length; i++) {
@@ -200,7 +205,7 @@ public class BundlePinholeBrown implements BundleAdjustmentCamera {
 
 	@Override
 	public void jacobian( double camX, double camY, double camZ, double[] inputX, double[] inputY,
-						  boolean computeIntrinsic, @Nullable double[] calibX, @Nullable double[] calibY ) {
+	                      boolean computeIntrinsic, @Nullable double[] calibX, @Nullable double[] calibY ) {
 		double nx = camX/camZ;
 		double ny = camY/camZ;
 
@@ -267,23 +272,26 @@ public class BundlePinholeBrown implements BundleAdjustmentCamera {
 			jacobianIntrinsic(calibX, calibY, nx, ny, x, y);
 	}
 
-	/**
-	 * @param calibX storage for calibration jacobian
-	 * @param calibY storage for calibration jacobian
-	 * @param nx undistorted normalized image coordinates
-	 * @param ny undistorted normalized image coordinates
-	 * @param dnx distorted normalized image coordinates
-	 * @param dny distorted normalized image coordinates
-	 */
+	/// @param calibX storage for calibration jacobian
+	/// @param calibY storage for calibration jacobian
+	/// @param nx undistorted normalized image coordinates
+	/// @param ny undistorted normalized image coordinates
+	/// @param dnx distorted normalized image coordinates
+	/// @param dny distorted normalized image coordinates
 	private void jacobianIntrinsic( double[] calibX, double[] calibY,
-									double nx, double ny,
-									double dnx, double dny ) {
+	                                double nx, double ny,
+	                                double dnx, double dny ) {
 		// Intrinsic parameters
 		int index = 0;
-		calibX[index] = dnx;
-		calibY[index++] = 0;   // fx
-		calibX[index] = 0;
-		calibY[index++] = dny; // fy
+		if (aspectRatio <= 0) {
+			calibX[index] = dnx;
+			calibY[index++] = 0;   // fx
+			calibX[index] = 0;
+			calibY[index++] = dny;  // fy
+		} else {
+			calibX[index] = dnx;
+			calibY[index++] = dny/aspectRatio;  // fx
+		}
 		calibX[index] = 1;
 		calibY[index++] = 0;   // cx
 		calibX[index] = 0;
@@ -322,13 +330,20 @@ public class BundlePinholeBrown implements BundleAdjustmentCamera {
 
 	@Override
 	public int getIntrinsicCount() {
-		return 4 + radial.length + (tangential ? 2 : 0) + (zeroSkew ? 0 : 1);
+		return (aspectRatio > 0 ? 1 : 2) + 2 + radial.length + (tangential ? 2 : 0) + (zeroSkew ? 0 : 1);
 	}
 
 	@Override public BundleAdjustmentCamera setTo( Map<String, Object> map ) {
 		try {
+			if (map.containsKey("aspectRatio"))
+				aspectRatio = getOrThrow(map, "aspectRatio");
+
 			fx = getOrThrow(map, "fx");
-			fy = getOrThrow(map, "fy");
+			if (aspectRatio > 0) {
+				fy = fx/aspectRatio;
+			} else {
+				fy = getOrThrow(map, "fy");
+			}
 			cx = getOrThrow(map, "cx");
 			cy = getOrThrow(map, "cy");
 
@@ -360,7 +375,10 @@ public class BundlePinholeBrown implements BundleAdjustmentCamera {
 		var map = new HashMap<String, Object>();
 		map.put("type", TYPE_NAME);
 		map.put("fx", fx);
-		map.put("fy", fy);
+		if (aspectRatio > 0)
+			map.put("aspectRatio", aspectRatio);
+		else
+			map.put("fy", fy);
 		if (!zeroSkew)
 			map.put("skew", skew);
 		map.put("cx", cx);

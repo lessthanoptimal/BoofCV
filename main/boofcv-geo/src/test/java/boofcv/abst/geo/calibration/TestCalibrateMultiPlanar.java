@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -151,7 +151,7 @@ public class TestCalibrateMultiPlanar extends BoofStandardJUnit {
 
 		List<Se3_F64> listSensorToWorld = createCameraLocations();
 
-		alg.getCalibratorMono().configurePinhole(true, 2, true);
+		alg.getCalibratorMono().configurePinhole(new ConfigCalibratePinhole().zeroSkew(true).tangential(true).numRadial(2));
 		alg.initialize(expected.intrinsics.size(), numLayouts);
 		for (int i = 0; i < expected.intrinsics.size(); i++) {
 			CameraModel cam = expected.intrinsics.get(i);

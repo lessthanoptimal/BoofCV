@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.app;
 import boofcv.abst.fiducial.calib.CalibrationPatterns;
 import boofcv.abst.fiducial.calib.ConfigECoCheckMarkers;
 import boofcv.abst.geo.calibration.CalibrateMultiPlanar;
+import boofcv.abst.geo.calibration.ConfigCalibratePinhole;
 import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
 import boofcv.alg.fiducial.calib.ConfigCalibrationTarget;
 import boofcv.alg.geo.calibration.SynchronizedCalObs;
@@ -130,7 +131,8 @@ public class CameraCalibrationMulti {
 		DetectSingleFiducialCalibration detector = FactoryFiducialCalibration.genericSingle(configTarget);
 
 		var calibrator = new CalibrateMultiPlanar();
-		calibrator.getCalibratorMono().configurePinhole(true, numRadial, false);
+		calibrator.getCalibratorMono().configurePinhole(
+				new ConfigCalibratePinhole().zeroSkew(true).tangential(false).numRadial(numRadial));
 		calibrator.initialize(/*num cameras*/cameras.size(), /*num targets*/1);
 		calibrator.setTargetLayout(0, detector.getLayout());
 
