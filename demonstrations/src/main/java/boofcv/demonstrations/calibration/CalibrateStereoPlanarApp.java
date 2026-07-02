@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -346,7 +346,10 @@ public class CalibrateStereoPlanarApp extends JPanel {
 			if (targetChanged || calibratorChanged) {
 				algorithms.calibrator = new CalibrateStereoPlanar(List.of(algorithms.detector.getLayout()));
 				ControlPanelPinhole controls = configurePanel.pinhole;
-				algorithms.calibrator.configure(controls.skew.value, controls.numRadial.vint(), controls.tangential.value);
+				var config = new ConfigCalibratePinhole().zeroSkew(controls.skew.value).
+						tangential(controls.tangential.value).
+						numRadial( controls.numRadial.vint());
+				algorithms.calibrator.configure(config);
 			}
 		});
 

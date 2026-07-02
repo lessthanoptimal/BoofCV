@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -112,16 +112,10 @@ public class CalibrateStereoPlanar implements VerbosePrint {
 
 	/**
 	 * Specify calibration assumptions.
-	 *
-	 * @param assumeZeroSkew If true zero skew is assumed.
-	 * @param numRadialParam Number of radial parameters
-	 * @param includeTangential If true it will estimate tangential distortion parameters.
 	 */
-	public void configure( boolean assumeZeroSkew,
-						   int numRadialParam,
-						   boolean includeTangential ) {
-		calibLeft.configurePinhole(assumeZeroSkew, numRadialParam, includeTangential);
-		calibRight.configurePinhole(assumeZeroSkew, numRadialParam, includeTangential);
+	public void configure(@Nullable ConfigCalibratePinhole config ) {
+		calibLeft.configurePinhole(config);
+		calibRight.configurePinhole(config);
 	}
 
 	/**

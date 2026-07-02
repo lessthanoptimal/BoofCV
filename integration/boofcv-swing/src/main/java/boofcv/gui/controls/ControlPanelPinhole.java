@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,6 +31,7 @@ public class ControlPanelPinhole extends StandardAlgConfigPanel {
 	public final JSpinnerNumber numRadial = spinnerWrap(2, 0, 10, 1).tt("Number of radial distortion terms");
 	public final JCheckBoxValue tangential = checkboxWrap("Tangential", false).tt("Include tangential distortion");
 	public final JCheckBoxValue skew = checkboxWrap("Zero Skew", true).tt("Include skew in camera model. Rarely needed.");
+	public final JCheckBoxValue aspectOne = checkboxWrap("Aspect One", true).tt("Assumes the aspect ratio is equal to 1. fx==fy");
 
 	// called after a parameter changes value
 	public Runnable parametersUpdated = ()->{};
@@ -40,6 +41,7 @@ public class ControlPanelPinhole extends StandardAlgConfigPanel {
 		addLabeled(numRadial.spinner, "Radial");
 		addAlignLeft(tangential.check);
 		addAlignLeft(skew.check);
+		addAlignLeft(aspectOne.check);
 	}
 
 	public ControlPanelPinhole( Runnable parametersUpdated ) {

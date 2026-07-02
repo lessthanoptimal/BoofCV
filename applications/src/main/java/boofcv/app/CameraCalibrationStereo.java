@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.BoofVerbose;
 import boofcv.abst.fiducial.calib.CalibrationPatterns;
 import boofcv.abst.fiducial.calib.ConfigECoCheckMarkers;
 import boofcv.abst.geo.calibration.CalibrateStereoPlanar;
+import boofcv.abst.geo.calibration.ConfigCalibratePinhole;
 import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
 import boofcv.alg.fiducial.calib.ConfigCalibrationTarget;
 import boofcv.alg.geo.calibration.CalibrationObservation;
@@ -82,6 +83,9 @@ public class CameraCalibrationStereo {
 
 	@Option(name = "--ZeroSkew", usage = "Assume zero skew in camera model")
 	protected boolean zeroSkew = true;
+
+	@Option(name = "--AspectRatio", usage = "If > 0 then fx = ratio*fy")
+	public double aspectRatio = -1;
 
 	@Option(name = "--Radial", usage = "Number of radial camera parameters")
 	protected int numRadial = 4;
@@ -287,7 +291,8 @@ public class CameraCalibrationStereo {
 				// Initialize now that we know the image size
 				calibrator.initialize(new ImageDimension(buffLeft.getWidth(), buffLeft.getHeight()),
 						new ImageDimension(buffRight.getWidth(), buffRight.getHeight()));
-				calibrator.configure(zeroSkew, numRadial, tangential);
+				calibrator.configure(new ConfigCalibratePinhole().zeroSkew(zeroSkew).tangential(tangential).
+						numRadial(numRadial).aspectRatio(aspectRatio));
 				minLandmarks = calibrator.getCalibLeft().getZhang99().getMinimumObservedPoints();
 			}
 
@@ -343,7 +348,7 @@ public class CameraCalibrationStereo {
 	}
 
 	private CalibrationObservation detectLandmarks( DetectSingleFiducialCalibration detector,
-													GrayF32 image, BufferedImage buffLeft ) {
+	                                                GrayF32 image, BufferedImage buffLeft ) {
 		ConvertBufferedImage.convertFrom(buffLeft, image);
 		String dot = detector.process(image) ? "." : "x";
 		if (verbose) System.out.print(dot);

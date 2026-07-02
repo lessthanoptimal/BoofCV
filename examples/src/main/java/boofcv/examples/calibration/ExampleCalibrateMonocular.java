@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.examples.calibration;
 
 import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.abst.geo.calibration.CalibrateMonoPlanar;
+import boofcv.abst.geo.calibration.ConfigCalibratePinhole;
 import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.io.UtilIO;
@@ -33,23 +34,21 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Example of how to calibrate a single (monocular) camera using a high level interface. Depending on the calibration
- * target detector and target type, the entire target might need to be visible in the image. All camera images
- * should be in focus and that target evenly spread through out the images. In particular the edges of the image
- * should be covered.
- *
- * After processing both intrinsic camera parameters and lens distortion are estimated. Square grid and chessboard
- * targets are demonstrated by this example. See calibration tutorial for a discussion of different target types
- * and how to collect good calibration images.
- *
- * All the image processing and calibration is taken care of inside of {@link CalibrateMonoPlanar}. The code below
- * loads calibration images as inputs, calibrates, and saves results to an XML file. See in code comments for tuning
- * and implementation issues.
- *
- * @author Peter Abeles
- * @see CalibrateMonoPlanar
- */
+/// Example of how to calibrate a single (monocular) camera using a high level interface. Depending on the calibration
+/// target detector and target type, the entire target might need to be visible in the image. All camera images
+/// should be in focus and that target evenly spread throughout the images. In particular the edges of the image
+/// should be covered.
+///
+/// After processing both intrinsic camera parameters and lens distortion are estimated. Square grid and chessboard
+/// targets are demonstrated by this example. See calibration tutorial for a discussion of different target types
+/// and how to collect good calibration images.
+///
+/// All the image processing and calibration is taken care of inside [CalibrateMonoPlanar]. The code below
+/// loads calibration images as inputs, calibrates, and saves results to an XML file. See in code comments for tuning
+/// and implementation issues.
+///
+/// @author Peter Abeles
+/// @see CalibrateMonoPlanar
 public class ExampleCalibrateMonocular {
 	public static void main( String[] args ) {
 		DetectSingleFiducialCalibration detector;
@@ -78,14 +77,11 @@ public class ExampleCalibrateMonocular {
 				new ConfigGridDimen(/*numRows*/ 7,/*numCols*/ 5,/*shapeSize*/ 30));
 		images = UtilIO.listByPrefix(UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess"), "left", null);
 
-		// Declare and setup the calibration algorithm
+		// Declare and set up the calibration algorithm
 		var calibrator = new CalibrateMonoPlanar();
 
-		// tell it type type of target and which intrinsic parameters to estimate
-		calibrator.configurePinhole(
-				/*assumeZeroSkew*/ true,
-				/*numRadialParam*/ 2,
-				/*includeTangential*/ false);
+		// tell it type of target and which intrinsic parameters to estimate
+		calibrator.configurePinhole(new ConfigCalibratePinhole().zeroSkew(true).tangential(false).numRadial(2));
 
 		var usedImages = new ArrayList<String>();
 		for (String n : images) {

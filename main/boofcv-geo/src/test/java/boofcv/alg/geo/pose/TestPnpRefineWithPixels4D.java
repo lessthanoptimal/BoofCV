@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -82,7 +82,7 @@ public class TestPnpRefineWithPixels4D extends BoofStandardJUnit {
 		var found = new Se3_F64();
 
 
-		alg.setCamera(new BundlePinholeBrown(true, false).setTo(camera), null);
+		alg.setCamera(new BundlePinholeBrown(true, false, -1).setTo(camera), null);
 		assertTrue(alg.refine(points, adjusted, found));
 
 		assertTrue(SpecialEuclideanOps_F64.isIdentical(worldToView, found, 1e-4, 1e-4));

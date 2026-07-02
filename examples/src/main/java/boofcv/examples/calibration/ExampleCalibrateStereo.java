@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.examples.calibration;
 import boofcv.abst.fiducial.calib.ConfigECoCheckMarkers;
 import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.abst.geo.calibration.CalibrateStereoPlanar;
+import boofcv.abst.geo.calibration.ConfigCalibratePinhole;
 import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
 import boofcv.abst.geo.calibration.MultiToSingleFiducialCalibration;
 import boofcv.alg.geo.calibration.CalibrationObservation;
@@ -112,7 +113,7 @@ public class ExampleCalibrateStereo {
 	public void process() {
 		// Declare and setup the calibration algorithm
 		var calibrator = new CalibrateStereoPlanar(List.of(detector.getLayout()));
-		calibrator.configure(/*zero skew*/true, /* radial */4, /* tangential */false);
+		calibrator.configure(new ConfigCalibratePinhole().zeroSkew(true).tangential(false).numRadial(4).aspectRatio(1.0));
 
 		// Uncomment to print more information to stdout
 //		calibratorAlg.setVerbose(System.out,null);

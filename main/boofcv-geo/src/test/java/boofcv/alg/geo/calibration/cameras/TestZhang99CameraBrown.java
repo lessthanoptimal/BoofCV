@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo.calibration.cameras;
 
+import boofcv.abst.geo.calibration.ConfigCalibratePinhole;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.calibration.GenericCalibrationZhang99;
 import boofcv.struct.calib.CameraPinholeBrown;
@@ -35,7 +36,7 @@ public class TestZhang99CameraBrown extends GenericCalibrationZhang99<CameraPinh
 	@Override
 	public Zhang99Camera createGenerator( CameraConfig config, List<Point2D_F64> layout ) {
 		BrownConfig c = (BrownConfig)config;
-		var alg = new Zhang99CameraBrown(c.assumeZeroSkew, c.includeTangential, c.numRadial);
+		var alg = new Zhang99CameraBrown(c.constraints);
 		alg.setLayouts(List.of(layout));
 		return alg;
 	}
@@ -49,10 +50,11 @@ public class TestZhang99CameraBrown extends GenericCalibrationZhang99<CameraPinh
 	public List<CameraConfig> createCamera( Random rand ) {
 		List<BrownConfig> list = new ArrayList<>();
 
-		list.add(createStandard(false, false, 0, rand));
-		list.add(createStandard(true, true, 2, rand));
-		list.add(createStandard(false, true, 2, rand));
-		list.add(createStandard(true, false, 2, rand));
+		list.add(createStandard(new ConfigCalibratePinhole().zeroSkew(false).tangential(false).numRadial(0), rand));
+		list.add(createStandard(new ConfigCalibratePinhole().zeroSkew(true).tangential(true).numRadial(2), rand));
+		list.add(createStandard(new ConfigCalibratePinhole().zeroSkew(false).tangential(true).numRadial(2), rand));
+		list.add(createStandard(new ConfigCalibratePinhole().zeroSkew(true).tangential(false).numRadial(2), rand));
+		list.add(createStandard(new ConfigCalibratePinhole().zeroSkew(true).tangential(true).numRadial(2).aspectRatio(1), rand));
 
 		return (List)list;
 	}
@@ -62,8 +64,8 @@ public class TestZhang99CameraBrown extends GenericCalibrationZhang99<CameraPinh
 		List<CameraConfig> list = new ArrayList<>();
 
 		// tangent can't be linearly estimated
-		list.add(createStandard(false, false, 0, rand));
-		list.add(createStandard(true, false, 0, rand));
+		list.add(createStandard(new ConfigCalibratePinhole().zeroSkew(false).tangential(false).numRadial(0), rand));
+		list.add(createStandard(new ConfigCalibratePinhole().zeroSkew(true).tangential(false).numRadial(0), rand));
 
 		// radial distortion has to be very small for parameters to have a decent estimate
 		// the estimate it does come up with is much better than starting from zero but has
@@ -73,18 +75,20 @@ public class TestZhang99CameraBrown extends GenericCalibrationZhang99<CameraPinh
 		return (List)list;
 	}
 
-	public BrownConfig createStandard( boolean zeroSkew,
-									   boolean tangent, int numRadial,
-									   Random rand ) {
+	public BrownConfig createStandard( ConfigCalibratePinhole constraints,
+	                                   Random rand ) {
 
-		BrownConfig p = new BrownConfig(zeroSkew, tangent, numRadial);
+		var p = new BrownConfig(constraints);
 
 		p.model.cx = 255;
 		p.model.cy = 260;
 		p.model.fx = 1250;
-		p.model.fy = 900;
+		if (constraints.aspectRatio < 0)
+			p.model.fy = 900;
+		else
+			p.model.fy = p.model.fx/constraints.aspectRatio;
 
-		if (zeroSkew)
+		if (constraints.zeroSkew)
 			p.model.skew = 0;
 		else
 			p.model.skew = 1.09083;
@@ -93,7 +97,7 @@ public class TestZhang99CameraBrown extends GenericCalibrationZhang99<CameraPinh
 			p.model.radial[i] = rand.nextGaussian()*0.05;
 		}
 
-		if (p.includeTangential) {
+		if (p.constraints.tangential) {
 			p.model.t1 = rand.nextGaussian()*0.02;
 			p.model.t2 = rand.nextGaussian()*0.02;
 		}
@@ -103,7 +107,7 @@ public class TestZhang99CameraBrown extends GenericCalibrationZhang99<CameraPinh
 
 	@Override
 	protected void checkIntrinsicOnly( CameraPinholeBrown expected, CameraPinholeBrown found,
-									   double tolK, double tolD, double tolT ) {
+	                                   double tolK, double tolD, double tolT ) {
 		assertEquals(expected.fx, found.fx, Math.abs(expected.fx)*tolK + EPS);
 		assertEquals(expected.fy, found.fy, Math.abs(expected.fy)*tolK + EPS);
 		assertEquals(expected.skew, found.skew, Math.abs(expected.skew)*tolK + EPS);
@@ -118,15 +122,11 @@ public class TestZhang99CameraBrown extends GenericCalibrationZhang99<CameraPinh
 	}
 
 	private class BrownConfig extends CameraConfig {
-		boolean assumeZeroSkew;
-		boolean includeTangential;
-		int numRadial;
+		ConfigCalibratePinhole constraints;
 
-		public BrownConfig( boolean assumeZeroSkew, boolean includeTangential, int numRadial ) {
-			this.assumeZeroSkew = assumeZeroSkew;
-			this.includeTangential = includeTangential;
-			this.numRadial = numRadial;
-			this.model = new CameraPinholeBrown(numRadial);
+		public BrownConfig( ConfigCalibratePinhole constraints ) {
+			this.constraints = constraints;
+			this.model = new CameraPinholeBrown(constraints.numRadial);
 		}
 	}
 }
