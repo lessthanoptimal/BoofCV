@@ -47,7 +47,6 @@ import java.util.List;
 /// loads calibration images as inputs, calibrates, and saves results to an XML file. See in code comments for tuning
 /// and implementation issues.
 ///
-/// @author Peter Abeles
 /// @see CalibrateMonoPlanar
 public class ExampleCalibrateMonocular {
 	public static void main( String[] args ) {
