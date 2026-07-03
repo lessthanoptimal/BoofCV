@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -138,57 +138,63 @@ class TestPlyCodec extends BoofStandardJUnit {
 
 	@Test void encode_decode_mesh_binary() throws IOException {
 		for (var endian : new ByteOrder[]{ByteOrder.LITTLE_ENDIAN, ByteOrder.BIG_ENDIAN}) {
-			var mesh = new VertexMesh();
-			mesh.textureName = "foo";
-			mesh.faceOffsets.add(0);
-			int numVertexes = 10;
-			for (int i = 0; i < numVertexes; i++) {
-				mesh.vertexes.append(i, 2, 3);
-				mesh.normals.append(i, 2, 3);
+			for (boolean floatType : new boolean[]{true, false}) {
+				var mesh = new VertexMesh();
+				mesh.textureName = "foo";
+				mesh.faceOffsets.add(0);
+				int numVertexes = 10;
+				for (int i = 0; i < numVertexes; i++) {
+					mesh.vertexes.append(i, 2, 3);
+					mesh.normals.append(i, 2, 3);
 
-				// bound indexes to ensure they are in the valid range
-				mesh.faceVertexes.add((i*3)%numVertexes);
-				mesh.faceVertexes.add((i*3 + 1)%numVertexes);
-				mesh.faceVertexes.add((i*3 + 2)%numVertexes);
-				mesh.faceOffsets.add(mesh.faceVertexes.size);
+					// bound indexes to ensure they are in the valid range
+					mesh.faceVertexes.add((i*3)%numVertexes);
+					mesh.faceVertexes.add((i*3 + 1)%numVertexes);
+					mesh.faceVertexes.add((i*3 + 2)%numVertexes);
+					mesh.faceOffsets.add(mesh.faceVertexes.size);
 
-				for (int idxPoly = 0; idxPoly < 3; idxPoly++) {
-					mesh.texture.append(1, idxPoly);
+					for (int idxPoly = 0; idxPoly < 3; idxPoly++) {
+						mesh.texture.append(1, idxPoly);
+					}
 				}
-			}
-			var colors = new DogArray_I32();
-			for (int i = 0; i < mesh.vertexes.size(); i++) {
-				colors.add(i + 5);
-			}
+				var colors = new DogArray_I32();
+				for (int i = 0; i < mesh.vertexes.size(); i++) {
+					colors.add(i + 5);
+				}
 
-			var output = new ByteArrayOutputStream();
-			PlyCodec.saveMeshBinary(mesh, colors, endian, true, output);
+				var output = new ByteArrayOutputStream();
+				PlyCodec.saveMeshBinary(mesh, colors, endian, floatType, output);
 
-			var foundMesh = new VertexMesh();
+				// Make sure it encoded it as the correct type
+				var header = output.toString(UTF_8);
+				assertTrue(header.contains("property list uchar " + (floatType ? "float" : "double") + " texcoord"));
 
-			var input = new ByteArrayInputStream(output.toByteArray());
-			PlyCodec.readMesh(input, foundMesh);
+				var foundMesh = new VertexMesh();
 
-			assertEquals(mesh.vertexes.size(), mesh.vertexes.size());
-			assertEquals(mesh.normals.size(), mesh.normals.size());
-			assertEquals(mesh.texture.size(), mesh.texture.size());
-			assertTrue(mesh.faceVertexes.isEquals(foundMesh.faceVertexes));
-			assertTrue(mesh.faceOffsets.isEquals(foundMesh.faceOffsets));
-			assertTrue(colors.isEquals(foundMesh.rgb));
+				var input = new ByteArrayInputStream(output.toByteArray());
+				PlyCodec.readMesh(input, foundMesh);
 
-			for (int i = 0; i < mesh.vertexes.size(); i++) {
-				Point3D_F64 expected = mesh.vertexes.getTemp(i);
-				Point3D_F64 found = foundMesh.vertexes.getTemp(i);
-				assertEquals(0.0, expected.distance(found));
-				assertTrue(mesh.normals.getTemp(i).isIdentical(foundMesh.normals.getTemp(i), 1e-4f));
-			}
+				assertEquals(mesh.vertexes.size(), mesh.vertexes.size());
+				assertEquals(mesh.normals.size(), mesh.normals.size());
+				assertEquals(mesh.texture.size(), mesh.texture.size());
+				assertTrue(mesh.faceVertexes.isEquals(foundMesh.faceVertexes));
+				assertTrue(mesh.faceOffsets.isEquals(foundMesh.faceOffsets));
+				assertTrue(colors.isEquals(foundMesh.rgb));
 
-			for (int i = 0; i < mesh.vertexes.size(); i++) {
-				assertEquals(mesh.faceVertexes.get(i), foundMesh.faceVertexes.get(i));
-			}
+				for (int i = 0; i < mesh.vertexes.size(); i++) {
+					Point3D_F64 expected = mesh.vertexes.getTemp(i);
+					Point3D_F64 found = foundMesh.vertexes.getTemp(i);
+					assertEquals(0.0, expected.distance(found));
+					assertTrue(mesh.normals.getTemp(i).isIdentical(foundMesh.normals.getTemp(i), 1e-4f));
+				}
 
-			for (int i = 0; i < mesh.texture.size(); i++) {
-				assertEquals(0.0f, mesh.texture.getTemp(i).distance(mesh.texture.getTemp(i)), UtilEjml.TEST_F32);
+				for (int i = 0; i < mesh.vertexes.size(); i++) {
+					assertEquals(mesh.faceVertexes.get(i), foundMesh.faceVertexes.get(i));
+				}
+
+				for (int i = 0; i < mesh.texture.size(); i++) {
+					assertEquals(0.0f, mesh.texture.getTemp(i).distance(mesh.texture.getTemp(i)), UtilEjml.TEST_F32);
+				}
 			}
 		}
 	}
