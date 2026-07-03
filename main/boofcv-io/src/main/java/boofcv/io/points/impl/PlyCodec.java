@@ -306,7 +306,7 @@ public class PlyCodec {
 			outputWriter.write(("element face " + triangleCount + "\n" +
 					"property list uchar int vertex_indices\n").getBytes(format));
 			if (hasTexture) {
-				outputWriter.write("property list uchar float texcoord\n".getBytes(format));
+				outputWriter.write(("property list uchar " + dataType + " texcoord\n").getBytes(format));
 			}
 		}
 		outputWriter.write("end_header\n".getBytes(format));
@@ -735,8 +735,8 @@ public class PlyCodec {
 		for (int wordIndex = 0; wordIndex < count; wordIndex++) {
 			switch (valueType) {
 				case FLOAT -> tempF[wordIndex] = bb.getFloat(wordIndex*valueType.size);
-
-				default -> throw new RuntimeException("Unexpected type");
+				case DOUBLE -> tempF[wordIndex] = (float)bb.getDouble(wordIndex*valueType.size);
+				default -> throw new RuntimeException("Unexpected texcoord value type " + valueType);
 			}
 		}
 		output.addTexture(count/2, tempF);
