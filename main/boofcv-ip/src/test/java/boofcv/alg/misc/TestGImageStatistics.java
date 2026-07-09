@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ public class TestGImageStatistics extends BaseGClassChecksInMisc {
 	}
 
 	@Test void compareToPixelMath() {
-		performTests(10);
+		performTests(11);
 	}
 
 	@Override
@@ -53,6 +53,7 @@ public class TestGImageStatistics extends BaseGClassChecksInMisc {
 		Object[][] ret = new Object[1][param.length];
 
 		switch (name) {
+			case "minAbs" -> ret[0][0] = inputA;
 			case "maxAbs" -> ret[0][0] = inputA;
 			case "max" -> ret[0][0] = inputA;
 			case "min" -> ret[0][0] = inputA;

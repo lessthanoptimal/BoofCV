@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,11 +23,7 @@ import boofcv.generate.CodeGeneratorBase;
 
 import java.io.FileNotFoundException;
 
-/**
- * Generates functions inside of ImplImageMiscOps.
- *
- * @author Peter Abeles
- */
+/// Generates functions inside ImplImageMiscOps.
 @SuppressWarnings("Duplicates")
 public class GenerateImplImageMiscOps extends CodeGeneratorBase {
 
@@ -64,7 +60,7 @@ public class GenerateImplImageMiscOps extends CodeGeneratorBase {
 				"/**\n" +
 				" * Implementations of functions for {@link ImageMiscOps}\n" +
 				" *\n" +
-				generateDocString("Peter Abeles") +
+				generateDocString() +
 				"public class " + className + " {\n\n");
 	}
 

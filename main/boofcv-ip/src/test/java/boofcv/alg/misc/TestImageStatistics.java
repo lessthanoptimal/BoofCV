@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,13 +30,14 @@ import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@SuppressWarnings("rawtypes")
 public class TestImageStatistics extends BoofStandardJUnit {
 	int width = 10;
 	int height = 15;
 	int numBands = 2;
 
 	@Test void checkAll() {
-		int numExpected = 11*8 + 8*8;
+		int numExpected = 12*8 + 9*8;
 		Method[] methods = ImageStatistics.class.getMethods();
 
 		// sanity check to make sure the functions are being found
@@ -51,6 +52,8 @@ public class TestImageStatistics extends BoofStandardJUnit {
 					testMin(m);
 				} else if( m.getName().compareTo("max") == 0 ) {
 					testMax(m);
+				} else if( m.getName().compareTo("minAbs") == 0 ) {
+					testMinAbs(m);
 				} else if( m.getName().compareTo("maxAbs") == 0 ) {
 					testMaxAbs(m);
 				} else if( m.getName().compareTo("sum") == 0 ) {
@@ -94,6 +97,23 @@ public class TestImageStatistics extends BoofStandardJUnit {
 		return ImageBase.class.isAssignableFrom(param[0]);
 	}
 
+	private void testMinAbs( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class[] paramTypes = m.getParameterTypes();
+		ImageBase input = GeneralizedImageOps.createImage(paramTypes[0], width, height, numBands);
+
+		if( input.getImageType().getDataType().isSigned() ) {
+			GImageMiscOps.fillUniform(input, rand, -40,-5);
+			GeneralizedImageOps.setB(input,0,3,0,1);
+		} else {
+			GImageMiscOps.fillUniform(input, rand, 10,40);
+			GeneralizedImageOps.setB(input,0,3,0,1);
+		}
+
+		Number o = (Number)m.invoke(null,input);
+
+		assertEquals(1,o.doubleValue(),1e-8);
+	}
+
 	private void testMaxAbs( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class[] paramTypes = m.getParameterTypes();
 		ImageBase input = GeneralizedImageOps.createImage(paramTypes[0], width, height, numBands);
@@ -109,7 +129,6 @@ public class TestImageStatistics extends BoofStandardJUnit {
 		Number o = (Number)m.invoke(null,input);
 
 		assertEquals(100,o.doubleValue(),1e-8);
-
 	}
 
 	private void testMax( Method m ) throws InvocationTargetException, IllegalAccessException {

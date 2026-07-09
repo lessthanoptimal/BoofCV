@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,17 +26,12 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Generates functions inside of ImageStatistics.
- *
- * @author Peter Abeles
- */
+/// Generates functions inside ImageStatistics.
 public class GenerateImplImageStatistics extends CodeGeneratorBase {
 
 	private AutoTypeImage input;
 
-	@Override
-	public void generateCode() throws FileNotFoundException {
+	@Override public void generateCode() throws FileNotFoundException {
 		printPreamble();
 		printAll();
 		out.println("}");
@@ -53,8 +48,7 @@ public class GenerateImplImageStatistics extends CodeGeneratorBase {
 				"\n" +
 				"/**\n" +
 				" * Computes statistical properties of pixels inside an image.\n" +
-				" *\n" +
-				generateDocString("Peter Abeles") +
+				generateDocString() +
 				"public class " + className + " {\n\n");
 	}
 
@@ -66,6 +60,7 @@ public class GenerateImplImageStatistics extends CodeGeneratorBase {
 		List<CodeGenerator> functions = new ArrayList<>();
 		functions.add(new GenerateMin());
 		functions.add(new GenerateMax());
+		functions.add(new GenerateMinAbs());
 		functions.add(new GenerateMaxAbs());
 		functions.add(new GenerateMeanDiffSq());
 		functions.add(new GenerateMeanDiffAbs());
@@ -249,37 +244,44 @@ public class GenerateImplImageStatistics extends CodeGeneratorBase {
 	}
 
 	private class GenerateMin extends InitValue {
-
 		public GenerateMin() {
 			super("min", "min", "v < output");
 		}
 
-		@Override
-		public String getValueMassage() { return "array[index] " + input.getBitWise(); }
+		@Override public String getValueMassage( String index ) {return "array[" + index + "] " + input.getBitWise();}
 	}
 
 	private class GenerateMax extends InitValue {
-
 		public GenerateMax() {
 			super("max", "max", "v > output");
 		}
 
-		@Override
-		public String getValueMassage() { return "array[index] " + input.getBitWise(); }
+		@Override public String getValueMassage( String index ) {return "array[" + index + "] " + input.getBitWise();}
+	}
+
+	private class GenerateMinAbs extends InitValue {
+		public GenerateMinAbs() {
+			super("minAbs", "min", "v < output");
+		}
+
+		@Override public String getValueMassage( String index ) {
+			if (input.isSigned())
+				return "Math.abs(array[" + index + "])";
+			else
+				return "array[" + index + "] " + input.getBitWise();
+		}
 	}
 
 	private class GenerateMaxAbs extends InitValue {
-
 		public GenerateMaxAbs() {
 			super("maxAbs", "max", "v > output");
 		}
 
-		@Override
-		public String getValueMassage() {
+		@Override public String getValueMassage( String index ) {
 			if (input.isSigned())
-				return "Math.abs(array[index])";
+				return "Math.abs(array[" + index + "])";
 			else
-				return "array[index] " + input.getBitWise();
+				return "array[" + index + "] " + input.getBitWise();
 		}
 	}
 
@@ -296,7 +298,6 @@ public class GenerateImplImageStatistics extends CodeGeneratorBase {
 	}
 
 	private abstract class InitValue implements CodeGenerator {
-
 		String name;
 		String conOp;
 		String conditional;
@@ -307,15 +308,14 @@ public class GenerateImplImageStatistics extends CodeGeneratorBase {
 			this.conditional = conditional;
 		}
 
-		@Override
-		public void printLowLevel() {
+		@Override public void printLowLevel() {
 			String sumType = input.getSumType();
 			String name = this.name + (input.isSigned() ? "" : "U");
 
 			out.print("\tpublic static " + sumType + " " + name + "( " + input.getDataType() + "[] array , int startIndex , int rows , int columns , int stride ) {\n" +
 					"\n" +
-					"\t\t//CONCURRENT_BELOW final " + sumType + " _output = array[startIndex]" + input.getBitWise() + ";\n" +
-					"\t\t" + sumType + " output = array[startIndex]" + input.getBitWise() + ";\n" +
+					"\t\t//CONCURRENT_BELOW final " + sumType + " _output = " + getValueMassage("startIndex") + ";\n" +
+					"\t\t" + sumType + " output = " + getValueMassage("startIndex") + ";\n" +
 					"\n" +
 					"\t\t//CONCURRENT_INLINE return BoofConcurrency." + conOp + "(0,rows," + sumType + ".class,y->{\n" +
 					"\t\t\t//CONCURRENT_BELOW " + sumType + " output = _output;\n" +
@@ -324,7 +324,7 @@ public class GenerateImplImageStatistics extends CodeGeneratorBase {
 					"\t\t\tint end = index + columns;\n" +
 					"\n" +
 					"\t\t\tfor( ; index < end; index++ ) {\n" +
-					"\t\t\t\t" + sumType + " v = " + getValueMassage() + ";\n" +
+					"\t\t\t\t" + sumType + " v = " + getValueMassage("index") + ";\n" +
 					"\t\t\t\tif( " + conditional + " )\n" +
 					"\t\t\t\t\toutput = v;\n" +
 					"\t\t\t}\n" +
@@ -333,7 +333,7 @@ public class GenerateImplImageStatistics extends CodeGeneratorBase {
 					"\t}\n\n");
 		}
 
-		public abstract String getValueMassage();
+		public abstract String getValueMassage( String index );
 	}
 
 	private class GenerateDifference implements CodeGenerator {
@@ -347,8 +347,7 @@ public class GenerateImplImageStatistics extends CodeGeneratorBase {
 			this.operation = operation;
 		}
 
-		@Override
-		public void printLowLevel() {
+		@Override public void printLowLevel() {
 			String dataType = input.getDataType();
 			String sumType = input.getSumType();
 			String name = this.name + (input.isSigned() ? "" : "U");
@@ -383,7 +382,7 @@ public class GenerateImplImageStatistics extends CodeGeneratorBase {
 	}
 
 	public static void main( String[] args ) throws FileNotFoundException {
-		GenerateImplImageStatistics gen = new GenerateImplImageStatistics();
+		var gen = new GenerateImplImageStatistics();
 		gen.setModuleName("boofcv-ip");
 		gen.parseArguments(args);
 		gen.generate();

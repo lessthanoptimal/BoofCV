@@ -18,8 +18,11 @@ Version : 1.4.1
 - Fixed bug in ChessboardCorner setTo()
 - CalibrationIO - supports OpenCV's XML format
 - Camera Calibration
-  - Supports aspect ratio constraint for Brown
+  * Supports aspect ratio constraint for Brown
 - More JMH benchmarks
+- ImageStatistics
+  * Added minAbs
+  * Fixed a nasty bug where abs was not applied to the first element. No idea how this went unnoticed.
 
 ---------------------
 Date    : 2026/May/25
