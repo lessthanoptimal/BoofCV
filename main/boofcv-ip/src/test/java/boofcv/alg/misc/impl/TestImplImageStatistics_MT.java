@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,7 +36,7 @@ class TestImplImageStatistics_MT extends CompareIdenticalFunctions {
 
 	@Test
 	void performTests() {
-		performTests(92);
+		performTests(100);
 	}
 
 	@Override
@@ -72,9 +72,11 @@ class TestImplImageStatistics_MT extends CompareIdenticalFunctions {
 		switch (candidate.getName()) {
 			case "min":
 			case "max":
+			case "minAbs":
 			case "maxAbs":
 			case "minU":
 			case "maxU":
+			case "minAbsU":
 			case "maxAbsU":
 				parameters[0] = GeneralizedImageOps.getArray((ImageGray)input1);
 				parameters[1] = 0;

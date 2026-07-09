@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,11 +26,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Generates functions inside of ImageStatistics.
- *
- * @author Peter Abeles
- */
+/// Generates functions inside ImageStatistics.
 public class GenerateImageStatistics extends CodeGeneratorBase {
 
 	private AutoTypeImage input;
@@ -53,8 +49,7 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 				"\n" +
 				"/**\n" +
 				" * Computes statistical properties of pixels inside an image.\n" +
-				" *\n" +
-				generateDocString("Peter Abeles") +
+				generateDocString() +
 				"public class " + className + " {\n\n");
 	}
 
@@ -66,6 +61,7 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 		List<CodeGenerator> functions = new ArrayList<>();
 		functions.add(new GenerateMin());
 		functions.add(new GenerateMax());
+		functions.add(new GenerateMinAbs());
 		functions.add(new GenerateMaxAbs());
 		functions.add(new GenerateMeanDiffSq());
 		functions.add(new GenerateMeanDiffAbs());
@@ -95,17 +91,17 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 
 		out.print("\t/**\n" +
 				"\t * Computes the histogram of intensity values for the image.\n" +
-				"\t * \n" +
+				"\t *\n" +
 				"\t * @param input (input) Image.\n" +
-				"\t * @param minValue (input) Minimum possible intensity value   \n" +
+				"\t * @param minValue (input) Minimum possible intensity value\n" +
 				"\t * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.\n" +
 				"\t */\n" +
 				"\tpublic static void histogram( " + input.getSingleBandName() + " input, " + sumType + " minValue, int[] histogram ) {\n" +
 				"\t\tint N = input.width*input.height;\n" +
 				"\t\tif (BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE) {\n" +
-				"\t\t\tImplImageStatistics_MT.histogram(input,minValue,histogram);\n" +
+				"\t\t\tImplImageStatistics_MT.histogram(input, minValue, histogram);\n" +
 				"\t\t} else {\n" +
-				"\t\t\tImplImageStatistics.histogram(input,minValue,histogram);\n" +
+				"\t\t\tImplImageStatistics.histogram(input, minValue, histogram);\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
 	}
@@ -115,7 +111,7 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 
 		out.print("\t/**\n" +
 				"\t * Computes the histogram of intensity values for the image while scaling the range to match the histogram.\n" +
-				"\t * \n" +
+				"\t *\n" +
 				"\t * @param input (input) Image.\n" +
 				"\t * @param minValue (input) Minimum possible intensity value   \n" +
 				"\t * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.\n" +
@@ -123,9 +119,9 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 				"\tpublic static void histogramScaled( " + input.getSingleBandName() + " input, " + sumType + " minValue, " + sumType + " maxValue, int[] histogram ) {\n" +
 				"\t\tint N = input.width*input.height;\n" +
 				"\t\tif (BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE) {\n" +
-				"\t\t\tImplImageStatistics_MT.histogramScaled(input,minValue,maxValue,histogram);\n" +
+				"\t\t\tImplImageStatistics_MT.histogramScaled(input, minValue, maxValue, histogram);\n" +
 				"\t\t} else {\n" +
-				"\t\t\tImplImageStatistics.histogramScaled(input,minValue,maxValue,histogram);\n" +
+				"\t\t\tImplImageStatistics.histogramScaled(input, minValue, maxValue, histogram);\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
 	}
@@ -138,7 +134,7 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 				"\t * <p>\n" +
 				"\t * Returns the sum of all the pixels in the image.\n" +
 				"\t * </p>\n" +
-				"\t * \n" +
+				"\t *\n" +
 				"\t * @param img Input image. Not modified.\n" +
 				"\t */\n" +
 				"\tpublic static " + sumType + " sum( " + input.getImageName(family) + " input ) {\n" +
@@ -160,7 +156,7 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 				"\t * <p>\n" +
 				"\t * Returns the sum of all the pixels in the image.\n" +
 				"\t * </p>\n" +
-				"\t * \n" +
+				"\t *\n" +
 				"\t * @param img Input image. Not modified.\n" +
 				"\t */\n" +
 				"\tpublic static " + sumType + " sumAbs( " + input.getImageName(family) + " input ) {\n");
@@ -183,7 +179,7 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 
 		out.print("\t/**\n" +
 				"\t * Returns the mean pixel intensity value.\n" +
-				"\t * \n" +
+				"\t *\n" +
 				"\t * @param img Input image. Not modified.\n" +
 				"\t * @return Mean pixel intensity value\n" +
 				"\t */\n" +
@@ -201,68 +197,82 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 				"\t *\n" +
 				"\t * @param img Input image. Not modified.\n" +
 				"\t * @param mean Mean pixel intensity value.\n" +
-				"\t * @return Pixel variance   \n" +
+				"\t * @return Pixel variance\n" +
 				"\t */\n" +
 				"\tpublic static " + sumType + " variance( " + input.getSingleBandName() + " img, " + sumType + " mean ) {\n" +
 				"\n" +
 				"\t\tint N = img.width*img.height;\n" +
 				"\t\tif (BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE) {\n" +
-				"\t\t\treturn ImplImageStatistics_MT.variance(img,mean);\n" +
+				"\t\t\treturn ImplImageStatistics_MT.variance(img, mean);\n" +
 				"\t\t} else {\n" +
-				"\t\t\treturn ImplImageStatistics.variance(img,mean);\n" +
+				"\t\t\treturn ImplImageStatistics.variance(img, mean);\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
 	}
 
 	private class GenerateMin extends InitValue {
-
 		public GenerateMin() {
 			super("min", "v < output",
 					"\t/**\n" +
 							"\t * Returns the minimum element value.\n" +
-							"\t * \n" +
+							"\t *\n" +
 							"\t * @param input Input image. Not modified.\n" +
 							"\t * @return Minimum pixel value.\n" +
 							"\t */"
 			);
 		}
 
-		@Override
-		public String getValueMassage() { return "array[index] " + input.getBitWise(); }
+		@Override public String getValueMassage() {return "array[index] " + input.getBitWise();}
 	}
 
 	private class GenerateMax extends InitValue {
-
 		public GenerateMax() {
 			super("max", "v > output",
 					"\t/**\n" +
 							"\t * Returns the maximum element value.\n" +
-							"\t * \n" +
+							"\t *\n" +
 							"\t * @param input Input image. Not modified.\n" +
 							"\t * @return Maximum pixel value.\n" +
 							"\t */"
 			);
 		}
 
-		@Override
-		public String getValueMassage() { return "array[index] " + input.getBitWise(); }
+		@Override public String getValueMassage() {return "array[index] " + input.getBitWise();}
+	}
+
+	private class GenerateMinAbs extends InitValue {
+		public GenerateMinAbs() {
+			super("minAbs", "v < output",
+					"\t/**\n" +
+							"\t * Returns the minimum element value.\n" +
+							"\t *\n" +
+							"\t * @param input Input image. Not modified.\n" +
+							"\t * @return Minimum pixel value.\n" +
+							"\t */"
+			);
+		}
+
+		@Override public String getValueMassage() {
+			if (input.isSigned())
+				return "Math.abs(array[index])";
+			else
+				return "array[index] " + input.getBitWise();
+		}
 	}
 
 	private class GenerateMaxAbs extends InitValue {
-
 		public GenerateMaxAbs() {
 			super("maxAbs", "v > output",
 					"\t/**\n" +
 							"\t * Returns the maximum element value.\n" +
-							"\t * \n" +
+							"\t *\n" +
 							"\t * @param input Input image. Not modified.\n" +
 							"\t * @return Maximum pixel value.\n" +
 							"\t */"
 			);
 		}
 
-		@Override
-		public String getValueMassage() {
+		@Override public String getValueMassage() {
 			if (input.isSigned())
 				return "Math.abs(array[index])";
 			else
@@ -308,8 +318,7 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 			this.javaDoc = javaDoc;
 		}
 
-		@Override
-		public void printHighLevel( ImageType.Family family ) {
+		@Override public void printHighLevel( ImageType.Family family ) {
 
 			String sumType = input.getSumType();
 			String columns = family == ImageType.Family.INTERLEAVED ? "input.width*input.numBands" : "input.width";
@@ -341,21 +350,20 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 			this.javaDoc = javaDoc;
 		}
 
-		@Override
-		public void printHighLevel( ImageType.Family family ) {
+		@Override public void printHighLevel( ImageType.Family family ) {
 
 			String columns = family == ImageType.Family.INTERLEAVED ? "imgA.width*imgA.numBands" : "imgA.width";
 			String nameUn = this.name + (input.isSigned() ? "" : "U");
 			String imageName = input.getImageName(family);
 
 			out.println(javaDoc);
-			out.print("\tpublic static double " + name + "(" + imageName + " imgA, " + imageName + " imgB ) {\n" +
-					"\t\tInputSanityCheck.checkSameShape(imgA,imgB);\n" +
+			out.print("\tpublic static double " + name + "( " + imageName + " imgA, " + imageName + " imgB ) {\n" +
+					"\t\tInputSanityCheck.checkSameShape(imgA, imgB);\n" +
 					"\t\tint N = imgA.width*imgA.height;\n" +
 					"\t\tif (BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE) {\n" +
-					"\t\t\treturn ImplImageStatistics_MT." + nameUn + "(imgA.data,imgA.startIndex,imgA.stride, imgB.data,imgB.startIndex,imgB.stride,imgA.height, " + columns + ");\n" +
+					"\t\t\treturn ImplImageStatistics_MT." + nameUn + "(imgA.data, imgA.startIndex, imgA.stride, imgB.data, imgB.startIndex, imgB.stride, imgA.height, " + columns + ");\n" +
 					"\t\t} else {\n" +
-					"\t\t\treturn ImplImageStatistics." + nameUn + "(imgA.data,imgA.startIndex,imgA.stride, imgB.data,imgB.startIndex,imgB.stride,imgA.height, " + columns + ");\n" +
+					"\t\t\treturn ImplImageStatistics." + nameUn + "(imgA.data, imgA.startIndex, imgA.stride, imgB.data, imgB.startIndex, imgB.stride, imgA.height, " + columns + ");\n" +
 					"\t\t}\n" +
 					"\t}\n\n");
 		}
@@ -366,7 +374,9 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 	}
 
 	public static void main( String[] args ) throws FileNotFoundException {
-		GenerateImageStatistics gen = new GenerateImageStatistics();
-		gen.generateCode();
+		var gen = new GenerateImageStatistics();
+		gen.setModuleName("boofcv-ip");
+		gen.parseArguments(args);
+		gen.generate();
 	}
 }

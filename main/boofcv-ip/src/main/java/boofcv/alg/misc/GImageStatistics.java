@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,18 +20,72 @@ package boofcv.alg.misc;
 
 import boofcv.struct.image.*;
 
-/**
- * Generalized version of {@link ImageStatistics}. Type checking is performed at runtime instead of at compile type.
- *
- * @author Peter Abeles
- */
+/// Generalized version of [ImageStatistics]. Type checking is performed at runtime instead of at compile type.
 public class GImageStatistics {
-	/**
-	 * Returns the absolute value of the element with the largest absolute value, across all bands
-	 *
-	 * @param input Input image. Not modified.
-	 * @return Largest pixel absolute value.
-	 */
+	/// Returns the absolute value of the element with the smallest absolute value, across all bands
+	///
+	/// @param input Input image. Not modified.
+	/// @return Smallest pixel absolute value.
+	public static double minAbs( ImageBase input ) {
+		if (input instanceof ImageGray) {
+			if (GrayU8.class == input.getClass()) {
+				return ImageStatistics.minAbs((GrayU8)input);
+			} else if (GrayS8.class == input.getClass()) {
+				return ImageStatistics.minAbs((GrayS8)input);
+			} else if (GrayU16.class == input.getClass()) {
+				return ImageStatistics.minAbs((GrayU16)input);
+			} else if (GrayS16.class == input.getClass()) {
+				return ImageStatistics.minAbs((GrayS16)input);
+			} else if (GrayS32.class == input.getClass()) {
+				return ImageStatistics.minAbs((GrayS32)input);
+			} else if (GrayS64.class == input.getClass()) {
+				return ImageStatistics.minAbs((GrayS64)input);
+			} else if (GrayF32.class == input.getClass()) {
+				return ImageStatistics.minAbs((GrayF32)input);
+			} else if (GrayF64.class == input.getClass()) {
+				return ImageStatistics.minAbs((GrayF64)input);
+			} else {
+				throw new IllegalArgumentException("Unknown Image Type: " + input.getClass().getSimpleName());
+			}
+		} else if (input instanceof ImageInterleaved) {
+			if (InterleavedU8.class == input.getClass()) {
+				return ImageStatistics.minAbs((InterleavedU8)input);
+			} else if (InterleavedS8.class == input.getClass()) {
+				return ImageStatistics.minAbs((InterleavedS8)input);
+			} else if (InterleavedU16.class == input.getClass()) {
+				return ImageStatistics.minAbs((InterleavedU16)input);
+			} else if (InterleavedS16.class == input.getClass()) {
+				return ImageStatistics.minAbs((InterleavedS16)input);
+			} else if (InterleavedS32.class == input.getClass()) {
+				return ImageStatistics.minAbs((InterleavedS32)input);
+			} else if (InterleavedS64.class == input.getClass()) {
+				return ImageStatistics.minAbs((InterleavedS64)input);
+			} else if (InterleavedF32.class == input.getClass()) {
+				return ImageStatistics.minAbs((InterleavedF32)input);
+			} else if (InterleavedF64.class == input.getClass()) {
+				return ImageStatistics.minAbs((InterleavedF64)input);
+			} else {
+				throw new IllegalArgumentException("Unknown Image Type: " + input.getClass().getSimpleName());
+			}
+		} else if (input instanceof Planar) {
+			Planar pl = (Planar)input;
+			int N = pl.getNumBands();
+			if (N == 0)
+				throw new IllegalArgumentException("Must have at least one band");
+			double result = minAbs(pl.bands[0]);
+			for (int i = 1; i < N; i++) {
+				result = Math.max(result, minAbs(pl.bands[i]));
+			}
+			return result;
+		} else {
+			throw new IllegalArgumentException("Image type not yet supported " + input.getClass().getSimpleName());
+		}
+	}
+
+	/// Returns the absolute value of the element with the largest absolute value, across all bands
+	///
+	/// @param input Input image. Not modified.
+	/// @return Largest pixel absolute value.
 	public static double maxAbs( ImageBase input ) {
 		if (input instanceof ImageGray) {
 			if (GrayU8.class == input.getClass()) {
@@ -88,12 +142,10 @@ public class GImageStatistics {
 		}
 	}
 
-	/**
-	 * Returns the maximum pixel value across all bands.
-	 *
-	 * @param input Input image. Not modified.
-	 * @return Maximum pixel value.
-	 */
+	/// Returns the maximum pixel value across all bands.
+	///
+	/// @param input Input image. Not modified.
+	/// @return Maximum pixel value.
 	public static double max( ImageBase input ) {
 		if (input instanceof ImageGray) {
 			if (GrayU8.class == input.getClass()) {
@@ -150,12 +202,10 @@ public class GImageStatistics {
 		}
 	}
 
-	/**
-	 * Returns the minimum pixel value across all bands
-	 *
-	 * @param input Input image. Not modified.
-	 * @return Minimum pixel value.
-	 */
+	/// Returns the minimum pixel value across all bands
+	///
+	/// @param input Input image. Not modified.
+	/// @return Minimum pixel value.
 	public static double min( ImageBase input ) {
 		if (input instanceof ImageGray) {
 			if (GrayU8.class == input.getClass()) {
@@ -212,14 +262,10 @@ public class GImageStatistics {
 		}
 	}
 
-	/**
-	 * <p>
-	 * Returns the sum of all the pixels in the image across all bands.
-	 * </p>
-	 *
-	 * @param input Input image. Not modified.
-	 * @return Sum of pixel intensity values
-	 */
+	/// Returns the sum of all the pixels in the image across all bands.
+	///
+	/// @param input Input image. Not modified.
+	/// @return Sum of pixel intensity values
 	public static double sum( ImageBase input ) {
 
 		if (input instanceof ImageGray) {
@@ -274,12 +320,10 @@ public class GImageStatistics {
 		}
 	}
 
-	/**
-	 * Returns the mean pixel intensity value.
-	 *
-	 * @param input Input image. Not modified.
-	 * @return Mean pixel value
-	 */
+	/// Returns the mean pixel intensity value.
+	///
+	/// @param input Input image. Not modified.
+	/// @return Mean pixel value
 	public static double mean( ImageBase input ) {
 
 		if (input instanceof ImageGray) {
@@ -334,13 +378,11 @@ public class GImageStatistics {
 		}
 	}
 
-	/**
-	 * Computes the variance of pixel intensity values inside the image.
-	 *
-	 * @param input Input image. Not modified.
-	 * @param mean Mean pixel intensity value.
-	 * @return Pixel variance
-	 */
+	/// Computes the variance of pixel intensity values inside the image.
+	///
+	/// @param input Input image. Not modified.
+	/// @param mean Mean pixel intensity value.
+	/// @return Pixel variance
 	public static <T extends ImageGray<T>> double variance( T input, double mean ) {
 
 		if (GrayU8.class == input.getClass()) {
@@ -364,13 +406,11 @@ public class GImageStatistics {
 		}
 	}
 
-	/**
-	 * Computes the mean of the difference squared between the two images.
-	 *
-	 * @param inputA Input image. Not modified.
-	 * @param inputB Input image. Not modified.
-	 * @return Mean difference squared
-	 */
+	/// Computes the mean of the difference squared between the two images.
+	///
+	/// @param inputA Input image. Not modified.
+	/// @param inputB Input image. Not modified.
+	/// @return Mean difference squared
 	public static <T extends ImageBase<T>> double meanDiffSq( T inputA, T inputB ) {
 
 		if (inputA instanceof ImageGray) {
@@ -426,13 +466,11 @@ public class GImageStatistics {
 		}
 	}
 
-	/**
-	 * Computes the mean of the absolute value of the difference between the two images across all bands
-	 *
-	 * @param inputA Input image. Not modified.
-	 * @param inputB Input image. Not modified.
-	 * @return Mean absolute difference
-	 */
+	/// Computes the mean of the absolute value of the difference between the two images across all bands
+	///
+	/// @param inputA Input image. Not modified.
+	/// @param inputB Input image. Not modified.
+	/// @return Mean absolute difference
 	public static <T extends ImageBase<T>> double meanDiffAbs( T inputA, T inputB ) {
 
 		if (inputA instanceof ImageGray) {
@@ -488,14 +526,12 @@ public class GImageStatistics {
 		}
 	}
 
-	/**
-	 * Computes the histogram of intensity values for the image. For floating point images it is rounded
-	 * to the nearest integer using "(int)value".
-	 *
-	 * @param input (input) Image.
-	 * @param minValue (input) Minimum possible intensity value   Ignored for unsigned images.
-	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
-	 */
+	/// Computes the histogram of intensity values for the image. For floating point images it is rounded
+	/// to the nearest integer using "(int)value".
+	///
+	/// @param input (input) Image.
+	/// @param minValue (input) Minimum possible intensity value   Ignored for unsigned images.
+	/// @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
 	public static void histogram( ImageGray input, double minValue, int histogram[] ) {
 		if (GrayU8.class == input.getClass()) {
 			ImageStatistics.histogram((GrayU8)input, (int)minValue, histogram);
@@ -518,14 +554,12 @@ public class GImageStatistics {
 		}
 	}
 
-	/**
-	 * Computes the histogram of intensity values for the image. For floating point images it is rounded
-	 * to the nearest integer using "(int)value".
-	 *
-	 * @param input (input) Image.
-	 * @param minValue (input) Minimum possible intensity value   Ignored for unsigned images.
-	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
-	 */
+	/// Computes the histogram of intensity values for the image. For floating point images it is rounded
+	/// to the nearest integer using "(int)value".
+	///
+	/// @param input (input) Image.
+	/// @param minValue (input) Minimum possible intensity value   Ignored for unsigned images.
+	/// @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
 	public static void histogramScaled( ImageGray input, double minValue, double maxValue, int histogram[] ) {
 		if (GrayU8.class == input.getClass()) {
 			ImageStatistics.histogramScaled((GrayU8)input, (int)minValue, (int)maxValue, histogram);

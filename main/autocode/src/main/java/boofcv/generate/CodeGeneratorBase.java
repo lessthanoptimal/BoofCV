@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -167,11 +167,10 @@ public abstract class CodeGeneratorBase {
 
 	public String generateDocString( String... authors ) {
 		String ret = " *\n" +
-				" * <p>DO NOT MODIFY. Automatically generated code created by " + getClass().getSimpleName() + "</p>\n" +
-				" *\n";
+				" * <p>DO NOT MODIFY. Automatically generated code created by " + getClass().getSimpleName() + "</p>\n";
 
 		for (String author : authors) {
-			ret += " * @author " + author + "\n";
+			ret += "\n * @author " + author + "\n";
 		}
 		ret += " */\n" +
 				"@Generated(\"" + getClass().getCanonicalName() + "\")\n";
