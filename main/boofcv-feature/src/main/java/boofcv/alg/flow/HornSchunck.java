@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,9 +19,10 @@
 package boofcv.alg.flow;
 
 import boofcv.alg.InputSanityCheck;
-import boofcv.struct.flow.ImageFlow;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.image.InterleavedF32;
 
 /**
  * <p>
@@ -47,8 +48,8 @@ public abstract class HornSchunck<T extends ImageBase<T>, D extends ImageBase<D>
 	// Number of iterations
 	protected int numIterations;
 
-	// storage for the average flow
-	protected ImageFlow averageFlow = new ImageFlow(1, 1);
+	// storage for the average flow. Interleaved: band 0 = x, band 1 = y
+	protected InterleavedF32 averageFlow = new InterleavedF32(1, 1, 2);
 
 	// If the output should be cleared each time a new image is processed or used as an initial estimate
 	protected boolean resetOutput = true;
@@ -88,9 +89,9 @@ public abstract class HornSchunck<T extends ImageBase<T>, D extends ImageBase<D>
 	 *
 	 * @param image1 First image
 	 * @param image2 Second image
-	 * @param output Found dense optical flow
+	 * @param output Found dense optical flow. Interleaved: band 0 = x, band 1 = y
 	 */
-	public void process( T image1, T image2, ImageFlow output ) {
+	public void process( T image1, T image2, InterleavedF32 output ) {
 
 		InputSanityCheck.checkSameShape(image1, image2);
 
@@ -101,7 +102,7 @@ public abstract class HornSchunck<T extends ImageBase<T>, D extends ImageBase<D>
 		averageFlow.reshape(output.width, output.height);
 
 		if (resetOutput)
-			output.fillZero();
+			ImageMiscOps.fill(output, 0);
 
 		computeDerivX(image1, image2, derivX);
 		computeDerivY(image1, image2, derivY);
@@ -119,33 +120,39 @@ public abstract class HornSchunck<T extends ImageBase<T>, D extends ImageBase<D>
 	/**
 	 * Inner function for computing optical flow
 	 */
-	protected abstract void findFlow( D derivX, D derivY, D derivT, ImageFlow output );
+	protected abstract void findFlow( D derivX, D derivY, D derivT, InterleavedF32 output );
 
 	/**
 	 * Computes average flow using an 8-connect neighborhood for the inner image
 	 */
-	protected static void innerAverageFlow( ImageFlow flow, ImageFlow averageFlow ) {
+	protected static void innerAverageFlow( InterleavedF32 flow, InterleavedF32 averageFlow ) {
 
 		int endX = flow.width - 1;
 		int endY = flow.height - 1;
 
+		final int w = flow.width;
+		final float[] f = flow.data;
+
 		for (int y = 1; y < endY; y++) {
-			int index = flow.width*y + 1;
+			int index = w*y + 1;
 			for (int x = 1; x < endX; x++, index++) {
-				ImageFlow.D average = averageFlow.data[index];
+				// pixel indices scaled by 2 bands (x = band 0, y = band 1)
+				int a = index*2;
 
-				ImageFlow.D f0 = flow.data[index - 1];
-				ImageFlow.D f1 = flow.data[index + 1];
-				ImageFlow.D f2 = flow.data[index - flow.width];
-				ImageFlow.D f3 = flow.data[index + flow.width];
+				int i0 = (index - 1)*2;
+				int i1 = (index + 1)*2;
+				int i2 = (index - w)*2;
+				int i3 = (index + w)*2;
 
-				ImageFlow.D f4 = flow.data[index - 1 - flow.width];
-				ImageFlow.D f5 = flow.data[index + 1 - flow.width];
-				ImageFlow.D f6 = flow.data[index - 1 + flow.width];
-				ImageFlow.D f7 = flow.data[index + 1 + flow.width];
+				int i4 = (index - 1 - w)*2;
+				int i5 = (index + 1 - w)*2;
+				int i6 = (index - 1 + w)*2;
+				int i7 = (index + 1 + w)*2;
 
-				average.x = 0.1666667f*(f0.x + f1.x + f2.x + f3.x) + 0.08333333f*(f4.x + f5.x + f6.x + f7.x);
-				average.y = 0.1666667f*(f0.y + f1.y + f2.y + f3.y) + 0.08333333f*(f4.y + f5.y + f6.y + f7.y);
+				averageFlow.data[a] = 0.1666667f*(f[i0] + f[i1] + f[i2] + f[i3]) +
+						0.08333333f*(f[i4] + f[i5] + f[i6] + f[i7]);
+				averageFlow.data[a + 1] = 0.1666667f*(f[i0 + 1] + f[i1 + 1] + f[i2 + 1] + f[i3 + 1]) +
+						0.08333333f*(f[i4 + 1] + f[i5 + 1] + f[i6 + 1] + f[i7 + 1]);
 			}
 		}
 	}
@@ -153,7 +160,7 @@ public abstract class HornSchunck<T extends ImageBase<T>, D extends ImageBase<D>
 	/**
 	 * Computes average flow using an 8-connect neighborhood for the image border
 	 */
-	protected static void borderAverageFlow( ImageFlow flow, ImageFlow averageFlow ) {
+	protected static void borderAverageFlow( InterleavedF32 flow, InterleavedF32 averageFlow ) {
 
 		for (int y = 0; y < flow.height; y++) {
 			computeBorder(flow, averageFlow, 0, y);
@@ -166,29 +173,34 @@ public abstract class HornSchunck<T extends ImageBase<T>, D extends ImageBase<D>
 		}
 	}
 
-	protected static void computeBorder( ImageFlow flow, ImageFlow averageFlow, int x, int y ) {
-		ImageFlow.D average = averageFlow.get(x, y);
+	protected static void computeBorder( InterleavedF32 flow, InterleavedF32 averageFlow, int x, int y ) {
+		int a = averageFlow.getIndex(x, y, 0);
 
-		ImageFlow.D f0 = getExtend(flow, x - 1, y);
-		ImageFlow.D f1 = getExtend(flow, x + 1, y);
-		ImageFlow.D f2 = getExtend(flow, x, y - 1);
-		ImageFlow.D f3 = getExtend(flow, x, y + 1);
+		final float[] f = flow.data;
 
-		ImageFlow.D f4 = getExtend(flow, x - 1, y - 1);
-		ImageFlow.D f5 = getExtend(flow, x + 1, y - 1);
-		ImageFlow.D f6 = getExtend(flow, x - 1, y + 1);
-		ImageFlow.D f7 = getExtend(flow, x + 1, y + 1);
+		int i0 = getExtend(flow, x - 1, y);
+		int i1 = getExtend(flow, x + 1, y);
+		int i2 = getExtend(flow, x, y - 1);
+		int i3 = getExtend(flow, x, y + 1);
 
-		average.x = 0.1666667f*(f0.x + f1.x + f2.x + f3.x) + 0.08333333f*(f4.x + f5.x + f6.x + f7.x);
-		average.y = 0.1666667f*(f0.y + f1.y + f2.y + f3.y) + 0.08333333f*(f4.y + f5.y + f6.y + f7.y);
+		int i4 = getExtend(flow, x - 1, y - 1);
+		int i5 = getExtend(flow, x + 1, y - 1);
+		int i6 = getExtend(flow, x - 1, y + 1);
+		int i7 = getExtend(flow, x + 1, y + 1);
+
+		averageFlow.data[a] = 0.1666667f*(f[i0] + f[i1] + f[i2] + f[i3]) +
+				0.08333333f*(f[i4] + f[i5] + f[i6] + f[i7]);
+		averageFlow.data[a + 1] = 0.1666667f*(f[i0 + 1] + f[i1 + 1] + f[i2 + 1] + f[i3 + 1]) +
+				0.08333333f*(f[i4 + 1] + f[i5 + 1] + f[i6 + 1] + f[i7 + 1]);
 	}
 
-	protected static ImageFlow.D getExtend( ImageFlow flow, int x, int y ) {
+	/** Returns the band-0 array index of the clamped (extended border) pixel */
+	protected static int getExtend( InterleavedF32 flow, int x, int y ) {
 		if (x < 0) x = 0;
 		else if (x >= flow.width) x = flow.width - 1;
 		if (y < 0) y = 0;
 		else if (y >= flow.height) y = flow.height - 1;
 
-		return flow.unsafe_get(x, y);
+		return flow.getIndex(x, y, 0);
 	}
 }

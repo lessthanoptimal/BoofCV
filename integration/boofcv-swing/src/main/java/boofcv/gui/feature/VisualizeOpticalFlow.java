@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,8 @@ package boofcv.gui.feature;
 
 import boofcv.alg.misc.PixelMath;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.struct.flow.ImageFlow;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.InterleavedF32;
 import georegression.struct.point.Point2D_F64;
 
 import java.awt.*;
@@ -44,7 +44,7 @@ public class VisualizeOpticalFlow {
 	double logScale = 25.0;
 	double maxLog = Math.log(logScale + logBase);
 
-	public static void colorizeDirection( ImageFlow flowImage, BufferedImage out ) {
+	public static void colorizeDirection( InterleavedF32 flowImage, BufferedImage out ) {
 
 		int[] tableSine = new int[360];
 		int[] tableCosine = new int[360];
@@ -57,12 +57,13 @@ public class VisualizeOpticalFlow {
 
 		for (int y = 0; y < flowImage.height; y++) {
 			for (int x = 0; x < flowImage.width; x++) {
-				ImageFlow.D f = flowImage.unsafe_get(x, y);
+				float fx = flowImage.getBand(x, y, 0);
+				float fy = flowImage.getBand(x, y, 1);
 
-				if (!f.isValid()) {
+				if (Float.isNaN(fx)) {
 					out.setRGB(x, y, 0xFF);
 				} else {
-					double angle = Math.atan2(f.y, f.x);
+					double angle = Math.atan2(fy, fx);
 					int degree = (int)(180 + angle*179.999/Math.PI);
 					int r = tableSine[degree];
 					int g = tableCosine[degree];
@@ -73,7 +74,7 @@ public class VisualizeOpticalFlow {
 		}
 	}
 
-	public static void magnitudeAbs( ImageFlow flowImage, BufferedImage out ) {
+	public static void magnitudeAbs( InterleavedF32 flowImage, BufferedImage out ) {
 
 		GrayF32 magnitude = new GrayF32(flowImage.width, flowImage.height);
 
@@ -81,12 +82,13 @@ public class VisualizeOpticalFlow {
 
 		for (int y = 0; y < flowImage.height; y++) {
 			for (int x = 0; x < flowImage.width; x++) {
-				ImageFlow.D f = flowImage.unsafe_get(x, y);
+				float fx = flowImage.getBand(x, y, 0);
+				float fy = flowImage.getBand(x, y, 1);
 
-				if (!f.isValid()) {
+				if (Float.isNaN(fx)) {
 					out.setRGB(x, y, 0xFF);
 				} else {
-					float m = Math.max(Math.abs(f.x), Math.abs(f.y));
+					float m = Math.max(Math.abs(fx), Math.abs(fy));
 					if (m > max)
 						max = m;
 					magnitude.unsafe_set(x, y, m);
@@ -99,18 +101,19 @@ public class VisualizeOpticalFlow {
 		ConvertBufferedImage.convertTo(magnitude, out);
 	}
 
-	public static void magnitudeAbs( ImageFlow flowImage, float maxValue, BufferedImage out ) {
+	public static void magnitudeAbs( InterleavedF32 flowImage, float maxValue, BufferedImage out ) {
 
 		GrayF32 magnitude = new GrayF32(flowImage.width, flowImage.height);
 
 		for (int y = 0; y < flowImage.height; y++) {
 			for (int x = 0; x < flowImage.width; x++) {
-				ImageFlow.D f = flowImage.unsafe_get(x, y);
+				float fx = flowImage.getBand(x, y, 0);
+				float fy = flowImage.getBand(x, y, 1);
 
-				if (!f.isValid()) {
+				if (Float.isNaN(fx)) {
 					out.setRGB(x, y, 0xFF);
 				} else {
-					float m = Math.max(Math.abs(f.x), Math.abs(f.y));
+					float m = Math.max(Math.abs(fx), Math.abs(fy));
 					magnitude.unsafe_set(x, y, m);
 				}
 			}
@@ -122,7 +125,7 @@ public class VisualizeOpticalFlow {
 		ConvertBufferedImage.convertTo(magnitude, out);
 	}
 
-	public static void colorized( ImageFlow flowImage, float maxValue, BufferedImage out ) {
+	public static void colorized( InterleavedF32 flowImage, float maxValue, BufferedImage out ) {
 
 		int[] tableSine = new int[360];
 		int[] tableCosine = new int[360];
@@ -135,16 +138,17 @@ public class VisualizeOpticalFlow {
 
 		for (int y = 0; y < flowImage.height; y++) {
 			for (int x = 0; x < flowImage.width; x++) {
-				ImageFlow.D f = flowImage.unsafe_get(x, y);
+				float fx = flowImage.getBand(x, y, 0);
+				float fy = flowImage.getBand(x, y, 1);
 
-				if (!f.isValid()) {
+				if (Float.isNaN(fx)) {
 					out.setRGB(x, y, 0x55);
 				} else {
-					float m = Math.max(Math.abs(f.x), Math.abs(f.y))/maxValue;
+					float m = Math.max(Math.abs(fx), Math.abs(fy))/maxValue;
 
 					if (m > 1) m = 1;
 
-					double angle = Math.atan2(f.y, f.x);
+					double angle = Math.atan2(fy, fx);
 					int degree = (int)(180 + angle*179.999/Math.PI);
 					int r = (int)(m*tableSine[degree]);
 					int g = (int)(m*tableCosine[degree]);

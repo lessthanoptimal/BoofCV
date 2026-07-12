@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,10 +20,11 @@ package boofcv.abst.flow;
 
 import boofcv.alg.flow.DenseOpticalFlowBlockPyramid;
 import boofcv.alg.flow.UtilDenseOpticalFlow;
-import boofcv.struct.flow.ImageFlow;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.image.InterleavedF32;
 import boofcv.struct.pyramid.ImagePyramid;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Wrapper around {@link boofcv.alg.flow.DenseOpticalFlowBlockPyramid} for {@link boofcv.abst.flow.DenseOpticalFlow}.
@@ -61,7 +62,7 @@ public class FlowBlock_to_DenseOpticalFlow<T extends ImageGray<T>>
 	}
 
 	@Override
-	public void process( T source, T destination, ImageFlow flow ) {
+	public void process( T source, T destination, InterleavedF32 flow ) {
 
 		if (width != source.width || height != source.height) {
 			width = source.width;
@@ -82,6 +83,15 @@ public class FlowBlock_to_DenseOpticalFlow<T extends ImageGray<T>>
 		flowAlg.process(pyramidSrc, pyramidDst);
 
 		flow.setTo(flowAlg.getOpticalFlow());
+	}
+
+	/// Attributes is the block matching fit error for each pixel
+	@Override
+	public @Nullable InterleavedF32 getAttributes() {
+		InterleavedF32 flow = flowAlg.getOpticalFlow();
+		var attributes = new InterleavedF32(flow.width, flow.height, 1);
+		System.arraycopy(flowAlg.getScores(), 0, attributes.data, 0, attributes.totalPixels());
+		return attributes;
 	}
 
 	@Override

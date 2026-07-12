@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,9 @@ package boofcv.alg.flow;
 import boofcv.BoofTesting;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.flow.ImageFlow;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.InterleavedF32;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
@@ -51,7 +51,7 @@ public abstract class ChecksHornSchunck<T extends ImageGray<T>, D extends ImageG
 
 		T image1 = GeneralizedImageOps.createSingleBand(imageType, width, height);
 		T image2 = GeneralizedImageOps.createSingleBand(imageType,width,height);
-		ImageFlow output = new ImageFlow(width,height);
+		InterleavedF32 output = new InterleavedF32(width,height,2);
 
 		GImageMiscOps.fillRectangle(image1, 100, 10, 0, 20, 30);
 		GImageMiscOps.fillRectangle(image2, 100, 11, 0, 20, 30);
@@ -60,10 +60,10 @@ public abstract class ChecksHornSchunck<T extends ImageGray<T>, D extends ImageG
 		alg.process(image1, image2, output);
 
 		for( int y = 0; y < height-1; y++ ) {
-			assertTrue( output.get(9,y).x > 0.9);
-			assertTrue( Math.abs(output.get(10,y).y) < 0.1 );
-			assertTrue( output.get(10,y).x > 0.9);
-			assertTrue( Math.abs(output.get(11,y).y) < 0.1 );
+			assertTrue( output.getBand(9,y,0) > 0.9);
+			assertTrue( Math.abs(output.getBand(10,y,1)) < 0.1 );
+			assertTrue( output.getBand(10,y,0) > 0.9);
+			assertTrue( Math.abs(output.getBand(11,y,1)) < 0.1 );
 		}
 	}
 

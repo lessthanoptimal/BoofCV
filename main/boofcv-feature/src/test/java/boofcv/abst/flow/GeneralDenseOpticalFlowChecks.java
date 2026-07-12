@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,8 @@ package boofcv.abst.flow;
 import boofcv.BoofTesting;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.flow.ImageFlow;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.InterleavedF32;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
@@ -33,7 +33,7 @@ public abstract class GeneralDenseOpticalFlowChecks<T extends ImageGray<T>> exte
 
 	T orig;
 	T shifted;
-	ImageFlow found;
+	InterleavedF32 found;
 
 	boolean justCorrectSign = false;
 
@@ -43,7 +43,7 @@ public abstract class GeneralDenseOpticalFlowChecks<T extends ImageGray<T>> exte
 		orig = GeneralizedImageOps.createSingleBand(imageType, 20, 25);
 		shifted = GeneralizedImageOps.createSingleBand(imageType, 20, 25);
 
-		found = new ImageFlow(20, 25);
+		found = new InterleavedF32(20, 25, 2);
 
 		GImageMiscOps.fillUniform(orig, rand, 0, 256);
 	}
@@ -62,9 +62,48 @@ public abstract class GeneralDenseOpticalFlowChecks<T extends ImageGray<T>> exte
 		checkPlanarMotion();
 		checkChangeInputSize();
 		checkSubImage();
+		attributes();
 	}
 
 	public abstract DenseOpticalFlow<T> createAlg( Class<T> imageType );
+
+	/** True if the pixel has a valid flow estimate (x-band is not NaN) */
+	private static boolean isValid( InterleavedF32 flow, int x, int y ) {
+		return !Float.isNaN(flow.getBand(x, y, 0));
+	}
+
+	/** Marks every pixel as invalid by setting the x-band to NaN */
+	private static void invalidateAll( InterleavedF32 flow ) {
+		int N = flow.width*flow.height;
+		for (int i = 0; i < N; i++)
+			flow.data[i*2] = Float.NaN;
+	}
+
+	/**
+	 * Attributes are optional. If an implementation provides them, they must match the flow's shape and have a
+	 * value everywhere the flow is valid.
+	 */
+	@Test void attributes() {
+		DenseOpticalFlow<T> alg = createAlg(imageType);
+		shift(orig, 1, 0, shifted);
+		alg.process(orig, shifted, found);
+
+		InterleavedF32 attributes = alg.getAttributes();
+		if (attributes == null)
+			return;
+
+		// shape must match the input images
+		assertEquals(orig.width, attributes.width);
+		assertEquals(orig.height, attributes.height);
+
+		// every pixel with a valid flow must have a valid (non-NaN) attribute
+		for (int y = 0; y < found.height; y++) {
+			for (int x = 0; x < found.width; x++) {
+				if (isValid(found, x, y))
+					assertFalse(Float.isNaN(attributes.getBand(x, y, 0)));
+			}
+		}
+	}
 
 	/**
 	 * Makes sure it attempts to compute flow through out the whole image. Specially checks the image border
@@ -75,14 +114,14 @@ public abstract class GeneralDenseOpticalFlowChecks<T extends ImageGray<T>> exte
 
 		DenseOpticalFlow<T> alg = createAlg(imageType);
 
-		found.invalidateAll();
+		invalidateAll(found);
 		alg.process(orig, shifted, found);
 
 		int count0 = 0, count1 = 0;
 		for (int x = 0; x < shifted.width; x++) {
-			if (found.get(x, 0).isValid())
+			if (isValid(found, x, 0))
 				count0++;
-			if (found.get(x, found.height - 2).isValid())
+			if (isValid(found, x, found.height - 2))
 				count1++;
 		}
 
@@ -91,15 +130,15 @@ public abstract class GeneralDenseOpticalFlowChecks<T extends ImageGray<T>> exte
 
 
 		// process it again so that there should be an obvious solution along the left and right sides
-		found.invalidateAll();
+		invalidateAll(found);
 		shift(orig, 0, 1, shifted);
 		alg.process(orig, shifted, found);
 
 		int count2 = 0, count3 = 0;
 		for (int y = 0; y < shifted.height; y++) {
-			if (found.get(0, y).isValid())
+			if (isValid(found, 0, y))
 				count2++;
-			if (found.get(found.width - 2, y).isValid())
+			if (isValid(found, found.width - 2, y))
 				count3++;
 		}
 
@@ -117,25 +156,23 @@ public abstract class GeneralDenseOpticalFlowChecks<T extends ImageGray<T>> exte
 				DenseOpticalFlow<T> alg = createAlg(imageType);
 				shift(orig, dx, dy, shifted);
 
-				found.invalidateAll();
+				invalidateAll(found);
 				alg.process(orig, shifted, found);
 
-				ImageFlow.D flow = found.get(10, 10);
-				assertTrue(flow.isValid());
+				assertTrue(isValid(found, 10, 10));
 				if (justCorrectSign) {
 					// if the two flows are in agreement then sum will be positive
 					float sum = 0;
 					for (int y = 0; y < found.height; y++) {
 						for (int x = 0; x < found.width; x++) {
-							flow = found.get(x, y);
-							sum += flow.x*dx;
-							sum += flow.y*dy;
+							sum += found.getBand(x, y, 0)*dx;
+							sum += found.getBand(x, y, 1)*dy;
 						}
 					}
 					assertTrue(sum >= 0);
 				} else {
-					assertEquals(dx, flow.x, 0.2);
-					assertEquals(dy, flow.y, 0.2);
+					assertEquals(dx, found.getBand(10, 10, 0), 0.2);
+					assertEquals(dy, found.getBand(10, 10, 1), 0.2);
 				}
 			}
 		}
@@ -153,7 +190,7 @@ public abstract class GeneralDenseOpticalFlowChecks<T extends ImageGray<T>> exte
 		T larger1 = GeneralizedImageOps.createSingleBand(imageType, 40, 35);
 
 		// if it doesn't blow up it worked
-		alg.process(larger0, larger1, new ImageFlow(40, 35));
+		alg.process(larger0, larger1, new InterleavedF32(40, 35, 2));
 	}
 
 	@Test void checkSubImage() {
@@ -165,19 +202,16 @@ public abstract class GeneralDenseOpticalFlowChecks<T extends ImageGray<T>> exte
 		// should produce identical solution
 		T subOrig = BoofTesting.createSubImageOf(orig);
 		T subShifted = BoofTesting.createSubImageOf(shifted);
-		ImageFlow found2 = new ImageFlow(found.width, found.height);
+		InterleavedF32 found2 = new InterleavedF32(found.width, found.height, 2);
 		alg.process(subOrig, subShifted, found2);
 
 		for (int y = 0; y < found.height; y++) {
 			for (int x = 0; x < found.width; x++) {
-				ImageFlow.D a = found.get(x, y);
-				ImageFlow.D b = found2.get(x, y);
-
-				if (a.isValid()) {
-					assertTrue(a.x == b.x);
-					assertTrue(a.y == b.y);
+				if (isValid(found, x, y)) {
+					assertTrue(found.getBand(x, y, 0) == found2.getBand(x, y, 0));
+					assertTrue(found.getBand(x, y, 1) == found2.getBand(x, y, 1));
 				} else {
-					assertFalse(b.isValid());
+					assertFalse(isValid(found2, x, y));
 				}
 			}
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,10 +19,11 @@
 package boofcv.abst.flow;
 
 import boofcv.alg.flow.BroxWarpingSpacial;
-import boofcv.struct.flow.ImageFlow;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.image.InterleavedF32;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Implementation of {@link BroxWarpingSpacial} for {@link boofcv.alg.flow.HornSchunck}.
@@ -41,7 +42,8 @@ public class BroxWarpingSpacial_to_DenseOpticalFlow<T extends ImageGray<T>>
 	}
 
 	@Override
-	public void process( T source, T destination, ImageFlow flow ) {
+	public void process( T source, T destination, InterleavedF32 flow ) {
+		flow.reshape(source.width, source.height, 2);
 
 		brox.process(source, destination);
 
@@ -49,13 +51,18 @@ public class BroxWarpingSpacial_to_DenseOpticalFlow<T extends ImageGray<T>>
 		GrayF32 flowY = brox.getFlowY();
 
 		int index = 0;
+		int indexOut = 0;
 		for (int y = 0; y < flow.height; y++) {
 			for (int x = 0; x < flow.width; x++, index++) {
-				ImageFlow.D d = flow.unsafe_get(x, y);
-				d.x = flowX.data[index];
-				d.y = flowY.data[index];
+				flow.data[indexOut++] = flowX.data[index];
+				flow.data[indexOut++] = flowY.data[index];
 			}
 		}
+	}
+
+	@Override
+	public @Nullable InterleavedF32 getAttributes() {
+		return null;
 	}
 
 	@Override

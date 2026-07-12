@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.flow;
 
-import boofcv.struct.flow.ImageFlow;
+import boofcv.struct.image.InterleavedF32;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
@@ -27,33 +27,33 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class TestHornSchunck extends BoofStandardJUnit {
 
 	@Test void innerAverageFlow_borderAverageFlow() {
-		ImageFlow flow = new ImageFlow(30,35);
-		ImageFlow found = new ImageFlow(30,35);
+		InterleavedF32 flow = new InterleavedF32(30,35,2);
+		InterleavedF32 found = new InterleavedF32(30,35,2);
 
 		for( int y = 0; y < flow.height; y++ ) {
 			for( int x = 0; x < flow.width; x++ ) {
-				flow.get(x,y).x = rand.nextFloat()*2;
-				flow.get(x,y).y = rand.nextFloat()*2;
+				flow.setBand(x,y,0, rand.nextFloat()*2);
+				flow.setBand(x,y,1, rand.nextFloat()*2);
 			}
 		}
 
 		HornSchunck.borderAverageFlow(flow, found);
 		HornSchunck.innerAverageFlow(flow, found);
 
-		ImageFlow.D expected = new ImageFlow.D();
+		float[] expected = new float[2];
 
 		for( int y = 0; y < flow.height; y++ ) {
 			for( int x = 0; x < flow.width; x++ ) {
 				computeAverage(flow,x,y,expected);
 
-				assertEquals(expected.x,found.get(x,y).x,1e-4);
-				assertEquals(expected.y,found.get(x,y).y,1e-4);
+				assertEquals(expected[0],found.getBand(x,y,0),1e-4);
+				assertEquals(expected[1],found.getBand(x,y,1),1e-4);
 			}
 		}
 	}
 
-	private void computeAverage( ImageFlow flow , int x , int y , ImageFlow.D expected )  {
-		expected.x = expected.y = 0;
+	private void computeAverage( InterleavedF32 flow , int x , int y , float[] expected )  {
+		expected[0] = expected[1] = 0;
 
 		addValue(flow,x+1,y  ,0.1666667f,expected);
 		addValue(flow,x-1,y  ,0.1666667f,expected);
@@ -66,15 +66,14 @@ public class TestHornSchunck extends BoofStandardJUnit {
 		addValue(flow,x-1,y-1,0.08333333f,expected);
 	}
 
-	private void addValue( ImageFlow flow , int x , int y , float coef , ImageFlow.D expected ) {
+	private void addValue( InterleavedF32 flow , int x , int y , float coef , float[] expected ) {
 		if( x < 0 ) x = 0;
 		else if( x >= flow.width ) x = flow.width - 1;
 		if( y < 0 ) y = 0;
 		else if( y >= flow.height ) y = flow.height - 1;
 
-		ImageFlow.D a = flow.get(x,y);
-		expected.x += a.x*coef;
-		expected.y += a.y*coef;
+		expected[0] += flow.getBand(x,y,0)*coef;
+		expected[1] += flow.getBand(x,y,1)*coef;
 
 	}
 

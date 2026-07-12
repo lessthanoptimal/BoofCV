@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,9 +19,10 @@
 package boofcv.abst.flow;
 
 import boofcv.alg.flow.HornSchunck;
-import boofcv.struct.flow.ImageFlow;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.image.InterleavedF32;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Implementation of {@link DenseOpticalFlow} for {@link boofcv.alg.flow.HornSchunck}.
@@ -41,8 +42,14 @@ public class HornSchunck_to_DenseOpticalFlow<T extends ImageBase<T>, D extends I
 	}
 
 	@Override
-	public void process( T source, T destination, ImageFlow flow ) {
+	public void process( T source, T destination, InterleavedF32 flow ) {
+		flow.reshape(source.width, source.height, 2);
 		hornSchunck.process(source, destination, flow);
+	}
+
+	@Override
+	public @Nullable InterleavedF32 getAttributes() {
+		return null;
 	}
 
 	@Override

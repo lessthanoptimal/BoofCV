@@ -26,9 +26,9 @@ import boofcv.alg.transform.pyramid.PyramidOps;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.tracker.FactoryTrackerAlg;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
-import boofcv.struct.flow.ImageFlow;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.image.InterleavedF32;
 import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import boofcv.struct.pyramid.ImagePyramid;
 import boofcv.testing.BoofStandardJUnit;
@@ -91,26 +91,26 @@ class TestDenseOpticalFlowKlt extends BoofStandardJUnit {
 
 		DenseOpticalFlowKlt<GrayF32, GrayF32> alg = createAlg();
 
-		ImageFlow flow = new ImageFlow(image0.width, image0.height);
-		flow.invalidateAll();
+		InterleavedF32 flow = new InterleavedF32(image0.width, image0.height, 2);
 
 		alg.process(prev, prevDerivX, prevDerivY, gradient.divisor(), curr, flow);
 
 		// no texture in the image so KLT can't do anything
-		check(flow.get(0, 0), false, 0, 0);
-		check(flow.get(29, 39), false, 0, 0);
+		check(flow, 0, 0, false, 0, 0);
+		check(flow, 29, 39, false, 0, 0);
 		// there is texture at the target
-		check(flow.get(10, 12), true, 1, 1);
-		check(flow.get(11, 12), true, 1, 1);
-		check(flow.get(10, 13), true, 1, 1);
-		check(flow.get(11, 13), true, 1, 1);
+		check(flow, 10, 12, true, 1, 1);
+		check(flow, 11, 12, true, 1, 1);
+		check(flow, 10, 13, true, 1, 1);
+		check(flow, 11, 13, true, 1, 1);
 	}
 
-	private void check( ImageFlow.D flow, boolean valid, float x, float y ) {
-		assertEquals(valid, flow.isValid());
+	private void check( InterleavedF32 flow, int px, int py, boolean valid, float x, float y ) {
+		float fx = flow.getBand(px, py, 0);
+		assertEquals(valid, !Float.isNaN(fx));
 		if (valid) {
-			assertEquals(x, flow.x, 0.05f);
-			assertEquals(y, flow.y, 0.05f);
+			assertEquals(x, fx, 0.05f);
+			assertEquals(y, flow.getBand(px, py, 1), 0.05f);
 		}
 	}
 
@@ -125,17 +125,18 @@ class TestDenseOpticalFlowKlt extends BoofStandardJUnit {
 
 		DenseOpticalFlowKlt<GrayF32, GrayF32> alg = createAlg();
 
-		ImageFlow flow = new ImageFlow(image0.width, image0.height);
+		InterleavedF32 flow = new InterleavedF32(image0.width, image0.height, 2);
 
 		alg.process(prev, prevDerivX, prevDerivY, gradient.divisor(), curr, flow);
 
+		int N = flow.width*flow.height;
 		int totalFail = 0;
-		for (int i = 0; i < flow.data.length; i++) {
-			if (!flow.data[i].isValid()) {
+		for (int i = 0; i < N; i++) {
+			if (Float.isNaN(flow.data[i*2])) {
 				totalFail++;
 			}
 		}
 
-		assertTrue(totalFail/(double)flow.data.length >= 0.90);
+		assertTrue(totalFail/(double)N >= 0.90);
 	}
 }

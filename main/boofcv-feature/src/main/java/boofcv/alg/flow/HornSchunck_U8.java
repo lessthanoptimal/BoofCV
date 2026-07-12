@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,11 +18,7 @@
 
 package boofcv.alg.flow;
 
-import boofcv.struct.flow.ImageFlow;
-import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayS16;
-import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageType;
+import boofcv.struct.image.*;
 
 /**
  * Implementation of {@link HornSchunck} for {@link GrayF32}.
@@ -149,7 +145,7 @@ public class HornSchunck_U8 extends HornSchunck<GrayU8, GrayS16> {
 
 	@Override
 	protected void findFlow( GrayS16 derivX, GrayS16 derivY,
-							 GrayS16 derivT, ImageFlow output ) {
+							 GrayS16 derivT, InterleavedF32 output ) {
 
 		int N = output.width*output.height;
 
@@ -163,15 +159,13 @@ public class HornSchunck_U8 extends HornSchunck<GrayU8, GrayS16> {
 				float dy = derivY.data[i];
 				float dt = derivT.data[i];
 
-				ImageFlow.D aveFlow = averageFlow.data[i];
+				int fi = i*2;
+				float u = averageFlow.data[fi];
+				float v = averageFlow.data[fi + 1];
 
-				float u = aveFlow.x;
-				float v = aveFlow.y;
-
-				ImageFlow.D flow = output.data[i];
 				float r = (dx*u + dy*v + dt)/(alpha2 + dx*dx + dy*dy);
-				flow.x = u - dx*r;
-				flow.y = v - dy*r;
+				output.data[fi] = u - dx*r;
+				output.data[fi + 1] = v - dy*r;
 			}
 		}
 	}

@@ -18,9 +18,9 @@
 
 package boofcv.alg.flow;
 
-import boofcv.struct.flow.ImageFlow;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.image.InterleavedF32;
 
 /**
  * Implementation of {@link HornSchunck} for {@link GrayF32}.
@@ -147,7 +147,7 @@ public class HornSchunck_F32 extends HornSchunck<GrayF32, GrayF32> {
 
 	@Override
 	protected void findFlow( GrayF32 derivX, GrayF32 derivY,
-							 GrayF32 derivT, ImageFlow output ) {
+							 GrayF32 derivT, InterleavedF32 output ) {
 
 		int N = output.width*output.height;
 
@@ -161,15 +161,13 @@ public class HornSchunck_F32 extends HornSchunck<GrayF32, GrayF32> {
 				float dy = derivY.data[i];
 				float dt = derivT.data[i];
 
-				ImageFlow.D aveFlow = averageFlow.data[i];
+				int fi = i*2;
+				float u = averageFlow.data[fi];
+				float v = averageFlow.data[fi + 1];
 
-				float u = aveFlow.x;
-				float v = aveFlow.y;
-
-				ImageFlow.D flow = output.data[i];
 				float r = (dx*u + dy*v + dt)/(alpha2 + dx*dx + dy*dy);
-				flow.x = u - dx*r;
-				flow.y = v - dy*r;
+				output.data[fi] = u - dx*r;
+				output.data[fi + 1] = v - dy*r;
 			}
 		}
 	}

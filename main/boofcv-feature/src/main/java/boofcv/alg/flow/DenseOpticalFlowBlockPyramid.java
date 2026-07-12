@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,11 +20,12 @@ package boofcv.alg.flow;
 
 import boofcv.alg.InputSanityCheck;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.flow.ImageFlow;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.InterleavedF32;
 import boofcv.struct.pyramid.ImagePyramid;
+import lombok.Getter;
 
 import java.util.Arrays;
 
@@ -66,15 +67,17 @@ public abstract class DenseOpticalFlowBlockPyramid<T extends ImageGray<T>> {
 	// maximum allowed error between two regions for it to be a valid flow
 	protected int maxError;
 
-	// flow in the previous layer
-	protected ImageFlow flowPrevLayer = new ImageFlow(1, 1);
+	// flow in the previous layer. Interleaved: band 0 = x, band 1 = y
+	protected InterleavedF32 flowPrevLayer = new InterleavedF32(1, 1, 2);
 	// flow in the current layer
-	protected ImageFlow flowCurrLayer = new ImageFlow(1, 1);
+	protected InterleavedF32 flowCurrLayer = new InterleavedF32(1, 1, 2);
 
-	protected ImageFlow.D tmp = new ImageFlow.D();
+	// scratch flow found by findFlow(). tmpValid is false when no valid flow was found.
+	protected float tmpX, tmpY;
+	protected boolean tmpValid;
 
 	// fit score for each pixel
-	protected float[] scores = new float[0];
+	@Getter protected float[] scores = new float[0];
 
 	/**
 	 * Configures the search.
@@ -129,12 +132,12 @@ public abstract class DenseOpticalFlowBlockPyramid<T extends ImageGray<T>> {
 				for (int y = regionRadius; y < y1; y++) {
 					for (int x = regionRadius; x < x1; x++) {
 						extractTemplate(x, y, prev);
-						float score = findFlow(x, y, curr, tmp);
+						float score = findFlow(x, y, curr);
 
-						if (tmp.isValid())
-							checkNeighbors(x, y, tmp, flowCurrLayer, score);
+						if (tmpValid)
+							checkNeighbors(x, y, tmpX, tmpY, flowCurrLayer, score);
 						else
-							flowCurrLayer.unsafe_get(x, y).markInvalid();
+							markInvalid(flowCurrLayer, x, y);
 					}
 				}
 			} else {
@@ -143,8 +146,10 @@ public abstract class DenseOpticalFlowBlockPyramid<T extends ImageGray<T>> {
 				for (int y = regionRadius; y < y1; y++) {
 					for (int x = regionRadius; x < x1; x++) {
 						// grab the flow in higher level pyramid
-						ImageFlow.D p = flowPrevLayer.get((int)(x/scale), (int)(y/scale));
-						if (!p.isValid())
+						int pIdx = flowPrevLayer.getIndex((int)(x/scale), (int)(y/scale), 0);
+						float pX = flowPrevLayer.data[pIdx];
+						float pY = flowPrevLayer.data[pIdx + 1];
+						if (Float.isNaN(pX))
 							continue;
 
 						// get the template around the current point in this layer
@@ -152,28 +157,28 @@ public abstract class DenseOpticalFlowBlockPyramid<T extends ImageGray<T>> {
 
 						// add the flow from the higher layer (adjusting for scale and rounding) as the start of
 						// this search
-						int deltaX = (int)(p.x*scale + 0.5);
-						int deltaY = (int)(p.y*scale + 0.5);
+						int deltaX = (int)(pX*scale + 0.5);
+						int deltaY = (int)(pY*scale + 0.5);
 
 						int startX = x + deltaX;
 						int startY = y + deltaY;
 
-						float score = findFlow(startX, startY, curr, tmp);
+						float score = findFlow(startX, startY, curr);
 
 						// find flow only does it relative to the starting point
-						tmp.x += deltaX;
-						tmp.y += deltaY;
+						tmpX += deltaX;
+						tmpY += deltaY;
 
-						if (tmp.isValid())
-							checkNeighbors(x, y, tmp, flowCurrLayer, score);
+						if (tmpValid)
+							checkNeighbors(x, y, tmpX, tmpY, flowCurrLayer, score);
 						else
-							flowCurrLayer.unsafe_get(x, y).markInvalid();
+							markInvalid(flowCurrLayer, x, y);
 					}
 				}
 			}
 
 			// swap the flow images
-			ImageFlow tmp = flowPrevLayer;
+			InterleavedF32 tmp = flowPrevLayer;
 			flowPrevLayer = flowCurrLayer;
 			flowCurrLayer = tmp;
 		}
@@ -181,9 +186,9 @@ public abstract class DenseOpticalFlowBlockPyramid<T extends ImageGray<T>> {
 
 	/**
 	 * Performs an exhaustive search centered around (cx,cy) for the region in 'curr' which is the best
-	 * match for the template. Results are written into 'flow'
+	 * match for the template. Results are written into the scratch fields tmpX/tmpY/tmpValid.
 	 */
-	protected float findFlow( int cx, int cy, T curr, ImageFlow.D flow ) {
+	protected float findFlow( int cx, int cy, T curr ) {
 		float bestScore = Float.MAX_VALUE;
 		int bestFlowX = 0, bestFlowY = 0;
 
@@ -216,39 +221,49 @@ public abstract class DenseOpticalFlowBlockPyramid<T extends ImageGray<T>> {
 		}
 
 		if (bestScore <= maxError) {
-			flow.x = bestFlowX;
-			flow.y = bestFlowY;
+			tmpX = bestFlowX;
+			tmpY = bestFlowY;
+			tmpValid = true;
 			return bestScore;
 		} else {
-			flow.markInvalid();
+			tmpValid = false;
 			return Float.NaN;
 		}
 	}
 
 	/**
 	 * Examines every pixel inside the region centered at (cx,cy) to see if their optical flow has a worse
-	 * score the one specified in 'flow'
+	 * score the one specified by (flowX,flowY)
 	 */
-	protected void checkNeighbors( int cx, int cy, ImageFlow.D flow, ImageFlow image, float score ) {
+	protected void checkNeighbors( int cx, int cy, float flowX, float flowY, InterleavedF32 image, float score ) {
 		for (int i = -regionRadius; i <= regionRadius; i++) {
 			int index = image.width*(cy + i) + (cx - regionRadius);
-			for (int j = -regionRadius; j <= regionRadius; j++, index++) {
+			int fi = index*2;
+			for (int j = -regionRadius; j <= regionRadius; j++, index++, fi += 2) {
 				float s = scores[index];
-				ImageFlow.D f = image.data[index];
 				if (s > score) {
-					f.set(flow);
+					image.data[fi] = flowX;
+					image.data[fi + 1] = flowY;
 					scores[index] = score;
 				} else if (s == score) {
 					// Pick solution with the least motion when ambiguous
-					float m0 = f.x*f.x + f.y*f.y;
-					float m1 = flow.x*flow.x + flow.y*flow.y;
+					float fx = image.data[fi];
+					float fy = image.data[fi + 1];
+					float m0 = fx*fx + fy*fy;
+					float m1 = flowX*flowX + flowY*flowY;
 					if (m1 < m0) {
-						f.set(flow);
+						image.data[fi] = flowX;
+						image.data[fi + 1] = flowY;
 						scores[index] = score;
 					}
 				}
 			}
 		}
+	}
+
+	/** Marks the pixel at (x,y) as having no valid flow by setting its x-band to NaN */
+	protected static void markInvalid( InterleavedF32 image, int x, int y ) {
+		image.data[(y*image.width + x)*2] = Float.NaN;
 	}
 
 	/**
@@ -264,7 +279,7 @@ public abstract class DenseOpticalFlowBlockPyramid<T extends ImageGray<T>> {
 	/**
 	 * Returns the found optical flow
 	 */
-	public ImageFlow getOpticalFlow() {
+	public InterleavedF32 getOpticalFlow() {
 		return flowPrevLayer;
 	}
 

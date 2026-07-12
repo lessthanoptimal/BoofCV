@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,13 +22,12 @@ import boofcv.factory.flow.FactoryDenseOpticalFlow;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofStandardJUnit;
+import org.junit.jupiter.api.Test;
 
 public class TestFlowRegion_to_DenseOpticalFlow extends BoofStandardJUnit {
 
-	public void allTests() {
-		Class imageTypes[] = new Class[]{GrayU8.class,GrayF32.class};
-
-		for( Class it : imageTypes ) {
+	@Test void allTests() {
+		for( Class<?> it : new Class[]{GrayU8.class,GrayF32.class} ) {
 			new GeneralDenseOpticalFlowChecks(it) {
 				@Override
 				public DenseOpticalFlow createAlg(Class imageType) {

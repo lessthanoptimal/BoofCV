@@ -22,18 +22,15 @@ import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.flow.DenseOpticalFlowKlt;
 import boofcv.alg.transform.pyramid.PyramidOps;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.flow.ImageFlow;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.image.InterleavedF32;
 import boofcv.struct.pyramid.ImagePyramid;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Array;
 
-/**
- * Wrapper around {@link DenseOpticalFlowKlt} for {@link DenseOpticalFlow}.
- *
- * @author Peter Abeles
- */
+/// Wrapper around [DenseOpticalFlowKlt] for [DenseOpticalFlow].
 @SuppressWarnings({"NullAway.Init"})
 public class FlowKlt_to_DenseOpticalFlow<I extends ImageGray<I>, D extends ImageGray<D>>
 		implements DenseOpticalFlow<I> {
@@ -65,7 +62,9 @@ public class FlowKlt_to_DenseOpticalFlow<I extends ImageGray<I>, D extends Image
 	}
 
 	@Override
-	public void process( I source, I destination, ImageFlow flow ) {
+	public void process( I source, I destination, InterleavedF32 flow ) {
+		flow.reshape(source.width, source.height, 2);
+
 		pyramidSrc.process(source);
 		pyramidDst.process(destination);
 
@@ -90,6 +89,14 @@ public class FlowKlt_to_DenseOpticalFlow<I extends ImageGray<I>, D extends Image
 		flowKlt.process(pyramidSrc,
 				srcDerivX, srcDerivY, gradient.divisor(),
 				pyramidDst, flow);
+	}
+
+	/// Attributes is the KLT error for each match
+	@Override
+	public @Nullable InterleavedF32 getAttributes() {
+		var attributes = new InterleavedF32(flowKlt.getWidth(), flowKlt.getHeight(), 1);
+		System.arraycopy(flowKlt.getScores(), 0, attributes.data, 0, attributes.totalPixels());
+		return attributes;
 	}
 
 	@Override
