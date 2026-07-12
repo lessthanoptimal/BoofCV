@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,8 +29,8 @@ import boofcv.io.MediaManager;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.wrapper.DefaultMediaManager;
-import boofcv.struct.flow.ImageFlow;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.InterleavedF32;
 
 import java.awt.image.BufferedImage;
 
@@ -70,7 +70,7 @@ public class ExampleDenseOpticalFlow {
 		// Dense optical flow is very computationally expensive. Just process the image at 1/2 resolution
 		GrayF32 previous = new GrayF32(full.width/2, full.height/2);
 		GrayF32 current = previous.createSameShape();
-		ImageFlow flow = new ImageFlow(previous.width, previous.height);
+		InterleavedF32 flow = new InterleavedF32(previous.width, previous.height, 2);
 
 		ConvertBufferedImage.convertFrom(buff0, full);
 		new FDistort(full, previous).scaleExt().apply();

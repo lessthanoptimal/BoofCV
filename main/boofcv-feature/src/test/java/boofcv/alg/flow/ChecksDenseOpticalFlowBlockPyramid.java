@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,9 @@ package boofcv.alg.flow;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
-import boofcv.struct.flow.ImageFlow;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.image.InterleavedF32;
 import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import boofcv.struct.pyramid.ImagePyramid;
 import boofcv.testing.BoofStandardJUnit;
@@ -61,11 +61,11 @@ public abstract class ChecksDenseOpticalFlowBlockPyramid<T extends ImageGray<T>>
 
 		alg.process(pyramid,pyramid);
 
-		ImageFlow output = alg.getOpticalFlow();
+		InterleavedF32 output = alg.getOpticalFlow();
 
 		for( int y = 0; y < output.height; y++ ) {
 			for (int x = 0; x < output.width; x++) {
-				assertTrue(output.get(x,y).isValid());
+				assertTrue(!Float.isNaN(output.getBand(x,y,0)));
 			}
 		}
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,30 +18,25 @@
 
 package boofcv.abst.flow;
 
-import boofcv.struct.flow.ImageFlow;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.image.InterleavedF32;
+import org.jetbrains.annotations.Nullable;
 
-/**
- * High level interface for computing the dense optical flow across the whole image.
- *
- * @author Peter Abeles
- */
+/// High level interface for computing the dense optical flow across the whole image.
 public interface DenseOpticalFlow<T extends ImageBase<T>> {
 
-	/**
-	 * Computes the optical flow.
-	 *
-	 * @param source (Input) First image
-	 * @param destination (Input) Second image
-	 * @param flow (Output) Computed flow information from source to destination
-	 */
-	void process( T source, T destination, ImageFlow flow );
+	/// Computes the optical flow.
+	///
+	/// @param source (Input) First image
+	/// @param destination (Input) Second image
+	/// @param flow (Output) Interleaved optical flow. band 0 = x, band 1 = y. maps to input image pixel coordinates.
+	/// x-component is NaN if there is no flow estimate available.
+	void process( T source, T destination, InterleavedF32 flow );
 
-	/**
-	 * Input image type
-	 *
-	 * @return image type
-	 */
+	/// (Optional) implementation specific attributes for all pixels. For example, error or confidence.
+	@Nullable InterleavedF32 getAttributes();
+
+	/// Input image type
 	ImageType<T> getInputType();
 }

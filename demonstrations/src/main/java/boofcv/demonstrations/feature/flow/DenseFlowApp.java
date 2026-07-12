@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,10 +33,10 @@ import boofcv.io.PathLabel;
 import boofcv.io.ProgressMonitorThread;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.struct.flow.ImageFlow;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.image.InterleavedF32;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -67,7 +67,7 @@ public class DenseFlowApp extends DemonstrationBase {
 	GrayF32 temp0 = new GrayF32(1, 1);
 	GrayF32 input0 = new GrayF32(1, 1);
 	GrayF32 input1 = new GrayF32(1, 1);
-	ImageFlow flow = new ImageFlow(1, 1);
+	InterleavedF32 flow = new InterleavedF32(1, 1, 2);
 
 	final Object lock = new Object();
 	DenseOpticalFlow<GrayF32> denseFlow;
