@@ -36,7 +36,7 @@ public class ChessboardCorner extends Point2D_F64 {
 	/// Value of smallest Eigen value in edge detector
 	public double edgeIntensity;
 
-	/// Ratio of smallest and largest Eigen values in edge detector
+	/// Ratio of smallest over largest Eigen values in edge detector range \[0,1\]. 0 = line, 1 = perfect corner.
 	public double edgeRatio;
 
 	/// The first and second level in the pyramid the corner was seen at. level1 <= level2
