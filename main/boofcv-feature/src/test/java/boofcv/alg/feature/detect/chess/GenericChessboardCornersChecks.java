@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,6 +32,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 abstract class GenericChessboardCornersChecks extends CommonChessboardCorners {
 
+	// Max pixel intensity value, it scales the image to have a max value of 1
+	double maxIntensity = 1;
+
 	public abstract List<ChessboardCorner> process( GrayF32 image );
 
 	/**
@@ -41,16 +44,16 @@ abstract class GenericChessboardCornersChecks extends CommonChessboardCorners {
 		// make it bigger so that being a pyramid matters
 		this.w = 50;
 
-		RenderCalibrationTargetsGraphics2D renderer = new RenderCalibrationTargetsGraphics2D(p,1);
-		renderer.chessboard(rows,cols,w);
+		var renderer = new RenderCalibrationTargetsGraphics2D(p, 1);
+		renderer.chessboard(rows, cols, w);
 
 		GrayF32 original = renderer.getGrayF32();
 		GrayF32 rotated = original.createSameShape();
 
 		for (int i = 0; i < 10; i++) {
 			angle = i*Math.PI/10;
-			new FDistort(original,rotated).rotate(angle).apply();
-			checkSolution(rotated.width,rotated.height,process(rotated));
+			new FDistort(original, rotated).rotate(angle).apply();
+			checkSolution(rotated.width, rotated.height, process(rotated));
 		}
 	}
 
@@ -61,43 +64,53 @@ abstract class GenericChessboardCornersChecks extends CommonChessboardCorners {
 		// make it bigger so that being a pyramid matters
 		this.w = 50;
 
-		RenderCalibrationTargetsGraphics2D renderer = new RenderCalibrationTargetsGraphics2D(p,1);
-		renderer.chessboard(rows,cols,w);
+		var renderer = new RenderCalibrationTargetsGraphics2D(p, 1);
+		renderer.chessboard(rows, cols, w);
 
 		GrayF32 original = renderer.getGrayF32();
 		GrayF32 blurred = original.createSameShape();
 
 
 		// mean blur messes it up much more than gaussian. This won't work if no pyramid
-		BlurImageOps.mean(original,blurred,5,null,null);
+		BlurImageOps.mean(original, blurred, 5, null, null);
 
-		checkSolution(blurred.width,blurred.height,process(blurred));
+		checkSolution(blurred.width, blurred.height, process(blurred));
 	}
 
-	private void checkSolution( int width , int height , List<ChessboardCorner> found ) {
+	private void checkSolution( int width, int height, List<ChessboardCorner> found ) {
 //		System.out.println("------- ENTER");
 
-		List<ChessboardCorner> expected = createExpected(rows,cols, width, height);
+		List<ChessboardCorner> expected = createExpected(rows, cols, width, height);
 
-		assertEquals(expected.size(),found.size());
+		assertEquals(expected.size(), found.size());
 
 //		for (int i = 0; i < found.size; i++) {
 //			found.get(i).print();
 //		}
 //		System.out.println("-------");
 
-		for( ChessboardCorner c : expected ) {
+		// Check contract for attributes
+		for (ChessboardCorner c : found) {
+			assertTrue(c.contrast >= -maxIntensity && c.contrast <= maxIntensity);
+			assertTrue(c.intensity >= -maxIntensity && c.intensity <= maxIntensity);
+			assertTrue(c.edgeRatio >= 0 && c.edgeRatio <= 1.0);
+			assertTrue(c.orientation >= -Math.PI && c.orientation <= Math.PI);
+		}
+
+		for (ChessboardCorner c : expected) {
+
+
 			int matches = 0;
 			for (int i = 0; i < found.size(); i++) {
 				ChessboardCorner f = found.get(i);
-				if( f.distance(c) < 1.5 ) {
+				if (f.distance(c) < 1.5) {
 					matches++;
-					assertEquals(0.0, UtilAngle.distHalf(c.orientation,f.orientation), 0.2);
-					assertTrue(f.intensity>0);
+					assertEquals(0.0, UtilAngle.distHalf(c.orientation, f.orientation), 0.2);
+					assertTrue(f.intensity > 0);
 				}
 			}
 //			c.print();
-			assertEquals(1,matches);
+			assertEquals(1, matches);
 		}
 	}
 }

@@ -26,11 +26,11 @@ public class ChessboardCorner extends Point2D_F64 {
 	public double orientation;
 	/// Used to judge how good of a fit the corner is to an ideal chessboard corner. Higher the value
 	/// the more x-corner like. Computed on a per-feature basis and should be more accurate than
-	/// the x-corner detector intensity.
+	/// the x-corner detector intensity. range: -max to max (pixel intensity value)
 	public double intensity;
 
 	/// The white region subtracted the black region at the chessboard corner. Can be used later on
-	/// for locally adaptive thresholds
+	/// for locally adaptive thresholds. range: -max to max (pixel intensity value)
 	public double contrast;
 
 	/// Value of smallest Eigen value in edge detector
@@ -39,7 +39,7 @@ public class ChessboardCorner extends Point2D_F64 {
 	/// Ratio of smallest over largest Eigen values in edge detector range \[0,1\]. 0 = line, 1 = perfect corner.
 	public double edgeRatio;
 
-	/// The first and second level in the pyramid the corner was seen at. level1 <= level2
+	/// The first and last level in the pyramid the corner was seen at. level1 <= level2
 	public int level1, level2;
 
 	/// Level with the maximum corner intensity

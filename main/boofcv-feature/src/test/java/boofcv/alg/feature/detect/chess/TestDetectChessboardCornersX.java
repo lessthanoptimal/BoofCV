@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,8 +30,7 @@ class TestDetectChessboardCornersX extends BoofStandardJUnit {
 	int width = 20;
 	int height = 15;
 
-	@Test
-	void checkPositiveInside() {
+	@Test void checkPositiveInside() {
 		DetectChessboardCornersX alg = new DetectChessboardCornersX();
 		GrayF32 intensity = alg._intensity = alg.intensityRaw;
 		intensity.reshape(width,height);
@@ -47,8 +46,7 @@ class TestDetectChessboardCornersX extends BoofStandardJUnit {
 		assertFalse(alg.checkPositiveInside(cx,cy,4));
 	}
 
-	@Test
-	void checkNegativeInside() {
+	@Test void checkNegativeInside() {
 		DetectChessboardCornersX alg = new DetectChessboardCornersX();
 		GrayF32 intensity = alg._intensity = alg.intensityRaw;
 		intensity.reshape(width,height);

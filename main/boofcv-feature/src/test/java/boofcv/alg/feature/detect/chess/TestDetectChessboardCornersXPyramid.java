@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ class TestDetectChessboardCornersXPyramid extends GenericChessboardCornersChecks
 
 	@Override
 	public List<ChessboardCorner> process(GrayF32 image) {
-		DetectChessboardCornersXPyramid<GrayF32> alg = new DetectChessboardCornersXPyramid<>(ImageType.SB_F32);
+		var alg = new DetectChessboardCornersXPyramid<>(ImageType.SB_F32);
 		alg.setPyramidTopSize(50);
 		alg.process(image);
 		return alg.getCorners().toList();

@@ -491,7 +491,8 @@ public class DetectChessboardCornersX {
 			double valA = spokesRadi[i] = integral.compute(cx, cy, cx + r*c, cy + r*s)/r;
 			double valB = spokesRadi[j] = integral.compute(cx, cy, cx - r*c, cy - r*s)/r;
 
-			spokesDiam[i] = valA + valB;
+			// range: 0 to max
+			spokesDiam[i] = (valA + valB)/2.0;
 		}
 		// NOTE: There used to be a check to see if there are 4 transitions between high and low. It used the mean
 		//       as the dividing point. It worked, but in highly skewed scenarios it degraded results a lot.
@@ -503,6 +504,8 @@ public class DetectChessboardCornersX {
 		for (int i = 0; i < numSpokeDiam; i++) {
 			// j = 90 off, which should be the opposite color
 			int j = (i + numSpokeDiam/2)%numSpokeDiam;
+
+			// range: -max to max
 			double score = scoreDiam[i] = smoothedDiam[i] - smoothedDiam[j];
 			// select black 'i', which will negative because white has a higher value
 			if (score < bestScore) {
@@ -524,7 +527,7 @@ public class DetectChessboardCornersX {
 		// to what is below.
 		corner.intensity = -bestScore;
 
-		// Compute difference between white and black region
+		// Compute difference between white and black region. range: -max to max
 		corner.contrast = (scoreDiam[(bestSpoke + numSpokeDiam/2)%numSpokeDiam] - scoreDiam[bestSpoke])/2.0;
 
 		return corner.intensity >= refinedXCornerThreshold;
