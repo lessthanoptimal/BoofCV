@@ -29,9 +29,13 @@ public class ChessboardCorner extends Point2D_F64 {
 	/// the x-corner detector intensity. range: -max to max (pixel intensity value)
 	public double intensity;
 
-	/// The white region subtracted the black region at the chessboard corner. Can be used later on
-	/// for locally adaptive thresholds. range: -max to max (pixel intensity value)
+	/// Measures how sharp of an edge there in between the corner and the black region inside scaled by the
+	/// intensity of the white region. Max contrast seen in pyramid. range: 0 to 1, 1 = sharpest
 	public double contrast;
+
+	/// Contrast at the first level it was seen. In blurred images this will significantly lower than at the
+	/// max level.
+	public double contrast1;
 
 	/// Value of smallest Eigen value in edge detector
 	public double edgeIntensity;
@@ -63,7 +67,7 @@ public class ChessboardCorner extends Point2D_F64 {
 		intensity = Double.NaN;
 		edgeIntensity = -1;
 		edgeRatio = -1;
-		contrast = 0;
+		contrast = contrast1 = 0;
 		level1 = level2 = levelMax = -1;
 	}
 
@@ -72,6 +76,7 @@ public class ChessboardCorner extends Point2D_F64 {
 		this.orientation = c.orientation;
 		this.intensity = c.intensity;
 		this.contrast = c.contrast;
+		this.contrast1 = c.contrast1;
 		this.edgeIntensity = c.edgeIntensity;
 		this.edgeRatio = c.edgeRatio;
 		this.level1 = c.level1;

@@ -124,7 +124,7 @@ public class DetectChessboardCornersXPyramid<T extends ImageGray<T>> {
 
 				ChessboardCorner cl = featsLevel.corners.get(i);
 				cl.setTo(x, y, cf.orientation, cf.intensity);
-				cl.contrast = cf.contrast;
+				cl.contrast = cl.contrast1 = cf.contrast;
 				cl.levelMax = level;
 				cl.edgeIntensity = cf.edgeIntensity;
 				cl.edgeRatio = cf.edgeRatio;
@@ -210,9 +210,11 @@ public class DetectChessboardCornersXPyramid<T extends ImageGray<T>> {
 					continue;
 
 				// Copy the original corner into the new candidate so that it can continue to higher pyramid levels
-				int tmp = c0.level1;
+				double lowContrast = c0.contrast1;
+				int lowLevel = c0.level1;
 				c0.setTo(resultsMax);
-				c0.level1 = tmp;
+				c0.level1 = lowLevel;
+				c0.contrast1 = lowContrast;
 			} else {
 				c0.level2 = resultsMax.level2;
 			}

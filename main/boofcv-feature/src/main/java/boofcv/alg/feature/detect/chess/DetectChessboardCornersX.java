@@ -151,6 +151,9 @@ public class DetectChessboardCornersX {
 	private final double[] spokesDiam = new double[numSpokeDiam];
 	private final double[] smoothedDiam = new double[numSpokeDiam];
 	private final double[] scoreDiam = new double[numSpokeDiam];
+	private final double[] spokeCos = new double[numSpokeDiam];
+	private final double[] spokeSin = new double[numSpokeDiam];
+
 	private final Kernel1D_F64 kernelSmooth = FactoryKernelGaussian.gaussian(1, true, 64, -1, numSpokeDiam/4);
 
 	// used to check up and down patterns of intensity image
@@ -195,6 +198,13 @@ public class DetectChessboardCornersX {
 		outsideCircleValues = new float[outsideCircle4.size];
 
 		borderBlur.setImage(blurred);
+
+		// Precompute the angles
+		for (int i = 0; i < numSpokeDiam; i++) {
+			double angle = Math.PI*i/numSpokeDiam;
+			spokeCos[i] = Math.cos(angle);
+			spokeSin[i] = Math.sin(angle);
+		}
 	}
 
 	/**
@@ -484,9 +494,8 @@ public class DetectChessboardCornersX {
 		double cy = corner.y;
 		for (int i = 0; i < numSpokeDiam; i++) {
 			int j = (i + numSpokeDiam)%numSpokes;
-			double angle = Math.PI*i/numSpokeDiam;
-			double c = Math.cos(angle);
-			double s = Math.sin(angle);
+			double c = spokeCos[i];
+			double s = spokeSin[i];
 
 			double valA = spokesRadi[i] = integral.compute(cx, cy, cx + r*c, cy + r*s)/r;
 			double valB = spokesRadi[j] = integral.compute(cx, cy, cx - r*c, cy - r*s)/r;
@@ -527,10 +536,23 @@ public class DetectChessboardCornersX {
 		// to what is below.
 		corner.intensity = -bestScore;
 
-		// Compute difference between white and black region. range: -max to max
-		corner.contrast = (scoreDiam[(bestSpoke + numSpokeDiam/2)%numSpokeDiam] - scoreDiam[bestSpoke])/2.0;
+		// Measure contrast based on how sharp of an edge there is transitioning to the black square
+		// this roughly correlates with focus.
+		double c = Math.cos(corner.orientation);
+		double s = Math.sin(corner.orientation);
+
+		corner.contrast = computeContrast(cx, cy, c, s, r);
 
 		return corner.intensity >= refinedXCornerThreshold;
+	}
+
+	/// Computes contrast as a measure of how sharp the corner is. More blurred lower this score will be
+	double computeContrast( double cx, double cy, double c, double s, double farR ) {
+		double nearR = farR/2;
+		double center = inputInterp.get((float)cx, (float)cy);
+		double nearBlack = (inputInterp.get((float)(cx + c*nearR), (float)(cy + s*nearR)) + inputInterp.get((float)(cx - c*nearR), (float)(cy - s*nearR)))/2.0;
+		double white = (inputInterp.get((float)(cx + s*farR), (float)(cy - c*farR)) + inputInterp.get((float)(cx - s*farR), (float)(cy + c*farR)))/2.0;
+		return Math.abs(center - nearBlack)/white;
 	}
 
 	private void smoothSpokeDiam() {

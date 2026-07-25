@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -150,6 +150,7 @@ public class DetectECoCheckApp extends DemonstrationBase {
 								text += String.format("  levels %d to %d\n", best.level1, best.level2);
 								text += String.format("  levelMax %d\n", best.levelMax);
 								text += String.format("  intensity %.3f\n", best.intensity);
+								text += String.format("  contrast-R %.3f\n", best.contrast1/best.contrast);
 								text += String.format("  orientation %.2f (deg)\n", UtilAngle.degree(best.orientation));
 							} else {
 								text += String.format("  pixel (%.1f %71f )\n", p.x, p.y);
