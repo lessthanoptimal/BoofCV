@@ -19,6 +19,10 @@ Version : 1.4.1
 - CalibrationIO - supports OpenCV's XML format
 - Camera Calibration
   * Supports aspect ratio constraint for Brown
+- ECoCheck
+  * Blur estimator actually works
+- ScoreCalibrationFill
+  * Accumulates counts in each bin
 - More JMH benchmarks
 - ImageStatistics
   * Added minAbs

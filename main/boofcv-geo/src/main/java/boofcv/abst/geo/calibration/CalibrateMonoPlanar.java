@@ -263,7 +263,7 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 
 		for (int i = 0; i < observations.size(); i++) {
 			CalibrationObservation obs = observations.get(i);
-			fillScorer.addObservation(obs.points);
+			fillScorer.addObservations(obs.points);
 			geoScorer.addObservation(obs.points, targetLayouts.get(obs.target));
 		}
 		geoScorer.computeScore();

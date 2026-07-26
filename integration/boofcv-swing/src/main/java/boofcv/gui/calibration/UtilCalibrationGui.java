@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,7 @@ import boofcv.alg.fiducial.calib.ecocheck.ECoCheckGenerator;
 import boofcv.alg.fiducial.calib.ecocheck.ECoCheckUtils;
 import boofcv.alg.fiducial.calib.hammingchess.HammingChessboardGenerator;
 import boofcv.alg.fiducial.calib.hamminggrids.HammingGridGenerator;
+import boofcv.alg.geo.calibration.ScoreCalibrationFill;
 import boofcv.factory.fiducial.ConfigHammingChessboard;
 import boofcv.factory.fiducial.ConfigHammingGrid;
 import boofcv.gui.FiducialRenderEngineGraphics2D;
@@ -35,20 +36,90 @@ import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.shapes.Rectangle2D_I32;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
-/**
- * Common utility functions for calibration UI.
- *
- * @author Peter Abeles
- */
+import static boofcv.gui.fiducial.VisualizeFiducial.drawLine;
+
+/// Common utility functions for calibration UI.
 public class UtilCalibrationGui {
+
+	/// Colorizes each region to indicate how filled in it is. Red means no points are there. Otherwise,
+	/// it's a green color gradient indicating how close the cell is the `maxCount` it is.
+	///
+	/// @param fill (Input) Region based fill
+	/// @param maxCount (Optional) The count which corresponds to pure green. Automatic if <= 0.
+	/// @param alpha The alpha channel, determines how opaque it is. 0 = translucent, 1 = opaque
+	/// @param g2 Used to draw the regions
+	public static void drawRegionFill( ScoreCalibrationFill fill, int maxCount, float alpha, Graphics2D g2, double scale ) {
+		if (fill.getOccupiedCounts().isEmpty()) {
+			System.err.println("fill is not initialized");
+			return;
+		}
+		if (maxCount <= 0)
+			maxCount = fill.getOccupiedCounts().get(fill.getOccupiedCounts().indexOfGreatest());
+		int divisor = maxCount;
+
+		var colorEmpty = new Color(1.0f, 0, 0, alpha);
+
+		var rect = new Rectangle2D.Double();
+
+		fill.forEach(( region ) -> {
+			Color c;
+			if (region.counts < fill.getMinCounts()) {
+				c = colorEmpty;
+			} else {
+				c = new Color(0, Math.min(1.0f, region.counts/(float)divisor), 0, alpha);
+			}
+			g2.setColor(c);
+			Rectangle2D_I32 r = region.region;
+			rect.setRect(r.x0*scale, r.y0*scale, r.getWidth()*scale, r.getHeight()*scale);
+			g2.fill(rect);
+		});
+	}
+
+	/// Draws lines across all grid borders
+	public static void drawRegionFillBorder( ScoreCalibrationFill fill, Graphics2D g2, double scale ) {
+		var line = new Line2D.Double();
+
+		int width = fill.getImageWidth();
+		int height = fill.getImageHeight();
+
+		// Handle inner region borders
+		int innerWidth = fill.getInnerWidth();
+		int innerHeight = fill.getInnerHeight();
+
+		for (int gridY = 0; gridY <= fill.regionsInner; gridY++) {
+			int y0 = fill.actualBorderPx + innerHeight*gridY/fill.regionsInner;
+			drawLine(g2, line, fill.actualBorderPx, y0, width - fill.actualBorderPx, y0, scale);
+		}
+		for (int gridX = 0; gridX <= fill.regionsInner; gridX++) {
+			int x0 = fill.actualBorderPx + innerWidth*gridX/fill.regionsInner;
+			drawLine(g2, line, x0, fill.actualBorderPx, x0, height - fill.actualBorderPx, scale);
+		}
+
+		// Handle the top and bottom
+		for (int gridX = 1; gridX < fill.regionsBorder; gridX++) {
+			int x0 = width*gridX/fill.regionsBorder;
+			drawLine(g2, line, x0, 0, x0, fill.actualBorderPx, scale);
+			drawLine(g2, line, x0, height - fill.actualBorderPx, x0, height, scale);
+		}
+
+		// Handle left and right sides
+		for (int gridY = 0; gridY <= fill.regionsBorder; gridY++) {
+			int y0 = fill.actualBorderPx + innerHeight*gridY/fill.regionsBorder;
+			drawLine(g2, line, 0, y0, fill.actualBorderPx, y0, scale);
+			drawLine(g2, line, width - fill.actualBorderPx, y0, width, y0, scale);
+		}
+	}
+
 	public static BufferedImage renderTargetBuffered( CalibrationPatterns type, Object config, int squareWidth ) {
 		int circle = squareWidth/2;
 
@@ -129,7 +200,7 @@ public class UtilCalibrationGui {
 	}
 
 	public static void renderOrder( Graphics2D g2, @Nullable Point2Transform2_F32 transform,
-									double scale, List<PointIndex2D_F64> points ) {
+	                                double scale, List<PointIndex2D_F64> points ) {
 		g2.setStroke(new BasicStroke(5));
 
 		Point2D_F32 adj0 = new Point2D_F32();
@@ -163,8 +234,8 @@ public class UtilCalibrationGui {
 	}
 
 	public static void drawNumbers( Graphics2D g2, List<PointIndex2D_F64> points,
-									@Nullable Point2Transform2_F32 transform,
-									double scale ) {
+	                                @Nullable Point2Transform2_F32 transform,
+	                                double scale ) {
 
 		Font regular = new Font("Serif", Font.PLAIN, 16);
 		g2.setFont(regular);
@@ -199,8 +270,8 @@ public class UtilCalibrationGui {
 	}
 
 	public static void drawIndexes( Graphics2D g2, int fontSize, List<Point2D_F64> points,
-									@Nullable Point2Transform2_F32 transform,
-									double scale ) {
+	                                @Nullable Point2Transform2_F32 transform,
+	                                double scale ) {
 
 		int numDigits = BoofMiscOps.numDigits(points.size());
 		String format = "%" + numDigits + "d";
@@ -236,8 +307,8 @@ public class UtilCalibrationGui {
 	}
 
 	public static void drawFeatureID( Graphics2D g2, int fontSize, List<PointIndex2D_F64> points,
-									  @Nullable Point2Transform2_F32 transform,
-									  double scale ) {
+	                                  @Nullable Point2Transform2_F32 transform,
+	                                  double scale ) {
 
 		int numDigits = BoofMiscOps.numDigits(points.size());
 		String format = "%" + numDigits + "d";
@@ -273,9 +344,9 @@ public class UtilCalibrationGui {
 	}
 
 	public static void drawIndexes( Graphics2D g2, int fontSize, List<ChessboardCorner> points,
-									@Nullable Point2Transform2_F32 transform,
-									int minLevel,
-									double scale ) {
+	                                @Nullable Point2Transform2_F32 transform,
+	                                int minLevel,
+	                                double scale ) {
 
 		int numDigits = BoofMiscOps.numDigits(points.size());
 		String format = "%" + numDigits + "d";
