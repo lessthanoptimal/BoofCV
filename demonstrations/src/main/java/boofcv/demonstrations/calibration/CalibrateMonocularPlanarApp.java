@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -560,8 +560,6 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 			results.safe(() -> {
 				CalibrateMonoPlanar.computeQuality(detectorSet.calibrator.getIntrinsic(), results.fillScorer,
 						layouts, results.allUsedObservations, results.quality);
-				// Compute the bounds of regions which do not have points for visualization
-				results.fillScorer.updateUnoccupied();
 
 				results.imageResults.clear();
 				List<ImageResults> listResults = detectorSet.calibrator.getErrors();
@@ -613,13 +611,13 @@ public class CalibrateMonocularPlanarApp extends JPanel {
 	private void showStatsToUser() {
 		// Need to ensure results are locked while inside GUI when copying occupied regions
 		// that's why this isn't in the same code block below
-		SwingUtilities.invokeLater(() -> results.safe(() -> getCalibrationPanel().setUnoccupied(
-				results.fillScorer.getUnoccupiedRegions().toList())));
+		SwingUtilities.invokeLater(() -> results.safe(() ->
+				getCalibrationPanel().setScoreFill(results.fillScorer)));
 
 		results.safe(() -> {
 			// Create a list of used image names and their results
-			List<ImageResults> listResults = new ArrayList<>();
-			List<String> names = new ArrayList<>();
+			var listResults = new ArrayList<ImageResults>();
+			var names = new ArrayList<String>();
 
 			for (int i = 0; i < results.usedImages.size(); i++) {
 				String image = results.imagePaths.get(results.usedImages.get(i));

@@ -492,8 +492,6 @@ public class CalibrateStereoPlanarApp extends JPanel {
 		CalibrateMonoPlanar.computeQuality(algorithms.calibrator.getCalibRight().getIntrinsic(),
 				results.right.fillScorer, layouts,
 				algorithms.calibrator.getCalibRight().getObservations(), results.right.quality);
-		results.left.fillScorer.updateUnoccupied();
-		results.right.fillScorer.updateUnoccupied();
 		results.unlock();
 		algorithms.unlock();
 	}
@@ -727,7 +725,7 @@ public class CalibrateStereoPlanarApp extends JPanel {
 				CalibrationObservation o = results.left.getObservation(imageName);
 				ImageResults errors = results.left.errors.get(imageName);
 				stereoPanel.panelLeft.setResults(o, errors, all);
-				stereoPanel.panelLeft.setUnoccupied(results.left.fillScorer.getUnoccupiedRegions().toList());
+				stereoPanel.panelLeft.setScoreFill(results.left.fillScorer);
 			}
 
 			{
@@ -736,7 +734,7 @@ public class CalibrateStereoPlanarApp extends JPanel {
 				CalibrationObservation o = results.right.getObservation(imageName);
 				ImageResults errors = results.right.errors.get(imageName);
 				stereoPanel.panelRight.setResults(o, errors, all);
-				stereoPanel.panelRight.setUnoccupied(results.right.fillScorer.getUnoccupiedRegions().toList());
+				stereoPanel.panelRight.setScoreFill(results.right.fillScorer);
 			}
 		});
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.gui.calibration;
 
 import boofcv.abst.geo.calibration.ImageResults;
 import boofcv.alg.geo.calibration.CalibrationObservation;
-import boofcv.alg.geo.calibration.ScoreCalibrationFill.RegionInfo;
+import boofcv.alg.geo.calibration.ScoreCalibrationFill;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ImageZoomPanel;
@@ -30,7 +30,6 @@ import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import lombok.Getter;
-import org.ddogleg.struct.DogArray;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -79,7 +78,7 @@ public abstract class DisplayCalibrationPanel extends ImageZoomPanel {
 	protected Point2Transform2_F32 pixelTransform = new DoNothing2Transform2_F32();
 
 	// Specified which regions in the image have been filled in
-	public final DogArray<RegionInfo> unoccupied = new DogArray<>(RegionInfo::new, RegionInfo::reset);
+	@Getter private final ScoreCalibrationFill scoreFill = new ScoreCalibrationFill();
 
 	// workspace
 	protected Point2D_F32 adj = new Point2D_F32();
@@ -136,7 +135,7 @@ public abstract class DisplayCalibrationPanel extends ImageZoomPanel {
 	}
 
 	public void setResults( CalibrationObservation features, @Nullable ImageResults results,
-							List<CalibrationObservation> allFeatures ) {
+	                        List<CalibrationObservation> allFeatures ) {
 		BoofSwingUtil.checkGuiThread();
 
 		this.observation = features;
@@ -145,13 +144,10 @@ public abstract class DisplayCalibrationPanel extends ImageZoomPanel {
 		this.selectedObservation = -1;
 	}
 
-	public void setUnoccupied( List<RegionInfo> unoccupied ) {
+	public void setScoreFill( ScoreCalibrationFill src ) {
 		BoofSwingUtil.checkGuiThread();
 
-		this.unoccupied.reset().resize(unoccupied.size());
-		for (int i = 0; i < unoccupied.size(); i++) {
-			this.unoccupied.get(i).setTo(unoccupied.get(i));
-		}
+		this.scoreFill.setTo(src);
 	}
 
 	/** Clears visualization image that is specific to a single view */
@@ -167,13 +163,13 @@ public abstract class DisplayCalibrationPanel extends ImageZoomPanel {
 	public void clearAllResults() {
 		clearViewResults();
 		allObservations = null;
-		unoccupied.reset();
+		scoreFill.clearCounts();
 	}
 
 	public void setDisplay( boolean showPoints, boolean showErrors,
-							boolean showUndistorted, boolean showAll, boolean showNumbers,
-							boolean showOrder,
-							double errorScale ) {
+	                        boolean showUndistorted, boolean showAll, boolean showNumbers,
+	                        boolean showOrder,
+	                        double errorScale ) {
 		this.showPoints = showPoints;
 		this.showErrors = showErrors;
 		this.showUndistorted = showUndistorted;
@@ -206,8 +202,11 @@ public abstract class DisplayCalibrationPanel extends ImageZoomPanel {
 	protected void drawFeatures( Graphics2D g2, double scale ) {
 		BoofSwingUtil.antialiasing(g2);
 
-		if (showImageUnoccupied)
-			drawImageUnoccupied(g2, scale);
+		if (showImageUnoccupied) {
+			UtilCalibrationGui.drawRegionFill(scoreFill, -1, 0.75f, g2, scale);
+			g2.setColor(Color.BLACK);
+			UtilCalibrationGui.drawRegionFillBorder(scoreFill, g2, scale);
+		}
 
 		if (showAll && allObservations != null) {
 			for (CalibrationObservation l : allObservations) {
@@ -298,33 +297,6 @@ public abstract class DisplayCalibrationPanel extends ImageZoomPanel {
 			PointIndex2D_F64 p = set.get(selectedObservation);
 			pixelTransform.compute((float)p.p.x, (float)p.p.y, adj);
 			VisualizeFeatures.drawPoint(g2, adj.x*scale, adj.y*scale, 10.0, Color.GREEN, true, ellipse);
-		}
-	}
-
-	protected void drawImageUnoccupied( Graphics2D g2, double scale ) {
-		if (unoccupied.isEmpty())
-			return;
-
-		// Make it translucent so you can see inside
-		var colorBorder = new Color(255, 0, 0, 100);
-		var colorInner = new Color(255, 200, 0, 100);
-
-		for (int i = 0; i < unoccupied.size; i++) {
-			// Convert region into a format Swing understands and compensate for the image being scaled
-			RegionInfo r = unoccupied.get(i);
-			rect.x = scale*r.region.x0;
-			rect.y = scale*r.region.y0;
-			rect.width = scale*r.region.getWidth();
-			rect.height = scale*r.region.getHeight();
-
-			// Fill with a solid color and draw a black outline so you can see individual regions
-			if (r.inner)
-				g2.setColor(colorInner);
-			else
-				g2.setColor(colorBorder);
-			g2.fill(rect);
-			g2.setColor(Color.BLACK);
-			g2.draw(rect);
 		}
 	}
 
