@@ -19,7 +19,7 @@
 package boofcv.gui.controls;
 
 import boofcv.abst.geo.calibration.CalibrateMonoPlanar;
-import boofcv.abst.geo.calibration.ConfigCalibratePinhole;
+import boofcv.abst.geo.calibration.ConfigCalibrateBrown;
 import boofcv.abst.geo.calibration.ConfigCalibrateUniversalOmni;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.struct.calib.CameraModelType;
@@ -90,7 +90,7 @@ public class CalibrationModelPanel extends StandardAlgConfigPanel implements Act
 	public void configureCalibrator( CalibrateMonoPlanar calibrator ) {
 		switch (selected) {
 			case BROWN -> {
-				var config = new ConfigCalibratePinhole();
+				var config = new ConfigCalibrateBrown();
 				config.zeroSkew = pinhole.skew.value;
 				config.tangential = pinhole.tangential.value;
 				config.numRadial = pinhole.numRadial.value.intValue();

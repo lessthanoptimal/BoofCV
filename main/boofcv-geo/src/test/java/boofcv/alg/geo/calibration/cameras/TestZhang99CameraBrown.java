@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.calibration.cameras;
 
-import boofcv.abst.geo.calibration.ConfigCalibratePinhole;
+import boofcv.abst.geo.calibration.ConfigCalibrateBrown;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.calibration.GenericCalibrationZhang99;
 import boofcv.struct.calib.CameraPinholeBrown;
@@ -50,11 +50,11 @@ public class TestZhang99CameraBrown extends GenericCalibrationZhang99<CameraPinh
 	public List<CameraConfig> createCamera( Random rand ) {
 		List<BrownConfig> list = new ArrayList<>();
 
-		list.add(createStandard(new ConfigCalibratePinhole().zeroSkew(false).tangential(false).numRadial(0), rand));
-		list.add(createStandard(new ConfigCalibratePinhole().zeroSkew(true).tangential(true).numRadial(2), rand));
-		list.add(createStandard(new ConfigCalibratePinhole().zeroSkew(false).tangential(true).numRadial(2), rand));
-		list.add(createStandard(new ConfigCalibratePinhole().zeroSkew(true).tangential(false).numRadial(2), rand));
-		list.add(createStandard(new ConfigCalibratePinhole().zeroSkew(true).tangential(true).numRadial(2).aspectRatio(1), rand));
+		list.add(createStandard(new ConfigCalibrateBrown().zeroSkew(false).tangential(false).numRadial(0), rand));
+		list.add(createStandard(new ConfigCalibrateBrown().zeroSkew(true).tangential(true).numRadial(2), rand));
+		list.add(createStandard(new ConfigCalibrateBrown().zeroSkew(false).tangential(true).numRadial(2), rand));
+		list.add(createStandard(new ConfigCalibrateBrown().zeroSkew(true).tangential(false).numRadial(2), rand));
+		list.add(createStandard(new ConfigCalibrateBrown().zeroSkew(true).tangential(true).numRadial(2).aspectRatio(1), rand));
 
 		return (List)list;
 	}
@@ -64,8 +64,8 @@ public class TestZhang99CameraBrown extends GenericCalibrationZhang99<CameraPinh
 		List<CameraConfig> list = new ArrayList<>();
 
 		// tangent can't be linearly estimated
-		list.add(createStandard(new ConfigCalibratePinhole().zeroSkew(false).tangential(false).numRadial(0), rand));
-		list.add(createStandard(new ConfigCalibratePinhole().zeroSkew(true).tangential(false).numRadial(0), rand));
+		list.add(createStandard(new ConfigCalibrateBrown().zeroSkew(false).tangential(false).numRadial(0), rand));
+		list.add(createStandard(new ConfigCalibrateBrown().zeroSkew(true).tangential(false).numRadial(0), rand));
 
 		// radial distortion has to be very small for parameters to have a decent estimate
 		// the estimate it does come up with is much better than starting from zero but has
@@ -75,7 +75,7 @@ public class TestZhang99CameraBrown extends GenericCalibrationZhang99<CameraPinh
 		return (List)list;
 	}
 
-	public BrownConfig createStandard( ConfigCalibratePinhole constraints,
+	public BrownConfig createStandard( ConfigCalibrateBrown constraints,
 	                                   Random rand ) {
 
 		var p = new BrownConfig(constraints);
@@ -122,9 +122,9 @@ public class TestZhang99CameraBrown extends GenericCalibrationZhang99<CameraPinh
 	}
 
 	private class BrownConfig extends CameraConfig {
-		ConfigCalibratePinhole constraints;
+		ConfigCalibrateBrown constraints;
 
-		public BrownConfig( ConfigCalibratePinhole constraints ) {
+		public BrownConfig( ConfigCalibrateBrown constraints ) {
 			this.constraints = constraints;
 			this.model = new CameraPinholeBrown(constraints.numRadial);
 		}

@@ -151,7 +151,7 @@ public class TestCalibrateMultiPlanar extends BoofStandardJUnit {
 
 		List<Se3_F64> listSensorToWorld = createCameraLocations();
 
-		alg.getCalibratorMono().configurePinhole(new ConfigCalibratePinhole().zeroSkew(true).tangential(true).numRadial(2));
+		alg.getCalibratorMono().configurePinhole(new ConfigCalibrateBrown().zeroSkew(true).tangential(true).numRadial(2));
 		alg.initialize(expected.intrinsics.size(), numLayouts);
 		for (int i = 0; i < expected.intrinsics.size(); i++) {
 			CameraModel cam = expected.intrinsics.get(i);

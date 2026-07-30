@@ -22,7 +22,7 @@ import boofcv.BoofVerbose;
 import boofcv.abst.fiducial.calib.CalibrationPatterns;
 import boofcv.abst.fiducial.calib.ConfigECoCheckMarkers;
 import boofcv.abst.geo.calibration.CalibrateStereoPlanar;
-import boofcv.abst.geo.calibration.ConfigCalibratePinhole;
+import boofcv.abst.geo.calibration.ConfigCalibrateBrown;
 import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
 import boofcv.alg.fiducial.calib.ConfigCalibrationTarget;
 import boofcv.alg.geo.calibration.CalibrationObservation;
@@ -291,7 +291,7 @@ public class CameraCalibrationStereo {
 				// Initialize now that we know the image size
 				calibrator.initialize(new ImageDimension(buffLeft.getWidth(), buffLeft.getHeight()),
 						new ImageDimension(buffRight.getWidth(), buffRight.getHeight()));
-				calibrator.configure(new ConfigCalibratePinhole().zeroSkew(zeroSkew).tangential(tangential).
+				calibrator.configure(new ConfigCalibrateBrown().zeroSkew(zeroSkew).tangential(tangential).
 						numRadial(numRadial).aspectRatio(aspectRatio));
 				minLandmarks = calibrator.getCalibLeft().getZhang99().getMinimumObservedPoints();
 			}

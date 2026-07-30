@@ -102,9 +102,9 @@ public class CalibrateMonoPlanar implements VerbosePrint {
 		zhang99.setZeroSkew(assumeZeroSkew);
 	}
 
-	public void configurePinhole( @Nullable ConfigCalibratePinhole config ) {
+	public void configurePinhole( @Nullable ConfigCalibrateBrown config ) {
 		if (config == null)
-			config = new ConfigCalibratePinhole();
+			config = new ConfigCalibrateBrown();
 		var camera = new Zhang99CameraBrown(config);
 		zhang99 = new CalibrationPlanarGridZhang99(camera);
 		zhang99.setZeroSkew(config.zeroSkew);

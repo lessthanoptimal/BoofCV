@@ -18,24 +18,6 @@
 
 package boofcv.abst.geo.calibration;
 
-import boofcv.struct.Configuration;
-import lombok.Setter;
-import lombok.experimental.Accessors;
+import boofcv.struct.StandardConfigurationChecks;
 
-/// Specifies constraints when calibrating a pinhole camera model
-@Setter
-@Accessors(chain = true, fluent = true)
-public class ConfigCalibratePinhole implements Configuration {
-	/// If true it will assume the skew is zero
-	public boolean zeroSkew = true;
-	/// Aspect ratio, if > 0 then `fx = ratio*fy``
-	public double aspectRatio = -1;
-
-	@Override public void checkValidity() {}
-
-	public ConfigCalibratePinhole setTo( ConfigCalibratePinhole src ) {
-		this.zeroSkew = src.zeroSkew;
-		this.aspectRatio = src.aspectRatio;
-		return this;
-	}
-}
+public class TestConfigCalibrateBrown extends StandardConfigurationChecks {}

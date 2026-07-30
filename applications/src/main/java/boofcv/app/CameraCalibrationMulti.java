@@ -21,7 +21,7 @@ package boofcv.app;
 import boofcv.abst.fiducial.calib.CalibrationPatterns;
 import boofcv.abst.fiducial.calib.ConfigECoCheckMarkers;
 import boofcv.abst.geo.calibration.CalibrateMultiPlanar;
-import boofcv.abst.geo.calibration.ConfigCalibratePinhole;
+import boofcv.abst.geo.calibration.ConfigCalibrateBrown;
 import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
 import boofcv.alg.fiducial.calib.ConfigCalibrationTarget;
 import boofcv.alg.geo.calibration.SynchronizedCalObs;
@@ -132,7 +132,7 @@ public class CameraCalibrationMulti {
 
 		var calibrator = new CalibrateMultiPlanar();
 		calibrator.getCalibratorMono().configurePinhole(
-				new ConfigCalibratePinhole().zeroSkew(true).tangential(false).numRadial(numRadial));
+				new ConfigCalibrateBrown().zeroSkew(true).tangential(false).numRadial(numRadial));
 		calibrator.initialize(/*num cameras*/cameras.size(), /*num targets*/1);
 		calibrator.setTargetLayout(0, detector.getLayout());
 

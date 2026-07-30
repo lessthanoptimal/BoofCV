@@ -21,7 +21,7 @@ package boofcv.examples.calibration;
 import boofcv.abst.fiducial.calib.CalibrationDetectorMultiECoCheck;
 import boofcv.abst.fiducial.calib.ConfigECoCheckMarkers;
 import boofcv.abst.geo.calibration.CalibrateMultiPlanar;
-import boofcv.abst.geo.calibration.ConfigCalibratePinhole;
+import boofcv.abst.geo.calibration.ConfigCalibrateBrown;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.geo.calibration.SynchronizedCalObs;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
@@ -61,7 +61,7 @@ public class ExampleCalibrateMulti {
 		calibrator.setSummaryThresholds(new double[]{0.25, 0.5, 1.0, 1.2, 1.5, 2.0, 2.5, 3.0, 5.0});
 
 		// Tell it what type of camera model to use
-		calibrator.getCalibratorMono().configurePinhole(new ConfigCalibratePinhole().zeroSkew(true).tangential(false).numRadial(3));
+		calibrator.getCalibratorMono().configurePinhole(new ConfigCalibrateBrown().zeroSkew(true).tangential(false).numRadial(3));
 		calibrator.initialize(/*num cameras*/3, /*num targets*/ detector.getTotalUniqueMarkers());
 		calibrator.setTargetLayouts(detector.getLayouts());
 		calibrator.setCameraProperties(0, 1224, 1024);

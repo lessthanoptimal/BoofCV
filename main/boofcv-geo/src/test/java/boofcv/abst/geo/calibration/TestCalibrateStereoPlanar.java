@@ -74,7 +74,7 @@ public class TestCalibrateStereoPlanar extends BoofStandardJUnit {
 	@Test void fullBasic() {
 		var alg = new CalibrateStereoPlanar(List.of(layouts.get(0)));
 		alg.initialize(intrinsic.getDimension(null), intrinsic.getDimension(null));
-		alg.configure(new ConfigCalibratePinhole().zeroSkew(true).tangential(true).numRadial(2));
+		alg.configure(new ConfigCalibrateBrown().zeroSkew(true).tangential(true).numRadial(2));
 
 		for (int i = 0; i < targetToLeft.size(); i++) {
 			alg.addPair(0, createFakeObservations(i, true, 0), createFakeObservations(i, false, 0));
@@ -107,7 +107,7 @@ public class TestCalibrateStereoPlanar extends BoofStandardJUnit {
 	@Test void multiTarget() {
 		var alg = new CalibrateStereoPlanar(layouts);
 		alg.initialize(intrinsic.getDimension(null), intrinsic.getDimension(null));
-		alg.configure(new ConfigCalibratePinhole().zeroSkew(true).tangential(true).numRadial(2));
+		alg.configure(new ConfigCalibrateBrown().zeroSkew(true).tangential(true).numRadial(2));
 
 		for (int i = 0; i < targetToLeft.size(); i++) {
 			int targetID = i%layouts.size();

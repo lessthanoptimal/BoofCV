@@ -67,7 +67,7 @@ public class TestCalibrateMonoPlanar extends BoofStandardJUnit {
 		var alg = new CalibrateMonoPlanar();
 		alg.initialize(intrinsic.width, intrinsic.height, List.of(layouts.get(0)));
 //		alg.setVerbose(System.out, null);
-		alg.configurePinhole(new ConfigCalibratePinhole().zeroSkew(true).tangential(true).numRadial(2));
+		alg.configurePinhole(new ConfigCalibrateBrown().zeroSkew(true).tangential(true).numRadial(2));
 
 		for (int i = 0; i < targetToCamera.size(); i++) {
 			alg.addImage(createFakeObservations(i, 0));
@@ -127,7 +127,7 @@ public class TestCalibrateMonoPlanar extends BoofStandardJUnit {
 		var alg = new CalibrateMonoPlanar();
 		alg.initialize(intrinsic.width, intrinsic.height, layouts);
 //		alg.setVerbose(System.out, null);
-		alg.configurePinhole(new ConfigCalibratePinhole().zeroSkew(true).tangential(true).numRadial(2));
+		alg.configurePinhole(new ConfigCalibrateBrown().zeroSkew(true).tangential(true).numRadial(2));
 
 		// Create observations from multiple targets
 		for (int i = 0; i < targetToCamera.size(); i++) {

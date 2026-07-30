@@ -21,7 +21,7 @@ package boofcv.app;
 import boofcv.abst.fiducial.calib.CalibrationPatterns;
 import boofcv.abst.fiducial.calib.ConfigECoCheckMarkers;
 import boofcv.abst.geo.calibration.CalibrateMonoPlanar;
-import boofcv.abst.geo.calibration.ConfigCalibratePinhole;
+import boofcv.abst.geo.calibration.ConfigCalibrateBrown;
 import boofcv.abst.geo.calibration.ConfigCalibrateUniversalOmni;
 import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
 import boofcv.alg.fiducial.calib.ConfigCalibrationTarget;
@@ -457,7 +457,7 @@ public class CameraCalibrationMono extends BaseStandardInputApp {
 		final var calibrationAlg = new CalibrateMonoPlanar();
 
 		switch (modeType) {
-			case BROWN -> calibrationAlg.configurePinhole(new ConfigCalibratePinhole().
+			case BROWN -> calibrationAlg.configurePinhole(new ConfigCalibrateBrown().
 					zeroSkew(zeroSkew).numRadial(numRadial).tangential(tangential));
 			case UNIVERSAL -> calibrationAlg.configureUniversalOmni(
 					new ConfigCalibrateUniversalOmni().zeroSkew(zeroSkew).numRadial(numRadial).tangential(tangential));

@@ -22,19 +22,25 @@ import boofcv.struct.Configuration;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-/// Specifies constraints when calibrating a pinhole camera model
+/// Specifies constraints when calibrating a brown camera model
 @Setter
 @Accessors(chain = true, fluent = true)
-public class ConfigCalibratePinhole implements Configuration {
+public class ConfigCalibrateBrown implements Configuration {
 	/// If true it will assume the skew is zero
 	public boolean zeroSkew = true;
+	/// Number of radial distortion terms it needs to consider.
+	public int numRadial = 3;
+	/// If true it will include tangential distortional terms
+	public boolean tangential = false;
 	/// Aspect ratio, if > 0 then `fx = ratio*fy``
 	public double aspectRatio = -1;
 
 	@Override public void checkValidity() {}
 
-	public ConfigCalibratePinhole setTo( ConfigCalibratePinhole src ) {
+	public ConfigCalibrateBrown setTo( ConfigCalibrateBrown src ) {
 		this.zeroSkew = src.zeroSkew;
+		this.numRadial = src.numRadial;
+		this.tangential = src.tangential;
 		this.aspectRatio = src.aspectRatio;
 		return this;
 	}

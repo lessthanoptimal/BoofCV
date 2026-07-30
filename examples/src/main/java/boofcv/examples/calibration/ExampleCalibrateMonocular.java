@@ -20,7 +20,7 @@ package boofcv.examples.calibration;
 
 import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.abst.geo.calibration.CalibrateMonoPlanar;
-import boofcv.abst.geo.calibration.ConfigCalibratePinhole;
+import boofcv.abst.geo.calibration.ConfigCalibrateBrown;
 import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.io.UtilIO;
@@ -80,7 +80,7 @@ public class ExampleCalibrateMonocular {
 		var calibrator = new CalibrateMonoPlanar();
 
 		// tell it type of target and which intrinsic parameters to estimate
-		calibrator.configurePinhole(new ConfigCalibratePinhole().zeroSkew(true).tangential(false).numRadial(2));
+		calibrator.configurePinhole(new ConfigCalibrateBrown().zeroSkew(true).tangential(false).numRadial(2));
 
 		var usedImages = new ArrayList<String>();
 		for (String n : images) {

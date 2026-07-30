@@ -19,7 +19,7 @@
 package boofcv.alg.geo.calibration.cameras;
 
 import boofcv.abst.geo.bundle.BundleAdjustmentCamera;
-import boofcv.abst.geo.calibration.ConfigCalibratePinhole;
+import boofcv.abst.geo.calibration.ConfigCalibrateBrown;
 import boofcv.alg.geo.bundle.BundleAdjustmentOps;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeBrown;
 import boofcv.alg.geo.calibration.CalibrationObservation;
@@ -32,11 +32,11 @@ import java.util.List;
 
 /// Camera parameters for model [boofcv.struct.calib.CameraPinholeBrown].
 public class Zhang99CameraBrown implements Zhang99Camera {
-	ConfigCalibratePinhole config;
+	ConfigCalibrateBrown config;
 
 	private final RadialDistortionEstimateLinear computeRadial;
 
-	public Zhang99CameraBrown( ConfigCalibratePinhole config ) {
+	public Zhang99CameraBrown( ConfigCalibrateBrown config ) {
 		this.config = config;
 		computeRadial = new RadialDistortionEstimateLinear(config.numRadial);
 	}

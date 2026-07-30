@@ -346,7 +346,7 @@ public class CalibrateStereoPlanarApp extends JPanel {
 			if (targetChanged || calibratorChanged) {
 				algorithms.calibrator = new CalibrateStereoPlanar(List.of(algorithms.detector.getLayout()));
 				ControlPanelPinhole controls = configurePanel.pinhole;
-				var config = new ConfigCalibratePinhole().zeroSkew(controls.skew.value).
+				var config = new ConfigCalibrateBrown().zeroSkew(controls.skew.value).
 						tangential(controls.tangential.value).
 						numRadial( controls.numRadial.vint());
 				algorithms.calibrator.configure(config);

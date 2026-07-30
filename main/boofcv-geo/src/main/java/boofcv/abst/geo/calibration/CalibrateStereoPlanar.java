@@ -113,7 +113,7 @@ public class CalibrateStereoPlanar implements VerbosePrint {
 	/**
 	 * Specify calibration assumptions.
 	 */
-	public void configure(@Nullable ConfigCalibratePinhole config ) {
+	public void configure(@Nullable ConfigCalibrateBrown config ) {
 		calibLeft.configurePinhole(config);
 		calibRight.configurePinhole(config);
 	}
