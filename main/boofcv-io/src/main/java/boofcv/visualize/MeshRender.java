@@ -109,6 +109,9 @@ public abstract class MeshRender implements VerbosePrint {
 
 	/// Passes in the mesh which is being viewed. This operation can be expensive or very fast depending on how
 	/// much is precomputed. Must be called again whenever the mesh has changed.
+	///
+	/// An implementation is allowed to keep a reference to the mesh rather than copy it. Do not modify
+	/// while rendering.
 	public abstract void setMesh( VertexMesh mesh );
 
 	/// Renders the mesh using the provided camera model and view location

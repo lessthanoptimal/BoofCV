@@ -47,14 +47,15 @@ public class MeshRayTracer extends MeshRender {
 
 	//---------------------------------------------------------------------------------- Mesh / BVH
 	// Bounding Volume Hierarchy (BVH)
-	// Triangle geometry, structure-of-arrays. v0 is the pivot vertex; e1=v1-v0, e2=v2-v0.
+	// Triangle geometry, indexed the way the source mesh stores it: a shared vertex pool plus three
+	// indices per triangle. A vertex belongs to several triangles at once -- six on a typical closed
+	// mesh -- so expanding the corners per triangle would write the same coordinates out that many
+	// times. The edges e1=v1-v0 and e2=v2-v0 are formed where they are used instead.
+	// Vertices are interleaved xyz, so vert[3*i], vert[3*i+1], vert[3*i+2].
 	// Triangle index == face index in the source VertexMesh (input is required to be triangles),
 	// so no triangle->face side table is needed.
-	private double[] V0X, V0Y, V0Z;
-	private double[] E1X, E1Y, E1Z;
-	private double[] E2X, E2Y, E2Z;
-	// Triangle centroids, used only during BVH construction.
-	private double[] cenX, cenY, cenZ;
+	private double[] vert;
+	private int[] triVert;
 	private int numTri;
 
 	// Per-triangle texture coordinates (corner 0,1,2), only allocated when the mesh is textured.
@@ -137,14 +138,25 @@ public class MeshRayTracer extends MeshRender {
 	//  Mesh ingest + BVH build  (heavy, camera-independent precompute)
 	// =====================================================================================
 
-	/// Verifies the mesh is triangulated, copies its triangles into the internal cache-friendly
-	/// layout, and builds the BVH. This is the heavy, camera-independent precompute; do it once per
-	/// mesh. Triangulate beforehand with [VertexMesh#toTriangles()].
+	/// Verifies the mesh is triangulated, copies its vertex pool and triangle indices into the
+	/// internal layout, and builds the BVH. This is the heavy, camera-independent precompute; do it
+	/// once per mesh. Triangulate beforehand with [VertexMesh#toTriangles()].
 	///
 	/// @throws IllegalArgumentException if any face is not a triangle.
 	@Override public void setMesh( VertexMesh mesh ) {
 		numTri = mesh.size();
-		allocateTriangles(numTri);
+		int numVertex = mesh.vertexes.size();
+		allocateTriangles(numTri, numVertex);
+
+		// One copy of the shared vertex pool, flattened out of its chunked storage so the hot loop
+		// reads a plain array
+		var vtmp = new Point3D_F64();
+		for (int i = 0; i < numVertex; i++) {
+			mesh.vertexes.getCopy(i, vtmp);
+			vert[i*3] = vtmp.x;
+			vert[i*3 + 1] = vtmp.y;
+			vert[i*3 + 2] = vtmp.z;
+		}
 
 		// Precompute texture coordinates per triangle only if the mesh carries them.
 		meshTextured = mesh.isTextured();
@@ -156,32 +168,15 @@ public class MeshRayTracer extends MeshRender {
 		// Faces are exactly 3 corners, so triangle f owns corners [3f, 3f+3) and triangle index == f.
 		// Keep every triangle (including any degenerate ones) so this identity holds; degenerate
 		// triangles are harmless and get rejected at trace time by EPS_DET.
-		var v = new Point3D_F64();
 		var tc = new Point2D_F32();
 		for (int f = 0; f < numTri; f++) {
 			int c = mesh.faceOffsets.get(f); // first corner of this face
 			if (mesh.faceOffsets.get(f + 1) - c != 3)
 				throw new IllegalArgumentException("All faces must be triangles. Call mesh.toTriangles() first.");
 
-			mesh.vertexes.getCopy(vertexIndex(mesh, c), v);
-			double ax = v.x, ay = v.y, az = v.z;
-			mesh.vertexes.getCopy(vertexIndex(mesh, c + 1), v);
-			double bx = v.x, by = v.y, bz = v.z;
-			mesh.vertexes.getCopy(vertexIndex(mesh, c + 2), v);
-			double cx = v.x, cy = v.y, cz = v.z;
-
-			V0X[f] = ax;
-			V0Y[f] = ay;
-			V0Z[f] = az;
-			E1X[f] = bx - ax;
-			E1Y[f] = by - ay;
-			E1Z[f] = bz - az;
-			E2X[f] = cx - ax;
-			E2Y[f] = cy - ay;
-			E2Z[f] = cz - az;
-			cenX[f] = (ax + bx + cx)/3.0;
-			cenY[f] = (ay + by + cy)/3.0;
-			cenZ[f] = (az + bz + cz)/3.0;
+			triVert[f*3] = vertexIndex(mesh, c);
+			triVert[f*3 + 1] = vertexIndex(mesh, c + 1);
+			triVert[f*3 + 2] = vertexIndex(mesh, c + 2);
 
 			if (meshTextured) {
 				// Texture corners are ordered the same as vertex corners (v0, v1=v0+e1, v2=v0+e2),
@@ -212,23 +207,21 @@ public class MeshRayTracer extends MeshRender {
 		return mesh.faceVertexTextures.isEmpty() ? corner : mesh.faceVertexTextures.get(corner);
 	}
 
-	private void allocateTriangles( int n ) {
-		V0X = new double[n];
-		V0Y = new double[n];
-		V0Z = new double[n];
-		E1X = new double[n];
-		E1Y = new double[n];
-		E1Z = new double[n];
-		E2X = new double[n];
-		E2Y = new double[n];
-		E2Z = new double[n];
-		cenX = new double[n];
-		cenY = new double[n];
-		cenZ = new double[n];
+	private void allocateTriangles( int n, int numVertex ) {
+		// Interleaving xyz makes the pool the first thing to overflow an int index, so the limit is
+		// stated here rather than surfacing as a NegativeArraySizeException
+		if (numVertex > Integer.MAX_VALUE/3)
+			throw new IllegalArgumentException("Too many vertexes to index: " + numVertex);
+		vert = new double[numVertex*3];
+		triVert = new int[n*3];
 		triIdx = new int[n];
 		for (int i = 0; i < n; i++) triIdx[i] = i;
 
-		int maxNodes = Math.max(1, 2*n);
+		// A node is split only when it holds more than LEAF_SIZE triangles, so a split always sees
+		// at least LEAF_SIZE+1 and hands its children at least (LEAF_SIZE+1)/2 >= 2 each. Every leaf
+		// therefore holds >= 2 triangles, giving at most n/2 leaves and, for a full binary tree,
+		// at most n-1 nodes. Allocating 2n assumed one triangle per leaf and doubled the BVH.
+		int maxNodes = Math.max(1, n);
 		bMinX = new double[maxNodes];
 		bMinY = new double[maxNodes];
 		bMinZ = new double[maxNodes];
@@ -300,9 +293,10 @@ public class MeshRayTracer extends MeshRender {
 		double maxX = Double.NEGATIVE_INFINITY, maxY = maxX, maxZ = maxX;
 		for (int i = 0; i < count; i++) {
 			int tri = triIdx[first + i];
-			double ax = V0X[tri], ay = V0Y[tri], az = V0Z[tri];
-			double bx = ax + E1X[tri], by = ay + E1Y[tri], bz = az + E1Z[tri];
-			double cx = ax + E2X[tri], cy = ay + E2Y[tri], cz = az + E2Z[tri];
+			int i0 = triVert[tri*3]*3, i1 = triVert[tri*3 + 1]*3, i2 = triVert[tri*3 + 2]*3;
+			double ax = vert[i0], ay = vert[i0 + 1], az = vert[i0 + 2];
+			double bx = vert[i1], by = vert[i1 + 1], bz = vert[i1 + 2];
+			double cx = vert[i2], cy = vert[i2 + 1], cz = vert[i2 + 2];
 			minX = min3(minX, ax, bx, cx);
 			maxX = max3(maxX, ax, bx, cx);
 			minY = min3(minY, ay, by, cy);
@@ -342,7 +336,11 @@ public class MeshRayTracer extends MeshRender {
 	}
 
 	private double centroid( int tri, int axis ) {
-		return axis == 0 ? cenX[tri] : axis == 1 ? cenY[tri] : cenZ[tri];
+		// Derived rather than stored. Keeping three double[numTri] arrays for a value used only to
+		// order triangles during construction costs 24 bytes per triangle at peak, which on a
+		// multi-million triangle mesh is hundreds of MB.
+		int i0 = triVert[tri*3]*3 + axis, i1 = triVert[tri*3 + 1]*3 + axis, i2 = triVert[tri*3 + 2]*3 + axis;
+		return (vert[i0] + vert[i1] + vert[i2])/3.0;
 	}
 
 	@Override public void render() {
@@ -470,8 +468,10 @@ public class MeshRayTracer extends MeshRender {
 	// Two-sided unless cullBackFaces is set.
 	void intersectTri( int tri, double ox, double oy, double oz,
 	                   double dx, double dy, double dz, Hit hit ) {
-		double e1x = E1X[tri], e1y = E1Y[tri], e1z = E1Z[tri];
-		double e2x = E2X[tri], e2y = E2Y[tri], e2z = E2Z[tri];
+		int i0 = triVert[tri*3]*3, i1 = triVert[tri*3 + 1]*3, i2 = triVert[tri*3 + 2]*3;
+		double v0x = vert[i0], v0y = vert[i0 + 1], v0z = vert[i0 + 2];
+		double e1x = vert[i1] - v0x, e1y = vert[i1 + 1] - v0y, e1z = vert[i1 + 2] - v0z;
+		double e2x = vert[i2] - v0x, e2y = vert[i2 + 1] - v0y, e2z = vert[i2 + 2] - v0z;
 
 		// pvec = D x e2
 		double px = dy*e2z - dz*e2y;
@@ -492,9 +492,9 @@ public class MeshRayTracer extends MeshRender {
 		double invDet = 1.0/det;
 
 		// tvec = O - v0
-		double tx = ox - V0X[tri];
-		double ty = oy - V0Y[tri];
-		double tz = oz - V0Z[tri];
+		double tx = ox - v0x;
+		double ty = oy - v0y;
+		double tz = oz - v0z;
 
 		double u = (tx*px + ty*py + tz*pz)*invDet;
 		if (u < 0.0 || u > 1.0) return;
