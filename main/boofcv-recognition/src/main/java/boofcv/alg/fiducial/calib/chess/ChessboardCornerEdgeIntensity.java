@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,7 +35,7 @@ import java.util.Arrays;
  */
 public class ChessboardCornerEdgeIntensity<T extends ImageGray<T>> {
 
-	// used to sample image at non integer points and handles boundary conditions
+	// used to sample image at non-integer points and handles boundary conditions
 	InterpolatePixelS<T> interpolate;
 
 	/**

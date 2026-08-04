@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -110,31 +110,24 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements Ve
 	/** Output. Contains a graph of connected corners */
 	private @Getter final DogArray<ChessboardCornerGraph> outputClusters = new DogArray<>(ChessboardCornerGraph::new);
 
-	// predeclared storage for results
-//	private SearchResults results = new SearchResults();
-//	private TupleI32 tuple3 = new TupleI32();
-
 	// Used to convert the internal graph into the output clusters
 	private final DogArray_I32 c2n = new DogArray_I32(); // corner index to output node index
 	private final DogArray_I32 n2c = new DogArray_I32(); // output node index to corner index
 	private final DogArray_I32 open = new DogArray_I32(); // list of corner index's which still need ot be processed
-
-	// Work space to store distances from NN searched to find median distance
-//	private DogArray_F64 distanceTmp = new DogArray_F64();
-//	private QuickSort_F64 sorter = new QuickSort_F64(); // use this instead of build in to minimize memory allocation
 
 	// reference to input corners for debugging
 	private List<ChessboardCorner> corners;
 
 	// Workspace for pruning invalid
 	private final List<Vertex> openVertexes = new ArrayList<>();
-	private final List<Vertex> dirtyVertexes = new ArrayList<>();
+	// package-private so a test can seed the repair step directly
+	final List<Vertex> dirtyVertexes = new ArrayList<>();
 
 	// Workspace for connecting vertices
-	private final List<Edge> bestSolution = new ArrayList<>();
-	private final List<Edge> solution = new ArrayList<>();
-	private final DogArray<PairIdx> pairs = new DogArray<>(PairIdx.class, PairIdx::new);
-	private final DogArray_B matched = new DogArray_B();
+	final List<Edge> bestSolution = new ArrayList<>();
+	final List<Edge> solution = new ArrayList<>();
+	final DogArray<PairIdx> pairs = new DogArray<>(PairIdx.class, PairIdx::new);
+	final DogArray_B matched = new DogArray_B();
 
 	@Nullable PrintStream verbose = null;
 
@@ -159,7 +152,6 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements Ve
 
 		initalizeStructures(image, corners, numLevels, cornersInLevel);
 
-
 		// Find neighbor corners starting at low resolution layers going to high resolution
 		List<ChessboardCorner> cornersUpToLevel = new ArrayList<>();
 		DogArray_I32 indexesUpToLevel = new DogArray_I32();
@@ -172,10 +164,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements Ve
 			printDualGraph();
 		}
 
-		// use edge intensity to prune connections
-		if (thresholdEdgeIntensity > 0) {
-			pruneConnectionsByIntensity(corners);
-		}
+		computeEdgeIntensityAndPrune(corners);
 		pruneSingleConnections();
 
 		if (verbose != null) printDualGraph();
@@ -240,8 +229,8 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements Ve
 	}
 
 	private void pyramidalFindNeighbors( List<ChessboardCorner> corners, int numLevels,
-										 List<DogArray_I32> cornersInLevel, List<ChessboardCorner> cornersUpToLevel,
-										 DogArray_I32 indexesUpToLevel ) {
+	                                     List<DogArray_I32> cornersInLevel, List<ChessboardCorner> cornersUpToLevel,
+	                                     DogArray_I32 indexesUpToLevel ) {
 		// start from top of the pyramid, which is the lowest resolution
 		for (int level = numLevels - 1; level >= 0; level--) {
 			DogArray_I32 levelCornerIdx = cornersInLevel.get(level);
@@ -295,7 +284,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements Ve
 	/**
 	 * Computes edge intensity and prunes connections if it's too low relative
 	 */
-	protected void pruneConnectionsByIntensity( List<ChessboardCorner> corners ) {
+	protected void computeEdgeIntensityAndPrune( List<ChessboardCorner> corners ) {
 
 		for (int i = 0; i < lines.size; i++) {
 			LineInfo line = lines.get(i);
@@ -314,7 +303,8 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements Ve
 			line.intensityRaw = computeConnInten.process(ca, cb, line.endA.direction);
 			line.intensity = line.intensityRaw/contrast;
 
-			if (line.intensity < thresholdEdgeIntensity) {
+			// check to see if pruning is disabled
+			if (thresholdEdgeIntensity > 0 && line.intensity < thresholdEdgeIntensity) {
 				if (!va.perpendicular.remove(line))
 					throw new RuntimeException("BUG");
 				if (!vb.perpendicular.remove(line))
@@ -734,7 +724,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements Ve
 	 * 3) Parallel lines must be parallel
 	 * 4) If current graph can't predict direction no decision is made
 	 */
-	private void repairVertexes() {
+	void repairVertexes() {
 //		System.out.println("######## Repair");
 
 		// the number of dirty can increase, but we don't want to check new additions
@@ -782,7 +772,8 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> implements Ve
 					for (int i = 0; i < v.perpendicular.size(); i++) {
 						Edge ei = v.perpendicular.get(i);
 
-						if (e == ei)
+						// Avoid cycling
+						if (solution.contains(ei))
 							continue;
 
 						// angle test
