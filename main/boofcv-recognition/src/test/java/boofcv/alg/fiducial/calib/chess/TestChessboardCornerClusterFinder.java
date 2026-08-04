@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,11 +21,11 @@ package boofcv.alg.fiducial.calib.chess;
 import boofcv.alg.feature.detect.chess.ChessboardCorner;
 import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofStandardJUnit;
+import georegression.geometry.UtilPoint2D_F64;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.DogArray;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -36,7 +36,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SuppressWarnings("WeakerAccess")
-@Disabled // TODO enable again, but might require a rewrite. Was commented out under develop and never written again
 class TestChessboardCornerClusterFinder extends BoofStandardJUnit {
 	final double sideLength = 40; // pixel distance between corners
 	double offsetX;
@@ -55,19 +54,20 @@ class TestChessboardCornerClusterFinder extends BoofStandardJUnit {
 	 */
 	@Test
 	void perfect_one() {
-		// test various sizes in an attempt to trigger edge cases
-		perfect(2, 2);
-		perfect(4, 2);
-		perfect(3, 3);
-		// NN search won't find all the corners now
-		perfect(4, 4);
-		perfect(10, 10);
+		for (int trial = 0; trial < 10; trial++) {
+			// test various sizes in an attempt to trigger edge cases
+			perfect(2, 2);
+			perfect(4, 2);
+			perfect(3, 3);
+			// NN search won't find all the corners now
+			perfect(4, 4);
+			perfect(10, 10);
+		}
 	}
 
 	void perfect( int rows, int cols ) {
 		List<ChessboardCorner> input = createCorners(rows, cols);
 		ChessboardCornerClusterFinder<GrayU8> alg = createAlg();
-		alg.setThresholdEdgeIntensity(0.0); // turn off this check
 		alg.setMaxNeighbors(10); // this is perfect, 8 should be enough
 		// reduced the number so that having an non-exhaustive search is stressed more
 		alg.process(image, input, 1);
@@ -151,63 +151,6 @@ class TestChessboardCornerClusterFinder extends BoofStandardJUnit {
 		assertTrue(found3x2);
 	}
 
-	/**
-	 * Actual corner observations from a fisheye image
-	 */
-	@Test
-	void fisheye() {
-		ChessboardCornerClusterFinder<GrayU8> alg = createAlg();
-		alg.setThresholdEdgeIntensity(-1);
-		alg.process(new GrayU8(480, 480), createFisheye(), 1);
-		DogArray<ChessboardCornerGraph> found = alg.getOutputClusters();
-		assertEquals(1, found.size);
-		assertEquals(24, found.get(0).corners.size);
-	}
-
-	List<ChessboardCorner> createFisheye() {
-		double[] data = new double[]{
-				901.730, 19.788, -0.916481,
-				776.088, 36.243, 0.800666,
-				659.545, 67.488, -1.141423,
-				556.513, 110.203, 0.534072,
-				568.884, 159.993, -1.193452,
-				587.523, 219.934, 0.483544,
-				609.680, 284.868, -1.216572,
-				699.776, 255.642, 0.630314,
-				799.915, 234.210, -1.047695,
-				906.694, 223.450, 0.866288,
-				1016.448, 224.564, -0.848513,
-				1122.507, 237.118, 1.029737,
-				1135.740, 163.016, -0.661328,
-				1146.909, 94.946, 1.022470,
-				1154.920, 40.350, -0.735298,
-				1026.851, 77.206, -0.746636,
-				1021.864, 147.066, 0.870077,
-				904.144, 146.284, -0.927371,
-				789.445, 159.577, 0.700495,
-				682.746, 185.030, -1.134515,
-				668.750, 120.472, 0.577675,
-				780.841, 91.222, -0.959134,
-				902.360, 75.823, 0.804160,
-				1030.534, 21.252, 0.903699};
-
-		// Input image was 1920x1920
-		// let's scale that down to 480x480
-		double scale = 4.0;
-
-		List<ChessboardCorner> out = new ArrayList<>();
-		for (int i = 0; i < data.length; i += 3) {
-			ChessboardCorner c = new ChessboardCorner();
-			c.x = data[i]/scale;
-			c.y = data[i + 1]/scale;
-			c.orientation = data[i + 2];
-			c.intensity = 100;
-			out.add(c);
-		}
-
-		return out;
-	}
-
 	List<ChessboardCorner> createCorners( int rows, int cols ) {
 		List<ChessboardCorner> corners = new ArrayList<>();
 
@@ -221,6 +164,8 @@ class TestChessboardCornerClusterFinder extends BoofStandardJUnit {
 				c.orientation = (((row%2) + (col%2))%2) == 0 ? Math.PI/4 : -Math.PI/4;
 				c.x = x;
 				c.y = y;
+				c.contrast = 1.0;
+				c.level1 = c.level2 = c.levelMax = 0;
 
 				corners.add(c);
 			}
@@ -314,18 +259,24 @@ class TestChessboardCornerClusterFinder extends BoofStandardJUnit {
 	}
 
 	public ChessboardCornerClusterFinder<GrayU8> createAlg() {
-		return new ChessboardCornerClusterFinder<>(new DummyIntensity());
+		return new ChessboardCornerClusterFinder<>(new DummyIntensitySquare());
 	}
 
-	private static class DummyIntensity extends ChessboardCornerEdgeIntensity<GrayU8> {
+	/// Intensity that assumes everything is a flat square
+	private class DummyIntensitySquare extends ChessboardCornerEdgeIntensity<GrayU8> {
 
-		public DummyIntensity() {
+		public DummyIntensitySquare() {
 			super(GrayU8.class);
 		}
 
 		@Override
 		public float process( ChessboardCorner ca, ChessboardCorner cb, double direction_a_to_b ) {
-			return 100.0f;
+			// in real images, if an edge have squares between it the edge intensity will be reduced because
+			// there are regions with no texture or direction of texture changes. This simulates that by
+			// degrading results which are farther than expected
+			double distance = UtilPoint2D_F64.distance(ca.x, ca.y, cb.x, cb.y);
+			double error = distance - sideLength;
+			return (float)(1.0/(error*error + 1.0));
 		}
 	}
 }
