@@ -27,7 +27,7 @@ public class SelectSparseErrorWithChecksWta_F32 extends SelectSparseStandardWta<
 	// texture threshold
 	protected float textureThreshold;
 
-	public SelectSparseErrorWithChecksWta_F32( int maxError, double texture, int tolRightToLeft ) {
+	public SelectSparseErrorWithChecksWta_F32( double maxError, double texture, int tolRightToLeft ) {
 		super(maxError, texture, tolRightToLeft);
 	}
 
@@ -56,13 +56,13 @@ public class SelectSparseErrorWithChecksWta_F32 extends SelectSparseStandardWta<
 		}
 
 		// See if the best match is within tolerance
-		if (scoreBest > maxError) {
+		if (scoreBest > maxErrorF) {
 			return false;
 		}
 		// test to see if the region lacks sufficient texture if:
 		// 1) not already eliminated 2) sufficient disparities to check, 3) it's activated
 		if (textureThreshold > 0 && disparityRange >= 3) {
-			// find the second best disparity value and exclude its neighbors
+			// find the second-best disparity value and exclude its neighbors
 			float secondBest = Float.MAX_VALUE;
 			for (int i = 0; i < bestDisparity - 1; i++) {
 				if (scores[i] < secondBest)

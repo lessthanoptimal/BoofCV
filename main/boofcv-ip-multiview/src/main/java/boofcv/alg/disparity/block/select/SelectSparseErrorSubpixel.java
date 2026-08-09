@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,21 +20,14 @@ package boofcv.alg.disparity.block.select;
 
 import boofcv.alg.disparity.block.score.DisparitySparseRectifiedScoreBM;
 
-/**
- * <p>
- * Subpixel accuracy for disparity. See {@link SelectErrorSubpixel} for more details on the
- * mathematics.
- * </p>
- *
- * @author Peter Abeles
- */
+/// Subpixel accuracy for disparity. See [SelectErrorSubpixel] for more details on the mathematics.
 public class SelectSparseErrorSubpixel {
 
 	public static class S32 extends SelectSparseErrorWithChecksWta_S32 {
-		/** If the error is a squared error. If false then it's assumed to be distance */
+		/// If the error is a squared error. If false then it's assumed to be distance
 		final boolean squaredError;
 
-		public S32( int maxError, double texture, int tolRightToLeft, boolean squaredError ) {
+		public S32( double maxError, double texture, int tolRightToLeft, boolean squaredError ) {
 			super(maxError, texture, tolRightToLeft);
 			this.squaredError = squaredError;
 		}
@@ -71,10 +64,10 @@ public class SelectSparseErrorSubpixel {
 	}
 
 	public static class F32 extends SelectSparseErrorWithChecksWta_F32 {
-		/** If the error is a squared error. If false then it's assumed to be distance */
+		/// If the error is a squared error. If false then it's assumed to be distance
 		final boolean squaredError;
 
-		public F32( int maxError, double texture, int tolRightToLeft, boolean squaredError ) {
+		public F32( double maxError, double texture, int tolRightToLeft, boolean squaredError ) {
 			super(maxError, texture, tolRightToLeft);
 			this.squaredError = squaredError;
 		}

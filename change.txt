@@ -28,7 +28,9 @@ Version : 1.4.1
   * Added minAbs
   * Fixed a nasty bug where abs was not applied to the first element. No idea how this went unnoticed.
 - DenseOpticalFlow: New API which is much more memory efficient
-- Block Matching Stereo: Added SSD error
+- Block Matching Stereo
+  * Added SSD error
+  * Fixed maxError bug for floats
 
 ---------------------
 Date    : 2026/May/25

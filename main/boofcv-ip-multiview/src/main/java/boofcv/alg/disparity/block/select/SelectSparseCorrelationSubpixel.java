@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,14 +20,7 @@ package boofcv.alg.disparity.block.select;
 
 import boofcv.alg.disparity.block.score.DisparitySparseRectifiedScoreBM;
 
-/**
- * <p>
- * Subpixel accuracy for disparity. See {@link SelectErrorSubpixel} for more details on the
- * mathematics.
- * </p>
- *
- * @author Peter Abeles
- */
+/// Subpixel accuracy for disparity. See [SelectErrorSubpixel] for more details on the mathematics.
 public class SelectSparseCorrelationSubpixel {
 
 	public static class F32 extends SelectSparseCorrelationWithChecksWta_F32 {

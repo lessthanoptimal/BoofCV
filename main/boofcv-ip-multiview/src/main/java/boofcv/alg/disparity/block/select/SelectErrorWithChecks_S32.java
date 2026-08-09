@@ -38,12 +38,12 @@ public abstract class SelectErrorWithChecks_S32<DI extends ImageGray<DI>>
 	protected int textureThreshold;
 	protected static final int discretizer = SelectDisparityWithChecksWta.DISCRETIZER;
 
-	protected SelectErrorWithChecks_S32( int maxError, int rightToLeftTolerance, double texture, Class<DI> disparityType ) {
+	protected SelectErrorWithChecks_S32( double maxError, int rightToLeftTolerance, double texture, Class<DI> disparityType ) {
 		super(maxError, rightToLeftTolerance, texture, disparityType);
 	}
 
 	protected SelectErrorWithChecks_S32( SelectErrorWithChecks_S32<DI> original ) {
-		this(original.maxError, original.rightToLeftTolerance,
+		this(original.maxErrorD, original.rightToLeftTolerance,
 				original.textureThreshold/(double)discretizer, original.disparityType);
 	}
 
@@ -96,7 +96,7 @@ public abstract class SelectErrorWithChecks_S32<DI extends ImageGray<DI>>
 			}
 
 			// detect bad matches
-			if (scoreBest > maxError) {
+			if (scoreBest > maxErrorI) {
 				// make sure the error isn't too large
 				bestDisparity = invalidDisparity;
 			} else if (rightToLeftTolerance >= 0) {
@@ -170,7 +170,7 @@ public abstract class SelectErrorWithChecks_S32<DI extends ImageGray<DI>>
 
 	/// Implementation for disparity images of type GrayU8
 	public static class DispU8 extends SelectErrorWithChecks_S32<GrayU8> {
-		public DispU8( int maxError, int rightToLeftTolerance, double texture ) {
+		public DispU8( double maxError, int rightToLeftTolerance, double texture ) {
 			super(maxError, rightToLeftTolerance, texture, GrayU8.class);
 		}
 
