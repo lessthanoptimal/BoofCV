@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -188,14 +188,14 @@ public class FactoryStereoDisparityAlgs {
 		return blockScore;
 	}
 
-	public static DisparitySelect<int[], GrayU8> selectDisparity_S32( int maxError, int tolR2L, double texture ) {
+	public static DisparitySelect<int[], GrayU8> selectDisparity_S32( double maxError, int tolR2L, double texture ) {
 		if (maxError < 0 && tolR2L < 0 && texture <= 0)
 			return new SelectErrorBasicWta_S32_U8();
 		else
 			return new SelectErrorWithChecks_S32.DispU8(maxError, tolR2L, texture);
 	}
 
-	public static DisparitySelect<float[], GrayU8> selectDisparity_F32( int maxError, int tolR2L, double texture ) {
+	public static DisparitySelect<float[], GrayU8> selectDisparity_F32( double maxError, int tolR2L, double texture ) {
 		if (maxError < 0 && tolR2L < 0 && texture <= 0)
 			return new SelectErrorBasicWta_F32_U8();
 		else
@@ -212,17 +212,17 @@ public class FactoryStereoDisparityAlgs {
 	}
 
 	public static DisparitySelect<int[], GrayF32>
-	selectDisparitySubpixel_S32( int maxError, int tolR2L, double texture, boolean squaredError ) {
+	selectDisparitySubpixel_S32( double maxError, int tolR2L, double texture, boolean squaredError ) {
 		return new SelectErrorSubpixel.S32_F32(maxError, tolR2L, texture, squaredError);
 	}
 
 	public static DisparitySelect<float[], GrayF32>
-	selectDisparitySubpixel_F32( int maxError, int tolR2L, double texture, boolean squaredError ) {
+	selectDisparitySubpixel_F32( double maxError, int tolR2L, double texture, boolean squaredError ) {
 		return new SelectErrorSubpixel.F32_F32(maxError, tolR2L, texture, squaredError);
 	}
 
 	public static DisparitySparseSelect<int[]>
-	selectDisparitySparse_S32( int maxError, double texture, int tolRightToLeft ) {
+	selectDisparitySparse_S32( double maxError, double texture, int tolRightToLeft ) {
 		if (maxError < 0 && texture <= 0)
 			return new SelectSparseErrorBasicWta_S32();
 		else
@@ -230,7 +230,7 @@ public class FactoryStereoDisparityAlgs {
 	}
 
 	public static DisparitySparseSelect<float[]>
-	selectDisparitySparse_F32( int maxError, double texture, int tolRightToLeft ) {
+	selectDisparitySparse_F32( double maxError, double texture, int tolRightToLeft ) {
 		if (maxError < 0 && texture <= 0)
 			return new SelectSparseErrorBasicWta_F32();
 		else
@@ -238,12 +238,12 @@ public class FactoryStereoDisparityAlgs {
 	}
 
 	public static DisparitySparseSelect<int[]>
-	selectDisparitySparseSubpixel_S32( int maxError, double texture, int tolRightToLeft, boolean squaredError  ) {
+	selectDisparitySparseSubpixel_S32( double maxError, double texture, int tolRightToLeft, boolean squaredError  ) {
 		return new SelectSparseErrorSubpixel.S32(maxError, texture, tolRightToLeft, squaredError);
 	}
 
 	public static DisparitySparseSelect<float[]>
-	selectDisparitySparseSubpixel_F32( int maxError, double texture, int tolRightToLeft, boolean squaredError  ) {
+	selectDisparitySparseSubpixel_F32( double maxError, double texture, int tolRightToLeft, boolean squaredError  ) {
 		return new SelectSparseErrorSubpixel.F32(maxError, texture, tolRightToLeft, squaredError);
 	}
 }

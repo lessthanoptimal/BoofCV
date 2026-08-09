@@ -85,21 +85,21 @@ public class FactoryStereoDisparity {
 
 		WrapBaseBlockMatch<T, DI, ?> bm = switch (config.errorType) {
 			case SAD -> {
-				DisparitySelect select = createDisparitySelect(config, imageType, (int)maxError);
+				DisparitySelect select = createDisparitySelect(config, imageType, maxError);
 				BlockRowScore rowScore = createScoreRowSad(config, imageType);
 				DisparityBlockMatchRowFormat alg = createBlockMatching(config, imageType, select, rowScore);
 				alg.setBorder(FactoryImageBorder.generic(config.border, rowScore.getImageType()));
 				yield new WrapDisparityBlockMatchRowFormat(alg);
 			}
 			case SSD -> {
-				DisparitySelect select = createDisparitySelect(config, imageType, (int)maxError);
+				DisparitySelect select = createDisparitySelect(config, imageType, maxError);
 				BlockRowScore rowScore = createScoreRowSsd(config, imageType);
 				DisparityBlockMatchRowFormat alg = createBlockMatching(config, imageType, select, rowScore);
 				alg.setBorder(FactoryImageBorder.generic(config.border, rowScore.getImageType()));
 				yield new WrapDisparityBlockMatchRowFormat(alg);
 			}
 			case CENSUS -> {
-				DisparitySelect select = createDisparitySelect(config, imageType, (int)maxError);
+				DisparitySelect select = createDisparitySelect(config, imageType, maxError);
 				FilterImageInterface censusTran = FactoryCensusTransform.variant(config.configCensus.variant, true, imageType);
 				BlockRowScore rowScore = createCensusRowScore(config, censusTran);
 
@@ -109,7 +109,7 @@ public class FactoryStereoDisparity {
 				yield new WrapDisparityBlockMatchCensus<>(censusTran, alg);
 			}
 			case NCC -> {
-				DisparitySelect select = createDisparitySelect(config, GrayF32.class, (int)maxError);
+				DisparitySelect select = createDisparitySelect(config, GrayF32.class, maxError);
 				BlockRowScore rowScore = createScoreRowNcc(config, GrayF32.class);
 				DisparityBlockMatchRowFormat alg = createBlockMatching(config, GrayF32.class, select, rowScore);
 				alg.setBorder(FactoryImageBorder.generic(config.border, rowScore.getImageType()));
@@ -141,7 +141,7 @@ public class FactoryStereoDisparity {
 	}
 
 	public static <T extends ImageGray<T>> DisparitySelect
-	createDisparitySelect( ConfigDisparityBM config, Class<T> imageType, int maxError ) {
+	createDisparitySelect( ConfigDisparityBM config, Class<T> imageType, double maxError ) {
 		DisparitySelect select;
 		if (!GeneralizedImageOps.isFloatingPoint(imageType) || config.errorType == DisparityError.CENSUS) {
 			// Census can have a float input but always scores as an integer since it converts it into a Census image
@@ -194,21 +194,21 @@ public class FactoryStereoDisparity {
 
 		WrapBaseBlockMatch<T, DI, ?> bm = switch (config.errorType) {
 			case SAD -> {
-				DisparitySelect select = createDisparitySelect(config, imageType, (int)maxError);
+				DisparitySelect select = createDisparitySelect(config, imageType, maxError);
 				BlockRowScore rowScore = createScoreRowSad(config, imageType);
 				DisparityBlockMatchRowFormat alg = createBestFive(config, imageType, select, rowScore);
 				alg.setBorder(FactoryImageBorder.generic(config.border, rowScore.getImageType()));
 				yield new WrapDisparityBlockMatchRowFormat(alg);
 			}
 			case SSD -> {
-				DisparitySelect select = createDisparitySelect(config, imageType, (int)maxError);
+				DisparitySelect select = createDisparitySelect(config, imageType, maxError);
 				BlockRowScore rowScore = createScoreRowSsd(config, imageType);
 				DisparityBlockMatchRowFormat alg = createBestFive(config, imageType, select, rowScore);
 				alg.setBorder(FactoryImageBorder.generic(config.border, rowScore.getImageType()));
 				yield new WrapDisparityBlockMatchRowFormat(alg);
 			}
 			case CENSUS -> {
-				DisparitySelect select = createDisparitySelect(config, imageType, (int)maxError);
+				DisparitySelect select = createDisparitySelect(config, imageType, maxError);
 				FilterImageInterface censusTran = FactoryCensusTransform.variant(config.configCensus.variant, true, imageType);
 				BlockRowScore rowScore = createCensusRowScore(config, censusTran);
 				DisparityBlockMatchRowFormat alg = createBestFive(config,
@@ -217,7 +217,7 @@ public class FactoryStereoDisparity {
 				yield new WrapDisparityBlockMatchCensus<>(censusTran, alg);
 			}
 			case NCC -> {
-				DisparitySelect select = createDisparitySelect(config, GrayF32.class, (int)maxError);
+				DisparitySelect select = createDisparitySelect(config, GrayF32.class, maxError);
 				BlockRowScore rowScore = createScoreRowNcc(config, GrayF32.class);
 				DisparityBlockMatchRowFormat alg = createBestFive(config, GrayF32.class, select, rowScore);
 				alg.setBorder(FactoryImageBorder.generic(config.border, rowScore.getImageType()));
@@ -316,15 +316,15 @@ public class FactoryStereoDisparity {
 		} else if (GeneralizedImageOps.isFloatingPoint(imageType) && config.errorType != DisparityError.CENSUS) {
 			if (config.subpixel)
 				select = FactoryStereoDisparityAlgs.selectDisparitySparseSubpixel_F32(
-						(int)maxError, config.texture, config.validateRtoL, config.errorType.isSquared());
+						maxError, config.texture, config.validateRtoL, config.errorType.isSquared());
 			else
-				select = FactoryStereoDisparityAlgs.selectDisparitySparse_F32((int)maxError, config.texture, config.validateRtoL);
+				select = FactoryStereoDisparityAlgs.selectDisparitySparse_F32(maxError, config.texture, config.validateRtoL);
 		} else {
 			if (config.subpixel)
 				select = FactoryStereoDisparityAlgs.selectDisparitySparseSubpixel_S32(
-						(int)maxError, config.texture, config.validateRtoL, config.errorType.isSquared());
+						maxError, config.texture, config.validateRtoL, config.errorType.isSquared());
 			else
-				select = FactoryStereoDisparityAlgs.selectDisparitySparse_S32((int)maxError, config.texture, config.validateRtoL);
+				select = FactoryStereoDisparityAlgs.selectDisparitySparse_S32(maxError, config.texture, config.validateRtoL);
 		}
 
 		DisparitySparseRectifiedScoreBM score = null;

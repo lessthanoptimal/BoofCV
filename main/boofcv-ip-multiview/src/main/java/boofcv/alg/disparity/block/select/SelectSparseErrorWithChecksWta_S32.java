@@ -29,7 +29,7 @@ public class SelectSparseErrorWithChecksWta_S32 extends SelectSparseStandardWta<
 	protected int textureThreshold;
 	protected static final int discretizer = SelectDisparityWithChecksWta.DISCRETIZER;
 
-	public SelectSparseErrorWithChecksWta_S32( int maxError, double texture, int tolRightToLeft ) {
+	public SelectSparseErrorWithChecksWta_S32( double maxError, double texture, int tolRightToLeft ) {
 		super(maxError, texture, tolRightToLeft);
 	}
 
@@ -58,7 +58,7 @@ public class SelectSparseErrorWithChecksWta_S32 extends SelectSparseStandardWta<
 		}
 
 		// See if the best match is within tolerance
-		if (scoreBest > maxError) {
+		if (scoreBest > maxErrorI) {
 			return false;
 		}
 		// test to see if the region lacks sufficient texture if:

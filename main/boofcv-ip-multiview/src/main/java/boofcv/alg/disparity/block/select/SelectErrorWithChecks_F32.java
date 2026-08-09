@@ -37,7 +37,7 @@ public abstract class SelectErrorWithChecks_F32<DI extends ImageGray<DI>>
 	// texture threshold, use an integer value for speed.
 	protected float textureThreshold;
 
-	protected SelectErrorWithChecks_F32( int maxError,
+	protected SelectErrorWithChecks_F32( double maxError,
 										 int rightToLeftTolerance,
 										 double texture,
 										 Class<DI> disparityType ) {
@@ -46,7 +46,7 @@ public abstract class SelectErrorWithChecks_F32<DI extends ImageGray<DI>>
 	}
 
 	protected SelectErrorWithChecks_F32( SelectErrorWithChecks_F32<DI> original ) {
-		this(original.maxError, original.rightToLeftTolerance, original.textureThreshold, original.disparityType);
+		this(original.maxErrorD, original.rightToLeftTolerance, original.textureThreshold, original.disparityType);
 	}
 
 	@Override public void setTexture( double threshold ) {
@@ -96,7 +96,7 @@ public abstract class SelectErrorWithChecks_F32<DI extends ImageGray<DI>>
 			}
 
 			// detect bad matches
-			if (scoreBest > maxError) {
+			if (scoreBest > maxErrorF) {
 				// make sure the error isn't too large
 				bestDisparity = invalidDisparity;
 			} else if (rightToLeftTolerance >= 0) {
@@ -168,7 +168,7 @@ public abstract class SelectErrorWithChecks_F32<DI extends ImageGray<DI>>
 
 	/// Implementation for disparity images of type GrayU8
 	public static class DispU8 extends SelectErrorWithChecks_F32<GrayU8> {
-		public DispU8( int maxError, int rightToLeftTolerance, double texture ) {
+		public DispU8( double maxError, int rightToLeftTolerance, double texture ) {
 			super(maxError, rightToLeftTolerance, texture, GrayU8.class);
 		}
 

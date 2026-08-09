@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,8 +33,9 @@ public abstract class SelectSparseStandardWta<ArrayType>
 	// found disparity
 	protected double disparity;
 
-	// maximum allowed error
-	protected int maxError;
+	// Maximum allowed error, in the score's native format so that no conversion is needed when comparing
+	protected int maxErrorI;
+	protected float maxErrorF;
 
 	// Tolerance for right to left validation. Disable with -1
 	protected int tolRightToLeft;
@@ -43,8 +44,11 @@ public abstract class SelectSparseStandardWta<ArrayType>
 	 * @param maxError Maximum allowed error. See comments above.
 	 * @param texture Texture threshold. See comments above.
 	 */
-	protected SelectSparseStandardWta( int maxError, double texture, int tolRightToLeft ) {
-		this.maxError = maxError <= 0 ? Integer.MAX_VALUE : maxError;
+	protected SelectSparseStandardWta( double maxError, double texture, int tolRightToLeft ) {
+		// Scores are rejected when strictly greater than the limit, so truncating towards zero leaves integer
+		// scores with the same accept/reject decision. A limit too large for an int saturates, which disables it.
+		this.maxErrorI = maxError <= 0 ? Integer.MAX_VALUE : (int)maxError;
+		this.maxErrorF = maxError <= 0 ? Float.MAX_VALUE : (float)maxError;
 		this.tolRightToLeft = tolRightToLeft;
 		setTexture(texture);
 	}

@@ -67,8 +67,10 @@ public abstract class SelectDisparityWithChecksWta<Array, DI extends ImageGray<D
 	protected int radiusX;
 	protected int regionWidth;
 
-	// maximum allowed error
-	protected int maxError;
+	// Maximum allowed error. The same limit in the score's native format, so that no conversion is needed when comparing
+	protected int maxErrorI;
+	protected float maxErrorF;
+	protected double maxErrorD;
 	// tolerance for right to left validation. if < 0 then it's disabled
 	protected int rightToLeftTolerance;
 
@@ -84,8 +86,10 @@ public abstract class SelectDisparityWithChecksWta<Array, DI extends ImageGray<D
 	/// @param rightToLeftTolerance Tolerance for how difference the left to right associated values can be. Try 6
 	/// @param texture Tolerance for how similar optimal region is to other region. Disable with a value ≤ 0.
 	/// Closer to zero is more tolerant. Try 0.1
-	protected SelectDisparityWithChecksWta( int maxError, int rightToLeftTolerance, double texture, Class<DI> disparityType ) {
-		this.maxError = maxError <= 0 ? Integer.MAX_VALUE : maxError;
+	protected SelectDisparityWithChecksWta( double maxError, int rightToLeftTolerance, double texture, Class<DI> disparityType ) {
+		this.maxErrorD = maxError <= 0 ? Double.MAX_VALUE : maxError;
+		this.maxErrorI = maxError <= 0 || maxError == Double.MAX_VALUE? Integer.MAX_VALUE : (int)maxError;
+		this.maxErrorF = maxError <= 0 || maxError == Double.MAX_VALUE? Float.MAX_VALUE : (float)maxError;
 		this.rightToLeftTolerance = rightToLeftTolerance;
 		this.disparityType = disparityType;
 		setTexture(texture);

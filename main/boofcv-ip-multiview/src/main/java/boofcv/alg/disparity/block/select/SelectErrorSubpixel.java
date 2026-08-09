@@ -37,7 +37,7 @@ public class SelectErrorSubpixel {
 		/// If the error is a squared error. If false then it's assumed to be distance
 		final boolean squaredError;
 
-		public S32_F32( int maxError, int rightToLeftTolerance, double texture, boolean squaredError ) {
+		public S32_F32( double maxError, int rightToLeftTolerance, double texture, boolean squaredError ) {
 			super(maxError, rightToLeftTolerance, texture, GrayF32.class);
 			this.squaredError = squaredError;
 		}
@@ -86,7 +86,7 @@ public class SelectErrorSubpixel {
 		/// If the error is a squared error. If false then it's assumed to be distance
 		final boolean squaredError;
 
-		public F32_F32( int maxError, int rightToLeftTolerance, double texture, boolean squaredError ) {
+		public F32_F32( double maxError, int rightToLeftTolerance, double texture, boolean squaredError ) {
 			super(maxError, rightToLeftTolerance, texture, GrayF32.class);
 			this.squaredError = squaredError;
 		}
