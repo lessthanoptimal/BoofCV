@@ -56,6 +56,14 @@ public abstract class BasicDisparityTests<I extends ImageGray<I>, DI extends Ima
 		return radius;
 	}
 
+	/// Fraction of pixels that are allowed to not match the expected disparity in [#checkShifted()]. Every
+	/// mismatch is inside the image border, where the block extends past the valid data and the "correct"
+	/// disparity is undefined. How many border pixels get it wrong depends on the error function, so this
+	/// can be overridden.
+	protected double checkShiftedErrorFraction() {
+		return 0.12;
+	}
+
 	/// A random image is generated then it's shifted by a fixed amount into the right image
 	@Test void checkShifted() {
 		initialize(0, maxDisparity, 2, 3);
@@ -68,7 +76,7 @@ public abstract class BasicDisparityTests<I extends ImageGray<I>, DI extends Ima
 
 		DI output = computeDisparity(left, right);
 
-		assertTrue(checkSolution(disparity, 0, output, 0.12));
+		assertTrue(checkSolution(disparity, 0, output, checkShiftedErrorFraction()));
 	}
 
 	/// Set the minimum disparity to a non-zero value and see if it has the expected results

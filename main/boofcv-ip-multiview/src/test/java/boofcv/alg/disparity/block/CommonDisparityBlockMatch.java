@@ -180,7 +180,7 @@ public abstract class CommonDisparityBlockMatch<I extends ImageGray<I>> {
 	protected abstract double computeScore( int leftX, int rightX, int centerY );
 
 	/**
-	 * Compute SAD (Sum of Absolute Difference) error.
+	 * Compute the block error for the configured error type.
 	 *
 	 * @param leftX X-axis center left image
 	 * @param rightX X-axis center left image
@@ -198,6 +198,21 @@ public abstract class CommonDisparityBlockMatch<I extends ImageGray<I>> {
 						double r = GeneralizedImageOps.get(bright, rightX + x, centerY + y);
 
 						ret += Math.abs(l - r);
+					}
+				}
+
+				return ret;
+			}
+
+			case SSD: {
+				double ret = 0;
+
+				for (int y = -radiusY; y <= radiusY; y++) {
+					for (int x = -radiusX; x <= radiusX; x++) {
+						double l = GeneralizedImageOps.get(bleft, leftX + x, centerY + y);
+						double r = GeneralizedImageOps.get(bright, rightX + x, centerY + y);
+
+						ret += (l - r)*(l - r);
 					}
 				}
 

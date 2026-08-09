@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,9 @@ import java.awt.*;
  */
 public class ControlPanelDisparitySparse extends StandardAlgConfigPanel {
 
-	private static String[] ERRORS_BLOCK = new String[]{"SAD","Census","NCC"};
+	// NOTE: These must be in the same order as the DisparityError enum since the combo box index is
+	//       mapped directly to the enum's ordinal
+	private static String[] ERRORS_BLOCK = new String[]{"SAD", "SSD", "Census", "NCC"};
 
 	public final ConfigDisparityBM config;
 
@@ -53,7 +55,7 @@ public class ControlPanelDisparitySparse extends StandardAlgConfigPanel {
 	ControlsCensus controlCensus;
 	ControlsNCC controlNCC;
 
-	boolean ignoreChanges=false;
+	boolean ignoreChanges = false;
 
 	Listener listener;
 
@@ -63,39 +65,38 @@ public class ControlPanelDisparitySparse extends StandardAlgConfigPanel {
 	 * @param listener Listener for when changes are made.
 	 * @param config Default configuration
 	 */
-	public ControlPanelDisparitySparse(Listener listener, ConfigDisparityBM config)
-	{
+	public ControlPanelDisparitySparse( Listener listener, ConfigDisparityBM config ) {
 		setBorder(BorderFactory.createEmptyBorder());
 		this.config = config;
 		this.listener = listener;
 
-		comboError = combo(e -> handleErrorSelected(false), config.errorType.ordinal(),(Object[])ERRORS_BLOCK);
+		comboError = combo(e -> handleErrorSelected(false), config.errorType.ordinal(), (Object[])ERRORS_BLOCK);
 		controlBM = new ControlsBlockMatching();
 		controlSad = new ControlsSAD();
 		controlCensus = new ControlsCensus();
 		controlNCC = new ControlsNCC();
 
-		tabbedPane.addTab("Disparity",controlBM);
-		tabbedPane.addTab("Error",getErrorControl(comboError.getSelectedIndex()));
+		tabbedPane.addTab("Disparity", controlBM);
+		tabbedPane.addTab("Error", getErrorControl(comboError.getSelectedIndex()));
 		tabbedPane.setBorder(BorderFactory.createEmptyBorder());
 
-		addLabeled(comboError,"Error");
+		addLabeled(comboError, "Error");
 		add(tabbedPane);
 	}
 
 	public void broadcastChange() {
 		Listener listener = this.listener;
-		if( listener == null )
+		if (listener == null)
 			return;
-		if( ignoreChanges )
+		if (ignoreChanges)
 			return;
 
 		listener.handleSparseDisparityChange();
 	}
 
 	public <T extends ImageGray<T>>
-	StereoDisparitySparse<T> createAlgorithm(Class<T> imageType) {
-		return FactoryStereoDisparity.sparseRectifiedBM(config,imageType);
+	StereoDisparitySparse<T> createAlgorithm( Class<T> imageType ) {
+		return FactoryStereoDisparity.sparseRectifiedBM(config, imageType);
 	}
 
 	public int getDisparityMin() {
@@ -108,12 +109,12 @@ public class ControlPanelDisparitySparse extends StandardAlgConfigPanel {
 
 	private void handleErrorSelected( boolean force ) {
 		int previousIdx = config.errorType.ordinal();
-		if( !force && previousIdx == comboError.getSelectedIndex() )
+		if (!force && previousIdx == comboError.getSelectedIndex())
 			return;
 		int selectedIdx = comboError.getSelectedIndex();
 
 		// Avoid multiple calls to broadcastChange()
-		if( !force )
+		if (!force)
 			ignoreChanges = true;
 
 		// If forced keep the previously active tab active
@@ -126,64 +127,64 @@ public class ControlPanelDisparitySparse extends StandardAlgConfigPanel {
 
 		Component c = getErrorControl(selectedIdx);
 		tabbedPane.removeTabAt(1);
-		tabbedPane.insertTab("Error",null,c,null,1);
+		tabbedPane.insertTab("Error", null, c, null, 1);
 		tabbedPane.setSelectedIndex(activeTab);
 
-		if( !force )
-			SwingUtilities.invokeLater(()->{ignoreChanges=false;broadcastChange();});
+		if (!force)
+			SwingUtilities.invokeLater(() -> {
+				ignoreChanges = false;
+				broadcastChange();
+			});
 	}
 
 	private Component getErrorControl( int selectedIdx ) {
-		Component c;
-		switch( selectedIdx ) {
-			case 0: c = controlSad; break;
-			case 1: c = controlCensus; break;
-			case 2: c = controlNCC; break;
-			default: throw new IllegalArgumentException("Unknown");
-		}
-		return c;
+		return switch (DisparityError.values()[selectedIdx]) {
+			case SAD, SSD -> controlSad;
+			case CENSUS -> controlCensus;
+			case NCC -> controlNCC;
+		};
 	}
 
 	public class ControlsBlockMatching extends StandardAlgConfigPanel {
-		JSpinner spinnerDisparityMin = spinner(config.disparityMin,0, 1000,5);
-		JSpinner spinnerDisparityRange = spinner(config.disparityRange,1, 254,5);
-		JSpinner radiusXSpinner = spinner(config.regionRadiusX,0,50,1);
-		JSpinner radiusYSpinner = spinner(config.regionRadiusY,0,50,1);
-		JSpinner spinnerError = spinner(config.maxPerPixelError,-1,80,5);
-		JSpinner spinnerReverse = spinner(config.validateRtoL,-1,50,1);
-		JSpinner spinnerTexture = spinner(config.texture,0.0,1.0,0.05,1,3);
-		JCheckBox subpixelToggle = checkbox("Subpixel", config.subpixel,"Subpixel Disparity Estimate");
+		JSpinner spinnerDisparityMin = spinner(config.disparityMin, 0, 1000, 5);
+		JSpinner spinnerDisparityRange = spinner(config.disparityRange, 1, 254, 5);
+		JSpinner radiusXSpinner = spinner(config.regionRadiusX, 0, 50, 1);
+		JSpinner radiusYSpinner = spinner(config.regionRadiusY, 0, 50, 1);
+		JSpinner spinnerError = spinner(config.maxPerPixelError, -1, 80, 5);
+		JSpinner spinnerReverse = spinner(config.validateRtoL, -1, 50, 1);
+		JSpinner spinnerTexture = spinner(config.texture, 0.0, 1.0, 0.05, 1, 3);
+		JCheckBox subpixelToggle = checkbox("Subpixel", config.subpixel, "Subpixel Disparity Estimate");
 
 		ControlsBlockMatching() {
 			setBorder(BorderFactory.createEmptyBorder());
-			addLabeled(spinnerDisparityMin, "Min Disp.","Minimum disparity value considered. (Pixels)");
-			addLabeled(spinnerDisparityRange, "Range Disp.","Range of disparity values searched. (Pixels)");
-			addLabeled(radiusXSpinner,    "Radius X","Block Width. (Pixels)");
-			addLabeled(radiusYSpinner,    "Radius Y", "Block Height. (Pixels)");
-			addLabeled(spinnerError,     "Max Error","Maximum allowed matching error");
-			addLabeled(spinnerTexture,   "Texture","Texture validation. 0 = disabled. 1 = most strict.");
-			addLabeled(spinnerReverse,   "Reverse","Reverse Validation Tolerance. -1 = disable. (Pixels)");
+			addLabeled(spinnerDisparityMin, "Min Disp.", "Minimum disparity value considered. (Pixels)");
+			addLabeled(spinnerDisparityRange, "Range Disp.", "Range of disparity values searched. (Pixels)");
+			addLabeled(radiusXSpinner, "Radius X", "Block Width. (Pixels)");
+			addLabeled(radiusYSpinner, "Radius Y", "Block Height. (Pixels)");
+			addLabeled(spinnerError, "Max Error", "Maximum allowed matching error");
+			addLabeled(spinnerTexture, "Texture", "Texture validation. 0 = disabled. 1 = most strict.");
+			addLabeled(spinnerReverse, "Reverse", "Reverse Validation Tolerance. -1 = disable. (Pixels)");
 			addAlignLeft(subpixelToggle);
 		}
 
 		@Override
-		public void controlChanged(final Object source) {
-			if( source == spinnerDisparityMin) {
-				config.disparityMin = ((Number) spinnerDisparityMin.getValue()).intValue();
-			} else if( source == spinnerDisparityRange) {
-				config.disparityRange = ((Number) spinnerDisparityRange.getValue()).intValue();
-			} else if( source == spinnerError) {
-				config.maxPerPixelError = ((Number) spinnerError.getValue()).intValue();
-			} else if( source == radiusXSpinner) {
-				config.regionRadiusX = ((Number) radiusXSpinner.getValue()).intValue();
-			} else if( source == radiusYSpinner) {
-				config.regionRadiusY = ((Number) radiusYSpinner.getValue()).intValue();
-			} else if( source == spinnerTexture) {
-				config.texture = ((Number) spinnerTexture.getValue()).doubleValue();
-			} else if( source == subpixelToggle) {
+		public void controlChanged( final Object source ) {
+			if (source == spinnerDisparityMin) {
+				config.disparityMin = ((Number)spinnerDisparityMin.getValue()).intValue();
+			} else if (source == spinnerDisparityRange) {
+				config.disparityRange = ((Number)spinnerDisparityRange.getValue()).intValue();
+			} else if (source == spinnerError) {
+				config.maxPerPixelError = ((Number)spinnerError.getValue()).intValue();
+			} else if (source == radiusXSpinner) {
+				config.regionRadiusX = ((Number)radiusXSpinner.getValue()).intValue();
+			} else if (source == radiusYSpinner) {
+				config.regionRadiusY = ((Number)radiusYSpinner.getValue()).intValue();
+			} else if (source == spinnerTexture) {
+				config.texture = ((Number)spinnerTexture.getValue()).doubleValue();
+			} else if (source == subpixelToggle) {
 				config.subpixel = subpixelToggle.isSelected();
-			} else if( source == spinnerReverse) {
-				config.validateRtoL = ((Number) spinnerReverse.getValue()).intValue();
+			} else if (source == spinnerReverse) {
+				config.validateRtoL = ((Number)spinnerReverse.getValue()).intValue();
 			} else {
 				throw new RuntimeException("Unknown");
 			}
@@ -191,12 +192,10 @@ public class ControlPanelDisparitySparse extends StandardAlgConfigPanel {
 		}
 	}
 
-	static class ControlsSAD extends StandardAlgConfigPanel {
-
-	}
+	static class ControlsSAD extends StandardAlgConfigPanel {}
 
 	class ControlsCensus extends StandardAlgConfigPanel {
-		JComboBox<String> comboVariant = combo(config.configCensus.variant.ordinal(), (Object[]) CensusVariants.values());
+		JComboBox<String> comboVariant = combo(config.configCensus.variant.ordinal(), (Object[])CensusVariants.values());
 
 		public ControlsCensus() {
 			setBorder(BorderFactory.createEmptyBorder());
@@ -208,8 +207,8 @@ public class ControlPanelDisparitySparse extends StandardAlgConfigPanel {
 		}
 
 		@Override
-		public void controlChanged(final Object source) {
-			if( source == comboVariant) {
+		public void controlChanged( final Object source ) {
+			if (source == comboVariant) {
 				config.configCensus.variant = CensusVariants.values()[comboVariant.getSelectedIndex()];
 			} else {
 				throw new RuntimeException("Unknown");
@@ -219,21 +218,21 @@ public class ControlPanelDisparitySparse extends StandardAlgConfigPanel {
 	}
 
 	class ControlsNCC extends StandardAlgConfigPanel {
-		JSpinner spinnerEps = spinner(config.configNCC.eps,0, 1.0,0.001,"0.0E0",10);
+		JSpinner spinnerEps = spinner(config.configNCC.eps, 0, 1.0, 0.001, "0.0E0", 10);
 
 		ControlsNCC() {
 			setBorder(BorderFactory.createEmptyBorder());
 			addLabeled(spinnerEps, "EPS");
 		}
 
-		public void update( ) {
+		public void update() {
 			spinnerEps.setValue(config.configNCC.eps);
 		}
 
 		@Override
-		public void controlChanged(final Object source) {
-			if( source == spinnerEps) {
-				config.configNCC.eps = ((Number) spinnerEps.getValue()).doubleValue();
+		public void controlChanged( final Object source ) {
+			if (source == spinnerEps) {
+				config.configNCC.eps = ((Number)spinnerEps.getValue()).doubleValue();
 			} else {
 				throw new RuntimeException("Unknown");
 			}
@@ -245,7 +244,7 @@ public class ControlPanelDisparitySparse extends StandardAlgConfigPanel {
 		return listener;
 	}
 
-	public void setListener(Listener listener) {
+	public void setListener( Listener listener ) {
 		this.listener = listener;
 	}
 
@@ -253,8 +252,8 @@ public class ControlPanelDisparitySparse extends StandardAlgConfigPanel {
 		void handleSparseDisparityChange();
 	}
 
-	public static void main(String[] args) {
-		var controls = new ControlPanelDisparitySparse(()->{}, new ConfigDisparityBM());
-		ShowImages.showWindow(controls,"Controls");
+	public static void main( String[] args ) {
+		var controls = new ControlPanelDisparitySparse(() -> {}, new ConfigDisparityBM());
+		ShowImages.showWindow(controls, "Controls");
 	}
 }

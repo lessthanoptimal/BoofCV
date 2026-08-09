@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,36 +35,43 @@ import static boofcv.factory.disparity.FactoryStereoDisparity.*;
 import static boofcv.factory.transform.census.FactoryCensusTransform.CENSUS_BORDER;
 
 public class TestWrapDisparitySparseRectifiedBM extends BoofStandardJUnit {
-	@Nested
-	class SAD_U8 extends CompareSparseToDenseDisparityChecks<GrayU8> {
+	@Nested class SAD_U8 extends CompareSparseToDenseDisparityChecks<GrayU8> {
 		public SAD_U8() {
 			super(DisparityError.SAD, ImageType.SB_U8);
 		}
 	}
 
-	@Nested
-	class SAD_F32 extends CompareSparseToDenseDisparityChecks<GrayF32> {
+	@Nested class SAD_F32 extends CompareSparseToDenseDisparityChecks<GrayF32> {
 		public SAD_F32() {
 			super(DisparityError.SAD, ImageType.SB_F32);
 		}
 	}
 
-	@Nested
-	class NCC_U8 extends CompareSparseToDenseDisparityChecks<GrayU8> {
+	@Nested class SSD_U8 extends CompareSparseToDenseDisparityChecks<GrayU8> {
+		public SSD_U8() {
+			super(DisparityError.SSD, ImageType.SB_U8);
+		}
+	}
+
+	@Nested class SSD_F32 extends CompareSparseToDenseDisparityChecks<GrayF32> {
+		public SSD_F32() {
+			super(DisparityError.SSD, ImageType.SB_F32);
+		}
+	}
+
+	@Nested class NCC_U8 extends CompareSparseToDenseDisparityChecks<GrayU8> {
 		public NCC_U8() {
 			super(DisparityError.NCC, ImageType.SB_U8);
 		}
 	}
 
-	@Nested
-	class NCC_F32 extends CompareSparseToDenseDisparityChecks<GrayF32> {
+	@Nested class NCC_F32 extends CompareSparseToDenseDisparityChecks<GrayF32> {
 		public NCC_F32() {
 			super(DisparityError.NCC, ImageType.SB_F32);
 		}
 	}
 
-	@Nested
-	class CENSUS_U8 extends CompareSparseToDenseDisparityChecks<GrayU8> {
+	@Nested class CENSUS_U8 extends CompareSparseToDenseDisparityChecks<GrayU8> {
 		public CENSUS_U8() {
 			super(DisparityError.CENSUS, ImageType.SB_U8);
 		}
@@ -84,8 +91,7 @@ public class TestWrapDisparitySparseRectifiedBM extends BoofStandardJUnit {
 		}
 	}
 
-	@Nested
-	class CENSUS_U16 extends CompareSparseToDenseDisparityChecks<GrayU16> {
+	@Nested class CENSUS_U16 extends CompareSparseToDenseDisparityChecks<GrayU16> {
 		public CENSUS_U16() {
 			super(DisparityError.CENSUS, ImageType.SB_U16);
 		}
@@ -105,8 +111,7 @@ public class TestWrapDisparitySparseRectifiedBM extends BoofStandardJUnit {
 		}
 	}
 
-	@Nested
-	class CENSUS_F32 extends CompareSparseToDenseDisparityChecks<GrayF32> {
+	@Nested class CENSUS_F32 extends CompareSparseToDenseDisparityChecks<GrayF32> {
 		public CENSUS_F32() {
 			super(DisparityError.CENSUS, ImageType.SB_F32);
 		}

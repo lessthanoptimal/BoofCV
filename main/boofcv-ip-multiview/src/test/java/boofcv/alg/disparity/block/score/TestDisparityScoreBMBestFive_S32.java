@@ -42,4 +42,17 @@ public class TestDisparityScoreBMBestFive_S32 extends BoofStandardJUnit {
 			return new DisparityScoreBMBestFive_S32<>(radiusX, radiusY, scoreRow, compDisp, ImageType.SB_U16);
 		}
 	}
+
+	@Nested
+	public class SSD extends ChecksDisparityBMBestFive<GrayU16, GrayU8> {
+		SSD() {
+			super(0, 200, DisparityError.SSD, GrayU16.class, GrayU8.class);
+		}
+
+		@Override
+		protected DisparityBlockMatchBestFive<GrayU16, GrayU8>
+		createAlg( int radiusX, int radiusY, BlockRowScore scoreRow, DisparitySelect compDisp ) {
+			return new DisparityScoreBMBestFive_S32<>(radiusX, radiusY, scoreRow, compDisp, ImageType.SB_U16);
+		}
+	}
 }

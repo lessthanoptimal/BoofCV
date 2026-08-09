@@ -25,16 +25,34 @@ import boofcv.factory.disparity.DisparityError;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
+import boofcv.testing.BoofStandardJUnit;
+import org.junit.jupiter.api.Nested;
 
-public class TestDisparityScoreBM_S32 extends ChecksDisparityBM<GrayS16, GrayU8> {
+public class TestDisparityScoreBM_S32 extends BoofStandardJUnit {
 
-	TestDisparityScoreBM_S32() {
-		super(0, 2000, DisparityError.SAD, GrayS16.class, GrayU8.class);
+	@Nested
+	public class SAD extends ChecksDisparityBM<GrayS16, GrayU8> {
+		SAD() {
+			super(0, 2000, DisparityError.SAD, GrayS16.class, GrayU8.class);
+		}
+
+		@Override
+		protected DisparityBlockMatch<GrayS16, GrayU8>
+		createAlg( int radiusX, int radiusY, BlockRowScore scoreRow, DisparitySelect compDisp ) {
+			return new DisparityScoreBM_S32<>(radiusX, radiusY, scoreRow, compDisp, ImageType.SB_S16);
+		}
 	}
 
-	@Override
-	protected DisparityBlockMatch<GrayS16, GrayU8>
-	createAlg( int radiusX, int radiusY, BlockRowScore scoreRow, DisparitySelect compDisp ) {
-		return new DisparityScoreBM_S32<>(radiusX, radiusY, scoreRow, compDisp, ImageType.SB_S16);
+	@Nested
+	public class SSD extends ChecksDisparityBM<GrayS16, GrayU8> {
+		SSD() {
+			super(0, 2000, DisparityError.SSD, GrayS16.class, GrayU8.class);
+		}
+
+		@Override
+		protected DisparityBlockMatch<GrayS16, GrayU8>
+		createAlg( int radiusX, int radiusY, BlockRowScore scoreRow, DisparitySelect compDisp ) {
+			return new DisparityScoreBM_S32<>(radiusX, radiusY, scoreRow, compDisp, ImageType.SB_S16);
+		}
 	}
 }
