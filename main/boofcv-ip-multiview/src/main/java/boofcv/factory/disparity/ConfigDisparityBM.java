@@ -37,7 +37,8 @@ public class ConfigDisparityBM implements Configuration {
 	/// Radius of the rectangular region along y-axis.
 	public int regionRadiusY = 3;
 	/// Maximum allowed error in a region per pixel. Only used by "error" based measures, e.g. NCC does not
-	/// use this value. Set to < 0 to disable.
+	/// use this value. This is in the same units as the error function, SAD would be N and SSD would be N^2.
+	/// Set to < 0 to disable.
 	public double maxPerPixelError = 0;
 	/// Tolerance for how difference the left to right associated values can be. Try 1. Disable with -1
 	public int validateRtoL = 1;

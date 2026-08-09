@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,40 +18,31 @@
 
 package boofcv.factory.disparity;
 
-/**
- * Different disparity error functions that are available. Not all algorithm will support all errors
- *
- * @author Peter Abeles
- */
+/// Different disparity error functions that are available. Not all algorithm will support all errors
 public enum DisparityError {
-	/**
-	 * Sum of Absolute Difference (SAD). It's often recommended that an image derivative like Laplacian is applied
-	 * first to add improved performance ot variable lighting between the two images.
-	 */
+	/// Sum of Absolute Difference (SAD). It's often recommended that an image derivative like Laplacian is applied
+	/// first to add improved performance ot variable lighting between the two images.
 	SAD,
-	/**
-	 * Census. Can handle affine changes in lighting between the two images. There are many different possible
-	 * sampling patterns.
-	 *
-	 * @see boofcv.alg.transform.census.CensusTransform
-	 */
+	/// Sum of Squared Difference (SSD). Large differences are punished more than SAD. Tends to have less
+	/// pixel locking when sub-pixel is turned on.
+	SSD,
+	/// Census. Can handle affine changes in lighting between the two images. There are many different possible
+	/// sampling patterns.
+	///
+	/// @see boofcv.alg.transform.census.CensusTransform
 	CENSUS,
-	/**
-	 * Normalized Cross Correlation (NCC). The NCC radius specifies the size of the local region used to compute
-	 * normalization statistics.
-	 */
+	/// Normalized Cross Correlation (NCC). The NCC radius specifies the size of the local region used to compute
+	/// normalization statistics.
 	NCC;
 
 	public boolean isCorrelation() {
 		return switch (this) {
-			case SAD, CENSUS -> false;
+			case SAD, SSD, CENSUS -> false;
 			default -> true;
 		};
 	}
 
-	/**
-	 * If the error is distance squared or false if distance
-	 */
+	/// If the error is distance squared or false if distance
 	public boolean isSquared() {
 		return switch (this) {
 			case SAD, CENSUS -> false;

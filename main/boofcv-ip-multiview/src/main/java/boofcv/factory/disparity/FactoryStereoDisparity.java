@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,32 +36,20 @@ import boofcv.factory.transform.census.FactoryCensusTransform;
 import boofcv.struct.image.*;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * <p>
- * Creates high level interfaces for computing the disparity between two rectified stereo images.
- * Algorithms which select the best disparity for each region independent of all the others are
- * referred to as Winner Takes All (WTA) in the literature. Dense algorithms compute the disparity for the
- * whole image while sparse algorithms do it in a per pixel basis as requested.
- * </p>
- *
- * <p>
- * Typically disparity calculations with regions will produce less erratic results, but their precision will
- * be decreased. This is especially evident along the border of objects. Computing a wider range of disparities
- * can better results, but is very computationally expensive.
- * </p>
- *
- * <p>
- * Dense vs Sparse. Here dense refers to computing the disparity across the whole image at once. Sparse refers
- * to computing the disparity for a single pixel at a time as requested by the user,
- * </p>
- *
- * @author Peter Abeles
- */
+/// Creates high level interfaces for computing the disparity between two rectified stereo images.
+/// Algorithms which select the best disparity for each region independent of all the others are
+/// referred to as Winner Takes All (WTA) in the literature. Dense algorithms compute the disparity for the
+/// whole image while sparse algorithms do it in a per pixel basis as requested.
+///
+/// Typically, disparity calculations with regions will produce less erratic results, but their precision will
+/// be decreased. This is especially evident along the border of objects. Computing a wider range of disparities
+/// can better results, but is very computationally expensive.
+///
+/// Dense vs Sparse. Here dense refers to computing the disparity across the whole image at once. Sparse refers
+/// to computing the disparity for a single pixel at a time as requested by the user,
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class FactoryStereoDisparity {
-	/**
-	 * Function for creating any dense stereo disparity algorithm in BoofCV
-	 */
+	/// Function for creating any dense stereo disparity algorithm in BoofCV
 	public static <T extends ImageGray<T>, DI extends ImageGray<DI>> StereoDisparity<T, DI>
 	generic( ConfigDisparity config, Class<T> imageType, Class<DI> dispType ) {
 		return switch (config.approach) {
@@ -99,6 +87,13 @@ public class FactoryStereoDisparity {
 			case SAD -> {
 				DisparitySelect select = createDisparitySelect(config, imageType, (int)maxError);
 				BlockRowScore rowScore = createScoreRowSad(config, imageType);
+				DisparityBlockMatchRowFormat alg = createBlockMatching(config, imageType, select, rowScore);
+				alg.setBorder(FactoryImageBorder.generic(config.border, rowScore.getImageType()));
+				yield new WrapDisparityBlockMatchRowFormat(alg);
+			}
+			case SSD -> {
+				DisparitySelect select = createDisparitySelect(config, imageType, (int)maxError);
+				BlockRowScore rowScore = createScoreRowSsd(config, imageType);
 				DisparityBlockMatchRowFormat alg = createBlockMatching(config, imageType, select, rowScore);
 				alg.setBorder(FactoryImageBorder.generic(config.border, rowScore.getImageType()));
 				yield new WrapDisparityBlockMatchRowFormat(alg);
@@ -205,6 +200,13 @@ public class FactoryStereoDisparity {
 				alg.setBorder(FactoryImageBorder.generic(config.border, rowScore.getImageType()));
 				yield new WrapDisparityBlockMatchRowFormat(alg);
 			}
+			case SSD -> {
+				DisparitySelect select = createDisparitySelect(config, imageType, (int)maxError);
+				BlockRowScore rowScore = createScoreRowSsd(config, imageType);
+				DisparityBlockMatchRowFormat alg = createBestFive(config, imageType, select, rowScore);
+				alg.setBorder(FactoryImageBorder.generic(config.border, rowScore.getImageType()));
+				yield new WrapDisparityBlockMatchRowFormat(alg);
+			}
 			case CENSUS -> {
 				DisparitySelect select = createDisparitySelect(config, imageType, (int)maxError);
 				FilterImageInterface censusTran = FactoryCensusTransform.variant(config.configCensus.variant, true, imageType);
@@ -237,6 +239,22 @@ public class FactoryStereoDisparity {
 			rowScore = new BlockRowScoreSad.S16();
 		} else if (imageType == GrayF32.class) {
 			rowScore = new BlockRowScoreSad.F32();
+		} else {
+			throw new IllegalArgumentException("Unsupported image type " + imageType.getSimpleName());
+		}
+		return rowScore;
+	}
+
+	public static <T extends ImageGray<T>> BlockRowScore createScoreRowSsd( ConfigDisparityBM config, Class<T> imageType ) {
+		BlockRowScore rowScore;
+		if (imageType == GrayU8.class) {
+			rowScore = new BlockRowScoreSsd.U8();
+		} else if (imageType == GrayU16.class) {
+			rowScore = new BlockRowScoreSsd.U16();
+		} else if (imageType == GrayS16.class) {
+			rowScore = new BlockRowScoreSsd.S16();
+		} else if (imageType == GrayF32.class) {
+			rowScore = new BlockRowScoreSsd.F32();
 		} else {
 			throw new IllegalArgumentException("Unsupported image type " + imageType.getSimpleName());
 		}
@@ -319,6 +337,16 @@ public class FactoryStereoDisparity {
 				} else
 					throw new RuntimeException("Image type not supported: " + imageType.getSimpleName());
 			}
+
+			case SSD -> {
+				if (imageType == GrayU8.class) {
+					score = new SparseScoreRectifiedSsd.U8(config.regionRadiusX, config.regionRadiusY);
+				} else if (imageType == GrayF32.class) {
+					score = new SparseScoreRectifiedSsd.F32(config.regionRadiusX, config.regionRadiusY);
+				} else
+					throw new RuntimeException("Image type not supported: " + imageType.getSimpleName());
+			}
+
 			case NCC -> {
 				SparseScoreRectifiedNcc _score_ =
 						new SparseScoreRectifiedNcc(config.regionRadiusX, config.regionRadiusY, imageType);
@@ -354,14 +382,12 @@ public class FactoryStereoDisparity {
 		return new WrapDisparitySparseRectifiedBM(score, select);
 	}
 
-	/**
-	 * Disparity computed using Semi Global Matching (SGM)
-	 *
-	 * @param config Configuration for SGM
-	 * @param imageType Type of input image
-	 * @param dispType Type of disparity image. F32 is sub-pixel is turned on, U8 otherwise
-	 * @return The algorithm.
-	 */
+	/// Disparity computed using Semi Global Matching (SGM)
+	///
+	/// @param config Configuration for SGM
+	/// @param imageType Type of input image
+	/// @param dispType Type of disparity image. F32 is sub-pixel is turned on, U8 otherwise
+	/// @return The algorithm.
 	public static <T extends ImageGray<T>, DI extends ImageGray<DI>> StereoDisparity<T, DI>
 	sgm( @Nullable ConfigDisparitySGM config, Class<T> imageType, Class<DI> dispType ) {
 		if (config == null)
@@ -385,9 +411,7 @@ public class FactoryStereoDisparity {
 		}
 	}
 
-	/**
-	 * Post processing filter the removes small regions from disparity image
-	 */
+	/// Post-processing filter the removes small regions from disparity image
 	public static <T extends ImageGray<T>, DI extends ImageGray<DI>>
 	DisparitySmoother<T, DI> removeSpeckle( @Nullable ConfigSpeckleFilter config, Class<DI> dispType ) {
 		if (config == null)

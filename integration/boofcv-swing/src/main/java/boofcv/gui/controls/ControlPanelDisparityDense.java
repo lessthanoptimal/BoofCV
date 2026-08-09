@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,7 +40,9 @@ import java.awt.*;
 @SuppressWarnings({"NullAway.Init"})
 public class ControlPanelDisparityDense extends StandardAlgConfigPanel {
 
-	private final static String[] ERRORS_BLOCK = new String[]{"SAD", "Census", "NCC"};
+	// NOTE: These must be in the same order as the DisparityError and DisparitySgmError enums since the
+	//       combo box index is mapped directly to the enum's ordinal
+	private final static String[] ERRORS_BLOCK = new String[]{"SAD", "SSD", "Census", "NCC"};
 	private final static String[] ERRORS_SGM = new String[]{"Absolute Diff", "Census", "HMI"};
 
 	// Disparity configuration. NOT publicly accessible because BM and BM5 are mirrored. use accessor
@@ -71,8 +73,8 @@ public class ControlPanelDisparityDense extends StandardAlgConfigPanel {
 	Class imageType;
 
 	public ControlPanelDisparityDense( ConfigDisparity configDisparity,
-									   ConfigSpeckleFilter configSpeckle,
-									   Class imageType ) {
+	                                   ConfigSpeckleFilter configSpeckle,
+	                                   Class imageType ) {
 		setBorder(BorderFactory.createEmptyBorder());
 		this.configDisparity = configDisparity;
 		this.configSpeckle = configSpeckle;
@@ -107,7 +109,7 @@ public class ControlPanelDisparityDense extends StandardAlgConfigPanel {
 	}
 
 	public static ControlPanelDisparityDense createRange( int disparityMin, int disparityRange,
-														  Class imageType ) {
+	                                                      Class imageType ) {
 		var c = new ConfigDisparity();
 		c.approachBM.disparityMin = disparityMin;
 		c.approachBM.disparityRange = disparityRange;
@@ -263,11 +265,11 @@ public class ControlPanelDisparityDense extends StandardAlgConfigPanel {
 	private Component getErrorControl( int selectedIdx ) {
 		Component c;
 		if (isBlockSelected()) {
-			c = switch (selectedIdx) {
-				case 0 -> controlSad;
-				case 1 -> controlCensus;
-				case 2 -> controlNCC;
-				default -> throw new IllegalArgumentException("Unknown");
+			// SAD and SSD have no error specific settings, so they share the same (empty) panel
+			c = switch (DisparityError.values()[selectedIdx]) {
+				case SAD, SSD -> controlSad;
+				case CENSUS -> controlCensus;
+				case NCC -> controlNCC;
 			};
 		} else {
 			c = switch (selectedIdx) {
