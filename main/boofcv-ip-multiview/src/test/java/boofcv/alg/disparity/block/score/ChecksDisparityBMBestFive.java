@@ -81,8 +81,9 @@ public abstract class ChecksDisparityBMBestFive<I extends ImageGray<I>, DI exten
 		scoreRow = switch (errorType) {
 			case SAD -> FactoryStereoDisparity.createScoreRowSad(config, imageType);
 			case SSD -> FactoryStereoDisparity.createScoreRowSsd(config, imageType);
+			case ZSSD -> FactoryStereoDisparity.createScoreRowZssd(config, imageType);
 			case NCC -> FactoryStereoDisparity.createScoreRowNcc(config, imageType);
-			default -> throw new IllegalArgumentException("Only SAD, SSD, and NCC supported");
+			default -> throw new IllegalArgumentException("Only SAD, SSD, ZSSD, and NCC supported");
 		};
 	}
 
@@ -113,7 +114,10 @@ public abstract class ChecksDisparityBMBestFive<I extends ImageGray<I>, DI exten
 		@Override protected double checkShiftedErrorFraction() {
 			// Squaring the error changes which disparity wins inside the border, where the block extends past
 			// the valid data. All of the extra mismatches are border pixels, the interior is exact.
-			return errorType == DisparityError.SSD ? 0.15 : super.checkShiftedErrorFraction();
+			return switch (errorType) {
+				case SSD, ZSSD -> 0.15;
+				default -> super.checkShiftedErrorFraction();
+			};
 		}
 
 		@Override public void initialize( int minDisparity, int maxDisparity, int radiusX, int radiusY ) {

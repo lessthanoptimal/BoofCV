@@ -26,11 +26,27 @@ import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/// Checks that configuration reaches the constructed algorithm intact.
+/// Checks behaviour of algorithms built by the factory which isn't covered by the algorithm specific tests,
+/// such as configuration reaching the constructed algorithm intact.
 class TestFactoryStereoDisparity extends BoofStandardJUnit {
 	int width = 60, height = 50;
+
+	private static ConfigDisparityBM createConfig( DisparityError errorType, double maxPerPixelError,
+												   int disparityRange ) {
+		var config = new ConfigDisparityBM();
+		config.errorType = errorType;
+		config.disparityMin = 0;
+		config.disparityRange = disparityRange;
+		config.regionRadiusX = config.regionRadiusY = 2;
+		config.texture = 0;
+		config.validateRtoL = -1;
+		config.subpixel = false;
+		config.maxPerPixelError = maxPerPixelError;
+		return config;
+	}
 
 	/// A fractional maxPerPixelError, which is what you get with images normalized to have a maximum pixel
 	/// value of 1, has to survive the trip to the selector. It used to be truncated to an int on the way,
@@ -56,15 +72,7 @@ class TestFactoryStereoDisparity extends BoofStandardJUnit {
 	}
 
 	private int countInvalid( GrayF32 left, GrayF32 right, double maxPerPixelError ) {
-		var config = new ConfigDisparityBM();
-		config.errorType = DisparityError.SAD;
-		config.disparityMin = 0;
-		config.disparityRange = 5;
-		config.regionRadiusX = config.regionRadiusY = 2;
-		config.texture = 0;
-		config.validateRtoL = -1;
-		config.subpixel = false;
-		config.maxPerPixelError = maxPerPixelError;
+		ConfigDisparityBM config = createConfig(DisparityError.SAD, maxPerPixelError, 5);
 
 		StereoDisparity<GrayF32, GrayU8> alg =
 				FactoryStereoDisparity.blockMatch(config, GrayF32.class, GrayU8.class);
@@ -96,15 +104,7 @@ class TestFactoryStereoDisparity extends BoofStandardJUnit {
 	}
 
 	private int countSparseInvalid( GrayF32 left, GrayF32 right, double maxPerPixelError ) {
-		var config = new ConfigDisparityBM();
-		config.errorType = DisparityError.SAD;
-		config.disparityMin = 0;
-		config.disparityRange = 5;
-		config.regionRadiusX = config.regionRadiusY = 2;
-		config.texture = 0;
-		config.validateRtoL = -1;
-		config.subpixel = false;
-		config.maxPerPixelError = maxPerPixelError;
+		ConfigDisparityBM config = createConfig(DisparityError.SAD, maxPerPixelError, 5);
 
 		StereoDisparitySparse<GrayF32> alg = FactoryStereoDisparity.sparseRectifiedBM(config, GrayF32.class);
 		alg.setImages(left, right);

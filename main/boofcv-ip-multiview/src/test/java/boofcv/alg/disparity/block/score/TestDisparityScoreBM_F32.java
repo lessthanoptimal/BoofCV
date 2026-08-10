@@ -56,6 +56,22 @@ public class TestDisparityScoreBM_F32 extends BoofStandardJUnit {
 	}
 
 	/**
+	 * Like NCC this requires normalization, but it's an error and not a correlation
+	 */
+	@Nested
+	public class ZSSD extends ChecksDisparityBM<GrayF32, GrayU8> {
+		ZSSD() {
+			super(0, 200, DisparityError.ZSSD, GrayF32.class, GrayU8.class);
+		}
+
+		@Override
+		protected DisparityBlockMatch<GrayF32, GrayU8>
+		createAlg( int radiusX, int radiusY, BlockRowScore scoreRow, DisparitySelect compDisp ) {
+			return new DisparityScoreBM_F32<>(radiusX, radiusY, scoreRow, compDisp);
+		}
+	}
+
+	/**
 	 * Test this with error that requires normalization
 	 */
 	@Nested
