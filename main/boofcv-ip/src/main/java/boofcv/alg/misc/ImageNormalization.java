@@ -18,7 +18,6 @@
 
 package boofcv.alg.misc;
 
-import boofcv.core.image.GConvertImage;
 import boofcv.struct.image.ImageGray;
 import org.jetbrains.annotations.Nullable;
 
@@ -54,11 +53,8 @@ public class ImageNormalization {
 		if (output.getDataType().isInteger())
 			throw new IllegalArgumentException("Output must be a floating point image");
 
-		// Convert first. Subtracting from an integer image would truncate the mean to a whole number, even
-		// when the output is floating point.
 		double mean = GImageStatistics.mean(input);
-		GConvertImage.convert(input, output);
-		GPixelMath.minus(output, mean, output);
+		GPixelMath.minus(input, mean, output);
 
 		if (parameters != null) {
 			parameters.offset = -mean;

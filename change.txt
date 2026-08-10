@@ -33,6 +33,8 @@ Version : 1.4.1
   * Added ZSSD error. Invariant to an additive difference in intensity.
   * Fixed maxError bug for floats
   * Block Match 5 with NCC now respects normalizeInput. It always normalized before.
+- GPixelMath
+  * Fixed incorrect type-cast of some scalars
 
 ---------------------
 Date    : 2026/May/25

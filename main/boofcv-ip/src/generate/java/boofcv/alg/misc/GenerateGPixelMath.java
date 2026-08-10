@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,7 +41,7 @@ public class GenerateGPixelMath extends CodeGeneratorBase {
 	public void generateCode() throws FileNotFoundException {
 		printPreamble();
 
-		printFunction(operator1(), AutoTypeImage.getGenericTypes());
+		printFunction(operator1(), AutoTypeImage.getGenericTypes(), AutoTypeImage.getGenericTypes(), true);
 		printFunction2same(operator2(), AutoTypeImage.getGenericTypes());
 		printFunction(abs(), signedTypes, signedTypes);
 		printFunction(negative(), signedTypes, signedTypes);
@@ -83,10 +83,16 @@ public class GenerateGPixelMath extends CodeGeneratorBase {
 
 
 	private void printFunction( Function f, AutoTypeImage[] types ) {
-		printFunction(f, types, types);
+		printFunction(f, types, types, false);
 	}
 
 	private void printFunction( Function f, AutoTypeImage[] typesIn, AutoTypeImage[] typesOut ) {
+		printFunction(f, typesIn, typesOut, false);
+	}
+
+	/// @param assignable Use isAssignableFrom() instead of an exact class match. Required when the types are
+	/// the generic groupings, e.g. GrayI8, since those are abstract and never equal a concrete image's class.
+	private void printFunction( Function f, AutoTypeImage[] typesIn, AutoTypeImage[] typesOut, boolean assignable ) {
 		out.print(
 				"\t/**\n" + f.printJavadoc() +
 						"\t */\n" +
@@ -94,11 +100,11 @@ public class GenerateGPixelMath extends CodeGeneratorBase {
 						"\t{\n" +
 						"\t\tif( input instanceof ImageGray) {\n");
 		singleBand = true;
-		printSwitch(f, typesIn, typesOut, "input", "\t\t\t");
+		printSwitchAny(f, typesIn, typesOut, "input", "\t\t\t", assignable);
 		out.print(
 				"\t\t} else if( input instanceof ImageInterleaved ) {\n");
 		singleBand = false;
-		printSwitch(f, typesIn, typesOut, "input", "\t\t\t");
+		printSwitchAny(f, typesIn, typesOut, "input", "\t\t\t", assignable);
 		out.print("\t\t} else if( input instanceof Planar ) {\n" +
 				"\t\t\tPlanar in = (Planar)input;\n" +
 				"\t\t\tPlanar out = (Planar)output;\n" +
@@ -172,6 +178,14 @@ public class GenerateGPixelMath extends CodeGeneratorBase {
 						"\t\t\tthrow new IllegalArgumentException(\"Unknown image Type: \"+input.getClass().getSimpleName());\n" +
 						"\t\t}\n" +
 						"\t}\n\n");
+	}
+
+	private void printSwitchAny( Function f, AutoTypeImage[] typesIn, AutoTypeImage[] typesOut, String imgName,
+								 String prefix, boolean assignable ) {
+		if (assignable)
+			printSwitchAssignable(f, typesIn, typesOut, imgName, prefix);
+		else
+			printSwitch(f, typesIn, typesOut, imgName, prefix);
 	}
 
 	private void printSwitchAssignable( Function f, AutoTypeImage[] typesIn, AutoTypeImage[] typesOut, String imgName, String prefix ) {
@@ -534,14 +548,14 @@ public class GenerateGPixelMath extends CodeGeneratorBase {
 		public String printCall() {
 			String t = typecastSum();
 			String scalarCast;
-			if (onlyFloat) {
-				if (input == output)
-					scalarCast = !input.isInteger() && input.getNumBits() == 32 ? "(float) " : "";
-				else { // this is a bit of a hack. Assumes output is F32 always
-					scalarCast = "(float)";
-				}
-			} else
+			if (input != output) {
+				// Different types means the output is F32 and the double needs to be casted to that.
+				scalarCast = "(float)";
+			} else if (onlyFloat) {
+				scalarCast = !input.isInteger() && input.getNumBits() == 32 ? "(float) " : "";
+			} else {
 				scalarCast = t;
+			}
 			if (bounded)
 				return String.format("(%s) input, %s%s, %s lower, %s upper, (%s) output", name(input), scalarCast, scalarName, t, t, name(output));
 			else
