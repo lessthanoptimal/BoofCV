@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ import javax.annotation.Generated;
  * Generalized version of {@link PixelMath}. Type checking is performed at runtime instead of at compile type.
  *
  * <p>DO NOT MODIFY. Automatically generated code created by GenerateGPixelMath</p>
- *
+
  * @author Peter Abeles
  */
 @Generated("boofcv.alg.misc.GenerateGPixelMath")
@@ -594,17 +594,17 @@ public class GPixelMath {
 				}
 			} else if( GrayF32.class == output.getClass() ) {
 				if (GrayU8.class == input.getClass()) {
-					PixelMath.plus((GrayU8) input, (int)value, (GrayF32) output);
+					PixelMath.plus((GrayU8) input, (float)value, (GrayF32) output);
 				} else if (GrayS8.class == input.getClass()) {
-					PixelMath.plus((GrayS8) input, (int)value, (GrayF32) output);
+					PixelMath.plus((GrayS8) input, (float)value, (GrayF32) output);
 				} else if (GrayU16.class == input.getClass()) {
-					PixelMath.plus((GrayU16) input, (int)value, (GrayF32) output);
+					PixelMath.plus((GrayU16) input, (float)value, (GrayF32) output);
 				} else if (GrayS16.class == input.getClass()) {
-					PixelMath.plus((GrayS16) input, (int)value, (GrayF32) output);
+					PixelMath.plus((GrayS16) input, (float)value, (GrayF32) output);
 				} else if (GrayS32.class == input.getClass()) {
-					PixelMath.plus((GrayS32) input, (int)value, (GrayF32) output);
+					PixelMath.plus((GrayS32) input, (float)value, (GrayF32) output);
 				} else if (GrayS64.class == input.getClass()) {
-					PixelMath.plus((GrayS64) input, (long)value, (GrayF32) output);
+					PixelMath.plus((GrayS64) input, (float)value, (GrayF32) output);
 				} else {
 					throw new IllegalArgumentException("Unknown image Type: " + input.getClass().getSimpleName());
 				}
@@ -632,17 +632,17 @@ public class GPixelMath {
 					}
 			} else if( InterleavedF32.class == output.getClass() ) {
 				if (InterleavedU8.class == input.getClass()) {
-					PixelMath.plus((InterleavedU8) input, (int)value, (InterleavedF32) output);
+					PixelMath.plus((InterleavedU8) input, (float)value, (InterleavedF32) output);
 				} else if (InterleavedS8.class == input.getClass()) {
-					PixelMath.plus((InterleavedS8) input, (int)value, (InterleavedF32) output);
+					PixelMath.plus((InterleavedS8) input, (float)value, (InterleavedF32) output);
 				} else if (InterleavedU16.class == input.getClass()) {
-					PixelMath.plus((InterleavedU16) input, (int)value, (InterleavedF32) output);
+					PixelMath.plus((InterleavedU16) input, (float)value, (InterleavedF32) output);
 				} else if (InterleavedS16.class == input.getClass()) {
-					PixelMath.plus((InterleavedS16) input, (int)value, (InterleavedF32) output);
+					PixelMath.plus((InterleavedS16) input, (float)value, (InterleavedF32) output);
 				} else if (InterleavedS32.class == input.getClass()) {
-					PixelMath.plus((InterleavedS32) input, (int)value, (InterleavedF32) output);
+					PixelMath.plus((InterleavedS32) input, (float)value, (InterleavedF32) output);
 				} else if (InterleavedS64.class == input.getClass()) {
-					PixelMath.plus((InterleavedS64) input, (long)value, (InterleavedF32) output);
+					PixelMath.plus((InterleavedS64) input, (float)value, (InterleavedF32) output);
 				} else {
 					throw new IllegalArgumentException("Unknown image Type: " + input.getClass().getSimpleName());
 				}
@@ -755,17 +755,17 @@ public class GPixelMath {
 				}
 			} else if( GrayF32.class == output.getClass() ) {
 				if (GrayU8.class == input.getClass()) {
-					PixelMath.minus((GrayU8) input, (int)value, (GrayF32) output);
+					PixelMath.minus((GrayU8) input, (float)value, (GrayF32) output);
 				} else if (GrayS8.class == input.getClass()) {
-					PixelMath.minus((GrayS8) input, (int)value, (GrayF32) output);
+					PixelMath.minus((GrayS8) input, (float)value, (GrayF32) output);
 				} else if (GrayU16.class == input.getClass()) {
-					PixelMath.minus((GrayU16) input, (int)value, (GrayF32) output);
+					PixelMath.minus((GrayU16) input, (float)value, (GrayF32) output);
 				} else if (GrayS16.class == input.getClass()) {
-					PixelMath.minus((GrayS16) input, (int)value, (GrayF32) output);
+					PixelMath.minus((GrayS16) input, (float)value, (GrayF32) output);
 				} else if (GrayS32.class == input.getClass()) {
-					PixelMath.minus((GrayS32) input, (int)value, (GrayF32) output);
+					PixelMath.minus((GrayS32) input, (float)value, (GrayF32) output);
 				} else if (GrayS64.class == input.getClass()) {
-					PixelMath.minus((GrayS64) input, (long)value, (GrayF32) output);
+					PixelMath.minus((GrayS64) input, (float)value, (GrayF32) output);
 				} else {
 					throw new IllegalArgumentException("Unknown image Type: " + input.getClass().getSimpleName());
 				}
@@ -793,17 +793,17 @@ public class GPixelMath {
 					}
 			} else if( InterleavedF32.class == output.getClass() ) {
 				if (InterleavedU8.class == input.getClass()) {
-					PixelMath.minus((InterleavedU8) input, (int)value, (InterleavedF32) output);
+					PixelMath.minus((InterleavedU8) input, (float)value, (InterleavedF32) output);
 				} else if (InterleavedS8.class == input.getClass()) {
-					PixelMath.minus((InterleavedS8) input, (int)value, (InterleavedF32) output);
+					PixelMath.minus((InterleavedS8) input, (float)value, (InterleavedF32) output);
 				} else if (InterleavedU16.class == input.getClass()) {
-					PixelMath.minus((InterleavedU16) input, (int)value, (InterleavedF32) output);
+					PixelMath.minus((InterleavedU16) input, (float)value, (InterleavedF32) output);
 				} else if (InterleavedS16.class == input.getClass()) {
-					PixelMath.minus((InterleavedS16) input, (int)value, (InterleavedF32) output);
+					PixelMath.minus((InterleavedS16) input, (float)value, (InterleavedF32) output);
 				} else if (InterleavedS32.class == input.getClass()) {
-					PixelMath.minus((InterleavedS32) input, (int)value, (InterleavedF32) output);
+					PixelMath.minus((InterleavedS32) input, (float)value, (InterleavedF32) output);
 				} else if (InterleavedS64.class == input.getClass()) {
-					PixelMath.minus((InterleavedS64) input, (long)value, (InterleavedF32) output);
+					PixelMath.minus((InterleavedS64) input, (float)value, (InterleavedF32) output);
 				} else {
 					throw new IllegalArgumentException("Unknown image Type: " + input.getClass().getSimpleName());
 				}
