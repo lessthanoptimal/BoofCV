@@ -30,7 +30,9 @@ Version : 1.4.1
 - DenseOpticalFlow: New API which is much more memory efficient
 - Block Matching Stereo
   * Added SSD error
+  * Added ZSSD error. Invariant to an additive difference in intensity.
   * Fixed maxError bug for floats
+  * Block Match 5 with NCC now respects normalizeInput. It always normalized before.
 
 ---------------------
 Date    : 2026/May/25

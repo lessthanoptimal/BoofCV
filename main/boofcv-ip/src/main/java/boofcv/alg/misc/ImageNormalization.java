@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.misc;
 
+import boofcv.core.image.GConvertImage;
 import boofcv.struct.image.ImageGray;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,6 +40,30 @@ public class ImageNormalization {
 	public static void apply( ImageGray input, NormalizeParameters parameter, ImageGray output ) {
 		GPixelMath.plus(input, parameter.offset, output);
 		GPixelMath.multiply(output, 1.0f/parameter.divisor, output);
+	}
+
+	/**
+	 * Subtracts the mean from the image without changing its scale.
+	 *
+	 * @param input Input image
+	 * @param output Output image with the mean removed. Can be the same instance as the input image.
+	 * @param parameters If not null, the offset and divisor which were applied
+	 */
+	public static void zeroMean( ImageGray input, ImageGray output, @Nullable NormalizeParameters parameters ) {
+		output.reshape(input);
+		if (output.getDataType().isInteger())
+			throw new IllegalArgumentException("Output must be a floating point image");
+
+		// Convert first. Subtracting from an integer image would truncate the mean to a whole number, even
+		// when the output is floating point.
+		double mean = GImageStatistics.mean(input);
+		GConvertImage.convert(input, output);
+		GPixelMath.minus(output, mean, output);
+
+		if (parameters != null) {
+			parameters.offset = -mean;
+			parameters.divisor = 1.0;
+		}
 	}
 
 	/**

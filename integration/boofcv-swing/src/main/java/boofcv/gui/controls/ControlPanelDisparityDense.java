@@ -42,7 +42,7 @@ public class ControlPanelDisparityDense extends StandardAlgConfigPanel {
 
 	// NOTE: These must be in the same order as the DisparityError and DisparitySgmError enums since the
 	//       combo box index is mapped directly to the enum's ordinal
-	private final static String[] ERRORS_BLOCK = new String[]{"SAD", "SSD", "Census", "NCC"};
+	private final static String[] ERRORS_BLOCK = new String[]{"SAD", "SSD", "ZSSD", "Census", "NCC"};
 	private final static String[] ERRORS_SGM = new String[]{"Absolute Diff", "Census", "HMI"};
 
 	// Disparity configuration. NOT publicly accessible because BM and BM5 are mirrored. use accessor
@@ -267,7 +267,7 @@ public class ControlPanelDisparityDense extends StandardAlgConfigPanel {
 		if (isBlockSelected()) {
 			// SAD and SSD have no error specific settings, so they share the same (empty) panel
 			c = switch (DisparityError.values()[selectedIdx]) {
-				case SAD, SSD -> controlSad;
+				case SAD, SSD, ZSSD -> controlSad;
 				case CENSUS -> controlCensus;
 				case NCC -> controlNCC;
 			};

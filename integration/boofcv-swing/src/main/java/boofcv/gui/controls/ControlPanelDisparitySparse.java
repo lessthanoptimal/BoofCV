@@ -39,7 +39,7 @@ public class ControlPanelDisparitySparse extends StandardAlgConfigPanel {
 
 	// NOTE: These must be in the same order as the DisparityError enum since the combo box index is
 	//       mapped directly to the enum's ordinal
-	private static String[] ERRORS_BLOCK = new String[]{"SAD", "SSD", "Census", "NCC"};
+	private static String[] ERRORS_BLOCK = new String[]{"SAD", "SSD", "ZSSD", "Census", "NCC"};
 
 	public final ConfigDisparityBM config;
 
@@ -139,7 +139,7 @@ public class ControlPanelDisparitySparse extends StandardAlgConfigPanel {
 
 	private Component getErrorControl( int selectedIdx ) {
 		return switch (DisparityError.values()[selectedIdx]) {
-			case SAD, SSD -> controlSad;
+			case SAD, SSD, ZSSD -> controlSad;
 			case CENSUS -> controlCensus;
 			case NCC -> controlNCC;
 		};

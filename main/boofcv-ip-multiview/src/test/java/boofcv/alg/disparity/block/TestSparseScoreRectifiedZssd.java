@@ -16,25 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.factory.disparity;
+package boofcv.alg.disparity.block;
 
-import boofcv.struct.StandardConfigurationChecks;
 import boofcv.testing.BoofStandardJUnit;
-import org.junit.jupiter.api.Nested;
 
-public class TestConfigDisparityError extends BoofStandardJUnit {
-	@Nested
-	public class Census extends StandardConfigurationChecks {
-		public Census() {super(ConfigDisparityError.Census.class);}
-	}
-
-	@Nested
-	public class NCC extends StandardConfigurationChecks {
-		public NCC() {super(ConfigDisparityError.NCC.class);}
-	}
-
-	@Nested
-	public class HMI extends StandardConfigurationChecks {
-		public HMI() {super(ConfigDisparityError.HMI.class);}
-	}
+class TestSparseScoreRectifiedZssd extends BoofStandardJUnit {
+	// See TestWrapDisparitySparseRectifiedBM
 }

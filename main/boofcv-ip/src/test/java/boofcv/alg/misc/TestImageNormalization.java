@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,155 +36,177 @@ class TestImageNormalization extends BoofStandardJUnit {
 
 	private Class[] types = new Class[]{GrayU8.class, GrayU16.class, GrayF32.class};
 
-	@Test
-	void maxAbsOfOne() {
-		for( Class type : types ) {
-			ImageGray src = GeneralizedImageOps.createSingleBand(type,width,height);
-			double maxValue = Math.min(src.getImageType().getDataType().getMaxValue(),2000);
+	@Test void maxAbsOfOne() {
+		for (Class type : types) {
+			ImageGray src = GeneralizedImageOps.createSingleBand(type, width, height);
+			double maxValue = Math.min(src.getImageType().getDataType().getMaxValue(), 2000);
 			double minValue = src.getDataType().isSigned() ? -maxValue : 0;
 
-			GImageMiscOps.fillUniform(src,rand,minValue,maxValue);
+			GImageMiscOps.fillUniform(src, rand, minValue, maxValue);
 			GrayF32 dst = (GrayF32)src.createSameShape(GrayF32.class);
 
 			NormalizeParameters param = new NormalizeParameters();
-			ImageNormalization.maxAbsOfOne(src,dst,param);
+			ImageNormalization.maxAbsOfOne(src, dst, param);
 
 			check_maxAbsOfOne(src, dst, param);
 		}
 	}
 
-	private void check_maxAbsOfOne(ImageGray src, GrayF32 dst, NormalizeParameters param) {
+	private void check_maxAbsOfOne( ImageGray src, GrayF32 dst, NormalizeParameters param ) {
 		double maxAbs = 0;
 
 		for (int y = 0; y < src.height; y++) {
 			for (int x = 0; x < src.width; x++) {
-				float v = dst.get(x,y);
-				maxAbs = Math.max(maxAbs,Math.abs(v));
+				float v = dst.get(x, y);
+				maxAbs = Math.max(maxAbs, Math.abs(v));
 			}
 		}
 
-		assertEquals(1.0,maxAbs,1e-2);
+		assertEquals(1.0, maxAbs, 1e-2);
 
 		// Apply the parameters and see if it gets the same results
 		GrayF32 dst2 = dst.createSameShape();
-		ImageNormalization.apply(src,param,dst2);
-		BoofTesting.assertEquals(dst,dst2,1e-2);
+		ImageNormalization.apply(src, param, dst2);
+		BoofTesting.assertEquals(dst, dst2, 1e-2);
 	}
 
-	@Test
-	void zeroMeanMaxOne() {
-		for( Class type : types ) {
-			ImageGray src = GeneralizedImageOps.createSingleBand(type,width,height);
-			double maxValue = Math.min(src.getImageType().getDataType().getMaxValue(),2000);
+	@Test void zeroMeanMaxOne() {
+		for (Class type : types) {
+			ImageGray src = GeneralizedImageOps.createSingleBand(type, width, height);
+			double maxValue = Math.min(src.getImageType().getDataType().getMaxValue(), 2000);
 			double minValue = src.getDataType().isSigned() ? -maxValue : 0;
 
-			GImageMiscOps.fillUniform(src,rand,minValue,maxValue);
+			GImageMiscOps.fillUniform(src, rand, minValue, maxValue);
 			GrayF32 dst = (GrayF32)src.createSameShape(GrayF32.class);
 
 			NormalizeParameters param = new NormalizeParameters();
-			ImageNormalization.zeroMeanMaxOne(src,dst,param);
+			ImageNormalization.zeroMeanMaxOne(src, dst, param);
 
-			check_zeroMeanMaxOne(src, dst, param,1.0);
+			check_zeroMeanMaxOne(src, dst, param, 1.0);
 		}
 	}
 
 	/**
 	 * Pathological case where everything is the same value
 	 */
-	@Test
-	void zeroMeanMaxOne_identical() {
-		for( Class type : types ) {
-			zeroMeanMaxOne_identical(type,0.0);
-			zeroMeanMaxOne_identical(type,5.0);
+	@Test void zeroMeanMaxOne_identical() {
+		for (Class type : types) {
+			zeroMeanMaxOne_identical(type, 0.0);
+			zeroMeanMaxOne_identical(type, 5.0);
 		}
 	}
+
 	void zeroMeanMaxOne_identical( Class type, double value ) {
-		ImageGray src = GeneralizedImageOps.createSingleBand(type,width,height);
-		GImageMiscOps.fill(src,value);
+		ImageGray src = GeneralizedImageOps.createSingleBand(type, width, height);
+		GImageMiscOps.fill(src, value);
 		GrayF32 dst = (GrayF32)src.createSameShape(GrayF32.class);
 
 		NormalizeParameters param = new NormalizeParameters();
-		ImageNormalization.zeroMeanMaxOne(src,dst,param);
+		ImageNormalization.zeroMeanMaxOne(src, dst, param);
 
-		check_zeroMeanMaxOne(src, dst, param,0.0);
+		check_zeroMeanMaxOne(src, dst, param, 0.0);
 	}
 
-	private void check_zeroMeanMaxOne(ImageGray src, GrayF32 dst, NormalizeParameters param, double expectedMaxAbs) {
+	private void check_zeroMeanMaxOne( ImageGray src, GrayF32 dst, NormalizeParameters param, double expectedMaxAbs ) {
 		double mean = 0;
 		double maxAbs = 0;
 
 		for (int y = 0; y < src.height; y++) {
 			for (int x = 0; x < src.width; x++) {
-				float v = dst.get(x,y);
+				float v = dst.get(x, y);
 				mean += v;
-				maxAbs = Math.max(maxAbs,Math.abs(v));
+				maxAbs = Math.max(maxAbs, Math.abs(v));
 			}
 		}
 
-		assertEquals(0.0,mean/src.totalPixels(), UtilEjml.TEST_F32);
-		assertEquals(expectedMaxAbs,maxAbs,1e-2);
+		assertEquals(0.0, mean/src.totalPixels(), UtilEjml.TEST_F32);
+		assertEquals(expectedMaxAbs, maxAbs, 1e-2);
 
 		// Apply the parmeters and see if it gets the same results
 		GrayF32 dst2 = dst.createSameShape();
-		ImageNormalization.apply(src,param,dst2);
-		BoofTesting.assertEquals(dst,dst2,1e-2);
+		ImageNormalization.apply(src, param, dst2);
+		BoofTesting.assertEquals(dst, dst2, 1e-2);
 	}
 
-	@Test
-	void zeroMeanStdOne() {
-		for( Class type : types ) {
-			ImageGray src = GeneralizedImageOps.createSingleBand(type,width,height);
-			double maxValue = Math.min(src.getImageType().getDataType().getMaxValue(),2000);
+	@Test void zeroMean() {
+		for (Class type : types) {
+			ImageGray src = GeneralizedImageOps.createSingleBand(type, width, height);
+			double maxValue = Math.min(src.getImageType().getDataType().getMaxValue(), 2000);
 			double minValue = src.getDataType().isSigned() ? -maxValue : 0;
 
-			GImageMiscOps.fillUniform(src,rand,minValue,maxValue);
+			GImageMiscOps.fillUniform(src, rand, minValue, maxValue);
 			GrayF32 dst = (GrayF32)src.createSameShape(GrayF32.class);
 
 			NormalizeParameters param = new NormalizeParameters();
-			ImageNormalization.zeroMeanStdOne(src,dst,param);
+			ImageNormalization.zeroMean(src, dst, param);
+
+			// mean was removed
+			assertEquals(0.0, ImageStatistics.mean(dst), Math.abs(maxValue)*1e-4);
+			// the scale was left alone, so applying the parameters to the source reproduces the output
+			assertEquals(1.0, param.divisor, UtilEjml.TEST_F64);
+			assertEquals(-GImageStatistics.mean(src), param.offset, Math.abs(maxValue)*1e-4);
+
+			// spread is unchanged, only shifted
+			double spreadSrc = GImageStatistics.max(src) - GImageStatistics.min(src);
+			double spreadDst = ImageStatistics.max(dst) - ImageStatistics.min(dst);
+			assertEquals(spreadSrc, spreadDst, Math.abs(maxValue)*1e-3);
+		}
+	}
+
+	@Test void zeroMeanStdOne() {
+		for (Class type : types) {
+			ImageGray src = GeneralizedImageOps.createSingleBand(type, width, height);
+			double maxValue = Math.min(src.getImageType().getDataType().getMaxValue(), 2000);
+			double minValue = src.getDataType().isSigned() ? -maxValue : 0;
+
+			GImageMiscOps.fillUniform(src, rand, minValue, maxValue);
+			GrayF32 dst = (GrayF32)src.createSameShape(GrayF32.class);
+
+			NormalizeParameters param = new NormalizeParameters();
+			ImageNormalization.zeroMeanStdOne(src, dst, param);
 
 			check_zeroMeanStdOne(src, dst, param, 1.0);
 		}
 	}
 
-	@Test
-	void zeroMeanStdOne_identical() {
-		for( Class type : types ) {
-			zeroMeanStdOne_identical(type,0.0);
-			zeroMeanStdOne_identical(type,5.0);
+	@Test void zeroMeanStdOne_identical() {
+		for (Class type : types) {
+			zeroMeanStdOne_identical(type, 0.0);
+			zeroMeanStdOne_identical(type, 5.0);
 		}
 	}
+
 	void zeroMeanStdOne_identical( Class type, double value ) {
-		ImageGray src = GeneralizedImageOps.createSingleBand(type,width,height);
-		GImageMiscOps.fill(src,value);
+		ImageGray src = GeneralizedImageOps.createSingleBand(type, width, height);
+		GImageMiscOps.fill(src, value);
 		GrayF32 dst = (GrayF32)src.createSameShape(GrayF32.class);
 
 		NormalizeParameters param = new NormalizeParameters();
-		ImageNormalization.zeroMeanStdOne(src,dst,param);
+		ImageNormalization.zeroMeanStdOne(src, dst, param);
 
 		check_zeroMeanStdOne(src, dst, param, 0.0);
 	}
 
-	private void check_zeroMeanStdOne(ImageGray src, GrayF32 dst, NormalizeParameters param , double expectedStdev) {
+	private void check_zeroMeanStdOne( ImageGray src, GrayF32 dst, NormalizeParameters param, double expectedStdev ) {
 		float mean = ImageStatistics.mean(dst);
 		double stdev = 0;
 
 		for (int y = 0; y < src.height; y++) {
 			for (int x = 0; x < src.width; x++) {
-				float v = dst.get(x,y)-mean;
+				float v = dst.get(x, y) - mean;
 				stdev += v*v;
 			}
 		}
 
-		stdev = Math.sqrt(stdev/(src.totalPixels()-1));
+		stdev = Math.sqrt(stdev/(src.totalPixels() - 1));
 
-		assertEquals(0.0,mean, UtilEjml.TEST_F32);
-		assertEquals(expectedStdev,stdev,1e-2);
+		assertEquals(0.0, mean, UtilEjml.TEST_F32);
+		assertEquals(expectedStdev, stdev, 1e-2);
 
 		// Apply the parmeters and see if it gets the same results
 		GrayF32 dst2 = dst.createSameShape();
-		ImageNormalization.apply(src,param,dst2);
-		BoofTesting.assertEquals(dst,dst2,0.1);
+		ImageNormalization.apply(src, param, dst2);
+		BoofTesting.assertEquals(dst, dst2, 0.1);
 		// Maybe this large tolerance is a sign the operations need to be changed
 	}
 }

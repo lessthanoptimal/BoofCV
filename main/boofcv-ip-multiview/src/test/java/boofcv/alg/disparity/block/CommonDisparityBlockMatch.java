@@ -219,6 +219,32 @@ public abstract class CommonDisparityBlockMatch<I extends ImageGray<I>> {
 				return ret;
 			}
 
+			case ZSSD: {
+				// Remove the mean of each block before comparing them
+				double meanL = 0, meanR = 0;
+				int area = (2*radiusX + 1)*(2*radiusY + 1);
+				for (int y = -radiusY; y <= radiusY; y++) {
+					for (int x = -radiusX; x <= radiusX; x++) {
+						meanL += GeneralizedImageOps.get(bleft, leftX + x, centerY + y);
+						meanR += GeneralizedImageOps.get(bright, rightX + x, centerY + y);
+					}
+				}
+				meanL /= area;
+				meanR /= area;
+
+				double ret = 0;
+				for (int y = -radiusY; y <= radiusY; y++) {
+					for (int x = -radiusX; x <= radiusX; x++) {
+						double l = GeneralizedImageOps.get(bleft, leftX + x, centerY + y) - meanL;
+						double r = GeneralizedImageOps.get(bright, rightX + x, centerY + y) - meanR;
+
+						ret += (l - r)*(l - r);
+					}
+				}
+
+				return ret;
+			}
+
 			case NCC: {
 				return TestBlockRowScoreNcc.ncc((ImageBorder_F32)bleft, (ImageBorder_F32)bright,
 						leftX, centerY, leftX - rightX, radiusX, radiusY, eps);

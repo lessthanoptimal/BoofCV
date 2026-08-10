@@ -59,6 +59,18 @@ public class TestWrapDisparitySparseRectifiedBM extends BoofStandardJUnit {
 		}
 	}
 
+	@Nested class ZSSD_U8 extends CompareSparseToDenseDisparityChecks<GrayU8> {
+		public ZSSD_U8() {
+			super(DisparityError.ZSSD, ImageType.SB_U8);
+		}
+	}
+
+	@Nested class ZSSD_F32 extends CompareSparseToDenseDisparityChecks<GrayF32> {
+		public ZSSD_F32() {
+			super(DisparityError.ZSSD, ImageType.SB_F32);
+		}
+	}
+
 	@Nested class NCC_U8 extends CompareSparseToDenseDisparityChecks<GrayU8> {
 		public NCC_U8() {
 			super(DisparityError.NCC, ImageType.SB_U8);

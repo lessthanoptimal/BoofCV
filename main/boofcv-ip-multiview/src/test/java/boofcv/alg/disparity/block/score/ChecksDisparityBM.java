@@ -82,8 +82,9 @@ public abstract class ChecksDisparityBM<I extends ImageGray<I>, DI extends Image
 		switch (errorType) {
 			case SAD -> scoreRow = FactoryStereoDisparity.createScoreRowSad(config, imageType);
 			case SSD -> scoreRow = FactoryStereoDisparity.createScoreRowSsd(config, imageType);
+			case ZSSD -> scoreRow = FactoryStereoDisparity.createScoreRowZssd(config, imageType);
 			case NCC -> scoreRow = FactoryStereoDisparity.createScoreRowNcc(config, imageType);
-			default -> throw new IllegalArgumentException("Only SAD, SSD, and NCC supported");
+			default -> throw new IllegalArgumentException("Only SAD, SSD, ZSSD, and NCC supported");
 		}
 	}
 
@@ -115,7 +116,10 @@ public abstract class ChecksDisparityBM<I extends ImageGray<I>, DI extends Image
 		protected double checkShiftedErrorFraction() {
 			// Squaring the error changes which disparity wins inside the border, where the block extends past
 			// the valid data. All of the extra mismatches are border pixels, the interior is exact.
-			return errorType == DisparityError.SSD ? 0.15 : super.checkShiftedErrorFraction();
+			return switch (errorType) {
+				case SSD, ZSSD -> 0.15;
+				default -> super.checkShiftedErrorFraction();
+			};
 		}
 
 		@Override

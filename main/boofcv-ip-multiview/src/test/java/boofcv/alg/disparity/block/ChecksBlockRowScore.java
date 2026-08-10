@@ -159,38 +159,10 @@ public abstract class ChecksBlockRowScore<T extends ImageBase<T>, ScoreArray, Da
 	}
 
 	void score_naive( int minDisparity, int maxDisparity, int radius, int row ) {
-		int w = radius*2 + 1;
 		GImageMiscOps.fillUniform(left, rand, 0, maxPixelValue);
 		GImageMiscOps.fillUniform(right, rand, 0, maxPixelValue);
 
-		BlockRowScore<T, ScoreArray, DataArray> alg = createAlg(radius, radius);
-		alg.setBorder(FactoryImageBorder.generic(BORDER_TYPE, alg.getImageType()));
-		alg.setInput(left, right);
-
-		int disparityRange = maxDisparity - minDisparity + 1;
-
-		ScoreArray scores = createArray(width*disparityRange);
-		ScoreArray elementScore = createArray(width + 2*radius);
-		ScoreArray scoresSum = createArray(width*disparityRange);
-		ScoreArray scoresSumNorm = createArray(width*disparityRange);
-		ScoreArray scoresEvaluated;
-
-		// compute the scores one row at a time then sum them up to get the unnormalized region score
-		for (int i = -radius; i <= radius; i++) {
-			growBorder.setImage(left);
-			growBorder.growRow(row + i, radius, radius, leftRow, 0);
-			growBorder.setImage(right);
-			growBorder.growRow(row + i, radius, radius, rightRow, 0);
-			alg.scoreRow(row + i, leftRow, rightRow, scores, minDisparity, maxDisparity, w, elementScore);
-			addToSum(scores, scoresSum);
-		}
-		// Normalize the region score
-		if (alg.isRequireNormalize()) {
-			alg.normalizeRegionScores(row, scoresSum, minDisparity, maxDisparity, w, w, scoresSumNorm);
-			scoresEvaluated = scoresSumNorm;
-		} else {
-			scoresEvaluated = scoresSum;
-		}
+		ScoreArray scoresEvaluated = computeRegionScores(minDisparity, maxDisparity, radius, row);
 
 		for (int d = minDisparity; d < maxDisparity; d++) {
 			// valid columns for this disparity, clamped to both image borders. Scores are stored at the
@@ -207,6 +179,39 @@ public abstract class ChecksBlockRowScore<T extends ImageBase<T>, ScoreArray, Da
 				assertEquals(expected, found, tol, "y = " + row + " x = " + x + " d = " + d);
 			}
 		}
+	}
+
+	/// Scores every disparity for a region centered on the given row, using the current left and right
+	/// images. Applies normalization if the score requires it.
+	protected ScoreArray computeRegionScores( int minDisparity, int maxDisparity, int radius, int row ) {
+		int w = radius*2 + 1;
+
+		BlockRowScore<T, ScoreArray, DataArray> alg = createAlg(radius, radius);
+		alg.setBorder(FactoryImageBorder.generic(BORDER_TYPE, alg.getImageType()));
+		alg.setInput(left, right);
+
+		int disparityRange = maxDisparity - minDisparity + 1;
+
+		ScoreArray scores = createArray(width*disparityRange);
+		ScoreArray elementScore = createArray(width + 2*radius);
+		ScoreArray scoresSum = createArray(width*disparityRange);
+		ScoreArray scoresSumNorm = createArray(width*disparityRange);
+
+		// compute the scores one row at a time then sum them up to get the unnormalized region score
+		for (int i = -radius; i <= radius; i++) {
+			growBorder.setImage(left);
+			growBorder.growRow(row + i, radius, radius, leftRow, 0);
+			growBorder.setImage(right);
+			growBorder.growRow(row + i, radius, radius, rightRow, 0);
+			alg.scoreRow(row + i, leftRow, rightRow, scores, minDisparity, maxDisparity, w, elementScore);
+			addToSum(scores, scoresSum);
+		}
+
+		if (!alg.isRequireNormalize())
+			return scoresSum;
+
+		alg.normalizeRegionScores(row, scoresSum, minDisparity, maxDisparity, w, w, scoresSumNorm);
+		return scoresSumNorm;
 	}
 
 	private void addToSum( ScoreArray scores, ScoreArray scoresSum ) {

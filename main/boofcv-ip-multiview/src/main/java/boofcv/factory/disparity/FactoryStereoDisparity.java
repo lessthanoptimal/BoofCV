@@ -98,6 +98,14 @@ public class FactoryStereoDisparity {
 				alg.setBorder(FactoryImageBorder.generic(config.border, rowScore.getImageType()));
 				yield new WrapDisparityBlockMatchRowFormat(alg);
 			}
+			case ZSSD -> {
+				DisparitySelect select = createDisparitySelect(config, GrayF32.class, maxError);
+				BlockRowScore rowScore = createScoreRowZssd(config, GrayF32.class);
+				DisparityBlockMatchRowFormat alg = createBlockMatching(config, GrayF32.class, select, rowScore);
+				alg.setBorder(FactoryImageBorder.generic(config.border, rowScore.getImageType()));
+				// Not normalized, unlike NCC, since rescaling the input would change the scale of the error
+				yield new DisparityBlockMatchPreFilter(alg, imageType);
+			}
 			case CENSUS -> {
 				DisparitySelect select = createDisparitySelect(config, imageType, maxError);
 				FilterImageInterface censusTran = FactoryCensusTransform.variant(config.configCensus.variant, true, imageType);
@@ -113,8 +121,9 @@ public class FactoryStereoDisparity {
 				BlockRowScore rowScore = createScoreRowNcc(config, GrayF32.class);
 				DisparityBlockMatchRowFormat alg = createBlockMatching(config, GrayF32.class, select, rowScore);
 				alg.setBorder(FactoryImageBorder.generic(config.border, rowScore.getImageType()));
-				DisparityBlockMatchCorrelation ret = new DisparityBlockMatchCorrelation(alg, imageType);
-				ret.setNormalizeInput(config.configNCC.normalizeInput);
+				var ret = new DisparityBlockMatchPreFilter(alg, imageType);
+				if (config.configNCC.normalizeInput)
+					ret.setType(DisparityBlockMatchPreFilter.Type.CORRELATION);
 				yield ret;
 			}
 			default -> throw new IllegalArgumentException("Unsupported error type " + config.errorType);
@@ -207,6 +216,14 @@ public class FactoryStereoDisparity {
 				alg.setBorder(FactoryImageBorder.generic(config.border, rowScore.getImageType()));
 				yield new WrapDisparityBlockMatchRowFormat(alg);
 			}
+			case ZSSD -> {
+				DisparitySelect select = createDisparitySelect(config, GrayF32.class, maxError);
+				BlockRowScore rowScore = createScoreRowZssd(config, GrayF32.class);
+				DisparityBlockMatchRowFormat alg = createBestFive(config, GrayF32.class, select, rowScore);
+				alg.setBorder(FactoryImageBorder.generic(config.border, rowScore.getImageType()));
+				// Not normalized, unlike NCC, since rescaling the input would change the scale of the error
+				yield new DisparityBlockMatchPreFilter(alg, imageType);
+			}
 			case CENSUS -> {
 				DisparitySelect select = createDisparitySelect(config, imageType, maxError);
 				FilterImageInterface censusTran = FactoryCensusTransform.variant(config.configCensus.variant, true, imageType);
@@ -221,7 +238,10 @@ public class FactoryStereoDisparity {
 				BlockRowScore rowScore = createScoreRowNcc(config, GrayF32.class);
 				DisparityBlockMatchRowFormat alg = createBestFive(config, GrayF32.class, select, rowScore);
 				alg.setBorder(FactoryImageBorder.generic(config.border, rowScore.getImageType()));
-				yield new DisparityBlockMatchCorrelation(alg, imageType);
+				var ret = new DisparityBlockMatchPreFilter(alg, imageType);
+				if (config.configNCC.normalizeInput)
+					ret.setType(DisparityBlockMatchPreFilter.Type.CORRELATION);
+				yield ret;
 			}
 			default -> throw new IllegalArgumentException("Unsupported error type " + config.errorType);
 		};
@@ -255,6 +275,17 @@ public class FactoryStereoDisparity {
 			rowScore = new BlockRowScoreSsd.S16();
 		} else if (imageType == GrayF32.class) {
 			rowScore = new BlockRowScoreSsd.F32();
+		} else {
+			throw new IllegalArgumentException("Unsupported image type " + imageType.getSimpleName());
+		}
+		return rowScore;
+	}
+
+	public static <T extends ImageGray<T>> BlockRowScore createScoreRowZssd( ConfigDisparityBM config, Class<T> imageType ) {
+		BlockRowScore rowScore;
+		if (imageType == GrayF32.class) {
+			// The mean is subtracted from the score, so it needs more precision than an integer image can store
+			rowScore = new BlockRowScoreZssd.F32(config.regionRadiusX, config.regionRadiusY);
 		} else {
 			throw new IllegalArgumentException("Unsupported image type " + imageType.getSimpleName());
 		}
@@ -313,7 +344,9 @@ public class FactoryStereoDisparity {
 			} else {
 				select = new SelectSparseCorrelationWithChecksWta_F32(config.texture, config.validateRtoL);
 			}
-		} else if (GeneralizedImageOps.isFloatingPoint(imageType) && config.errorType != DisparityError.CENSUS) {
+		} else if (config.errorType == DisparityError.ZSSD ||
+				(GeneralizedImageOps.isFloatingPoint(imageType) && config.errorType != DisparityError.CENSUS)) {
+			// ZSSD scores using floats for all input image types, but it's an error and not a correlation
 			if (config.subpixel)
 				select = FactoryStereoDisparityAlgs.selectDisparitySparseSubpixel_F32(
 						maxError, config.texture, config.validateRtoL, config.errorType.isSquared());
@@ -345,6 +378,11 @@ public class FactoryStereoDisparity {
 					score = new SparseScoreRectifiedSsd.F32(config.regionRadiusX, config.regionRadiusY);
 				} else
 					throw new RuntimeException("Image type not supported: " + imageType.getSimpleName());
+			}
+
+			case ZSSD -> {
+				// All image types are supported since the patches are converted to float internally
+				score = new SparseScoreRectifiedZssd<>(config.regionRadiusX, config.regionRadiusY, imageType);
 			}
 
 			case NCC -> {
