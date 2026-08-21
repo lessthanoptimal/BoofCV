@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,16 +23,12 @@ import boofcv.struct.Configuration;
 
 import static boofcv.misc.BoofMiscOps.checkTrue;
 
-/**
- * Configuration for {@link DisparitySmootherSpeckleFilter}.
- *
- * @author Peter Abeles
- */
+/// Configuration for [DisparitySmootherSpeckleFilter].
 public class ConfigSpeckleFilter implements Configuration {
-	/** How similar two pixel values need to be for them to be considered connected */
+	/// How similar two pixel values need to be for them to be considered connected
 	public float similarTol = 1.0f;
 
-	/** The maximum area (in pixels) for a region to be filtered. If relative, then it's relative to width*height */
+	/// The maximum area (in pixels) for a region to be filtered. If relative, then it's relative to width\*height
 	public final ConfigLength maximumArea = ConfigLength.relative(0.002, 0.0);
 
 	@Override public void checkValidity() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,11 +21,7 @@ package boofcv.alg.disparity.block;
 import boofcv.alg.descriptor.DescriptorDistance;
 import boofcv.struct.image.*;
 
-/**
- * Computes the block disparity score using a {@link boofcv.alg.transform.census.CensusTransform}.
- *
- * @author Peter Abeles
- */
+/// Computes the block disparity score using a [boofcv.alg.transform.census.CensusTransform].
 public interface BlockRowScoreCensus {
 	abstract class CensusArrayS32_B32<T extends GrayI<T>, ImageData> extends BlockRowScore.ArrayS32_BS32<T, ImageData> {
 		CensusArrayS32_B32( int maxPerPixel ) {super(maxPerPixel);}

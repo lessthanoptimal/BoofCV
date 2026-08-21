@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,14 +32,7 @@ import pabeles.concurrency.IntRangeObjectConsumer;
 
 import java.util.Arrays;
 
-/**
- * <p>
- * Implementation of {@link DisparityBlockMatch} for processing
- * input images of type {@link GrayF32}.
- * </p>
- *
- * @author Peter Abeles
- */
+/// Implementation of [DisparityBlockMatch] for processing  input images of type [GrayF32].
 @SuppressWarnings({"NullAway.Init"})
 public class DisparityScoreBM_F32<DI extends ImageGray<DI>>
 		extends DisparityBlockMatch<GrayF32, DI> {
@@ -142,10 +135,8 @@ public class DisparityScoreBM_F32<DI extends ImageGray<DI>>
 		}
 	}
 
-	/**
-	 * Initializes disparity calculation by finding the scores for the initial block of horizontal
-	 * rows.
-	 */
+	/// Initializes disparity calculation by finding the scores for the initial block of horizontal
+	/// rows.
 	private void computeFirstRow( int row0, WorkSpace ws ) {
 		int disparityMax = Math.min(left.width, this.disparityMax);
 
@@ -169,11 +160,9 @@ public class DisparityScoreBM_F32<DI extends ImageGray<DI>>
 		}
 	}
 
-	/**
-	 * Using previously computed results it efficiently finds the disparity in the remaining rows.
-	 * When a new block is processes the last row/column is subtracted and the new row/column is
-	 * added.
-	 */
+	/// Using previously computed results it efficiently finds the disparity in the remaining rows.
+	/// When a new block is processes the last row/column is subtracted and the new row/column is
+	/// added.
 	private void computeRemainingRows( int row0, int row1, WorkSpace ws ) {
 		int disparityMax = Math.min(left.width, this.disparityMax);
 
@@ -214,10 +203,8 @@ public class DisparityScoreBM_F32<DI extends ImageGray<DI>>
 		}
 	}
 
-	/**
-	 * Computes vertical score from scratch. This is done because there is either no initial score or as a way
-	 * to mitigate catastrophic cancellation.
-	 */
+	/// Computes vertical score from scratch. This is done because there is either no initial score or as a way
+	/// to mitigate catastrophic cancellation.
 	private void computeVerticalScoreFromScratch( WorkSpace ws ) {
 		float[] verticalScore = ws.verticalScore;
 

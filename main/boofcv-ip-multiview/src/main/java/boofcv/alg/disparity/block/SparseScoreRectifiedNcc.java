@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,12 +31,8 @@ import boofcv.struct.image.ImageType;
 import lombok.Getter;
 import org.ejml.UtilEjml;
 
-/**
- * Compute NCC error for sparse disparity. Should produce similar results to dense version. Image normalization
- * is computed using local statistics instead of global statistics across input image.
- *
- * @author Peter Abeles
- */
+/// Compute NCC error for sparse disparity. Should produce similar results to dense version. Image normalization
+/// is computed using local statistics instead of global statistics across input image.
 @SuppressWarnings({"MissingOverride", "NullAway.Init"})
 public class SparseScoreRectifiedNcc<T extends ImageGray<T>> extends DisparitySparseRectifiedScoreBM<float[], T> {
 	// Storage for temporary images used to compute local mean and stdev
@@ -130,9 +126,7 @@ public class SparseScoreRectifiedNcc<T extends ImageGray<T>> extends DisparitySp
 		}
 	}
 
-	/**
-	 * Computes local image statics needed by NCC error
-	 */
+	/// Computes local image statics needed by NCC error
 	private void computeStats( GrayF32 input, SparseStatistics stats ) {
 		meanFilter.process(input, stats.mean);
 		GPixelMath.pow2(input, stats.pow2);

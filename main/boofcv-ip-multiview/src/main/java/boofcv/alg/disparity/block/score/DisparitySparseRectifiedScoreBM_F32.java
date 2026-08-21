@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,13 +21,7 @@ package boofcv.alg.disparity.block.score;
 import boofcv.struct.image.GrayF32;
 import lombok.Getter;
 
-/**
- * <p>
- * Implementation of {@link DisparitySparseRectifiedScoreBM} that processes images of type {@link GrayF32}.
- * </p>
- *
- * @author Peter Abeles
- */
+/// Implementation of [DisparitySparseRectifiedScoreBM] that processes images of type [GrayF32].
 @SuppressWarnings({"MissingOverride", "NullAway.Init"})
 public abstract class DisparitySparseRectifiedScoreBM_F32 extends DisparitySparseRectifiedScoreBM<float[], GrayF32> {
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,11 +24,7 @@ import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.GrayU8;
 
-/**
- * Computes sparse SAD scores from rectified input images
- *
- * @author Peter Abeles
- */
+/// Computes sparse SAD scores from rectified input images
 public interface SparseScoreRectifiedSad {
 	class F32 extends DisparitySparseRectifiedScoreBM_F32 {
 		public F32( int radiusX, int radiusY ) {

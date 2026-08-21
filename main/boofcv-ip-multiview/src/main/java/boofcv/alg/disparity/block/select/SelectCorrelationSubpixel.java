@@ -22,13 +22,13 @@ import boofcv.alg.disparity.block.DisparitySelect;
 import boofcv.struct.image.GrayF32;
 
 /// Implementation of [SelectCorrelationWithChecks_F32] that adds sub-pixel accuracy. Using
-/// equation (3) from [1]:
+/// equation (3) from \[1\]:
 ///
 /// d\_sub = d + (C0 - C2)/(2\*(C0 - 2\*C1 + C2)
 ///
 /// where C0,C1,C2 is the cost value, before, at, and after the selected disparity.
 ///
-/// [1] Wannes van der Mark and Dariu M. Gavrila, "Real-Time Dense Stereo for Intelligent Vehicles"
+/// 1) Wannes van der Mark and Dariu M. Gavrila, "Real-Time Dense Stereo for Intelligent Vehicles"
 /// IEEE Trans. Intelligent Transportation Systems, Vol 7., No 1. March 2006.
 public class SelectCorrelationSubpixel {
 

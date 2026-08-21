@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,30 +20,19 @@ package boofcv.alg.disparity.block;
 
 import boofcv.alg.disparity.block.score.DisparitySparseRectifiedScoreBM;
 
-/**
- * Computes the disparity given disparity score calculations provided by
- * {@link DisparitySparseRectifiedScoreBM}. Array specifies the
- * type of primitive array that stores the scores that it processes,
- *
- * @author Peter Abeles
- */
+/// Computes the disparity given disparity score calculations provided by [DisparitySparseRectifiedScoreBM].
+/// Array specifies the type of primitive array that stores the scores that it processes.
 public interface DisparitySparseSelect<ArrayType> {
 
-	/**
-	 * Examines disparity scores and looks for the best correspondence. If no correspondence
-	 * can be found then false is returned.
-	 *
-	 * @param scorer Computes the disparity score
-	 * @param x Pixel coordinate x-axis
-	 * @param y Pixel coordinate y-axis
-	 * @return true if a valid correspondence was found
-	 */
+	/// Examines disparity scores and looks for the best correspondence. If no correspondence
+	/// can be found then false is returned.
+	///
+	/// @param scorer Computes the disparity score
+	/// @param x Pixel coordinate x-axis
+	/// @param y Pixel coordinate y-axis
+	/// @return true if a valid correspondence was found
 	boolean select( DisparitySparseRectifiedScoreBM<ArrayType, ?> scorer, int x, int y );
 
-	/**
-	 * Returns the found disparity
-	 *
-	 * @return disparity
-	 */
+	/// Returns the found disparity
 	double getDisparity();
 }

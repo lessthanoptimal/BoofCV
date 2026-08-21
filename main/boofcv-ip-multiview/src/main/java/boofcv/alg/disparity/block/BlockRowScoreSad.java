@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,23 +20,16 @@ package boofcv.alg.disparity.block;
 
 import boofcv.struct.image.*;
 
-/**
- * <p>Computes the Sum of Absolute Difference (SAD) for block matching based algorithms.</p>
- *
- * <p>
- * Notes on scoreSad():<br>
- * compute the score for each element all at once to encourage the JVM to optimize and
- * encourage the JVM to optimize this section of code.
- * </p>
- *
- * <p>
- * Was original inline, but was actually slightly slower by about 3% consistently,  It
- * is in its own function so that it can be overridden and have different cost functions
- * inserted easily.
- * </p>
- *
- * @author Peter Abeles
- */
+/// Computes the Sum of Absolute Difference (SAD) for block matching based algorithms.
+///
+/// Notes on scoreSad():
+///
+/// compute the score for each element all at once to encourage the JVM to optimize and
+/// encourage the JVM to optimize this section of code.
+///
+/// Was original inline, but was actually slightly slower by about 3% consistently,  It
+/// is in its own function so that it can be overridden and have different cost functions
+/// inserted easily.
 public interface BlockRowScoreSad {
 	abstract class SadArrayS32<T extends GrayI<T>, ImageData> extends BlockRowScore.ArrayS32_BS32<T, ImageData> {
 		SadArrayS32( int maxPerPixel ) {

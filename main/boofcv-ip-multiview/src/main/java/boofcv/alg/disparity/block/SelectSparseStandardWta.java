@@ -18,15 +18,9 @@
 
 package boofcv.alg.disparity.block;
 
-/**
- * <p>
- * Selects the disparity the smallest error and optionally applies several different types of validation to remove false
- * positives. The two validations it can apply are maxError and texture based.
- * See {@link SelectDisparityWithChecksWta} for more details on validation checks.
- * </p>
- *
- * @author Peter Abeles
- */
+/// Selects the disparity the smallest error and optionally applies several different types of validation to remove false
+/// positives. The two validations it can apply are maxError and texture based.
+/// See [SelectDisparityWithChecksWta] for more details on validation checks.
 public abstract class SelectSparseStandardWta<ArrayType>
 		implements DisparitySparseSelect<ArrayType> {
 
@@ -40,10 +34,8 @@ public abstract class SelectSparseStandardWta<ArrayType>
 	// Tolerance for right to left validation. Disable with -1
 	protected int tolRightToLeft;
 
-	/**
-	 * @param maxError Maximum allowed error. See comments above.
-	 * @param texture Texture threshold. See comments above.
-	 */
+	/// @param maxError Maximum allowed error. See comments above.
+	/// @param texture Texture threshold. See comments above.
 	protected SelectSparseStandardWta( double maxError, double texture, int tolRightToLeft ) {
 		// Scores are rejected when strictly greater than the limit, so truncating towards zero leaves integer
 		// scores with the same accept/reject decision. A limit too large for an int saturates, which disables it.
@@ -53,18 +45,14 @@ public abstract class SelectSparseStandardWta<ArrayType>
 		setTexture(texture);
 	}
 
-	/**
-	 * Sets the texture threshold.
-	 *
-	 * @param texture Texture threshold.
-	 */
+	/// Sets the texture threshold.
+	///
+	/// @param texture Texture threshold.
 	protected abstract void setTexture( double texture );
 
-	/**
-	 * Specifies tolerance for right to left validation.
-	 *
-	 * @param maxError Maximum number of pixels different for right to left validation. If error is < 0 then disabled.
-	 */
+	/// Specifies tolerance for right to left validation.
+	///
+	/// @param maxError Maximum number of pixels different for right to left validation. If error is < 0 then disabled.
 	protected void setValidateRtoL( int maxError ) {
 		this.tolRightToLeft = maxError;
 	}

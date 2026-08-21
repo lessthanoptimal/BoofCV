@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,11 +25,7 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * Base class for wrapped block matching algorithms.
- *
- * @author Peter Abeles
- */
+/// Base class for wrapped block matching algorithms.
 @SuppressWarnings({"NullAway.Init"})
 public abstract class WrapBaseBlockMatch<In extends ImageGray<In>, T extends ImageGray<T>, DI extends ImageGray<DI>>
 		implements StereoDisparity<In, DI> {

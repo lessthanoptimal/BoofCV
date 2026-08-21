@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,14 +28,7 @@ import org.jetbrains.annotations.Nullable;
 import pabeles.concurrency.GrowArray;
 import pabeles.concurrency.IntRangeObjectConsumer;
 
-/**
- * <p>
- * Implementation of {@link boofcv.alg.disparity.DisparityBlockMatch} for processing
- * input images of type {@link GrayU8}.
- * </p>
- *
- * @author Peter Abeles
- */
+/// Implementation of [boofcv.alg.disparity.DisparityBlockMatch] for processing  input images of type [GrayU8].
 @SuppressWarnings({"NullAway.Init"})
 public class DisparityScoreBM_S32<T extends ImageBase<T>, DI extends ImageGray<DI>>
 		extends DisparityBlockMatch<T, DI> {
@@ -139,10 +132,8 @@ public class DisparityScoreBM_S32<T extends ImageBase<T>, DI extends ImageGray<D
 		}
 	}
 
-	/**
-	 * Initializes disparity calculation by finding the scores for the initial block of horizontal
-	 * rows.
-	 */
+	/// Initializes disparity calculation by finding the scores for the initial block of horizontal
+	/// rows.
 	private void computeFirstRow( int row0, WorkSpace ws ) {
 		int disparityMax = Math.min(left.width, this.disparityMax);
 
@@ -172,11 +163,9 @@ public class DisparityScoreBM_S32<T extends ImageBase<T>, DI extends ImageGray<D
 		}
 	}
 
-	/**
-	 * Using previously computed results it efficiently finds the disparity in the remaining rows.
-	 * When a new block is processes the last row/column is subtracted and the new row/column is
-	 * added.
-	 */
+	/// Using previously computed results it efficiently finds the disparity in the remaining rows.
+	/// When a new block is processes the last row/column is subtracted and the new row/column is
+	/// added.
 	private void computeRemainingRows( int row0, int row1, WorkSpace ws ) {
 		int disparityMax = Math.min(left.width, this.disparityMax);
 

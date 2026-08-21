@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,55 +23,38 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * <p>
- * Selects the best disparity given the set of scores calculated by
- * {@link DisparityBlockMatch}. The scores
- * are provided as an array of integers or floats. A disparity of zero either means
- * no match was found or the disparity was in fact zero.
- * </p>
- *
- * <p>
- * The selected disparity written into the output image is equal to the found disparity minus the disparityMin.
- * If a pixel is found to be invalid and no disparity found then its value is set to (disparityMax-disparityMin) + 1.
- * The first requirement maximizes the useful storage of the output image and the second provides an unambiguous
- * way to identify invalid pixels.
- * </p>
- *
- * @author Peter Abeles
- */
+/// Selects the best disparity given the set of scores calculated by [DisparityBlockMatch]. The scores
+/// are provided as an array of integers or floats. A disparity of zero either means
+/// no match was found or the disparity was in fact zero.
+///
+/// The selected disparity written into the output image is equal to the found disparity minus the disparityMin.
+/// If a pixel is found to be invalid and no disparity found then its value is set to (disparityMax-disparityMin) + 1.
+/// The first requirement maximizes the useful storage of the output image and the second provides an unambiguous
+/// way to identify invalid pixels.
 public interface DisparitySelect<Array, T extends ImageGray> {
-	/**
-	 * Specifies the output and algorithmic configuration.
-	 *
-	 * @param imageDisparity Output disparity image.
-	 * @param imageScore If not null, then the score for best fit disparity will be stored here.
-	 * @param disparityMin Minimum disparity that can be computed
-	 * @param disparityMax Maximum disparity that is calculated
-	 * @param radiusX Radius of the rectangular region being matched along x-axis.
-	 */
+	/// Specifies the output and algorithmic configuration.
+	///
+	/// @param imageDisparity Output disparity image.
+	/// @param imageScore If not null, then the score for best fit disparity will be stored here.
+	/// @param disparityMin Minimum disparity that can be computed
+	/// @param disparityMax Maximum disparity that is calculated
+	/// @param radiusX Radius of the rectangular region being matched along x-axis.
 	void configure( T imageDisparity, @Nullable GrayF32 imageScore, int disparityMin, int disparityMax, int radiusX );
 
-	/**
-	 * Processes the array of scores. The score format is described in
-	 * {@link DisparityBlockMatch}. The results are written directly into the
-	 * disparity image passed to it in {@link #configure}.
-	 *
-	 * @param row Image row the scores are from.
-	 * @param scoresArray Array containing scores. (int[] or float[])
-	 */
+	/// Processes the array of scores. The score format is described in
+	/// [DisparityBlockMatch]. The results are written directly into the
+	/// disparity image passed to it in [#configure].
+	///
+	/// @param row Image row the scores are from.
+	/// @param scoresArray Array containing scores. (int[] or float[])
 	void process( int row, Array scoresArray );
 
-	/**
-	 * Creates a copy with separate working space. Used for concurrency. Data structures which are threadsafe
-	 * can be shared
-	 */
+	/// Creates a copy with separate working space. Used for concurrency. Data structures which are threadsafe
+	/// can be shared
 	DisparitySelect<Array, T> concurrentCopy();
 
-	/**
-	 * Type of image the disparity is
-	 *
-	 * @return Image type for disparity
-	 */
+	/// Type of image the disparity is
+	///
+	/// @return Image type for disparity
 	Class<T> getDisparityType();
 }
