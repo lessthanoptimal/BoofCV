@@ -34,12 +34,12 @@ import org.jetbrains.annotations.Nullable;
 /// the left as its optimal solution, within tolerance.
 ///
 /// **texture** Tolerance for how similar the best region is to the second best. Lower values indicate greater
-/// tolerance. Reject if textureTol ≤ (C2-C1)/C1, where C2 = second best region score and C1 = best region score
+/// tolerance. Reject if textureTol ≤ (C2-C1)/C1, where C2 = second-best region score and C1 = best region score
 ///
 /// This implementation is not based off of any individual paper but ideas commonly expressed in several different
 /// sources. A good study and summary of similar algorithms can be found in:
 ///
-/// [1] Wannes van der Mark and Dariu M. Gavrila, "Real-Time Dense Stereo for Intelligent Vehicles"
+/// 1) Wannes van der Mark and Dariu M. Gavrila, "Real-Time Dense Stereo for Intelligent Vehicles"
 /// IEEE TRANSACTIONS ON INTELLIGENT TRANSPORTATION SYSTEMS, VOL. 7, NO. 1, MARCH 2006
 @SuppressWarnings({"NullAway.Init"})
 public abstract class SelectDisparityWithChecksWta<Array, DI extends ImageGray<DI>>

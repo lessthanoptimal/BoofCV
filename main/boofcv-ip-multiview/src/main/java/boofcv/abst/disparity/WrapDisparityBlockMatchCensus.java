@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,11 +24,7 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
-/**
- * Wrapper around Block Matching disparity which uses Census as an error measure.
- *
- * @author Peter Abeles
- */
+/// Wrapper around Block Matching disparity which uses Census as an error measure.
 public class WrapDisparityBlockMatchCensus
 		<T extends ImageGray<T>, C extends ImageGray<C>, DI extends ImageGray<DI>>
 		extends WrapBaseBlockMatch<T, C, DI> {

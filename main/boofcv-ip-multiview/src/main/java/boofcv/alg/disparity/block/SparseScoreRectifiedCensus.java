@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,22 +23,16 @@ import boofcv.alg.descriptor.DescriptorDistance;
 import boofcv.alg.disparity.block.score.DisparitySparseRectifiedScoreBM_S32;
 import boofcv.struct.image.*;
 
-/**
- * Disparity score functions for sparse Census.
- *
- * WARNING: This will not produce identical results to the dense implementation at the image border. In the
- * dense implementation it computes the Census transform for the entire image. Then when it computes the block
- * score it ventures outside the image again and by default will reflect while in the sparse case it uses
- * a padded sub image and will not trigger a border situation. To fix this problem would require a lot of
- * complex specialized code and would most likely not produce significantly better results.
- *
- * @author Peter Abeles
- */
+/// Disparity score functions for sparse Census.
+///
+/// WARNING: This will not produce identical results to the dense implementation at the image border. In the
+/// dense implementation it computes the Census transform for the entire image. Then when it computes the block
+/// score it ventures outside the image again and by default will reflect while in the sparse case it uses
+/// a padded sub image and will not trigger a border situation. To fix this problem would require a lot of
+/// complex specialized code and would most likely not produce significantly better results.
 public interface SparseScoreRectifiedCensus {
 
-	/**
-	 * Applies a census transform to the input image and creates a new transformed image patch for later processing
-	 */
+	/// Applies a census transform to the input image and creates a new transformed image patch for later processing
 	abstract class Census<In extends ImageGray<In>, Out extends ImageGray<Out>>
 			extends DisparitySparseRectifiedScoreBM_S32<In> {
 		// Applies census transform to input iamges
@@ -76,9 +70,7 @@ public interface SparseScoreRectifiedCensus {
 		protected abstract void scoreCensus( int disparityRange, final boolean leftToRight );
 	}
 
-	/**
-	 * Computes census score for transformed images of type U8
-	 */
+	/// Computes census score for transformed images of type U8
 	class U8<T extends GrayI<T>> extends Census<T, GrayU8> {
 		public U8( int radiusX, int radiusY,
 				   FilterCensusTransform<T, GrayU8> censusTran,
@@ -108,9 +100,7 @@ public interface SparseScoreRectifiedCensus {
 		}
 	}
 
-	/**
-	 * Computes census score for transformed images of type S32
-	 */
+	/// Computes census score for transformed images of type S32
 	class S32<T extends GrayI<T>> extends Census<T, GrayS32> {
 		public S32( int radiusX, int radiusY,
 					FilterCensusTransform<T, GrayS32> censusTran,
@@ -140,9 +130,7 @@ public interface SparseScoreRectifiedCensus {
 		}
 	}
 
-	/**
-	 * Computes census score for transformed images of type S64
-	 */
+	/// Computes census score for transformed images of type S64
 	class S64<T extends GrayI<T>> extends Census<T, GrayS64> {
 		public S64( int radiusX, int radiusY,
 					FilterCensusTransform<T, GrayS64> censusTran,

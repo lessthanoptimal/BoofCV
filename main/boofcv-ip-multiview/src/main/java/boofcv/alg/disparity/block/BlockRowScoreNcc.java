@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,14 +27,10 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import org.ejml.UtilEjml;
 
-/**
- * Score using NCC. Takes advantage for the forumla for NCC error which can be computed by applying block filters
- * to the image.
- *
- * NCC = ((1/N)*[sum( L(x)*R(x+d) ) - u_l(x)*u_r(x+d) )/ (sigma_L(x) * sigma_R(x+d))
- *
- * @author Peter Abeles
- */
+/// Score using NCC. Takes advantage for the formulation of NCC error which can be efficiently found applying
+/// block filters to the image.
+///
+/// `NCC = (1/N)\*\[sum( L(x)\*R(x+d) ) - u\_l(x)\*u\_r(x+d) )/ (sigma\_L(x) \* sigma\_R(x+d))\]`
 public class BlockRowScoreNcc<T extends ImageBase<T>> {
 	// Storage for mean of left + right image
 	T meanL, meanR;

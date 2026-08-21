@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,92 +24,66 @@ import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * <p>
- * Given two rectified images compute the corresponding dense disparity image. Input images are assumed
- * to be rectified along the x-axis. Disparity goes from left to right image, thus the x coordinates of pixels
- * in the left and right images have the following relationship x_right = x_left + disparity, and y_right = y_left..
- * To speed up calculations only a limited range of disparities are considered from minDisparity to maxDisparity.
- * Image borders are not processed and the border size is specified by functions below.
- * </p>
- *
- * <p>
- * DISPARITY IMAGE FORMAT: Returned disparity image is offset from the true value by minDisparity. This
- * is done to maximize storage efficiency. To get the actual disparity value simply extract the value
- * of a pixel and add minDisparity to it. Invalid pixels are indicated by having a value greater than
- * (maxDisparity - minDisparity).
- * </p>
- *
- * @see StereoDisparitySparse
- */
+/// Given two rectified images compute the corresponding dense disparity image. Input images are assumed
+/// to be rectified along the x-axis. Disparity goes from left to right image, thus the x coordinates of pixels
+/// in the left and right images have the following relationship x\_right = x\_left + disparity, and y\_right = y\_left..
+/// To speed up calculations only a limited range of disparities are considered from minDisparity to maxDisparity.
+/// Image borders are not processed and the border size is specified by functions below.
+///
+/// DISPARITY IMAGE FORMAT: Returned disparity image is offset from the true value by minDisparity. This
+/// is done to maximize storage efficiency. To get the actual disparity value simply extract the value
+/// of a pixel and add minDisparity to it. Invalid pixels are indicated by having a value greater than
+/// (maxDisparity - minDisparity).
+///
+/// @see StereoDisparitySparse
 public interface StereoDisparity<Image extends ImageBase<Image>, Disparity extends ImageGray<Disparity>> {
 
-	/**
-	 * Computes stereo disparity.
-	 *
-	 * @param imageLeft Input left rectified image.
-	 * @param imageRight Input right rectified image.
-	 */
+	/// Computes stereo disparity.
+	///
+	/// @param imageLeft Input left rectified image.
+	/// @param imageRight Input right rectified image.
 	void process( Image imageLeft, Image imageRight );
 
-	/**
-	 * Return the computed disparity image. See comments in class description on disparity image format.
-	 *
-	 * @return Output disparity from left to right image.
-	 */
+	/// Return the computed disparity image. See comments in class description on disparity image format.
+	///
+	/// @return Output disparity from left to right image.
 	Disparity getDisparity();
 
-	/**
-	 * Returns a score that represents the goodness of fit for the selected value. Meaning of the score
-	 * is cost function dependent. If null is returned that means the score was not saved. This can be
-	 */
+	/// Returns a score that represents the goodness of fit for the selected value. Meaning of the score
+	/// is cost function dependent. If null is returned that means the score was not saved. This can be
 	@Nullable GrayF32 getDisparityScore();
 
-	/**
-	 * The minimum disparity which will be checked for.
-	 *
-	 * @return Minimum disparity.
-	 */
+	/// The minimum disparity which will be checked for.
+	///
+	/// @return Minimum disparity.
 	int getDisparityMin();
 
-	/**
-	 * The number of possible disparity values. The maximum value (inclusive) is min + range -1.
-	 *
-	 * @return Maximum disparity.
-	 */
+	/// The number of possible disparity values. The maximum value (inclusive) is min + range -1.
+	///
+	/// @return Maximum disparity.
 	int getDisparityRange();
 
-	/**
-	 * Specifies the value that pixels with no valid disparity estimate will be filled in with. This
-	 * is always range, but any value >= range should be considered invalid.
-	 */
+	/// Specifies the value that pixels with no valid disparity estimate will be filled in with. This
+	/// is always range, but any value >= range should be considered invalid.
 	int getInvalidValue();
 
-	/**
-	 * Border around the image's x-axis which is not processed.
-	 *
-	 * @return border x-axis
-	 */
+	/// Border around the image's x-axis which is not processed.
+	///
+	/// @return border x-axis
 	int getBorderX();
 
-	/**
-	 * Border around the image's y-axis which is not processed.
-	 *
-	 * @return border y-axis
-	 */
+	/// Border around the image's y-axis which is not processed.
+	///
+	/// @return border y-axis
 	int getBorderY();
 
-	/**
-	 * Type of input images it can process
-	 *
-	 * @return Input image type
-	 */
+	/// Type of input images it can process
+	///
+	/// @return Input image type
 	ImageType<Image> getInputType();
 
-	/**
-	 * Type of disparity image it can write to.
-	 *
-	 * @return Output image type
-	 */
+	/// Type of disparity image it can write to.
+	///
+	/// @return Output image type
 	Class<Disparity> getDisparityType();
 }

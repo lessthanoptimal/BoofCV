@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,11 +28,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.PrintStream;
 import java.util.Set;
 
-/**
- * Wrapper around {@link ConnectedTwoRowSpeckleFiller_F32} for {@link DisparitySmoother}
- *
- * @author Peter Abeles
- */
+/// Wrapper around [ConnectedTwoRowSpeckleFiller_F32] for [DisparitySmoother]
 public class DisparitySmootherSpeckleFilter<Image extends ImageBase<Image>, Disp extends ImageGray<Disp>>
 		implements DisparitySmoother<Image, Disp> {
 

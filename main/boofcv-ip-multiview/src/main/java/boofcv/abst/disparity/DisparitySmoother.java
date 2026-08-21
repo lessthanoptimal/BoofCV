@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,19 +22,13 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import org.ddogleg.struct.VerbosePrint;
 
-/**
- * High level API for algorithm which attempt to reduce the noise in disparity images in a post processing step
- *
- * @author Peter Abeles
- */
+/// High level API for algorithm which attempt to reduce the noise in disparity images in a post processing step
 public interface DisparitySmoother<Image extends ImageBase<Image>, Disparity extends ImageGray<Disparity>>
 		extends VerbosePrint {
-	/**
-	 * Process the disparity image and smooth it. The input disparity is modified.
-	 *
-	 * @param image (Input) Rectified image the disparity is computed from. Pixels should line up.
-	 * @param disparity (Input, Output) The disparity image which is to be smoothed.
-	 * @param disparityRange (Input) Range of values in the disparity image.
-	 */
+	/// Process the disparity image and smooth it. The input disparity is modified.
+	///
+	/// @param image (Input) Rectified image the disparity is computed from. Pixels should line up.
+	/// @param disparity (Input, Output) The disparity image which is to be smoothed.
+	/// @param disparityRange (Input) Range of values in the disparity image.
 	void process( Image image, Disparity disparity, int disparityRange );
 }

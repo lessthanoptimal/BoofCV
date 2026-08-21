@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,13 +21,7 @@ package boofcv.alg.disparity.block.score;
 import boofcv.struct.image.ImageGray;
 import lombok.Getter;
 
-/**
- * <p>
- * Implementation of {@link DisparitySparseRectifiedScoreBM} that processes integer typed images.
- * </p>
- *
- * @author Peter Abeles
- */
+/// Implementation of [DisparitySparseRectifiedScoreBM] that processes integer typed images.
 @SuppressWarnings({"MissingOverride", "NullAway.Init"})
 public abstract class DisparitySparseRectifiedScoreBM_S32<T extends ImageGray<T>>
 		extends DisparitySparseRectifiedScoreBM<int[], T> {

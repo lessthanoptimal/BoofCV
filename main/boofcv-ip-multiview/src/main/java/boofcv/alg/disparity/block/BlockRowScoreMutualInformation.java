@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,12 +23,8 @@ import boofcv.alg.disparity.sgm.cost.StereoMutualInformation;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 
-/**
- * Block {@link StereoMutualInformation} implementation. You must some how first "train" the MI score or else this
- * will not work. Also pre-compute the scaled cost.
- *
- * @author Peter Abeles
- */
+/// Block [StereoMutualInformation] implementation. You must somehow first "train" the MI score or else this
+/// will not work. Also pre-compute the scaled cost.
 public interface BlockRowScoreMutualInformation {
 	class U8 extends BlockRowScore.ArrayS32_BS32<GrayU8, byte[]> {
 		StereoMutualInformation mi;
