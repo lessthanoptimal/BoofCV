@@ -61,7 +61,7 @@ import static boofcv.misc.CircularIndex.addOffset;
 /**
  * Chessboard corner detector that's designed to be robust and fast. Specifically tested under many different lighting
  * conditions, with/without fisheye distortion, motion blur, out of focus, up close, far away, ... etc. This class
- * only operates at a single scale. See {@link DetectChessboardCornersXPyramid} for multi scale that's needed
+ * only operates at a single scale. See {@link DetectChessboardCornersXPyramid} for multiscale that's needed
  * to work in noisy images.
  *
  * Overview:
@@ -77,7 +77,6 @@ import static boofcv.misc.CircularIndex.addOffset;
  *
  * At different steps various adaptive filters are applied. See code for details.
  *
- * @author Peter Abeles
  * @see XCornerAbeles2019Intensity
  */
 @SuppressWarnings({"NullAway.Init"})
@@ -536,23 +535,10 @@ public class DetectChessboardCornersX {
 		// to what is below.
 		corner.intensity = -bestScore;
 
-		// Measure contrast based on how sharp of an edge there is transitioning to the black square
-		// this roughly correlates with focus.
-		double c = Math.cos(corner.orientation);
-		double s = Math.sin(corner.orientation);
-
-		corner.contrast = computeContrast(cx, cy, c, s, r);
+		// most bright line minus the line which is probably the darkest. technically -max to max range, but ~0 to max.
+		corner.contrast = spokesDiam[(bestSpokeIdx + numSpokeDiam/2)%numSpokeDiam] - spokesDiam[bestSpokeIdx];
 
 		return corner.intensity >= refinedXCornerThreshold;
-	}
-
-	/// Computes contrast as a measure of how sharp the corner is. More blurred lower this score will be
-	double computeContrast( double cx, double cy, double c, double s, double farR ) {
-		double nearR = farR/2;
-		double center = inputInterp.get((float)cx, (float)cy);
-		double nearBlack = (inputInterp.get((float)(cx + c*nearR), (float)(cy + s*nearR)) + inputInterp.get((float)(cx - c*nearR), (float)(cy - s*nearR)))/2.0;
-		double white = (inputInterp.get((float)(cx + s*farR), (float)(cy - c*farR)) + inputInterp.get((float)(cx - s*farR), (float)(cy + c*farR)))/2.0;
-		return Math.abs(center - nearBlack)/white;
 	}
 
 	private void smoothSpokeDiam() {

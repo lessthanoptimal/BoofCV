@@ -23,6 +23,7 @@ import boofcv.alg.filter.blur.BlurImageOps;
 import boofcv.gui.RenderCalibrationTargetsGraphics2D;
 import boofcv.struct.image.GrayF32;
 import georegression.metric.UtilAngle;
+import org.ddogleg.struct.DogArray_F64;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -57,6 +58,42 @@ abstract class GenericChessboardCornersChecks extends CommonChessboardCorners {
 		}
 	}
 
+	/// Verifies that the blur estimator works by increasing the blur estimate based on the amount of blur
+	/// applied to the image
+	@Test void blurRadius() {
+		// this will cause it to have at least 3 levels, needed to estimate the blur
+		this.w = 100;
+
+		// Render perfect
+		var renderer = new RenderCalibrationTargetsGraphics2D(p, 1);
+		renderer.chessboard(rows, cols, w);
+
+		GrayF32 original = renderer.getGrayF32();
+		List<ChessboardCorner> found = process(original);
+
+		// Save the blur in the sharpest image, it should be close to 0
+		var previous = new DogArray_F64();
+		for (int idxCorner = 0; idxCorner < found.size(); idxCorner++) {
+			ChessboardCorner c = found.get(idxCorner);
+			assertEquals(0.0, c.blurRadius, 0.05);
+			previous.add(c.blurRadius);
+		}
+
+		GrayF32 blurred = original.createSameShape();
+		for (double blurRadius : new double[]{0.5, 1.0, 2.0, 4.0}) {
+			BlurImageOps.gaussian(original, blurred, blurRadius, -1, null);
+			found = process(blurred);
+
+			// Ensure that the radius is always getting bigger. The exact response isn't formally defined.
+			// It's not defined to characterize any specific blur.
+			for (int idxCorner = 0; idxCorner < found.size(); idxCorner++) {
+				ChessboardCorner c = found.get(idxCorner);
+				assertTrue(c.blurRadius > previous.get(idxCorner));
+				previous.set(idxCorner, c.blurRadius);
+			}
+		}
+	}
+
 	/**
 	 * Apply heavy blurring to the input image so that the bottom most layer won't reliably detect corners
 	 */
@@ -70,8 +107,7 @@ abstract class GenericChessboardCornersChecks extends CommonChessboardCorners {
 		GrayF32 original = renderer.getGrayF32();
 		GrayF32 blurred = original.createSameShape();
 
-
-		// mean blur messes it up much more than gaussian. This won't work if no pyramid
+		// mean blur messes it up much more than Gaussian. This won't work if no pyramid
 		BlurImageOps.mean(original, blurred, 5, null, null);
 
 		checkSolution(blurred.width, blurred.height, process(blurred));
