@@ -508,7 +508,7 @@ public class DetectChessboardCornersX {
 
 		smoothSpokeDiam();
 		// Select the orientation
-		int bestSpoke = -1;
+		int bestSpokeIdx = -1;
 		double bestScore = Double.MAX_VALUE;
 		for (int i = 0; i < numSpokeDiam; i++) {
 			// j = 90 off, which should be the opposite color
@@ -519,15 +519,15 @@ public class DetectChessboardCornersX {
 			// select black 'i', which will negative because white has a higher value
 			if (score < bestScore) {
 				bestScore = score;
-				bestSpoke = i;
+				bestSpokeIdx = i;
 			}
 		}
 
 		// Use a quadratic to estimate the peak's location to a sub-bin accuracy
-		double value0 = scoreDiam[addOffset(bestSpoke, -1, numSpokeDiam)];
-		double value2 = scoreDiam[addOffset(bestSpoke, 1, numSpokeDiam)];
+		double value0 = scoreDiam[addOffset(bestSpokeIdx, -1, numSpokeDiam)];
+		double value2 = scoreDiam[addOffset(bestSpokeIdx, 1, numSpokeDiam)];
 
-		double adjustedIndex = bestSpoke + FastHessianFeatureDetector.polyPeak(value0, bestSpoke, value2);
+		double adjustedIndex = bestSpokeIdx + FastHessianFeatureDetector.polyPeak(value0, bestScore, value2);
 		corner.orientation = UtilAngle.boundHalf(Math.PI*adjustedIndex/numSpokeDiam);
 
 		// Why this score? Basically, simplicity.
