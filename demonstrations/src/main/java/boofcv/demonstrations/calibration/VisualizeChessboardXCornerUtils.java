@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,11 +40,7 @@ import java.awt.geom.Line2D;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Various functions for visualizing chessboard x-corners
- *
- * @author Peter Abeles
- */
+/// Various functions for visualizing chessboard x-corners
 public class VisualizeChessboardXCornerUtils {
 	public final DogArray<ChessboardCorner> foundCorners = new DogArray<>(ChessboardCorner::new);
 	public final DogArray<CalibrationObservation> foundGrids = new DogArray<>(CalibrationObservation::new);
@@ -110,6 +106,26 @@ public class VisualizeChessboardXCornerUtils {
 		DogArray<ChessboardCornerGraph> clusters = detector.getClusterFinder().getOutputClusters();
 		for (int i = 0; i < clusters.size; i++) {
 			clusters.get(i).convert(foundClusters.grow());
+		}
+	}
+
+	public void visualizeBlur(Graphics2D g2, double scale, int minPyramidLevel) {
+		for (int i = 0; i < foundCorners.size; i++) {
+			ChessboardCorner c = foundCorners.get(i);
+			if (c.level2 < minPyramidLevel)
+				continue;
+
+			double x = c.x;
+			double y = c.y;
+
+			// Draw the blur as a circle
+			double blurRadius = c.blurRadius*scale;
+			g2.setStroke(stroke5);
+			g2.setColor(Color.BLACK);
+			VisualizeFeatures.drawCircle(g2, x*scale, y*scale, blurRadius, circle);
+			g2.setStroke(stroke2);
+			g2.setColor(Color.MAGENTA);
+			VisualizeFeatures.drawCircle(g2, x*scale, y*scale, blurRadius, circle);
 		}
 	}
 

@@ -25,8 +25,7 @@ import java.util.List;
 
 class TestDetectChessboardCornersXPyramid extends GenericChessboardCornersChecks {
 
-	@Override
-	public List<ChessboardCorner> process(GrayF32 image) {
+	@Override public List<ChessboardCorner> process(GrayF32 image) {
 		var alg = new DetectChessboardCornersXPyramid<>(ImageType.SB_F32);
 		alg.setPyramidTopSize(50);
 		alg.process(image);

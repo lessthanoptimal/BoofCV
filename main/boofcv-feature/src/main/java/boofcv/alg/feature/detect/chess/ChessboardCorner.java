@@ -37,6 +37,9 @@ public class ChessboardCorner extends Point2D_F64 {
 	/// max level.
 	public double contrast1;
 
+	/// Crudely estimated blur `radius = pow(2,level2)*(1.0 contrast1/contrast)`
+	public double blurRadius;
+
 	/// Value of smallest Eigen value in edge detector
 	public double edgeIntensity;
 
@@ -65,6 +68,7 @@ public class ChessboardCorner extends Point2D_F64 {
 		super.setTo(-1, -1);
 		orientation = Double.NaN;
 		intensity = Double.NaN;
+		blurRadius = Double.NaN;
 		edgeIntensity = -1;
 		edgeRatio = -1;
 		contrast = contrast1 = 0;
@@ -77,6 +81,7 @@ public class ChessboardCorner extends Point2D_F64 {
 		this.intensity = c.intensity;
 		this.contrast = c.contrast;
 		this.contrast1 = c.contrast1;
+		this.blurRadius = c.blurRadius;
 		this.edgeIntensity = c.edgeIntensity;
 		this.edgeRatio = c.edgeRatio;
 		this.level1 = c.level1;

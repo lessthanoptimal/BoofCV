@@ -150,7 +150,8 @@ public class DetectECoCheckApp extends DemonstrationBase {
 								text += String.format("  levels %d to %d\n", best.level1, best.level2);
 								text += String.format("  levelMax %d\n", best.levelMax);
 								text += String.format("  intensity %.3f\n", best.intensity);
-								text += String.format("  contrast-R %.3f\n", best.contrast1/best.contrast);
+								text += String.format("  contrast1 %.3f\n", best.contrast1);
+								text += String.format("  blur %.3f\n", best.blurRadius);
 								text += String.format("  orientation %.2f (deg)\n", UtilAngle.degree(best.orientation));
 							} else {
 								text += String.format("  pixel (%.1f %71f )\n", p.x, p.y);
@@ -262,15 +263,14 @@ public class DetectECoCheckApp extends DemonstrationBase {
 	}
 
 	class DisplayPanel extends ShapeVisualizePanel {
-		@Override
-		protected void paintInPanel( AffineTransform tran, Graphics2D g2 ) {
+		@Override protected void paintInPanel( AffineTransform tran, Graphics2D g2 ) {
 			super.paintInPanel(tran, g2);
 			BoofSwingUtil.antialiasing(g2);
 
 			if (controlPanel.translucent > 0) {
 				// this requires some explaining
 				// for some reason it was decided that the transform would apply a translation, but not a scale
-				// so this scale will be concatted on top of the translation in the g2
+				// so this scale will be concatenated on top of the translation in the g2
 				tran.setTransform(scale, 0, 0, scale, 0, 0);
 				Composite beforeAC = g2.getComposite();
 				float translucent = controlPanel.translucent/100.0f;
@@ -278,6 +278,12 @@ public class DetectECoCheckApp extends DemonstrationBase {
 				g2.setComposite(ac);
 				g2.drawImage(visualized, tran, null);
 				g2.setComposite(beforeAC);
+			}
+
+			if (controlPanel.showBlur.value) {
+				synchronized (lockVisualize) {
+					visualizeUtils.visualizeBlur(g2, scale, 0);
+				}
 			}
 
 			if (controlPanel.showCorners.value) {
@@ -314,8 +320,7 @@ public class DetectECoCheckApp extends DemonstrationBase {
 			}
 		}
 
-		@Override
-		public synchronized void setScale( double scale ) {
+		@Override public synchronized void setScale( double scale ) {
 			controlPanel.setZoom(scale);
 			super.setScale(controlPanel.zoom);
 		}
@@ -336,6 +341,7 @@ public class DetectECoCheckApp extends DemonstrationBase {
 		JCheckBoxValue showChessboards = checkboxWrap("Chessboard", true).tt("Display found chessboards");
 		JCheckBoxValue showNumbers = checkboxWrap("Numbers", false).tt("Show feature numbers");
 		JCheckBoxValue showCorners = checkboxWrap("Corners", false).tt("Show x-corner locations");
+		JCheckBoxValue showBlur = checkboxWrap("Blur", false).tt("Shows blur magnitude");
 		JCheckBoxValue showAnonymous = checkboxWrap("Anonymous", false).tt("Show unknown chessboards");
 		JCheckBoxValue showClusters = checkboxWrap("Grids", false).tt("Chessboard grids");
 		JCheckBoxValue showPerpendicular = checkboxWrap("Perpendicular", false).tt("Chessboard edge intensity");
@@ -370,6 +376,7 @@ public class DetectECoCheckApp extends DemonstrationBase {
 			panelChecks.add(showChessboards.check);
 			panelChecks.add(showNumbers.check);
 			panelChecks.add(showCorners.check);
+			panelChecks.add(showBlur.check);
 			panelChecks.add(showAnonymous.check);
 			panelChecks.add(showPerpendicular.check);
 			panelChecks.add(showClusters.check);
@@ -404,6 +411,9 @@ public class DetectECoCheckApp extends DemonstrationBase {
 		@Override public void controlChanged( Object source ) {
 			if (source == showChessboards.check) {
 				showChessboards.updateValue();
+				imagePanel.repaint();
+			} else if (source == showBlur.check) {
+				showBlur.updateValue();
 				imagePanel.repaint();
 			} else if (source == showNumbers.check) {
 				showNumbers.updateValue();

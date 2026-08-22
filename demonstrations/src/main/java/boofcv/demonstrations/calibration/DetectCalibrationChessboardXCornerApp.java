@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -300,6 +300,12 @@ public class DetectCalibrationChessboardXCornerApp extends DemonstrationBase {
 				g2.setComposite(beforeAC);
 			}
 
+			if (controlPanel.showBlur) {
+				synchronized (lockCorners) {
+					visualizeUtils.visualizeBlur(g2, scale, controlPanel.detMinPyrLevel);
+				}
+			}
+
 			if (controlPanel.showCorners) {
 				synchronized (lockCorners) {
 					visualizeUtils.visualizeCorners(g2, scale, controlPanel.detMinPyrLevel, controlPanel.showNumbers);
@@ -370,6 +376,7 @@ public class DetectCalibrationChessboardXCornerApp extends DemonstrationBase {
 
 		boolean showChessboards = true;
 		boolean showNumbers = true;
+		boolean showBlur = false;
 		boolean showClusters = false;
 		boolean showPerpendicular = false;
 		boolean showCorners = false;
@@ -398,6 +405,7 @@ public class DetectCalibrationChessboardXCornerApp extends DemonstrationBase {
 
 		JCheckBox checkShowTargets = checkbox("Chessboard", showChessboards);
 		JCheckBox checkShowNumbers = checkbox("Numbers", showNumbers);
+		JCheckBox checkShowBlur = checkbox("Blur", showBlur);
 		JCheckBox checkShowClusters = checkbox("Clusters", showClusters);
 		JCheckBox checkShowPerpendicular = checkbox("Perp.", showPerpendicular);
 		JCheckBox checkShowCorners = checkbox("Corners", showCorners);
@@ -457,6 +465,7 @@ public class DetectCalibrationChessboardXCornerApp extends DemonstrationBase {
 			panelChecks.add(checkShowClusters);
 			panelChecks.add(checkShowPerpendicular);
 			panelChecks.add(checkShowCorners);
+			panelChecks.add(checkShowBlur);
 			panelChecks.add(checkLogIntensity);
 			panelChecks.add(showRawIntensity.check);
 
@@ -492,6 +501,9 @@ public class DetectCalibrationChessboardXCornerApp extends DemonstrationBase {
 		public void actionPerformed( ActionEvent e ) {
 			if (e.getSource() == checkShowCorners) {
 				showCorners = checkShowCorners.isSelected();
+				imagePanel.repaint();
+			} else if (e.getSource() == checkShowBlur) {
+				showBlur = checkShowBlur.isSelected();
 				imagePanel.repaint();
 			} else if (e.getSource() == checkLogIntensity) {
 				logIntensity = checkLogIntensity.isSelected();

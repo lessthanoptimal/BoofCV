@@ -210,11 +210,12 @@ public class DetectChessboardCornersXPyramid<T extends ImageGray<T>> {
 					continue;
 
 				// Copy the original corner into the new candidate so that it can continue to higher pyramid levels
-				double lowContrast = c0.contrast1;
+				double contrastLevel1 = c0.contrast1;
 				int lowLevel = c0.level1;
 				c0.setTo(resultsMax);
 				c0.level1 = lowLevel;
-				c0.contrast1 = lowContrast;
+				c0.contrast1 = contrastLevel1;
+				c0.blurRadius = Math.pow(2, c0.level2)*(Math.max(0, 1.0 - c0.contrast1/c0.contrast));
 			} else {
 				c0.level2 = resultsMax.level2;
 			}
