@@ -19,6 +19,7 @@
 package boofcv.alg.feature.detect.chess;
 
 import georegression.struct.point.Point2D_F64;
+import lombok.Getter;
 
 /// Corner in a chessboard. Orientation is estimated uniquely up to 180 degrees.
 public class ChessboardCorner extends Point2D_F64 {
@@ -29,8 +30,8 @@ public class ChessboardCorner extends Point2D_F64 {
 	/// the x-corner detector intensity. range: -max to max (pixel intensity value)
 	public double intensity;
 
-	/// Measures how sharp of an edge there in between the corner and the black region inside scaled by the
-	/// intensity of the white region. Max contrast seen in pyramid. range: 0 to 1, 1 = sharpest
+	/// Measures the difference between white and black regions in the corner. This value is the max
+	/// contrast seen across the entire pyramid.
 	public double contrast;
 
 	/// Contrast at the first level it was seen. In blurred images this will significantly lower than at the
@@ -52,16 +53,14 @@ public class ChessboardCorner extends Point2D_F64 {
 	/// Level with the maximum corner intensity
 	public int levelMax;
 
+	/// If true then a feature is marked to be discarded. Used for internal bookkeeping.
+	@Getter public boolean discarded;
+
 	{reset();}
 
 	/// Mark the corner as needing to be discarded
 	public void markDiscard() {
-		level1 = -1;
-	}
-
-	/// Returns true if it has been marked to be discarded
-	public boolean isDiscarded() {
-		return level1 == -1;
+		discarded = true;
 	}
 
 	public void reset() {
@@ -73,6 +72,7 @@ public class ChessboardCorner extends Point2D_F64 {
 		edgeRatio = -1;
 		contrast = contrast1 = 0;
 		level1 = level2 = levelMax = -1;
+		discarded = false;
 	}
 
 	public ChessboardCorner setTo( ChessboardCorner c ) {
@@ -87,6 +87,7 @@ public class ChessboardCorner extends Point2D_F64 {
 		this.level1 = c.level1;
 		this.level2 = c.level2;
 		this.levelMax = c.levelMax;
+		this.discarded = c.discarded;
 		return this;
 	}
 
