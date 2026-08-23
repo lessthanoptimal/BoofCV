@@ -7,8 +7,8 @@ Version Meaning: <compatible>.<feature>.<bug fix>
 - Last digit always indicates a bug fix and other minor changes
 
 ---------------------
-Date    : 2026/XXX/YY
-Version : 1.4.1
+Date    : 2026/Aug/23
+Version : 1.5.0
 
 - Stereo Disparity
   * Added support for negative disparity
