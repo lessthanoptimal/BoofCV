@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.factory.fiducial;
 
 import boofcv.alg.descriptor.DescriptorDistance;
 import boofcv.alg.fiducial.qrcode.PackedBits32;
-import boofcv.struct.StandardConfigurationChecks;
+import boofcv.testing.StandardConfigurationChecks;
 import org.junit.jupiter.api.Test;
 
 import static boofcv.factory.fiducial.ConfigHammingMarker.loadDictionary;

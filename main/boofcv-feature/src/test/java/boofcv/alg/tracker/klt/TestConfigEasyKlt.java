@@ -18,6 +18,6 @@
 
 package boofcv.alg.tracker.klt;
 
-import boofcv.struct.StandardConfigurationChecks;
+import boofcv.testing.StandardConfigurationChecks;
 
 public class TestConfigEasyKlt extends StandardConfigurationChecks {}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,6 @@ package boofcv.alg.segmentation.fh04.impl;
 
 import boofcv.generate.AutoTypeImage;
 import boofcv.generate.CodeGeneratorBase;
-import boofcv.struct.ConnectRule;
 
 import java.io.FileNotFoundException;
 
@@ -29,15 +28,15 @@ public class GenerateFhEdgeWeights_SB extends CodeGeneratorBase {
 
 	@Override
 	public void generateCode() throws FileNotFoundException {
-		create(AutoTypeImage.F32, ConnectRule.EIGHT);
-		create(AutoTypeImage.U8, ConnectRule.EIGHT);
-		create(AutoTypeImage.F32, ConnectRule.FOUR);
-		create(AutoTypeImage.U8, ConnectRule.FOUR);
+		create(AutoTypeImage.F32, 8);
+		create(AutoTypeImage.U8, 8);
+		create(AutoTypeImage.F32, 4);
+		create(AutoTypeImage.U8, 4);
 	}
 
-	protected void create( AutoTypeImage imageType , ConnectRule rule ) throws FileNotFoundException {
+	protected void create( AutoTypeImage imageType , int rule ) throws FileNotFoundException {
 
-		String name = "FhEdgeWeights" + rule.getShortName() + "_" + imageType.getAbbreviatedType();
+		String name = "FhEdgeWeights" + rule + "_" + imageType.getAbbreviatedType();
 		setOutputFile(name);
 		printPreamble(imageType,rule);
 		printProcess(imageType,rule);
@@ -47,11 +46,11 @@ public class GenerateFhEdgeWeights_SB extends CodeGeneratorBase {
 		out.print("}\n");
 	}
 
-	private void printPreamble( AutoTypeImage imageType , ConnectRule rule ) {
+	private void printPreamble( AutoTypeImage imageType , int rule ) {
 
 		String imageName = imageType.getSingleBandName();
 
-		int N = rule == ConnectRule.EIGHT ? 8 : 4;
+		int N = rule;
 
 		out.print("import boofcv.struct.image."+imageName+";\n" +
 				"import boofcv.alg.segmentation.fh04.FhEdgeWeights;\n" +
@@ -73,13 +72,13 @@ public class GenerateFhEdgeWeights_SB extends CodeGeneratorBase {
 				"public class "+className+" implements FhEdgeWeights<"+imageName+"> {\n\n");
 	}
 
-	private void printProcess( AutoTypeImage imageType , ConnectRule rule ) {
+	private void printProcess( AutoTypeImage imageType , int rule ) {
 
 		String imageName = imageType.getSingleBandName();
 		String sumType = imageType.getSumType();
 		String bitwise = imageType.getBitWise();
 
-		int startX = rule == ConnectRule.FOUR ? 0 : 1;
+		int startX = rule == 4 ? 0 : 1;
 
 		out.print("\t@Override\n" +
 				"\tpublic void process("+imageName+" input,\n" +
@@ -108,7 +107,7 @@ public class GenerateFhEdgeWeights_SB extends CodeGeneratorBase {
 				"\t\t\t\te2.sortValue = Math.abs(color2-color0);\n" +
 				"\t\t\t\te2.indexA = indexDst;\n" +
 				"\t\t\t\te2.indexB = indexDst+input.width;\n");
-		if( rule == ConnectRule.EIGHT ) {
+		if( rule == 8 ) {
 			out.print(
 				"\n" +
 				"\t\t\t\t"+sumType+" color3 = input.data[indexSrc+1+input.stride]"+bitwise+"; // (x+1,y+1)\n" +
@@ -130,7 +129,7 @@ public class GenerateFhEdgeWeights_SB extends CodeGeneratorBase {
 				"\t\t}\n"+
 				"\t\t// Handle border pixels\n");
 
-		if( rule == ConnectRule.EIGHT ) {
+		if( rule == 8 ) {
 			out.print(
 					"\t\tfor( int y = 0; y < h; y++ ) {\n" +
 					"\t\t\tcheckAround(0,y,input,edges);\n" +
@@ -154,7 +153,7 @@ public class GenerateFhEdgeWeights_SB extends CodeGeneratorBase {
 		out.print("\t}\n");
 	}
 
-	private void printCheckAround( AutoTypeImage imageType , ConnectRule rule ) {
+	private void printCheckAround( AutoTypeImage imageType , int rule ) {
 
 		String imageName = imageType.getSingleBandName();
 		String bitwise = imageType.getBitWise();
@@ -172,7 +171,7 @@ public class GenerateFhEdgeWeights_SB extends CodeGeneratorBase {
 				"\t\tcheck(x+1,y  ,color0,indexA,input,edges);\n" +
 				"\t\tcheck(x  ,y+1,color0,indexA,input,edges);\n");
 
-		if( rule == ConnectRule.EIGHT ) {
+		if( rule == 8 ) {
 			out.print(
 				"\t\tcheck(x+1,y+1,color0,indexA,input,edges);\n" +
 				"\t\tcheck(x-1,y+1,color0,indexA,input,edges);\n");

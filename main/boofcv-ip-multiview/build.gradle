@@ -1,9 +1,0 @@
-dependencies {
-	api project(':main:boofcv-geo')
-	api project(':main:boofcv-ip')
-	api project(':main:boofcv-feature') // this could probably be moved
-
-	testImplementation project(':main:boofcv-io')
-	testImplementation project(':main:boofcv-simulation')
-	testImplementation project(':integration:boofcv-swing')
-}

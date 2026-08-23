@@ -1,4 +1,0 @@
-dependencies {
-	project.configurations.compileOnly.extendsFrom(project.sourceSets.noauto.compileClasspath)
-	implementation project.sourceSets.noauto.runtimeClasspath
-}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.struct.feature;
 
-import boofcv.struct.StandardStructChecks;
+import boofcv.testing.StandardStructChecks;
 
 public class TestAssociatedTripleIndex extends StandardStructChecks {
 }

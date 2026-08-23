@@ -1,6 +1,0 @@
-dependencies {
-	api project(':main:boofcv-io')
-	api project(':main:boofcv-recognition')
-
-	implementation("org.apache.pdfbox:pdfbox:$pdfbox_version")
-}

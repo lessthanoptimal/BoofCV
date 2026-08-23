@@ -18,7 +18,7 @@
 
 package boofcv.struct.geo;
 
-import boofcv.struct.StandardStructChecks;
+import boofcv.testing.StandardStructChecks;
 import org.ejml.MapPrintFormat;
 import org.junit.jupiter.api.Test;
 

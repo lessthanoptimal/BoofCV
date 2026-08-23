@@ -18,6 +18,6 @@
 
 package boofcv.alg.feature.detect.chess;
 
-import boofcv.struct.StandardStructChecks;
+import boofcv.testing.StandardStructChecks;
 
 public class TestChessboardCorner extends StandardStructChecks {}
