@@ -215,6 +215,7 @@ public class DetectChessboardCornersXPyramid<T extends ImageGray<T>> {
 				c0.setTo(resultsMax);
 				c0.level1 = lowLevel;
 				c0.contrast1 = lowContrast;
+				c0.discarded = false;
 			} else {
 				c0.level2 = resultsMax.level2;
 			}
@@ -267,7 +268,7 @@ public class DetectChessboardCornersXPyramid<T extends ImageGray<T>> {
 	}
 
 	private static class PyramidLevel {
-		DogArray<ChessboardCorner> corners = new DogArray<>(ChessboardCorner::new);
+		DogArray<ChessboardCorner> corners = new DogArray<>(ChessboardCorner::new, ChessboardCorner::reset);
 	}
 
 	public int getNumberOfLevels() {

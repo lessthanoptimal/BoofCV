@@ -19,6 +19,7 @@
 package boofcv.alg.feature.detect.chess;
 
 import georegression.struct.point.Point2D_F64;
+import lombok.Getter;
 
 /// Corner in a chessboard. Orientation is estimated uniquely up to 180 degrees.
 public class ChessboardCorner extends Point2D_F64 {
@@ -49,17 +50,13 @@ public class ChessboardCorner extends Point2D_F64 {
 	/// Level with the maximum corner intensity
 	public int levelMax;
 
+	/// Internal bookkeeping that indicates a corner should be discarded and not used
+	@Getter public boolean discarded;
+
 	{reset();}
 
 	/// Mark the corner as needing to be discarded
-	public void markDiscard() {
-		level1 = -1;
-	}
-
-	/// Returns true if it has been marked to be discarded
-	public boolean isDiscarded() {
-		return level1 == -1;
-	}
+	public void markDiscard() {discarded = true;}
 
 	public void reset() {
 		super.setTo(-1, -1);
@@ -69,6 +66,7 @@ public class ChessboardCorner extends Point2D_F64 {
 		edgeRatio = -1;
 		contrast = contrast1 = 0;
 		level1 = level2 = levelMax = -1;
+		discarded = false;
 	}
 
 	public ChessboardCorner setTo( ChessboardCorner c ) {
@@ -82,6 +80,7 @@ public class ChessboardCorner extends Point2D_F64 {
 		this.level1 = c.level1;
 		this.level2 = c.level2;
 		this.levelMax = c.levelMax;
+		this.discarded = c.discarded;
 		return this;
 	}
 
