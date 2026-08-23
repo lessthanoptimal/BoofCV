@@ -18,7 +18,7 @@
 
 package boofcv.struct.geo;
 
-import boofcv.struct.StandardStructChecks;
+import boofcv.testing.StandardStructChecks;
 
 public class TestPairLineNorm extends StandardStructChecks {
 	{this.resetName = "zero";}

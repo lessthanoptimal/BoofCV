@@ -14,3 +14,6 @@ Project.xml
 !gradle-wrapper.jar
 # Adding to allow local changes to avoid problems in IntelliJ
 build.gradle
+
+# Machine specific. Points the Android build at a local SDK.
+local.properties

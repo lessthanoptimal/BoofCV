@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,7 +49,7 @@ public class TestEnforceCodeStandards {
 	// Skip over these directories since they don't contain library code
 	String[] blacklistConfig = new String[]{"autocode", "boofcv-core", "checks"};
 	// Only run this on performance critical code
-	String[] blackListLanguage = new String[]{"boofcv-io", "checks", "autocode"};
+	String[] blackListLanguage = new String[]{"boofcv-io", "checks", "autocode", "boofcv-test"};
 
 	/**
 	 * This code needs to run fast and minimize memory usage. Lint check for certain illegal operations.
@@ -269,7 +269,7 @@ public class TestEnforceCodeStandards {
 //		out.println();
 //		out.println("package " + path + ";");
 //		out.println();
-//		out.println("import boofcv.struct.StandardConfigurationChecks;");
+//		out.println("import boofcv.testing.StandardConfigurationChecks;");
 //		out.println();
 //		out.println("public class " + className + " extends StandardConfigurationChecks {}");
 //		out.println();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,8 @@
 package boofcv.alg.misc;
 
 import boofcv.generate.AutoTypeImage;
+import boofcv.generate.ImageFamily;
 import boofcv.generate.CodeGeneratorBase;
-import boofcv.struct.image.ImageType;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -38,7 +38,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 	private AutoTypeImage input;
 	private AutoTypeImage output;
 
-	ImageType.Family[] families = new ImageType.Family[]{ImageType.Family.GRAY, ImageType.Family.INTERLEAVED};
+	ImageFamily[] families = new ImageFamily[]{ImageFamily.GRAY, ImageFamily.INTERLEAVED};
 
 	@Override
 	public void generateCode() throws FileNotFoundException {
@@ -107,9 +107,9 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 			printSubtractTwoImages(types[i], outputsSub[i]);
 
 			if (!types[i].isInteger()) {
-				printMultTwoImages(ImageType.Family.GRAY, types[i], types[i]);
-				printDivTwoImages(ImageType.Family.GRAY, types[i], types[i]);
-				for (ImageType.Family f : families) {
+				printMultTwoImages(ImageFamily.GRAY, types[i], types[i]);
+				printDivTwoImages(ImageFamily.GRAY, types[i], types[i]);
+				for (ImageFamily f : families) {
 					printLog(f, types[i], types[i]);
 					printLogSign(f, types[i], types[i]);
 					printSqrt(f, types[i], types[i]);
@@ -124,17 +124,17 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 	}
 
 	private void increaseBits( AutoTypeImage a, AutoTypeImage b ) {
-		printPow2(ImageType.Family.GRAY, a, b);
-		printPow2(ImageType.Family.INTERLEAVED, a, b);
+		printPow2(ImageFamily.GRAY, a, b);
+		printPow2(ImageFamily.INTERLEAVED, a, b);
 		printStdev(a, b);
 	}
 
 	private void print( String funcName, String javadoc, AutoTypeImage[] types ) {
 		for (AutoTypeImage t : types) {
 			input = t;
-			for (ImageType.Family family : families) {
+			for (ImageFamily family : families) {
 				String inputName, columns;
-				if (family == ImageType.Family.INTERLEAVED) {
+				if (family == ImageFamily.INTERLEAVED) {
 					inputName = input.getInterleavedName();
 					columns = "input.width*input.numBands";
 				} else {
@@ -174,10 +174,10 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 
 		for (AutoTypeImage t : AutoTypeImage.getGenericTypes()) {
 			input = t;
-			for (ImageType.Family family : families) {
+			for (ImageFamily family : families) {
 				String lambdaType = input.getAbbreviatedType();
 				String inputName, columns;
-				if (family == ImageType.Family.INTERLEAVED) {
+				if (family == ImageFamily.INTERLEAVED) {
 					inputName = input.getInterleavedName();
 					columns = "input.width*input.numBands";
 				} else {
@@ -218,10 +218,10 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 
 		for (AutoTypeImage t : AutoTypeImage.getGenericTypes()) {
 			input = t;
-			for (ImageType.Family family : families) {
+			for (ImageFamily family : families) {
 				String lambdaType = input.getAbbreviatedType();
 				String inputName, columns;
-				if (family == ImageType.Family.INTERLEAVED) {
+				if (family == ImageFamily.INTERLEAVED) {
 					inputName = input.getInterleavedName();
 					columns = "imgA.width*imgA.numBands";
 				} else {
@@ -314,9 +314,9 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 		String funcArrayName = input.isSigned() ? funcName : funcName + "U";
 		funcArrayName += template.isImageFirst() ? "_A" : "_B";
 
-		for (ImageType.Family family : families) {
+		for (ImageFamily family : families) {
 			String inputName, outputName, columns, reshape;
-			if (family == ImageType.Family.INTERLEAVED) {
+			if (family == ImageFamily.INTERLEAVED) {
 				inputName = input.getInterleavedName();
 				outputName = output.getInterleavedName();
 				columns = "input.width*input.numBands";
@@ -472,7 +472,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	public void printMultTwoImages( ImageType.Family f, AutoTypeImage typeIn, AutoTypeImage typeOut ) {
+	public void printMultTwoImages( ImageFamily f, AutoTypeImage typeIn, AutoTypeImage typeOut ) {
 		out.print("\t/**\n" +
 				"\t * <p>\n" +
 				"\t * Performs pixel-wise multiplication<br>\n" +
@@ -495,7 +495,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	public void printDivTwoImages( ImageType.Family f, AutoTypeImage typeIn, AutoTypeImage typeOut ) {
+	public void printDivTwoImages( ImageFamily f, AutoTypeImage typeIn, AutoTypeImage typeOut ) {
 
 		out.print("\t/**\n" +
 				"\t * <p>\n" +
@@ -519,7 +519,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	public void printLog( ImageType.Family f, AutoTypeImage typeIn, AutoTypeImage typeOut ) {
+	public void printLog( ImageFamily f, AutoTypeImage typeIn, AutoTypeImage typeOut ) {
 		out.print("\t/**\n" +
 				"\t * Sets each pixel in the output image to log( val + input(x,y)) of the input image.\n" +
 				"\t * Both the input and output image can be the same instance.\n" +
@@ -530,7 +530,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 		printNonImageVal("log", f, typeIn, typeOut);
 	}
 
-	public void printLogSign( ImageType.Family f, AutoTypeImage typeIn, AutoTypeImage typeOut ) {
+	public void printLogSign( ImageFamily f, AutoTypeImage typeIn, AutoTypeImage typeOut ) {
 		out.print("\t/**\n" +
 				"\t * Sets each pixel in the output image to sgn*log( val + sgn*input(x,y)) of the input image.\n" +
 				"\t * where sng is the sign of input(x,y). \n" +
@@ -542,7 +542,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 		printNonImageVal("logSign", f, typeIn, typeOut);
 	}
 
-	public void printPow2( ImageType.Family f, AutoTypeImage typeIn, AutoTypeImage typeOut ) {
+	public void printPow2( ImageFamily f, AutoTypeImage typeIn, AutoTypeImage typeOut ) {
 
 		out.print("\t/**\n" +
 				"\t * Raises each pixel in the input image to the power of two. Both the input and output image can be the \n" +
@@ -554,7 +554,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 		printNonImage("pow2", f, typeIn, typeOut);
 	}
 
-	public void printSqrt( ImageType.Family f, AutoTypeImage typeIn, AutoTypeImage typeOut ) {
+	public void printSqrt( ImageFamily f, AutoTypeImage typeIn, AutoTypeImage typeOut ) {
 
 		out.print("\t/**\n" +
 				"\t * Computes the square root of each pixel in the input image. Both the input and output image can be the\n" +
@@ -566,9 +566,9 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 		printNonImage("sqrt", f, typeIn, typeOut);
 	}
 
-	public void printNonImage( String op, ImageType.Family f, AutoTypeImage typeIn, AutoTypeImage typeOut ) {
-		String columns = f == ImageType.Family.GRAY ? "" : "\t\tint columns = input.width*input.numBands;\n";
-		String width = f == ImageType.Family.GRAY ? "input.width" : "columns";
+	public void printNonImage( String op, ImageFamily f, AutoTypeImage typeIn, AutoTypeImage typeOut ) {
+		String columns = f == ImageFamily.GRAY ? "" : "\t\tint columns = input.width*input.numBands;\n";
+		String width = f == ImageFamily.GRAY ? "input.width" : "columns";
 		out.print(
 				"\tpublic static void " + op + "( " + typeIn.getName(f) + " input , " + typeOut.getName(f) + " output ) {\n" +
 						"\n" +
@@ -590,9 +590,9 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 						"\t}\n\n");
 	}
 
-	public void printNonImageVal( String op, ImageType.Family f, AutoTypeImage typeIn, AutoTypeImage typeOut ) {
-		String columns = f == ImageType.Family.GRAY ? "" : "\t\tint columns = input.width*input.numBands;\n";
-		String width = f == ImageType.Family.GRAY ? "input.width" : "columns";
+	public void printNonImageVal( String op, ImageFamily f, AutoTypeImage typeIn, AutoTypeImage typeOut ) {
+		String columns = f == ImageFamily.GRAY ? "" : "\t\tint columns = input.width*input.numBands;\n";
+		String width = f == ImageFamily.GRAY ? "input.width" : "columns";
 		out.print(
 				"\tpublic static void " + op + "( " + typeIn.getName(f) + " input , final " + typeIn.getSumType() + " val, " + typeOut.getName(f) + " output ) {\n" +
 						"\n" +

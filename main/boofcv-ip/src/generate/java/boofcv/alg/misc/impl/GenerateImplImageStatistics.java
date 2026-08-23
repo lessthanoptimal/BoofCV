@@ -19,8 +19,8 @@
 package boofcv.alg.misc.impl;
 
 import boofcv.generate.AutoTypeImage;
+import boofcv.generate.ImageFamily;
 import boofcv.generate.CodeGeneratorBase;
-import boofcv.struct.image.ImageType;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -55,7 +55,7 @@ public class GenerateImplImageStatistics extends CodeGeneratorBase {
 	public void printAll() {
 		AutoTypeImage[] types = AutoTypeImage.getSpecificTypes();
 
-		ImageType.Family[] families = new ImageType.Family[]{ImageType.Family.GRAY, ImageType.Family.INTERLEAVED};
+		ImageFamily[] families = new ImageFamily[]{ImageFamily.GRAY, ImageFamily.INTERLEAVED};
 
 		List<CodeGenerator> functions = new ArrayList<>();
 		functions.add(new GenerateMin());
@@ -71,7 +71,7 @@ public class GenerateImplImageStatistics extends CodeGeneratorBase {
 			for (CodeGenerator generator : functions) {
 				generator.printLowLevel();
 			}
-			for (ImageType.Family f : families) {
+			for (ImageFamily f : families) {
 				printSum(f);
 				if (t.isSigned()) {
 					printSumAbs(f);
@@ -159,10 +159,10 @@ public class GenerateImplImageStatistics extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	public void printSum( ImageType.Family family ) {
+	public void printSum( ImageFamily family ) {
 
 		String bitWise = input.getBitWise();
-		String columns = family == ImageType.Family.INTERLEAVED ? "*img.numBands" : "";
+		String columns = family == ImageFamily.INTERLEAVED ? "*img.numBands" : "";
 		String sumType = input.getSumType();
 		String numTo = input.getSumNumberToType();
 		out.print("\tpublic static " + sumType + " sum( " + input.getImageName(family) + " img ) {\n" +
@@ -187,10 +187,10 @@ public class GenerateImplImageStatistics extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	public void printSumAbs( ImageType.Family family ) {
+	public void printSumAbs( ImageFamily family ) {
 
 		String bitWise = input.getBitWise();
-		String columns = family == ImageType.Family.INTERLEAVED ? "*img.numBands" : "";
+		String columns = family == ImageFamily.INTERLEAVED ? "*img.numBands" : "";
 		String sumType = input.getSumType();
 		String numTo = input.getSumNumberToType();
 		out.print(

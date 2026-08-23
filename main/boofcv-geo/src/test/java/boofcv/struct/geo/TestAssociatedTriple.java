@@ -18,7 +18,7 @@
 
 package boofcv.struct.geo;
 
-import boofcv.struct.StandardStructChecks;
+import boofcv.testing.StandardStructChecks;
 import georegression.struct.point.Point2D_F64;
 import org.ejml.MapPrintFormat;
 import org.junit.jupiter.api.Test;

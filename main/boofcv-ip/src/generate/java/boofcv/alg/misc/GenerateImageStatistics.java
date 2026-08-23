@@ -19,8 +19,8 @@
 package boofcv.alg.misc;
 
 import boofcv.generate.AutoTypeImage;
+import boofcv.generate.ImageFamily;
 import boofcv.generate.CodeGeneratorBase;
-import boofcv.struct.image.ImageType;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -56,7 +56,7 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 	public void printAll() {
 		AutoTypeImage[] types = AutoTypeImage.getSpecificTypes();
 
-		ImageType.Family[] families = new ImageType.Family[]{ImageType.Family.GRAY, ImageType.Family.INTERLEAVED};
+		ImageFamily[] families = new ImageFamily[]{ImageFamily.GRAY, ImageFamily.INTERLEAVED};
 
 		List<CodeGenerator> functions = new ArrayList<>();
 		functions.add(new GenerateMin());
@@ -70,11 +70,11 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 			input = t;
 
 			for (CodeGenerator generator : functions) {
-				for (ImageType.Family f : families) {
+				for (ImageFamily f : families) {
 					generator.printHighLevel(f);
 				}
 			}
-			for (ImageType.Family f : families) {
+			for (ImageFamily f : families) {
 				printSum(f);
 				printSumAbs(f);
 				printMean(f);
@@ -126,7 +126,7 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	public void printSum( ImageType.Family family ) {
+	public void printSum( ImageFamily family ) {
 
 		String sumType = input.getSumType();
 
@@ -148,7 +148,7 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	public void printSumAbs( ImageType.Family family ) {
+	public void printSumAbs( ImageFamily family ) {
 
 		String sumType = input.getSumType();
 
@@ -173,8 +173,8 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 		out.print("\t}\n\n");
 	}
 
-	public void printMean( ImageType.Family family ) {
-		String columns = family == ImageType.Family.INTERLEAVED ? "*img.numBands" : "";
+	public void printMean( ImageFamily family ) {
+		String columns = family == ImageFamily.INTERLEAVED ? "*img.numBands" : "";
 		String sumType = input.isInteger() ? "double" : input.getSumType();
 
 		out.print("\t/**\n" +
@@ -318,10 +318,10 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 			this.javaDoc = javaDoc;
 		}
 
-		@Override public void printHighLevel( ImageType.Family family ) {
+		@Override public void printHighLevel( ImageFamily family ) {
 
 			String sumType = input.getSumType();
-			String columns = family == ImageType.Family.INTERLEAVED ? "input.width*input.numBands" : "input.width";
+			String columns = family == ImageFamily.INTERLEAVED ? "input.width*input.numBands" : "input.width";
 			String nameUn = this.name + (input.isSigned() ? "" : "U");
 
 			out.println(javaDoc);
@@ -350,9 +350,9 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 			this.javaDoc = javaDoc;
 		}
 
-		@Override public void printHighLevel( ImageType.Family family ) {
+		@Override public void printHighLevel( ImageFamily family ) {
 
-			String columns = family == ImageType.Family.INTERLEAVED ? "imgA.width*imgA.numBands" : "imgA.width";
+			String columns = family == ImageFamily.INTERLEAVED ? "imgA.width*imgA.numBands" : "imgA.width";
 			String nameUn = this.name + (input.isSigned() ? "" : "U");
 			String imageName = input.getImageName(family);
 
@@ -370,7 +370,7 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 	}
 
 	private interface CodeGenerator {
-		void printHighLevel( ImageType.Family family );
+		void printHighLevel( ImageFamily family );
 	}
 
 	public static void main( String[] args ) throws FileNotFoundException {

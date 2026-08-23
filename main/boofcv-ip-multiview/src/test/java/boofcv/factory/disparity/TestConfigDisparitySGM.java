@@ -18,7 +18,7 @@
 
 package boofcv.factory.disparity;
 
-import boofcv.struct.StandardConfigurationChecks;
+import boofcv.testing.StandardConfigurationChecks;
 import org.junit.jupiter.api.Test;
 
 public class TestConfigDisparitySGM extends StandardConfigurationChecks {

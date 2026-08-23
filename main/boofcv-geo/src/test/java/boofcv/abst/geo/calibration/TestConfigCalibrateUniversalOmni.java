@@ -18,6 +18,6 @@
 
 package boofcv.abst.geo.calibration;
 
-import boofcv.struct.StandardConfigurationChecks;
+import boofcv.testing.StandardConfigurationChecks;
 
 public class TestConfigCalibrateUniversalOmni extends StandardConfigurationChecks {}

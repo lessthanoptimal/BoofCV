@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,6 @@
 
 package boofcv.struct.geo;
 
-import boofcv.struct.StandardStructChecks;
+import boofcv.testing.StandardStructChecks;
 
 public class TestAssociatedPairConic extends StandardStructChecks {{this.resetName = "zero";}}

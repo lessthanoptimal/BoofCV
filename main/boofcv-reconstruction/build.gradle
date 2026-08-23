@@ -1,9 +1,0 @@
-dependencies {
-	api project(':main:boofcv-recognition')
-	api project(':main:boofcv-sfm')
-
-	testImplementation project(':main:boofcv-io')
-	testImplementation project(':main:boofcv-simulation')
-	testImplementation project(':integration:boofcv-swing')
-	testImplementation project(':main:boofcv-sfm').sourceSets.test.output
-}

@@ -1,7 +1,0 @@
-dependencies {
-	api project(':main:boofcv-types')
-
-	testImplementation project(':integration:boofcv-swing')
-	testImplementation project(':main:boofcv-io')
-	testImplementation project(':main:boofcv-recognition')
-}

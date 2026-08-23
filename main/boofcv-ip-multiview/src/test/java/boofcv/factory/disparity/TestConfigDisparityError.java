@@ -18,7 +18,7 @@
 
 package boofcv.factory.disparity;
 
-import boofcv.struct.StandardConfigurationChecks;
+import boofcv.testing.StandardConfigurationChecks;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Nested;
 
