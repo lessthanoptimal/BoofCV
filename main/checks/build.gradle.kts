@@ -23,6 +23,10 @@ plugins {
 // Every core module, found by path rather than by a hand-maintained list.
 val coreModules = rootProject.subprojects.filter { it.path.startsWith(":main:boofcv-") }
 
+// Native binaries for this machine. The published ones are optional, so anything that
+// actually decodes video has to ask for them explicitly.
+val hostPlatform = rootProject.extra["hostPlatform"] as String
+
 dependencies {
 	api(project(":main:boofcv-core"))
 	api(project(":main:autocode"))
@@ -41,6 +45,7 @@ dependencies {
 	implementation(Libs.REGRESSION) { exclude(group = "org.yaml") }
 	implementation(Libs.LANGUAGE)
 	api(Libs.JMH_CORE)
+	runtimeOnly("${Libs.FFMPEG}:$hostPlatform")
 }
 
 // checks is a test harness. It applies only boofcv.java-conventions, so there is no

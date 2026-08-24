@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import lombok.Getter;
 import org.bytedeco.copiedstuff.FFmpegFrameGrabber;
 import org.bytedeco.copiedstuff.Frame;
 import org.bytedeco.copiedstuff.FrameGrabber;
@@ -30,16 +31,11 @@ import org.bytedeco.copiedstuff.Java2DFrameConverter;
 
 import java.awt.image.BufferedImage;
 
-import static org.bytedeco.javacpp.avutil.AV_LOG_ERROR;
-import static org.bytedeco.javacpp.avutil.av_log_set_level;
+import static org.bytedeco.ffmpeg.global.avutil.AV_LOG_ERROR;
+import static org.bytedeco.ffmpeg.global.avutil.av_log_set_level;
 
-/**
- * Uses JavaCV, which uses FFMPEG, to read in a video.
- *
- * @author Peter Abeles
- */
-public class FfmpegVideoImageSequence<T extends ImageBase<T>> implements SimpleImageSequence<T>
-{
+/// Uses JavaCV, which uses FFMPEG, to read in a video.
+public class FfmpegVideoImageSequence<T extends ImageBase<T>> implements SimpleImageSequence<T> {
 	String filename;
 	FFmpegFrameGrabber frameGrabber;
 	ImageType<T> imageType;
@@ -52,8 +48,10 @@ public class FfmpegVideoImageSequence<T extends ImageBase<T>> implements SimpleI
 	BufferedImage next;
 	T currentBoof;
 	int frameNumber;
+	// Image dimensions. Cached in reset() because 'next' is the look ahead frame and could NPE
+	@Getter int width, height;
 
-	public FfmpegVideoImageSequence(String filename, ImageType<T> imageType ) {
+	public FfmpegVideoImageSequence( String filename, ImageType<T> imageType ) {
 		// Turn off that super annoying error message!
 		av_log_set_level(AV_LOG_ERROR);
 
@@ -61,55 +59,43 @@ public class FfmpegVideoImageSequence<T extends ImageBase<T>> implements SimpleI
 		this.imageType = imageType;
 		converter = new Java2DFrameConverter();
 		reset();
-		if( finished )
-			throw new RuntimeException("FFMPEG failed to open file. "+filename);
+		if (finished)
+			throw new RuntimeException("FFMPEG failed to open file. " + filename);
 	}
 
-	@Override
-	public int getWidth() {
-		return next.getWidth();
-	}
-
-	@Override
-	public int getHeight() {
-		return next.getHeight();
-	}
-
-	@Override
-	public boolean hasNext() {
+	@Override public boolean hasNext() {
 		return !finished;
 	}
 
-	@Override
-	public T next() {
-		if( finished)
+	@Override public T next() {
+		if (finished)
 			return null;
 
-		current.createGraphics().drawImage(next,0,0,null);
+		current.createGraphics().drawImage(next, 0, 0, null);
 		try {
 			next = converter.convert(frameGrabber.grab());
 			frameNumber++;
+			// grab() returns null at the end of the stream.
+			if (next == null)
+				finished = true;
 		} catch (FrameGrabber.Exception e) {
 			finished = true;
 		}
-		if( frameNumber >= frameGrabber.getLengthInFrames() )
+		if (frameNumber >= frameGrabber.getLengthInFrames())
 			finished = true;
-		ConvertBufferedImage.convertFrom(current,currentBoof,true);
+		ConvertBufferedImage.convertFrom(current, currentBoof, true);
 		return currentBoof;
 	}
 
-	@Override
-	public T getImage() {
+	@Override public T getImage() {
 		return currentBoof;
 	}
 
-	@Override
-	public <InternalImage> InternalImage getGuiImage() {
+	@Override public <InternalImage> InternalImage getGuiImage() {
 		return (InternalImage)current;
 	}
 
-	@Override
-	public void close() {
+	@Override public void close() {
 		try {
 			frameGrabber.stop();
 			finished = true;
@@ -118,24 +104,26 @@ public class FfmpegVideoImageSequence<T extends ImageBase<T>> implements SimpleI
 		}
 	}
 
-	@Override
-	public int getFrameNumber() {
+	@Override public int getFrameNumber() {
 		return frameNumber;
 	}
 
-	@Override
-	public void setLoop(boolean loop) {
+	@Override public void setLoop( boolean loop ) {}
 
-	}
-
-	@Override
-	public ImageType<T> getImageType() {
+	@Override public ImageType<T> getImageType() {
 		return imageType;
 	}
 
-	@Override
-	public void reset() {
+	@Override public void reset() {
 		filename = UtilIO.checkIfJarAndCopyToTemp(filename);
+
+		// Release the native resources held by a previous grabber.
+		if (frameGrabber != null) {
+			try {
+				frameGrabber.release();
+			} catch (FrameGrabber.Exception ignore) {
+			}
+		}
 
 		this.frameGrabber = new FFmpegFrameGrabber(filename);
 		try {
@@ -151,11 +139,12 @@ public class FfmpegVideoImageSequence<T extends ImageBase<T>> implements SimpleI
 		try {
 			Frame frame = frameGrabber.grab();
 			next = converter.convert(frame);
-			current = new BufferedImage(next.getWidth(),next.getHeight(),next.getType());
-			currentBoof = imageType.createImage(next.getWidth(),next.getHeight());
+			width = next.getWidth();
+			height = next.getHeight();
+			current = new BufferedImage(width, height, next.getType());
+			currentBoof = imageType.createImage(width, height);
 		} catch (FrameGrabber.Exception e) {
 			finished = true;
 		}
 	}
-
 }

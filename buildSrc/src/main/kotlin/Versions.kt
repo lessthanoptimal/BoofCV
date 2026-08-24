@@ -38,6 +38,12 @@ object Versions {
     const val TROVE4J = "3.0.3"
     const val PDFBOX = "3.0.4"
 
+    // JavaCPP presets. These are the versions pinned by JavaCV 1.5.14; keep them in step.
+    const val JAVACV = "1.5.14"
+    const val OPENCV = "4.14.0-1.5.14"
+    const val OPENBLAS = "0.3.34-1.5.14"
+    const val FFMPEG = "8.1.2-1.5.14"
+
     // Forced versions. Not declared directly, only pinned via resolutionStrategy.
     const val BYTEBUDDY = "1.17.7"
     const val CHECKER_QUAL = "2.10.0"
@@ -84,6 +90,11 @@ object Libs {
     const val ARGS4J = "args4j:args4j:${Versions.ARGS4J}"
     const val PDFBOX = "org.apache.pdfbox:pdfbox:${Versions.PDFBOX}"
     const val SNAKEYAML = "org.yaml:snakeyaml:${Versions.SNAKEYAML}"
+
+    const val JAVACV = "org.bytedeco:javacv:${Versions.JAVACV}"
+    const val FFMPEG = "org.bytedeco:ffmpeg:${Versions.FFMPEG}"
+    const val OPENCV = "org.bytedeco:opencv:${Versions.OPENCV}"
+    const val OPENBLAS = "org.bytedeco:openblas:${Versions.OPENBLAS}"
 
     const val BYTEBUDDY = "net.bytebuddy:byte-buddy:${Versions.BYTEBUDDY}"
     const val BYTEBUDDY_AGENT = "net.bytebuddy:byte-buddy-agent:${Versions.BYTEBUDDY}"

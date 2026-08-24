@@ -91,6 +91,33 @@ Here are a list of the most commonly used modules and what they are for:
 | integration/    | Contains code which allows BoofCV to be easily integrated with 3rd party libraries. Primary for video input/output. |
 | main/           | Contains the source code for BoofCV                                                                                 |
 
+## JavaCV and FFMPEG
+
+Starting in BoofCV 1.5.0, native binaries for the optional `boofcv-ffmpeg` and `boofcv-javacv` are no longer
+included by default. This greatly reduces the number of unnecessary jars which need to be downloaded.
+
+IMPORTANT: You will need to specify your platform, i.e. linux-x85_64. See [JavaCV](https://repo1.maven.org/maven2/org/bytedeco/opencv/4.14.0-1.5.14/)
+and [FFMPEG](https://repo1.maven.org/maven2/org/bytedeco/ffmpeg/8.1.2-1.5.14/) for a list of what's available.
+
+```
+dependencies {
+    # FFMPEG
+    runtimeOnly 'org.bytedeco:ffmpeg:8.1.2-1.5.14:<ENTER PLATFORM HERE>'
+
+    # JavaCV
+    runtimeOnly 'org.bytedeco:opencv:4.14.0-1.5.14:<ENTER PLATFORM HERE>'
+    runtimeOnly 'org.bytedeco:openblas:0.3.34-1.5.14:<ENTER PLATFORM HERE>'
+}
+```
+
+If you see an error similar to `java.lang.UnsatisfiedLinkError: no jniopenblas_nolapack in java.library.path` then
+that's probably the cause and it's fixed by adding the dependencies above.
+
+# boofcv-javacv
+
+Wraps [JavaCV](https://github.com/bytedeco/javacv) for OpenCV interop and webcam capture.
+
+
 ------------------------------------
 # Building from Source
 
@@ -141,7 +168,9 @@ Code from the following libraries has been integrated into BoofCV
 
 - [General Purpose FFT by Takuya Ooura](http://www.kurims.kyoto-u.ac.jp/~ooura/fft.html)
   * Java port by Piotr Wendykier with modifications by Peter Abeles to recycle memory.
-  
+ 
+- [bytedeco for Native binaries for FFMPEG and JavaCV](https://bytedeco.org/)
+
 The optional sub-projects in integration also have several dependencies. See those sub-projects for a list of their dependencies.
 
 ------------------------------------

@@ -20,6 +20,10 @@ plugins {
 	id("boofcv.libs-conventions")
 }
 
+// Native binaries for this machine. The published ones are optional, so anything that
+// actually decodes video has to ask for them explicitly.
+val hostPlatform = rootProject.extra["hostPlatform"] as String
+
 dependencies {
 	api(project(":main:boofcv-ip"))
 	api(project(":main:boofcv-geo"))
@@ -30,4 +34,5 @@ dependencies {
 
 	testImplementation(project(":main:boofcv-io"))
 	testImplementation(project(":integration:boofcv-swing"))
+	"benchmarkRuntimeOnly"("${Libs.FFMPEG}:$hostPlatform")
 }

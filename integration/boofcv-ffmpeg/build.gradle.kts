@@ -20,16 +20,33 @@ plugins {
 	id("boofcv.libs-conventions")
 }
 
-// Native platform slices to publish. Set with -Pnative_arch=<arch>; see the root build.
+// Native platform slices to publish, and the platform of this machine. Set with
+// -Pnative_arch=<arch>[,<arch>...]; see the root build.
 @Suppress("UNCHECKED_CAST")
-val nativeArch = rootProject.extra["nativeArch"] as List<String>
+val nativePlatforms = rootProject.extra["nativePlatforms"] as List<String>
+val hostPlatform = rootProject.extra["hostPlatform"] as String
+
+// Native binaries are published as optional dependencies so downstream users are not forced
+// to download every architecture. See the readme in org/bytedeco/copiedstuff.
+java {
+	registerFeature("natives") { usingSourceSet(sourceSets["main"]) }
+}
 
 dependencies {
 	api(project(":main:boofcv-ip"))
 	api(project(":main:boofcv-io"))
 
-	api("org.bytedeco.javacpp-presets:ffmpeg:4.1-1.4.4")
-	nativeArch.forEach { arch ->
-		implementation("org.bytedeco.javacpp-presets:ffmpeg:4.1-1.4.4:$arch")
+	// Only the FFmpeg presets are needed. The frame grabber below org/bytedeco/copiedstuff is a
+	// trimmed copy of JavaCV's, so there is no dependency on org.bytedeco:javacv and the presets
+	// it drags in (OpenCV, OpenBLAS, Tesseract, RealSense, Kinect, ...) which this module never
+	// uses.
+	api(Libs.FFMPEG)
+
+	// Advertised as optional. Which platforms are listed is controlled by -Pnative_arch.
+	nativePlatforms.forEach { platform ->
+		"nativesRuntimeOnly"("${Libs.FFMPEG}:$platform")
 	}
+
+	// BoofCV's own tests decode a real video, so they need real binaries
+	testRuntimeOnly("${Libs.FFMPEG}:$hostPlatform")
 }
