@@ -28,6 +28,10 @@ boofcvApp {
 	jarName.set("examples.jar")
 }
 
+// Native binaries for this machine. The published ones are optional, so anything that
+// actually decodes video has to ask for them explicitly.
+val hostPlatform = rootProject.extra["hostPlatform"] as String
+
 dependencies {
 	api(project(":main:boofcv-core"))
 	api(project(":integration:boofcv-swing"))
@@ -43,6 +47,7 @@ dependencies {
 		exclude(group = "org.slf4j")
 		exclude(group = "com.google.guava")
 	}
+	runtimeOnly("${Libs.FFMPEG}:$hostPlatform")
 }
 
 // Disable ErrorProne since this code needs to be very concise

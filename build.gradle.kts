@@ -20,11 +20,32 @@ plugins {
     id("io.github.gradle-nexus.publish-plugin")
 }
 
-// Which native platforms are supported can be specified on the command line. Otherwise the
-// default is to support all of them. Read by boofcv-ffmpeg and boofcv-javacv.
-val nativeArch: List<String> by extra(
-    if (project.hasProperty("native_arch")) listOf(project.property("native_arch") as String)
-    else listOf("linux-x86_64", "macosx-x86_64", "windows-x86_64")
+// Native platforms published by boofcv-ffmpeg and boofcv-javacv. Override from the command
+// line with -Pnative_arch=linux-arm64 or -Pnative_arch=linux-x86_64,macosx-arm64.
+// These binaries are published as optional dependencies.
+val nativePlatforms: List<String> by extra(
+    if (project.hasProperty("native_arch"))
+        project.property("native_arch").toString().split(",").map { it.trim() }
+    else
+        listOf("linux-x86_64", "linux-arm64", "macosx-arm64", "windows-x86_64")
+)
+
+// Platform of the machine running the build. The published native dependencies are optional,
+// so BoofCV's own tests, examples and demonstrations have to ask for real binaries explicitly.
+val hostPlatform: String by extra(
+    run {
+        val os = System.getProperty("os.name").lowercase()
+        val arch = System.getProperty("os.arch").lowercase()
+        val name = when {
+            os.contains("mac") -> "macosx"
+            os.contains("win") -> "windows"
+            else -> "linux"
+        }
+        // Only x86_64 and arm64 binaries are published, and Windows only as x86_64
+        val cpu = if (name != "windows" && (arch.contains("aarch64") || arch.contains("arm64")))
+            "arm64" else "x86_64"
+        "$name-$cpu"
+    }
 )
 
 // Sonatype publishing coordination. Only configured when credentials are present; otherwise

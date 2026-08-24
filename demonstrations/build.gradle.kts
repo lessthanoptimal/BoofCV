@@ -26,6 +26,10 @@ boofcvApp {
 	jarName.set("demonstrations.jar")
 }
 
+// Native binaries for this machine. The published ones are optional, so anything that
+// actually decodes video has to ask for them explicitly.
+val hostPlatform = rootProject.extra["hostPlatform"] as String
+
 dependencies {
 	api(project(":main:boofcv-core"))
 	api(project(":integration:boofcv-swing"))
@@ -35,4 +39,5 @@ dependencies {
 	implementation(project(":integration:boofcv-WebcamCapture"))
 
 	implementation(Libs.COMMONS_IO)
+	runtimeOnly("${Libs.FFMPEG}:$hostPlatform")
 }

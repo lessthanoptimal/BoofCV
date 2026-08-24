@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,17 +46,15 @@ import org.bytedeco.javacpp.indexer.*;
 import java.nio.*;
 
 /**
- * A class to manage the data of audio and video frames. It it used by
- * {@link CanvasFrame}, {@link FrameGrabber}, {@link FrameRecorder}, and their
- * subclasses. We can also make the link with other APIs, such as Android,
- * Java 2D, FFmpeg, and OpenCV, via a {@link FrameConverter}.
+ * A class to manage the data of a video frame. It is used by {@link FrameGrabber} and we can make
+ * the link with other APIs, such as Java 2D, via a {@link FrameConverter}.
+ *
+ * <p>Trimmed from JavaCV for BoofCV: the audio sample fields were removed since BoofCV only decodes
+ * video. See the readme in this package.</p>
  *
  * @author Samuel Audet
  */
 public class Frame implements Indexable {
-    /** A flag set by a FrameGrabber or a FrameRecorder to indicate a key frame. */
-    public boolean keyFrame;
-
     /** Constants to be used for {@link #imageDepth}. */
     public static final int
             DEPTH_BYTE   =  -8,
@@ -77,12 +75,6 @@ public class Frame implements Indexable {
      * to allow users to store images in a planar format as well.
      */
     public Buffer[] image;
-
-    /** Information associated with the {@link #samples} field. */
-    public int sampleRate, audioChannels;
-
-    /** Buffers to hold audio samples from multiple channels for an audio frame. */
-    public Buffer[] samples;
 
     /** The underlying data object, for example, AVFrame, IplImage, or Mat. */
     public Object opaque;
@@ -181,23 +173,13 @@ public class Frame implements Indexable {
     public Frame clone() {
         Frame newFrame = new Frame();
 
-
-        // Video part
         newFrame.imageWidth = imageWidth;
         newFrame.imageHeight = imageHeight;
         newFrame.imageDepth = imageDepth;
         newFrame.imageChannels = imageChannels;
         newFrame.imageStride = imageStride;
-        newFrame.keyFrame = keyFrame;
         newFrame.opaque = opaque;
         newFrame.image = cloneBufferArray(image);
-
-        // Audio part
-        newFrame.audioChannels = audioChannels;
-        newFrame.sampleRate = sampleRate;
-        newFrame.samples = cloneBufferArray(samples);
-
-        // Add timestamp
         newFrame.timestamp = timestamp;
 
         return newFrame;

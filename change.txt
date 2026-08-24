@@ -27,6 +27,13 @@ Version : 1.5.0
 - ImageStatistics
   * Added minAbs
   * Fixed a nasty bug where abs was not applied to the first element. No idea how this went unnoticed.
+- FFmpeg + JavaCV / OpenCV
+  * Updated the presets from FFmpeg 4.1 (2018) to 8.1.2, org.bytedeco:ffmpeg 8.1.2-1.5.14
+  * Updated to JavaCV 1.5.14 and OpenCV 4.14.0-1.5.14, from JavaCV 1.4.4 and OpenCV 4.0.1
+  * Native binaries are now an optional dependency. See the module readme
+  * Thanks joshuajaharwood for working in this much needed update
+- Build
+  * Fixed -Pnative_arch. It can be used to add arm support for ffmpeg + javacv
 - DenseOpticalFlow: New API which is much more memory efficient
 - Block Matching Stereo
   * Added SSD error

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,173 +40,39 @@
 
 package org.bytedeco.copiedstuff;
 
-import java.beans.PropertyEditorSupport;
 import java.io.Closeable;
-import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayDeque;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.*;
 
 /**
+ * Base class for {@link FFmpegFrameGrabber}.
+ *
+ * <p>Trimmed from JavaCV for BoofCV. Everything BoofCV does not use was removed: the static grabber
+ * registry and {@code createDefault} factories, the {@code PropertyEditor}, the multi-grabber
+ * {@code Array} synchronizer, {@code delayedGrab}, trigger mode, and every audio property. What is
+ * left is the property bag that {@link FFmpegFrameGrabber} reads plus the grab lifecycle. See the
+ * readme in this package.</p>
  *
  * @author Samuel Audet
  */
-@SuppressWarnings({"UnsafeFinalization","MissingOverride","NarrowingCompoundAssignment","JavaLangClash"})
 public abstract class FrameGrabber implements Closeable {
 
-    public static final ArrayDeque<String> list = new ArrayDeque<>(Arrays.asList(
-            "DC1394", "FlyCapture", "FlyCapture2", "OpenKinect", "OpenKinect2", "RealSense", "PS3Eye", "VideoInput", "OpenCV", "FFmpeg", "IPCamera"));
-    public static void init() {
-        for (String name : list) {
-            try {
-                Class<? extends FrameGrabber> c = get(name);
-                c.getMethod("tryLoad").invoke(null);
-            } catch (Throwable t) {
-                continue;
-            }
-        }
-    }
-    public static Class<? extends FrameGrabber> getDefault() {
-        // select first frame grabber that can load and that may have some cameras..
-        for (String name : list) {
-            try {
-                Class<? extends FrameGrabber> c = get(name);
-                c.getMethod("tryLoad").invoke(null);
-                boolean mayContainCameras = false;
-                try {
-                    String[] s = (String[])c.getMethod("getDeviceDescriptions").invoke(null);
-                    if (s.length > 0) {
-                        mayContainCameras = true;
-                    }
-                } catch (Throwable t) {
-                    if (t.getCause() instanceof UnsupportedOperationException) {
-                        mayContainCameras = true;
-                    }
-                }
-                if (mayContainCameras) {
-                    return c;
-                }
-            } catch (Throwable t) {
-                continue;
-            }
-        }
-        return null;
-    }
-    public static Class<? extends FrameGrabber> get(String className) throws Exception {
-        className = FrameGrabber.class.getPackage().getName() + "." + className;
-        try {
-            return Class.forName(className).asSubclass(FrameGrabber.class);
-        } catch (ClassNotFoundException e) {
-            String className2 = className + "FrameGrabber";
-            try {
-                return Class.forName(className2).asSubclass(FrameGrabber.class);
-            } catch (ClassNotFoundException ex) {
-                throw new Exception("Could not get FrameGrabber class for " + className + " or " + className2, e);
-            }
-        }
+    public enum ImageMode {
+        COLOR, GRAY
     }
 
-    public static FrameGrabber create(Class<? extends FrameGrabber> c, Class p, Object o) throws Exception {
-        Throwable cause = null;
-        try {
-            return c.getConstructor(p).newInstance(o);
-        } catch (InstantiationException ex) {
-            cause = ex;
-        } catch (IllegalAccessException ex) {
-            cause = ex;
-        } catch (IllegalArgumentException ex) {
-            cause = ex;
-        } catch (NoSuchMethodException ex) {
-            cause = ex;
-        } catch (InvocationTargetException ex) {
-            cause = ex.getCause();
-        }
-        throw new Exception("Could not create new " + c.getSimpleName() + "(" + o + ")", cause);
-    }
-
-    public static FrameGrabber createDefault(File deviceFile) throws Exception {
-        return create(getDefault(), File.class, deviceFile);
-    }
-    public static FrameGrabber createDefault(String devicePath) throws Exception {
-        return create(getDefault(), String.class, devicePath);
-    }
-    public static FrameGrabber createDefault(int deviceNumber) throws Exception {
-        try {
-            return create(getDefault(), int.class, deviceNumber);
-        } catch (Exception ex) {
-            return create(getDefault(), Integer.class, deviceNumber);
-        }
-    }
-
-    public static FrameGrabber create(String className, File deviceFile) throws Exception {
-        return create(get(className), File.class, deviceFile);
-    }
-    public static FrameGrabber create(String className, String devicePath) throws Exception {
-        return create(get(className), String.class, devicePath);
-    }
-    public static FrameGrabber create(String className, int deviceNumber) throws Exception {
-        try {
-            return create(get(className), int.class, deviceNumber);
-        } catch (Exception ex) {
-            return create(get(className), Integer.class, deviceNumber);
-        }
-    }
-
-    public static class PropertyEditor extends PropertyEditorSupport {
-        @Override public String getAsText() {
-            Class c = (Class)getValue();
-            return c == null ? "null" : c.getSimpleName().split("FrameGrabber")[0];
-        }
-        @Override public void setAsText(String s) {
-            if (s == null) {
-                setValue(null);
-            }
-            try {
-                setValue(get(s));
-            } catch (Exception ex) {
-                throw new IllegalArgumentException(ex);
-            }
-        }
-        @Override public String[] getTags() {
-            return list.toArray(new String[list.size()]);
-        }
-    }
-
-
-    public static enum ImageMode {
-        COLOR, GRAY, RAW
-    }
-
-    public static final long
-            SENSOR_PATTERN_RGGB = 0,
-            SENSOR_PATTERN_GBRG = (1L << 32),
-            SENSOR_PATTERN_GRBG = 1,
-            SENSOR_PATTERN_BGGR = (1L << 32) | 1;
-
-    protected int videoStream = -1, audioStream = -1;
+    protected int videoStream = -1;
     protected String format = null;
-    protected int imageWidth = 0, imageHeight = 0, audioChannels = 0;
+    protected int imageWidth = 0, imageHeight = 0;
     protected ImageMode imageMode = ImageMode.COLOR;
-    protected long sensorPattern = -1L;
     protected int pixelFormat = -1, videoCodec, videoBitrate = 0;
     protected double aspectRatio = 0, frameRate = 0;
-    protected int sampleFormat = 0, audioCodec, audioBitrate = 0, sampleRate = 0;
-    protected boolean triggerMode = false;
-    protected int bpp = 0;
-    protected int timeout = 10000;
-    protected int numBuffers = 4;
     protected double gamma = 0.0;
-    protected boolean deinterlace = false;
-    protected HashMap<String, String> options = new HashMap<String, String>();
-    protected HashMap<String, String> videoOptions = new HashMap<String, String>();
-    protected HashMap<String, String> audioOptions = new HashMap<String, String>();
-    protected HashMap<String, String> metadata = new HashMap<String, String>();
-    protected HashMap<String, String> videoMetadata = new HashMap<String, String>();
-    protected HashMap<String, String> audioMetadata = new HashMap<String, String>();
+    protected HashMap<String, String> options = new HashMap<>();
+    protected HashMap<String, String> videoOptions = new HashMap<>();
+    protected HashMap<String, String> metadata = new HashMap<>();
+    protected HashMap<String, String> videoMetadata = new HashMap<>();
     protected int frameNumber = 0;
     protected long timestamp = 0;
 
@@ -215,13 +81,6 @@ public abstract class FrameGrabber implements Closeable {
     }
     public void setVideoStream(int videoStream) {
         this.videoStream = videoStream;
-    }
-
-    public int getAudioStream() {
-        return audioStream;
-    }
-    public void setAudioStream(int audioStream) {
-        this.audioStream = audioStream;
     }
 
     public String getFormat() {
@@ -245,25 +104,11 @@ public abstract class FrameGrabber implements Closeable {
         this.imageHeight = imageHeight;
     }
 
-    public int getAudioChannels() {
-        return audioChannels;
-    }
-    public void setAudioChannels(int audioChannels) {
-        this.audioChannels = audioChannels;
-    }
-
     public ImageMode getImageMode() {
         return imageMode;
     }
     public void setImageMode(ImageMode imageMode) {
         this.imageMode = imageMode;
-    }
-
-    public long getSensorPattern() {
-        return sensorPattern;
-    }
-    public void setSensorPattern(long sensorPattern) {
-        this.sensorPattern = sensorPattern;
     }
 
     public int getPixelFormat() {
@@ -301,74 +146,11 @@ public abstract class FrameGrabber implements Closeable {
         this.frameRate = frameRate;
     }
 
-    public int getAudioCodec() {
-        return audioCodec;
-    }
-    public void setAudioCodec(int audioCodec) {
-        this.audioCodec = audioCodec;
-    }
-
-    public int getAudioBitrate() {
-        return audioBitrate;
-    }
-    public void setAudioBitrate(int audioBitrate) {
-        this.audioBitrate = audioBitrate;
-    }
-
-    public int getSampleFormat() {
-        return sampleFormat;
-    }
-    public void setSampleFormat(int sampleFormat) {
-        this.sampleFormat = sampleFormat;
-    }
-
-    public int getSampleRate() {
-        return sampleRate;
-    }
-    public void setSampleRate(int sampleRate) {
-        this.sampleRate = sampleRate;
-    }
-
-    public boolean isTriggerMode() {
-        return triggerMode;
-    }
-    public void setTriggerMode(boolean triggerMode) {
-        this.triggerMode = triggerMode;
-    }
-
-    public int getBitsPerPixel() {
-        return bpp;
-    }
-    public void setBitsPerPixel(int bitsPerPixel) {
-        this.bpp = bitsPerPixel;
-    }
-
-    public int getTimeout() {
-        return timeout;
-    }
-    public void setTimeout(int timeout) {
-        this.timeout = timeout;
-    }
-
-    public int getNumBuffers() {
-        return numBuffers;
-    }
-    public void setNumBuffers(int numBuffers) {
-        this.numBuffers = numBuffers;
-    }
-
     public double getGamma() {
         return gamma;
     }
     public void setGamma(double gamma) {
         this.gamma = gamma;
-    }
-
-    public boolean isDeinterlace() {
-        return deinterlace;
-    }
-    public void setDeinterlace(boolean deinterlace) {
-        this.deinterlace = deinterlace;
     }
 
     public String getOption(String key) {
@@ -385,14 +167,7 @@ public abstract class FrameGrabber implements Closeable {
         videoOptions.put(key, value);
     }
 
-    public String getAudioOption(String key) {
-        return audioOptions.get(key);
-    }
-    public void setAudioOption(String key, String value) {
-        audioOptions.put(key, value);
-    }
-
-    public Map<String,String> getMetadata() {
+    public Map<String, String> getMetadata() {
         return metadata;
     }
 
@@ -408,13 +183,6 @@ public abstract class FrameGrabber implements Closeable {
     }
     public void setVideoMetadata(String key, String value) {
         videoMetadata.put(key, value);
-    }
-
-    public String getAudioMetadata(String key) {
-        return audioMetadata.get(key);
-    }
-    public void setAudioMetadata(String key, String value) {
-        audioMetadata.put(key, value);
     }
 
     public int getFrameNumber() {
@@ -445,7 +213,7 @@ public abstract class FrameGrabber implements Closeable {
 
     public abstract void start() throws Exception;
     public abstract void stop() throws Exception;
-    public abstract void trigger() throws Exception;
+    public abstract void release() throws Exception;
 
     @Override public void close() throws Exception {
         stop();
@@ -471,192 +239,9 @@ public abstract class FrameGrabber implements Closeable {
      * @throws Exception If there is a problem grabbing the frame.
      */
     public abstract Frame grab() throws Exception;
-    public Frame grabFrame() throws Exception { return grab(); }
-    public abstract void release() throws Exception;
 
     public void restart() throws Exception {
         stop();
         start();
-    }
-    public void flush() throws Exception {
-        for (int i = 0; i < numBuffers+1; i++) {
-            grab();
-        }
-    }
-
-    private ExecutorService executor = Executors.newSingleThreadExecutor();
-    private Future<Void> future = null;
-    private Frame delayedFrame = null;
-    private long delayedTime = 0;
-    public void delayedGrab(final long delayTime) {
-        delayedFrame = null;
-        delayedTime = 0;
-        final long start = System.nanoTime()/1000;
-        if (future != null && !future.isDone()) {
-            return;
-        }
-        future = executor.submit(new Callable<Void>() { public Void call() throws Exception {
-            do {
-                delayedFrame = grab();
-                delayedTime = System.nanoTime()/1000 - start;
-            } while (delayedTime < delayTime);
-            return null;
-        }});
-    }
-    public long getDelayedTime() throws InterruptedException, ExecutionException {
-        if (future == null) {
-            return 0;
-        }
-        future.get();
-        return delayedTime;
-    }
-    public Frame getDelayedFrame() throws InterruptedException, ExecutionException {
-        if (future == null) {
-            return null;
-        }
-        future.get();
-        return delayedFrame;
-    }
-
-    public static class Array {
-        // declared protected to force users to use createArray(), which
-        // can be overridden without changing the calling code...
-        protected Array(FrameGrabber[] frameGrabbers) {
-            setFrameGrabbers(frameGrabbers);
-        }
-
-        private Frame[] grabbedFrames = null;
-        private long[] latencies = null;
-        private long[] bestLatencies = null;
-        private long lastNewestTimestamp = 0;
-        private long bestInterval = Long.MAX_VALUE;
-
-        protected FrameGrabber[] frameGrabbers = null;
-        public FrameGrabber[] getFrameGrabbers() {
-            return frameGrabbers;
-        }
-        public void setFrameGrabbers(FrameGrabber[] frameGrabbers) {
-            this.frameGrabbers = frameGrabbers;
-            grabbedFrames = new Frame[frameGrabbers.length];
-            latencies = new long[frameGrabbers.length];
-            bestLatencies = null;
-            lastNewestTimestamp = 0;
-        }
-        public int size() {
-            return frameGrabbers.length;
-        }
-
-        public void start() throws Exception {
-            for (FrameGrabber f : frameGrabbers) {
-                f.start();
-            }
-        }
-        public void stop() throws Exception {
-            for (FrameGrabber f : frameGrabbers) {
-                f.stop();
-            }
-        }
-        // should be overriden to implement a broadcast trigger...
-        public void trigger() throws Exception {
-            for (FrameGrabber f : frameGrabbers) {
-                if (f.isTriggerMode()) {
-                    f.trigger();
-                }
-            }
-        }
-        // should be overriden to implement a broadcast grab...
-        public Frame[] grab() throws Exception {
-            if (frameGrabbers.length == 1) {
-                grabbedFrames[0] = frameGrabbers[0].grab();
-                return grabbedFrames;
-            }
-
-            // assume we sometimes get perfectly synchronized images,
-            // so save the best latencies we find as the perfectly
-            // synchronized case, so we know what to aim for in
-            // cases of missing/dropped frames ...
-            long newestTimestamp = 0;
-            boolean unsynchronized = false;
-            for (int i = 0; i < frameGrabbers.length; i++) {
-                grabbedFrames[i] = frameGrabbers[i].grab();
-                if (grabbedFrames[i] != null) {
-                    newestTimestamp = Math.max(newestTimestamp, frameGrabbers[i].getTimestamp());
-                }
-                if (frameGrabbers[i].getClass() != frameGrabbers[(i + 1) % frameGrabbers.length].getClass()) {
-                    // assume we can't synchronize different types of cameras with each other
-                    unsynchronized = true;
-                }
-            }
-            if (unsynchronized) {
-                return grabbedFrames;
-            }
-            for (int i = 0; i < frameGrabbers.length; i++) {
-                if (grabbedFrames[i] != null) {
-                    latencies[i] = newestTimestamp - Math.max(0, frameGrabbers[i].getTimestamp());
-                }
-            }
-            if (bestLatencies == null) {
-                bestLatencies = Arrays.copyOf(latencies, latencies.length);
-            } else {
-                int sum1 = 0, sum2 = 0;
-                for (int i = 0; i < frameGrabbers.length; i++) {
-                    sum1 += latencies[i];
-                    sum2 += bestLatencies[i];
-                }
-                if (sum1 < sum2) {
-                    bestLatencies = Arrays.copyOf(latencies, latencies.length);
-                }
-            }
-
-            // we cannot have latencies higher than the time between frames..
-            // or something too close to it anyway... 90% is good?
-            bestInterval = Math.min(bestInterval, newestTimestamp-lastNewestTimestamp);
-            for (int i = 0; i < bestLatencies.length; i++) {
-                bestLatencies[i] = Math.min(bestLatencies[i], bestInterval*9/10);
-            }
-
-            // try to synchronize by attempting to land within 10% of
-            // the bestLatencies looking up to 2 frames ahead ...
-            for (int j = 0; j < 2; j++) {
-                for (int i = 0; i < frameGrabbers.length; i++) {
-                    if (frameGrabbers[i].isTriggerMode() || grabbedFrames[i] == null) {
-                        continue;
-                    }
-                    int latency = (int)(newestTimestamp - Math.max(0, frameGrabbers[i].getTimestamp()));
-                    while (latency-bestLatencies[i] > 0.1*bestLatencies[i]) {
-                        grabbedFrames[i] = frameGrabbers[i].grab();
-                        if (grabbedFrames[i] == null) {
-                            break;
-                        }
-                        latency = (int)(newestTimestamp - Math.max(0, frameGrabbers[i].getTimestamp()));
-                        if (latency < 0) {
-                            // woops, a camera seems to have dropped a frame somewhere...
-                            // bump up the newestTimestamp
-                            newestTimestamp = Math.max(0, frameGrabbers[i].getTimestamp());
-                            break;
-                        }
-                    }
-                }
-            }
-
-//for (int i = 0; i < frameGrabbers.length; i++) {
-//    long latency = newestTimestamp - Math.max(0, frameGrabbers[i].getTimestamp());
-//    System.out.print(bestLatencies[i] + " " + latency + "  ");
-//}
-//System.out.println("  " + bestInterval);
-
-            lastNewestTimestamp = newestTimestamp;
-
-            return grabbedFrames;
-        }
-        public void release() throws Exception {
-            for (FrameGrabber f : frameGrabbers) {
-                f.release();
-            }
-        }
-    }
-
-    public Array createArray(FrameGrabber[] frameGrabbers) {
-        return new Array(frameGrabbers);
     }
 }

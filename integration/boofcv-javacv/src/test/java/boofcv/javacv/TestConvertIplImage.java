@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,11 +19,12 @@
 package boofcv.javacv;
 
 import boofcv.struct.image.*;
+import org.bytedeco.opencv.opencv_core.IplImage;
 import org.junit.jupiter.api.Test;
 
 import java.nio.*;
 
-import static org.bytedeco.javacpp.opencv_core.*;
+import static org.bytedeco.opencv.global.opencv_core.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestConvertIplImage {
