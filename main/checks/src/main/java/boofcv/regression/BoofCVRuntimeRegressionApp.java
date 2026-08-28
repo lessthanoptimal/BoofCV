@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ public class BoofCVRuntimeRegressionApp {
 	public static void main( String[] args ) {
 		// Set up the environment
 		ProjectUtils.checkRoot = ( f ) ->
-				new File(f, "README.md").exists() && new File(f, "settings.gradle").exists();
+				new File(f, "README.md").exists() && new File(f, "settings.gradle.kts").exists();
 
 		ProjectUtils.libraryInfo.version = BoofVersion.VERSION;
 		ProjectUtils.libraryInfo.gitDate = BoofVersion.GIT_DATE;
@@ -36,7 +36,7 @@ public class BoofCVRuntimeRegressionApp {
 		ProjectUtils.libraryInfo.projectName = "BoofCV";
 
 		// Specify which packages it should skip over
-		String[] excluded = new String[]{"autocode", "checks", "boofcv-types", "boofcv-core"};
+		String[] excluded = new String[]{"autocode", "checks", "boofcv-types", "boofcv-test", "boofcv-core"};
 		ProjectUtils.skipTest = ( f ) -> {
 			for (String name : excluded) {
 				if (f.getName().equals(name))
