@@ -218,6 +218,7 @@ public class DetectChessboardCornersX {
 		foundNonmax.reset();
 		borderInput.setImage(input);
 		inputInterp.setImage(input);
+		borderBlur.setImage(blurred);
 
 		// The x-corner detector requires a little bit of blur to be applied ot the input image
 		blurFilter.process(input, blurred);
