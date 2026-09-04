@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -206,8 +206,8 @@ public class CreateCalibrationTargetGenerator {
 		//       for some reason
 
 		if (showInfo) {
-			float offX = Math.max(CM_TO_POINTS, (pageWidth - patternWidth)/4);
-			float offY = Math.max(CM_TO_POINTS, (pageHeight - patternHeight)/4);
+			float offX = 0;
+			float offY = Math.min(CM_TO_POINTS, (pageHeight - patternHeight)/4.0f);
 
 			var timeRoman = new PDType1Font(Standard14Fonts.FontName.TIMES_ROMAN);
 
