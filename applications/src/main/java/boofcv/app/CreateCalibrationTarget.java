@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -84,6 +84,9 @@ public class CreateCalibrationTarget {
 
 	@Option(name = "-i", aliases = {"--DisablePrintInfo"}, usage = "Disable printing information about the calibration target")
 	boolean disablePrintInfo = false;
+
+	@Option(name = "--BoldInfo", usage = "Makes info text larger and darker so that it's easier to read")
+	boolean boldInfo = false;
 
 	@Option(name = "-e", aliases = {"--Encoding"}, usage = "Encoding for hamming markers")
 	String encodingName = HammingDictionary.ARUCO_MIP_25h7.name();
@@ -272,11 +275,11 @@ public class CreateCalibrationTarget {
 		System.out.println("   type      : " + type);
 		System.out.println("   rows      : " + rows);
 		System.out.println("   columns   : " + columns);
-		System.out.println("   info      : " + !disablePrintInfo);
+		System.out.println("   info      : " + !disablePrintInfo + (boldInfo ? " (Bold)" : ""));
 
 		if (type == CalibrationPatterns.ECOCHECK) {
 			CreateECoCheckDocumentPDF doc = ecoCheckToPdf(
-					paperSize, unit, !disablePrintInfo, rows, columns, shapeWidth, numMarkers, chessBitsError, ecocheckChecksum);
+					paperSize, unit, !disablePrintInfo, boldInfo, rows, columns, shapeWidth, numMarkers, chessBitsError, ecocheckChecksum);
 			doc.showInfo = !disablePrintInfo;
 			if (sendToPrinter) {
 				doc.sendToPrinter();
@@ -368,6 +371,7 @@ public class CreateCalibrationTarget {
 
 	public static CreateECoCheckDocumentPDF ecoCheckToPdf( PaperSize paper, Unit units,
 														   boolean showInfo,
+														   boolean boldInfo,
 														   int rows, int columns, float squareWidth,
 														   int numMarkers, int errorLevel, int checksum ) throws IOException {
 		ConfigECoCheckMarkers config = ConfigECoCheckMarkers.singleShape(rows, columns, numMarkers, squareWidth);
@@ -388,6 +392,7 @@ public class CreateCalibrationTarget {
 		doc.spaceBetween = squareWidth/2.0f;
 		doc.squareWidth = squareWidth;
 		doc.showInfo = showInfo;
+		doc.boldInfo = boldInfo;
 		doc.render(utils);
 		return doc;
 	}

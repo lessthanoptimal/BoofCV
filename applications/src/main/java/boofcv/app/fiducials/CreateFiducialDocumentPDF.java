@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,6 +60,7 @@ public abstract class CreateFiducialDocumentPDF {
 	public boolean gridFill = false;
 	public boolean drawGrid = false;
 	public boolean drawLineBorder = false;
+	public boolean boldInfo = false;
 
 	public float markerWidth;
 	// If > 0 then it specifies the height, otherwise a square marker is assumed.
@@ -131,6 +132,8 @@ public abstract class CreateFiducialDocumentPDF {
 		int markersPerPage = numRows*numCols;
 		int numPages = (int)Math.ceil(totalMarkers/(double)markersPerPage);
 
+		float spaceBetweenPoints = UNIT_TO_POINTS*spaceBetween/2f;
+
 		int markerIndex = 0;
 		for (int pageIdx = 0; pageIdx < numPages; pageIdx++) {
 
@@ -143,32 +146,32 @@ public abstract class CreateFiducialDocumentPDF {
 			configureRenderer(r);
 
 			if (showInfo) {
-				// Print info on the right side of the document
-				float offX = Math.min(CM_TO_POINTS, spaceBetween*CM_TO_POINTS/2);
-				float offY = Math.min(CM_TO_POINTS, spaceBetween*CM_TO_POINTS/2);
-
 				int fontSize = 7;
 				String text = String.format("%sCreated by BoofCV", getMarkerType());
 				float textWidth = timeRoman.getStringWidth(text)/1000*fontSize;
 
+				// Print info on the right side of the document
+				float offX = pageWidth - textWidth - centerY - spaceBetweenPoints;
+				float offY = Math.max(centerX + spaceBetweenPoints - CM_TO_POINTS, (centerX + spaceBetweenPoints)/2.0f);
+
 				pcs.beginText();
 				pcs.setFont(timeRoman, fontSize);
-				pcs.newLineAtOffset(pageWidth - textWidth - offX, offY);
+				pcs.newLineAtOffset(offX, offY);
 				pcs.showText(text);
 				pcs.endText();
 			}
 
 			for (int row = 0; row < numRows; row++) {
-				r.offsetY = centerX + row*sizeBoxY + UNIT_TO_POINTS*spaceBetween/2f;
+				r.offsetY = centerX + row*sizeBoxY + spaceBetweenPoints;
 
 				for (int col = 0; col < numCols; col++, markerIndex++) {
 					if (!gridFill && markerIndex >= totalMarkers)
 						break;
-					r.offsetX = centerY + col*sizeBoxX + UNIT_TO_POINTS*spaceBetween/2f;
+					r.offsetX = centerY + col*sizeBoxX + spaceBetweenPoints;
 					render(markerIndex%totalMarkers);
 
 					if (showInfo) {
-						float offset = 12;
+						float offset = boldInfo ? 20 : 12;
 
 						int maxLength = (int)(markerWidth*UNIT_TO_POINTS)/4;
 						String message = names.get(markerIndex%totalMarkers);
@@ -177,8 +180,13 @@ public abstract class CreateFiducialDocumentPDF {
 						}
 
 						pcs.beginText();
-						pcs.setNonStrokingColor(Color.GRAY);
-						pcs.setFont(timeRoman, 7);
+						if (boldInfo) {
+							pcs.setNonStrokingColor(Color.BLACK);
+							pcs.setFont(timeRoman, 16);
+						} else {
+							pcs.setNonStrokingColor(Color.GRAY);
+							pcs.setFont(timeRoman, 7);
+						}
 						pcs.newLineAtOffset((float)r.offsetX, (float)r.offsetY - offset);
 						pcs.showText(message);
 						pcs.endText();

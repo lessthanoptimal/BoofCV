@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -114,14 +114,12 @@ public class CreateECoCheckDocumentPDF extends CreateFiducialDocumentPDF {
 
 		names = new ArrayList<>();
 		for (int i = 0; i < totalMarkers; i++) {
-			names.add(String.format("ID: %d, config=%s", i, shorthand));
+			names.add(String.format("ID: %d, %s, %4.1f %2s", i, shorthand, squareWidth, units.abbreviation));
 		}
 
 		render();
 	}
 
-	@Override
-	protected String createMarkerSizeString() {
-		return String.format("square: %4.1f %2s", squareWidth, units.getAbbreviation());
-	}
+	// info is contained in names
+	@Override protected String createMarkerSizeString() {return "";}
 }
