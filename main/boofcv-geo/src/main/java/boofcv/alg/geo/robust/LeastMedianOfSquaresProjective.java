@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,11 +35,10 @@ public class LeastMedianOfSquaresProjective<Model, Point> extends LeastMedianOfS
 	private final ModelGeneratorViews<Model, Point, ElevateViewInfo> modelGenerator;
 
 	public LeastMedianOfSquaresProjective( long randSeed, int totalCycles, double maxMedianError,
-										   double inlierFraction,
 										   ModelManager<Model> modelManager,
 										   ModelGeneratorViews<Model, Point, ElevateViewInfo> generator,
 										   DistanceFromModelViews<Model, Point, ElevateViewInfo> errorMetric ) {
-		super(randSeed, totalCycles, maxMedianError, inlierFraction, modelManager, errorMetric.getPointType());
+		super(randSeed, totalCycles, maxMedianError, modelManager, errorMetric.getPointType());
 		setModel(() -> generator, () -> errorMetric);
 		this.modelDistance = errorMetric;
 		this.modelGenerator = generator;

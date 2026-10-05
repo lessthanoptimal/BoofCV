@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,25 +22,21 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.struct.Configuration;
 import org.ddogleg.fitting.modelset.lmeds.LeastMedianOfSquares;
 
-/**
- * Standard configuration parameters for {@link LeastMedianOfSquares}
- *
- * @author Peter Abeles
- */
+/// Standard configuration parameters for [LeastMedianOfSquares]
 public class ConfigLMedS implements Configuration {
-	/**
-	 * Random seed that's used internally
-	 */
+	/// Random seed that's used internally
 	public long randSeed = 0xDEADBEEF;
-	/**
-	 * Number of cycles it will perform when minimizing the median error. TUNE THIS
-	 */
+	/// Number of cycles it will perform when minimizing the median error. TUNE THIS
 	public int totalCycles;
 
-	/**
-	 * The error fraction it's optimized against
-	 */
+	/// The error fraction it's optimized against
 	public double errorFraction = 0.5;
+
+	/// Define the inlier set as the specified fractions with the least amount of errors. disable if <= 0
+	public double inlierFraction = 0;
+
+	/// Defines an inlier by assuming a normal distribution via Rouseeuw. Default if inlierFraction isn't specified.
+	public double inlierRouseeuwSigma = 2.5;
 
 	public ConfigLMedS() {}
 
@@ -53,12 +49,15 @@ public class ConfigLMedS implements Configuration {
 		this.randSeed = src.randSeed;
 		this.totalCycles = src.totalCycles;
 		this.errorFraction = src.errorFraction;
+		this.inlierFraction = src.inlierFraction;
+		this.inlierRouseeuwSigma = src.inlierRouseeuwSigma;
 		return this;
 	}
 
 	@Override
 	public void checkValidity() {
 		BoofMiscOps.checkTrue(errorFraction >= 0.0 && errorFraction <= 1.0, "errorFraction is 0 to 1.0");
+		BoofMiscOps.checkTrue(inlierRouseeuwSigma > 0.0, "Sigma must be a positive number");
 		if (totalCycles <= 0) {
 			throw new RuntimeException("You need to set the number of cycles. Varies by problem. Try 100 and increase");
 		}
