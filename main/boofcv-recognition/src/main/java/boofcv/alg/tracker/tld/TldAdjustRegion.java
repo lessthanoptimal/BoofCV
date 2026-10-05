@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,7 +48,7 @@ public class TldAdjustRegion {
 		ModelManager<ScaleTranslate2D> manager = new ModelManagerScaleTranslate2D();
 
 		estimateMotion = new LeastMedianOfSquares<>(123123, numCycles, Double.MAX_VALUE,
-				0, manager, AssociatedPair.class);
+				manager, AssociatedPair.class);
 		estimateMotion.setModel(GenerateScaleTranslate2D::new, DistanceScaleTranslate2DSq::new);
 	}
 

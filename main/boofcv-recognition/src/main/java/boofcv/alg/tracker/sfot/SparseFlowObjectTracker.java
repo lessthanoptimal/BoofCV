@@ -103,7 +103,7 @@ public class SparseFlowObjectTracker<Image extends ImageGray<Image>, Derivative 
 		var manager = new ModelManagerScaleTranslateRotate2D();
 
 		estimateMotion = new LeastMedianOfSquares<>(
-				config.randSeed, config.robustCycles, Double.MAX_VALUE, 0, manager, AssociatedPair.class);
+				config.randSeed, config.robustCycles, Double.MAX_VALUE, manager, AssociatedPair.class);
 		estimateMotion.setModel(GenerateScaleTranslateRotate2D::new, DistanceScaleTranslateRotate2DSq::new);
 	}
 

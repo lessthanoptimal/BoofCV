@@ -529,8 +529,12 @@ public class FactoryMultiViewRobust {
 		var distance = new DistanceFromModelIntoViews<MetricCameraTriple, AssociatedTriple, ElevateViewInfo>
 				(new DistanceMetricTripleReprojection23(), 3);
 
-		return new LeastMedianOfSquaresProjective<>(configLMedS.randSeed, configLMedS.totalCycles, Double.MAX_VALUE,
-				configLMedS.errorFraction, manager, generator, distance);
+		var alg = new LeastMedianOfSquaresProjective<>(configLMedS.randSeed, configLMedS.totalCycles, Double.MAX_VALUE,
+				manager, generator, distance);
+		alg.setErrorFraction(configLMedS.errorFraction);
+		alg.setInlierFraction(configLMedS.inlierFraction);
+		alg.setInlierRouseeuwSigma(configLMedS.inlierRouseeuwSigma);
+		return alg;
 	}
 
 	public static <Model, Point> LeastMedianOfSquares<Model, Point>
@@ -540,6 +544,8 @@ public class FactoryMultiViewRobust {
 				:
 				new LeastMedianOfSquares<>(configLMedS.randSeed, configLMedS.totalCycles, manager, pointType);
 		alg.setErrorFraction(configLMedS.errorFraction);
+		alg.setInlierFraction(configLMedS.inlierFraction);
+		alg.setInlierRouseeuwSigma(configLMedS.inlierRouseeuwSigma);
 		return alg;
 	}
 

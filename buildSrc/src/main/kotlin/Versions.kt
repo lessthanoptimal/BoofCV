@@ -18,8 +18,8 @@
 
 /** Single source of truth for third party versions. Previously `project.ext.*` in build.gradle. */
 object Versions {
-    const val DDOGLEG = "0.25.3"
-    const val GEOREGRESSION = "0.30.1"
+    const val DDOGLEG = "0.25.4-SNAPSHOT"
+    const val GEOREGRESSION = "0.30.2-SNAPSHOT"
     const val COMMONS_IO = "2.16.1"
     const val DEEPBOOF = "0.5.3"
     const val LOMBOK = "1.18.42"
