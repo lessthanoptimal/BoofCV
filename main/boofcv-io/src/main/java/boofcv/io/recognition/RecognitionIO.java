@@ -845,11 +845,19 @@ public class RecognitionIO {
 
 	private static void decompressZip( File src, File dst, boolean delete ) {
 		try (java.util.zip.ZipFile zipFile = new ZipFile(src)) {
-			Enumeration<? extends ZipEntry> entries = zipFile.entries();
+			String targetPath = dst.getCanonicalPath();
+      
+      Enumeration<? extends ZipEntry> entries = zipFile.entries();
 			while (entries.hasMoreElements()) {
 				ZipEntry entry = entries.nextElement();
 				File entryDestination = new File(dst, entry.getName());
-				if (entry.isDirectory()) {
+				
+        // Security check to prevent zip slip vulnerability
+        if (!entryDestination.getCanonicalPath().startsWith(targetPath)) {
+            throw new IOException("Security violation: Zip entry attempting path traversal: " + entry.getName());
+        }
+
+        if (entry.isDirectory()) {
 					entryDestination.mkdirs();
 				} else {
 					entryDestination.getParentFile().mkdirs();
