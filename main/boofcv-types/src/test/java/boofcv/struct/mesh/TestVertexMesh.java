@@ -54,6 +54,19 @@ public class TestVertexMesh extends BoofStandardJUnit {
 		assertIdentical(shapeB, found.toList());
 	}
 
+	@Test void getFaceTexture() {
+		var mesh = new VertexMesh();
+		mesh.faceOffsets.add(3);
+		mesh.faceOffsets.add(6);
+
+		// If not specified then every face uses the first texture
+		assertEquals(0, mesh.getFaceTexture(1));
+
+		mesh.faceTextures.add(2);
+		mesh.faceTextures.add(3);
+		assertEquals(3, mesh.getFaceTexture(1));
+	}
+
 	@Test void getTexture() {
 		var shape = new DogArray<>(Point3D_F64::new);
 

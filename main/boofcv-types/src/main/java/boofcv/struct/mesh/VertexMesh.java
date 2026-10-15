@@ -91,6 +91,11 @@ public class VertexMesh {
 		return faceOffsets.get(which + 1) - faceOffsets.get(which);
 	}
 
+	/// Index of the texture in [#textureNames] that a face uses
+	public int getFaceTexture( int which ) {
+		return faceTextures.isEmpty() ? 0 : faceTextures.get(which);
+	}
+
 	/// Copies texture coordinates from a polygon
 	///
 	/// @param which Which shape to copy
@@ -245,7 +250,7 @@ public class VertexMesh {
 		};
 	}
 
-	public boolean isTextured() {
+	public boolean isTextureCoors() {
 		return texture.size() > 0;
 	}
 

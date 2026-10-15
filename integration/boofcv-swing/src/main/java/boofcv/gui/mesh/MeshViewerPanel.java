@@ -518,7 +518,7 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 	 */
 	public void cycleColorizer() {
 		int totalColors = colorizers.size();
-		if (mesh.isTextured()) {
+		if (mesh.isTextureCoors()) {
 			totalColors++;
 		}
 
@@ -527,7 +527,7 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 			activeColorizer = (activeColorizer + 1)%totalColors;
 
 			// If it has texture then that is the first possible colorizer
-			if (mesh.isTextured()) {
+			if (mesh.isTextureCoors()) {
 				if (activeColorizer == 0) {
 					renderer.forceColorizer = false;
 				} else {
@@ -650,8 +650,8 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 		return false;
 	}
 
-	public void setTextureImage( InterleavedU8 rgb ) {
-		renderer.setTextureImage(rgb);
+	public void setTextureImages( List<InterleavedU8> images ) {
+		renderer.setTextureImages(images);
 	}
 
 	/** Returns a copy of the intrinsics */

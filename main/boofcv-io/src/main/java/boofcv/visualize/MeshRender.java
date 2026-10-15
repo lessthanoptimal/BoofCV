@@ -37,6 +37,7 @@ import org.ddogleg.util.VerboseUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
+import java.util.List;
 import java.util.Set;
 
 /// High level API for rendering a mesh onto a camera view. The mesh can be rendered using a texture map or
@@ -77,7 +78,13 @@ public abstract class MeshRender implements VerbosePrint {
 	/// Changes the world to view transform
 	public abstract void setWorldToView( Se3_F64 worldToView );
 
-	public abstract void setTextureImage( InterleavedU8 textureImage );
+	/// Specifies the texture images. Index of each image matches [VertexMesh#textureNames]
+	public abstract void setTextureImages( List<InterleavedU8> textureImages );
+
+	/// Convenience for when there is only one texture image
+	public void setTextureImage( InterleavedU8 textureImage ) {
+		setTextureImages(List.of(textureImage));
+	}
 
 	/// General camera model that supports > 180 FOV
 	///

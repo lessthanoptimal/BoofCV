@@ -46,6 +46,7 @@ import org.ddogleg.struct.FastAccess;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
+import java.util.List;
 
 /// Simple algorithm that renders a 3D mesh and computes a depth image, but only works for pinhole camera models.
 /// To keep the code simple and fast it makes the following assumptions: each shape has a single color and
@@ -60,8 +61,12 @@ public class MeshRasterizer extends MeshRender {
 	// The mesh being rendered
 	private VertexMesh mesh;
 
-	// Image for texture mapping
+	// Images for texture mapping
+	private List<InterleavedU8> textureImages = List.of();
+
+	// Texture image used by the face being rendered and its index
 	private InterleavedU8 textureImage = new InterleavedU8(1, 1, 3);
+	private int textureIndex = -1;
 	private InterpolatePixelMB<InterleavedU8> textureInterp = FactoryInterpolation.bilinearPixelMB(textureImage, BorderType.EXTENDED);
 	private float[] textureValues = new float[3];
 
@@ -101,8 +106,17 @@ public class MeshRasterizer extends MeshRender {
 		this.surfaceColor.setWorldToView(worldToView);
 	}
 
-	@Override public void setTextureImage( InterleavedU8 textureImage ) {
-		this.textureImage = textureImage;
+	@Override public void setTextureImages( List<InterleavedU8> textureImages ) {
+		this.textureImages = textureImages;
+		this.textureIndex = -1;
+	}
+
+	/// Changes the texture image if it's different from the current one
+	private void selectTexture( int index ) {
+		if (index == textureIndex)
+			return;
+		textureIndex = index;
+		textureImage = textureImages.get(index);
 		textureInterp.setImage(textureImage);
 		textureValues = new float[textureImage.numBands];
 	}
@@ -135,7 +149,7 @@ public class MeshRasterizer extends MeshRender {
 		worldToView.transformReverse(worldCamera, worldCamera);
 
 		// Decide if it should texture map or user a per shape color
-		final boolean useColorizer = forceColorizer || mesh.texture.size() == 0;
+		final boolean useColorizer = forceColorizer || mesh.texture.size() == 0 || textureImages.isEmpty();
 
 		for (int shapeIdx = 1; shapeIdx < mesh.faceOffsets.size; shapeIdx++) {
 			// First and last point in the polygon
@@ -152,6 +166,7 @@ public class MeshRasterizer extends MeshRender {
 
 			if (!useColorizer) {
 				mesh.getTexture(shapeIdx - 1, polygonTex.vertexes);
+				selectTexture(mesh.getFaceTexture(shapeIdx - 1));
 			}
 
 			// Prune using normal vector
