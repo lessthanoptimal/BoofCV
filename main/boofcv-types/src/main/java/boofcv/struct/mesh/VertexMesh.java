@@ -30,6 +30,7 @@ import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /// Specifies a 3D mesh. BigArray types are used since a 3D mesh can have a very large number of points in it.
@@ -62,8 +63,11 @@ public class VertexMesh {
 	/// Start index of each face + the last index
 	public final DogArray_I32 faceOffsets = new DogArray_I32();
 
-	/// Name of the texture file associated with this mesh
-	public String textureName = "";
+	/// Names of the texture files associated with this mesh. Typically, there is only one.
+	public final List<String> textureNames = new ArrayList<>();
+
+	/// Which texture in [#textureNames] is applied to each face. If empty then every face uses the first texture.
+	public final DogArray_I32 faceTextures = new DogArray_I32();
 
 	{
 		faceOffsets.add(0);
@@ -113,7 +117,7 @@ public class VertexMesh {
 	/// the offsets, which are assumed to be the same as with the vertexes
 	///
 	/// @param count Number of points in the coordinates
-	/// @param coordinates Array containing interleaved coordinates [x0,y0, x1,y1, ... , x[n], y[n]]
+	/// @param coordinates Array containing interleaved coordinates [x0,y0, x1,y1, ... , x\[n\], y\[n\]]
 	public void addTexture( int count, float[] coordinates ) {
 		for (int i = 0; i < count; i++) {
 			texture.append(coordinates[i*2], coordinates[i*2 + 1]);
@@ -208,7 +212,9 @@ public class VertexMesh {
 		this.faceNormals.setTo(src.faceNormals);
 		this.faceOffsets.setTo(src.faceOffsets);
 		this.faceVertexNormals.setTo(src.faceVertexNormals);
-		this.textureName = src.textureName;
+		this.textureNames.clear();
+		this.textureNames.addAll(src.textureNames);
+		this.faceTextures.setTo(src.faceTextures);
 		return this;
 	}
 
@@ -222,7 +228,8 @@ public class VertexMesh {
 		faceNormals.reset();
 		faceOffsets.reset().add(0);
 		faceVertexNormals.reset();
-		textureName = "";
+		textureNames.clear();
+		faceTextures.reset();
 	}
 
 	/// Wraps the data structure inside [MeshPolygonAccess].
@@ -265,8 +272,7 @@ public class VertexMesh {
 	///
 	/// Faces with fewer than three vertexes cannot form a triangle and are dropped.
 	///
-	/// @param output (Optional) Storage for the result. If null a new instance is created. Must not be
-	/// `this`.
+	/// @param output (Optional) Storage for the result. If null a new instance is created. Must not be `this`.
 	/// @return The triangulated mesh.
 	public VertexMesh toTriangles( @Nullable VertexMesh output ) {
 		if (output == null)
@@ -281,11 +287,13 @@ public class VertexMesh {
 		output.texture.setTo(texture);
 		output.normals.setTo(normals);
 		output.rgb.setTo(rgb);
-		output.textureName = textureName;
+		output.textureNames.clear();
+		output.textureNames.addAll(textureNames);
 
 		final boolean textured = texture.size() > 0;
 		final boolean cornerNormals = !faceVertexNormals.isEmpty();
 		final boolean facePlaneNormals = !faceNormals.isEmpty();
+		final boolean perFaceTextures = !faceTextures.isEmpty();
 
 		final int numFaces = size();
 		for (int face = 0; face < numFaces; face++) {
@@ -305,6 +313,10 @@ public class VertexMesh {
 				// Every fan triangle inherits the parent face's plane normal.
 				if (facePlaneNormals)
 					output.faceNormals.add(faceNormals.get(face));
+
+				// and the parent face's texture image
+				if (perFaceTextures)
+					output.faceTextures.add(faceTextures.get(face));
 			}
 		}
 

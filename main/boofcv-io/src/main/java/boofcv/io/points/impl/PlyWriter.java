@@ -21,47 +21,45 @@ package boofcv.io.points.impl;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.tuples.GeoTuple3D_F64;
 
-/**
- * Generic interface for accessing data used to write PLY files
- *
- * @author Peter Abeles
- */
+import java.util.List;
+
+/// Generic interface for accessing data used to write PLY files
+///
+/// @author Peter Abeles
 public interface PlyWriter {
 	int getVertexCount();
 
 	int getPolygonCount();
 
-	/** True if a vertex has color information or not */
+	/// True if a vertex has color information or not
 	boolean isColor();
 
-	/** True if a polygon has a texture coordinate */
-	boolean isTextured();
+	/// True if a polygon has a texture coordinate
+	boolean isTextureCoors();
 
-	/** True if vertexes have normal vectors */
+	/// True if vertexes have normal vectors
 	boolean isVertexNormals();
 
-	/** Name of textured map file. Return an empty string if there is none. */
-	String getTextureName();
+	/// Names of the texture map files. Empty if there are none
+	List<String> getTextureNames();
+
+	/// Returns which texture a face uses. Only called if there is more than one texture name. Return 0 if
+	/// not specified on a per-face basis.
+	int getFaceTexture( int which );
 
 	void getVertex( int which, Point3D_F64 vertex );
 
 	void getVertexNormal( int which, GeoTuple3D_F64<?> normal );
 
-	/**
-	 * Color of a vertex
-	 */
+	/// Color of a vertex
 	int getColor( int which );
 
-	/**
-	 * Get the indexes of each vertex in the polygon. Returns the number of vertexes.
-	 */
+	/// Get the indexes of each vertex in the polygon. Returns the number of vertexes.
 	int getIndexes( int which, int[] indexes );
 
-	/**
-	 * Reads the texture coordinate for the specified shape. Returns the number of vertexes for that shape.
-	 *
-	 * @param which Which shape
-	 * @param coordinates Texture coordinate of the specified vertex
-	 */
+	/// Reads the texture coordinate for the specified shape. Returns the number of vertexes for that shape.
+	///
+	/// @param which Which shape
+	/// @param coordinates Texture coordinate of the specified vertex
 	int getTextureCoors( int which, float[] coordinates );
 }

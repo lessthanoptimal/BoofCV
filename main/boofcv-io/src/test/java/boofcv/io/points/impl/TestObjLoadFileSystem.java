@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -83,13 +83,13 @@ public class TestObjLoadFileSystem extends BoofStandardJUnit {
 		assertEquals(2, found.size());
 
 		VertexMesh mesh1 = found.get("a");
-		assertEquals("a.jpg", mesh1.textureName);
+		assertEquals("a.jpg", mesh1.textureNames.get(0));
 		assertEquals(2, mesh1.vertexes.size());
 		assertEquals(0, mesh1.faceNormals.size());
 
 
 		VertexMesh mesh2 = found.get("b");
-		assertEquals("b.jpg", mesh2.textureName);
+		assertEquals("b.jpg", mesh2.textureNames.get(0));
 		assertEquals(2, mesh2.vertexes.size());
 		assertEquals(1, mesh2.size());
 		assertEquals(0, mesh2.vertexes.getTemp(0).distance(1.0, 0, 0));

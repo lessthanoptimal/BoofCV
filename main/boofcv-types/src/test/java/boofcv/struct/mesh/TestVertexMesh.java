@@ -160,6 +160,7 @@ public class TestVertexMesh extends BoofStandardJUnit {
 		original.addFaceVectors(shape.toList());
 		assertFalse(original.isTriangles());
 		assertEquals(2, original.faceOffsets.size);
+		original.faceTextures.add(2);
 
 		VertexMesh found = original.toTriangles();
 		assertTrue(found.isTriangles());
@@ -167,5 +168,8 @@ public class TestVertexMesh extends BoofStandardJUnit {
 		// vertexes should not have vertexes
 		assertTrue(original.vertexes.isEquals(found.vertexes));
 		assertEquals(3, found.faceOffsets.size);
+
+		// Each triangle should use the same texture as the original face
+		assertTrue(found.faceTextures.isEquals(2, 2));
 	}
 }

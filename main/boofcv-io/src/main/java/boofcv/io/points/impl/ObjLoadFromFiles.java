@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -91,7 +91,7 @@ public class ObjLoadFromFiles {
 
 				// Set the texture file name if it's specified for this material
 				if (materialToTextureFile.containsKey(name)) {
-					active.textureName = materialToTextureFile.get(name);
+					active.textureNames.add(materialToTextureFile.get(name));
 				} else {
 					System.err.println("Unknown material '" + name + "'");
 				}
