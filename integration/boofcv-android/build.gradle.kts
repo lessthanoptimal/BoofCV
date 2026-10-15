@@ -75,8 +75,6 @@ dependencies {
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.0")
-
-    annotationProcessor(Libs.JABEL)
 }
 
 publishing {

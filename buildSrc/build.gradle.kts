@@ -25,10 +25,6 @@ repositories {
     mavenCentral()
 }
 
-// While BoofCV itself targets Java 25, the build scripts are compiled with an older JDK
-// so the build works on machines that do not have 25 installed.
-kotlin { jvmToolchain(17) }
-
 dependencies {
     implementation("com.peterabeles.gversion:com.peterabeles.gversion.gradle.plugin:1.11.0")
     implementation("net.ltgt.errorprone:net.ltgt.errorprone.gradle.plugin:4.0.1")
