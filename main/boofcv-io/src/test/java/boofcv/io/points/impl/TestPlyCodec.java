@@ -215,4 +215,142 @@ class TestPlyCodec extends BoofStandardJUnit {
 
 		assertEquals("foo", foundMesh.textureName);
 	}
+
+	/** Metashape adds a scalar texnumber to each face. It is skipped and the faces after it still line up */
+	@Test void faceScalarProperty_binary() throws IOException {
+		var bytes = new ByteArrayOutputStream();
+		bytes.write(("""
+				ply
+				format binary_little_endian 1.0
+				element vertex 4
+				property float x
+				property float y
+				property float z
+				element face 2
+				property list uchar int vertex_indices
+				property list uchar float texcoord
+				property int texnumber
+				end_header
+				""").getBytes(UTF_8));
+		var bb = java.nio.ByteBuffer.allocate(4*3*4 + 2*(1 + 3*4 + 1 + 6*4 + 4)).order(ByteOrder.LITTLE_ENDIAN);
+		for (int i = 0; i < 4; i++) {
+			bb.putFloat(i).putFloat(i + 10).putFloat(i + 20);
+		}
+		int[][] faces = {{0, 1, 2}, {1, 3, 2}};
+		for (int[] face : faces) {
+			bb.put((byte)3).putInt(face[0]).putInt(face[1]).putInt(face[2]);
+			bb.put((byte)6);
+			for (int i = 0; i < 6; i++)
+				bb.putFloat(0.1f*i);
+			bb.putInt(7);
+		}
+		bytes.write(bb.array());
+
+		checkTwoFaces(new ByteArrayInputStream(bytes.toByteArray()), faces);
+	}
+
+	@Test void faceScalarProperty_ascii() throws IOException {
+		String text = """
+				ply
+				format ascii 1.0
+				element vertex 4
+				property float x
+				property float y
+				property float z
+				element face 2
+				property list uchar int vertex_indices
+				property int texnumber
+				end_header
+				0 10 20
+				1 11 21
+				2 12 22
+				3 13 23
+				3 0 1 2 7
+				3 1 3 2 7
+				""";
+		checkTwoFaces(new ByteArrayInputStream(text.getBytes(UTF_8)), new int[][]{{0, 1, 2}, {1, 3, 2}});
+	}
+
+	/**
+	 * An element the reader does not use, placed between the vertexes and faces, an unknown list on the faces,
+	 * and the sized type names. All are skipped and the faces still line up
+	 */
+	@Test void unknownElementsAndLists_binary() throws IOException {
+		var bytes = new ByteArrayOutputStream();
+		bytes.write(("""
+				ply
+				format binary_little_endian 1.0
+				element vertex 4
+				property float32 x
+				property float32 y
+				property float32 z
+				property uint8 quality
+				element material 2
+				property list uint8 int32 ids
+				property float64 shininess
+				element face 2
+				property list uint8 int32 vertex_indices
+				property list uint8 uint16 flags
+				property int32 texnumber
+				end_header
+				""").getBytes(UTF_8));
+		var bb = java.nio.ByteBuffer.allocate(1000).order(ByteOrder.LITTLE_ENDIAN);
+		for (int i = 0; i < 4; i++) {
+			bb.putFloat(i).putFloat(i + 10).putFloat(i + 20).put((byte)9);
+		}
+		// material: a list of 3 ints then a double, and an empty list then a double
+		bb.put((byte)3).putInt(1).putInt(2).putInt(3).putDouble(0.5);
+		bb.put((byte)0).putDouble(0.25);
+		int[][] faces = {{0, 1, 2}, {1, 3, 2}};
+		for (int[] face : faces) {
+			bb.put((byte)3).putInt(face[0]).putInt(face[1]).putInt(face[2]);
+			bb.put((byte)2).putShort((short)5).putShort((short)6);
+			bb.putInt(7);
+		}
+		bytes.write(bb.array(), 0, bb.position());
+
+		checkTwoFaces(new ByteArrayInputStream(bytes.toByteArray()), faces);
+	}
+
+	@Test void unknownElementsAndLists_ascii() throws IOException {
+		String text = """
+				ply
+				format ascii 1.0
+				element vertex 4
+				property float32 x
+				property float32 y
+				property float32 z
+				element material 2
+				property list uint8 int32 ids
+				property float64 shininess
+				element face 2
+				property list uint8 int32 vertex_indices
+				property list uint8 uint16 flags
+				end_header
+				0 10 20
+				1 11 21
+				2 12 22
+				3 13 23
+				3 1 2 3 0.5
+				0 0.25
+				3 0 1 2 2 5 6
+				3 1 3 2 2 5 6
+				""";
+		checkTwoFaces(new ByteArrayInputStream(text.getBytes(UTF_8)), new int[][]{{0, 1, 2}, {1, 3, 2}});
+	}
+
+	private void checkTwoFaces( ByteArrayInputStream input, int[][] expected ) throws IOException {
+		var mesh = new VertexMesh();
+		PlyCodec.readMesh(input, mesh);
+		assertEquals(4, mesh.vertexes.size());
+		assertEquals(3.0, mesh.vertexes.getTemp(3).x, UtilEjml.TEST_F64);
+		assertEquals(23.0, mesh.vertexes.getTemp(3).z, UtilEjml.TEST_F64);
+		assertEquals(expected.length, mesh.size());
+		for (int face = 0; face < expected.length; face++) {
+			int offset = mesh.faceOffsets.get(face);
+			for (int i = 0; i < 3; i++) {
+				assertEquals(expected[face][i], mesh.faceVertexes.get(offset + i));
+			}
+		}
+	}
 }

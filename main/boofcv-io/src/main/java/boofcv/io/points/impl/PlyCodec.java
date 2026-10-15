@@ -39,12 +39,9 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
-/**
- * For reading PLY point files.
- *
- * @author Peter Abeles
- */
+/// For reading PLY point files.
 public class PlyCodec {
 	public static void saveAscii( PlyWriter data, Writer outputWriter ) throws IOException {
 		writeAsciiHeader(data.getVertexCount(), data.getPolygonCount(), data.isColor(), data.isTextured(),
@@ -147,28 +144,24 @@ public class PlyCodec {
 		outputWriter.write("end_header\n");
 	}
 
-	/**
-	 * Saves data in binary format
-	 *
-	 * @param cloud (Input) Point cloud data
-	 * @param order The byte order of the binary data. ByteOrder.BIG_ENDIAN is recommended
-	 * @param saveRgb if true it will save RGB information
-	 * @param saveAsFloat if true it will save it as a 4-byte float and if false as an 8-byte double
-	 * @param outputWriter Stream it will write to
-	 */
+	/// Saves data in binary format
+	///
+	/// @param cloud (Input) Point cloud data
+	/// @param order The byte order of the binary data. ByteOrder.BIG\_ENDIAN is recommended
+	/// @param saveRgb if true it will save RGB information
+	/// @param saveAsFloat if true it will save it as a 4-byte float and if false as an 8-byte double
+	/// @param outputWriter Stream it will write to
 	public static void saveCloudBinary( PointCloudReader cloud, ByteOrder order, boolean saveRgb, boolean saveAsFloat,
 										OutputStream outputWriter ) throws IOException {
 		saveBinary(wrapCloudForWriting(cloud, saveRgb), order, saveAsFloat, outputWriter);
 	}
 
-	/**
-	 * Saves data in binary format
-	 *
-	 * @param mesh (Input) Point cloud data
-	 * @param colorRGB (Input) color of each vertex
-	 * @param saveAsFloat if true it will save it as a 4-byte float and if false as an 8-byte double
-	 * @param outputWriter Stream it will write to
-	 */
+	/// Saves data in binary format
+	///
+	/// @param mesh (Input) Point cloud data
+	/// @param colorRGB (Input) color of each vertex
+	/// @param saveAsFloat if true it will save it as a 4-byte float and if false as an 8-byte double
+	/// @param outputWriter Stream it will write to
 	public static void saveMeshBinary( VertexMesh mesh,
 									   @Nullable DogArray_I32 colorRGB,
 									   ByteOrder order, boolean saveAsFloat, OutputStream outputWriter )
@@ -331,6 +324,7 @@ public class PlyCodec {
 
 		line = readNextPly(input, true, buffer);
 		boolean previousVertex = false;
+		boolean previousFace = false;
 		while (!line.isEmpty()) {
 			if (line.startsWith("comment")) {
 				if (line.contains("TextureFile")) {
@@ -355,24 +349,31 @@ public class PlyCodec {
 				};
 			} else if (line.startsWith("element")) {
 				previousVertex = false;
+				previousFace = false;
+				header.elements.add(new Element(words[1], Integer.parseInt(words[2])));
 				if (words[1].equals("vertex")) {
 					previousVertex = true;
 					header.vertexCount = Integer.parseInt(words[2]);
 				} else if (words[1].equals("face")) {
+					previousFace = true;
 					header.triangleCount = Integer.parseInt(words[2]);
 				}
+			} else if (words[0].equals("property") && header.elements.isEmpty()) {
+				throw new IOException("Property before any element: '" + line + "'");
+			} else if (words[0].equals("property") && !previousVertex && !previousFace) {
+				// An element that is not read. Its properties are recorded so its records can be skipped
+				Element element = header.elements.get(header.elements.size() - 1);
+				if (words[1].equals("list")) {
+					if (words.length != 5)
+						throw new IOException("Unexpected number of words in list property: '" + line + "'");
+					element.properties.add(new PropertyList(words[4], DataType.parse(words[2]), DataType.parse(words[3])));
+				} else {
+					element.properties.add(new PropertyList(words[2], null, DataType.parse(words[1])));
+				}
 			} else if (words[0].equals("property") && previousVertex) {
-				DataType d = switch (words[1].toLowerCase(Locale.US)) {
-					case "float" -> DataType.FLOAT;
-					case "double" -> DataType.DOUBLE;
-					case "char" -> DataType.CHAR;
-					case "short" -> DataType.SHORT;
-					case "int" -> DataType.INT;
-					case "uchar" -> DataType.UCHAR;
-					case "ushort" -> DataType.USHORT;
-					case "uint" -> DataType.UINT;
-					default -> throw new RuntimeException("Add support for " + words[1]);
-				};
+				if (words[1].equals("list"))
+					throw new IOException("List properties on vertexes are not supported: '" + line + "'");
+				DataType d = DataType.parse(words[1]);
 				VarType v;
 				switch (words[2].toLowerCase(Locale.US)) {
 					case "x" -> v = VarType.X;
@@ -393,10 +394,13 @@ public class PlyCodec {
 				}
 
 				// Parse the data type info
-				var countType = DataType.valueOf(words[2].toUpperCase(Locale.US));
-				var valueType = DataType.valueOf(words[3].toUpperCase(Locale.US));
+				var countType = DataType.parse(words[2]);
+				var valueType = DataType.parse(words[3]);
 
 				header.properties.add(new PropertyList(words[4], countType, valueType));
+			} else if (words[0].equals("property") && previousFace && words.length == 3) {
+				// A scalar on a face, e.g. Metashape's texnumber. Not used, but its bytes must be skipped
+				header.properties.add(new PropertyList(words[2], null, DataType.parse(words[1])));
 			} else {
 				throw new IOException("Unknown header element: '" + line + "'");
 			}
@@ -500,15 +504,84 @@ public class PlyCodec {
 		output.initialize(header.vertexCount, header.triangleCount, header.rgb);
 		output.setTextureName(header.textureName);
 
-		switch (header.format) {
-			case ASCII -> readAscii(output, input, header);
-			case BINARY_LITTLE, BINARY_BIG -> readCloudBinary(output, input, header);
-			default -> throw new RuntimeException("BUG!");
+		// Elements are read in the order they were declared. Ones that are not understood are skipped
+		boolean ascii = header.format == Format.ASCII;
+		var buffer = new StringBuilder();
+		for (Element element : header.elements) {
+			switch (element.name) {
+				case "vertex" -> {
+					if (ascii) readVerticesAscii(output, input, header, buffer);
+					else readVerticesBinary(output, input, header);
+				}
+				case "face" -> {
+					if (ascii) readFacesAscii(output, input, header, buffer);
+					else readFacesBinary(output, input, header);
+				}
+				default -> {
+					if (ascii) {
+						for (int i = 0; i < element.count; i++)
+							readNextPly(input, true, buffer);
+					} else {
+						skipElementBinary(input, header, element);
+					}
+				}
+			}
 		}
 	}
 
-	private static void readAscii( PlyReader output, InputStream reader, Header header ) throws IOException {
-		var buffer = new StringBuilder();
+	/// Skips every record of an element that is not used. Lists are skipped by reading their count
+	private static void skipElementBinary( InputStream reader, Header header, Element element ) throws IOException {
+		var bb = ByteBuffer.allocate(8).order(header.byteOrder());
+		for (int i = 0; i < element.count; i++) {
+			for (PropertyList prop : element.properties) {
+				if (prop.countType == null) {
+					skipBytes(reader, prop.valueType.size);
+				} else {
+					skipList(reader, bb, prop);
+				}
+			}
+		}
+	}
+
+	/// Reads a list's count then skips its values
+	private static void skipList( InputStream reader, ByteBuffer bb, PropertyList prop ) throws IOException {
+		int countType = Objects.requireNonNull(prop.countType).size;
+		readFully(reader, bb.array(), countType);
+		long count = switch (prop.countType) {
+			case CHAR -> bb.get(0);
+			case UCHAR -> bb.get(0) & 0xFF;
+			case SHORT -> bb.getShort(0);
+			case USHORT -> bb.getShort(0) & 0xFFFF;
+			case INT, UINT -> bb.getInt(0) & 0xFFFFFFFFL;
+			default -> throw new IOException("List count must be an integer type, not " + prop.countType);
+		};
+		skipBytes(reader, count*prop.valueType.size);
+	}
+
+	private static void skipBytes( InputStream reader, long count ) throws IOException {
+		while (count > 0) {
+			long skipped = reader.skip(count);
+			if (skipped <= 0) {
+				if (reader.read() < 0)
+					throw new IOException("Unexpected end of file");
+				skipped = 1;
+			}
+			count -= skipped;
+		}
+	}
+
+	private static void readFully( InputStream reader, byte[] data, int length ) throws IOException {
+		int total = 0;
+		while (total < length) {
+			int found = reader.read(data, total, length - total);
+			if (found < 0)
+				throw new IOException("Unexpected end of file");
+			total += found;
+		}
+	}
+
+	private static void readVerticesAscii( PlyReader output, InputStream reader, Header header, StringBuilder buffer )
+			throws IOException {
 
 		// storage for read in values
 		int I32 = -1;
@@ -559,6 +632,10 @@ public class PlyCodec {
 			output.stopVertex();
 		}
 
+	}
+
+	private static void readFacesAscii( PlyReader output, InputStream reader, Header header, StringBuilder buffer )
+			throws IOException {
 		var indexes = new int[100];
 		var texture = new float[100];
 		for (int idxTriangle = 0; idxTriangle < header.triangleCount; idxTriangle++) {
@@ -568,6 +645,10 @@ public class PlyCodec {
 
 			for (int idxProperty = 0; idxProperty < header.properties.size(); idxProperty++) {
 				PropertyList prop = header.properties.get(idxProperty);
+				if (prop.countType == null) {
+					idxWord++;
+					continue;
+				}
 				int n = Integer.parseInt(words[idxWord++]);
 				if (words.length < n + idxWord) {
 					throw new RuntimeException("Unexpected number of words. " + words.length + " vs " + (n + 1));
@@ -586,16 +667,13 @@ public class PlyCodec {
 						}
 						output.addTexture(n/2, texture);
 					}
-					default -> {
-						idxWord += n;
-						System.err.println("Unknown property type " + prop.label);
-					}
+					default -> idxWord += n;
 				}
 			}
 		}
 	}
 
-	private static void readCloudBinary( PlyReader output, InputStream reader, Header header ) throws IOException {
+	private static void readVerticesBinary( PlyReader output, InputStream reader, Header header ) throws IOException {
 		int countVertexBytes = 0;
 		for (int i = 0; i < header.dataWords.size(); i++) {
 			countVertexBytes += header.dataWords.get(i).data.size;
@@ -611,11 +689,9 @@ public class PlyCodec {
 			countBytes = Math.max(countBytes, countPropBytes);
 		}
 
-		ByteOrder order = header.format == Format.BINARY_LITTLE ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN;
-
 		final byte[] line = new byte[countBytes];
 		final ByteBuffer bb = ByteBuffer.wrap(line);
-		bb.order(order);
+		bb.order(header.byteOrder());
 
 		// storage for read in values
 		int I32 = -1;
@@ -673,21 +749,45 @@ public class PlyCodec {
 			output.stopVertex();
 		}
 
+	}
+
+	private static void readFacesBinary( PlyReader output, InputStream reader, Header header ) throws IOException {
+		// Large enough for a polygon of up to 100 vertexes and any property's values
+		int countBytes = 8;
+		for (int i = 0; i < header.properties.size(); i++) {
+			countBytes = Math.max(countBytes, header.properties.get(i).valueType.size*100);
+		}
+		final byte[] line = new byte[countBytes];
+		final ByteBuffer bb = ByteBuffer.wrap(line);
+		bb.order(header.byteOrder());
+
 		var arrayI = new int[100];
 		var arrayF = new float[100];
 		for (int i = 0; i < header.triangleCount; i++) {
 			for (int idxProperty = 0; idxProperty < header.properties.size(); idxProperty++) {
 				PropertyList prop = header.properties.get(idxProperty);
-				if (prop.countType != DataType.UCHAR) {
-					throw new IOException("Expected unsigned byte for count type, not " + prop.countType);
+				if (prop.countType == null) {
+					skipBytes(reader, prop.valueType.size);
+					continue;
 				}
 				switch (prop.label) {
-					case "vertex_indices" -> readPolygon(reader, bb, line, arrayI, header.vertexCount, output);
-					case "texcoord" -> readTextureCoor(reader, prop.valueType, bb, line, arrayF, output);
-					default -> System.err.println("Unknown property type " + prop.label);
+					case "vertex_indices" -> {
+						checkUCharCount(prop);
+						readPolygon(reader, bb, line, arrayI, header.vertexCount, output);
+					}
+					case "texcoord" -> {
+						checkUCharCount(prop);
+						readTextureCoor(reader, prop.valueType, bb, line, arrayF, output);
+					}
+					default -> skipList(reader, bb, prop);
 				}
 			}
 		}
+	}
+
+	private static void checkUCharCount( PropertyList prop ) throws IOException {
+		if (prop.countType != DataType.UCHAR)
+			throw new IOException("Expected unsigned byte for count type, not " + prop.countType);
 	}
 
 	private static void readPolygon( InputStream reader, ByteBuffer bb, byte[] lineBytes, int[] indexes, int vertexCount,
@@ -844,24 +944,41 @@ public class PlyCodec {
 		// true if normals for each shape is encoded
 		boolean normals = false;
 		List<PropertyList> properties = new ArrayList<>();
+		/// Every element in the order they appear. Properties are filled in for ones that are skipped
+		List<Element> elements = new ArrayList<>();
 		Format format = Format.ASCII;
+
+		ByteOrder byteOrder() {
+			return format == Format.BINARY_LITTLE ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN;
+		}
 		String textureName = "";
 	}
 
 	private static class PropertyList {
-		/** Propery name */
+		/// Property name
 		String label;
 
-		/** What the number of elements is stored in */
-		DataType countType;
+		/// What the number of elements is stored in. Null for a scalar property
+		@Nullable DataType countType;
 
-		/** Array value data type */
+		/// Array value data type
 		DataType valueType;
 
-		PropertyList( String label, DataType countType, DataType valueType ) {
+		PropertyList( String label, @Nullable DataType countType, DataType valueType ) {
 			this.label = label;
 			this.countType = countType;
 			this.valueType = valueType;
+		}
+	}
+
+	private static class Element {
+		final String name;
+		final int count;
+		final List<PropertyList> properties = new ArrayList<>();
+
+		Element( String name, int count ) {
+			this.name = name;
+			this.count = count;
 		}
 	}
 
@@ -893,6 +1010,21 @@ public class PlyCodec {
 
 		DataType( int size ) {
 			this.size = size;
+		}
+
+		/// Accepts both the original names and the sized aliases, e.g. int8 or float32
+		static DataType parse( String name ) throws IOException {
+			return switch (name.toLowerCase(Locale.US)) {
+				case "float", "float32" -> FLOAT;
+				case "double", "float64" -> DOUBLE;
+				case "char", "int8" -> CHAR;
+				case "uchar", "uint8" -> UCHAR;
+				case "short", "int16" -> SHORT;
+				case "ushort", "uint16" -> USHORT;
+				case "int", "int32" -> INT;
+				case "uint", "uint32" -> UINT;
+				default -> throw new IOException("Unknown PLY data type '" + name + "'");
+			};
 		}
 	}
 
