@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -137,7 +137,7 @@ public class PointCloudIO {
 	 * Reads a point cloud from the input stream in the specified format and writes it to the output.
 	 *
 	 * @param format Storage format
-	 * @param input Input stream
+	 * @param input Input stream. Should be buffered, otherwise binary files can be very slow to read.
 	 * @param output Output cloud writer
 	 */
 	public static void load( Format format, InputStream input, PointCloudWriter output ) throws IOException {
@@ -174,7 +174,7 @@ public class PointCloudIO {
 			return;
 		}
 
-		try (var input = new FileInputStream(file)) {
+		try (var input = new BufferedInputStream(new FileInputStream(file), 1024*1024)) {
 			PointCloudIO.load(type, input, mesh);
 		}
 	}
@@ -193,7 +193,7 @@ public class PointCloudIO {
 	 * Reads a 3D mesh from the input stream in the specified format and writes it to the output.
 	 *
 	 * @param format Storage format
-	 * @param input Input stream
+	 * @param input Input stream. Should be buffered, otherwise binary files can be very slow to read.
 	 * @param mesh (Output) 3D mesh
 	 */
 	public static void load( Format format, InputStream input, VertexMesh mesh ) throws IOException {
