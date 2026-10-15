@@ -85,7 +85,8 @@ public class OrbitAroundPointControl extends MouseAdapter implements Swing3dCame
 
 		// evenly sub sample points in the mesh
 		for (int i = 0; i < N; i++) {
-			int vertIndex = i*mesh.vertexes.size()/N;
+			// long to avoid overflow with large meshes
+			int vertIndex = (int)((long)i*mesh.vertexes.size()/N);
 			mesh.vertexes.getCopy(vertIndex, sampled.grow());
 		}
 
