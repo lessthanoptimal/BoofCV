@@ -32,6 +32,8 @@ import georegression.struct.tuples.GeoTuple3D_F32;
 import georegression.struct.tuples.GeoTuple3D_F64;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
 /// Supports any camera model because it uses ray-tracing.
 ///
 /// - [#depthImage] is actually a range image. Each pixel is Euclidean distance from camera center to the surface
@@ -62,9 +64,11 @@ public class MeshRayTracer extends MeshRender {
 	// Parallel to the triangle arrays, so indexed by triangle (== face) index.
 	private boolean meshTextured;
 	private float[] tex0U, tex0V, tex1U, tex1V, tex2U, tex2V;
+	// Which texture image each triangle uses
+	private int[] triTexture;
 
-	// Texture image, sampled with bilinear interpolation. Assumed 3-band RGB.
-	private @Nullable InterleavedU8 textureImage = null;
+	// Texture images, sampled with bilinear interpolation. Assumed 3-band RGB.
+	private List<InterleavedU8> textureImages = List.of();
 
 	// Flattened BVH. An internal node has count==0 and its two children live at
 	// [leftFirst, leftFirst+1]. A leaf has count>0 and owns triIdx[leftFirst .. leftFirst+count).
@@ -119,8 +123,8 @@ public class MeshRayTracer extends MeshRender {
 		dirCamZ[i] = z/norm;
 	}
 
-	@Override public void setTextureImage( InterleavedU8 textureImage ) {
-		this.textureImage = textureImage;
+	@Override public void setTextureImages( List<InterleavedU8> textureImages ) {
+		this.textureImages = textureImages;
 	}
 
 	@Override public Se3_F64 getWorldToView( @Nullable Se3_F64 output ) {
@@ -159,7 +163,7 @@ public class MeshRayTracer extends MeshRender {
 		}
 
 		// Precompute texture coordinates per triangle only if the mesh carries them.
-		meshTextured = mesh.isTextured();
+		meshTextured = mesh.isTextureCoors();
 		if (meshTextured)
 			allocateTexCoords(numTri);
 		else
@@ -190,6 +194,7 @@ public class MeshRayTracer extends MeshRender {
 				mesh.texture.getCopy(texIndex(mesh, c + 2), tc);
 				tex2U[f] = tc.x;
 				tex2V[f] = tc.y;
+				triTexture[f] = mesh.getFaceTexture(f);
 			}
 		}
 
@@ -239,10 +244,12 @@ public class MeshRayTracer extends MeshRender {
 		tex1V = new float[n];
 		tex2U = new float[n];
 		tex2V = new float[n];
+		triTexture = new int[n];
 	}
 
 	private void freeTexCoords() {
 		tex0U = tex0V = tex1U = tex1V = tex2U = tex2V = null;
+		triTexture = null;
 	}
 
 	private void buildBvh() {
@@ -353,7 +360,7 @@ public class MeshRayTracer extends MeshRender {
 		// Decide once whether to texture map or fall back to the per-face colorizer. Mirrors
 		// RenderMesh: use the colorizer if forced, if the mesh has no texture coordinates, or if no
 		// texture image was supplied.
-		final boolean useColorizer = forceColorizer || !meshTextured || textureImage == null;
+		final boolean useColorizer = forceColorizer || !meshTextured || textureImages.isEmpty();
 
 		// Camera center in world: the point that maps to the view origin.
 		worldToView.transformReverse(new Point3D_F64(0, 0, 0), camCenter);
@@ -530,7 +537,7 @@ public class MeshRayTracer extends MeshRender {
 		float s = (float)(w0*tex0U[tri] + u*tex1U[tri] + v*tex2U[tri]);
 		float t = (float)(w0*tex0V[tri] + u*tex1V[tri] + v*tex2V[tri]);
 
-		final InterleavedU8 img = textureImage;
+		final InterleavedU8 img = textureImages.get(triTexture[tri]);
 		final int W = img.width, H = img.height;
 
 		// Texture coords are fractions in [0,1]; v is flipped because image rows run top-to-bottom.

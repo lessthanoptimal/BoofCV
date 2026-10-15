@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,6 +31,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Very simple app for opening and viewing a 3D mesh
@@ -56,26 +57,31 @@ public class MeshViewerApp {
 			System.err.println("No shapes to render! Is this a point cloud?");
 		}
 
-		// See if there should be a texture mapped file
-		InterleavedU8 textureImage = null;
+		// Load all the texture mapped files
+		var textureImages = new ArrayList<InterleavedU8>();
 		if (mesh.texture.size() > 0) {
-			// Only one texture file is currently supported
-			if (mesh.textureNames.isEmpty()) {
+			if (mesh.textureNames.isEmpty())
 				System.err.println("Texture file was not encoded. Clearing texture coordinates.");
-				mesh.texture.reset();
-			} else {
-				textureImage = UtilImageIO.loadImage(new File(file.getParentFile(), mesh.textureNames.get(0)), true, ImageType.IL_U8);
+			for (String name : mesh.textureNames) {
+				InterleavedU8 image = UtilImageIO.loadImage(new File(file.getParentFile(), name), true, ImageType.IL_U8);
+				if (image == null) {
+					System.err.println("Failed to load texture '" + name + "'. Clearing texture coordinates.");
+					textureImages.clear();
+					break;
+				}
+				textureImages.add(image);
 			}
+			if (textureImages.isEmpty())
+				mesh.texture.reset();
 		}
 
-		InterleavedU8 _image = textureImage;
 		SwingUtilities.invokeLater(() -> {
 			var panel = new MeshViewerPanel();
 			panel.setMesh(mesh, false);
 			if (mesh.rgb.size > 0)
 				panel.setVertexColors("RGB", mesh.rgb.data);
-			if (_image != null)
-				panel.setTextureImage(_image);
+			if (!textureImages.isEmpty())
+				panel.setTextureImages(textureImages);
 			panel.setPreferredSize(new Dimension(500, 500));
 			ShowImages.showWindow(panel, "Mesh Viewer", true);
 		});

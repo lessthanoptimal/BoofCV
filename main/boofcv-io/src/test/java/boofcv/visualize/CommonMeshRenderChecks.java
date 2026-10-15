@@ -26,6 +26,8 @@ import boofcv.testing.BoofStandardJUnit;
 import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class CommonMeshRenderChecks extends BoofStandardJUnit {
@@ -75,6 +77,44 @@ public abstract class CommonMeshRenderChecks extends BoofStandardJUnit {
 		alg.setMesh(mesh);
 		alg.render();
 		assertEquals(0, countNotDefault(alg.getRenderedImage()));
+	}
+
+	/// Square made of two triangles. Each triangle uses a different solid color texture image
+	@Test void multipleTextures() {
+		var mesh = new VertexMesh();
+		mesh.vertexes.append(-1, -1, 10);
+		mesh.vertexes.append(1, -1, 10);
+		mesh.vertexes.append(1, 1, 10);
+		mesh.vertexes.append(-1, 1, 10);
+		mesh.faceVertexes.addAll(DogArray_I32.array(0, 1, 2, 0, 2, 3));
+		mesh.faceOffsets.add(3);
+		mesh.faceOffsets.add(6);
+		for (int i = 0; i < 6; i++) {
+			mesh.texture.append(0.5f, 0.5f);
+		}
+		mesh.faceTextures.addAll(DogArray_I32.array(0, 1));
+
+		MeshRender alg = create();
+		var intrinsics = new CameraPinholeBrown();
+		PerspectiveOps.createIntrinsic(300, 200, 90, -1, intrinsics);
+		alg.setCamera(intrinsics);
+		alg.setMesh(mesh);
+		alg.setTextureImages(List.of(solidImage(0xFF0000), solidImage(0x0000FF)));
+		alg.render();
+
+		// The square spans pixels 135 to 165 along x and 85 to 115 along y
+		assertEquals(0xFF0000, alg.getRenderedImage().get24(157, 92));
+		assertEquals(0x0000FF, alg.getRenderedImage().get24(142, 107));
+	}
+
+	private InterleavedU8 solidImage( int rgb ) {
+		var image = new InterleavedU8(4, 4, 3);
+		for (int y = 0; y < image.height; y++) {
+			for (int x = 0; x < image.width; x++) {
+				image.set24(x, y, rgb);
+			}
+		}
+		return image;
 	}
 
 	private int countNotDefault( InterleavedU8 renderedImage ) {
