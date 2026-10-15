@@ -28,7 +28,7 @@ plugins {
 
 android {
     namespace = "${project.group}.android.library"
-    compileSdk = 33
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 22 // Depends on which API you use
