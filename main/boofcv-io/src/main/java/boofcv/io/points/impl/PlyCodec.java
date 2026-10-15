@@ -44,8 +44,9 @@ import java.util.Objects;
 /// For reading PLY point files.
 public class PlyCodec {
 	public static void saveAscii( PlyWriter data, Writer outputWriter ) throws IOException {
-		writeAsciiHeader(data.getVertexCount(), data.getPolygonCount(), data.isColor(), data.isTextured(),
-				data.getTextureName(), data.isVertexNormals(), outputWriter);
+		writeAsciiHeader(data.getVertexCount(), data.getPolygonCount(), data.isColor(), data.isTextureCoors(),
+				data.getTextureNames(), data.isVertexNormals(), outputWriter);
+		boolean faceTextures = isFaceTextures(data.isTextureCoors(), data.getTextureNames());
 
 		boolean color = data.isColor();
 
@@ -81,7 +82,7 @@ public class PlyCodec {
 				outputWriter.write(" " + arrayI[idx]);
 			}
 
-			if (data.isTextured()) {
+			if (data.isTextureCoors()) {
 				BoofMiscOps.checkEq(size, data.getTextureCoors(i, arrayF));
 				outputWriter.write(" " + (size*2));
 				for (int idx = 0; idx < size*2; idx++) {
@@ -89,9 +90,17 @@ public class PlyCodec {
 				}
 			}
 
+			if (faceTextures)
+				outputWriter.write(" " + data.getFaceTexture(i));
+
 			outputWriter.write('\n');
 		}
 		outputWriter.flush();
+	}
+
+	/// Per-face texture indexes are only saved if there are texture coordinates and more than one texture
+	static boolean isFaceTextures( boolean hasTextureCoors, List<String> textureNames ) {
+		return hasTextureCoors && textureNames.size() > 1;
 	}
 
 	public static void saveMeshAscii( VertexMesh mesh, @Nullable DogArray_I32 colorRGB
@@ -103,17 +112,16 @@ public class PlyCodec {
 		saveAscii(wrapCloudForWriting(cloud, saveRgb), outputWriter);
 	}
 
-	private static void writeAsciiHeader( int vertexCount, int triangleCount, boolean hasColor, boolean hasTexture,
-										  String textureName, boolean hasNormals, Writer outputWriter )
+	private static void writeAsciiHeader( int vertexCount, int triangleCount, boolean hasColor, boolean hasTextureCoors,
+										  List<String> textureNames, boolean hasNormals, Writer outputWriter )
 			throws IOException {
 		outputWriter.write("ply\n");
 		outputWriter.write("format ascii 1.0\n");
 		outputWriter.write("comment Created using BoofCV!\n");
-		if (textureName.isEmpty() && hasTexture) {
+		if (textureNames.isEmpty() && hasTextureCoors)
 			System.err.println("Texture file name not specified and it has texture coordinates");
-		}
-		if (!textureName.isEmpty())
-			outputWriter.write("comment TextureFile " + textureName + "\n");
+		for (String name : textureNames)
+			outputWriter.write("comment TextureFile " + name + "\n");
 
 		outputWriter.write("element vertex " + vertexCount + "\n" +
 				"property float x\n" +
@@ -137,8 +145,11 @@ public class PlyCodec {
 			outputWriter.write("element face " + triangleCount + "\n" +
 					"property list uchar int vertex_indices\n");
 
-			if (hasTexture) {
+			if (hasTextureCoors) {
 				outputWriter.write("property list uchar float texcoord\n");
+			}
+			if (isFaceTextures(hasTextureCoors, textureNames)) {
+				outputWriter.write("property int texnumber\n");
 			}
 		}
 		outputWriter.write("end_header\n");
@@ -174,8 +185,9 @@ public class PlyCodec {
 		String format = "UTF-8";
 		int dataLength = saveAsFloat ? 4 : 8;
 		writeBinaryHeader(data.getVertexCount(), data.getPolygonCount(), order, data.isColor(),
-				data.isTextured(), data.isVertexNormals(), data.getTextureName(),
+				data.isTextureCoors(), data.isVertexNormals(), data.getTextureNames(),
 				saveAsFloat, format, outputWriter);
+		boolean faceTextures = isFaceTextures(data.isTextureCoors(), data.getTextureNames());
 
 		boolean color = data.isColor();
 
@@ -237,7 +249,7 @@ public class PlyCodec {
 			}
 			outputWriter.write(bytes.array(), 0, 1 + 4*size);
 
-			if (!data.isTextured())
+			if (!data.isTextureCoors())
 				continue;
 
 			bytes.position(0);
@@ -251,12 +263,17 @@ public class PlyCodec {
 				}
 			}
 			outputWriter.write(bytes.array(), 0, 1 + 2*dataLength*size);
+
+			if (faceTextures) {
+				bytes.putInt(0, data.getFaceTexture(i));
+				outputWriter.write(bytes.array(), 0, 4);
+			}
 		}
 		outputWriter.flush();
 	}
 
 	private static void writeBinaryHeader( int vertexCount, int triangleCount, ByteOrder order, boolean hasColor,
-										   boolean hasTexture, boolean hasVertexNormals, String textureName,
+										   boolean hasTextureCoors, boolean hasVertexNormals, List<String> textureNames,
 										   boolean saveAsFloat, String format, OutputStream outputWriter )
 			throws IOException {
 		String dataType = saveAsFloat ? "float" : "double";
@@ -269,11 +286,10 @@ public class PlyCodec {
 		outputWriter.write(("format binary_" + orderStr + "_endian 1.0\n").getBytes(format));
 		outputWriter.write("comment Created using BoofCV!\n".getBytes(format));
 
-		if (textureName.isEmpty() && hasTexture) {
+		if (textureNames.isEmpty() && hasTextureCoors)
 			System.err.println("Texture file name not specified and it has texture coordinates");
-		}
-		if (!textureName.isEmpty())
-			outputWriter.write(("comment TextureFile " + textureName + "\n").getBytes(format));
+		for (String name : textureNames)
+			outputWriter.write(("comment TextureFile " + name + "\n").getBytes(format));
 
 		outputWriter.write(("element vertex " + vertexCount + "\n").getBytes(format));
 		outputWriter.write((
@@ -298,8 +314,11 @@ public class PlyCodec {
 		if (triangleCount > 0) {
 			outputWriter.write(("element face " + triangleCount + "\n" +
 					"property list uchar int vertex_indices\n").getBytes(format));
-			if (hasTexture) {
+			if (hasTextureCoors) {
 				outputWriter.write(("property list uchar " + dataType + " texcoord\n").getBytes(format));
+			}
+			if (isFaceTextures(hasTextureCoors, textureNames)) {
+				outputWriter.write("property int texnumber\n".getBytes(format));
 			}
 		}
 		outputWriter.write("end_header\n".getBytes(format));
@@ -312,7 +331,7 @@ public class PlyCodec {
 		return line;
 	}
 
-	private static void readHeader( InputStream input, Header header ) throws IOException {
+	static void readHeader( InputStream input, Header header ) throws IOException {
 		// Assume no triangles by default
 		header.triangleCount = 0;
 
@@ -329,7 +348,7 @@ public class PlyCodec {
 			if (line.startsWith("comment")) {
 				if (line.contains("TextureFile")) {
 					int start = "comment TextureFile ".length();
-					header.textureName = line.substring(start);
+					header.textureNames.add(line.substring(start));
 				}
 				line = readNextPly(input, true, buffer);
 				continue;
@@ -399,7 +418,7 @@ public class PlyCodec {
 
 				header.properties.add(new PropertyList(words[4], countType, valueType));
 			} else if (words[0].equals("property") && previousFace && words.length == 3) {
-				// A scalar on a face, e.g. Metashape's texnumber. Not used, but its bytes must be skipped
+				// A scalar on a face, e.g. Metashape's texnumber
 				header.properties.add(new PropertyList(words[2], null, DataType.parse(words[1])));
 			} else {
 				throw new IOException("Unknown header element: '" + line + "'");
@@ -445,9 +464,11 @@ public class PlyCodec {
 
 			@Override public void addPolygon( int[] indexes, int offset, int length ) {}
 
-			@Override public void setTextureName( String textureName ) {}
+			@Override public void addTextureName( String textureName ) {}
 
 			@Override public void addTexture( int count, float[] coor ) {}
+
+			@Override public void addFaceTexture( int index ) {}
 		});
 	}
 
@@ -480,13 +501,13 @@ public class PlyCodec {
 				mesh.faceVertexes.addAll(indexes, offset, offset + length);
 			}
 
-			@Override public void setTextureName( String textureName ) {
-				mesh.textureName = textureName;
+			@Override public void addTextureName( String textureName ) {
+				mesh.textureNames.add(textureName);
 			}
 
-			@Override public void addTexture( int count, float[] coor ) {
-				mesh.addTexture(count, coor);
-			}
+			@Override public void addTexture( int count, float[] coor ) {mesh.addTexture(count, coor);}
+
+			@Override public void addFaceTexture( int index ) {mesh.faceTextures.add(index);}
 		});
 	}
 
@@ -502,7 +523,8 @@ public class PlyCodec {
 			throw new IOException("Format is never specified");
 
 		output.initialize(header.vertexCount, header.triangleCount, header.rgb);
-		output.setTextureName(header.textureName);
+		for (String name : header.textureNames)
+			output.addTextureName(name);
 
 		// Elements are read in the order they were declared. Ones that are not understood are skipped
 		boolean ascii = header.format == Format.ASCII;
@@ -545,17 +567,21 @@ public class PlyCodec {
 
 	/// Reads a list's count then skips its values
 	private static void skipList( InputStream reader, ByteBuffer bb, PropertyList prop ) throws IOException {
-		int countType = Objects.requireNonNull(prop.countType).size;
-		readFully(reader, bb.array(), countType);
-		long count = switch (prop.countType) {
+		long count = readIntegerBinary(reader, bb, Objects.requireNonNull(prop.countType));
+		skipBytes(reader, count*prop.valueType.size);
+	}
+
+	/// Reads a single binary integer of the specified type
+	private static long readIntegerBinary( InputStream reader, ByteBuffer bb, DataType type ) throws IOException {
+		readFully(reader, bb.array(), type.size);
+		return switch (type) {
 			case CHAR -> bb.get(0);
 			case UCHAR -> bb.get(0) & 0xFF;
 			case SHORT -> bb.getShort(0);
 			case USHORT -> bb.getShort(0) & 0xFFFF;
 			case INT, UINT -> bb.getInt(0) & 0xFFFFFFFFL;
-			default -> throw new IOException("List count must be an integer type, not " + prop.countType);
+			default -> throw new IOException("Must be an integer type, not " + type);
 		};
-		skipBytes(reader, count*prop.valueType.size);
 	}
 
 	private static void skipBytes( InputStream reader, long count ) throws IOException {
@@ -631,7 +657,6 @@ public class PlyCodec {
 			}
 			output.stopVertex();
 		}
-
 	}
 
 	private static void readFacesAscii( PlyReader output, InputStream reader, Header header, StringBuilder buffer )
@@ -646,6 +671,8 @@ public class PlyCodec {
 			for (int idxProperty = 0; idxProperty < header.properties.size(); idxProperty++) {
 				PropertyList prop = header.properties.get(idxProperty);
 				if (prop.countType == null) {
+					if (prop.label.equals("texnumber"))
+						output.addFaceTexture(Integer.parseInt(words[idxWord]));
 					idxWord++;
 					continue;
 				}
@@ -658,6 +685,7 @@ public class PlyCodec {
 					case "vertex_indices" -> {
 						for (int i = 0; i < n; i++) {
 							indexes[i] = Integer.parseInt(words[idxWord++]);
+							checkVertexIndex(indexes[i], header.vertexCount);
 						}
 						output.addPolygon(indexes, 0, n);
 					}
@@ -748,7 +776,6 @@ public class PlyCodec {
 			}
 			output.stopVertex();
 		}
-
 	}
 
 	private static void readFacesBinary( PlyReader output, InputStream reader, Header header ) throws IOException {
@@ -767,7 +794,10 @@ public class PlyCodec {
 			for (int idxProperty = 0; idxProperty < header.properties.size(); idxProperty++) {
 				PropertyList prop = header.properties.get(idxProperty);
 				if (prop.countType == null) {
-					skipBytes(reader, prop.valueType.size);
+					switch (prop.label) {
+						case "texnumber" -> output.addFaceTexture((int)readIntegerBinary(reader, bb, prop.valueType));
+						default -> skipBytes(reader, prop.valueType.size);
+					}
 					continue;
 				}
 				switch (prop.label) {
@@ -783,6 +813,12 @@ public class PlyCodec {
 				}
 			}
 		}
+	}
+
+	/// Throws an exception if the vertex index is out of range
+	static void checkVertexIndex( int index, int vertexCount ) throws IOException {
+		if (index < 0 || index >= vertexCount)
+			throw new IOException("Vertex index out of range. index=" + index + " count=" + vertexCount);
 	}
 
 	private static void checkUCharCount( PropertyList prop ) throws IOException {
@@ -805,10 +841,8 @@ public class PlyCodec {
 			throw new IOException("Read unexpected number of bytes. " + found + " vs " + bytesInLine);
 
 		for (int wordIndex = 0; wordIndex < count; wordIndex++) {
-			int foundIndex = bb.getInt(wordIndex*4);
-			if (foundIndex < 0 || foundIndex > vertexCount)
-				throw new IOException("Negative index. word: " + wordIndex + " value: " + foundIndex + " count: " + vertexCount);
-			indexes[wordIndex] = foundIndex;
+			indexes[wordIndex] = bb.getInt(wordIndex*4);
+			checkVertexIndex(indexes[wordIndex], vertexCount);
 		}
 
 		output.addPolygon(indexes, 0, count);
@@ -842,7 +876,7 @@ public class PlyCodec {
 		output.addTexture(count/2, tempF);
 	}
 
-	private static PlyWriter wrapMeshForWriting( VertexMesh mesh, @Nullable DogArray_I32 colorRGB ) {
+	static PlyWriter wrapMeshForWriting( VertexMesh mesh, @Nullable DogArray_I32 colorRGB ) {
 		return new PlyWriter() {
 			@Override public int getVertexCount() {return mesh.vertexes.size();}
 
@@ -850,7 +884,7 @@ public class PlyCodec {
 
 			@Override public boolean isColor() {return colorRGB != null;}
 
-			@Override public boolean isTextured() {
+			@Override public boolean isTextureCoors() {
 				return mesh.texture.size() > 0;
 			}
 
@@ -858,8 +892,13 @@ public class PlyCodec {
 				return mesh.normals.size() > 0;
 			}
 
-			@Override public String getTextureName() {
-				return mesh.textureName;
+			@Override public List<String> getTextureNames() {return mesh.textureNames;}
+
+			@Override public int getFaceTexture( int which ) {
+				// Empty means every face uses the first texture
+				if (mesh.faceTextures.isEmpty())
+					return 0;
+				return mesh.faceTextures.get(which);
 			}
 
 			@Override public void getVertex( int which, Point3D_F64 vertex ) {mesh.vertexes.getCopy(which, vertex);}
@@ -917,11 +956,13 @@ public class PlyCodec {
 
 			@Override public boolean isColor() {return saveRgb;}
 
-			@Override public boolean isTextured() {return false;}
+			@Override public boolean isTextureCoors() {return false;}
 
 			@Override public boolean isVertexNormals() {return false;}
 
-			@Override public String getTextureName() {return "";}
+			@Override public List<String> getTextureNames() {return List.of();}
+
+			@Override public int getFaceTexture( int which ) {return 0;}
 
 			@Override public void getVertex( int which, Point3D_F64 vertex ) {cloud.get(which, vertex);}
 
@@ -935,13 +976,13 @@ public class PlyCodec {
 		};
 	}
 
-	private static class Header {
+	static class Header {
 		List<DataWord> dataWords = new ArrayList<>();
 		int vertexCount = -1;
 		int triangleCount = -1;
-		// true of rgb colors for each vertex is encoded
+		/// true of rgb colors for each vertex is encoded
 		boolean rgb = false;
-		// true if normals for each shape is encoded
+		/// true if normals for each shape is encoded
 		boolean normals = false;
 		List<PropertyList> properties = new ArrayList<>();
 		/// Every element in the order they appear. Properties are filled in for ones that are skipped
@@ -951,10 +992,11 @@ public class PlyCodec {
 		ByteOrder byteOrder() {
 			return format == Format.BINARY_LITTLE ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN;
 		}
-		String textureName = "";
+
+		List<String> textureNames = new ArrayList<>();
 	}
 
-	private static class PropertyList {
+	static class PropertyList {
 		/// Property name
 		String label;
 

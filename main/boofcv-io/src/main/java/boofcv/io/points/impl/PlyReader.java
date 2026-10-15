@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,18 +18,14 @@
 
 package boofcv.io.points.impl;
 
-/**
- * Generic interface for accessing data used to read PLY files
- *
- * @author Peter Abeles
- */
+/// Generic interface for accessing data used to read PLY files
 public interface PlyReader {
 	void initialize( int vertexes, int triangles, boolean color );
 
-	/** Creates a new vertex */
+	/// Creates a new vertex
 	void startVertex();
 
-	/** Done adding attributes to the vertex and saves the results */
+	/// Done adding attributes to the vertex and saves the results
 	void stopVertex();
 
 	void setVertexLocation( double x, double y, double z );
@@ -40,13 +36,14 @@ public interface PlyReader {
 
 	void addPolygon( int[] indexes, int offset, int length );
 
-	void setTextureName( String textureName );
+	void addTextureName( String textureName );
 
-	/**
-	 * Adds coordinates for texture in the ply file
-	 *
-	 * @param count Number of 2D points in the coordinates
-	 * @param coor Array storing the 2D coordinates, interleaved (x,y)
-	 */
+	/// Adds coordinates for texture in the ply file
+	///
+	/// @param count Number of 2D points in the coordinates
+	/// @param coor Array storing the 2D coordinates, interleaved (x,y)
 	void addTexture( int count, float[] coor );
+
+	/// Which texture a face uses. Only called if the file has texnumber
+	void addFaceTexture( int index );
 }

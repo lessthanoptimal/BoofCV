@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -86,9 +86,9 @@ public class ObjFileCodec {
 		var obj = new ObjFileWriter(writer);
 		obj.addComment("Created by BoofCV");
 
-		// If there's a texture file, add a material
-		if (!mesh.textureName.isEmpty()) {
-			String baseName = FilenameUtils.getBaseName(mesh.textureName);
+		// If there's a texture file, add a material. Only one texture file is currently supported
+		if (!mesh.textureNames.isEmpty()) {
+			String baseName = FilenameUtils.getBaseName(mesh.textureNames.get(0));
 			obj.addLibrary(baseName + ".mtl");
 			obj.addMaterial(baseName);
 		}

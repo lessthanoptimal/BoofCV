@@ -59,11 +59,12 @@ public class MeshViewerApp {
 		// See if there should be a texture mapped file
 		InterleavedU8 textureImage = null;
 		if (mesh.texture.size() > 0) {
-			if (mesh.textureName.isEmpty()) {
+			// Only one texture file is currently supported
+			if (mesh.textureNames.isEmpty()) {
 				System.err.println("Texture file was not encoded. Clearing texture coordinates.");
 				mesh.texture.reset();
 			} else {
-				textureImage = UtilImageIO.loadImage(new File(file.getParentFile(), mesh.textureName), true, ImageType.IL_U8);
+				textureImage = UtilImageIO.loadImage(new File(file.getParentFile(), mesh.textureNames.get(0)), true, ImageType.IL_U8);
 			}
 		}
 

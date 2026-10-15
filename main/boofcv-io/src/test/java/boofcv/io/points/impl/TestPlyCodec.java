@@ -38,8 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class TestPlyCodec extends BoofStandardJUnit {
 	@Test void encode_decode_3D_ascii() throws IOException {
@@ -137,74 +136,107 @@ class TestPlyCodec extends BoofStandardJUnit {
 	}
 
 	@Test void encode_decode_mesh_binary() throws IOException {
-		for (var endian : new ByteOrder[]{ByteOrder.LITTLE_ENDIAN, ByteOrder.BIG_ENDIAN}) {
-			for (boolean floatType : new boolean[]{true, false}) {
-				var mesh = new VertexMesh();
-				mesh.textureName = "foo";
-				mesh.faceOffsets.add(0);
-				int numVertexes = 10;
-				for (int i = 0; i < numVertexes; i++) {
-					mesh.vertexes.append(i, 2, 3);
-					mesh.normals.append(i, 2, 3);
+		for (int numTextures : new int[]{1, 3}) {
+			for (var endian : new ByteOrder[]{ByteOrder.LITTLE_ENDIAN, ByteOrder.BIG_ENDIAN}) {
+				for (boolean floatType : new boolean[]{true, false}) {
+					VertexMesh mesh = createMesh(numTextures);
+					DogArray_I32 colors = createColors(mesh);
 
-					// bound indexes to ensure they are in the valid range
-					mesh.faceVertexes.add((i*3)%numVertexes);
-					mesh.faceVertexes.add((i*3 + 1)%numVertexes);
-					mesh.faceVertexes.add((i*3 + 2)%numVertexes);
-					mesh.faceOffsets.add(mesh.faceVertexes.size);
+					var output = new ByteArrayOutputStream();
+					PlyCodec.saveMeshBinary(mesh, colors, endian, floatType, output);
 
-					for (int idxPoly = 0; idxPoly < 3; idxPoly++) {
-						mesh.texture.append(1, idxPoly);
-					}
-				}
-				var colors = new DogArray_I32();
-				for (int i = 0; i < mesh.vertexes.size(); i++) {
-					colors.add(i + 5);
-				}
+					// Make sure it encoded it as the correct type
+					var header = output.toString(UTF_8);
+					assertTrue(header.contains("property list uchar " + (floatType ? "float" : "double") + " texcoord"));
 
-				var output = new ByteArrayOutputStream();
-				PlyCodec.saveMeshBinary(mesh, colors, endian, floatType, output);
-
-				// Make sure it encoded it as the correct type
-				var header = output.toString(UTF_8);
-				assertTrue(header.contains("property list uchar " + (floatType ? "float" : "double") + " texcoord"));
-
-				var foundMesh = new VertexMesh();
-
-				var input = new ByteArrayInputStream(output.toByteArray());
-				PlyCodec.readMesh(input, foundMesh);
-
-				assertEquals(mesh.vertexes.size(), mesh.vertexes.size());
-				assertEquals(mesh.normals.size(), mesh.normals.size());
-				assertEquals(mesh.texture.size(), mesh.texture.size());
-				assertTrue(mesh.faceVertexes.isEquals(foundMesh.faceVertexes));
-				assertTrue(mesh.faceOffsets.isEquals(foundMesh.faceOffsets));
-				assertTrue(colors.isEquals(foundMesh.rgb));
-
-				for (int i = 0; i < mesh.vertexes.size(); i++) {
-					Point3D_F64 expected = mesh.vertexes.getTemp(i);
-					Point3D_F64 found = foundMesh.vertexes.getTemp(i);
-					assertEquals(0.0, expected.distance(found));
-					assertTrue(mesh.normals.getTemp(i).isIdentical(foundMesh.normals.getTemp(i), 1e-4f));
-				}
-
-				for (int i = 0; i < mesh.vertexes.size(); i++) {
-					assertEquals(mesh.faceVertexes.get(i), foundMesh.faceVertexes.get(i));
-				}
-
-				for (int i = 0; i < mesh.texture.size(); i++) {
-					assertEquals(0.0f, mesh.texture.getTemp(i).distance(mesh.texture.getTemp(i)), UtilEjml.TEST_F32);
+					var foundMesh = new VertexMesh();
+					PlyCodec.readMesh(new ByteArrayInputStream(output.toByteArray()), foundMesh);
+					checkSameMesh(mesh, colors, foundMesh);
 				}
 			}
 		}
 	}
 
-	/**
-	 * Makes sure it saves and can read the texture map image name
-	 */
+	@Test void encode_decode_mesh_ascii() throws IOException {
+		for (int numTextures : new int[]{1, 3}) {
+			VertexMesh mesh = createMesh(numTextures);
+			DogArray_I32 colors = createColors(mesh);
+
+			var output = new StringWriter();
+			PlyCodec.saveMeshAscii(mesh, colors, output);
+
+			var foundMesh = new VertexMesh();
+			PlyCodec.readMesh(new ByteArrayInputStream(output.toString().getBytes(UTF_8)), foundMesh);
+			checkSameMesh(mesh, colors, foundMesh);
+		}
+	}
+
+	/// Creates a textured triangle mesh. If there's more than one texture, each face specifies its texture
+	private VertexMesh createMesh( int numTextures ) {
+		var mesh = new VertexMesh();
+		for (int i = 0; i < numTextures; i++) {
+			mesh.textureNames.add("foo" + i + ".jpg");
+		}
+		int numVertexes = 10;
+		for (int i = 0; i < numVertexes; i++) {
+			mesh.vertexes.append(i, 2, 3);
+			mesh.normals.append(i, 2, 3);
+
+			// bound indexes to ensure they are in the valid range
+			mesh.faceVertexes.add((i*3)%numVertexes);
+			mesh.faceVertexes.add((i*3 + 1)%numVertexes);
+			mesh.faceVertexes.add((i*3 + 2)%numVertexes);
+			mesh.faceOffsets.add(mesh.faceVertexes.size);
+
+			for (int idxPoly = 0; idxPoly < 3; idxPoly++) {
+				mesh.texture.append(1, idxPoly);
+			}
+
+			if (numTextures > 1)
+				mesh.faceTextures.add(i%numTextures);
+		}
+		return mesh;
+	}
+
+	private DogArray_I32 createColors( VertexMesh mesh ) {
+		var colors = new DogArray_I32();
+		for (int i = 0; i < mesh.vertexes.size(); i++) {
+			colors.add(i + 5);
+		}
+		return colors;
+	}
+
+	private void checkSameMesh( VertexMesh expected, DogArray_I32 colors, VertexMesh found ) {
+		assertEquals(expected.vertexes.size(), found.vertexes.size());
+		assertEquals(expected.normals.size(), found.normals.size());
+		assertEquals(expected.texture.size(), found.texture.size());
+		assertTrue(expected.faceVertexes.isEquals(found.faceVertexes));
+		assertTrue(expected.faceOffsets.isEquals(found.faceOffsets));
+		assertTrue(colors.isEquals(found.rgb));
+		assertEquals(expected.textureNames, found.textureNames);
+		assertTrue(expected.faceTextures.isEquals(found.faceTextures));
+
+		for (int i = 0; i < expected.vertexes.size(); i++) {
+			assertEquals(0.0, expected.vertexes.getTemp(i).distance(found.vertexes.getTemp(i)));
+			assertTrue(expected.normals.getTemp(i).isIdentical(found.normals.getTemp(i), 1e-4f));
+		}
+
+		for (int i = 0; i < expected.texture.size(); i++) {
+			assertEquals(0.0f, expected.texture.getTemp(i).distance(found.texture.getTemp(i)), UtilEjml.TEST_F32);
+		}
+	}
+
+	/// If per-face textures are not specified then every face uses the first texture
+	@Test void wrapMeshForWriting_faceTexture() {
+		VertexMesh mesh = createMesh(2);
+		mesh.faceTextures.reset();
+		assertEquals(0, PlyCodec.wrapMeshForWriting(mesh, null).getFaceTexture(1));
+	}
+
+	/// Makes sure it saves and can read the texture map image name
 	@Test void textureName() throws IOException {
 		var mesh = new VertexMesh();
-		mesh.textureName = "foo";
+		mesh.textureNames.add("foo");
 
 		var output = new ByteArrayOutputStream();
 		PlyCodec.saveMeshBinary(mesh, null, ByteOrder.BIG_ENDIAN, true, output);
@@ -213,10 +245,18 @@ class TestPlyCodec extends BoofStandardJUnit {
 		var foundMesh = new VertexMesh();
 		PlyCodec.readMesh(input, foundMesh);
 
-		assertEquals("foo", foundMesh.textureName);
+		assertEquals(List.of("foo"), foundMesh.textureNames);
 	}
 
-	/** Metashape adds a scalar texnumber to each face. It is skipped and the faces after it still line up */
+	/// Per-face texture indexes are only saved if there are texture coordinates and more than one texture
+	@Test void isFaceTextures() {
+		assertFalse(PlyCodec.isFaceTextures(true, List.of()));
+		assertFalse(PlyCodec.isFaceTextures(true, List.of("a")));
+		assertTrue(PlyCodec.isFaceTextures(true, List.of("a", "b")));
+		assertFalse(PlyCodec.isFaceTextures(false, List.of("a", "b")));
+	}
+
+	/// Metashape adds a scalar texnumber to each face. The faces after it still line up
 	@Test void faceScalarProperty_binary() throws IOException {
 		var bytes = new ByteArrayOutputStream();
 		bytes.write(("""
@@ -237,16 +277,18 @@ class TestPlyCodec extends BoofStandardJUnit {
 			bb.putFloat(i).putFloat(i + 10).putFloat(i + 20);
 		}
 		int[][] faces = {{0, 1, 2}, {1, 3, 2}};
-		for (int[] face : faces) {
+		for (int idxFace = 0; idxFace < faces.length; idxFace++) {
+			int[] face = faces[idxFace];
 			bb.put((byte)3).putInt(face[0]).putInt(face[1]).putInt(face[2]);
 			bb.put((byte)6);
 			for (int i = 0; i < 6; i++)
 				bb.putFloat(0.1f*i);
-			bb.putInt(7);
+			bb.putInt(idxFace);
 		}
 		bytes.write(bb.array());
 
-		checkTwoFaces(new ByteArrayInputStream(bytes.toByteArray()), faces);
+		VertexMesh mesh = checkTwoFaces(new ByteArrayInputStream(bytes.toByteArray()), faces);
+		assertTrue(mesh.faceTextures.isEquals(0, 1));
 	}
 
 	@Test void faceScalarProperty_ascii() throws IOException {
@@ -265,16 +307,47 @@ class TestPlyCodec extends BoofStandardJUnit {
 				1 11 21
 				2 12 22
 				3 13 23
-				3 0 1 2 7
-				3 1 3 2 7
+				3 0 1 2 0
+				3 1 3 2 1
 				""";
-		checkTwoFaces(new ByteArrayInputStream(text.getBytes(UTF_8)), new int[][]{{0, 1, 2}, {1, 3, 2}});
+		VertexMesh mesh = checkTwoFaces(new ByteArrayInputStream(text.getBytes(UTF_8)), new int[][]{{0, 1, 2}, {1, 3, 2}});
+		assertTrue(mesh.faceTextures.isEquals(0, 1));
 	}
 
-	/**
-	 * An element the reader does not use, placed between the vertexes and faces, an unknown list on the faces,
-	 * and the sized type names. All are skipped and the faces still line up
-	 */
+	/// Metashape lists every texture file in a comment and adds texnumber to faces
+	@Test void readHeader_textures() throws IOException {
+		String text = """
+				ply
+				format ascii 1.0
+				comment TextureFile a.jpg
+				comment TextureFile b.jpg
+				element vertex 4
+				property float x
+				property float y
+				property float z
+				element face 2
+				property list uchar int vertex_indices
+				property list uchar float texcoord
+				property int texnumber
+				end_header
+				""";
+		var header = new PlyCodec.Header();
+		PlyCodec.readHeader(new ByteArrayInputStream(text.getBytes(UTF_8)), header);
+
+		assertEquals(List.of("a.jpg", "b.jpg"), header.textureNames);
+		assertEquals(3, header.properties.size());
+		assertEquals("texnumber", header.properties.get(2).label);
+	}
+
+	@Test void checkVertexIndex() throws IOException {
+		PlyCodec.checkVertexIndex(0, 3);
+		PlyCodec.checkVertexIndex(2, 3);
+		assertThrows(IOException.class, () -> PlyCodec.checkVertexIndex(-1, 3));
+		assertThrows(IOException.class, () -> PlyCodec.checkVertexIndex(3, 3));
+	}
+
+	/// An element the reader does not use, placed between the vertexes and faces, an unknown list on the faces,
+	/// and the sized type names. All are skipped and the faces still line up
 	@Test void unknownElementsAndLists_binary() throws IOException {
 		var bytes = new ByteArrayOutputStream();
 		bytes.write(("""
@@ -302,14 +375,16 @@ class TestPlyCodec extends BoofStandardJUnit {
 		bb.put((byte)3).putInt(1).putInt(2).putInt(3).putDouble(0.5);
 		bb.put((byte)0).putDouble(0.25);
 		int[][] faces = {{0, 1, 2}, {1, 3, 2}};
-		for (int[] face : faces) {
+		for (int idxFace = 0; idxFace < faces.length; idxFace++) {
+			int[] face = faces[idxFace];
 			bb.put((byte)3).putInt(face[0]).putInt(face[1]).putInt(face[2]);
 			bb.put((byte)2).putShort((short)5).putShort((short)6);
-			bb.putInt(7);
+			bb.putInt(idxFace + 7);
 		}
 		bytes.write(bb.array(), 0, bb.position());
 
-		checkTwoFaces(new ByteArrayInputStream(bytes.toByteArray()), faces);
+		VertexMesh mesh = checkTwoFaces(new ByteArrayInputStream(bytes.toByteArray()), faces);
+		assertTrue(mesh.faceTextures.isEquals(7, 8));
 	}
 
 	@Test void unknownElementsAndLists_ascii() throws IOException {
@@ -339,7 +414,7 @@ class TestPlyCodec extends BoofStandardJUnit {
 		checkTwoFaces(new ByteArrayInputStream(text.getBytes(UTF_8)), new int[][]{{0, 1, 2}, {1, 3, 2}});
 	}
 
-	private void checkTwoFaces( ByteArrayInputStream input, int[][] expected ) throws IOException {
+	private VertexMesh checkTwoFaces( ByteArrayInputStream input, int[][] expected ) throws IOException {
 		var mesh = new VertexMesh();
 		PlyCodec.readMesh(input, mesh);
 		assertEquals(4, mesh.vertexes.size());
@@ -352,5 +427,6 @@ class TestPlyCodec extends BoofStandardJUnit {
 				assertEquals(expected[face][i], mesh.faceVertexes.get(offset + i));
 			}
 		}
+		return mesh;
 	}
 }
