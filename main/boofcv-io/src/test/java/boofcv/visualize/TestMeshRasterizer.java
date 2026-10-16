@@ -20,6 +20,7 @@ package boofcv.visualize;
 
 import boofcv.struct.image.InterleavedU8;
 import boofcv.struct.mesh.VertexMesh;
+import georegression.metric.Intersection2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.shapes.Polygon2D_F32;
@@ -174,6 +175,40 @@ public class TestMeshRasterizer extends CommonMeshRenderChecks {
 
 		assertEquals(600, countDepth);
 		assertEquals(600, countRgb);
+	}
+
+	/// Pixels inside a triangle must be the same as Intersection2D_F64.containsConvex(), including when
+	/// vertexes lie exactly on pixel coordinates
+	@Test void projectSurfaceTexture_sameAsContainsConvex() {
+		var alg = new MeshRasterizer() {
+			@Override int interpolateTextureRgb( float px, float py ) {return 1;}
+		};
+		alg.resolution.setTo(30, 25);
+
+		var polygon = new Polygon2D_F64(3);
+		var shapeInCamera = new DogArray<>(Point3D_F64::new);
+		shapeInCamera.resize(3, ( p ) -> p.setTo(0, 0, 10));
+		var polyTexture = new Polygon2D_F32(3);
+		var point = new Point2D_F64();
+
+		for (int trial = 0; trial < 200; trial++) {
+			// Half the trials have vertexes on integer coordinates, the others on half pixels
+			double step = trial%2 == 0 ? 1.0 : 0.5;
+			for (int i = 0; i < 3; i++) {
+				polygon.get(i).setTo(rand.nextInt(60)*step - 2, rand.nextInt(50)*step - 2);
+			}
+
+			alg.initializeImages();
+			alg.projectSurfaceTexture(shapeInCamera, polygon, polyTexture);
+
+			for (int y = 0; y < alg.resolution.height; y++) {
+				for (int x = 0; x < alg.resolution.width; x++) {
+					point.setTo(x, y);
+					boolean expected = Intersection2D_F64.containsConvex(polygon, point);
+					assertEquals(expected, alg.getRenderedImage().get24(x, y) != 0xFFFFFF);
+				}
+			}
+		}
 	}
 
 	/// Rotate in a circle and check two handcrafted scenarios
