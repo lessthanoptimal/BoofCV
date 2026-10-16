@@ -355,7 +355,10 @@ public class MeshRasterizer extends MeshRender {
 			// TODO look at vertexes and get min/max depth. Use that to quickly reject pixels based on depth without
 			//      convex intersection or computing the depth at that pixel on this surface
 
-			computeBoundingBox(resolution.width, resolution.height, workTri, aabb);
+			// Skip if no pixels are inside the triangle's bounding box
+			Point2D_F64 pa = polyProj.get(vertA), pb = polyProj.get(vertB), pc = polyProj.get(vertC);
+			if (!boundingPixels(pa.x, pa.y, pb.x, pb.y, pc.x, pc.y, resolution.width, resolution.height, aabb))
+				continue;
 
 			// Go through all pixels and see if the points are inside the polygon. If so
 			for (int pixelY = aabb.y0; pixelY < aabb.y1; pixelY++) {
@@ -404,6 +407,45 @@ public class MeshRasterizer extends MeshRender {
 				}
 			}
 		}
+	}
+
+	/// Computes the range of pixels whose integer coordinates lie inside the triangle's bounding box,
+	/// clipped to the image. Upper extent is exclusive.
+	///
+	/// @return false if no pixel coordinate is inside the bounding box
+	static boolean boundingPixels( double ax, double ay, double bx, double by, double cx, double cy,
+								   int width, int height, Rectangle2D_I32 aabb ) {
+		// min/max with plain comparisons. Math.min/max for doubles also handle NaN and -0.0, which isn't needed
+		double minX = ax < bx ? ax : bx;
+		double maxX = ax < bx ? bx : ax;
+		if (cx < minX) minX = cx; else if (cx > maxX) maxX = cx;
+
+		double minY = ay < by ? ay : by;
+		double maxY = ay < by ? by : ay;
+		if (cy < minY) minY = cy; else if (cy > maxY) maxY = cy;
+
+		// Entirely outside the image
+		if (maxX < 0.0 || maxY < 0.0 || minX > width - 1 || minY > height - 1)
+			return false;
+
+		// Clip to the image
+		if (minX < 0.0) minX = 0.0;
+		if (minY < 0.0) minY = 0.0;
+		if (maxX > width - 1) maxX = width - 1;
+		if (maxY > height - 1) maxY = height - 1;
+
+		// All values are now non-negative, so casting to int is the same as floor
+		int x0 = (int)minX;
+		if (x0 < minX) x0++; // ceil
+		int y0 = (int)minY;
+		if (y0 < minY) y0++;
+
+		aabb.x0 = x0;
+		aabb.y0 = y0;
+		aabb.x1 = (int)maxX + 1; // floor + 1, exclusive
+		aabb.y1 = (int)maxY + 1;
+
+		return aabb.x0 < aabb.x1 && aabb.y0 < aabb.y1;
 	}
 
 	private static float edgeFunction( float x0, float y0, float x1, float y1, float x2, float y2 ) {
