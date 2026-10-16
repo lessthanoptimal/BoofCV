@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,18 +23,14 @@ import org.ddogleg.struct.DogArray_I32;
 import java.io.BufferedReader;
 import java.io.IOException;
 
-/**
- * Reads an OBJ file and adds objects as they are read.
- */
+/// Reads an OBJ file and adds objects as they are read.
 public abstract class ObjFileReader {
 	DogArray_I32 vertexIndexes = new DogArray_I32();
 	int vertexCount = 0;
 	int vertexTextureCount = 0;
 	int vertexNormalCount = 0;
 
-	/**
-	 * Decodes / reads the OBJ file encoded as text in the reader
-	 */
+	/// Decodes / reads the OBJ file encoded as text in the reader
 	public void parse( BufferedReader reader ) throws IOException {
 		vertexCount = 0;
 		vertexTextureCount = 0;
@@ -128,21 +124,17 @@ public abstract class ObjFileReader {
 		}
 	}
 
-	/**
-	 * Converts the index found in the file into an array index. OBJ files are 1 index and accept
-	 * negative numbers, which are relative to the end of the array.
-	 *
-	 * @param count Number of elements in the array the index refers to
-	 */
+	/// Converts the index found in the file into an array index. OBJ files are 1 index and accept
+	/// negative numbers, which are relative to the end of the array.
+	///
+	/// @param count Number of elements in the array the index refers to
 	static int ensureIndex( int found, int count ) {
 		if (found > 0)
 			return found - 1;
 		return count + found;
 	}
 
-	/**
-	 * Converts words into an array of indexes
-	 */
+	/// Converts words into an array of indexes
 	private void readPoints( String[] words ) {
 		vertexIndexes.reset();
 		for (int i = 1; i < words.length; i++) {
@@ -150,18 +142,15 @@ public abstract class ObjFileReader {
 		}
 	}
 
-	/**
-	 * Read face indices. Examples of what it can read
-	 *
-	 * <pre>
-	 * f v1 v2 v3
-	 * f v1/vt1 v2/vt2
-	 * f v1/vt1/vn1 v2/vt2/vn2
-	 * f v1//vn1 v2//vn2
-	 * </pre>
-	 *
-	 * v = vertex index. vt = vertex texture index. vn = vertex normal index
-	 */
+	/// Read face indices. Examples of what it can read
+	/// <pre>
+	/// f v1 v2 v3
+	/// f v1/vt1 v2/vt2
+	/// f v1/vt1/vn1 v2/vt2/vn2
+	/// f v1//vn1 v2//vn2
+	/// </pre>
+	///
+	/// v = vertex index. vt = vertex texture index. vn = vertex normal index
 	private void readFaceIndexes( String[] words ) {
 		vertexIndexes.reset();
 		for (int i = 1; i < words.length; i++) {
@@ -186,19 +175,15 @@ public abstract class ObjFileReader {
 		}
 	}
 
-	/**
-	 * Adds an MTL library that it should load
-	 */
+	/// Adds an MTL library that it should load
 	protected abstract void addLibrary( String name );
 
-	/**
-	 * Tells it that these vectors belongs the material defined in the MTL library
-	 */
+	/// Tells it that these vectors belongs the material defined in the MTL library
 	protected abstract void addMaterial( String name );
 
 	protected abstract void addVertex( double x, double y, double z );
 
-	/** Adds a color for a vertex. RGB is specified in a range of 0 to 1.0 */
+	/// Adds a color for a vertex. RGB is specified in a range of 0 to 1.0
 	protected abstract void addVertexWithColor( double x, double y, double z, double red, double green, double blue );
 
 	protected abstract void addVertexNormal( double x, double y, double z );
@@ -209,17 +194,13 @@ public abstract class ObjFileReader {
 
 	protected abstract void addLine( DogArray_I32 vertexes );
 
-	/**
-	 * Adds a face. Indexes are interleaved in vertex, normal, and texture order.
-	 *
-	 * @param indexes Indexes of vertex values
-	 * @param vertexCount Number of vertexes in the face
-	 */
+	/// Adds a face. Indexes are interleaved in vertex, normal, and texture order.
+	///
+	/// @param indexes Indexes of vertex values
+	/// @param vertexCount Number of vertexes in the face
 	protected abstract void addFace( DogArray_I32 indexes, int vertexCount );
 
-	/**
-	 * If something goes where it's passed here
-	 */
+	/// If something goes where it's passed here
 	protected void handleError( String message ) {
 		System.err.println(message);
 	}

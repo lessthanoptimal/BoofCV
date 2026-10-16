@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,9 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestObjFileWriter extends BoofStandardJUnit {
-	/**
-	 * Create a OBJ file then see if it can be read
-	 */
+	/// Create a OBJ file then see if it can be read
 	@Test void encodeThenDecode() throws IOException {
 		var output = new StringWriter();
 		var alg = new ObjFileWriter(output);
@@ -109,7 +107,7 @@ public class TestObjFileWriter extends BoofStandardJUnit {
 		assertEquals(2, reader.countFaces);
 	}
 
-	/** Writes faces with separate vertex, texture, and normal indexes */
+	/// Writes faces with separate vertex, texture, and normal indexes
 	@Test void addFace_separateIndexes() throws IOException {
 		var output = new StringWriter();
 		var alg = new ObjFileWriter(output);

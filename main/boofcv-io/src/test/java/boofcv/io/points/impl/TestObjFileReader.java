@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,9 +33,7 @@ import java.io.StringReader;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestObjFileReader extends BoofStandardJUnit {
-	/**
-	 * Simple file with a comment and on face
-	 */
+	/// Simple file with a comment and on face
 	@Test void case0() throws IOException {
 		String text = """
 				# Simple Wavefront file
@@ -70,9 +68,7 @@ public class TestObjFileReader extends BoofStandardJUnit {
 		assertEquals(0.0, vertexes.get(2).distance(1, 0, 0), UtilEjml.TEST_F64);
 	}
 
-	/**
-	 * Simple file with vertex, texture, and normals
-	 */
+	/// Simple file with vertex, texture, and normals
 	@Test void case1() throws IOException {
 		String text = """
 				v 0.0 0.0 0.0
@@ -127,9 +123,7 @@ public class TestObjFileReader extends BoofStandardJUnit {
 		assertEquals(0.0, textures.get(2).distance(1.1, 0.1), UtilEjml.TEST_F64);
 	}
 
-	/**
-	 * Simple file with vertex, and normals
-	 */
+	/// Simple file with vertex, and normals
 	@Test void case2() throws IOException {
 		String text = """
 				v 0.0 0.0 0.0
@@ -178,7 +172,7 @@ public class TestObjFileReader extends BoofStandardJUnit {
 		assertEquals(0.0, normals.get(2).distance(-1, 0, 0), UtilEjml.TEST_F64);
 	}
 
-	/** test case where vectors also have colors */
+	/// test case where vectors also have colors
 	@Test void vectorColor() throws IOException {
 		String text = """
 				# Simple Wavefront file
@@ -215,10 +209,8 @@ public class TestObjFileReader extends BoofStandardJUnit {
 		assertEquals(0.0, colors.get(2).distance(0.4, 0.3, 0.2), UtilEjml.TEST_F64);
 	}
 
-	/**
-	 * See if negative indexes are handled correct. Add two faces. Negative to be relative to current number
-	 * of read in vertexes
-	 */
+	/// See if negative indexes are handled correct. Add two faces. Negative to be relative to current number
+	/// of read in vertexes
 	@Test void faceWithNegativeVertexes() throws IOException {
 		String text = """
 				# Simple Wavefront file
@@ -250,7 +242,7 @@ public class TestObjFileReader extends BoofStandardJUnit {
 		assertEquals(2, reader.count);
 	}
 
-	/** Does it handle the multi-line character correctly */
+	/// Does it handle the multi-line character correctly
 	@Test void multiLine() throws IOException {
 		String text = """
 				v 0.0 0.0 0.0
@@ -292,7 +284,7 @@ public class TestObjFileReader extends BoofStandardJUnit {
 		assertEquals(7, ObjFileReader.ensureIndex(-5, 12));
 	}
 
-	/** Relative texture and normal indexes are relative to their own arrays, not the vertexes */
+	/// Relative texture and normal indexes are relative to their own arrays, not the vertexes
 	@Test void relativeFaceIndexes() throws IOException {
 		String text = """
 				v 0.0 0.0 0.0

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,10 +24,8 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.io.Writer;
 
-/**
- * Interface for creating an OBJ file. As components are added they are written to. It's possible to
- * add a face that automatically uses recent vertexes. Only vertexes and faces are currently supported.
- */
+/// Interface for creating an OBJ file. As components are added they are written to. It's possible to
+/// add a face that automatically uses recent vertexes. Only vertexes and faces are currently supported.
 public class ObjFileWriter {
 	public String formatFloat = "%.8f";
 
@@ -92,39 +90,32 @@ public class ObjFileWriter {
 		writer.write("p " + vertex + "\n");
 	}
 
-	/**
-	 * Adds a line with the specified vertexes.
-	 *
-	 * <p>NOTE: Vertexes indexes are 0-indexed. Not 1-indexed like they are in OBJ files.</p>
-	 *
-	 * @param vertexes Index of vertexes in this face. If null then automatic.
-	 */
+	/// Adds a line with the specified vertexes.
+	///
+	/// NOTE: Vertexes indexes are 0-indexed. Not 1-indexed like they are in OBJ files.
+	///
+	/// @param vertexes Index of vertexes in this face. If null then automatic.
 	public void addLine( @Nullable DogArray_I32 vertexes ) throws IOException {
 		writeObject('l', vertexes, 1);
 	}
 
-	/**
-	 * Adds a face with the specified vertexes. If there are no vertex indexes it will
-	 * reference all the vertexes added since the last object was written.
-	 *
-	 * <p>NOTE: Vertexes indexes are 0-indexed. Not 1-indexed like they are in OBJ files.</p>
-	 *
-	 *
-	 * @param count Number of different vertex types, i.e. 3D, texture, normal. All are assumed to
-	 * reference a point with the same index.
-	 * @param vertexes Index of vertexes in this face. If null then automatic.
-	 */
+	/// Adds a face with the specified vertexes. If there are no vertex indexes it will
+	/// reference all the vertexes added since the last object was written.
+	///
+	/// NOTE: Vertexes indexes are 0-indexed. Not 1-indexed like they are in OBJ files.
+	///
+	/// @param count Number of different vertex types, i.e. 3D, texture, normal. All are assumed to
+	/// reference a point with the same index.
+	/// @param vertexes Index of vertexes in this face. If null then automatic.
 	public void addFace( @Nullable DogArray_I32 vertexes, int count ) throws IOException {
 		writeObject('f', vertexes, count);
 	}
 
-	/**
-	 * Adds a face where vertex, texture, and normal indexes are specified separately. All indexes are 0-indexed.
-	 *
-	 * @param vertexes Index of each vertex in the face
-	 * @param textures Index of each texture coordinate. Empty if there are none.
-	 * @param normals Index of each normal. Empty if there are none.
-	 */
+	/// Adds a face where vertex, texture, and normal indexes are specified separately. All indexes are 0-indexed.
+	///
+	/// @param vertexes Index of each vertex in the face
+	/// @param textures Index of each texture coordinate. Empty if there are none.
+	/// @param normals Index of each normal. Empty if there are none.
 	public void addFace( DogArray_I32 vertexes, DogArray_I32 textures, DogArray_I32 normals ) throws IOException {
 		writer.write('f');
 		for (int i = 0; i < vertexes.size; i++) {
@@ -143,11 +134,8 @@ public class ObjFileWriter {
 		lastObjectVertexCount = vertexCount;
 	}
 
-	/**
-	 *
-	 * @param count How many times it should duplicate the index. It's assumed all vertexes reference
-	 * objects with the same index values.
-	 */
+	/// @param count How many times it should duplicate the index. It's assumed all vertexes reference
+	/// objects with the same index values.
 	private void writeObject( char name, @Nullable DogArray_I32 vertexes, int count ) throws IOException {
 		writer.write(name);
 		if (vertexes == null || vertexes.size == 0) {
