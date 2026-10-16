@@ -33,6 +33,8 @@ import boofcv.struct.image.InterleavedU8;
 import boofcv.struct.mesh.VertexMesh;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.metric.Intersection2D_F64;
+import georegression.struct.packed.PackedArrayPoint2D_F64;
+import georegression.struct.packed.PackedArrayPoint3D_F64;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F32;
@@ -76,8 +78,8 @@ public class MeshRasterizer extends MeshRender {
 	protected ImageDimension resolution = new ImageDimension();
 
 	//---------- Workspace variables
-	private final Point3D_F64 camera = new Point3D_F64();
-	private final Point2D_F64 point = new Point2D_F64();
+	private final Point3D_F64 tmp3D = new Point3D_F64();
+	private final Point2D_F64 tmp2D = new Point2D_F64();
 
 	// mesh in camera reference frame
 	private final DogArray<Point3D_F64> meshCam = new DogArray<>(Point3D_F64::new);
@@ -89,6 +91,10 @@ public class MeshRasterizer extends MeshRender {
 	final Rectangle2D_I32 aabb = new Rectangle2D_I32();
 	// Workspace for a sub-triangle in the polygon
 	private final Polygon2D_F64 workTri = new Polygon2D_F64(3);
+
+	// Precompute 3D location and 2D projection of points
+	private final PackedArrayPoint3D_F64 camVert3D = new PackedArrayPoint3D_F64();
+	private final PackedArrayPoint2D_F64 camPixel = new PackedArrayPoint2D_F64();
 
 	@Nullable PrintStream verbose = null;
 
@@ -122,7 +128,7 @@ public class MeshRasterizer extends MeshRender {
 	}
 
 	@Override public void setCamera( Point2Transform3_F64 pixelToPointing,
-	                                 Point3Transform2_F64 pointingToPixel, int width, int height ) {
+									 Point3Transform2_F64 pointingToPixel, int width, int height ) {
 		this.pixelToNorm = new PixelToNormUsingSphere_F64(pixelToPointing);
 		this.normToPixel = new NormToPixelUsingSphere_F64(pointingToPixel);
 		this.resolution.setTo(width, height);
@@ -133,6 +139,10 @@ public class MeshRasterizer extends MeshRender {
 		if (cullBackFaces && mesh.faceNormals.size() == 0)
 			mesh.computeFaceNormals();
 		this.mesh = mesh;
+
+		// declare workspace storage
+		camVert3D.resize(mesh.vertexes.size());
+		camPixel.resize(mesh.vertexes.size());
 	}
 
 	@Override public void render() {
@@ -148,6 +158,22 @@ public class MeshRasterizer extends MeshRender {
 		var worldCamera = new Point3D_F64();
 		worldToView.transformReverse(worldCamera, worldCamera);
 
+		// Precompute points in the view so that vertexes which are shared are computed only once
+		for (int i = 0; i < mesh.vertexes.size(); i++) {
+			worldToView.transform(mesh.vertexes.getTemp(i), tmp3D);
+			camVert3D.set(i, tmp3D);
+			if (tmp3D.z <= 0) {
+				continue;
+			}
+			// normalized image coordinates
+			double normX = tmp3D.x/tmp3D.z;
+			double normY = tmp3D.y/tmp3D.z;
+
+			// Compute pixel coordinates of this observation
+			normToPixel.compute(normX, normY, tmp2D);
+			camPixel.set(i, tmp2D);
+		}
+
 		// Decide if it should texture map or user a per shape color
 		final boolean useColorizer = forceColorizer || mesh.texture.size() == 0 || textureImages.isEmpty();
 
@@ -160,24 +186,20 @@ public class MeshRasterizer extends MeshRender {
 			if (idx0 >= idx1)
 				continue;
 
-			// Project points on the shape onto the image and store in polygon
-			polygonProj.vertexes.reset().reserve(idx1 - idx0);
-			meshCam.reset().reserve(idx1 - idx0);
-
-			if (!useColorizer) {
-				mesh.getTexture(shapeIdx - 1, polygonTex.vertexes);
-				selectTexture(mesh.getFaceTexture(shapeIdx - 1));
-			}
-
 			// Prune using normal vector
 			if (cullBackFaces) {
 				if (!isFrontVisible(mesh, shapeIdx - 1, idx0, worldCamera)) continue;
 			}
 
+			// Project points on the shape onto the image and store in polygon
+			polygonProj.vertexes.reset().reserve(idx1 - idx0);
+			meshCam.reset().reserve(idx1 - idx0);
+
 			boolean behindCamera = false;
 			for (int i = idx0; i < idx1; i++) {
-				Point3D_F64 world = mesh.vertexes.getTemp(mesh.faceVertexes.get(i));
-				worldToView.transform(world, camera);
+				// Look up precomputed camera location of vertex
+				Point3D_F64 camera = meshCam.grow();
+				camVert3D.getCopy(mesh.faceVertexes.get(i), camera);
 
 				// If any part is behind the camera skip it. While not ideal this keeps the code simple,
 				// speeds it up a lot, and removes weird rendering artifacts
@@ -186,13 +208,8 @@ public class MeshRasterizer extends MeshRender {
 					break;
 				}
 
-				// normalized image coordinates
-				double normX = camera.x/camera.z;
-				double normY = camera.y/camera.z;
-
-				// Compute pixel coordinates of this observation
-				normToPixel.compute(normX, normY, polygonProj.vertexes.grow());
-				meshCam.grow().setTo(camera);
+				// Save polygon in camera frame
+				camPixel.getCopy(mesh.faceVertexes.get(i), polygonProj.vertexes.grow());
 			}
 
 			// Skip if not visible
@@ -202,6 +219,8 @@ public class MeshRasterizer extends MeshRender {
 			if (useColorizer) {
 				projectSurfaceColor(meshCam, polygonProj, shapeIdx - 1);
 			} else {
+				mesh.getTexture(shapeIdx - 1, polygonTex.vertexes);
+				selectTexture(mesh.getFaceTexture(shapeIdx - 1));
 				projectSurfaceTexture(meshCam, polygonProj, polygonTex);
 			}
 
@@ -279,8 +298,8 @@ public class MeshRasterizer extends MeshRender {
 					continue;
 				}
 
-				point.setTo(pixelX, pixelY);
-				if (!Intersection2D_F64.containsConvex(polyProj, point))
+				tmp2D.setTo(pixelX, pixelY);
+				if (!Intersection2D_F64.containsConvex(polyProj, tmp2D))
 					continue;
 
 				// Update depth and image
@@ -345,8 +364,8 @@ public class MeshRasterizer extends MeshRender {
 				for (int pixelX = aabb.x0; pixelX < aabb.x1; pixelX++) {
 					float px = pixelX/scale;
 
-					point.setTo(pixelX, pixelY);
-					if (!Intersection2D_F64.containsConvex(workTri, point))
+					tmp2D.setTo(pixelX, pixelY);
+					if (!Intersection2D_F64.containsConvex(workTri, tmp2D))
 						continue;
 
 					// See if this is the closest point appearing at this pixel
