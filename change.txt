@@ -7,6 +7,15 @@ Version Meaning: <compatible>.<feature>.<bug fix>
 - Last digit always indicates a bug fix and other minor changes
 
 ---------------------
+Date    : 2026/Oct/16
+Version : 1.5.1
+
+- Build - Modernized with Gradle Conventions
+- CreateECoCheckDocumentPDF - Better text alignment and size
+- MeshRender supports multiple texture images. PLY and OBJ
+- MeshRasterizer is about 2x faster
+
+---------------------
 Date    : 2026/Aug/23
 Version : 1.5.0
 
