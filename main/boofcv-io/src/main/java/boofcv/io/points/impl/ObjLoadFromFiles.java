@@ -26,20 +26,16 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Loads a OBJ file and associated MTL file. This makes assumptions that it's reading from a file system and doesn't.
- * This allows it to search for files referenced in the OBJ.
- */
+/// Loads a OBJ file and associated MTL file. This makes assumptions that it's reading from a file system and doesn't.
+/// This allows it to search for files referenced in the OBJ.
 public class ObjLoadFromFiles {
 	private final Map<String, String> materialToTextureFile = new HashMap<>();
 
-	/**
-	 * Loads the OBJ file from disk. Opens up and reads in any related MTL files as needed. Each material's texture
-	 * file is added to {@link VertexMesh#textureNames} and {@link VertexMesh#faceTextures} specifies which one a
-	 * face uses.
-	 *
-	 * @param outputMesh (Output) storage for the mesh
-	 */
+	/// Loads the OBJ file from disk. Opens up and reads in any related MTL files as needed. Each material's texture
+	/// file is added to [VertexMesh#textureNames] and [VertexMesh#faceTextures] specifies which one a
+	/// face uses.
+	///
+	/// @param outputMesh (Output) storage for the mesh
 	public void load( File file, VertexMesh outputMesh ) {
 		materialToTextureFile.clear();
 		outputMesh.reset();
@@ -107,9 +103,7 @@ public class ObjLoadFromFiles {
 			outputMesh.faceTextures.reset();
 	}
 
-	/**
-	 * Just read in the texture file names from the MTL file
-	 */
+	/// Just read in the texture file names from the MTL file
 	void readTextureFilesFromMTL( File file ) {
 		String materialName = "";
 		try (var input = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {

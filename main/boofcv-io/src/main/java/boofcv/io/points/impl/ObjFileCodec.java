@@ -31,17 +31,13 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-/**
- * High level interface for reading and writing OBJ files. Takes in BoofCV specific data structures
- * for input and output. This format was created by Wavefront and a link to format is found below.
- *
- * @see <a href="https://people.computing.clemson.edu/~dhouse/courses/405/docs/brief-obj-file-format.html">OBJ Format</a>
- */
+/// High level interface for reading and writing OBJ files. Takes in BoofCV specific data structures
+/// for input and output. This format was created by Wavefront and a link to format is found below.
+///
+/// @see <a href="https://people.computing.clemson.edu/~dhouse/courses/405/docs/brief-obj-file-format.html">OBJ Format</a>
 public class ObjFileCodec {
-	/**
-	 * Writes a point cloud with no color information since the format doesn't support
-	 * colored points.
-	 */
+	/// Writes a point cloud with no color information since the format doesn't support
+	/// colored points.
 	public static void save( PointCloudReader cloud, Writer writer ) throws IOException {
 		var obj = new ObjFileWriter(writer);
 		obj.addComment("Created by BoofCV");
@@ -61,13 +57,11 @@ public class ObjFileCodec {
 		}
 	}
 
-	/**
-	 * Creates a MTL file with one material for each texture file. This is required if the mesh is textured mapped.
-	 * Each material is named after its texture file, see {@link #materialName}.
-	 *
-	 * @param textureFiles Path to each texture mapped file
-	 * @param writer Where the MTL will be written to
-	 */
+	/// Creates a MTL file with one material for each texture file. This is required if the mesh is textured mapped.
+	/// Each material is named after its texture file, see [#materialName].
+	///
+	/// @param textureFiles Path to each texture mapped file
+	/// @param writer Where the MTL will be written to
 	public static void saveMtl( List<String> textureFiles, Writer writer ) throws IOException {
 		// Use hard coded values
 		String text = """
@@ -86,15 +80,13 @@ public class ObjFileCodec {
 		}
 	}
 
-	/** Name of the material that uses a texture file */
+	/// Name of the material that uses a texture file
 	static String materialName( String textureFile ) {
 		return FilenameUtils.getBaseName(textureFile);
 	}
 
-	/**
-	 * Saves the mesh. If there are texture files then the MTL file is assumed to have the same base name as
-	 * the first texture file. Use {@link #saveMtl} to create it.
-	 */
+	/// Saves the mesh. If there are texture files then the MTL file is assumed to have the same base name as
+	/// the first texture file. Use [#saveMtl] to create it.
 	public static void save( VertexMesh mesh, Writer writer ) throws IOException {
 		var obj = new ObjFileWriter(writer);
 		obj.addComment("Created by BoofCV");
