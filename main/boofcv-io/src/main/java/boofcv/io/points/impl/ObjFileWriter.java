@@ -74,7 +74,6 @@ public class ObjFileWriter {
 		writer.write(String.format(" " + formatFloat, dx));
 		writer.write(String.format(" " + formatFloat, dy));
 		writer.write(String.format(" " + formatFloat + "\n", dz));
-		vertexCount++;
 	}
 
 	public void addMaterial( String name ) throws IOException {
@@ -117,6 +116,31 @@ public class ObjFileWriter {
 	 */
 	public void addFace( @Nullable DogArray_I32 vertexes, int count ) throws IOException {
 		writeObject('f', vertexes, count);
+	}
+
+	/**
+	 * Adds a face where vertex, texture, and normal indexes are specified separately. All indexes are 0-indexed.
+	 *
+	 * @param vertexes Index of each vertex in the face
+	 * @param textures Index of each texture coordinate. Empty if there are none.
+	 * @param normals Index of each normal. Empty if there are none.
+	 */
+	public void addFace( DogArray_I32 vertexes, DogArray_I32 textures, DogArray_I32 normals ) throws IOException {
+		writer.write('f');
+		for (int i = 0; i < vertexes.size; i++) {
+			int vertIndex = vertexes.get(i);
+			if (vertIndex < 0 || vertIndex >= vertexCount)
+				throw new IllegalArgumentException("Vertex index out of range. index=" + vertIndex);
+
+			// The file format is 1-indexed
+			writer.write(" " + (vertIndex + 1));
+			if (!textures.isEmpty())
+				writer.write("/" + (textures.get(i) + 1));
+			if (!normals.isEmpty())
+				writer.write((textures.isEmpty() ? "//" : "/") + (normals.get(i) + 1));
+		}
+		writer.write('\n');
+		lastObjectVertexCount = vertexCount;
 	}
 
 	/**

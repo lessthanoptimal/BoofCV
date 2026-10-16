@@ -282,17 +282,39 @@ public class TestObjFileReader extends BoofStandardJUnit {
 	}
 
 	@Test void ensureIndex() {
-		var reader = new DummyReader(){};
-
 		// Vertexes are stored in 1-index but need to make sure it's converted to 0-index
-		assertEquals(0, reader.ensureIndex(1));
-		assertEquals(4, reader.ensureIndex(5));
-		assertEquals(8, reader.ensureIndex(9));
+		assertEquals(0, ObjFileReader.ensureIndex(1, 12));
+		assertEquals(4, ObjFileReader.ensureIndex(5, 12));
+		assertEquals(8, ObjFileReader.ensureIndex(9, 12));
 
 		// Negative numbers count from end of array
-		reader.vertexCount = 12;
-		assertEquals(11, reader.ensureIndex(-1));
-		assertEquals(7, reader.ensureIndex(-5));
+		assertEquals(11, ObjFileReader.ensureIndex(-1, 12));
+		assertEquals(7, ObjFileReader.ensureIndex(-5, 12));
+	}
+
+	/** Relative texture and normal indexes are relative to their own arrays, not the vertexes */
+	@Test void relativeFaceIndexes() throws IOException {
+		String text = """
+				v 0.0 0.0 0.0
+				v 0.0 1.0 0.0
+				v 1.0 0.0 0.0
+				v 1.0 1.0 0.0
+				vt 0.0 0.0
+				vt 1.0 0.0
+				vn 0.0 0.0 1.0
+				f -1/-1/-1 -2/-2/-1 -3/-1/-1
+				""";
+
+		var found = new DogArray_I32();
+		var reader = new DummyReader() {
+			@Override protected void addFace( DogArray_I32 vertexes, int vertexCount ) {
+				found.setTo(vertexes);
+			}
+		};
+		reader.parse(new BufferedReader(new StringReader(text)));
+
+		// Interleaved vertex, texture, normal for each corner
+		assertTrue(found.isEquals(3, 1, 0, 2, 0, 0, 1, 1, 0));
 	}
 
 	static abstract class DummyReader extends ObjFileReader {

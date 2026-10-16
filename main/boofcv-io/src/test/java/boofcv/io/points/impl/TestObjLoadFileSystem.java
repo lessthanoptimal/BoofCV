@@ -21,17 +21,21 @@ package boofcv.io.points.impl;
 import boofcv.io.UtilIO;
 import boofcv.struct.mesh.VertexMesh;
 import boofcv.testing.BoofStandardJUnit;
+import georegression.struct.point.Point2D_F32;
 import org.apache.commons.io.FileUtils;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.Map;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -59,106 +63,37 @@ public class TestObjLoadFileSystem extends BoofStandardJUnit {
 		String text = """
 				v 0.0 0.0 0.0
 				v 0.0 1.0 0.0
+				v 1.0 0.0 0.0
 				f 1 2 3
 				""";
 		save(fileObj, text);
 
-		var alg = new ObjLoadFromFiles();
-		alg.load(new File(workDir, fileObj), null);
-		Map<String, VertexMesh> found = alg.getShapeToMesh();
-		assertEquals(1, found.size());
+		var mesh = new VertexMesh();
+		mesh.rgb.add(1); // test to see if it calls reset
 
-		VertexMesh mesh = found.get("");
+		new ObjLoadFromFiles().load(new File(workDir, fileObj), mesh);
 
-		assertEquals(2, mesh.vertexes.size());
+		assertEquals(3, mesh.vertexes.size());
 		assertEquals(1, mesh.size());
+		assertEquals(0, mesh.rgb.size());
+		assertTrue(mesh.textureNames.isEmpty());
+		assertTrue(mesh.faceTextures.isEmpty());
 	}
 
+	/** Each material has its own texture and all faces are in one mesh */
 	@Test void multipleMaterials() {
-		createMultipleMaterialFiles();
-
-		var alg = new ObjLoadFromFiles();
-		alg.load(new File(workDir, fileObj), null);
-		Map<String, VertexMesh> found = alg.getShapeToMesh();
-		assertEquals(2, found.size());
-
-		VertexMesh mesh1 = found.get("a");
-		assertEquals("a.jpg", mesh1.textureNames.get(0));
-		assertEquals(2, mesh1.vertexes.size());
-		assertEquals(0, mesh1.faceNormals.size());
-
-
-		VertexMesh mesh2 = found.get("b");
-		assertEquals("b.jpg", mesh2.textureNames.get(0));
-		assertEquals(2, mesh2.vertexes.size());
-		assertEquals(1, mesh2.size());
-		assertEquals(0, mesh2.vertexes.getTemp(0).distance(1.0, 0, 0));
-		assertEquals(0, mesh2.vertexes.getTemp(1).distance(0.0, 2, 0));
-	}
-
-	@Test void singleMesh_noMaterial() {
-		String text = """
-				v 0.0 0.0 0.0
-				v 0.0 1.0 0.0
-				f 1 2 3
-				""";
-		save(fileObj, text);
-
-		var mesh = new VertexMesh();
-		mesh.rgb.add(1); // test to see if it calls reset
-
-		var alg = new ObjLoadFromFiles();
-		alg.load(new File(workDir, fileObj), mesh);
-		Map<String, VertexMesh> found = alg.getShapeToMesh();
-
-		assertFalse(alg.isIgnoredMaterial());
-		assertEquals(1, found.size());
-		assertSame(mesh, found.get(""));
-
-		assertEquals(2, mesh.vertexes.size());
-		assertEquals(1, mesh.size());
-		assertEquals(0, mesh.rgb.size());
-	}
-
-	@Test void singleMesh_multipleMaterial() {
-		createMultipleMaterialFiles();
-
-		var mesh = new VertexMesh();
-		mesh.rgb.add(1); // test to see if it calls reset
-
-		var alg = new ObjLoadFromFiles();
-		alg.load(new File(workDir, fileObj), mesh);
-		Map<String, VertexMesh> found = alg.getShapeToMesh();
-		assertTrue(alg.isIgnoredMaterial());
-
-		assertEquals(1, found.size());
-		assertSame(mesh, found.get("a"));
-
-		assertEquals(2, mesh.vertexes.size());
-		assertEquals(0, mesh.vertexes.getTemp(0).distance(0.0, 0, 0));
-		assertEquals(0, mesh.vertexes.getTemp(1).distance(0.0, 1, 0));
-		assertEquals(0, mesh.size());
-		assertEquals(0, mesh.rgb.size());
-	}
-
-	private void save( String fileName, String text ) {
-		try {
-			FileUtils.writeStringToFile(new File(workDir, fileName), text, StandardCharsets.UTF_8);
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
-	}
-
-	private void createMultipleMaterialFiles() {
 		String textObj = """
 				mtllib file.mtl
-				usemtl a
 				v 0.0 0.0 0.0
 				v 0.0 1.0 0.0
-				usemtl b
 				v 1.0 0.0 0.0
-				v 0.0 2.0 0.0
+				v 1.0 1.0 0.0
+				usemtl a
 				f 1 2 3
+				usemtl b
+				f 1 3 4
+				usemtl a
+				f 2 3 4
 				""";
 		save(fileObj, textObj);
 
@@ -169,5 +104,131 @@ public class TestObjLoadFileSystem extends BoofStandardJUnit {
 				map_Kd b.jpg
 				""";
 		save(fileMtl, textMtl);
+
+		var mesh = new VertexMesh();
+		new ObjLoadFromFiles().load(new File(workDir, fileObj), mesh);
+
+		assertEquals(4, mesh.vertexes.size());
+		assertEquals(3, mesh.size());
+		assertEquals(List.of("a.jpg", "b.jpg"), mesh.textureNames);
+		assertTrue(mesh.faceTextures.isEquals(0, 1, 0));
+	}
+
+	/** Materials which share a texture or have no texture */
+	@Test void sharedAndMissingTextures() {
+		String textObj = """
+				mtllib file.mtl
+				v 0.0 0.0 0.0
+				v 0.0 1.0 0.0
+				v 1.0 0.0 0.0
+				usemtl b
+				f 1 2 3
+				usemtl a
+				f 1 2 3
+				usemtl c
+				f 1 2 3
+				usemtl d
+				f 1 2 3
+				""";
+		save(fileObj, textObj);
+
+		// 'c' has the same texture as 'a' and 'd' has no texture
+		String textMtl = """
+				newmtl a
+				map_Kd a.jpg
+				newmtl b
+				map_Kd b.jpg
+				newmtl c
+				map_Kd a.jpg
+				newmtl d
+				""";
+		save(fileMtl, textMtl);
+
+		var mesh = new VertexMesh();
+		new ObjLoadFromFiles().load(new File(workDir, fileObj), mesh);
+
+		assertEquals(List.of("b.jpg", "a.jpg"), mesh.textureNames);
+		assertTrue(mesh.faceTextures.isEquals(0, 1, 1, 0));
+
+		// A warning is printed for the material without a texture
+		assertTrue(err.used);
+		err.used = false;
+	}
+
+	/** Saves a mesh with multiple textures using ObjFileCodec then reads it back in */
+	@Test void saveThenLoad_multipleTextures() throws IOException {
+		// Texture coordinates for each vertex in a face, the same as a PLY file
+		saveThenLoad(createTexturedMesh());
+
+		// Texture coordinate and normal indexes are specified
+		VertexMesh mesh = createTexturedMesh();
+		mesh.faceVertexTextures.addAll(DogArray_I32.array(2, 1, 0, 0, 1, 2));
+		mesh.normals.append(0, 0, 1);
+		mesh.normals.append(0, 0, -1);
+		mesh.faceVertexNormals.addAll(DogArray_I32.array(1, 0, 1, 0, 1, 0));
+		saveThenLoad(mesh);
+	}
+
+	private void saveThenLoad( VertexMesh expected ) throws IOException {
+		try (var writer = new FileWriter(new File(workDir, fileObj), StandardCharsets.UTF_8)) {
+			ObjFileCodec.save(expected, writer);
+		}
+		try (var writer = new FileWriter(new File(workDir, "red.mtl"), StandardCharsets.UTF_8)) {
+			ObjFileCodec.saveMtl(expected.textureNames, writer);
+		}
+
+		var found = new VertexMesh();
+		new ObjLoadFromFiles().load(new File(workDir, fileObj), found);
+
+		assertEquals(expected.vertexes.size(), found.vertexes.size());
+		assertTrue(expected.faceVertexes.isEquals(found.faceVertexes));
+		assertTrue(expected.faceOffsets.isEquals(found.faceOffsets));
+		assertTrue(expected.faceVertexNormals.isEquals(found.faceVertexNormals));
+
+		// Textures are indexed in the order they are first used, so compare the texture name of each face
+		assertEquals(expected.textureNames.size(), found.textureNames.size());
+		for (int face = 0; face < expected.size(); face++) {
+			assertEquals(expected.textureNames.get(expected.getFaceTexture(face)),
+					found.textureNames.get(found.getFaceTexture(face)));
+		}
+
+		// Compare the texture coordinates of each face, since indexes are not saved the same way
+		var expectedCoors = new DogArray<>(Point2D_F32::new);
+		var foundCoors = new DogArray<>(Point2D_F32::new);
+		for (int face = 0; face < expected.size(); face++) {
+			expected.getTexture(face, expectedCoors);
+			found.getTexture(face, foundCoors);
+			assertEquals(expectedCoors.size, foundCoors.size);
+			for (int i = 0; i < expectedCoors.size; i++) {
+				assertEquals(0.0, expectedCoors.get(i).distance(foundCoors.get(i)), 1e-5);
+			}
+		}
+	}
+
+	/** Two triangles which use different textures and have a texture coordinate for each vertex in a face */
+	private static VertexMesh createTexturedMesh() {
+		var mesh = new VertexMesh();
+		mesh.vertexes.append(0, 0, 0);
+		mesh.vertexes.append(0, 1, 0);
+		mesh.vertexes.append(1, 0, 0);
+		mesh.vertexes.append(1, 1, 0);
+		mesh.faceVertexes.addAll(DogArray_I32.array(0, 1, 2, 1, 2, 3));
+		mesh.faceOffsets.add(3);
+		mesh.faceOffsets.add(6);
+		for (int i = 0; i < 6; i++) {
+			mesh.texture.append(i*0.1f, 1.0f - i*0.1f);
+		}
+		mesh.textureNames.add("red.jpg");
+		mesh.textureNames.add("blue.jpg");
+		mesh.faceTextures.addAll(DogArray_I32.array(1, 0));
+		return mesh;
+	}
+
+	private void save( String fileName, String text ) {
+		try {
+			FileUtils.writeStringToFile(new File(workDir, fileName), text, StandardCharsets.UTF_8);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
 	}
 }

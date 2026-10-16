@@ -29,6 +29,7 @@ import org.ddogleg.struct.DogArray_I32;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 /**
  * High level interface for reading and writing OBJ files. Takes in BoofCV specific data structures
@@ -61,12 +62,13 @@ public class ObjFileCodec {
 	}
 
 	/**
-	 * Creates a MTL file. This is required if the mesh is textured mapped
+	 * Creates a MTL file with one material for each texture file. This is required if the mesh is textured mapped.
+	 * Each material is named after its texture file, see {@link #materialName}.
 	 *
-	 * @param textureFile Path to texture mapped file
+	 * @param textureFiles Path to each texture mapped file
 	 * @param writer Where the MTL will be written to
 	 */
-	public static void saveMtl( String textureFile, Writer writer ) throws IOException {
+	public static void saveMtl( List<String> textureFiles, Writer writer ) throws IOException {
 		// Use hard coded values
 		String text = """
 				newmtl %s
@@ -76,21 +78,30 @@ public class ObjFileCodec {
 				d 1.0
 				Ns 0.0
 				illum 0
-				map_Kd %s""";
+				map_Kd %s
+				""";
 
-		String baseName = FilenameUtils.getBaseName(textureFile);
-		writer.write(String.format(text, baseName, textureFile));
+		for (String textureFile : textureFiles) {
+			writer.write(String.format(text, materialName(textureFile), textureFile));
+		}
 	}
 
+	/** Name of the material that uses a texture file */
+	static String materialName( String textureFile ) {
+		return FilenameUtils.getBaseName(textureFile);
+	}
+
+	/**
+	 * Saves the mesh. If there are texture files then the MTL file is assumed to have the same base name as
+	 * the first texture file. Use {@link #saveMtl} to create it.
+	 */
 	public static void save( VertexMesh mesh, Writer writer ) throws IOException {
 		var obj = new ObjFileWriter(writer);
 		obj.addComment("Created by BoofCV");
 
-		// If there's a texture file, add a material. Only one texture file is currently supported
-		if (!mesh.textureNames.isEmpty()) {
-			String baseName = FilenameUtils.getBaseName(mesh.textureNames.get(0));
-			obj.addLibrary(baseName + ".mtl");
-			obj.addMaterial(baseName);
+		boolean hasMaterials = !mesh.textureNames.isEmpty();
+		if (hasMaterials) {
+			obj.addLibrary(materialName(mesh.textureNames.get(0)) + ".mtl");
 		}
 
 		boolean hasVertexColors = mesh.rgb.size > 0;
@@ -118,24 +129,36 @@ public class ObjFileCodec {
 			obj.addTextureVertex(p.x, p.y);
 		}
 
-		// See how many different types of vertexes need to be saved
-		int count = 0;
-		if (mesh.vertexes.size() > 0)
-			count++;
-		if (mesh.normals.size() > 0)
-			count++;
-		if (mesh.texture.size() > 0)
-			count++;
-
 		// Create the faces
-		var indexes = new DogArray_I32();
-		for (int i = 1; i < mesh.faceOffsets.size; i++) {
-			int idx0 = mesh.faceOffsets.get(i - 1);
-			int idx1 = mesh.faceOffsets.get(i);
+		var vertexes = new DogArray_I32();
+		var textures = new DogArray_I32();
+		var normals = new DogArray_I32();
+		int activeTexture = -1;
+		for (int face = 0; face < mesh.size(); face++) {
+			// Change the material when the texture changes
+			if (hasMaterials && mesh.getFaceTexture(face) != activeTexture) {
+				activeTexture = mesh.getFaceTexture(face);
+				obj.addMaterial(materialName(mesh.textureNames.get(activeTexture)));
+			}
 
-			indexes.reset();
-			indexes.addAll(mesh.faceVertexes.data, idx0, idx1);
-			obj.addFace(indexes, count);
+			int idx0 = mesh.faceOffsets.get(face);
+			int idx1 = mesh.faceOffsets.get(face + 1);
+
+			vertexes.reset();
+			textures.reset();
+			normals.reset();
+			for (int i = idx0; i < idx1; i++) {
+				vertexes.add(mesh.faceVertexes.get(i));
+
+				// If not specified, there is one texture coordinate for each vertex in a face
+				if (mesh.isTextureCoors())
+					textures.add(mesh.faceVertexTextures.isEmpty() ? i : mesh.faceVertexTextures.get(i));
+
+				// If not specified, there is one normal for each vertex
+				if (mesh.isNormals())
+					normals.add(mesh.faceVertexNormals.isEmpty() ? mesh.faceVertexes.get(i) : mesh.faceVertexNormals.get(i));
+			}
+			obj.addFace(vertexes, textures, normals);
 		}
 	}
 

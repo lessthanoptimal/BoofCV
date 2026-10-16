@@ -108,4 +108,31 @@ public class TestObjFileWriter extends BoofStandardJUnit {
 		assertEquals(1, reader.countVertexColor);
 		assertEquals(2, reader.countFaces);
 	}
+
+	/** Writes faces with separate vertex, texture, and normal indexes */
+	@Test void addFace_separateIndexes() throws IOException {
+		var output = new StringWriter();
+		var alg = new ObjFileWriter(output);
+		for (int i = 0; i < 3; i++) {
+			alg.addVertex(i, 0, 0);
+		}
+		var vertexes = DogArray_I32.array(0, 1, 2);
+		var textures = DogArray_I32.array(5, 4, 3);
+		var normals = DogArray_I32.array(7, 8, 9);
+		var empty = new DogArray_I32();
+
+		output.getBuffer().setLength(0);
+		alg.addFace(vertexes, textures, normals);
+		alg.addFace(vertexes, textures, empty);
+		alg.addFace(vertexes, empty, normals);
+		alg.addFace(vertexes, empty, empty);
+
+		String expected = """
+				f 1/6/8 2/5/9 3/4/10
+				f 1/6 2/5 3/4
+				f 1//8 2//9 3//10
+				f 1 2 3
+				""";
+		assertEquals(expected, output.toString());
+	}
 }

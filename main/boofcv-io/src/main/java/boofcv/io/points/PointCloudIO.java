@@ -36,7 +36,6 @@ import java.io.*;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
-import java.util.Map;
 
 /**
  * Code for reading different point cloud formats
@@ -166,8 +165,7 @@ public class PointCloudIO {
 		};
 
 
-		// OBJ files are special. They need to read in multiple files to get the texture map image and
-		// there can be multiple shapes defined. This will handle all those situations
+		// OBJ files are special. They need to read in the MTL file to get the texture image names
 		if (type == PointCloudIO.Format.OBJ) {
 			var reader = new ObjLoadFromFiles();
 			reader.load(file, mesh);
@@ -177,16 +175,6 @@ public class PointCloudIO {
 		try (var input = new BufferedInputStream(new FileInputStream(file), 1024*1024)) {
 			PointCloudIO.load(type, input, mesh);
 		}
-	}
-
-	/**
-	 * Loads a set of {@link VertexMesh} from an OBJ file. This can ready any type of OBJ file as it doesn't make
-	 * assumptions about what is contained inside of it
-	 */
-	public static Map<String, VertexMesh> loadObj( File file ) {
-		var reader = new ObjLoadFromFiles();
-		reader.load(file, null);
-		return reader.getShapeToMesh();
 	}
 
 	/**
