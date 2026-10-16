@@ -19,9 +19,7 @@
 package boofcv.io.points.impl;
 
 import boofcv.struct.mesh.VertexMesh;
-import lombok.Getter;
 import org.ddogleg.struct.DogArray_I32;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -33,87 +31,58 @@ import java.util.Map;
  * This allows it to search for files referenced in the OBJ.
  */
 public class ObjLoadFromFiles {
-	private Map<String, String> materialToTextureFile = new HashMap<>();
-
-	/** Returns a map containing all the shapes that were loaded from the OBJ file */
-	private @Getter Map<String, VertexMesh> shapeToMesh = new HashMap<>();
-
-	/** Indicates that it found multiple materials in the file. */
-	private @Getter boolean ignoredMaterial = false;
-
-	// If true then the material being seen is the first one
-	private boolean first = true;
+	private final Map<String, String> materialToTextureFile = new HashMap<>();
 
 	/**
-	 * Loads the OBJ file from disk. Opens up and reads in any related MTL files as needed. To see if any materials
-	 * were ignored because a mesh was passed in, look at {@link #ignoredMaterial}. If no material is defined then
-	 * the output mesh will be placed in the map with a key of an empty String.
+	 * Loads the OBJ file from disk. Opens up and reads in any related MTL files as needed. Each material's texture
+	 * file is added to {@link VertexMesh#textureNames} and {@link VertexMesh#faceTextures} specifies which one a
+	 * face uses.
 	 *
-	 * @param outputMesh If not null the proved mesh will be used for storage. If more than one mesh is defined in
-	 * the file then only the first one will be read.
+	 * @param outputMesh (Output) storage for the mesh
 	 */
-	public void load( File file, @Nullable VertexMesh outputMesh ) {
-		ignoredMaterial = false;
-		first = true;
+	public void load( File file, VertexMesh outputMesh ) {
+		materialToTextureFile.clear();
+		outputMesh.reset();
 		var reader = new ObjFileReader() {
-			VertexMesh active;
-
-			{
-				// If the output mesh was passed in default to that, otherwise create a new mesh to default to
-				active = outputMesh != null ? outputMesh : new VertexMesh();
-				active.reset();
-				shapeToMesh.put("", active);
-			}
+			// Index of the texture used by faces that are read in
+			int activeTexture = 0;
 
 			@Override protected void addLibrary( String name ) {
 				readTextureFilesFromMTL(new File(file.getParent(), name));
 			}
 
 			@Override protected void addMaterial( String name ) {
-				// If this is the first material to add AND a shape has not been defined already,
-				// remove the default mesh from the map since it isn't being used
-				if (first && active.vertexes.size() == 0) {
-					shapeToMesh.remove("");
+				String textureFile = materialToTextureFile.get(name);
+				if (textureFile == null) {
+					System.err.println("No texture file for material '" + name + "'. Using the first texture");
+					activeTexture = 0;
+					return;
 				}
 
-				if (outputMesh != null) {
-					// If first isn't true that means another material was encountered. If vertexes are not zero that
-					// means it was reading in a default object already
-					if (!first || active.vertexes.size() != 0) {
-						ignoredMaterial = true;
-						throw new MultipleMaterials();
-					}
-				} else {
-					active = new VertexMesh();
+				// Materials can share a texture file
+				activeTexture = outputMesh.textureNames.indexOf(textureFile);
+				if (activeTexture < 0) {
+					activeTexture = outputMesh.textureNames.size();
+					outputMesh.textureNames.add(textureFile);
 				}
-
-				first = false;
-
-				// Set the texture file name if it's specified for this material
-				if (materialToTextureFile.containsKey(name)) {
-					active.textureNames.add(materialToTextureFile.get(name));
-				} else {
-					System.err.println("Unknown material '" + name + "'");
-				}
-				shapeToMesh.put(name, active);
 			}
 
 			@Override protected void addVertex( double x, double y, double z ) {
-				active.vertexes.append(x, y, z);
+				outputMesh.vertexes.append(x, y, z);
 			}
 
 			@Override
 			protected void addVertexWithColor( double x, double y, double z, double red, double green, double blue ) {
-				active.vertexes.append(x, y, z);
-				active.rgb.add(ObjFileCodec.convertToInt(red, green, blue));
+				outputMesh.vertexes.append(x, y, z);
+				outputMesh.rgb.add(ObjFileCodec.convertToInt(red, green, blue));
 			}
 
 			@Override protected void addVertexNormal( double x, double y, double z ) {
-				active.normals.append((float)x, (float)y, (float)z);
+				outputMesh.normals.append((float)x, (float)y, (float)z);
 			}
 
 			@Override protected void addVertexTexture( double x, double y ) {
-				active.texture.append((float)x, (float)y);
+				outputMesh.texture.append((float)x, (float)y);
 			}
 
 			@Override protected void addPoint( int vertex ) {}
@@ -121,7 +90,8 @@ public class ObjLoadFromFiles {
 			@Override protected void addLine( DogArray_I32 vertexes ) {}
 
 			@Override protected void addFace( DogArray_I32 indexes, int vertexCount ) {
-				ObjFileCodec.addFactToMesh(indexes, vertexCount, active);
+				ObjFileCodec.addFactToMesh(indexes, vertexCount, outputMesh);
+				outputMesh.faceTextures.add(activeTexture);
 			}
 		};
 
@@ -130,9 +100,11 @@ public class ObjLoadFromFiles {
 			reader.parse(new BufferedReader(input));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
-		} catch (MultipleMaterials e) {
-			ignoredMaterial = true;
 		}
+
+		// Per-face texture indexes are only needed if there is more than one texture
+		if (outputMesh.textureNames.size() <= 1)
+			outputMesh.faceTextures.reset();
 	}
 
 	/**
@@ -171,7 +143,4 @@ public class ObjLoadFromFiles {
 			throw new RuntimeException(e);
 		}
 	}
-
-	/** Thrown as a way to escape if it starts to read a second material and a mesh was passed in */
-	static class MultipleMaterials extends RuntimeException {}
 }

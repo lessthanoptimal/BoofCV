@@ -107,7 +107,7 @@ public abstract class ObjFileReader {
 						vertexTextureCount++;
 					}
 
-					case "p" -> addPoint(ensureIndex(Integer.parseInt(words[1])));
+					case "p" -> addPoint(ensureIndex(Integer.parseInt(words[1]), vertexCount));
 					case "l" -> {
 						readPoints(words);
 						addLine(vertexIndexes);
@@ -121,9 +121,6 @@ public abstract class ObjFileReader {
 					case "usemtl" -> addMaterial(words[1]);
 					default -> handleError(actualLineCount + " Unknown object type. '" + words[0] + "'");
 				}
-			} catch (ObjLoadFromFiles.MultipleMaterials e) {
-				// this exception is thrown as a way to stop reading the file
-				return;
 			} catch (Exception e) {
 				// Skip over locally bad data
 				handleError(actualLineCount + " Bad object description " + words[0] + " '" + e.getMessage() + "'");
@@ -132,13 +129,15 @@ public abstract class ObjFileReader {
 	}
 
 	/**
-	 * Converts the vertex number found in the file into an array index. OBJ files are 1 index and accept
-	 * negative numbers.
+	 * Converts the index found in the file into an array index. OBJ files are 1 index and accept
+	 * negative numbers, which are relative to the end of the array.
+	 *
+	 * @param count Number of elements in the array the index refers to
 	 */
-	int ensureIndex( int found ) {
+	static int ensureIndex( int found, int count ) {
 		if (found > 0)
 			return found - 1;
-		return vertexCount + found;
+		return count + found;
 	}
 
 	/**
@@ -147,7 +146,7 @@ public abstract class ObjFileReader {
 	private void readPoints( String[] words ) {
 		vertexIndexes.reset();
 		for (int i = 1; i < words.length; i++) {
-			vertexIndexes.add(ensureIndex(Integer.parseInt(words[i])));
+			vertexIndexes.add(ensureIndex(Integer.parseInt(words[i]), vertexCount));
 		}
 	}
 
@@ -170,20 +169,20 @@ public abstract class ObjFileReader {
 
 			int idx1 = word.indexOf('/');
 			if (idx1 == -1) {
-				vertexIndexes.add(ensureIndex(Integer.parseInt(word)));
+				vertexIndexes.add(ensureIndex(Integer.parseInt(word), vertexCount));
 				continue;
 			}
-			vertexIndexes.add(ensureIndex(Integer.parseInt(word.substring(0, idx1))));
+			vertexIndexes.add(ensureIndex(Integer.parseInt(word.substring(0, idx1)), vertexCount));
 			int idx2 = word.indexOf('/', idx1 + 1);
 			if (idx2 == -1) {
-				vertexIndexes.add(ensureIndex(Integer.parseInt(word.substring(idx1 + 1))));
+				vertexIndexes.add(ensureIndex(Integer.parseInt(word.substring(idx1 + 1)), vertexTextureCount));
 				continue;
 			}
 			if (idx2 > idx1 + 1) {
 				// avoid the case where you have "//"
-				vertexIndexes.add(ensureIndex(Integer.parseInt(word.substring(idx1 + 1, idx2))));
+				vertexIndexes.add(ensureIndex(Integer.parseInt(word.substring(idx1 + 1, idx2)), vertexTextureCount));
 			}
-			vertexIndexes.add(ensureIndex(Integer.parseInt(word.substring(idx2 + 1))));
+			vertexIndexes.add(ensureIndex(Integer.parseInt(word.substring(idx2 + 1)), vertexNormalCount));
 		}
 	}
 
