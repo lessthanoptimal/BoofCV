@@ -54,6 +54,33 @@ public class TestVertexMesh extends BoofStandardJUnit {
 		assertIdentical(shapeB, found.toList());
 	}
 
+	/// Faces that share vertexes come first. Then a face that adds its own vertexes.
+	@Test void addFaceVectors_sharedVertexes() {
+		List<Point3D_F64> shapeA = createRandomShape(3);
+		List<Point3D_F64> shapeB = createRandomShape(4);
+
+		var alg = new VertexMesh();
+		for (Point3D_F64 p : shapeA) {
+			alg.vertexes.append(p.x, p.y, p.z);
+		}
+		// Two faces that use the same vertexes
+		for (int face = 0; face < 2; face++) {
+			for (int i = 0; i < shapeA.size(); i++) {
+				alg.faceVertexes.add(i);
+			}
+			alg.faceOffsets.add(alg.faceVertexes.size);
+		}
+
+		alg.addFaceVectors(shapeB);
+
+		assertEquals(3, alg.size());
+		var found = new DogArray<>(Point3D_F64::new);
+		alg.getFaceVectors(1, found);
+		assertIdentical(shapeA, found.toList());
+		alg.getFaceVectors(2, found);
+		assertIdentical(shapeB, found.toList());
+	}
+
 	@Test void getFaceTexture() {
 		var mesh = new VertexMesh();
 		mesh.faceOffsets.add(3);

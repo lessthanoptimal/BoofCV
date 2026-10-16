@@ -167,7 +167,7 @@ public class VertexMesh {
 			faceVertexes.add(idx0 + i);
 		}
 
-		faceOffsets.add(idx0 + shape.size());
+		faceOffsets.add(faceVertexes.size);
 		vertexes.appendAll(shape);
 	}
 
