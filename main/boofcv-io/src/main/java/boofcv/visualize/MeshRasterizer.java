@@ -196,6 +196,8 @@ public class MeshRasterizer extends MeshRender {
 			meshCam.reset().reserve(idx1 - idx0);
 
 			boolean behindCamera = false;
+			double minX = Double.MAX_VALUE, minY = Double.MAX_VALUE;
+			double maxX = -Double.MAX_VALUE, maxY = -Double.MAX_VALUE;
 			for (int i = idx0; i < idx1; i++) {
 				// Look up precomputed camera location of vertex
 				Point3D_F64 camera = meshCam.grow();
@@ -209,11 +211,21 @@ public class MeshRasterizer extends MeshRender {
 				}
 
 				// Save polygon in camera frame
-				camPixel.getCopy(mesh.faceVertexes.get(i), polygonProj.vertexes.grow());
+				Point2D_F64 pixel = polygonProj.vertexes.grow();
+				camPixel.getCopy(mesh.faceVertexes.get(i), pixel);
+
+				if (pixel.x < minX) minX = pixel.x;
+				if (pixel.x > maxX) maxX = pixel.x;
+				if (pixel.y < minY) minY = pixel.y;
+				if (pixel.y > maxY) maxY = pixel.y;
 			}
 
 			// Skip if not visible
 			if (behindCamera)
+				continue;
+
+			// Skip if no pixels are inside the polygon's bounding box
+			if (!boundsToPixels(minX, minY, maxX, maxY, resolution.width, resolution.height, aabb))
 				continue;
 
 			if (useColorizer) {
@@ -360,16 +372,28 @@ public class MeshRasterizer extends MeshRender {
 			if (!boundingPixels(pa.x, pa.y, pb.x, pb.y, pc.x, pc.y, resolution.width, resolution.height, aabb))
 				continue;
 
-			// Go through all pixels and see if the points are inside the polygon. If so
+			// Go through all pixels inside the triangle
 			for (int pixelY = aabb.y0; pixelY < aabb.y1; pixelY++) {
 				float py = pixelY/scale;
 
-				for (int pixelX = aabb.x0; pixelX < aabb.x1; pixelX++) {
-					float px = pixelX/scale;
-
-					tmp2D.setTo(pixelX, pixelY);
-					if (!Intersection2D_F64.containsConvex(workTri, tmp2D))
+				// Pixels in this row inside the triangle are lo <= x < hi. This is the same test as
+				// Intersection2D_F64.containsConvex() but done once for the row instead of at every pixel
+				double lo = Double.MAX_VALUE;
+				double hi = -Double.MAX_VALUE;
+				for (int i = 0, j = 2; i < 3; j = i++) {
+					Point2D_F64 a = workTri.get(i);
+					Point2D_F64 b = workTri.get(j);
+					if ((a.y > pixelY) == (b.y > pixelY))
 						continue;
+					double x = (b.x - a.x)*(pixelY - a.y)/(b.y - a.y) + a.x;
+					if (x < lo) lo = x;
+					if (x > hi) hi = x;
+				}
+				int x0 = (int)Math.max(aabb.x0, Math.ceil(lo));
+				int x1 = (int)Math.min(aabb.x1, Math.ceil(hi));
+
+				for (int pixelX = x0; pixelX < x1; pixelX++) {
+					float px = pixelX/scale;
 
 					// See if this is the closest point appearing at this pixel
 					float pixelDepth = depthImage.unsafe_get(pixelX, pixelY);
@@ -424,6 +448,15 @@ public class MeshRasterizer extends MeshRender {
 		double maxY = ay < by ? by : ay;
 		if (cy < minY) minY = cy; else if (cy > maxY) maxY = cy;
 
+		return boundsToPixels(minX, minY, maxX, maxY, width, height, aabb);
+	}
+
+	/// Computes the range of pixels whose integer coordinates lie inside the bounds, clipped to the image.
+	/// Upper extent is exclusive.
+	///
+	/// @return false if no pixel coordinate is inside the bounds
+	static boolean boundsToPixels( double minX, double minY, double maxX, double maxY,
+								   int width, int height, Rectangle2D_I32 aabb ) {
 		// Entirely outside the image
 		if (maxX < 0.0 || maxY < 0.0 || minX > width - 1 || minY > height - 1)
 			return false;
