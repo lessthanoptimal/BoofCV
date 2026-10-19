@@ -46,8 +46,8 @@ class TestCameraKannalaBrandt extends CommonCameraChecks {
 		a.fsetK(1.1234,2,3,4,5,100,200);
 		String found = a.formatMap(new MapPrintFormat().withPrecision(2));
 		assertEquals("{fx: 1.12, fy: 2, skew: 3, cx: 4, cy: 5, width: 100, height: 200, " +
-				"symmetric: {3, 4}, " +
-				"radial: {-0.1, -0.2}, radialTrig: {}, " +
-				"tangent: {0.1, 0.2}, tangentTrig: {}}", found);
+				"symmetric: [3, 4], " +
+				"radial: [-0.1, -0.2], radialTrig: [], " +
+				"tangent: [0.1, 0.2], tangentTrig: []}", found);
 	}
 }

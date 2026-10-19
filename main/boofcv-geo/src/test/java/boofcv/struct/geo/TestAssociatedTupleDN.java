@@ -50,6 +50,6 @@ public class TestAssociatedTupleDN extends StandardStructChecks {
 		p.set(0, 1.234, 2);
 		p.set(1, 3, 4);
 		String found = p.formatMap(new MapPrintFormat().withPrecision(2));
-		assertEquals("[{x: 1.23, y: 2},\n{x: 3, y: 4}]", found);
+		assertEquals("[{x: 1.23, y: 2}, {x: 3, y: 4}]", found);
 	}
 }

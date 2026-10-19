@@ -98,12 +98,8 @@ public class TestTrifocalTensor extends BoofStandardJUnit {
 			t.getT( i/9 ).set(i%9,i);
 
 		String found = t.formatMap(new MapPrintFormat().withPrecision(2));
-		assertEquals("{T1: [{0, 1, 2},\n" +
-				"{3, 4, 5},\n" +
-				"{6, 7, 8}], T2: [{9, 10, 11},\n" +
-				"{12, 13, 14},\n" +
-				"{15, 16, 17}], T3: [{18, 19, 20},\n" +
-				"{21, 22, 23},\n" +
-				"{24, 25, 26}]}", found);
+		assertEquals("{T1: [{0, 1, 2}, {3, 4, 5}, {6, 7, 8}], " +
+				"T2: [{9, 10, 11}, {12, 13, 14}, {15, 16, 17}], " +
+				"T3: [{18, 19, 20}, {21, 22, 23}, {24, 25, 26}]}", found);
 	}
 }
