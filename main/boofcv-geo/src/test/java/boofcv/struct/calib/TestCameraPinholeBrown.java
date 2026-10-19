@@ -126,11 +126,11 @@ public class TestCameraPinholeBrown extends CommonCameraChecks {
 		var p = new CameraPinholeBrown(200,210,1.1234,320,240,640,380).
 				fsetRadial(0.123, 4).fsetTangential(0.3, 0.4);
 		String found = p.formatMap(new MapPrintFormat().withPrecision(2));
-		assertEquals("{fx: 200, fy: 210, skew: 1.12, cx: 320, cy: 240, width: 640, height: 380, radial: {0.12, 4}, t1: 0.3, t2: 0.4}", found);
+		assertEquals("{fx: 200, fy: 210, skew: 1.12, cx: 320, cy: 240, width: 640, height: 380, radial: [0.12, 4], t1: 0.3, t2: 0.4}", found);
 
 		// Now will null radial
 		p.radial = null;
 		found = p.formatMap(new MapPrintFormat().withPrecision(2));
-		assertEquals("{fx: 200, fy: 210, skew: 1.12, cx: 320, cy: 240, width: 640, height: 380, radial: {}, t1: 0.3, t2: 0.4}", found);
+		assertEquals("{fx: 200, fy: 210, skew: 1.12, cx: 320, cy: 240, width: 640, height: 380, radial: [], t1: 0.3, t2: 0.4}", found);
 	}
 }

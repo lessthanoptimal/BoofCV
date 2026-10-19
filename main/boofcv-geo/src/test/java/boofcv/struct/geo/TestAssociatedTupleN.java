@@ -48,6 +48,6 @@ public class TestAssociatedTupleN extends StandardStructChecks {
 	@Test void formatMap() {
 		var p = new AssociatedTupleN(new Point2D_F64(1.234, 2), new Point2D_F64(3, 4));
 		String found = p.formatMap(new MapPrintFormat().withPrecision(2));
-		assertEquals("[{x: 1.23, y: 2},\n{x: 3, y: 4}]", found);
+		assertEquals("[{x: 1.23, y: 2}, {x: 3, y: 4}]", found);
 	}
 }
