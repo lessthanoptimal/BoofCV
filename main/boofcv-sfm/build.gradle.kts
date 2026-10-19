@@ -29,4 +29,6 @@ dependencies {
 	testImplementation(project(path = ":main:boofcv-types", configuration = "testOutput"))
 	testImplementation(project(":main:boofcv-simulation"))
 	testImplementation(project(":integration:boofcv-swing"))
+	// DDogleg's checks for chain rule operators
+	testImplementation(testFixtures(Libs.DDOGLEG))
 }
