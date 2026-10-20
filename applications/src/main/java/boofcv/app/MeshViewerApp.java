@@ -21,17 +21,10 @@ package boofcv.app;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.mesh.MeshViewerPanel;
-import boofcv.io.image.UtilImageIO;
-import boofcv.io.points.PointCloudIO;
-import boofcv.struct.image.ImageType;
-import boofcv.struct.image.InterleavedU8;
-import boofcv.struct.mesh.VertexMesh;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
 
 /**
  * Very simple app for opening and viewing a 3D mesh
@@ -44,46 +37,22 @@ public class MeshViewerApp {
 	}
 
 	private static void loadFile( File file ) {
-		// Load the mesh
-		var mesh = new VertexMesh();
-		try {
-			PointCloudIO.load(file, mesh);
-		} catch (IOException e) {
-			e.printStackTrace(System.err);
-			System.exit(1);
-		}
-
-		if (mesh.size() == 0) {
-			System.err.println("No shapes to render! Is this a point cloud?");
-		}
-
-		// Load all the texture mapped files
-		var textureImages = new ArrayList<InterleavedU8>();
-		if (mesh.texture.size() > 0) {
-			if (mesh.textureNames.isEmpty())
-				System.err.println("Texture file was not encoded. Clearing texture coordinates.");
-			for (String name : mesh.textureNames) {
-				InterleavedU8 image = UtilImageIO.loadImage(new File(file.getParentFile(), name), true, ImageType.IL_U8);
-				if (image == null) {
-					System.err.println("Failed to load texture '" + name + "'. Clearing texture coordinates.");
-					textureImages.clear();
-					break;
-				}
-				textureImages.add(image);
-			}
-			if (textureImages.isEmpty())
-				mesh.texture.reset();
-		}
-
 		SwingUtilities.invokeLater(() -> {
 			var panel = new MeshViewerPanel();
-			panel.setMesh(mesh, false);
-			if (mesh.rgb.size > 0)
-				panel.setVertexColors("RGB", mesh.rgb.data);
-			if (!textureImages.isEmpty())
-				panel.setTextureImages(textureImages);
-			panel.setPreferredSize(new Dimension(500, 500));
-			ShowImages.showWindow(panel, "Mesh Viewer", true);
+			// Load the mesh outside the UI thread since it can be slow
+			new Thread(() -> {
+				if (!panel.loadMesh(file)) {
+					System.err.println("Failed to load mesh " + file.getPath());
+					System.exit(1);
+				}
+				// Finish setting up the panel
+				SwingUtilities.invokeLater(() -> {
+					if (panel.getMesh().rgb.size > 0)
+						panel.setVertexColors("RGB", panel.getMesh().rgb.data);
+					panel.setPreferredSize(new Dimension(500, 500));
+					ShowImages.showWindow(panel, "Mesh Viewer", true);
+				});
+			}, "MeshLoad").start();
 		});
 	}
 

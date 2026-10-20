@@ -562,6 +562,8 @@ public class MeshRayTracer extends MeshRender {
 		int i11 = img.getIndex(x1, y1, 0);
 
 		int r = bilerp(d, i00, i10, i01, i11, 0, fx, fy);
+		if (img.numBands < 3)
+			return (r << 16) | (r << 8) | r;
 		int g = bilerp(d, i00, i10, i01, i11, 1, fx, fy);
 		int b = bilerp(d, i00, i10, i01, i11, 2, fx, fy);
 		return (r << 16) | (g << 8) | b;

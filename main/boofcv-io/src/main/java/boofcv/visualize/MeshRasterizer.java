@@ -123,8 +123,12 @@ public class MeshRasterizer extends MeshRender {
 			return;
 		textureIndex = index;
 		textureImage = textureImages.get(index);
+		// The interpolator is specific to the number of bands
+		if (textureValues.length != textureImage.numBands) {
+			textureInterp = FactoryInterpolation.bilinearPixelMB(textureImage, BorderType.EXTENDED);
+			textureValues = new float[textureImage.numBands];
+		}
 		textureInterp.setImage(textureImage);
-		textureValues = new float[textureImage.numBands];
 	}
 
 	@Override public void setCamera( Point2Transform3_F64 pixelToPointing,
@@ -485,10 +489,13 @@ public class MeshRasterizer extends MeshRender {
 		return (x2 - x0)*(y1 - y0) - (y2 - y0)*(x1 - x0);
 	}
 
-	/// Gets the RGB color using interpolation at the specified pixel coordinate in the texture image
+	/// Gets the RGB color using interpolation at the specified pixel coordinate in the texture image. Gray if
+	/// the texture has fewer than 3 bands
 	int interpolateTextureRgb( float px, float py ) {
 		textureInterp.get(px, py, textureValues);
 		int r = (int)(textureValues[0] + 0.5f);
+		if (textureValues.length < 3)
+			return (r << 16) | (r << 8) | r;
 		int g = (int)(textureValues[1] + 0.5f);
 		int b = (int)(textureValues[2] + 0.5f);
 		return (r << 16) | (g << 8) | b;

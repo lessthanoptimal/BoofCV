@@ -24,6 +24,7 @@ import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.image.SaveImageOnClick;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.io.points.PointCloudIO;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.image.GrayF32;
@@ -47,37 +48,35 @@ import java.awt.event.*;
 import java.awt.font.GlyphVector;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
-/**
- * <p>Displays a rendered mesh in 3D and provides mouse and keyboard controls for moving the camera. Each shape in the
- * mesh can be assigned a single color. By default this colorization will be based on the normal angle, but the user
- * can provide custom colors. Two styles of control are provided by default {@link OrbitAroundPointControl orbit} and
- * {@link FirstPersonCameraControl first person}, again the user can provide others easily.</p>
- *
- * <p>To ensure smooth updates a double buffer is used and rendering is done in a separate thread. All rendering
- * is done in software and can't use a GPU. The rendering thread will automatically stop and stop depending
- * on the lifecycle of this panel.</p>
- *
- * @author Peter Abeles
- */
+/// Displays a rendered mesh in 3D and provides mouse and keyboard controls for moving the camera. Each shape in the
+/// mesh can be assigned a single color. By default, this colorization will be based on the normal angle, but the user
+/// can provide custom colors. Two styles of control are provided by default [`orbit`][OrbitAroundPointControl] and
+/// [`first person`][FirstPersonCameraControl], again the user can provide others easily.
+///
+/// To ensure smooth updates a double buffer is used and rendering is done in a separate thread. All rendering
+/// is done in software and can't use a GPU. The rendering thread will automatically start and stop depending
+/// on the lifecycle of this panel.
 @SuppressWarnings({"NullAway.Init"})
 public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDispatcher {
-	/** Name given to the default approach that colorizes based on normal angle */
+	/// Name given to the default approach that colorizes based on normal angle
 	public static final String COLOR_NORMAL = "Normal";
 
-	/** How big the help button appears to be */
+	/// How big the help button appears to be
 	public int buttonSize = 60;
 	public Font helpButtonFont = new Font("Serif", Font.BOLD, 45);
-	/** If the help button exists */
+	/// If the help button exists
 	@Getter @Setter public boolean helpButtonActive = true;
 
-	/** Renders the mesh into a projected image. Default is a rasterizer */
+	/// Renders the mesh into a projected image. Default is a rasterizer
 	@Getter @Setter MeshRender renderer = new MeshRasterizer();
-	VertexMesh mesh = new VertexMesh(); // empty mesh to avoid NPE
+	@Getter VertexMesh mesh = new VertexMesh(); // empty mesh to avoid NPE
 
 	// Lock for swapping the double buffer for rendering. When the active buffer is being drawn this lock is
 	// active. When the render thread wants to swap the buffers it will activate the lock just for the swap.
@@ -109,9 +108,9 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 	@Getter @Setter boolean showDepth = false;
 
 	// Variables below are synchronized against 'controls'
-	/** Map of all camera controls */
+	/// Map of all camera controls
 	final Map<String, Swing3dCameraControl> controls = new HashMap<>();
-	/** Name of the most recently active control */
+	/// Name of the most recently active control
 	@Getter String lastControlName = "";
 	// Most recent world to view. This is passed into a camera control when changed.
 	Se3_F64 recentWorldToView = new Se3_F64();
@@ -140,19 +139,15 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 	// Intrinsic camera parameters
 	CameraPinhole intrinsics = new CameraPinhole();
 
-	/**
-	 * Convenience constructor that calls {@link #setMesh(VertexMesh, boolean)} and the default constructor.
-	 *
-	 * @param mesh That mesh which is to be viewed. A reference is saved internally.
-	 */
+	/// Convenience constructor that calls [#setMesh(VertexMesh, boolean)] and the default constructor.
+	///
+	/// @param mesh That mesh which is to be viewed. A reference is saved internally.
 	public MeshViewerPanel( VertexMesh mesh ) {
 		this();
 		setMesh(mesh, false);
 	}
 
-	/**
-	 * Default constructor. Configures the GUI and adds in default controls and colorizations.
-	 */
+	/// Default constructor. Configures the GUI and adds in default controls and colorizations.
 	public MeshViewerPanel() {
 		// Add the standard way to save images
 		addMouseListener(new SaveImageOnClick(this));
@@ -217,15 +212,13 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 		return depth.unsafe_get(pixelX, pixelY);
 	}
 
-	/**
-	 * Given an image pixel, look up the 3D coordinate of the point. If the pixel doesn't intersect the mesh then
-	 * false is returned.
-	 *
-	 * @param pixelX (Input) x-coordinate of the pixel
-	 * @param pixelY (Input) y-coordinate of the pixel
-	 * @param norm (Output) normalized image coordinate of pixel
-	 * @param p3 (Output) 3D location of point in camera frame
-	 */
+	/// Given an image pixel, look up the 3D coordinate of the point. If the pixel doesn't intersect the mesh then
+	/// false is returned.
+	///
+	/// @param pixelX (Input) x-coordinate of the pixel
+	/// @param pixelY (Input) y-coordinate of the pixel
+	/// @param norm (Output) normalized image coordinate of pixel
+	/// @param p3 (Output) 3D location of point in camera frame
 	public boolean imagePixelToCamera3D( int pixelX, int pixelY, Point2D_F64 norm, Point3D_F64 p3 ) {
 		// Note: We are ignoring background rendering
 		GrayF32 depth = renderer.depthImage;
@@ -276,9 +269,7 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 		}
 	}
 
-	/**
-	 * Changes the active camera control
-	 */
+	/// Changes the active camera control
 	public void setActiveControl( String name ) {
 		lastControlName = name;
 		synchronized (controls) {
@@ -308,9 +299,7 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 		}
 	}
 
-	/**
-	 * Removes the active control
-	 */
+	/// Removes the active control
 	public void removeActiveControl() {
 		synchronized (controls) {
 			if (activeControl != null)
@@ -319,9 +308,7 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 		}
 	}
 
-	/**
-	 * Perform clean up when this component is no longer being used
-	 */
+	/// Perform clean up when this component is no longer being used
 	@Override
 	public void removeNotify() {
 		super.removeNotify();
@@ -332,19 +319,15 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 		shutdownRenderThread();
 	}
 
-	/**
-	 * Send a request that the rendering thread
-	 */
+	/// Requests that the rendering thread shut down
 	public void shutdownRenderThread() {
 		shutdownRequested = true;
 	}
 
-	/**
-	 * Sets the mesh which will be rendered.
-	 *
-	 * @param copy If true then a copy of the mesh will be made and saved. If false then a reference will be saved.
-	 * You should create a copy if this mesh is going to be modified.
-	 */
+	/// Sets the mesh which will be rendered.
+	///
+	/// @param copy If true then a copy of the mesh will be made and saved. If false then a reference will be saved.
+	/// You should create a copy if this mesh is going to be modified.
 	public void setMesh( VertexMesh mesh, boolean copy ) {
 		if (copy) {
 			mesh = new VertexMesh().setTo(mesh);
@@ -366,11 +349,33 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 		}
 	}
 
-	/**
-	 * Lets you specify the RGB color for each vertex in the mesh. It's added to the list and made active.
-	 *
-	 * @param name Name given to this colorization approach
-	 */
+	/// Loads a mesh from disk along with its texture images
+	///
+	/// @return true if it successfully loads
+	public boolean loadMesh( File meshFile ) {
+		// Load the mesh
+		var mesh = new VertexMesh();
+		try {
+			PointCloudIO.load(meshFile, mesh);
+		} catch (IOException e) {
+			e.printStackTrace(System.err);
+			return false;
+		}
+
+		if (mesh.size() == 0) {
+			System.err.println("No shapes to render! Is this a point cloud?");
+			return false;
+		}
+		setMesh(mesh, false);
+		if (!renderer.setTextureImages(meshFile.getParentFile(), mesh.textureNames)) {
+			mesh.texture.reset();
+		}
+		return true;
+	}
+
+	/// Lets you specify the RGB color for each vertex in the mesh. It's added to the list and made active.
+	///
+	/// @param name Name given to this colorization approach
 	public void setSurfaceColor( String name, MeshRasterizer.SurfaceColor colorizer ) {
 		synchronized (colorizers) {
 			activeColorizer = colorizers.size();
@@ -380,11 +385,9 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 		}
 	}
 
-	/**
-	 * It will colorize each surface using the color of the vertexes
-	 *
-	 * @param name Name given to this colorization approach
-	 */
+	/// It will colorize each surface using the color of the vertexes
+	///
+	/// @param name Name given to this colorization approach
 	public void setVertexColors( String name, int[] vertexColors ) {
 		if (mesh == null)
 			throw new IllegalArgumentException("You must first specify the mesh before calling this function");
@@ -392,18 +395,14 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 		setSurfaceColor(name, MeshColorizeOps.colorizeByVertex(mesh, vertexColors));
 	}
 
-	/**
-	 * Requests that a new image is rendered. Typically, this is done when a configuration has changed. It will render
-	 * when the rendering thread has a chance.
-	 */
+	/// Requests that a new image is rendered. Typically, this is done when a configuration has changed. It will render
+	/// when the rendering thread has a chance.
 	public void requestRender() {
 		// tell the render thread to stop rendering
 		renderRequested = true;
 	}
 
-	/**
-	 * Performs the main render loop. This will only exit when a request to shutdown has been made.
-	 */
+	/// Performs the main render loop. This will only exit when a request to shutdown has been made.
 	private void renderLoop() {
 		if (verbose != null) verbose.println("Starting render loop");
 		while (!shutdownRequested) {
@@ -421,11 +420,9 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 		if (verbose != null) verbose.println("Finished render loop");
 	}
 
-	/**
-	 * Renders the scene onto a buffered image. Every time this is called the intrinsic parameters are recomputed
-	 * based on the current panel dimensions. Rendering is done using a double buffer to avoid artifacts when
-	 * drawn.
-	 */
+	/// Renders the scene onto a buffered image. Every time this is called the intrinsic parameters are recomputed
+	/// based on the current panel dimensions. Rendering is done using a double buffer to avoid artifacts when
+	/// drawn.
 	private void render() {
 		// Update render parameters from GUI
 		synchronized (dimension) {
@@ -503,19 +500,15 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 		super.repaint();
 	}
 
-	/**
-	 * Changes the camera's horizontal field-of-view.
-	 *
-	 * @param degrees FOV in degrees
-	 */
+	/// Changes the camera's horizontal field-of-view.
+	///
+	/// @param degrees FOV in degrees
 	public void setHorizontalFov( double degrees ) {
 		this.hfov = degrees;
 		requestRender();
 	}
 
-	/**
-	 * Each time this is called it will change the colorizer being used, if more than one has been specified
-	 */
+	/// Each time this is called it will change the colorizer being used, if more than one has been specified
 	public void cycleColorizer() {
 		int totalColors = colorizers.size();
 		if (mesh.isTextureCoors()) {
@@ -586,9 +579,7 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 		g2.drawString(text, offsetX, offsetY);
 	}
 
-	/**
-	 * Opens a window which provides help about keys and lets the user modify control settings
-	 */
+	/// Opens a window which provides help about keys and lets the user modify control settings
 	public void showHelpWindow() {
 		// See if the window is already visible
 		if (helpWindow != null)
@@ -612,9 +603,7 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 		VerboseUtils.verboseChildren(out, configuration, renderer);
 	}
 
-	/**
-	 * Color of background when rendering
-	 */
+	/// Color of background when rendering
 	public void setRenderBackgroundColor( int rgba ) {
 		renderer.defaultColorRgb = rgba;
 	}
@@ -625,9 +614,7 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 
 	long coolDownTime = 0L;
 
-	/**
-	 * Provides keyboard commands that adjust how and what data is displayed
-	 */
+	/// Provides keyboard commands that adjust how and what data is displayed
 	@Override public boolean dispatchKeyEvent( KeyEvent e ) {
 		if (System.currentTimeMillis() <= coolDownTime)
 			return false;
@@ -654,7 +641,7 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 		renderer.setTextureImages(images);
 	}
 
-	/** Returns a copy of the intrinsics */
+	/// Returns a copy of the intrinsics
 	public CameraPinhole getIntrinsicsCopy() {
 		// We don't copy intrinsics since that is only updated when rendered
 		var camera = new CameraPinhole();
@@ -666,7 +653,7 @@ public class MeshViewerPanel extends JPanel implements VerbosePrint, KeyEventDis
 		void paint( Graphics2D g2 );
 	}
 
-	/** Used to listen in when the camera model has changed */
+	/// Used to listen in when the camera model has changed
 	public interface CameraChanged {
 		void cameraChanged( CameraPinhole intrinsics );
 	}
