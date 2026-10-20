@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,25 +20,24 @@ package boofcv.generate;
 
 import lombok.Getter;
 
-/**
- * Set of standard units of measure, conversions between them, and their abbreviations
- *
- * @author Peter Abeles
- */
+/// Set of standard units of measure, conversions between them, and their abbreviations
 public enum Unit {
 	UNKNOWN(Double.NaN, "?"),
-	/** A.k.a. Micron */
-	MICROMETER(1e-5, "um"),
+	/// A.k.a. Micron
+	MICROMETER(1e-6, "um"),
 	MILLIMETER(0.001, "mm"),
 	CENTIMETER(0.01, "cm"),
 	METER(1, "m"),
 	KILOMETER(1000, "km"),
-	/** 0.001 inch a.k.a. thou */
+	/// 0.001 inch US
 	MIL(2.54e-5, "mil"),
+	/// 0.001 inch
+	THOU(2.54e-5, "thou"),
 	INCH(0.0254, "in"),
 	FOOT(0.3048, "ft"),
 	YARD(0.9144, "yd"),
-	MILE(1852, "ml");
+	/// Statute mile
+	MILE(1609.344, "mi");
 
 	public final @Getter double unitToMeter;
 	public final @Getter String abbreviation;
@@ -48,19 +47,15 @@ public enum Unit {
 		this.abbreviation = abbreviation;
 	}
 
-	/**
-	 * Returns value of all units which are not "UNKNOWN"
-	 */
-	public Unit[] valuesKnown() {
+	/// Returns value of all units which are not "UNKNOWN"
+	public static Unit[] valuesKnown() {
 		Unit[] all = values();
 		var ret = new Unit[all.length-1];
 		System.arraycopy(all, 1, ret, 0, all.length - 1);
 		return ret;
 	}
 
-	/**
-	 * Sees if the specified work matches any of the units full name or short name.
-	 */
+	/// Sees if the specified work matches any of the units full name or short name.
 	public static Unit lookup( String word ) {
 		Unit[] values = values();
 		for (int i = 0; i < values.length; i++) {
