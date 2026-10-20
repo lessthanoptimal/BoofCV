@@ -23,10 +23,12 @@ import boofcv.alg.distort.NarrowPixelToSphere_F64;
 import boofcv.alg.distort.SphereToNarrowPixel_F64;
 import boofcv.alg.distort.pinhole.LensDistortionPinhole;
 import boofcv.alg.geo.PerspectiveOps;
+import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.distort.Point2Transform3_F64;
 import boofcv.struct.distort.Point3Transform2_F64;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.InterleavedU8;
 import boofcv.struct.mesh.VertexMesh;
 import georegression.struct.se.Se3_F64;
@@ -36,7 +38,9 @@ import org.ddogleg.struct.VerbosePrint;
 import org.ddogleg.util.VerboseUtils;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -84,6 +88,33 @@ public abstract class MeshRender implements VerbosePrint {
 	/// Convenience for when there is only one texture image
 	public void setTextureImage( InterleavedU8 textureImage ) {
 		setTextureImages(List.of(textureImage));
+	}
+
+	/// Loads images, converts to [InterleavedU8], passes into [#setTextureImages(java.util.List)].
+	///
+	/// @param baseDir Directory that image names are relative to
+	/// @param imageNames Names / relative path to images
+	/// @return true if successful. If false, no textures are set
+	public boolean setTextureImages( File baseDir, List<String> imageNames ) {
+		if (imageNames.isEmpty()) {
+			setTextureImages(List.of());
+			return false;
+		}
+
+		var images = new ArrayList<InterleavedU8>();
+		for (String name : imageNames) {
+			var textureFile = new File(baseDir, name);
+			InterleavedU8 image = UtilImageIO.loadImage(textureFile, true, ImageType.IL_U8);
+			if (image == null) {
+				// don't pass in any textures if one image fails to load
+				System.err.println("Failed to load texture " + textureFile.getPath());
+				setTextureImages(List.of());
+				return false;
+			}
+			images.add(image);
+		}
+		setTextureImages(images);
+		return true;
 	}
 
 	/// General camera model that supports > 180 FOV

@@ -81,18 +81,7 @@ public abstract class CommonMeshRenderChecks extends BoofStandardJUnit {
 
 	/// Square made of two triangles. Each triangle uses a different solid color texture image
 	@Test void multipleTextures() {
-		var mesh = new VertexMesh();
-		mesh.vertexes.append(-1, -1, 10);
-		mesh.vertexes.append(1, -1, 10);
-		mesh.vertexes.append(1, 1, 10);
-		mesh.vertexes.append(-1, 1, 10);
-		mesh.faceVertexes.addAll(DogArray_I32.array(0, 1, 2, 0, 2, 3));
-		mesh.faceOffsets.add(3);
-		mesh.faceOffsets.add(6);
-		for (int i = 0; i < 6; i++) {
-			mesh.texture.append(0.5f, 0.5f);
-		}
-		mesh.faceTextures.addAll(DogArray_I32.array(0, 1));
+		VertexMesh mesh = texturedSquare(0, 1);
 
 		MeshRender alg = create();
 		var intrinsics = new CameraPinholeBrown();
@@ -105,6 +94,48 @@ public abstract class CommonMeshRenderChecks extends BoofStandardJUnit {
 		// The square spans pixels 135 to 165 along x and 85 to 115 along y
 		assertEquals(0xFF0000, alg.getRenderedImage().get24(157, 92));
 		assertEquals(0x0000FF, alg.getRenderedImage().get24(142, 107));
+	}
+
+	/// A single band texture is rendered as gray
+	@Test void grayTexture() {
+		VertexMesh mesh = texturedSquare(0, 0);
+
+		// Varies along x, so reading a neighboring pixel as another band changes the color
+		var texture = new InterleavedU8(4, 4, 1);
+		for (int y = 0; y < texture.height; y++) {
+			for (int x = 0; x < texture.width; x++) {
+				texture.set(x, y, 0x40 + 0x20*x);
+			}
+		}
+
+		MeshRender alg = create();
+		var intrinsics = new CameraPinholeBrown();
+		PerspectiveOps.createIntrinsic(300, 200, 90, -1, intrinsics);
+		alg.setCamera(intrinsics);
+		alg.setMesh(mesh);
+		alg.setTextureImage(texture);
+		alg.render();
+
+		// Texture coordinate (0.5, 0.5) is halfway between x = 1 and 2
+		assertEquals(0x707070, alg.getRenderedImage().get24(157, 92));
+		assertEquals(0x707070, alg.getRenderedImage().get24(142, 107));
+	}
+
+	/// Square at z = 10 made of two triangles, with the specified texture image for each triangle
+	private VertexMesh texturedSquare( int texture0, int texture1 ) {
+		var mesh = new VertexMesh();
+		mesh.vertexes.append(-1, -1, 10);
+		mesh.vertexes.append(1, -1, 10);
+		mesh.vertexes.append(1, 1, 10);
+		mesh.vertexes.append(-1, 1, 10);
+		mesh.faceVertexes.addAll(DogArray_I32.array(0, 1, 2, 0, 2, 3));
+		mesh.faceOffsets.add(3);
+		mesh.faceOffsets.add(6);
+		for (int i = 0; i < 6; i++) {
+			mesh.texture.append(0.5f, 0.5f);
+		}
+		mesh.faceTextures.addAll(DogArray_I32.array(texture0, texture1));
+		return mesh;
 	}
 
 	private InterleavedU8 solidImage( int rgb ) {
