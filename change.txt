@@ -7,8 +7,8 @@ Version Meaning: <compatible>.<feature>.<bug fix>
 - Last digit always indicates a bug fix and other minor changes
 
 ---------------------
-Date    : 2026/Oct/16
-Version : 1.5.1
+Date    : 2026/Oct/22
+Version : 1.6.0
 
 - Build: Modernized with Gradle Conventions
 - CreateECoCheckDocumentPDF: Better text alignment and size
