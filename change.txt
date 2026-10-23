@@ -10,10 +10,12 @@ Version Meaning: <compatible>.<feature>.<bug fix>
 Date    : 2026/Oct/16
 Version : 1.5.1
 
-- Build - Modernized with Gradle Conventions
-- CreateECoCheckDocumentPDF - Better text alignment and size
+- Build: Modernized with Gradle Conventions
+- CreateECoCheckDocumentPDF: Better text alignment and size
 - MeshRender supports multiple texture images. PLY and OBJ
 - MeshRasterizer is about 2x faster
+- Units: Fixed micrometer and mile, added thou
+- Added chainrule from DDogleg, added SBA example
 
 ---------------------
 Date    : 2026/Aug/23
