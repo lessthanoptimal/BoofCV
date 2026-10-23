@@ -109,6 +109,9 @@ configurations.configureEach {
         // Needed when updated to Java 25 and used by jabel
         force(Libs.BYTEBUDDY)
         force(Libs.BYTEBUDDY_AGENT)
+
+        // Transitive in several direct dependencies. Periodically comment out and see if this should be updated
+        force("org.jspecify:jspecify:1.0.1")
     }
 }
 
