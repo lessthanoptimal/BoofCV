@@ -619,12 +619,31 @@ public class UtilIO {
 	 * Deletes all the file/directory and all of its children
 	 */
 	public static void deleteRecursive( File f ) {
-		if (f.isDirectory()) {
-			for (File c : f.listFiles())
-				deleteRecursive(c);
-		}
-		if (!f.delete())
-			throw new RuntimeException("Failed to delete file: " + f);
+		// Check if file exists
+    if (!f.exists()) {
+        return;
+    }
+    
+    // Security check: ensure we're only deleting files within the base directory
+    if (!(f.getCanonicalFile().toPath().startsWith(baseDir.getCanonicalFile().toPath()))) {
+        throw new IOException("Security violation: Attempting to delete a file outside the base directory: "
+                + f.getCanonicalPath());
+    }
+    
+    // Recursively delete contents if it's a directory
+    if (f.isDirectory()) {
+        File[] children = f.listFiles();
+        if (children != null) {
+            for (File c : children) {
+                deleteRecursive(c, baseDir);
+            }
+        }
+    }
+    
+    // Delete the file itself
+    if (!f.delete()) {
+        throw new IOException("Failed to delete file: " + f);
+    }
 	}
 
 	/**
