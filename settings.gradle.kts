@@ -72,9 +72,49 @@ include(
     "integration:boofcv-javacv", "integration:boofcv-WebcamCapture",
     "integration:boofcv-jcodec", "integration:boofcv-swing",
     "integration:boofcv-ffmpeg", "integration:boofcv-pdf", "integration:boofcv-kotlin",
-    "integration:boofcv-deepboof",
-
-    // AGP configures fine without an SDK; only executing an android task needs one. The
-    // root aggregate tasks skip it because it applies no boofcv convention plugin.
-    "integration:boofcv-android"
+    "integration:boofcv-deepboof"
 )
+
+// The android module is only included when an Android SDK is found. Without one, AGP still
+// configures, but root tasks such as build, test and publishToMavenLocal fail with
+// "SDK location not found". Override with -Pboofcv.android=true|false.
+// The SDK is looked up in the same order AGP uses: sdk.dir in local.properties, ANDROID_HOME,
+// then ANDROID_SDK_ROOT.
+fun findAndroidSdk(): Pair<String, String>? {
+    val localProperties = file("local.properties")
+    if (localProperties.isFile) {
+        val props = java.util.Properties()
+        localProperties.inputStream().use { props.load(it) }
+        props.getProperty("sdk.dir")?.let { return "sdk.dir in local.properties" to it }
+    }
+    for (name in listOf("ANDROID_HOME", "ANDROID_SDK_ROOT")) {
+        System.getenv(name)?.takeIf { it.isNotBlank() }?.let { return name to it }
+    }
+    return null
+}
+
+fun androidSkipReason(): String? {
+    val (source, path) = findAndroidSdk()
+        ?: return "no Android SDK found. Set ANDROID_HOME or sdk.dir in local.properties."
+    val dir = file(path)
+    if (!dir.isDirectory)
+        return "$source=$path does not exist."
+    if (!dir.resolve("platforms").isDirectory)
+        return "$source=$path does not look like an Android SDK (no 'platforms' directory). " +
+            "It should point to the SDK root, which contains platforms/ and build-tools/."
+    return null
+}
+
+when (providers.gradleProperty("boofcv.android").orNull?.lowercase()) {
+    "true" -> include("integration:boofcv-android")
+    "false" -> {}
+    else -> {
+        val reason = androidSkipReason()
+        if (reason == null) {
+            include("integration:boofcv-android")
+        } else {
+            logger.warn("WARNING: Skipping integration:boofcv-android because $reason " +
+                "Use -Pboofcv.android=false to silence this warning.")
+        }
+    }
+}
