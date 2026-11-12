@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -486,7 +486,7 @@ public class ImplAverageDownSample {
 		float scale = src.height/(float)dst.height;
 		float offset = centered ? -(scale - 1.0f)/2.0f : 0.0f;
 		int dstBorder0 = centered ? 1 : 0;
-		int dstBorder1 = upperBorder(src.width, dst.width, offset, scale);
+		int dstBorder1 = upperBorder(src.height, dst.height, offset, scale);
 
 		// If workspace was not provided declare it
 		if (workspaces == null) {
@@ -621,7 +621,7 @@ public class ImplAverageDownSample {
 		float scale = src.height/(float)dst.height;
 		float offset = centered ? -(scale - 1.0f)/2.0f : 0.0f;
 		int dstBorder0 = centered ? 1 : 0;
-		int dstBorder1 = upperBorder(src.width, dst.width, offset, scale);
+		int dstBorder1 = upperBorder(src.height, dst.height, offset, scale);
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, dst.height, y -> {
 		for (int y = 0; y < dst.height; y++) {
@@ -742,7 +742,7 @@ public class ImplAverageDownSample {
 		float scale = src.height/(float)dst.height;
 		float offset = centered ? -(scale - 1.0f)/2.0f : 0.0f;
 		int dstBorder0 = centered ? 1 : 0;
-		int dstBorder1 = upperBorder(src.width, dst.width, offset, scale);
+		int dstBorder1 = upperBorder(src.height, dst.height, offset, scale);
 
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, dst.height, y -> {
 		for (int y = 0; y < dst.height; y++) {
