@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -223,7 +223,7 @@ public class GenerateImplAverageDownSample extends CodeGeneratorBase {
 				"\t\tfloat scale = src.height/(float)dst.height;\n" +
 				"\t\tfloat offset = centered ? -(scale - 1.0f)/2.0f : 0.0f;\n" +
 				"\t\tint dstBorder0 = centered ? 1 : 0;\n" +
-				"\t\tint dstBorder1 = upperBorder(src.width, dst.width, offset, scale);\n" +
+				"\t\tint dstBorder1 = upperBorder(src.height, dst.height, offset, scale);\n" +
 				"\n" +
 				"\t\t// If workspace was not provided declare it\n" +
 				"\t\tif (workspaces == null) {\n" +
@@ -305,7 +305,7 @@ public class GenerateImplAverageDownSample extends CodeGeneratorBase {
 				"\t\tfloat scale = src.height/(float)dst.height;\n" +
 				"\t\tfloat offset = centered ? -(scale - 1.0f)/2.0f : 0.0f;\n" +
 				"\t\tint dstBorder0 = centered ? 1 : 0;\n" +
-				"\t\tint dstBorder1 = upperBorder(src.width, dst.width, offset, scale);\n" +
+				"\t\tint dstBorder1 = upperBorder(src.height, dst.height, offset, scale);\n" +
 				"\n" +
 				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0, dst.height, y -> {\n" +
 				"\t\tfor (int y = 0; y < dst.height; y++) {\n" +

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -119,6 +119,9 @@ public class TestImplAverageDownSample extends BoofStandardJUnit {
 
 				// randomly scale the width for output image
 				int height = (int)(src.height/(1.2 + rand.nextDouble()) - 0.5);
+
+				// Bug where width was used instead of height
+				if (i == 0) { src = GeneralizedImageOps.createSingleBand(typeSrc, 14, 14); height = 13; }
 				ImageGray dst = GeneralizedImageOps.createSingleBand(typeDst, src.width, height);
 
 				// Fill source image with random values
