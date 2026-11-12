@@ -19,7 +19,7 @@
 package boofcv.alg.disparity.sgm.cost;
 
 import boofcv.alg.InputSanityCheck;
-import boofcv.alg.disparity.sgm.SgmStereoDisparityHmi;
+import boofcv.alg.disparity.sgm.StereoDisparitySgmHmiAlg;
 import boofcv.alg.filter.convolve.ConvolveImageNormalized;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageMiscOps;
@@ -57,7 +57,7 @@ import java.util.Random;
 ///
 /// 1) Hirschmuller, Heiko. "Stereo processing by semiglobal matching and mutual information."
 /// IEEE Transactions on pattern analysis and machine intelligence 30.2 (2007): 328-341.
-/// @see SgmStereoDisparityHmi
+/// @see StereoDisparitySgmHmiAlg
 @SuppressWarnings({"NullAway.Init"})
 public class StereoMutualInformation {
 

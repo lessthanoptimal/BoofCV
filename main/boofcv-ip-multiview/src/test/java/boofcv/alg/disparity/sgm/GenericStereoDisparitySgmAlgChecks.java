@@ -27,24 +27,24 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public abstract class GenericSgmStereoDisparityChecks<T extends ImageGray<T>, C extends ImageBase<C>>
+public abstract class GenericStereoDisparitySgmAlgChecks<T extends ImageGray<T>, C extends ImageBase<C>>
 		extends CommonSgmChecks<T> {
 	// test using a random image
 	boolean useRandomImage = true;
 	double acceptTol = 0.01;
 
-	protected GenericSgmStereoDisparityChecks( ImageType<T> imageType ) {
+	protected GenericStereoDisparitySgmAlgChecks( ImageType<T> imageType ) {
 		super(80, 60, imageType);
 	}
 
-	public abstract SgmStereoDisparity<T, C> createAlgorithm();
+	public abstract StereoDisparitySgmAlg<T, C> createAlgorithm();
 
 	/// Input images are identical. Disparity should be zero
 	@Test void identicalImages() {
 		int rangeD = 10;
 		renderStereoRandom(0, 255, 0, rangeD);
 
-		SgmStereoDisparity<T, C> alg = createAlgorithm();
+		StereoDisparitySgmAlg<T, C> alg = createAlgorithm();
 
 		alg.setDisparityMin(0);
 		alg.setDisparityRange(rangeD);
@@ -63,7 +63,7 @@ public abstract class GenericSgmStereoDisparityChecks<T extends ImageGray<T>, C 
 
 	/// Adjust the disparity search and see if it succeeds and fails when it should
 	@Test void disparitySearch() {
-		SgmStereoDisparity<T, C> alg = createAlgorithm();
+		StereoDisparitySgmAlg<T, C> alg = createAlgorithm();
 		// When you include the diagonal paths it's harder to predict what's going on
 		alg.getAggregation().setPathsConsidered(4);
 		alg.getSelector().setRightToLeftTolerance(-1);
@@ -78,7 +78,7 @@ public abstract class GenericSgmStereoDisparityChecks<T extends ImageGray<T>, C 
 	/// Same as [#disparitySearch()] but with a disparity range that includes negative values, which
 	/// exercises clamping against the right border of the right image.
 	@Test void disparitySearchNegative() {
-		SgmStereoDisparity<T, C> alg = createAlgorithm();
+		StereoDisparitySgmAlg<T, C> alg = createAlgorithm();
 		alg.getAggregation().setPathsConsidered(4);
 		alg.getSelector().setRightToLeftTolerance(-1);
 
@@ -89,7 +89,7 @@ public abstract class GenericSgmStereoDisparityChecks<T extends ImageGray<T>, C 
 		disparitySearchNegative(-8, 5, -6, alg);
 	}
 
-	public void disparitySearchNegative( int disparityMin, int disparityRange, int disparityActual, SgmStereoDisparity<T, C> alg ) {
+	public void disparitySearchNegative( int disparityMin, int disparityRange, int disparityActual, StereoDisparitySgmAlg<T, C> alg ) {
 
 		SgmHelper helper = new SgmHelper();
 		helper.configure(width, disparityMin, disparityRange);
@@ -127,7 +127,7 @@ public abstract class GenericSgmStereoDisparityChecks<T extends ImageGray<T>, C 
 		assertTrue(fractionCorrect > 1.0 - acceptTol, "diff " + fractionCorrect);
 	}
 
-	public void disparitySearch( int disparityMin, int disparityRange, int disparityActual, SgmStereoDisparity<T, C> alg ) {
+	public void disparitySearch( int disparityMin, int disparityRange, int disparityActual, StereoDisparitySgmAlg<T, C> alg ) {
 
 		SgmHelper helper = new SgmHelper();
 		helper.width = width;

@@ -28,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
 /// Base class for wrapped block matching algorithms.
 @SuppressWarnings({"NullAway.Init"})
 public abstract class WrapBaseBlockMatch<In extends ImageGray<In>, T extends ImageGray<T>, DI extends ImageGray<DI>>
-		implements StereoDisparity<In, DI> {
+		implements StereoDisparityBlockMatch<In, DI> {
 	DisparityBlockMatchRowFormat<T, DI> alg;
 
 	DI disparity;
@@ -56,7 +56,7 @@ public abstract class WrapBaseBlockMatch<In extends ImageGray<In>, T extends Ima
 
 	protected abstract void _process( In imageLeft, In imageRight );
 
-	public void setScoreEnabled( boolean enabled ) {
+	@Override public void setScoreEnabled( boolean enabled ) {
 		// see if the current state matches the request
 		if (enabled && score != null)
 			return;
@@ -100,7 +100,7 @@ public abstract class WrapBaseBlockMatch<In extends ImageGray<In>, T extends Ima
 		return alg.getDisparityType();
 	}
 
-	public DisparityBlockMatchRowFormat<T, DI> getAlg() {
+	@Override public DisparityBlockMatchRowFormat<T, DI> getAlg() {
 		return alg;
 	}
 }

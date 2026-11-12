@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,7 +54,7 @@ import java.util.Random;
  * IEEE Transactions on pattern analysis and machine intelligence 30.2 (2007): 328-341.</p>
  */
 @SuppressWarnings("WeakerAccess")
-public class SgmStereoDisparityHmi extends SgmStereoDisparityError<GrayU8> {
+public class StereoDisparitySgmHmiAlg extends StereoDisparitySgmErrorAlg<GrayU8> {
 
 	protected Random rand = new Random(234);
 
@@ -74,7 +74,7 @@ public class SgmStereoDisparityHmi extends SgmStereoDisparityError<GrayU8> {
 	 * @param stereoMI Computes mutual information from a stereo pair with known disparity
 	 * @param selector Selects the best disparity given the cost
 	 */
-	public SgmStereoDisparityHmi( ConfigDiscreteLevels configPyr,
+	public StereoDisparitySgmHmiAlg( ConfigDiscreteLevels configPyr,
 								  StereoMutualInformation stereoMI,
 								  SgmDisparitySelector selector ) {
 		super(new SgmMutualInformation_U8(stereoMI), selector);
@@ -83,7 +83,7 @@ public class SgmStereoDisparityHmi extends SgmStereoDisparityError<GrayU8> {
 		pyrRight.getConfigLayers().setTo(configPyr);
 	}
 
-	public SgmStereoDisparityHmi( ConfigDiscreteLevels configPyr,
+	public StereoDisparitySgmHmiAlg( ConfigDiscreteLevels configPyr,
 								  StereoMutualInformation stereoMI,
 								  SgmDisparitySelector selector,
 								  SgmCostFromBlocks<GrayU8> blockScore ) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,32 +30,32 @@ import org.junit.jupiter.api.Nested;
 import static boofcv.factory.transform.census.CensusVariants.BLOCK_3_3;
 import static boofcv.factory.transform.census.CensusVariants.BLOCK_5_5;
 
-class TestSgmStereoDisparityCensus extends BoofStandardJUnit {
+class TestStereoDisparitySgmCensusAlg extends BoofStandardJUnit {
 	@Nested
-	public class U8_U8 extends GenericSgmStereoDisparityChecks<GrayU8, GrayU8> {
+	public class U8_U8 extends GenericStereoDisparitySgmAlgChecks<GrayU8, GrayU8> {
 		protected U8_U8() {
 			super(ImageType.SB_U8);
 		}
 
 		@Override
-		public SgmStereoDisparity<GrayU8, GrayU8> createAlgorithm() {
+		public StereoDisparitySgmAlg<GrayU8, GrayU8> createAlgorithm() {
 			FilterImageInterface censusTran = FactoryCensusTransform.variant(BLOCK_3_3, true, GrayU8.class);
 			SgmCostHamming<GrayU8> cost = new SgmCostHamming.U8();
-			return new SgmStereoDisparityCensus(censusTran, cost, new SgmDisparitySelector());
+			return new StereoDisparitySgmCensusAlg(censusTran, cost, new SgmDisparitySelector());
 		}
 	}
 
 	@Nested
-	public class U8_S32 extends GenericSgmStereoDisparityChecks<GrayU8, GrayS32> {
+	public class U8_S32 extends GenericStereoDisparitySgmAlgChecks<GrayU8, GrayS32> {
 		protected U8_S32() {
 			super(ImageType.SB_U8);
 		}
 
 		@Override
-		public SgmStereoDisparity<GrayU8, GrayS32> createAlgorithm() {
+		public StereoDisparitySgmAlg<GrayU8, GrayS32> createAlgorithm() {
 			FilterImageInterface censusTran = FactoryCensusTransform.variant(BLOCK_5_5, true, GrayU8.class);
 			SgmCostHamming<GrayS32> cost = new SgmCostHamming.S32();
-			return new SgmStereoDisparityCensus(censusTran, cost, new SgmDisparitySelector());
+			return new StereoDisparitySgmCensusAlg(censusTran, cost, new SgmDisparitySelector());
 		}
 	}
 }

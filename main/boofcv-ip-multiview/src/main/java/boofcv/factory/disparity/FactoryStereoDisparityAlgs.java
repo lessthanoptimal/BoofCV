@@ -49,7 +49,7 @@ public class FactoryStereoDisparityAlgs {
 	/**
 	 * Creates SGM stereo using HMI.
 	 */
-	public static SgmStereoDisparity createSgm( @Nullable ConfigDisparitySGM config ) {
+	public static StereoDisparitySgmAlg createSgm( @Nullable ConfigDisparitySGM config ) {
 		if (config == null)
 			config = new ConfigDisparitySGM();
 
@@ -61,7 +61,7 @@ public class FactoryStereoDisparityAlgs {
 		selector.setMaxError(maxError);
 		selector.setTextureThreshold(config.texture);
 
-		SgmStereoDisparity sgm;
+		StereoDisparitySgmAlg sgm;
 
 		// There's currently no block variant of MI
 		if (!config.useBlocks)
@@ -78,19 +78,19 @@ public class FactoryStereoDisparityAlgs {
 		return sgm;
 	}
 
-	private static SgmStereoDisparity createSgmNativeCost( ConfigDisparitySGM config, SgmDisparitySelector selector ) {
-		SgmStereoDisparity sgm;
+	private static StereoDisparitySgmAlg createSgmNativeCost( ConfigDisparitySGM config, SgmDisparitySelector selector ) {
+		StereoDisparitySgmAlg sgm;
 
 		switch (config.errorType) {
 			case MUTUAL_INFORMATION: {
 				StereoMutualInformation stereoMI = createStereoMutualInformation(config);
-				sgm = new SgmStereoDisparityHmi(config.configHMI.pyramidLayers, stereoMI, selector);
-				((SgmStereoDisparityHmi)sgm).setExtraIterations(config.configHMI.extraIterations);
+				sgm = new StereoDisparitySgmHmiAlg(config.configHMI.pyramidLayers, stereoMI, selector);
+				((StereoDisparitySgmHmiAlg)sgm).setExtraIterations(config.configHMI.extraIterations);
 			}
 			break;
 
 			case ABSOLUTE_DIFFERENCE: {
-				sgm = new SgmStereoDisparityError(new SgmCostAbsoluteDifference.U8(), selector);
+				sgm = new StereoDisparitySgmErrorAlg(new SgmCostAbsoluteDifference.U8(), selector);
 			}
 			break;
 
@@ -107,7 +107,7 @@ public class FactoryStereoDisparityAlgs {
 				} else {
 					throw new IllegalArgumentException("Unsupported image type");
 				}
-				sgm = new SgmStereoDisparityCensus(censusTran, cost, selector);
+				sgm = new StereoDisparitySgmCensusAlg(censusTran, cost, selector);
 			}
 			break;
 
@@ -118,8 +118,8 @@ public class FactoryStereoDisparityAlgs {
 	}
 
 	private static <T extends ImageGray<T>>
-	SgmStereoDisparity createSgmBlockCost( ConfigDisparitySGM config, SgmDisparitySelector selector, Class<T> imageType ) {
-		SgmStereoDisparity sgm;
+	StereoDisparitySgmAlg createSgmBlockCost( ConfigDisparitySGM config, SgmDisparitySelector selector, Class<T> imageType ) {
+		StereoDisparitySgmAlg sgm;
 		ConfigDisparityBM configBM = new ConfigDisparityBM();
 		configBM.regionRadiusX = config.configBlockMatch.radiusX;
 		configBM.regionRadiusY = config.configBlockMatch.radiusY;
@@ -140,8 +140,8 @@ public class FactoryStereoDisparityAlgs {
 				rowScore.setBorder(FactoryImageBorder.generic(config.border, rowScore.getImageType()));
 				blockScore = createSgmBlockMatch(config, imageType, configBM, blockCost, rowScore);
 				blockScore.setBorder(FactoryImageBorder.generic(config.border, rowScore.getImageType()));
-				sgm = new SgmStereoDisparityHmi(config.configHMI.pyramidLayers, stereoMI, selector, (SgmCostFromBlocks)blockCost);
-				((SgmStereoDisparityHmi)sgm).setExtraIterations(config.configHMI.extraIterations);
+				sgm = new StereoDisparitySgmHmiAlg(config.configHMI.pyramidLayers, stereoMI, selector, (SgmCostFromBlocks)blockCost);
+				((StereoDisparitySgmHmiAlg)sgm).setExtraIterations(config.configHMI.extraIterations);
 			}
 			break;
 
@@ -149,7 +149,7 @@ public class FactoryStereoDisparityAlgs {
 				BlockRowScore rowScore = createScoreRowSad(configBM, imageType);
 				blockScore = createSgmBlockMatch(config, (Class<T>)imageType, configBM, (SgmCostFromBlocks<T>)blockCost, rowScore);
 				blockScore.setBorder(FactoryImageBorder.generic(config.border, rowScore.getImageType()));
-				sgm = new SgmStereoDisparityError(blockCost, selector);
+				sgm = new StereoDisparitySgmErrorAlg(blockCost, selector);
 			}
 			break;
 
@@ -159,7 +159,7 @@ public class FactoryStereoDisparityAlgs {
 				blockScore = createSgmBlockMatch(config, censusTran.getOutputType().getImageClass(),
 						configBM, blockCost, rowScore);
 				blockScore.setBorder(FactoryImageBorder.generic(config.border, censusTran.getOutputType()));
-				sgm = new SgmStereoDisparityCensus(censusTran, blockCost, selector);
+				sgm = new StereoDisparitySgmCensusAlg(censusTran, blockCost, selector);
 			}
 			break;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,9 +27,9 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class TestSgmStereoDisparityHmi extends GenericSgmStereoDisparityChecks<GrayU8, GrayU8> {
+class TestStereoDisparitySgmHmiAlg extends GenericStereoDisparitySgmAlgChecks<GrayU8, GrayU8> {
 
-	protected TestSgmStereoDisparityHmi() {
+	protected TestStereoDisparitySgmHmiAlg() {
 		super(ImageType.SB_U8);
 		// HMI doesn't excel in these scenarios as much as the others
 		this.acceptTol = 0.15;
@@ -38,7 +38,7 @@ class TestSgmStereoDisparityHmi extends GenericSgmStereoDisparityChecks<GrayU8, 
 	}
 
 	@Override
-	public SgmStereoDisparity<GrayU8, GrayU8> createAlgorithm() {
+	public StereoDisparitySgmAlg<GrayU8, GrayU8> createAlgorithm() {
 		return create();
 	}
 
@@ -55,7 +55,7 @@ class TestSgmStereoDisparityHmi extends GenericSgmStereoDisparityChecks<GrayU8, 
 		// it would converge to an incorrect solution
 		renderStereoStep(d, rangeD);
 
-		SgmStereoDisparityHmi alg = create();
+		StereoDisparitySgmHmiAlg alg = create();
 		alg.setDisparityMin(0);
 		alg.setDisparityRange(rangeD);
 		alg.process(left, right, disparityTruth, rangeD);
@@ -92,12 +92,12 @@ class TestSgmStereoDisparityHmi extends GenericSgmStereoDisparityChecks<GrayU8, 
 //		assertTrue(errorMax<2,"max error "+errorMax);
 	}
 
-	SgmStereoDisparityHmi create() {
+	StereoDisparitySgmHmiAlg create() {
 		StereoMutualInformation stereoMI = new StereoMutualInformation();
 		stereoMI.configureSmoothing(3);
 		stereoMI.configureHistogram(256);
 		SgmDisparitySelector selector = new SgmDisparitySelector();
 		selector.setRightToLeftTolerance(-1);
-		return new SgmStereoDisparityHmi(new ConfigDiscreteLevels(-1, 20, 20), stereoMI, selector);
+		return new StereoDisparitySgmHmiAlg(new ConfigDiscreteLevels(-1, 20, 20), stereoMI, selector);
 	}
 }
