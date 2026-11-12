@@ -135,7 +135,8 @@ If you wish to have jars instead, the following commands are provided.
 ./gradlew alljavadoc              # Combines all JavaDoc from all sub-projects into a single set
 ```
 
-[1] A couple of the integration submodules have a custom build process that can't be performed by Gradle. The script is smart enough to ignore modules and tell you that it is doing so if you haven't configured it yet.
+[1] boofcv-android is only built if an Android SDK is found through ANDROID_HOME, ANDROID_SDK_ROOT, or sdk.dir
+in local.properties. Use `-Pboofcv.android=true` or `false` to force it on or off.
 
 ## IntelliJ
 
