@@ -26,7 +26,7 @@ import boofcv.alg.disparity.block.*;
 import boofcv.alg.disparity.block.score.*;
 import boofcv.alg.disparity.block.select.SelectSparseCorrelationSubpixel;
 import boofcv.alg.disparity.block.select.SelectSparseCorrelationWithChecksWta_F32;
-import boofcv.alg.disparity.sgm.SgmStereoDisparity;
+import boofcv.alg.disparity.sgm.StereoDisparitySgmAlg;
 import boofcv.alg.segmentation.cc.ConnectedSpeckleFiller;
 import boofcv.alg.segmentation.cc.ConnectedTwoRowSpeckleFiller_F32;
 import boofcv.alg.segmentation.cc.ConnectedTwoRowSpeckleFiller_U8;
@@ -39,7 +39,7 @@ import org.jetbrains.annotations.Nullable;
 /// Creates high level interfaces for computing the disparity between two rectified stereo images.
 /// Algorithms which select the best disparity for each region independent of all the others are
 /// referred to as Winner Takes All (WTA) in the literature. Dense algorithms compute the disparity for the
-/// whole image while sparse algorithms do it in a per pixel basis as requested.
+/// whole image while sparse algorithms do it in a per-pixel basis as requested.
 ///
 /// Typically, disparity calculations with regions will produce less erratic results, but their precision will
 /// be decreased. This is especially evident along the border of objects. Computing a wider range of disparities
@@ -62,12 +62,12 @@ public class FactoryStereoDisparity {
 
 	public static <T extends ImageGray<T>, DI extends ImageGray<DI>> StereoDisparity<T, DI>
 	generic( ConfigDisparity config, Class<T> imageType ) {
-		// Determine the require disparity image type from the configuration
+		// Determine the required disparity image type from the configuration
 		Class<DI> dispType = (Class)(config.isSubpixel() ? GrayF32.class : GrayU8.class);
 		return generic(config, imageType, dispType);
 	}
 
-	public static <T extends ImageGray<T>, DI extends ImageGray<DI>> StereoDisparity<T, DI>
+	public static <T extends ImageGray<T>, DI extends ImageGray<DI>> StereoDisparityBlockMatch<T, DI>
 	blockMatch( @Nullable ConfigDisparityBM config, Class<T> imageType, Class<DI> dispType ) {
 		if (config == null)
 			config = new ConfigDisparityBM();
@@ -81,55 +81,59 @@ public class FactoryStereoDisparity {
 				throw new IllegalArgumentException("With subpixel on, disparity image must be GrayU8");
 		}
 
-		double maxError = (config.regionRadiusX*2 + 1)*(config.regionRadiusY*2 + 1)*config.maxPerPixelError;
+		// See if an override method has been specified
+		StereoDisparityBlockMatch<T, ?> bm = BOverrideStereoDisparity.createBlockMatch(config, imageType, dispType);
+		if (bm == null) {
+			double maxError = (config.regionRadiusX*2 + 1)*(config.regionRadiusY*2 + 1)*config.maxPerPixelError;
 
-		WrapBaseBlockMatch<T, DI, ?> bm = switch (config.errorType) {
-			case SAD -> {
-				DisparitySelect select = createDisparitySelect(config, imageType, maxError);
-				BlockRowScore rowScore = createScoreRowSad(config, imageType);
-				DisparityBlockMatchRowFormat alg = createBlockMatching(config, imageType, select, rowScore);
-				alg.setBorder(FactoryImageBorder.generic(config.border, rowScore.getImageType()));
-				yield new WrapDisparityBlockMatchRowFormat(alg);
-			}
-			case SSD -> {
-				DisparitySelect select = createDisparitySelect(config, imageType, maxError);
-				BlockRowScore rowScore = createScoreRowSsd(config, imageType);
-				DisparityBlockMatchRowFormat alg = createBlockMatching(config, imageType, select, rowScore);
-				alg.setBorder(FactoryImageBorder.generic(config.border, rowScore.getImageType()));
-				yield new WrapDisparityBlockMatchRowFormat(alg);
-			}
-			case ZSSD -> {
-				DisparitySelect select = createDisparitySelect(config, GrayF32.class, maxError);
-				BlockRowScore rowScore = createScoreRowZssd(config, GrayF32.class);
-				DisparityBlockMatchRowFormat alg = createBlockMatching(config, GrayF32.class, select, rowScore);
-				alg.setBorder(FactoryImageBorder.generic(config.border, rowScore.getImageType()));
-				// Not normalized, unlike NCC, since rescaling the input would change the scale of the error
-				yield new DisparityBlockMatchPreFilter(alg, imageType);
-			}
-			case CENSUS -> {
-				DisparitySelect select = createDisparitySelect(config, imageType, maxError);
-				FilterImageInterface censusTran = FactoryCensusTransform.variant(config.configCensus.variant, true, imageType);
-				BlockRowScore rowScore = createCensusRowScore(config, censusTran);
+			bm = switch (config.errorType) {
+				case SAD -> {
+					DisparitySelect select = createDisparitySelect(config, imageType, maxError);
+					BlockRowScore rowScore = createScoreRowSad(config, imageType);
+					DisparityBlockMatchRowFormat alg = createBlockMatching(config, imageType, select, rowScore);
+					alg.setBorder(FactoryImageBorder.generic(config.border, rowScore.getImageType()));
+					yield new WrapDisparityBlockMatchRowFormat(alg);
+				}
+				case SSD -> {
+					DisparitySelect select = createDisparitySelect(config, imageType, maxError);
+					BlockRowScore rowScore = createScoreRowSsd(config, imageType);
+					DisparityBlockMatchRowFormat alg = createBlockMatching(config, imageType, select, rowScore);
+					alg.setBorder(FactoryImageBorder.generic(config.border, rowScore.getImageType()));
+					yield new WrapDisparityBlockMatchRowFormat(alg);
+				}
+				case ZSSD -> {
+					DisparitySelect select = createDisparitySelect(config, GrayF32.class, maxError);
+					BlockRowScore rowScore = createScoreRowZssd(config, GrayF32.class);
+					DisparityBlockMatchRowFormat alg = createBlockMatching(config, GrayF32.class, select, rowScore);
+					alg.setBorder(FactoryImageBorder.generic(config.border, rowScore.getImageType()));
+					// Not normalized, unlike NCC, since rescaling the input would change the scale of the error
+					yield new DisparityBlockMatchPreFilter(alg, imageType);
+				}
+				case CENSUS -> {
+					DisparitySelect select = createDisparitySelect(config, imageType, maxError);
+					FilterImageInterface censusTran = FactoryCensusTransform.variant(config.configCensus.variant, true, imageType);
+					BlockRowScore rowScore = createCensusRowScore(config, censusTran);
 
-				DisparityBlockMatchRowFormat alg = createBlockMatching(config,
-						censusTran.getOutputType().getImageClass(), select, rowScore);
-				alg.setBorder(FactoryImageBorder.generic(config.border, censusTran.getOutputType()));
-				yield new WrapDisparityBlockMatchCensus<>(censusTran, alg);
-			}
-			case NCC -> {
-				DisparitySelect select = createDisparitySelect(config, GrayF32.class, maxError);
-				BlockRowScore rowScore = createScoreRowNcc(config, GrayF32.class);
-				DisparityBlockMatchRowFormat alg = createBlockMatching(config, GrayF32.class, select, rowScore);
-				alg.setBorder(FactoryImageBorder.generic(config.border, rowScore.getImageType()));
-				var ret = new DisparityBlockMatchPreFilter(alg, imageType);
-				if (config.configNCC.normalizeInput)
-					ret.setType(DisparityBlockMatchPreFilter.Type.CORRELATION);
-				yield ret;
-			}
-			default -> throw new IllegalArgumentException("Unsupported error type " + config.errorType);
-		};
+					DisparityBlockMatchRowFormat alg = createBlockMatching(config,
+							censusTran.getOutputType().getImageClass(), select, rowScore);
+					alg.setBorder(FactoryImageBorder.generic(config.border, censusTran.getOutputType()));
+					yield new WrapDisparityBlockMatchCensus<>(censusTran, alg);
+				}
+				case NCC -> {
+					DisparitySelect select = createDisparitySelect(config, GrayF32.class, maxError);
+					BlockRowScore rowScore = createScoreRowNcc(config, GrayF32.class);
+					DisparityBlockMatchRowFormat alg = createBlockMatching(config, GrayF32.class, select, rowScore);
+					alg.setBorder(FactoryImageBorder.generic(config.border, rowScore.getImageType()));
+					var ret = new DisparityBlockMatchPreFilter(alg, imageType);
+					if (config.configNCC.normalizeInput)
+						ret.setType(DisparityBlockMatchPreFilter.Type.CORRELATION);
+					yield ret;
+				}
+				default -> throw new IllegalArgumentException("Unsupported error type " + config.errorType);
+			};
+		}
 		bm.setScoreEnabled(config.saveScore);
-		return (StereoDisparity)bm;
+		return (StereoDisparityBlockMatch)bm;
 	}
 
 	public static BlockRowScore createCensusRowScore( ConfigDisparityBM config, FilterImageInterface censusTran ) {
@@ -196,55 +200,60 @@ public class FactoryStereoDisparity {
 				throw new IllegalArgumentException("With subpixel off, disparity image must be GrayU8");
 		}
 
-		double maxError = (config.regionRadiusX*2 + 1)*(config.regionRadiusY*2 + 1)*config.maxPerPixelError;
+		// See if an override method has been specified
+		StereoDisparityBlockMatch<T, ?> bm = BOverrideStereoDisparity.createBlockMatch5(config, imageType, dispType);
+		if (bm == null) {
 
-		// 3 regions are used not just one in this case
-		maxError *= 3;
+			double maxError = (config.regionRadiusX*2 + 1)*(config.regionRadiusY*2 + 1)*config.maxPerPixelError;
 
-		WrapBaseBlockMatch<T, DI, ?> bm = switch (config.errorType) {
-			case SAD -> {
-				DisparitySelect select = createDisparitySelect(config, imageType, maxError);
-				BlockRowScore rowScore = createScoreRowSad(config, imageType);
-				DisparityBlockMatchRowFormat alg = createBestFive(config, imageType, select, rowScore);
-				alg.setBorder(FactoryImageBorder.generic(config.border, rowScore.getImageType()));
-				yield new WrapDisparityBlockMatchRowFormat(alg);
-			}
-			case SSD -> {
-				DisparitySelect select = createDisparitySelect(config, imageType, maxError);
-				BlockRowScore rowScore = createScoreRowSsd(config, imageType);
-				DisparityBlockMatchRowFormat alg = createBestFive(config, imageType, select, rowScore);
-				alg.setBorder(FactoryImageBorder.generic(config.border, rowScore.getImageType()));
-				yield new WrapDisparityBlockMatchRowFormat(alg);
-			}
-			case ZSSD -> {
-				DisparitySelect select = createDisparitySelect(config, GrayF32.class, maxError);
-				BlockRowScore rowScore = createScoreRowZssd(config, GrayF32.class);
-				DisparityBlockMatchRowFormat alg = createBestFive(config, GrayF32.class, select, rowScore);
-				alg.setBorder(FactoryImageBorder.generic(config.border, rowScore.getImageType()));
-				// Not normalized, unlike NCC, since rescaling the input would change the scale of the error
-				yield new DisparityBlockMatchPreFilter(alg, imageType);
-			}
-			case CENSUS -> {
-				DisparitySelect select = createDisparitySelect(config, imageType, maxError);
-				FilterImageInterface censusTran = FactoryCensusTransform.variant(config.configCensus.variant, true, imageType);
-				BlockRowScore rowScore = createCensusRowScore(config, censusTran);
-				DisparityBlockMatchRowFormat alg = createBestFive(config,
-						censusTran.getOutputType().getImageClass(), select, rowScore);
-				alg.setBorder(FactoryImageBorder.generic(config.border, censusTran.getOutputType()));
-				yield new WrapDisparityBlockMatchCensus<>(censusTran, alg);
-			}
-			case NCC -> {
-				DisparitySelect select = createDisparitySelect(config, GrayF32.class, maxError);
-				BlockRowScore rowScore = createScoreRowNcc(config, GrayF32.class);
-				DisparityBlockMatchRowFormat alg = createBestFive(config, GrayF32.class, select, rowScore);
-				alg.setBorder(FactoryImageBorder.generic(config.border, rowScore.getImageType()));
-				var ret = new DisparityBlockMatchPreFilter(alg, imageType);
-				if (config.configNCC.normalizeInput)
-					ret.setType(DisparityBlockMatchPreFilter.Type.CORRELATION);
-				yield ret;
-			}
-			default -> throw new IllegalArgumentException("Unsupported error type " + config.errorType);
-		};
+			// 3 regions are used not just one in this case
+			maxError *= 3;
+
+			bm = switch (config.errorType) {
+				case SAD -> {
+					DisparitySelect select = createDisparitySelect(config, imageType, maxError);
+					BlockRowScore rowScore = createScoreRowSad(config, imageType);
+					DisparityBlockMatchRowFormat alg = createBestFive(config, imageType, select, rowScore);
+					alg.setBorder(FactoryImageBorder.generic(config.border, rowScore.getImageType()));
+					yield new WrapDisparityBlockMatchRowFormat(alg);
+				}
+				case SSD -> {
+					DisparitySelect select = createDisparitySelect(config, imageType, maxError);
+					BlockRowScore rowScore = createScoreRowSsd(config, imageType);
+					DisparityBlockMatchRowFormat alg = createBestFive(config, imageType, select, rowScore);
+					alg.setBorder(FactoryImageBorder.generic(config.border, rowScore.getImageType()));
+					yield new WrapDisparityBlockMatchRowFormat(alg);
+				}
+				case ZSSD -> {
+					DisparitySelect select = createDisparitySelect(config, GrayF32.class, maxError);
+					BlockRowScore rowScore = createScoreRowZssd(config, GrayF32.class);
+					DisparityBlockMatchRowFormat alg = createBestFive(config, GrayF32.class, select, rowScore);
+					alg.setBorder(FactoryImageBorder.generic(config.border, rowScore.getImageType()));
+					// Not normalized, unlike NCC, since rescaling the input would change the scale of the error
+					yield new DisparityBlockMatchPreFilter(alg, imageType);
+				}
+				case CENSUS -> {
+					DisparitySelect select = createDisparitySelect(config, imageType, maxError);
+					FilterImageInterface censusTran = FactoryCensusTransform.variant(config.configCensus.variant, true, imageType);
+					BlockRowScore rowScore = createCensusRowScore(config, censusTran);
+					DisparityBlockMatchRowFormat alg = createBestFive(config,
+							censusTran.getOutputType().getImageClass(), select, rowScore);
+					alg.setBorder(FactoryImageBorder.generic(config.border, censusTran.getOutputType()));
+					yield new WrapDisparityBlockMatchCensus<>(censusTran, alg);
+				}
+				case NCC -> {
+					DisparitySelect select = createDisparitySelect(config, GrayF32.class, maxError);
+					BlockRowScore rowScore = createScoreRowNcc(config, GrayF32.class);
+					DisparityBlockMatchRowFormat alg = createBestFive(config, GrayF32.class, select, rowScore);
+					alg.setBorder(FactoryImageBorder.generic(config.border, rowScore.getImageType()));
+					var ret = new DisparityBlockMatchPreFilter(alg, imageType);
+					if (config.configNCC.normalizeInput)
+						ret.setType(DisparityBlockMatchPreFilter.Type.CORRELATION);
+					yield ret;
+				}
+				default -> throw new IllegalArgumentException("Unsupported error type " + config.errorType);
+			};
+		}
 		bm.setScoreEnabled(config.saveScore);
 		return (StereoDisparity)bm;
 	}
@@ -426,7 +435,7 @@ public class FactoryStereoDisparity {
 	/// @param imageType Type of input image
 	/// @param dispType Type of disparity image. F32 is sub-pixel is turned on, U8 otherwise
 	/// @return The algorithm.
-	public static <T extends ImageGray<T>, DI extends ImageGray<DI>> StereoDisparity<T, DI>
+	public static <T extends ImageGray<T>, DI extends ImageGray<DI>> StereoDisparitySgm<T, DI>
 	sgm( @Nullable ConfigDisparitySGM config, Class<T> imageType, Class<DI> dispType ) {
 		if (config == null)
 			config = new ConfigDisparitySGM();
@@ -441,9 +450,14 @@ public class FactoryStereoDisparity {
 			}
 		}
 
+		// See if an override method has been specified
+		StereoDisparitySgm<T, DI> override = BOverrideStereoDisparity.createSgm(config, imageType, dispType);
+		if (override != null)
+			return override;
+
 		if (imageType == GrayU8.class) {
-			SgmStereoDisparity alg = FactoryStereoDisparityAlgs.createSgm(config);
-			return (StereoDisparity)new WrapDisparitySgm(alg, config.subpixel);
+			StereoDisparitySgmAlg alg = FactoryStereoDisparityAlgs.createSgm(config);
+			return (StereoDisparitySgm)new WrapDisparitySgm(alg, config.subpixel);
 		} else {
 			throw new IllegalArgumentException("Only U8 input supported");
 		}

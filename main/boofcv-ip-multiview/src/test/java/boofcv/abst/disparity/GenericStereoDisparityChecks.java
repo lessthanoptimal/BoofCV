@@ -106,6 +106,14 @@ public abstract class GenericStereoDisparityChecks<Image extends ImageBase<Image
 		assertTrue(range <= alg.getInvalidValue());
 	}
 
+	/** The reported disparity type must match the type of the returned disparity image */
+	@Test void disparityType() {
+		StereoDisparity<Image, Disparity> alg = createAlg(0, 20);
+		assertEquals(disparityType.getImageClass(), alg.getDisparityType());
+		alg.process(left, right);
+		assertEquals(alg.getDisparityType(), alg.getDisparity().getClass());
+	}
+
 	@Test
 	void runTwiceSameResult() {
 		StereoDisparity<Image, Disparity> alg = createAlg(0, 20);

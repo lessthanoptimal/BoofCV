@@ -54,7 +54,7 @@ import pabeles.concurrency.IntRangeObjectConsumer;
 ///
 /// @see SgmDisparityCost
 /// @see SgmDisparitySelector
-/// @see SgmStereoDisparity
+/// @see StereoDisparitySgmAlg
 @SuppressWarnings({"NullAway.Init"})
 public class SgmCostAggregation {
 

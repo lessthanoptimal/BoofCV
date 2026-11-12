@@ -19,14 +19,14 @@
 package boofcv.factory.disparity;
 
 import boofcv.alg.disparity.sgm.SgmDisparityCost;
-import boofcv.alg.disparity.sgm.SgmStereoDisparityHmi;
+import boofcv.alg.disparity.sgm.StereoDisparitySgmHmiAlg;
 import boofcv.struct.Configuration;
 import boofcv.struct.KernelRadius2D;
 import boofcv.struct.border.BorderType;
 
 import static boofcv.alg.disparity.sgm.SgmDisparityCost.MAX_COST;
 
-/// Configuration for [`Semi Global Matching`][SgmStereoDisparityHmi]
+/// Configuration for [`Semi Global Matching`][StereoDisparitySgmHmiAlg]
 public class ConfigDisparitySGM implements Configuration {
 	/// Minimum disparity to consider. Can be positive or negative. In almost all cases this should be set
 	/// to zero, e.g. stereo images. A negative value is useful for dual pixel processing.

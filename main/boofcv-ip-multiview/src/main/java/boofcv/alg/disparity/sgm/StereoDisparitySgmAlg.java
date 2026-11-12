@@ -29,7 +29,7 @@ import lombok.Setter;
 ///
 /// 1) Hirschmuller, Heiko. "Stereo processing by semiglobal matching and mutual information."
 /// IEEE Transactions on pattern analysis and machine intelligence 30.2 (2007): 328-341.
-public abstract class SgmStereoDisparity<T extends ImageBase<T>, C extends ImageBase<C>> {
+public abstract class StereoDisparitySgmAlg<T extends ImageBase<T>, C extends ImageBase<C>> {
 	// Defines the disparity search range
 	@Getter @Setter protected int disparityMin = 0;     // minimum disparity considered
 	@Getter @Setter protected int disparityRange = 0;   // number of disparity values considered
@@ -49,7 +49,7 @@ public abstract class SgmStereoDisparity<T extends ImageBase<T>, C extends Image
 	// score for selected disparity
 	@Getter protected GrayF32 score = new GrayF32(1, 1);
 
-	protected SgmStereoDisparity( SgmDisparityCost<C> sgmCost, SgmDisparitySelector selector ) {
+	protected StereoDisparitySgmAlg( SgmDisparityCost<C> sgmCost, SgmDisparitySelector selector ) {
 		this.sgmCost = sgmCost;
 		this.selector = selector;
 	}

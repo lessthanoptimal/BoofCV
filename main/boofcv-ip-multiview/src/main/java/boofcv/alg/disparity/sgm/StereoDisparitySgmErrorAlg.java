@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,31 +18,18 @@
 
 package boofcv.alg.disparity.sgm;
 
-import boofcv.abst.filter.FilterImageInterface;
 import boofcv.alg.InputSanityCheck;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageGray;
 
 /**
- * Computes Census score for SGM using a straight forward implementation. A census transform is applied
- * to the left and right input images. That's then used to compute the census error.
+ * Base class for SGM score functions that compute the score directly from the input images.
  *
  * @author Peter Abeles
  */
-public class SgmStereoDisparityCensus<T extends ImageBase<T>, C extends ImageGray<C>>
-		extends SgmStereoDisparity<T, C> {
-	FilterImageInterface<T, C> censusTran;
-	// Storage for census transform of left and right images
-	C cleft;
-	C cright;
-
-	public SgmStereoDisparityCensus( FilterImageInterface<T, C> censusTran,
-									 SgmDisparityCost<C> sgmCost, SgmDisparitySelector selector ) {
+public class StereoDisparitySgmErrorAlg<T extends ImageBase<T>>
+		extends StereoDisparitySgmAlg<T, T> {
+	public StereoDisparitySgmErrorAlg( SgmDisparityCost<T> sgmCost, SgmDisparitySelector selector ) {
 		super(sgmCost, selector);
-
-		this.censusTran = censusTran;
-		cleft = censusTran.getOutputType().createImage(1, 1);
-		cright = censusTran.getOutputType().createImage(1, 1);
 	}
 
 	/**
@@ -54,18 +41,13 @@ public class SgmStereoDisparityCensus<T extends ImageBase<T>, C extends ImageGra
 	@Override
 	public void process( T left, T right ) {
 		InputSanityCheck.checkSameShape(left, right);
-
-		// Apply Census Transform to input images
-		censusTran.process(left, cleft);
-		censusTran.process(right, cright);
-
 		disparity.reshape(left);
 		helper.configure(left.width, disparityMin, disparityRange);
 		sgmCost.configure(disparityMin, disparityRange);
 		aggregation.configure(disparityMin);
 
 		// Compute the cost using mutual information
-		sgmCost.process(cleft, cright, costYXD);
+		sgmCost.process(left, right, costYXD);
 		// Aggregate the cost along all the paths
 		aggregation.process(costYXD);
 

@@ -7,10 +7,13 @@ Version Meaning: <compatible>.<feature>.<bug fix>
 - Last digit always indicates a bug fix and other minor changes
 
 ---------------------
-Date    : 2026/
-Version : 1.6.1
+Date    : 2026/XXX/YY
+Version : 1.7.0
 
--- StereoDisparity: single and multi-thread produce identical results. BM and BM5
+- Build: Doesn't require Android SDK to build anymore
+- AverageDownSample: Fixed width being used when height should have
+- StereoDisparity: BOverride added for native implementations
+- StereoDisparity: single and multi-thread produce identical results. BM and BM5
 
 ---------------------
 Date    : 2026/Oct/22

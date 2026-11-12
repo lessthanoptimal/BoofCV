@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,17 +24,17 @@ import boofcv.struct.image.ImageType;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Nested;
 
-class TestSgmStereoDisparityError extends BoofStandardJUnit {
+class TestStereoDisparitySgmErrorAlg extends BoofStandardJUnit {
 	@Nested
-	public class U8_U8 extends GenericSgmStereoDisparityChecks<GrayU8, GrayU8> {
+	public class U8_U8 extends GenericStereoDisparitySgmAlgChecks<GrayU8, GrayU8> {
 		protected U8_U8() {
 			super(ImageType.SB_U8);
 		}
 
 		@Override
-		public SgmStereoDisparity<GrayU8, GrayU8> createAlgorithm() {
+		public StereoDisparitySgmAlg<GrayU8, GrayU8> createAlgorithm() {
 			SgmDisparitySelector selector = new SgmDisparitySelector();
-			return new SgmStereoDisparityError<>(new SgmCostAbsoluteDifference.U8(), selector);
+			return new StereoDisparitySgmErrorAlg<>(new SgmCostAbsoluteDifference.U8(), selector);
 		}
 	}
 }
