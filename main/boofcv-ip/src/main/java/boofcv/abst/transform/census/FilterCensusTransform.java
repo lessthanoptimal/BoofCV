@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,11 +27,7 @@ import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastAccess;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * Filter implementation of {@link boofcv.alg.transform.census.CensusTransform}.
- *
- * @author Peter Abeles
- */
+/// Filter implementation of [boofcv.alg.transform.census.CensusTransform].
 public abstract class FilterCensusTransform<In extends ImageGray<In>, Out extends ImageBase<Out>>
 		implements FilterImageInterface<In, Out> {
 	@Nullable ImageBorder<In> border;       // How the border for the input image is handled
@@ -48,9 +44,7 @@ public abstract class FilterCensusTransform<In extends ImageGray<In>, Out extend
 		this.ignoreRadius = border == null ? radius : 0;
 	}
 
-	/**
-	 * return the maximum distance away a coordinate is sampled
-	 */
+	/// return the maximum distance away a coordinate is sampled
 	static protected int computeRadius( final FastAccess<Point2D_I32> sample ) {
 		int radius = 0;
 		for (int i = 0; i < sample.size; i++) {
@@ -61,16 +55,12 @@ public abstract class FilterCensusTransform<In extends ImageGray<In>, Out extend
 		return radius;
 	}
 
-	/**
-	 * Radius of the local region sampled along x-axis
-	 */
+	/// Radius of the local region sampled along x-axis
 	public int getRadiusX() {
 		return sampleRadius;
 	}
 
-	/**
-	 * Radius of the local region sampled along y-axis
-	 */
+	/// Radius of the local region sampled along y-axis
 	public int getRadiusY() {
 		return sampleRadius;
 	}

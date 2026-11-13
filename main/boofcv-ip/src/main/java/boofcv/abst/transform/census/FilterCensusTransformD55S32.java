@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,11 +25,7 @@ import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * Census {@link GCensusTransform#dense5x5} transform with output in {@link GrayS32} image.
- *
- * @author Peter Abeles
- */
+/// Census [GCensusTransform#dense5x5] transform with output in [GrayS32] image.
 public class FilterCensusTransformD55S32<In extends ImageGray<In>>
 		extends FilterCensusTransform<In, GrayS32> {
 	public FilterCensusTransformD55S32( @Nullable ImageBorder<In> border, Class<In> imageType ) {

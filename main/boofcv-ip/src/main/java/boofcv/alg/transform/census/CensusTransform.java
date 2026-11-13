@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,22 +33,16 @@ import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * <p>The Census Transform [1] computes a bit mask for each pixel in the image. If a neighboring pixel is greater than the
- * center pixel in a region that bit is set to 1. A 3x3 region 9radius=1) is encoded in 8-bits and a 5x5 region
- * (radius=2) in 24-bits. To compute the error between two pixels simply compute the hamming distance. The
- * hamming distance for an input can be computed using DescriptorDistance.hamming().</p>
- *
- * <p>DEVELOPMENT NOTE: See if this can be speed up by only comparing each pixel with another once.
- * Code will be complex</p>
- *
- * <p>
- * [1] Zabih, Ramin, and John Woodfill. "Non-parametric local transforms for computing visual correspondence."
- * European conference on computer vision. Springer, Berlin, Heidelberg, 1994.
- * </p>
- *
- * @author Peter Abeles
- */
+/// The Census Transform [1] computes a bit mask for each pixel in the image. If a neighboring pixel is greater than the
+/// center pixel in a region that bit is set to 1. A 3x3 region (radius=1) is encoded in 8-bits and a 5x5 region
+/// (radius=2) in 24-bits. To compute the error between two pixels simply compute the hamming distance. The
+/// hamming distance for an input can be computed using DescriptorDistance.hamming().
+///
+/// DEVELOPMENT NOTE: See if this can be speed up by only comparing each pixel with another once.
+/// Code will be complex
+///
+/// [1] Zabih, Ramin, and John Woodfill. "Non-parametric local transforms for computing visual correspondence."
+/// European conference on computer vision. Springer, Berlin, Heidelberg, 1994.
 public class CensusTransform {
 
 	public static DogArray<Point2D_I32> createBlockSamples( int radius ) {
@@ -98,13 +92,11 @@ public class CensusTransform {
 		return samples;
 	}
 
-	/**
-	 * Census transform for local 3x3 region around each pixel.
-	 *
-	 * @param input Input image
-	 * @param output Census transformed output image
-	 * @param border (Nullable) How the border is handled
-	 */
+	/// Census transform for local 3x3 region around each pixel.
+	///
+	/// @param input Input image
+	/// @param output Census transformed output image
+	/// @param border (Nullable) How the border is handled
 	public static void dense3x3( final GrayU8 input, final GrayU8 output, @Nullable ImageBorder_S32<GrayU8> border ) {
 		InputSanityCheck.checkReshape(input, output);
 
@@ -120,13 +112,11 @@ public class CensusTransform {
 		}
 	}
 
-	/**
-	 * Census transform for local 3x3 region around each pixel.
-	 *
-	 * @param input Input image
-	 * @param output Census transformed output image
-	 * @param border (Nullable) How the border is handled
-	 */
+	/// Census transform for local 3x3 region around each pixel.
+	///
+	/// @param input Input image
+	/// @param output Census transformed output image
+	/// @param border (Nullable) How the border is handled
 	public static void dense3x3( final GrayU16 input, final GrayU8 output, @Nullable ImageBorder_S32<GrayU16> border ) {
 		InputSanityCheck.checkReshape(input, output);
 
@@ -142,13 +132,11 @@ public class CensusTransform {
 		}
 	}
 
-	/**
-	 * Census transform for local 3x3 region around each pixel.
-	 *
-	 * @param input Input image
-	 * @param output Census transformed output image
-	 * @param border (Nullable) How the border is handled
-	 */
+	/// Census transform for local 3x3 region around each pixel.
+	///
+	/// @param input Input image
+	/// @param output Census transformed output image
+	/// @param border (Nullable) How the border is handled
 	public static void dense3x3( final GrayF32 input, final GrayU8 output, @Nullable ImageBorder_F32 border ) {
 		InputSanityCheck.checkReshape(input, output);
 
@@ -164,13 +152,11 @@ public class CensusTransform {
 		}
 	}
 
-	/**
-	 * Census transform for local 5x5 region around each pixel.
-	 *
-	 * @param input Input image
-	 * @param output Census transformed output image
-	 * @param border (Nullable) How the border is handled
-	 */
+	/// Census transform for local 5x5 region around each pixel.
+	///
+	/// @param input Input image
+	/// @param output Census transformed output image
+	/// @param border (Nullable) How the border is handled
 	public static void dense5x5( final GrayU8 input, final GrayS32 output, @Nullable ImageBorder_S32<GrayU8> border ) {
 		InputSanityCheck.checkReshape(input, output);
 
@@ -186,13 +172,11 @@ public class CensusTransform {
 		}
 	}
 
-	/**
-	 * Census transform for local 5x5 region around each pixel.
-	 *
-	 * @param input Input image
-	 * @param output Census transformed output image
-	 * @param border (Nullable) How the border is handled
-	 */
+	/// Census transform for local 5x5 region around each pixel.
+	///
+	/// @param input Input image
+	/// @param output Census transformed output image
+	/// @param border (Nullable) How the border is handled
 	public static void dense5x5( final GrayU16 input, final GrayS32 output, @Nullable ImageBorder_S32<GrayU16> border ) {
 		InputSanityCheck.checkReshape(input, output);
 
@@ -208,13 +192,11 @@ public class CensusTransform {
 		}
 	}
 
-	/**
-	 * Census transform for local 5x5 region around each pixel.
-	 *
-	 * @param input Input image
-	 * @param output Census transformed output image
-	 * @param border (Nullable) How the border is handled
-	 */
+	/// Census transform for local 5x5 region around each pixel.
+	///
+	/// @param input Input image
+	/// @param output Census transformed output image
+	/// @param border (Nullable) How the border is handled
 	public static void dense5x5( final GrayF32 input, final GrayS32 output, @Nullable ImageBorder_F32 border ) {
 		InputSanityCheck.checkReshape(input, output);
 
@@ -230,14 +212,12 @@ public class CensusTransform {
 		}
 	}
 
-	/**
-	 * Census transform for an arbitrary region specified by the provided sample points
-	 *
-	 * @param input Input image
-	 * @param sample Relative coordinates that are sampled when computing the
-	 * @param output Census transformed output image
-	 * @param border (Nullable) How the border is handled
-	 */
+	/// Census transform for an arbitrary region specified by the provided sample points
+	///
+	/// @param input Input image
+	/// @param sample Relative coordinates that are sampled when computing the census
+	/// @param output Census transformed output image
+	/// @param border (Nullable) How the border is handled
 	public static void sample_S64( final GrayU8 input, final FastAccess<Point2D_I32> sample,
 								   final GrayS64 output, @Nullable ImageBorder_S32<GrayU8> border,
 								   @Nullable DogArray_I32 workSpace ) {
@@ -261,14 +241,12 @@ public class CensusTransform {
 		}
 	}
 
-	/**
-	 * Census transform for an arbitrary region specified by the provided sample points
-	 *
-	 * @param input Input image
-	 * @param sample Relative coordinates that are sampled when computing the
-	 * @param output Census transformed output image
-	 * @param border (Nullable) How the border is handled
-	 */
+	/// Census transform for an arbitrary region specified by the provided sample points
+	///
+	/// @param input Input image
+	/// @param sample Relative coordinates that are sampled when computing the census
+	/// @param output Census transformed output image
+	/// @param border (Nullable) How the border is handled
 	public static void sample_S64( final GrayU16 input, final FastAccess<Point2D_I32> sample,
 								   final GrayS64 output, @Nullable ImageBorder_S32<GrayU16> border,
 								   @Nullable DogArray_I32 workSpace ) {
@@ -292,14 +270,12 @@ public class CensusTransform {
 		}
 	}
 
-	/**
-	 * Census transform for an arbitrary region specified by the provided sample points
-	 *
-	 * @param input Input image
-	 * @param sample Relative coordinates that are sampled when computing the
-	 * @param output Census transformed output image
-	 * @param border (Nullable) How the border is handled
-	 */
+	/// Census transform for an arbitrary region specified by the provided sample points
+	///
+	/// @param input Input image
+	/// @param sample Relative coordinates that are sampled when computing the census
+	/// @param output Census transformed output image
+	/// @param border (Nullable) How the border is handled
 	public static void sample_S64( final GrayF32 input, final FastAccess<Point2D_I32> sample,
 								   final GrayS64 output, @Nullable ImageBorder_F32 border,
 								   @Nullable DogArray_I32 workSpace ) {
@@ -323,14 +299,12 @@ public class CensusTransform {
 		}
 	}
 
-	/**
-	 * Census transform for an arbitrary region specified by the provided sample points
-	 *
-	 * @param input Input image
-	 * @param sample Relative coordinates that are sampled when computing the
-	 * @param output Census transformed output image
-	 * @param border (Nullable) How the border is handled
-	 */
+	/// Census transform for an arbitrary region specified by the provided sample points
+	///
+	/// @param input Input image
+	/// @param sample Relative coordinates that are sampled when computing the census
+	/// @param output Census transformed output image
+	/// @param border (Nullable) How the border is handled
 	public static void sample_IU16( final GrayU8 input, final FastAccess<Point2D_I32> sample,
 									final InterleavedU16 output, @Nullable ImageBorder_S32<GrayU8> border,
 									@Nullable DogArray_I32 workSpace ) {
@@ -356,14 +330,12 @@ public class CensusTransform {
 		}
 	}
 
-	/**
-	 * Census transform for an arbitrary region specified by the provided sample points
-	 *
-	 * @param input Input image
-	 * @param sample Relative coordinates that are sampled when computing the
-	 * @param output Census transformed output image
-	 * @param border (Nullable) How the border is handled
-	 */
+	/// Census transform for an arbitrary region specified by the provided sample points
+	///
+	/// @param input Input image
+	/// @param sample Relative coordinates that are sampled when computing the census
+	/// @param output Census transformed output image
+	/// @param border (Nullable) How the border is handled
 	public static void sample_IU16( final GrayU16 input, final FastAccess<Point2D_I32> sample,
 									final InterleavedU16 output, @Nullable ImageBorder_S32<GrayU16> border,
 									@Nullable DogArray_I32 workSpace ) {
@@ -389,14 +361,12 @@ public class CensusTransform {
 		}
 	}
 
-	/**
-	 * Census transform for an arbitrary region specified by the provided sample points
-	 *
-	 * @param input Input image
-	 * @param sample Relative coordinates that are sampled when computing the
-	 * @param output Census transformed output image
-	 * @param border (Nullable) How the border is handled
-	 */
+	/// Census transform for an arbitrary region specified by the provided sample points
+	///
+	/// @param input Input image
+	/// @param sample Relative coordinates that are sampled when computing the census
+	/// @param output Census transformed output image
+	/// @param border (Nullable) How the border is handled
 	public static void sample_IU16( final GrayF32 input, final FastAccess<Point2D_I32> sample,
 									final InterleavedU16 output, @Nullable ImageBorder_F32 border,
 									@Nullable DogArray_I32 workSpace ) {
@@ -422,12 +392,10 @@ public class CensusTransform {
 		}
 	}
 
-	/**
-	 * @param input (Input) Input image
-	 * @param sample (Input) Points being sampled
-	 * @param workSpace (Output) Stores the offsets from current point that need to be sampled
-	 * @return The maximum distance away (x and y) that a point is sampled
-	 */
+	/// @param input (Input) Input image
+	/// @param sample (Input) Points being sampled
+	/// @param workSpace (Output) Stores the offsets from current point that need to be sampled
+	/// @return The maximum distance away (x and y) that a point is sampled
 	private static int computeRadiusWorkspace( ImageBase input, FastAccess<Point2D_I32> sample, DogArray_I32 workSpace ) {
 		int radius = 0;
 		workSpace.resize(sample.size);
