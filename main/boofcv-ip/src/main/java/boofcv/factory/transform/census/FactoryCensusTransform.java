@@ -48,7 +48,7 @@ public class FactoryCensusTransform {
 			case BLOCK_5_5: return blockDense(2, border, imageType);
 			case BLOCK_7_7: return blockDense(3, border, imageType);
 			case BLOCK_9_7: return blockDense(4, 3, border, imageType);
-			case BLOCK_13_5: return blockDense(5, 2, border, imageType);
+			case BLOCK_13_5: return blockDense(6, 2, border, imageType);
 			case CIRCLE_9: {
 				DogArray<Point2D_I32> points = CensusTransform.createCircleSamples();
 				return new FilterCensusTransformSampleS64(points, createBorder(border, imageType), imageType);
