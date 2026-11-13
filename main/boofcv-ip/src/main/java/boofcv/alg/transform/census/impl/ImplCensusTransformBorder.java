@@ -67,118 +67,74 @@ public class ImplCensusTransformBorder {
 	}
 
 	public static void dense3x3_U8(final ImageBorder_S32 input, final GrayU8 output ) {
+		final int radius = 1;
 		final int width = output.width;
 		final int height = output.height;
 
-		int indexDst0 = output.startIndex;
-		int indexDst1 = output.startIndex + (output.height-1)*output.stride;
-		final int h = output.height-1;
-
-		for (int x = 0; x < width; x++) {
-			output.data[indexDst0++] = (byte) regionNxN(input,x,0,1);
-			output.data[indexDst1++] = (byte) regionNxN(input,x,h,1);
-		}
-
-		indexDst0 = output.startIndex + output.stride;
-		indexDst1 = output.startIndex + output.stride + width-1;
-		for (int y = 1; y < height-1; y++) {
-			output.data[indexDst0] = (byte) regionNxN(input,0,y,1);
-			output.data[indexDst1] = (byte) regionNxN(input,width-1,y,1);
-
-			indexDst0 += output.stride;
-			indexDst1 += output.stride;
+		// Each border pixel is computed once. Rows within the radius of the top or bottom, and every row when the
+		// image is too narrow to have an inner part, are entirely border. Other rows skip over the inner image.
+		for (int y = 0; y < height; y++) {
+			boolean wholeRow = y < radius || y >= height - radius || width <= 2*radius;
+			int indexDst = output.startIndex + y*output.stride;
+			for (int x = 0; x < width; x++) {
+				if (!wholeRow && x == radius)
+					x = width - radius;
+				output.data[indexDst + x] = (byte)regionNxN(input, x, y, radius);
+			}
 		}
 	}
 
 	public static void dense3x3_F32(final ImageBorder_F32 input, final GrayU8 output ) {
+		final int radius = 1;
 		final int width = output.width;
 		final int height = output.height;
 
-		int indexDst0 = output.startIndex;
-		int indexDst1 = output.startIndex + (output.height-1)*output.stride;
-		final int h = output.height-1;
-
-		for (int x = 0; x < width; x++) {
-			output.data[indexDst0++] = (byte) regionNxN(input,x,0,1);
-			output.data[indexDst1++] = (byte) regionNxN(input,x,h,1);
-		}
-
-		indexDst0 = output.startIndex + output.stride;
-		indexDst1 = output.startIndex + output.stride + width-1;
-		for (int y = 1; y < height-1; y++) {
-			output.data[indexDst0] = (byte) regionNxN(input,0,y,1);
-			output.data[indexDst1] = (byte) regionNxN(input,width-1,y,1);
-
-			indexDst0 += output.stride;
-			indexDst1 += output.stride;
+		// Each border pixel is computed once. Rows within the radius of the top or bottom, and every row when the
+		// image is too narrow to have an inner part, are entirely border. Other rows skip over the inner image.
+		for (int y = 0; y < height; y++) {
+			boolean wholeRow = y < radius || y >= height - radius || width <= 2*radius;
+			int indexDst = output.startIndex + y*output.stride;
+			for (int x = 0; x < width; x++) {
+				if (!wholeRow && x == radius)
+					x = width - radius;
+				output.data[indexDst + x] = (byte)regionNxN(input, x, y, radius);
+			}
 		}
 	}
 
 	public static void dense5x5_U8(final ImageBorder_S32 input, final GrayS32 output ) {
+		final int radius = 2;
 		final int width = output.width;
 		final int height = output.height;
 
-		int indexDst0 = output.startIndex;
-		int indexDst1 = output.startIndex + output.stride;
-		int indexDst2 = output.startIndex + (output.height-2)*output.stride;
-		int indexDst3 = output.startIndex + (output.height-1)*output.stride;
-
-		for (int x = 0; x < width; x++) {
-			output.data[indexDst0++] = regionNxN(input,x,0,2);
-			output.data[indexDst1++] = regionNxN(input,x,1,2);
-			output.data[indexDst2++] = regionNxN(input,x,height-2,2);
-			output.data[indexDst3++] = regionNxN(input,x,height-1,2);
-		}
-
-		indexDst0 = output.startIndex + output.stride;
-		indexDst1 = output.startIndex + output.stride + 1;
-		indexDst2 = output.startIndex + output.stride + width-2;
-		indexDst3 = output.startIndex + output.stride + width-1;
-
-		for (int y = 1; y < height-1; y++) {
-			output.data[indexDst0] = regionNxN(input,0,y,2);
-			output.data[indexDst1] = regionNxN(input,1,y,2);
-			output.data[indexDst2] = regionNxN(input,width-2,y,2);
-			output.data[indexDst3] = regionNxN(input,width-1,y,2);
-
-			indexDst0 += output.stride;
-			indexDst1 += output.stride;
-			indexDst2 += output.stride;
-			indexDst3 += output.stride;
+		// Each border pixel is computed once. Rows within the radius of the top or bottom, and every row when the
+		// image is too narrow to have an inner part, are entirely border. Other rows skip over the inner image.
+		for (int y = 0; y < height; y++) {
+			boolean wholeRow = y < radius || y >= height - radius || width <= 2*radius;
+			int indexDst = output.startIndex + y*output.stride;
+			for (int x = 0; x < width; x++) {
+				if (!wholeRow && x == radius)
+					x = width - radius;
+				output.data[indexDst + x] = regionNxN(input, x, y, radius);
+			}
 		}
 	}
 
 	public static void dense5x5_F32(final ImageBorder_F32 input, final GrayS32 output ) {
+		final int radius = 2;
 		final int width = output.width;
 		final int height = output.height;
 
-		int indexDst0 = output.startIndex;
-		int indexDst1 = output.startIndex + output.stride;
-		int indexDst2 = output.startIndex + (output.height-2)*output.stride;
-		int indexDst3 = output.startIndex + (output.height-1)*output.stride;
-
-		for (int x = 0; x < width; x++) {
-			output.data[indexDst0++] = regionNxN(input,x,0,2);
-			output.data[indexDst1++] = regionNxN(input,x,1,2);
-			output.data[indexDst2++] = regionNxN(input,x,height-2,2);
-			output.data[indexDst3++] = regionNxN(input,x,height-1,2);
-		}
-
-		indexDst0 = output.startIndex + output.stride;
-		indexDst1 = output.startIndex + output.stride + 1;
-		indexDst2 = output.startIndex + output.stride + width-2;
-		indexDst3 = output.startIndex + output.stride + width-1;
-
-		for (int y = 1; y < height-1; y++) {
-			output.data[indexDst0] = regionNxN(input,0,y,2);
-			output.data[indexDst1] = regionNxN(input,1,y,2);
-			output.data[indexDst2] = regionNxN(input,width-2,y,2);
-			output.data[indexDst3] = regionNxN(input,width-1,y,2);
-
-			indexDst0 += output.stride;
-			indexDst1 += output.stride;
-			indexDst2 += output.stride;
-			indexDst3 += output.stride;
+		// Each border pixel is computed once. Rows within the radius of the top or bottom, and every row when the
+		// image is too narrow to have an inner part, are entirely border. Other rows skip over the inner image.
+		for (int y = 0; y < height; y++) {
+			boolean wholeRow = y < radius || y >= height - radius || width <= 2*radius;
+			int indexDst = output.startIndex + y*output.stride;
+			for (int x = 0; x < width; x++) {
+				if (!wholeRow && x == radius)
+					x = width - radius;
+				output.data[indexDst + x] = regionNxN(input, x, y, radius);
+			}
 		}
 	}
 
@@ -188,23 +144,15 @@ public class ImplCensusTransformBorder {
 		final int width = output.width;
 		final int height = output.height;
 
-		for (int r = 0; r < radius; r++) {
-			int indexDst0 = output.startIndex + r*output.stride;
-			int indexDst1 = output.startIndex + (height-r-1)*output.stride;
+		// Each border pixel is computed once. Rows within the radius of the top or bottom, and every row when the
+		// image is too narrow to have an inner part, are entirely border. Other rows skip over the inner image.
+		for (int y = 0; y < height; y++) {
+			boolean wholeRow = y < radius || y >= height - radius || width <= 2*radius;
+			int indexDst = output.startIndex + y*output.stride;
 			for (int x = 0; x < width; x++) {
-				output.data[indexDst0++] = sample_S64(input,x,r,offsets);
-				output.data[indexDst1++] = sample_S64(input,x,height-r-1,offsets);
-			}
-		}
-
-		for (int r = 0; r < radius; r++) {
-			int indexDst0 = output.startIndex + radius*output.stride+r;
-			int indexDst1 = output.startIndex + radius*output.stride+(width-r-1);
-			for (int y = radius; y < height-radius; y++) {
-				output.data[indexDst0] = sample_S64(input,r,y,offsets);
-				output.data[indexDst1] = sample_S64(input,width-r-1,y,offsets);
-				indexDst0 += output.stride;
-				indexDst1 += output.stride;
+				if (!wholeRow && x == radius)
+					x = width - radius;
+				output.data[indexDst + x] = sample_S64(input, x, y, offsets);
 			}
 		}
 	}
@@ -215,23 +163,15 @@ public class ImplCensusTransformBorder {
 		final int width = output.width;
 		final int height = output.height;
 
-		for (int r = 0; r < radius; r++) {
-			int indexDst0 = output.startIndex + r*output.stride;
-			int indexDst1 = output.startIndex + (height-r-1)*output.stride;
+		// Each border pixel is computed once. Rows within the radius of the top or bottom, and every row when the
+		// image is too narrow to have an inner part, are entirely border. Other rows skip over the inner image.
+		for (int y = 0; y < height; y++) {
+			boolean wholeRow = y < radius || y >= height - radius || width <= 2*radius;
+			int indexDst = output.startIndex + y*output.stride;
 			for (int x = 0; x < width; x++) {
-				output.data[indexDst0++] = sample_S64(input,x,r,offsets);
-				output.data[indexDst1++] = sample_S64(input,x,height-r-1,offsets);
-			}
-		}
-
-		for (int r = 0; r < radius; r++) {
-			int indexDst0 = output.startIndex + radius*output.stride+r;
-			int indexDst1 = output.startIndex + radius*output.stride+(width-r-1);
-			for (int y = radius; y < height-radius; y++) {
-				output.data[indexDst0] = sample_S64(input,r,y,offsets);
-				output.data[indexDst1] = sample_S64(input,width-r-1,y,offsets);
-				indexDst0 += output.stride;
-				indexDst1 += output.stride;
+				if (!wholeRow && x == radius)
+					x = width - radius;
+				output.data[indexDst + x] = sample_S64(input, x, y, offsets);
 			}
 		}
 	}
@@ -302,88 +242,52 @@ public class ImplCensusTransformBorder {
 
 	public static void sample_IU16(final ImageBorder_S32 input , final int radius , final FastAccess<Point2D_I32> offsets,
 								   final InterleavedU16 output ) {
+		final int numBands = output.numBands;
+		final int fullBlocks = offsets.size/16;
+
 		final int width = output.width;
 		final int height = output.height;
 
-		int numBands = output.numBands;
-
-		int fullBlocks = offsets.size/16;
-
-		for (int r = 0; r < radius; r++) {
-			int indexDst0 = output.startIndex + r*output.stride;
-			int indexDst1 = output.startIndex + (height-r-1)*output.stride;
+		// Each border pixel is computed once. Rows within the radius of the top or bottom, and every row when the
+		// image is too narrow to have an inner part, are entirely border. Other rows skip over the inner image.
+		for (int y = 0; y < height; y++) {
+			boolean wholeRow = y < radius || y >= height - radius || width <= 2*radius;
+			int indexDst = output.startIndex + y*output.stride;
 			for (int x = 0; x < width; x++) {
+				if (!wholeRow && x == radius)
+					x = width - radius;
+				int index = indexDst + x*numBands;
 				for (int i = 0; i < fullBlocks; i++) {
-					int idx0 = i*16;
-					int idx1 = idx0+16;
-					output.data[indexDst0++] = sample(input,x,r,offsets,idx0,idx1);
-					output.data[indexDst1++] = sample(input,x,height-r-1,offsets,idx0,idx1);
+					output.data[index++] = sample(input, x, y, offsets, i*16, i*16 + 16);
 				}
-				if( numBands != fullBlocks) {
-					output.data[indexDst0++] = sample(input,x,r,offsets,fullBlocks*16,offsets.size);
-					output.data[indexDst1++] = sample(input,x,height-r-1,offsets,fullBlocks*16,offsets.size);
-				}
-			}
-		}
-
-		for (int r = 0; r < radius; r++) {
-			for (int y = radius; y < height-radius; y++) {
-				int indexDst0 = output.startIndex + y*output.stride+r*numBands;
-				int indexDst1 = output.startIndex + y*output.stride+(width-r-1)*numBands;
-				for (int i = 0; i < fullBlocks; i++) {
-					int idx0 = i*16;
-					int idx1 = idx0+16;
-					output.data[indexDst0++] = sample(input,r,y,offsets,idx0,idx1);
-					output.data[indexDst1++] = sample(input,width-r-1,y,offsets,idx0,idx1);
-					}
-				if( numBands != fullBlocks) {
-					output.data[indexDst0++] = sample(input,r,y,offsets,fullBlocks*16,offsets.size);
-					output.data[indexDst1++] = sample(input,width-r-1,y,offsets,fullBlocks*16,offsets.size);
-				}
+				if (numBands != fullBlocks)
+					output.data[index] = sample(input, x, y, offsets, fullBlocks*16, offsets.size);
 			}
 		}
 	}
 
 	public static void sample_IU16(final ImageBorder_F32 input , final int radius , final FastAccess<Point2D_I32> offsets,
 								   final InterleavedU16 output ) {
+		final int numBands = output.numBands;
+		final int fullBlocks = offsets.size/16;
+
 		final int width = output.width;
 		final int height = output.height;
 
-		int numBands = output.numBands;
-
-		int fullBlocks = offsets.size/16;
-
-		for (int r = 0; r < radius; r++) {
-			int indexDst0 = output.startIndex + r*output.stride;
-			int indexDst1 = output.startIndex + (height-r-1)*output.stride;
+		// Each border pixel is computed once. Rows within the radius of the top or bottom, and every row when the
+		// image is too narrow to have an inner part, are entirely border. Other rows skip over the inner image.
+		for (int y = 0; y < height; y++) {
+			boolean wholeRow = y < radius || y >= height - radius || width <= 2*radius;
+			int indexDst = output.startIndex + y*output.stride;
 			for (int x = 0; x < width; x++) {
+				if (!wholeRow && x == radius)
+					x = width - radius;
+				int index = indexDst + x*numBands;
 				for (int i = 0; i < fullBlocks; i++) {
-					int idx0 = i*16;
-					int idx1 = idx0+16;
-					output.data[indexDst0++] = sample(input,x,r,offsets,idx0,idx1);
-					output.data[indexDst1++] = sample(input,x,height-r-1,offsets,idx0,idx1);
+					output.data[index++] = sample(input, x, y, offsets, i*16, i*16 + 16);
 				}
-				if( numBands != fullBlocks) {
-					output.data[indexDst0++] = sample(input,x,r,offsets,fullBlocks*16,offsets.size);
-					output.data[indexDst1++] = sample(input,x,height-r-1,offsets,fullBlocks*16,offsets.size);
-				}
-			}
-		}
-
-		for (int r = 0; r < radius; r++) {
-			for (int y = radius; y < height-radius; y++) {
-				int indexDst0 = output.startIndex + y*output.stride+r*numBands;
-				int indexDst1 = output.startIndex + y*output.stride+(width-r-1)*numBands;
-				for (int i = 0; i < fullBlocks; i++) {
-					int idx0 = i*16;
-					int idx1 = idx0+16;
-					output.data[indexDst0++] = sample(input,r,y,offsets,idx0,idx1);
-					output.data[indexDst1++] = sample(input,width-r-1,y,offsets,idx0,idx1);
-				}
-				if( numBands != fullBlocks) {
-					output.data[indexDst0++] = sample(input,r,y,offsets,fullBlocks*16,offsets.size);
-					output.data[indexDst1++] = sample(input,width-r-1,y,offsets,fullBlocks*16,offsets.size);
-				}
+				if (numBands != fullBlocks)
+					output.data[index] = sample(input, x, y, offsets, fullBlocks*16, offsets.size);
 			}
 		}
 	}
