@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,15 @@
 
 package boofcv.alg.transform.census;
 
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.core.image.GeneralizedImageOps;
+import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.struct.border.BorderType;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS64;
+import boofcv.struct.image.GrayU16;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.DogArray;
@@ -27,7 +36,8 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Only tests sampling functions. The actual transforms are tested by GCensusTransform
+ * Tests sampling functions and which bit each sample sets. The transforms are compared against a brute force
+ * implementation in GCensusTransform
  *
  * @author Peter Abeles
  */
@@ -78,5 +88,34 @@ class TestCensusTransform extends BoofStandardJUnit {
 		}
 		assertEquals(0, meanX);
 		assertEquals(0, meanY);
+	}
+
+	/**
+	 * Only one sample is brighter than the center pixel, so only its bit is set. Samples 31 and above need a 64-bit
+	 * mask. Checks a pixel in the inner image and one in the border.
+	 */
+	@Test
+	void sample_S64_bitOrder() {
+		DogArray<Point2D_I32> samples = CensusTransform.createBlockSamples(3);
+		assertEquals(48, samples.size);
+
+		for (Class type : new Class[]{GrayU8.class, GrayU16.class, GrayF32.class}) {
+			for (int index : new int[]{0, 30, 31, 32, 47}) {
+				// inner and border center pixels. Sample 0 is at (-3,-3), the others have positive offsets
+				int[][] centers = index == 0 ? new int[][]{{10, 10}, {18, 18}} : new int[][]{{10, 10}, {1, 1}};
+				for (int[] c : centers) {
+					ImageGray input = GeneralizedImageOps.createSingleBand(type, 20, 20);
+					GImageMiscOps.fill(input, 10);
+					Point2D_I32 p = samples.get(index);
+					GeneralizedImageOps.set(input, c[0] + p.x, c[1] + p.y, 20);
+
+					var output = new GrayS64(1, 1);
+					GCensusTransform.sample_S64(input, samples, output,
+							FactoryImageBorder.wrap(BorderType.EXTENDED, input), null);
+					assertEquals(1L << index, output.get(c[0], c[1]),
+							type.getSimpleName() + " index=" + index + " at " + c[0] + "," + c[1]);
+				}
+			}
+		}
 	}
 }

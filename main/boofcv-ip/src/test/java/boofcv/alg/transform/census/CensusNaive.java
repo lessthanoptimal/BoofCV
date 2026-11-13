@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -86,7 +86,7 @@ public class CensusNaive {
 		for (int y = 0; y < input.height; y++) {
 			for (int x = 0; x < input.width; x++) {
 				long census = 0;
-				int bit = 1;
+				long bit = 1;
 				double center = src.get(x,y).doubleValue();
 				for (int i = 0; i < sample.size; i++) {
 					Point2D_I32 p = sample.get(i);
