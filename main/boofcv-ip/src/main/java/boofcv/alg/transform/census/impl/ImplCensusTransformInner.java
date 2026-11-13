@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -203,7 +203,7 @@ public class ImplCensusTransformInner {
 				int center = src[indexSrc]& 0xFF;
 
 				long census = 0;
-				int bit = 1;
+				long bit = 1;
 				for (int i = 0; i < offsets.size; i++) {
 					if ((src[indexSrc + offsets.data[i]]& 0xFF) > center)
 						census |= bit;
@@ -455,7 +455,7 @@ public class ImplCensusTransformInner {
 				int center = src[indexSrc]& 0xFFFF;
 
 				long census = 0;
-				int bit = 1;
+				long bit = 1;
 				for (int i = 0; i < offsets.size; i++) {
 					if ((src[indexSrc + offsets.data[i]]& 0xFFFF) > center)
 						census |= bit;
@@ -707,7 +707,7 @@ public class ImplCensusTransformInner {
 				float center = src[indexSrc];
 
 				long census = 0;
-				int bit = 1;
+				long bit = 1;
 				for (int i = 0; i < offsets.size; i++) {
 					if ((src[indexSrc + offsets.data[i]]) > center)
 						census |= bit;

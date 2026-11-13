@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -277,7 +277,7 @@ public class ImplCensusTransformBorder {
 		int center = input.get(cx, cy);
 		long census = 0;
 
-		int bit = 1;
+		long bit = 1;
 		for (int i = 0; i < offsets.size; i++) {
 			Point2D_I32 p = offsets.data[i];
 			if( input.get(cx+p.x,cy+p.y) > center )
@@ -293,7 +293,7 @@ public class ImplCensusTransformBorder {
 		float center = input.get(cx, cy);
 		long census = 0;
 
-		int bit = 1;
+		long bit = 1;
 		for (int i = 0; i < offsets.size; i++) {
 			Point2D_I32 p = offsets.data[i];
 			if( input.get(cx+p.x,cy+p.y) > center )

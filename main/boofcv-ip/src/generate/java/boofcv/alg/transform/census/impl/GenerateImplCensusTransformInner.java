@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -239,7 +239,7 @@ public class GenerateImplCensusTransformInner extends CodeGeneratorBase {
 				"\t\t\t\t"+sumType+" center = src[indexSrc]"+bitwise+";\n" +
 				"\n" +
 				"\t\t\t\tlong census = 0;\n" +
-				"\t\t\t\tint bit = 1;\n" +
+				"\t\t\t\tlong bit = 1;\n" +
 				"\t\t\t\tfor (int i = 0; i < offsets.size; i++) {\n" +
 				"\t\t\t\t\tif ((src[indexSrc + offsets.data[i]]"+bitwise+") > center)\n" +
 				"\t\t\t\t\t\tcensus |= bit;\n" +
