@@ -42,8 +42,8 @@ public class GenerateImplCensusTransformInner extends CodeGeneratorBase {
 	private void printPreamble() {
 		out.print(
 				"import boofcv.struct.image.*;\n" +
-				"import boofcv.struct.image.InterleavedU16;\n" +
 				"import org.ddogleg.struct.DogArray_I32;\n" +
+				"\n" +
 				"import javax.annotation.Generated;\n" +
 				"\n" +
 				"//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;\n" +
@@ -51,6 +51,7 @@ public class GenerateImplCensusTransformInner extends CodeGeneratorBase {
 				"/**\n" +
 				" * Implementations of Census transform.\n" +
 				generateDocString("Peter Abeles") +
+				"@SuppressWarnings({\"NarrowingCompoundAssignment\"})\n" +
 				"public class "+className+" {\n");
 	}
 
@@ -331,7 +332,8 @@ public class GenerateImplCensusTransformInner extends CodeGeneratorBase {
 	}
 
 	public static void main( String[] args ) throws FileNotFoundException {
-		GenerateImplCensusTransformInner app = new GenerateImplCensusTransformInner();
-		app.generateCode();
+		var app = new GenerateImplCensusTransformInner();
+		app.setModuleName("boofcv-ip");
+		app.generate();
 	}
 }
