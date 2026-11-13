@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,28 +20,24 @@ package boofcv;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 
-/**
- * Master application which calls all auto code generating classes.
- *
- * @author Peter Abeles
- */
+/// Master application which calls all auto code generating classes.
 public class AutocodeMasterApp {
+	/// Finds the project root by searching the working directory and its parents
 	public static File findPathToProjectRoot() {
-		String path = "./";
-		while (true) {
-			File d = new File(path);
+		return findPathToProjectRoot(new File(""));
+	}
+
+	/// Finds the project root by searching start and its parents. The root is the first directory with "main"
+	/// and "gradle.properties" in it.
+	///
+	/// @throws RuntimeException If no parent is the project root
+	public static File findPathToProjectRoot( File start ) {
+		for (File d = start.getAbsoluteFile(); d != null; d = d.getParentFile()) {
 			if (new File(d, "main").exists() && new File(d, "gradle.properties").exists())
-				break;
-			path = "../" + path;
+				return d;
 		}
-
-		// normalize().toFile() messes up in this situation and makes it relative to "/"
-		if (path.equals("./"))
-			return new File(path);
-
-		return Paths.get(path).normalize().toFile();
+		throw new RuntimeException("Can't find the project root in or above " + start.getAbsolutePath());
 	}
 
 	public static void main( String[] args ) throws IOException {
