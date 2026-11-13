@@ -25,6 +25,8 @@ import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+
 import static boofcv.alg.disparity.block.select.ChecksSelectDisparity.copyToCorrectType;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -191,6 +193,31 @@ public abstract class ChecksSelectSparseDisparityWithChecks<ArrayData> extends B
 		@Override
 		protected int convertErrorToScore( int error ) {
 			return error;
+		}
+
+		/// Range of 3 with the best in the middle excludes every other candidate from the texture test. There is no
+		/// competing disparity, so the pixel is kept.
+		@Test void textureNoOtherCandidate() {
+			SelectSparseStandardWta<ArrayData> alg = createAlg(-1, 0.15, -1);
+			assertTrue(alg.select(createDummy(new int[]{20, 10, 20}, 3), -1, -1));
+			assertEquals(1, (int)alg.getDisparity());
+		}
+
+		/// Scores as large as SSD with a large region must not overflow in the texture test
+		@Test void textureLargeScores() {
+			SelectSparseStandardWta<ArrayData> alg = createAlg(-1, 0.15, -1);
+			int[] scores = new int[11];
+			Arrays.fill(scores, 2_000_000);
+			scores[5] = 500_000;
+
+			// second best is twice the best, so it's a unique match
+			scores[2] = 1_000_000;
+			assertTrue(alg.select(createDummy(scores, 11), -1, -1));
+			assertEquals(5, (int)alg.getDisparity());
+
+			// second best is only 10% larger, so it's ambiguous
+			scores[2] = 550_000;
+			assertFalse(alg.select(createDummy(scores, 11), -1, -1));
 		}
 	}
 

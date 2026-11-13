@@ -25,6 +25,8 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageGray;
 import org.junit.jupiter.api.Test;
 
+import java.util.function.IntBinaryOperator;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public abstract class ChecksSelectDisparityWithChecksWta<ArrayData, D extends ImageGray<D>>
@@ -50,6 +52,17 @@ public abstract class ChecksSelectDisparityWithChecksWta<ArrayData, D extends Im
 	}
 
 	public abstract SelectDisparityWithChecksWta<ArrayData, D> createSelector( int rightToLeftTolerance, double texture );
+
+	/// Scores for one row. scores[w*d + x] = f(d, x)
+	protected int[] createScores( IntBinaryOperator f ) {
+		int[] scores = new int[w*rangeDisparity];
+		for (int d = 0; d < rangeDisparity; d++) {
+			for (int x = 0; x < w; x++) {
+				scores[w*d + x] = f.applyAsInt(d, x);
+			}
+		}
+		return scores;
+	}
 
 	@Override
 	public DisparitySelect<ArrayData, D> createAlg() {
@@ -79,12 +92,7 @@ public abstract class ChecksSelectDisparityWithChecksWta<ArrayData, D extends Im
 		int r = 2;
 
 		// Error is minimized at disparity index 5 in every column
-		int[] scores = new int[w*rangeDisparity];
-		for (int d = 0; d < rangeDisparity; d++) {
-			for (int x = 0; x < w; x++) {
-				scores[w*d + x] = convertErrorToScore(Math.abs(d - 5));
-			}
-		}
+		int[] scores = createScores(( d, x ) -> convertErrorToScore(Math.abs(d - 5)));
 
 		// Compare against a model of the expected result for a couple of tolerances
 		for (int tol : new int[]{1, 0}) {
@@ -142,17 +150,7 @@ public abstract class ChecksSelectDisparityWithChecksWta<ArrayData, D extends Im
 		SelectDisparityWithChecksWta<ArrayData, D> alg = createSelector(-1, 0.25);
 		alg.configure(disparity, null, minDisparity, maxDisparity, 2);
 
-		int[] scores = new int[w*rangeDisparity];
-
-		for (int d = 0; d < rangeDisparity; d++) {
-			for (int x = 0; x < w; x++) {
-				if (x == w/2) {
-					scores[w*d + x] = convertErrorToScore(minValue - 1);
-				} else {
-					scores[w*d + x] = convertErrorToScore(minValue);
-				}
-			}
-		}
+		int[] scores = createScores(( d, x ) -> convertErrorToScore(x == w/2 ? minValue - 1 : minValue));
 
 		alg.process(y, copyToCorrectType(scores));
 
@@ -183,13 +181,7 @@ public abstract class ChecksSelectDisparityWithChecksWta<ArrayData, D extends Im
 		SelectDisparityWithChecksWta<ArrayData, D> alg = createSelector(-1, 0.25);
 		alg.configure(disparity, null, minDisparity, maxDisparity, r);
 
-		int[] scores = new int[w*rangeDisparity];
-
-		for (int d = 0; d < rangeDisparity; d++) {
-			for (int x = 0; x < w; x++) {
-				scores[w*d + x] = convertErrorToScore(minValue + (d%3));
-			}
-		}
+		int[] scores = createScores(( d, x ) -> convertErrorToScore(minValue + (d%3)));
 
 		alg.process(y, copyToCorrectType(scores));
 
