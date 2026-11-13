@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,12 +28,21 @@ import boofcv.struct.border.BorderIndex1D;
 public class BorderIndex1D_Wrap extends BorderIndex1D {
 	@Override
 	public int getIndex( int index ) {
-		if (index < 0)
-			return length + index;
-		else if (index >= length)
-			return index - length;
-		else
+		if (index < 0) {
+			int wrapped = length + index;
+			if (wrapped >= 0)
+				return wrapped;
+		} else if (index >= length) {
+			int wrapped = index - length;
+			if (wrapped < length)
+				return wrapped;
+		} else {
 			return index;
+		}
+
+		// The image is smaller than the distance outside, so it's wrapped more than once
+		int wrapped = index%length;
+		return wrapped < 0 ? wrapped + length : wrapped;
 	}
 
 	@Override
