@@ -63,6 +63,10 @@ public class ConfigDisparitySGM implements Configuration {
 	public ConfigBlockMatchError configBlockMatch = new ConfigBlockMatchError();
 	/// Specifies how the image border is handled. In general, you want to avoid an approach which would bias the
 	/// error to prefer a region with lots of pixels outside the image border.
+	///
+	/// Don't use a constant value border, such as ZERO, with census. Pixels outside the image would always
+	/// perfectly match the pixels outside the right image, giving them a lower cost. That lower cost biases the
+	/// error, making it more likely to select a disparity at the image border.
 	public BorderType border = BorderType.REFLECT;
 
 	public KernelRadius2D getBlockSize() {
@@ -133,6 +137,8 @@ public class ConfigDisparitySGM implements Configuration {
 			throw new IllegalArgumentException("Invalid value for penaltySmallChange.");
 		if (penaltyLargeChange < 0 || penaltyLargeChange > MAX_COST)
 			throw new IllegalArgumentException("Invalid value for penaltySmallChange.");
+		if (border == BorderType.NORMALIZED || border == BorderType.SKIP)
+			throw new IllegalArgumentException("Normalized and Skip are not supported");
 		configBlockMatch.checkValidity();
 	}
 

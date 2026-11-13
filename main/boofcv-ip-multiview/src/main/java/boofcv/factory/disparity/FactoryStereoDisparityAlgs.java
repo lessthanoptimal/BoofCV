@@ -95,7 +95,8 @@ public class FactoryStereoDisparityAlgs {
 			break;
 
 			case CENSUS: {
-				FilterImageInterface censusTran = FactoryCensusTransform.variant(config.configCensus.variant, true, GrayU8.class);
+				FilterImageInterface censusTran = FactoryCensusTransform.variant(config.configCensus.variant,
+						config.border, GrayU8.class);
 				Class censusType = censusTran.getOutputType().getImageClass();
 				SgmCostHamming cost;
 				if (censusType == GrayU8.class) {
@@ -154,7 +155,8 @@ public class FactoryStereoDisparityAlgs {
 			break;
 
 			case CENSUS: {
-				FilterImageInterface censusTran = FactoryCensusTransform.variant(config.configCensus.variant, true, imageType);
+				FilterImageInterface censusTran = FactoryCensusTransform.variant(config.configCensus.variant,
+						config.border, imageType);
 				BlockRowScore rowScore = createCensusRowScore(configBM, censusTran);
 				blockScore = createSgmBlockMatch(config, censusTran.getOutputType().getImageClass(),
 						configBM, blockCost, rowScore);
