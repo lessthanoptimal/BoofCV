@@ -17,6 +17,7 @@ Version : 1.7.0
   * single and multi-thread produce identical results. BM and BM5
   * CENSUS fixed bug for >= 32-bit errors
   * CENSUS border is part of a Config and not a global variable
+  * CENSUS BLOCK_13_5 samples a 13x5 block. It was 11x5, even though it had 64 bits
 - Border
   * Reflect and wrap will both cycle
   * ZERO works with GrayS64
