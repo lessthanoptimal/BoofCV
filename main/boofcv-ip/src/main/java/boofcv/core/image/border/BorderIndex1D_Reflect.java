@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,12 +31,23 @@ import boofcv.struct.border.BorderIndex1D;
 public class BorderIndex1D_Reflect extends BorderIndex1D {
 	@Override
 	public int getIndex( int index ) {
-		if (index < 0)
-			return -index;
-		else if (index >= length)
-			return length - 2 - (index - length);
-		else
+		if (index < 0) {
+			int reflected = -index;
+			if (reflected < length)
+				return reflected;
+		} else if (index >= length) {
+			int reflected = length - 2 - (index - length);
+			if (reflected >= 0)
+				return reflected;
+		} else {
 			return index;
+		}
+
+		// The image is smaller than the distance outside, so it's reflected more than once.
+		// Reflections repeat with a period of 2*(length-1)
+		int period = Math.max(1, 2*(length - 1));
+		int reflected = Math.abs(index)%period;
+		return reflected < length ? reflected : period - reflected;
 	}
 
 	@Override
