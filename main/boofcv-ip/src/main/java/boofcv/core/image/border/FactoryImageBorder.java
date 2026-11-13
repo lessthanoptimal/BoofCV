@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -258,6 +258,8 @@ public class FactoryImageBorder {
 			return (ImageBorder<T>)new ImageBorderValue.Value_F64(value);
 		} else if( GrayI.class.isAssignableFrom(imageType) ) {
 			return (ImageBorder<T>)new ImageBorderValue.Value_I((int)value);
+		} else if( imageType == GrayS64.class ) {
+			return (ImageBorder<T>)new ImageBorderValue.Value_I64((long)value);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: "+imageType.getSimpleName());
 		}
