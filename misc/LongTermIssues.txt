@@ -1,3 +1,12 @@
 - Add offset parameter to convolution kernel
 - Process the convolution kernel in the correct order
 - Look at comments in PnPLepetitEPnP and consider
+- Concurrency: big.LITTLE cores run at uneven rates but loopBlocks gives each thread an equal block. Need a dynamic
+  schedule (e.g. contiguous ranges + work stealing) so faster cores process more
+- Disparity BM F32: replace rolling vertical sum + catastrophicReset with van Herk/Gil-Werman (sliding window sum
+  without subtraction). Bounded error, ~3 vs 2 adds/element (~5-15% slower), 2x score row memory
+- Concurrency threshold: replace fixed SMALL_IMAGE with work-based check. Estimate work per call, calibrate
+  fork/join overhead + throughput once at startup, only split if each thread gets >= min task time. Fits the
+  dynamic scheduler: small inputs become one chunk and run inline. Optional: FFTW-style runtime tuning
+- ConcurrencyOps.loopBlocks (EJML pabeles.concurrency): with one block it still does pool.submit().get(), a thread
+  handoff. Should run inline when there is only one block
