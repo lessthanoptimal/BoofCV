@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,23 +27,18 @@ import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * <p>The Census Transform [1] computes a bit mask for each pixel in the image. If a neighboring pixel is greater than the
- * center pixel in a region that bit is set to 1. A 3x3 region 9radius=1) is encoded in 8-bits and a 5x5 region
- * (radius=2) in 24-bits. To compute the error between two pixels simply compute the hamming distance. The
- * hamming distance for an input can be computed using DescriptorDistance.hamming().</p>
- *
- * <p>DEVELOPMENT NOTE: See if this can be speed up by only comparing each pixel with another once.
- * Code will be complex</p>
- *
- * <p>
- * [1] Zabih, Ramin, and John Woodfill. "Non-parametric local transforms for computing visual correspondence."
- * European conference on computer vision. Springer, Berlin, Heidelberg, 1994.
- * </p>
- *
- * @author Peter Abeles
- * @see CensusTransform
- */
+/// The Census Transform [1] computes a bit mask for each pixel in the image. If a neighboring pixel is greater than the
+/// center pixel in a region that bit is set to 1. A 3x3 region (radius=1) is encoded in 8-bits and a 5x5 region
+/// (radius=2) in 24-bits. To compute the error between two pixels simply compute the hamming distance. The
+/// hamming distance for an input can be computed using DescriptorDistance.hamming().
+///
+/// DEVELOPMENT NOTE: See if this can be speed up by only comparing each pixel with another once.
+/// Code will be complex
+///
+/// [1] Zabih, Ramin, and John Woodfill. "Non-parametric local transforms for computing visual correspondence."
+/// European conference on computer vision. Springer, Berlin, Heidelberg, 1994.
+///
+/// @see CensusTransform
 public class GCensusTransform {
 	public static <T extends ImageGray<T>> void dense3x3( final T input, final GrayU8 output,
 														  @Nullable ImageBorder<T> border ) {

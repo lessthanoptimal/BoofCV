@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,11 +28,7 @@ import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.FastAccess;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * Census transform which saves output in a {@link InterleavedU16}.
- *
- * @author Peter Abeles
- */
+/// Census transform which saves output in an [InterleavedU16].
 public class FilterCensusTransformSampleIU16<In extends ImageGray<In>>
 		extends FilterCensusTransform<In, InterleavedU16> {
 	FastAccess<Point2D_I32> samples;

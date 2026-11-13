@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,9 +50,7 @@ public abstract class GenericFilterCensusTransformChecks<In extends ImageGray<In
 
 	public abstract FilterCensusTransform<In, Out> createAlg( ImageBorder<In> border );
 
-	/**
-	 * Make sure the border radius is set correctly. If the border is null it should have a non-zero value
-	 */
+	/// Make sure the border radius is set correctly. If the border is null it should have a non-zero value
 	@Test void checkBorderRadius() {
 		FilterCensusTransform<In, Out> alg = createAlg(border);
 		assertEquals(radius, alg.getRadiusX());
@@ -67,9 +65,7 @@ public abstract class GenericFilterCensusTransformChecks<In extends ImageGray<In
 		assertEquals(radius, alg.getBorderY());
 	}
 
-	/**
-	 * Makes sure the filter produces the same results as the function
-	 */
+	/// Makes sure the filter produces the same results as the function
 	@Test void compareToFunction() {
 		FilterCensusTransform<In, Out> alg = createAlg(border);
 

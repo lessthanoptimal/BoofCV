@@ -27,11 +27,7 @@ import boofcv.struct.image.*;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.DogArray;
 
-/**
- * Brute force implementation of Census Transform used for testing
- *
- * @author Peter Abeles
- */
+/// Brute force implementation of Census Transform used for testing
 public class CensusNaive {
 	public static void region3x3( ImageGray input , GrayU8 output ) {
 		GImageGray src = FactoryGImageGray.wrap(FactoryImageBorder.wrap(BorderType.EXTENDED,input));

@@ -27,11 +27,7 @@ import boofcv.struct.image.InterleavedU16;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastAccess;
 
-/**
- * Operations for handling borders in a Census Transform.
- *
- * @author Peter Abeles
- */
+/// Operations for handling borders in a Census Transform.
 public class ImplCensusTransformBorder {
 
 	public static int regionNxN( final ImageBorder_S32 input , int cx , int cy , int radius ) {

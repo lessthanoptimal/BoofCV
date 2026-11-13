@@ -35,12 +35,8 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Tests sampling functions and which bit each sample sets. The transforms are compared against a brute force
- * implementation in GCensusTransform
- *
- * @author Peter Abeles
- */
+/// Tests sampling functions and which bit each sample sets. The transforms are compared against a brute force
+/// implementation in GCensusTransform
 class TestCensusTransform extends BoofStandardJUnit {
 	@Test
 	void createBlockSamples_1() {
@@ -90,10 +86,8 @@ class TestCensusTransform extends BoofStandardJUnit {
 		assertEquals(0, meanY);
 	}
 
-	/**
-	 * Only one sample is brighter than the center pixel, so only its bit is set. Samples 31 and above need a 64-bit
-	 * mask. Checks a pixel in the inner image and one in the border.
-	 */
+	/// Only one sample is brighter than the center pixel, so only its bit is set. Samples 31 and above need a 64-bit
+	/// mask. Checks a pixel in the inner image and one in the border.
 	@Test
 	void sample_S64_bitOrder() {
 		DogArray<Point2D_I32> samples = CensusTransform.createBlockSamples(3);

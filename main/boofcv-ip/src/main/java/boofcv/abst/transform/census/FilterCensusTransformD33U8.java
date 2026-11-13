@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,11 +25,7 @@ import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * Census {@link GCensusTransform#dense3x3} transform with output in {@link GrayU8} image.
- *
- * @author Peter Abeles
- */
+/// Census [GCensusTransform#dense3x3] transform with output in [GrayU8] image.
 public class FilterCensusTransformD33U8<In extends ImageGray<In>>
 		extends FilterCensusTransform<In, GrayU8> {
 	public FilterCensusTransformD33U8( @Nullable ImageBorder<In> border, Class<In> imageType ) {
