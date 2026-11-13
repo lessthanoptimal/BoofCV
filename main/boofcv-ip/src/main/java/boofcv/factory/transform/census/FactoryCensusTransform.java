@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,70 +30,79 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.DogArray;
+import org.jetbrains.annotations.Nullable;
 
-/**
- * Factory for creating different types of census transforms
- *
- * @author Peter Abeles
- */
+/// Factory for creating different types of census transforms
 @SuppressWarnings("unchecked")
 public class FactoryCensusTransform {
-
-	/**
-	 * For SGM it's important that you don't use a constant value border. If it's say zero, it will always perfectly
-	 * match the pixels outside the border in the right image, giving it a lower cost. That lower cost will bias
-	 * the error making it more likely to select border pixel.
-	 */
-	public static BorderType CENSUS_BORDER = BorderType.REFLECT;
-
+	/// Creates a census transform for the specified variant
+	///
+	/// @param type Which pixels are sampled
+	/// @param border How pixels outside the image are read. [BorderType#SKIP] if the image border isn't processed.
+	/// @param imageType Type of input image
+	/// @return Census Transform
 	public static <In extends ImageGray<In>, Out extends ImageBase<Out>>
-	FilterCensusTransform<In, Out> variant(CensusVariants type, boolean border, Class<In> imageType) {
-		switch( type ) {
+	FilterCensusTransform<In, Out> variant( CensusVariants type, BorderType border, Class<In> imageType ) {
+		switch (type) {
 			case BLOCK_3_3: return blockDense(1, border, imageType);
 			case BLOCK_5_5: return blockDense(2, border, imageType);
-			case BLOCK_7_7: return blockDense( 3, border, imageType);
-			case BLOCK_9_7: return blockDense(4,3, border, imageType);
-			case BLOCK_13_5: return blockDense(5,2, border, imageType);
+			case BLOCK_7_7: return blockDense(3, border, imageType);
+			case BLOCK_9_7: return blockDense(4, 3, border, imageType);
+			case BLOCK_13_5: return blockDense(5, 2, border, imageType);
 			case CIRCLE_9: {
 				DogArray<Point2D_I32> points = CensusTransform.createCircleSamples();
-				ImageBorder<In> imageBorder = border ? FactoryImageBorder.single(CENSUS_BORDER,imageType) : null;
-				return new FilterCensusTransformSampleS64(points,imageBorder, imageType);
+				return new FilterCensusTransformSampleS64(points, createBorder(border, imageType), imageType);
 			}
-			default: throw new IllegalArgumentException("Unknown type "+type);
+			default: throw new IllegalArgumentException("Unknown type " + type);
 		}
 	}
 
-	/**
-	 * Samples a dense square block
-	 *
-	 * @param <In> Input image
-	 * @param <Out> Output image
-	 * @param radius Radius of the block. Width = 2*radius+1
-	 * @param border If true then it will process the image border
-	 * @param imageType Type of input image
-	 * @return Census Transform
-	 */
+	/// Samples a dense square block
+	///
+	/// @param <In> Input image
+	/// @param <Out> Output image
+	/// @param radius Radius of the block. Width = 2*radius+1
+	/// @param border How pixels outside the image are read. [BorderType#SKIP] if the image border isn't processed.
+	/// @param imageType Type of input image
+	/// @return Census Transform
 	public static <In extends ImageGray<In>, Out extends ImageBase<Out>>
-	FilterCensusTransform<In, Out> blockDense(int radius, boolean border, Class<In> imageType) {
-		ImageBorder<In> imageBorder = border ? FactoryImageBorder.single(CENSUS_BORDER,imageType) : null;
-		switch( radius ) {
+	FilterCensusTransform<In, Out> blockDense( int radius, BorderType border, Class<In> imageType ) {
+		ImageBorder<In> imageBorder = createBorder(border, imageType);
+		switch (radius) {
 			case 1:
 				return new FilterCensusTransformD33U8(imageBorder, imageType);
 			case 2:
 				return new FilterCensusTransformD55S32(imageBorder, imageType);
 			case 3: {
 				DogArray<Point2D_I32> points7x7 = CensusTransform.createBlockSamples(3);
-				return new FilterCensusTransformSampleS64(points7x7,imageBorder, imageType);
+				return new FilterCensusTransformSampleS64(points7x7, imageBorder, imageType);
 			}
 
 			default:
 				throw new IllegalArgumentException("Currently only radius 1 to 3 is supported");
 		}
 	}
+
+	/// Samples a dense rectangular block
+	///
+	/// @param radiusX Radius of the block along x-axis. Width = 2*radiusX+1
+	/// @param radiusY Radius of the block along y-axis. Height = 2*radiusY+1
+	/// @param border How pixels outside the image are read. [BorderType#SKIP] if the image border isn't processed.
+	/// @param imageType Type of input image
+	/// @return Census Transform
 	public static <In extends ImageGray<In>, Out extends ImageBase<Out>>
-	FilterCensusTransform<In, Out> blockDense(int radiusX, int radiusY, boolean border, Class<In> imageType) {
-		ImageBorder<In> imageBorder = border ? FactoryImageBorder.single(CENSUS_BORDER,imageType) : null;
-		DogArray<Point2D_I32> points = CensusTransform.createBlockSamples(radiusX,radiusY);
-		return new FilterCensusTransformSampleS64(points,imageBorder, imageType);
+	FilterCensusTransform<In, Out> blockDense( int radiusX, int radiusY, BorderType border, Class<In> imageType ) {
+		DogArray<Point2D_I32> points = CensusTransform.createBlockSamples(radiusX, radiusY);
+		return new FilterCensusTransformSampleS64(points, createBorder(border, imageType), imageType);
+	}
+
+	/// Returns null for [BorderType#SKIP], which census transforms interpret as don't process the border
+	private static <In extends ImageGray<In>> @Nullable ImageBorder<In>
+	createBorder( BorderType border, Class<In> imageType ) {
+		if (border == BorderType.SKIP)
+			return null;
+		if (border == BorderType.NORMALIZED)
+			throw new IllegalArgumentException("Normalized border isn't supported by census transforms");
+		return FactoryImageBorder.single(border, imageType);
 	}
 }

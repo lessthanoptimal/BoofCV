@@ -32,7 +32,6 @@ import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Nested;
 
 import static boofcv.factory.disparity.FactoryStereoDisparity.*;
-import static boofcv.factory.transform.census.FactoryCensusTransform.CENSUS_BORDER;
 
 public class TestWrapDisparitySparseRectifiedBM extends BoofStandardJUnit {
 	@Nested class SAD_U8 extends CompareSparseToDenseDisparityChecks<GrayU8> {
@@ -92,13 +91,14 @@ public class TestWrapDisparitySparseRectifiedBM extends BoofStandardJUnit {
 		public <D extends ImageGray<D>> StereoDisparity<GrayU8, D> createDense( ConfigDisparityBM config ) {
 			double maxError = (config.regionRadiusX*2 + 1)*(config.regionRadiusY*2 + 1)*config.maxPerPixelError;
 			DisparitySelect select = createDisparitySelect(config, imageType.getImageClass(), (int)maxError);
-			FilterCensusTransform censusTran = FactoryCensusTransform.variant(config.configCensus.variant, true, imageType.getImageClass());
+			FilterCensusTransform censusTran = FactoryCensusTransform.variant(config.configCensus.variant,
+					config.border, imageType.getImageClass());
 			BlockRowScore rowScore = createCensusRowScore(config, censusTran);
 
 			DisparityBlockMatchRowFormat alg = createBlockMatching(config,
 					censusTran.getOutputType().getImageClass(), select, rowScore);
 			alg.setBorder(FactoryImageBorder.generic(config.border, censusTran.getOutputType()));
-			ImageBorder censusBorder = FactoryImageBorder.single(CENSUS_BORDER, imageType.getImageClass());
+			ImageBorder censusBorder = FactoryImageBorder.single(config.border, imageType.getImageClass());
 			return new MakeCensusDenseLikeSparse<>(censusTran, censusBorder, alg);
 		}
 	}
@@ -112,13 +112,14 @@ public class TestWrapDisparitySparseRectifiedBM extends BoofStandardJUnit {
 		public <D extends ImageGray<D>> StereoDisparity<GrayU16, D> createDense( ConfigDisparityBM config ) {
 			double maxError = (config.regionRadiusX*2 + 1)*(config.regionRadiusY*2 + 1)*config.maxPerPixelError;
 			DisparitySelect select = createDisparitySelect(config, imageType.getImageClass(), (int)maxError);
-			FilterCensusTransform censusTran = FactoryCensusTransform.variant(config.configCensus.variant, true, imageType.getImageClass());
+			FilterCensusTransform censusTran = FactoryCensusTransform.variant(config.configCensus.variant,
+					config.border, imageType.getImageClass());
 			BlockRowScore rowScore = createCensusRowScore(config, censusTran);
 
 			DisparityBlockMatchRowFormat alg = createBlockMatching(config,
 					censusTran.getOutputType().getImageClass(), select, rowScore);
 			alg.setBorder(FactoryImageBorder.generic(config.border, censusTran.getOutputType()));
-			ImageBorder censusBorder = FactoryImageBorder.single(CENSUS_BORDER, imageType.getImageClass());
+			ImageBorder censusBorder = FactoryImageBorder.single(config.border, imageType.getImageClass());
 			return new MakeCensusDenseLikeSparse<>(censusTran, censusBorder, alg);
 		}
 	}
@@ -132,13 +133,14 @@ public class TestWrapDisparitySparseRectifiedBM extends BoofStandardJUnit {
 		public <D extends ImageGray<D>> StereoDisparity<GrayF32, D> createDense( ConfigDisparityBM config ) {
 			double maxError = (config.regionRadiusX*2 + 1)*(config.regionRadiusY*2 + 1)*config.maxPerPixelError;
 			DisparitySelect select = createDisparitySelect(config, imageType.getImageClass(), (int)maxError);
-			FilterCensusTransform censusTran = FactoryCensusTransform.variant(config.configCensus.variant, true, imageType.getImageClass());
+			FilterCensusTransform censusTran = FactoryCensusTransform.variant(config.configCensus.variant,
+					config.border, imageType.getImageClass());
 			BlockRowScore rowScore = createCensusRowScore(config, censusTran);
 
 			DisparityBlockMatchRowFormat alg = createBlockMatching(config,
 					censusTran.getOutputType().getImageClass(), select, rowScore);
 			alg.setBorder(FactoryImageBorder.generic(config.border, censusTran.getOutputType()));
-			ImageBorder censusBorder = FactoryImageBorder.single(CENSUS_BORDER, imageType.getImageClass());
+			ImageBorder censusBorder = FactoryImageBorder.single(config.border, imageType.getImageClass());
 			return new MakeCensusDenseLikeSparse<>(censusTran, censusBorder, alg);
 		}
 	}

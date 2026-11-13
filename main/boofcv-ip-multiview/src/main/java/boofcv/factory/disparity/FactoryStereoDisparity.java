@@ -33,6 +33,7 @@ import boofcv.alg.segmentation.cc.ConnectedTwoRowSpeckleFiller_U8;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.factory.transform.census.FactoryCensusTransform;
+import boofcv.struct.border.BorderType;
 import boofcv.struct.image.*;
 import org.jetbrains.annotations.Nullable;
 
@@ -111,7 +112,8 @@ public class FactoryStereoDisparity {
 				}
 				case CENSUS -> {
 					DisparitySelect select = createDisparitySelect(config, imageType, maxError);
-					FilterImageInterface censusTran = FactoryCensusTransform.variant(config.configCensus.variant, true, imageType);
+					FilterImageInterface censusTran = FactoryCensusTransform.variant(config.configCensus.variant,
+							config.border, imageType);
 					BlockRowScore rowScore = createCensusRowScore(config, censusTran);
 
 					DisparityBlockMatchRowFormat alg = createBlockMatching(config,
@@ -234,7 +236,8 @@ public class FactoryStereoDisparity {
 				}
 				case CENSUS -> {
 					DisparitySelect select = createDisparitySelect(config, imageType, maxError);
-					FilterImageInterface censusTran = FactoryCensusTransform.variant(config.configCensus.variant, true, imageType);
+					FilterImageInterface censusTran = FactoryCensusTransform.variant(config.configCensus.variant,
+							config.border, imageType);
 					BlockRowScore rowScore = createCensusRowScore(config, censusTran);
 					DisparityBlockMatchRowFormat alg = createBestFive(config,
 							censusTran.getOutputType().getImageClass(), select, rowScore);
@@ -404,7 +407,8 @@ public class FactoryStereoDisparity {
 			case CENSUS -> {
 				// no border since only the inner portion of the image "patch" is needed.
 				// See the sparse code for details
-				FilterCensusTransform censusTran = FactoryCensusTransform.variant(config.configCensus.variant, false, imageType);
+				FilterCensusTransform censusTran = FactoryCensusTransform.variant(config.configCensus.variant,
+						BorderType.SKIP, imageType);
 
 				final Class censusType = censusTran.getOutputType().getImageClass();
 

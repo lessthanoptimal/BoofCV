@@ -21,6 +21,7 @@ package boofcv.alg.disparity.sgm;
 import boofcv.abst.filter.FilterImageInterface;
 import boofcv.alg.disparity.sgm.cost.SgmCostHamming;
 import boofcv.factory.transform.census.FactoryCensusTransform;
+import boofcv.struct.border.BorderType;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
@@ -39,7 +40,8 @@ class TestStereoDisparitySgmCensusAlg extends BoofStandardJUnit {
 
 		@Override
 		public StereoDisparitySgmAlg<GrayU8, GrayU8> createAlgorithm() {
-			FilterImageInterface censusTran = FactoryCensusTransform.variant(BLOCK_3_3, true, GrayU8.class);
+			FilterImageInterface censusTran =
+					FactoryCensusTransform.variant(BLOCK_3_3, BorderType.REFLECT, GrayU8.class);
 			SgmCostHamming<GrayU8> cost = new SgmCostHamming.U8();
 			return new StereoDisparitySgmCensusAlg(censusTran, cost, new SgmDisparitySelector());
 		}
@@ -53,7 +55,8 @@ class TestStereoDisparitySgmCensusAlg extends BoofStandardJUnit {
 
 		@Override
 		public StereoDisparitySgmAlg<GrayU8, GrayS32> createAlgorithm() {
-			FilterImageInterface censusTran = FactoryCensusTransform.variant(BLOCK_5_5, true, GrayU8.class);
+			FilterImageInterface censusTran =
+					FactoryCensusTransform.variant(BLOCK_5_5, BorderType.REFLECT, GrayU8.class);
 			SgmCostHamming<GrayS32> cost = new SgmCostHamming.S32();
 			return new StereoDisparitySgmCensusAlg(censusTran, cost, new SgmDisparitySelector());
 		}
