@@ -77,10 +77,14 @@ public class DisparityScoreBM_F32<DI extends ImageGray<DI>>
 
 		scoreRows.setInput(left, right);
 
+		// Work is split into chunks of rows that start where the vertical score is reset. Resets and the
+		// horizontalScore row index depend only on the image row, so results are identical no matter how
+		// chunks are split between threads.
+		int numChunks = (left.height + catastrophicReset - 1)/catastrophicReset;
 		if (BoofConcurrency.USE_CONCURRENT) {
-			BoofConcurrency.loopBlocks(0, left.height, regionHeight, workspace, computeBlock);
+			BoofConcurrency.loopBlocks(0, numChunks, 1, workspace, computeBlock);
 		} else {
-			computeBlock.accept((WorkSpace)workspace.get(0), 0, left.height);
+			computeBlock.accept((WorkSpace)workspace.get(0), 0, numChunks);
 		}
 	}
 
@@ -122,10 +126,10 @@ public class DisparityScoreBM_F32<DI extends ImageGray<DI>>
 
 	private class ComputeBlock implements IntRangeObjectConsumer<WorkSpace> {
 		@Override
-		public void accept( WorkSpace workspace, int minInclusive, int maxExclusive ) {
+		public void accept( WorkSpace workspace, int chunk0, int chunk1 ) {
 			workspace.checkSize();
-			int row0 = minInclusive - radiusY;
-			int row1 = maxExclusive + radiusY;
+			int row0 = chunk0*catastrophicReset - radiusY;
+			int row1 = Math.min(left.height, chunk1*catastrophicReset) + radiusY;
 
 			// initialize computation
 			computeFirstRow(row0, workspace);
@@ -133,6 +137,11 @@ public class DisparityScoreBM_F32<DI extends ImageGray<DI>>
 			// efficiently compute rest of the rows using previous results to avoid repeat computations
 			computeRemainingRows(row0, row1, workspace);
 		}
+	}
+
+	/// Index of the horizontalScore row that the image row is stored in. Offset is the first row read, -radiusY
+	private int rowToScoreIndex( int row ) {
+		return (row + radiusY)%regionHeight;
 	}
 
 	/// Initializes disparity calculation by finding the scores for the initial block of horizontal
@@ -144,7 +153,7 @@ public class DisparityScoreBM_F32<DI extends ImageGray<DI>>
 		for (int row = 0; row < regionHeight; row++) {
 			growBorderL.growRow(row0 + row, radiusX, radiusX, ws.leftRow, 0);
 			growBorderR.growRow(row0 + row, radiusX, radiusX, ws.rightRow, 0);
-			final float[] scores = ws.horizontalScore[row];
+			final float[] scores = ws.horizontalScore[rowToScoreIndex(row0 + row)];
 			scoreRows.scoreRow(row0 + row, ws.leftRow, ws.rightRow, scores, disparityMin, disparityMax, regionWidth, ws.elementScore);
 		}
 
@@ -166,13 +175,9 @@ public class DisparityScoreBM_F32<DI extends ImageGray<DI>>
 	private void computeRemainingRows( int row0, int row1, WorkSpace ws ) {
 		int disparityMax = Math.min(left.width, this.disparityMax);
 
-		int nextReset = row0 + catastrophicReset;
-
 		for (int row = row0 + regionHeight; row < row1; row++) {
-			int oldRow = (row - row0)%regionHeight;
-
-			// subtract first row from vertical score
-			final float[] scores = ws.horizontalScore[oldRow];
+			// subtract first row from vertical score. The new row is stored in the same place
+			final float[] scores = ws.horizontalScore[rowToScoreIndex(row)];
 			for (int i = 0; i < widthDisparityBlock; i++) {
 				ws.verticalScore[i] -= scores[i];
 			}
@@ -182,8 +187,7 @@ public class DisparityScoreBM_F32<DI extends ImageGray<DI>>
 			scoreRows.scoreRow(row, ws.leftRow, ws.rightRow, scores, disparityMin, disparityMax, regionWidth, ws.elementScore);
 
 			// Here we mitigate catastrophic cancellation. See catastrophicReset for an explanation
-			if (row == nextReset) {
-				nextReset = row + catastrophicReset;
+			if ((row - radiusY)%catastrophicReset == 0) {
 				computeVerticalScoreFromScratch(ws);
 			} else {
 				// Perform the faster score sum that adds a tinny bit of floating point noise each time
