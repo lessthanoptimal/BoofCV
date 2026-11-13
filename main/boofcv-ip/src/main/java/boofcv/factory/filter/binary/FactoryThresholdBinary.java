@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -281,7 +281,7 @@ public class FactoryThresholdBinary {
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> globalEntropy( int minValue, int maxValue, double scale, boolean down, Class<T> inputType ) {
 		if (BOverrideFactoryThresholdBinary.globalEntropy != null)
-			return BOverrideFactoryThresholdBinary.globalEntropy.handle(minValue, maxValue, down, inputType);
+			return BOverrideFactoryThresholdBinary.globalEntropy.handle(minValue, maxValue, scale, down, inputType);
 		return new GlobalBinaryFilter.Entropy<>(minValue, maxValue, scale, down, ImageType.single(inputType));
 	}
 
@@ -312,7 +312,7 @@ public class FactoryThresholdBinary {
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> globalOtsu( double minValue, double maxValue, double scale, boolean down, Class<T> inputType ) {
 		if (BOverrideFactoryThresholdBinary.globalOtsu != null)
-			return BOverrideFactoryThresholdBinary.globalOtsu.handle(minValue, maxValue, down, inputType);
+			return BOverrideFactoryThresholdBinary.globalOtsu.handle(minValue, maxValue, scale, down, inputType);
 		return new GlobalBinaryFilter.Otsu<>(minValue, maxValue, scale, down, ImageType.single(inputType));
 	}
 
