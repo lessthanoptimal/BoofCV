@@ -23,9 +23,9 @@ import boofcv.alg.disparity.DisparityBlockMatch;
 import boofcv.alg.disparity.block.BlockRowScore;
 import boofcv.alg.disparity.block.DisparityBlockMatchNaive;
 import boofcv.alg.disparity.block.DisparitySelect;
-import boofcv.alg.disparity.block.select.SelectCorrelationWta_F32_U8;
-import boofcv.alg.disparity.block.select.SelectErrorBasicWta_F32_U8;
-import boofcv.alg.disparity.block.select.SelectErrorBasicWta_S32_U8;
+import boofcv.alg.disparity.block.select.SelectCorrelationWithChecks_F32;
+import boofcv.alg.disparity.block.select.SelectErrorWithChecks_F32;
+import boofcv.alg.disparity.block.select.SelectErrorWithChecks_S32;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.core.image.GeneralizedImageOps;
@@ -62,13 +62,14 @@ public abstract class ChecksDisparityBM<I extends ImageGray<I>, DI extends Image
 		this.disparityType = disparityType;
 		this.errorType = errorType;
 
+		// Selectors with all checks off pick the same disparity as basic WTA, but also save the score
 		if (errorType.isCorrelation()) {
-			compDisp = (DisparitySelect)new SelectCorrelationWta_F32_U8();
+			compDisp = (DisparitySelect)new SelectCorrelationWithChecks_F32.DispU8(-1, 0);
 		} else {
 			if (imageType == GrayU8.class || imageType == GrayU16.class || imageType == GrayS16.class) {
-				compDisp = (DisparitySelect)new SelectErrorBasicWta_S32_U8();
+				compDisp = (DisparitySelect)new SelectErrorWithChecks_S32.DispU8(0, -1, 0);
 			} else {
-				compDisp = (DisparitySelect)new SelectErrorBasicWta_F32_U8();
+				compDisp = (DisparitySelect)new SelectErrorWithChecks_F32.DispU8(0, -1, 0);
 			}
 		}
 	}
@@ -196,29 +197,32 @@ public abstract class ChecksDisparityBM<I extends ImageGray<I>, DI extends Image
 		// disparity ranges that include negative values
 		checkConcurrent(left, right, -5, 5, radiusX, radiusY);
 		checkConcurrent(left, right, -8, -2, radiusX, radiusY);
+		// regionHeight=3 doesn't divide the thread block size, so the ring buffer order differs between threads
+		checkConcurrent(left, right, 0, 10, radiusX, 1);
 	}
 
-	private void checkConcurrent( I left, I right,
-	                              int minDisparity, int maxDisparity,
-	                              int radiusX, int radiusY ) {
+	private void checkConcurrent( I left, I right, int minDisparity, int maxDisparity, int radiusX, int radiusY ) {
 		int w = left.width;
 		int h = left.height;
 
 		DI expected = GeneralizedImageOps.createSingleBand(disparityType, w, h);
 		DI found = GeneralizedImageOps.createSingleBand(disparityType, w, h);
+		var expectedScore = new GrayF32(w, h);
+		var foundScore = new GrayF32(w, h);
 
 		BoofConcurrency.USE_CONCURRENT = false;
 		DisparityBlockMatch<I, DI> alg = createAlg(minDisparity, maxDisparity, radiusX, radiusY);
-		alg.process(left, right, expected, null);
+		alg.process(left, right, expected, expectedScore);
 		BoofConcurrency.USE_CONCURRENT = true;
 		alg = createAlg(minDisparity, maxDisparity, radiusX, radiusY);
-		alg.process(left, right, found, null);
+		alg.process(left, right, found, foundScore);
 
 //		((GrayU8)expected).print();
 //		System.out.println();
 //		((GrayU8)found).print();
 
 		BoofTesting.assertEquals(found, expected, 0);
+		BoofTesting.assertEquals(foundScore, expectedScore, 0);
 	}
 
 	/**
