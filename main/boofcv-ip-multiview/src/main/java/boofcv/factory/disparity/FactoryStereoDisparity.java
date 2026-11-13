@@ -345,6 +345,7 @@ public class FactoryStereoDisparity {
 
 	public static <T extends ImageGray<T>> StereoDisparitySparse<T>
 	sparseRectifiedBM( ConfigDisparityBM config, final Class<T> imageType ) {
+		config.checkValidity();
 
 		double maxError = (config.regionRadiusX*2 + 1)*(config.regionRadiusY*2 + 1)*config.maxPerPixelError;
 
@@ -443,6 +444,7 @@ public class FactoryStereoDisparity {
 	sgm( @Nullable ConfigDisparitySGM config, Class<T> imageType, Class<DI> dispType ) {
 		if (config == null)
 			config = new ConfigDisparitySGM();
+		config.checkValidity();
 
 		if (config.subpixel) {
 			if (dispType != GrayF32.class) {
