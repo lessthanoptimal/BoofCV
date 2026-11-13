@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,11 +30,7 @@ import java.util.Arrays;
 import static boofcv.alg.disparity.block.select.ChecksSelectDisparity.copyToCorrectType;
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Base class for sparse disparity checks
- *
- * @author Peter Abeles
- */
+/// Base class for sparse disparity checks
 @SuppressWarnings("WeakerAccess")
 public abstract class ChecksSelectSparseDisparityWithChecks<ArrayData> extends BoofStandardJUnit {
 
@@ -46,14 +42,10 @@ public abstract class ChecksSelectSparseDisparityWithChecks<ArrayData> extends B
 
 	protected abstract SelectSparseStandardWta<ArrayData> createAlg( int maxError, double texture, int tolRightToLeft );
 
-	/**
-	 * Given an error return a score that's appropriate for the algorithm
-	 */
+	/// Given an error return a score that's appropriate for the algorithm
 	protected abstract int convertErrorToScore( int error );
 
-	/**
-	 * All validation tests are turned off
-	 */
+	/// All validation tests are turned off
 	@Test
 	void everythingOff() {
 		int maxDisparity = 30;
@@ -73,9 +65,7 @@ public abstract class ChecksSelectSparseDisparityWithChecks<ArrayData> extends B
 		assertEquals(5, (int)alg.getDisparity());
 	}
 
-	/**
-	 * Test the confidence in a region with very similar cost score (little texture)
-	 */
+	/// Test the confidence in a region with very similar cost score (little texture)
 	@Test
 	void confidenceFlatRegion() {
 		int minValue = 3;
@@ -92,9 +82,7 @@ public abstract class ChecksSelectSparseDisparityWithChecks<ArrayData> extends B
 		assertFalse(alg.select(createDummy(scores, maxDisparity), -1, -1));
 	}
 
-	/**
-	 * There are two similar peaks. Repeated pattern
-	 */
+	/// There are two similar peaks. Repeated pattern
 	@Test
 	void confidenceMultiplePeak() {
 		confidenceMultiplePeak(3);
@@ -115,10 +103,8 @@ public abstract class ChecksSelectSparseDisparityWithChecks<ArrayData> extends B
 		assertFalse(alg.select(createDummy(scores, maxDisparity), -1, -1));
 	}
 
-	/**
-	 * See if multiple peak detection works correctly when the first peak is at zero. There was a bug related to
-	 * this at one point.
-	 */
+	/// See if multiple peak detection works correctly when the first peak is at zero. There was a bug related to
+	/// this at one point.
 	@Test
 	void multiplePeakFirstAtIndexZero() {
 		int maxDisparity = 10;

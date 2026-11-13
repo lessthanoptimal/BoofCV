@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,11 +24,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * Unit tests for implementers of {@link SelectDisparityWithChecksWta}
- *
- * @author Peter Abeles
- */
+/// Unit tests for implementers of [SelectDisparityWithChecksWta]
 @SuppressWarnings("WeakerAccess")
 public abstract class ChecksSelectDisparityWithChecksWtaError<ArrayData, D extends ImageGray<D>>
 		extends ChecksSelectDisparityWithChecksWta<ArrayData, D> {
