@@ -169,8 +169,10 @@ public abstract class CodeGeneratorBase {
 		String ret = " *\n" +
 				" * <p>DO NOT MODIFY. Automatically generated code created by " + getClass().getSimpleName() + "</p>\n";
 
+		if (authors.length > 0)
+			ret += " *\n";
 		for (String author : authors) {
-			ret += "\n * @author " + author + "\n";
+			ret += " * @author " + author + "\n";
 		}
 		ret += " */\n" +
 				"@Generated(\"" + getClass().getCanonicalName() + "\")\n";
