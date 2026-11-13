@@ -22,6 +22,7 @@ import boofcv.alg.InputSanityCheck;
 import boofcv.alg.disparity.DisparityBlockMatchBestFive;
 import boofcv.alg.disparity.block.BlockRowScore;
 import boofcv.alg.disparity.block.DisparitySelect;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.misc.Compare_F32;
 import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.GrayF32;
@@ -80,11 +81,15 @@ public class DisparityScoreBMBestFive_F32<DI extends ImageGray<DI>>
 		this.score = score;
 		scoreRows.setInput(left, right);
 
-//		if (BoofConcurrency.USE_CONCURRENT) {
-//			BoofConcurrency.loopBlocks(0, left.height, regionHeight, workspace, computeBlock);
-//		} else {
-			computeBlock.accept((WorkSpace)workspace.get(0), 0, left.height);
-//		}
+		// Work is split into chunks of rows that start where the vertical score is reset. Resets and the
+		// horizontalScore row index depend only on the image row, so results are identical no matter how
+		// chunks are split between threads.
+		int numChunks = (left.height + catastrophicReset - 1)/catastrophicReset;
+		if (BoofConcurrency.USE_CONCURRENT) {
+			BoofConcurrency.loopBlocks(0, numChunks, 1, workspace, computeBlock);
+		} else {
+			computeBlock.accept((WorkSpace)workspace.get(0), 0, numChunks);
+		}
 	}
 
 	@SuppressWarnings({"NullAway.Init"})
@@ -126,13 +131,11 @@ public class DisparityScoreBMBestFive_F32<DI extends ImageGray<DI>>
 
 	private class ComputeBlock implements IntRangeObjectConsumer<WorkSpace> {
 		@Override
-		public void accept( WorkSpace workspace, int minInclusive, int maxExclusive ) {
+		public void accept( WorkSpace workspace, int chunk0, int chunk1 ) {
 			// NOTE: for out of image pixels maybe the approach used in horizontal direction should be adapted?
 			workspace.checkSize();
-//			int row0 = Math.max(0,minInclusive-2*radiusY);
-//			int row1 = Math.min(left.height,maxExclusive+2*radiusY);
-			int row0 = minInclusive - 2*radiusY;
-			int row1 = maxExclusive + 2*radiusY;
+			int row0 = chunk0*catastrophicReset - 2*radiusY;
+			int row1 = Math.min(left.height, chunk1*catastrophicReset) + 2*radiusY;
 
 			// initialize computation
 			computeFirstRow(row0, workspace);
@@ -140,6 +143,11 @@ public class DisparityScoreBMBestFive_F32<DI extends ImageGray<DI>>
 			// efficiently compute rest of the rows using previous results to avoid repeat computations
 			computeRemainingRows(row0, row1, workspace);
 		}
+	}
+
+	/// Index of the horizontalScore row that the image row is stored in. Offset is the first row read, -2*radiusY
+	private int rowToScoreIndex( int row ) {
+		return (row + 2*radiusY)%regionHeight;
 	}
 
 	/// Initializes disparity calculation by finding the scores for the initial block of horizontal rows.
@@ -152,7 +160,7 @@ public class DisparityScoreBMBestFive_F32<DI extends ImageGray<DI>>
 		for (int row = 0; row < regionHeight; row++) {
 			growBorderL.growRow(row0 + row, radiusX, radiusX, ws.leftRow, 0);
 			growBorderR.growRow(row0 + row, radiusX, radiusX, ws.rightRow, 0);
-			float[] scores = ws.horizontalScore[row];
+			float[] scores = ws.horizontalScore[rowToScoreIndex(row0 + row)];
 			scoreRows.scoreRow(row0 + row, ws.leftRow, ws.rightRow, scores, disparityMin, disparityMax, regionWidth, ws.elementScore);
 		}
 
@@ -172,16 +180,13 @@ public class DisparityScoreBMBestFive_F32<DI extends ImageGray<DI>>
 	private void computeRemainingRows( final int row0, final int row1, final WorkSpace ws ) {
 		int disparityMax = Math.min(left.width, this.disparityMax);
 
-		int nextReset = row0 + catastrophicReset;
-
 		for (int row = row0 + regionHeight; row < row1; row++, ws.activeVerticalScore++) {
 			int activeIndex = ws.activeVerticalScore%regionHeight;
-			int oldRow = (row - row0)%regionHeight;
 			float[] previous = ws.verticalScore[(ws.activeVerticalScore - 1)%regionHeight];
 			float[] active = ws.verticalScore[activeIndex];
 
-			// subtract first row from vertical score
-			float[] scores = ws.horizontalScore[oldRow];
+			// subtract first row from vertical score. The new row is stored in the same place
+			float[] scores = ws.horizontalScore[rowToScoreIndex(row)];
 			for (int i = 0; i < widthDisparityBlock; i++) {
 				active[i] = previous[i] - scores[i];
 			}
@@ -191,8 +196,7 @@ public class DisparityScoreBMBestFive_F32<DI extends ImageGray<DI>>
 			scoreRows.scoreRow(row, ws.leftRow, ws.rightRow, scores, disparityMin, disparityMax, regionWidth, ws.elementScore);
 
 			// Here we mitigate catastrophic cancellation. See catastrophicReset for an explanation
-			if (row == nextReset) {
-				nextReset = row + catastrophicReset;
+			if (row%catastrophicReset == 0) {
 				computeVerticalScoreFromScratch(ws, active);
 			} else {
 				// add the new score
