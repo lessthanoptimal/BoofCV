@@ -77,7 +77,8 @@ public class SelectSparseErrorWithChecksWta_S32 extends SelectSparseStandardWta<
 
 			// similar scores indicate lack of texture
 			// C = (C2-C1)/C1
-			if (discretizer*(secondBest - scoreBest) <= textureThreshold*scoreBest)
+			// long so it can't overflow. secondBest is MAX_VALUE
+			if (discretizer*(long)(secondBest - scoreBest) <= (long)textureThreshold*scoreBest)
 				return false;
 		}
 
