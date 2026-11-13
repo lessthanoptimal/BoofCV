@@ -7,6 +7,12 @@ Version Meaning: <compatible>.<feature>.<bug fix>
 - Last digit always indicates a bug fix and other minor changes
 
 ---------------------
+Date    : 2026/
+Version : 1.6.1
+
+-- StereoDisparity: single and multi-thread produce identical results. BM and BM5
+
+---------------------
 Date    : 2026/Oct/22
 Version : 1.6.0
 
