@@ -12,8 +12,13 @@ Version : 1.7.0
 
 - Build: Doesn't require Android SDK to build anymore
 - AverageDownSample: Fixed width being used when height should have
-- StereoDisparity: BOverride added for native implementations
-- StereoDisparity: single and multi-thread produce identical results. BM and BM5
+- StereoDisparity
+  * BOverride added for native implementations
+  * single and multi-thread produce identical results. BM and BM5
+  * CENSUS fixed bug for >= 32-bit errors
+  * CENSUS border is part of a Config and not a global variable
+- Border
+  * Reflect and wrap will both cycle
 
 ---------------------
 Date    : 2026/Oct/22
