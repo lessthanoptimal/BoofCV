@@ -19,6 +19,7 @@ Version : 1.7.0
   * CENSUS border is part of a Config and not a global variable
 - Border
   * Reflect and wrap will both cycle
+  * ZERO works with GrayS64
 
 ---------------------
 Date    : 2026/Oct/22
