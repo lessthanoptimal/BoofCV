@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,5 +40,21 @@ public class TestBorderIndex1D_Wrap extends BoofStandardJUnit {
 		assertEquals(8,alg.getIndex(-2));
 		assertEquals(0,alg.getIndex(length));
 		assertEquals(1,alg.getIndex(length+1));
+	}
+
+	/// Images smaller than the distance outside are wrapped more than once
+	@Test void smallerThanOffset() {
+		BorderIndex1D_Wrap alg = new BorderIndex1D_Wrap();
+		alg.setLength(1);
+		assertEquals(0, alg.getIndex(-1));
+		assertEquals(0, alg.getIndex(1));
+		assertEquals(0, alg.getIndex(-2));
+		assertEquals(0, alg.getIndex(2));
+
+		alg.setLength(2);
+		assertEquals(1, alg.getIndex(-3));
+		assertEquals(0, alg.getIndex(-4));
+		assertEquals(0, alg.getIndex(4));
+		assertEquals(1, alg.getIndex(5));
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,5 +40,22 @@ public class TestBorderIndex1D_Reflect extends BoofStandardJUnit {
 		assertEquals(2,alg.getIndex(-2));
 		assertEquals(8,alg.getIndex(length));
 		assertEquals(7,alg.getIndex(length+1));
+	}
+
+	/// Images smaller than the distance outside are reflected more than once
+	@Test void smallerThanOffset() {
+		BorderIndex1D_Reflect alg = new BorderIndex1D_Reflect();
+		alg.setLength(1);
+		assertEquals(0, alg.getIndex(-1));
+		assertEquals(0, alg.getIndex(1));
+		assertEquals(0, alg.getIndex(-2));
+		assertEquals(0, alg.getIndex(2));
+
+		// image is 0 1 2. Index -3 to 5 is 1 2 1 0 1 2 1 0 1
+		alg.setLength(3);
+		assertEquals(1, alg.getIndex(-3));
+		assertEquals(2, alg.getIndex(-2));
+		assertEquals(0, alg.getIndex(4));
+		assertEquals(1, alg.getIndex(5));
 	}
 }
