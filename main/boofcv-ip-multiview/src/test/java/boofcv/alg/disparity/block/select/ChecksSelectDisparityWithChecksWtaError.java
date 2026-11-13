@@ -53,13 +53,7 @@ public abstract class ChecksSelectDisparityWithChecksWtaError<ArrayData, D exten
 		SelectDisparityWithChecksWta<ArrayData, D> alg = createSelector(2, -1, -1);
 		alg.configure(disparity, null, 0, maxDisparity, 2);
 
-		int[] scores = new int[w*rangeDisparity];
-
-		for (int d = 0; d < rangeDisparity; d++) {
-			for (int x = 0; x < w; x++) {
-				scores[w*d + x] = d == 0 ? 5 : x;
-			}
-		}
+		int[] scores = createScores(( d, x ) -> d == 0 ? 5 : x);
 
 		alg.process(y, copyToCorrectType(scores));
 
@@ -76,6 +70,49 @@ public abstract class ChecksSelectDisparityWithChecksWtaError<ArrayData, D exten
 		alg.process(y, copyToCorrectType(scores));
 		assertEquals(1, getDisparity(3, y), 1);
 		assertEquals(1, getDisparity(4, y), 1);
+	}
+
+	/// Range of 3 with the best in the middle excludes every other candidate from the texture test. There is no
+	/// competing disparity, so the pixel is kept.
+	@Test void textureNoOtherCandidate() {
+		init(0, 2);
+		int y = 3;
+
+		SelectDisparityWithChecksWta<ArrayData, D> alg = createSelector(-1, -1, 0.15);
+		alg.configure(disparity, null, 0, maxDisparity, 2);
+
+		int[] scores = createScores(( d, x ) -> d == 1 ? 10 : 20);
+
+		alg.process(y, copyToCorrectType(scores));
+
+		for (int x = 2; x < w; x++) {
+			assertEquals(1, getDisparity(x, y), "col=" + x);
+		}
+	}
+
+	/// Scores as large as SSD with a large region must not overflow in the texture test
+	@Test void textureLargeScores() {
+		// second best is twice the best, so it's a unique match
+		textureLargeScores(1_000_000, 5);
+		// second best is only 10% larger, so it's ambiguous
+		textureLargeScores(550_000, reject);
+	}
+
+	private void textureLargeScores( int secondBest, int expected ) {
+		init(0, 10);
+		int y = 3;
+
+		SelectDisparityWithChecksWta<ArrayData, D> alg = createSelector(-1, -1, 0.15);
+		alg.configure(disparity, null, 0, maxDisparity, 2);
+
+		int[] scores = createScores(( d, x ) -> d == 5 ? 500_000 : d == 2 ? secondBest : 2_000_000);
+
+		alg.process(y, copyToCorrectType(scores));
+
+		// Columns that can see disparities 2 to 6
+		for (int x = 6; x < w; x++) {
+			assertEquals(expected, getDisparity(x, y), "col=" + x);
+		}
 	}
 
 	@Override
