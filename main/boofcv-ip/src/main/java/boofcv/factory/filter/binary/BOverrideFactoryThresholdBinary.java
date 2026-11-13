@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,7 +49,7 @@ public class BOverrideFactoryThresholdBinary extends BOverrideClass {
 
 	public interface GlobalEntropy {
 		<T extends ImageGray<T>>
-		InputToBinary<T> handle( int minValue, int maxValue, boolean down, Class<T> inputType );
+		InputToBinary<T> handle( int minValue, int maxValue, double scale, boolean down, Class<T> inputType );
 	}
 
 	public interface GlobalFixed {
@@ -59,7 +59,7 @@ public class BOverrideFactoryThresholdBinary extends BOverrideClass {
 
 	public interface GlobalOtsu {
 		<T extends ImageGray<T>>
-		InputToBinary<T> handle( double minValue, double maxValue, boolean down, Class<T> inputType );
+		InputToBinary<T> handle( double minValue, double maxValue, double scale, boolean down, Class<T> inputType );
 	}
 
 	public interface LocalGaussian {
