@@ -60,7 +60,8 @@ public class BenchmarkConvolveImageStandard_SB extends CommonBenchmarkConvolve_S
 	@Benchmark public void vertical_U8_I16() {ConvolveImageStandard_SB.vertical(kernelI32, input_U8, out_S16);}
 	@Benchmark public void vertical_U8_I32() {ConvolveImageStandard_SB.vertical(kernelI32, input_U8, out_S32);}
 	@Benchmark public void vertical_U16_I16() {ConvolveImageStandard_SB.vertical(kernelI32, input_U16, out_S16);}
-	@Benchmark public void vertical_U16_I32_DIV() {ConvolveImageStandard_SB.vertical(kernelI32, input_U16, out_S16, 10, work_I32);}
+	@Benchmark public void vertical_U16_I8_DIV() {ConvolveImageStandard_SB.vertical(kernelI32, input_U16, out_U8, 10, work_I32);}
+	@Benchmark public void vertical_U16_I16_DIV() {ConvolveImageStandard_SB.vertical(kernelI32, input_U16, out_S16, 10, work_I32);}
 	@Benchmark public void vertical_S16_I16() {ConvolveImageStandard_SB.vertical(kernelI32, input_S16, out_S16);}
 	@Benchmark public void vertical_S16_I16_DIV() {ConvolveImageStandard_SB.vertical(kernelI32, input_S16, out_S16, 10, work_I32);}
 	@Benchmark public void vertical_S32_I16_DIV() {ConvolveImageStandard_SB.vertical(kernelI32, input_S32, out_S16, 10, work_I32);}
