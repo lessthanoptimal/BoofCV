@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,7 @@ import boofcv.alg.misc.GImageStatistics;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.Kernel1D;
+import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.convolve.Kernel2D;
 import boofcv.struct.convolve.KernelBase;
 import boofcv.struct.image.ImageGray;
@@ -77,6 +78,58 @@ public class TestConvolveImageStandard_SB extends BoofStandardJUnit {
 		// update this as needed when new functions are added
 		if (numExpected != numFound)
 			throw new RuntimeException("Unexpected number of methods: Found " + numFound + "  expected " + numExpected);
+	}
+
+	/**
+	 * Vertical convolution with a divisor gives the same result as integer division, (total + divisor/2)/divisor.
+	 * The sums are the ones next to multiples of the divisor, where rounding errors change the result, near zero and
+	 * near the largest and smallest sums, including negative sums for signed images. Divisors include ones where
+	 * 1.0/divisor rounds down, e.g. 49*(1.0/49) = 0.9999999999999999 truncates to 0 instead of 1.
+	 */
+	@Test void verticalDiv_sameAsIntegerDivision() throws Exception {
+		int[] divisors = {1, 2, 3, 49, 98, 103, 107, 65537, Integer.MAX_VALUE/4};
+		int numFound = 0;
+		for (Method m : ConvolveImageStandard_SB.class.getMethods()) {
+			Class[] param = m.getParameterTypes();
+			if (!m.getName().equals("vertical") || param.length != 5)
+				continue;
+
+			ImageGray template = GeneralizedImageOps.createSingleBand(param[1], 1, 1);
+			// S32 sums are limited so that adding divisor/2 can't overflow
+			int min = template.getDataType().isSigned() ? (int)Math.max(-(1 << 30), template.getDataType().getMinValue()) : 0;
+			int max = (int)Math.min(1 << 30, template.getDataType().getMaxValue());
+
+			for (int d : divisors) {
+				// sums next to multiples of the divisor, near zero and near the smallest and largest sums
+				long qMin = Math.floorDiv(min + d/2, d), qMax = Math.floorDiv(max + d/2, d);
+				var values = new DogArray_I32();
+				values.add(min);
+				values.add(max);
+				for (long q : new long[]{qMin, qMin + 1, -3, -2, -1, 0, 1, 2, 3, qMax - 1, qMax}) {
+					for (int delta = -1; delta <= 0; delta++) {
+						long v = q*d - d/2 + delta;
+						if (v >= min && v <= max)
+							values.add((int)v);
+					}
+				}
+
+				ImageGray input = GeneralizedImageOps.createSingleBand(param[1], values.size, 1);
+				ImageGray found = GeneralizedImageOps.createSingleBand(param[2], values.size, 1);
+				ImageGray expected = GeneralizedImageOps.createSingleBand(param[2], values.size, 1);
+				for (int x = 0; x < values.size; x++) {
+					GeneralizedImageOps.set(input, x, 0, values.get(x));
+					GeneralizedImageOps.set(expected, x, 0, (values.get(x) + d/2)/d);
+				}
+
+				m.invoke(null, new Kernel1D_S32(1, new int[]{1}), input, found, d, new GrowArray<>(DogArray_I32::new));
+				for (int x = 0; x < values.size; x++) {
+					assertEquals(get(expected, x, 0), get(found, x, 0),
+							param[1].getSimpleName() + " divisor " + d + " sum " + values.get(x));
+				}
+			}
+			numFound++;
+		}
+		assertEquals(6, numFound);
 	}
 
 	private boolean isTestMethod( Method m ) {
