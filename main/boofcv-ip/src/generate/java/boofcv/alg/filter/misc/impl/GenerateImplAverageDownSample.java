@@ -37,10 +37,10 @@ public class GenerateImplAverageDownSample extends CodeGeneratorBase {
 		naivePixelVertical(AutoTypeImage.F64);
 
 		horizontal(AutoTypeImage.U8, AutoTypeImage.F32);
-		verticalOutInt(AutoTypeImage.I8);
+		verticalOutInt(AutoTypeImage.U8);
 
 		horizontal(AutoTypeImage.U16, AutoTypeImage.F32);
-		verticalOutInt(AutoTypeImage.I16);
+		verticalOutInt(AutoTypeImage.U16);
 
 		horizontal(AutoTypeImage.F32, AutoTypeImage.F32);
 		verticalFloat(AutoTypeImage.F32);
@@ -53,10 +53,11 @@ public class GenerateImplAverageDownSample extends CodeGeneratorBase {
 
 	private void printPreamble() {
 		out.print("import boofcv.struct.image.*;\n" +
-				"import javax.annotation.Generated;\n" +
 				"import org.ddogleg.struct.DogArray_F32;\n" +
 				"import org.jetbrains.annotations.Nullable;\n" +
 				"import pabeles.concurrency.GrowArray;\n" +
+				"\n" +
+				"import javax.annotation.Generated;\n" +
 				"\n" +
 				"//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;\n" +
 				"\n" +
@@ -201,7 +202,6 @@ public class GenerateImplAverageDownSample extends CodeGeneratorBase {
 
 	private void verticalOutInt( AutoTypeImage output ) {
 		String outputTypecast = "(" + output.getDataType() + ")";
-		String round = output.isInteger() ? "+ 0.5f" : "";
 
 		out.print("\t/// Same as vertical but workspace is null by default\n" +
 				"\tpublic static void vertical( GrayF32 src, boolean centered, " + output.getSingleBandName() + " dst) {\n" +
@@ -209,6 +209,7 @@ public class GenerateImplAverageDownSample extends CodeGeneratorBase {
 				"\t}\n\n");
 
 		out.print("\t/// Down samples the image along the y-axis only. Image width's must be the same.\n" +
+				"\t/// The input is always the floating point output of horizontal(), even for integer images.\n" +
 				"\t///\n" +
 				"\t/// @param src Input image. Not modified.\n" +
 				"\t/// @param centered The kernel will be centered to avoid shifting pixel values.\n" +
@@ -283,7 +284,7 @@ public class GenerateImplAverageDownSample extends CodeGeneratorBase {
 				"\n" +
 				"\t\t\tint dstIndex = dst.getIndex(0, y);\n" +
 				"\t\t\tfor (int x = 0; x < dst.width; x++) {\n" +
-				"\t\t\t\tdst.data[dstIndex++] = " + outputTypecast + "(workArray[x] + " + round + ");\n" +
+				"\t\t\t\tdst.data[dstIndex++] = " + outputTypecast + "(workArray[x] + 0.5f);\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t\t//CONCURRENT_INLINE });\n" +
