@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -323,7 +323,7 @@ public class GenerateConvolvedUnrolled_SB extends CodeGeneratorBase {
 				"\t\tfinal int imgWidth = dst.getWidth();\n" +
 				"\t\tfinal int imgHeight = dst.getHeight();\n" +
 				"\t\tfinal int halfDivisor = divisor/2;\n" +
-				"\t\tfinal double divisionHack = 1.0/divisor; // WTF integer division is slower than converting to a float??\n" +
+				"\t\tfinal double divisorInv = Math.nextUp(1.0/divisor); // faster than division. See ConvolveImageStandard_SB\n" +
 				"\n" +
 				"\t\tfinal int yEnd = imgHeight-offset;\n");
 		String body = "";
@@ -337,7 +337,7 @@ public class GenerateConvolvedUnrolled_SB extends CodeGeneratorBase {
 		body += "\n" +
 				"\t\t\tint indexDst = dst.startIndex + y*dst.stride;\n" +
 				"\t\t\tfor (int j = 0; j < imgWidth; j++) {\n" +
-				"\t\t\t\tdataDst[indexDst++] = ("+dataOutput+")((totalRow[j] + halfDivisor)*divisionHack);\n" +
+				"\t\t\t\tdataDst[indexDst++] = ("+dataOutput+")((totalRow[j] + halfDivisor)*divisorInv);\n" +
 				"\t\t\t}\n" +
 				"\t\t\tArrays.fill(totalRow,0,imgWidth,0);\n" +
 				"\t\t}\n";

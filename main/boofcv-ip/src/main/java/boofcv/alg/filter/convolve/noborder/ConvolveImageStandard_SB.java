@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,6 +34,12 @@ import java.util.Arrays;
 /**
  * <p>
  * Standard algorithms with no fancy optimization for convolving 1D and 2D kernels across an image.
+ * </p>
+ *
+ * <p>
+ * Explanation of <pre>divisorInv = Math.nextUp(1.0/divisor)</pre>: Multiplication by a float is faster
+ * than integer division. However, 1.0/divisor is rounded down 49*(1.0/49) = 0.99999, which truncates
+ * to 0 instead of 1. Rounding the reciprocal up makes every product at least the exact quotient.
  * </p>
  *
  * <p>DO NOT MODIFY. Automatically generated code created by GenerateConvolveImageStandard_SB</p>
@@ -403,7 +409,7 @@ public class ConvolveImageStandard_SB {
 		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 		final int halfDivisor = divisor/2;
-		final double divisionHack = 1.0/divisor; // WTF integer division is slower than converting to a float??
+		final double divisorInv = Math.nextUp(1.0/divisor); // nextUp is required. See class JavaDoc
 
 		final int imgWidth = dst.getWidth();
 		final int imgHeight = dst.getHeight();
@@ -423,7 +429,7 @@ public class ConvolveImageStandard_SB {
 
 			int indexDst = dst.startIndex + y*dst.stride;
 			for (int i = 0; i < imgWidth; i++) {
-				dataDst[indexDst++] = (byte)((totalRow[i] + halfDivisor)*divisionHack);
+				dataDst[indexDst++] = (byte)((totalRow[i] + halfDivisor)*divisorInv);
 			}
 			Arrays.fill(totalRow,0,imgWidth,0);
 		}
@@ -557,7 +563,7 @@ public class ConvolveImageStandard_SB {
 		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 		final int halfDivisor = divisor/2;
-		final double divisionHack = 1.0/divisor; // WTF integer division is slower than converting to a float??
+		final double divisorInv = Math.nextUp(1.0/divisor); // nextUp is required. See class JavaDoc
 
 		final int imgWidth = dst.getWidth();
 		final int imgHeight = dst.getHeight();
@@ -577,7 +583,7 @@ public class ConvolveImageStandard_SB {
 
 			int indexDst = dst.startIndex + y*dst.stride;
 			for (int i = 0; i < imgWidth; i++) {
-				dataDst[indexDst++] = (byte)((totalRow[i] + halfDivisor)*divisionHack);
+				dataDst[indexDst++] = (byte)((totalRow[i] + halfDivisor)*divisorInv);
 			}
 			Arrays.fill(totalRow,0,imgWidth,0);
 		}
@@ -676,7 +682,7 @@ public class ConvolveImageStandard_SB {
 		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 		final int halfDivisor = divisor/2;
-		final double divisionHack = 1.0/divisor; // WTF integer division is slower than converting to a float??
+		final double divisorInv = Math.nextUp(1.0/divisor); // nextUp is required. See class JavaDoc
 
 		final int imgWidth = dst.getWidth();
 		final int imgHeight = dst.getHeight();
@@ -696,7 +702,7 @@ public class ConvolveImageStandard_SB {
 
 			int indexDst = dst.startIndex + y*dst.stride;
 			for (int i = 0; i < imgWidth; i++) {
-				dataDst[indexDst++] = (short)((totalRow[i] + halfDivisor)*divisionHack);
+				dataDst[indexDst++] = (short)((totalRow[i] + halfDivisor)*divisorInv);
 			}
 			Arrays.fill(totalRow,0,imgWidth,0);
 		}
@@ -882,7 +888,7 @@ public class ConvolveImageStandard_SB {
 		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 		final int halfDivisor = divisor/2;
-		final double divisionHack = 1.0/divisor; // WTF integer division is slower than converting to a float??
+		final double divisorInv = Math.nextUp(1.0/divisor); // nextUp is required. See class JavaDoc
 
 		final int imgWidth = dst.getWidth();
 		final int imgHeight = dst.getHeight();
@@ -902,7 +908,7 @@ public class ConvolveImageStandard_SB {
 
 			int indexDst = dst.startIndex + y*dst.stride;
 			for (int i = 0; i < imgWidth; i++) {
-				dataDst[indexDst++] = (short)((totalRow[i] + halfDivisor)*divisionHack);
+				dataDst[indexDst++] = (short)((totalRow[i] + halfDivisor)*divisorInv);
 			}
 			Arrays.fill(totalRow,0,imgWidth,0);
 		}
@@ -972,7 +978,7 @@ public class ConvolveImageStandard_SB {
 		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 		final int halfDivisor = divisor/2;
-		final double divisionHack = 1.0/divisor; // WTF integer division is slower than converting to a float??
+		final double divisorInv = Math.nextUp(1.0/divisor); // nextUp is required. See class JavaDoc
 
 		final int imgWidth = dst.getWidth();
 		final int imgHeight = dst.getHeight();
@@ -992,7 +998,7 @@ public class ConvolveImageStandard_SB {
 
 			int indexDst = dst.startIndex + y*dst.stride;
 			for (int i = 0; i < imgWidth; i++) {
-				dataDst[indexDst++] = (short)((totalRow[i] + halfDivisor)*divisionHack);
+				dataDst[indexDst++] = (short)((totalRow[i] + halfDivisor)*divisorInv);
 			}
 			Arrays.fill(totalRow,0,imgWidth,0);
 		}
@@ -1126,7 +1132,7 @@ public class ConvolveImageStandard_SB {
 		final int offset = kernel.getOffset();
 		final int kernelWidth = kernel.getWidth();
 		final int halfDivisor = divisor/2;
-		final double divisionHack = 1.0/divisor; // WTF integer division is slower than converting to a float??
+		final double divisorInv = Math.nextUp(1.0/divisor); // nextUp is required. See class JavaDoc
 
 		final int imgWidth = dst.getWidth();
 		final int imgHeight = dst.getHeight();
@@ -1146,7 +1152,7 @@ public class ConvolveImageStandard_SB {
 
 			int indexDst = dst.startIndex + y*dst.stride;
 			for (int i = 0; i < imgWidth; i++) {
-				dataDst[indexDst++] = (int)((totalRow[i] + halfDivisor)*divisionHack);
+				dataDst[indexDst++] = (int)((totalRow[i] + halfDivisor)*divisorInv);
 			}
 			Arrays.fill(totalRow,0,imgWidth,0);
 		}

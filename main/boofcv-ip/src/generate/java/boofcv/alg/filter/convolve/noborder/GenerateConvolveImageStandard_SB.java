@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -65,12 +65,12 @@ public class GenerateConvolveImageStandard_SB extends CodeGeneratorBase {
 
 	private void printPreamble() {
 		autoSelectName();
-		out.print("import pabeles.concurrency.GrowArray;\n" +
-				"import boofcv.misc.BoofMiscOps;\n" +
+		out.print("import boofcv.misc.BoofMiscOps;\n" +
 				"import boofcv.struct.convolve.*;\n" +
 				"import boofcv.struct.image.*;\n" +
 				"import org.ddogleg.struct.DogArray_I32;\n" +
 				"import org.jetbrains.annotations.Nullable;\n" +
+				"import pabeles.concurrency.GrowArray;\n" +
 				"\n" +
 				"import javax.annotation.Generated;\n" +
 				"import java.util.Arrays;\n");
@@ -82,6 +82,12 @@ public class GenerateConvolveImageStandard_SB extends CodeGeneratorBase {
 		out.print("/**\n" +
 				" * <p>\n" +
 				" * Standard algorithms with no fancy optimization for convolving 1D and 2D kernels across an image.\n" +
+				" * </p>\n" +
+				" *\n" +
+				" * <p>\n" +
+				" * Explanation of <pre>divisorInv = Math.nextUp(1.0/divisor)</pre>: Multiplication by a float is faster\n" +
+				" * than integer division. However, 1.0/divisor is rounded down 49*(1.0/49) = 0.99999, which truncates\n" +
+				" * to 0 instead of 1. Rounding the reciprocal up makes every product at least the exact quotient.\n" +
 				" * </p>\n" +
 				generateDocString("Peter Abeles") +
 				"@SuppressWarnings({\"ForLoopReplaceableByForEach\",\"Duplicates\"})\n" +
@@ -175,7 +181,7 @@ public class GenerateConvolveImageStandard_SB extends CodeGeneratorBase {
 				"\t\tfinal int offset = kernel.getOffset();\n" +
 				"\t\tfinal int kernelWidth = kernel.getWidth();\n" +
 				"\t\tfinal int halfDivisor = divisor/2;\n" +
-				"\t\tfinal double divisionHack = 1.0/divisor; // WTF integer division is slower than converting to a float??\n" +
+				"\t\tfinal double divisorInv = Math.nextUp(1.0/divisor); // nextUp is required. See class JavaDoc\n" +
 				"\n" +
 				"\t\tfinal int imgWidth = dst.getWidth();\n" +
 				"\t\tfinal int imgHeight = dst.getHeight();\n" +
@@ -194,7 +200,7 @@ public class GenerateConvolveImageStandard_SB extends CodeGeneratorBase {
 				"\n" +
 				"\t\t\tint indexDst = dst.startIndex + y*dst.stride;\n" +
 				"\t\t\tfor (int i = 0; i < imgWidth; i++) {\n" +
-				"\t\t\t\tdataDst[indexDst++] = (" + outputData + ")((totalRow[i] + halfDivisor)*divisionHack);\n" +
+				"\t\t\t\tdataDst[indexDst++] = (" + outputData + ")((totalRow[i] + halfDivisor)*divisorInv);\n" +
 				"\t\t\t}\n" +
 				"\t\t\tArrays.fill(totalRow,0,imgWidth,0);\n" +
 				"\t\t}\n";
