@@ -134,6 +134,9 @@ public class AverageDownSampleOps {
 	/// @param middle (Optional) GrayF32 or GrayF64 used to store intermediate results
 	public static <T extends ImageBase<T>>
 	void down( T input, boolean centered, T output, @Nullable ImageGray middle ) {
+		if (BOverrideAverageDownSampleOps.invokeNativeDown(input, centered, output, middle))
+			return;
+
 		if (middle == null) {
 			if (output.getImageType().getDataType().getNumBits() < 64)
 				middle = new GrayF32(output.width, input.height);
@@ -184,6 +187,9 @@ public class AverageDownSampleOps {
 
 	/// Downsample the horizontal axis only. Output must be [GrayF32] or [GrayF64], depending on image type.
 	public static void horizontal( ImageBase<?> input, boolean centered, ImageBase<?> output ) {
+		if (BOverrideAverageDownSampleOps.invokeNativeHorizontal(input, centered, output))
+			return;
+
 		if (ImageGray.class.isAssignableFrom(input.getClass())) {
 			if (BoofConcurrency.USE_CONCURRENT) {
 				if (input instanceof GrayU8) {
@@ -229,6 +235,9 @@ public class AverageDownSampleOps {
 	/// used with integer output image types
 	public static void vertical( ImageBase<?> input, boolean centered, ImageBase<?> output,
 								 @Nullable GrowArray<DogArray_F32> workspaces ) {
+		if (BOverrideAverageDownSampleOps.invokeNativeVertical(input, centered, output))
+			return;
+
 		if (workspaces == null && output.getImageType().getDataType().isInteger()) {
 			workspaces = new GrowArray<>(DogArray_F32::new);
 		}
@@ -310,6 +319,9 @@ public class AverageDownSampleOps {
 	/// @param sampleWidth Width of square region.
 	/// @param output Output image. Modified.
 	public static void down( GrayU8 input, int sampleWidth, GrayI8 output ) {
+		if (BOverrideAverageDownSampleOps.invokeNativeDown(input, sampleWidth, output))
+			return;
+
 		if (sampleWidth == 2) {
 			if (BoofConcurrency.USE_CONCURRENT) {
 				ImplAverageDownSample2_MT.down(input, output);
@@ -331,6 +343,9 @@ public class AverageDownSampleOps {
 	/// @param sampleWidth Width of square region.
 	/// @param output Output image. Modified.
 	public static void down( GrayS8 input, int sampleWidth, GrayI8 output ) {
+		if (BOverrideAverageDownSampleOps.invokeNativeDown(input, sampleWidth, output))
+			return;
+
 		if (sampleWidth == 2) {
 			if (BoofConcurrency.USE_CONCURRENT) {
 				ImplAverageDownSample2_MT.down(input, output);
@@ -352,6 +367,9 @@ public class AverageDownSampleOps {
 	/// @param sampleWidth Width of square region.
 	/// @param output Output image. Modified.
 	public static void down( GrayU16 input, int sampleWidth, GrayI16 output ) {
+		if (BOverrideAverageDownSampleOps.invokeNativeDown(input, sampleWidth, output))
+			return;
+
 		if (sampleWidth == 2) {
 			if (BoofConcurrency.USE_CONCURRENT) {
 				ImplAverageDownSample2_MT.down(input, output);
@@ -373,6 +391,9 @@ public class AverageDownSampleOps {
 	/// @param sampleWidth Width of square region.
 	/// @param output Output image. Modified.
 	public static void down( GrayS16 input, int sampleWidth, GrayI16 output ) {
+		if (BOverrideAverageDownSampleOps.invokeNativeDown(input, sampleWidth, output))
+			return;
+
 		if (sampleWidth == 2) {
 			if (BoofConcurrency.USE_CONCURRENT) {
 				ImplAverageDownSample2_MT.down(input, output);
@@ -394,6 +415,9 @@ public class AverageDownSampleOps {
 	/// @param sampleWidth Width of square region.
 	/// @param output Output image. Modified.
 	public static void down( GrayS32 input, int sampleWidth, GrayS32 output ) {
+		if (BOverrideAverageDownSampleOps.invokeNativeDown(input, sampleWidth, output))
+			return;
+
 		if (sampleWidth == 2) {
 			if (BoofConcurrency.USE_CONCURRENT) {
 				ImplAverageDownSample2_MT.down(input, output);
@@ -415,6 +439,9 @@ public class AverageDownSampleOps {
 	/// @param sampleWidth Width of square region.
 	/// @param output Output image. Modified.
 	public static void down( GrayF32 input, int sampleWidth, GrayF32 output ) {
+		if (BOverrideAverageDownSampleOps.invokeNativeDown(input, sampleWidth, output))
+			return;
+
 		if (sampleWidth == 2) {
 			if (BoofConcurrency.USE_CONCURRENT) {
 				ImplAverageDownSample2_MT.down(input, output);
@@ -436,6 +463,9 @@ public class AverageDownSampleOps {
 	/// @param sampleWidth Width of square region.
 	/// @param output Output image. Modified.
 	public static void down( GrayF64 input, int sampleWidth, GrayF64 output ) {
+		if (BOverrideAverageDownSampleOps.invokeNativeDown(input, sampleWidth, output))
+			return;
+
 		if (sampleWidth == 2) {
 			if (BoofConcurrency.USE_CONCURRENT) {
 				ImplAverageDownSample2_MT.down(input, output);
