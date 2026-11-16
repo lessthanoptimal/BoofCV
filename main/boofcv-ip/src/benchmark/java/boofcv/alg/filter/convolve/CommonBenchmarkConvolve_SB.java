@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,7 @@ public class CommonBenchmarkConvolve_SB {
 	protected static GrayF64 out_F64 = new GrayF64(1, 1);
 	protected static GrayU8 input_U8 = new GrayU8(1, 1);
 	protected static GrayS16 input_S16 = new GrayS16(1, 1);
-	protected static GrayS16 input_U16 = new GrayS16(1, 1);
+	protected static GrayU16 input_U16 = new GrayU16(1, 1);
 	protected static GrayS32 input_S32 = new GrayS32(1, 1);
 	protected static GrayU8 out_U8 = new GrayU8(1, 1);
 	protected static GrayS16 out_S16 = new GrayS16(1, 1);
