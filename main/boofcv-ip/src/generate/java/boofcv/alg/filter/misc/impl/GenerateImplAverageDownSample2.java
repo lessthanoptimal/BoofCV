@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.filter.misc;
+package boofcv.alg.filter.misc.impl;
 
 import boofcv.generate.AutoTypeImage;
 import boofcv.generate.CodeGeneratorBase;
@@ -42,14 +42,15 @@ public class GenerateImplAverageDownSample2 extends CodeGeneratorBase {
 	}
 
 	private void printPreamble() {
-		out.print("import boofcv.struct.image.*;\n" +
+		out.print("import boofcv.alg.filter.misc.AverageDownSampleOps;\n" +
+				"import boofcv.struct.image.*;\n" +
+				"\n" +
 				"import javax.annotation.Generated;\n" +
 				"\n" +
 				"//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;\n" +
 				"\n" +
 				"/**\n" +
 				" * <p>Implementation of {@link AverageDownSampleOps} specialized for square regions of width 2.</p>\n" +
-				" *\n" +
 				generateDocString("Peter Abeles") +
 				"public class "+className+" {\n");
 	}
@@ -59,8 +60,19 @@ public class GenerateImplAverageDownSample2 extends CodeGeneratorBase {
 		String sumType = input.getSumType();
 		String cast = input.getTypeCastFromSum();
 		String bitwise = input.getBitWise();
-		String computeAve4 = input.isInteger() ? "((total+2)/4)" : "(total/4)";
-		String computeAve2 = input.isInteger() ? "((total+1)/2)" : "(total/2)";
+		String computeAve4, computeAve2;
+		if (!input.isInteger()) {
+			computeAve4 = "(total/4)";
+			computeAve2 = "(total/2)";
+		} else if (input.isSigned()) {
+			// round half away from zero, the same as ImplAverageDownSampleN. Only the offset depends on the sign
+			// so the JIT uses a conditional move instead of a branch
+			computeAve4 = "((total + (total >= 0 ? 2 : -2))/4)";
+			computeAve2 = "((total + (total >= 0 ? 1 : -1))/2)";
+		} else {
+			computeAve4 = "((total+2)/4)";
+			computeAve2 = "((total+1)/2)";
+		}
 
 		out.print("\tpublic static void down( "+input.getSingleBandName()+" input , "+output.getSingleBandName()+" output ) {\n" +
 				"\t\tint maxY = input.height - input.height%2;\n" +
@@ -124,6 +136,7 @@ public class GenerateImplAverageDownSample2 extends CodeGeneratorBase {
 
 	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateImplAverageDownSample2 app = new GenerateImplAverageDownSample2();
-		app.generateCode();
+		app.setModuleName("boofcv-ip");
+		app.generate();
 	}
 }

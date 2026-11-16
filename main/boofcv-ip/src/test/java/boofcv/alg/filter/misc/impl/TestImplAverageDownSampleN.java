@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -62,7 +62,8 @@ public class TestImplAverageDownSampleN extends BoofStandardJUnit {
 
 		ImageGray input = GeneralizedImageOps.createSingleBand(inputType,width,height);
 
-		GImageMiscOps.fillUniform(input, rand, 0, 100);
+		// negative values for signed images to test rounding
+		GImageMiscOps.fillUniform(input, rand, input.getDataType().isSigned() ? -100 : 0, 100);
 
 		for( int region = 1; region <= 5; region++ ) {
 			int downWidth = width%region == 0 ? width/region : width/region+1;
@@ -100,8 +101,9 @@ public class TestImplAverageDownSampleN extends BoofStandardJUnit {
 					}
 				}
 
+				// integer images round half away from zero
 				if( input.getDataType().isInteger())
-					GeneralizedImageOps.set( output, x/region, y/region , (int)Math.round(total/count) );
+					GeneralizedImageOps.set( output, x/region, y/region , (int)Math.signum(total)*(int)Math.round(Math.abs(total)/count) );
 				else
 					GeneralizedImageOps.set( output, x/region, y/region , total/count );
 			}
