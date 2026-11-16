@@ -326,17 +326,18 @@ public class ImplAverageDownSample {
 	}
 
 	/// Same as vertical but workspace is null by default
-	public static void vertical( GrayF32 src, boolean centered, GrayI8 dst) {
+	public static void vertical( GrayF32 src, boolean centered, GrayU8 dst) {
 		vertical(src, centered, dst, null);
 	}
 
 	/// Down samples the image along the y-axis only. Image width's must be the same.
+	/// The input is always the floating point output of horizontal(), even for integer images.
 	///
 	/// @param src Input image. Not modified.
 	/// @param centered The kernel will be centered to avoid shifting pixel values.
 	/// @param dst Output image. Modified.
 	/// @param workspaces (Optional) Storage for workspace used to store intermediate results
-	public static void vertical( GrayF32 src, boolean centered, GrayI8 dst, @Nullable GrowArray<DogArray_F32> workspaces ) {
+	public static void vertical( GrayF32 src, boolean centered, GrayU8 dst, @Nullable GrowArray<DogArray_F32> workspaces ) {
 		if (src.height < dst.height)
 			throw new IllegalArgumentException("src height must be >= dst height");
 		if (src.width != dst.width)
@@ -405,7 +406,7 @@ public class ImplAverageDownSample {
 
 			int dstIndex = dst.getIndex(0, y);
 			for (int x = 0; x < dst.width; x++) {
-				dst.data[dstIndex++] = (byte)(workArray[x] + + 0.5f);
+				dst.data[dstIndex++] = (byte)(workArray[x] + 0.5f);
 			}
 		}
 		//CONCURRENT_INLINE });
@@ -467,17 +468,18 @@ public class ImplAverageDownSample {
 	}
 
 	/// Same as vertical but workspace is null by default
-	public static void vertical( GrayF32 src, boolean centered, GrayI16 dst) {
+	public static void vertical( GrayF32 src, boolean centered, GrayU16 dst) {
 		vertical(src, centered, dst, null);
 	}
 
 	/// Down samples the image along the y-axis only. Image width's must be the same.
+	/// The input is always the floating point output of horizontal(), even for integer images.
 	///
 	/// @param src Input image. Not modified.
 	/// @param centered The kernel will be centered to avoid shifting pixel values.
 	/// @param dst Output image. Modified.
 	/// @param workspaces (Optional) Storage for workspace used to store intermediate results
-	public static void vertical( GrayF32 src, boolean centered, GrayI16 dst, @Nullable GrowArray<DogArray_F32> workspaces ) {
+	public static void vertical( GrayF32 src, boolean centered, GrayU16 dst, @Nullable GrowArray<DogArray_F32> workspaces ) {
 		if (src.height < dst.height)
 			throw new IllegalArgumentException("src height must be >= dst height");
 		if (src.width != dst.width)
@@ -546,7 +548,7 @@ public class ImplAverageDownSample {
 
 			int dstIndex = dst.getIndex(0, y);
 			for (int x = 0; x < dst.width; x++) {
-				dst.data[dstIndex++] = (short)(workArray[x] + + 0.5f);
+				dst.data[dstIndex++] = (short)(workArray[x] + 0.5f);
 			}
 		}
 		//CONCURRENT_INLINE });

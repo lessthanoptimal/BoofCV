@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -145,7 +145,7 @@ public class AverageDownSampleOps {
 			if (BoofConcurrency.USE_CONCURRENT) {
 				if (input instanceof GrayU8) {
 					ImplAverageDownSample_MT.horizontal((GrayU8)input, centered, (GrayF32)middle);
-					ImplAverageDownSample_MT.vertical((GrayF32)middle, centered, (GrayI8)output, null);
+					ImplAverageDownSample_MT.vertical((GrayF32)middle, centered, (GrayU8)output, null);
 				} else if (input instanceof GrayU16) {
 					ImplAverageDownSample_MT.horizontal((GrayU16)input, centered, (GrayF32)middle);
 					ImplAverageDownSample_MT.vertical((GrayF32)middle, centered, (GrayU16)output, null);
@@ -161,7 +161,7 @@ public class AverageDownSampleOps {
 			} else {
 				if (input instanceof GrayU8) {
 					ImplAverageDownSample.horizontal((GrayU8)input, centered, (GrayF32)middle);
-					ImplAverageDownSample.vertical((GrayF32)middle, centered, (GrayI8)output, null);
+					ImplAverageDownSample.vertical((GrayF32)middle, centered, (GrayU8)output, null);
 				} else if (input instanceof GrayU16) {
 					ImplAverageDownSample.horizontal((GrayU16)input, centered, (GrayF32)middle);
 					ImplAverageDownSample.vertical((GrayF32)middle, centered, (GrayU16)output, null);
@@ -236,7 +236,7 @@ public class AverageDownSampleOps {
 		if (ImageGray.class.isAssignableFrom(input.getClass())) {
 			if (BoofConcurrency.USE_CONCURRENT) {
 				if (input instanceof GrayU8) {
-					ImplAverageDownSample_MT.vertical((GrayF32)input, centered, (GrayI8)output, workspaces);
+					ImplAverageDownSample_MT.vertical((GrayF32)input, centered, (GrayU8)output, workspaces);
 				} else if (input instanceof GrayU16) {
 					ImplAverageDownSample_MT.vertical((GrayF32)input, centered, (GrayU16)output, workspaces);
 				} else if (input instanceof GrayF32) {
@@ -248,7 +248,7 @@ public class AverageDownSampleOps {
 				}
 			} else {
 				if (input instanceof GrayU8) {
-					ImplAverageDownSample.vertical((GrayF32)input, centered, (GrayI8)output, workspaces);
+					ImplAverageDownSample.vertical((GrayF32)input, centered, (GrayU8)output, workspaces);
 				} else if (input instanceof GrayU16) {
 					ImplAverageDownSample.vertical((GrayF32)input, centered, (GrayU16)output, workspaces);
 				} else if (input instanceof GrayF32) {
