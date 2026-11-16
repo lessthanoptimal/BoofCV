@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.filter.misc;
+package boofcv.alg.filter.misc.impl;
 
 import boofcv.generate.AutoTypeImage;
 import boofcv.generate.CodeGeneratorBase;
@@ -42,14 +42,15 @@ public class GenerateImplAverageDownSampleN extends CodeGeneratorBase {
 	}
 
 	private void printPreamble() {
-		out.print("import boofcv.struct.image.*;\n" +
+		out.print("import boofcv.alg.filter.misc.AverageDownSampleOps;\n" +
+				"import boofcv.struct.image.*;\n" +
+				"\n" +
 				"import javax.annotation.Generated;\n" +
 				"\n" +
 				"//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;\n" +
 				"\n" +
 				"/**\n" +
 				" * <p>Implementation of {@link AverageDownSampleOps} specialized for square regions of width N.</p>\n" +
-				" *\n" +
 				generateDocString("Peter Abeles") +
 				"public class "+className+" {\n");
 	}
@@ -66,7 +67,8 @@ public class GenerateImplAverageDownSampleN extends CodeGeneratorBase {
 
 		if( input.isInteger() ) {
 			if( input.isSigned() ) {
-				computeAve = "total >= 0 ? "+cast+"((total+N_half)/N) : "+cast+"((total-N_half)/N)";
+				// Only the offset depends on the sign so the JIT uses a conditional move instead of a branch
+				computeAve = cast+"((total + (total >= 0 ? N_half : -N_half))/N)";
 			} else {
 				computeAve = cast+"((total+N_half)/N)";
 			}
@@ -174,6 +176,7 @@ public class GenerateImplAverageDownSampleN extends CodeGeneratorBase {
 
 	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateImplAverageDownSampleN app = new GenerateImplAverageDownSampleN();
-		app.generateCode();
+		app.setModuleName("boofcv-ip");
+		app.generate();
 	}
 }

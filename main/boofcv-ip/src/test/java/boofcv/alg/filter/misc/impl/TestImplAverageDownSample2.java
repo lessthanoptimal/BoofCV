@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,7 +64,8 @@ public class TestImplAverageDownSample2 extends BoofStandardJUnit {
 
 		ImageGray input = GeneralizedImageOps.createSingleBand(inputType,width,height);
 
-		GImageMiscOps.fillUniform(input, rand, 0, 100);
+		// negative values for signed images to test rounding
+		GImageMiscOps.fillUniform(input, rand, input.getDataType().isSigned() ? -100 : 0, 100);
 
 			int downWidth = AverageDownSampleOps.downSampleSize(width,2);
 			int downHeight = AverageDownSampleOps.downSampleSize(height,2);
