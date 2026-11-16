@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,15 +18,14 @@
 
 package boofcv.alg.filter.misc;
 
-import boofcv.alg.filter.misc.impl.*;
-import boofcv.alg.misc.ImageMiscOps;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.concurrency.BoofConcurrency;
+import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayS8;
-import boofcv.struct.image.GrayU8;
-import org.ddogleg.struct.DogArray_F32;
+import boofcv.struct.image.GrayF64;
+import boofcv.struct.image.ImageDataType;
+import boofcv.struct.image.ImageGray;
 import org.openjdk.jmh.annotations.*;
-import pabeles.concurrency.GrowArray;
 
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -44,85 +43,43 @@ public class BenchmarkAverageDownSample {
 	@Param({"1000"})
 	public int size;
 
-	GrayU8 inputU8 = new GrayU8(1,1);
-	GrayS8 inputS8 = new GrayS8(1,1);
-	GrayU8 inputF32 = new GrayU8(1,1);
-	GrayU8 out8 = new GrayU8(1,1);
-	GrayF32 tmpF32 = new GrayF32(1,1);
-	GrayF32 outF32 = new GrayF32(1,1);
+	@Param({"U8", "U16", "F32", "F64"})
+	public String imageType;
+
+	ImageGray input;
+	ImageGray out2;
+	ImageGray out3;
+	ImageGray out8;
+	ImageGray middle;
 
 	@Setup public void setup() {
 		BoofConcurrency.USE_CONCURRENT = concurrent;
-		Random rand = new Random(234);
+		ImageDataType dataType = ImageDataType.valueOf(imageType);
 
-		inputU8.reshape(size, size);
-		inputS8.reshape(size, size);
-		inputF32.reshape(size, size);
-		out8.reshape(size, size);
-		tmpF32.reshape(size/2, size/2);
-		outF32.reshape(size/2, size/2);
+		input = GeneralizedImageOps.createSingleBand(dataType, size, size);
+		GImageMiscOps.fillUniform(input, new Random(234), 0, 200);
 
-		ImageMiscOps.fillUniform(inputU8,rand,0,200);
-		ImageMiscOps.fillUniform(inputS8,rand,0,200);
-		ImageMiscOps.fillUniform(inputF32,rand,0,200);
+		out2 = GeneralizedImageOps.createSingleBand(dataType, size/2, size/2);
+		int size3 = AverageDownSampleOps.downSampleSize(size, 3);
+		out3 = GeneralizedImageOps.createSingleBand(dataType, size3, size3);
+		int size8 = AverageDownSampleOps.downSampleSize(size, 8);
+		out8 = GeneralizedImageOps.createSingleBand(dataType, size8, size8);
+		middle = dataType == ImageDataType.F64 ? new GrayF64(size/2, size) : new GrayF32(size/2, size);
 	}
 
-	@Benchmark public void general_8_U8() {
-		if( BoofConcurrency.USE_CONCURRENT ) {
-			ImplAverageDownSampleN_MT.down(inputU8, 8, out8);
-		} else {
-			ImplAverageDownSampleN.down(inputU8, 8, out8);
-		}
+	@Benchmark public void special2x2() {
+		AverageDownSampleOps.down(input, 2, out2);
 	}
 
-	@Benchmark public void general_2_U8() {
-		if( BoofConcurrency.USE_CONCURRENT ) {
-			ImplAverageDownSampleN_MT.down(inputU8, 2, out8);
-		} else {
-			ImplAverageDownSampleN.down(inputU8, 2, out8);
-		}
+	@Benchmark public void general_3() {
+		AverageDownSampleOps.down(input, 3, out3);
 	}
 
-	@Benchmark public void general_2_S8() {
-		if( BoofConcurrency.USE_CONCURRENT ) {
-			ImplAverageDownSampleN_MT.down(inputS8, 2, out8);
-		} else {
-			ImplAverageDownSampleN.down(inputS8, 2, out8);
-		}
+	@Benchmark public void general_8() {
+		AverageDownSampleOps.down(input, 8, out8);
 	}
 
-	@Benchmark public void special2x2_U8() {
-		if( BoofConcurrency.USE_CONCURRENT ) {
-			ImplAverageDownSample2_MT.down(inputU8, out8);
-		} else {
-			ImplAverageDownSample2.down(inputU8, out8);
-		}
-	}
-
-	@Benchmark public void general_HV_U8() {
-		tmpF32.reshape(size/2, size);
-		out8.reshape(size/2, size/2);
-		var workspace = new GrowArray<>(DogArray_F32::new);
-
-		if( BoofConcurrency.USE_CONCURRENT ) {
-			ImplAverageDownSample_MT.horizontal(inputU8, false, tmpF32);
-			ImplAverageDownSample_MT.vertical(tmpF32, false, out8, workspace);
-		} else {
-			ImplAverageDownSample.horizontal(inputU8, false, tmpF32);
-			ImplAverageDownSample.vertical(tmpF32, false, out8, workspace);
-		}
-	}
-
-	@Benchmark public void general_HV_F32() {
-		tmpF32.reshape(size/2, size);
-		out8.reshape(size/2, size/2);
-
-		if( BoofConcurrency.USE_CONCURRENT ) {
-			ImplAverageDownSample_MT.horizontal(inputF32, false, tmpF32);
-			ImplAverageDownSample_MT.vertical(tmpF32, false, outF32);
-		} else {
-			ImplAverageDownSample.horizontal(inputF32, false, tmpF32);
-			ImplAverageDownSample.vertical(tmpF32, false, outF32);
-		}
+	@Benchmark public void general_HV() {
+		AverageDownSampleOps.down(input, false, out2, middle);
 	}
 }
