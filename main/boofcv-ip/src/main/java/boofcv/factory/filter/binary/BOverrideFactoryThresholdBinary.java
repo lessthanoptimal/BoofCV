@@ -25,13 +25,9 @@ import boofcv.struct.ConfigLength;
 import boofcv.struct.image.ImageGray;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * Override functions which allows external code to be called instead of BoofCV for thresholding operations.
- * A function returns null or throws a RuntimeException if it doesn't support the input, and BoofCV's implementation
- * is used instead.
- *
- * @author Peter Abeles
- */
+/// Override functions which allows external code to be called instead of BoofCV for thresholding operations.
+/// A function returns null or throws a RuntimeException if it doesn't support the input, and BoofCV's implementation
+/// is used instead.
 public class BOverrideFactoryThresholdBinary extends BOverrideClass {
 
 	public static @Nullable GlobalEntropy globalEntropy;
