@@ -35,23 +35,17 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Function;
 
-/**
- * Factory for creating various filters which convert an input image into a binary one
- *
- * @author Peter Abeles
- */
-@SuppressWarnings("unchecked")
+/// Factory for creating various filters which convert an input image into a binary one
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class FactoryThresholdBinary {
 
-	/**
-	 * {@link LocalGaussianBinaryFilter}
-	 *
-	 * @param regionWidth Width of square region.
-	 * @param scale Threshold scale adjustment
-	 * @param down Should it threshold up or down.
-	 * @param inputType Type of input image
-	 * @return Filter to binary
-	 */
+	/// [LocalGaussianBinaryFilter]
+	///
+	/// @param regionWidth Width of square region.
+	/// @param scale Threshold scale adjustment
+	/// @param down Should it threshold up or down.
+	/// @param inputType Type of input image
+	/// @return Filter to binary
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> localGaussian( ConfigLength regionWidth, double scale, boolean down, Class<T> inputType ) {
 		InputToBinary<T> filter = override(BOverrideFactoryThresholdBinary.localGaussian,
@@ -61,58 +55,50 @@ public class FactoryThresholdBinary {
 		return new LocalGaussianBinaryFilter<>(regionWidth, scale, down, ImageType.single(inputType));
 	}
 
-	/**
-	 * {@link ThresholdNiblackFamily}
-	 *
-	 * @param width Width of square region.
-	 * @param down Should it threshold up or down.
-	 * @param k User specified threshold adjustment factor. Must be positive. Try 0.3
-	 * @param inputType Type of input image
-	 * @return Filter to binary
-	 */
+	/// [ThresholdNiblackFamily]
+	///
+	/// @param width Width of square region.
+	/// @param down Should it threshold up or down.
+	/// @param k User specified threshold adjustment factor. Must be positive. Try 0.3
+	/// @param inputType Type of input image
+	/// @return Filter to binary
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> localSauvola( ConfigLength width, boolean down, float k, Class<T> inputType ) {
 		return localNiblackFamily(ThresholdNiblackFamily.Variant.SAUVOLA, width, down, k, inputType);
 	}
 
-	/**
-	 * {@link ThresholdNiblackFamily}
-	 *
-	 * @param width Width of square region.
-	 * @param down Should it threshold up or down.
-	 * @param k User specified threshold adjustment factor. Must be positive. Try 0.3
-	 * @param inputType Type of input image
-	 * @return Filter to binary
-	 */
+	/// [ThresholdNiblackFamily]
+	///
+	/// @param width Width of square region.
+	/// @param down Should it threshold up or down.
+	/// @param k User specified threshold adjustment factor. Must be positive. Try 0.3
+	/// @param inputType Type of input image
+	/// @return Filter to binary
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> localWolf( ConfigLength width, boolean down, float k, Class<T> inputType ) {
 		return localNiblackFamily(ThresholdNiblackFamily.Variant.WOLF_JOLION, width, down, k, inputType);
 	}
 
-	/**
-	 * {@link ThresholdNiblackFamily}
-	 *
-	 * @param width Width of square region.
-	 * @param down Should it threshold up or down.
-	 * @param k User specified threshold adjustment factor. Must be positive. Try 0.3
-	 * @param inputType Type of input image
-	 * @return Filter to binary
-	 */
+	/// [ThresholdNiblackFamily]
+	///
+	/// @param width Width of square region.
+	/// @param down Should it threshold up or down.
+	/// @param k User specified threshold adjustment factor. Must be positive. Try 0.3
+	/// @param inputType Type of input image
+	/// @return Filter to binary
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> localNiblack( ConfigLength width, boolean down, float k, Class<T> inputType ) {
 		return localNiblackFamily(ThresholdNiblackFamily.Variant.NIBLACK, width, down, k, inputType);
 	}
 
-	/**
-	 * {@link ThresholdNiblackFamily}
-	 *
-	 * @param variant Which variant in the family
-	 * @param width Width of square region.
-	 * @param down Should it threshold up or down.
-	 * @param k User specified threshold adjustment factor. Must be positive. Try 0.3
-	 * @param inputType Type of input image
-	 * @return Filter to binary
-	 */
+	/// [ThresholdNiblackFamily]
+	///
+	/// @param variant Which variant in the family
+	/// @param width Width of square region.
+	/// @param down Should it threshold up or down.
+	/// @param k User specified threshold adjustment factor. Must be positive. Try 0.3
+	/// @param inputType Type of input image
+	/// @return Filter to binary
 	protected static <T extends ImageGray<T>>
 	InputToBinary<T> localNiblackFamily( ThresholdNiblackFamily.Variant variant,
 										 ConfigLength width, boolean down, float k, Class<T> inputType ) {
@@ -128,15 +114,13 @@ public class FactoryThresholdBinary {
 		return new InputToBinarySwitch<>(sauvola, inputType);
 	}
 
-	/**
-	 * {@link ThresholdNick}
-	 *
-	 * @param width size of local region. Try 31
-	 * @param down Should it threshold up or down.
-	 * @param k The Niblack factor. Recommend -0.1 to -0.2
-	 * @param inputType Type of input image
-	 * @return Filter to binary
-	 */
+	/// [ThresholdNick]
+	///
+	/// @param width size of local region. Try 31
+	/// @param down Should it threshold up or down.
+	/// @param k The Niblack factor. Recommend -0.1 to -0.2
+	/// @param inputType Type of input image
+	/// @return Filter to binary
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> localNick( ConfigLength width, boolean down, float k, Class<T> inputType ) {
 //		if( BOverrideFactoryThresholdBinary.localNick != null )
@@ -144,15 +128,13 @@ public class FactoryThresholdBinary {
 		return new InputToBinarySwitch<>(new ThresholdNick(width, k, down), inputType);
 	}
 
-	/**
-	 * {@link boofcv.alg.filter.binary.GThresholdImageOps#localMean}
-	 *
-	 * @param width Width of square region.
-	 * @param scale Scale factor adjust for threshold. 1.0 means no change.
-	 * @param down Should it threshold up or down.
-	 * @param inputType Type of input image
-	 * @return Filter to binary
-	 */
+	/// [boofcv.alg.filter.binary.GThresholdImageOps#localMean]
+	///
+	/// @param width Width of square region.
+	/// @param scale Scale factor adjust for threshold. 1.0 means no change.
+	/// @param down Should it threshold up or down.
+	/// @param inputType Type of input image
+	/// @return Filter to binary
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> localMean( ConfigLength width, double scale, boolean down, Class<T> inputType ) {
 		InputToBinary<T> filter = override(BOverrideFactoryThresholdBinary.localMean,
@@ -162,16 +144,14 @@ public class FactoryThresholdBinary {
 		return new LocalMeanBinaryFilter<>(width, scale, down, ImageType.single(inputType));
 	}
 
-	/**
-	 * Applies a local Otsu threshold. {@link ThresholdLocalOtsu}
-	 *
-	 * @param regionWidth About how wide and tall you wish a block to be in pixels.
-	 * @param scale Scale factor adjust for threshold. 1.0 means no change.
-	 * @param down Should it threshold up or down.
-	 * @param tuning Tuning parameter. 0 = standard Otsu. Greater than 0 will penalize zero texture.
-	 * @param inputType Type of input image
-	 * @return Filter to binary
-	 */
+	/// Applies a local Otsu threshold. [ThresholdLocalOtsu]
+	///
+	/// @param regionWidth About how wide and tall you wish a block to be in pixels.
+	/// @param scale Scale factor adjust for threshold. 1.0 means no change.
+	/// @param down Should it threshold up or down.
+	/// @param tuning Tuning parameter. 0 = standard Otsu. Greater than 0 will penalize zero texture.
+	/// @param inputType Type of input image
+	/// @return Filter to binary
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> localOtsu( ConfigLength regionWidth, double scale, boolean down, boolean otsu2, double tuning, Class<T> inputType ) {
 		InputToBinary<T> filter = override(BOverrideFactoryThresholdBinary.localOtsu,
@@ -188,18 +168,16 @@ public class FactoryThresholdBinary {
 		return new InputToBinarySwitch<>(otsu, inputType);
 	}
 
-	/**
-	 * Applies a very fast non-overlapping block thresholding algorithm which uses min/max statistics.
-	 *
-	 * @param regionWidth Approximate size of block region
-	 * @param scale Scale factor adjust for threshold. 1.0 means no change.
-	 * @param down Should it threshold up or down.
-	 * @param minimumSpread If the difference between min max is less than or equal to this
-	 * value then it is considered textureless. Set to &le; -1 to disable.
-	 * @param inputType Type of input image
-	 * @return Filter to binary
-	 * @see ThresholdBlockMinMax
-	 */
+	/// Applies a very fast non-overlapping block thresholding algorithm which uses min/max statistics.
+	///
+	/// @param regionWidth Approximate size of block region
+	/// @param scale Scale factor adjust for threshold. 1.0 means no change.
+	/// @param down Should it threshold up or down.
+	/// @param minimumSpread If the difference between min max is less than or equal to this
+	/// value then it is considered textureless. Set to ≤ -1 to disable.
+	/// @param inputType Type of input image
+	/// @return Filter to binary
+	/// @see ThresholdBlockMinMax
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> blockMinMax( ConfigLength regionWidth, double scale, boolean down,
 								  boolean thresholdFromLocalBlocks, double minimumSpread, Class<T> inputType ) {
@@ -221,16 +199,14 @@ public class FactoryThresholdBinary {
 		}
 	}
 
-	/**
-	 * Applies a non-overlapping block mean threshold
-	 *
-	 * @param scale Scale factor adjust for threshold. 1.0 means no change.
-	 * @param down Should it threshold up or down.
-	 * @param regionWidth Approximate size of block region
-	 * @param inputType Type of input image
-	 * @return Filter to binary
-	 * @see ThresholdBlockMean
-	 */
+	/// Applies a non-overlapping block mean threshold
+	///
+	/// @param scale Scale factor adjust for threshold. 1.0 means no change.
+	/// @param down Should it threshold up or down.
+	/// @param regionWidth Approximate size of block region
+	/// @param inputType Type of input image
+	/// @return Filter to binary
+	/// @see ThresholdBlockMean
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> blockMean( ConfigLength regionWidth, double scale, boolean down, boolean thresholdFromLocalBlocks,
 								Class<T> inputType ) {
@@ -252,15 +228,13 @@ public class FactoryThresholdBinary {
 		}
 	}
 
-	/**
-	 * Applies a non-overlapping block Otsu threshold. {@link ThresholdBlockOtsu}
-	 *
-	 * @param regionWidth Approximate size of block region
-	 * @param scale Scale factor adjust for threshold. 1.0 means no change.
-	 * @param down Should it threshold up or down.
-	 * @param inputType Type of input image
-	 * @return Filter to binary
-	 */
+	/// Applies a non-overlapping block Otsu threshold. [ThresholdBlockOtsu]
+	///
+	/// @param regionWidth Approximate size of block region
+	/// @param scale Scale factor adjust for threshold. 1.0 means no change.
+	/// @param down Should it threshold up or down.
+	/// @param inputType Type of input image
+	/// @return Filter to binary
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> blockOtsu( ConfigLength regionWidth, double scale, boolean down, boolean thresholdFromLocalBlocks,
 								boolean otsu2, double tuning, Class<T> inputType ) {
@@ -281,15 +255,13 @@ public class FactoryThresholdBinary {
 		return new InputToBinarySwitch<>(otsu, inputType);
 	}
 
-	/**
-	 * {@link GThresholdImageOps#computeEntropy}
-	 *
-	 * @param minValue The minimum value of a pixel in the image. (inclusive)
-	 * @param maxValue The maximum value of a pixel in the image. (inclusive)
-	 * @param down Should it threshold up or down.
-	 * @param inputType Type of input image
-	 * @return Filter to binary
-	 */
+	/// [GThresholdImageOps#computeEntropy]
+	///
+	/// @param minValue The minimum value of a pixel in the image. (inclusive)
+	/// @param maxValue The maximum value of a pixel in the image. (inclusive)
+	/// @param down Should it threshold up or down.
+	/// @param inputType Type of input image
+	/// @return Filter to binary
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> globalEntropy( int minValue, int maxValue, double scale, boolean down, Class<T> inputType ) {
 		InputToBinary<T> filter = override(BOverrideFactoryThresholdBinary.globalEntropy,
@@ -299,14 +271,12 @@ public class FactoryThresholdBinary {
 		return new GlobalBinaryFilter.Entropy<>(minValue, maxValue, scale, down, ImageType.single(inputType));
 	}
 
-	/**
-	 * {@link boofcv.alg.filter.binary.GThresholdImageOps#threshold}
-	 *
-	 * @param threshold threshold value.
-	 * @param down If true then the inequality &le; is used, otherwise if false then &ge; is used.
-	 * @param inputType Type of input image
-	 * @return Filter to binary
-	 */
+	/// [boofcv.alg.filter.binary.GThresholdImageOps#threshold]
+	///
+	/// @param threshold threshold value.
+	/// @param down If true then the inequality ≤ is used, otherwise if false then ≥ is used.
+	/// @param inputType Type of input image
+	/// @return Filter to binary
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> globalFixed( double threshold, boolean down, Class<T> inputType ) {
 		InputToBinary<T> filter = override(BOverrideFactoryThresholdBinary.globalFixed,
@@ -316,15 +286,13 @@ public class FactoryThresholdBinary {
 		return new GlobalFixedBinaryFilter<>(threshold, down, ImageType.single(inputType));
 	}
 
-	/**
-	 * {@link boofcv.alg.filter.binary.GThresholdImageOps#computeOtsu}
-	 *
-	 * @param minValue The minimum value of a pixel in the image. (inclusive)
-	 * @param maxValue The maximum value of a pixel in the image. (inclusive)
-	 * @param down Should it threshold up or down.
-	 * @param inputType Type of input image
-	 * @return Filter to binary
-	 */
+	/// [boofcv.alg.filter.binary.GThresholdImageOps#computeOtsu]
+	///
+	/// @param minValue The minimum value of a pixel in the image. (inclusive)
+	/// @param maxValue The maximum value of a pixel in the image. (inclusive)
+	/// @param down Should it threshold up or down.
+	/// @param inputType Type of input image
+	/// @return Filter to binary
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> globalOtsu( double minValue, double maxValue, double scale, boolean down, Class<T> inputType ) {
 		InputToBinary<T> filter = override(BOverrideFactoryThresholdBinary.globalOtsu,
@@ -334,41 +302,35 @@ public class FactoryThresholdBinary {
 		return new GlobalBinaryFilter.Otsu<>(minValue, maxValue, scale, down, ImageType.single(inputType));
 	}
 
-	/**
-	 * {@link boofcv.alg.filter.binary.GThresholdImageOps#computeLi(int[], int)}
-	 *
-	 * @param minValue The minimum value of a pixel in the image. (inclusive)
-	 * @param maxValue The maximum value of a pixel in the image. (inclusive)
-	 * @param down Should it threshold up or down.
-	 * @param inputType Type of input image
-	 * @return Filter to binary
-	 */
+	/// [boofcv.alg.filter.binary.GThresholdImageOps#computeLi(int\[\], int)]
+	///
+	/// @param minValue The minimum value of a pixel in the image. (inclusive)
+	/// @param maxValue The maximum value of a pixel in the image. (inclusive)
+	/// @param down Should it threshold up or down.
+	/// @param inputType Type of input image
+	/// @return Filter to binary
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> globalLi( double minValue, double maxValue, double scale, boolean down, Class<T> inputType ) {
 		return new GlobalBinaryFilter.Li<>(minValue, maxValue, scale, down, ImageType.single(inputType));
 	}
 
-	/**
-	 * {@link boofcv.alg.filter.binary.GThresholdImageOps#computeHuang(int[], int)}.
-	 *
-	 * @param minValue The minimum value of a pixel in the image. (inclusive)
-	 * @param maxValue The maximum value of a pixel in the image. (inclusive)
-	 * @param down Should it threshold up or down.
-	 * @param inputType Type of input image
-	 * @return Filter to binary
-	 */
+	/// [boofcv.alg.filter.binary.GThresholdImageOps#computeHuang(int\[\], int)].
+	///
+	/// @param minValue The minimum value of a pixel in the image. (inclusive)
+	/// @param maxValue The maximum value of a pixel in the image. (inclusive)
+	/// @param down Should it threshold up or down.
+	/// @param inputType Type of input image
+	/// @return Filter to binary
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> globalHuang( double minValue, double maxValue, double scale, boolean down, Class<T> inputType ) {
 		return new GlobalBinaryFilter.Huang<>(minValue, maxValue, scale, down, ImageType.single(inputType));
 	}
 
-	/**
-	 * Creates threshold using a config class
-	 *
-	 * @param config Configuration
-	 * @param inputType Type of input image
-	 * @return The thresholder
-	 */
+	/// Creates threshold using a config class
+	///
+	/// @param config Configuration
+	/// @param inputType Type of input image
+	/// @return The thresholder
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> threshold( ConfigThreshold config, Class<T> inputType ) {
 		return switch (config.type) {
@@ -405,10 +367,8 @@ public class FactoryThresholdBinary {
 		};
 	}
 
-	/**
-	 * Filter created by the override. Null if the override isn't set, returns null, or throws a RuntimeException,
-	 * which means it doesn't support the input
-	 */
+	/// Filter created by the override. Null if the override isn't set, returns null, or throws a RuntimeException,
+	/// which means it doesn't support the input
 	private static <H, T extends ImageGray<T>>
 	@Nullable InputToBinary<T> override( @Nullable H hook, Function<H, InputToBinary<T>> create ) {
 		if (hook == null)
