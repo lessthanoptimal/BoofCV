@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,6 +31,7 @@ import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class TestAverageDownSampleOps extends BoofStandardJUnit {
@@ -78,6 +79,32 @@ public class TestAverageDownSampleOps extends BoofStandardJUnit {
 
 			BoofTesting.assertEquals(expected, found, 1e-4);
 		}
+	}
+
+	/// vertical() selects the implementation from the output type, since the input is always floating point
+	@Test void vertical() throws InvocationTargetException, IllegalAccessException {
+		Class[] middle = new Class[]{GrayF32.class, GrayF32.class, GrayF32.class, GrayF64.class};
+		Class[] output = new Class[]{GrayU8.class, GrayU16.class, GrayF32.class, GrayF64.class};
+
+		for (int i = 0; i < output.length; i++) {
+			for (boolean centered : new boolean[]{false, true}) {
+				ImageGray mid = GeneralizedImageOps.createSingleBand(middle[i], 5, 14);
+				ImageGray found = GeneralizedImageOps.createSingleBand(output[i], 5, 4);
+				ImageGray expected = GeneralizedImageOps.createSingleBand(output[i], 5, 4);
+
+				GImageMiscOps.fillUniform(mid, rand, 0, 100);
+
+				Method vertical = BoofTesting.findMethod(ImplAverageDownSample.class, "vertical", middle[i], boolean.class, output[i]);
+				vertical.invoke(null, mid, centered, expected);
+
+				AverageDownSampleOps.vertical(mid, centered, found, null);
+
+				BoofTesting.assertEquals(expected, found, 0.0);
+			}
+		}
+
+		assertThrows(IllegalArgumentException.class,
+				() -> AverageDownSampleOps.vertical(new GrayF32(5, 14), false, new GrayS16(5, 4), null));
 	}
 
 	/** Make sure it adjusts the number of bands in the output image */

@@ -231,8 +231,8 @@ public class AverageDownSampleOps {
 		}
 	}
 
-	/// Downsample vertical axis only. Input must be [GrayF32] or [GrayF64]. The workspace is only
-	/// used with integer output image types
+	/// Downsample vertical axis only. Input must be [GrayF32] or [GrayF64], the output of [#horizontal]. The workspace
+	/// is only used with integer output image types
 	public static void vertical( ImageBase<?> input, boolean centered, ImageBase<?> output,
 								 @Nullable GrowArray<DogArray_F32> workspaces ) {
 		if (BOverrideAverageDownSampleOps.invokeNativeVertical(input, centered, output))
@@ -244,28 +244,28 @@ public class AverageDownSampleOps {
 
 		if (ImageGray.class.isAssignableFrom(input.getClass())) {
 			if (BoofConcurrency.USE_CONCURRENT) {
-				if (input instanceof GrayU8) {
+				if (output instanceof GrayU8) {
 					ImplAverageDownSample_MT.vertical((GrayF32)input, centered, (GrayU8)output, workspaces);
-				} else if (input instanceof GrayU16) {
+				} else if (output instanceof GrayU16) {
 					ImplAverageDownSample_MT.vertical((GrayF32)input, centered, (GrayU16)output, workspaces);
-				} else if (input instanceof GrayF32) {
+				} else if (output instanceof GrayF32) {
 					ImplAverageDownSample_MT.vertical((GrayF32)input, centered, (GrayF32)output);
-				} else if (input instanceof GrayF64) {
+				} else if (output instanceof GrayF64) {
 					ImplAverageDownSample_MT.vertical((GrayF64)input, centered, (GrayF64)output);
 				} else {
-					throw new IllegalArgumentException("Unknown image type");
+					throw new IllegalArgumentException("Not implemented for " + output.getClass().getSimpleName());
 				}
 			} else {
-				if (input instanceof GrayU8) {
+				if (output instanceof GrayU8) {
 					ImplAverageDownSample.vertical((GrayF32)input, centered, (GrayU8)output, workspaces);
-				} else if (input instanceof GrayU16) {
+				} else if (output instanceof GrayU16) {
 					ImplAverageDownSample.vertical((GrayF32)input, centered, (GrayU16)output, workspaces);
-				} else if (input instanceof GrayF32) {
+				} else if (output instanceof GrayF32) {
 					ImplAverageDownSample.vertical((GrayF32)input, centered, (GrayF32)output);
-				} else if (input instanceof GrayF64) {
+				} else if (output instanceof GrayF64) {
 					ImplAverageDownSample.vertical((GrayF64)input, centered, (GrayF64)output);
 				} else {
-					throw new IllegalArgumentException("Unknown image type");
+					throw new IllegalArgumentException("Not implemented for " + output.getClass().getSimpleName());
 				}
 			}
 		} else if (Planar.class.isAssignableFrom(input.getClass())) {
