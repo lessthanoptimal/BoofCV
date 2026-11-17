@@ -1,0 +1,47 @@
+/*
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
+ *
+ * This file is part of BoofCV (http://boofcv.org).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package boofcv.override;
+
+import boofcv.alg.filter.blur.BOverrideBlurImageOps;
+import boofcv.alg.filter.misc.BOverrideAverageDownSampleOps;
+import boofcv.struct.border.ImageBorder;
+import boofcv.struct.image.ImageBase;
+import boofcv.testing.BoofStandardJUnit;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertNull;
+
+public class TestBOverrideManager extends BoofStandardJUnit {
+	/// Overrides in different classes are all removed
+	@Test void clear() {
+		BOverrideBlurImageOps.mean = new BOverrideBlurImageOps.Mean() {
+			@Override public void processMeanWeighted( ImageBase input, ImageBase output, int radiusX, int radiusY,
+													   ImageBase storage ) {}
+
+			@Override public void processMeanBorder( ImageBase input, ImageBase output, int radiusX, int radiusY,
+													 ImageBorder border, ImageBase storage ) {}
+		};
+		BOverrideAverageDownSampleOps.square = ( input, sampleWidth, output ) -> {};
+
+		BOverrideManager.clear();
+
+		assertNull(BOverrideBlurImageOps.mean);
+		assertNull(BOverrideAverageDownSampleOps.square);
+	}
+}
