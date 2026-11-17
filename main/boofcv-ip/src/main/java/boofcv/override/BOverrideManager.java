@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,34 +18,43 @@
 
 package boofcv.override;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Provides functions for managing overrided functions
- *
- * @author Peter Abeles
- */
+/// Provides functions for managing overridden functions
 public class BOverrideManager {
 
 	public static final List<Class> list = new ArrayList<>();
 
 	public static synchronized void register( Class target ) {
-		if( BOverrideClass.class.isAssignableFrom(target)) {
+		if (BOverrideClass.class.isAssignableFrom(target)) {
 			list.add(target);
 		} else {
-			throw new RuntimeException("Expected a class derived from "+BOverrideClass.class.getSimpleName());
+			throw new RuntimeException("Expected a class derived from " + BOverrideClass.class.getSimpleName());
 		}
 	}
 
-	/**
-	 * Prints a summary of what has been overriden
-	 */
-	public static void print() {
-		System.out.println("Total registered "+list.size());
+	/// Removes every override, so BoofCV uses its own implementations again. Sets each public static field of every
+	/// registered class to null.
+	public static synchronized void clear() {
+		for (Class target : list) { // lint:forbidden ignore_line
+			for (Field field : target.getFields()) { // lint:forbidden ignore_line
+				int modifiers = field.getModifiers();
+				if (!Modifier.isStatic(modifiers) || Modifier.isFinal(modifiers) || field.getType().isPrimitive())
+					continue;
+				try {
+					field.set(null, null);
+				} catch (IllegalAccessException e) {
+					throw new RuntimeException(e);
+				}
+			}
+		}
 	}
 
-	public static void main(String[] args) {
-		BOverrideManager.print();
-	}
+	/// Prints a summary of what has been overridden
+	public static void print() {System.out.println("Total registered " + list.size());}
+
+	public static void main( String[] args ) {BOverrideManager.print();}
 }
