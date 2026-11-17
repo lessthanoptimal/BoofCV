@@ -100,6 +100,9 @@ public class CensusTransform {
 	public static void dense3x3( final GrayU8 input, final GrayU8 output, @Nullable ImageBorder_S32<GrayU8> border ) {
 		InputSanityCheck.checkReshape(input, output);
 
+		if (BOverrideCensusTransform.invokeNativeDense3x3(input, output, border))
+			return;
+
 		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplCensusTransformInner_MT.dense3x3(input, output);
 		} else {
@@ -119,6 +122,9 @@ public class CensusTransform {
 	/// @param border (Nullable) How the border is handled
 	public static void dense3x3( final GrayU16 input, final GrayU8 output, @Nullable ImageBorder_S32<GrayU16> border ) {
 		InputSanityCheck.checkReshape(input, output);
+
+		if (BOverrideCensusTransform.invokeNativeDense3x3(input, output, border))
+			return;
 
 		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplCensusTransformInner_MT.dense3x3(input, output);
@@ -140,6 +146,9 @@ public class CensusTransform {
 	public static void dense3x3( final GrayF32 input, final GrayU8 output, @Nullable ImageBorder_F32 border ) {
 		InputSanityCheck.checkReshape(input, output);
 
+		if (BOverrideCensusTransform.invokeNativeDense3x3(input, output, border))
+			return;
+
 		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplCensusTransformInner_MT.dense3x3(input, output);
 		} else {
@@ -159,6 +168,9 @@ public class CensusTransform {
 	/// @param border (Nullable) How the border is handled
 	public static void dense5x5( final GrayU8 input, final GrayS32 output, @Nullable ImageBorder_S32<GrayU8> border ) {
 		InputSanityCheck.checkReshape(input, output);
+
+		if (BOverrideCensusTransform.invokeNativeDense5x5(input, output, border))
+			return;
 
 		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplCensusTransformInner_MT.dense5x5(input, output);
@@ -180,6 +192,9 @@ public class CensusTransform {
 	public static void dense5x5( final GrayU16 input, final GrayS32 output, @Nullable ImageBorder_S32<GrayU16> border ) {
 		InputSanityCheck.checkReshape(input, output);
 
+		if (BOverrideCensusTransform.invokeNativeDense5x5(input, output, border))
+			return;
+
 		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplCensusTransformInner_MT.dense5x5(input, output);
 		} else {
@@ -199,6 +214,9 @@ public class CensusTransform {
 	/// @param border (Nullable) How the border is handled
 	public static void dense5x5( final GrayF32 input, final GrayS32 output, @Nullable ImageBorder_F32 border ) {
 		InputSanityCheck.checkReshape(input, output);
+
+		if (BOverrideCensusTransform.invokeNativeDense5x5(input, output, border))
+			return;
 
 		if (BoofConcurrency.USE_CONCURRENT) {
 			ImplCensusTransformInner_MT.dense5x5(input, output);
@@ -222,6 +240,9 @@ public class CensusTransform {
 								   final GrayS64 output, @Nullable ImageBorder_S32<GrayU8> border,
 								   @Nullable DogArray_I32 workSpace ) {
 		output.reshape(input.width, input.height);
+
+		if (BOverrideCensusTransform.invokeNativeSample_S64(input, sample, output, border))
+			return;
 
 		// Precompute the offset in array indexes for the sample points
 		if (workSpace == null)
@@ -252,6 +273,9 @@ public class CensusTransform {
 								   @Nullable DogArray_I32 workSpace ) {
 		output.reshape(input.width, input.height);
 
+		if (BOverrideCensusTransform.invokeNativeSample_S64(input, sample, output, border))
+			return;
+
 		// Precompute the offset in array indexes for the sample points
 		if (workSpace == null)
 			workSpace = new DogArray_I32();
@@ -280,6 +304,9 @@ public class CensusTransform {
 								   final GrayS64 output, @Nullable ImageBorder_F32 border,
 								   @Nullable DogArray_I32 workSpace ) {
 		output.reshape(input.width, input.height);
+
+		if (BOverrideCensusTransform.invokeNativeSample_S64(input, sample, output, border))
+			return;
 
 		// Precompute the offset in array indexes for the sample points
 		if (workSpace == null)
@@ -312,6 +339,9 @@ public class CensusTransform {
 		int numBlocks = BoofMiscOps.bitsToWords(sample.size, 16);
 		output.reshape(input.width, input.height, numBlocks);
 
+		if (BOverrideCensusTransform.invokeNativeSample_IU16(input, sample, output, border))
+			return;
+
 		// Precompute the offset in array indexes for the sample points
 		if (workSpace == null)
 			workSpace = new DogArray_I32();
@@ -343,6 +373,9 @@ public class CensusTransform {
 		int numBlocks = BoofMiscOps.bitsToWords(sample.size, 16);
 		output.reshape(input.width, input.height, numBlocks);
 
+		if (BOverrideCensusTransform.invokeNativeSample_IU16(input, sample, output, border))
+			return;
+
 		// Precompute the offset in array indexes for the sample points
 		if (workSpace == null)
 			workSpace = new DogArray_I32();
@@ -373,6 +406,9 @@ public class CensusTransform {
 		// Compute the number of 16-bit values that are needed to store
 		int numBlocks = BoofMiscOps.bitsToWords(sample.size, 16);
 		output.reshape(input.width, input.height, numBlocks);
+
+		if (BOverrideCensusTransform.invokeNativeSample_IU16(input, sample, output, border))
+			return;
 
 		// Precompute the offset in array indexes for the sample points
 		if (workSpace == null)

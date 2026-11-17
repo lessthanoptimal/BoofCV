@@ -18,26 +18,101 @@
 
 package boofcv.alg.transform.census;
 
+import boofcv.BoofTesting;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.override.BOverrideManager;
 import boofcv.struct.border.BorderType;
+import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayS64;
 import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.InterleavedU16;
 import boofcv.testing.BoofStandardJUnit;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.DogArray;
 import org.ejml.UtilEjml;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+
+import java.lang.reflect.Proxy;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /// Tests sampling functions and which bit each sample sets. The transforms are compared against a brute force
 /// implementation in GCensusTransform
 class TestCensusTransform extends BoofStandardJUnit {
+	@AfterEach void clearOverrides() {
+		BOverrideManager.clear();
+	}
+
+	/// Every function gives the reshaped output to a registered override, and uses its own code if the override
+	/// throws a RuntimeException
+	@Test void override() {
+		for (Class type : new Class[]{GrayU8.class, GrayU16.class, GrayF32.class}) {
+			ImageGray input = GeneralizedImageOps.createSingleBand(type, 20, 15);
+			GImageMiscOps.fillUniform(input, rand, 0, 100);
+			List<ImageBase> expected = transformAll(input);
+
+			// The override fills the output with 3. The output is the second to last argument
+			List<String> called = new ArrayList<>();
+			BOverrideCensusTransform.census = override(( method, args ) -> {
+				called.add(method);
+				GImageMiscOps.fill((ImageBase)args[args.length - 2], 3);
+			});
+			List<ImageBase> found = transformAll(input);
+			assertEquals(List.of("dense3x3", "dense5x5", "sample_S64", "sample_IU16"), called);
+			for (int i = 0; i < found.size(); i++) {
+				ImageBase threes = expected.get(i).createSameShape();
+				GImageMiscOps.fill(threes, 3);
+				BoofTesting.assertEquals(threes, found.get(i), 0);
+			}
+
+			BOverrideCensusTransform.census = override(( method, args ) -> {
+				throw new IllegalArgumentException("Unsupported");
+			});
+			found = transformAll(input);
+			for (int i = 0; i < found.size(); i++) {
+				BoofTesting.assertEquals(expected.get(i), found.get(i), 0);
+			}
+		}
+	}
+
+	interface OverrideCall {
+		void call( String method, Object[] args );
+	}
+
+	private static BOverrideCensusTransform.Census override( OverrideCall call ) {
+		return (BOverrideCensusTransform.Census)Proxy.newProxyInstance(
+				BOverrideCensusTransform.Census.class.getClassLoader(),
+				new Class<?>[]{BOverrideCensusTransform.Census.class}, ( proxy, method, args ) -> {
+					call.call(method.getName(), args);
+					return null;
+				});
+	}
+
+	/// Output of every census function. Outputs start as 1x1 images, so they must be reshaped
+	private static List<ImageBase> transformAll( ImageGray input ) {
+		ImageBorder border = FactoryImageBorder.wrap(BorderType.REFLECT, input);
+		DogArray<Point2D_I32> samples = CensusTransform.createBlockSamples(3);
+		var dense3x3 = new GrayU8(1, 1);
+		var dense5x5 = new GrayS32(1, 1);
+		var sampleS64 = new GrayS64(1, 1);
+		var sampleIU16 = new InterleavedU16(1, 1, 1);
+		GCensusTransform.dense3x3(input, dense3x3, border);
+		GCensusTransform.dense5x5(input, dense5x5, border);
+		GCensusTransform.sample_S64(input, samples, sampleS64, border, null);
+		GCensusTransform.sample_IU16(input, samples, sampleIU16, border, null);
+		return List.of(dense3x3, dense5x5, sampleS64, sampleIU16);
+	}
+
 	@Test
 	void createBlockSamples_1() {
 		DogArray<Point2D_I32> samples = CensusTransform.createBlockSamples(2);
