@@ -27,6 +27,8 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Override functions which allows external code to be called instead of BoofCV for thresholding operations.
+ * A function returns null or throws a RuntimeException if it doesn't support the input, and BoofCV's implementation
+ * is used instead.
  *
  * @author Peter Abeles
  */
@@ -49,54 +51,55 @@ public class BOverrideFactoryThresholdBinary extends BOverrideClass {
 
 	public interface GlobalEntropy {
 		<T extends ImageGray<T>>
-		InputToBinary<T> handle( int minValue, int maxValue, double scale, boolean down, Class<T> inputType );
+		@Nullable InputToBinary<T> handle( int minValue, int maxValue, double scale, boolean down, Class<T> inputType );
 	}
 
 	public interface GlobalFixed {
 		<T extends ImageGray<T>>
-		InputToBinary<T> handle( double threshold, boolean down, Class<T> inputType );
+		@Nullable InputToBinary<T> handle( double threshold, boolean down, Class<T> inputType );
 	}
 
 	public interface GlobalOtsu {
 		<T extends ImageGray<T>>
-		InputToBinary<T> handle( double minValue, double maxValue, double scale, boolean down, Class<T> inputType );
+		@Nullable InputToBinary<T> handle( double minValue, double maxValue, double scale, boolean down, Class<T> inputType );
 	}
 
 	public interface LocalGaussian {
 		<T extends ImageGray<T>>
-		InputToBinary<T> handle( ConfigLength regionWidth, double scale, boolean down, Class<T> inputType );
+		@Nullable InputToBinary<T> handle( ConfigLength regionWidth, double scale, boolean down, Class<T> inputType );
 	}
 
 	public interface LocalSauvola {
 		<T extends ImageGray<T>>
-		InputToBinary<T> handle( ConfigLength regionWidth, float k, boolean down, Class<T> inputType );
+		@Nullable InputToBinary<T> handle( ConfigLength regionWidth, float k, boolean down, Class<T> inputType );
 	}
 
 	public interface LocalMean {
 		<T extends ImageGray<T>>
-		InputToBinary<T> handle( ConfigLength regionWidth, double scale, boolean down, Class<T> inputType );
+		@Nullable InputToBinary<T> handle( ConfigLength regionWidth, double scale, boolean down, Class<T> inputType );
 	}
 
 	public interface LocalBlockMinMax {
 		<T extends ImageGray<T>>
-		InputToBinary<T> handle( ConfigLength regionWidth, double scale, boolean down,
+		@Nullable InputToBinary<T> handle( ConfigLength regionWidth, double scale, boolean down,
 								 double minimumSpread, boolean thresholdFromLocalBlocks, Class<T> inputType );
 	}
 
 	public interface LocalBlockMean {
 		<T extends ImageGray<T>>
-		InputToBinary<T> handle( ConfigLength regionWidth, double scale, boolean down, boolean thresholdFromLocalBlocks,
-								 Class<T> inputType );
+		@Nullable InputToBinary<T> handle( ConfigLength regionWidth, double scale, boolean down,
+										   boolean thresholdFromLocalBlocks, Class<T> inputType );
 	}
 
 	public interface LocalBlockOtsu {
 		<T extends ImageGray<T>>
-		InputToBinary<T> handle( boolean otsu2, ConfigLength regionWidth, double tuning, double scale,
+		@Nullable InputToBinary<T> handle( boolean otsu2, ConfigLength regionWidth, double tuning, double scale,
 								 boolean down, boolean thresholdFromLocalBlocks, Class<T> inputType );
 	}
 
 	public interface LocalOtsu {
 		<T extends ImageGray<T>>
-		InputToBinary<T> handle( boolean otsu2, ConfigLength regionWidth, double tuning, double scale, boolean down, Class<T> inputType );
+		@Nullable InputToBinary<T> handle( boolean otsu2, ConfigLength regionWidth, double tuning, double scale, boolean down,
+										   Class<T> inputType );
 	}
 }

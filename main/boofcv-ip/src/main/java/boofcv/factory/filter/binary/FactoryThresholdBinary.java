@@ -31,6 +31,9 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.function.Function;
 
 /**
  * Factory for creating various filters which convert an input image into a binary one
@@ -51,8 +54,10 @@ public class FactoryThresholdBinary {
 	 */
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> localGaussian( ConfigLength regionWidth, double scale, boolean down, Class<T> inputType ) {
-		if (BOverrideFactoryThresholdBinary.localGaussian != null)
-			return BOverrideFactoryThresholdBinary.localGaussian.handle(regionWidth, scale, down, inputType);
+		InputToBinary<T> filter = override(BOverrideFactoryThresholdBinary.localGaussian,
+				hook -> hook.handle(regionWidth, scale, down, inputType));
+		if (filter != null)
+			return filter;
 		return new LocalGaussianBinaryFilter<>(regionWidth, scale, down, ImageType.single(inputType));
 	}
 
@@ -150,8 +155,10 @@ public class FactoryThresholdBinary {
 	 */
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> localMean( ConfigLength width, double scale, boolean down, Class<T> inputType ) {
-		if (BOverrideFactoryThresholdBinary.localMean != null)
-			return BOverrideFactoryThresholdBinary.localMean.handle(width, scale, down, inputType);
+		InputToBinary<T> filter = override(BOverrideFactoryThresholdBinary.localMean,
+				hook -> hook.handle(width, scale, down, inputType));
+		if (filter != null)
+			return filter;
 		return new LocalMeanBinaryFilter<>(width, scale, down, ImageType.single(inputType));
 	}
 
@@ -167,8 +174,10 @@ public class FactoryThresholdBinary {
 	 */
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> localOtsu( ConfigLength regionWidth, double scale, boolean down, boolean otsu2, double tuning, Class<T> inputType ) {
-		if (BOverrideFactoryThresholdBinary.localOtsu != null)
-			return BOverrideFactoryThresholdBinary.localOtsu.handle(otsu2, regionWidth, tuning, scale, down, inputType);
+		InputToBinary<T> filter = override(BOverrideFactoryThresholdBinary.localOtsu,
+				hook -> hook.handle(otsu2, regionWidth, tuning, scale, down, inputType));
+		if (filter != null)
+			return filter;
 
 		ThresholdLocalOtsu otsu;
 		if (BoofConcurrency.USE_CONCURRENT) {
@@ -194,9 +203,10 @@ public class FactoryThresholdBinary {
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> blockMinMax( ConfigLength regionWidth, double scale, boolean down,
 								  boolean thresholdFromLocalBlocks, double minimumSpread, Class<T> inputType ) {
-		if (BOverrideFactoryThresholdBinary.blockMinMax != null)
-			return BOverrideFactoryThresholdBinary.blockMinMax.handle(regionWidth, scale, down,
-					minimumSpread, thresholdFromLocalBlocks, inputType);
+		InputToBinary<T> filter = override(BOverrideFactoryThresholdBinary.blockMinMax,
+				hook -> hook.handle(regionWidth, scale, down, minimumSpread, thresholdFromLocalBlocks, inputType));
+		if (filter != null)
+			return filter;
 
 		BlockProcessor processor;
 		if (inputType == GrayU8.class)
@@ -224,9 +234,10 @@ public class FactoryThresholdBinary {
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> blockMean( ConfigLength regionWidth, double scale, boolean down, boolean thresholdFromLocalBlocks,
 								Class<T> inputType ) {
-		if (BOverrideFactoryThresholdBinary.blockMean != null)
-			return BOverrideFactoryThresholdBinary.blockMean.handle(regionWidth, scale, down,
-					thresholdFromLocalBlocks, inputType);
+		InputToBinary<T> filter = override(BOverrideFactoryThresholdBinary.blockMean,
+				hook -> hook.handle(regionWidth, scale, down, thresholdFromLocalBlocks, inputType));
+		if (filter != null)
+			return filter;
 
 		BlockProcessor processor;
 		if (inputType == GrayU8.class)
@@ -253,9 +264,10 @@ public class FactoryThresholdBinary {
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> blockOtsu( ConfigLength regionWidth, double scale, boolean down, boolean thresholdFromLocalBlocks,
 								boolean otsu2, double tuning, Class<T> inputType ) {
-		if (BOverrideFactoryThresholdBinary.blockOtsu != null)
-			return BOverrideFactoryThresholdBinary.blockOtsu.handle(otsu2, regionWidth, tuning, scale, down,
-					thresholdFromLocalBlocks, inputType);
+		InputToBinary<T> filter = override(BOverrideFactoryThresholdBinary.blockOtsu,
+				hook -> hook.handle(otsu2, regionWidth, tuning, scale, down, thresholdFromLocalBlocks, inputType));
+		if (filter != null)
+			return filter;
 
 		BlockProcessor processor = new ThresholdBlockOtsu(otsu2, tuning, scale, down);
 		InputToBinary<GrayU8> otsu;
@@ -280,8 +292,10 @@ public class FactoryThresholdBinary {
 	 */
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> globalEntropy( int minValue, int maxValue, double scale, boolean down, Class<T> inputType ) {
-		if (BOverrideFactoryThresholdBinary.globalEntropy != null)
-			return BOverrideFactoryThresholdBinary.globalEntropy.handle(minValue, maxValue, scale, down, inputType);
+		InputToBinary<T> filter = override(BOverrideFactoryThresholdBinary.globalEntropy,
+				hook -> hook.handle(minValue, maxValue, scale, down, inputType));
+		if (filter != null)
+			return filter;
 		return new GlobalBinaryFilter.Entropy<>(minValue, maxValue, scale, down, ImageType.single(inputType));
 	}
 
@@ -295,8 +309,10 @@ public class FactoryThresholdBinary {
 	 */
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> globalFixed( double threshold, boolean down, Class<T> inputType ) {
-		if (BOverrideFactoryThresholdBinary.globalFixed != null)
-			return BOverrideFactoryThresholdBinary.globalFixed.handle(threshold, down, inputType);
+		InputToBinary<T> filter = override(BOverrideFactoryThresholdBinary.globalFixed,
+				hook -> hook.handle(threshold, down, inputType));
+		if (filter != null)
+			return filter;
 		return new GlobalFixedBinaryFilter<>(threshold, down, ImageType.single(inputType));
 	}
 
@@ -311,8 +327,10 @@ public class FactoryThresholdBinary {
 	 */
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> globalOtsu( double minValue, double maxValue, double scale, boolean down, Class<T> inputType ) {
-		if (BOverrideFactoryThresholdBinary.globalOtsu != null)
-			return BOverrideFactoryThresholdBinary.globalOtsu.handle(minValue, maxValue, scale, down, inputType);
+		InputToBinary<T> filter = override(BOverrideFactoryThresholdBinary.globalOtsu,
+				hook -> hook.handle(minValue, maxValue, scale, down, inputType));
+		if (filter != null)
+			return filter;
 		return new GlobalBinaryFilter.Otsu<>(minValue, maxValue, scale, down, ImageType.single(inputType));
 	}
 
@@ -385,5 +403,20 @@ public class FactoryThresholdBinary {
 						inputType);
 			}
 		};
+	}
+
+	/**
+	 * Filter created by the override. Null if the override isn't set, returns null, or throws a RuntimeException,
+	 * which means it doesn't support the input
+	 */
+	private static <H, T extends ImageGray<T>>
+	@Nullable InputToBinary<T> override( @Nullable H hook, Function<H, InputToBinary<T>> create ) {
+		if (hook == null)
+			return null;
+		try {
+			return create.apply(hook);
+		} catch (RuntimeException ignore) {
+			return null;
+		}
 	}
 }
