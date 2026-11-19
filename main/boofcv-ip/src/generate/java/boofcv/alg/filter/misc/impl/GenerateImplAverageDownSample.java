@@ -161,8 +161,73 @@ public class GenerateImplAverageDownSample extends CodeGeneratorBase {
 				"\t\tint dstBorder0 = centered ? 1 : 0;\n" +
 				"\t\tint dstBorder1 = upperBorder(src.width, dst.width, offset, scale);\n" +
 				"\n" +
-				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0, dst.height, y -> {\n" +
-				"\t\tfor (int y = 0; y < dst.height; y++) {\n" +
+				"\t\t// Each sum waits on its previous addition. Summing the same region in 4 rows at once lets the CPU\n" +
+				"\t\t// work on the 4 sums in parallel, and the region is only computed once for the 4 rows\n" +
+				"\t\tint blockEnd = dst.height - dst.height%4;\n" +
+				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0, blockEnd, 4, y -> {\n" +
+				"\t\tfor (int y = 0; y < blockEnd; y += 4) {\n" +
+				"\t\t\tint indexSrc0 = src.startIndex + y*src.stride;\n" +
+				"\t\t\tint indexSrc1 = indexSrc0 + src.stride;\n" +
+				"\t\t\tint indexSrc2 = indexSrc1 + src.stride;\n" +
+				"\t\t\tint indexSrc3 = indexSrc2 + src.stride;\n" +
+				"\t\t\tint indexDst0 = dst.startIndex + y*dst.stride;\n" +
+				"\t\t\tint indexDst1 = indexDst0 + dst.stride;\n" +
+				"\t\t\tint indexDst2 = indexDst1 + dst.stride;\n" +
+				"\t\t\tint indexDst3 = indexDst2 + dst.stride;\n" +
+				"\n" +
+				"\t\t\tif (centered) {\n" +
+				"\t\t\t\tdst.data[indexDst0] = naivePixelHorizontal(src, offset, scale, 0, y);\n" +
+				"\t\t\t\tdst.data[indexDst1] = naivePixelHorizontal(src, offset, scale, 0, y + 1);\n" +
+				"\t\t\t\tdst.data[indexDst2] = naivePixelHorizontal(src, offset, scale, 0, y + 2);\n" +
+				"\t\t\t\tdst.data[indexDst3] = naivePixelHorizontal(src, offset, scale, 0, y + 3);\n" +
+				"\t\t\t}\n" +
+				"\n" +
+				"\t\t\tfor (int x = dstBorder0; x < dstBorder1; x++) {\n" +
+				"\t\t\t\tfloat srcX0 = x*scale + offset;\n" +
+				"\t\t\t\tfloat srcX1 = (x + 1)*scale + offset;\n" +
+				"\n" +
+				"\t\t\t\tint isrcX0 = (int)srcX0;\n" +
+				"\t\t\t\tint isrcX1 = (int)srcX1;\n" +
+				"\n" +
+				"\t\t\t\t// compute value of overlapped region\n" +
+				"\t\t\t\tfloat weight0 = isrcX0 + 1 - srcX0;\n" +
+				"\t\t\t\t" + outputSumType + " sum0 = weight0*(src.data[indexSrc0 + isrcX0]" + bitwise + ");\n" +
+				"\t\t\t\t" + outputSumType + " sum1 = weight0*(src.data[indexSrc1 + isrcX0]" + bitwise + ");\n" +
+				"\t\t\t\t" + outputSumType + " sum2 = weight0*(src.data[indexSrc2 + isrcX0]" + bitwise + ");\n" +
+				"\t\t\t\t" + outputSumType + " sum3 = weight0*(src.data[indexSrc3 + isrcX0]" + bitwise + ");\n" +
+				"\n" +
+				"\t\t\t\tfor (int i = isrcX0 + 1; i < isrcX1; i++) {\n" +
+				"\t\t\t\t\tsum0 += src.data[indexSrc0 + i]" + bitwise + ";\n" +
+				"\t\t\t\t\tsum1 += src.data[indexSrc1 + i]" + bitwise + ";\n" +
+				"\t\t\t\t\tsum2 += src.data[indexSrc2 + i]" + bitwise + ";\n" +
+				"\t\t\t\t\tsum3 += src.data[indexSrc3 + i]" + bitwise + ";\n" +
+				"\t\t\t\t}\n" +
+				"\n" +
+				"\t\t\t\tif (isrcX1 < srcX1) {\n" +
+				"\t\t\t\t\tfloat weight1 = srcX1 - isrcX1;\n" +
+				"\t\t\t\t\tsum0 += weight1*(src.data[indexSrc0 + isrcX1]" + bitwise + ");\n" +
+				"\t\t\t\t\tsum1 += weight1*(src.data[indexSrc1 + isrcX1]" + bitwise + ");\n" +
+				"\t\t\t\t\tsum2 += weight1*(src.data[indexSrc2 + isrcX1]" + bitwise + ");\n" +
+				"\t\t\t\t\tsum3 += weight1*(src.data[indexSrc3 + isrcX1]" + bitwise + ");\n" +
+				"\t\t\t\t}\n" +
+				"\n" +
+				"\t\t\t\tdst.data[indexDst0 + x] = sum0/scale;\n" +
+				"\t\t\t\tdst.data[indexDst1 + x] = sum1/scale;\n" +
+				"\t\t\t\tdst.data[indexDst2 + x] = sum2/scale;\n" +
+				"\t\t\t\tdst.data[indexDst3 + x] = sum3/scale;\n" +
+				"\t\t\t}\n" +
+				"\n" +
+				"\t\t\tif (dstBorder1 != dst.width) {\n" +
+				"\t\t\t\tdst.data[indexDst0 + dstBorder1] = naivePixelHorizontal(src, offset, scale, dstBorder1, y);\n" +
+				"\t\t\t\tdst.data[indexDst1 + dstBorder1] = naivePixelHorizontal(src, offset, scale, dstBorder1, y + 1);\n" +
+				"\t\t\t\tdst.data[indexDst2 + dstBorder1] = naivePixelHorizontal(src, offset, scale, dstBorder1, y + 2);\n" +
+				"\t\t\t\tdst.data[indexDst3 + dstBorder1] = naivePixelHorizontal(src, offset, scale, dstBorder1, y + 3);\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t\t//CONCURRENT_ABOVE });\n" +
+				"\n" +
+				"\t\t// The remaining rows, one at a time\n" +
+				"\t\tfor (int y = blockEnd; y < dst.height; y++) {\n" +
 				"\t\t\tint indexDst = dst.startIndex + y*dst.stride;\n" +
 				"\n" +
 				"\t\t\tif (centered) {\n" +
@@ -196,7 +261,6 @@ public class GenerateImplAverageDownSample extends CodeGeneratorBase {
 				"\t\t\t\tdst.data[indexDst++] = naivePixelHorizontal(src, offset, scale, dstBorder1, y);\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
-				"\t\t//CONCURRENT_ABOVE });\n" +
 				"\t}\n\n");
 	}
 

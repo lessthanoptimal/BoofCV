@@ -287,8 +287,73 @@ public class ImplAverageDownSample {
 		int dstBorder0 = centered ? 1 : 0;
 		int dstBorder1 = upperBorder(src.width, dst.width, offset, scale);
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, dst.height, y -> {
-		for (int y = 0; y < dst.height; y++) {
+		// Each sum waits on its previous addition. Summing the same region in 4 rows at once lets the CPU
+		// work on the 4 sums in parallel, and the region is only computed once for the 4 rows
+		int blockEnd = dst.height - dst.height%4;
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, blockEnd, 4, y -> {
+		for (int y = 0; y < blockEnd; y += 4) {
+			int indexSrc0 = src.startIndex + y*src.stride;
+			int indexSrc1 = indexSrc0 + src.stride;
+			int indexSrc2 = indexSrc1 + src.stride;
+			int indexSrc3 = indexSrc2 + src.stride;
+			int indexDst0 = dst.startIndex + y*dst.stride;
+			int indexDst1 = indexDst0 + dst.stride;
+			int indexDst2 = indexDst1 + dst.stride;
+			int indexDst3 = indexDst2 + dst.stride;
+
+			if (centered) {
+				dst.data[indexDst0] = naivePixelHorizontal(src, offset, scale, 0, y);
+				dst.data[indexDst1] = naivePixelHorizontal(src, offset, scale, 0, y + 1);
+				dst.data[indexDst2] = naivePixelHorizontal(src, offset, scale, 0, y + 2);
+				dst.data[indexDst3] = naivePixelHorizontal(src, offset, scale, 0, y + 3);
+			}
+
+			for (int x = dstBorder0; x < dstBorder1; x++) {
+				float srcX0 = x*scale + offset;
+				float srcX1 = (x + 1)*scale + offset;
+
+				int isrcX0 = (int)srcX0;
+				int isrcX1 = (int)srcX1;
+
+				// compute value of overlapped region
+				float weight0 = isrcX0 + 1 - srcX0;
+				float sum0 = weight0*(src.data[indexSrc0 + isrcX0]& 0xFF);
+				float sum1 = weight0*(src.data[indexSrc1 + isrcX0]& 0xFF);
+				float sum2 = weight0*(src.data[indexSrc2 + isrcX0]& 0xFF);
+				float sum3 = weight0*(src.data[indexSrc3 + isrcX0]& 0xFF);
+
+				for (int i = isrcX0 + 1; i < isrcX1; i++) {
+					sum0 += src.data[indexSrc0 + i]& 0xFF;
+					sum1 += src.data[indexSrc1 + i]& 0xFF;
+					sum2 += src.data[indexSrc2 + i]& 0xFF;
+					sum3 += src.data[indexSrc3 + i]& 0xFF;
+				}
+
+				if (isrcX1 < srcX1) {
+					float weight1 = srcX1 - isrcX1;
+					sum0 += weight1*(src.data[indexSrc0 + isrcX1]& 0xFF);
+					sum1 += weight1*(src.data[indexSrc1 + isrcX1]& 0xFF);
+					sum2 += weight1*(src.data[indexSrc2 + isrcX1]& 0xFF);
+					sum3 += weight1*(src.data[indexSrc3 + isrcX1]& 0xFF);
+				}
+
+				dst.data[indexDst0 + x] = sum0/scale;
+				dst.data[indexDst1 + x] = sum1/scale;
+				dst.data[indexDst2 + x] = sum2/scale;
+				dst.data[indexDst3 + x] = sum3/scale;
+			}
+
+			if (dstBorder1 != dst.width) {
+				dst.data[indexDst0 + dstBorder1] = naivePixelHorizontal(src, offset, scale, dstBorder1, y);
+				dst.data[indexDst1 + dstBorder1] = naivePixelHorizontal(src, offset, scale, dstBorder1, y + 1);
+				dst.data[indexDst2 + dstBorder1] = naivePixelHorizontal(src, offset, scale, dstBorder1, y + 2);
+				dst.data[indexDst3 + dstBorder1] = naivePixelHorizontal(src, offset, scale, dstBorder1, y + 3);
+			}
+		}
+		//CONCURRENT_ABOVE });
+
+		// The remaining rows, one at a time
+		for (int y = blockEnd; y < dst.height; y++) {
 			int indexDst = dst.startIndex + y*dst.stride;
 
 			if (centered) {
@@ -322,7 +387,6 @@ public class ImplAverageDownSample {
 				dst.data[indexDst++] = naivePixelHorizontal(src, offset, scale, dstBorder1, y);
 			}
 		}
-		//CONCURRENT_ABOVE });
 	}
 
 	/// Same as vertical but workspace is null by default
@@ -429,8 +493,73 @@ public class ImplAverageDownSample {
 		int dstBorder0 = centered ? 1 : 0;
 		int dstBorder1 = upperBorder(src.width, dst.width, offset, scale);
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, dst.height, y -> {
-		for (int y = 0; y < dst.height; y++) {
+		// Each sum waits on its previous addition. Summing the same region in 4 rows at once lets the CPU
+		// work on the 4 sums in parallel, and the region is only computed once for the 4 rows
+		int blockEnd = dst.height - dst.height%4;
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, blockEnd, 4, y -> {
+		for (int y = 0; y < blockEnd; y += 4) {
+			int indexSrc0 = src.startIndex + y*src.stride;
+			int indexSrc1 = indexSrc0 + src.stride;
+			int indexSrc2 = indexSrc1 + src.stride;
+			int indexSrc3 = indexSrc2 + src.stride;
+			int indexDst0 = dst.startIndex + y*dst.stride;
+			int indexDst1 = indexDst0 + dst.stride;
+			int indexDst2 = indexDst1 + dst.stride;
+			int indexDst3 = indexDst2 + dst.stride;
+
+			if (centered) {
+				dst.data[indexDst0] = naivePixelHorizontal(src, offset, scale, 0, y);
+				dst.data[indexDst1] = naivePixelHorizontal(src, offset, scale, 0, y + 1);
+				dst.data[indexDst2] = naivePixelHorizontal(src, offset, scale, 0, y + 2);
+				dst.data[indexDst3] = naivePixelHorizontal(src, offset, scale, 0, y + 3);
+			}
+
+			for (int x = dstBorder0; x < dstBorder1; x++) {
+				float srcX0 = x*scale + offset;
+				float srcX1 = (x + 1)*scale + offset;
+
+				int isrcX0 = (int)srcX0;
+				int isrcX1 = (int)srcX1;
+
+				// compute value of overlapped region
+				float weight0 = isrcX0 + 1 - srcX0;
+				float sum0 = weight0*(src.data[indexSrc0 + isrcX0]& 0xFFFF);
+				float sum1 = weight0*(src.data[indexSrc1 + isrcX0]& 0xFFFF);
+				float sum2 = weight0*(src.data[indexSrc2 + isrcX0]& 0xFFFF);
+				float sum3 = weight0*(src.data[indexSrc3 + isrcX0]& 0xFFFF);
+
+				for (int i = isrcX0 + 1; i < isrcX1; i++) {
+					sum0 += src.data[indexSrc0 + i]& 0xFFFF;
+					sum1 += src.data[indexSrc1 + i]& 0xFFFF;
+					sum2 += src.data[indexSrc2 + i]& 0xFFFF;
+					sum3 += src.data[indexSrc3 + i]& 0xFFFF;
+				}
+
+				if (isrcX1 < srcX1) {
+					float weight1 = srcX1 - isrcX1;
+					sum0 += weight1*(src.data[indexSrc0 + isrcX1]& 0xFFFF);
+					sum1 += weight1*(src.data[indexSrc1 + isrcX1]& 0xFFFF);
+					sum2 += weight1*(src.data[indexSrc2 + isrcX1]& 0xFFFF);
+					sum3 += weight1*(src.data[indexSrc3 + isrcX1]& 0xFFFF);
+				}
+
+				dst.data[indexDst0 + x] = sum0/scale;
+				dst.data[indexDst1 + x] = sum1/scale;
+				dst.data[indexDst2 + x] = sum2/scale;
+				dst.data[indexDst3 + x] = sum3/scale;
+			}
+
+			if (dstBorder1 != dst.width) {
+				dst.data[indexDst0 + dstBorder1] = naivePixelHorizontal(src, offset, scale, dstBorder1, y);
+				dst.data[indexDst1 + dstBorder1] = naivePixelHorizontal(src, offset, scale, dstBorder1, y + 1);
+				dst.data[indexDst2 + dstBorder1] = naivePixelHorizontal(src, offset, scale, dstBorder1, y + 2);
+				dst.data[indexDst3 + dstBorder1] = naivePixelHorizontal(src, offset, scale, dstBorder1, y + 3);
+			}
+		}
+		//CONCURRENT_ABOVE });
+
+		// The remaining rows, one at a time
+		for (int y = blockEnd; y < dst.height; y++) {
 			int indexDst = dst.startIndex + y*dst.stride;
 
 			if (centered) {
@@ -464,7 +593,6 @@ public class ImplAverageDownSample {
 				dst.data[indexDst++] = naivePixelHorizontal(src, offset, scale, dstBorder1, y);
 			}
 		}
-		//CONCURRENT_ABOVE });
 	}
 
 	/// Same as vertical but workspace is null by default
@@ -571,8 +699,73 @@ public class ImplAverageDownSample {
 		int dstBorder0 = centered ? 1 : 0;
 		int dstBorder1 = upperBorder(src.width, dst.width, offset, scale);
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, dst.height, y -> {
-		for (int y = 0; y < dst.height; y++) {
+		// Each sum waits on its previous addition. Summing the same region in 4 rows at once lets the CPU
+		// work on the 4 sums in parallel, and the region is only computed once for the 4 rows
+		int blockEnd = dst.height - dst.height%4;
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, blockEnd, 4, y -> {
+		for (int y = 0; y < blockEnd; y += 4) {
+			int indexSrc0 = src.startIndex + y*src.stride;
+			int indexSrc1 = indexSrc0 + src.stride;
+			int indexSrc2 = indexSrc1 + src.stride;
+			int indexSrc3 = indexSrc2 + src.stride;
+			int indexDst0 = dst.startIndex + y*dst.stride;
+			int indexDst1 = indexDst0 + dst.stride;
+			int indexDst2 = indexDst1 + dst.stride;
+			int indexDst3 = indexDst2 + dst.stride;
+
+			if (centered) {
+				dst.data[indexDst0] = naivePixelHorizontal(src, offset, scale, 0, y);
+				dst.data[indexDst1] = naivePixelHorizontal(src, offset, scale, 0, y + 1);
+				dst.data[indexDst2] = naivePixelHorizontal(src, offset, scale, 0, y + 2);
+				dst.data[indexDst3] = naivePixelHorizontal(src, offset, scale, 0, y + 3);
+			}
+
+			for (int x = dstBorder0; x < dstBorder1; x++) {
+				float srcX0 = x*scale + offset;
+				float srcX1 = (x + 1)*scale + offset;
+
+				int isrcX0 = (int)srcX0;
+				int isrcX1 = (int)srcX1;
+
+				// compute value of overlapped region
+				float weight0 = isrcX0 + 1 - srcX0;
+				float sum0 = weight0*(src.data[indexSrc0 + isrcX0]);
+				float sum1 = weight0*(src.data[indexSrc1 + isrcX0]);
+				float sum2 = weight0*(src.data[indexSrc2 + isrcX0]);
+				float sum3 = weight0*(src.data[indexSrc3 + isrcX0]);
+
+				for (int i = isrcX0 + 1; i < isrcX1; i++) {
+					sum0 += src.data[indexSrc0 + i];
+					sum1 += src.data[indexSrc1 + i];
+					sum2 += src.data[indexSrc2 + i];
+					sum3 += src.data[indexSrc3 + i];
+				}
+
+				if (isrcX1 < srcX1) {
+					float weight1 = srcX1 - isrcX1;
+					sum0 += weight1*(src.data[indexSrc0 + isrcX1]);
+					sum1 += weight1*(src.data[indexSrc1 + isrcX1]);
+					sum2 += weight1*(src.data[indexSrc2 + isrcX1]);
+					sum3 += weight1*(src.data[indexSrc3 + isrcX1]);
+				}
+
+				dst.data[indexDst0 + x] = sum0/scale;
+				dst.data[indexDst1 + x] = sum1/scale;
+				dst.data[indexDst2 + x] = sum2/scale;
+				dst.data[indexDst3 + x] = sum3/scale;
+			}
+
+			if (dstBorder1 != dst.width) {
+				dst.data[indexDst0 + dstBorder1] = naivePixelHorizontal(src, offset, scale, dstBorder1, y);
+				dst.data[indexDst1 + dstBorder1] = naivePixelHorizontal(src, offset, scale, dstBorder1, y + 1);
+				dst.data[indexDst2 + dstBorder1] = naivePixelHorizontal(src, offset, scale, dstBorder1, y + 2);
+				dst.data[indexDst3 + dstBorder1] = naivePixelHorizontal(src, offset, scale, dstBorder1, y + 3);
+			}
+		}
+		//CONCURRENT_ABOVE });
+
+		// The remaining rows, one at a time
+		for (int y = blockEnd; y < dst.height; y++) {
 			int indexDst = dst.startIndex + y*dst.stride;
 
 			if (centered) {
@@ -606,7 +799,6 @@ public class ImplAverageDownSample {
 				dst.data[indexDst++] = naivePixelHorizontal(src, offset, scale, dstBorder1, y);
 			}
 		}
-		//CONCURRENT_ABOVE });
 	}
 
 	/// Down samples the image along the y-axis only. Image width's must be the same.
@@ -692,8 +884,73 @@ public class ImplAverageDownSample {
 		int dstBorder0 = centered ? 1 : 0;
 		int dstBorder1 = upperBorder(src.width, dst.width, offset, scale);
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, dst.height, y -> {
-		for (int y = 0; y < dst.height; y++) {
+		// Each sum waits on its previous addition. Summing the same region in 4 rows at once lets the CPU
+		// work on the 4 sums in parallel, and the region is only computed once for the 4 rows
+		int blockEnd = dst.height - dst.height%4;
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, blockEnd, 4, y -> {
+		for (int y = 0; y < blockEnd; y += 4) {
+			int indexSrc0 = src.startIndex + y*src.stride;
+			int indexSrc1 = indexSrc0 + src.stride;
+			int indexSrc2 = indexSrc1 + src.stride;
+			int indexSrc3 = indexSrc2 + src.stride;
+			int indexDst0 = dst.startIndex + y*dst.stride;
+			int indexDst1 = indexDst0 + dst.stride;
+			int indexDst2 = indexDst1 + dst.stride;
+			int indexDst3 = indexDst2 + dst.stride;
+
+			if (centered) {
+				dst.data[indexDst0] = naivePixelHorizontal(src, offset, scale, 0, y);
+				dst.data[indexDst1] = naivePixelHorizontal(src, offset, scale, 0, y + 1);
+				dst.data[indexDst2] = naivePixelHorizontal(src, offset, scale, 0, y + 2);
+				dst.data[indexDst3] = naivePixelHorizontal(src, offset, scale, 0, y + 3);
+			}
+
+			for (int x = dstBorder0; x < dstBorder1; x++) {
+				float srcX0 = x*scale + offset;
+				float srcX1 = (x + 1)*scale + offset;
+
+				int isrcX0 = (int)srcX0;
+				int isrcX1 = (int)srcX1;
+
+				// compute value of overlapped region
+				float weight0 = isrcX0 + 1 - srcX0;
+				double sum0 = weight0*(src.data[indexSrc0 + isrcX0]);
+				double sum1 = weight0*(src.data[indexSrc1 + isrcX0]);
+				double sum2 = weight0*(src.data[indexSrc2 + isrcX0]);
+				double sum3 = weight0*(src.data[indexSrc3 + isrcX0]);
+
+				for (int i = isrcX0 + 1; i < isrcX1; i++) {
+					sum0 += src.data[indexSrc0 + i];
+					sum1 += src.data[indexSrc1 + i];
+					sum2 += src.data[indexSrc2 + i];
+					sum3 += src.data[indexSrc3 + i];
+				}
+
+				if (isrcX1 < srcX1) {
+					float weight1 = srcX1 - isrcX1;
+					sum0 += weight1*(src.data[indexSrc0 + isrcX1]);
+					sum1 += weight1*(src.data[indexSrc1 + isrcX1]);
+					sum2 += weight1*(src.data[indexSrc2 + isrcX1]);
+					sum3 += weight1*(src.data[indexSrc3 + isrcX1]);
+				}
+
+				dst.data[indexDst0 + x] = sum0/scale;
+				dst.data[indexDst1 + x] = sum1/scale;
+				dst.data[indexDst2 + x] = sum2/scale;
+				dst.data[indexDst3 + x] = sum3/scale;
+			}
+
+			if (dstBorder1 != dst.width) {
+				dst.data[indexDst0 + dstBorder1] = naivePixelHorizontal(src, offset, scale, dstBorder1, y);
+				dst.data[indexDst1 + dstBorder1] = naivePixelHorizontal(src, offset, scale, dstBorder1, y + 1);
+				dst.data[indexDst2 + dstBorder1] = naivePixelHorizontal(src, offset, scale, dstBorder1, y + 2);
+				dst.data[indexDst3 + dstBorder1] = naivePixelHorizontal(src, offset, scale, dstBorder1, y + 3);
+			}
+		}
+		//CONCURRENT_ABOVE });
+
+		// The remaining rows, one at a time
+		for (int y = blockEnd; y < dst.height; y++) {
 			int indexDst = dst.startIndex + y*dst.stride;
 
 			if (centered) {
@@ -727,7 +984,6 @@ public class ImplAverageDownSample {
 				dst.data[indexDst++] = naivePixelHorizontal(src, offset, scale, dstBorder1, y);
 			}
 		}
-		//CONCURRENT_ABOVE });
 	}
 
 	/// Down samples the image along the y-axis only. Image width's must be the same.
