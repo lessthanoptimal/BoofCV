@@ -50,7 +50,9 @@ public class BenchmarkAverageDownSample {
 	ImageGray out2;
 	ImageGray out3;
 	ImageGray out8;
+	ImageGray out333;
 	ImageGray middle;
+	ImageGray middle333;
 
 	@Setup public void setup() {
 		BoofConcurrency.USE_CONCURRENT = concurrent;
@@ -64,7 +66,9 @@ public class BenchmarkAverageDownSample {
 		out3 = GeneralizedImageOps.createSingleBand(dataType, size3, size3);
 		int size8 = AverageDownSampleOps.downSampleSize(size, 8);
 		out8 = GeneralizedImageOps.createSingleBand(dataType, size8, size8);
+		out333 = GeneralizedImageOps.createSingleBand(dataType, size/3, size/3);
 		middle = dataType == ImageDataType.F64 ? new GrayF64(size/2, size) : new GrayF32(size/2, size);
+		middle333 = dataType == ImageDataType.F64 ? new GrayF64(size/3, size) : new GrayF32(size/3, size);
 	}
 
 	@Benchmark public void special2x2() {
@@ -81,5 +85,18 @@ public class BenchmarkAverageDownSample {
 
 	@Benchmark public void general_HV() {
 		AverageDownSampleOps.down(input, false, out2, middle);
+	}
+
+	@Benchmark public void general_HV_centered() {
+		AverageDownSampleOps.down(input, true, out2, middle);
+	}
+
+	/// Regions which aren't a whole number of pixels
+	@Benchmark public void general_HV_third() {
+		AverageDownSampleOps.down(input, false, out333, middle333);
+	}
+
+	@Benchmark public void general_HV_third_centered() {
+		AverageDownSampleOps.down(input, true, out333, middle333);
 	}
 }

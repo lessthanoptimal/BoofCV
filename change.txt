@@ -22,6 +22,7 @@ Version : 1.7.0
   * Reflect and wrap will both cycle
   * ZERO works with GrayS64
 - ConvolveImageStandard_SB: Fixed division rounding issue for kernels wider than 11.
+- AverageDownSample: 2x faster
 
 ---------------------
 Date    : 2026/Oct/22

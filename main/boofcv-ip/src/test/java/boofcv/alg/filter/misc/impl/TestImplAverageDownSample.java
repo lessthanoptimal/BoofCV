@@ -18,6 +18,7 @@
 
 package boofcv.alg.filter.misc.impl;
 
+import boofcv.BoofTesting;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.GrayF64;
@@ -68,12 +69,18 @@ public class TestImplAverageDownSample extends BoofStandardJUnit {
 					float.class, float.class, int.class, int.class);
 
 			for (int i = 0; i < 25; i++) {
-				// Randomize the width of the source image
+				// Randomize the width of the source image. A height of 5 isn't a multiple of the rows processed at once
 				ImageGray src = GeneralizedImageOps.createSingleBand(typeSrc, 20 + rand.nextInt(3), 5);
 
-				// randomly scale the width for output image
-				int width = (int)(src.width/(1.2 + rand.nextDouble()) - 0.5);
+				// randomly scale the width for output image. Large scales have more than 4 pixels in a region
+				int width = (int)(src.width/(1.2 + 4.8*rand.nextDouble()) - 0.5);
 				ImageGray dst = GeneralizedImageOps.createSingleBand(typeDst, width, src.height);
+
+				// Sub-images, so start index and stride aren't the defaults
+				if (i%2 == 1) {
+					src = BoofTesting.createSubImageOf(src);
+					dst = BoofTesting.createSubImageOf(dst);
+				}
 
 				// Fill source image with random values
 				GImageMiscOps.fillUniform(src, rand, 0, 200);
@@ -117,12 +124,18 @@ public class TestImplAverageDownSample extends BoofStandardJUnit {
 				// Randomize the width of the source image
 				ImageGray src = GeneralizedImageOps.createSingleBand(typeSrc, 5, 20 + rand.nextInt(3));
 
-				// randomly scale the width for output image
-				int height = (int)(src.height/(1.2 + rand.nextDouble()) - 0.5);
+				// randomly scale the height for output image. Large scales have more than 4 rows in a region
+				int height = (int)(src.height/(1.2 + 4.8*rand.nextDouble()) - 0.5);
 
 				// Bug where width was used instead of height
 				if (i == 0) { src = GeneralizedImageOps.createSingleBand(typeSrc, 14, 14); height = 13; }
 				ImageGray dst = GeneralizedImageOps.createSingleBand(typeDst, src.width, height);
+
+				// Sub-images, so start index and stride aren't the defaults
+				if (i%2 == 1) {
+					src = BoofTesting.createSubImageOf(src);
+					dst = BoofTesting.createSubImageOf(dst);
+				}
 
 				// Fill source image with random values
 				GImageMiscOps.fillUniform(src, rand, 0, 200);

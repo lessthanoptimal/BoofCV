@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -62,8 +62,8 @@ class TestImplAverageDownSample_MT extends CompareIdenticalFunctions {
 		GImageMiscOps.fillUniform(output, rand, 0, 100);
 
 		if (candidate.getParameterTypes().length == 3)
-			return new Object[][]{{input, false, output}};
+			return new Object[][]{{input, false, output}, {input, true, output}};
 		else
-			return new Object[][]{{input, false, output, null}};
+			return new Object[][]{{input, false, output, null}, {input, true, output, null}};
 	}
 }
