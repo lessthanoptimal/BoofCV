@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,14 +23,9 @@ import boofcv.alg.filter.binary.ThresholdBlockMinMax;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.InterleavedU8;
 
-/**
- * Implementation of {@link ThresholdBlockMinMax} for input images of type {@link GrayU8}
- *
- * @author Peter Abeles
- */
+/// Implementation of [ThresholdBlockMinMax] for input images of type [GrayU8]
 @SuppressWarnings("Duplicates")
-public class ThresholdBlockMinMax_U8
-		extends ThresholdBlockMinMax<GrayU8, InterleavedU8> {
+public class ThresholdBlockMinMax_U8 extends ThresholdBlockMinMax<GrayU8, InterleavedU8> {
 	double scale;
 
 	public ThresholdBlockMinMax_U8( double minimumSpread, double scale, boolean down ) {
@@ -76,8 +71,8 @@ public class ThresholdBlockMinMax_U8
 			}
 		}
 
-		// apply threshold
-		int textureThreshold = (int)this.minimumSpread;
+		// Applies the threshold
+		int textureThreshold = computeTextureThreshold();
 		if (down) {
 			for (int y = y0; y < y1; y++) {
 				int indexInput = input.startIndex + y*input.stride + x0;
@@ -109,6 +104,12 @@ public class ThresholdBlockMinMax_U8
 		}
 	}
 
+	/// Discretizes the threshold by rounding the spread. Disables if negative.
+	/// @see boofcv.factory.filter.binary.ConfigThresholdBlockMinMax#minimumSpread
+	int computeTextureThreshold() {
+		return minimumSpread < 0 ? -1 : (int)Math.min(Integer.MAX_VALUE, Math.round(minimumSpread));
+	}
+
 	@Override
 	public InterleavedU8 createStats() {
 		return new InterleavedU8(1, 1, 2);
@@ -138,6 +139,6 @@ public class ThresholdBlockMinMax_U8
 
 	@Override
 	public ThresholdBlock.BlockProcessor<GrayU8, InterleavedU8> copy() {
-		return new ThresholdBlockMinMax_U8((float)minimumSpread, scale, down);
+		return new ThresholdBlockMinMax_U8(minimumSpread, scale, down);
 	}
 }

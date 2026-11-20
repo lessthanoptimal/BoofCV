@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,53 +18,46 @@
 
 package boofcv.alg.filter.binary;
 
+import boofcv.factory.filter.binary.ConfigThresholdBlockMinMax;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageInterleaved;
 
-/**
- * <p>
- * Applies a threshold to an image by computing the min and max values in a regular grid across
- * the image. When thresholding all the pixels inside a box (grid element) the min max values is found
- * in the surrounding 3x3 grid region. If the difference between min and max is &le; textureThreshold then
- * it will be marked as one, since it is considered a textureless region. Otherwise the pixel threshold
- * is set to (min+max)/2.
- * </p>
- *
- * <p>This thresholding strategy is designed to quickly detect shapes with nearly uniform values both inside
- * the image and along the image border, with locally variable intensity values. The image border is
- * particularly problematic since there are no neighboring pixels outside the image from which to compute
- * a local threshold. This is why if a region is considered textureless it is marked as 1.</p>
- *
- * <p>The min-max values inside a local 3x3 grid region is used to reduce the adverse affects of using a grid.
- * Ideally a local region around each pixel would be used, but this is expensive to compute. Since a grid is
- * used instead of a pixel local region boundary conditions can be an issue. For example, consider a black square
- * in the image, if the grid just happens to lie on this black square perfectly then if you look at only a single
- * grid element it will be considered textureless and the edge lost. This problem isn't an issue if you consder
- * a local 3x3 region of blocks.</p>
- *
- * <p>The size each block in the grid in pixels is adjusted depending on image size. This is done to minimize
- * "squares" in the upper image boundaries from having many more pixels than other blocks.</p>
- *
- * <p>The block based approach used here was inspired by a high level description found in AprilTags.</p>
- *
- * @author Peter Abeles
- */
+/// Applies a threshold to an image by computing the min and max values in a regular grid across
+/// the image. When thresholding all the pixels inside a box (grid element) the min max values is found
+/// in the surrounding 3x3 grid region. If the difference between min and max is ≤ textureThreshold then
+/// it will be marked as one, since it is considered a textureless region. Otherwise the pixel threshold
+/// is set to (min+max)/2.
+///
+/// This thresholding strategy is designed to quickly detect shapes with nearly uniform values both inside
+/// the image and along the image border, with locally variable intensity values. The image border is
+/// particularly problematic since there are no neighboring pixels outside the image from which to compute
+/// a local threshold. This is why if a region is considered textureless it is marked as 1.
+///
+/// The min-max values inside a local 3x3 grid region is used to reduce the adverse affects of using a grid.
+/// Ideally a local region around each pixel would be used, but this is expensive to compute. Since a grid is
+/// used instead of a pixel local region boundary conditions can be an issue. For example, consider a black square
+/// in the image, if the grid just happens to lie on this black square perfectly then if you look at only a single
+/// grid element it will be considered textureless and the edge lost. This problem isn't an issue if you consider
+/// a local 3x3 region of blocks.
+///
+/// The size each block in the grid in pixels is adjusted depending on image size. This is done to minimize
+/// "squares" in the upper image boundaries from having many more pixels than other blocks.
+///
+/// The block based approach used here was inspired by a high level description found in AprilTags.
+///
+/// @author Peter Abeles
 public abstract class ThresholdBlockMinMax<T extends ImageGray<T>, I extends ImageInterleaved<I>>
 		implements ThresholdBlock.BlockProcessor<T, I> {
 	protected int blockWidth, blockHeight;
 	protected boolean thresholdFromLocalBlocks;
-	// if the min and max value's difference is <= to this value then it is considered
-	// to be textureless and a default value is used
+	/// See [ConfigThresholdBlockMinMax#minimumSpread]
 	protected double minimumSpread;
 
 	protected boolean down;
 
-	/**
-	 * Configures the detector
-	 *
-	 * @param minimumSpread If the difference between min max is less than or equal to this
-	 * value then it is considered textureless. Set to &le; -1 to disable.
-	 */
+	/// Configures the detector
+	///
+	/// @param minimumSpread [ConfigThresholdBlockMinMax#minimumSpread]
 	protected ThresholdBlockMinMax( double minimumSpread, boolean down ) {
 		this.minimumSpread = minimumSpread;
 		this.down = down;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,17 +22,11 @@ import boofcv.struct.ConfigLength;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Configuration for {@link boofcv.alg.filter.binary.ThresholdBlockMinMax}
- *
- * @author Peter Abeles
- */
+/// Configuration for [boofcv.alg.filter.binary.ThresholdBlockMinMax]
 @Getter @Setter
 public class ConfigThresholdBlockMinMax extends ConfigThreshold {
-	/**
-	 * If the lower and upper histogram values are different by less than or equal to this amount it is considered
-	 * a textureless region. Set to a value <= -1 to disable.
-	 */
+	/// If the lower and upper histogram values are different by less than or equal to this amount it is considered
+	/// a textureless region. Integer images round it to the nearest integer. Set to a negative value to disable.
 	public double minimumSpread = 10;
 
 	{
