@@ -173,8 +173,7 @@ public class FactoryThresholdBinary {
 	/// @param regionWidth Approximate size of block region
 	/// @param scale Scale factor adjust for threshold. 1.0 means no change.
 	/// @param down Should it threshold up or down.
-	/// @param minimumSpread If the difference between min max is less than or equal to this
-	/// value then it is considered textureless. Set to ≤ -1 to disable.
+	/// @param minimumSpread See [ConfigThresholdBlockMinMax#minimumSpread]
 	/// @param inputType Type of input image
 	/// @return Filter to binary
 	/// @see ThresholdBlockMinMax

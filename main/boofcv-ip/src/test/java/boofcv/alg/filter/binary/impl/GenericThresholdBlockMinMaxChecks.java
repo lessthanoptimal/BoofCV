@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -78,6 +78,18 @@ public abstract class GenericThresholdBlockMinMaxChecks
 		for (int y = 45; y < 77; y++) {
 			assertEquals(0, output.get(39, y));
 			assertEquals(0, output.get(71, y));
+		}
+	}
+
+	/// A negative spread disables the textureless check, so thresholding a flat image up marks nothing
+	@Test void negativeSpreadDisables() {
+		T input = GeneralizedImageOps.createSingleBand(imageType, 30, 20);
+		GImageMiscOps.fill(input, 128);
+		GrayU8 output = new GrayU8(input.width, input.height);
+
+		for (double spread : new double[]{-0.1, -1}) {
+			createThresholder(spread, 5, 1.0, false).process(input, output);
+			assertEquals(0, ImageStatistics.sum(output), "spread " + spread);
 		}
 	}
 }
