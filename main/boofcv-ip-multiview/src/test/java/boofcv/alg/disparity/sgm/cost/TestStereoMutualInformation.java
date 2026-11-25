@@ -240,7 +240,7 @@ class TestStereoMutualInformation extends CommonSgmChecks<GrayU8> {
 		alg.configureHistogram(251);
 		alg.computeJointHistogram(left, right, 0, disparity, invalid);
 
-		int found = ImageStatistics.sum(alg.histJoint);
+		long found = ImageStatistics.sum(alg.histJoint);
 		assertEquals(width*height/2, found);
 	}
 

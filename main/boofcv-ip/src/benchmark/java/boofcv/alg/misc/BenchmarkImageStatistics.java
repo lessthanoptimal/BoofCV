@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -68,40 +68,48 @@ public class BenchmarkImageStatistics {
 		GImageMiscOps.fillUniform(imgB_F32, rand, -100, 100);
 	}
 
-	@Benchmark public void maxAbs() {
-		GImageStatistics.maxAbs(imgA_U8);
+	@Benchmark public double maxAbs() {
+		return GImageStatistics.maxAbs(imgA_U8);
 	}
 
 	@Benchmark public void histogram() {
 		GImageStatistics.histogram(imgA_U8, 0, histogram);
 	}
 
-	@Benchmark public void max() {
-		GImageStatistics.max(imgA_U8);
+	@Benchmark public double max() {
+		return GImageStatistics.max(imgA_U8);
 	}
 
-	@Benchmark public void min() {
-		GImageStatistics.min(imgA_U8);
+	@Benchmark public double min() {
+		return GImageStatistics.min(imgA_U8);
 	}
 
-	@Benchmark public void mean() {
-		GImageStatistics.mean(imgA_U8);
+	@Benchmark public double mean() {
+		return GImageStatistics.mean(imgA_U8);
 	}
 
-	@Benchmark public void meanDiffAbs() {
-		GImageStatistics.meanDiffAbs(imgA_F32, imgB_F32);
+	@Benchmark public double meanDiffAbs() {
+		return GImageStatistics.meanDiffAbs(imgA_F32, imgB_F32);
 	}
 
-	@Benchmark public void meanDiffSq() {
-		GImageStatistics.meanDiffSq(imgA_U8, imgB_U8);
+	@Benchmark public double meanDiffSq() {
+		return GImageStatistics.meanDiffSq(imgA_U8, imgB_U8);
 	}
 
-	@Benchmark public void sum() {
-		GImageStatistics.sum(imgA_U8);
+	@Benchmark public double sum() {
+		return GImageStatistics.sum(imgA_U8);
 	}
 
-	@Benchmark public void variance() {
-		GImageStatistics.variance(imgA_U8, 120);
+	@Benchmark public double sum_F32() {
+		return GImageStatistics.sum(imgA_F32);
+	}
+
+	@Benchmark public double variance_F32() {
+		return GImageStatistics.variance(imgA_F32, 12);
+	}
+
+	@Benchmark public double variance() {
+		return GImageStatistics.variance(imgA_U8, 120);
 	}
 
 	public static void main( String[] args ) throws RunnerException {

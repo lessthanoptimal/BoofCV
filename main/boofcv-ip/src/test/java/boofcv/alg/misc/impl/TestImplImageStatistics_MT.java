@@ -27,6 +27,8 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 class TestImplImageStatistics_MT extends CompareIdenticalFunctions {
 	int width = 70,height=80;
 
@@ -42,6 +44,13 @@ class TestImplImageStatistics_MT extends CompareIdenticalFunctions {
 	@Override
 	protected boolean isTestMethod(Method m) {
 		return super.isTestMethod(m) ||m.getParameterTypes().length > 2;
+	}
+
+	/// Results must be identical to single threaded
+	@Override
+	protected void compareResults( Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam ) {
+		super.compareResults(targetResult, targetParam, validationResult, validationParam);
+		assertEquals(validationResult, targetResult, methodTest.toString());
 	}
 
 	@Override

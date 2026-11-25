@@ -18,13 +18,13 @@
 
 package boofcv.alg.misc;
 
+import boofcv.struct.image.*;
+import javax.annotation.Generated;
 import boofcv.alg.InputSanityCheck;
+import java.util.Arrays;
 import boofcv.alg.misc.impl.ImplImageStatistics;
 import boofcv.alg.misc.impl.ImplImageStatistics_MT;
 import boofcv.concurrency.BoofConcurrency;
-import boofcv.struct.image.*;
-
-import javax.annotation.Generated;
 
 /**
  * Computes statistical properties of pixels inside an image.
@@ -229,7 +229,7 @@ public class ImageStatistics {
 	 *
 	 * @param img Input image. Not modified.
 	 */
-	public static int sum( GrayU8 input ) {
+	public static long sum( GrayU8 input ) {
 
 		int N = input.width*input.height;
 		if (BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE) {
@@ -246,7 +246,7 @@ public class ImageStatistics {
 	 *
 	 * @param img Input image. Not modified.
 	 */
-	public static int sumAbs( GrayU8 input ) {
+	public static long sumAbs( GrayU8 input ) {
 		return sum(input);
 	}
 
@@ -267,7 +267,7 @@ public class ImageStatistics {
 	 *
 	 * @param img Input image. Not modified.
 	 */
-	public static int sum( InterleavedU8 input ) {
+	public static long sum( InterleavedU8 input ) {
 
 		int N = input.width*input.height;
 		if (BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE) {
@@ -284,7 +284,7 @@ public class ImageStatistics {
 	 *
 	 * @param img Input image. Not modified.
 	 */
-	public static int sumAbs( InterleavedU8 input ) {
+	public static long sumAbs( InterleavedU8 input ) {
 		return sum(input);
 	}
 
@@ -542,7 +542,7 @@ public class ImageStatistics {
 	 *
 	 * @param img Input image. Not modified.
 	 */
-	public static int sum( GrayS8 input ) {
+	public static long sum( GrayS8 input ) {
 
 		int N = input.width*input.height;
 		if (BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE) {
@@ -559,7 +559,7 @@ public class ImageStatistics {
 	 *
 	 * @param img Input image. Not modified.
 	 */
-	public static int sumAbs( GrayS8 input ) {
+	public static long sumAbs( GrayS8 input ) {
 
 		int N = input.width*input.height;
 		if (BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE) {
@@ -586,7 +586,7 @@ public class ImageStatistics {
 	 *
 	 * @param img Input image. Not modified.
 	 */
-	public static int sum( InterleavedS8 input ) {
+	public static long sum( InterleavedS8 input ) {
 
 		int N = input.width*input.height;
 		if (BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE) {
@@ -603,7 +603,7 @@ public class ImageStatistics {
 	 *
 	 * @param img Input image. Not modified.
 	 */
-	public static int sumAbs( InterleavedS8 input ) {
+	public static long sumAbs( InterleavedS8 input ) {
 
 		int N = input.width*input.height;
 		if (BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE) {
@@ -867,7 +867,7 @@ public class ImageStatistics {
 	 *
 	 * @param img Input image. Not modified.
 	 */
-	public static int sum( GrayU16 input ) {
+	public static long sum( GrayU16 input ) {
 
 		int N = input.width*input.height;
 		if (BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE) {
@@ -884,7 +884,7 @@ public class ImageStatistics {
 	 *
 	 * @param img Input image. Not modified.
 	 */
-	public static int sumAbs( GrayU16 input ) {
+	public static long sumAbs( GrayU16 input ) {
 		return sum(input);
 	}
 
@@ -905,7 +905,7 @@ public class ImageStatistics {
 	 *
 	 * @param img Input image. Not modified.
 	 */
-	public static int sum( InterleavedU16 input ) {
+	public static long sum( InterleavedU16 input ) {
 
 		int N = input.width*input.height;
 		if (BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE) {
@@ -922,7 +922,7 @@ public class ImageStatistics {
 	 *
 	 * @param img Input image. Not modified.
 	 */
-	public static int sumAbs( InterleavedU16 input ) {
+	public static long sumAbs( InterleavedU16 input ) {
 		return sum(input);
 	}
 
@@ -1180,7 +1180,7 @@ public class ImageStatistics {
 	 *
 	 * @param img Input image. Not modified.
 	 */
-	public static int sum( GrayS16 input ) {
+	public static long sum( GrayS16 input ) {
 
 		int N = input.width*input.height;
 		if (BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE) {
@@ -1197,7 +1197,7 @@ public class ImageStatistics {
 	 *
 	 * @param img Input image. Not modified.
 	 */
-	public static int sumAbs( GrayS16 input ) {
+	public static long sumAbs( GrayS16 input ) {
 
 		int N = input.width*input.height;
 		if (BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE) {
@@ -1224,7 +1224,7 @@ public class ImageStatistics {
 	 *
 	 * @param img Input image. Not modified.
 	 */
-	public static int sum( InterleavedS16 input ) {
+	public static long sum( InterleavedS16 input ) {
 
 		int N = input.width*input.height;
 		if (BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE) {
@@ -1241,7 +1241,7 @@ public class ImageStatistics {
 	 *
 	 * @param img Input image. Not modified.
 	 */
-	public static int sumAbs( InterleavedS16 input ) {
+	public static long sumAbs( InterleavedS16 input ) {
 
 		int N = input.width*input.height;
 		if (BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE) {
@@ -1505,7 +1505,7 @@ public class ImageStatistics {
 	 *
 	 * @param img Input image. Not modified.
 	 */
-	public static int sum( GrayS32 input ) {
+	public static long sum( GrayS32 input ) {
 
 		int N = input.width*input.height;
 		if (BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE) {
@@ -1522,7 +1522,7 @@ public class ImageStatistics {
 	 *
 	 * @param img Input image. Not modified.
 	 */
-	public static int sumAbs( GrayS32 input ) {
+	public static long sumAbs( GrayS32 input ) {
 
 		int N = input.width*input.height;
 		if (BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE) {
@@ -1549,7 +1549,7 @@ public class ImageStatistics {
 	 *
 	 * @param img Input image. Not modified.
 	 */
-	public static int sum( InterleavedS32 input ) {
+	public static long sum( InterleavedS32 input ) {
 
 		int N = input.width*input.height;
 		if (BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE) {
@@ -1566,7 +1566,7 @@ public class ImageStatistics {
 	 *
 	 * @param img Input image. Not modified.
 	 */
-	public static int sumAbs( InterleavedS32 input ) {
+	public static long sumAbs( InterleavedS32 input ) {
 
 		int N = input.width*input.height;
 		if (BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE) {

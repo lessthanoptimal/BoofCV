@@ -18,7 +18,9 @@
 
 package boofcv.alg.misc;
 
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofStandardJUnit;
@@ -35,6 +37,28 @@ public class TestImageStatistics extends BoofStandardJUnit {
 	int width = 10;
 	int height = 15;
 	int numBands = 2;
+
+	/// Integer totals don't overflow an int, single threaded and concurrent
+	@Test void integerTotalsExceedInt() {
+		var image = new GrayU8(3000, 3000);
+		ImageMiscOps.fill(image, 255);
+		var imageA = new GrayU8(300, 300);
+		var imageB = new GrayU8(300, 300);
+		ImageMiscOps.fill(imageA, 255);
+
+		boolean original = BoofConcurrency.USE_CONCURRENT;
+		try {
+			for (boolean concurrent : new boolean[]{false, true}) {
+				BoofConcurrency.USE_CONCURRENT = concurrent;
+				assertEquals(255L*3000*3000, ImageStatistics.sum(image));
+				assertEquals(255.0, ImageStatistics.mean(image));
+				assertEquals(0.0, ImageStatistics.variance(image, 255.0));
+				assertEquals(255.0*255.0, ImageStatistics.meanDiffSq(imageA, imageB));
+			}
+		} finally {
+			BoofConcurrency.USE_CONCURRENT = original;
+		}
+	}
 
 	@Test void checkAll() {
 		int numExpected = 12*8 + 9*8;
