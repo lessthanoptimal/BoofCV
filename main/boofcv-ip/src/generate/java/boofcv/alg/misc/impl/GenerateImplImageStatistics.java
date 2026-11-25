@@ -18,367 +18,148 @@
 
 package boofcv.alg.misc.impl;
 
-import boofcv.generate.AutoTypeImage;
-import boofcv.generate.ImageFamily;
-import boofcv.generate.CodeGeneratorBase;
-
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
 
-/// Generates functions inside ImageStatistics.
-public class GenerateImplImageStatistics extends CodeGeneratorBase {
+/// Generates ImplImageStatistics, which has the row helpers that ImplImageStatistics_MT also uses
+public class GenerateImplImageStatistics extends ImageStatisticsCodeBase {
 
-	private AutoTypeImage input;
-
-	@Override public void generateCode() throws FileNotFoundException {
-		printPreamble();
-		printAll();
-		out.println("}");
-	}
-
-	private void printPreamble() throws FileNotFoundException {
+	@Override protected void printPreamble() {
 		out.print("import boofcv.struct.image.*;\n" +
 				"import javax.annotation.Generated;\n" +
 				"import java.util.Arrays;\n" +
 				"\n" +
-				"//CONCURRENT_INLINE import java.util.ArrayList;\n" +
-				"//CONCURRENT_INLINE import java.util.List;\n" +
-				"//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;\n" +
-				"\n" +
 				"/**\n" +
-				" * Computes statistical properties of pixels inside an image.\n" +
+				" * Computes statistical properties of pixels inside an image. Each function's inner loop over a row is\n" +
+				" * in a helper which {@link ImplImageStatistics_MT} shares.\n" +
 				generateDocString() +
 				"public class " + className + " {\n\n");
 	}
 
-	public void printAll() {
-		AutoTypeImage[] types = AutoTypeImage.getSpecificTypes();
-
-		ImageFamily[] families = new ImageFamily[]{ImageFamily.GRAY, ImageFamily.INTERLEAVED};
-
-		List<CodeGenerator> functions = new ArrayList<>();
-		functions.add(new GenerateMin());
-		functions.add(new GenerateMax());
-		functions.add(new GenerateMinAbs());
-		functions.add(new GenerateMaxAbs());
-		functions.add(new GenerateMeanDiffSq());
-		functions.add(new GenerateMeanDiffAbs());
-
-		for (AutoTypeImage t : types) {
-			input = t;
-
-			for (CodeGenerator generator : functions) {
-				generator.printLowLevel();
-			}
-			for (ImageFamily f : families) {
-				printSum(f);
-				if (t.isSigned()) {
-					printSumAbs(f);
-				}
-			}
-
-			printVariance();
-			printHistogram();
-			printHistogramScaled();
+	@Override protected void printRowHelpers() {
+		for (Select s : SELECTS) {
+			printSelectRowHelper(s);
 		}
+		for (String name : DIFFERENCES) {
+			printDifferenceRowHelper(name, isSquared(name));
+		}
+		printSumRowHelper("sumRow", value("data", "index"));
+		if (input.isSigned())
+			printSumRowHelper("sumAbsRow", "Math.abs(" + value("data", "index") + ")");
+		printVarianceRowHelper();
+		printHistogramRowHelpers();
 	}
 
-	public void printHistogram() {
+	@Override protected void printSelect( Select select, String row ) {
 		String sumType = input.getSumType();
-
-		out.print("\tpublic static void histogram( " + input.getSingleBandName() + " input , " + sumType + " minValue , int[] histogram ) {\n" +
-				"\t\tArrays.fill(histogram,0);\n" +
-				"\n" +
-				"\t\t//CONCURRENT_INLINE final List<int[]> list = new ArrayList<>();\n" +
-				"\t\t//CONCURRENT_INLINE BoofConcurrency.loopBlocks(0,input.height,(y0,y1)->{\n" +
-				"\t\t//CONCURRENT_BELOW final int[] h = new int[histogram.length];\n" +
-				"\t\tfinal int[] h = histogram;\n" +
-				"\t\t//CONCURRENT_BELOW for( int y = y0; y < y1; y++ ) {\n" +
-				"\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
-				"\t\t\tint index = input.startIndex + y*input.stride;\n" +
-				"\t\t\tint end = index + input.width;\n" +
-				"\n" +
-				"\t\t\twhile( index < end ) {\n");
-		if (input.isInteger()) {
-			if (input.getNumBits() == 64)
-				out.print("\t\t\t\th[(int)(input.data[index++] - minValue)]++;\n");
-			else
-				out.print("\t\t\t\th[(input.data[index++]" + input.getBitWise() + ") - minValue ]++;\n");
-		} else {
-			out.print("\t\t\t\th[(int)(input.data[index++] - minValue)]++;\n");
-		}
-		out.print("\t\t\t}\n" +
-				"\t\t}\n" +
-				"\t\t//CONCURRENT_INLINE synchronized(list){list.add(h);}});\n" +
-				"\t\t//CONCURRENT_INLINE for (int i = 0; i < list.size(); i++) {\n" +
-				"\t\t//CONCURRENT_INLINE \tint[] h = list.get(i);\n" +
-				"\t\t//CONCURRENT_INLINE \tfor (int j = 0; j < histogram.length; j++) {\n" +
-				"\t\t//CONCURRENT_INLINE \t\thistogram[j] += h[j];\n" +
-				"\t\t//CONCURRENT_INLINE \t}\n" +
-				"\t\t//CONCURRENT_INLINE }\n" +
-				"\t}\n\n");
-	}
-
-	public void printHistogramScaled() {
-		String sumType = input.getSumType();
-
-		out.print("\tpublic static void histogramScaled( " + input.getSingleBandName() + " input , " + sumType + " minValue , " + sumType + " maxValue, int[] histogram ) {\n" +
-				"\t\tArrays.fill(histogram,0);\n" +
-				"\n" +
-				"\t\tfinal " + sumType + " histLength = histogram.length;\n" +
-				"\t\tfinal " + sumType + " rangeValue = maxValue-minValue+1;\n" +
-				"\t\t\n" +
-				"\t\t//CONCURRENT_INLINE final List<int[]> list = new ArrayList<>();\n" +
-				"\t\t//CONCURRENT_INLINE BoofConcurrency.loopBlocks(0,input.height,(y0,y1)->{\n" +
-				"\t\t//CONCURRENT_BELOW final int[] h = new int[histogram.length];\n" +
-				"\t\tfinal int[] h = histogram;\n" +
-				"\t\t//CONCURRENT_BELOW for( int y = y0; y < y1; y++ ) {\n" +
-				"\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
-				"\t\t\tint index = input.startIndex + y*input.stride;\n" +
-				"\t\t\tint end = index + input.width;\n" +
-				"\n" +
-				"\t\t\twhile( index < end ) {\n");
-		if (input.isInteger()) {
-			if (input.getNumBits() == 64)
-				out.print("\t\t\t\th[(int)(histLength*(input.data[index++] - minValue)/rangeValue)]++;\n");
-			else
-				out.print("\t\t\t\th[(int)(histLength*((input.data[index++]" + input.getBitWise() + ") - minValue)/rangeValue) ]++;\n");
-		} else {
-			out.print("\t\t\t\th[(int)(histLength*(input.data[index++] - minValue)/rangeValue)]++;\n");
-		}
-		out.print("\t\t\t}\n" +
-				"\t\t}\n" +
-				"\t\t//CONCURRENT_INLINE synchronized(list){list.add(h);}});\n" +
-				"\t\t//CONCURRENT_INLINE for (int i = 0; i < list.size(); i++) {\n" +
-				"\t\t//CONCURRENT_INLINE \tint[] h = list.get(i);\n" +
-				"\t\t//CONCURRENT_INLINE \tfor (int j = 0; j < histogram.length; j++) {\n" +
-				"\t\t//CONCURRENT_INLINE \t\thistogram[j] += h[j];\n" +
-				"\t\t//CONCURRENT_INLINE \t}\n" +
-				"\t\t//CONCURRENT_INLINE }\n" +
-				"\t}\n\n");
-	}
-
-	public void printSum( ImageFamily family ) {
-
-		String bitWise = input.getBitWise();
-		String columns = family == ImageFamily.INTERLEAVED ? "*img.numBands" : "";
-		String sumType = input.getSumType();
-		String numTo = input.getSumNumberToType();
-		out.print("\tpublic static " + sumType + " sum( " + input.getImageName(family) + " img ) {\n" +
-				"\n" +
-				"\t\tfinal int rows = img.height;\n" +
-				"\t\tfinal int columns = img.width" + columns + ";\n" +
-				"\n" +
-				"\t\t//CONCURRENT_REMOVE_BELOW\n" +
-				"\t\t" + sumType + " total = 0;\n" +
-				"\n" +
-				"\t\t//CONCURRENT_INLINE return BoofConcurrency.sum(0,img.height," + sumType + ".class,y->{\n" +
-				"\t\t\t//CONCURRENT_BELOW " + sumType + " total = 0;\n" +
+		out.print("\t\t" + sumType + " output = initial;\n" +
 				"\t\tfor (int y = 0; y < rows; y++) {\n" +
-				"\t\t\tint index = img.startIndex + y * img.stride;\n" +
-				"\t\t\t\n" +
-				"\t\t\tint indexEnd = index+columns;\n" +
-				"\t\t\tfor (; index < indexEnd; index++ ) {\n" +
-				"\t\t\t\ttotal += img.data[index] " + bitWise + ";\n" +
-				"\t\t\t}\n" +
-				"\t\t} return total;\n" +
-				"\t\t//CONCURRENT_ABOVE return total;})." + numTo + ";\n" +
-				"\t}\n\n");
+				"\t\t\toutput = " + row + "(array, startIndex + y*stride, columns, output);\n" +
+				"\t\t}\n" +
+				"\t\treturn output;\n");
 	}
 
-	public void printSumAbs( ImageFamily family ) {
+	@Override protected void printRowTotals( String totalType, String[] rowStart, String rowTotal ) {
+		out.print("\t\t" + totalType + " total = 0;\n" +
+				"\t\tfor (int y = 0; y < rows; y++) {\n" +
+				statements(rowStart, "\t\t\t") +
+				"\t\t\ttotal += " + rowTotal + ";\n" +
+				"\t\t}\n");
+	}
 
-		String bitWise = input.getBitWise();
-		String columns = family == ImageFamily.INTERLEAVED ? "*img.numBands" : "";
+	@Override protected void printIntegerVariance() {
+		out.print(varianceRows("\t\t", "0", "rows", ""));
+	}
+
+	@Override protected void printHistogram( String rowCall ) {
+		out.print("\t\tfor (int y = 0; y < input.height; y++) {\n" +
+				"\t\t\t" + rowCall.replace("HIST", "histogram") + ";\n" +
+				"\t\t}\n");
+	}
+
+	private void printSelectRowHelper( Select s ) {
 		String sumType = input.getSumType();
-		String numTo = input.getSumNumberToType();
-		out.print(
-				"\tpublic static " + sumType + " sumAbs( " + input.getImageName(family) + " img ) {\n" +
-						"\n" +
-						"\t\tfinal int rows = img.height;\n" +
-						"\t\tfinal int columns = img.width" + columns + ";\n" +
-						"\n" +
-						"\t\t//CONCURRENT_REMOVE_BELOW\n" +
-						"\t\t" + sumType + " total = 0;\n" +
-						"\n" +
-						"\t\t//CONCURRENT_INLINE return BoofConcurrency.sum(0,img.height," + sumType + ".class,y->{\n" +
-						"\t\t\t//CONCURRENT_BELOW " + sumType + " total = 0;\n" +
-						"\t\tfor (int y = 0; y < rows; y++) {\n" +
-						"\t\t\tint index = img.startIndex + y * img.stride;\n" +
-						"\t\t\t\n" +
-						"\t\t\tint indexEnd = index+columns;\n" +
-						"\t\t\tfor (; index < indexEnd; index++ ) {\n" +
-						"\t\t\t\ttotal += Math.abs(img.data[index] " + bitWise + ");\n" +
-						"\t\t\t}\n" +
-						"\t\t} return total;\n" +
-						"\t\t//CONCURRENT_ABOVE return total;})." + numTo + ";\n" +
-						"\t}\n\n");
-	}
-
-	public void printVariance() {
-
-		String bitWise = input.getBitWise();
-		String sumType = input.isInteger() ? "double" : input.getSumType();
-		String numTo = input.getSumNumberToType();
-
-		out.print("\tpublic static " + sumType + " variance( " + input.getSingleBandName() + " img , " + sumType + " mean ) {\n" +
-				"\n" +
-				"\t\t//CONCURRENT_REMOVE_BELOW\n" +
-				"\t\t" + sumType + " total = 0;\n" +
-				"\n" +
-				"\t\t//CONCURRENT_INLINE return BoofConcurrency.sum(0,img.height," + sumType + ".class,y->{\n" +
-				"\t\t\t//CONCURRENT_BELOW " + sumType + " total = 0;\n" +
-				"\t\tfor (int y = 0; y < img.height; y++) {\n" +
-				"\t\t\tint index = img.getStartIndex() + y * img.getStride();\n" +
-				"\n" +
-				"\t\t\tint indexEnd = index+img.width;\n" +
-				"\t\t\t// for(int x = 0; x < img.width; x++ ) {\n" +
-				"\t\t\tfor (; index < indexEnd; index++ ) {\n" +
-				"\t\t\t\t" + sumType + " d = (img.data[index]" + bitWise + ") - mean; \n" +
-				"\t\t\t\ttotal += d*d;\n" +
-				"\t\t\t}\n" +
-				"\t\t} return total/(img.width*img.height);\n" +
-				"\t\t//CONCURRENT_ABOVE return total;})." + numTo + "/(img.width*img.height);\n" +
+		out.print("\tstatic " + sumType + " " + helper(s.name + "Row") + "( " + input.getDataType() + "[] array, int index, int columns, " + sumType + " output ) {\n" +
+				"\t\tfinal int end = index + columns;\n" +
+				"\t\tfor (; index < end; index++) {\n" +
+				"\t\t\t" + sumType + " v = " + selectValue(s, "index") + ";\n" +
+				"\t\t\tif (" + s.conditional + ")\n" +
+				"\t\t\t\toutput = v;\n" +
+				"\t\t}\n" +
+				"\t\treturn output;\n" +
 				"\t}\n\n");
 	}
 
-	private class GenerateMin extends InitValue {
-		public GenerateMin() {
-			super("min", "min", "v < output");
-		}
+	private void printDifferenceRowHelper( String name, boolean squared ) {
+		String dataType = input.getDataType();
+		String rowType = rowType(squared);
+		String diffType = !input.isInteger() ? input.getSumType() : input.getNumBits() >= 32 ? "long" : "int";
+		String toLong = input.isInteger() && input.getNumBits() == 32 ? "(long)" : "";
+		String operation = squared ? square("difference", rowType) : "Math.abs(difference)";
 
-		@Override public String getValueMassage( String index ) {return "array[" + index + "] " + input.getBitWise();}
+		out.print("\tstatic " + rowType + " " + helper(name + "Row") + "( " + dataType + "[] dataA, int indexA, " + dataType + "[] dataB, int indexB, int columns ) {\n" +
+				"\t\tfinal int end = indexA + columns;\n" +
+				"\t\t" + rowType + " total = 0;\n" +
+				"\t\tfor (; indexA < end; indexA++, indexB++) {\n" +
+				"\t\t\t" + diffType + " difference = " + toLong + value("dataA", "indexA") + " - " + value("dataB", "indexB") + ";\n" +
+				"\t\t\ttotal += " + operation + ";\n" +
+				"\t\t}\n" +
+				"\t\treturn total;\n" +
+				"\t}\n\n");
 	}
 
-	private class GenerateMax extends InitValue {
-		public GenerateMax() {
-			super("max", "max", "v > output");
-		}
-
-		@Override public String getValueMassage( String index ) {return "array[" + index + "] " + input.getBitWise();}
+	private void printSumRowHelper( String name, String element ) {
+		String rowType = rowType(false);
+		out.print("\tstatic " + rowType + " " + helper(name) + "( " + input.getDataType() + "[] data, int index, int columns ) {\n" +
+				"\t\tfinal int end = index + columns;\n" +
+				"\t\t" + rowType + " total = 0;\n" +
+				"\t\tfor (; index < end; index++) {\n" +
+				"\t\t\ttotal += " + element + ";\n" +
+				"\t\t}\n" +
+				"\t\treturn total;\n" +
+				"\t}\n\n");
 	}
 
-	private class GenerateMinAbs extends InitValue {
-		public GenerateMinAbs() {
-			super("minAbs", "min", "v < output");
-		}
-
-		@Override public String getValueMassage( String index ) {
-			if (input.isSigned())
-				return "Math.abs(array[" + index + "])";
-			else
-				return "array[" + index + "] " + input.getBitWise();
-		}
+	/// Floating point rows return the sum of squared differences from the mean. Integer variance sums its rows inline
+	private void printVarianceRowHelper() {
+		if (input.isInteger())
+			return;
+		String dataType = input.getDataType();
+		String sumType = input.getSumType();
+		out.print("\tstatic " + sumType + " " + helper("varianceRow") + "( " + dataType + "[] data, int index, int columns, " + sumType + " mean ) {\n" +
+				"\t\tfinal int end = index + columns;\n" +
+				"\t\t" + sumType + " total = 0;\n" +
+				"\t\tfor (; index < end; index++) {\n" +
+				"\t\t\t" + sumType + " d = data[index] - mean;\n" +
+				"\t\t\ttotal += d*d;\n" +
+				"\t\t}\n" +
+				"\t\treturn total;\n" +
+				"\t}\n\n");
 	}
 
-	private class GenerateMaxAbs extends InitValue {
-		public GenerateMaxAbs() {
-			super("maxAbs", "max", "v > output");
-		}
-
-		@Override public String getValueMassage( String index ) {
-			if (input.isSigned())
-				return "Math.abs(array[" + index + "])";
-			else
-				return "array[" + index + "] " + input.getBitWise();
-		}
+	/// Histogram bin of the element at 'index'
+	private String histogramBin( String scale ) {
+		String v = input.isInteger() && input.getNumBits() != 64 ? value("data", "index") : "data[index]";
+		if (scale.isEmpty())
+			return input.isInteger() && input.getNumBits() != 64 ? v + " - minValue" : "(int)(" + v + " - minValue)";
+		return "(int)(histLength*(" + v + " - minValue)/rangeValue)";
 	}
 
-	private class GenerateMeanDiffSq extends GenerateDifference {
-		public GenerateMeanDiffSq() {
-			super("meanDiffSq", "sum", "difference*difference");
-		}
-	}
-
-	private class GenerateMeanDiffAbs extends GenerateDifference {
-		public GenerateMeanDiffAbs() {
-			super("meanDiffAbs", "sum", "Math.abs(difference)");
-		}
-	}
-
-	private abstract class InitValue implements CodeGenerator {
-		String name;
-		String conOp;
-		String conditional;
-
-		protected InitValue( String name, String conOp, String conditional ) {
-			this.name = name;
-			this.conOp = conOp;
-			this.conditional = conditional;
-		}
-
-		@Override public void printLowLevel() {
-			String sumType = input.getSumType();
-			String name = this.name + (input.isSigned() ? "" : "U");
-
-			out.print("\tpublic static " + sumType + " " + name + "( " + input.getDataType() + "[] array , int startIndex , int rows , int columns , int stride ) {\n" +
-					"\n" +
-					"\t\t//CONCURRENT_BELOW final " + sumType + " _output = " + getValueMassage("startIndex") + ";\n" +
-					"\t\t" + sumType + " output = " + getValueMassage("startIndex") + ";\n" +
-					"\n" +
-					"\t\t//CONCURRENT_INLINE return BoofConcurrency." + conOp + "(0,rows," + sumType + ".class,y->{\n" +
-					"\t\t\t//CONCURRENT_BELOW " + sumType + " output = _output;\n" +
-					"\t\tfor( int y = 0; y < rows; y++ ) {\n" +
-					"\t\t\tint index = startIndex + y*stride;\n" +
-					"\t\t\tint end = index + columns;\n" +
-					"\n" +
-					"\t\t\tfor( ; index < end; index++ ) {\n" +
-					"\t\t\t\t" + sumType + " v = " + getValueMassage("index") + ";\n" +
-					"\t\t\t\tif( " + conditional + " )\n" +
-					"\t\t\t\t\toutput = v;\n" +
-					"\t\t\t}\n" +
-					"\t\t} return output;\n" +
-					"\t\t//CONCURRENT_ABOVE return output;})." + input.getSumNumberToType() + ";\n" +
-					"\t}\n\n");
-		}
-
-		public abstract String getValueMassage( String index );
-	}
-
-	private class GenerateDifference implements CodeGenerator {
-		String name;
-		String conOp;
-		String operation;
-
-		public GenerateDifference( String name, String conOp, String operation ) {
-			this.name = name;
-			this.conOp = conOp;
-			this.operation = operation;
-		}
-
-		@Override public void printLowLevel() {
-			String dataType = input.getDataType();
-			String sumType = input.getSumType();
-			String name = this.name + (input.isSigned() ? "" : "U");
-			String bitWise = input.getBitWise();
-
-			out.print("\tpublic static double " + name + "(" + dataType + " []dataA, int startIndexA , int strideA,\n" +
-					"\t\t\t\t\t\t\t\t\t" + dataType + " []dataB, int startIndexB , int strideB,\n" +
-					"\t\t\t\t\t\t\t\t\tint rows , int columns ) {\n" +
-					"\t\t//CONCURRENT_REMOVE_BELOW\n" +
-					"\t\t" + sumType + " total = 0;\n" +
-					"\n" +
-					"\t\t//CONCURRENT_INLINE return BoofConcurrency." + conOp + "(0,rows," + sumType + ".class,y->{\n" +
-					"\t\t\t//CONCURRENT_BELOW " + sumType + " total = 0;\n" +
-					"\t\tfor (int y = 0; y < rows; y++) {\n" +
-					"\t\t\tint indexA = startIndexA + y * strideA;\n" +
-					"\t\t\tint indexB = startIndexB + y * strideB;\n" +
-					"\t\t\t\n" +
-					"\t\t\tint indexEnd = indexA+columns;\n" +
-					"\t\t\t\n" +
-					"\t\t\tfor (; indexA < indexEnd; indexA++,indexB++) {\n" +
-					"\t\t\t\t" + sumType + " difference = (dataA[indexA]" + bitWise + ")-(dataB[indexB]" + bitWise + ");\n" +
-					"\t\t\t\ttotal += " + operation + ";\n" +
-					"\t\t\t}\n" +
-					"\t\t} return total / (double)(rows*columns);\n" +
-					"\t\t//CONCURRENT_ABOVE return total;})." + input.getSumNumberToType() + "/ (double)(rows*columns);\n" +
-					"\t}\n\n");
-		}
-	}
-
-	private interface CodeGenerator {
-		void printLowLevel();
+	private void printHistogramRowHelpers() {
+		String sumType = input.getSumType();
+		String dataType = input.getDataType();
+		out.print("\tstatic void " + helper("histogramRow") + "( " + dataType + "[] data, int index, int columns, " + sumType + " minValue, int[] histogram ) {\n" +
+				"\t\tfinal int end = index + columns;\n" +
+				"\t\tfor (; index < end; index++) {\n" +
+				"\t\t\thistogram[" + histogramBin("") + "]++;\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+		out.print("\tstatic void " + helper("histogramScaledRow") + "( " + dataType + "[] data, int index, int columns, " + sumType + " minValue,\n" +
+				"\t\t\t\t\t\t\t\t\t\t" + sumType + " histLength, " + sumType + " rangeValue, int[] histogram ) {\n" +
+				"\t\tfinal int end = index + columns;\n" +
+				"\t\tfor (; index < end; index++) {\n" +
+				"\t\t\thistogram[" + histogramBin("scaled") + "]++;\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
 	}
 
 	public static void main( String[] args ) throws FileNotFoundException {

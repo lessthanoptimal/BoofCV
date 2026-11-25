@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -79,7 +79,7 @@ public class TestMultiViewStereoOps extends BoofStandardJUnit {
 		assertTrue(cloud.size()*0.97 <= ImageStatistics.sum(mask));
 
 		// Make a point barely within tolerance. The mask should not change
-		int maskCountBefore = ImageStatistics.sum(mask);
+		long maskCountBefore = ImageStatistics.sum(mask);
 		ImageMiscOps.fill(mask, 0);
 		ImageMiscOps.findAndProcess(inverseDepth, ( v ) -> v > 0, ( int x, int y ) -> {
 			inverseDepth.data[inverseDepth.getIndex(x, y)] += tolerance - 0.0001f;

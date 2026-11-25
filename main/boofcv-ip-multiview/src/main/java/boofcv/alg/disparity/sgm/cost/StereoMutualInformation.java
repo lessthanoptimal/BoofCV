@@ -210,7 +210,7 @@ public class StereoMutualInformation {
 	/// Computes the joint and image specific probabilities using the joint histogram.
 	void computeProbabilities() {
 		// Convert joint histogram into a joint probability
-		float totalPixels = totalDispPixels = ImageStatistics.sum(histJoint);
+		float totalPixels = totalDispPixels = (int)ImageStatistics.sum(histJoint);
 		int histN = histJoint.totalPixels();
 		for (int i = 0; i < histN; i++) {
 			entropyJoint.data[i] = histJoint.data[i]/totalPixels;

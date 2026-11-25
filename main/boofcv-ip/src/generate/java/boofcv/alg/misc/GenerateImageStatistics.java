@@ -126,10 +126,11 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
+	private String totalType() {
+		return input.isInteger() ? "long" : input.getSumType();
+	}
+
 	public void printSum( ImageFamily family ) {
-
-		String sumType = input.getSumType();
-
 		out.print("\t/**\n" +
 				"\t * <p>\n" +
 				"\t * Returns the sum of all the pixels in the image.\n" +
@@ -137,7 +138,7 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 				"\t *\n" +
 				"\t * @param img Input image. Not modified.\n" +
 				"\t */\n" +
-				"\tpublic static " + sumType + " sum( " + input.getImageName(family) + " input ) {\n" +
+				"\tpublic static " + totalType() + " sum( " + input.getImageName(family) + " input ) {\n" +
 				"\n" +
 				"\t\tint N = input.width*input.height;\n" +
 				"\t\tif (BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE) {\n" +
@@ -150,8 +151,6 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 
 	public void printSumAbs( ImageFamily family ) {
 
-		String sumType = input.getSumType();
-
 		out.print("\t/**\n" +
 				"\t * <p>\n" +
 				"\t * Returns the sum of all the pixels in the image.\n" +
@@ -159,7 +158,7 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 				"\t *\n" +
 				"\t * @param img Input image. Not modified.\n" +
 				"\t */\n" +
-				"\tpublic static " + sumType + " sumAbs( " + input.getImageName(family) + " input ) {\n");
+				"\tpublic static " + totalType() + " sumAbs( " + input.getImageName(family) + " input ) {\n");
 		if (input.isSigned()) {
 			out.print("\n\t\tint N = input.width*input.height;\n" +
 					"\t\tif (BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE) {\n" +

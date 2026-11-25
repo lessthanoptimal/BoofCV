@@ -23,6 +23,8 @@ Version : 1.7.0
   * ZERO works with GrayS64
 - ConvolveImageStandard_SB: Fixed division rounding issue for kernels wider than 11.
 - AverageDownSample: 2x faster
+- BoofConcurrency: Thread local workspace, primitive sum and select
+- ImageStatistics: Faster and concurrent results do not depend on thread count
 
 ---------------------
 Date    : 2026/Oct/22
