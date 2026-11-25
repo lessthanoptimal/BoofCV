@@ -25,11 +25,12 @@ import boofcv.struct.image.ImageInterleaved;
 import boofcv.struct.image.Planar;
 import org.ejml.UtilEjml;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 
 /**
- * Provides common implementations of functions in CompareEquivalentFunctions. Assumes only
- * images are modified and tests those.
+ * Provides common implementations of functions in CompareEquivalentFunctions. Images and primitive arrays
+ * are copied for the validation function, then compared, along with returned values.
  *
  * @author Peter Abeles
  */
@@ -86,8 +87,13 @@ public abstract class CompareIdenticalFunctions extends CompareEquivalentFunctio
 		for (int i = 0; i < targetParam.length; i++) {
 			if (targetParam[i] == null)
 				continue;
-			if (ImageBase.class.isAssignableFrom(targetParam[i].getClass())) {
+			Class<?> type = targetParam[i].getClass();
+			if (ImageBase.class.isAssignableFrom(type)) {
 				ret[i] = ((ImageBase)targetParam[i]).clone();
+			} else if (type.isArray() && type.getComponentType().isPrimitive()) {
+				int length = Array.getLength(targetParam[i]);
+				ret[i] = Array.newInstance(type.getComponentType(), length);
+				System.arraycopy(targetParam[i], 0, ret[i], 0, length);
 			} else {
 				ret[i] = targetParam[i];
 			}
@@ -96,7 +102,6 @@ public abstract class CompareIdenticalFunctions extends CompareEquivalentFunctio
 		return ret;
 	}
 
-	@SuppressWarnings({"EmptyCatch"})
 	@Override
 	protected void compareResults( Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam ) {
 
@@ -127,14 +132,11 @@ public abstract class CompareIdenticalFunctions extends CompareEquivalentFunctio
 			BoofTesting.assertEqualsRelative(v, t, 1e-4);// todo is this tolerance too big?  some operations with a slightly different ordering seem to require it
 		}
 
-		if (targetResult != null) {
-			try {
-				double error = ((Number)targetResult).doubleValue() - ((Number)validationResult).doubleValue();
-				if (Math.abs(error) > 1e-3) {
-					throw new RuntimeException("Failed");
-				}
-			} catch (RuntimeException ignore) {
-			}
+		if (targetResult instanceof Number) {
+			double expected = ((Number)validationResult).doubleValue();
+			double found = ((Number)targetResult).doubleValue();
+			if (Math.abs(found - expected) > 1e-3)
+				throw new RuntimeException("Returned values differ. expected=" + expected + " found=" + found);
 		}
 	}
 }
