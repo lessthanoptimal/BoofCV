@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -101,7 +101,7 @@ public class ShowImageBlurApp<T extends ImageGray<T>> extends DemonstrationBase 
 		long time0 = System.nanoTime();
 		switch (active) {
 			case 0 -> GBlurImageOps.gaussian(image, output, -1, radius, storage);
-			case 1 -> GBlurImageOps.mean(image, output, radius, storage, workspaces);
+			case 1 -> GBlurImageOps.mean(image, output, radius, storage);
 			case 2 -> GBlurImageOps.median(image, output, radius, radius, workspaces);
 			case 3 -> GBlurImageOps.meanGeometric(image, output, radius, radius);
 			case 4 -> GBlurImageOps.meanAdaptive(image, output, radius, radius, noiseVariance);

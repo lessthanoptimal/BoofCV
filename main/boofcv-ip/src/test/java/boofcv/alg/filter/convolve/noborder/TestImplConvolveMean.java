@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,261 +19,183 @@
 package boofcv.alg.filter.convolve.noborder;
 
 import boofcv.BoofTesting;
-import boofcv.alg.filter.convolve.normalized.ConvolveNormalized_JustBorder_SB;
+import boofcv.alg.filter.convolve.ConvolveImageNormalized;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.factory.filter.kernel.FactoryKernel;
-import boofcv.struct.convolve.Kernel1D_F32;
-import boofcv.struct.convolve.Kernel1D_F64;
-import boofcv.struct.convolve.Kernel1D_S32;
-import boofcv.struct.image.ImageBase;
+import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.struct.border.BorderType;
+import boofcv.struct.border.ImageBorder;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayF64;
 import boofcv.struct.image.ImageGray;
-import boofcv.testing.CompareEquivalentFunctions;
+import boofcv.testing.BoofStandardJUnit;
+import org.ddogleg.struct.DogArray;
+import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SuppressWarnings({"rawtypes", "unchecked"})
-public class TestImplConvolveMean extends CompareEquivalentFunctions {
+public class TestImplConvolveMean extends BoofStandardJUnit {
+	/// width, height, offset, length. Includes kernels as large as the image, images with several VERTICAL_RESTART
+	/// blocks, and a kernel too long for U8's multiply and shift division
+	static int[][] cases = {
+			{10, 12, 2, 5}, {10, 12, 0, 5}, {10, 12, 4, 5}, {10, 12, 1, 4}, {31, 9, 3, 7}, {9, 31, 3, 7},
+			{5, 6, 3, 7}, {40, 30, 4, 9}, {20, 200, 2, 5}, {1010, 4, 500, 1001}, {4, 1010, 500, 1001}};
 
-	static int width = 10;
-	static int height = 12;
-	static int kernelOffset = 2;
-	static int kernelLength = 5;
-
-	public TestImplConvolveMean() {
-		super(ImplConvolveMean.class, ConvolveImageStandard_SB.class);
-	}
-
-	@Test void compareToStandard() {
-		performTests(10);
-	}
-
-	@Override
-	protected boolean isTestMethod( Method m ) {
-		Class<?>[] params = m.getParameterTypes();
-
-		if (params.length != 4 && params.length != 5)
-			return false;
-
-		return ImageGray.class.isAssignableFrom(params[0]);
-	}
-
-	@Override
-	protected boolean isEquivalent( Method candidate, Method validation ) {
-		Class<?>[] c = candidate.getParameterTypes();
-		Class<?>[] v = validation.getParameterTypes();
-
-		if (c.length < 3)
-			return false;
-
-		if (!GeneralizedImageOps.isFloatingPoint(v[0])) {
-			if (c.length != 4 && c.length != 5)
-				return false;
-		} else {
-			if (c.length != 3)
-				return false;
-		}
-
-		if (!candidate.getName().equals(validation.getName()))
-			return false;
-
-		return v[0] == c[1] && v[1] == c[2];
-	}
-
-	@Override
-	protected Object[][] createInputParam( Method candidate, Method validation ) {
-
-		Class[] candidateParam = candidate.getParameterTypes();
-
-		ImageGray input = GeneralizedImageOps.createSingleBand(candidateParam[0], width, height);
-		ImageGray output = GeneralizedImageOps.createSingleBand(candidateParam[1], width, height);
-
-		// Make sure the bitwise operators do something. If the value is too small it won't change the value
-		double maxValue = 100.0;
-		if (input.getDataType().isInteger()) {
-			maxValue = input.getDataType().getMaxValue();
-		}
-		GImageMiscOps.fillUniform(input, rand, 0, maxValue);
-
-		Object[][] ret = new Object[5][];
-		if (candidateParam.length == 4) {
-			ret[0] = new Object[]{input, output, kernelOffset, kernelLength};
-			ret[1] = new Object[]{input, output, kernelOffset + 1, kernelLength};
-			ret[2] = new Object[]{input, output, kernelOffset, kernelLength - 1};
-			ret[3] = new Object[]{input, output, 0, kernelLength};
-			ret[4] = new Object[]{input, output,  kernelLength - 1, kernelLength};
-		} else {
-			// vertical has one more argument
-			ret[0] = new Object[]{input, output, kernelOffset, kernelLength, null};
-			ret[1] = new Object[]{input, output, kernelOffset + 1, kernelLength, null};
-			ret[2] = new Object[]{input, output, kernelOffset, kernelLength - 1, null};
-			ret[3] = new Object[]{input, output, 0, kernelLength, null};
-			ret[4] = new Object[]{input, output, kernelLength - 1, kernelLength, null};
-		}
-
-		return ret;
-	}
-
-	@Override
-	protected Object[] reformatForValidation( Method m, Object[] targetParam ) {
-		Class<?>[] params = m.getParameterTypes();
-		Object kernel = createTableKernel(params[0], (Integer)targetParam[2], (Integer)targetParam[3]);
-
-		ImageGray output = (ImageGray)((ImageGray)targetParam[1]).clone();
-
-		if (output.getDataType().isInteger())
-			if (m.getName().equals("vertical"))
-				return new Object[]{kernel, targetParam[0], output, targetParam[3], null};
-			else
-				return new Object[]{kernel, targetParam[0], output, targetParam[3]};
-		else
-			return new Object[]{kernel, targetParam[0], output};
-	}
-
-	@Override
-	protected void compareResults( Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam ) {
-		ImageGray expected = (ImageGray)validationParam[2];
-		ImageGray found = (ImageGray)targetParam[1];
-
-		try {
-			BoofTesting.assertEquals(expected, found, 1e-4);
-		} catch( RuntimeException e ) {
-			expected.print();
-			System.out.println("-------");
-			found.print();
-			throw e;
-		}
-	}
-
-	public static Object createTableKernel( Class<?> kernelType, int offset, int length ) {
-		Object kernel;
-		if (Kernel1D_F32.class == kernelType) {
-			kernel = FactoryKernel.table1D_F32(offset, length, true);
-		} else if (Kernel1D_F64.class == kernelType) {
-			kernel = FactoryKernel.table1D_F64(offset, length, true);
-		} else if (Kernel1D_S32.class == kernelType) {
-			kernel = FactoryKernel.table1D_S32(offset, length);
-		} else {
-			throw new RuntimeException("Unknown kernel type");
-		}
-		return kernel;
-	}
-
-	@Test void horizontalBorder() throws InvocationTargetException, IllegalAccessException {
+	/// The whole image against ConvolveImageNormalized, with and without an ImageBorder
+	@Test void compareToStandard() throws Exception {
 		int count = 0;
-		Method[] methods = ImplConvolveMean.class.getMethods();
-		for (int i = 0; i < methods.length; i++) {
-			Method m = methods[i];
-			if (!m.getName().equals("horizontalBorder"))
+		for (Method m : ImplConvolveMean.class.getMethods()) {
+			if (!isWholeImage(m))
 				continue;
-
-			Class<?>[] params = m.getParameterTypes();
-
-			ImageBase input = GeneralizedImageOps.createImage((Class)params[0], width, height, 1);
-			ImageBase expected = GeneralizedImageOps.createImage((Class)params[1], width, height, 1);
-			ImageBase found = GeneralizedImageOps.createImage((Class)params[1], width, height, 1);
-
-			GImageMiscOps.fillUniform(input, rand, 0, 50);
-
-//			if (input.getClass() != GrayU8.class)
-//				continue;
-
-			Method testMethod = null;
-			Class<?>[] testParams = null;
-			for (Method method : ConvolveNormalized_JustBorder_SB.class.getMethods()) {
-				if (!method.getName().equals("horizontal")) {
+			Class[] params = m.getParameterTypes();
+			for (int[] c : cases) {
+				// the long kernel is for integer division. Float sums of 1000 pixels differ by more than the tolerance
+				if (c[3] > 100 && (params[0] == GrayF32.class || params[0] == GrayF64.class))
 					continue;
+				ImageGray input = GeneralizedImageOps.createSingleBand(params[0], c[0], c[1]);
+				// make sure the bitwise operators do something
+				double maxValue = input.getDataType().isInteger() ? input.getDataType().getMaxValue() : 100;
+				GImageMiscOps.fillUniform(input, rand, 0, maxValue);
+				for (boolean useBorder : new boolean[]{false, true}) {
+					ImageBorder border = useBorder ? FactoryImageBorder.generic(BorderType.REFLECT, input.getImageType()) : null;
+					if (border != null)
+						border.setImage(input);
+
+					ImageGray expected = GeneralizedImageOps.createSingleBand(params[1], c[0], c[1]);
+					ImageGray found = GeneralizedImageOps.createSingleBand(params[1], c[0], c[1]);
+					Object kernel = TestImplConvolveBox.tableKernel(input, c[2], c[3], true);
+					if (border == null)
+						findMethod(ConvolveImageNormalized.class, m.getName(), kernel, input, expected).
+								invoke(null, kernel, input, expected);
+					else
+						findMethod(ConvolveImageNormalized.class, m.getName(), kernel, input, expected, border).
+								invoke(null, kernel, input, expected, border);
+
+					m.invoke(null, arguments(m, input, found, c[2], c[3], border));
+					BoofTesting.assertEquals(expected, found, input.getDataType().isInteger() ? 0 : 1e-4);
 				}
-				testParams = method.getParameterTypes();
-				if (testParams[1] == input.getClass()) {
-					testMethod = method;
-					break;
-				}
-			}
-			assertNotNull(testMethod);
-
-			int length = 4;
-			for (int offset = 0; offset < length; offset++) {
-				Object kernel = createTableKernel(testParams[0], offset, length);
-
-				testMethod.invoke(null, kernel, input, expected);
-				m.invoke(null, input, found, offset, length);
-
-//				System.out.println("------");
-//				((GrayU8)expected).print();
-//				System.out.println();
-//				((GrayU8)found).print();
-
-				BoofTesting.assertEqualsBorder(expected, found, 1e-4, length, offset);
 			}
 			count++;
 		}
-
-		assertEquals(5, count);
+		assertEquals(10, count);
 	}
 
-	@Test void verticalBorder() throws InvocationTargetException, IllegalAccessException {
+	/// horizontalInner() and verticalInner() match horizontal() and vertical() inside and leave the border unchanged
+	@Test void inner() throws Exception {
 		int count = 0;
-		Method[] methods = ImplConvolveMean.class.getMethods();
-		for (int i = 0; i < methods.length; i++) {
-			Method m = methods[i];
-			if (!m.getName().equals("verticalBorder"))
+		for (Method m : ImplConvolveMean.class.getMethods()) {
+			boolean horizontal = m.getName().equals("horizontalInner") && m.getParameterCount() == 4;
+			if (!horizontal && !(m.getName().equals("verticalInner") && m.getParameterCount() == 5))
 				continue;
-
-			Class<?>[] params = m.getParameterTypes();
-
-			ImageBase input = GeneralizedImageOps.createImage((Class)params[0], width, height, 1);
-			ImageBase expected = GeneralizedImageOps.createImage((Class)params[1], width, height, 1);
-			ImageBase found = GeneralizedImageOps.createImage((Class)params[1], width, height, 1);
-
-//			if (input.getClass() != GrayU8.class)
-//				continue;
-
-			GImageMiscOps.fillUniform(input, rand, 0, 50);
-
-			Method testMethod = null;
-			Class<?>[] testParams = null;
-			for (Method method : ConvolveNormalized_JustBorder_SB.class.getMethods()) {
-				if (!method.getName().equals("vertical")) {
-					continue;
-				}
-				testParams = method.getParameterTypes();
-				if (testParams[1] == input.getClass()) {
-					testMethod = method;
-					break;
-				}
+			Class[] params = m.getParameterTypes();
+			Method whole = null;
+			for (Method w : ImplConvolveMean.class.getMethods()) {
+				if (isWholeImage(w) && w.getName().equals(horizontal ? "horizontal" : "vertical") &&
+						w.getParameterTypes()[0] == params[0] && w.getParameterTypes()[1] == params[1])
+					whole = w;
 			}
-			assertNotNull(testMethod);
+			for (int[] c : cases) {
+				int width = c[0], height = c[1], offset = c[2], length = c[3];
+				ImageGray input = GeneralizedImageOps.createSingleBand(params[0], width, height);
+				GImageMiscOps.fillUniform(input, rand, 0, 100);
+				ImageGray expected = GeneralizedImageOps.createSingleBand(params[1], width, height);
+				ImageGray found = GeneralizedImageOps.createSingleBand(params[1], width, height);
+				GImageMiscOps.fill(found, 3);
 
-			int length = 4;
-			for (int offset = 0; offset < length; offset++) {
-				GImageMiscOps.fill(expected, 0);
-				GImageMiscOps.fill(found, 0);
+				whole.invoke(null, arguments(whole, input, expected, offset, length, null));
+				if (horizontal)
+					m.invoke(null, input, found, offset, length);
+				else
+					m.invoke(null, input, found, offset, length, createRows(m.getGenericParameterTypes()[4]));
 
-				Object kernel = createTableKernel(testParams[0], offset, length);
-
-				if (input.getImageType().getDataType().isInteger()) {
-					testMethod.invoke(null, kernel, input, expected, null);
-				} else {
-					testMethod.invoke(null, kernel, input, expected);
+				int offsetR = length - offset - 1;
+				for (int y = 0; y < height; y++) {
+					for (int x = 0; x < width; x++) {
+						int i = horizontal ? x : y, size = horizontal ? width : height;
+						boolean inside = length <= size && i >= offset && i < size - offsetR;
+						double value = inside ? GeneralizedImageOps.get(expected, x, y) : 3;
+						assertEquals(value, GeneralizedImageOps.get(found, x, y), 0.0);
+					}
 				}
-				m.invoke(null, input, found, offset, length, null);
-
-//				System.out.println("------");
-//				((GrayU8)expected).print();
-//				System.out.println();
-//				((GrayU8)found).print();
-
-				BoofTesting.assertEqualsBorder(expected, found, 1e-4, length, offset);
 			}
 			count++;
 		}
+		assertEquals(10, count);
+	}
 
-		assertEquals(5, count);
+	/// Floating point vertical() restarts its running sums every VERTICAL_RESTART rows, so processing an image in two
+	/// blocks split at a restart row gives the same image as processing it at once
+	@Test void floatRestartContract() throws Exception {
+		int count = 0;
+		for (Method m : ImplConvolveMean.class.getMethods()) {
+			Class[] params = m.getParameterTypes();
+			if (!m.getName().equals("vertical") || params.length != 8 || !(params[0] == GrayF32.class || params[0] == GrayF64.class))
+				continue;
+			int width = 20, height = 200, offset = 2, length = 5;
+			ImageGray input = GeneralizedImageOps.createSingleBand(params[0], width, height);
+			ImageGray expected = GeneralizedImageOps.createSingleBand(params[1], width, height);
+			ImageGray found = GeneralizedImageOps.createSingleBand(params[1], width, height);
+			GImageMiscOps.fillUniform(input, rand, 0, 100);
+
+			int blocks = ImplConvolveBox.restartBlocks(height, length);
+			assertTrue(blocks > 2);
+			int middle = ImplConvolveBox.restartRow(2, blocks, height, offset);
+
+			Object rows = createRows(m.getGenericParameterTypes()[7]);
+			m.invoke(null, input, expected, offset, length, null, 0, height, rows);
+			m.invoke(null, input, found, offset, length, null, 0, middle, rows);
+			m.invoke(null, input, found, offset, length, null, middle, height, rows);
+			BoofTesting.assertEquals(expected, found, 0);
+			count++;
+		}
+		assertEquals(2, count);
+	}
+
+	/// horizontal() or vertical() of the whole image
+	static boolean isWholeImage( Method m ) {
+		int length = m.getParameterCount();
+		return (m.getName().equals("horizontal") && length == 5) || (m.getName().equals("vertical") && length == 6);
+	}
+
+	/// Arguments of a whole image function, with new row buffers for vertical()
+	static Object[] arguments( Method m, ImageGray input, ImageGray output, int offset, int length,
+							   @Nullable ImageBorder border ) {
+		if (m.getParameterCount() == 5)
+			return new Object[]{input, output, offset, length, border};
+		return new Object[]{input, output, offset, length, border, createRows(m.getGenericParameterTypes()[5])};
+	}
+
+	/// DogArray<DogArray_X> for the parameter type
+	static DogArray<?> createRows( Type type ) {
+		Class<?> element = (Class<?>)((ParameterizedType)type).getActualTypeArguments()[0];
+		return new DogArray<>(() -> {
+			try {
+				return element.getConstructor().newInstance();
+			} catch (ReflectiveOperationException e) {
+				throw new RuntimeException(e);
+			}
+		});
+	}
+
+	/// Static method with this name whose parameters accept the arguments
+	static Method findMethod( Class<?> owner, String name, Object... args ) {
+		escape:
+		for (Method m : owner.getMethods()) {
+			Class<?>[] p = m.getParameterTypes();
+			if (!m.getName().equals(name) || p.length != args.length)
+				continue;
+			for (int i = 0; i < p.length; i++) {
+				if (!p[i].isAssignableFrom(args[i].getClass()))
+					continue escape;
+			}
+			return m;
+		}
+		throw new RuntimeException("No " + name + " in " + owner.getSimpleName());
 	}
 }

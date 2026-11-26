@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,12 @@
 package boofcv.alg.filter.convolve;
 
 import boofcv.concurrency.BoofConcurrency;
+import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.struct.border.BorderType;
+import boofcv.struct.border.ImageBorder_F32;
+import boofcv.struct.border.ImageBorder_S32;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
@@ -42,29 +48,35 @@ public class BenchmarkConvolveMean extends CommonBenchmarkConvolve_SB {
 	@Param({"10"})
 	public int radius;
 
+	ImageBorder_S32<GrayU8> borderU8 = (ImageBorder_S32<GrayU8>)FactoryImageBorder.single(BorderType.EXTENDED, GrayU8.class);
+	ImageBorder_F32 borderF32 = (ImageBorder_F32)FactoryImageBorder.single(BorderType.EXTENDED, GrayF32.class);
+
 	@Setup public void setup() {
+		// large enough for ConvolveImageMean to use threads
+		width = 1200;
+		height = 1000;
 		BoofConcurrency.USE_CONCURRENT = concurrent;
 		setup(radius);
 	}
 
 	@Benchmark public void vertical_U8() {
-		ConvolveImageMean.vertical(input_U8, out_U8, radius, radius*2+1, work_I32);
+		ConvolveImageMean.vertical(input_U8, out_U8, radius, radius*2+1);
 	}
 
 	@Benchmark public void vertical_S16() {
-		ConvolveImageMean.vertical(input_S16, out_S16, radius, radius*2+1, work_I32);
+		ConvolveImageMean.vertical(input_S16, out_S16, radius, radius*2+1);
 	}
 
 	@Benchmark public void vertical_U16() {
-		ConvolveImageMean.vertical(input_U16, out_S16, radius, radius*2+1, work_I32);
+		ConvolveImageMean.vertical(input_U16, out_S16, radius, radius*2+1);
 	}
 
 	@Benchmark public void vertical_F32() {
-		ConvolveImageMean.vertical(input_F32, out_F32, radius, radius*2+1, work_F32);
+		ConvolveImageMean.vertical(input_F32, out_F32, radius, radius*2+1);
 	}
 
 	@Benchmark public void vertical_F64() {
-		ConvolveImageMean.vertical(input_F64, out_F64, radius, radius*2+1, work_F64);
+		ConvolveImageMean.vertical(input_F64, out_F64, radius, radius*2+1);
 	}
 
 	@Benchmark public void horizontal_U8() {
@@ -85,6 +97,22 @@ public class BenchmarkConvolveMean extends CommonBenchmarkConvolve_SB {
 
 	@Benchmark public void horizontal_F64() {
 		ConvolveImageMean.horizontal(input_F64, out_F64, radius, radius*2+1);
+	}
+
+	@Benchmark public void horizontalBorder_U8() {
+		ConvolveImageMean.horizontal(input_U8, out_U8, radius, radius*2+1, borderU8);
+	}
+
+	@Benchmark public void verticalBorder_U8() {
+		ConvolveImageMean.vertical(input_U8, out_U8, radius, radius*2+1, borderU8);
+	}
+
+	@Benchmark public void horizontalBorder_F32() {
+		ConvolveImageMean.horizontal(input_F32, out_F32, radius, radius*2+1, borderF32);
+	}
+
+	@Benchmark public void verticalBorder_F32() {
+		ConvolveImageMean.vertical(input_F32, out_F32, radius, radius*2+1, borderF32);
 	}
 
 	public static void main( String[] args ) throws RunnerException {

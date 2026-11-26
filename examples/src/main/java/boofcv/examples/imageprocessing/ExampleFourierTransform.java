@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -92,7 +92,7 @@ public class ExampleFourierTransform {
 		// For sake of comparison, let's compute the box blur filter in the spatial domain
 		// NOTE: The image border will be different since the frequency domain wraps around and this implementation
 		// of the spacial domain adapts the kernel size
-		BlurImageOps.mean(input, spatialBlur, 7, null, null);
+		BlurImageOps.mean(input, spatialBlur, 7, null);
 
 		// Convert to BufferedImage for output
 		BufferedImage originOut = ConvertBufferedImage.convertTo(input, null);

@@ -69,21 +69,22 @@ public class GenerateImplConvolveBox extends CodeGeneratorBase {
 				"public class " + className + " {\n\n" +
 				"\t/// Floating point running sums along y start over every VERTICAL_RESTART rows, so the results don't depend\n" +
 				"\t/// on how rows are split between threads. Fewer rows bound the error of the running sums more tightly but\n" +
-				"\t/// recompute more sums\n" +
+				"\t/// recompute more sums. ImplConvolveMean uses it and the functions below too\n" +
 				"\tpublic static int VERTICAL_RESTART = 64;\n" +
 				"\n" +
-				"\t/// Number of blocks of VERTICAL_RESTART inner rows\n" +
-				"\tpublic static int restartBlocks( int height, int radius ) {\n" +
-				"\t\treturn Math.max(1, (height - 2*radius + VERTICAL_RESTART - 1)/VERTICAL_RESTART);\n" +
+				"\t/// Number of blocks of VERTICAL_RESTART inner rows for a kernel 'length' rows long\n" +
+				"\tpublic static int restartBlocks( int height, int length ) {\n" +
+				"\t\treturn Math.max(1, (height - length + VERTICAL_RESTART)/VERTICAL_RESTART);\n" +
 				"\t}\n" +
 				"\n" +
-				"\t/// First output row of the block. Block 0 includes the top border and the last block the bottom border\n" +
-				"\tpublic static int restartRow( int block, int blocks, int height, int radius ) {\n" +
+				"\t/// First output row of the block, for a kernel that starts 'offset' rows before the output row. Block 0\n" +
+				"\t/// includes the top border and the last block the bottom border\n" +
+				"\tpublic static int restartRow( int block, int blocks, int height, int offset ) {\n" +
 				"\t\tif (block == 0)\n" +
 				"\t\t\treturn 0;\n" +
 				"\t\tif (block >= blocks)\n" +
 				"\t\t\treturn height;\n" +
-				"\t\treturn radius + block*VERTICAL_RESTART;\n" +
+				"\t\treturn offset + block*VERTICAL_RESTART;\n" +
 				"\t}\n\n");
 	}
 
@@ -172,42 +173,28 @@ public class GenerateImplConvolveBox extends CodeGeneratorBase {
 	/// Inner image of floating point images, two rows at a time. total += added - removed puts one addition per pixel
 	/// on the dependency chain, and the two rows' chains run in parallel
 	private void printHorizontalInnerTwoRows( String sumType ) {
-		out.print("\t\tint y = y0;\n" +
-				"\t\tfor (; y + 2 <= y1; y += 2) {\n" +
+		out.print("\t\tfor (int y = y0; y < y1; y += 2) {\n" +
+				"\t\t\t// the second row, or the same row again if only one is left\n" +
+				"\t\t\tfinal boolean pair = y + 1 < y1;\n" +
+				"\t\t\tfinal int nextIn = pair ? strideIn : 0, nextOut = pair ? strideOut : 0;\n" +
 				"\t\t\tint indexIn = input.startIndex + strideIn*y;\n" +
 				"\t\t\tint indexOut = output.startIndex + strideOut*y + radius;\n" +
 				"\n" +
 				"\t\t\t" + sumType + " total0 = 0, total1 = 0;\n" +
 				"\t\t\tfor (int i = indexIn; i < indexIn + kernelWidth; i++) {\n" +
 				"\t\t\t\ttotal0 += input.data[i];\n" +
-				"\t\t\t\ttotal1 += input.data[i + strideIn];\n" +
+				"\t\t\t\ttotal1 += input.data[i + nextIn];\n" +
 				"\t\t\t}\n" +
 				"\t\t\toutput.data[indexOut] = total0;\n" +
-				"\t\t\toutput.data[indexOut + strideOut] = total1;\n" +
+				"\t\t\toutput.data[indexOut + nextOut] = total1;\n" +
 				"\n" +
 				"\t\t\tfinal int indexEnd = indexIn + width;\n" +
 				"\t\t\tfor (int i = indexIn + kernelWidth; i < indexEnd; i++) {\n" +
 				"\t\t\t\tindexOut++;\n" +
 				"\t\t\t\ttotal0 += input.data[i] - input.data[i - kernelWidth];\n" +
-				"\t\t\t\ttotal1 += input.data[i + strideIn] - input.data[i + strideIn - kernelWidth];\n" +
+				"\t\t\t\ttotal1 += input.data[i + nextIn] - input.data[i + nextIn - kernelWidth];\n" +
 				"\t\t\t\toutput.data[indexOut] = total0;\n" +
-				"\t\t\t\toutput.data[indexOut + strideOut] = total1;\n" +
-				"\t\t\t}\n" +
-				"\t\t}\n" +
-				"\t\tif (y < y1) {\n" +
-				"\t\t\tint indexIn = input.startIndex + strideIn*y;\n" +
-				"\t\t\tint indexOut = output.startIndex + strideOut*y + radius;\n" +
-				"\n" +
-				"\t\t\t" + sumType + " total = 0;\n" +
-				"\t\t\tfor (int i = indexIn; i < indexIn + kernelWidth; i++) {\n" +
-				"\t\t\t\ttotal += input.data[i];\n" +
-				"\t\t\t}\n" +
-				"\t\t\toutput.data[indexOut] = total;\n" +
-				"\n" +
-				"\t\t\tfinal int indexEnd = indexIn + width;\n" +
-				"\t\t\tfor (int i = indexIn + kernelWidth; i < indexEnd; i++) {\n" +
-				"\t\t\t\ttotal += input.data[i] - input.data[i - kernelWidth];\n" +
-				"\t\t\t\toutput.data[++indexOut] = total;\n" +
+				"\t\t\t\toutput.data[indexOut + nextOut] = total1;\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n");
 	}

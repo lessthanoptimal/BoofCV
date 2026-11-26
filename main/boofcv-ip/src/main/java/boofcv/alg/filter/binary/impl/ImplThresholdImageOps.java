@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,15 +18,11 @@
 
 package boofcv.alg.filter.binary.impl;
 
+import javax.annotation.Generated;
+
+import boofcv.struct.image.*;
 import boofcv.alg.filter.blur.BlurImageOps;
 import boofcv.struct.ConfigLength;
-import boofcv.struct.image.*;
-import org.ddogleg.struct.DogArray_F32;
-import org.ddogleg.struct.DogArray_I32;
-import org.jetbrains.annotations.Nullable;
-import pabeles.concurrency.GrowArray;
-
-import javax.annotation.Generated;
 
 //CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
@@ -223,14 +219,13 @@ public class ImplThresholdImageOps {
 
 	public static GrayU8 localMean( GrayU8 input , GrayU8 output ,
 											 ConfigLength width , float scale , boolean down ,
-											 GrayU8 storage1 , GrayU8 storage2 ,
-											 @Nullable GrowArray<DogArray_I32> storage3 ) {
+											 GrayU8 storage1 , GrayU8 storage2 ) {
 
 		int radius = width.computeI(Math.min(input.width,input.height))/2;
 
 		GrayU8 mean = storage1;
 
-		BlurImageOps.mean(input,mean,radius,storage2,storage3);
+		BlurImageOps.mean(input,mean,radius,storage2);
 
 		if( down ) {
 			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
@@ -322,14 +317,13 @@ public class ImplThresholdImageOps {
 
 	public static GrayU8 localMean( GrayU16 input , GrayU8 output ,
 											 ConfigLength width , float scale , boolean down ,
-											 GrayU16 storage1 , GrayU16 storage2 ,
-											 @Nullable GrowArray<DogArray_I32> storage3 ) {
+											 GrayU16 storage1 , GrayU16 storage2 ) {
 
 		int radius = width.computeI(Math.min(input.width,input.height))/2;
 
 		GrayU16 mean = storage1;
 
-		BlurImageOps.mean(input,mean,radius,storage2,storage3);
+		BlurImageOps.mean(input,mean,radius,storage2);
 
 		if( down ) {
 			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
@@ -421,14 +415,13 @@ public class ImplThresholdImageOps {
 
 	public static GrayU8 localMean( GrayF32 input , GrayU8 output ,
 											 ConfigLength width , float scale , boolean down ,
-											 GrayF32 storage1 , GrayF32 storage2 ,
-											 @Nullable GrowArray<DogArray_F32> storage3 ) {
+											 GrayF32 storage1 , GrayF32 storage2 ) {
 
 		int radius = width.computeI(Math.min(input.width,input.height))/2;
 
 		GrayF32 mean = storage1;
 
-		BlurImageOps.mean(input,mean,radius,storage2,storage3);
+		BlurImageOps.mean(input,mean,radius,storage2);
 
 		if( down ) {
 			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {

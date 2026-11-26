@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,14 +19,11 @@
 package boofcv.alg.filter.convolve;
 
 import boofcv.BoofTesting;
+import boofcv.alg.filter.convolve.noborder.TestImplConvolveBox;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.ImageBorderValue;
-import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.border.ImageBorder;
-import boofcv.struct.convolve.Kernel1D_F32;
-import boofcv.struct.convolve.Kernel1D_F64;
-import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.image.ImageGray;
 import boofcv.testing.CompareEquivalentFunctions;
 import org.junit.jupiter.api.Test;
@@ -93,8 +90,7 @@ public class TestConvolveImageBox extends CompareEquivalentFunctions {
 
 	@Override
 	protected Object[] reformatForValidation(Method m, Object[] targetParam) {
-		Class<?> params[] = m.getParameterTypes();
-		Object kernel = TestConvolveImageBox.createTableKernel(params[0],kernelRadius,rand);
+		Object kernel = TestImplConvolveBox.tableKernel((ImageGray)targetParam[0], kernelRadius, 2*kernelRadius + 1, false);
 
 		ImageGray output = (ImageGray)((ImageGray)targetParam[1]).clone();
 
@@ -111,18 +107,5 @@ public class TestConvolveImageBox extends CompareEquivalentFunctions {
 		BoofTesting.assertEquals(expected, found, 1e-4);
 	}
 
-	public static Object createTableKernel(Class<?> kernelType, int kernelRadius, Random rand) {
-		Object kernel;
-		if (Kernel1D_F32.class == kernelType) {
-			kernel = FactoryKernel.table1D_F32(kernelRadius, false);
-		} else if (Kernel1D_F64.class == kernelType) {
-			kernel = FactoryKernel.table1D_F64(kernelRadius, false);
-		} else if (Kernel1D_S32.class == kernelType) {
-			kernel = FactoryKernel.table1D_S32(kernelRadius);
-		} else {
-			throw new RuntimeException("Unknown kernel type: "+kernelType.getSimpleName());
-		}
-		return kernel;
-	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.filter.convolve;
 
 import boofcv.BoofTesting;
+import boofcv.alg.filter.convolve.noborder.TestImplConvolveBox;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.FactoryImageBorder;
@@ -26,12 +27,13 @@ import boofcv.struct.border.BorderType;
 import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.ImageGray;
 import boofcv.testing.CompareEquivalentFunctions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 import java.util.Random;
 
-import static boofcv.alg.filter.convolve.noborder.TestImplConvolveMean.createTableKernel;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestConvolveImageMean extends CompareEquivalentFunctions {
 
@@ -52,11 +54,47 @@ public class TestConvolveImageMean extends CompareEquivalentFunctions {
 		performTests(20);
 	}
 
+	/// A null border isn't processed. Inside the image it's the same as the functions without a border
+	@Test void nullBorder() throws Exception {
+		int count = 0;
+		for (Method m : ConvolveImageMean.class.getMethods()) {
+			Class<?>[] params = m.getParameterTypes();
+			if (params.length != 5 || !ImageGray.class.isAssignableFrom(params[0]))
+				continue;
+			Method noBorder = ConvolveImageMean.class.getMethod(m.getName(), params[0], params[1], int.class, int.class);
+			ImageGray input = GeneralizedImageOps.createSingleBand((Class)params[0], width, height);
+			GImageMiscOps.fillUniform(input, rand, 0, 100);
+			ImageGray expected = GeneralizedImageOps.createSingleBand((Class)params[1], width, height);
+			ImageGray found = GeneralizedImageOps.createSingleBand((Class)params[1], width, height);
+			GImageMiscOps.fill(found, 3);
+
+			noBorder.invoke(null, input, expected, offset1, length1);
+			m.invoke(null, input, found, offset1, length1, null);
+
+			boolean horizontal = m.getName().equals("horizontal");
+			int offsetR = length1 - offset1 - 1;
+			for (int y = 0; y < height; y++) {
+				for (int x = 0; x < width; x++) {
+					int i = horizontal ? x : y, size = horizontal ? width : height;
+					double value = i >= offset1 && i < size - offsetR ? GeneralizedImageOps.get(expected, x, y) : 3;
+					assertEquals(value, GeneralizedImageOps.get(found, x, y), 0.0);
+				}
+			}
+			count++;
+		}
+		assertEquals(10, count);
+	}
+
+	@Disabled("Needs a way to observe which implementation the concurrency system ran")
+	@Test void switchSingleToConcurrent() {
+		// TODO verify CONCURRENT_MIN_PIXELS_HORIZONTAL/VERTICAL and USE_CONCURRENT select ImplConvolveMean_MT
+	}
+
 	@Override
 	protected boolean isTestMethod( Method m ) {
 		Class<?> params[] = m.getParameterTypes();
 
-		if (params.length < 4 || params.length > 6)
+		if (params.length != 4 && params.length != 5)
 			return false;
 
 		return ImageGray.class.isAssignableFrom(params[0]);
@@ -64,7 +102,6 @@ public class TestConvolveImageMean extends CompareEquivalentFunctions {
 
 	@Override
 	protected boolean isEquivalent( Method validation, Method target ) {
-
 		Class<?>[] v = validation.getParameterTypes();
 		Class<?>[] c = target.getParameterTypes();
 
@@ -74,17 +111,9 @@ public class TestConvolveImageMean extends CompareEquivalentFunctions {
 		if (c[0] != v[1] || c[1] != v[2])
 			return false;
 
-		if (target.getName().equals("vertical")) {
-			if (ImageBorder.class.isAssignableFrom(c[4])) {
-				return v.length >= 4 && ImageBorder.class.isAssignableFrom(v[3]);
-			} else if (v.length != 3) {
-				return false;
-			}
-		} else if ((c.length == 4) ^ (v.length == 3)) {
-			return false;
-		}
-
-		return true;
+		// functions with an ImageBorder (5 arguments) against ConvolveImageNormalized with one (4 arguments)
+		int mean = Math.max(v.length, c.length), normalized = Math.min(v.length, c.length);
+		return mean == 5 ? normalized == 4 : normalized == 3;
 	}
 
 	@Override
@@ -103,16 +132,9 @@ public class TestConvolveImageMean extends CompareEquivalentFunctions {
 		if (c.length == 4) {
 			ret[0] = new Object[]{input, output, offset1, length1};
 			ret[1] = new Object[]{input, output, offset2, length2};
-		} else if (c.length == 5) {
-			ret[0] = new Object[]{input, output, offset1, length1, null};
-			ret[1] = new Object[]{input, output, offset2, length2, null};
-			if (ImageBorder.class.isAssignableFrom(c[4])) {
-				ret[0][4] = border;
-				ret[1][4] = border;
-			}
 		} else {
-			ret[0] = new Object[]{input, output, offset1, length1, border, null};
-			ret[1] = new Object[]{input, output, offset2, length2, border, null};
+			ret[0] = new Object[]{input, output, offset1, length1, border};
+			ret[1] = new Object[]{input, output, offset2, length2, border};
 		}
 
 		return ret;
@@ -121,7 +143,8 @@ public class TestConvolveImageMean extends CompareEquivalentFunctions {
 	@Override
 	protected Object[] reformatForValidation( Method m, Object[] targetParam ) {
 		Class<?>[] params = m.getParameterTypes();
-		Object kernel = createTableKernel(params[0], (Integer)targetParam[2], (Integer)targetParam[3]);
+		Object kernel = TestImplConvolveBox.tableKernel((ImageGray)targetParam[0], (Integer)targetParam[2],
+				(Integer)targetParam[3], true);
 
 		ImageGray output = (ImageGray)((ImageGray)targetParam[1]).clone();
 
@@ -137,11 +160,7 @@ public class TestConvolveImageMean extends CompareEquivalentFunctions {
 		ImageGray expected = (ImageGray)validationParam[2];
 		ImageGray found = (ImageGray)targetParam[1];
 		try {
-			if (validationParam.length == 3) {
-				BoofTesting.assertEquals(expected, found, 1e-4);
-			} else {
-				BoofTesting.assertEquals(expected, found, 1e-4);
-			}
+			BoofTesting.assertEquals(expected, found, 1e-4);
 		} catch (Exception e) {
 			expected.print();
 			System.out.println("----");

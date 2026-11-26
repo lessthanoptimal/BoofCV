@@ -69,7 +69,7 @@ public class TestImplConvolveBox extends CompareEquivalentFunctions {
 			ImageGray found = GeneralizedImageOps.createSingleBand(params[1], width, height);
 			GImageMiscOps.fillUniform(input, rand, 0, 100);
 
-			int blocks = ImplConvolveBox.restartBlocks(height, radius);
+			int blocks = ImplConvolveBox.restartBlocks(height, 2*radius + 1);
 			assertTrue(blocks > 2);
 			int middle = ImplConvolveBox.restartRow(2, blocks, height, radius);
 
@@ -84,13 +84,13 @@ public class TestImplConvolveBox extends CompareEquivalentFunctions {
 	}
 
 	@Test void restartBlocks() {
-		// 2*radius rows are border, then blocks of VERTICAL_RESTART inner rows
+		// length - 1 rows are border, then blocks of VERTICAL_RESTART inner rows
 		int R = ImplConvolveBox.VERTICAL_RESTART;
-		assertEquals(1, ImplConvolveBox.restartBlocks(10, 2));
-		assertEquals(1, ImplConvolveBox.restartBlocks(4 + R, 2));
-		assertEquals(2, ImplConvolveBox.restartBlocks(5 + R, 2));
+		assertEquals(1, ImplConvolveBox.restartBlocks(10, 5));
+		assertEquals(1, ImplConvolveBox.restartBlocks(4 + R, 5));
+		assertEquals(2, ImplConvolveBox.restartBlocks(5 + R, 5));
 		// image smaller than the kernel
-		assertEquals(1, ImplConvolveBox.restartBlocks(3, 2));
+		assertEquals(1, ImplConvolveBox.restartBlocks(3, 5));
 	}
 
 	@Test void restartRow() {
@@ -183,13 +183,7 @@ public class TestImplConvolveBox extends CompareEquivalentFunctions {
 		ImageGray expected = (ImageGray)((ImageGray)targetParam[1]).createSameShape();
 		int radius = (Integer)targetParam[2];
 
-		Object kernel;
-		if (input instanceof GrayF32)
-			kernel = FactoryKernel.table1D_F32(radius, false);
-		else if (input instanceof GrayF64)
-			kernel = FactoryKernel.table1D_F64(radius, false);
-		else
-			kernel = FactoryKernel.table1D_S32(radius);
+		Object kernel = tableKernel(input, radius, 2*radius + 1, false);
 
 		// The border. ConvolveImageStandard_SB fills in the inner image
 		ImageBorder border = ImageBorderValue.wrap(input, 0);
@@ -205,5 +199,14 @@ public class TestImplConvolveBox extends CompareEquivalentFunctions {
 	@Override
 	protected void compareResults( Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam ) {
 		BoofTesting.assertEquals((ImageGray)validationParam[2], (ImageGray)targetParam[1], 1e-4);
+	}
+
+	/// Kernel of ones, or of 1/length for floating point if normalized, for ConvolveImage functions with this input
+	public static Object tableKernel( ImageGray<?> input, int offset, int length, boolean normalized ) {
+		if (input instanceof GrayF32)
+			return FactoryKernel.table1D_F32(offset, length, normalized);
+		if (input instanceof GrayF64)
+			return FactoryKernel.table1D_F64(offset, length, normalized);
+		return FactoryKernel.table1D_S32(offset, length);
 	}
 }

@@ -42,21 +42,22 @@ public class ImplConvolveBox {
 
 	/// Floating point running sums along y start over every VERTICAL_RESTART rows, so the results don't depend
 	/// on how rows are split between threads. Fewer rows bound the error of the running sums more tightly but
-	/// recompute more sums
+	/// recompute more sums. ImplConvolveMean uses it and the functions below too
 	public static int VERTICAL_RESTART = 64;
 
-	/// Number of blocks of VERTICAL_RESTART inner rows
-	public static int restartBlocks( int height, int radius ) {
-		return Math.max(1, (height - 2*radius + VERTICAL_RESTART - 1)/VERTICAL_RESTART);
+	/// Number of blocks of VERTICAL_RESTART inner rows for a kernel 'length' rows long
+	public static int restartBlocks( int height, int length ) {
+		return Math.max(1, (height - length + VERTICAL_RESTART)/VERTICAL_RESTART);
 	}
 
-	/// First output row of the block. Block 0 includes the top border and the last block the bottom border
-	public static int restartRow( int block, int blocks, int height, int radius ) {
+	/// First output row of the block, for a kernel that starts 'offset' rows before the output row. Block 0
+	/// includes the top border and the last block the bottom border
+	public static int restartRow( int block, int blocks, int height, int offset ) {
 		if (block == 0)
 			return 0;
 		if (block >= blocks)
 			return height;
-		return radius + block*VERTICAL_RESTART;
+		return offset + block*VERTICAL_RESTART;
 	}
 
 	/// Box sum along x. Pixels outside the image are zero
@@ -759,42 +760,28 @@ public class ImplConvolveBox {
 		if (kernelWidth > width)
 			return;
 
-		int y = y0;
-		for (; y + 2 <= y1; y += 2) {
+		for (int y = y0; y < y1; y += 2) {
+			// the second row, or the same row again if only one is left
+			final boolean pair = y + 1 < y1;
+			final int nextIn = pair ? strideIn : 0, nextOut = pair ? strideOut : 0;
 			int indexIn = input.startIndex + strideIn*y;
 			int indexOut = output.startIndex + strideOut*y + radius;
 
 			float total0 = 0, total1 = 0;
 			for (int i = indexIn; i < indexIn + kernelWidth; i++) {
 				total0 += input.data[i];
-				total1 += input.data[i + strideIn];
+				total1 += input.data[i + nextIn];
 			}
 			output.data[indexOut] = total0;
-			output.data[indexOut + strideOut] = total1;
+			output.data[indexOut + nextOut] = total1;
 
 			final int indexEnd = indexIn + width;
 			for (int i = indexIn + kernelWidth; i < indexEnd; i++) {
 				indexOut++;
 				total0 += input.data[i] - input.data[i - kernelWidth];
-				total1 += input.data[i + strideIn] - input.data[i + strideIn - kernelWidth];
+				total1 += input.data[i + nextIn] - input.data[i + nextIn - kernelWidth];
 				output.data[indexOut] = total0;
-				output.data[indexOut + strideOut] = total1;
-			}
-		}
-		if (y < y1) {
-			int indexIn = input.startIndex + strideIn*y;
-			int indexOut = output.startIndex + strideOut*y + radius;
-
-			float total = 0;
-			for (int i = indexIn; i < indexIn + kernelWidth; i++) {
-				total += input.data[i];
-			}
-			output.data[indexOut] = total;
-
-			final int indexEnd = indexIn + width;
-			for (int i = indexIn + kernelWidth; i < indexEnd; i++) {
-				total += input.data[i] - input.data[i - kernelWidth];
-				output.data[++indexOut] = total;
+				output.data[indexOut + nextOut] = total1;
 			}
 		}
 	}
@@ -918,42 +905,28 @@ public class ImplConvolveBox {
 		if (kernelWidth > width)
 			return;
 
-		int y = y0;
-		for (; y + 2 <= y1; y += 2) {
+		for (int y = y0; y < y1; y += 2) {
+			// the second row, or the same row again if only one is left
+			final boolean pair = y + 1 < y1;
+			final int nextIn = pair ? strideIn : 0, nextOut = pair ? strideOut : 0;
 			int indexIn = input.startIndex + strideIn*y;
 			int indexOut = output.startIndex + strideOut*y + radius;
 
 			double total0 = 0, total1 = 0;
 			for (int i = indexIn; i < indexIn + kernelWidth; i++) {
 				total0 += input.data[i];
-				total1 += input.data[i + strideIn];
+				total1 += input.data[i + nextIn];
 			}
 			output.data[indexOut] = total0;
-			output.data[indexOut + strideOut] = total1;
+			output.data[indexOut + nextOut] = total1;
 
 			final int indexEnd = indexIn + width;
 			for (int i = indexIn + kernelWidth; i < indexEnd; i++) {
 				indexOut++;
 				total0 += input.data[i] - input.data[i - kernelWidth];
-				total1 += input.data[i + strideIn] - input.data[i + strideIn - kernelWidth];
+				total1 += input.data[i + nextIn] - input.data[i + nextIn - kernelWidth];
 				output.data[indexOut] = total0;
-				output.data[indexOut + strideOut] = total1;
-			}
-		}
-		if (y < y1) {
-			int indexIn = input.startIndex + strideIn*y;
-			int indexOut = output.startIndex + strideOut*y + radius;
-
-			double total = 0;
-			for (int i = indexIn; i < indexIn + kernelWidth; i++) {
-				total += input.data[i];
-			}
-			output.data[indexOut] = total;
-
-			final int indexEnd = indexIn + width;
-			for (int i = indexIn + kernelWidth; i < indexEnd; i++) {
-				total += input.data[i] - input.data[i - kernelWidth];
-				output.data[++indexOut] = total;
+				output.data[indexOut + nextOut] = total1;
 			}
 		}
 	}

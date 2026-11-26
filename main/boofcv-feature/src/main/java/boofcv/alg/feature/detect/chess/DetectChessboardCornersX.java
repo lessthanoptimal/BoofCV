@@ -50,8 +50,6 @@ import georegression.struct.point.Point2D_I32;
 import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.struct.DogArray;
-import org.ddogleg.struct.DogArray_F32;
-import pabeles.concurrency.GrowArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -162,7 +160,6 @@ public class DetectChessboardCornersX {
 
 	// Workspace
 	GrayF32 tmp = new GrayF32(1, 1);
-	GrowArray<DogArray_F32> fwork = new GrowArray<>(DogArray_F32::new);
 
 	/**
 	 * Declares internal data structures
@@ -225,7 +222,7 @@ public class DetectChessboardCornersX {
 		// x-corner intensity is results in a symmetric 2x2 region under ideal conditions. Applying a 2x2 mean filter
 		// breaks the symmetry. There will be a single unique optimal value, but it will be biased by 0.5 of a pixel.
 		ConvolveImageMean.horizontal(intensityRaw, tmp, 0, 2);
-		ConvolveImageMean.vertical(tmp, intensity2x2, 0, 2, fwork);
+		ConvolveImageMean.vertical(tmp, intensity2x2, 0, 2);
 
 		// NOTE: There's a small improvement if raw is used after detection. That's why everything is so funky
 		//       the small performance improvement might be a result of over fitting to test set

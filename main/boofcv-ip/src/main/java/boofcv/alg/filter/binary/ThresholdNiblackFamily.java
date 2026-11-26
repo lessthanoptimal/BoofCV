@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,8 +28,6 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 import lombok.Getter;
 import lombok.Setter;
-import org.ddogleg.struct.DogArray_F32;
-import pabeles.concurrency.GrowArray;
 
 /**
  * <p>Several related algorithms based off the Niblack's [1] paper which are intended for use in thresholding
@@ -85,7 +83,6 @@ public class ThresholdNiblackFamily implements InputToBinary<GrayF32> {
 	GrayF32 stdev = new GrayF32(1, 1); // computed standard deviation
 
 	GrayF32 tmp = new GrayF32(1, 1); // work space
-	GrowArray<DogArray_F32> work = new GrowArray<>(DogArray_F32::new);
 
 	// Maximum stdev across entire image
 	float maxStdev;
@@ -135,11 +132,11 @@ public class ThresholdNiblackFamily implements InputToBinary<GrayF32> {
 		int radius = width.computeI(Math.min(input.width, input.height))/2;
 
 		// mean of input image = E[X]
-		BlurImageOps.mean(input, inputMean, radius, tmp, work);
+		BlurImageOps.mean(input, inputMean, radius, tmp);
 
 		// standard deviation = sqrt( E[X^2] + E[X]^2)
 		PixelMath.pow2(input, inputPow2);
-		BlurImageOps.mean(inputPow2, inputPow2Mean, radius, tmp, work);
+		BlurImageOps.mean(inputPow2, inputPow2Mean, radius, tmp);
 		PixelMath.pow2(inputMean, inputMeanPow2);
 		PixelMath.subtract(inputPow2Mean, inputMeanPow2, stdev);
 		PixelMath.sqrt(stdev, stdev);

@@ -23,6 +23,9 @@ import boofcv.alg.misc.impl.GenerateImplImageStatistics;
 import boofcv.alg.misc.impl.GenerateImplImageStatistics_MT;
 import boofcv.alg.filter.convolve.noborder.GenerateImplConvolveBox;
 import boofcv.alg.filter.convolve.noborder.GenerateImplConvolveBox_MT;
+import boofcv.alg.filter.convolve.noborder.GenerateImplConvolveMean;
+import boofcv.alg.filter.convolve.noborder.GenerateImplConvolveMean_MT;
+import boofcv.alg.filter.convolve.GenerateConvolveImageMean;
 import boofcv.alg.misc.impl.GenerateImplPixelMath;
 import boofcv.generate.CodeGeneratorBase;
 
@@ -41,6 +44,9 @@ public class GenerateImageProcessing {
 				GenerateImplImageStatistics_MT.class,
 				GenerateImplConvolveBox.class,
 				GenerateImplConvolveBox_MT.class,
+				GenerateImplConvolveMean.class,
+				GenerateImplConvolveMean_MT.class,
+				GenerateConvolveImageMean.class,
 				GenerateImplPixelMath.class,
 		};
 

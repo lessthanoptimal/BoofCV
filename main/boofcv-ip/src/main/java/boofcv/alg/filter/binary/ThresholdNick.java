@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,8 +25,6 @@ import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import org.ddogleg.struct.DogArray_F32;
-import pabeles.concurrency.GrowArray;
 //CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
 /**
@@ -60,7 +58,6 @@ public class ThresholdNick implements InputToBinary<GrayF32> {
 	GrayF32 meanI2 = new GrayF32(1, 1);
 
 	GrayF32 tmp = new GrayF32(1, 1); // work space
-	GrowArray<DogArray_F32> work = new GrowArray<>(DogArray_F32::new);
 
 	/**
 	 * Configures the algorithm.
@@ -95,13 +92,13 @@ public class ThresholdNick implements InputToBinary<GrayF32> {
 		float NP = (radius*2 + 1)*(radius*2 + 1);
 
 		// mean of input image = E[X]
-		BlurImageOps.mean(input, meanImage, radius, tmp, work);
+		BlurImageOps.mean(input, meanImage, radius, tmp);
 
 		// Compute I^2
 		PixelMath.pow2(input, imageI2);
 
 		// Compute local mean of I^2
-		BlurImageOps.mean(imageI2, meanI2, radius, tmp, work);
+		BlurImageOps.mean(imageI2, meanI2, radius, tmp);
 
 		if (down) {
 			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {

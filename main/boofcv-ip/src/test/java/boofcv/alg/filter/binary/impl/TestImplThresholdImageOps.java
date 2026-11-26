@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -82,14 +82,14 @@ public class TestImplThresholdImageOps extends BoofStandardJUnit {
 				float scale = (float)(0.8 + 0.4*(indexScale/3.0));
 				ImageMiscOps.fillUniform(output, rand, 0, 200);
 				ImageMiscOps.fillUniform(expected, rand, 0, 200);
-				m.invoke(null, input, output, width, scale, true, storage1, storage2, null);
+				m.invoke(null, input, output, width, scale, true, storage1, storage2);
 				naiveLocalMean(input, expected, radius, scale, true);
 
 				BoofTesting.assertEquals(expected, output, 0);
 
 				ImageMiscOps.fillUniform(output, rand, 0, 200);
 				ImageMiscOps.fillUniform(expected, rand, 0, 200);
-				m.invoke(null, input, output, width, scale, false, storage1, storage2, null);
+				m.invoke(null, input, output, width, scale, false, storage1, storage2);
 				naiveLocalMean(input, expected, radius, scale, false);
 
 				BoofTesting.assertEquals(expected, output, 0);
@@ -103,13 +103,13 @@ public class TestImplThresholdImageOps extends BoofStandardJUnit {
 		boolean isInt;
 		if (input instanceof GrayU8) {
 			isInt = true;
-			blur = BlurImageOps.mean((GrayU8)input, null, radius, null, null);
+			blur = BlurImageOps.mean((GrayU8)input, null, radius, null);
 		} else if (input instanceof GrayU16) {
 			isInt = true;
-			blur = BlurImageOps.mean((GrayU16)input, null, radius, null, null);
+			blur = BlurImageOps.mean((GrayU16)input, null, radius, null);
 		} else {
 			isInt = false;
-			blur = BlurImageOps.mean((GrayF32)input, null, radius, null, null);
+			blur = BlurImageOps.mean((GrayF32)input, null, radius, null);
 		}
 
 		float fscale = (float)scale;
