@@ -20,6 +20,7 @@ package boofcv.alg.transform.census;
 
 import boofcv.override.BOverrideClass;
 import boofcv.override.BOverrideManager;
+import boofcv.struct.border.BorderType;
 import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayS64;
@@ -42,23 +43,23 @@ public class BOverrideCensusTransform extends BOverrideClass {
 
 	/// Same arguments as the functions in [CensusTransform]. The output has already been reshaped
 	public interface Census<T extends ImageGray<T>> {
-		void dense3x3( T input, GrayU8 output, @Nullable ImageBorder<T> border );
+		void dense3x3( T input, GrayU8 output, BorderType border );
 
-		void dense5x5( T input, GrayS32 output, @Nullable ImageBorder<T> border );
+		void dense5x5( T input, GrayS32 output, BorderType border );
 
-		void sample_S64( T input, FastAccess<Point2D_I32> sample, GrayS64 output, @Nullable ImageBorder<T> border );
+		void sample_S64( T input, FastAccess<Point2D_I32> sample, GrayS64 output, BorderType border );
 
 		void sample_IU16( T input, FastAccess<Point2D_I32> sample, InterleavedU16 output,
-						  @Nullable ImageBorder<T> border );
+						  BorderType border );
 	}
 
 	/// Returns true if the override processed the image
 	public static <T extends ImageGray<T>>
 	boolean invokeNativeDense3x3( T input, GrayU8 output, @Nullable ImageBorder<T> border ) {
-		if (census == null)
+		if (census == null || !canOverride(border))
 			return false;
 		try {
-			census.dense3x3(input, output, border);
+			census.dense3x3(input, output, overrideBorderOrSkip(border));
 			return true;
 		} catch (RuntimeException ignore) {
 			return false;
@@ -68,10 +69,10 @@ public class BOverrideCensusTransform extends BOverrideClass {
 	/// Returns true if the override processed the image
 	public static <T extends ImageGray<T>>
 	boolean invokeNativeDense5x5( T input, GrayS32 output, @Nullable ImageBorder<T> border ) {
-		if (census == null)
+		if (census == null || !canOverride(border))
 			return false;
 		try {
-			census.dense5x5(input, output, border);
+			census.dense5x5(input, output, overrideBorderOrSkip(border));
 			return true;
 		} catch (RuntimeException ignore) {
 			return false;
@@ -82,10 +83,10 @@ public class BOverrideCensusTransform extends BOverrideClass {
 	public static <T extends ImageGray<T>>
 	boolean invokeNativeSample_S64( T input, FastAccess<Point2D_I32> sample, GrayS64 output,
 									@Nullable ImageBorder<T> border ) {
-		if (census == null)
+		if (census == null || !canOverride(border))
 			return false;
 		try {
-			census.sample_S64(input, sample, output, border);
+			census.sample_S64(input, sample, output, overrideBorderOrSkip(border));
 			return true;
 		} catch (RuntimeException ignore) {
 			return false;
@@ -96,10 +97,10 @@ public class BOverrideCensusTransform extends BOverrideClass {
 	public static <T extends ImageGray<T>>
 	boolean invokeNativeSample_IU16( T input, FastAccess<Point2D_I32> sample, InterleavedU16 output,
 									 @Nullable ImageBorder<T> border ) {
-		if (census == null)
+		if (census == null || !canOverride(border))
 			return false;
 		try {
-			census.sample_IU16(input, sample, output, border);
+			census.sample_IU16(input, sample, output, overrideBorderOrSkip(border));
 			return true;
 		} catch (RuntimeException ignore) {
 			return false;

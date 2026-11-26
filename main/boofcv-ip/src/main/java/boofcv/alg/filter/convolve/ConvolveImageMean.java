@@ -82,6 +82,10 @@ public class ConvolveImageMean {
 	public static void horizontal( GrayU8 input, GrayI8 output, int offset, int length,
 								   @Nullable ImageBorder_S32<GrayU8> border ) {
 		output.reshape(input);
+
+		if (BOverrideConvolveImageMean.invokeNativeHorizontalBorder(input, output, offset, length, border))
+			return;
+
 		horizontal(input, output, offset, length, border, border == null);
 	}
 
@@ -97,6 +101,10 @@ public class ConvolveImageMean {
 	public static void vertical( GrayU8 input, GrayI8 output, int offset, int length,
 								 @Nullable ImageBorder_S32<GrayU8> border ) {
 		output.reshape(input);
+
+		if (BOverrideConvolveImageMean.invokeNativeVerticalBorder(input, output, offset, length, border))
+			return;
+
 		vertical(input, output, offset, length, border, border == null);
 	}
 
@@ -178,6 +186,10 @@ public class ConvolveImageMean {
 	public static void horizontal( GrayS16 input, GrayI16 output, int offset, int length,
 								   @Nullable ImageBorder_S32<GrayS16> border ) {
 		output.reshape(input);
+
+		if (BOverrideConvolveImageMean.invokeNativeHorizontalBorder(input, output, offset, length, border))
+			return;
+
 		horizontal(input, output, offset, length, border, border == null);
 	}
 
@@ -193,6 +205,10 @@ public class ConvolveImageMean {
 	public static void vertical( GrayS16 input, GrayI16 output, int offset, int length,
 								 @Nullable ImageBorder_S32<GrayS16> border ) {
 		output.reshape(input);
+
+		if (BOverrideConvolveImageMean.invokeNativeVerticalBorder(input, output, offset, length, border))
+			return;
+
 		vertical(input, output, offset, length, border, border == null);
 	}
 
@@ -274,6 +290,10 @@ public class ConvolveImageMean {
 	public static void horizontal( GrayU16 input, GrayI16 output, int offset, int length,
 								   @Nullable ImageBorder_S32<GrayU16> border ) {
 		output.reshape(input);
+
+		if (BOverrideConvolveImageMean.invokeNativeHorizontalBorder(input, output, offset, length, border))
+			return;
+
 		horizontal(input, output, offset, length, border, border == null);
 	}
 
@@ -289,6 +309,10 @@ public class ConvolveImageMean {
 	public static void vertical( GrayU16 input, GrayI16 output, int offset, int length,
 								 @Nullable ImageBorder_S32<GrayU16> border ) {
 		output.reshape(input);
+
+		if (BOverrideConvolveImageMean.invokeNativeVerticalBorder(input, output, offset, length, border))
+			return;
+
 		vertical(input, output, offset, length, border, border == null);
 	}
 
@@ -370,6 +394,10 @@ public class ConvolveImageMean {
 	public static void horizontal( GrayF32 input, GrayF32 output, int offset, int length,
 								   @Nullable ImageBorder_F32 border ) {
 		output.reshape(input);
+
+		if (BOverrideConvolveImageMean.invokeNativeHorizontalBorder(input, output, offset, length, border))
+			return;
+
 		horizontal(input, output, offset, length, border, border == null);
 	}
 
@@ -385,6 +413,10 @@ public class ConvolveImageMean {
 	public static void vertical( GrayF32 input, GrayF32 output, int offset, int length,
 								 @Nullable ImageBorder_F32 border ) {
 		output.reshape(input);
+
+		if (BOverrideConvolveImageMean.invokeNativeVerticalBorder(input, output, offset, length, border))
+			return;
+
 		vertical(input, output, offset, length, border, border == null);
 	}
 
@@ -466,6 +498,10 @@ public class ConvolveImageMean {
 	public static void horizontal( GrayF64 input, GrayF64 output, int offset, int length,
 								   @Nullable ImageBorder_F64 border ) {
 		output.reshape(input);
+
+		if (BOverrideConvolveImageMean.invokeNativeHorizontalBorder(input, output, offset, length, border))
+			return;
+
 		horizontal(input, output, offset, length, border, border == null);
 	}
 
@@ -481,6 +517,10 @@ public class ConvolveImageMean {
 	public static void vertical( GrayF64 input, GrayF64 output, int offset, int length,
 								 @Nullable ImageBorder_F64 border ) {
 		output.reshape(input);
+
+		if (BOverrideConvolveImageMean.invokeNativeVerticalBorder(input, output, offset, length, border))
+			return;
+
 		vertical(input, output, offset, length, border, border == null);
 	}
 

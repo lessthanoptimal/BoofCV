@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,11 +20,13 @@ package boofcv.alg.filter.convolve;
 
 import boofcv.override.BOverrideClass;
 import boofcv.override.BOverrideManager;
+import boofcv.struct.border.BorderType;
+import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.ImageBase;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Override for {@link ConvolveImageMean}
+ * Override for {@link ConvolveImageMean}. Same arguments as its functions.
  *
  * @author Peter Abeles
  */
@@ -38,32 +40,60 @@ public class BOverrideConvolveImageMean extends BOverrideClass {
 	public static @Nullable Vertical vertical;
 
 	public interface Horizontal {
-		void horizontal(ImageBase input, ImageBase output, int offset, int length);
+		void horizontal( ImageBase input, ImageBase output, int offset, int length, BorderType border );
 	}
 
 	public interface Vertical {
-		void vertical(ImageBase input, ImageBase output, int offset, int length);
+		void vertical( ImageBase input, ImageBase output, int offset, int length, BorderType border );
 	}
 
-	public static boolean invokeNativeHorizontal(ImageBase input, ImageBase output, int offset, int length) {
-		boolean processed = false;
-		if( BOverrideConvolveImageMean.horizontal != null ) {
-			try {
-				BOverrideConvolveImageMean.horizontal.horizontal(input,output,offset,length);
-				processed = true;
-			} catch( RuntimeException ignore ) {}
-		}
-		return processed;
+	/// The functions without a border, so NORMALIZED
+	public static boolean invokeNativeHorizontal( ImageBase input, ImageBase output, int offset, int length ) {
+		return invokeHorizontal(input, output, offset, length, BorderType.NORMALIZED);
 	}
 
-	public static boolean invokeNativeVertical(ImageBase input, ImageBase output, int offset, int length) {
-		boolean processed = false;
-		if( BOverrideConvolveImageMean.vertical != null ) {
-			try {
-				BOverrideConvolveImageMean.vertical.vertical(input,output,offset,length);
-				processed = true;
-			} catch( RuntimeException ignore ) {}
+	/// The functions without a border, so NORMALIZED
+	public static boolean invokeNativeVertical( ImageBase input, ImageBase output, int offset, int length ) {
+		return invokeVertical(input, output, offset, length, BorderType.NORMALIZED);
+	}
+
+	/// A null border is SKIP
+	public static boolean invokeNativeHorizontalBorder( ImageBase input, ImageBase output, int offset, int length,
+														@Nullable ImageBorder border ) {
+		if (!canOverride(border))
+			return false;
+		return invokeHorizontal(input, output, offset, length, overrideBorderOrSkip(border));
+	}
+
+	/// A null border is SKIP
+	public static boolean invokeNativeVerticalBorder( ImageBase input, ImageBase output, int offset, int length,
+													  @Nullable ImageBorder border ) {
+		if (!canOverride(border))
+			return false;
+		return invokeVertical(input, output, offset, length, overrideBorderOrSkip(border));
+	}
+
+	private static boolean invokeHorizontal( ImageBase input, ImageBase output, int offset, int length,
+											 BorderType border ) {
+		if (horizontal == null)
+			return false;
+		try {
+			horizontal.horizontal(input, output, offset, length, border);
+			return true;
+		} catch (RuntimeException ignore) {
+			return false;
 		}
-		return processed;
+	}
+
+	private static boolean invokeVertical( ImageBase input, ImageBase output, int offset, int length,
+										   BorderType border ) {
+		if (vertical == null)
+			return false;
+		try {
+			vertical.vertical(input, output, offset, length, border);
+			return true;
+		} catch (RuntimeException ignore) {
+			return false;
+		}
 	}
 }
