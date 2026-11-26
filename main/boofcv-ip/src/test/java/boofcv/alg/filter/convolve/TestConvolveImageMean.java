@@ -22,15 +22,22 @@ import boofcv.BoofTesting;
 import boofcv.alg.filter.convolve.noborder.TestImplConvolveBox;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.core.image.border.BorderIndex1D_Extend;
 import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.override.BOverrideManager;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.border.ImageBorder;
+import boofcv.struct.border.ImageBorder1D_F32;
+import boofcv.struct.border.ImageBorder_F32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import boofcv.testing.CompareEquivalentFunctions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -83,6 +90,26 @@ public class TestConvolveImageMean extends CompareEquivalentFunctions {
 			count++;
 		}
 		assertEquals(10, count);
+	}
+
+	@Test void override_borderType() {
+		List<BorderType> found = new ArrayList<>();
+		BOverrideConvolveImageMean.horizontal = ( input, output, offset, length, border ) -> found.add(border);
+		BOverrideConvolveImageMean.vertical = ( input, output, offset, length, border ) -> found.add(border);
+		try {
+			var input = new GrayF32(width, height);
+			var output = new GrayF32(width, height);
+			ImageBorder_F32 custom = new ImageBorder1D_F32(BorderIndex1D_Extend::new);
+			ConvolveImageMean.horizontal(input, output, offset1, length1);
+			ConvolveImageMean.vertical(input, output, offset1, length1);
+			ConvolveImageMean.horizontal(input, output, offset1, length1,
+					(ImageBorder_F32)FactoryImageBorder.single(BorderType.WRAP, GrayF32.class));
+			ConvolveImageMean.vertical(input, output, offset1, length1, custom);
+			ConvolveImageMean.vertical(input, output, offset1, length1, null);
+			assertEquals(List.of(BorderType.NORMALIZED, BorderType.NORMALIZED, BorderType.WRAP, BorderType.SKIP), found);
+		} finally {
+			BOverrideManager.clear();
+		}
 	}
 
 	@Disabled("Needs a way to observe which implementation the concurrency system ran")

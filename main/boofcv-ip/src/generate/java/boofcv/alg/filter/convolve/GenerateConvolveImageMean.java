@@ -81,6 +81,10 @@ public class GenerateConvolveImageMean extends CodeGeneratorBase {
 					public static void horizontal( NAME_IN input, NAME_OUT output, int offset, int length,
 												   @Nullable BORDER_TYPE border ) {
 						output.reshape(input);
+
+						if (BOverrideConvolveImageMean.invokeNativeHorizontalBorder(input, output, offset, length, border))
+							return;
+
 						horizontal(input, output, offset, length, border, border == null);
 					}
 
@@ -96,6 +100,10 @@ public class GenerateConvolveImageMean extends CodeGeneratorBase {
 					public static void vertical( NAME_IN input, NAME_OUT output, int offset, int length,
 												 @Nullable BORDER_TYPE border ) {
 						output.reshape(input);
+
+						if (BOverrideConvolveImageMean.invokeNativeVerticalBorder(input, output, offset, length, border))
+							return;
+
 						vertical(input, output, offset, length, border, border == null);
 					}
 

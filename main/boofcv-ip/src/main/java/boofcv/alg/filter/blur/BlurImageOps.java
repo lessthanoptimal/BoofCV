@@ -85,7 +85,7 @@ public class BlurImageOps {
 		output = InputSanityCheck.declareOrReshape(input, output);
 		storage = InputSanityCheck.declareOrReshape(input, storage);
 
-		boolean processed = BOverrideBlurImageOps.invokeNativeMeanWeighted(input, output, radiusX, radiusY, storage);
+		boolean processed = BOverrideBlurImageOps.invokeNativeMean(input, output, radiusX, radiusY, storage);
 
 		if (processed)
 			return output;
@@ -305,7 +305,7 @@ public class BlurImageOps {
 		output = InputSanityCheck.declareOrReshape(input, output);
 		storage = InputSanityCheck.declareOrReshape(input, storage);
 
-		boolean processed = BOverrideBlurImageOps.invokeNativeMeanWeighted(input, output, radiusX, radiusY, storage);
+		boolean processed = BOverrideBlurImageOps.invokeNativeMean(input, output, radiusX, radiusY, storage);
 
 		if (processed)
 			return output;
@@ -525,7 +525,7 @@ public class BlurImageOps {
 		output = InputSanityCheck.declareOrReshape(input, output);
 		storage = InputSanityCheck.declareOrReshape(input, storage);
 
-		boolean processed = BOverrideBlurImageOps.invokeNativeMeanWeighted(input, output, radiusX, radiusY, storage);
+		boolean processed = BOverrideBlurImageOps.invokeNativeMean(input, output, radiusX, radiusY, storage);
 
 		if (processed)
 			return output;
@@ -745,7 +745,7 @@ public class BlurImageOps {
 		output = InputSanityCheck.declareOrReshape(input, output);
 		storage = InputSanityCheck.declareOrReshape(input, storage);
 
-		boolean processed = BOverrideBlurImageOps.invokeNativeMeanWeighted(input, output, radiusX, radiusY, storage);
+		boolean processed = BOverrideBlurImageOps.invokeNativeMean(input, output, radiusX, radiusY, storage);
 
 		if (processed)
 			return output;

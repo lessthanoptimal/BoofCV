@@ -20,8 +20,6 @@ package boofcv.override;
 
 import boofcv.alg.filter.blur.BOverrideBlurImageOps;
 import boofcv.alg.filter.misc.BOverrideAverageDownSampleOps;
-import boofcv.struct.border.ImageBorder;
-import boofcv.struct.image.ImageBase;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
@@ -30,13 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 public class TestBOverrideManager extends BoofStandardJUnit {
 	/// Overrides in different classes are all removed
 	@Test void clear() {
-		BOverrideBlurImageOps.mean = new BOverrideBlurImageOps.Mean() {
-			@Override public void processMeanWeighted( ImageBase input, ImageBase output, int radiusX, int radiusY,
-													   ImageBase storage ) {}
-
-			@Override public void processMeanBorder( ImageBase input, ImageBase output, int radiusX, int radiusY,
-													 ImageBorder border, ImageBase storage ) {}
-		};
+		BOverrideBlurImageOps.mean = ( input, output, radiusX, radiusY, border, storage ) -> {};
 		BOverrideAverageDownSampleOps.square = ( input, sampleWidth, output ) -> {};
 
 		BOverrideManager.clear();

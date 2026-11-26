@@ -111,7 +111,7 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"\t\toutput = InputSanityCheck.declareOrReshape(input, output);\n" +
 				"\t\tstorage = InputSanityCheck.declareOrReshape(input, storage);\n" +
 				"\n" +
-				"\t\tboolean processed = BOverrideBlurImageOps.invokeNativeMeanWeighted(input, output, radiusX, radiusY, storage);\n" +
+				"\t\tboolean processed = BOverrideBlurImageOps.invokeNativeMean(input, output, radiusX, radiusY, storage);\n" +
 				"\n" +
 				"\t\tif (processed)\n" +
 				"\t\t\treturn output;\n" +

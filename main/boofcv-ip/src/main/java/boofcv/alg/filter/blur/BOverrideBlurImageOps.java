@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.filter.blur;
 
 import boofcv.override.BOverrideClass;
 import boofcv.override.BOverrideManager;
+import boofcv.struct.border.BorderType;
 import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.ImageBase;
 import org.jetbrains.annotations.Nullable;
@@ -40,10 +41,7 @@ public class BOverrideBlurImageOps extends BOverrideClass {
 	public static @Nullable Gaussian gaussian;
 
 	public interface Mean<T extends ImageBase<T>> {
-		void processMeanWeighted( T input, T output, int radiusX, int radiusY, @Nullable T storage );
-
-		void processMeanBorder( T input, T output, int radiusX, int radiusY, @Nullable ImageBorder<T> border,
-								@Nullable T storage );
+		void processMean( T input, T output, int radiusX, int radiusY, BorderType border, @Nullable T storage );
 	}
 
 	public interface Median<T extends ImageBase<T>> {
@@ -55,35 +53,31 @@ public class BOverrideBlurImageOps extends BOverrideClass {
 							  @Nullable T storage );
 	}
 
-	/**
-	 * Weighted average mean
-	 */
+	/// Mean without a border, so NORMALIZED
 	public static <T extends ImageBase<T>>
-	boolean invokeNativeMeanWeighted( T input, T output, int radiusX, int radiusY, @Nullable T storage ) {
-		boolean processed = false;
-		if (BOverrideBlurImageOps.mean != null) {
-			try {
-				BOverrideBlurImageOps.mean.processMeanWeighted(input, output, radiusX, radiusY, storage);
-				processed = true;
-			} catch (RuntimeException ignore) {}
-		}
-		return processed;
+	boolean invokeNativeMean( T input, T output, int radiusX, int radiusY, @Nullable T storage ) {
+		return invokeMean(input, output, radiusX, radiusY, BorderType.NORMALIZED, storage);
 	}
 
-	/**
-	 * Extended border mean
-	 */
+	/// A null border is SKIP
 	public static <T extends ImageBase<T>>
 	boolean invokeNativeMeanBorder( T input, T output, int radiusX, int radiusY,
 									@Nullable ImageBorder<T> border, @Nullable T storage ) {
-		boolean processed = false;
-		if (BOverrideBlurImageOps.mean != null) {
-			try {
-				BOverrideBlurImageOps.mean.processMeanBorder(input, output, radiusX, radiusY, border, storage);
-				processed = true;
-			} catch (RuntimeException ignore) {}
+		if (!canOverride(border))
+			return false;
+		return invokeMean(input, output, radiusX, radiusY, overrideBorderOrSkip(border), storage);
+	}
+
+	private static <T extends ImageBase<T>>
+	boolean invokeMean( T input, T output, int radiusX, int radiusY, BorderType border, @Nullable T storage ) {
+		if (mean == null)
+			return false;
+		try {
+			mean.processMean(input, output, radiusX, radiusY, border, storage);
+			return true;
+		} catch (RuntimeException ignore) {
+			return false;
 		}
-		return processed;
 	}
 
 	public static <T extends ImageBase<T>>
