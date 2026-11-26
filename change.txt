@@ -22,6 +22,7 @@ Version : 1.7.0
   * Reflect and wrap will both cycle
   * ZERO works with GrayS64
 - ConvolveImageStandard_SB: Fixed division rounding issue for kernels wider than 11.
+- Box Filter: Faster and concurrent results do not depend on thread count
 - AverageDownSample: 2x faster
 - BoofConcurrency: Thread local workspace, primitive sum and select
 - ImageStatistics: Faster and concurrent results do not depend on thread count
