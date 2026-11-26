@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.filter.convolve;
 
 import boofcv.alg.filter.convolve.noborder.ImplConvolveMean;
+import boofcv.alg.filter.convolve.noborder.ImplConvolveMean_MT;
 import org.ddogleg.struct.DogArray_F32;
 import org.ddogleg.struct.DogArray_F64;
 import org.ddogleg.struct.DogArray_I32;
@@ -88,6 +89,46 @@ public class BenchmarkConvolveMeanImpl extends CommonBenchmarkConvolve_SB {
 
 	@Benchmark public void horizontal_F64() {
 		ImplConvolveMean.horizontal(input_F64, out_F64, radius, radius*2+1);
+	}
+
+	@Benchmark public void vertical_MT_U8() {
+		ImplConvolveMean_MT.vertical(input_U8, out_U8, radius, radius*2+1, work_I32);
+	}
+
+	@Benchmark public void vertical_MT_S16() {
+		ImplConvolveMean_MT.vertical(input_S16, out_S16, radius, radius*2+1, work_I32);
+	}
+
+	@Benchmark public void vertical_MT_U16() {
+		ImplConvolveMean_MT.vertical(input_U16, out_S16, radius, radius*2+1, work_I32);
+	}
+
+	@Benchmark public void vertical_MT_F32() {
+		ImplConvolveMean_MT.vertical(input_F32, out_F32, radius, radius*2+1, work_F32);
+	}
+
+	@Benchmark public void vertical_MT_F64() {
+		ImplConvolveMean_MT.vertical(input_F64, out_F64, radius, radius*2+1, work_F64);
+	}
+
+	@Benchmark public void horizontal_MT_U8() {
+		ImplConvolveMean_MT.horizontal(input_U8, out_U8, radius, radius*2+1);
+	}
+
+	@Benchmark public void horizontal_MT_S16() {
+		ImplConvolveMean_MT.horizontal(input_S16, out_S16, radius, radius*2+1);
+	}
+
+	@Benchmark public void horizontal_MT_U16() {
+		ImplConvolveMean_MT.horizontal(input_U16, out_S16, radius, radius*2+1);
+	}
+
+	@Benchmark public void horizontal_MT_F32() {
+		ImplConvolveMean_MT.horizontal(input_F32, out_F32, radius, radius*2+1);
+	}
+
+	@Benchmark public void horizontal_MT_F64() {
+		ImplConvolveMean_MT.horizontal(input_F64, out_F64, radius, radius*2+1);
 	}
 
 	public static void main( String[] args ) throws RunnerException {
