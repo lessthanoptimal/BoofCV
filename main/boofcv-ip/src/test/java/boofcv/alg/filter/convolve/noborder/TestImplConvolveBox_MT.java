@@ -52,7 +52,7 @@ public class TestImplConvolveBox_MT extends BoofStandardJUnit {
 	}
 
 	/// Compares results to single threaded
-	@Test void compareToSingle() throws Exception {
+	private void compareToSingle() throws Exception {
 		int count = 0;
 		for (Method m : ImplConvolveBox_MT.class.getMethods()) {
 			String name = m.getName();

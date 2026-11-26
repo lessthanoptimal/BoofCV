@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -63,7 +63,6 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"import boofcv.struct.convolve.Kernel1D_S32;\n" +
 				"import boofcv.struct.image.*;\n" +
 				"import org.ddogleg.struct.DogArray_F32;\n" +
-				"import org.ddogleg.struct.DogArray_F64;\n" +
 				"import org.ddogleg.struct.DogArray_I32;\n" +
 				"import org.jetbrains.annotations.Nullable;\n" +
 				"import pabeles.concurrency.GrowArray;\n" +
@@ -80,7 +79,6 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 
 	private void generateMeanWeighted(AutoTypeImage type ) {
 		String imageName = type.getSingleBandName();
-		String workType = ("DogArray_"+type.getKernelType()).replace("S32","I32");
 		out.print("\t/**\n" +
 				"\t * Applies a mean box filter with re-weighted image borders.\n" +
 				"\t *\n" +
@@ -91,8 +89,8 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"\t * @return Output blurred image.\n" +
 				"\t */\n" +
 				"\tpublic static "+imageName+" mean("+imageName+" input, @Nullable "+imageName+" output, int radius,\n" +
-				"\t\t\t\t\t\t\t  @Nullable "+imageName+" storage, @Nullable GrowArray<"+workType+"> workVert ) {\n" +
-				"\t\treturn mean(input, output, radius, radius, storage, workVert);\n" +
+				"\t\t\t\t\t\t\t  @Nullable "+imageName+" storage ) {\n" +
+				"\t\treturn mean(input, output, radius, radius, storage);\n" +
 				"\t}\n" +
 				"\n" +
 				"\t/**\n" +
@@ -106,7 +104,7 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"\t * @return Output blurred image.\n" +
 				"\t */\n" +
 				"\tpublic static "+imageName+" mean( "+imageName+" input, @Nullable "+imageName+" output, int radiusX, int radiusY,\n" +
-				"\t\t\t\t\t\t\t  @Nullable "+imageName+" storage, @Nullable GrowArray<"+workType+"> workVert ) {\n" +
+				"\t\t\t\t\t\t\t  @Nullable "+imageName+" storage ) {\n" +
 				"\t\tif (radiusX <= 0 || radiusY <= 0)\n" +
 				"\t\t\tthrow new IllegalArgumentException(\"Radius must be > 0\");\n" +
 				"\n" +
@@ -119,7 +117,7 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"\t\t\treturn output;\n" +
 				"\n" +
 				"\t\tConvolveImageMean.horizontal(input, storage, radiusX, radiusX*2 + 1);\n" +
-				"\t\tConvolveImageMean.vertical(storage, output, radiusY, radiusY*2 + 1, workVert);\n" +
+				"\t\tConvolveImageMean.vertical(storage, output, radiusY, radiusY*2 + 1);\n" +
 				"\n" +
 				"\t\treturn output;\n" +
 				"\t}\n\n");
@@ -127,7 +125,6 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 
 	private void generateMeanBorder(AutoTypeImage type ) {
 		String imageName = type.getSingleBandName();
-		String workType = ("DogArray_"+type.getKernelType()).replace("S32","I32");
 		String suffix = type.getKernelType();
 		String borderSuffix = type.isInteger() ? suffix+"<"+imageName+">" : suffix;
 		out.print(
@@ -138,12 +135,13 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"\t * @param output (Optional) Storage for output image, Can be null. Modified.\n" +
 				"\t * @param radiusX Radius of the box blur function along the x-axis\n" +
 				"\t * @param radiusY Radius of the box blur function along the y-axis\n" +
+				"\t * @param binput Pixels outside the image. If null, the image border isn't processed.\n" +
 				"\t * @param storage (Optional) Storage for intermediate results. Same size as input image. Can be null.\n" +
 				"\t * @return Output blurred image.\n" +
 				"\t */\n" +
 				"\tpublic static "+imageName+" meanB( "+imageName+" input, @Nullable "+imageName+" output, int radiusX, int radiusY,\n" +
 				"\t\t\t\t\t\t\t  @Nullable ImageBorder_"+borderSuffix+" binput,\n" +
-				"\t\t\t\t\t\t\t  @Nullable "+imageName+" storage, @Nullable GrowArray<"+workType+"> workVert ) {\n" +
+				"\t\t\t\t\t\t\t  @Nullable "+imageName+" storage ) {\n" +
 				"\t\tif (radiusX <= 0 || radiusY <= 0)\n" +
 				"\t\t\tthrow new IllegalArgumentException(\"Radius must be > 0\");\n" +
 				"\n" +
@@ -156,7 +154,7 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"\t\t\treturn output;\n" +
 				"\n" +
 				"\t\tConvolveImageMean.horizontal(input, storage, radiusX, radiusX*2 + 1, binput);\n" +
-				"\t\tConvolveImageMean.vertical(storage, output, radiusY, radiusY*2 + 1, binput, workVert);\n" +
+				"\t\tConvolveImageMean.vertical(storage, output, radiusY, radiusY*2 + 1, binput);\n" +
 				"\n" +
 				"\t\treturn output;\n" +
 				"\t}\n\n");
@@ -420,8 +418,8 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"\t */\n" +
 				"\tpublic static <T extends ImageGray<T>>\n" +
 				"\tPlanar<T> mean(Planar<T> input, @Nullable Planar<T> output, int radius ,\n" +
-				"\t\t\t\t   @Nullable T storage, @Nullable GrowArray workVert ) {\n" +
-				"\t\treturn mean(input,output,radius,radius,storage,workVert);\n" +
+				"\t\t\t\t   @Nullable T storage ) {\n" +
+				"\t\treturn mean(input,output,radius,radius,storage);\n" +
 				"\t}\n" +
 				"\n" +
 				"\t/**\n" +
@@ -436,14 +434,14 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"\t */\n" +
 				"\tpublic static <T extends ImageGray<T>>\n" +
 				"\tPlanar<T> mean( Planar<T> input, @Nullable Planar<T> output, int radiusX, int radiusY,\n" +
-				"\t\t\t\t   @Nullable T storage, @Nullable GrowArray workVert ) {\n" +
+				"\t\t\t\t   @Nullable T storage ) {\n" +
 				"\t\tif (storage == null)\n" +
 				"\t\t\tstorage = GeneralizedImageOps.createSingleBand(input.getBandType(), input.width, input.height);\n" +
 				"\t\tif (output == null)\n" +
 				"\t\t\toutput = input.createNew(input.width, input.height);\n" +
 				"\n" +
 				"\t\tfor (int band = 0; band < input.getNumBands(); band++) {\n" +
-				"\t\t\tGBlurImageOps.mean(input.getBand(band), output.getBand(band), radiusX, radiusY, storage, workVert);\n" +
+				"\t\t\tGBlurImageOps.mean(input.getBand(band), output.getBand(band), radiusX, radiusY, storage);\n" +
 				"\t\t}\n" +
 				"\t\treturn output;\n" +
 				"\t}\n\n");
@@ -501,19 +499,20 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"\t * @param output (Optional) Storage for output image, Can be null. Modified.\n" +
 				"\t * @param radiusX Radius of the box blur function along the x-axis\n" +
 				"\t * @param radiusY Radius of the box blur function along the y-axis\n" +
+				"\t * @param binput Pixels outside the image. If null, the image border isn't processed.\n" +
 				"\t * @param storage (Optional) Storage for intermediate results. Same size as input image. Can be null.\n" +
 				"\t * @return Output blurred image.\n" +
 				"\t */\n" +
 				"\tpublic static <T extends ImageGray<T>>\n" +
 				"\tPlanar<T> meanB( Planar<T> input, @Nullable Planar<T> output, int radiusX, int radiusY,\n" +
 				"\t\t\t\t   @Nullable ImageBorder<T> binput,\n" +
-				"\t\t\t\t   @Nullable T storage, @Nullable GrowArray workVert ) {\n" +
+				"\t\t\t\t   @Nullable T storage ) {\n" +
 				"\t\tif (storage == null)\n" +
 				"\t\t\tstorage = GeneralizedImageOps.createSingleBand(input.getBandType(), input.width, input.height);\n" +
 				"\t\tif (output == null)\n" +
 				"\t\t\toutput = input.createNew(input.width, input.height);\n" +
 				"\t\tfor (int band = 0; band < input.getNumBands(); band++) {\n" +
-				"\t\t\tGBlurImageOps.meanB(input.getBand(band), output.getBand(band), radiusX, radiusY, binput, storage, workVert);\n" +
+				"\t\t\tGBlurImageOps.meanB(input.getBand(band), output.getBand(band), radiusX, radiusY, binput, storage);\n" +
 				"\t\t}\n" +
 				"\t\treturn output;\n" +
 				"\t}\n\n");

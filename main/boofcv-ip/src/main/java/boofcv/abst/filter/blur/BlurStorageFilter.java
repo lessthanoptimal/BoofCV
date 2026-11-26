@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -146,14 +146,14 @@ public class BlurStorageFilter<T extends ImageBase<T>> implements BlurFilter<T> 
 			if (border != null)
 				throw new IllegalArgumentException(
 						"Border has been set but will never be used. Must be a bug. Use meanB() instead");
-			GBlurImageOps.mean(input, output, radiusX, radiusY, storage, growArray);
+			GBlurImageOps.mean(input, output, radiusX, radiusY, storage);
 		}
 	}
 
 	private class MeanBorderOperation implements BlurOperation {
 		@Override
 		public void process( ImageBase input, ImageBase output ) {
-			GBlurImageOps.meanB(input, output, radiusX, radiusY, (ImageBorder)border, storage, growArray);
+			GBlurImageOps.meanB(input, output, radiusX, radiusY, (ImageBorder)border, storage);
 		}
 	}
 

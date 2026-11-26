@@ -108,7 +108,7 @@ abstract class GenericChessboardCornersChecks extends CommonChessboardCorners {
 		GrayF32 blurred = original.createSameShape();
 
 		// mean blur messes it up much more than Gaussian. This won't work if no pyramid
-		BlurImageOps.mean(original, blurred, 5, null, null);
+		BlurImageOps.mean(original, blurred, 5, null);
 
 		checkSolution(blurred.width, blurred.height, process(blurred));
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,6 @@ import boofcv.struct.image.GrayF;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayF64;
 import boofcv.struct.image.ImageType;
-import pabeles.concurrency.GrowArray;
 
 /**
  * Provides different functions for normalizing the spatially local statics of an image.
@@ -139,10 +138,9 @@ public class ImageLocalNormalization<T extends GrayF<T>> {
 
 		// take advantage of 2D gaussian kernels being separable
 		if (border == null) {
-			GrowArray work = GeneralizedImageOps.createGrowArray(input.getImageType());
-			GBlurImageOps.mean(adjusted, localMean, radius, output, work);
+			GBlurImageOps.mean(adjusted, localMean, radius, output);
 			GPixelMath.pow2(adjusted, pow2);
-			GBlurImageOps.mean(pow2, localPow2, radius, output, work);
+			GBlurImageOps.mean(pow2, localPow2, radius, output);
 		} else {
 			throw new IllegalArgumentException("Only renormalize border supported here so far. This can be changed...");
 		}

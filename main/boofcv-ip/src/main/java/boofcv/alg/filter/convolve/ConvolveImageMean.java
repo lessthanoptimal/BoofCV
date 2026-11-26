@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,18 +18,14 @@
 
 package boofcv.alg.filter.convolve;
 
-import boofcv.alg.filter.convolve.border.ConvolveJustBorder_General_SB;
 import boofcv.alg.filter.convolve.noborder.ImplConvolveMean;
 import boofcv.alg.filter.convolve.noborder.ImplConvolveMean_MT;
 import boofcv.concurrency.BoofConcurrency;
-import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.border.ImageBorder_F32;
 import boofcv.struct.border.ImageBorder_F64;
 import boofcv.struct.border.ImageBorder_S32;
-import boofcv.struct.convolve.Kernel1D_F32;
-import boofcv.struct.convolve.Kernel1D_F64;
-import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.image.*;
+import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_F32;
 import org.ddogleg.struct.DogArray_F64;
 import org.ddogleg.struct.DogArray_I32;
@@ -47,62 +43,31 @@ import javax.annotation.Generated;
  */
 @Generated("boofcv.alg.filter.convolve.GenerateConvolveImageMean")
 public class ConvolveImageMean {
+	/// Images with fewer pixels than this are processed single threaded by vertical(), since dispatching to
+	/// threads costs more
+	public static int CONCURRENT_MIN_PIXELS_VERTICAL = 500*500;
 
-	/**
-	 * Performs a horizontal 1D mean box filter. Borders are handled by reducing the box size.
-	 *
-	 * @param input The input image. Not modified.
-	 * @param output Where the resulting image is written to. Modified.
-	 * @param offset Start offset from pixel coordinate
-	 * @param length How long the mean filter is
-	 */
+	/// Same as CONCURRENT_MIN_PIXELS_VERTICAL for horizontal()
+	public static int CONCURRENT_MIN_PIXELS_HORIZONTAL = 400*400;
+
+	/// Mean along x. Near the image border only the pixels inside the image are averaged
 	public static void horizontal( GrayU8 input, GrayI8 output, int offset, int length ) {
 		output.reshape(input);
 
 		if (BOverrideConvolveImageMean.invokeNativeHorizontal(input, output, offset, length))
 			return;
 
-		if (length > input.width) {
-			Kernel1D_S32 kernel = FactoryKernel.table1D_S32(offset, length);
-			ConvolveImageNormalized.horizontal(kernel, input, output);
-		} else {
-			if (BoofConcurrency.USE_CONCURRENT) {
-				ImplConvolveMean_MT.horizontalBorder(input, output, offset, length);
-				ImplConvolveMean_MT.horizontal(input, output, offset, length);
-			} else {
-				ImplConvolveMean.horizontalBorder(input, output, offset, length);
-				ImplConvolveMean.horizontal(input, output, offset, length);
-			}
-		}
+		horizontal(input, output, offset, length, null, false);
 	}
 
-	/**
-	 * Performs a vertical 1D mean box filter. Borders are handled by reducing the box size.
-	 *
-	 * @param input The input image. Not modified.
-	 * @param output Where the resulting image is written to. Modified.
-	 * @param offset Start offset from pixel coordinate
-	 * @param length How long the mean filter is
-	 * @param work (Optional) Storage for work array
-	 */
-	public static void vertical( GrayU8 input, GrayI8 output, int offset, int length, @Nullable GrowArray<DogArray_I32> workspaces ) {
+	/// Mean along y. Near the image border only the pixels inside the image are averaged
+	public static void vertical( GrayU8 input, GrayI8 output, int offset, int length ) {
 		output.reshape(input);
 
 		if (BOverrideConvolveImageMean.invokeNativeVertical(input, output, offset, length))
 			return;
 
-		if (length > input.height) {
-			Kernel1D_S32 kernel = FactoryKernel.table1D_S32(offset, length);
-			ConvolveImageNormalized.vertical(kernel, input, output);
-		} else {
-			if (BoofConcurrency.USE_CONCURRENT) {
-				ImplConvolveMean_MT.verticalBorder(input, output, offset, length, workspaces);
-				ImplConvolveMean_MT.vertical(input, output, offset, length, workspaces);
-			} else {
-				ImplConvolveMean.verticalBorder(input, output, offset, length, workspaces);
-				ImplConvolveMean.vertical(input, output, offset, length, workspaces);
-			}
-		}
+		vertical(input, output, offset, length, null, false);
 	}
 
 	/**
@@ -111,24 +76,13 @@ public class ConvolveImageMean {
 	 * @param input The input image. Not modified.
 	 * @param output Where the resulting image is written to. Modified.
 	 * @param offset Start offset from pixel coordinate
-	 * @param binput Used to process image borders. If null borders are not processed.
 	 * @param length How long the mean filter is
+	 * @param border Pixels outside the image. If null, the image border isn't processed.
 	 */
-	public static void horizontal( GrayU8 input, GrayI8 output, int offset, int length, @Nullable ImageBorder_S32<GrayU8> binput ) {
-		output.reshape(input.width,output.height);
-
-		if (binput != null) {
-			binput.setImage(input);
-			Kernel1D_S32 kernel = FactoryKernel.table1D_S32(offset, length);
-			ConvolveJustBorder_General_SB.horizontal(kernel, binput, output, kernel.computeSum());
-		}
-		if (length <= input.width) {
-			if(BoofConcurrency.USE_CONCURRENT) {
-				ImplConvolveMean_MT.horizontal(input, output, offset, length);
-			} else {
-				ImplConvolveMean.horizontal(input, output, offset, length);
-			}
-		}
+	public static void horizontal( GrayU8 input, GrayI8 output, int offset, int length,
+								   @Nullable ImageBorder_S32<GrayU8> border ) {
+		output.reshape(input);
+		horizontal(input, output, offset, length, border, border == null);
 	}
 
 	/**
@@ -137,81 +91,79 @@ public class ConvolveImageMean {
 	 * @param input The input image. Not modified.
 	 * @param output Where the resulting image is written to. Modified.
 	 * @param offset Start offset from pixel coordinate
-	 * @param binput Used to process image borders. If null borders are not processed.
-	 * @param work (Optional) Storage for work array
+	 * @param length How long the mean filter is
+	 * @param border Pixels outside the image. If null, the image border isn't processed.
 	 */
-	public static void vertical( GrayU8 input, GrayI8 output, int offset, int length, @Nullable ImageBorder_S32<GrayU8> binput, @Nullable GrowArray<DogArray_I32> workspaces ) {
+	public static void vertical( GrayU8 input, GrayI8 output, int offset, int length,
+								 @Nullable ImageBorder_S32<GrayU8> border ) {
 		output.reshape(input);
+		vertical(input, output, offset, length, border, border == null);
+	}
 
-		if( binput != null ) {
-			binput.setImage(input);
-			Kernel1D_S32 kernel = FactoryKernel.table1D_S32(offset, length);
-			ConvolveJustBorder_General_SB.vertical(kernel, binput, output, kernel.computeSum());
-		}
-		if (length <= input.height) {
-			if(BoofConcurrency.USE_CONCURRENT) {
-				ImplConvolveMean_MT.vertical(input, output, offset, length, workspaces);
-			} else {
-				ImplConvolveMean.vertical(input, output, offset, length, workspaces);
-			}
+	/// Picks single or multi threaded. If skipBorder only the inner image is processed
+	private static void horizontal( GrayU8 input, GrayI8 output, int offset, int length,
+									@Nullable ImageBorder_S32<GrayU8> border, boolean skipBorder ) {
+		if (border != null)
+			border.setImage(input);
+
+		boolean concurrent = isConcurrent(input, CONCURRENT_MIN_PIXELS_HORIZONTAL);
+		if (skipBorder) {
+			if (concurrent)
+				ImplConvolveMean_MT.horizontalInner(input, output, offset, length);
+			else
+				ImplConvolveMean.horizontalInner(input, output, offset, length);
+		} else if (concurrent) {
+			ImplConvolveMean_MT.horizontal(input, output, offset, length, border);
+		} else {
+			ImplConvolveMean.horizontal(input, output, offset, length, border);
 		}
 	}
 
-	/**
-	 * Performs a horizontal 1D mean box filter. Borders are handled by reducing the box size.
-	 *
-	 * @param input The input image. Not modified.
-	 * @param output Where the resulting image is written to. Modified.
-	 * @param offset Start offset from pixel coordinate
-	 * @param length How long the mean filter is
-	 */
+	/// Picks single or multi threaded. If skipBorder only the inner image is processed
+	private static void vertical( GrayU8 input, GrayI8 output, int offset, int length,
+								  @Nullable ImageBorder_S32<GrayU8> border, boolean skipBorder ) {
+		if (border != null)
+			border.setImage(input);
+
+		GrowArray<DogArray<DogArray_I32>> workspaces = BoofConcurrency.takeRowBlocks_I32();
+		try {
+			boolean concurrent = isConcurrent(input, CONCURRENT_MIN_PIXELS_VERTICAL);
+			if (skipBorder) {
+				if (concurrent) {
+					ImplConvolveMean_MT.verticalInner(input, output, offset, length, workspaces);
+				} else {
+					workspaces.reset();
+					ImplConvolveMean.verticalInner(input, output, offset, length, workspaces.grow());
+				}
+			} else if (concurrent) {
+				ImplConvolveMean_MT.vertical(input, output, offset, length, border, workspaces);
+			} else {
+				workspaces.reset();
+				ImplConvolveMean.vertical(input, output, offset, length, border, workspaces.grow());
+			}
+		} finally {
+			BoofConcurrency.releaseRowBlocks_I32();
+		}
+	}
+
+	/// Mean along x. Near the image border only the pixels inside the image are averaged
 	public static void horizontal( GrayS16 input, GrayI16 output, int offset, int length ) {
 		output.reshape(input);
 
 		if (BOverrideConvolveImageMean.invokeNativeHorizontal(input, output, offset, length))
 			return;
 
-		if (length > input.width) {
-			Kernel1D_S32 kernel = FactoryKernel.table1D_S32(offset, length);
-			ConvolveImageNormalized.horizontal(kernel, input, output);
-		} else {
-			if (BoofConcurrency.USE_CONCURRENT) {
-				ImplConvolveMean_MT.horizontalBorder(input, output, offset, length);
-				ImplConvolveMean_MT.horizontal(input, output, offset, length);
-			} else {
-				ImplConvolveMean.horizontalBorder(input, output, offset, length);
-				ImplConvolveMean.horizontal(input, output, offset, length);
-			}
-		}
+		horizontal(input, output, offset, length, null, false);
 	}
 
-	/**
-	 * Performs a vertical 1D mean box filter. Borders are handled by reducing the box size.
-	 *
-	 * @param input The input image. Not modified.
-	 * @param output Where the resulting image is written to. Modified.
-	 * @param offset Start offset from pixel coordinate
-	 * @param length How long the mean filter is
-	 * @param work (Optional) Storage for work array
-	 */
-	public static void vertical( GrayS16 input, GrayI16 output, int offset, int length, @Nullable GrowArray<DogArray_I32> workspaces ) {
+	/// Mean along y. Near the image border only the pixels inside the image are averaged
+	public static void vertical( GrayS16 input, GrayI16 output, int offset, int length ) {
 		output.reshape(input);
 
 		if (BOverrideConvolveImageMean.invokeNativeVertical(input, output, offset, length))
 			return;
 
-		if (length > input.height) {
-			Kernel1D_S32 kernel = FactoryKernel.table1D_S32(offset, length);
-			ConvolveImageNormalized.vertical(kernel, input, output);
-		} else {
-			if (BoofConcurrency.USE_CONCURRENT) {
-				ImplConvolveMean_MT.verticalBorder(input, output, offset, length, workspaces);
-				ImplConvolveMean_MT.vertical(input, output, offset, length, workspaces);
-			} else {
-				ImplConvolveMean.verticalBorder(input, output, offset, length, workspaces);
-				ImplConvolveMean.vertical(input, output, offset, length, workspaces);
-			}
-		}
+		vertical(input, output, offset, length, null, false);
 	}
 
 	/**
@@ -220,24 +172,13 @@ public class ConvolveImageMean {
 	 * @param input The input image. Not modified.
 	 * @param output Where the resulting image is written to. Modified.
 	 * @param offset Start offset from pixel coordinate
-	 * @param binput Used to process image borders. If null borders are not processed.
 	 * @param length How long the mean filter is
+	 * @param border Pixels outside the image. If null, the image border isn't processed.
 	 */
-	public static void horizontal( GrayS16 input, GrayI16 output, int offset, int length, @Nullable ImageBorder_S32<GrayS16> binput ) {
-		output.reshape(input.width,output.height);
-
-		if (binput != null) {
-			binput.setImage(input);
-			Kernel1D_S32 kernel = FactoryKernel.table1D_S32(offset, length);
-			ConvolveJustBorder_General_SB.horizontal(kernel, binput, output, kernel.computeSum());
-		}
-		if (length <= input.width) {
-			if(BoofConcurrency.USE_CONCURRENT) {
-				ImplConvolveMean_MT.horizontal(input, output, offset, length);
-			} else {
-				ImplConvolveMean.horizontal(input, output, offset, length);
-			}
-		}
+	public static void horizontal( GrayS16 input, GrayI16 output, int offset, int length,
+								   @Nullable ImageBorder_S32<GrayS16> border ) {
+		output.reshape(input);
+		horizontal(input, output, offset, length, border, border == null);
 	}
 
 	/**
@@ -246,81 +187,79 @@ public class ConvolveImageMean {
 	 * @param input The input image. Not modified.
 	 * @param output Where the resulting image is written to. Modified.
 	 * @param offset Start offset from pixel coordinate
-	 * @param binput Used to process image borders. If null borders are not processed.
-	 * @param work (Optional) Storage for work array
+	 * @param length How long the mean filter is
+	 * @param border Pixels outside the image. If null, the image border isn't processed.
 	 */
-	public static void vertical( GrayS16 input, GrayI16 output, int offset, int length, @Nullable ImageBorder_S32<GrayS16> binput, @Nullable GrowArray<DogArray_I32> workspaces ) {
+	public static void vertical( GrayS16 input, GrayI16 output, int offset, int length,
+								 @Nullable ImageBorder_S32<GrayS16> border ) {
 		output.reshape(input);
+		vertical(input, output, offset, length, border, border == null);
+	}
 
-		if( binput != null ) {
-			binput.setImage(input);
-			Kernel1D_S32 kernel = FactoryKernel.table1D_S32(offset, length);
-			ConvolveJustBorder_General_SB.vertical(kernel, binput, output, kernel.computeSum());
-		}
-		if (length <= input.height) {
-			if(BoofConcurrency.USE_CONCURRENT) {
-				ImplConvolveMean_MT.vertical(input, output, offset, length, workspaces);
-			} else {
-				ImplConvolveMean.vertical(input, output, offset, length, workspaces);
-			}
+	/// Picks single or multi threaded. If skipBorder only the inner image is processed
+	private static void horizontal( GrayS16 input, GrayI16 output, int offset, int length,
+									@Nullable ImageBorder_S32<GrayS16> border, boolean skipBorder ) {
+		if (border != null)
+			border.setImage(input);
+
+		boolean concurrent = isConcurrent(input, CONCURRENT_MIN_PIXELS_HORIZONTAL);
+		if (skipBorder) {
+			if (concurrent)
+				ImplConvolveMean_MT.horizontalInner(input, output, offset, length);
+			else
+				ImplConvolveMean.horizontalInner(input, output, offset, length);
+		} else if (concurrent) {
+			ImplConvolveMean_MT.horizontal(input, output, offset, length, border);
+		} else {
+			ImplConvolveMean.horizontal(input, output, offset, length, border);
 		}
 	}
 
-	/**
-	 * Performs a horizontal 1D mean box filter. Borders are handled by reducing the box size.
-	 *
-	 * @param input The input image. Not modified.
-	 * @param output Where the resulting image is written to. Modified.
-	 * @param offset Start offset from pixel coordinate
-	 * @param length How long the mean filter is
-	 */
+	/// Picks single or multi threaded. If skipBorder only the inner image is processed
+	private static void vertical( GrayS16 input, GrayI16 output, int offset, int length,
+								  @Nullable ImageBorder_S32<GrayS16> border, boolean skipBorder ) {
+		if (border != null)
+			border.setImage(input);
+
+		GrowArray<DogArray<DogArray_F64>> workspaces = BoofConcurrency.takeRowBlocks_F64();
+		try {
+			boolean concurrent = isConcurrent(input, CONCURRENT_MIN_PIXELS_VERTICAL);
+			if (skipBorder) {
+				if (concurrent) {
+					ImplConvolveMean_MT.verticalInner(input, output, offset, length, workspaces);
+				} else {
+					workspaces.reset();
+					ImplConvolveMean.verticalInner(input, output, offset, length, workspaces.grow());
+				}
+			} else if (concurrent) {
+				ImplConvolveMean_MT.vertical(input, output, offset, length, border, workspaces);
+			} else {
+				workspaces.reset();
+				ImplConvolveMean.vertical(input, output, offset, length, border, workspaces.grow());
+			}
+		} finally {
+			BoofConcurrency.releaseRowBlocks_F64();
+		}
+	}
+
+	/// Mean along x. Near the image border only the pixels inside the image are averaged
 	public static void horizontal( GrayU16 input, GrayI16 output, int offset, int length ) {
 		output.reshape(input);
 
 		if (BOverrideConvolveImageMean.invokeNativeHorizontal(input, output, offset, length))
 			return;
 
-		if (length > input.width) {
-			Kernel1D_S32 kernel = FactoryKernel.table1D_S32(offset, length);
-			ConvolveImageNormalized.horizontal(kernel, input, output);
-		} else {
-			if (BoofConcurrency.USE_CONCURRENT) {
-				ImplConvolveMean_MT.horizontalBorder(input, output, offset, length);
-				ImplConvolveMean_MT.horizontal(input, output, offset, length);
-			} else {
-				ImplConvolveMean.horizontalBorder(input, output, offset, length);
-				ImplConvolveMean.horizontal(input, output, offset, length);
-			}
-		}
+		horizontal(input, output, offset, length, null, false);
 	}
 
-	/**
-	 * Performs a vertical 1D mean box filter. Borders are handled by reducing the box size.
-	 *
-	 * @param input The input image. Not modified.
-	 * @param output Where the resulting image is written to. Modified.
-	 * @param offset Start offset from pixel coordinate
-	 * @param length How long the mean filter is
-	 * @param work (Optional) Storage for work array
-	 */
-	public static void vertical( GrayU16 input, GrayI16 output, int offset, int length, @Nullable GrowArray<DogArray_I32> workspaces ) {
+	/// Mean along y. Near the image border only the pixels inside the image are averaged
+	public static void vertical( GrayU16 input, GrayI16 output, int offset, int length ) {
 		output.reshape(input);
 
 		if (BOverrideConvolveImageMean.invokeNativeVertical(input, output, offset, length))
 			return;
 
-		if (length > input.height) {
-			Kernel1D_S32 kernel = FactoryKernel.table1D_S32(offset, length);
-			ConvolveImageNormalized.vertical(kernel, input, output);
-		} else {
-			if (BoofConcurrency.USE_CONCURRENT) {
-				ImplConvolveMean_MT.verticalBorder(input, output, offset, length, workspaces);
-				ImplConvolveMean_MT.vertical(input, output, offset, length, workspaces);
-			} else {
-				ImplConvolveMean.verticalBorder(input, output, offset, length, workspaces);
-				ImplConvolveMean.vertical(input, output, offset, length, workspaces);
-			}
-		}
+		vertical(input, output, offset, length, null, false);
 	}
 
 	/**
@@ -329,24 +268,13 @@ public class ConvolveImageMean {
 	 * @param input The input image. Not modified.
 	 * @param output Where the resulting image is written to. Modified.
 	 * @param offset Start offset from pixel coordinate
-	 * @param binput Used to process image borders. If null borders are not processed.
 	 * @param length How long the mean filter is
+	 * @param border Pixels outside the image. If null, the image border isn't processed.
 	 */
-	public static void horizontal( GrayU16 input, GrayI16 output, int offset, int length, @Nullable ImageBorder_S32<GrayU16> binput ) {
-		output.reshape(input.width,output.height);
-
-		if (binput != null) {
-			binput.setImage(input);
-			Kernel1D_S32 kernel = FactoryKernel.table1D_S32(offset, length);
-			ConvolveJustBorder_General_SB.horizontal(kernel, binput, output, kernel.computeSum());
-		}
-		if (length <= input.width) {
-			if(BoofConcurrency.USE_CONCURRENT) {
-				ImplConvolveMean_MT.horizontal(input, output, offset, length);
-			} else {
-				ImplConvolveMean.horizontal(input, output, offset, length);
-			}
-		}
+	public static void horizontal( GrayU16 input, GrayI16 output, int offset, int length,
+								   @Nullable ImageBorder_S32<GrayU16> border ) {
+		output.reshape(input);
+		horizontal(input, output, offset, length, border, border == null);
 	}
 
 	/**
@@ -355,81 +283,79 @@ public class ConvolveImageMean {
 	 * @param input The input image. Not modified.
 	 * @param output Where the resulting image is written to. Modified.
 	 * @param offset Start offset from pixel coordinate
-	 * @param binput Used to process image borders. If null borders are not processed.
-	 * @param work (Optional) Storage for work array
+	 * @param length How long the mean filter is
+	 * @param border Pixels outside the image. If null, the image border isn't processed.
 	 */
-	public static void vertical( GrayU16 input, GrayI16 output, int offset, int length, @Nullable ImageBorder_S32<GrayU16> binput, @Nullable GrowArray<DogArray_I32> workspaces ) {
+	public static void vertical( GrayU16 input, GrayI16 output, int offset, int length,
+								 @Nullable ImageBorder_S32<GrayU16> border ) {
 		output.reshape(input);
+		vertical(input, output, offset, length, border, border == null);
+	}
 
-		if( binput != null ) {
-			binput.setImage(input);
-			Kernel1D_S32 kernel = FactoryKernel.table1D_S32(offset, length);
-			ConvolveJustBorder_General_SB.vertical(kernel, binput, output, kernel.computeSum());
-		}
-		if (length <= input.height) {
-			if(BoofConcurrency.USE_CONCURRENT) {
-				ImplConvolveMean_MT.vertical(input, output, offset, length, workspaces);
-			} else {
-				ImplConvolveMean.vertical(input, output, offset, length, workspaces);
-			}
+	/// Picks single or multi threaded. If skipBorder only the inner image is processed
+	private static void horizontal( GrayU16 input, GrayI16 output, int offset, int length,
+									@Nullable ImageBorder_S32<GrayU16> border, boolean skipBorder ) {
+		if (border != null)
+			border.setImage(input);
+
+		boolean concurrent = isConcurrent(input, CONCURRENT_MIN_PIXELS_HORIZONTAL);
+		if (skipBorder) {
+			if (concurrent)
+				ImplConvolveMean_MT.horizontalInner(input, output, offset, length);
+			else
+				ImplConvolveMean.horizontalInner(input, output, offset, length);
+		} else if (concurrent) {
+			ImplConvolveMean_MT.horizontal(input, output, offset, length, border);
+		} else {
+			ImplConvolveMean.horizontal(input, output, offset, length, border);
 		}
 	}
 
-	/**
-	 * Performs a horizontal 1D mean box filter. Borders are handled by reducing the box size.
-	 *
-	 * @param input The input image. Not modified.
-	 * @param output Where the resulting image is written to. Modified.
-	 * @param offset Start offset from pixel coordinate
-	 * @param length How long the mean filter is
-	 */
+	/// Picks single or multi threaded. If skipBorder only the inner image is processed
+	private static void vertical( GrayU16 input, GrayI16 output, int offset, int length,
+								  @Nullable ImageBorder_S32<GrayU16> border, boolean skipBorder ) {
+		if (border != null)
+			border.setImage(input);
+
+		GrowArray<DogArray<DogArray_F64>> workspaces = BoofConcurrency.takeRowBlocks_F64();
+		try {
+			boolean concurrent = isConcurrent(input, CONCURRENT_MIN_PIXELS_VERTICAL);
+			if (skipBorder) {
+				if (concurrent) {
+					ImplConvolveMean_MT.verticalInner(input, output, offset, length, workspaces);
+				} else {
+					workspaces.reset();
+					ImplConvolveMean.verticalInner(input, output, offset, length, workspaces.grow());
+				}
+			} else if (concurrent) {
+				ImplConvolveMean_MT.vertical(input, output, offset, length, border, workspaces);
+			} else {
+				workspaces.reset();
+				ImplConvolveMean.vertical(input, output, offset, length, border, workspaces.grow());
+			}
+		} finally {
+			BoofConcurrency.releaseRowBlocks_F64();
+		}
+	}
+
+	/// Mean along x. Near the image border only the pixels inside the image are averaged
 	public static void horizontal( GrayF32 input, GrayF32 output, int offset, int length ) {
 		output.reshape(input);
 
 		if (BOverrideConvolveImageMean.invokeNativeHorizontal(input, output, offset, length))
 			return;
 
-		if (length > input.width) {
-			Kernel1D_F32 kernel = FactoryKernel.table1D_F32(offset, length , true);
-			ConvolveImageNormalized.horizontal(kernel, input, output);
-		} else {
-			if (BoofConcurrency.USE_CONCURRENT) {
-				ImplConvolveMean_MT.horizontalBorder(input, output, offset, length);
-				ImplConvolveMean_MT.horizontal(input, output, offset, length);
-			} else {
-				ImplConvolveMean.horizontalBorder(input, output, offset, length);
-				ImplConvolveMean.horizontal(input, output, offset, length);
-			}
-		}
+		horizontal(input, output, offset, length, null, false);
 	}
 
-	/**
-	 * Performs a vertical 1D mean box filter. Borders are handled by reducing the box size.
-	 *
-	 * @param input The input image. Not modified.
-	 * @param output Where the resulting image is written to. Modified.
-	 * @param offset Start offset from pixel coordinate
-	 * @param length How long the mean filter is
-	 * @param work (Optional) Storage for work array
-	 */
-	public static void vertical( GrayF32 input, GrayF32 output, int offset, int length, @Nullable GrowArray<DogArray_F32> workspaces ) {
+	/// Mean along y. Near the image border only the pixels inside the image are averaged
+	public static void vertical( GrayF32 input, GrayF32 output, int offset, int length ) {
 		output.reshape(input);
 
 		if (BOverrideConvolveImageMean.invokeNativeVertical(input, output, offset, length))
 			return;
 
-		if (length > input.height) {
-			Kernel1D_F32 kernel = FactoryKernel.table1D_F32(offset, length , true);
-			ConvolveImageNormalized.vertical(kernel, input, output);
-		} else {
-			if (BoofConcurrency.USE_CONCURRENT) {
-				ImplConvolveMean_MT.verticalBorder(input, output, offset, length, workspaces);
-				ImplConvolveMean_MT.vertical(input, output, offset, length, workspaces);
-			} else {
-				ImplConvolveMean.verticalBorder(input, output, offset, length, workspaces);
-				ImplConvolveMean.vertical(input, output, offset, length, workspaces);
-			}
-		}
+		vertical(input, output, offset, length, null, false);
 	}
 
 	/**
@@ -438,24 +364,13 @@ public class ConvolveImageMean {
 	 * @param input The input image. Not modified.
 	 * @param output Where the resulting image is written to. Modified.
 	 * @param offset Start offset from pixel coordinate
-	 * @param binput Used to process image borders. If null borders are not processed.
 	 * @param length How long the mean filter is
+	 * @param border Pixels outside the image. If null, the image border isn't processed.
 	 */
-	public static void horizontal( GrayF32 input, GrayF32 output, int offset, int length, @Nullable ImageBorder_F32 binput ) {
-		output.reshape(input.width,output.height);
-
-		if (binput != null) {
-			binput.setImage(input);
-			Kernel1D_F32 kernel = FactoryKernel.table1D_F32(offset, length , true);
-			ConvolveJustBorder_General_SB.horizontal(kernel, binput, output);
-		}
-		if (length <= input.width) {
-			if(BoofConcurrency.USE_CONCURRENT) {
-				ImplConvolveMean_MT.horizontal(input, output, offset, length);
-			} else {
-				ImplConvolveMean.horizontal(input, output, offset, length);
-			}
-		}
+	public static void horizontal( GrayF32 input, GrayF32 output, int offset, int length,
+								   @Nullable ImageBorder_F32 border ) {
+		output.reshape(input);
+		horizontal(input, output, offset, length, border, border == null);
 	}
 
 	/**
@@ -464,81 +379,79 @@ public class ConvolveImageMean {
 	 * @param input The input image. Not modified.
 	 * @param output Where the resulting image is written to. Modified.
 	 * @param offset Start offset from pixel coordinate
-	 * @param binput Used to process image borders. If null borders are not processed.
-	 * @param work (Optional) Storage for work array
+	 * @param length How long the mean filter is
+	 * @param border Pixels outside the image. If null, the image border isn't processed.
 	 */
-	public static void vertical( GrayF32 input, GrayF32 output, int offset, int length, @Nullable ImageBorder_F32 binput, @Nullable GrowArray<DogArray_F32> workspaces ) {
+	public static void vertical( GrayF32 input, GrayF32 output, int offset, int length,
+								 @Nullable ImageBorder_F32 border ) {
 		output.reshape(input);
+		vertical(input, output, offset, length, border, border == null);
+	}
 
-		if( binput != null ) {
-			binput.setImage(input);
-			Kernel1D_F32 kernel = FactoryKernel.table1D_F32(offset, length , true);
-			ConvolveJustBorder_General_SB.vertical(kernel, binput, output);
-		}
-		if (length <= input.height) {
-			if(BoofConcurrency.USE_CONCURRENT) {
-				ImplConvolveMean_MT.vertical(input, output, offset, length, workspaces);
-			} else {
-				ImplConvolveMean.vertical(input, output, offset, length, workspaces);
-			}
+	/// Picks single or multi threaded. If skipBorder only the inner image is processed
+	private static void horizontal( GrayF32 input, GrayF32 output, int offset, int length,
+									@Nullable ImageBorder_F32 border, boolean skipBorder ) {
+		if (border != null)
+			border.setImage(input);
+
+		boolean concurrent = isConcurrent(input, CONCURRENT_MIN_PIXELS_HORIZONTAL);
+		if (skipBorder) {
+			if (concurrent)
+				ImplConvolveMean_MT.horizontalInner(input, output, offset, length);
+			else
+				ImplConvolveMean.horizontalInner(input, output, offset, length);
+		} else if (concurrent) {
+			ImplConvolveMean_MT.horizontal(input, output, offset, length, border);
+		} else {
+			ImplConvolveMean.horizontal(input, output, offset, length, border);
 		}
 	}
 
-	/**
-	 * Performs a horizontal 1D mean box filter. Borders are handled by reducing the box size.
-	 *
-	 * @param input The input image. Not modified.
-	 * @param output Where the resulting image is written to. Modified.
-	 * @param offset Start offset from pixel coordinate
-	 * @param length How long the mean filter is
-	 */
+	/// Picks single or multi threaded. If skipBorder only the inner image is processed
+	private static void vertical( GrayF32 input, GrayF32 output, int offset, int length,
+								  @Nullable ImageBorder_F32 border, boolean skipBorder ) {
+		if (border != null)
+			border.setImage(input);
+
+		GrowArray<DogArray<DogArray_F32>> workspaces = BoofConcurrency.takeRowBlocks_F32();
+		try {
+			boolean concurrent = isConcurrent(input, CONCURRENT_MIN_PIXELS_VERTICAL);
+			if (skipBorder) {
+				if (concurrent) {
+					ImplConvolveMean_MT.verticalInner(input, output, offset, length, workspaces);
+				} else {
+					workspaces.reset();
+					ImplConvolveMean.verticalInner(input, output, offset, length, workspaces.grow());
+				}
+			} else if (concurrent) {
+				ImplConvolveMean_MT.vertical(input, output, offset, length, border, workspaces);
+			} else {
+				workspaces.reset();
+				ImplConvolveMean.vertical(input, output, offset, length, border, workspaces.grow());
+			}
+		} finally {
+			BoofConcurrency.releaseRowBlocks_F32();
+		}
+	}
+
+	/// Mean along x. Near the image border only the pixels inside the image are averaged
 	public static void horizontal( GrayF64 input, GrayF64 output, int offset, int length ) {
 		output.reshape(input);
 
 		if (BOverrideConvolveImageMean.invokeNativeHorizontal(input, output, offset, length))
 			return;
 
-		if (length > input.width) {
-			Kernel1D_F64 kernel = FactoryKernel.table1D_F64(offset, length , true);
-			ConvolveImageNormalized.horizontal(kernel, input, output);
-		} else {
-			if (BoofConcurrency.USE_CONCURRENT) {
-				ImplConvolveMean_MT.horizontalBorder(input, output, offset, length);
-				ImplConvolveMean_MT.horizontal(input, output, offset, length);
-			} else {
-				ImplConvolveMean.horizontalBorder(input, output, offset, length);
-				ImplConvolveMean.horizontal(input, output, offset, length);
-			}
-		}
+		horizontal(input, output, offset, length, null, false);
 	}
 
-	/**
-	 * Performs a vertical 1D mean box filter. Borders are handled by reducing the box size.
-	 *
-	 * @param input The input image. Not modified.
-	 * @param output Where the resulting image is written to. Modified.
-	 * @param offset Start offset from pixel coordinate
-	 * @param length How long the mean filter is
-	 * @param work (Optional) Storage for work array
-	 */
-	public static void vertical( GrayF64 input, GrayF64 output, int offset, int length, @Nullable GrowArray<DogArray_F64> workspaces ) {
+	/// Mean along y. Near the image border only the pixels inside the image are averaged
+	public static void vertical( GrayF64 input, GrayF64 output, int offset, int length ) {
 		output.reshape(input);
 
 		if (BOverrideConvolveImageMean.invokeNativeVertical(input, output, offset, length))
 			return;
 
-		if (length > input.height) {
-			Kernel1D_F64 kernel = FactoryKernel.table1D_F64(offset, length , true);
-			ConvolveImageNormalized.vertical(kernel, input, output);
-		} else {
-			if (BoofConcurrency.USE_CONCURRENT) {
-				ImplConvolveMean_MT.verticalBorder(input, output, offset, length, workspaces);
-				ImplConvolveMean_MT.vertical(input, output, offset, length, workspaces);
-			} else {
-				ImplConvolveMean.verticalBorder(input, output, offset, length, workspaces);
-				ImplConvolveMean.vertical(input, output, offset, length, workspaces);
-			}
-		}
+		vertical(input, output, offset, length, null, false);
 	}
 
 	/**
@@ -547,24 +460,13 @@ public class ConvolveImageMean {
 	 * @param input The input image. Not modified.
 	 * @param output Where the resulting image is written to. Modified.
 	 * @param offset Start offset from pixel coordinate
-	 * @param binput Used to process image borders. If null borders are not processed.
 	 * @param length How long the mean filter is
+	 * @param border Pixels outside the image. If null, the image border isn't processed.
 	 */
-	public static void horizontal( GrayF64 input, GrayF64 output, int offset, int length, @Nullable ImageBorder_F64 binput ) {
-		output.reshape(input.width,output.height);
-
-		if (binput != null) {
-			binput.setImage(input);
-			Kernel1D_F64 kernel = FactoryKernel.table1D_F64(offset, length , true);
-			ConvolveJustBorder_General_SB.horizontal(kernel, binput, output);
-		}
-		if (length <= input.width) {
-			if(BoofConcurrency.USE_CONCURRENT) {
-				ImplConvolveMean_MT.horizontal(input, output, offset, length);
-			} else {
-				ImplConvolveMean.horizontal(input, output, offset, length);
-			}
-		}
+	public static void horizontal( GrayF64 input, GrayF64 output, int offset, int length,
+								   @Nullable ImageBorder_F64 border ) {
+		output.reshape(input);
+		horizontal(input, output, offset, length, border, border == null);
 	}
 
 	/**
@@ -573,24 +475,62 @@ public class ConvolveImageMean {
 	 * @param input The input image. Not modified.
 	 * @param output Where the resulting image is written to. Modified.
 	 * @param offset Start offset from pixel coordinate
-	 * @param binput Used to process image borders. If null borders are not processed.
-	 * @param work (Optional) Storage for work array
+	 * @param length How long the mean filter is
+	 * @param border Pixels outside the image. If null, the image border isn't processed.
 	 */
-	public static void vertical( GrayF64 input, GrayF64 output, int offset, int length, @Nullable ImageBorder_F64 binput, @Nullable GrowArray<DogArray_F64> workspaces ) {
+	public static void vertical( GrayF64 input, GrayF64 output, int offset, int length,
+								 @Nullable ImageBorder_F64 border ) {
 		output.reshape(input);
+		vertical(input, output, offset, length, border, border == null);
+	}
 
-		if( binput != null ) {
-			binput.setImage(input);
-			Kernel1D_F64 kernel = FactoryKernel.table1D_F64(offset, length , true);
-			ConvolveJustBorder_General_SB.vertical(kernel, binput, output);
-		}
-		if (length <= input.height) {
-			if(BoofConcurrency.USE_CONCURRENT) {
-				ImplConvolveMean_MT.vertical(input, output, offset, length, workspaces);
-			} else {
-				ImplConvolveMean.vertical(input, output, offset, length, workspaces);
-			}
+	/// Picks single or multi threaded. If skipBorder only the inner image is processed
+	private static void horizontal( GrayF64 input, GrayF64 output, int offset, int length,
+									@Nullable ImageBorder_F64 border, boolean skipBorder ) {
+		if (border != null)
+			border.setImage(input);
+
+		boolean concurrent = isConcurrent(input, CONCURRENT_MIN_PIXELS_HORIZONTAL);
+		if (skipBorder) {
+			if (concurrent)
+				ImplConvolveMean_MT.horizontalInner(input, output, offset, length);
+			else
+				ImplConvolveMean.horizontalInner(input, output, offset, length);
+		} else if (concurrent) {
+			ImplConvolveMean_MT.horizontal(input, output, offset, length, border);
+		} else {
+			ImplConvolveMean.horizontal(input, output, offset, length, border);
 		}
 	}
 
+	/// Picks single or multi threaded. If skipBorder only the inner image is processed
+	private static void vertical( GrayF64 input, GrayF64 output, int offset, int length,
+								  @Nullable ImageBorder_F64 border, boolean skipBorder ) {
+		if (border != null)
+			border.setImage(input);
+
+		GrowArray<DogArray<DogArray_F64>> workspaces = BoofConcurrency.takeRowBlocks_F64();
+		try {
+			boolean concurrent = isConcurrent(input, CONCURRENT_MIN_PIXELS_VERTICAL);
+			if (skipBorder) {
+				if (concurrent) {
+					ImplConvolveMean_MT.verticalInner(input, output, offset, length, workspaces);
+				} else {
+					workspaces.reset();
+					ImplConvolveMean.verticalInner(input, output, offset, length, workspaces.grow());
+				}
+			} else if (concurrent) {
+				ImplConvolveMean_MT.vertical(input, output, offset, length, border, workspaces);
+			} else {
+				workspaces.reset();
+				ImplConvolveMean.vertical(input, output, offset, length, border, workspaces.grow());
+			}
+		} finally {
+			BoofConcurrency.releaseRowBlocks_F64();
+		}
+	}
+
+	private static boolean isConcurrent( ImageGray<?> input, int minPixels ) {
+		return BoofConcurrency.USE_CONCURRENT && input.width*input.height >= minPixels;
+	}
 }

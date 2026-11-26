@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,10 +24,7 @@ import boofcv.alg.filter.binary.impl.ImplThresholdImageOps_MT;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.image.*;
-import org.ddogleg.struct.DogArray_F32;
-import org.ddogleg.struct.DogArray_I32;
 import org.jetbrains.annotations.Nullable;
-import pabeles.concurrency.GrowArray;
 
 /**
  * <p>
@@ -200,17 +197,16 @@ public class ThresholdImageOps {
 	 */
 	public static GrayU8 localMean( GrayU8 input, @Nullable GrayU8 output,
 									ConfigLength width, float scale, boolean down,
-									@Nullable GrayU8 storage1, @Nullable GrayU8 storage2,
-									@Nullable GrowArray<DogArray_I32> storage3 ) {
+									@Nullable GrayU8 storage1, @Nullable GrayU8 storage2 ) {
 
 		output = InputSanityCheck.declareOrReshape(input, output, GrayU8.class);
 		storage1 = InputSanityCheck.declareOrReshape(input, storage1, GrayU8.class);
 		storage2 = InputSanityCheck.declareOrReshape(input, storage2, GrayU8.class);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
-			ImplThresholdImageOps_MT.localMean(input, output, width, scale, down, storage1, storage2, storage3);
+			ImplThresholdImageOps_MT.localMean(input, output, width, scale, down, storage1, storage2);
 		} else {
-			ImplThresholdImageOps.localMean(input, output, width, scale, down, storage1, storage2, storage3);
+			ImplThresholdImageOps.localMean(input, output, width, scale, down, storage1, storage2);
 		}
 
 		return output;
@@ -265,17 +261,16 @@ public class ThresholdImageOps {
 	 */
 	public static GrayU8 localMean( GrayU16 input, @Nullable GrayU8 output,
 									ConfigLength width, float scale, boolean down,
-									@Nullable GrayU16 storage1, @Nullable GrayU16 storage2,
-									@Nullable GrowArray<DogArray_I32> storage3 ) {
+									@Nullable GrayU16 storage1, @Nullable GrayU16 storage2 ) {
 
 		output = InputSanityCheck.declareOrReshape(input, output, GrayU8.class);
 		storage1 = InputSanityCheck.declareOrReshape(input, storage1, GrayU16.class);
 		storage2 = InputSanityCheck.declareOrReshape(input, storage2, GrayU16.class);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
-			ImplThresholdImageOps_MT.localMean(input, output, width, scale, down, storage1, storage2, storage3);
+			ImplThresholdImageOps_MT.localMean(input, output, width, scale, down, storage1, storage2);
 		} else {
-			ImplThresholdImageOps.localMean(input, output, width, scale, down, storage1, storage2, storage3);
+			ImplThresholdImageOps.localMean(input, output, width, scale, down, storage1, storage2);
 		}
 
 		return output;
@@ -330,17 +325,16 @@ public class ThresholdImageOps {
 	 */
 	public static GrayU8 localMean( GrayF32 input, @Nullable GrayU8 output,
 									ConfigLength width, float scale, boolean down,
-									@Nullable GrayF32 storage1, @Nullable GrayF32 storage2,
-									@Nullable GrowArray<DogArray_F32> storage3 ) {
+									@Nullable GrayF32 storage1, @Nullable GrayF32 storage2 ) {
 
 		output = InputSanityCheck.declareOrReshape(input, output, GrayU8.class);
 		storage1 = InputSanityCheck.declareOrReshape(input, storage1, GrayF32.class);
 		storage2 = InputSanityCheck.declareOrReshape(input, storage2, GrayF32.class);
 
 		if (BoofConcurrency.USE_CONCURRENT) {
-			ImplThresholdImageOps_MT.localMean(input, output, width, scale, down, storage1, storage2, storage3);
+			ImplThresholdImageOps_MT.localMean(input, output, width, scale, down, storage1, storage2);
 		} else {
-			ImplThresholdImageOps.localMean(input, output, width, scale, down, storage1, storage2, storage3);
+			ImplThresholdImageOps.localMean(input, output, width, scale, down, storage1, storage2);
 		}
 
 		return output;

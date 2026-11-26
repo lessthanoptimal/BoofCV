@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,6 @@ import boofcv.struct.border.ImageBorder_F64;
 import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.image.*;
 import org.ddogleg.struct.DogArray_F32;
-import org.ddogleg.struct.DogArray_F64;
 import org.ddogleg.struct.DogArray_I32;
 import org.jetbrains.annotations.Nullable;
 import pabeles.concurrency.GrowArray;
@@ -49,17 +48,17 @@ public class GBlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static <T extends ImageBase<T>>
-	T mean( T input, @Nullable T output, int radius, @Nullable ImageBase storage, @Nullable GrowArray workVert ) {
+	T mean( T input, @Nullable T output, int radius, @Nullable ImageBase storage ) {
 		if (input instanceof GrayU8) {
-			return (T)BlurImageOps.mean((GrayU8)input, (GrayU8)output, radius, (GrayU8)storage, (GrowArray<DogArray_I32>)workVert);
+			return (T)BlurImageOps.mean((GrayU8)input, (GrayU8)output, radius, (GrayU8)storage);
 		} else if (input instanceof GrayU16) {
-			return (T)BlurImageOps.mean((GrayU16)input, (GrayU16)output, radius, (GrayU16)storage, (GrowArray<DogArray_I32>)workVert);
+			return (T)BlurImageOps.mean((GrayU16)input, (GrayU16)output, radius, (GrayU16)storage);
 		} else if (input instanceof GrayF32) {
-			return (T)BlurImageOps.mean((GrayF32)input, (GrayF32)output, radius, (GrayF32)storage, (GrowArray<DogArray_F32>)workVert);
+			return (T)BlurImageOps.mean((GrayF32)input, (GrayF32)output, radius, (GrayF32)storage);
 		} else if (input instanceof GrayF64) {
-			return (T)BlurImageOps.mean((GrayF64)input, (GrayF64)output, radius, (GrayF64)storage, (GrowArray<DogArray_F64>)workVert);
+			return (T)BlurImageOps.mean((GrayF64)input, (GrayF64)output, radius, (GrayF64)storage);
 		} else if (input instanceof Planar) {
-			return (T)BlurImageOps.mean((Planar)input, (Planar)output, radius, (ImageGray)storage, workVert);
+			return (T)BlurImageOps.mean((Planar)input, (Planar)output, radius, (ImageGray)storage);
 		} else {
 			throw new IllegalArgumentException("Unsupported image type");
 		}
@@ -77,17 +76,17 @@ public class GBlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static <T extends ImageBase<T>>
-	T mean( T input, @Nullable T output, int radiusX, int radiusY, @Nullable ImageBase storage, @Nullable GrowArray workVert ) {
+	T mean( T input, @Nullable T output, int radiusX, int radiusY, @Nullable ImageBase storage ) {
 		if (input instanceof GrayU8) {
-			return (T)BlurImageOps.mean((GrayU8)input, (GrayU8)output, radiusX, radiusY, (GrayU8)storage, (GrowArray<DogArray_I32>)workVert);
+			return (T)BlurImageOps.mean((GrayU8)input, (GrayU8)output, radiusX, radiusY, (GrayU8)storage);
 		} else if (input instanceof GrayU16) {
-			return (T)BlurImageOps.mean((GrayU16)input, (GrayU16)output, radiusX, radiusY, (GrayU16)storage, (GrowArray<DogArray_I32>)workVert);
+			return (T)BlurImageOps.mean((GrayU16)input, (GrayU16)output, radiusX, radiusY, (GrayU16)storage);
 		} else if (input instanceof GrayF32) {
-			return (T)BlurImageOps.mean((GrayF32)input, (GrayF32)output, radiusX, radiusY, (GrayF32)storage, (GrowArray<DogArray_F32>)workVert);
+			return (T)BlurImageOps.mean((GrayF32)input, (GrayF32)output, radiusX, radiusY, (GrayF32)storage);
 		} else if (input instanceof GrayF64) {
-			return (T)BlurImageOps.mean((GrayF64)input, (GrayF64)output, radiusX, radiusY, (GrayF64)storage, (GrowArray<DogArray_F64>)workVert);
+			return (T)BlurImageOps.mean((GrayF64)input, (GrayF64)output, radiusX, radiusY, (GrayF64)storage);
 		} else if (input instanceof Planar) {
-			return (T)BlurImageOps.mean((Planar)input, (Planar)output, radiusX, radiusY, (ImageGray)storage, workVert);
+			return (T)BlurImageOps.mean((Planar)input, (Planar)output, radiusX, radiusY, (ImageGray)storage);
 		} else {
 			throw new IllegalArgumentException("Unsupported image type");
 		}
@@ -100,28 +99,28 @@ public class GBlurImageOps {
 	 * @param output (Optional) Storage for output image, Can be null. Modified.
 	 * @param radiusX Radius of the box blur function along the x-axis
 	 * @param radiusY Radius of the box blur function along the y-axis
-	 * @param border (Optional) Specified how the image borders are handled. If null then only the inner portion is processed.
+	 * @param border Pixels outside the image. If null, the image border isn't processed.
 	 * @param storage (Optional) Storage for intermediate results. Same size as input image. Can be null.
 	 * @param <T> Input image type.
 	 * @return Output blurred image.
 	 */
 	public static <T extends ImageBase<T>>
 	T meanB( T input, @Nullable T output, int radiusX, int radiusY, @Nullable ImageBorder<T> border,
-			 @Nullable ImageBase storage, @Nullable GrowArray workVert ) {
+			 @Nullable ImageBase storage ) {
 		if (input instanceof GrayU8) {
 			return (T)BlurImageOps.meanB((GrayU8)input, (GrayU8)output, radiusX, radiusY, (ImageBorder_S32)border,
-					(GrayU8)storage, (GrowArray<DogArray_I32>)workVert);
+					(GrayU8)storage);
 		} else if (input instanceof GrayU16) {
 			return (T)BlurImageOps.meanB((GrayU16)input, (GrayU16)output, radiusX, radiusY, (ImageBorder_S32)border,
-					(GrayU16)storage, (GrowArray<DogArray_I32>)workVert);
+					(GrayU16)storage);
 		} else if (input instanceof GrayF32) {
 			return (T)BlurImageOps.meanB((GrayF32)input, (GrayF32)output, radiusX, radiusY, (ImageBorder_F32)border,
-					(GrayF32)storage, (GrowArray<DogArray_F32>)workVert);
+					(GrayF32)storage);
 		} else if (input instanceof GrayF64) {
 			return (T)BlurImageOps.meanB((GrayF64)input, (GrayF64)output, radiusX, radiusY, (ImageBorder_F64)border,
-					(GrayF64)storage, (GrowArray<DogArray_F64>)workVert);
+					(GrayF64)storage);
 		} else if (input instanceof Planar) {
-			return (T)BlurImageOps.meanB((Planar)input, (Planar)output, radiusX, radiusY, (ImageBorder)border, (ImageGray)storage, workVert);
+			return (T)BlurImageOps.meanB((Planar)input, (Planar)output, radiusX, radiusY, (ImageBorder)border, (ImageGray)storage);
 		} else {
 			throw new IllegalArgumentException("Unsupported image type");
 		}

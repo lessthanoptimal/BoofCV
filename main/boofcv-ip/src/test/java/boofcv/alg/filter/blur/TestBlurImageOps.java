@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -80,17 +80,9 @@ import java.lang.reflect.Method;
 				try {
 					Class storage = type.getFamily() == ImageType.Family.PLANAR ?
 							ImageGray.class : input.getClass();
-					Class work = GeneralizedImageOps.createGrowArray(type).getClass();
-					if (type.getFamily() == ImageType.Family.PLANAR) {
-						work = GrowArray.class;
-						Method m = BlurImageOps.class.getMethod(
-								"mean", input.getClass(), found.getClass(), int.class, storage, work);
-						m.invoke(null, input, found, radius, null, null);
-					} else {
-						Method m = BlurImageOps.class.getMethod(
-								"mean", input.getClass(), found.getClass(), int.class, storage, work);
-						m.invoke(null, input, found, radius, null, null);
-					}
+					Method m = BlurImageOps.class.getMethod(
+							"mean", input.getClass(), found.getClass(), int.class, storage);
+					m.invoke(null, input, found, radius, null);
 
 					BoofTesting.assertEquals(expected, found, 2);
 				} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
@@ -124,7 +116,6 @@ import java.lang.reflect.Method;
 				GConvolveImageOps.convolveNormalized(kernel, input, expected, border);
 				Class storage = type.getFamily() == ImageType.Family.PLANAR ?
 						ImageGray.class : input.getClass();
-				Class work = GeneralizedImageOps.createGrowArray(type).getClass();
 				Class borderType = ImageBorder.class;
 				if (type.getFamily() == ImageType.Family.GRAY) {
 					switch (type.getDataType()) {
@@ -140,31 +131,14 @@ import java.lang.reflect.Method;
 				}
 				try {
 					// Compare with image border
-					if (type.getFamily() == ImageType.Family.PLANAR) {
-						work = GrowArray.class;
-						Method m = BlurImageOps.class.getMethod(
-								"meanB", input.getClass(), found.getClass(), int.class, int.class, borderType, storage, work);
-						m.invoke(null, input, found, radius, radius, border, null, null);
-					} else {
-						Method m = BlurImageOps.class.getMethod(
-								"meanB", input.getClass(), found.getClass(), int.class, int.class, borderType, storage, work);
-						m.invoke(null, input, found, radius, radius, border, null, null);
-					}
-
+					Method m = BlurImageOps.class.getMethod(
+							"meanB", input.getClass(), found.getClass(), int.class, int.class, borderType, storage);
+					m.invoke(null, input, found, radius, radius, border, null);
 					BoofTesting.assertEquals(expected, found, 2);
 
 					// Test will null border
 					GImageMiscOps.fill(found, 0); // zero the image
-					if (type.getFamily() == ImageType.Family.PLANAR) {
-						work = GrowArray.class;
-						Method m = BlurImageOps.class.getMethod(
-								"meanB", input.getClass(), found.getClass(), int.class, int.class, borderType, storage, work);
-						m.invoke(null, input, found, radius, radius, border, null, null);
-					} else {
-						Method m = BlurImageOps.class.getMethod(
-								"meanB", input.getClass(), found.getClass(), int.class, int.class, borderType, storage, work);
-						m.invoke(null, input, found, radius, radius, border, null, null);
-					}
+					m.invoke(null, input, found, radius, radius, null, null);
 					// Inner should be the same
 					BoofTesting.assertEqualsInner(expected, found, 2, radius, radius, false);
 					// outer should be zeros

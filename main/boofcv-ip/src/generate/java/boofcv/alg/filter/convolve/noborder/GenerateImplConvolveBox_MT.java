@@ -82,7 +82,7 @@ public class GenerateImplConvolveBox_MT extends CodeGeneratorBase {
 					"\t\t\t\tImplConvolveBox.vertical(input, output, radius, y0, y1, rows));\n");
 		} else {
 			// blocks start where ImplConvolveBox restarts the running sums
-			out.print("\t\tfinal int blocks = ImplConvolveBox.restartBlocks(input.height, radius);\n" +
+			out.print("\t\tfinal int blocks = ImplConvolveBox.restartBlocks(input.height, 2*radius + 1);\n" +
 					"\t\tBoofConcurrency.loopBlocks(0, blocks, workspaces, ( rows, b0, b1 ) ->\n" +
 					"\t\t\t\tImplConvolveBox.vertical(input, output, radius,\n" +
 					"\t\t\t\t\t\tImplConvolveBox.restartRow(b0, blocks, input.height, radius),\n" +

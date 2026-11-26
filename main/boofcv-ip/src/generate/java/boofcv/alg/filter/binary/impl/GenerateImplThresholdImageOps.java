@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,10 +48,6 @@ public class GenerateImplThresholdImageOps extends CodeGeneratorBase {
 		out.print(
 				"import javax.annotation.Generated;\n" +
 				"\n" +
-				"import pabeles.concurrency.GrowArray;\n" +
-				"import org.ddogleg.struct.DogArray_F32;\n" +
-				"import org.ddogleg.struct.DogArray_I32;\n" +
-				"import org.jetbrains.annotations.Nullable;\n" +
 				"import boofcv.struct.image.*;\n" +
 				"import boofcv.alg.filter.blur.BlurImageOps;\n" +
 				"import boofcv.struct.ConfigLength;\n" +
@@ -113,19 +109,16 @@ public class GenerateImplThresholdImageOps extends CodeGeneratorBase {
 		String imageName = imageIn.getSingleBandName();
 		String bitwise = imageIn.getBitWise();
 
-		String workType = ("DogArray_"+imageIn.getKernelType()).replace("S32","I32");
-
 		out.print(
 				"\tpublic static GrayU8 localMean( "+imageName+" input , GrayU8 output ,\n" +
 				"\t\t\t\t\t\t\t\t\t\t\t ConfigLength width , float scale , boolean down ,\n" +
-				"\t\t\t\t\t\t\t\t\t\t\t "+imageName+" storage1 , "+imageName+" storage2 ,\n" +
-				"\t\t\t\t\t\t\t\t\t\t\t @Nullable GrowArray<"+workType+"> storage3 ) {\n" +
+				"\t\t\t\t\t\t\t\t\t\t\t "+imageName+" storage1 , "+imageName+" storage2 ) {\n" +
 				"\n" +
 				"\t\tint radius = width.computeI(Math.min(input.width,input.height))/2;\n" +
 				"\n" +
 				"\t\t"+imageName+" mean = storage1;\n" +
 				"\n" +
-				"\t\tBlurImageOps.mean(input,mean,radius,storage2,storage3);\n" +
+				"\t\tBlurImageOps.mean(input,mean,radius,storage2);\n" +
 				"\n" +
 				"\t\tif( down ) {\n" +
 				"\t\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {\n" +
