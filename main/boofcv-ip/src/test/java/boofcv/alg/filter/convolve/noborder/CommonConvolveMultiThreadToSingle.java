@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -110,7 +110,7 @@ public abstract class CommonConvolveMultiThreadToSingle extends BoofStandardJUni
 
 				assertNotEquals(0.0, GImageStatistics.sum(expected), 0.1);
 				try {
-					BoofTesting.assertEquals(expected, found, 1);
+					BoofTesting.assertEquals(expected, found, 0);
 				} catch (RuntimeException e) {
 					e.printStackTrace();
 					System.out.println("Method " + name + " " + input.getImageType() + " radius " + kernelRadius);

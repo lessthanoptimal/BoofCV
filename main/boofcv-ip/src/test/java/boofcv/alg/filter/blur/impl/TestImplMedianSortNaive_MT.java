@@ -30,6 +30,10 @@ import java.lang.reflect.Method;
 public class TestImplMedianSortNaive_MT extends CompareIdenticalFunctions {
 	public TestImplMedianSortNaive_MT() {
 		super(ImplMedianSortNaive_MT.class, ImplMedianSortNaive.class);
+		tolArrayF32 = 0;
+		tolArrayF64 = 0;
+		tolImageRelative = 0;
+		tolResult = 0;
 	}
 
 	@Test void performTests() {

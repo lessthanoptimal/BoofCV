@@ -35,6 +35,14 @@ import java.lang.reflect.Method;
  * @author Peter Abeles
  */
 public abstract class CompareIdenticalFunctions extends CompareEquivalentFunctions {
+	/// Tolerance for float[] parameters
+	protected float tolArrayF32 = UtilEjml.TEST_F32;
+	/// Tolerance for double[] parameters
+	protected double tolArrayF64 = UtilEjml.TEST_F64;
+	/// Relative tolerance for image parameters
+	protected double tolImageRelative = 1e-4;
+	/// Tolerance for a returned number
+	protected double tolResult = 1e-3;
 
 	/**
 	 *
@@ -118,9 +126,9 @@ public abstract class CompareIdenticalFunctions extends CompareEquivalentFunctio
 			} else if (targetParam[i].getClass() == long[].class) {
 				BoofTesting.assertEquals((long[])validationParam[i], (long[])targetParam[i]);
 			} else if (targetParam[i].getClass() == float[].class) {
-				BoofTesting.assertEquals((float[])validationParam[i], (float[])targetParam[i], UtilEjml.TEST_F32);
+				BoofTesting.assertEquals((float[])validationParam[i], (float[])targetParam[i], tolArrayF32);
 			} else if (targetParam[i].getClass() == double[].class) {
-				BoofTesting.assertEquals((double[])validationParam[i], (double[])targetParam[i], UtilEjml.TEST_F64);
+				BoofTesting.assertEquals((double[])validationParam[i], (double[])targetParam[i], tolArrayF64);
 			}
 
 			if (!ImageBase.class.isAssignableFrom(targetParam[i].getClass()))
@@ -129,13 +137,13 @@ public abstract class CompareIdenticalFunctions extends CompareEquivalentFunctio
 			ImageBase t = (ImageBase)targetParam[i];
 			ImageBase v = (ImageBase)validationParam[i];
 
-			BoofTesting.assertEqualsRelative(v, t, 1e-4);// todo is this tolerance too big?  some operations with a slightly different ordering seem to require it
+			BoofTesting.assertEqualsRelative(v, t, tolImageRelative);
 		}
 
 		if (targetResult instanceof Number) {
 			double expected = ((Number)validationResult).doubleValue();
 			double found = ((Number)targetResult).doubleValue();
-			if (Math.abs(found - expected) > 1e-3)
+			if (Math.abs(found - expected) > tolResult)
 				throw new RuntimeException("Returned values differ. expected=" + expected + " found=" + found);
 		}
 	}

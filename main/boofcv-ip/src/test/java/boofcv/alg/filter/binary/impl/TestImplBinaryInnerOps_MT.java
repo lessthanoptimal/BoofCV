@@ -30,6 +30,10 @@ class TestImplBinaryInnerOps_MT extends CompareIdenticalFunctions {
 
 	protected TestImplBinaryInnerOps_MT() {
 		super(ImplBinaryInnerOps_MT.class, ImplBinaryInnerOps.class);
+		tolArrayF32 = 0;
+		tolArrayF64 = 0;
+		tolImageRelative = 0;
+		tolResult = 0;
 	}
 
 	@Test void performTests() {super.performTests(7);}

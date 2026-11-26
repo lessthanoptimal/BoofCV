@@ -32,6 +32,10 @@ class TestImplBinaryImageOps_MT extends CompareIdenticalFunctions {
 
 	protected TestImplBinaryImageOps_MT() {
 		super(ImplBinaryImageOps_MT.class, ImplBinaryImageOps.class);
+		tolArrayF32 = 0;
+		tolArrayF64 = 0;
+		tolImageRelative = 0;
+		tolResult = 0;
 	}
 
 	@Test

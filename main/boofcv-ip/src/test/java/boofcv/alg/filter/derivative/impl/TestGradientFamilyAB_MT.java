@@ -80,8 +80,8 @@ class TestGradientFamilyAB_MT extends BoofStandardJUnit {
 			}
 
 			assertNotEquals(0.0, GImageStatistics.sum(expectedX), 0.1);
-			BoofTesting.assertEquals(expectedX, foundX, 1);
-			BoofTesting.assertEquals(expectedY, foundY, 1);
+			BoofTesting.assertEquals(expectedX, foundX, 0);
+			BoofTesting.assertEquals(expectedY, foundY, 0);
 			count++;
 		}
 

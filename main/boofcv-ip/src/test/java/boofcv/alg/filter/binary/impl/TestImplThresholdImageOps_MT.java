@@ -21,5 +21,9 @@ package boofcv.alg.filter.binary.impl;
 class TestImplThresholdImageOps_MT extends CompareToImplThresholdImageOps {
 	TestImplThresholdImageOps_MT() {
 		super(ImplThresholdImageOps_MT.class);
+		tolArrayF32 = 0;
+		tolArrayF64 = 0;
+		tolImageRelative = 0;
+		tolResult = 0;
 	}
 }

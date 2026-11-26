@@ -70,7 +70,7 @@ public class TestImplConvolveMean_MT extends BoofStandardJUnit {
 				fail("Exception");
 			}
 
-			BoofTesting.assertEquals(expected, found, 1);
+			BoofTesting.assertEquals(expected, found, 0);
 			count++;
 		}
 		assertEquals(20, count);

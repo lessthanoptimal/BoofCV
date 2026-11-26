@@ -80,7 +80,7 @@ class TestConvolveNormalized_JustBorder_SB_MT extends BoofStandardJUnit {
 					m.invoke(null, kernel1, kernel2, input, found);
 				}
 
-				BoofTesting.assertEquals(expected, found, 1);
+				BoofTesting.assertEquals(expected, found, 0);
 				count++;
 			} catch (Exception e) {
 				e.printStackTrace();

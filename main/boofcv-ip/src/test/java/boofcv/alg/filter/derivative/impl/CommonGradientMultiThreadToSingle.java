@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -80,8 +80,8 @@ public abstract class CommonGradientMultiThreadToSingle extends BoofStandardJUni
 			}
 
 			assertNotEquals(0.0, GImageStatistics.sum(expectedX), 0.1);
-			BoofTesting.assertEquals(expectedX, foundX, 1);
-			BoofTesting.assertEquals(expectedY, foundY, 1);
+			BoofTesting.assertEquals(expectedX, foundX, 0);
+			BoofTesting.assertEquals(expectedY, foundY, 0);
 			count++;
 		}
 

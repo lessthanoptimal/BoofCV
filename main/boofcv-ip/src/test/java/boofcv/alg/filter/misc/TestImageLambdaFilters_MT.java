@@ -31,6 +31,10 @@ class TestImageLambdaFilters_MT extends CompareIdenticalFunctions {
 
 	protected TestImageLambdaFilters_MT() {
 		super(ImageLambdaFilters_MT.class, ImageLambdaFilters.class);
+		tolArrayF32 = 0;
+		tolArrayF64 = 0;
+		tolImageRelative = 0;
+		tolResult = 0;
 	}
 
 	@Test

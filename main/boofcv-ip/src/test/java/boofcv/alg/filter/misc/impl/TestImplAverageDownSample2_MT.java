@@ -35,6 +35,10 @@ class TestImplAverageDownSample2_MT extends CompareIdenticalFunctions
 
 	protected TestImplAverageDownSample2_MT() {
 		super(ImplAverageDownSample2_MT.class, ImplAverageDownSample2.class);
+		tolArrayF32 = 0;
+		tolArrayF64 = 0;
+		tolImageRelative = 0;
+		tolResult = 0;
 	}
 
 	@Test

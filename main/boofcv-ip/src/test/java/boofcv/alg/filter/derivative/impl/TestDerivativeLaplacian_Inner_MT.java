@@ -24,7 +24,6 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofStandardJUnit;
-import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
 class TestDerivativeLaplacian_Inner_MT extends BoofStandardJUnit {
@@ -55,7 +54,7 @@ class TestDerivativeLaplacian_Inner_MT extends BoofStandardJUnit {
 		DerivativeLaplacian_Inner.process(input, expected);
 		DerivativeLaplacian_Inner_MT.process(input, found);
 
-		BoofTesting.assertEqualsInner(expected,found, UtilEjml.TEST_F32,1,1,false);
+		BoofTesting.assertEqualsInner(expected,found, 0,1,1,false);
 	}
 
 	@Test void U8_F32() {
@@ -68,7 +67,7 @@ class TestDerivativeLaplacian_Inner_MT extends BoofStandardJUnit {
 		DerivativeLaplacian_Inner.process(input, expected);
 		DerivativeLaplacian_Inner_MT.process(input, found);
 
-		BoofTesting.assertEqualsInner(expected,found, UtilEjml.TEST_F32,1,1,false);
+		BoofTesting.assertEqualsInner(expected,found, 0,1,1,false);
 	}
 }
 

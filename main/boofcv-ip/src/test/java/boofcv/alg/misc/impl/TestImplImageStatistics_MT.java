@@ -34,6 +34,10 @@ class TestImplImageStatistics_MT extends CompareIdenticalFunctions {
 
 	public TestImplImageStatistics_MT() {
 		super(ImplImageStatistics_MT.class, ImplImageStatistics.class);
+		tolArrayF32 = 0;
+		tolArrayF64 = 0;
+		tolImageRelative = 0;
+		tolResult = 0;
 	}
 
 	@Test
