@@ -210,6 +210,23 @@ class TestBoofConcurrency extends BoofStandardJUnit {
 		assertEquals(0, BoofConcurrency.localF64.get().depth);
 	}
 
+	/// Row blocks are separate from the arrays and each type has its own
+	@Test void takeRelease_rowBlocks() {
+		assertNotSame(BoofConcurrency.takeRowBlocks_I16(), BoofConcurrency.takeRowBlocks_I16());
+		BoofConcurrency.takeRowBlocks_F32();
+		assertEquals(2, BoofConcurrency.localRowBlocksI16.get().depth);
+		assertEquals(0, BoofConcurrency.localRowBlocksI32.get().depth);
+		assertEquals(1, BoofConcurrency.localRowBlocksF32.get().depth);
+		assertEquals(0, BoofConcurrency.localRowBlocksF64.get().depth);
+		assertEquals(0, BoofConcurrency.localF32.get().depth);
+		BoofConcurrency.releaseRowBlocks_I16();
+		BoofConcurrency.releaseRowBlocks_I16();
+		BoofConcurrency.releaseRowBlocks_F32();
+		assertEquals(0, BoofConcurrency.localRowBlocksI16.get().depth);
+		assertEquals(0, BoofConcurrency.localRowBlocksF32.get().depth);
+		assertThrows(IllegalStateException.class, BoofConcurrency::releaseRowBlocks_F64);
+	}
+
 	/// Functions release what they take, and clearing discards the arrays
 	@Test void clearThreadLocal() {
 		// Earlier tests on this thread may have left more arrays
@@ -219,6 +236,14 @@ class TestBoofConcurrency extends BoofStandardJUnit {
 		BoofConcurrency.sumBlocks(0, 1000, new int[5], ( block, i0, i1 ) -> {});
 		BoofConcurrency.select_I32(0, 1000, 0, i -> valuesI32[i], ( v, s ) -> v < s);
 		BoofConcurrency.sum_I64(0, 1000, i -> valuesI64[i]);
+		BoofConcurrency.takeRowBlocks_I16();
+		BoofConcurrency.releaseRowBlocks_I16();
+		BoofConcurrency.takeRowBlocks_I32();
+		BoofConcurrency.releaseRowBlocks_I32();
+		BoofConcurrency.takeRowBlocks_F32();
+		BoofConcurrency.releaseRowBlocks_F32();
+		BoofConcurrency.takeRowBlocks_F64();
+		BoofConcurrency.releaseRowBlocks_F64();
 		for (BoofConcurrency.LocalArrays<?> local : allLocal()) {
 			assertEquals(0, local.depth);
 			assertEquals(1, local.arrays.size());
@@ -244,11 +269,19 @@ class TestBoofConcurrency extends BoofStandardJUnit {
 		} finally {
 			BoofConcurrency.releaseArray_F64();
 		}
+		BoofConcurrency.takeRowBlocks_I32();
+		try {
+			assertThrows(IllegalStateException.class, BoofConcurrency::clearThreadLocal);
+		} finally {
+			BoofConcurrency.releaseRowBlocks_I32();
+		}
 		BoofConcurrency.clearThreadLocal();
 	}
 
 	private static BoofConcurrency.LocalArrays<?>[] allLocal() {
 		return new BoofConcurrency.LocalArrays<?>[]{BoofConcurrency.localI32.get(), BoofConcurrency.localI64.get(),
-				BoofConcurrency.localF32.get(), BoofConcurrency.localF64.get(), BoofConcurrency.localBlocks.get()};
+				BoofConcurrency.localF32.get(), BoofConcurrency.localF64.get(), BoofConcurrency.localBlocks.get(),
+				BoofConcurrency.localRowBlocksI16.get(), BoofConcurrency.localRowBlocksI32.get(),
+				BoofConcurrency.localRowBlocksF32.get(), BoofConcurrency.localRowBlocksF64.get()};
 	}
 }
