@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.filter.convolve;
 
-import boofcv.alg.filter.convolve.noborder.ImplConvolveBox;
+import boofcv.concurrency.BoofConcurrency;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
@@ -35,25 +35,34 @@ import java.util.concurrent.TimeUnit;
 @State(Scope.Benchmark)
 @Fork(value = 1)
 public class BenchmarkConvolveBox extends CommonBenchmarkConvolve_SB {
+	@Param({"true", "false"})
+	boolean concurrent;
+
 	@Param({"1", "4"})
 	public int radius;
 
-	@Setup public void setup() {setup(radius);}
+	@Setup public void setup() {
+		// large enough for ConvolveImageBox to use threads
+		width = 1200;
+		height = 1000;
+		BoofConcurrency.USE_CONCURRENT = concurrent;
+		setup(radius);
+	}
 
 	@Benchmark public void Vertical_U8_I16() {
-		ImplConvolveBox.vertical(input_U8, out_S16, radius, null);
+		ConvolveImageBox.vertical(input_U8, out_S16, radius);
 	}
 
 	@Benchmark public void Vertical_U8_I32() {
-		ImplConvolveBox.vertical(input_U8, out_S32, radius, null);
+		ConvolveImageBox.vertical(input_U8, out_S32, radius);
 	}
 
 	@Benchmark public void Vertical_S16_I16() {
-		ImplConvolveBox.vertical(input_U8, out_S16, radius, null);
+		ConvolveImageBox.vertical(input_S16, out_S16, radius);
 	}
 
 	@Benchmark public void Vertical_F32_F32() {
-		ImplConvolveBox.vertical(input_F32, out_F32, radius, null);
+		ConvolveImageBox.vertical(input_F32, out_F32, radius);
 	}
 
 	@Benchmark public void Vertical_Alt_F32_F32() {
@@ -61,19 +70,19 @@ public class BenchmarkConvolveBox extends CommonBenchmarkConvolve_SB {
 	}
 
 	@Benchmark public void Horizontal_U8_I16() {
-		ImplConvolveBox.horizontal(input_U8, out_S16, radius);
+		ConvolveImageBox.horizontal(input_U8, out_S16, radius);
 	}
 
 	@Benchmark public void Horizontal_U8_I32() {
-		ImplConvolveBox.horizontal(input_U8, out_S32, radius);
+		ConvolveImageBox.horizontal(input_U8, out_S32, radius);
 	}
 
 	@Benchmark public void Horizontal_S16_I16() {
-		ImplConvolveBox.horizontal(out_S16, out_S16, radius);
+		ConvolveImageBox.horizontal(input_S16, out_S16, radius);
 	}
 
 	@Benchmark public void Horizontal_F32_F32() {
-		ImplConvolveBox.horizontal(input_F32, out_F32, radius);
+		ConvolveImageBox.horizontal(input_F32, out_F32, radius);
 	}
 
 	public static void main( String[] args ) throws RunnerException {

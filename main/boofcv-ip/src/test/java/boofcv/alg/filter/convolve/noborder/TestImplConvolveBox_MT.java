@@ -20,59 +20,64 @@ package boofcv.alg.filter.convolve.noborder;
 
 import boofcv.BoofTesting;
 import boofcv.alg.misc.GImageMiscOps;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageGray;
+import org.ddogleg.struct.DogArray;
+import pabeles.concurrency.GrowArray;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 
 public class TestImplConvolveBox_MT extends BoofStandardJUnit {
-	int width = 100,height=90;
+	// several VERTICAL_RESTART blocks
+	int width = 100, height = 300;
 
-	/**
-	 * Compares results to single threaded
-	 */
-	@Test
-	void compareToSingle() {
+	/// Results must not depend on the number of threads
+	@Test void compareToSingle_threads() throws Exception {
+		int original = BoofConcurrency.getMaxThreads();
+		try {
+			for (int threads : new int[]{1, 3, 7}) {
+				BoofConcurrency.setMaxThreads(threads);
+				compareToSingle();
+			}
+		} finally {
+			BoofConcurrency.setMaxThreads(original);
+		}
+	}
+
+	/// Compares results to single threaded
+	@Test void compareToSingle() throws Exception {
 		int count = 0;
-		Method[] methods = ImplConvolveBox_MT.class.getMethods();
-		for( Method m : methods ) {
+		for (Method m : ImplConvolveBox_MT.class.getMethods()) {
 			String name = m.getName();
-			if( !(name.equals("horizontal") || name.equals("vertical")) )
+			if (!name.equals("horizontal") && !name.equals("vertical"))
 				continue;
-
-			// look up the test method
 			Class[] params = m.getParameterTypes();
-			Method testM = BoofTesting.findMethod(ImplConvolveBox.class,name,params);
+			Method single = ImplConvolveBox.class.getMethod(name, name.equals("horizontal") ? params :
+					new Class[]{params[0], params[1], int.class, DogArray.class});
 
-			ImageBase input = GeneralizedImageOps.createImage(params[0],width,height,2);
-			ImageBase expected = GeneralizedImageOps.createImage(params[1],width,height,2);
-			ImageBase found = GeneralizedImageOps.createImage(params[1],width,height,2);
+			ImageGray input = GeneralizedImageOps.createSingleBand(params[0], width, height);
+			ImageGray expected = GeneralizedImageOps.createSingleBand(params[1], width, height);
+			ImageGray found = GeneralizedImageOps.createSingleBand(params[1], width, height);
+			GImageMiscOps.fillUniform(input, rand, 0, 200);
 
-//			System.out.println("Method "+name+" "+input.getImageType());
-
-			GImageMiscOps.fillUniform(input,rand,0,200);
-
-			try {
-				if( name.equals("horizontal") ) {
-					testM.invoke(null, input, expected, 8);
-					m.invoke(null, input, found, 8);
-				} else {
-					testM.invoke(null, input, expected, 8, null);
-					m.invoke(null, input, found, 8, null);
-				}
-			} catch( Exception e ) {
-				e.printStackTrace();
-				fail("Exception");
+			single.invoke(null, TestImplConvolveBox.arguments(single, input, expected, 8));
+			if (name.equals("horizontal")) {
+				m.invoke(null, input, found, 8);
+			} else {
+				Type rowsType = ((ParameterizedType)m.getGenericParameterTypes()[3]).getActualTypeArguments()[0];
+				m.invoke(null, input, found, 8, new GrowArray<>(() -> TestImplConvolveBox.createRows(rowsType)));
 			}
 
-			BoofTesting.assertEquals(expected,found,1);
+			BoofTesting.assertEquals(expected, found, 0);
 			count++;
 		}
-		assertEquals(14,count);
+		assertEquals(14, count);
 	}
 }
