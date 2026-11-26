@@ -43,20 +43,6 @@ public class ConvolveImageBox {
 	/// Same as CONCURRENT_MIN_PIXELS_VERTICAL for horizontal(), which is slower single threaded
 	public static int CONCURRENT_MIN_PIXELS_HORIZONTAL = 800*800/4;
 
-	// Row buffers of the vertical pass, for each calling thread
-	private static final ThreadLocal<DogArray<DogArray_F32>> rowsF32 =
-			ThreadLocal.withInitial(() -> new DogArray<>(DogArray_F32::new));
-	private static final ThreadLocal<DogArray<DogArray_I16>> rowsI16 =
-			ThreadLocal.withInitial(() -> new DogArray<>(DogArray_I16::new));
-	private static final ThreadLocal<DogArray<DogArray_I32>> rowsI32 =
-			ThreadLocal.withInitial(() -> new DogArray<>(DogArray_I32::new));
-	private static final ThreadLocal<GrowArray<DogArray<DogArray_F32>>> workspacesF32 =
-			ThreadLocal.withInitial(() -> new GrowArray<>(() -> new DogArray<>(DogArray_F32::new)));
-	private static final ThreadLocal<GrowArray<DogArray<DogArray_I16>>> workspacesI16 =
-			ThreadLocal.withInitial(() -> new GrowArray<>(() -> new DogArray<>(DogArray_I16::new)));
-	private static final ThreadLocal<GrowArray<DogArray<DogArray_I32>>> workspacesI32 =
-			ThreadLocal.withInitial(() -> new GrowArray<>(() -> new DogArray<>(DogArray_I32::new)));
-
 	/**
 	 * Performs a horizontal 1D convolution of a box kernel across the image
 	 *
@@ -135,10 +121,16 @@ public class ConvolveImageBox {
 	public static void vertical( GrayF32 input, GrayF32 output, int radius ) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		if (isConcurrent(input, CONCURRENT_MIN_PIXELS_VERTICAL)) {
-			ImplConvolveBox_MT.vertical(input, output, radius, workspacesF32.get());
-		} else {
-			ImplConvolveBox.vertical(input, output, radius, rowsF32.get());
+		GrowArray<DogArray<DogArray_F32>> workspaces = BoofConcurrency.takeRowBlocks_F32();
+		try {
+			if (isConcurrent(input, CONCURRENT_MIN_PIXELS_VERTICAL)) {
+				ImplConvolveBox_MT.vertical(input, output, radius, workspaces);
+			} else {
+				workspaces.reset();
+				ImplConvolveBox.vertical(input, output, radius, workspaces.grow());
+			}
+		} finally {
+			BoofConcurrency.releaseRowBlocks_F32();
 		}
 	}
 
@@ -152,10 +144,16 @@ public class ConvolveImageBox {
 	public static void vertical( GrayU8 input, GrayI16 output, int radius ) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		if (isConcurrent(input, CONCURRENT_MIN_PIXELS_VERTICAL)) {
-			ImplConvolveBox_MT.vertical(input, output, radius, workspacesI16.get());
-		} else {
-			ImplConvolveBox.vertical(input, output, radius, rowsI16.get());
+		GrowArray<DogArray<DogArray_I16>> workspaces = BoofConcurrency.takeRowBlocks_I16();
+		try {
+			if (isConcurrent(input, CONCURRENT_MIN_PIXELS_VERTICAL)) {
+				ImplConvolveBox_MT.vertical(input, output, radius, workspaces);
+			} else {
+				workspaces.reset();
+				ImplConvolveBox.vertical(input, output, radius, workspaces.grow());
+			}
+		} finally {
+			BoofConcurrency.releaseRowBlocks_I16();
 		}
 	}
 
@@ -169,10 +167,16 @@ public class ConvolveImageBox {
 	public static void vertical( GrayU8 input, GrayS32 output, int radius ) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		if (isConcurrent(input, CONCURRENT_MIN_PIXELS_VERTICAL)) {
-			ImplConvolveBox_MT.vertical(input, output, radius, workspacesI32.get());
-		} else {
-			ImplConvolveBox.vertical(input, output, radius, rowsI32.get());
+		GrowArray<DogArray<DogArray_I32>> workspaces = BoofConcurrency.takeRowBlocks_I32();
+		try {
+			if (isConcurrent(input, CONCURRENT_MIN_PIXELS_VERTICAL)) {
+				ImplConvolveBox_MT.vertical(input, output, radius, workspaces);
+			} else {
+				workspaces.reset();
+				ImplConvolveBox.vertical(input, output, radius, workspaces.grow());
+			}
+		} finally {
+			BoofConcurrency.releaseRowBlocks_I32();
 		}
 	}
 
@@ -186,10 +190,16 @@ public class ConvolveImageBox {
 	public static void vertical( GrayS16 input, GrayI16 output, int radius ) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		if (isConcurrent(input, CONCURRENT_MIN_PIXELS_VERTICAL)) {
-			ImplConvolveBox_MT.vertical(input, output, radius, workspacesI16.get());
-		} else {
-			ImplConvolveBox.vertical(input, output, radius, rowsI16.get());
+		GrowArray<DogArray<DogArray_I16>> workspaces = BoofConcurrency.takeRowBlocks_I16();
+		try {
+			if (isConcurrent(input, CONCURRENT_MIN_PIXELS_VERTICAL)) {
+				ImplConvolveBox_MT.vertical(input, output, radius, workspaces);
+			} else {
+				workspaces.reset();
+				ImplConvolveBox.vertical(input, output, radius, workspaces.grow());
+			}
+		} finally {
+			BoofConcurrency.releaseRowBlocks_I16();
 		}
 	}
 

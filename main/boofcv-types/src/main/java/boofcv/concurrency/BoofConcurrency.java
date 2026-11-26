@@ -19,10 +19,7 @@
 package boofcv.concurrency;
 
 import boofcv.misc.BoofMiscOps;
-import org.ddogleg.struct.DogArray_F32;
-import org.ddogleg.struct.DogArray_F64;
-import org.ddogleg.struct.DogArray_I32;
-import org.ddogleg.struct.DogArray_I64;
+import org.ddogleg.struct.*;
 import pabeles.concurrency.ConcurrencyOps;
 import pabeles.concurrency.GrowArray;
 import pabeles.concurrency.IntRangeObjectConsumer;
@@ -80,6 +77,12 @@ public class BoofConcurrency extends ConcurrencyOps {
 		}
 	}
 
+	// TODO Java will not vectorize if its not 100% sure the array isn't reading/writing to the same memory location.
+	//      Easiest way to do that is using separate arrays, hence localRowBlocks. However, this design limits array
+	//      reuse. Ideally, once the number of arrays needed is known, they would be pre-allocated. Then the location
+	//      or a reference to the array block passed in. There currently is no real clean way to do that right now which isn't
+	//      brittle or forces it to allocate a small temporary array.
+
 	static final ThreadLocal<LocalArrays<DogArray_I32>> localI32 = ThreadLocal.withInitial(() -> new LocalArrays<>(DogArray_I32::new));
 	static final ThreadLocal<LocalArrays<DogArray_I64>> localI64 = ThreadLocal.withInitial(() -> new LocalArrays<>(DogArray_I64::new));
 	static final ThreadLocal<LocalArrays<DogArray_F32>> localF32 = ThreadLocal.withInitial(() -> new LocalArrays<>(DogArray_F32::new));
@@ -87,10 +90,19 @@ public class BoofConcurrency extends ConcurrencyOps {
 	// Each block's array in sumBlocks
 	static final ThreadLocal<LocalArrays<GrowArray<DogArray_I32>>> localBlocks =
 			ThreadLocal.withInitial(() -> new LocalArrays<>(() -> new GrowArray<>(DogArray_I32::new)));
+	// Row buffers for each block of rows
+	static final ThreadLocal<LocalArrays<GrowArray<DogArray<DogArray_I16>>>> localRowBlocksI16 = localRowBlocks(DogArray_I16::new);
+	static final ThreadLocal<LocalArrays<GrowArray<DogArray<DogArray_I32>>>> localRowBlocksI32 = localRowBlocks(DogArray_I32::new);
+	static final ThreadLocal<LocalArrays<GrowArray<DogArray<DogArray_F32>>>> localRowBlocksF32 = localRowBlocks(DogArray_F32::new);
+	static final ThreadLocal<LocalArrays<GrowArray<DogArray<DogArray_F64>>>> localRowBlocksF64 = localRowBlocks(DogArray_F64::new);
+
+	static <T> ThreadLocal<LocalArrays<GrowArray<DogArray<T>>>> localRowBlocks( Supplier<T> row ) {
+		return ThreadLocal.withInitial(() -> new LocalArrays<>(() -> new GrowArray<>(() -> new DogArray<>(row::get))));
+	}
 
 	/// Sets the maximum number of threads available in the thread pool and adjusts USE\_CONCURRENT. If
 	/// the number of threads is less than 2 then USE\_CONCURRENT will be set to false and the single thread
-	/// version of code will be called. Otherwise USE\_CONCURRENT will be true and the max threads in the pool
+	/// version of code will be called. Otherwise, USE\_CONCURRENT will be true and the max threads in the pool
 	/// set to the specified number.
 	///
 	/// @param maxThreads Maximum number of threads. &le 1 means it will not be threaded.
@@ -115,13 +127,18 @@ public class BoofConcurrency extends ConcurrencyOps {
 	/// @throws IllegalStateException If an array is taken and not released
 	public static void clearThreadLocal() {
 		if (localI32.get().depth + localI64.get().depth + localF32.get().depth + localF64.get().depth +
-				localBlocks.get().depth != 0)
+				localBlocks.get().depth + localRowBlocksI16.get().depth + localRowBlocksI32.get().depth +
+				localRowBlocksF32.get().depth + localRowBlocksF64.get().depth != 0)
 			throw new IllegalStateException("A local work array is taken and not released");
 		localI32.remove();
 		localI64.remove();
 		localF32.remove();
 		localF64.remove();
 		localBlocks.remove();
+		localRowBlocksI16.remove();
+		localRowBlocksI32.remove();
+		localRowBlocksF32.remove();
+		localRowBlocksF64.remove();
 	}
 
 	/// Takes one of the calling thread's local work arrays. See the class description
@@ -147,6 +164,34 @@ public class BoofConcurrency extends ConcurrencyOps {
 
 	/// Releases the array last taken by {@link #takeArray_F64()}. See the class description
 	public static void releaseArray_F64() {localF64.get().release();}
+
+	/// Takes one of the calling thread's local sets of row buffers, one set for each block of rows. See the class
+	/// description
+	public static GrowArray<DogArray<DogArray_I16>> takeRowBlocks_I16() {return localRowBlocksI16.get().take();}
+
+	/// Releases the row buffers last taken by {@link #takeRowBlocks_I16()}. See the class description
+	public static void releaseRowBlocks_I16() {localRowBlocksI16.get().release();}
+
+	/// Takes one of the calling thread's local sets of row buffers, one set for each block of rows. See the class
+	/// description
+	public static GrowArray<DogArray<DogArray_I32>> takeRowBlocks_I32() {return localRowBlocksI32.get().take();}
+
+	/// Releases the row buffers last taken by {@link #takeRowBlocks_I32()}. See the class description
+	public static void releaseRowBlocks_I32() {localRowBlocksI32.get().release();}
+
+	/// Takes one of the calling thread's local sets of row buffers, one set for each block of rows. See the class
+	/// description
+	public static GrowArray<DogArray<DogArray_F32>> takeRowBlocks_F32() {return localRowBlocksF32.get().take();}
+
+	/// Releases the row buffers last taken by {@link #takeRowBlocks_F32()}. See the class description
+	public static void releaseRowBlocks_F32() {localRowBlocksF32.get().release();}
+
+	/// Takes one of the calling thread's local sets of row buffers, one set for each block of rows. See the class
+	/// description
+	public static GrowArray<DogArray<DogArray_F64>> takeRowBlocks_F64() {return localRowBlocksF64.get().take();}
+
+	/// Releases the row buffers last taken by {@link #takeRowBlocks_F64()}. See the class description
+	public static void releaseRowBlocks_F64() {localRowBlocksF64.get().release();}
 
 	/// Each block of indexes from 'start' to 'endExclusive' is given its own zeroed array, which 'consumer' adds to,
 	/// and the arrays are then added to 'total'. Only the first total.length elements of a block's array are used.
