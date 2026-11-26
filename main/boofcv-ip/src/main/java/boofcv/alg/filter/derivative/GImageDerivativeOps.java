@@ -347,13 +347,17 @@ public class GImageDerivativeOps {
 	 * Creates a new instance of the default border for derivatives of integer images
 	 */
 	public static ImageBorder_S32 borderDerivative_I32() {
-		return new ImageBorder1D_S32(BorderIndex1D_Extend::new);
+		var border = new ImageBorder1D_S32(BorderIndex1D_Extend::new);
+		border.type = BorderType.EXTENDED;
+		return border;
 	}
 
 	/**
 	 * Creates a new instance of the default border for derivatives of GrayF32
 	 */
 	public static ImageBorder_F32 borderDerivative_F32() {
-		return new ImageBorder1D_F32(BorderIndex1D_Extend::new);
+		var border = new ImageBorder1D_F32(BorderIndex1D_Extend::new);
+		border.type = BorderType.EXTENDED;
+		return border;
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,7 +53,7 @@ public class ImageBorder1D_IL_S64 extends ImageBorder_IL_S64 implements ImageBor
 
 	@Override
 	public ImageBorder1D_IL_S64 copy() {
-		return new ImageBorder1D_IL_S64(this.rowWrap.copy(), this.colWrap.copy());
+		return copyType(new ImageBorder1D_IL_S64(this.rowWrap.copy(), this.colWrap.copy()));
 	}
 
 	@Override

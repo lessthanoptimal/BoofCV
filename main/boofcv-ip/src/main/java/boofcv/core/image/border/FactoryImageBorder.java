@@ -153,23 +153,29 @@ public class FactoryImageBorder {
 				factory = BorderIndex1D_Wrap::new;
 				break;
 
-			case ZERO:
-				return (Border)FactoryImageBorder.singleValue(0, imageType);
+			case ZERO: {
+				ImageBorder<T> border = FactoryImageBorder.singleValue(0, imageType);
+				border.type = BorderType.ZERO;
+				return (Border)border;
+			}
 
 			default:
 				throw new IllegalArgumentException("Border type not supported: "+borderType);
 		}
 
+		ImageBorder border;
 		if( imageType == GrayF32.class )
-			return (Border)new ImageBorder1D_F32(factory);
-		if( imageType == GrayF64.class )
-			return (Border)new ImageBorder1D_F64(factory);
+			border = new ImageBorder1D_F32(factory);
+		else if( imageType == GrayF64.class )
+			border = new ImageBorder1D_F64(factory);
 		else if( GrayI.class.isAssignableFrom(imageType) )
-			return (Border)new ImageBorder1D_S32(factory);
+			border = new ImageBorder1D_S32(factory);
 		else if( imageType == GrayS64.class )
-			return (Border)new ImageBorder1D_S64(factory);
+			border = new ImageBorder1D_S64(factory);
 		else
 			throw new IllegalArgumentException("Unknown image type: "+imageType.getSimpleName());
+		border.type = borderType;
+		return (Border)border;
 	}
 
 	/**
@@ -208,23 +214,29 @@ public class FactoryImageBorder {
 				factory = BorderIndex1D_Wrap::new;
 				break;
 
-			case ZERO:
-				return FactoryImageBorder.interleavedValue(0, imageType);
+			case ZERO: {
+				ImageBorder<T> border = FactoryImageBorder.interleavedValue(0, imageType);
+				border.type = BorderType.ZERO;
+				return border;
+			}
 
 			default:
 				throw new IllegalArgumentException("Border type not supported: "+borderType);
 		}
 
+		ImageBorder border;
 		if( imageType == InterleavedF32.class )
-			return (ImageBorder<T>)new ImageBorder1D_IL_F32(factory);
+			border = new ImageBorder1D_IL_F32(factory);
 		else if( imageType == InterleavedF64.class )
-			return (ImageBorder<T>)new ImageBorder1D_IL_F64(factory);
+			border = new ImageBorder1D_IL_F64(factory);
 		else if( InterleavedInteger.class.isAssignableFrom(imageType) )
-			return (ImageBorder<T>)new ImageBorder1D_IL_S32(factory);
+			border = new ImageBorder1D_IL_S32(factory);
 		else if( imageType == InterleavedS64.class )
-			return (ImageBorder<T>)new ImageBorder1D_IL_S64(factory);
+			border = new ImageBorder1D_IL_S64(factory);
 		else
 			throw new IllegalArgumentException("Unknown image type: "+imageType.getSimpleName());
+		border.type = borderType;
+		return (ImageBorder<T>)border;
 	}
 
 	/**

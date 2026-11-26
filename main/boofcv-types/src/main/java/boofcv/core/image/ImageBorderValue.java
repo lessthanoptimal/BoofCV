@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -97,7 +97,7 @@ public class ImageBorderValue {
 
 		@Override
 		public Value_I64 copy() {
-			return new Value_I64(value);
+			return copyType(new Value_I64(value));
 		}
 	}
 
@@ -125,7 +125,7 @@ public class ImageBorderValue {
 
 		@Override
 		public Value_F64 copy() {
-			return new Value_F64(value);
+			return copyType(new Value_F64(value));
 		}
 	}
 
@@ -153,7 +153,7 @@ public class ImageBorderValue {
 
 		@Override
 		public Value_F32 copy() {
-			return new Value_F32(value);
+			return copyType(new Value_F32(value));
 		}
 	}
 
@@ -181,7 +181,9 @@ public class ImageBorderValue {
 
 		@Override
 		public Value_I copy() {
-			return new Value_I(value);
+			var copy = new Value_I(value);
+			copy.type = type;
+			return copy;
 		}
 	}
 
@@ -205,7 +207,7 @@ public class ImageBorderValue {
 
 		@Override
 		public Value_IL_F32 copy() {
-			return new Value_IL_F32(value);
+			return copyType(new Value_IL_F32(value));
 		}
 	}
 
@@ -229,7 +231,7 @@ public class ImageBorderValue {
 
 		@Override
 		public Value_IL_F64 copy() {
-			return new Value_IL_F64(value);
+			return copyType(new Value_IL_F64(value));
 		}
 	}
 
@@ -253,7 +255,9 @@ public class ImageBorderValue {
 
 		@Override
 		public Value_IL_S32 copy() {
-			return new Value_IL_S32(value);
+			var copy = new Value_IL_S32(value);
+			copy.type = type;
+			return copy;
 		}
 	}
 
@@ -277,7 +281,7 @@ public class ImageBorderValue {
 
 		@Override
 		public Value_IL_S64 copy() {
-			return new Value_IL_S64(value);
+			return copyType(new Value_IL_S64(value));
 		}
 	}
 }

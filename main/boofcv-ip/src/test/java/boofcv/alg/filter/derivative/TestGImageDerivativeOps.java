@@ -18,6 +18,7 @@
 
 package boofcv.alg.filter.derivative;
 
+import boofcv.struct.border.BorderType;
 import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
@@ -40,5 +41,10 @@ public class TestGImageDerivativeOps extends BoofStandardJUnit {
 
 		assertSame(GradientTwo1.kernel_I32, GImageDerivativeOps.lookupKernelX(DerivativeType.TWO_1, true));
 		assertSame(GradientTwo1.kernel_F32, GImageDerivativeOps.lookupKernelX(DerivativeType.TWO_1, false));
+	}
+
+	@Test void borderDerivative() {
+		assertSame(BorderType.EXTENDED, GImageDerivativeOps.borderDerivative_I32().type);
+		assertSame(BorderType.EXTENDED, GImageDerivativeOps.borderDerivative_F32().type);
 	}
 }

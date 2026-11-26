@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
  * Common tests for implementers of {@link ImageBorder}.
@@ -138,8 +139,10 @@ public abstract class GenericImageBorderTests<T extends ImageBase<T>> extends Bo
 			fillUniform(img, rand, 0, 100);
 
 			ImageBorder<T> borderA = wrap(img);
+			borderA.type = BorderType.REFLECT;
 			ImageBorder<T> borderB = borderA.copy();
 			borderB.setImage(img);
+			assertSame(borderA.type, borderB.type);
 
 			checkEquals(1, 1, borderA, borderB);
 			checkEquals(0, 0, borderA, borderB);
