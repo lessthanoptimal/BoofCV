@@ -21,9 +21,6 @@ package boofcv.alg.filter.derivative;
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.convolve.ConvolveImage;
 import boofcv.alg.filter.convolve.ConvolveImageNoBorder;
-import boofcv.core.image.border.BorderIndex1D_Extend;
-import boofcv.struct.border.ImageBorder1D_F32;
-import boofcv.struct.border.ImageBorder1D_S32;
 import boofcv.struct.border.ImageBorder_F32;
 import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.image.GrayF32;
@@ -113,7 +110,7 @@ public class HessianFromGradient {
 
 		if (border != null)
 			ConvolveImage.convolve(GradientSobel.kernelY_I32, inputDerivY, derivYY,
-					new ImageBorder1D_S32(BorderIndex1D_Extend::new));
+					GImageDerivativeOps.borderDerivative_I32());
 		else
 			ConvolveImageNoBorder.convolve(GradientSobel.kernelY_I32, inputDerivY, derivYY);
 	}
@@ -137,7 +134,7 @@ public class HessianFromGradient {
 
 		if (border != null)
 			ConvolveImage.convolve(GradientSobel.kernelY_F32, inputDerivY, derivYY,
-					new ImageBorder1D_F32(BorderIndex1D_Extend::new));
+					GImageDerivativeOps.borderDerivative_F32());
 		else
 			ConvolveImageNoBorder.convolve(GradientSobel.kernelY_F32, inputDerivY, derivYY);
 	}
@@ -161,7 +158,7 @@ public class HessianFromGradient {
 
 		if (border != null)
 			ConvolveImage.vertical(GradientThree.kernel_I32, inputDerivY, derivYY,
-					new ImageBorder1D_S32(BorderIndex1D_Extend::new));
+					GImageDerivativeOps.borderDerivative_I32());
 		else
 			ConvolveImageNoBorder.vertical(GradientThree.kernel_I32, inputDerivY, derivYY);
 	}
@@ -185,7 +182,7 @@ public class HessianFromGradient {
 
 		if (border != null)
 			ConvolveImage.vertical(GradientThree.kernel_F32, inputDerivY, derivYY,
-					new ImageBorder1D_F32(BorderIndex1D_Extend::new));
+					GImageDerivativeOps.borderDerivative_F32());
 		else
 			ConvolveImageNoBorder.vertical(GradientThree.kernel_F32, inputDerivY, derivYY);
 	}

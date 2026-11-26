@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.struct.border;
 
 import boofcv.struct.image.ImageBase;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * A wrapper around a normal image that returns a numeric value if a pixel is requested that is outside of the image
@@ -30,6 +31,9 @@ import boofcv.struct.image.ImageBase;
 public abstract class ImageBorder<T extends ImageBase<T>> {
 
 	protected T image;
+
+	/// If not null, then border is a standard border. Needed for BOverride.
+	public @Nullable BorderType type;
 
 	protected ImageBorder( T image ) {
 		setImage(image);
@@ -50,4 +54,10 @@ public abstract class ImageBorder<T extends ImageBase<T>> {
 	public abstract void setGeneral( int x, int y, double[] pixel );
 
 	public abstract ImageBorder<T> copy();
+
+	/// Copies the type into 'copy'
+	protected <B extends ImageBorder<T>> B copyType( B copy ) {
+		copy.type = type;
+		return copy;
+	}
 }

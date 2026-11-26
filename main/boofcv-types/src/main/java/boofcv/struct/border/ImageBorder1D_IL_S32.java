@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2026, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,7 +54,7 @@ public class ImageBorder1D_IL_S32<T extends InterleavedInteger<T>>
 
 	@Override
 	public ImageBorder1D_IL_S32<T> copy() {
-		return new ImageBorder1D_IL_S32<>(this.rowWrap.copy(), this.colWrap.copy());
+		return copyType(new ImageBorder1D_IL_S32<>(this.rowWrap.copy(), this.colWrap.copy()));
 	}
 
 	@Override

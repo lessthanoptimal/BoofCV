@@ -26,11 +26,14 @@ import boofcv.testing.BoofStandardJUnit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 class TestFactoryImageBorder extends BoofStandardJUnit {
 	Class[] grayTypes = {GrayU8.class, GrayS8.class, GrayU16.class, GrayS16.class, GrayS32.class, GrayS64.class,
 			GrayF32.class, GrayF64.class};
+	/// Borders which read pixels outside the image
+	BorderType[] borders = {BorderType.EXTENDED, BorderType.REFLECT, BorderType.WRAP, BorderType.ZERO};
 
 	/// Every gray image type can have a border with a constant value
 	@Test void singleValue_everyGrayType() {
@@ -39,12 +42,13 @@ class TestFactoryImageBorder extends BoofStandardJUnit {
 			border.setImage(GeneralizedImageOps.createSingleBand(type, 5, 4));
 			assertEquals(7.0, getGeneral(border, -1, 2), type.getSimpleName());
 			assertEquals(7.0, getGeneral(border, 5, 4), type.getSimpleName());
+			// a value border isn't a standard border, even if the value is zero
+			assertNull(border.type);
 		}
 	}
 
 	/// Every gray image type can have every border which reads pixels outside the image
 	@Test void single_everyGrayType() {
-		BorderType[] borders = {BorderType.EXTENDED, BorderType.REFLECT, BorderType.WRAP, BorderType.ZERO};
 		for (Class type : grayTypes) {
 			ImageGray image = GeneralizedImageOps.createSingleBand(type, 5, 4);
 			GeneralizedImageOps.set(image, 0, 2, 3);
@@ -54,7 +58,19 @@ class TestFactoryImageBorder extends BoofStandardJUnit {
 				// one pixel to the left of (0,2) is (0,2) for extended, (1,2) for reflect, (4,2) for wrap
 				double expected = borderType == BorderType.EXTENDED ? 3 : 0;
 				assertEquals(expected, getGeneral(border, -1, 2), type.getSimpleName() + " " + borderType);
+				assertEquals(borderType, border.type);
 			}
+		}
+	}
+
+	@Test void interleaved_type() {
+		Class[] types = {InterleavedU8.class, InterleavedS32.class, InterleavedS64.class, InterleavedF32.class,
+				InterleavedF64.class};
+		for (Class type : types) {
+			for (BorderType borderType : borders) {
+				assertEquals(borderType, FactoryImageBorder.interleaved(borderType, type).type);
+			}
+			assertNull(FactoryImageBorder.interleavedValue(0, type).type);
 		}
 	}
 
