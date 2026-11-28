@@ -102,8 +102,10 @@ public class FactoryThresholdBinary {
 	protected static <T extends ImageGray<T>>
 	InputToBinary<T> localNiblackFamily( ThresholdNiblackFamily.Variant variant,
 										 ConfigLength width, boolean down, float k, Class<T> inputType ) {
-		if (BOverrideFactoryThresholdBinary.localSauvola != null)
-			throw new RuntimeException("Update how overrides are handled for Niblack family");
+		InputToBinary<T> filter = override(BOverrideFactoryThresholdBinary.localNiblackFamily,
+				hook -> hook.handle(variant, width, k, down, inputType));
+		if (filter != null)
+			return filter;
 
 		InputToBinary<GrayF32> sauvola;
 		if (BoofConcurrency.USE_CONCURRENT) {
