@@ -65,6 +65,9 @@ public class TestFactoryThresholdBinary extends BoofStandardJUnit {
 		ConfigLength width = ConfigLength.fixed(5);
 		Class<GrayU8> type = GrayU8.class;
 		assertNotNull(FactoryThresholdBinary.localGaussian(width, 1.0, true, type));
+		assertNotNull(FactoryThresholdBinary.localNiblack(width, true, 0.3f, type));
+		assertNotNull(FactoryThresholdBinary.localSauvola(width, true, 0.3f, type));
+		assertNotNull(FactoryThresholdBinary.localWolf(width, true, 0.3f, type));
 		assertNotNull(FactoryThresholdBinary.localMean(width, 1.0, true, type));
 		assertNotNull(FactoryThresholdBinary.localOtsu(width, 1.0, true, false, 0.1, type));
 		assertNotNull(FactoryThresholdBinary.blockMinMax(width, 1.0, true, true, 2.0, type));
@@ -74,8 +77,9 @@ public class TestFactoryThresholdBinary extends BoofStandardJUnit {
 		assertNotNull(FactoryThresholdBinary.globalFixed(10, true, type));
 		assertNotNull(FactoryThresholdBinary.globalOtsu(0, 255, 1.0, true, type));
 
-		assertEquals(List.of("localGaussian", "localMean", "localOtsu", "blockMinMax", "blockMean", "blockOtsu",
-				"globalEntropy", "globalFixed", "globalOtsu"), called);
+		assertEquals(List.of("localGaussian", "localNiblackFamily", "localNiblackFamily", "localNiblackFamily",
+				"localMean", "localOtsu", "blockMinMax", "blockMean", "blockOtsu", "globalEntropy", "globalFixed",
+				"globalOtsu"), called);
 	}
 
 	/// If an override returns a filter, the factory returns it

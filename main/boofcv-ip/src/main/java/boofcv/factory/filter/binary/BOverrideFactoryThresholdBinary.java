@@ -19,6 +19,7 @@
 package boofcv.factory.filter.binary;
 
 import boofcv.abst.filter.binary.InputToBinary;
+import boofcv.alg.filter.binary.ThresholdNiblackFamily;
 import boofcv.override.BOverrideClass;
 import boofcv.override.BOverrideManager;
 import boofcv.struct.ConfigLength;
@@ -34,7 +35,7 @@ public class BOverrideFactoryThresholdBinary extends BOverrideClass {
 	public static @Nullable GlobalFixed globalFixed;
 	public static @Nullable GlobalOtsu globalOtsu;
 	public static @Nullable LocalGaussian localGaussian;
-	public static @Nullable LocalSauvola localSauvola;
+	public static @Nullable LocalNiblackFamily localNiblackFamily;
 	public static @Nullable LocalMean localMean;
 	public static @Nullable LocalOtsu localOtsu;
 	public static @Nullable LocalBlockMinMax blockMinMax;
@@ -65,9 +66,10 @@ public class BOverrideFactoryThresholdBinary extends BOverrideClass {
 		@Nullable InputToBinary<T> handle( ConfigLength regionWidth, double scale, boolean down, Class<T> inputType );
 	}
 
-	public interface LocalSauvola {
+	public interface LocalNiblackFamily {
 		<T extends ImageGray<T>>
-		@Nullable InputToBinary<T> handle( ConfigLength regionWidth, float k, boolean down, Class<T> inputType );
+		@Nullable InputToBinary<T> handle( ThresholdNiblackFamily.Variant variant, ConfigLength regionWidth, float k,
+										   boolean down, Class<T> inputType );
 	}
 
 	public interface LocalMean {
