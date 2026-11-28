@@ -125,8 +125,10 @@ public class FactoryThresholdBinary {
 	/// @return Filter to binary
 	public static <T extends ImageGray<T>>
 	InputToBinary<T> localNick( ConfigLength width, boolean down, float k, Class<T> inputType ) {
-//		if( BOverrideFactoryThresholdBinary.localNick != null )
-//			return BOverrideFactoryThresholdBinary.localNick.handle(width, k, down, inputType);
+		InputToBinary<T> filter = override(BOverrideFactoryThresholdBinary.localNick,
+				hook -> hook.handle(width, k, down, inputType));
+		if (filter != null)
+			return filter;
 		return new InputToBinarySwitch<>(new ThresholdNick(width, k, down), inputType);
 	}
 
