@@ -36,6 +36,7 @@ public class BOverrideFactoryThresholdBinary extends BOverrideClass {
 	public static @Nullable GlobalOtsu globalOtsu;
 	public static @Nullable LocalGaussian localGaussian;
 	public static @Nullable LocalNiblackFamily localNiblackFamily;
+	public static @Nullable LocalNick localNick;
 	public static @Nullable LocalMean localMean;
 	public static @Nullable LocalOtsu localOtsu;
 	public static @Nullable LocalBlockMinMax blockMinMax;
@@ -70,6 +71,11 @@ public class BOverrideFactoryThresholdBinary extends BOverrideClass {
 		<T extends ImageGray<T>>
 		@Nullable InputToBinary<T> handle( ThresholdNiblackFamily.Variant variant, ConfigLength regionWidth, float k,
 										   boolean down, Class<T> inputType );
+	}
+
+	public interface LocalNick {
+		<T extends ImageGray<T>>
+		@Nullable InputToBinary<T> handle( ConfigLength regionWidth, float k, boolean down, Class<T> inputType );
 	}
 
 	public interface LocalMean {
